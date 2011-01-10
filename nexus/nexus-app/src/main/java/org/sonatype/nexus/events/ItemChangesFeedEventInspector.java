@@ -102,7 +102,7 @@ public class ItemChangesFeedEventInspector
 
                 NexusArtifactEvent nae = new NexusArtifactEvent( ievt.getEventDate(), action, "", ai );
                 // set context
-                nae.addEventContext( ievt.getContext() );
+                nae.addEventContext( ievt.getItemContext() );
                 // set attributes
                 nae.addItemAttributes( ievt.getItem().getAttributes() );
 

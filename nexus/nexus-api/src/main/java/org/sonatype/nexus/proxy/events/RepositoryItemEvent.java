@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.proxy.events;
 
-import org.sonatype.nexus.proxy.RequestContext;
+import java.util.Map;
+
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -33,12 +34,16 @@ public abstract class RepositoryItemEvent
 {
     /** The item in question */
     private final StorageItem item;
+    
+    private final Map<String, Object> itemContext;
 
     public RepositoryItemEvent( final Repository repository, final StorageItem item )
     {
         super( repository );
 
         this.item = item;
+        
+        this.itemContext = item.getItemContext().flatten();
     }
 
     /**
@@ -52,13 +57,14 @@ public abstract class RepositoryItemEvent
     }
 
     /**
-     * Gets the item context. Shortcut for item.getItemContext().
+     * Gets the item context. A snapshot of item.getItemContext() in creation moment of this event, since
+     * item.getItemContenxt() is mutable is is probably changed when some async processor will process this event!
      * 
      * @return the item context
      */
-    public RequestContext getContext()
+    public Map<String, Object> getItemContext()
     {
-        return item.getItemContext();
+        return itemContext;
     }
 
     /**
