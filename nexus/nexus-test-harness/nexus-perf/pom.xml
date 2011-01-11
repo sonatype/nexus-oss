@@ -28,7 +28,6 @@
   </parent>
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-perf</artifactId>
-  <version>1.9-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>nexus-perf</name>
   <description>Nexus Perf Parent</description>
