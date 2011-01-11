@@ -41,14 +41,14 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-repository-metadata-model</artifactId>
-        <version>${nexus.version}</version>
+        <version>${project.version}</version>
         <type>jar</type>
         <scope>compile</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-repository-metadata-api</artifactId>
-        <version>${nexus.version}</version>
+        <version>${project.version}</version>
         <type>jar</type>
         <scope>compile</scope>
       </dependency>
