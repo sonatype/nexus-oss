@@ -11,7 +11,7 @@
   </parent>
 
   <artifactId>nexus-archetype-common</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
 
   <name>Nexus Maven Archetype Catalog Plugin Common</name>
 
@@ -138,11 +138,4 @@
 
     </plugins>
   </build>
-
-
-  <scm>
-    <connection>scm:svn:http://svn.sonatype.org/spice/tags/nexus-archetype-common-1.1</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/spice/tags/nexus-archetype-common-1.1</developerConnection>
-    <url>http://svn.sonatype.org/spice/tags/nexus-archetype-common-1.1</url>
-  </scm>
 </project>
