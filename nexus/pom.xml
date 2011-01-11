@@ -160,7 +160,7 @@
 
   <!-- Shortcuts for outnumbered deps :) -->
   <properties>
-    <maven.indexer.version>4.0.0-SNAPSHOT</maven.indexer.version>
+    <maven.indexer.version>4.0.0</maven.indexer.version>
     <maven.version>3.0.1</maven.version>
     <aether.version>1.8</aether.version>
 
