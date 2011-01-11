@@ -18,14 +18,13 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.maven.index.artifact.GavCalculator;
 import org.codehaus.plexus.logging.Logger;
-import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentLocator;
@@ -34,7 +33,6 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
  * Default MetadataHelper in Nexus, works based on a Repository.
@@ -55,35 +53,32 @@ public class DefaultMetadataHelper
 
     @Override
     public void store( String content, String path )
-        throws Exception
+        throws IOException
     {
         ContentLocator contentLocator = new StringContentLocator( content );
 
-        storeItem( path, contentLocator );
+        putStorageItem( path, contentLocator );
     }
 
     @Override
     public void remove( String path )
-        throws StorageException,
-            UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException
+        throws IOException
     {
-        repository.deleteItem( false, new ResourceStoreRequest( path, true ) );
+        deleteStorageItem( path );
     }
 
     @Override
     public boolean exists( String path )
-        throws StorageException
+        throws IOException
     {
         return repository.getLocalStorage().containsItem( repository, new ResourceStoreRequest( path, true ) );
     }
 
     @Override
     public InputStream retrieveContent( String path )
-        throws Exception
+        throws IOException
     {
-        StorageItem item = repository.retrieveItem( false, new ResourceStoreRequest( path, false ) );
+        StorageItem item = getStorageItem( path, false );
 
         if ( item instanceof StorageFileItem )
         {
@@ -105,7 +100,7 @@ public class DefaultMetadataHelper
 
         try
         {
-            if ( getStorageItem( path ).isVirtual() )
+            if ( getStorageItem( path, true ).isVirtual() )
             {
                 return false;
             }
@@ -120,39 +115,62 @@ public class DefaultMetadataHelper
 
     @Override
     public String buildMd5( String path )
-        throws StorageException,
-            ItemNotFoundException
+        throws IOException
     {
-        return getStorageItem( path ).getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
+        return getStorageItem( path, true ).getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
     }
 
     @Override
     public String buildSh1( String path )
-        throws StorageException,
-            ItemNotFoundException
+        throws IOException
     {
-        return getStorageItem( path ).getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+        return getStorageItem( path, true ).getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
     }
 
-    private AbstractStorageItem getStorageItem( String path )
-        throws StorageException,
-            ItemNotFoundException
+    private AbstractStorageItem getStorageItem( final String path, final boolean localOnly )
+        throws IOException
     {
-        return repository.getLocalStorage().retrieveItem( repository, new ResourceStoreRequest( path, true ) );
+        try
+        {
+            return repository.getLocalStorage().retrieveItem( repository, new ResourceStoreRequest( path, localOnly ) );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            throw new IOException( "Item not found!", e );
+        }
     }
 
-    private void storeItem( String path, ContentLocator contentLocator )
-        throws StorageException,
-            UnsupportedStorageOperationException,
-            IllegalOperationException
+    private void putStorageItem( final String path, final ContentLocator contentLocator )
+        throws IOException
     {
-        ResourceStoreRequest req = new ResourceStoreRequest( path );
+        try
+        {
+            ResourceStoreRequest req = new ResourceStoreRequest( path );
 
-        DefaultStorageFileItem mdFile = new DefaultStorageFileItem( repository, req, true, true, contentLocator );
+            DefaultStorageFileItem mdFile = new DefaultStorageFileItem( repository, req, true, true, contentLocator );
 
-        repository.storeItem( false, mdFile );
+            repository.storeItem( false, mdFile );
 
-        repository.removeFromNotFoundCache( req );
+            // TODO: why? storeItem() already does this!!!
+            repository.removeFromNotFoundCache( req );
+        }
+        catch ( Exception e )
+        {
+            throw new IOException( e );
+        }
+    }
+
+    private void deleteStorageItem( final String path )
+        throws IOException
+    {
+        try
+        {
+            repository.deleteItem( false, new ResourceStoreRequest( path, true ) );
+        }
+        catch ( Exception e )
+        {
+            throw new IOException( e );
+        }
     }
 
     @Override

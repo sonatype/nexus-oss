@@ -18,12 +18,12 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
-import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
 
 /**
  * @author juven
@@ -45,7 +45,7 @@ public abstract class AbstractMetadataProcessor
      * @throws Exception
      */
     public boolean process( String path )
-        throws Exception
+        throws IOException
     {
         if ( !shouldProcessMetadata( path ) )
         {
@@ -79,25 +79,23 @@ public abstract class AbstractMetadataProcessor
     }
 
     protected boolean isMetadataExisted( String path )
-        throws Exception
+        throws IOException
     {
         return metadataHelper.exists( path + METADATA_SUFFIX );
     }
 
     protected Metadata readMetadata( String path )
-        throws Exception
+        throws IOException
     {
-        InputStream mdStream = null;
+        InputStream mdStream = metadataHelper.retrieveContent( path + METADATA_SUFFIX );
 
         try
         {
-            mdStream = metadataHelper.retrieveContent( path + METADATA_SUFFIX );
-
             Metadata md = MetadataBuilder.read( mdStream );
 
             return md;
         }
-        catch ( MetadataException e )
+        catch ( IOException e )
         {
             if ( metadataHelper.logger.isDebugEnabled() )
             {
@@ -117,24 +115,24 @@ public abstract class AbstractMetadataProcessor
     }
 
     protected void removedMetadata( String path )
-        throws Exception
+        throws IOException
     {
         metadataHelper.remove( path + METADATA_SUFFIX );
     }
 
     protected void buildMetadataChecksum( String path )
-        throws Exception
+        throws IOException
     {
         metadataHelper.rebuildChecksum( path + METADATA_SUFFIX );
     }
 
     protected abstract boolean isMetadataCorrect( Metadata metadata, String path )
-        throws Exception;
+        throws IOException;
 
     protected abstract boolean shouldProcessMetadata( String path );
 
     protected abstract void processMetadata( String path )
-        throws Exception;
+        throws IOException;
 
     protected abstract void postProcessMetadata( String path );
 }

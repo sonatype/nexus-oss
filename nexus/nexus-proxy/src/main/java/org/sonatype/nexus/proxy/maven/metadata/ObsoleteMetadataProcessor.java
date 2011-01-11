@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata;
 
+import java.io.IOException;
+
 import org.apache.maven.artifact.repository.metadata.Metadata;
 
 /**
@@ -39,7 +41,7 @@ public class ObsoleteMetadataProcessor
      */
     @Override
     protected boolean isMetadataCorrect( Metadata oldMd, String path )
-        throws Exception
+        throws IOException
     {
         return false;
     }
@@ -52,7 +54,7 @@ public class ObsoleteMetadataProcessor
 
     @Override
     protected void processMetadata( String path )
-        throws Exception
+        throws IOException
     {
         // do nothing
     }

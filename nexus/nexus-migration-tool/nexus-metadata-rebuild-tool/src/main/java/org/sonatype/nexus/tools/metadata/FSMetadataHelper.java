@@ -19,17 +19,16 @@
 package org.sonatype.nexus.tools.metadata;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
-import java.security.MessageDigest;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.maven.index.artifact.GavCalculator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.proxy.maven.metadata.AbstractMetadataHelper;
+import org.sonatype.nexus.util.DigesterUtils;
 
 @Component( role = FSMetadataHelper.class )
 public class FSMetadataHelper
@@ -47,31 +46,18 @@ public class FSMetadataHelper
 
     @Override
     public InputStream retrieveContent( String path )
+        throws IOException
     {
-        try
-        {
-            return new FileInputStream( repo + path );
-        }
-        catch ( FileNotFoundException e )
-        {
-            throw new RuntimeException( "Can't find file: " + repo + path );
-        }
+        return new FileInputStream( repo + path );
     }
 
     @Override
     public void store( String content, String path )
+        throws IOException
     {
         String file = repo + path;
 
-        try
-        {
-            FileUtils.fileWrite( file, content );
-        }
-        catch ( Exception e )
-        {
-            throw new RuntimeException( "Can't write content to: " + file, e );
-        }
-
+        FileUtils.fileWrite( file, content );
     }
 
     @Override
@@ -93,76 +79,21 @@ public class FSMetadataHelper
     // copy from org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector
     @Override
     public String buildMd5( String path )
-        throws Exception
+        throws IOException
     {
-        InputStream fis = retrieveContent( path );
-
-        try
-        {
-            byte[] buffer = new byte[1024];
-
-            MessageDigest md5 = MessageDigest.getInstance( "MD5" );
-
-            int numRead;
-
-            do
-            {
-                numRead = fis.read( buffer );
-
-                if ( numRead > 0 )
-                {
-                    md5.update( buffer, 0, numRead );
-                }
-            }
-            while ( numRead != -1 );
-
-            return new String( Hex.encodeHex( md5.digest() ) );
-
-        }
-        finally
-        {
-            fis.close();
-        }
+        return DigesterUtils.getMd5Digest( retrieveContent( path ) );
     }
 
     @Override
     public String buildSh1( String path )
-        throws Exception
+        throws IOException
     {
-        InputStream fis = retrieveContent( path );
-
-        try
-        {
-            byte[] buffer = new byte[1024];
-
-            MessageDigest sha1 = MessageDigest.getInstance( "SHA1" );
-
-            int numRead;
-
-            do
-            {
-                numRead = fis.read( buffer );
-
-                if ( numRead > 0 )
-                {
-                    sha1.update( buffer, 0, numRead );
-
-                }
-            }
-            while ( numRead != -1 );
-
-            return new String( Hex.encodeHex( sha1.digest() ) );
-
-        }
-        finally
-        {
-            fis.close();
-        }
+        return DigesterUtils.getSha1Digest( retrieveContent( path ) );
     }
 
     @Override
     public void remove( String path )
-        throws Exception
+        throws IOException
     {
         FileUtils.forceDelete( repo + path );
     }

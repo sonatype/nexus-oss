@@ -18,11 +18,10 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -31,6 +30,7 @@ import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.codehaus.plexus.util.WriterFactory;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 /**
  * utility class to help with de/serializing metadata from/to XML
@@ -48,40 +48,20 @@ public class MetadataBuilder
      * @throws MetadataException
      */
     public static Metadata read( InputStream in )
-        throws MetadataException
+        throws IOException
     {
         try
         {
             return new MetadataXpp3Reader().read( in );
         }
-        catch ( Exception e )
+        catch ( NullPointerException e )
         {
-            throw new MetadataException( e );
+            // XPP3 parser throws NPE on some malformed XMLs
+            throw new IOException( "Malformed XML!", e );
         }
-    }
-
-    /**
-     * instantiate Metadata from a byte array
-     * 
-     * @param in
-     * @return
-     * @throws MetadataException
-     */
-    public static Metadata getMetadata( byte[] in )
-        throws MetadataException
-    {
-        if ( in == null || in.length < 10 )
+        catch ( XmlPullParserException e )
         {
-            return null;
-        }
-
-        try
-        {
-            return new MetadataXpp3Reader().read( new ByteArrayInputStream( in ) );
-        }
-        catch ( Exception e )
-        {
-            throw new MetadataException( e );
+            throw new IOException( e );
         }
     }
 
@@ -94,23 +74,16 @@ public class MetadataBuilder
      * @throws MetadataException if any problems occurred
      */
     public static Metadata write( Metadata metadata, OutputStream out )
-        throws MetadataException
+        throws IOException
     {
         if ( metadata == null )
         {
             return metadata;
         }
 
-        try
-        {
-            new MetadataXpp3Writer().write( WriterFactory.newXmlWriter( out ), metadata );
+        new MetadataXpp3Writer().write( WriterFactory.newXmlWriter( out ), metadata );
 
-            return metadata;
-        }
-        catch ( Exception e )
-        {
-            throw new MetadataException( e );
-        }
+        return metadata;
     }
 
     /**
@@ -121,66 +94,7 @@ public class MetadataBuilder
      * @return changed serialized object
      * @throws MetadataException
      */
-    public static byte[] changeMetadata( byte[] metadataBytes, List<MetadataOperation> mutators )
-        throws MetadataException
-    {
-        if ( mutators == null || mutators.size() < 1 )
-        {
-            return metadataBytes;
-        }
-
-        Metadata metadata;
-        boolean changed = false;
-
-        if ( metadataBytes == null || metadataBytes.length < 10 )
-        {
-            metadata = new Metadata();
-        }
-        else
-        {
-            ByteArrayInputStream in = new ByteArrayInputStream( metadataBytes );
-            metadata = read( in );
-        }
-
-        for ( MetadataOperation op : mutators )
-        {
-            changed = op.perform( metadata ) || changed;
-        }
-
-        // TODO og: does not work - check
-        // if( !changed )
-        // return metadataBytes;
-
-        return getBytes( metadata );
-    }
-
-    /**
-     * marshall metadata into a byte array
-     * 
-     * @param metadata
-     * @return
-     * @throws MetadataException
-     */
-    public static byte[] getBytes( Metadata metadata )
-        throws MetadataException
-    {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        write( metadata, out );
-
-        byte[] res = out.toByteArray();
-
-        return res;
-    }
-
-    /**
-     * apply a list of operators to the specified serialized Metadata object
-     * 
-     * @param metadataBytes - serialized Metadata object
-     * @param mutators - operators
-     * @return changed serialized object
-     * @throws MetadataException
-     */
-    public static byte[] changeMetadata( Metadata metadata, List<MetadataOperation> mutators )
+    public static void changeMetadata( Metadata metadata, List<MetadataOperation> mutators )
         throws MetadataException
     {
 
@@ -198,31 +112,12 @@ public class MetadataBuilder
                 changed = op.perform( metadata ) || changed;
             }
         }
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        write( metadata, out );
-
-        byte[] res = out.toByteArray();
-
-        return res;
     }
 
-    public static byte[] changeMetadata( byte[] metadataBytes, MetadataOperation op )
+    public static void changeMetadata( Metadata metadata, MetadataOperation op )
         throws MetadataException
     {
-        ArrayList<MetadataOperation> ops = new ArrayList<MetadataOperation>( 1 );
-        ops.add( op );
-
-        return changeMetadata( metadataBytes, ops );
-    }
-
-    public static byte[] changeMetadata( Metadata metadata, MetadataOperation op )
-        throws MetadataException
-    {
-        ArrayList<MetadataOperation> ops = new ArrayList<MetadataOperation>( 1 );
-        ops.add( op );
-
-        return changeMetadata( metadata, ops );
+        changeMetadata( metadata, Collections.singletonList( op ) );
     }
 
     /**
@@ -263,26 +158,26 @@ public class MetadataBuilder
         }
 
         int pos = version.lastIndexOf( '-' );
-        
-        if( pos == -1 )
+
+        if ( pos == -1 )
         {
             throw new IllegalArgumentException();
         }
 
         String sbn = version.substring( pos + 1 );
-        
+
         int bn = Integer.parseInt( sbn );
         sn.setBuildNumber( bn );
-        
-        String sts = version.substring( 0, pos);
+
+        String sts = version.substring( 0, pos );
         pos = sts.lastIndexOf( '-' );
-        
-        if( pos == -1 )
+
+        if ( pos == -1 )
         {
             throw new IllegalArgumentException();
         }
-        
-        sn.setTimestamp( sts.substring( pos+1 ) );
+
+        sn.setTimestamp( sts.substring( pos + 1 ) );
 
         return sn;
     }

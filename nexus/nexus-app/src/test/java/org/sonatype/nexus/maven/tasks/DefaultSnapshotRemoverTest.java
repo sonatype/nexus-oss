@@ -20,7 +20,6 @@ package org.sonatype.nexus.maven.tasks;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -651,7 +650,7 @@ public class DefaultSnapshotRemoverTest
     }
 
     private Metadata readMavenMetadata( File mdFle )
-        throws FileNotFoundException, MetadataException
+        throws MetadataException, IOException
     {
         FileInputStream inputStream = new FileInputStream( mdFle );
         Metadata md = null;

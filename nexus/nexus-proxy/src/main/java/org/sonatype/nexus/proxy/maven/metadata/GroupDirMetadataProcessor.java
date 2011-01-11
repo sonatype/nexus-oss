@@ -21,6 +21,7 @@ package org.sonatype.nexus.proxy.maven.metadata;
 import static org.sonatype.nexus.proxy.maven.metadata.operations.MetadataUtil.isPluginEquals;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -48,7 +49,7 @@ public class GroupDirMetadataProcessor
 
     @Override
     public void processMetadata( String path )
-        throws Exception
+        throws IOException
     {
         Metadata md = createMetadata( path );
 
@@ -65,20 +66,27 @@ public class GroupDirMetadataProcessor
     }
 
     private Metadata createMetadata( String path )
-        throws MetadataException
+        throws IOException
     {
-        Metadata md = new Metadata();
-
-        List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
-
-        for ( Plugin plugin : metadataHelper.gData.get( path ) )
+        try
         {
-            ops.add( new AddPluginOperation( new PluginOperand( plugin ) ) );
+            Metadata md = new Metadata();
+
+            List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
+
+            for ( Plugin plugin : metadataHelper.gData.get( path ) )
+            {
+                ops.add( new AddPluginOperation( new PluginOperand( plugin ) ) );
+            }
+
+            MetadataBuilder.changeMetadata( md, ops );
+
+            return md;
         }
-
-        MetadataBuilder.changeMetadata( md, ops );
-
-        return md;
+        catch ( MetadataException e )
+        {
+            throw new IOException( e );
+        }
     }
 
     @Override
@@ -102,7 +110,7 @@ public class GroupDirMetadataProcessor
 
     @Override
     protected boolean isMetadataCorrect( Metadata oldMd, String path )
-        throws Exception
+        throws IOException
     {
         Metadata md = createMetadata( path );
 

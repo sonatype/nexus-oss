@@ -19,6 +19,7 @@
 package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,7 +46,7 @@ public class ArtifactDirMetadataProcessor
 
     @Override
     public void processMetadata( String path )
-        throws Exception
+        throws IOException
     {
         Metadata md = createMetadata( path );
 
@@ -61,17 +62,24 @@ public class ArtifactDirMetadataProcessor
     }
 
     private Metadata createMetadata( String path )
-        throws Exception
+        throws IOException
     {
-        Metadata md = new Metadata();
+        try
+        {
+            Metadata md = new Metadata();
 
-        md.setGroupId( calculateGroupId( path ) );
+            md.setGroupId( calculateGroupId( path ) );
 
-        md.setArtifactId( calculateArtifactId( path ) );
+            md.setArtifactId( calculateArtifactId( path ) );
 
-        versioning( md, metadataHelper.gaData.get( path ) );
+            versioning( md, metadataHelper.gaData.get( path ) );
 
-        return md;
+            return md;
+        }
+        catch ( MetadataException e )
+        {
+            throw new IOException( e );
+        }
     }
 
     private String calculateGroupId( String path )
@@ -118,7 +126,7 @@ public class ArtifactDirMetadataProcessor
 
     @Override
     protected boolean isMetadataCorrect( Metadata oldMd, String path )
-        throws Exception
+        throws IOException
     {
         Metadata md = createMetadata( path );
 

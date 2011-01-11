@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -31,6 +32,7 @@ import java.util.zip.ZipInputStream;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.GavCalculator;
+import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.index.artifact.M2ArtifactRecognizer;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -88,13 +90,13 @@ abstract public class AbstractMetadataHelper
     }
 
     public void onDirEnter( String path )
-        throws Exception
+        throws IOException
     {
         // do nothing
     }
 
     public void onDirExit( String path )
-        throws Exception
+        throws IOException
     {
 
         for ( AbstractMetadataProcessor metadataProcessor : metadataProcessors )
@@ -108,7 +110,7 @@ abstract public class AbstractMetadataHelper
     }
 
     public void processFile( String path )
-        throws Exception
+        throws IOException
     {
         // remove rotten checksum
         if ( isObsoleteChecksum( path ) )
@@ -127,7 +129,7 @@ abstract public class AbstractMetadataHelper
     }
 
     private boolean isObsoleteChecksum( String path )
-        throws Exception
+        throws IOException
     {
         if ( !isChecksumFile( path ) )
         {
@@ -157,7 +159,7 @@ abstract public class AbstractMetadataHelper
     }
 
     protected void updateMavenInfo( String path )
-        throws Exception
+        throws IOException
     {
         // groupId, artifactId, version, artifactName
         String g = null;
@@ -166,7 +168,18 @@ abstract public class AbstractMetadataHelper
         String n = null;
         n = path.substring( path.lastIndexOf( '/' ) + 1 );
 
-        Gav gav = getGavCalculator().pathToGav( path );
+        Gav gav = null;
+
+        try
+        {
+            gav = getGavCalculator().pathToGav( path );
+        }
+        catch ( IllegalArtifactCoordinateException e )
+        {
+            // not a M2 artifact
+            gav = null;
+        }
+
         if ( gav != null )
         {
             g = gav.getGroupId();
@@ -175,9 +188,16 @@ abstract public class AbstractMetadataHelper
         }
         else
         {
-            logger.warn( "Unable to parse good GAV values. Path: '" + path + "'. GAV: '" + g + ":" + a + ":" + v + "'" );
+            // mute it, we still don't know is this a M2 artifact or not
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Unable to parse good GAV values. Path: '" + path + "'. GAV: '" + g + ":" + a + ":" + v
+                    + "'" );
+            }
         }
 
+        // try to see is this a POM
+        // TODO: even if it does not fit M2 layout?
         Model model = null;
         if ( path.endsWith( "pom" ) )
         {
@@ -224,7 +244,12 @@ abstract public class AbstractMetadataHelper
 
         if ( g == null || a == null || v == null )
         {
-            logger.warn( "Unable to resolve gav for '" + path + "'. g:" + g + " a:" + a + " v:" + v );
+            // we were called with a path not pointing to a file that obeys M2 layout, just silently return
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Unable to resolve gav for '" + path + "'. g:" + g + " a:" + a + " v:" + v );
+            }
+
             return;
         }
 
@@ -350,7 +375,7 @@ abstract public class AbstractMetadataHelper
     }
 
     void rebuildChecksum( String path )
-        throws Exception
+        throws IOException
     {
         if ( !exists( path ) )
         {
@@ -396,10 +421,10 @@ abstract public class AbstractMetadataHelper
     }
 
     abstract public String buildMd5( String path )
-        throws Exception;
+        throws IOException;
 
     abstract public String buildSh1( String path )
-        throws Exception;
+        throws IOException;
 
     /**
      * Store the content to the file of the path
@@ -408,7 +433,7 @@ abstract public class AbstractMetadataHelper
      * @param path
      */
     abstract public void store( String content, String path )
-        throws Exception;
+        throws IOException;
 
     /**
      * Remove the file of the path
@@ -417,7 +442,7 @@ abstract public class AbstractMetadataHelper
      * @throws Exception
      */
     abstract public void remove( String path )
-        throws Exception;
+        throws IOException;
 
     /**
      * Retrieve the content according to the path
@@ -426,7 +451,7 @@ abstract public class AbstractMetadataHelper
      * @return
      */
     abstract public InputStream retrieveContent( String path )
-        throws Exception;
+        throws IOException;
 
     /**
      * Check if the file or item of this path exists
@@ -436,7 +461,7 @@ abstract public class AbstractMetadataHelper
      * @throws Exception
      */
     abstract public boolean exists( String path )
-        throws Exception;
+        throws IOException;
 
     abstract protected GavCalculator getGavCalculator();
 

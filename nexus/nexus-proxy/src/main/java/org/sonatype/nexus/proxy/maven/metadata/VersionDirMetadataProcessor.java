@@ -19,6 +19,7 @@
 package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -67,7 +68,7 @@ public class VersionDirMetadataProcessor
 
     @Override
     public void processMetadata( String path )
-        throws Exception
+        throws IOException
     {
         Metadata md = createMetadata( path );
 
@@ -83,21 +84,32 @@ public class VersionDirMetadataProcessor
     }
 
     private Metadata createMetadata( String path )
-        throws Exception
+        throws IOException
     {
-        Metadata md = new Metadata();
+        try
+        {
+            Metadata md = new Metadata();
 
-        md.setGroupId( calculateGroupId( path ) );
+            md.setGroupId( calculateGroupId( path ) );
 
-        md.setArtifactId( calculateArtifactId( path ) );
+            md.setArtifactId( calculateArtifactId( path ) );
 
-        md.setVersion( calculateVersion( path ) );
+            md.setVersion( calculateVersion( path ) );
 
-        md.setModelVersion( "1.1.0" );
+            md.setModelVersion( "1.1.0" );
 
-        versioning( md, getGavs( path, metadataHelper.gavData.get( path ) ) );
+            versioning( md, getGavs( path, metadataHelper.gavData.get( path ) ) );
 
-        return md;
+            return md;
+        }
+        catch ( IllegalArtifactCoordinateException e )
+        {
+            throw new IOException( e );
+        }
+        catch ( MetadataException e )
+        {
+            throw new IOException( e );
+        }
     }
 
     private Collection<Gav> getGavs( String path, Collection<String> items )
@@ -211,7 +223,7 @@ public class VersionDirMetadataProcessor
 
     @Override
     protected boolean isMetadataCorrect( Metadata oldMd, String path )
-        throws Exception
+        throws IOException
     {
         if ( oldMd.getArtifactId() == null || oldMd.getGroupId() == null || oldMd.getVersion() == null
             || oldMd.getVersioning() == null || oldMd.getVersioning().getSnapshot() == null
