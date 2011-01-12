@@ -163,22 +163,10 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <configuration>
-              <sourceDirectory>${project.build.directory}/classes/static/js/</sourceDirectory>
-              <output>${project.build.directory}/classes/static/js/nexus-rrb-plugin-all.js</output>
-              <nosuffix>true</nosuffix>
-              <nomunge>true</nomunge>
-              <jswarn>false</jswarn>
-              <nominify>true</nominify>
-              <insertNewLine>true</insertNewLine>
-            </configuration>
-          </execution>
-        </executions>
+        <configuration>
+          <sourceDirectory>${project.build.directory}/classes/static/js/</sourceDirectory>
+          <output>${project.build.directory}/classes/static/js/nexus-rrb-plugin-all.js</output>
+        </configuration>
       </plugin>
     </plugins>
   </build>

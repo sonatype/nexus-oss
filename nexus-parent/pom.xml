@@ -62,6 +62,7 @@
 
     <jetty.version>6.1.19</jetty.version>
     <nexus.version>${project.version}</nexus.version>
+    <debug-js>false</debug-js>
   </properties>
 
   <dependencyManagement>
@@ -351,6 +352,21 @@
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>0.0.1</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>aggregate</goal>
+                </goals>
+                <configuration>
+                  <nosuffix>true</nosuffix>
+                  <nomunge>true</nomunge>
+                  <nominify>${debug-js}</nominify>
+                  <jswarn>false</jswarn>
+                  <insertNewLine>true</insertNewLine>
+                  <disableOptimizations>true</disableOptimizations>
+                </configuration>
+              </execution>
+            </executions>
         </plugin>
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
