@@ -18,9 +18,7 @@
  */
 package org.sonatype.nexus.plugins.rrb;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
