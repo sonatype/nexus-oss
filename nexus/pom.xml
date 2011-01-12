@@ -164,7 +164,7 @@
     <maven.version>3.0.1</maven.version>
     <aether.version>1.8</aether.version>
 
-    <spice-timeline.version>2.0.0-SNAPSHOT</spice-timeline.version>
+    <spice-timeline.version>2.0</spice-timeline.version>
     <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
     <plexus-security.version>2.1</plexus-security.version>
