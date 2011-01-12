@@ -39,10 +39,15 @@ public class IndexRepositoryFolderCleaner
             return;
         }
 
-        File indexerFolder =
-            getApplicationConfiguration().getWorkingDirectory( DefaultIndexerManager.INDEXER_WORKING_DIRECTORY_KEY );
+        File indexContextFolder =
+            new File( getApplicationConfiguration().getWorkingDirectory(
+                DefaultIndexerManager.INDEXER_WORKING_DIRECTORY_KEY ), repository.getId()
+                + DefaultIndexerManager.CTX_SUFIX );
 
-        delete( new File( indexerFolder, repository.getId() + DefaultIndexerManager.CTX_SUFIX ), deleteForever );
+        if ( indexContextFolder.isDirectory() )
+        {
+            delete( indexContextFolder, deleteForever );
+        }
     }
 
 }
