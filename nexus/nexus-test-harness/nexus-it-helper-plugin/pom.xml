@@ -58,7 +58,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <type>nexus-plugin</type>
       <scope>provided</scope>
     </dependency>

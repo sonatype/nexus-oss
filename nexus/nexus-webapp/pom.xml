@@ -58,7 +58,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-lvo-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- There are problems with the Maven reactor that would require these modules However if we include as a test scope 
@@ -66,7 +66,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
@@ -75,7 +75,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-core-documentation-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
@@ -84,7 +84,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
@@ -93,7 +93,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
@@ -102,7 +102,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rrb-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
@@ -111,7 +111,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
@@ -120,7 +120,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-archetype-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
@@ -129,7 +129,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-groovy-console-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
@@ -161,7 +161,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-manager</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -215,7 +215,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-plugin-console-plugin</artifactId>
-                  <version>${nexus.version}</version>
+                  <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
                   <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
@@ -223,7 +223,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-core-documentation-plugin</artifactId>
-                  <version>${nexus.version}</version>
+                  <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
                   <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
@@ -231,7 +231,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins.ldap</groupId>
                   <artifactId>nexus-ldap-realm-plugin</artifactId>
-                  <version>${nexus.version}</version>
+                  <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
                   <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
@@ -239,7 +239,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-rrb-plugin</artifactId>
-                  <version>${nexus.version}</version>
+                  <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
                   <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
@@ -247,7 +247,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-indexer-lucene-plugin</artifactId>
-                  <version>${nexus.version}</version>
+                  <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
                   <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
@@ -255,7 +255,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-archetype-plugin</artifactId>
-                  <version>${nexus.version}</version>
+                  <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
                   <outputDirectory>target/${optional-plugins.directory}</outputDirectory>
@@ -263,7 +263,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-groovy-console-plugin</artifactId>
-                  <version>${nexus.version}</version>
+                  <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
                   <outputDirectory>target/${optional-plugins.directory}</outputDirectory>
@@ -271,7 +271,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-capabilities-plugin</artifactId>
-                  <version>${nexus.version}</version>
+                  <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
                   <outputDirectory>target/${optional-plugins.directory}</outputDirectory>

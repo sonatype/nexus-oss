@@ -39,7 +39,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 

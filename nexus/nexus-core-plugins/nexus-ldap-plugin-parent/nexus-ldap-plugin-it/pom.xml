@@ -81,7 +81,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -95,7 +95,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -108,7 +108,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>provided</scope>
@@ -116,7 +116,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <classifier>tests</classifier>
       <type>jar</type>
       <scope>test</scope>
@@ -125,7 +125,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <type>jar</type>
       <scope>test</scope>
     </dependency>
@@ -150,7 +150,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-oss-webapp</artifactId>
-      <version>${nexus.version}</version>
+      <version>${project.version}</version>
       <type>zip</type>
       <classifier>bundle</classifier>
       <scope>test</scope>
@@ -189,19 +189,19 @@
           <nexusBundleArtifact>
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-oss-webapp</artifactId>
-            <version>${nexus.version}</version>
+            <version>${project.version}</version>
             <type>zip</type>
             <classifier>bundle</classifier>
           </nexusBundleArtifact>
 
-          <nexusBundleName>nexus-oss-webapp-${nexus.version}</nexusBundleName>
+          <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
 
-          <nexusVersion>${nexus.version}</nexusVersion>
+          <nexusVersion>${project.version}</nexusVersion>
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-it-helper-plugin</artifactId>
-              <version>${nexus.version}</version>
+              <version>${project.version}</version>
               <classifier>cp</classifier>
             </plugin>
             <plugin>
