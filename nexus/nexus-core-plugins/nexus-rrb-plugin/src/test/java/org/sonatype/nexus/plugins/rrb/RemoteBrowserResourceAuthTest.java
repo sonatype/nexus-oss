@@ -112,7 +112,7 @@ public class RemoteBrowserResourceAuthTest
         m2Repo.commitChanges();
         
         Reference rootRef = new Reference( "http://localhost:8081/nexus/service/local/repositories/" + repoId + "" );
-        Reference resourceRef = new Reference( rootRef, "http://localhost:8081/nexus/service/local/repositories/" + repoId + "/" + remoteUrl );
+        Reference resourceRef = new Reference( rootRef, "http://localhost:8081/nexus/service/local/repositories/" + repoId + "/" );
 
         // now call the REST resource
         Request request = new Request();

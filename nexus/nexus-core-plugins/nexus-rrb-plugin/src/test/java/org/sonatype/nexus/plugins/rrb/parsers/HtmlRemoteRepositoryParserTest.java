@@ -41,7 +41,7 @@ public class HtmlRemoteRepositoryParserTest
     {
         String remoteUrl = "http://www.xxx.com"; // The exact names of the urls
         String localUrl = "http://local"; // doesn't matter in the tests
-        parser = new HtmlRemoteRepositoryParser( remoteUrl, localUrl, "test", "http://www.xxx.com/" );
+        parser = new HtmlRemoteRepositoryParser( "/", localUrl, "test", remoteUrl + "/" );
 
         // htmlExample is an html repo with three sub directories
         StringBuilder indata = new StringBuilder( getExampleFileContent( "/htmlExample" ) );

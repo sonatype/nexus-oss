@@ -44,7 +44,7 @@ public class S3RemoteRepositoryParserTest
     @Before
     public void setUp()
     {
-        parser = new S3RemoteRepositoryParser( remoteUrl, localUrl, id, "milestone" );
+        parser = new S3RemoteRepositoryParser( "/", localUrl, id, "milestone" );
     }
 
     @Test
@@ -91,7 +91,7 @@ public class S3RemoteRepositoryParserTest
         RepositoryDirectory repositoryDirectory = result.iterator().next();
         assertEquals( "org.springframework.batch.archetype.simple.cli", repositoryDirectory.getText() );
         assertEquals(
-                      localUrl + "/milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli/",
+                      localUrl + "/org/springframework/batch/org.springframework.batch.archetype.simple.cli/",
                       repositoryDirectory.getResourceURI() );
         assertEquals( "/org/springframework/batch/org.springframework.batch.archetype.simple.cli/",
                       repositoryDirectory.getRelativePath() );
@@ -103,6 +103,9 @@ public class S3RemoteRepositoryParserTest
     @Test
     public void testExtractCommonPrefix()
     {
+        // no prefix
+        parser = new S3RemoteRepositoryParser( "/", localUrl, id, "" );
+        
         StringBuilder indata = new StringBuilder( repoWithCommonPrefixes() );
         parser.extractCommonPrefix( indata );
         List<RepositoryDirectory> result = parser.result;
@@ -115,6 +118,9 @@ public class S3RemoteRepositoryParserTest
             assertFalse( repositoryDirectory.isLeaf() );
             assertEquals( expectedResultIterator.next(), repositoryDirectory.getText() );
         }
+        
+        assertFalse( result.get( 0 ).getRelativePath().contains( "prefix" ) );
+        assertFalse( result.get( 0 ).getResourceURI().contains( "prefix" ) );
     }
 
     /**

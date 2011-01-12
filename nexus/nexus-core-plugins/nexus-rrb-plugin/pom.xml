@@ -161,44 +161,12 @@
         <artifactId>app-lifecycle-maven-plugin</artifactId>
       </plugin>
       <plugin>
-        <groupId>net.sf.alchim</groupId>
+        <groupId>org.sonatype.plugins</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compress</goal>
-            </goals>
-            <configuration>
-              <aggregations>
-                <aggregation>
-                  <output>${project.build.directory}/classes/static/js/nexus-rrb-plugin-all.js</output>
-                  <!-- files to include, path relative to output's directory or absolute path -->
-                  <includes>
-                    <include>${project.build.directory}/classes/static/js/repoServer.RemoteRepoBrowsePanel.js</include>
-                  </includes>
-                </aggregation>
-              </aggregations>
-            </configuration>
-          </execution>
-        </executions>
         <configuration>
-          <nosuffix>true</nosuffix>
-          <nomunge>true</nomunge>
-          <jswarn>false</jswarn>
-          <aggregations>
-            <aggregation>
-              <!-- insert new line after each concatenation (default: false) -->
-              <insertNewLine>true</insertNewLine>
-            </aggregation>
-          </aggregations>
+          <sourceDirectory>${project.build.directory}/classes/static/js/</sourceDirectory>
+          <output>${project.build.directory}/classes/static/js/nexus-rrb-plugin-all.js</output>
         </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-            <version>1.1</version>
-          </dependency>
-        </dependencies>
       </plugin>
     </plugins>
   </build>

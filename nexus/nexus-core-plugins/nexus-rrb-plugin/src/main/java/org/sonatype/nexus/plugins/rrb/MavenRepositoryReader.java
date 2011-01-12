@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -47,6 +48,8 @@ public class MavenRepositoryReader
 
     private final Logger logger = LoggerFactory.getLogger( MavenRepositoryReader.class );
 
+    private String remotePath;
+    
     private String remoteUrl;
 
     private String localUrl;
@@ -56,19 +59,31 @@ public class MavenRepositoryReader
     private String id;
 
     /**
-     * @param remoteUrl url to the remote repository
+     * @param remotePath remote path added to the URL
      * @param localUrl url to the local resource service
      * @return a list containing the remote data
      */
-    public List<RepositoryDirectory> extract( String remoteUrl, String localUrl, ProxyRepository proxyRepository,
+    public List<RepositoryDirectory> extract( String remotePath, String localUrl, ProxyRepository proxyRepository,
                                               String id )
     {
-        logger.debug( "remoteUrl={}", remoteUrl );
-        this.remoteUrl = remoteUrl;
+        logger.debug( "remotePath={}", remotePath );
+        this.remotePath = remotePath;
         this.localUrl = localUrl;
         this.proxyRepository = proxyRepository;
 
         this.id = id;
+        
+        String baseRemoteUrl = proxyRepository.getRemoteUrl();
+        
+        if( !baseRemoteUrl.endsWith( "/" ) && !remotePath.startsWith( "/" ) )
+        {
+            this.remoteUrl = baseRemoteUrl + "/" + remotePath;
+        }
+        else
+        {
+            this.remoteUrl = baseRemoteUrl + remotePath;
+        }
+        
         StringBuilder html = getContent();
         if ( logger.isDebugEnabled() )
         {
@@ -91,10 +106,10 @@ public class MavenRepositoryReader
             //if title="Artifactory" then it is an Artifactory repo...
             if ( indata.indexOf( "title=\"Artifactory\"" ) != -1 ) {
             	logger.debug( "is Artifactory repository" );
-            	parser = new ArtifactoryRemoteRepositoryParser( remoteUrl, localUrl, id, baseUrl );
+            	parser = new ArtifactoryRemoteRepositoryParser( remotePath, localUrl, id, baseUrl );
             } else {
                 logger.debug( "is html repository" );
-            	parser = new HtmlRemoteRepositoryParser( remoteUrl, localUrl, id, baseUrl );
+            	parser = new HtmlRemoteRepositoryParser( remotePath, localUrl, id, baseUrl );
             }
         }
         else if ( indata.indexOf( "xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"" ) != -1
@@ -112,13 +127,13 @@ public class MavenRepositoryReader
             }
             
             parser =
-                new S3RemoteRepositoryParser( remoteUrl, localUrl, id, baseUrl.replace( findRootUrl( indata ), "" ) );
+                new S3RemoteRepositoryParser( remotePath, localUrl, id, baseUrl.replace( findRootUrl( indata ), "" ) );
         }
         else
         {
             logger.debug( "Found no matching parser, using default html parser" );
 
-            parser = new HtmlRemoteRepositoryParser( remoteUrl, localUrl, id, baseUrl );
+            parser = new HtmlRemoteRepositoryParser( remotePath, localUrl, id, baseUrl );
         }
         return parser.extractLinks( indata );
     }
@@ -259,6 +274,16 @@ public class MavenRepositoryReader
             method.releaseConnection();
         }
 
+        // here is the deal, For reasons I do not understand, S3 comes back with an empty response (and a 200), stripping off the last '/' 
+        //returns the error we are looking for (so we can do a query)
+        Header serverHeader = method.getResponseHeader( "Server" );
+        if( result.length() == 0 && serverHeader.getValue().equals( "AmazonS3" ) && this.remoteUrl.endsWith( "/" ) )
+        {
+            this.remoteUrl = this.remoteUrl.substring( 0, this.remoteUrl.length() - 1 );
+            // now just call it again
+            return this.getContent();
+        }
+        
         return result;
     }
 

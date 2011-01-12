@@ -43,11 +43,11 @@ public class ArtifactoryRemoteRepositoryParser extends
 	//static String xmlLink = artifactoryLinkPattern + " xml";
 	//static String pomLink = artifactoryLinkPattern + " pom";
 	static String uriPrefixEnd = "/http";
-
-	public ArtifactoryRemoteRepositoryParser(String remoteUrl, String localUrl,
+	
+	public ArtifactoryRemoteRepositoryParser(String remotePath, String localUrl,
 			String id, String baseUrl)
 	{
-		super(remoteUrl, localUrl, id, baseUrl);
+		super(remotePath, localUrl, id, baseUrl);		    
 	}
 	
 	@Override
@@ -67,8 +67,8 @@ public class ArtifactoryRemoteRepositoryParser extends
         	//If the link not contains the folderLink string it is a leaf
          	repositoryDirectory.setLeaf( !artifactoryLink.matches(folderLinkMatchPattern));
         	repositoryDirectory.setText( text );        	
-        	repositoryDirectory.setResourceURI( uriPrefix + getLinkUrl( artifactoryLink ) );
-        	repositoryDirectory.setRelativePath( getLinkUrl( artifactoryLink ) ); 
+        	repositoryDirectory.setResourceURI( getLinkUrl( artifactoryLink ) );
+        	repositoryDirectory.setRelativePath( getRelativePath( artifactoryLink ) ); 
         	result.add( repositoryDirectory ); 
 		}
         return result;
@@ -122,9 +122,47 @@ public class ArtifactoryRemoteRepositoryParser extends
         return getLinkName( new StringBuilder( anchorString ) );
     }
 
-    protected String getLinkUrl( String anchorString )
+    private String getRelativePath( String anchorString )
     {
-    	return getLinkUrl( new StringBuilder( anchorString ) );
+        String artifactoryUrl = getLinkUrl( new StringBuilder( anchorString ) );
+        
+        return artifactoryUrl.substring( this.baseUrl.length() );
+    }
+    
+    protected String getLinkUrl( String anchorString )
+    {   
+        String relativePath = this.getRelativePath( anchorString );
+
+        // strip starting /
+        if( relativePath.startsWith( "/" ) )
+        {
+            relativePath = relativePath.substring( 1 );
+        }
+        
+        // the localUrl already contains part of the relative path, so strip that too
+        if( relativePath.startsWith( this.remotePath ) )
+        {
+            relativePath = relativePath.substring( this.remotePath.length() );
+            
+            // more path fun, we really should be using a lib for this, this is crazy
+            if( relativePath.startsWith( "/" ) )
+            {
+                relativePath = relativePath.substring( 1 );
+            }
+        }
+        
+        String url;
+        if( !this.localUrl.endsWith( "/" ) )
+        {
+            url = this.localUrl + "/" + relativePath;
+        }
+        else
+        {
+            url = this.localUrl + relativePath;
+        }
+        
+        return url;
+        
     }
 
 }

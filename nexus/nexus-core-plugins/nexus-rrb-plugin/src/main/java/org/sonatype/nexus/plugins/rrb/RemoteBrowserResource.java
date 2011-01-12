@@ -18,7 +18,9 @@
  */
 package org.sonatype.nexus.plugins.rrb;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -104,46 +106,38 @@ public class RemoteBrowserResource
     {
         String id = request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ).toString();
         ResourceStoreRequest storageItem = getResourceStoreRequest( request );
-        String remoteUrl = null;
+        String remotePath = null;
 
         try
         {
-            remoteUrl = URLDecoder.decode( storageItem.getRequestPath().substring( 1 ), "UTF-8" );
+            remotePath = URLDecoder.decode( storageItem.getRequestPath().substring( 1 ), "UTF-8" );
         }
         catch ( Exception e )
         {
             // old way
-            remoteUrl = storageItem.getRequestPath().substring( 1 );
+            remotePath = storageItem.getRequestPath().substring( 1 );
         }
 
-        String query = storageItem.getRequestUrl().substring( storageItem.getRequestUrl().indexOf( "?" ) + 1 );
-        String prefix = "";
-        if ( query.indexOf( "prefix=" ) != -1 )
-        {
-            int end = query.indexOf( '?', query.indexOf( "prefix=" ) );
-            if ( end == -1 )
-            {
-                end = query.length();
-            }
-            prefix = "?" + query.substring( query.indexOf( "prefix=" ), end );
-        }
 
         ProxyRepository proxyRepository = null;
         try
         {
             proxyRepository = getUnprotectedRepositoryRegistry().getRepositoryWithFacet( id, ProxyRepository.class );
+            
+            MavenRepositoryReader mr = new MavenRepositoryReader();
+            MavenRepositoryReaderResponse data = new MavenRepositoryReaderResponse();
+            // we really should not do the encoding here, but this is work around until NEXUS-4058 is fixed.
+            data.setData( mr.extract( remotePath,
+                createRemoteResourceReference( request, id, remotePath ).toString( false, false ), proxyRepository, id ) );
+            logger.debug( "return value is {}", data.toString() );
+
+            return data;
         }
-        catch ( NoSuchRepositoryException e1 )
+        catch ( NoSuchRepositoryException e )
         {
-            this.logger.warn( "Could not find repository: " + id, e1 );
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Could not find repository: " + id, e1 );
+            this.logger.warn( "Could not find repository: " + id, e );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Could not find repository: " + id, e );
         }
-        MavenRepositoryReader mr = new MavenRepositoryReader();
-        MavenRepositoryReaderResponse data = new MavenRepositoryReaderResponse();
-        data.setData( mr.extract( remoteUrl + prefix,
-            createRemoteResourceReference( request, id, remoteUrl ).toString( false, false ), proxyRepository, id ) );
-        logger.debug( "return value is {}", data.toString() );
-        return data;
     }
 
     protected Reference createRemoteResourceReference( Request request, String repoId, String remoteUrl )

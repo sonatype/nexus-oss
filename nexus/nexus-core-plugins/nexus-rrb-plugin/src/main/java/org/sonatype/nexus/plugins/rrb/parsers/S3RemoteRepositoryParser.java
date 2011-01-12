@@ -20,6 +20,7 @@ package org.sonatype.nexus.plugins.rrb.parsers;
 
 import java.util.ArrayList;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.rrb.RepositoryDirectory;
@@ -35,19 +36,43 @@ public class S3RemoteRepositoryParser
     private String localUrl;
 
     private String basePrefix;
+    
+    private String prefix;
 
-    private String remoteUrl;
-
+    private String remotePath;
+    
     ArrayList<RepositoryDirectory> result = new ArrayList<RepositoryDirectory>();
 
     private String id;
 
-    public S3RemoteRepositoryParser( String remoteUrl, String localUrl, String id, String basePrefix )
+    public S3RemoteRepositoryParser( String remotePath, String localUrl, String id, String basePrefix )
     {
-        this.remoteUrl = remoteUrl;
+        this.remotePath = remotePath;
         this.localUrl = localUrl;
+        
+        //strip the remotePath from the localUrl
+        if( localUrl.endsWith( remotePath ) )
+        {
+            this.localUrl = localUrl.substring( 0, localUrl.lastIndexOf( remotePath ) );
+        }
+        
+        if( !this.localUrl.endsWith( "/" ))
+        {
+            this.localUrl += "/";
+        }
+        
+        if( !this.remotePath.endsWith( "/" ))
+        {
+            this.remotePath += "/";
+        }
+        
         this.id = id;
         this.basePrefix = basePrefix;
+        
+//        if( basePrefix.contains( "=" ) )
+//        {
+//            this.prefix = basePrefix.substring( basePrefix.indexOf( "=" ) + 1 );
+//        }
     }
 
     void extractContent( StringBuilder indata )
@@ -67,15 +92,19 @@ public class S3RemoteRepositoryParser
             temp.append( indata.subSequence( start, end ) );
             if ( !exclude( temp ) )
             {
-                rp.setLeaf( true );
-                rp.setText( getText( getKeyName( temp ) ) );
-                rp.setResourceURI( localUrl + "/" + getKeyName( temp ) );
-                rp.setRelativePath( ( getKeyName( temp ).replace( basePrefix, "" ) ).replace( "//", "/" ) );
-                if ( !rp.getRelativePath().startsWith( "/" ) )
+                String relativePath = removePrefix( getKeyName( temp ), this.basePrefix ).replace( "//", "/" );
+                if( relativePath.startsWith( "/" ));
                 {
-                    rp.setRelativePath( "/" + rp.getRelativePath() );
+                    relativePath = relativePath.replaceFirst( "/", "" );
                 }
-                if ( !remoteUrl.endsWith( rp.getRelativePath().substring( 1 ) ) )
+                
+                rp.setLeaf( true );
+                rp.setText( getText( relativePath ) );
+                rp.setResourceURI( localUrl + relativePath );
+                rp.setRelativePath( relativePath );
+                rp.setRelativePath( "/" + rp.getRelativePath() );
+                
+                if ( !remotePath.endsWith( rp.getRelativePath().substring( 1 ) ) )
                 {
                     logger.debug( "addning {} to result", rp.toString() );
                     result.add( rp );
@@ -105,17 +134,10 @@ public class S3RemoteRepositoryParser
             if ( !exclude( temp ) )
             {
                 rp.setLeaf( false );
-                rp.setText( getText( getPrefix( temp ) ) );
-                if ( remoteUrl.indexOf( '?' ) != -1 )
-                {
-                    rp.setResourceURI( removePrefix( localUrl, getPrefix( temp ) ) + "?prefix=" + getPrefix( temp ) );
-                }
-                else
-                {
-                    rp.setResourceURI( removePrefix( localUrl, getPrefix( temp ) ) + "?prefix=" + getPrefix( temp ) );
-                }
-
-                rp.setRelativePath( "/?prefix=" + getPrefix( temp ) );
+                rp.setText( getText( getRelitivePath( temp ) ) );
+                
+                rp.setResourceURI( localUrl + getRelitivePath( temp ) );
+                rp.setRelativePath( getRelitivePath( temp ) );
 
                 result.add( rp );
             }
@@ -126,12 +148,12 @@ public class S3RemoteRepositoryParser
 
     private String removePrefix( String localUrl, String prefix )
     {
-        int end = localUrl.indexOf( prefix.substring( 0, prefix.indexOf( '/' ) ) );
-        if ( end > 0 )
+        if( prefix == null )
         {
-            localUrl = localUrl.substring( 0, end );
+            return localUrl;
         }
-        return localUrl;
+        
+        return localUrl.replaceFirst( prefix, "" );
     }
 
     private String getText( String keyName )
@@ -162,6 +184,21 @@ public class S3RemoteRepositoryParser
                 return true;
             }
         }
+        
+        if( xmlContainsString( value, this.basePrefix ) || xmlContainsString( value, this.remotePath ) || xmlContainsString( value,  this.basePrefix + this.remotePath ) )
+        {
+            return true;
+        }
+
+        return false;
+    }
+    
+    private static boolean xmlContainsString( StringBuilder xmlSnippet, String checkFor )
+    {
+        if( StringUtils.isNotEmpty( checkFor ) && ( xmlSnippet.indexOf( ">"+ checkFor +"<" ) > 0 || xmlSnippet.indexOf( ">"+ checkFor +"/<" ) > 0 ) )
+        {
+            return true;
+        }
         return false;
     }
 
@@ -178,11 +215,11 @@ public class S3RemoteRepositoryParser
     /**
      * Extracts the prefix.
      */
-    private String getPrefix( StringBuilder temp )
+    private String getRelitivePath( StringBuilder temp )
     {
         int start = temp.indexOf( "<Prefix>" ) + 8;
         int end = temp.indexOf( "</Prefix" );
-        return temp.substring( start, end );
+        return this.removePrefix( temp.substring( start, end ), this.basePrefix ) ;
     }
 
     public ArrayList<RepositoryDirectory> extractLinks( StringBuilder indata )

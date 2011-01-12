@@ -38,10 +38,11 @@ public class ArtifactoryRemoteRepositoryParserTest extends
     public void setUp()
         throws Exception
     {
-        String remoteUrl = "http://www.remote.com"; // The exact name doesn't matter
+        String remoteUrl = "http://repo.jfrog.org/artifactory/java.net-cache"; // The exact name doesn't matter
         //However the format of the localUrl is important for the outcome
-        String localUrl = localPrefix + "http://repo.jfrog.org/artifactory/java.net";
-        parser = new ArtifactoryRemoteRepositoryParser( remoteUrl, localUrl, "test", "http://www.base.com/" );
+        String localUrl = localPrefix;
+        
+        parser = new ArtifactoryRemoteRepositoryParser( "/", localUrl, "test", remoteUrl );
 
         // Artifactory.java.net.htm is a file extracted from an Artifactory repo
         indata = new StringBuilder( getExampleFileContent( "/Artifactory.java.net.htm" ) );
@@ -64,7 +65,10 @@ public class ArtifactoryRemoteRepositoryParserTest extends
         for (RepositoryDirectory repo : result) {
         	//One repo is a leaf, "archetype-catalog.xml", the rest are not leafs
         	assertEquals(repo.getText().equals("archetype-catalog.xml"), repo.isLeaf());
-        	assertTrue(repo.getResourceURI().matches(localPrefix + "http.*/" + repo.getText() + (repo.isLeaf() ? "" : "/")));
+        	assertEquals(  (localPrefix + repo.getText() + (repo.isLeaf() ? "" : "/") ),  repo.getResourceURI() );
+            assertFalse( repo.getResourceURI().contains( "repo.jfrog.org" ) );
+
+        	
 		}
     }
     

@@ -38,7 +38,7 @@ public class HtmlRemoteRepositoryParser
 
 	protected String localUrl;
 	
-	protected String remoteUrl;
+	protected String remotePath;
 	
 	protected String linkStart = "<a ";
 	
@@ -50,9 +50,9 @@ public class HtmlRemoteRepositoryParser
 	
 	protected String baseUrl;
 
-    public HtmlRemoteRepositoryParser( String remoteUrl, String localUrl, String id, String baseUrl )
+    public HtmlRemoteRepositoryParser( String remotePath, String localUrl, String id, String baseUrl )
     {
-        this.remoteUrl = remoteUrl;
+        this.remotePath = remotePath;
         this.localUrl = localUrl;
         this.id = id;
         this.baseUrl = baseUrl;
@@ -96,16 +96,16 @@ public class HtmlRemoteRepositoryParser
                     rp.setLeaf( true );
                 }
                 rp.setText( getLinkName( temp ).replace( "/", "" ).trim() );
-                if ( !remoteUrl.endsWith( "/" ) )
+                if ( !remotePath.endsWith( "/" ) )
                 {
-                    remoteUrl += "/";
+                    remotePath += "/";
                 }
                 if ( !localUrl.endsWith( "/" ) )
                 {
                     localUrl += "/";
                 }
                 rp.setResourceURI( localUrl + getLinkUrl( temp ) );
-                rp.setRelativePath( remoteUrl.replace( baseUrl, "" ) + getLinkUrl( temp ) );
+                rp.setRelativePath( remotePath + getLinkUrl( temp ) );
                 if ( !rp.getRelativePath().startsWith( "/" ) )
                 {
                     rp.setRelativePath( "/" + rp.getRelativePath() );
