@@ -37,8 +37,6 @@ public class S3RemoteRepositoryParser
 
     private String basePrefix;
     
-    private String prefix;
-
     private String remotePath;
     
     ArrayList<RepositoryDirectory> result = new ArrayList<RepositoryDirectory>();
@@ -101,8 +99,7 @@ public class S3RemoteRepositoryParser
                 rp.setLeaf( true );
                 rp.setText( getText( relativePath ) );
                 rp.setResourceURI( localUrl + relativePath );
-                rp.setRelativePath( relativePath );
-                rp.setRelativePath( "/" + rp.getRelativePath() );
+                rp.setRelativePath( "/" + relativePath );
                 
                 if ( !remotePath.endsWith( rp.getRelativePath().substring( 1 ) ) )
                 {
@@ -133,11 +130,13 @@ public class S3RemoteRepositoryParser
             temp.append( indata.subSequence( start, end ) );
             if ( !exclude( temp ) )
             {
-                rp.setLeaf( false );
-                rp.setText( getText( getRelitivePath( temp ) ) );
+                String relativePath = getRelitivePath( temp );
                 
-                rp.setResourceURI( localUrl + getRelitivePath( temp ) );
-                rp.setRelativePath( getRelitivePath( temp ) );
+                rp.setLeaf( false );
+                rp.setText( getText( relativePath ) );
+                
+                rp.setResourceURI( localUrl + relativePath );
+                rp.setRelativePath( "/" + relativePath );
 
                 result.add( rp );
             }
@@ -219,7 +218,12 @@ public class S3RemoteRepositoryParser
     {
         int start = temp.indexOf( "<Prefix>" ) + 8;
         int end = temp.indexOf( "</Prefix" );
-        return this.removePrefix( temp.substring( start, end ), this.basePrefix ) ;
+        String relativePath = this.removePrefix( temp.substring( start, end ), this.basePrefix ).replaceAll( "//", "/" );
+        if( relativePath.startsWith( "/" ) )
+        {
+            relativePath = relativePath.substring( 1 );
+        }
+        return relativePath;
     }
 
     public ArrayList<RepositoryDirectory> extractLinks( StringBuilder indata )

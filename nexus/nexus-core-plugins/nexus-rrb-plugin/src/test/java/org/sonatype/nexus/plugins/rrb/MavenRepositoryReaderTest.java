@@ -33,6 +33,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import junit.framework.Assert;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -117,11 +119,19 @@ public class MavenRepositoryReaderTest
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
                 throws IOException, ServletException
             {   
+
+                if( target.endsWith( "/" ) )
+                {
+                    // might need index.html handling somewhere else.
+                    target = target + "root";
+                }
+                
                 response.setStatus( HttpServletResponse.SC_OK );
                 InputStream stream = this.getClass().getResourceAsStream( target );
-
+               
                 StringBuilder result = new StringBuilder();
                 BufferedReader reader = new BufferedReader( new InputStreamReader( stream ) );
+                
 
                 String line = null;
                 while ( ( line = reader.readLine() ) != null )
@@ -214,6 +224,23 @@ public class MavenRepositoryReaderTest
             assertFalse( repositoryDirectory.getRelativePath().contains( "prefix" ) );
             assertFalse( repositoryDirectory.getResourceURI().contains( "prefix" ) );
         }
+    }
+    
+    @Test//( timeout = 5000 )
+    public void testAmazon_20110112_errorThenFindRoot()
+    {
+        // Fetched from URI http://repository.springsource.com/?prifix=maven/bundles/release&delimiter=/
+        // and http://repository.springsource.com/maven/bundles/release/com
+        List<RepositoryDirectory> result =
+            reader.extract( "/com" , localUrl, new FakeProxyRepo( getRemoteUrl() + "Amazon_20110112/maven/bundles/release" ), "test" );
+        assertEquals( "Result: "+ result, 1, result.size() );
+        
+        RepositoryDirectory repositoryDirectory1 = result.get( 0 );
+        Assert.assertFalse( repositoryDirectory1.isLeaf() );
+        Assert.assertEquals( localUrl + "/com/springsource/", repositoryDirectory1.getResourceURI() );
+        Assert.assertEquals( "/com/springsource/", repositoryDirectory1.getRelativePath() );
+        
+        
     }
     
     @Test( timeout = 5000 )
