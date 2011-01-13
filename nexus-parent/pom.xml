@@ -31,7 +31,7 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-parent</artifactId>
-  <version>18-SNAPSHOT</version>
+  <version>19-SNAPSHOT</version>
 
   <packaging>pom</packaging>
   <name>Sonatype Nexus Parent</name>
