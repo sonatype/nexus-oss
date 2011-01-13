@@ -36,6 +36,8 @@ public class Nexus4038DeleteSystemFeedIT
         assertTrue( Status.isSuccess( getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_REPO, gav,
             getTestFile( "artifact.jar" ) ) ) );
 
+        // timeline resolution is _one second_, so to be sure that ordering is kept he keep gaps between operations bigger than one second 
+        Thread.sleep( 1100 );
         getEventInspectorsUtil().waitForCalmPeriod();
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
@@ -46,18 +48,20 @@ public class Nexus4038DeleteSystemFeedIT
                 + GavUtil.getRelitiveArtifactPath( gav ).replace( ".jar", ".pom" );
         Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
         Status status = response.getStatus();
-        Assert.assertTrue( status.isSuccess(), "Fail to delete " + gav + status );
+        Assert.assertTrue( status.isSuccess(), "Failed to delete " + gav + status );
 
-        Thread.sleep( 1000 );
+        // timeline resolution is _one second_, so to be sure that ordering is kept he keep gaps between operations bigger than one second 
+        Thread.sleep( 1100 );
         getEventInspectorsUtil().waitForCalmPeriod();
 
         SyndFeed feed = FeedUtil.getFeed( "recentlyChangedArtifacts" );
 
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( entries.size() >= 2, "Expected more then 2 entries, but got " + entries.size() + " - "
+        Assert.assertTrue( entries.size() >= 2, "Expected more than 2 entries, but got " + entries.size() + " - "
             + entries );
 
+        // now because above gaps, we are sure the record is 1st one! 
         assertThat( entries.get( 0 ).getDescription().getValue(),
             containsString( "deleted.Action was initiated by user \"" + TEST_USER_NAME + "\"" ) );
     }
