@@ -18,7 +18,9 @@
  */
 package org.sonatype.nexus.plugins.rest;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -37,7 +39,15 @@ public class SimpleDocumentationResourceBundle
     protected ZipFile getZipFile()
         throws IOException
     {
-        return new ZipFile( getClass().getResource( "/docs.zip" ).getFile() );
+        final String file = new File( getClass().getResource( "/docs.zip" ).getFile() ).getCanonicalPath();
+        try
+        {
+            return new ZipFile( file );
+        }
+        catch ( ZipException e )
+        {
+            throw new IOException( e.getMessage() + ": " + file, e );
+        }
     }
 
     @Override

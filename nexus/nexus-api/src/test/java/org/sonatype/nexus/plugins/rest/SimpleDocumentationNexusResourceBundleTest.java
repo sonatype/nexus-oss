@@ -28,7 +28,7 @@ public class SimpleDocumentationNexusResourceBundleTest
     public void testDoc()
         throws Exception
     {
-        AbstractDocumentationNexusResourceBundle docBundle = (AbstractDocumentationNexusResourceBundle) lookup( NexusResourceBundle.class, "simpleTest" );
+        NexusResourceBundle docBundle = lookup( NexusResourceBundle.class, "simpleTest" );
 
         List<StaticResource> resources = docBundle.getContributedResouces();
         assertNotNull( resources );
