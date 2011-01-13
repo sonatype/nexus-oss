@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
-    <version>1.9</version>
+    <version>1.10-SNAPSHOT</version>
   </parent>
   <!-- a unique name for this project -->
   <artifactId>nexus-mock</artifactId>
