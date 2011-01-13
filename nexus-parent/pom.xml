@@ -31,7 +31,7 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-parent</artifactId>
-  <version>19-SNAPSHOT</version>
+  <version>18-SNAPSHOT</version>
 
   <packaging>pom</packaging>
   <name>Sonatype Nexus Parent</name>
@@ -335,18 +335,6 @@
           <configuration>
             <useJava5>true</useJava5>
           </configuration>
-        </plugin>
-        <plugin>
-          <groupId>net.sf.alchim</groupId>
-          <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>0.7.1</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.codehaus.plexus</groupId>
-              <artifactId>plexus-utils</artifactId>
-              <version>2.0.1</version>
-            </dependency>
-          </dependencies>
         </plugin>
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
