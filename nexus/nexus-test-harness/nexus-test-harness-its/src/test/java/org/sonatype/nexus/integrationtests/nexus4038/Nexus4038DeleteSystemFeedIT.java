@@ -2,8 +2,10 @@ package org.sonatype.nexus.integrationtests.nexus4038;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.collection.IsCollectionContaining.hasItem;
 import static org.testng.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.index.artifact.Gav;
@@ -61,8 +63,12 @@ public class Nexus4038DeleteSystemFeedIT
         Assert.assertTrue( entries.size() >= 2, "Expected more than 2 entries, but got " + entries.size() + " - "
             + entries );
 
-        // now because above gaps, we are sure the record is 1st one! 
-        assertThat( entries.get( 0 ).getDescription().getValue(),
-            containsString( "deleted.Action was initiated by user \"" + TEST_USER_NAME + "\"" ) );
+        List<String> desc = new ArrayList<String>();
+        for ( SyndEntry entry : entries )
+        {
+            desc.add( entry.getDescription().getValue() );
+        }
+
+        assertThat( desc, hasItem( containsString( "deleted.Action was initiated by user \"" + TEST_USER_NAME + "\"" ) ) );
     }
 }
