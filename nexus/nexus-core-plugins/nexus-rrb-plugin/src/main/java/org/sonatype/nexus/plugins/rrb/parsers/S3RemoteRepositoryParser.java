@@ -35,13 +35,9 @@ public class S3RemoteRepositoryParser
 
     private String localUrl;
 
-    private String basePrefix;
-    
     private String remotePath;
     
     ArrayList<RepositoryDirectory> result = new ArrayList<RepositoryDirectory>();
-
-    private String id;
 
     public S3RemoteRepositoryParser( String remotePath, String localUrl, String id, String basePrefix )
     {
@@ -63,17 +59,9 @@ public class S3RemoteRepositoryParser
         {
             this.remotePath += "/";
         }
-        
-        this.id = id;
-        this.basePrefix = basePrefix;
-        
-//        if( basePrefix.contains( "=" ) )
-//        {
-//            this.prefix = basePrefix.substring( basePrefix.indexOf( "=" ) + 1 );
-//        }
     }
 
-    void extractContent( StringBuilder indata )
+    void extractContent( StringBuilder indata, String prefix )
     {
         int start = 0;
         int end = 0;
@@ -88,9 +76,9 @@ public class S3RemoteRepositoryParser
             }
             end = indata.indexOf( "/Key>", start ) + 5;
             temp.append( indata.subSequence( start, end ) );
-            if ( !exclude( temp ) )
+            if ( !exclude( temp, prefix ) )
             {
-                String relativePath = removePrefix( getKeyName( temp ), this.basePrefix ).replace( "//", "/" );
+                String relativePath = removePrefix( getKeyName( temp ), prefix ).replace( "//", "/" );
                 if( relativePath.startsWith( "/" ));
                 {
                     relativePath = relativePath.replaceFirst( "/", "" );
@@ -113,8 +101,8 @@ public class S3RemoteRepositoryParser
 
     }
 
-    void extractCommonPrefix( StringBuilder indata )
-    {
+    void extractCommonPrefix( StringBuilder indata, String prefix )
+    {   
         int start = 0;
         int end = 0;
         do
@@ -128,9 +116,9 @@ public class S3RemoteRepositoryParser
             }
             end = indata.indexOf( "/CommonP", start ) + 8;
             temp.append( indata.subSequence( start, end ) );
-            if ( !exclude( temp ) )
+            if ( !exclude( temp, prefix ) )
             {
-                String relativePath = getRelitivePath( temp );
+                String relativePath = getRelitivePath( temp, prefix );
                 
                 rp.setLeaf( false );
                 rp.setText( getText( relativePath ) );
@@ -173,7 +161,7 @@ public class S3RemoteRepositoryParser
     /**
      * Excludes links that are not relevant for the listing.
      */
-    private boolean exclude( StringBuilder value )
+    private boolean exclude( StringBuilder value, String prefix )
     {
         for ( String s : EXCLUDES )
         {
@@ -184,7 +172,7 @@ public class S3RemoteRepositoryParser
             }
         }
         
-        if( xmlContainsString( value, this.basePrefix ) || xmlContainsString( value, this.remotePath ) || xmlContainsString( value,  this.basePrefix + this.remotePath ) )
+        if( xmlContainsString( value, prefix ) || xmlContainsString( value, this.remotePath ) || xmlContainsString( value,  prefix + this.remotePath ) )
         {
             return true;
         }
@@ -214,11 +202,25 @@ public class S3RemoteRepositoryParser
     /**
      * Extracts the prefix.
      */
-    private String getRelitivePath( StringBuilder temp )
+    private String getPrefix( StringBuilder temp )
+    {
+       if( temp.indexOf( "<Prefix>" ) < 0)
+        {
+            return "";
+        }
+        
+        int start = temp.indexOf( "<Prefix>" ) + 8;
+        int end = temp.indexOf( "</Prefix" );
+        return temp.substring( start, end );
+    }
+    
+    private String getRelitivePath( StringBuilder temp, String prefix )
     {
         int start = temp.indexOf( "<Prefix>" ) + 8;
         int end = temp.indexOf( "</Prefix" );
-        String relativePath = this.removePrefix( temp.substring( start, end ), this.basePrefix ).replaceAll( "//", "/" );
+        String relativePath = (this.remotePath + this.removePrefix( temp.substring( start, end ), prefix )).replaceAll( "//", "/" );
+        
+        // strip the leading /
         if( relativePath.startsWith( "/" ) )
         {
             relativePath = relativePath.substring( 1 );
@@ -228,8 +230,10 @@ public class S3RemoteRepositoryParser
 
     public ArrayList<RepositoryDirectory> extractLinks( StringBuilder indata )
     {
-        extractContent( indata );
-        extractCommonPrefix( indata );
+        String prefix = getPrefix( indata );
+        
+        extractContent( indata, prefix );
+        extractCommonPrefix( indata, prefix );
 
         return result;
     }

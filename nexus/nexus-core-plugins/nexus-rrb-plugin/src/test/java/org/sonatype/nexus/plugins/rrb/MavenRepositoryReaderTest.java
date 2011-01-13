@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -119,16 +120,34 @@ public class MavenRepositoryReaderTest
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
                 throws IOException, ServletException
             {   
-
-                if( target.endsWith( "/" ) )
+                String path = target;
+                if( path.endsWith( "/" ) && StringUtils.isNotEmpty( request.getParameter( "prefix" ) ) )
                 {
-                    // might need index.html handling somewhere else.
-                    target = target + "root";
+                    String prefix = request.getParameter( "prefix" );
+                    path = path + prefix.replaceAll( "/", "-" );
+                }
+                else if( target.endsWith( "/" ) )
+                {
+                    // might need welcome pages later.
+                    path += "root";
                 }
                 
                 response.setStatus( HttpServletResponse.SC_OK );
-                InputStream stream = this.getClass().getResourceAsStream( target );
+                InputStream stream = this.getClass().getResourceAsStream( path );
                
+                // added to make old tests work
+                // we need to fall back to the file name that matches 
+                if( stream == null && path.endsWith( "root" ))
+                {
+                    path = target;
+                    stream = this.getClass().getResourceAsStream( path );
+                }
+                
+                if( stream == null )
+                {
+                    System.out.println( "Error handling: " + path );
+                }
+                
                 StringBuilder result = new StringBuilder();
                 BufferedReader reader = new BufferedReader( new InputStreamReader( stream ) );
                 
@@ -182,7 +201,7 @@ public class MavenRepositoryReaderTest
     {
         List<RepositoryDirectory> result =
             reader.extract( "s3Example" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
-        assertEquals( 14, result.size() );
+        assertEquals( 13, result.size() );
     }
 
     @Test( timeout = 5000 )
@@ -226,21 +245,39 @@ public class MavenRepositoryReaderTest
         }
     }
     
-    @Test//( timeout = 5000 )
-    public void testAmazon_20110112_errorThenFindRoot()
+    @Test( timeout = 5000 )
+    public void testAmazon_20110112_slashCom()
     {
         // Fetched from URI http://repository.springsource.com/?prifix=maven/bundles/release&delimiter=/
         // and http://repository.springsource.com/maven/bundles/release/com
         List<RepositoryDirectory> result =
-            reader.extract( "/com" , localUrl, new FakeProxyRepo( getRemoteUrl() + "Amazon_20110112/maven/bundles/release" ), "test" );
+            reader.extract( "/com/" , localUrl, new FakeProxyRepo( getRemoteUrl() + "Amazon_20110112/maven/bundles/release" ), "test" );
         assertEquals( "Result: "+ result, 1, result.size() );
         
         RepositoryDirectory repositoryDirectory1 = result.get( 0 );
         Assert.assertFalse( repositoryDirectory1.isLeaf() );
         Assert.assertEquals( localUrl + "/com/springsource/", repositoryDirectory1.getResourceURI() );
         Assert.assertEquals( "/com/springsource/", repositoryDirectory1.getRelativePath() );
+    }
+    
+    @Test//( timeout = 5000 )
+    public void testAmazon_20110112_slashRoot()
+    {
+        // Fetched from URI http://repository.springsource.com/?prifix=maven/bundles/release&delimiter=/
+        // and http://repository.springsource.com/maven/bundles/release/
+        List<RepositoryDirectory> result =
+            reader.extract( "/" , localUrl, new FakeProxyRepo( getRemoteUrl() + "Amazon_20110112/maven/bundles/release" ), "test" );
+        assertEquals( "Result: "+ result, 2, result.size() );
         
+        RepositoryDirectory repositoryDirectory1 = result.get( 0 );
+        Assert.assertFalse( repositoryDirectory1.isLeaf() );
+        Assert.assertEquals( localUrl + "/com/", repositoryDirectory1.getResourceURI() );
+        Assert.assertEquals( "/com/", repositoryDirectory1.getRelativePath() );
         
+        RepositoryDirectory repositoryDirectory2 = result.get( 1 );
+        Assert.assertFalse( repositoryDirectory2.isLeaf() );
+        Assert.assertEquals( localUrl + "/org/", repositoryDirectory2.getResourceURI() );
+        Assert.assertEquals( "/org/", repositoryDirectory2.getRelativePath() );
     }
     
     @Test( timeout = 5000 )

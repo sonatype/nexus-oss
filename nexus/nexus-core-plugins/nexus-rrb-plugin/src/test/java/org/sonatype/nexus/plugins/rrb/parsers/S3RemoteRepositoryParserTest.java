@@ -57,8 +57,8 @@ public class S3RemoteRepositoryParserTest
         List<RepositoryDirectory> result = parser.extractLinks( indata );
 
         // Contents key:ed as robots.txt should not appear in the list of
-        // RepositoryDirectory, which means that the result's size should be 14.
-        assertEquals( 14, result.size() );
+        // RepositoryDirectory, which means that the result's size should be 13.
+        assertEquals( 13, result.size() );
     }
 
     /**
@@ -85,13 +85,12 @@ public class S3RemoteRepositoryParserTest
     public void testExtractContent()
     {
         StringBuilder indata = new StringBuilder( contentString() );
-        parser.extractContent( indata );
+        parser.extractContent( indata, "milestone" );
         List<RepositoryDirectory> result = parser.result;
         assertEquals( 1, result.size() );
         RepositoryDirectory repositoryDirectory = result.iterator().next();
         assertEquals( "org.springframework.batch.archetype.simple.cli", repositoryDirectory.getText() );
-        assertEquals(
-                      localUrl + "/org/springframework/batch/org.springframework.batch.archetype.simple.cli/",
+        assertEquals( localUrl + "/org/springframework/batch/org.springframework.batch.archetype.simple.cli/",
                       repositoryDirectory.getResourceURI() );
         assertEquals( "/org/springframework/batch/org.springframework.batch.archetype.simple.cli/",
                       repositoryDirectory.getRelativePath() );
@@ -107,7 +106,7 @@ public class S3RemoteRepositoryParserTest
         parser = new S3RemoteRepositoryParser( "/", localUrl, id, "" );
         
         StringBuilder indata = new StringBuilder( repoWithCommonPrefixes() );
-        parser.extractCommonPrefix( indata );
+        parser.extractCommonPrefix( indata, "" );
         List<RepositoryDirectory> result = parser.result;
         assertEquals( 5, result.size() );
         String[] expectedResults = { "external", "milestone", "osgi", "release", "snapshot" };
@@ -153,7 +152,7 @@ public class S3RemoteRepositoryParserTest
             + "		<Prefix>milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli</Prefix>"
             + "		<Marker></Marker>" + "		<MaxKeys>1000</MaxKeys>" + "		<IsTruncated>false</IsTruncated>	"
             + "		<Contents>"
-            + "			<Key>milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli/</Key>"
+            + "			<Key>milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli/one</Key>"
             + "			<LastModified>2009-01-29T20:11:37.000Z</LastModified>"
             + "			<ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag>" + "			<Size>0</Size>"
             + "			<StorageClass>STANDARD</StorageClass>" + "		</Contents>" + "	</ListBucketResult>";
@@ -167,7 +166,7 @@ public class S3RemoteRepositoryParserTest
             + "		<Prefix>milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli</Prefix>"
             + "		<Marker></Marker>" + "		<MaxKeys>1000</MaxKeys>" + "		<IsTruncated>false</IsTruncated>	"
             + "		<Contents>"
-            + "			<Key>milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli/</Key>"
+            + "			<Key>milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli/one</Key>"
             + "			<LastModified>2009-01-29T20:11:37.000Z</LastModified>"
             + "			<ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag>" + "			<Size>0</Size>"
             + "			<StorageClass>STANDARD</StorageClass>" + "		</Contents>" + "		<Contents>"
