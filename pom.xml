@@ -28,7 +28,7 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp-dependencies</artifactId>
-        <version>${this.version}</version>
+        <version>${nexus.oss.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
