@@ -28,7 +28,7 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp-dependencies</artifactId>
-        <version>${this.version}</version>
+        <version>${nexus.oss.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -77,8 +77,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
-      <version>${this.version}</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
