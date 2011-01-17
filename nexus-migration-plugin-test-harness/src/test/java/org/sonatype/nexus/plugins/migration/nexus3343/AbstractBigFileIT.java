@@ -2,10 +2,10 @@ package org.sonatype.nexus.plugins.migration.nexus3343;
 
 import java.io.File;
 
+import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;

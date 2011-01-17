@@ -16,9 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -69,16 +66,7 @@ public abstract class AbstractImportSecurityIT
         repoTargetUtil = new TargetMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
         privilegeUtil = new PrivilegesMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
         roleUtil = new RoleMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
-        try
-        {
-            repoUtil =
-                new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML,
-                                           this.getRepositoryTypeRegistry() );
-        }
-        catch ( ComponentLookupException e )
-        {
-            Assert.fail( "Failed to lookup component: " + e.getMessage() );
-        }
+        repoUtil = new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
         groupUtil = new GroupMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
     }
 

@@ -3,7 +3,7 @@ package org.sonatype.nexus.plugins.migration.nexus1832;
 import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
-import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.RepairIndexTask;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1832VirtualRepoIT
@@ -26,7 +26,7 @@ public class Nexus1832VirtualRepoIT
 
         checkGroup( "repo" );
 
-        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        TaskScheduleUtil.waitForAllTasksToStop( RepairIndexTask.class );
         checkIndex( "plugins-releases", "nexus1832", "plugins-releases", "1.0" );
         checkIndex( "repo", "nexus1832", "plugins-releases", "1.0" );
         checkIndex( "ext-snapshots", "nexus1832", "ext-snapshots", "1.0-SNAPSHOT" );

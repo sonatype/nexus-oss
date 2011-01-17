@@ -96,6 +96,8 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-indexer-lucene-app</artifactId>
+      <scope>provided</scope>
+      <version>${nexus.version}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

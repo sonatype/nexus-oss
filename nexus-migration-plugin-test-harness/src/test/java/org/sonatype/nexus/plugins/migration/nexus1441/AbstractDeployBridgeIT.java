@@ -14,8 +14,8 @@ package org.sonatype.nexus.plugins.migration.nexus1441;
 
 import java.io.File;
 
+import org.apache.maven.index.artifact.Gav;
 import org.junit.Assert;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;

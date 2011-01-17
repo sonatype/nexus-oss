@@ -67,7 +67,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
-import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.RepairIndexTask;
 import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 import org.sonatype.nexus.templates.repository.ManuallyConfiguredRepositoryTemplate;
@@ -964,7 +964,7 @@ public class DefaultArtifactoryMigrator
                 result.addWarningMessage( "Error creating maven metadata " + repoId, e );
             }
 
-            ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+            RepairIndexTask rt = nexusScheduler.createTaskInstance( RepairIndexTask.class );
             rt.setRepositoryId( repoId );
             schedule = nexusScheduler.submit( "reindex-" + repoId, rt );
             try

@@ -19,24 +19,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.task.ArtifactoryMigrationTaskDescriptor;
 import org.sonatype.nexus.plugins.migration.util.ImportMessageUtil;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
-import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
@@ -64,16 +64,8 @@ public abstract class AbstractMigrationIntegrationTest
 
     public AbstractMigrationIntegrationTest()
     {
-        try
-        {
-            this.repositoryUtil =
-                new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML,
-                    this.getRepositoryTypeRegistry() );
-        }
-        catch ( ComponentLookupException e )
-        {
-            Assert.fail( "Failed to lookup component: " + e.getMessage() );
-        }
+        this.repositoryUtil =
+            new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
         this.groupUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
         this.searchUtil = new SearchMessageUtil( this );
         this.userUtil = new UserMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
@@ -267,4 +259,5 @@ public abstract class AbstractMigrationIntegrationTest
         new EventInspectorsUtil( this ).waitForCalmPeriod();
         TaskScheduleUtil.waitForAllTasksToStop();
     }
+    
 }
