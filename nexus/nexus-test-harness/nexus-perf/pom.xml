@@ -24,7 +24,7 @@
   <parent>
     <artifactId>nexus-test-harness</artifactId>
     <groupId>org.sonatype.nexus</groupId>
-    <version>1.9-SNAPSHOT</version>
+    <version>1.10-SNAPSHOT</version>
   </parent>
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-perf</artifactId>
