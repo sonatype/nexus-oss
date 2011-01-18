@@ -94,10 +94,11 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-indexer-lucene-app</artifactId>
-      <scope>provided</scope>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-indexer-lucene-plugin</artifactId>
       <version>${nexus.version}</version>
+      <type>nexus-plugin</type>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
