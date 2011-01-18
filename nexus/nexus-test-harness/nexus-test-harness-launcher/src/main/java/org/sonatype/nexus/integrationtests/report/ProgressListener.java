@@ -31,13 +31,17 @@ public class ProgressListener
 
     private PrintStream out;
 
+    private PrintStream err;
+
     @Override
     public void onStart( ITestContext testContext )
     {
         super.onStart( testContext );
 
         out = System.out;
+        err = System.err;
         System.setOut( new PrintStream( new NullOutputStream() ) );
+        System.setErr( new PrintStream( new NullOutputStream() ) );
     }
 
     @Override
@@ -46,6 +50,7 @@ public class ProgressListener
         super.onFinish( testContext );
 
         System.setOut( out );
+        System.setErr( err );
     }
 
     @Override
