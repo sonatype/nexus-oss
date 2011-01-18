@@ -112,4 +112,11 @@
       </plugin>
     </plugins>
   </build>
+  
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/trunk/nexus-migration-plugin</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/trunk/nexus-migration-plugin</developerConnection>
+    <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-migration-plugin</url>
+  </scm>
+  
 </project>
