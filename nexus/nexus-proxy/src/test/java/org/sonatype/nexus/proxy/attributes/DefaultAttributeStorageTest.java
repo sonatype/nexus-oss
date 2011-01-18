@@ -129,7 +129,11 @@ public class DefaultAttributeStorageTest
         assertTrue( "kuku".equals( file1.getAttributes().get( "kuku" ) ) );
 
         // this above is same as in testSimplePutGet(), but now we will replace the attribute file
-        File attributeFile = new File( localStorageDirectory, ".nexus/attributes/a.txt" );
+
+        // reverted back to "old" attributes
+        File attributeFile = new File( ((DefaultFSAttributeStorage)attributeStorage).getWorkingDirectory(), repository.getId() + "/a.txt" );
+        // File attributeFile = new File( localStorageDirectory, ".nexus/attributes/a.txt" );
+        
         FileUtils.fileWrite( attributeFile.getAbsolutePath(), "<file" );
 
         // try to read it, we should not get NPE

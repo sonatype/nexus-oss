@@ -52,7 +52,7 @@ import com.thoughtworks.xstream.XStreamException;
  * 
  * @author cstamas
  */
-@Component( role = AttributeStorage.class )
+@Component( role = AttributeStorage.class, hint = "ls" )
 public class DefaultLSAttributeStorage
     implements AttributeStorage
 {

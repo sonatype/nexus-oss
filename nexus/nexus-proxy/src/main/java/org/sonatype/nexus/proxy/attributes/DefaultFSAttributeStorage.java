@@ -26,7 +26,7 @@ import java.io.IOException;
 import org.apache.commons.io.FilenameUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
@@ -40,6 +40,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.uid.IsMetadataMaintainedAttribute;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
@@ -53,11 +54,13 @@ import com.thoughtworks.xstream.XStreamException;
  * 
  * @author cstamas
  */
-@Component( role = AttributeStorage.class, hint = "fs" )
+@Component( role = AttributeStorage.class )
 public class DefaultFSAttributeStorage
-    extends AbstractLogEnabled
     implements AttributeStorage, EventListener, Initializable
 {
+    @Requirement
+    private Logger logger;
+
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
 
@@ -83,6 +86,11 @@ public class DefaultFSAttributeStorage
         this.xstream.alias( "compositeFile", DefaultStorageCompositeFileItem.class );
         this.xstream.alias( "collection", DefaultStorageCollectionItem.class );
         this.xstream.alias( "link", DefaultStorageLinkItem.class );
+    }
+
+    protected Logger getLogger()
+    {
+        return logger;
     }
 
     public void initialize()
@@ -138,8 +146,29 @@ public class DefaultFSAttributeStorage
         this.workingDirectory = baseDir;
     }
 
+    protected boolean IsMetadataMaintained( RepositoryItemUid uid )
+    {
+        Boolean isMetadataMaintained = uid.getAttributeValue( IsMetadataMaintainedAttribute.class );
+
+        if ( isMetadataMaintained != null )
+        {
+            return isMetadataMaintained.booleanValue();
+        }
+        else
+        {
+            // safest
+            return true;
+        }
+    }
+
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
+        if ( !IsMetadataMaintained( uid ) )
+        {
+            // do nothing
+            return false;
+        }
+
         uid.lockAttributes( Action.delete );
 
         try
@@ -172,6 +201,12 @@ public class DefaultFSAttributeStorage
 
     public AbstractStorageItem getAttributes( RepositoryItemUid uid )
     {
+        if ( !IsMetadataMaintained( uid ) )
+        {
+            // do nothing
+            return null;
+        }
+
         uid.lockAttributes( Action.read );
 
         try
@@ -203,6 +238,12 @@ public class DefaultFSAttributeStorage
 
     public void putAttribute( StorageItem item )
     {
+        if ( !IsMetadataMaintained( item.getRepositoryItemUid() ) )
+        {
+            // do nothing
+            return;
+        }
+
         RepositoryItemUid origUid = item.getRepositoryItemUid();
 
         origUid.lockAttributes( Action.create );
@@ -297,6 +338,8 @@ public class DefaultFSAttributeStorage
 
         AbstractStorageItem result = null;
 
+        boolean corrupt = false;
+
         if ( target.exists() && target.isFile() )
         {
             FileInputStream fis = null;
@@ -323,8 +366,16 @@ public class DefaultFSAttributeStorage
                     result.setLastRequested( System.currentTimeMillis() );
                 }
             }
-            catch ( XStreamException e )
+            catch ( IOException e )
             {
+                getLogger().info( "While reading attributes of " + uid + " we got IOException:", e );
+
+                throw e;
+            }
+            catch ( NullPointerException e )
+            {
+                // NEXUS-3911: seems that on malformed XML the XMLpull parser throws NPE?
+                // org.xmlpull.mxp1.MXParser.fillBuf(MXParser.java:3020) : NPE
                 // it is corrupt
                 if ( getLogger().isDebugEnabled() )
                 {
@@ -337,12 +388,33 @@ public class DefaultFSAttributeStorage
                     getLogger().info( "Attributes of " + uid + " are corrupt, deleting it." );
                 }
 
-                deleteAttributes( uid );
+                corrupt = true;
+            }
+            catch ( XStreamException e )
+            {
+                // it is corrupt -- so says XStream, but see above and NEXUS-3911
+                if ( getLogger().isDebugEnabled() )
+                {
+                    // we log the stacktrace
+                    getLogger().info( "Attributes of " + uid + " are corrupt, deleting it.", e );
+                }
+                else
+                {
+                    // just remark about this
+                    getLogger().info( "Attributes of " + uid + " are corrupt, deleting it." );
+                }
+
+                corrupt = true;
             }
             finally
             {
                 IOUtil.close( fis );
             }
+        }
+
+        if ( corrupt )
+        {
+            deleteAttributes( uid );
         }
 
         return result;

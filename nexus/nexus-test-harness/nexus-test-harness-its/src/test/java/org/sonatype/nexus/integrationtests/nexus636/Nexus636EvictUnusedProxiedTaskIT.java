@@ -63,7 +63,8 @@ public class Nexus636EvictUnusedProxiedTaskIT
     {
 
         repositoryPath = new File( nexusWorkDir, "storage/" + REPO_RELEASE_PROXY_REPO1 );
-        attributesPath = new File( nexusWorkDir, "storage/" + REPO_RELEASE_PROXY_REPO1 + "/.nexus/attributes" );
+        // attributesPath = new File( nexusWorkDir, "storage/" + REPO_RELEASE_PROXY_REPO1 + "/.nexus/attributes" );
+        attributesPath = new File( nexusWorkDir, "proxy/attributes/" + REPO_RELEASE_PROXY_REPO1 );
 
         File repo = getTestFile( "repo" );
 

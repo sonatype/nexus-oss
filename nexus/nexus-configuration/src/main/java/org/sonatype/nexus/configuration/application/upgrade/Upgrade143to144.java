@@ -101,6 +101,8 @@ public class Upgrade143to144
             }
         }
 
+        // DISABLED FOR NOW, WILL DO THIS PROXY ATTRIBUTES MOVE IN SOME POST-1.9 VERSION
+/*
         // Upgrade for Attributes
         final File oldAttributesBase = new File( applicationConfiguration.getWorkingDirectory( "proxy" ), "attributes" );
 
@@ -175,6 +177,8 @@ public class Upgrade143to144
             getLogger().warn(
                 "Could not delete old proxy folder from nexus work directory but migration did succeed; manual cleanup needed." );
         }
+*/        
+        // DISABLED FOR NOW, WILL DO THIS PROXY ATTRIBUTES MOVE IN SOME POST-1.9 VERSION
 
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
