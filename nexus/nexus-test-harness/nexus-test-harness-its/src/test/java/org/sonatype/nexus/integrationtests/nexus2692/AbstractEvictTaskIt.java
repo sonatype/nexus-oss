@@ -74,7 +74,7 @@ public class AbstractEvictTaskIt
         this.storageWorkDir = new File( workDir, "storage" );
 
         FileUtils.copyDirectoryStructure( this.getTestResourceAsFile( "storage/" ), storageWorkDir );
-        FileUtils.copyDirectoryStructure( this.getTestResourceAsFile( "attributes/" ), storageWorkDir );
+        copyAttributes();
 
         // now setup all the attributes
         File attributesInfo = this.getTestResourceAsFile( "attributes.info" );
@@ -144,8 +144,21 @@ public class AbstractEvictTaskIt
         }
     }
 
+    protected void copyAttributes()
+        throws IOException
+    {
+        File srcDir = getTestResourceAsFile( "attributes/" );
+
+        // old location
+        FileUtils.copyDirectoryStructure( srcDir, new File( new File( nexusWorkDir ), "proxy/attributes" ) );
+        
+        // new location will need path mangling, see getAttributeFile()
+    }
+
     protected File getAttributeFile( String filePart )
     {
+        return new File(new File( new File( nexusWorkDir ), "proxy/attributes" ), filePart);
+        /* This is NEW layout!
         String[] parts = filePart.split( "/" );
 
         // repoId
@@ -161,6 +174,7 @@ public class AbstractEvictTaskIt
         }
 
         return new File( storageWorkDir, sb.toString() );
+        */
     }
 
     protected void runTask( int days, String repoId )
@@ -271,16 +285,17 @@ public class AbstractEvictTaskIt
         throws IOException
     {
         SortedSet<String> result = new TreeSet<String>();
-
-        SortedSet<String> attributes = getFilePaths( getStorageWorkDir() );
+        
+        SortedSet<String> attributes = getFilePaths( new File( new File( nexusWorkDir ), "proxy/attributes" ) );
+        // SortedSet<String> attributes = getFilePaths( getStorageWorkDir() );
 
         for ( String attribute : attributes )
         {
-            if ( attribute.contains( "/.nexus/attributes" ) && !attribute.contains( "/.nexus/trash/.nexus/attributes" ) )
-            {
+            // if ( attribute.contains( "/.nexus/attributes" ) && !attribute.contains( "/.nexus/trash/.nexus/attributes" ) )
+            //{
                 // "tweak" the path, since test is dumb
                 result.add( attribute.replace( "/.nexus/attributes", "" ) );
-            }
+            //}
         }
 
         return result;
