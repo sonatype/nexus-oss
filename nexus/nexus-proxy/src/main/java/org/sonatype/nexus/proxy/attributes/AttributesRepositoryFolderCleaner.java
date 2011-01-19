@@ -26,7 +26,8 @@ public class AttributesRepositoryFolderCleaner
             new File( new File( getApplicationConfiguration().getWorkingDirectory(), "proxy/attributes" ),
                 repository.getId() );
         
-        delete( defaultProxyAttributesFolder, deleteForever );
+        // attributes are not preserved
+        delete( defaultProxyAttributesFolder, true );
     }
 
 }
