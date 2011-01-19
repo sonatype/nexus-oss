@@ -58,7 +58,7 @@ public class ProgressListener
     {
         super.onTestFailedButWithinSuccessPercentage( tr );
 
-        showResult( tr, "partial success" );
+        showResult( tr, "partial success", err );
     }
 
     @Override
@@ -66,7 +66,7 @@ public class ProgressListener
     {
         super.onTestFailure( tr );
 
-        showResult( tr, "failed" );
+        showResult( tr, "failed", err );
     }
 
     @Override
@@ -74,7 +74,7 @@ public class ProgressListener
     {
         super.onTestSkipped( tr );
 
-        showResult( tr, "skipped" );
+        showResult( tr, "skipped", err );
     }
 
     @Override
@@ -82,12 +82,12 @@ public class ProgressListener
     {
         super.onTestSuccess( tr );
 
-        showResult( tr, "success" );
+        showResult( tr, "success", out );
     }
 
-    private void showResult( ITestResult result, String status )
+    private void showResult( ITestResult result, String status, PrintStream printer )
     {
-        out.println( "Result: " + result.getTestClass().getName() + "." + result.getName() + "() ===> " + status );
+        printer.println( "Result: " + result.getTestClass().getName() + "." + result.getName() + "() ===> " + status );
     }
 
 }
