@@ -33,12 +33,10 @@ public class PurgeTimelineTaskDescriptor
 
     public static final String OLDER_THAN_FIELD_ID = "purgeOlderThan";
 
-    private final NumberTextFormField olderThanField =
-        new NumberTextFormField(
-                                 OLDER_THAN_FIELD_ID,
-                                 "Purge items older than (days)",
-                                 "Set the number of days, to purge all items that were trashed before the given number of days.",
-                                 FormField.OPTIONAL );
+    private final NumberTextFormField olderThanField = new NumberTextFormField( OLDER_THAN_FIELD_ID,
+        "Purge items older than (days)",
+        "Set the number of days, to purge all items that were trashed before the given number of days.",
+        FormField.MANDATORY );
 
     public String getId()
     {
@@ -50,6 +48,7 @@ public class PurgeTimelineTaskDescriptor
         return "Purge Nexus Timeline";
     }
 
+    @Override
     public List<FormField> formFields()
     {
         List<FormField> fields = new ArrayList<FormField>();
