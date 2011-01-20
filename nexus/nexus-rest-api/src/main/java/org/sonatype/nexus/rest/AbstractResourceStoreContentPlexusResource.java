@@ -329,13 +329,16 @@ public abstract class AbstractResourceStoreContentPlexusResource
             return renderDescribeItem( context, req, res, variant, store, item.getResourceStoreRequest(), item );
         }
 
-        if ( !item.getRepositoryItemUid().getBooleanAttributeValue( IsRemotelyAccessibleAttribute.class ) )
+        if ( !item.isVirtual() )
         {
-            getLogger().debug(
-                String.format( "Request for remotely non-accessible UID %s is made and refused",
-                    item.getRepositoryItemUid().toString() ) );
+            if ( !item.getRepositoryItemUid().getBooleanAttributeValue( IsRemotelyAccessibleAttribute.class ) )
+            {
+                getLogger().debug(
+                    String.format( "Request for remotely non-accessible UID %s is made and refused",
+                        item.getRepositoryItemUid().toString() ) );
 
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Resource is not found." );
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Resource is not found." );
+            }
         }
 
         Representation result = null;
