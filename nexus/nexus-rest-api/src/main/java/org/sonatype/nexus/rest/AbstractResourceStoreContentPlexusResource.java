@@ -422,7 +422,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             for ( StorageItem child : children )
             {
-                if ( !child.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
+                if ( child.isVirtual() || !child.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
                 {
                     if ( !uniqueNames.contains( child.getName() ) )
                     {
