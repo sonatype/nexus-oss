@@ -394,12 +394,14 @@ public class CommonsHttpClientRemoteStorage
         method.setRequestHeader( new Header( "accept-encoding", "gzip, identity" ) );
         method.setRequestHeader( new Header( "cache-control", "no-cache" ) );
 
-        // HTTP keep alive should not be used
-        method.setRequestHeader( new Header( "Connection", "close" ) );
-        method.setRequestHeader( new Header( "Proxy-Connection", "close" ) );
+        // HTTP keep alive should not be used, except when NTLM is used
+        Boolean isNtlmUsed = (Boolean) ctx.getContextObject( HttpClientProxyUtil.NTLM_IS_IN_USE_KEY );
 
-        // to use HTTP keep alive
-        // method.setRequestHeader( new Header( "Connection", "Keep-Alive" ) );
+        if ( isNtlmUsed == null || !isNtlmUsed )
+        {
+            method.setRequestHeader( new Header( "Connection", "close" ) );
+            method.setRequestHeader( new Header( "Proxy-Connection", "close" ) );
+        }
 
         method.setFollowRedirects( true );
 
