@@ -18,11 +18,13 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
 
 /**
  * Snapshot storage
@@ -33,20 +35,36 @@ import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 public class SnapshotOperand
     extends AbstractOperand
 {
+    private final String timestamp;
+    
+    private final Snapshot snapshot;
 
-    private Snapshot snapshot;
+    private final List<SnapshotVersion> snapshotVersions;
 
-    private List<SnapshotVersion> snapshotVersions;
-
-    public SnapshotOperand( Snapshot data, SnapshotVersion... snapshotVersions )
+    public SnapshotOperand( final Version originModelVersion, final String timestamp, final Snapshot data,
+                            final SnapshotVersion... snapshotVersions )
     {
-        this( data, Arrays.asList( snapshotVersions ) );
+        this( originModelVersion, timestamp, data, Arrays.asList( snapshotVersions ) );
     }
 
-    public SnapshotOperand( Snapshot data, List<SnapshotVersion> snapshotVersions )
+    public SnapshotOperand( final Version originModelVersion, final String timestamp, final Snapshot data,
+                            final List<SnapshotVersion> snapshotVersions )
     {
+        super( originModelVersion );
+
+        this.timestamp = timestamp;
         this.snapshot = data;
-        this.snapshotVersions = snapshotVersions;
+        this.snapshotVersions = new ArrayList<SnapshotVersion>();
+
+        if ( snapshotVersions != null )
+        {
+            this.snapshotVersions.addAll( snapshotVersions );
+        }
+    }
+
+    public String getTimestamp()
+    {
+        return timestamp;
     }
 
     public Snapshot getSnapshot()
@@ -56,7 +74,7 @@ public class SnapshotOperand
 
     public List<SnapshotVersion> getSnapshotVersions()
     {
+        //TODO: should this be unmodifiable list? I think yes
         return snapshotVersions;
     }
-
 }

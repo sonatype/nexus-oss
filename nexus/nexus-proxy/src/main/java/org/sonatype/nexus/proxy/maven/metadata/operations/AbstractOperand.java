@@ -18,14 +18,23 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
+
 /**
- *
- *
  * @author Oleg Gusakov
  * @version $Id: AbstractOperand.java 720564 2008-11-25 18:58:02Z ogusakov $
- *
  */
 public abstract class AbstractOperand
 {
+    private final Version originModelVersion;
 
+    protected AbstractOperand( final Version originModelVersion )
+    {
+        this.originModelVersion = originModelVersion;
+    }
+
+    public Version getOriginModelVersion()
+    {
+        return originModelVersion;
+    }
 }

@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperation;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataUtil;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 import org.sonatype.nexus.proxy.maven.metadata.operations.SetSnapshotOperation;
 import org.sonatype.nexus.proxy.maven.metadata.operations.SnapshotOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.TimeUtil;
@@ -96,7 +97,7 @@ public class VersionDirMetadataProcessor
 
             md.setVersion( calculateVersion( path ) );
 
-            md.setModelVersion( "1.1.0" );
+            ModelVersionUtility.setModelVersion( md, ModelVersionUtility.LATEST_MODEL_VERSION );
 
             versioning( md, getGavs( path, metadataHelper.gavData.get( path ) ) );
 
@@ -158,7 +159,8 @@ public class VersionDirMetadataProcessor
 
         for ( Gav gav : artifactNames )
         {
-            ops.add( new SetSnapshotOperation( new SnapshotOperand( buildSnapshot( gav ), buildVersion( gav ) ) ) );
+            ops.add( new SetSnapshotOperation( new SnapshotOperand( ModelVersionUtility.LATEST_MODEL_VERSION,
+                TimeUtil.getUTCTimestamp(), buildSnapshot( gav ), buildVersion( gav ) ) ) );
         }
 
         MetadataBuilder.changeMetadata( metadata, ops );

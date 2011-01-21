@@ -19,6 +19,7 @@
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 import org.apache.maven.artifact.repository.metadata.Plugin;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
 
 /**
  * Plugin storage
@@ -29,11 +30,12 @@ import org.apache.maven.artifact.repository.metadata.Plugin;
 public class PluginOperand
     extends AbstractOperand
 {
+    private final Plugin plugin;
 
-    Plugin plugin;
-
-    public PluginOperand( Plugin data )
+    public PluginOperand( final Version originModelVersion, final Plugin data )
     {
+        super( originModelVersion );
+
         this.plugin = data;
     }
 

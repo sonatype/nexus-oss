@@ -39,6 +39,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.AddVersionOperation;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperation;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 import org.sonatype.nexus.proxy.maven.metadata.operations.PluginOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.SetSnapshotOperation;
 import org.sonatype.nexus.proxy.maven.metadata.operations.SnapshotOperand;
@@ -87,6 +88,7 @@ public class DefaultMetadataUpdater
             if ( gav.isSnapshot() )
             {
                 operations.add( new SetSnapshotOperation( new SnapshotOperand(
+                    ModelVersionUtility.getModelVersion( gavMd ), TimeUtil.getUTCTimestamp(),
                     MetadataBuilder.createSnapshot( request.getVersion() ), buildVersioning( gav ) ) ) );
 
                 MetadataBuilder.changeMetadata( gavMd, operations );
@@ -100,7 +102,8 @@ public class DefaultMetadataUpdater
 
             Metadata gaMd = locator.retrieveGAMetadata( request );
 
-            operations.add( new AddVersionOperation( new StringOperand( request.getVersion() ) ) );
+            operations.add( new AddVersionOperation( new StringOperand( ModelVersionUtility.getModelVersion( gaMd ),
+                request.getVersion() ) ) );
 
             MetadataBuilder.changeMetadata( gaMd, operations );
 
@@ -118,7 +121,8 @@ public class DefaultMetadataUpdater
 
                 if ( pluginElem != null )
                 {
-                    operations.add( new AddPluginOperation( new PluginOperand( pluginElem ) ) );
+                    operations.add( new AddPluginOperation( new PluginOperand(
+                        ModelVersionUtility.getModelVersion( gMd ), pluginElem ) ) );
 
                     MetadataBuilder.changeMetadata( gMd, operations );
 
@@ -176,6 +180,7 @@ public class DefaultMetadataUpdater
             if ( gav.isSnapshot() )
             {
                 operations.add( new SetSnapshotOperation( new SnapshotOperand(
+                    ModelVersionUtility.getModelVersion( gavMd ), TimeUtil.getUTCTimestamp(),
                     MetadataBuilder.createSnapshot( request.getVersion() ), buildVersioning( gav ) ) ) );
             }
 
@@ -189,7 +194,8 @@ public class DefaultMetadataUpdater
 
             Metadata gaMd = locator.retrieveGAMetadata( request );
 
-            operations.add( new AddVersionOperation( new StringOperand( request.getVersion() ) ) );
+            operations.add( new AddVersionOperation( new StringOperand( ModelVersionUtility.getModelVersion( gaMd ),
+                request.getVersion() ) ) );
 
             MetadataBuilder.changeMetadata( gaMd, operations );
 
@@ -207,7 +213,8 @@ public class DefaultMetadataUpdater
 
                 if ( pluginElem != null )
                 {
-                    operations.add( new AddPluginOperation( new PluginOperand( pluginElem ) ) );
+                    operations.add( new AddPluginOperation( new PluginOperand(
+                        ModelVersionUtility.getModelVersion( gMd ), pluginElem ) ) );
 
                     MetadataBuilder.changeMetadata( gMd, operations );
 

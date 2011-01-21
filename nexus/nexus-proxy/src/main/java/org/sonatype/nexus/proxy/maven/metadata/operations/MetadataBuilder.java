@@ -21,6 +21,7 @@ package org.sonatype.nexus.proxy.maven.metadata.operations;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -97,7 +98,6 @@ public class MetadataBuilder
     public static void changeMetadata( Metadata metadata, List<MetadataOperation> mutators )
         throws MetadataException
     {
-
         boolean changed = false;
 
         if ( metadata == null )
@@ -105,19 +105,38 @@ public class MetadataBuilder
             metadata = new Metadata();
         }
 
+        // Uncomment these once the fixes are in place
+        // Version mdModelVersion = ModelVersionUtility.getModelVersion( metadata );
+
         if ( mutators != null && mutators.size() > 0 )
         {
+            boolean currentChanged = false;
+
             for ( MetadataOperation op : mutators )
             {
-                changed = op.perform( metadata ) || changed;
+                currentChanged = op.perform( metadata );
+
+                // if (currentChanged) {
+                // mdModelVersion = max of mdModelVersion and op.getModelVersion;
+                // }
+
+                changed = currentChanged || changed;
             }
         }
+
+        // ModelVersionUtility.setModelVersion( metadata, mdModelVersion );
     }
 
     public static void changeMetadata( Metadata metadata, MetadataOperation op )
         throws MetadataException
     {
         changeMetadata( metadata, Collections.singletonList( op ) );
+    }
+
+    public static void changeMetadata( Metadata metadata, MetadataOperation... ops )
+        throws MetadataException
+    {
+        changeMetadata( metadata, Arrays.asList( ops ) );
     }
 
     /**

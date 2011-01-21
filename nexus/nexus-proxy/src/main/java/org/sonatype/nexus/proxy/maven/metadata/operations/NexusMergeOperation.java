@@ -25,14 +25,16 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
 
 public class NexusMergeOperation
     implements MetadataOperation
 {
-
     private Metadata sourceMetadata;
 
-    public NexusMergeOperation( MetadataOperand data )
+    private Version sourceModelVersion;
+
+    public NexusMergeOperation( final MetadataOperand data )
         throws MetadataException
     {
         setOperand( data );
@@ -99,7 +101,7 @@ public class NexusMergeOperation
         // plugins
         for ( Plugin plugin : sourceMetadata.getPlugins() )
         {
-            ops.add( new AddPluginOperation( new PluginOperand( plugin ) ) );
+            ops.add( new AddPluginOperation( new PluginOperand( sourceModelVersion, plugin ) ) );
         }
 
         // gav
@@ -132,12 +134,12 @@ public class NexusMergeOperation
         // versioning
 
         if ( sourceMetadata.getVersioning() != null )
-        {            
+        {
             // versioning.verions
             // merge all versions together
             for ( String version : sourceMetadata.getVersioning().getVersions() )
             {
-                ops.add( new AddVersionOperation( new StringOperand( version ) ) );
+                ops.add( new AddVersionOperation( new StringOperand( sourceModelVersion, version ) ) );
             }
 
             // versioning.snapshot
@@ -148,23 +150,24 @@ public class NexusMergeOperation
             {
                 long timestamp = -1;
 
-                if ( targetMetadata.getVersioning() != null 
-                    && targetMetadata.getVersioning().getSnapshot() != null 
+                if ( targetMetadata.getVersioning() != null && targetMetadata.getVersioning().getSnapshot() != null
                     && targetMetadata.getVersioning().getSnapshot().getTimestamp() != null )
                 {
                     try
                     {
-                        timestamp = Long.parseLong( targetMetadata.getVersioning().getSnapshot().getTimestamp().replace( ".", "" ) );
+                        timestamp =
+                            Long.parseLong( targetMetadata.getVersioning().getSnapshot().getTimestamp().replace( ".",
+                                "" ) );
                     }
                     catch ( NumberFormatException e )
                     {
                     }
                 }
-                
+
                 if ( sourceSnapshot.getTimestamp() != null )
                 {
                     long sourceTimestamp = -1;
-                    
+
                     try
                     {
                         sourceTimestamp = Long.parseLong( sourceSnapshot.getTimestamp().replace( ".", "" ) );
@@ -172,10 +175,11 @@ public class NexusMergeOperation
                     catch ( NumberFormatException e )
                     {
                     }
-                    
+
                     if ( sourceTimestamp > timestamp )
                     {
-                        ops.add( new SetSnapshotOperation( new SnapshotOperand( sourceSnapshot,
+                        ops.add( new SetSnapshotOperation( new SnapshotOperand( sourceModelVersion,
+                            sourceSnapshot.getTimestamp().replace( ".", "" ), sourceSnapshot,
                             sourceMetadata.getVersioning().getSnapshotVersions() ) ) );
                     }
                 }
@@ -205,6 +209,8 @@ public class NexusMergeOperation
         }
 
         sourceMetadata = ( (MetadataOperand) data ).getOperand();
+
+        sourceModelVersion = ( (MetadataOperand) data ).getOriginModelVersion();
     }
 
     // ==

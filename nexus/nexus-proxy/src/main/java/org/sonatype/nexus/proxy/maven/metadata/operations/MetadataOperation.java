@@ -30,12 +30,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 public interface MetadataOperation
 {
     /**
-     *  sets the operation's data
-     */
-    public void setOperand( AbstractOperand data )
-        throws MetadataException;
-  
-    /**
      * performs the operation
      * 
      * @param metadata to perform on

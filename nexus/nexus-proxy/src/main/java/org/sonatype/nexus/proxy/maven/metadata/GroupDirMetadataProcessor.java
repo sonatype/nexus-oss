@@ -32,6 +32,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.AddPluginOperation;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperation;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 import org.sonatype.nexus.proxy.maven.metadata.operations.PluginOperand;
 
 /**
@@ -76,10 +77,12 @@ public class GroupDirMetadataProcessor
 
             for ( Plugin plugin : metadataHelper.gData.get( path ) )
             {
-                ops.add( new AddPluginOperation( new PluginOperand( plugin ) ) );
+                ops.add( new AddPluginOperation( new PluginOperand( ModelVersionUtility.LATEST_MODEL_VERSION, plugin ) ) );
             }
 
             MetadataBuilder.changeMetadata( md, ops );
+
+            ModelVersionUtility.setModelVersion( md, ModelVersionUtility.LATEST_MODEL_VERSION );
 
             return md;
         }

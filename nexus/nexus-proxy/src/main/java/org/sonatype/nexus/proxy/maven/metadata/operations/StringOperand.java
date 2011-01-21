@@ -18,6 +18,9 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
+import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
+
 /**
  * String storage
  * 
@@ -27,15 +30,17 @@ package org.sonatype.nexus.proxy.maven.metadata.operations;
 public class StringOperand
     extends AbstractOperand
 {
+    private final String str;
 
-    private String str;
-
-    public StringOperand( String data )
+    public StringOperand( final Version originModelVersion, final String data )
     {
-        if ( data == null || data.length() < 1 )
+        super( originModelVersion );
+
+        if ( StringUtils.isBlank( data ) )
         {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException( "String operand may not carry empty/null string!" );
         }
+
         this.str = data;
     }
 

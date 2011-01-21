@@ -24,6 +24,7 @@ import java.util.List;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
 
 /**
  * adds new snapshot to metadata
@@ -34,7 +35,6 @@ import org.apache.maven.artifact.repository.metadata.Versioning;
 public class SetSnapshotOperation
     implements MetadataOperation
 {
-
     private SnapshotOperand operand;
 
     /**
@@ -81,45 +81,61 @@ public class SetSnapshotOperation
             metadata.setVersioning( vs );
         }
 
-        return updateSnapshot( vs );
+        return updateSnapshot( metadata );
     }
 
-    private boolean updateSnapshot( Versioning vs )
+    private boolean updateSnapshot( Metadata metadata )
         throws MetadataException
     {
+        final Versioning vs = metadata.getVersioning();
+
         if ( operand.getSnapshot() != null )
         {
             vs.setSnapshot( operand.getSnapshot() );
         }
 
-        vs.setLastUpdated( TimeUtil.getUTCTimestamp() );
-
         List<SnapshotVersion> extras = operand.getSnapshotVersions();
         List<SnapshotVersion> currents = vs.getSnapshotVersions();
-        for ( SnapshotVersion extra : extras )
+
+        if ( extras != null && extras.size() > 0 )
         {
-            SnapshotVersion current = MetadataUtil.searchForEquivalent( extra, currents );
-            if ( current == null )
+            // fix/upgrade the version
+            ModelVersionUtility.setModelVersion( metadata, ModelVersionUtility.LATEST_MODEL_VERSION );
+
+            for ( SnapshotVersion extra : extras )
             {
-                currents.add( extra );
-            }
-            else
-            {
-                try
+                SnapshotVersion current = MetadataUtil.searchForEquivalent( extra, currents );
+                if ( current == null )
                 {
-                    if ( TimeUtil.compare( current.getUpdated(), extra.getUpdated() ) < 0 )
-                    {
-                        currents.remove( current );
-                        currents.add( extra );
-                    }
+                    currents.add( extra );
                 }
-                catch ( ParseException e )
+                else
                 {
-                    throw new MetadataException(
-                        "Invalid timetamp: " + current.getUpdated() + "-" + extra.getUpdated(), e );
+                    try
+                    {
+                        if ( TimeUtil.compare( current.getUpdated(), extra.getUpdated() ) < 0 )
+                        {
+                            currents.remove( current );
+                            currents.add( extra );
+                        }
+                    }
+                    catch ( ParseException e )
+                    {
+                        throw new MetadataException( "Invalid timetamp: " + current.getUpdated() + "-"
+                            + extra.getUpdated(), e );
+                    }
                 }
             }
         }
+        else if ( Version.V100 == operand.getOriginModelVersion() )
+        {
+            for ( SnapshotVersion current : currents )
+            {
+                current.setUpdated( operand.getTimestamp() );
+            }
+        }
+
+        vs.setLastUpdated( operand.getTimestamp() );
 
         return true;
     }

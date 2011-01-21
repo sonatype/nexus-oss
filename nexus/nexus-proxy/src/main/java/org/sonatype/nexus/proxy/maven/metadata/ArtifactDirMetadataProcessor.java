@@ -29,6 +29,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.AddVersionOperation;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperation;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 import org.sonatype.nexus.proxy.maven.metadata.operations.StringOperand;
 
 /**
@@ -74,6 +75,8 @@ public class ArtifactDirMetadataProcessor
 
             versioning( md, metadataHelper.gaData.get( path ) );
 
+            ModelVersionUtility.setModelVersion( md, ModelVersionUtility.LATEST_MODEL_VERSION );
+
             return md;
         }
         catch ( MetadataException e )
@@ -112,7 +115,7 @@ public class ArtifactDirMetadataProcessor
 
         for ( String version : versions )
         {
-            ops.add( new AddVersionOperation( new StringOperand( version ) ) );
+            ops.add( new AddVersionOperation( new StringOperand( ModelVersionUtility.LATEST_MODEL_VERSION, version ) ) );
         }
 
         MetadataBuilder.changeMetadata( metadata, ops );

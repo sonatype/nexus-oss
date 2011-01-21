@@ -35,6 +35,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 
 public class GroupMetadataMergeTest
     extends AbstractProxyTestEnvironment
@@ -85,20 +86,13 @@ public class GroupMetadataMergeTest
 
         assertEquals( "1.4.0-SNAPSHOT", md.getVersioning().getLatest() );
         assertEquals( "1.3.4", md.getVersioning().getRelease() );
-        String[] versions = {
-            "1.2.1",
-            "1.3.0",
-            "1.3.1-SNAPSHOT",
-            "1.3.1",
-            "1.3.2",
-            "1.3.3-SNAPSHOT",
-            "1.3.3",
-            "1.3.4",
-            "1.4.0-SNAPSHOT" };
+        String[] versions =
+            { "1.2.1", "1.3.0", "1.3.1-SNAPSHOT", "1.3.1", "1.3.2", "1.3.3-SNAPSHOT", "1.3.3", "1.3.4",
+                "1.4.0-SNAPSHOT" };
         assertEquals( Arrays.asList( versions ), md.getVersioning().getVersions() );
         assertEquals( "20090620231210", md.getVersioning().getLastUpdated() );
     }
-    
+
     public void testGAMerge2()
         throws Exception
     {
@@ -114,18 +108,12 @@ public class GroupMetadataMergeTest
 
         assertEquals( "2.3.0.5-SNAPSHOT", md.getVersioning().getLatest() );
         assertEquals( "2.3.0.4", md.getVersioning().getRelease() );
-        String[] versions = {
-            "2.3.0.2-SNAPSHOT",
-            "2.3.0.2",
-            "2.3.0.3-SNAPSHOT",
-            "2.3.0.3",
-            "2.3.0.4-SNAPSHOT",
-            "2.3.0.4",
-            "2.3.0.5-SNAPSHOT" };
+        String[] versions =
+            { "2.3.0.2-SNAPSHOT", "2.3.0.2", "2.3.0.3-SNAPSHOT", "2.3.0.3", "2.3.0.4-SNAPSHOT", "2.3.0.4",
+                "2.3.0.5-SNAPSHOT" };
         assertEquals( Arrays.asList( versions ), md.getVersioning().getVersions() );
         assertEquals( "20091124120836", md.getVersioning().getLastUpdated() );
     }
-
 
     /**
      * Merge 3 GA maven-metadata.xml
@@ -147,45 +135,31 @@ public class GroupMetadataMergeTest
 
         assertEquals( "1.4.1-SNAPSHOT", md.getVersioning().getLatest() );
         assertEquals( "1.3.4", md.getVersioning().getRelease() );
-        String[] versions = {
-            "1.2.1",
-            "1.3.0",
-            "1.3.1-SNAPSHOT",
-            "1.3.1",
-            "1.3.2",
-            "1.3.3-SNAPSHOT",
-            "1.3.3",
-            "1.3.4",
-            "1.4.0-SNAPSHOT",
-            "1.4.1-SNAPSHOT" };
+        String[] versions =
+            { "1.2.1", "1.3.0", "1.3.1-SNAPSHOT", "1.3.1", "1.3.2", "1.3.3-SNAPSHOT", "1.3.3", "1.3.4",
+                "1.4.0-SNAPSHOT", "1.4.1-SNAPSHOT" };
         assertEquals( Arrays.asList( versions ), md.getVersioning().getVersions() );
         assertEquals( "20090720231210", md.getVersioning().getLastUpdated() );
     }
-    
+
     public void testGA4Merge()
         throws Exception
     {
         String mdPath = "/md-merge/ga4/maven-metadata.xml";
-    
+
         StorageItem item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath, false ) );
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
-    
+
         Metadata md = parseMetadata( (StorageFileItem) item );
-    
+
         assertEquals( "xxx.distribution.core", md.getGroupId() );
         assertEquals( "core", md.getArtifactId() );
-    
+
         assertEquals( "2.3.0.0.5-SNAPSHOT", md.getVersioning().getLatest() );
         assertEquals( "2.3.0.0.4", md.getVersioning().getRelease() );
-        String[] versions = {
-            "2.3.0.0.1-SNAPSHOT",
-            "2.3.0.0.2-SNAPSHOT",
-            "2.3.0.0.2",
-            "2.3.0.0.3-SNAPSHOT",
-            "2.3.0.0.3",
-            "2.3.0.0.4-SNAPSHOT",
-            "2.3.0.0.4",
-            "2.3.0.0.5-SNAPSHOT"};
+        String[] versions =
+            { "2.3.0.0.1-SNAPSHOT", "2.3.0.0.2-SNAPSHOT", "2.3.0.0.2", "2.3.0.0.3-SNAPSHOT", "2.3.0.0.3",
+                "2.3.0.0.4-SNAPSHOT", "2.3.0.0.4", "2.3.0.0.5-SNAPSHOT" };
         assertEquals( Arrays.asList( versions ), md.getVersioning().getVersions() );
         assertEquals( "20091119113313", md.getVersioning().getLastUpdated() );
     }
@@ -207,17 +181,17 @@ public class GroupMetadataMergeTest
         assertEquals( 51, md.getVersioning().getSnapshot().getBuildNumber() );
         assertEquals( "20090527162714", md.getVersioning().getLastUpdated() );
     }
-    
+
     public void testGAVMergeWithNewBuildNumberAndOldTimestamp()
         throws Exception
     {
         String mdPath = "/md-merge/gav2/maven-metadata.xml";
-    
+
         StorageItem item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath, false ) );
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
-    
+
         Metadata md = parseMetadata( (StorageFileItem) item );
-    
+
         assertEquals( "org.sonatype.nexus", md.getGroupId() );
         assertEquals( "nexus", md.getArtifactId() );
         assertEquals( "1.3.4-SNAPSHOT", md.getVersion() );
@@ -237,10 +211,10 @@ public class GroupMetadataMergeTest
         File mdFile = File.createTempFile( "metadata", "tmp" );
         saveItemToFile( ( (StorageFileItem) item ), mdFile );
 
-        StorageItem md5Item = getRootRouter().retrieveItem(
-            new ResourceStoreRequest( "/groups/test" + mdPath + ".md5", false ) );
-        StorageItem sha1Item = getRootRouter().retrieveItem(
-            new ResourceStoreRequest( "/groups/test" + mdPath + ".sha1", false ) );
+        StorageItem md5Item =
+            getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath + ".md5", false ) );
+        StorageItem sha1Item =
+            getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath + ".sha1", false ) );
 
         String md5Hash = contentAsString( md5Item );
         String sha1Hash = contentAsString( sha1Item );
@@ -301,6 +275,69 @@ public class GroupMetadataMergeTest
         String[] versions = { "1.4.1-SNAPSHOT" };
         assertEquals( Arrays.asList( versions ), md.getVersioning().getVersions() );
         assertEquals( "20090720231210", md.getVersioning().getLastUpdated() );
+    }
+
+    public void testV100V100MdMerge()
+        throws Exception
+    {
+        // net/test/tamas/test/3.0-SNAPSHOT
+        String mdPath = "/net/test/tamas/test/3.0-SNAPSHOT/maven-metadata.xml";
+
+        StorageItem item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath, false ) );
+        assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
+
+        Metadata md = parseMetadata( (StorageFileItem) item );
+
+        assertEquals( ModelVersionUtility.Version.V100, ModelVersionUtility.getModelVersion( md ) );
+        assertEquals( 0, md.getVersioning().getSnapshotVersions().size() );
+    }
+
+    public void testV110V110MdMerge()
+        throws Exception
+    {
+        // net/test/tamas/test/4.0-SNAPSHOT
+        String mdPath = "/net/test/tamas/test/4.0-SNAPSHOT/maven-metadata.xml";
+
+        StorageItem item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath, false ) );
+        assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
+
+        Metadata md = parseMetadata( (StorageFileItem) item );
+
+        assertEquals( ModelVersionUtility.Version.V110, ModelVersionUtility.getModelVersion( md ) );
+        assertEquals( 3, md.getVersioning().getSnapshotVersions().size() );
+    }
+
+    public void testV110V100MdMergeWithV110Newer()
+        throws Exception
+    {
+        // net/test/tamas/test/1.0-SNAPSHOT
+        String mdPath = "/net/test/tamas/test/1.0-SNAPSHOT/maven-metadata.xml";
+
+        StorageItem item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath, false ) );
+        assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
+
+        Metadata md = parseMetadata( (StorageFileItem) item );
+
+        assertEquals( ModelVersionUtility.Version.V110, ModelVersionUtility.getModelVersion( md ) );
+        assertEquals( 3, md.getVersioning().getSnapshotVersions().size() );
+        assertEquals( "20110121213648", md.getVersioning().getSnapshotVersions().get( 0 ).getUpdated() );
+    }
+
+    public void testV110V100MdMergeWithV100Newer()
+        throws Exception
+    {
+        // net/test/tamas/test/2.0-SNAPSHOT
+        String mdPath = "/net/test/tamas/test/2.0-SNAPSHOT/maven-metadata.xml";
+
+        StorageItem item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath, false ) );
+        assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
+
+        Metadata md = parseMetadata( (StorageFileItem) item );
+
+        assertEquals( ModelVersionUtility.Version.V110, ModelVersionUtility.getModelVersion( md ) );
+        assertEquals( 3, md.getVersioning().getSnapshotVersions().size() );
+        assertEquals( "20110122213648", md.getVersioning().getSnapshotVersions().get( 0 ).getUpdated() );
+
     }
 
     protected Metadata parseMetadata( File file )

@@ -120,7 +120,6 @@ public class DefaultMetadataManager
         }
     }
 
-    @SuppressWarnings( "unchecked" )
     protected String resolveLatest( ArtifactStoreRequest gavRequest, Gav gav )
         throws IOException
     {

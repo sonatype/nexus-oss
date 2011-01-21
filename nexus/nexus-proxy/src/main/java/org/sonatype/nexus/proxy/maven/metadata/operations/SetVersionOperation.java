@@ -29,7 +29,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 public class SetVersionOperation
     implements MetadataOperation
 {
-
     private String version;
 
     /**

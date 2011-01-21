@@ -50,7 +50,12 @@ public class AddPluginOperation
     public AddPluginOperation( PluginOperand data )
         throws MetadataException
     {
-        setOperand( data );
+        if ( data == null )
+        {
+            throw new MetadataException( "Operand is not correct: cannot accept null!" );
+        }
+
+        this.plugin = data.getOperand();
     }
 
     public void setOperand( AbstractOperand data )

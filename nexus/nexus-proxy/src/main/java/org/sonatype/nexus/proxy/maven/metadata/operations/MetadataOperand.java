@@ -27,11 +27,12 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 public class MetadataOperand
     extends AbstractOperand
 {
+    private final Metadata metadata;
 
-    Metadata metadata;
-
-    public MetadataOperand( Metadata data )
+    public MetadataOperand( final Metadata data )
     {
+        super( data == null ? ModelVersionUtility.LATEST_MODEL_VERSION : ModelVersionUtility.getModelVersion( data ) );
+
         if ( data == null )
         {
             this.metadata = new Metadata();
