@@ -59,7 +59,6 @@ import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.rt.boot.ITAppBooterCustomizer;
 import org.sonatype.nexus.rt.prefs.FilePreferencesFactory;
 import org.sonatype.nexus.test.utils.DeployUtils;
@@ -988,7 +987,7 @@ public abstract class AbstractNexusIntegrationTest
         String c = gav.getClassifier() == null ? "" : "&c=" + Reference.encode( gav.getClassifier() );
         String serviceURI =
             "service/local/artifact/maven/redirect?r=" + repository + "&g=" + gav.getGroupId() + "&a="
-                + gav.getArtifactId() + "&v=" + gav.getVersion() + c;
+                + gav.getArtifactId() + "&v=" + Reference.encode( gav.getVersion() ) + c;
         Response response = RequestFacade.doGetRequest( serviceURI );
         Status status = response.getStatus();
         if ( status.isError() )

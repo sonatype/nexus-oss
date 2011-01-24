@@ -62,6 +62,15 @@ public class Nexus2302DeployEncodedFileIT
     }
 
     @Test
+    public void version()
+        throws Exception
+    {
+        Gav gav =
+            new Gav( "nexus2302", "artifact", "1++0", null, "jar", null, null, null, false, false, null, false, null );
+        testIt( gav );
+    }
+
+    @Test
     public void dolarSign()
         throws Exception
     {
@@ -111,8 +120,11 @@ public class Nexus2302DeployEncodedFileIT
         assertThat( content, containsString( gav.getVersion() ) );
 
         url = new URL( url.toString() + gav.getVersion() + "/" );
-        content = IOUtil.toString( url.openStream() );
-        assertThat( content, containsString( gav.getClassifier() ) );
+        if ( gav.getClassifier() != null )
+        {
+            content = IOUtil.toString( url.openStream() );
+            assertThat( content, containsString( gav.getClassifier() ) );
+        }
     }
 
     private void checkRepoBrowse( Gav gav )
@@ -135,9 +147,9 @@ public class Nexus2302DeployEncodedFileIT
 
         result = contentUtil.getContentListResource( REPO_TEST_HARNESS_REPO, v.getRelativePath(), false );
 
+        String clas = gav.getClassifier() == null ? "" : "-" + gav.getClassifier();
         ContentListResource c =
-            select( result,
-                gav.getArtifactId() + "-" + gav.getVersion() + "-" + gav.getClassifier() + "." + gav.getExtension() );
+            select( result, gav.getArtifactId() + "-" + gav.getVersion() + clas + "." + gav.getExtension() );
 
         assertNotNull( c );
     }
@@ -153,7 +165,8 @@ public class Nexus2302DeployEncodedFileIT
                 g = content;
             }
         }
-        assertNotNull( g );
+        assertNotNull( g, text + " not found" );
+        assertThat( g.getResourceURI(), containsString( text ) );
 
         return g;
     }
