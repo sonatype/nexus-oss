@@ -44,16 +44,13 @@ public class DefaultReferenceFactory
 
     private Reference updateBaseRefPath( Reference reference )
     {
-        if ( reference.getBaseRef() != null )
+        if ( reference.getBaseRef().getPath() == null )
         {
-            if ( reference.getBaseRef().getPath() == null )
-            {
-                reference.getBaseRef().setPath( "/" );
-            }
-            else if ( !reference.getBaseRef().getPath().endsWith( "/" ) )
-            {
-                reference.getBaseRef().setPath( reference.getBaseRef().getPath() + "/" );
-            }
+            reference.getBaseRef().setPath( "/" );
+        }
+        else if ( !reference.getBaseRef().getPath().endsWith( "/" ) )
+        {
+            reference.getBaseRef().setPath( reference.getBaseRef().getPath() + "/" );
         }
 
         return reference;
@@ -70,14 +67,9 @@ public class DefaultReferenceFactory
         {
             uriPart = uriPart.substring( 1 );
         }
-        if ( uriPart.endsWith( "/" ) )
-        {
-            uriPart = uriPart.substring( 0, uriPart.length() - 1 );
-        }
-
 
         Reference result =
-            updateBaseRefPath( createReference( getContextRoot( request ), uriPart ) ).addSegment( childPath );
+            updateBaseRefPath( new Reference( getContextRoot( request ), uriPart ) ).addSegment( childPath );
 
         if ( result.hasQuery() )
         {
@@ -89,9 +81,7 @@ public class DefaultReferenceFactory
 
     public Reference createReference( Reference base, String relPart )
     {
-        Reference ref = new Reference( base );
-
-        ref.addSegment( relPart );
+        Reference ref = new Reference( base, relPart );
 
         return updateBaseRefPath( ref ).getTargetRef();
     }
