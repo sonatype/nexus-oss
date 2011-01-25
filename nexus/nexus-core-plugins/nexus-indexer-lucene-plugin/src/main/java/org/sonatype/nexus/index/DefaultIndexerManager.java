@@ -690,6 +690,14 @@ public class DefaultIndexerManager
             return;
         }
 
+        // index for proxy repos shouldn't change just because you deleted something locally
+        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        {
+            logSkippingRepositoryMessage( repository );
+
+            return;
+        }
+
         // do the work
         IndexingContext context = getRepositoryIndexContext( repository );
 
