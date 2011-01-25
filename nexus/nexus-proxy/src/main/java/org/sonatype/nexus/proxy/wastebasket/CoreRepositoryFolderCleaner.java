@@ -41,9 +41,10 @@ public class CoreRepositoryFolderCleaner
 
         localURI = localURI.endsWith( "/" ) ? localURI : localURI + "/";
 
-        boolean sameLocation = defaultStorageURI.equals( localURI );
+        boolean defaultLocation = defaultStorageURI.equals( localURI );
 
-        if ( sameLocation )
+        // we do this _only_ if storage is not user-customized
+        if ( defaultLocation )
         {
             delete( defaultStorageFolder, deleteForever );
         }

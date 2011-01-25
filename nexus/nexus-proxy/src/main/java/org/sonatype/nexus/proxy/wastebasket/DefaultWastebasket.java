@@ -18,12 +18,14 @@
  */
 package org.sonatype.nexus.proxy.wastebasket;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -50,12 +52,29 @@ public class DefaultWastebasket
     @Requirement
     private Logger logger;
 
-    @Requirement
-    private Walker walker;
-
     protected Logger getLogger()
     {
         return logger;
+    }
+
+    // ==
+
+    @Requirement
+    private ApplicationConfiguration applicationConfiguration;
+
+    protected ApplicationConfiguration getApplicationConfiguration()
+    {
+        return applicationConfiguration;
+    }
+
+    // ==
+
+    @Requirement
+    private Walker walker;
+
+    protected Walker getWalker()
+    {
+        return walker;
     }
 
     // ==
@@ -67,6 +86,8 @@ public class DefaultWastebasket
     {
         return repositoryRegistry;
     }
+
+    // ==
 
     private DeleteOperation deleteOperation = DeleteOperation.MOVE_TO_TRASH;
 
@@ -107,6 +128,19 @@ public class DefaultWastebasket
         for ( Repository repository : getRepositoryRegistry().getRepositories() )
         {
             purge( repository, age );
+        }
+
+        if ( age == ALL )
+        {
+            // NEXUS-4078: deleting "legacy" trash too for now
+            File basketFile =
+                getApplicationConfiguration().getWorkingDirectory( AbstractRepositoryFolderCleaner.GLOBAL_TRASH_KEY );
+
+            // check for existence, is this needed at all?
+            if ( basketFile.isDirectory() )
+            {
+                AbstractRepositoryFolderCleaner.deleteFilesRecursively( basketFile );
+            }
         }
     }
 
@@ -150,10 +184,10 @@ public class DefaultWastebasket
             {
                 DefaultWalkerContext ctx =
                     new DefaultWalkerContext( repository, trashRoot, new AffirmativeStoreWalkerFilter() );
-                
+
                 ctx.getProcessors().add( new WastebasketWalker( age ) );
 
-                walker.walk( ctx );
+                getWalker().walk( ctx );
             }
         }
     }

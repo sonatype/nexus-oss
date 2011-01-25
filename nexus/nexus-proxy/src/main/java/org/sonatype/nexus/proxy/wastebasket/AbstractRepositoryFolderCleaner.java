@@ -29,6 +29,8 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 public abstract class AbstractRepositoryFolderCleaner
     implements RepositoryFolderCleaner
 {
+    public static final String GLOBAL_TRASH_KEY = "trash";
+
     @Requirement
     private Logger logger;
 
@@ -57,7 +59,8 @@ public abstract class AbstractRepositoryFolderCleaner
     {
         if ( !deleteForever )
         {
-            File basketFile = new File( getApplicationConfiguration().getWorkingDirectory( "trash" ), file.getName() );
+            File basketFile =
+                new File( getApplicationConfiguration().getWorkingDirectory( GLOBAL_TRASH_KEY ), file.getName() );
 
             if ( file.isDirectory() )
             {
@@ -82,7 +85,7 @@ public abstract class AbstractRepositoryFolderCleaner
 
     // This method prevents locked files on Windows from not allowing to delete unlocked files, i.e., it will keep on
     // deleting other files even if it reaches a locked file first.
-    private void deleteFilesRecursively( File folder )
+    protected static void deleteFilesRecursively( File folder )
     {
         // First check if it's a directory to avoid future misuse.
         if ( folder.isDirectory() )

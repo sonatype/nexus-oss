@@ -46,7 +46,8 @@ public class IndexRepositoryFolderCleaner
 
         if ( indexContextFolder.isDirectory() )
         {
-            delete( indexContextFolder, deleteForever );
+            // indexes are not preserved
+            delete( indexContextFolder, true );
         }
     }
 
