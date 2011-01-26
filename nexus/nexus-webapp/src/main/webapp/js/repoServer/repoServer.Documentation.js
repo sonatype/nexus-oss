@@ -48,7 +48,7 @@ Ext.extend(Sonatype.repoServer.Documentation, Ext.Panel, {
     + ' Version'
     + '<br><a href="http://nexus.sonatype.org/" target="_new">Nexus Home</a>'
     + '<br><a href="http://www.sonatype.com/book/reference/repository-manager.html" target="_new">Getting Started</a>'
-    + '<br><a href="https://docs.sonatype.com/display/NX/Home" target="_new">Nexus Wiki</a>'
+    + '<br><a href="http://nexus.sonatype.org/wiki/" target="_new">Nexus Wiki</a>'
     + '<br><a href="http://www.sonatype.com/books/nexus-book/" target="_new">Nexus Book</a>'
     + '<br><a href="http://www.sonatype.com/book/reference/public-book.html" target="_new">Maven Book</a>'
     + '<br><a href="http://nexus.sonatype.org/changes.html" target="_new">Release Notes</a>'
