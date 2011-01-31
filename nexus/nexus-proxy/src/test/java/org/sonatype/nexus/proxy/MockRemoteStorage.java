@@ -51,19 +51,19 @@ public class MockRemoteStorage
 
     @Override
     protected void updateContext( ProxyRepository repository, RemoteStorageContext context )
-        throws StorageException
+        throws RemoteStorageException
     {
     }
 
     public boolean containsItem( long newerThen, ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException, StorageException
+        throws RemoteAccessException, RemoteStorageException
     {
         // TODO: not sure what to do here.
         return false;
     }
 
     public void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException, StorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException, RemoteStorageException
     {
         throw new UnsupportedStorageOperationException( "This is a mock, no deleting!" );
     }
@@ -74,14 +74,14 @@ public class MockRemoteStorage
     }
 
     public boolean isReachable( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException, StorageException
+        throws RemoteAccessException, RemoteStorageException
     {
         // TODO: not sure what to do here, this must be for the status check
         return false;
     }
 
     public AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
-        throws ItemNotFoundException, RemoteAccessException, StorageException
+        throws ItemNotFoundException, RemoteAccessException, RemoteStorageException
     {
         this.requests.add( new MockRequestRecord( repository, request, baseUrl ) );
 
@@ -122,13 +122,13 @@ public class MockRemoteStorage
     }
 
     public void storeItem( ProxyRepository repository, StorageItem item )
-        throws UnsupportedStorageOperationException, RemoteAccessException, StorageException
+        throws UnsupportedStorageOperationException, RemoteAccessException, RemoteStorageException
     {
         throw new UnsupportedStorageOperationException( "This is a mock, no writing!" );
     }
 
     public void validateStorageUrl( String url )
-        throws StorageException
+        throws RemoteStorageException
     {
         // do nothing
     }
