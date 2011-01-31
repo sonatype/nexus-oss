@@ -33,7 +33,6 @@ import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
@@ -88,13 +87,13 @@ public abstract class AbstractRemoteRepositoryStorage
      * @return the absolute url from base
      */
     public URL getAbsoluteUrlFromBase( ProxyRepository repository, ResourceStoreRequest request )
-        throws StorageException
+        throws RemoteStorageException
     {
         return getAbsoluteUrlFromBase( repository.getRemoteUrl(), request.getRequestPath() );
     }
 
     protected URL getAbsoluteUrlFromBase( String baseUrl, String path )
-        throws StorageException
+        throws RemoteStorageException
     {
         StringBuffer urlStr = new StringBuffer( baseUrl );
 
@@ -129,10 +128,10 @@ public abstract class AbstractRemoteRepositoryStorage
      * @param context
      */
     protected abstract void updateContext( ProxyRepository repository, RemoteStorageContext context )
-        throws StorageException;
+        throws RemoteStorageException;
 
     protected synchronized RemoteStorageContext getRemoteStorageContext( ProxyRepository repository )
-        throws StorageException
+        throws RemoteStorageException
     {
         if ( repository.getRemoteStorageContext() != null )
         {
@@ -153,7 +152,7 @@ public abstract class AbstractRemoteRepositoryStorage
     }
 
     public boolean containsItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAuthenticationNeededException, RemoteAccessException, StorageException
+        throws RemoteAuthenticationNeededException, RemoteAccessException, RemoteStorageException
     {
         return containsItem( 0, repository, request );
     }
@@ -189,7 +188,6 @@ public abstract class AbstractRemoteRepositoryStorage
     }
 
     protected String formatUserAgentString( RemoteStorageContext ctx, Repository repository )
-        throws StorageException
     {
         StringBuffer buf = new StringBuffer( getUserAgentPlatformInfo() );
 

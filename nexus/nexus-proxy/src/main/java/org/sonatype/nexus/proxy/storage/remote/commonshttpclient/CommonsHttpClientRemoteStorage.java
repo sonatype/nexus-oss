@@ -49,7 +49,6 @@ import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
@@ -93,7 +92,7 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public void validateStorageUrl( String url )
-        throws StorageException
+        throws RemoteStorageException
     {
         try
         {
@@ -112,7 +111,7 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public boolean isReachable( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException, StorageException
+        throws RemoteAccessException, RemoteStorageException
     {
         boolean result = false;
 
@@ -147,13 +146,13 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public boolean containsItem( long newerThen, ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException, StorageException
+        throws RemoteAccessException, RemoteStorageException
     {
         return checkRemoteAvailability( newerThen, repository, request, true );
     }
 
     public AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
-        throws ItemNotFoundException, RemoteAccessException, StorageException
+        throws ItemNotFoundException, RemoteAccessException, RemoteStorageException
     {
         URL remoteURL = getAbsoluteUrlFromBase( baseUrl, request.getRequestPath() );
 
@@ -260,7 +259,7 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public void storeItem( ProxyRepository repository, StorageItem item )
-        throws UnsupportedStorageOperationException, RemoteAccessException, StorageException
+        throws UnsupportedStorageOperationException, RemoteAccessException, RemoteStorageException
     {
         if ( !( item instanceof StorageFileItem ) )
         {
@@ -305,7 +304,7 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException, StorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException, RemoteStorageException
     {
         URL remoteURL = getAbsoluteUrlFromBase( repository, request );
 
@@ -363,7 +362,7 @@ public class CommonsHttpClientRemoteStorage
      */
     protected int executeMethod( ProxyRepository repository, ResourceStoreRequest request, HttpMethod method,
                                  URL remoteUrl )
-        throws RemoteAccessException, StorageException
+        throws RemoteAccessException, RemoteStorageException
     {
         URI methodURI = null;
 
@@ -436,7 +435,7 @@ public class CommonsHttpClientRemoteStorage
                 throw new RemoteStorageException( "Invalid artifact found, most likely a proxy redirected to an HTML error page." );
             }
         }
-        catch ( StorageException e )
+        catch ( RemoteStorageException e )
         {
             method.releaseConnection();
 
@@ -505,11 +504,11 @@ public class CommonsHttpClientRemoteStorage
      * @return
      * @throws RemoteAuthenticationNeededException
      * @throws RemoteAccessException
-     * @throws StorageException
+     * @throws RemoteStorageException
      */
     protected boolean checkRemoteAvailability( long newerThen, ProxyRepository repository,
                                                ResourceStoreRequest request, boolean isStrict )
-        throws RemoteAuthenticationNeededException, RemoteAccessException, StorageException
+        throws RemoteAuthenticationNeededException, RemoteAccessException, RemoteStorageException
     {
         URL remoteURL = getAbsoluteUrlFromBase( repository, request );
 
@@ -524,7 +523,7 @@ public class CommonsHttpClientRemoteStorage
         {
             response = executeMethod( repository, request, method, remoteURL );
         }
-        catch ( StorageException e )
+        catch ( RemoteStorageException e )
         {
             // If HEAD failed, attempt a GET. Some repos may not support HEAD method
             doGet = true;
@@ -604,10 +603,10 @@ public class CommonsHttpClientRemoteStorage
      * 
      * @param repository that needs to be checked.
      * @return true only if we know that ProxyRepository in question points to Amazon S3 storage.
-     * @throws StorageException in case of some error.
+     * @throws RemoteStorageException in case of some error.
      */
     public boolean isRemotePeerAmazonS3Storage( ProxyRepository repository )
-        throws StorageException
+        throws RemoteStorageException
     {
         RemoteStorageContext ctx = getRemoteStorageContext( repository );
 
@@ -622,7 +621,7 @@ public class CommonsHttpClientRemoteStorage
     }
 
     protected void checkForRemotePeerAmazonS3Storage( ProxyRepository repository, HttpMethod method )
-        throws StorageException
+        throws RemoteStorageException
     {
         RemoteStorageContext ctx = getRemoteStorageContext( repository );
 

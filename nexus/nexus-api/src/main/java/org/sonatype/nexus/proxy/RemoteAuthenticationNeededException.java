@@ -31,8 +31,22 @@ public class RemoteAuthenticationNeededException
 {
     private static final long serialVersionUID = -7702305441562438729L;
 
+    private final String remoteUrl;
+
     public RemoteAuthenticationNeededException( ProxyRepository repository, String message )
     {
+        this( repository, null, message );
+    }
+
+    public RemoteAuthenticationNeededException( ProxyRepository repository, String remoteUrl, String message )
+    {
         super( repository, message );
+
+        this.remoteUrl = remoteUrl;
+    }
+
+    public String getRemoteUrl()
+    {
+        return remoteUrl;
     }
 }

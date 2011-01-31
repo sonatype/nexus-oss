@@ -24,8 +24,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -60,76 +60,69 @@ public interface RemoteRepositoryStorage
      * 
      * @param uid the uid
      * @return true, if available (reachable)
-     * @throws StorageException the storage exception
+     * @throws RemoteStorageException the storage exception
      */
     boolean isReachable( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException,
-            StorageException;
+        throws RemoteAccessException, RemoteStorageException;
 
     /**
      * Gets the absolute url from base.
      * 
      * @param uid the uid
      * @return the absolute url from base
-     * @throws StorageException when the repository in question has wrong/malformed URL set
+     * @throws RemoteStorageException when the repository in question has wrong/malformed URL set
      */
     URL getAbsoluteUrlFromBase( ProxyRepository repository, ResourceStoreRequest request )
-        throws StorageException;
+        throws RemoteStorageException;
 
     /**
      * Validate that the URL that defines storage location is valid.
      * 
      * @param url
-     * @throws StorageException
+     * @throws RemoteStorageException
      */
     void validateStorageUrl( String url )
-        throws StorageException;
+        throws RemoteStorageException;
 
     /**
      * Check remote storage if contains item.
      * 
      * @param uid the uid
      * @return true, if successful
-     * @throws StorageException the storage exception
+     * @throws RemoteStorageException the storage exception
      */
     boolean containsItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException,
-            StorageException;
+        throws RemoteAccessException, RemoteStorageException;
 
     /**
      * Check remote storage if contains item newer then newerThen.
      * 
      * @param uid the uid
      * @return true, if successful
-     * @throws StorageException the storage exception
+     * @throws RemoteStorageException the storage exception
      */
     boolean containsItem( long newerThen, ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException,
-            StorageException;
+        throws RemoteAccessException, RemoteStorageException;
 
     /**
      * Retrieve item unconditionally.
      * 
      * @return the abstract storage item
      * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
+     * @throws RemoteStorageException the storage exception
      */
     AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
-        throws ItemNotFoundException,
-            RemoteAccessException,
-            StorageException;
+        throws ItemNotFoundException, RemoteAccessException, RemoteStorageException;
 
     /**
      * Store item.
      * 
      * @param item the item
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
-     * @throws StorageException the storage exception
+     * @throws RemoteStorageException the storage exception
      */
     void storeItem( ProxyRepository repository, StorageItem item )
-        throws UnsupportedStorageOperationException,
-            RemoteAccessException,
-            StorageException;
+        throws UnsupportedStorageOperationException, RemoteAccessException, RemoteStorageException;
 
     /**
      * Delete item.
@@ -137,11 +130,9 @@ public interface RemoteRepositoryStorage
      * @param uid the uid
      * @throws ItemNotFoundException the item not found exception
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
-     * @throws StorageException the storage exception
+     * @throws RemoteStorageException the storage exception
      */
     void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
-            RemoteAccessException,
-            StorageException;
+        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException,
+        RemoteStorageException;
 }
