@@ -54,6 +54,9 @@ public class DefaultAhcProvider
 
         result.setUserAgent( userAgentBuilder.formatRemoteRepositoryStorageUserAgentString( repository, ctx ) );
 
+        // enable redirects for RRS use
+        result.setFollowRedirects( true );
+
         return result;
     }
 
@@ -70,9 +73,6 @@ public class DefaultAhcProvider
         
         // handle compression
         result.setCompressionEnabled( true );
-
-        // enable redirects
-        result.setFollowRedirects( true );
 
         // remote auth
         RemoteAuthenticationSettings ras = ctx.getRemoteAuthenticationSettings();

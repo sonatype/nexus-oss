@@ -156,6 +156,7 @@ public abstract class AbstractRemoteRepositoryStorage
 
     // helper methods
 
+    @Deprecated
     protected String formatUserAgentString( RemoteStorageContext ctx, ProxyRepository repository )
     {
         return userAgentBuilder.formatRemoteRepositoryStorageUserAgentString( repository, ctx );

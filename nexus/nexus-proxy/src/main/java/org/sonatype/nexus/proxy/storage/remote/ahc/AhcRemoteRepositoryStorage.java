@@ -241,17 +241,18 @@ public class AhcRemoteRepositoryStorage
         // maintain the S3 flag
         checkForRemotePeerAmazonS3Storage( repository, response );
 
-        if ( AHCUtils.isAnyOfTheseStatusCodes( response, expectedCodes ) )
-        {
-            return;
-        }
-
         if ( response.isRedirected() )
         {
             getLogger().info(
                 String.format(
                     "Proxy repository %s (id=%s) got redirected from %s, please verify your remoteUrl is up-to-date!",
                     repository.getName(), repository.getId(), remoteUrl ) );
+        }
+
+        if ( AHCUtils.isAnyOfTheseStatusCodes( response, expectedCodes ) )
+        {
+            // good, an expected one
+            return;
         }
 
         // 404 NotFound
@@ -297,15 +298,6 @@ public class AhcRemoteRepositoryStorage
                 + repository.getName() + "\"), updating HTTP transport..." );
 
         final AsyncHttpClientConfig.Builder clientConfigBuilder = ahcProvider.getAsyncHttpClient( repository, context );
-
-        // set user agent
-        clientConfigBuilder.setUserAgent( formatUserAgentString( context, repository ) );
-
-        // handle compression
-        clientConfigBuilder.setCompressionEnabled( true );
-
-        // enable redirects
-        clientConfigBuilder.setFollowRedirects( true );
 
         final AsyncHttpClient client = new AsyncHttpClient( clientConfigBuilder.build() );
 
