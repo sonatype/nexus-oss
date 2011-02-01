@@ -82,6 +82,10 @@
     </dependency>
     <!-- Local and remote storage techs -->
     <dependency>
+      <groupId>com.ning</groupId>
+      <artifactId>async-http-client</artifactId>
+    </dependency>
+    <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
     </dependency>

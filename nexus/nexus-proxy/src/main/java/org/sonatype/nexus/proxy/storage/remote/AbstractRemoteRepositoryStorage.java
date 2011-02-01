@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.mime.MimeUtil;
@@ -35,8 +34,7 @@ import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 /**
  * This class is a base abstract class for remot storages.
@@ -48,22 +46,15 @@ public abstract class AbstractRemoteRepositoryStorage
 {
     @Requirement
     private Logger logger;
-    
-    @Requirement
-    private ApplicationStatusSource applicationStatusSource;
 
     @Requirement
     private MimeUtil mimeUtil;
 
-    /**
-     * The edtion, that will tell us is there some change happened with installation.
-     */
-    private String platformEditionShort;
+    @Requirement
+    private ApplicationStatusSource applicationStatusSource;
 
-    /**
-     * The lazily calculated invariant part of the UserAgentString.
-     */
-    private String userAgentPlatformInfo;
+    @Requirement
+    private UserAgentBuilder userAgentBuilder;
 
     /**
      * Since storages are shared, we are tracking the last changes from each of them.
@@ -74,7 +65,7 @@ public abstract class AbstractRemoteRepositoryStorage
     {
         return logger;
     }
-    
+
     protected MimeUtil getMimeUtil()
     {
         return mimeUtil;
@@ -137,14 +128,13 @@ public abstract class AbstractRemoteRepositoryStorage
         {
             // we have repo specific settings
             // if contextContains key and is newer, or does not contain yet
-            if ( ( repositoryContexts.containsKey( repository.getId() ) && repository.getRemoteStorageContext()
-                            .getLastChanged() > ( repositoryContexts.get( repository.getId() ).longValue() ) )
-                 || !repositoryContexts.containsKey( repository.getId() ) )
+            if ( ( repositoryContexts.containsKey( repository.getId() ) && repository.getRemoteStorageContext().getLastChanged() > ( repositoryContexts.get( repository.getId() ).longValue() ) )
+                || !repositoryContexts.containsKey( repository.getId() ) )
             {
                 updateContext( repository, repository.getRemoteStorageContext() );
 
-                repositoryContexts.put( repository.getId(), Long.valueOf( repository.getRemoteStorageContext()
-                                .getLastChanged() ) );
+                repositoryContexts.put( repository.getId(),
+                    Long.valueOf( repository.getRemoteStorageContext().getLastChanged() ) );
             }
         }
 
@@ -166,41 +156,8 @@ public abstract class AbstractRemoteRepositoryStorage
 
     // helper methods
 
-    private String getUserAgentPlatformInfo()
+    protected String formatUserAgentString( RemoteStorageContext ctx, ProxyRepository repository )
     {
-        // TODO: this is a workaround, see NXCM-363
-        SystemStatus status = applicationStatusSource.getSystemStatus();
-
-        if ( platformEditionShort == null || !platformEditionShort.equals( status.getEditionShort() )
-             || userAgentPlatformInfo == null )
-        {
-            platformEditionShort = status.getEditionShort();
-
-            userAgentPlatformInfo =
-                new StringBuffer( "Nexus/" ).append( status.getVersion() ).append( " (" ).append(
-                    status.getEditionShort() ).append( "; " ).append( System.getProperty( "os.name" ) ).append( "; " )
-                                .append( System.getProperty( "os.version" ) ).append( "; " ).append(
-                                    System.getProperty( "os.arch" ) ).append( "; " ).append(
-                                    System.getProperty( "java.version" ) ).append( ") " ).toString();
-        }
-
-        return userAgentPlatformInfo;
-    }
-
-    protected String formatUserAgentString( RemoteStorageContext ctx, Repository repository )
-    {
-        StringBuffer buf = new StringBuffer( getUserAgentPlatformInfo() );
-
-        buf.append( getProviderId() ).append( "/" ).append( getVersion() );
-
-        // user customization
-        RemoteConnectionSettings remoteConnectionSettings = ctx.getRemoteConnectionSettings();
-
-        if ( !StringUtils.isEmpty( remoteConnectionSettings.getUserAgentCustomizationString() ) )
-        {
-            buf.append( " " ).append( remoteConnectionSettings.getUserAgentCustomizationString() );
-        }
-
-        return buf.toString();
+        return userAgentBuilder.formatRemoteRepositoryStorageUserAgentString( repository, ctx );
     }
 }

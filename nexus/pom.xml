@@ -681,6 +681,12 @@
 
       <!-- Various deps -->
       <dependency>
+        <groupId>com.ning</groupId>
+        <artifactId>async-http-client</artifactId>
+        <version>1.5.0</version>
+      </dependency>
+      
+      <dependency>
         <groupId>commons-httpclient</groupId>
         <artifactId>commons-httpclient</artifactId>
         <version>3.1</version>
