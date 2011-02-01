@@ -3,7 +3,6 @@ package org.sonatype.nexus.proxy.storage.remote.ahc;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.commons.httpclient.HttpStatus;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.ahc.AhcProvider;
@@ -358,12 +357,20 @@ public class AhcRemoteRepositoryStorage
 
             validateResponse( repository, request, "HEAD", itemUrl, responseObject, 200 );
         }
+        catch ( ItemNotFoundException e )
+        {
+            return false;
+        }
         catch ( RemoteStorageException e )
         {
             // If HEAD failed, attempt a GET. Some repos may not support HEAD method
             doGet = true;
 
             getLogger().debug( "HEAD method failed, will attempt GET.  Exception: " + e.getMessage(), e );
+        }
+        catch ( Exception e )
+        {
+            throw new RemoteStorageException( e );
         }
         finally
         {
@@ -379,11 +386,22 @@ public class AhcRemoteRepositoryStorage
 
         if ( doGet )
         {
-            responseObject = client.prepareGet( itemUrl ).execute().get();
+            try
+            {
+                responseObject = client.prepareGet( itemUrl ).execute().get();
 
-            response = responseObject.getStatusCode();
+                response = responseObject.getStatusCode();
 
-            validateResponse( repository, request, "GET", itemUrl, responseObject, 200 );
+                validateResponse( repository, request, "GET", itemUrl, responseObject, 200 );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                return false;
+            }
+            catch ( Exception e )
+            {
+                throw new RemoteStorageException( e );
+            }
         }
 
         // if we are not strict and remote is S3
@@ -398,7 +416,7 @@ public class AhcRemoteRepositoryStorage
         else
         {
             // non relaxed check is strict, and will select only the OK response
-            if ( response == HttpStatus.SC_OK )
+            if ( response == 200 )
             {
                 // we have it
                 // we have newer if this below is true
