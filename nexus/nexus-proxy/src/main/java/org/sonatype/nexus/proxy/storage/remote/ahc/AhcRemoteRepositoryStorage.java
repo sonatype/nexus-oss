@@ -3,6 +3,7 @@ package org.sonatype.nexus.proxy.storage.remote.ahc;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.ahc.AhcProvider;
@@ -14,6 +15,8 @@ import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.PreparedContentLocator;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -21,13 +24,10 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.storage.remote.ahc.AhcContentLocator.ResponseInputStream;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.Response;
-import com.ning.http.util.DateUtil;
-import com.ning.http.util.DateUtil.DateParseException;
 
 /**
  * AsyncHttpClient powered RemoteRepositoryStorage.
@@ -45,8 +45,6 @@ public class AhcRemoteRepositoryStorage
     private static final String CTX_KEY_CLIENT = CTX_KEY + ".client";
 
     private static final String CTX_KEY_S3_FLAG = CTX_KEY + ".remoteIsAmazonS3";
-
-    private static final boolean HEAD_THEN_GET = true;
 
     @Requirement
     private AhcProvider ahcProvider;
@@ -81,16 +79,43 @@ public class AhcRemoteRepositoryStorage
     public boolean isReachable( ProxyRepository repository, ResourceStoreRequest request )
         throws RemoteAccessException, RemoteStorageException
     {
-        // TODO Auto-generated method stub
-        return false;
+        boolean result = false;
+
+        try
+        {
+            request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
+
+            try
+            {
+                result = checkRemoteAvailability( 0, repository, request, false );
+            }
+            catch ( RemoteAccessDeniedException e )
+            {
+                // NEXUS-3338: we have to swallow this on S3
+                if ( isRemotePeerAmazonS3Storage( repository ) )
+                {
+                    // this is S3 remote, and we got 403: just say all is well (for now)
+                    return true;
+                }
+                else
+                {
+                    throw e;
+                }
+            }
+        }
+        finally
+        {
+            request.popRequestPath();
+        }
+
+        return result;
     }
 
     @Override
     public boolean containsItem( long newerThen, ProxyRepository repository, ResourceStoreRequest request )
         throws RemoteAccessException, RemoteStorageException
     {
-        // TODO Auto-generated method stub
-        return false;
+        return checkRemoteAvailability( newerThen, repository, request, true );
     }
 
     @Override
@@ -105,107 +130,46 @@ public class AhcRemoteRepositoryStorage
 
         try
         {
-            // TODO: this is code duplication while experimenting with AHC, will cleanup later!
-            if ( HEAD_THEN_GET )
+
+            ResponseInputStream ris = AHCUtils.fetchContent( client, itemUrl );
+
+            // this blocks until response headers arrived
+            Response response = ris.getResponse();
+
+            // expected: 200 OK
+            validateResponse( repository, request, "GET", itemUrl, response, 200 );
+
+            long length = -1;
+
+            try
             {
-                Response response = client.prepareHead( itemUrl ).execute().get();
-
-                // expected: 200 OK
-                validateResponse( repository, request, "HEAD", itemUrl, response, 200 );
-
-                long length = -1;
-
-                try
-                {
-                    length = Long.parseLong( response.getHeader( "content-length" ) );
-                }
-                catch ( NumberFormatException e )
-                {
-                    // neglect
-                }
-
-                long lastModified = System.currentTimeMillis();
-
-                try
-                {
-                    lastModified = DateUtil.parseDate( response.getHeader( "last-modified" ) ).getTime();
-                }
-                catch ( DateParseException e )
-                {
-                    // neglect
-                }
-
-                // reusable content locator, since it will do it's own GET on getContent() invocation.
-                AhcContentLocator contentLocator =
-                    new AhcContentLocator( client, itemUrl, length, lastModified, response.getContentType(), null );
-
-                DefaultStorageFileItem result =
-                    new DefaultStorageFileItem( repository, request, true /* canRead */, true /* canWrite */,
-                        contentLocator );
-
-                result.setLength( contentLocator.getLength() );
-
-                result.setModified( contentLocator.getLastModified() );
-
-                result.setCreated( result.getModified() );
-
-                result.setRemoteUrl( contentLocator.getItemUrl() );
-
-                result.getItemContext().setParentContext( request.getRequestContext() );
-
-                return result;
+                length = Long.parseLong( response.getHeader( "content-length" ) );
             }
-            else
+            catch ( NumberFormatException e )
             {
-                ResponseInputStream ris = AhcContentLocator.fetchContent( client, itemUrl );
-
-                Response response = ris.getResponse();
-
-                // expected: 200 OK
-                validateResponse( repository, request, "GET", itemUrl, response, 200 );
-
-                long length = -1;
-
-                try
-                {
-                    length = Long.parseLong( response.getHeader( "content-length" ) );
-                }
-                catch ( NumberFormatException e )
-                {
-                    // neglect
-                }
-
-                long lastModified = System.currentTimeMillis();
-
-                try
-                {
-                    lastModified = DateUtil.parseDate( response.getHeader( "last-modified" ) ).getTime();
-                }
-                catch ( DateParseException e )
-                {
-                    // neglect
-                }
-
-                // non-reusable content locator, since we did a GET and we are passing in the Body
-                AhcContentLocator contentLocator =
-                    new AhcContentLocator( client, itemUrl, length, lastModified, response.getContentType(), ris );
-
-                DefaultStorageFileItem result =
-                    new DefaultStorageFileItem( repository, request, true /* canRead */, true /* canWrite */,
-                        contentLocator );
-
-                result.setLength( contentLocator.getLength() );
-
-                result.setModified( contentLocator.getLastModified() );
-
-                result.setCreated( result.getModified() );
-
-                result.setRemoteUrl( contentLocator.getItemUrl() );
-
-                result.getItemContext().setParentContext( request.getRequestContext() );
-
-                return result;
+                // neglect
             }
+
+            long lastModified = AHCUtils.getLastModified( response );
+
+            // non-reusable simplest content locator, the ris InputStream is ready to be consumed
+            PreparedContentLocator contentLocator = new PreparedContentLocator( ris, response.getContentType() );
+
+            DefaultStorageFileItem result =
+                new DefaultStorageFileItem( repository, request, true /* canRead */, true /* canWrite */,
+                    contentLocator );
+
+            result.setLength( length );
+
+            result.setModified( lastModified );
+
+            result.setCreated( result.getModified() );
+
+            result.setRemoteUrl( itemUrl );
+
+            result.getItemContext().setParentContext( request.getRequestContext() );
+
+            return result;
         }
         catch ( Exception e )
         {
@@ -350,6 +314,108 @@ public class AhcRemoteRepositoryStorage
 
         // we don't know is remote S3, we have new URL maybe so recheck is needed
         context.removeContextObject( CTX_KEY_S3_FLAG );
+    }
+
+    /**
+     * Initially, this method is here only to share the code for "availability check" and for "contains" check.
+     * Unfortunately, the "availability" check cannot be done at RemoteStorage level, since it is completely repository
+     * layout unaware and is able to tell only about the existence of remote server and that the URI on it exists. This
+     * "availability" check will have to be moved upper into repository, since it is aware of "what it holds".
+     * Ultimately, this method will check is the remote server "present" and is responding or not. But nothing more.
+     * 
+     * @param newerThen
+     * @param repository
+     * @param context
+     * @param path
+     * @param relaxedCheck
+     * @return
+     * @throws RemoteAuthenticationNeededException
+     * @throws RemoteAccessException
+     * @throws RemoteStorageException
+     */
+    protected boolean checkRemoteAvailability( long newerThen, ProxyRepository repository,
+                                               ResourceStoreRequest request, boolean isStrict )
+        throws RemoteAuthenticationNeededException, RemoteAccessException, RemoteStorageException
+    {
+        final URL remoteURL = getAbsoluteUrlFromBase( repository, request );
+
+        final String itemUrl = remoteURL.toString();
+
+        final AsyncHttpClient client = getClient( repository );
+
+        // artifactory hack, it pukes on HEAD so we will try with GET if HEAD fails
+        boolean doGet = false;
+
+        Response responseObject = null;
+
+        int response = 400;
+
+        try
+        {
+            responseObject = client.prepareHead( itemUrl ).execute().get();
+
+            response = responseObject.getStatusCode();
+
+            validateResponse( repository, request, "HEAD", itemUrl, responseObject, 200 );
+        }
+        catch ( RemoteStorageException e )
+        {
+            // If HEAD failed, attempt a GET. Some repos may not support HEAD method
+            doGet = true;
+
+            getLogger().debug( "HEAD method failed, will attempt GET.  Exception: " + e.getMessage(), e );
+        }
+        finally
+        {
+            // HEAD returned error, but not exception, try GET before failing
+            if ( !doGet && response != 200 )
+            {
+                // try with GET unless some known to fail responses are in
+                doGet = ( response != 401 ) && ( response != 403 );
+
+                getLogger().debug( "HEAD method failed, will attempt GET.  Status: " + response );
+            }
+        }
+
+        if ( doGet )
+        {
+            responseObject = client.prepareGet( itemUrl ).execute().get();
+
+            response = responseObject.getStatusCode();
+
+            validateResponse( repository, request, "GET", itemUrl, responseObject, 200 );
+        }
+
+        // if we are not strict and remote is S3
+        if ( !isStrict && isRemotePeerAmazonS3Storage( repository ) )
+        {
+            // if we are relaxed, we will accept any HTTP response code below 500. This means anyway the HTTP
+            // transaction succeeded. This method was never really detecting that the remoteUrl really denotes a root of
+            // repository (how could we do that?)
+            // this "relaxed" check will help us to "pass" S3 remote storage.
+            return response >= 200 && response < 500;
+        }
+        else
+        {
+            // non relaxed check is strict, and will select only the OK response
+            if ( response == HttpStatus.SC_OK )
+            {
+                // we have it
+                // we have newer if this below is true
+                return AHCUtils.getLastModified( responseObject ) > newerThen;
+            }
+            else if ( ( response >= 300 && response < 400 ) || response == 404 )
+            {
+                return false;
+            }
+            else
+            {
+                throw new RemoteStorageException( "Unexpected response code while executing GET"
+                    + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                    + "\", remoteUrl=\"" + itemUrl + "\"]. Expected: \"SUCCESS (200)\". Received: " + response + " : "
+                    + responseObject.getStatusText() );
+            }
+        }
     }
 
     /**
