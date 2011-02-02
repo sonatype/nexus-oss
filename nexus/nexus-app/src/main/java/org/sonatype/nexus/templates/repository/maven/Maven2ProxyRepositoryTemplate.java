@@ -30,8 +30,6 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
-import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
-import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 
 public class Maven2ProxyRepositoryTemplate
@@ -61,7 +59,7 @@ public class Maven2ProxyRepositoryTemplate
         repo.setProviderHint( "maven2" );
 
         repo.setRemoteStorage( new CRemoteStorage() );
-        repo.getRemoteStorage().setProvider( RemoteProviderHintFactory.getDefaultRoleHint() );
+        repo.getRemoteStorage().setProvider( getTemplateProvider().getDefaultRemoteProviderHint() );
         repo.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root" );
 
         Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );

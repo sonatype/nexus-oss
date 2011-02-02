@@ -28,6 +28,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.templates.AbstractTemplateProvider;
 import org.sonatype.nexus.templates.TemplateSet;
 
@@ -44,11 +45,19 @@ public abstract class AbstractRepositoryTemplateProvider
 
     @Requirement
     private Nexus nexus;
+    
+    @Requirement
+    private RemoteProviderHintFactory remoteProviderHintFactory;
 
     protected Repository createRepository( CRepository repository )
         throws ConfigurationException, IOException
     {
         return this.nexus.getNexusConfiguration().createRepository( repository );
+    }
+    
+    public String getDefaultRemoteProviderHint()
+    {
+        return remoteProviderHintFactory.getDefaultRoleHint();
     }
 
     public Class<RepositoryTemplate> getTemplateClass()
