@@ -162,7 +162,7 @@
   <properties>
     <maven.indexer.version>4.0.0</maven.indexer.version>
     <maven.version>3.0.1</maven.version>
-    <aether.version>1.8</aether.version>
+    <aether.version>1.8.1</aether.version>
 
     <spice-timeline.version>2.0</spice-timeline.version>
     <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
@@ -574,6 +574,16 @@
       <dependency>
         <groupId>org.sonatype.aether</groupId>
         <artifactId>aether-util</artifactId>
+        <version>${aether.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.aether</groupId>
+        <artifactId>aether-spi</artifactId>
+        <version>${aether.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.aether</groupId>
+        <artifactId>aether-impl</artifactId>
         <version>${aether.version}</version>
       </dependency>
 
@@ -1036,6 +1046,15 @@
                     <exclude>*:xml-apis</exclude>
                   </excludes>
                   <message>xml apis got banned since they are already included on java 6</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.sonatype.aether:*:1.8</exclude>
+                  </excludes>
+                  <includes>
+                    <include>org.sonatype.aether:*:1.8.1</include>
+                  </includes>
+                  <message>Must use aether 1.8.1 or newer</message>
                 </bannedDependencies>
                 <!-- <requirePluginVersions> <banSnapshots>false</banSnapshots> </requirePluginVersions> -->
               </rules>
