@@ -68,8 +68,8 @@ public class Nexus641ReindexTaskIT
 
         // reindex
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryOrGroupId" );
-        prop.setValue( "repo_" + this.getTestRepositoryId() );
+        prop.setKey( "repositoryId" );
+        prop.setValue( this.getTestRepositoryId() );
 
         // reindex
         TaskScheduleUtil.runTask( UpdateIndexTaskDescriptor.ID, prop );

@@ -182,6 +182,12 @@ public class TaskScheduleUtil
     public static void waitForTask( String name, int maxAttempts )
         throws Exception
     {
+
+        if ( maxAttempts == 0 )
+        {
+            return;
+        }
+
         String uri = "service/local/taskhelper?attempts=" + maxAttempts;
 
         if ( name != null )
@@ -237,15 +243,14 @@ public class TaskScheduleUtil
         runTask( typeId, typeId, properties );
     }
 
-    public static void runTask( String taskName, String typeId,
-                                                        ScheduledServicePropertyResource... properties )
+    public static void runTask( String taskName, String typeId, ScheduledServicePropertyResource... properties )
         throws Exception
     {
         runTask( taskName, typeId, 300, properties );
     }
 
     public static void runTask( String taskName, String typeId, int maxAttempts,
-                                                        ScheduledServicePropertyResource... properties )
+                                ScheduledServicePropertyResource... properties )
         throws Exception
     {
         ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();
@@ -268,5 +273,13 @@ public class TaskScheduleUtil
         Assert.assertTrue( status.isSuccess(), "Unable to run task:" + scheduledTask.getTypeId() );
 
         waitForTask( taskName, maxAttempts );
+    }
+
+    public static ScheduledServicePropertyResource newProperty( String name, String value )
+    {
+        ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
+        prop.setKey( name );
+        prop.setValue( value );
+        return prop;
     }
 }

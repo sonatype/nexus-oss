@@ -23,8 +23,6 @@ import java.util.Collection;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
@@ -63,15 +61,9 @@ public class EvictUnusedProxiedItemsTask
 
         long olderThan = System.currentTimeMillis() - ( getEvictOlderCacheItemsThen() * A_DAY );
 
-        if ( getRepositoryGroupId() != null )
+        if ( getRepositoryId() != null )
         {
-            return getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).evictUnusedItems( req,
-                                                                                                                                     olderThan );
-        }
-        else if ( getRepositoryId() != null )
-        {
-            return getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), Repository.class ).evictUnusedItems( req,
-                                                                                                                           olderThan );
+            return getRepositoryRegistry().getRepository( getRepositoryId() ).evictUnusedItems( req, olderThan );
         }
         else
         {
@@ -88,11 +80,7 @@ public class EvictUnusedProxiedItemsTask
     @Override
     protected String getMessage()
     {
-        if ( getRepositoryGroupId() != null )
-        {
-            return "Evicting unused proxied items for repository group " + getRepositoryName() + ".";
-        }
-        else if ( getRepositoryId() != null )
+        if ( getRepositoryId() != null )
         {
             return "Evicting unused proxied items for repository " + getRepositoryName() + ".";
         }

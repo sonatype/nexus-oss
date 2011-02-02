@@ -33,7 +33,7 @@ public class Nexus2692EvictHostedReleaseTaskIT
     {
         int days = 1;
         // run Task
-        runTask( days, "repo_releases" );
+        runTask( days, "releases" );
 
         // check files
         SortedSet<String> resultStorageFiles = getItemFilePaths();

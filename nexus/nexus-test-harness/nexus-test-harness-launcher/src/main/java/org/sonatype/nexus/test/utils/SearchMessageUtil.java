@@ -403,14 +403,7 @@ public class SearchMessageUtil
         {
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
             prop.setKey( UpdateIndexTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
-            if ( group )
-            {
-                prop.setValue( "group_" + repoId );
-            }
-            else
-            {
-                prop.setValue( "repo_" + repoId );
-            }
+                prop.setValue(  repoId );
             scheduledTask.addProperty( prop );
         }
 

@@ -104,19 +104,13 @@ public class DefaultSnapshotRemover
             if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
                 && repository.getRepositoryContentClass().isCompatible( contentClass ) )
             {
-                result.addResult( removeSnapshotsFromMavenRepository( repository.adaptToFacet( MavenRepository.class ),
-                    request ) );
+                process( request, result, repository );
             }
             else
             {
                 throw new IllegalArgumentException( "The repository with ID=" + repository.getId()
                     + " is not MavenRepository!" );
             }
-        }
-        else if ( request.getRepositoryGroupId() != null )
-        {
-            process( request, result,
-                getRepositoryRegistry().getRepositoryWithFacet( request.getRepositoryGroupId(), GroupRepository.class ) );
         }
         else
         {
@@ -257,11 +251,6 @@ public class DefaultSnapshotRemover
         if ( request.getRepositoryId() != null )
         {
             getLogger().info( "Removing old SNAPSHOT deployments from " + request.getRepositoryId() + " repository." );
-        }
-        else if ( request.getRepositoryGroupId() != null )
-        {
-            getLogger().info(
-                "Removing old SNAPSHOT deployments from " + request.getRepositoryGroupId() + " repository group." );
         }
         else
         {

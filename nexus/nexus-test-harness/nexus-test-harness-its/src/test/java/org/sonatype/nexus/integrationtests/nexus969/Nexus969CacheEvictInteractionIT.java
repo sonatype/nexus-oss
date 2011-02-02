@@ -56,7 +56,7 @@ public class Nexus969CacheEvictInteractionIT
         throws Exception
     {
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( "repositoryOrGroupId" );
+        repo.setKey( "repositoryId" );
         repo.setValue( "all_repo" );
         ScheduledServicePropertyResource age = new ScheduledServicePropertyResource();
         age.setKey( "evictOlderCacheItemsThen" );

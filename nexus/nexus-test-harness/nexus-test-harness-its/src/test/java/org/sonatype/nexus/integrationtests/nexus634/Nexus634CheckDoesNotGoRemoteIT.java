@@ -119,12 +119,12 @@ public class Nexus634CheckDoesNotGoRemoteIT
 
         // expire caches
         ScheduledServicePropertyResource repoOrGroupProp = new ScheduledServicePropertyResource();
-        repoOrGroupProp.setKey( "repositoryOrGroupId" );
-        repoOrGroupProp.setValue( "repo_" + REPO_RELEASE_PROXY_REPO1 );
+        repoOrGroupProp.setKey( "repositoryId" );
+        repoOrGroupProp.setValue( REPO_RELEASE_PROXY_REPO1 );
         TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, repoOrGroupProp );
 
         // run snapshot remover
-        runSnapshotRemover( "repo_nexus-test-harness-snapshot-repo", 0, 0, true );
+        runSnapshotRemover( "nexus-test-harness-snapshot-repo", 0, 0, true );
 
         // check is proxy touched
         Assert.assertEquals( touchTrackingHandler.getTouchedTargets().size(), 0,

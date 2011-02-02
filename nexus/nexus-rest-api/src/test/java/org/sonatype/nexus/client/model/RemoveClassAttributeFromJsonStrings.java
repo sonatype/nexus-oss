@@ -93,7 +93,7 @@ public class RemoveClassAttributeFromJsonStrings
 
     public void testScheduleJsonStringWithOutClassAttribute()
     {
-        String text = "{\"data\":{\"id\":null,\"name\":\"clear repo cache\",\"enabled\":true,\"typeId\":\"ExpireCacheTask\",\"schedule\":\"manual\",\"properties\":[{\"id\":\"repositoryOrGroupId\",\"value\":\"all_repo\"},{\"id\":\"resourceStorePath\",\"value\":\"\"}]}}";
+        String text = "{\"data\":{\"id\":null,\"name\":\"clear repo cache\",\"enabled\":true,\"typeId\":\"ExpireCacheTask\",\"schedule\":\"manual\",\"properties\":[{\"id\":\"repositoryId\",\"value\":\"all_repo\"},{\"id\":\"resourceStorePath\",\"value\":\"\"}]}}";
 
         XStreamRepresentation representation = new XStreamRepresentation(
             this.xstreamJSON,

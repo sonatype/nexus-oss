@@ -50,7 +50,7 @@ public class Nexus533TaskCronIT
             scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
 
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-            prop.setKey( "repositoryOrGroupId" );
+            prop.setKey( "repositoryId" );
             prop.setValue( "all_repo" );
             scheduledTask.addProperty( prop );
         }

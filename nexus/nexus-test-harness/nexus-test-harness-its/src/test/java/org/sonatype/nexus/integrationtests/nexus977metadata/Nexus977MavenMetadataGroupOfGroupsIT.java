@@ -45,18 +45,18 @@ public class Nexus977MavenMetadataGroupOfGroupsIT
         super.runOnce();
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( "repositoryOrGroupId" );
-        repo.setValue( "repo_release" );
+        repo.setKey( "repositoryId" );
+        repo.setValue( "release" );
         TaskScheduleUtil.runTask( "RebuildMavenMetadata-release", RebuildMavenMetadataTaskDescriptor.ID, repo );
 
         repo = new ScheduledServicePropertyResource();
-        repo.setKey( "repositoryOrGroupId" );
-        repo.setValue( "repo_release2" );
+        repo.setKey( "repositoryId" );
+        repo.setValue( "release2" );
         TaskScheduleUtil.runTask( "RebuildMavenMetadata-release2", RebuildMavenMetadataTaskDescriptor.ID, repo );
 
         repo = new ScheduledServicePropertyResource();
-        repo.setKey( "repositoryOrGroupId" );
-        repo.setValue( "repo_snapshot" );
+        repo.setKey( "repositoryId" );
+        repo.setValue( "snapshot" );
         TaskScheduleUtil.runTask( "RebuildMavenMetadata-snapshot", RebuildMavenMetadataTaskDescriptor.ID, repo );
     }
 

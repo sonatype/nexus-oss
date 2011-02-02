@@ -42,7 +42,7 @@ public class Nexus836OOSRepoReindexTaskIT
         throws Exception
     {
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryOrGroupId" );
+        prop.setKey( "repositoryId" );
         prop.setValue( "all_repo" );
 
         TaskScheduleUtil.waitForAllTasksToStop();

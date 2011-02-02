@@ -79,13 +79,13 @@ public abstract class AbstractSnapshotRemoverIT
         artifactFolder = new File( repositoryPath, "nexus634/artifact/1.0-SNAPSHOT" );
     }
 
-    protected void runSnapshotRemover( String repositoryOrGroupId, int minSnapshotsToKeep, int removeOlderThanDays,
+    protected void runSnapshotRemover( String repositoryId, int minSnapshotsToKeep, int removeOlderThanDays,
                                        boolean removeIfReleaseExists )
         throws Exception
     {
         ScheduledServicePropertyResource repositoryProp = new ScheduledServicePropertyResource();
-        repositoryProp.setKey( "repositoryOrGroupId" );
-        repositoryProp.setValue( repositoryOrGroupId );
+        repositoryProp.setKey( "repositoryId" );
+        repositoryProp.setValue( repositoryId );
 
         ScheduledServicePropertyResource keepSnapshotsProp = new ScheduledServicePropertyResource();
         keepSnapshotsProp.setKey( "minSnapshotsToKeep" );

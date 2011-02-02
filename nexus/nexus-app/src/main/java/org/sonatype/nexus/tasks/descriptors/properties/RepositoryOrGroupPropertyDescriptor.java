@@ -24,7 +24,7 @@ import org.codehaus.plexus.component.annotations.Component;
 public class RepositoryOrGroupPropertyDescriptor
     extends AbstractRepositoryOrGroupPropertyDescriptor
 {
-    public static final String ID = "repositoryOrGroupId";
+    public static final String ID = "repositoryId";
     
     public RepositoryOrGroupPropertyDescriptor()
     {

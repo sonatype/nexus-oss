@@ -42,9 +42,9 @@ public class Nexus1022RebuildRepositoryMavenMetadataTaskIT
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
 
-        repo.setKey( "repositoryOrGroupId" );
+        repo.setKey( "repositoryId" );
 
-        repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
+        repo.setValue( REPO_TEST_HARNESS_REPO );
 
         TaskScheduleUtil.runTask( "RebuildMavenMetadata-Nexus1022", RebuildMavenMetadataTaskDescriptor.ID, repo );
         

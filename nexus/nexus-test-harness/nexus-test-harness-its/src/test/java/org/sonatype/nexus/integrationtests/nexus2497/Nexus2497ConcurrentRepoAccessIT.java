@@ -109,8 +109,8 @@ public class Nexus2497ConcurrentRepoAccessIT
         }
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( "repositoryOrGroupId" );
-        repo.setValue( "repo_" + REPO_TEST_HARNESS_SNAPSHOT_REPO );
+        repo.setKey( "repositoryId" );
+        repo.setValue(  REPO_TEST_HARNESS_SNAPSHOT_REPO );
         TaskScheduleUtil.runTask( TASK_NAME, RebuildMavenMetadataTaskDescriptor.ID, repo );
 
         // uploads while rebuilding

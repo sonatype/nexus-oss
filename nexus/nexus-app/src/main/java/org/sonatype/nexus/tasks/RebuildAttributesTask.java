@@ -24,8 +24,6 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
@@ -51,6 +49,7 @@ public class RebuildAttributesTask
         return RebuildAttributesTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
     }
 
+    @Override
     public Object doRun()
         throws Exception
     {
@@ -58,15 +57,9 @@ public class RebuildAttributesTask
 
         Map<String, String> initialData = new HashMap<String, String>();
 
-        if ( getRepositoryGroupId() != null )
+        if ( getRepositoryId() != null )
         {
-            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).recreateAttributes(
-                req, initialData );
-        }
-        else if ( getRepositoryId() != null )
-        {
-            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), Repository.class ).recreateAttributes(
-                req, initialData );
+            getRepositoryRegistry().getRepository( getRepositoryId() ).recreateAttributes( req, initialData );
         }
         else
         {
@@ -76,19 +69,16 @@ public class RebuildAttributesTask
         return null;
     }
 
+    @Override
     protected String getAction()
     {
         return FeedRecorder.SYSTEM_REBUILDATTRIBUTES_ACTION;
     }
 
+    @Override
     protected String getMessage()
     {
-        if ( getRepositoryGroupId() != null )
-        {
-            return "Rebuilding attributes of repository group " + getRepositoryGroupName() + " from path "
-                + getResourceStorePath() + " and below.";
-        }
-        else if ( getRepositoryId() != null )
+        if ( getRepositoryId() != null )
         {
             return "Rebuilding attributes of repository " + getRepositoryName() + " from path "
                 + getResourceStorePath() + " and below.";

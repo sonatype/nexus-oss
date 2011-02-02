@@ -50,7 +50,7 @@ public class NEXUS3854Maven3MetadataIT
 
         ScheduledServicePropertyResource props = new ScheduledServicePropertyResource();
         props.setKey( RebuildMavenMetadataTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
-        props.setValue( "repo_" + REPO_TEST_HARNESS_SNAPSHOT_REPO );
+        props.setValue( REPO_TEST_HARNESS_SNAPSHOT_REPO );
         TaskScheduleUtil.runTask( RebuildMavenMetadataTaskDescriptor.ID, props );
         TaskScheduleUtil.waitForAllTasksToStop();
 

@@ -25,7 +25,7 @@ import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 public class RepositoryPropertyDescriptor
     implements PrivilegePropertyDescriptor
 {
-    public static final String ID = "repositoryOrGroupId";
+    public static final String ID = "repositoryId";
     
     public String getHelpText()
     {

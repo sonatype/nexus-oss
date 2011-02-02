@@ -32,7 +32,7 @@ public class RebuildAttributesTaskDescriptor
 {
     public static final String ID = "RebuildAttributesTask";
 
-    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
+    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
     public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
 

@@ -95,8 +95,8 @@ public class Nexus1111ProxyRemote500ErrorIT
 
         // clear cache, then download
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryOrGroupId" );
-        prop.setValue( "repo_" + testRepositoryId );
+        prop.setKey( "repositoryId" );
+        prop.setValue( testRepositoryId );
         TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, prop );
 
         try

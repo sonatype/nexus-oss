@@ -74,9 +74,26 @@ public interface GroupRepository
      * over resulting list.
      * 
      * @return a List<Repository>
-     * @throws StorageException
      */
     List<Repository> getMemberRepositories();
+
+    /**
+     * Returns the unmodifiable list of Transitive Repositories that are group members in this GroupRepository. This
+     * method differs from {@link #getMemberRepositories()} by resolving all inner groups member as well. <b>The
+     * resulting list won't contain any GroupRepository.</b>
+     * 
+     * @return a List<Repository>
+     */
+    List<Repository> getTransitiveMemberRepositories();
+
+    /**
+     * Returns the unmodifiable ID list of the transitive members of this group. This method differs from
+     * {@link #getMemberRepositoryIds()} by resolving all inner groups member as well. <b>The resulting list won't
+     * contain any GroupRepository.</b>
+     * 
+     * @return a List<Repository>
+     */
+    List<String> getTransitiveMemberRepositoryIds();
 
     /**
      * Returns the list of available items in the group for same path. The resulting list keeps the order of reposes

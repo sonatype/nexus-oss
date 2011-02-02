@@ -34,7 +34,7 @@ package org.sonatype.nexus.configuration.model.v1_4_5.upgrade;
  * Converts from version 1.4.5 (with version in package name) to
  * version 1.4.5 (without version in package name) of the model.
  * 
- * @version $Revision$ $Date$
+ * @version $Revision: 7811 $ $Date: 2011-02-02 11:22:58 -0600 (Wed, 02 Feb 2011) $
  */
 @SuppressWarnings( "all" )
 public interface VersionConverter

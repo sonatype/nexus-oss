@@ -39,13 +39,11 @@ import org.sonatype.scheduling.TaskState;
 public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
 {
-    private static final String REPO_PREFIX = "repo_";
-
-    private static final String GROUP_PREFIX = "group_";
 
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
+    @Deprecated
     public static String getIdFromPrefixedString( String prefix, String prefixedString )
     {
         if ( prefixedString != null && prefixedString.startsWith( prefix ) )
@@ -65,50 +63,43 @@ public abstract class AbstractNexusRepositoriesTask<T>
     // This method SHOULD be overridden in new task impls
     protected String getRepositoryFieldId()
     {
-        return "repositoryOrGroupId";
+        return "repositoryId";
     }
 
     public String getRepositoryId()
     {
-        return getIdFromPrefixedString( REPO_PREFIX, getParameters().get( getRepositoryFieldId() ) );
+        final String id = getParameters().get( getRepositoryFieldId() );
+        if ( "all_repo".equals( id ) )
+        {
+            return null;
+        }
+        return id;
     }
 
     public void setRepositoryId( String repositoryId )
     {
         if ( !StringUtils.isEmpty( repositoryId ) )
         {
-            getParameters().put( getRepositoryFieldId(), REPO_PREFIX + repositoryId );
+            getParameters().put( getRepositoryFieldId(), repositoryId );
         }
     }
 
+    @Deprecated
     public String getRepositoryGroupId()
     {
-        return getIdFromPrefixedString( GROUP_PREFIX, getParameters().get( getRepositoryFieldId() ) );
+        return getRepositoryId();
     }
 
+    @Deprecated
     public void setRepositoryGroupId( String repositoryGroupId )
     {
-        if ( !StringUtils.isEmpty( repositoryGroupId ) )
-        {
-            getParameters().put( getRepositoryFieldId(), GROUP_PREFIX + repositoryGroupId );
-        }
+        setRepositoryId( repositoryGroupId );
     }
 
+    @Deprecated
     public String getRepositoryGroupName()
     {
-        try
-        {
-            GroupRepository repo =
-                getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class );
-
-            return repo.getName() + " (group)";
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            this.getLogger().warn( "Could not read repository group!", e );
-
-            return getRepositoryGroupId();
-        }
+        return getRepositoryName();
     }
 
     public String getRepositoryName()
@@ -140,7 +131,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
         {
             ComponentDescriptor<?> cd =
                 getPlexusContainer().getComponentDescriptor( SchedulerTask.class, SchedulerTask.class.getName(),
-                                                             taskType );
+                    taskType );
 
             if ( cd != null )
             {
@@ -159,9 +150,9 @@ public abstract class AbstractNexusRepositoriesTask<T>
                         {
                             if ( getLogger().isDebugEnabled() )
                             {
-                                getLogger().debug( "Task " + task.getName()
-                                                       + " is already running and is conflicting with task "
-                                                       + this.getClass().getName() );
+                                getLogger().debug(
+                                    "Task " + task.getName() + " is already running and is conflicting with task "
+                                        + this.getClass().getName() );
                             }
 
                             return true;
@@ -178,27 +169,16 @@ public abstract class AbstractNexusRepositoriesTask<T>
         return false;
     }
 
-    protected boolean repositorySetIntersectionIsNotEmpty( String repoOrGroupId )
+    protected boolean repositorySetIntersectionIsNotEmpty( String repositoryId )
     {
-        String otherRepositoryId = getIdFromPrefixedString( REPO_PREFIX, repoOrGroupId );
-        String otherRepositoryGroupId = getIdFromPrefixedString( GROUP_PREFIX, repoOrGroupId );
-
         // simplest cases, checking for repoId and groupId equality
-        if ( getRepositoryId() != null && otherRepositoryId != null
-            && StringUtils.equals( getRepositoryId(), otherRepositoryId ) )
-        {
-            return true;
-        }
-
-        if ( getRepositoryGroupId() != null && otherRepositoryGroupId != null
-            && StringUtils.equals( getRepositoryGroupId(), otherRepositoryGroupId ) )
+        if ( StringUtils.equals( getRepositoryId(), repositoryId ) )
         {
             return true;
         }
 
         // All repo check
-        if ( ( getRepositoryId() == null && getRepositoryGroupId() == null )
-            || ( otherRepositoryId == null && otherRepositoryGroupId == null ) )
+        if ( getRepositoryId() == null || repositoryId == null )
         {
             return true;
         }
@@ -207,39 +187,48 @@ public abstract class AbstractNexusRepositoriesTask<T>
         {
             // complex case: repoA may be in both groupA and groupB as member
             // so we actually evaluate all tackled reposes for both task and have intersected those
-            List<Repository> thisReposes = new ArrayList<Repository>();
+            final List<Repository> thisReposes = new ArrayList<Repository>();
+            {
+                final Repository repo = getRepositoryRegistry().getRepository( getRepositoryId() );
 
-            if ( getRepositoryId() != null )
-            {
-                thisReposes.add( getRepositoryRegistry().getRepository( getRepositoryId() ) );
-            }
-            else
-            {
-                thisReposes.addAll( getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(),
-                                                                                    GroupRepository.class ).getMemberRepositories() );
+                if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+                {
+                    thisReposes.addAll( repo.adaptToFacet( GroupRepository.class ).getTransitiveMemberRepositories() );
+                }
+                else
+                {
+                    thisReposes.add( repo );
+                }
             }
 
-            List<Repository> otherReposes = new ArrayList<Repository>();
+            final List<Repository> reposes = new ArrayList<Repository>();
+            {
+                final Repository repo = getRepositoryRegistry().getRepository( repositoryId );
 
-            if ( otherRepositoryId != null )
-            {
-                otherReposes.add( getRepositoryRegistry().getRepository( otherRepositoryId ) );
-            }
-            else
-            {
-                otherReposes.addAll( getRepositoryRegistry().getRepositoryWithFacet( otherRepositoryGroupId,
-                                                                                     GroupRepository.class ).getMemberRepositories() );
+                if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+                {
+                    reposes.addAll( repo.adaptToFacet( GroupRepository.class ).getTransitiveMemberRepositories() );
+                }
+                else
+                {
+                    reposes.add( repo );
+                }
             }
 
             HashSet<Repository> testSet = new HashSet<Repository>();
             testSet.addAll( thisReposes );
-            testSet.addAll( otherReposes );
+            testSet.addAll( reposes );
 
             // the set does not intersects
-            return thisReposes.size() + otherReposes.size() != testSet.size();
+            return thisReposes.size() + reposes.size() != testSet.size();
         }
         catch ( NoSuchResourceStoreException e )
         {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().error( e.getMessage(), e );
+            }
+
             // in this case, one of the tasks will die anyway, let's say false
             return false;
         }

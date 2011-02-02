@@ -35,7 +35,7 @@ public class Nexus2692EvictGroupTaskIT
     {
         int days = 6;
         // run Task
-        runTask( days, "group_public" );
+        runTask( days, "public" );
 
         // check files
         SortedSet<String> resultStorageFiles = getItemFilePaths();

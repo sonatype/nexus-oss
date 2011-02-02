@@ -21,8 +21,6 @@ package org.sonatype.nexus.tasks;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
@@ -48,18 +46,15 @@ public class ExpireCacheTask
         return ExpireCacheTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
     }
 
+    @Override
     public Object doRun()
         throws Exception
     {
         ResourceStoreRequest req = new ResourceStoreRequest( getResourceStorePath() );
 
-        if ( getRepositoryGroupId() != null )
+        if ( getRepositoryId() != null )
         {
-            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).expireCaches( req );
-        }
-        else if ( getRepositoryId() != null )
-        {
-            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), Repository.class ).expireCaches( req );
+            getRepositoryRegistry().getRepository( getRepositoryId() ).expireCaches( req );
         }
         else
         {
@@ -69,19 +64,16 @@ public class ExpireCacheTask
         return null;
     }
 
+    @Override
     protected String getAction()
     {
         return FeedRecorder.SYSTEM_EXPIRE_CACHE_ACTION;
     }
 
+    @Override
     protected String getMessage()
     {
-        if ( getRepositoryGroupId() != null )
-        {
-            return "Expiring caches for repository group " + getRepositoryGroupName() + " from path "
-                + getResourceStorePath() + " and below.";
-        }
-        else if ( getRepositoryId() != null )
+        if ( getRepositoryId() != null )
         {
             return "Expiring caches for repository " + getRepositoryName() + " from path " + getResourceStorePath()
                 + " and below.";

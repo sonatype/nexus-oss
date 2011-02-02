@@ -38,7 +38,7 @@ public class Nexus634RemoveAllIT
         throws Exception
     {
         // This is THE important part
-        runSnapshotRemover( "repo_nexus-test-harness-snapshot-repo", 0, 0, true );
+        runSnapshotRemover( "nexus-test-harness-snapshot-repo", 0, 0, true );
 
         /*
          * This IT is now very wrong, as snapshot remover will no longer remove -SNAPSHOT artifacts,

@@ -32,7 +32,7 @@ public class EvictUnusedItemsTaskDescriptor
 {
     public static final String ID = "EvictUnusedProxiedItemsTask";
 
-    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
+    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
     public static final String OLDER_THAN_FIELD_ID = "evictOlderCacheItemsThen";
 

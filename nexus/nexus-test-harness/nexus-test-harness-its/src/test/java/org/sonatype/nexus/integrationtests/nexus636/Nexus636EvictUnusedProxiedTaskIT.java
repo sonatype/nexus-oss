@@ -75,8 +75,8 @@ public class Nexus636EvictUnusedProxiedTaskIT
 
         // rebuild attributes
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryOrGroupId" );
-        prop.setValue( "repo_" + this.getTestRepositoryId() );
+        prop.setKey( "repositoryId" );
+        prop.setValue(  this.getTestRepositoryId() );
         TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, prop );
 
     }
@@ -85,7 +85,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
     public void clearProxy()
         throws Exception
     {
-        executeTask( "clearProxy", "repo_release-proxy-repo-1", 0 );
+        executeTask( "clearProxy", "release-proxy-repo-1", 0 );
 
         File[] files = repositoryPath.listFiles();
 
@@ -112,7 +112,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
     public void keepTestDeployedFiles()
         throws Exception
     {
-        executeTask( "keepTestDeployedFiles", "repo_release-proxy-repo-1", 2 );
+        executeTask( "keepTestDeployedFiles", "release-proxy-repo-1", 2 );
 
         File artifact = new File( repositoryPath, "nexus636/artifact-new/1.0/artifact-new-1.0.jar" );
         Assert.assertTrue( artifact.exists(), "The files deployed by this test should be young enought to be kept" );
@@ -124,7 +124,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         throws Exception
     {
 
-        executeTask( "doNotDeleteEverythingTest-1", "repo_release-proxy-repo-1", 2 );
+        executeTask( "doNotDeleteEverythingTest-1", "release-proxy-repo-1", 2 );
         // expect 3 files in repo
         File groupDirectory = new File( repositoryPath, this.getTestId() );
         File[] files = groupDirectory.listFiles();
@@ -139,7 +139,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         this.changeProxyAttributeDate( oldPom, -3 );
 
         // run task
-        executeTask( "doNotDeleteEverythingTest-2", "repo_release-proxy-repo-1", 2 );
+        executeTask( "doNotDeleteEverythingTest-2", "release-proxy-repo-1", 2 );
 
         // check file list
         files = groupDirectory.listFiles();
@@ -150,7 +150,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         throws Exception
     {
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( "repositoryOrGroupId" );
+        repo.setKey( "repositoryId" );
         repo.setValue( repository );
         ScheduledServicePropertyResource age = new ScheduledServicePropertyResource();
         age.setKey( "evictOlderCacheItemsThen" );

@@ -85,8 +85,8 @@ public class Nexus977GroupOfGroupsSnapshotRemoverTaskTaskIT
         ageProp.setValue( String.valueOf( 0 ) );
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( "repositoryOrGroupId" );
-        repo.setValue( "group_g4" );
+        repo.setKey( "repositoryId" );
+        repo.setValue( "g4" );
         TaskScheduleUtil.runTask( "SnapshotRemovalTask-snapshot", SnapshotRemovalTaskDescriptor.ID, repo,
             keepSnapshotsProp, ageProp );
 

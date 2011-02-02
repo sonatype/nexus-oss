@@ -32,7 +32,7 @@ public class ExpireCacheTaskDescriptor
 {
     public static final String ID = "ExpireCacheTask";
 
-    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
+    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
     public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
 

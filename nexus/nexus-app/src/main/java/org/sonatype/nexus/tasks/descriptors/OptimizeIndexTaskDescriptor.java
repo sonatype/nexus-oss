@@ -31,7 +31,7 @@ public class OptimizeIndexTaskDescriptor
 {
     public static final String ID = "OptimizeIndexTask";
 
-    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
+    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
     private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
                                                                                        FormField.MANDATORY );

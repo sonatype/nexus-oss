@@ -90,28 +90,27 @@ public class SnapshotRemoverTask
                              Boolean.toString( removeIfReleaseExists ) );
     }
 
+    @Override
     public SnapshotRemovalResult doRun()
         throws Exception
     {
         SnapshotRemovalRequest req =
-            new SnapshotRemovalRequest( getRepositoryId(), getRepositoryGroupId(), getMinSnapshotsToKeep(),
-                                        getRemoveOlderThanDays(), isRemoveIfReleaseExists() );
+            new SnapshotRemovalRequest( getRepositoryId(), getMinSnapshotsToKeep(), getRemoveOlderThanDays(),
+                isRemoveIfReleaseExists() );
 
         return getNexus().removeSnapshots( req );
     }
 
+    @Override
     protected String getAction()
     {
         return SYSTEM_REMOVE_SNAPSHOTS_ACTION;
     }
 
+    @Override
     protected String getMessage()
     {
-        if ( getRepositoryGroupId() != null )
-        {
-            return "Removing snapshots from repository group " + getRepositoryGroupName();
-        }
-        else if ( getRepositoryId() != null )
+        if ( getRepositoryId() != null )
         {
             return "Removing snapshots from repository " + getRepositoryName();
         }

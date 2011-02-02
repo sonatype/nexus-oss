@@ -94,9 +94,9 @@ public class Nexus3233IndexPomSha1IT
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
 
-        repo.setKey( "repositoryOrGroupId" );
+        repo.setKey( "repositoryId" );
 
-        repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
+        repo.setValue(  REPO_TEST_HARNESS_REPO );
 
         TaskScheduleUtil.runTask( "RebuildMavenMetadata-Nexus3233", RebuildMavenMetadataTaskDescriptor.ID, repo );
         

@@ -21,6 +21,7 @@ package org.sonatype.nexus.configuration.application.upgrade;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -28,14 +29,17 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
+import org.sonatype.nexus.configuration.model.CProps;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.v1_4_5.upgrade.BasicVersionConverter;
 
 /**
- * Upgrades configuration model from version 1.4.4 to 1.4.5.
+ * Upgrades configuration model from version 1.4.4 to 1.4.5.<BR>
+ * This is here for upgrade testing to a new remote storage provider. This upgrade does NOTHING unless the System
+ * property: default.http.provider is set
  * 
- * This is here for upgrade testing to a new remote storage provider. 
- * This upgrade does NOTHING unless the System property: default.http.provider is set
+ * @author toby
+ * @author velo
  */
 @Component( role = SingleVersionUpgrader.class, hint = "1.4.4" )
 public class Upgrade144to145
@@ -81,28 +85,42 @@ public class Upgrade144to145
         org.sonatype.nexus.configuration.model.v1_4_4.Configuration oldc =
             (org.sonatype.nexus.configuration.model.v1_4_4.Configuration) message.getConfiguration();
 
-        
         BasicVersionConverter versionConverter = new BasicVersionConverter()
         {
             @Override
-            public CRemoteStorage convertCRemoteStorage(  org.sonatype.nexus.configuration.model.v1_4_4.CRemoteStorage cRemoteStorage )
+            public CRemoteStorage convertCRemoteStorage( org.sonatype.nexus.configuration.model.v1_4_4.CRemoteStorage cRemoteStorage )
             {
                 CRemoteStorage newRemoteStorage = super.convertCRemoteStorage( cRemoteStorage );
 
-                // change the provider 
-                if(newRemoteStorage != null && System.getProperty( "default.http.provider" ) != null)
+                // change the provider
+                if ( newRemoteStorage != null && System.getProperty( "default.http.provider" ) != null )
                 {
                     newRemoteStorage.setProvider( System.getProperty( "default.http.provider" ) );
                 }
-                
+
                 return newRemoteStorage;
             }
         };
-            org.sonatype.nexus.configuration.model.Configuration newc = versionConverter.convertConfiguration( oldc );
+
+        org.sonatype.nexus.configuration.model.Configuration newc = versionConverter.convertConfiguration( oldc );
+
+        // NEXUS-3861
+        for ( org.sonatype.nexus.configuration.model.CScheduledTask task : newc.getTasks() )
+        {
+            List<CProps> props = task.getProperties();
+            for ( CProps cProp : props )
+            {
+                if ( "repositoryOrGroupId".equals( cProp.getKey() ) )
+                {
+                    cProp.setKey( "repositoryId" );
+                    cProp.setValue( cProp.getValue().replaceFirst( "repo\\_", "" ).replaceFirst( "group\\_", "" ) );
+                }
+            }
+        }
 
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
-    
+
 }

@@ -78,7 +78,7 @@ public class Nexus1650MultipleManualTaskIT
         throws Exception
     {
         ScheduledServicePropertyResource repositoryProp = new ScheduledServicePropertyResource();
-        repositoryProp.setKey( "repositoryOrGroupId" );
+        repositoryProp.setKey( "repositoryId" );
         repositoryProp.setValue( "nexus-test-harness-snapshot-repo" );
 
         ScheduledServicePropertyResource keepSnapshotsProp = new ScheduledServicePropertyResource();

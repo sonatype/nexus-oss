@@ -57,8 +57,8 @@ public class Nexus2923SearchResultDownloadLinkIT
         FileUtils.copyDirectory( testFiles, testRepo );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryOrGroupId" );
-        prop.setValue( "repo_" + this.getTestRepositoryId() );
+        prop.setKey( "repositoryId" );
+        prop.setValue( this.getTestRepositoryId() );
 
         TaskScheduleUtil.runTask( UpdateIndexTaskDescriptor.ID, prop );
     }

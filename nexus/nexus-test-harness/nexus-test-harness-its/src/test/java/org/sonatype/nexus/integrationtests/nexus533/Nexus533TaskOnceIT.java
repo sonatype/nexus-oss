@@ -51,7 +51,7 @@ public class Nexus533TaskOnceIT
             scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
 
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-            prop.setKey( "repositoryOrGroupId" );
+            prop.setKey( "repositoryId" );
             prop.setValue( "all_repo" );
             scheduledTask.addProperty( prop );
         }

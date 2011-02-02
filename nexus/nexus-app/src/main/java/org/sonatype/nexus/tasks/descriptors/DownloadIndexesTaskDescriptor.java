@@ -31,7 +31,7 @@ public class DownloadIndexesTaskDescriptor
 {
     public static final String ID = "DownloadIndexesTask";
 
-    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
+    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
     private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
                                                                                        FormField.MANDATORY );

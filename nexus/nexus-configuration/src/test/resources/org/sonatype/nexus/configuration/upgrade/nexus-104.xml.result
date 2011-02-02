@@ -674,7 +674,7 @@
       </schedule>
       <properties>
         <property>
-          <key>repositoryOrGroupId</key>
+          <key>repositoryId</key>
           <value>all_repo</value>
         </property>
       </properties>

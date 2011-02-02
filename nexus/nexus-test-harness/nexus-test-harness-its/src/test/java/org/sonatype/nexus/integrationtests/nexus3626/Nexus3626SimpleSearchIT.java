@@ -99,9 +99,9 @@ public class Nexus3626SimpleSearchIT
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
 
-        repo.setKey( "repositoryOrGroupId" );
+        repo.setKey( "repositoryId" );
 
-        repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
+        repo.setValue( REPO_TEST_HARNESS_REPO );
 
         TaskScheduleUtil.runTask( "RebuildMavenMetadata-nexus3626", RebuildMavenMetadataTaskDescriptor.ID, repo );
         

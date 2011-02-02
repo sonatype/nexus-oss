@@ -23,7 +23,7 @@ import java.util.Set;
 
 public class SnapshotRemovalRequest
 {
-    private final String repositoryId, repositoryGroupId;
+    private final String repositoryId;
 
     private final int minCountOfSnapshotsToKeep;
 
@@ -35,14 +35,12 @@ public class SnapshotRemovalRequest
     
     private final Set<String> processedRepos;
 
-    public SnapshotRemovalRequest( String repositoryId, String repositoryGroupId, int minCountOfSnapshotsToKeep,
+    public SnapshotRemovalRequest( String repositoryId, int minCountOfSnapshotsToKeep,
         int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists )
     {
         super();
 
         this.repositoryId = repositoryId;
-
-        this.repositoryGroupId = repositoryGroupId;
 
         this.minCountOfSnapshotsToKeep = minCountOfSnapshotsToKeep;
 
@@ -58,11 +56,6 @@ public class SnapshotRemovalRequest
     public String getRepositoryId()
     {
         return repositoryId;
-    }
-
-    public String getRepositoryGroupId()
-    {
-        return repositoryGroupId;
     }
 
     public int getMinCountOfSnapshotsToKeep()

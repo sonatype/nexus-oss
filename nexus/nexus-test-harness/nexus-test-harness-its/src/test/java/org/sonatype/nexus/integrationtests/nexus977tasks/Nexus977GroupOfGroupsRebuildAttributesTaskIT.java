@@ -51,8 +51,8 @@ public class Nexus977GroupOfGroupsRebuildAttributesTaskIT
         FileUtils.copyFile( getTestFile( "project.jar" ), dest );
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( "repositoryOrGroupId" );
-        repo.setValue( "group_g4" );
+        repo.setKey( "repositoryId" );
+        repo.setValue( "g4" );
         TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, repo );
 
         DirectoryScanner scan = new DirectoryScanner();

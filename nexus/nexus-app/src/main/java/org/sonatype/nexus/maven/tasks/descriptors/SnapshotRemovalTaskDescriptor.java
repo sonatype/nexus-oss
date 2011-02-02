@@ -35,7 +35,7 @@ public class SnapshotRemovalTaskDescriptor
 {
     public static final String ID = "SnapshotRemoverTask";
 
-    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
+    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
     public static final String MIN_TO_KEEP_FIELD_ID = "minSnapshotsToKeep";
 

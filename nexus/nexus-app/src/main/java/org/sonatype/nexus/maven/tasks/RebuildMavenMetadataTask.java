@@ -48,22 +48,20 @@ public class RebuildMavenMetadataTask
         return RebuildMavenMetadataTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
     }
 
+    @Override
     public Object doRun()
         throws Exception
     {
         ResourceStoreRequest req = new ResourceStoreRequest( getResourceStorePath() );
 
-        // group wins if both given, repoId if group not given. Or null, if none given.
-        String repoId = StringUtils.isNotBlank( getRepositoryGroupId() ) ? getRepositoryGroupId() : getRepositoryId();
-
         // no repo id, then do all repos
-        if ( StringUtils.isEmpty( repoId ) )
+        if ( StringUtils.isEmpty( getRepositoryId() ) )
         {
             getNexus().rebuildMavenMetadataAllRepositories( req );
         }
         else
         {
-            Repository repository = getRepositoryRegistry().getRepository( repoId );
+            Repository repository = getRepositoryRegistry().getRepository( getRepositoryId() );
 
             // is this a Maven repository at all?
             if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
@@ -82,19 +80,16 @@ public class RebuildMavenMetadataTask
         return null;
     }
 
+    @Override
     protected String getAction()
     {
         return REBUILD_MAVEN_METADATA_ACTION;
     }
 
+    @Override
     protected String getMessage()
     {
-        if ( getRepositoryGroupId() != null )
-        {
-            return "Rebuilding maven metadata of repository group " + getRepositoryGroupName() + " from path "
-                + getResourceStorePath() + " and below.";
-        }
-        else if ( getRepositoryId() != null )
+        if ( getRepositoryId() != null )
         {
             return "Rebuilding maven metadata of repository " + getRepositoryName() + " from path "
                 + getResourceStorePath() + " and below.";

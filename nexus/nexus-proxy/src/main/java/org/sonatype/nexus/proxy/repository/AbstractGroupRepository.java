@@ -462,4 +462,39 @@ public abstract class AbstractGroupRepository
 
         super.expireCaches( request );
     }
+
+    @Override
+    public List<Repository> getTransitiveMemberRepositories()
+    {
+        return getTransitiveMemberRepositories( this );
+    }
+
+    protected List<Repository> getTransitiveMemberRepositories( GroupRepository group )
+    {
+        List<Repository> repos = new ArrayList<Repository>();
+        for ( Repository repo : group.getMemberRepositories() )
+        {
+            if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            {
+                repos.addAll( getTransitiveMemberRepositories( repo.adaptToFacet( GroupRepository.class ) ) );
+            }
+            else
+            {
+                repos.add( repo );
+            }
+        }
+        return repos;
+    }
+
+    @Override
+    public List<String> getTransitiveMemberRepositoryIds()
+    {
+        List<String> ids = new ArrayList<String>();
+        for ( Repository repo : getTransitiveMemberRepositories() )
+        {
+            ids.add( repo.getId() );
+        }
+        return ids;
+    }
+
 }

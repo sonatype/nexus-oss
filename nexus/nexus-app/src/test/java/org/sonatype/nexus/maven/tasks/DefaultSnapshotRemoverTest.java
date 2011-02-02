@@ -85,7 +85,7 @@ public class DefaultSnapshotRemoverTest
         itemFile.setLastModified( tenDaysAgo );
 
         SnapshotRemovalRequest snapshotRemovalRequest =
-            new SnapshotRemovalRequest( snapshots.getId(), null, 1, 10, true );
+ new SnapshotRemovalRequest( snapshots.getId(), 1, 10, true );
 
         assertTrue( itemFile.exists() );
 
@@ -125,7 +125,7 @@ public class DefaultSnapshotRemoverTest
         // -----------------------------
 
         SnapshotRemovalRequest snapshotRemovalRequest =
-            new SnapshotRemovalRequest( snapshots.getId(), null, 3, 1, true );
+ new SnapshotRemovalRequest( snapshots.getId(), 3, 1, true );
 
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
 
@@ -146,7 +146,7 @@ public class DefaultSnapshotRemoverTest
         // and now setup the request
         // process the apacheSnapshots, leave min 1 snap, remove older than 0 day and delete them if release exists
         SnapshotRemovalRequest snapshotRemovalRequest =
-            new SnapshotRemovalRequest( snapshots.getId(), null, 1, 0, true );
+ new SnapshotRemovalRequest( snapshots.getId(), 1, 0, true );
 
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
 
@@ -234,7 +234,7 @@ public class DefaultSnapshotRemoverTest
         // and now setup the request
         // process the apacheSnapshots, leave min 2 snap, do not remove released ones
         SnapshotRemovalRequest snapshotRemovalRequest =
-            new SnapshotRemovalRequest( snapshots.getId(), null, 2, -1, false );
+ new SnapshotRemovalRequest( snapshots.getId(), 2, -1, false );
 
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
 
@@ -298,7 +298,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( apacheSnapshots.getId(), null, 2, -1, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( apacheSnapshots.getId(), 2, -1, false );
 
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
@@ -329,7 +329,7 @@ public class DefaultSnapshotRemoverTest
         Metadata mdBefore =
             readMavenMetadata( retrieveFile( snapshots, "org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/maven-metadata.xml" ) );
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 1, -1, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), 1, -1, false );
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertTrue( result.isSuccessful() );
@@ -356,7 +356,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 0, 1, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), 0, 1, false );
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertTrue( result.isSuccessful() );
@@ -385,7 +385,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 0, -1, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), 0, -1, false );
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertTrue( result.isSuccessful() );
@@ -411,7 +411,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 2, -1, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), 2, -1, false );
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertTrue( result.isSuccessful() );
@@ -442,7 +442,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 1, -1, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), 1, -1, false );
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertTrue( result.isSuccessful() );
@@ -462,7 +462,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 1, 1, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), 1, 1, false );
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertTrue( result.isSuccessful() );
@@ -509,7 +509,7 @@ public class DefaultSnapshotRemoverTest
         fillInRepo();
 
         // run on the public group, which contains the snapshot repo
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( null, null, 1, 1, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( null, 1, 1, false );
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertTrue( result.isSuccessful() );
@@ -560,7 +560,7 @@ public class DefaultSnapshotRemoverTest
         fillInRepo();
 
         // run on the public group, which contains the snapshot repo
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( null, "public", 1, 1, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( "public", 1, 1, false );
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertTrue( result.isSuccessful() );
@@ -606,7 +606,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 0, -1, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), 0, -1, false );
 
         assertTrue( defaultNexus.removeSnapshots( request ).isSuccessful() );
 
@@ -636,7 +636,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 0, -1, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), 0, -1, false );
 
         assertTrue( defaultNexus.removeSnapshots( request ).isSuccessful() );
 

@@ -42,7 +42,7 @@ public class Nexus1719OOSRepoEvictUnusedTaskIT
         throws Exception
     {
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryOrGroupId" );
+        prop.setKey( "repositoryId" );
         prop.setValue( "all_repo" );
 
         ScheduledServicePropertyResource age = new ScheduledServicePropertyResource();

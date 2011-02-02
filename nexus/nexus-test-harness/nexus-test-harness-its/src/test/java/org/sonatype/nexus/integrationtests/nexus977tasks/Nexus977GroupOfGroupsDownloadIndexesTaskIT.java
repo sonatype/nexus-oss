@@ -37,8 +37,8 @@ public class Nexus977GroupOfGroupsDownloadIndexesTaskIT
         Assert.assertTrue( getSearchMessageUtil().searchForGav( getTestId(), "project", "2.1" ).isEmpty() );
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( "repositoryOrGroupId" );
-        repo.setValue( "group_g4" );
+        repo.setKey( "repositoryId" );
+        repo.setValue( "g4" );
         TaskScheduleUtil.runTask( "DownloadIndexesTaskDescriptor-snapshot", DownloadIndexesTaskDescriptor.ID, repo );
         
         Assert.assertFalse( getSearchMessageUtil().searchForGav( getTestId(), "project", "0.8" ).isEmpty() );

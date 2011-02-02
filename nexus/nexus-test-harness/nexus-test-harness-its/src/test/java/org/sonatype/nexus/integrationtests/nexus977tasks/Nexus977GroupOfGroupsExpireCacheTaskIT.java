@@ -51,8 +51,8 @@ public class Nexus977GroupOfGroupsExpireCacheTaskIT
         failDownload( gav );
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( "repositoryOrGroupId" );
-        repo.setValue( "group_g4" );
+        repo.setKey( "repositoryId" );
+        repo.setValue( "g4" );
         TaskScheduleUtil.runTask( "ExpireCacheTaskDescriptor-snapshot", ExpireCacheTaskDescriptor.ID, repo );
         
         downloadArtifactFromRepository( "g4", gav, "target/downloads/nexus977tasks" );

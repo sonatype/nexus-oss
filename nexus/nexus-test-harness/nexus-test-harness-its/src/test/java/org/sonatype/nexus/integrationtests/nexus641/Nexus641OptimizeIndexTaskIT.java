@@ -49,8 +49,8 @@ public class Nexus641OptimizeIndexTaskIT
     {
         // reindex
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryOrGroupId" );
-        prop.setValue( "repo_nexus-test-harness-repo" );
+        prop.setKey( "repositoryId" );
+        prop.setValue( "nexus-test-harness-repo" );
 
         // reindex
         TaskScheduleUtil.runTask( OptimizeIndexTaskDescriptor.ID, prop );

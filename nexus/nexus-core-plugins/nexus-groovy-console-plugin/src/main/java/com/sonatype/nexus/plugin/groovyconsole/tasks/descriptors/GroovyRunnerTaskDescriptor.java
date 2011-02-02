@@ -35,7 +35,7 @@ public class GroovyRunnerTaskDescriptor
 {
     public static final String ID = "GroovyRunnerTask";
 
-    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
+    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
     public static final String SCRIPT_FIELD_ID = "groovyScript";
 

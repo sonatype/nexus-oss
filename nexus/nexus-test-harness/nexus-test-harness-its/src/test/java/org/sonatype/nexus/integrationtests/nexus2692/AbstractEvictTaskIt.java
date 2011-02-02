@@ -183,7 +183,7 @@ public class AbstractEvictTaskIt
         TaskScheduleUtil.waitForAllTasksToStop(); // be sure nothing else is locking tasks
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryOrGroupId" );
+        prop.setKey( "repositoryId" );
         prop.setValue( repoId );
 
         ScheduledServicePropertyResource age = new ScheduledServicePropertyResource();

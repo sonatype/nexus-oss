@@ -33,7 +33,6 @@ import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_4_4.upgrade.BasicVersionConverter;
 
 /**
@@ -91,7 +90,7 @@ public class Upgrade143to144
             new BasicVersionConverter().convertConfiguration( oldc );
 
         // NEXUS-3833
-        for ( CScheduledTask task : newc.getTasks() )
+        for ( org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask task : newc.getTasks() )
         {
             if ( "ReindexTask".equals( task.getType() ) )
             {

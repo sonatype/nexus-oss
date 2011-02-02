@@ -238,9 +238,9 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
             fn : function() {
               this.repositoryDataStore.each(function(item, i, len) {
                     var newRec = new this.repositoryOrGroupRecordConstructor({
-                          id : 'repo_' + item.data.id,
+                          id : item.data.id,
                           name : item.data.name + ' (Repo)'
-                        }, 'repo_' + item.id);
+                        },  item.id);
                     this.repoOrGroupDataStore.add([newRec]);
                   }, this);
               var allRec = new this.repositoryRecordConstructor({
@@ -273,9 +273,9 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
             fn : function() {
               this.repositoryGroupDataStore.each(function(item, i, len) {
                     var newRec = new this.repositoryOrGroupRecordConstructor({
-                          id : 'group_' + item.data.id,
+                          id :  item.data.id,
                           name : item.data.name + ' (Group)'
-                        }, 'group_' + item.id);
+                        },  item.id);
                     this.repoOrGroupDataStore.add([newRec]);
                   }, this);
             },

@@ -78,8 +78,8 @@ public class Nexus635ExpireCacheTaskIT
                            "Before ExpireCache should download artifact 1" );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryOrGroupId" );
-        prop.setValue( "repo_tasks-snapshot-repo" );
+        prop.setKey( "repositoryId" );
+        prop.setValue( "tasks-snapshot-repo" );
 
         // prop = new ScheduledServicePropertyResource();
         // prop.setId( "resourceStorePath" );

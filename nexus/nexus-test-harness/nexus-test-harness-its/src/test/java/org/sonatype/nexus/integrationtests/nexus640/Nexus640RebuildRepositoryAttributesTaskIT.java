@@ -42,8 +42,8 @@ public class Nexus640RebuildRepositoryAttributesTaskIT
         String attributePath = "proxy/attributes/"+REPO_TEST_HARNESS_REPO+"/nexus640/artifact/1.0.0/";
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( "repositoryOrGroupId" );
-        repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
+        repo.setKey( "repositoryId" );
+        repo.setValue( REPO_TEST_HARNESS_REPO );
         TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, repo );
 
         File jar = new File( nexusWorkDir, attributePath + "artifact-1.0.0.jar" );
