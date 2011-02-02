@@ -27,15 +27,13 @@ import java.net.URL;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CScheduledTask;
+import org.sonatype.nexus.configuration.model.v1_4_4.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_4_4.upgrade.BasicVersionConverter;
 
 /**
@@ -89,7 +87,7 @@ public class Upgrade143to144
         org.sonatype.nexus.configuration.model.v1_4_3.Configuration oldc =
             (org.sonatype.nexus.configuration.model.v1_4_3.Configuration) message.getConfiguration();
 
-        org.sonatype.nexus.configuration.model.Configuration newc =
+        org.sonatype.nexus.configuration.model.v1_4_4.Configuration newc =
             new BasicVersionConverter().convertConfiguration( oldc );
 
         // NEXUS-3833
@@ -180,8 +178,8 @@ public class Upgrade143to144
 */        
         // DISABLED FOR NOW, WILL DO THIS PROXY ATTRIBUTES MOVE IN SOME POST-1.9 VERSION
 
-        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
-        message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.nexus.configuration.model.v1_4_4.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.nexus.configuration.model.v1_4_4.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
 

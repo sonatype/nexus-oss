@@ -20,7 +20,7 @@
 
 -->
 <nexusConfiguration>
-  <version>1.4.4</version>
+  <version>1.4.5</version>
   <globalConnectionSettings>
     <connectionTimeout>20000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>

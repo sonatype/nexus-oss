@@ -20,11 +20,13 @@ package org.sonatype.nexus.integrationtests;
 
 import static org.testng.Assert.fail;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -520,7 +522,16 @@ public abstract class AbstractNexusIntegrationTest
         throws IOException
     {
         this.copyConfigFile( "nexus.xml", WORK_CONF_DIR );
-
+        
+        // this is comment out for now, this has been moved into an upgrade step, that will get hit the same system property is set
+        // we might need to enable this if we have any nexus.xml with version 1.4.5 (which would NOT hit the upgrade step)
+        // now we need to filter the nexus.xml to potentially change the default http provider
+//        if( System.getProperty( RemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY ) != null)
+//        {
+//            String providerString = "<provider>" + System.getProperty( RemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY ) + "</provider>";
+//            this.findReplaceInFile( new File( WORK_CONF_DIR, "nexus.xml" ), "<provider>apacheHttpClient3x</provider>", providerString );
+//        }
+        
         // copy security config
         this.copyConfigFile( "security.xml", WORK_CONF_DIR );
         this.copyConfigFile( "security-configuration.xml", WORK_CONF_DIR );
@@ -528,6 +539,38 @@ public abstract class AbstractNexusIntegrationTest
         this.copyConfigFile( "log4j.properties", WORK_CONF_DIR );
     }
 
+    protected void findReplaceInFile( File file, String findString, String replaceString ) throws IOException
+    {
+        BufferedReader bufferedFileReader = new BufferedReader( new FileReader( file ) );
+        File tmpFile = new File( file.getAbsolutePath() + "-tmp" );
+        
+        FileWriter writer = null;
+        
+        try
+        {
+            writer = new FileWriter( tmpFile );
+            
+            String line = null;
+            while( ( line = bufferedFileReader.readLine()) != null)
+            {
+                writer.write( line.replaceAll( findString, replaceString ) );
+                writer.write( "\n" ); // new line
+            }
+            
+            // close the streams and move the file
+            IOUtil.close( bufferedFileReader );
+            IOUtil.close( writer );
+            
+            FileUtils.rename( tmpFile, file );
+        }
+        finally
+        {
+            IOUtil.close( bufferedFileReader );
+            IOUtil.close( writer );
+        }
+        
+    }
+    
     protected static void cleanWorkDir()
         throws Exception
     {

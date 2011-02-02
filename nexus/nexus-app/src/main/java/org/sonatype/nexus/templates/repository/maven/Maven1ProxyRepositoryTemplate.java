@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.maven.maven1.M1RepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
+import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 
@@ -60,7 +61,7 @@ public class Maven1ProxyRepositoryTemplate
         repo.setProviderHint( "maven1" );
 
         repo.setRemoteStorage( new CRemoteStorage() );
-        repo.getRemoteStorage().setProvider( CommonsHttpClientRemoteStorage.PROVIDER_STRING );
+        repo.getRemoteStorage().setProvider( RemoteProviderHintFactory.getDefaultRoleHint() );
         repo.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root" );
 
         Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
