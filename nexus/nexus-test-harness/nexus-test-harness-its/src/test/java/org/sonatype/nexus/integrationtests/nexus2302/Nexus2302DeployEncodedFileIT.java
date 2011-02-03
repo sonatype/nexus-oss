@@ -41,6 +41,7 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.ContentListMessageUtil;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.annotations.Test;
 
 public class Nexus2302DeployEncodedFileIT
@@ -89,6 +90,9 @@ public class Nexus2302DeployEncodedFileIT
                 getOverridableFile( "settings.xml" ) );
         v.verifyErrorFreeLog();
 
+        getEventInspectorsUtil().waitForCalmPeriod();
+        TaskScheduleUtil.waitForAllTasksToStop();
+
         // direct download
         assertTrue( FileTestingUtils.compareFileSHA1s( file,
             downloadArtifact( gav, "target/nexus2302/" + gav.getArtifactId() + ".jar" ) ) );
@@ -101,10 +105,11 @@ public class Nexus2302DeployEncodedFileIT
         checkIndex( gav );
         checkRepoBrowse( gav );
         checkBrowse( gav );
+        checkContentBrowse( gav );
         delete( gav );
     }
 
-    private void checkBrowse( Gav gav )
+    private void checkContentBrowse( Gav gav )
         throws Exception
     {
         URL url = new URL( nexusBaseUrl + "content/repositories/" + REPO_TEST_HARNESS_REPO + "/" );
@@ -112,17 +117,49 @@ public class Nexus2302DeployEncodedFileIT
         assertThat( content, containsString( gav.getGroupId() ) );
 
         url = new URL( url.toString() + gav.getGroupId() + "/" );
+        assertThat( content, containsString( url.toString() ) );
         content = IOUtil.toString( url.openStream() );
         assertThat( content, containsString( gav.getArtifactId() ) );
 
         url = new URL( url.toString() + gav.getArtifactId() + "/" );
+        assertThat( content, containsString( url.toString() ) );
         content = IOUtil.toString( url.openStream() );
         assertThat( content, containsString( gav.getVersion() ) );
 
         url = new URL( url.toString() + gav.getVersion() + "/" );
+        assertThat( content, containsString( url.toString() ) );
+        content = IOUtil.toString( url.openStream() );
+        assertThat( content, containsString( gav.getArtifactId() ) );
+
+        String clas = gav.getClassifier() == null ? "" : "-" + gav.getClassifier();
+        url = new URL( url.toString() + gav.getArtifactId() + "-" + gav.getVersion() + clas + "." + gav.getExtension() );
+        assertThat( content, containsString( url.toString() ) );
+    }
+
+    private void checkBrowse( Gav gav )
+        throws Exception
+    {
+        URL url = new URL( nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO + "/content/" );
+        String content = IOUtil.toString( url.openStream() );
+        assertThat( content, containsString( url.toString() ) );
+        assertThat( content, containsString( gav.getGroupId() ) );
+
+        url = new URL( url.toString() + gav.getGroupId() + "/" );
+        content = IOUtil.toString( url.openStream() );
+        assertThat( content, containsString( url.toString() ) );
+        assertThat( content, containsString( gav.getArtifactId() ) );
+
+        url = new URL( url.toString() + gav.getArtifactId() + "/" );
+        content = IOUtil.toString( url.openStream() );
+        assertThat( content, containsString( url.toString() ) );
+        assertThat( content, containsString( gav.getVersion() ) );
+
+        url = new URL( url.toString() + gav.getVersion() + "/" );
+        content = IOUtil.toString( url.openStream() );
+        assertThat( content, containsString( url.toString() ) );
+        assertThat( content, containsString( gav.getArtifactId() ) );
         if ( gav.getClassifier() != null )
         {
-            content = IOUtil.toString( url.openStream() );
             assertThat( content, containsString( gav.getClassifier() ) );
         }
     }
@@ -136,22 +173,33 @@ public class Nexus2302DeployEncodedFileIT
         List<ContentListResource> result = contentUtil.getContentListResource( REPO_TEST_HARNESS_REPO, "/", false );
 
         ContentListResource g = select( result, gav.getGroupId() );
+        assertThat( g.getResourceURI(), equalTo( nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO
+            + "/content/" + gav.getGroupId() + "/" ) );
 
         result = contentUtil.getContentListResource( REPO_TEST_HARNESS_REPO, g.getRelativePath(), false );
 
         ContentListResource a = select( result, gav.getArtifactId() );
+        assertThat( a.getResourceURI(), equalTo( nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO
+            + "/content/" + gav.getGroupId() + "/" + gav.getArtifactId() + "/" ) );
 
         result = contentUtil.getContentListResource( REPO_TEST_HARNESS_REPO, a.getRelativePath(), false );
 
         ContentListResource v = select( result, gav.getVersion() );
+        assertThat( v.getResourceURI(), equalTo( nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO
+            + "/content/" + gav.getGroupId() + "/" + gav.getArtifactId() + "/" + gav.getVersion() + "/" ) );
 
         result = contentUtil.getContentListResource( REPO_TEST_HARNESS_REPO, v.getRelativePath(), false );
 
         String clas = gav.getClassifier() == null ? "" : "-" + gav.getClassifier();
         ContentListResource c =
             select( result, gav.getArtifactId() + "-" + gav.getVersion() + clas + "." + gav.getExtension() );
-
         assertNotNull( c );
+        assertThat(
+            c.getResourceURI(),
+            equalTo( nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO + "/content/"
+                + gav.getGroupId() + "/" + gav.getArtifactId() + "/" + gav.getVersion() + "/" + gav.getArtifactId()
+                + "-" + gav.getVersion() + clas + "." + gav.getExtension() ) );
+
     }
 
     private ContentListResource select( List<ContentListResource> result, String text )

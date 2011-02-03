@@ -39,7 +39,6 @@ import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.data.Parameter;
-import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -432,8 +431,17 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
                         resource.setLeaf( !StorageCollectionItem.class.isAssignableFrom( child.getClass() ) );
 
-                        resource.setResourceURI( Reference.decode( createChildReference( req, this, child.getName() ).toString() )
-                            + ( resource.isLeaf() ? "" : "/" ) );
+                        String uri = req.getResourceRef().toString();
+                        if ( !uri.endsWith( "/" ) )
+                        {
+                            uri += "/";
+                        }
+                        uri += child.getName();
+                        if ( !resource.isLeaf() )
+                        {
+                            uri += "/";
+                        }
+                        resource.setResourceURI( uri );
 
                         resource.setRelativePath( child.getPath() + ( resource.isLeaf() ? "" : "/" ) );
 
