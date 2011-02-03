@@ -209,20 +209,27 @@ public class GroupMetadataMergeTest
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
 
         File mdFile = File.createTempFile( "metadata", "tmp" );
-        saveItemToFile( ( (StorageFileItem) item ), mdFile );
+        try
+        {
+            saveItemToFile( ( (StorageFileItem) item ), mdFile );
 
-        StorageItem md5Item =
-            getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath + ".md5", false ) );
-        StorageItem sha1Item =
-            getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath + ".sha1", false ) );
+            StorageItem md5Item =
+                getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath + ".md5", false ) );
+            StorageItem sha1Item =
+                getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath + ".sha1", false ) );
 
-        String md5Hash = contentAsString( md5Item );
-        String sha1Hash = contentAsString( sha1Item );
+            String md5Hash = contentAsString( md5Item );
+            String sha1Hash = contentAsString( sha1Item );
 
-        Md5Digester md5Digester = new Md5Digester();
-        md5Digester.verify( mdFile, md5Hash );
-        Sha1Digester sha1Digester = new Sha1Digester();
-        sha1Digester.verify( mdFile, sha1Hash );
+            Md5Digester md5Digester = new Md5Digester();
+            md5Digester.verify( mdFile, md5Hash );
+            Sha1Digester sha1Digester = new Sha1Digester();
+            sha1Digester.verify( mdFile, sha1Hash );
+        }
+        finally
+        {
+            mdFile.delete();
+        }
     }
 
     public void testConflictMerge()
