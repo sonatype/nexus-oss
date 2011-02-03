@@ -18,7 +18,7 @@ public class AHCUtils
         {
             final PipedOutputStream po = new PipedOutputStream();
 
-            final ResponseBlockingAsyncHandler hrah = new ResponseBlockingAsyncHandler( itemUrl, po );
+            final ResponseBlockingAsyncHandler hrah = new ResponseBlockingAsyncHandler( po );
 
             client.prepareGet( itemUrl ).execute( hrah );
 

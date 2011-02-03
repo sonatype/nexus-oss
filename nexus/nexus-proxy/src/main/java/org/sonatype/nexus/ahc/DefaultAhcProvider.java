@@ -95,10 +95,9 @@ public class DefaultAhcProvider
             {
                 NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
 
-                // rb.setNtlmHost( nras.getNtlmHost() )?
                 realm =
-                    new Realm.RealmBuilder().setPrincipal( nras.getUsername() ).setPassword( nras.getPassword() ).setDomain(
-                        nras.getNtlmDomain() ).build();
+                    new Realm.RealmBuilder().setPrincipal( nras.getUsername() ).setPassword( nras.getPassword() ).setNtlmDomain(
+                        nras.getNtlmDomain() ).setNtlmHost( nras.getNtlmHost() ).build();
             }
             else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
             {
@@ -134,11 +133,11 @@ public class DefaultAhcProvider
                 }
                 else if ( ras instanceof NtlmRemoteAuthenticationSettings )
                 {
-                    // AHC-10
                     NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
 
-                    // TODO: depends on AHC-10 for proper implementation, this below is fairly incomplete
                     proxy = new ProxyServer( rps.getHostname(), rps.getPort(), nras.getUsername(), nras.getPassword() );
+
+                    proxy.setNtlmDomain( nras.getNtlmDomain() );
                 }
                 else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
                 {
@@ -161,8 +160,7 @@ public class DefaultAhcProvider
                 {
                     // TODO: someone "invented" non-proxy hosts as a list of regexps! So, question is, how to
                     // transport that "smart move" to AHC?
-                    // AHC currently does plain string comparison, at least some "ant-pattern like" support would be
-                    // nice.
+                    // AHC supports "*" as wildcard
                     for ( String nonProxyHost : rps.getNonProxyHosts() )
                     {
                         proxy.addNonProxyHost( nonProxyHost );
