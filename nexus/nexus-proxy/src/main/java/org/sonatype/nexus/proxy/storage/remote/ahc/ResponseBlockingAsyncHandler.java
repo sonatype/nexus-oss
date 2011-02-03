@@ -24,7 +24,7 @@ public class ResponseBlockingAsyncHandler
 {
     private final ResponseBuilder responseBuilder = new ResponseBuilder();
 
-    private final BlockingQueue<Response> exchanger = new ArrayBlockingQueue<Response>( 3 );
+    private final BlockingQueue<Response> exchanger = new ArrayBlockingQueue<Response>( 1 );
 
     private final String itemUrl;
 
