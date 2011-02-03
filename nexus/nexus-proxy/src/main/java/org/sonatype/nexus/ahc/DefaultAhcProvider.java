@@ -57,6 +57,10 @@ public class DefaultAhcProvider
         // enable redirects for RRS use
         result.setFollowRedirects( true );
 
+        // limiting (with httpClient defaults) to prevent bashing of remote repositories
+        result.setMaximumConnectionsPerHost( 20 );
+        result.setMaximumConnectionsTotal( 20 );
+
         return result;
     }
 
@@ -70,7 +74,7 @@ public class DefaultAhcProvider
         final int timeout = ctx.getRemoteConnectionSettings().getConnectionTimeout();
         result.setConnectionTimeoutInMs( timeout );
         result.setRequestTimeoutInMs( timeout );
-        
+
         // handle compression
         result.setCompressionEnabled( true );
 
@@ -118,11 +122,6 @@ public class DefaultAhcProvider
         {
             ProxyServer proxy = null;
 
-            if ( rps.getNonProxyHosts() != null && !rps.getNonProxyHosts().isEmpty() )
-            {
-                // set non-proxy hosts
-            }
-
             if ( rps.getProxyAuthentication() != null )
             {
                 ras = rps.getProxyAuthentication();
@@ -157,6 +156,19 @@ public class DefaultAhcProvider
             // to avoid NPEs while incomplete
             if ( proxy != null )
             {
+                // check if we have non-proxy hosts
+                if ( rps.getNonProxyHosts() != null && !rps.getNonProxyHosts().isEmpty() )
+                {
+                    // TODO: someone "invented" non-proxy hosts as a list of regexps! So, question is, how to
+                    // transport that "smart move" to AHC?
+                    // AHC currently does plain string comparison, at least some "ant-pattern like" support would be
+                    // nice.
+                    for ( String nonProxyHost : rps.getNonProxyHosts() )
+                    {
+                        proxy.addNonProxyHost( nonProxyHost );
+                    }
+                }
+
                 result.setProxyServer( proxy );
             }
         }
