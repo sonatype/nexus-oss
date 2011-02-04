@@ -58,31 +58,6 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
         }
       });
 
-  this.roleStore = new Ext.data.JsonStore({
-        root : 'data',
-        id : 'roleId',
-        fields : [{
-              name : 'roleId'
-            }, {
-              name : 'name',
-              sortType : Ext.data.SortTypes.asUCString
-            }, {
-              name : 'source'
-            }],
-        sortInfo : {
-          field : 'name',
-          direction : 'ASC'
-        },
-        url : Sonatype.config.servicePath + '/plexus_roles/default',
-        listeners : {
-          load : {
-            fn : this.loadServerConfig,
-            scope : this
-          }
-        },
-        autoLoad : true
-      });
-
   // help text alias
   var ht = Sonatype.repoServer.resources.help.server;
 
@@ -620,16 +595,13 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
                     anchor : Sonatype.view.FIELD_OFFSET,
                     allowBlank : true
                   }, {
-                    xtype : 'twinpanelchooser',
-                    titleLeft : 'Roles',
-                    titleRight : 'Available Roles',
-                    name : 'systemNotificationSettings.roles',
-                    valueField : 'roleId',
-                    store : this.roleStore,
-                    required : false,
-                    validateLeftItems : true,
-                    halfSize : false,
-                    doubleWide : true
+                    xtype : 'rolemanager',
+                    name : 'systemNotificationRoleManager',
+                    height : 200,
+                    width : 505,
+                    usePrivileges : false,
+                    doValidation : false,
+                    style : 'margin-top: 10px;border: 1px solid #B5B8C8;'
                   }]
             } // end notification settings
         ],
@@ -708,7 +680,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       },
 
       saveBtnHandler : function() {
-        var allValid = this.form.isValid() && this.find('name', 'securityRealms')[0].validate() && this.find('name', 'systemNotificationSettings.roles')[0].validate();
+        var allValid = this.form.isValid() && this.find('name', 'securityRealms')[0].validate() && this.find('name', 'systemNotificationRoleManager')[0].validate();
 
         if (allValid)
         {
@@ -735,7 +707,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
                   return fpanel.find('name', 'securityRealms')[0].getValue();
                 },
                 "systemNotificationSettings.roles" : function(val, fpanel) {
-                  return fpanel.find('name', 'systemNotificationSettings.roles')[0].getValue();
+                  return fpanel.find('name', 'systemNotificationRoleManager')[0].getSelectedRoleIds();
                 },
                 "securityAnonymousAccessEnabled" : function(val, fpanel) {
                   return fpanel.isSecurityAnonymousAccessEnabled;
@@ -786,7 +758,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
 
       loadServerConfig : function() {
         // if stores aren't loaded, abort, they will load again when done
-        if (this.roleStore.lastOptions == null || this.realmTypeDataStore.lastOptions == null)
+        if (this.realmTypeDataStore.lastOptions == null)
         {
           return;
         }
@@ -807,9 +779,8 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
                   // sonatypeLoad data modifier requirement
                 },
                 "systemNotificationSettings.roles" : function(arr, srcObj, fpanel) {
-                  fpanel.find('name', 'systemNotificationSettings.roles')[0].setValue(arr);
-                  return arr; // return arr, even if empty to comply with
-                  // sonatypeLoad data modifier requirement
+                    fpanel.find('name', 'systemNotificationRoleManager')[0].setSelectedRoleIds(arr, true);
+                    return arr;
                 },
                 "securityAnonymousAccessEnabled" : function(arr, srcObj, fpanel) {
                   fpanel.isSecurityAnonymousAccessEnabled = arr;
