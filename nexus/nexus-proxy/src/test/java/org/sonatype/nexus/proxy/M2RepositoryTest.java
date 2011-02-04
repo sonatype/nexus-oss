@@ -285,7 +285,7 @@ public class M2RepositoryTest
     public void testExpiration_NEXUS1675()
         throws Exception
     {
-        doTestExpiration( "/spoof/maven-metadata.xml", true, 0, 3, 5, 1 );
+        doTestExpiration( "/spoof/maven-metadata.xml", 0, 3, 5, 1 );
     }
 
     public void testExpiration_NEXUS3065()
@@ -294,7 +294,7 @@ public class M2RepositoryTest
         // "defaults"
         // enforce = true, hence even if 1stround age = 0 (always), enforce will prevent redownload, so 1st round will
         // have 1 remote hits
-        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", true, 0, 1, -1, 1 );
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 0, 3, -1, 1 );
 
         // "overrides"
         // enforce = false, hence since 1stround age = 0 (always), 1st round will
@@ -302,8 +302,8 @@ public class M2RepositoryTest
         // doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", false, 0, 3, -1, 1 );
     }
 
-    public void doTestExpiration( String path, boolean enforceReleaseRedownloadPolicy, int age1stround,
-                                  int remoteHitsExpected1stround, int age2ndround, int remoteHitsExpected2ndround )
+    public void doTestExpiration( String path, int age1stround, int remoteHitsExpected1stround, int age2ndround,
+                                  int remoteHitsExpected2ndround )
         throws Exception
     {
         CounterListener ch = new CounterListener();
