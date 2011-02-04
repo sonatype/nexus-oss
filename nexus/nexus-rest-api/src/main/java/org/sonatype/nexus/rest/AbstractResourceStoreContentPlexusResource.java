@@ -39,6 +39,7 @@ import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
 import org.restlet.data.Parameter;
+import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -431,16 +432,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
                         resource.setLeaf( !StorageCollectionItem.class.isAssignableFrom( child.getClass() ) );
 
-                        String uri = req.getResourceRef().toString();
-                        if ( !uri.endsWith( "/" ) )
-                        {
-                            uri += "/";
-                        }
-                        uri += child.getName();
-                        if ( !resource.isLeaf() )
-                        {
-                            uri += "/";
-                        }
+                        String uri = getResourceUri( req, resource, child );
                         resource.setResourceURI( uri );
 
                         resource.setRelativePath( child.getPath() + ( resource.isLeaf() ? "" : "/" ) );
@@ -470,6 +462,32 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
 
         return result;
+    }
+
+    private String getResourceUri( Request req, ContentListResource resource, StorageItem child )
+    {
+        Reference root = getContextRoot( req );
+        Reference requestRoot = req.getRootRef();
+
+        String uri = req.getResourceRef().getTargetRef().toString();
+        if ( !uri.endsWith( "/" ) )
+        {
+            uri += "/";
+        }
+        uri += child.getName();
+        if ( !resource.isLeaf() )
+        {
+            uri += "/";
+        }
+
+        if ( root == requestRoot || root.equals( requestRoot ) )
+        {
+            return uri;
+        }
+        else
+        {
+            return uri.replace( requestRoot.toString(), root.toString() );
+        }
     }
 
     protected Representation serialize( Context context, Request req, Variant variant, Object payload )
