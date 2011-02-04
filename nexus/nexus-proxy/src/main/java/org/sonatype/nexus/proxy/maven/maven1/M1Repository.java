@@ -96,6 +96,7 @@ public class M1Repository
         return m1RepositoryConfigurator;
     }
 
+    @Override
     public boolean isMavenMetadataPath( String path )
     {
         return M1ArtifactRecognizer.isMetadata( path );
@@ -107,6 +108,7 @@ public class M1Repository
      * @param uid the uid
      * @return true, if successful
      */
+    @Override
     public boolean shouldServeByPolicies( ResourceStoreRequest request )
     {
         if ( M1ArtifactRecognizer.isMetadata( request.getRequestPath() ) )
@@ -185,7 +187,7 @@ public class M1Repository
         }
 
         // it is a release
-        return ( !RepositoryPolicy.RELEASE.equals( getRepositoryPolicy() ) ) && isOld( getArtifactMaxAge(), item );
+        return isOld( getArtifactMaxAge(), item );
     }
 
     // not available on maven1 repo

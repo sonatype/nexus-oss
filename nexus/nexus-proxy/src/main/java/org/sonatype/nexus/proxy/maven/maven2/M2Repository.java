@@ -115,6 +115,7 @@ public class M2Repository
         return m2RepositoryConfigurator;
     }
 
+    @Override
     public boolean isMavenMetadataPath( String path )
     {
         return M2ArtifactRecognizer.isMetadata( path );
@@ -126,6 +127,7 @@ public class M2Repository
      * @param uid the uid
      * @return true, if successful
      */
+    @Override
     public boolean shouldServeByPolicies( ResourceStoreRequest request )
     {
         if ( M2ArtifactRecognizer.isMetadata( request.getRequestPath() ) )
@@ -172,6 +174,7 @@ public class M2Repository
         }
     }
 
+    @Override
     public AbstractStorageItem doCacheItem( AbstractStorageItem item )
         throws StorageException
     {
@@ -258,10 +261,9 @@ public class M2Repository
             return super.isOld( item );
         }
         // it is a release
-        return ( !RepositoryPolicy.RELEASE.equals( getRepositoryPolicy() ) ) && isOld( getArtifactMaxAge(), item );
+        return isOld( getArtifactMaxAge(), item );
     }
 
-    @SuppressWarnings( "unchecked" )
     protected Metadata cleanseMetadataForRepository( boolean snapshot, Metadata metadata )
     {
         // remove base versions not belonging here
