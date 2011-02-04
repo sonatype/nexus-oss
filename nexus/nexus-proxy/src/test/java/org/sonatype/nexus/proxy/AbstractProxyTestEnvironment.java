@@ -190,6 +190,7 @@ public abstract class AbstractProxyTestEnvironment
      * (non-Javadoc)
      * @see org.codehaus.plexus.PlexusTestCase#setUp()
      */
+    @Override
     public void setUp()
         throws Exception
     {
@@ -237,6 +238,7 @@ public abstract class AbstractProxyTestEnvironment
      * (non-Javadoc)
      * @see org.codehaus.plexus.PlexusTestCase#tearDown()
      */
+    @Override
     public void tearDown()
         throws Exception
     {
@@ -478,5 +480,14 @@ public abstract class AbstractProxyTestEnvironment
         {
             IOUtil.close( is );
         }
+    }
+
+    protected File createTempFile( String prefix, String sufix )
+        throws IOException
+    {
+        final File tmpDir = new File( getWorkHomeDir(), "ftemp" );
+        tmpDir.mkdirs();
+
+        return File.createTempFile( prefix, sufix, tmpDir );
     }
 }

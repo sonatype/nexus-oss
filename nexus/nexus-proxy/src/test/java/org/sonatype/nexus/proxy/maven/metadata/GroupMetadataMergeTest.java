@@ -208,7 +208,7 @@ public class GroupMetadataMergeTest
         StorageItem item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath, false ) );
         assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
 
-        File mdFile = File.createTempFile( "metadata", "tmp" );
+        File mdFile = createTempFile( "metadata", "tmp" );
         try
         {
             saveItemToFile( ( (StorageFileItem) item ), mdFile );
