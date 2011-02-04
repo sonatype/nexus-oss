@@ -51,6 +51,7 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
@@ -101,15 +102,10 @@ public class DefaultSnapshotRemover
         {
             Repository repository = getRepositoryRegistry().getRepository( request.getRepositoryId() );
 
-            if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
-                && repository.getRepositoryContentClass().isCompatible( contentClass ) )
-            {
-                process( request, result, repository );
-            }
-            else
+            if ( !process( request, result, repository ) )
             {
                 throw new IllegalArgumentException( "The repository with ID=" + repository.getId()
-                    + " is not MavenRepository!" );
+                    + " is not valid for Snapshot Removal Task!" );
             }
         }
         else
@@ -131,12 +127,19 @@ public class DefaultSnapshotRemover
         }
     }
 
-    private void process( SnapshotRemovalRequest request, SnapshotRemovalResult result, Repository repository )
+    private boolean process( SnapshotRemovalRequest request, SnapshotRemovalResult result, Repository repository )
     {
         // only from maven repositories, stay silent for others and simply skip
         if ( !repository.getRepositoryContentClass().isCompatible( contentClass ) )
         {
-            return;
+            getLogger().debug( "Skipping '" + repository.getId() + "' is not a maven 2 repository" );
+            return false;
+        }
+
+        if ( LocalStatus.OUT_OF_SERVICE.equals( repository.getLocalStatus() ) )
+        {
+            getLogger().debug( "Skipping '" + repository.getId() + "' the repository is out of service" );
+            return false;
         }
 
         if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
@@ -148,6 +151,8 @@ public class DefaultSnapshotRemover
             result.addResult( removeSnapshotsFromMavenRepository( repository.adaptToFacet( MavenRepository.class ),
                 request ) );
         }
+
+        return true;
     }
 
     /**
