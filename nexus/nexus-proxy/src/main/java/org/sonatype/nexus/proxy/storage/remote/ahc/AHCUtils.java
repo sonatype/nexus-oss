@@ -42,6 +42,29 @@ public class AHCUtils
         }
     }
 
+    public static long getContentLength( final Response response, final long defaultValue )
+    {
+        final String contentLengthStr = response.getHeader( "content-length" );
+
+        if ( null != contentLengthStr )
+        {
+            try
+            {
+                return Long.parseLong( contentLengthStr );
+            }
+            catch ( NumberFormatException e )
+            {
+                // neglect
+                return defaultValue;
+            }
+        }
+        else
+        {
+            return defaultValue;
+        }
+
+    }
+
     public static long getLastModified( final Response response, final long defaultValue )
     {
         final String lastModifiedStr = response.getHeader( "last-modified" );
@@ -50,7 +73,7 @@ public class AHCUtils
         {
             try
             {
-                return DateUtil.parseDate( response.getHeader( "last-modified" ) ).getTime();
+                return DateUtil.parseDate( lastModifiedStr ).getTime();
             }
             catch ( DateParseException e )
             {

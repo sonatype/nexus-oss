@@ -140,16 +140,7 @@ public class AhcRemoteRepositoryStorage
             // expected: 200 OK
             validateResponse( repository, request, "GET", itemUrl, response, 200 );
 
-            long length = -1;
-
-            try
-            {
-                length = Long.parseLong( response.getHeader( "content-length" ) );
-            }
-            catch ( NumberFormatException e )
-            {
-                // neglect
-            }
+            long length = AHCUtils.getContentLength( response, -1 );
 
             long lastModified = AHCUtils.getLastModified( response, System.currentTimeMillis() );
 
