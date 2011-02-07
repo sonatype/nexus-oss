@@ -42,16 +42,25 @@ public class AHCUtils
         }
     }
 
-    public static long getLastModified( Response response )
+    public static long getLastModified( final Response response, final long defaultValue )
     {
-        try
+        final String lastModifiedStr = response.getHeader( "last-modified" );
+
+        if ( null != lastModifiedStr )
         {
-            return DateUtil.parseDate( response.getHeader( "last-modified" ) ).getTime();
+            try
+            {
+                return DateUtil.parseDate( response.getHeader( "last-modified" ) ).getTime();
+            }
+            catch ( DateParseException e )
+            {
+                // neglect
+                return defaultValue;
+            }
         }
-        catch ( DateParseException e )
+        else
         {
-            // neglect
-            return System.currentTimeMillis();
+            return defaultValue;
         }
     }
 

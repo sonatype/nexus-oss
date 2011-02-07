@@ -151,7 +151,7 @@ public class AhcRemoteRepositoryStorage
                 // neglect
             }
 
-            long lastModified = AHCUtils.getLastModified( response );
+            long lastModified = AHCUtils.getLastModified( response, System.currentTimeMillis() );
 
             // non-reusable simplest content locator, the ris InputStream is ready to be consumed
             PreparedContentLocator contentLocator = new PreparedContentLocator( ris, response.getContentType() );
@@ -344,6 +344,13 @@ public class AhcRemoteRepositoryStorage
 
         final AsyncHttpClient client = getClient( repository );
 
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug(
+                String.format( "Checking remote availability of proxy repository \"%s\" (id=%s) on URL %s",
+                    repository.getName(), repository.getId(), itemUrl ) );
+        }
+
         // artifactory hack, it pukes on HEAD so we will try with GET if HEAD fails
         boolean doGet = false;
 
@@ -422,7 +429,7 @@ public class AhcRemoteRepositoryStorage
             {
                 // we have it
                 // we have newer if this below is true
-                return AHCUtils.getLastModified( responseObject ) > newerThen;
+                return AHCUtils.getLastModified( responseObject, System.currentTimeMillis() ) > newerThen;
             }
             else if ( ( response >= 300 && response < 400 ) || response == 404 )
             {
