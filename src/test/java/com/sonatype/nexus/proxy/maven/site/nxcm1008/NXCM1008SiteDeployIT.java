@@ -41,9 +41,9 @@ public class NXCM1008SiteDeployIT
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
 
-        repo.setKey( "repositoryOrGroupId" );
+        repo.setKey( "repositoryId" );
 
-        repo.setValue( "repo_fake-central" );
+        repo.setValue( "fake-central" );
 
         TaskScheduleUtil.runTask( "RebuildMavenMetadata-Nexus1022", RebuildMavenMetadataTaskDescriptor.ID, repo );
     }
