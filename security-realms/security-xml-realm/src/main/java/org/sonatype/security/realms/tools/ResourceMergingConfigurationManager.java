@@ -17,14 +17,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantLock;
 
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
@@ -40,15 +38,14 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
  * ConfigurationManager that aggregates {@link StaticSecurityResource}s with default ConfigurationManager.
+ * 
  * @author Brian Demers
- *
  */
 @Singleton
 @Typed( value = ConfigurationManager.class )
 @Named( value = "resourceMerging" )
 public class ResourceMergingConfigurationManager
-    extends AbstractLogEnabled
-    implements ConfigurationManager
+    extends AbstractConfigurationManager
 {
     // This will handle all normal security.xml file loading/storing
     @Inject
@@ -58,19 +55,10 @@ public class ResourceMergingConfigurationManager
     @Inject
     private List<StaticSecurityResource> staticResources;
 
-    /**
-     * This will hold the current configuration in memory, to reload, will need to set this to null
-     */
-    private Configuration configuration = null;
-
-    private ReentrantLock lock = new ReentrantLock();
-
-    public void clearCache()
+    public synchronized void clearCache()
     {
+        super.clearCache();
         manager.clearCache();
-        lock.lock();
-        configuration = null;
-        lock.unlock();
     }
 
     public void createPrivilege( CPrivilege privilege )
@@ -240,41 +228,40 @@ public class ResourceMergingConfigurationManager
 
         return list;
     }
-    
 
     private CRole mergeRolesContents( CRole roleA, CRole roleB )
     {
-     // ROLES
+        // ROLES
         Set<String> roles = new HashSet<String>();
         // make sure they are not empty
-        if( roleA.getRoles() != null )
+        if ( roleA.getRoles() != null )
         {
             roles.addAll( roleA.getRoles() );
         }
-        if( roleB.getRoles() != null )
+        if ( roleB.getRoles() != null )
         {
             roles.addAll( roleB.getRoles() );
         }
-        
+
         // PRIVS
         Set<String> privs = new HashSet<String>();
         // make sure they are not empty
-        if( roleA.getPrivileges() != null )
+        if ( roleA.getPrivileges() != null )
         {
             privs.addAll( roleA.getPrivileges() );
         }
-        if( roleB.getPrivileges() != null )
+        if ( roleB.getPrivileges() != null )
         {
             privs.addAll( roleB.getPrivileges() );
         }
-        
+
         CRole newRole = new CRole();
         newRole.setId( roleA.getId() );
         newRole.setRoles( new ArrayList<String>( roles ) );
         newRole.setPrivileges( new ArrayList<String>( privs ) );
-        
+
         // now for the name and description
-        if( StringUtils.isNotEmpty( roleA.getName() ) )
+        if ( StringUtils.isNotEmpty( roleA.getName() ) )
         {
             newRole.setName( roleA.getName() );
         }
@@ -282,8 +269,8 @@ public class ResourceMergingConfigurationManager
         {
             newRole.setName( roleB.getName() );
         }
-        
-        if( StringUtils.isNotEmpty( roleA.getDescription() ) )
+
+        if ( StringUtils.isNotEmpty( roleA.getDescription() ) )
         {
             newRole.setDescription( roleA.getDescription() );
         }
@@ -291,9 +278,9 @@ public class ResourceMergingConfigurationManager
         {
             newRole.setDescription( roleB.getDescription() );
         }
-        
+
         // and session timeout (which we don't use)
-        if( roleA.getSessionTimeout() > roleB.getSessionTimeout() )
+        if ( roleA.getSessionTimeout() > roleB.getSessionTimeout() )
         {
             newRole.setSessionTimeout( roleA.getSessionTimeout() );
         }
@@ -301,10 +288,10 @@ public class ResourceMergingConfigurationManager
         {
             newRole.setSessionTimeout( roleB.getSessionTimeout() );
         }
-        
+
         return newRole;
     }
-    
+
     public List<CUser> listUsers()
     {
         return manager.listUsers();
@@ -313,37 +300,36 @@ public class ResourceMergingConfigurationManager
     public CPrivilege readPrivilege( String id )
         throws NoSuchPrivilegeException
     {
-        for ( CPrivilege privilege : (List<CPrivilege>) getConfiguration().getPrivileges() )
-        {
-            if ( privilege.getId().equals( id ) )
-            {
-             // ALL privileges that come from StaticSecurityResources are NOT editable
-                // only roles defined in the security.xml can be updated.
-                privilege.setReadOnly( true );
-                return privilege;
-            }
-        }
+        final CPrivilege privilege = getConfiguration().getPrivilegeById( id );
 
-        return manager.readPrivilege( id );
+        if ( privilege != null )
+        {
+            privilege.setReadOnly( true );
+
+            return privilege;
+        }
+        else
+        {
+            return manager.readPrivilege( id );
+        }
     }
 
     public CRole readRole( String id )
         throws NoSuchRoleException
     {
-        for ( CRole role : (List<CRole>) getConfiguration().getRoles() )
-        {
-            if ( role.getId().equals( id ) )
-            {
-                // ALL roles that come from StaticSecurityResources are NOT editable
-                // only roles defined in the security.xml can be updated.
-                role.setReadOnly( true );
-                
-                return role;
-            }
-        }
+        final CRole role = getConfiguration().getRoleById( id );
 
-        // nothing found in static, try the original source, will throw if nothing is found
-        return manager.readRole( id );
+        if ( role != null )
+        {
+            role.setReadOnly( true );
+
+            return role;
+        }
+        else
+        {
+            // nothing found in static, try the original source, will throw if nothing is found
+            return manager.readRole( id );
+        }
     }
 
     public CUser readUser( String id )
@@ -361,161 +347,57 @@ public class ResourceMergingConfigurationManager
             context = this.initializeContext();
         }
 
-        this.manager.createUserRoleMapping( userRoleMapping, context );
+        manager.createUserRoleMapping( userRoleMapping, context );
     }
 
     public void createUserRoleMapping( CUserRoleMapping userRoleMapping )
         throws InvalidConfigurationException
     {
-        this.manager.createUserRoleMapping( userRoleMapping, this.initializeContext() );
+        manager.createUserRoleMapping( userRoleMapping, initializeContext() );
     }
 
     public void deleteUserRoleMapping( String userId, String source )
         throws NoSuchRoleMappingException
     {
-        this.manager.deleteUserRoleMapping( userId, source );
+        manager.deleteUserRoleMapping( userId, source );
     }
 
     public List<CUserRoleMapping> listUserRoleMappings()
     {
-        return this.manager.listUserRoleMappings();
+        return manager.listUserRoleMappings();
     }
 
     public CUserRoleMapping readUserRoleMapping( String userId, String source )
         throws NoSuchRoleMappingException
     {
-        return this.manager.readUserRoleMapping( userId, source );
+        return manager.readUserRoleMapping( userId, source );
     }
 
     public void updateUserRoleMapping( CUserRoleMapping userRoleMapping, SecurityValidationContext context )
-        throws InvalidConfigurationException,
-            NoSuchRoleMappingException
+        throws InvalidConfigurationException, NoSuchRoleMappingException
     {
         if ( context == null )
         {
             context = this.initializeContext();
         }
 
-        this.manager.updateUserRoleMapping( userRoleMapping, context );
+        manager.updateUserRoleMapping( userRoleMapping, context );
     }
 
     public void updateUserRoleMapping( CUserRoleMapping userRoleMapping )
-        throws InvalidConfigurationException,
-            NoSuchRoleMappingException
+        throws InvalidConfigurationException, NoSuchRoleMappingException
     {
-        this.updateUserRoleMapping( userRoleMapping, this.initializeContext() );
-    }
-
-    private Configuration initializeStaticConfiguration()
-    {
-        lock.lock();
-
-        try
-        {
-            for ( StaticSecurityResource resource : staticResources )
-            {
-                Configuration config = resource.getConfiguration();
-
-                if ( config != null )
-                {
-                    appendConfig( config );
-                }
-            }
-        }
-        finally
-        {
-            if ( configuration == null )
-            {
-                configuration = new Configuration();
-            }
-
-            lock.unlock();
-        }
-
-        return configuration;
-    }
-
-    private Configuration appendConfig( Configuration config )
-    {
-        if ( configuration == null )
-        {
-            configuration = new Configuration();
-        }
-
-        for ( CPrivilege privilege : (List<CPrivilege>) config.getPrivileges() )
-        {
-            configuration.addPrivilege( privilege );
-        }
-
-        for ( Iterator<CRole> iterator = config.getRoles().iterator(); iterator.hasNext(); )
-        {
-            CRole role = iterator.next();
-            
-            // need to check if we need to merge the static config
-            for ( CRole eachRole : this.configuration.getRoles() )
-            {
-                if( eachRole.getId().equals( role.getId() ))
-                {
-                    role = this.mergeRolesContents( role, eachRole );
-                    configuration.removeRole( eachRole );
-                    break;
-                }
-            }
-            
-            configuration.addRole( role );
-        }
-
-        for ( CUser user : (List<CUser>) config.getUsers() )
-        {
-            configuration.addUser( user );
-        }
-
-        return configuration;
-    }
-
-    private Configuration getConfiguration()
-    {
-        lock.lock();
-        try
-        {
-            for ( StaticSecurityResource resource : staticResources )
-            {
-                if ( resource.isDirty() )
-                {
-                    configuration = null;
-                    break;
-                }
-            }
-
-            if ( configuration != null )
-            {
-                return configuration;
-            }
-
-            return initializeStaticConfiguration();
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-
-    public void save()
-    {
-        // The static config can't be updated, so delegate to xml file
-        manager.save();
+        updateUserRoleMapping( userRoleMapping, initializeContext() );
     }
 
     public void updatePrivilege( CPrivilege privilege )
-        throws InvalidConfigurationException,
-            NoSuchPrivilegeException
+        throws InvalidConfigurationException, NoSuchPrivilegeException
     {
         manager.updatePrivilege( privilege, initializeContext() );
     }
 
     public void updatePrivilege( CPrivilege privilege, SecurityValidationContext context )
-        throws InvalidConfigurationException,
-            NoSuchPrivilegeException
+        throws InvalidConfigurationException, NoSuchPrivilegeException
     {
         if ( context == null )
         {
@@ -527,15 +409,13 @@ public class ResourceMergingConfigurationManager
     }
 
     public void updateRole( CRole role )
-        throws InvalidConfigurationException,
-            NoSuchRoleException
+        throws InvalidConfigurationException, NoSuchRoleException
     {
         manager.updateRole( role, initializeContext() );
     }
 
     public void updateRole( CRole role, SecurityValidationContext context )
-        throws InvalidConfigurationException,
-            NoSuchRoleException
+        throws InvalidConfigurationException, NoSuchRoleException
     {
         if ( context == null )
         {
@@ -547,15 +427,13 @@ public class ResourceMergingConfigurationManager
     }
 
     public void updateUser( CUser user, Set<String> roles )
-        throws InvalidConfigurationException,
-            UserNotFoundException
+        throws InvalidConfigurationException, UserNotFoundException
     {
         manager.updateUser( user, roles, initializeContext() );
     }
 
     public void updateUser( CUser user, Set<String> roles, SecurityValidationContext context )
-        throws InvalidConfigurationException,
-            UserNotFoundException
+        throws InvalidConfigurationException, UserNotFoundException
     {
         if ( context == null )
         {
@@ -579,5 +457,82 @@ public class ResourceMergingConfigurationManager
     public void cleanRemovedRole( String roleId )
     {
         manager.cleanRemovedRole( roleId );
+    }
+
+    // ==
+
+    public void save()
+    {
+        // The static config can't be updated, so delegate to xml file
+        manager.save();
+    }
+
+    // ==
+
+    protected EnhancedConfiguration getConfiguration()
+    {
+        for ( StaticSecurityResource resource : staticResources )
+        {
+            if ( resource.isDirty() )
+            {
+                // forcing reload since some of static ones are "dirty"
+                // TODO: is this isDirty() method used at all? I did not find any references to real uses
+                // Note: not this.clearCache() since it would invoke delegate's clearCache too!
+                super.clearCache();
+                break;
+            }
+        }
+
+        return super.getConfiguration();
+    }
+
+    protected Configuration doGetConfiguration()
+    {
+        final Configuration configuration = new Configuration();
+
+        for ( StaticSecurityResource resource : staticResources )
+        {
+            Configuration resConfig = resource.getConfiguration();
+
+            if ( resConfig != null )
+            {
+                appendConfig( configuration, resConfig );
+            }
+        }
+
+        return configuration;
+    }
+
+    private Configuration appendConfig( final Configuration configuration, final Configuration config )
+    {
+        for ( CPrivilege privilege : (List<CPrivilege>) config.getPrivileges() )
+        {
+            configuration.addPrivilege( privilege );
+        }
+
+        for ( Iterator<CRole> iterator = config.getRoles().iterator(); iterator.hasNext(); )
+        {
+            CRole role = iterator.next();
+
+            // need to check if we need to merge the static config
+            for ( CRole eachRole : configuration.getRoles() )
+            {
+                if ( eachRole.getId().equals( role.getId() ) )
+                {
+                    role = this.mergeRolesContents( role, eachRole );
+                    configuration.removeRole( eachRole );
+                    break;
+                }
+            }
+
+            configuration.addRole( role );
+        }
+
+        for ( CUser user : (List<CUser>) config.getUsers() )
+        {
+            configuration.addUser( user );
+        }
+
+        return configuration;
     }
 }
