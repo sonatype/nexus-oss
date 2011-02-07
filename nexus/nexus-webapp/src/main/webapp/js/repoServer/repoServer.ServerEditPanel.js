@@ -255,7 +255,7 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
                       'collapse' : {
                         fn : function(panel) {
                           this.formPanel.isSecurityAnonymousAccessEnabled = false;
-                          panel.find('name', 'securityAnonymousPassword')[0].setValue('');
+                          // panel.find('name', 'securityAnonymousPassword')[0].setValue('');
                           this.optionalFieldsetCollapseHandler(panel);
                         },
                         scope : this,
