@@ -3,28 +3,31 @@ package org.sonatype.nexus.proxy.storage.remote.ahc;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.concurrent.Future;
 
 import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.BodyDeferringAsyncHandler;
+import com.ning.http.client.BodyDeferringAsyncHandler.BodyDeferringInputStream;
 import com.ning.http.client.Response;
 import com.ning.http.util.DateUtil;
 import com.ning.http.util.DateUtil.DateParseException;
 
 public class AHCUtils
 {
-    public static ResponseInputStream fetchContent( final AsyncHttpClient client, final String itemUrl )
+    public static BodyDeferringInputStream fetchContent( final AsyncHttpClient client, final String itemUrl )
         throws IOException
     {
         try
         {
             final PipedOutputStream po = new PipedOutputStream();
 
-            final ResponseBlockingAsyncHandler hrah = new ResponseBlockingAsyncHandler( po );
+            final PipedInputStream pi = new PipedInputStream( po );
 
-            client.prepareGet( itemUrl ).execute( hrah );
+            final BodyDeferringAsyncHandler hrah = new BodyDeferringAsyncHandler( po );
 
-            PipedInputStream pi = new PipedInputStream( po );
+            Future<Response> f = client.prepareGet( itemUrl ).execute( hrah );
 
-            return new ResponseInputStream( hrah, pi );
+            return new BodyDeferringInputStream( f, hrah, pi );
         }
         catch ( Exception e )
         {

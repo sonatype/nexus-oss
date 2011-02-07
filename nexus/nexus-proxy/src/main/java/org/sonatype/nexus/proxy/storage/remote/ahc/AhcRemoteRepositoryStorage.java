@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.Response;
+import com.ning.http.client.BodyDeferringAsyncHandler.BodyDeferringInputStream;
 
 /**
  * AsyncHttpClient powered RemoteRepositoryStorage.
@@ -130,10 +131,10 @@ public class AhcRemoteRepositoryStorage
         try
         {
 
-            ResponseInputStream ris = AHCUtils.fetchContent( client, itemUrl );
+            BodyDeferringInputStream ris = AHCUtils.fetchContent( client, itemUrl );
 
             // this blocks until response headers arrived
-            Response response = ris.getResponse();
+            Response response = ris.getAsapResponse();
 
             // expected: 200 OK
             validateResponse( repository, request, "GET", itemUrl, response, 200 );
