@@ -21,13 +21,14 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext.BooleanFlagHolder;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
-import com.ning.http.client.Response;
 import com.ning.http.client.BodyDeferringAsyncHandler.BodyDeferringInputStream;
+import com.ning.http.client.Response;
 
 /**
  * AsyncHttpClient powered RemoteRepositoryStorage.
@@ -298,14 +299,22 @@ public class AhcRemoteRepositoryStorage
             "Remote storage settings change detected for ProxyRepository ID=\"" + repository.getId() + "\" (\""
                 + repository.getName() + "\"), updating HTTP transport..." );
 
+        if ( context.hasContextObject( CTX_KEY_CLIENT ) )
+        {
+            // proper shutdown of AHC, but cannot call getClient() here that would result in endless loop!
+            AsyncHttpClient oldClient = (AsyncHttpClient) context.getContextObject( CTX_KEY_CLIENT );
+
+            // TODO: AHC-26: current solution would kill ongoing downloads, be smarter
+            oldClient.close();
+        }
+
         final AsyncHttpClientConfig.Builder clientConfigBuilder = ahcProvider.getAsyncHttpClient( repository, context );
 
         final AsyncHttpClient client = new AsyncHttpClient( clientConfigBuilder.build() );
 
         context.putContextObject( CTX_KEY_CLIENT, client );
 
-        // we don't know is remote S3, we have new URL maybe so recheck is needed
-        context.removeContextObject( CTX_KEY_S3_FLAG );
+        context.putContextObject( CTX_KEY_S3_FLAG, new BooleanFlagHolder() );
     }
 
     /**
@@ -442,22 +451,10 @@ public class AhcRemoteRepositoryStorage
     public boolean isRemotePeerAmazonS3Storage( ProxyRepository repository )
         throws RemoteStorageException
     {
-        RemoteStorageContext ctx = getRemoteStorageContext( repository );
+        BooleanFlagHolder flag =
+            (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject( CTX_KEY_S3_FLAG );
 
-        if ( ctx.hasContextObject( CTX_KEY_S3_FLAG ) )
-        {
-            Boolean flag = (Boolean) ctx.getContextObject( CTX_KEY_S3_FLAG );
-
-            if ( flag != null && flag.booleanValue() )
-            {
-                // it is S3 if we have CTX_KEY_S3_FLAG set, the flag value is not null, and flag value is true
-                // if flag is False, we know it is not S3
-                // if flag is null, we still did not contact remote, so we were not able to tell yet
-                return true;
-            }
-        }
-
-        return false;
+        return flag.isFlag();
     }
 
     /**
@@ -474,7 +471,7 @@ public class AhcRemoteRepositoryStorage
         RemoteStorageContext ctx = getRemoteStorageContext( repository );
 
         // we already know the result, do nothing
-        if ( ctx.hasContextObject( CTX_KEY_S3_FLAG ) )
+        if ( !( (BooleanFlagHolder) ctx.getContextObject( CTX_KEY_S3_FLAG ) ).isNull() )
         {
             return;
         }
@@ -484,9 +481,11 @@ public class AhcRemoteRepositoryStorage
 
         boolean isAmazonS3 = ( hdr != null ) && ( hdr.toLowerCase().contains( "amazons3" ) );
 
+        BooleanFlagHolder holder = (BooleanFlagHolder) ctx.getContextObject( CTX_KEY_S3_FLAG );
+
         if ( isAmazonS3 )
         {
-            ctx.putContextObject( CTX_KEY_S3_FLAG, Boolean.TRUE );
+            holder.setFlag( Boolean.TRUE );
 
             getLogger().warn(
                 "The proxy repository \""
@@ -497,7 +496,7 @@ public class AhcRemoteRepositoryStorage
         }
         else
         {
-            ctx.putContextObject( CTX_KEY_S3_FLAG, Boolean.FALSE );
+            holder.setFlag( Boolean.FALSE );
         }
     }
 }

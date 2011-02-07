@@ -134,4 +134,41 @@ public class DefaultRemoteStorageContext
     {
         removeContextObject( RemoteProxySettings.class.getName() );
     }
+
+    // ==
+
+    /**
+     * Simple helper class to have boolean stored in context and not disturbing the update of it.
+     */
+    public static class BooleanFlagHolder
+    {
+        private Boolean flag = null;
+
+        /**
+         * Returns true only and if only flag is not null and has value Boolean.TRUE.
+         * 
+         * @return
+         */
+        public boolean isFlag()
+        {
+            if ( flag != null )
+            {
+                return flag;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public boolean isNull()
+        {
+            return flag == null;
+        }
+
+        public void setFlag( Boolean flag )
+        {
+            this.flag = flag;
+        }
+    }
 }
