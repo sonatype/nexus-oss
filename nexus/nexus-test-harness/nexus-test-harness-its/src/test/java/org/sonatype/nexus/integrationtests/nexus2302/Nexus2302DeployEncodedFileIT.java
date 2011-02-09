@@ -104,14 +104,21 @@ public class Nexus2302DeployEncodedFileIT
         checkFileSystem( gav );
         checkIndex( gav );
         checkRepoBrowse( gav );
+        checkRepoBrowse( gav );
         checkBrowse( gav );
-        checkContentBrowse( gav );
+        checkContentBrowse( gav, null );
+        checkContentBrowse( gav, "?abc=321" );
         delete( gav );
     }
 
-    private void checkContentBrowse( Gav gav )
+    private void checkContentBrowse( Gav gav, String query )
         throws Exception
     {
+        if ( query == null )
+        {
+            query = "";
+        }
+
         URL url = new URL( nexusBaseUrl + "content/repositories/" + REPO_TEST_HARNESS_REPO + "/" );
         String content = IOUtil.toString( url.openStream() );
         assertThat( content, containsString( gav.getGroupId() ) );

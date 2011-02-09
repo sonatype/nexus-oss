@@ -422,7 +422,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             for ( StorageItem child : children )
             {
-                if ( child.isVirtual() || !child.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
+                if ( child.isVirtual()
+                    || !child.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
                 {
                     if ( !uniqueNames.contains( child.getName() ) )
                     {
@@ -469,7 +470,14 @@ public abstract class AbstractResourceStoreContentPlexusResource
         Reference root = getContextRoot( req );
         Reference requestRoot = req.getRootRef();
 
-        String uri = req.getResourceRef().getTargetRef().toString();
+        final Reference ref = req.getResourceRef().getTargetRef();
+        String uri = ref.toString();
+
+        if ( ref.getQuery() != null )
+        {
+            uri = uri.substring( 0, uri.length() - ref.getQuery().length() - 1 );
+        }
+
         if ( !uri.endsWith( "/" ) )
         {
             uri += "/";
