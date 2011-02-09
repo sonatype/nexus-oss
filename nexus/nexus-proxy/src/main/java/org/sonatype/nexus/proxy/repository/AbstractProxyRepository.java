@@ -32,6 +32,7 @@ import java.util.concurrent.Executors;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
@@ -1344,7 +1345,7 @@ public abstract class AbstractProxyRepository
                                 // a validator could detect that the Remote repo is hosed, i.e. a jar
                                 // gets returned as an html file, which would indicate that the mirror
                                 // is messed up, or a proxy is returning an html page
-                                lastException = new InvalidItemContentException( request, mirror );
+                                lastException = new InvalidItemContentException( request, mirror, remoteItem );
 
                                 continue all_urls; // retry with next url
                             }
@@ -1427,6 +1428,8 @@ public abstract class AbstractProxyRepository
 
             if ( lastException instanceof InvalidItemContentException )
             {
+                newContentValidationEvent( (InvalidItemContentException) lastException );
+
                 throw new ItemNotFoundException( request, this, lastException );
             }
             else if ( lastException instanceof StorageException )
@@ -1445,6 +1448,29 @@ public abstract class AbstractProxyRepository
         {
             itemUid.unlock();
         }
+    }
+
+    private void newContentValidationEvent( InvalidItemContentException iice )
+    {
+        NexusItemInfo ai = new NexusItemInfo();
+
+        ai.setPath( iice.getRemoteItem().getPath() );
+
+        ai.setRepositoryId( iice.getRemoteItem().getRepositoryId() );
+
+        ai.setRemoteUrl( iice.getRemoteItem().getRemoteUrl() );
+        String msg =
+            "Error, the artifact " + iice.getRemoteItem().getPath() + " content is invalid in repository "
+                + iice.getRemoteItem().getRepositoryId() + "!";
+
+        NexusArtifactEvent nae =
+            new NexusArtifactEvent( new Date(), NexusArtifactEvent.ACTION_BROKEN_INVALID_CONTENT, msg, ai );
+
+        nae.addEventContext( iice.getRemoteItem().getItemContext() );
+
+        nae.addItemAttributes( iice.getRemoteItem().getAttributes() );
+
+        getFeedRecorder().addNexusArtifactEvent( nae );
     }
 
     private void logFailedMirror( Mirror mirror, Exception e )

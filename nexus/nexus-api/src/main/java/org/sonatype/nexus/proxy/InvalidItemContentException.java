@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.proxy;
 
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.repository.Mirror;
 
 public class InvalidItemContentException
@@ -25,14 +26,22 @@ public class InvalidItemContentException
 {
     private static final long serialVersionUID = -1749678254941504279L;
 
+    private AbstractStorageItem remoteItem;
+
+    public AbstractStorageItem getRemoteItem()
+    {
+        return remoteItem;
+    }
+
     public InvalidItemContentException( String msg, Throwable cause )
     {
         super( msg, cause );
     }
 
-    public InvalidItemContentException( ResourceStoreRequest req, Mirror mirror )
+    public InvalidItemContentException( ResourceStoreRequest req, Mirror mirror, AbstractStorageItem remoteItem )
     {
         super( "Item content is invalid on path '" + req.toString() + "' on mirror '" + mirror.getUrl() + "'" );
+        this.remoteItem = remoteItem;
     }
 
 }

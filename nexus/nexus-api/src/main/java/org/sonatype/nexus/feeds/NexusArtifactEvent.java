@@ -44,6 +44,8 @@ public class NexusArtifactEvent
 
     public static final String ACTION_BROKEN_WRONG_REMOTE_CHECKSUM = "brokenWRC";
 
+    public static final String ACTION_BROKEN_INVALID_CONTENT = "brokenIC";
+
     /**
      * The artifactInfo about artifact.
      */

@@ -112,6 +112,12 @@ abstract public class AbstractNexusItemEventEntryBuilder
 
         StringBuilder msg = new StringBuilder();
 
+        if ( event.getMessage() != null )
+        {
+            msg.append( event.getMessage() );
+            msg.append( ' ' );
+        }
+
         msg.append( buildDescriptionMsgItem( event ) );
 
         msg.append( buildDescriptionMsgAction( event ) );

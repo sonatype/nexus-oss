@@ -75,7 +75,6 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
@@ -565,7 +564,8 @@ public class DefaultNexus
 
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
                                                         NexusArtifactEvent.ACTION_BROKEN,
-                                                        NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM } ) ),
+                                                        NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM,
+                                                        NexusArtifactEvent.ACTION_BROKEN_INVALID_CONTENT } ) ),
                                                     from, count, filter );
     }
 
