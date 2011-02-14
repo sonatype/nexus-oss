@@ -60,6 +60,9 @@ public class DefaultAhcProvider
         // limiting (with httpClient defaults) to prevent bashing of remote repositories
         result.setMaximumConnectionsPerHost( 20 );
         result.setMaximumConnectionsTotal( 20 );
+        
+        // proxy-logic will handle retries
+        result.setMaxRequestRetry( 0 );
 
         return result;
     }
