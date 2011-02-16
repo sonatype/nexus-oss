@@ -80,7 +80,7 @@ public class UserToRolePlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[security:users]" );
+        return new PathProtectionDescriptor( "/user_to_roles/*", "authcBasic,perms[security:users]" );
     }
 
     @Override
