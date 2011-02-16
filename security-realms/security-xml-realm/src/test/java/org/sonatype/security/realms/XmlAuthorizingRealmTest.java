@@ -19,6 +19,8 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.authz.permission.WildcardPermission;
@@ -102,7 +104,52 @@ public class XmlAuthorizingRealmTest
         Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:ui:delete" ) ) );
     }
     
+    
+    public void testCaseSensitiveAuthorization() throws Exception
+    {
+        buildTestAuthorizationConfig( "ABcd" );
+        
+        SimplePrincipalCollection principal = new SimplePrincipalCollection( "ABcd", realm.getName() );
+        
+        Assert.assertTrue( realm.hasRole( principal, "role" ) );
+        
+        // Verify the permission
+        Assert.assertTrue( realm.isPermitted( principal, new WildcardPermission( "app:config:read" ) ) );
+        // Verify other method not allowed
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:config:create" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:config:update" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:config:delete" ) ) );
+        
+        // Verify other permission not allowed
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:ui:read" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:ui:create" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:ui:update" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:ui:delete" ) ) );
+        
+        principal = new SimplePrincipalCollection( "abcd", realm.getName() );
+        
+        Assert.assertTrue( realm.hasRole( principal, "role" ) );
+        
+        // Verify the permission
+        Assert.assertTrue( realm.isPermitted( principal, new WildcardPermission( "app:config:read" ) ) );
+        // Verify other method not allowed
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:config:create" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:config:update" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:config:delete" ) ) );
+        
+        // Verify other permission not allowed
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:ui:read" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:ui:create" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:ui:update" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:ui:delete" ) ) );
+    }
+    
     private void buildTestAuthorizationConfig() throws InvalidConfigurationException
+    {
+        buildTestAuthorizationConfig( "username" );
+    }
+    
+    private void buildTestAuthorizationConfig( String userId ) throws InvalidConfigurationException
     {
         CProperty permissionProp = new CProperty();
         permissionProp.setKey( ApplicationPrivilegePermissionPropertyDescriptor.ID );
@@ -136,7 +183,7 @@ public class XmlAuthorizingRealmTest
         user.setFirstName( "dummyFirstName" );
         user.setLastName( "dummyLastName" );
         user.setStatus( UserStatus.active.toString() );
-        user.setId( "username" );
+        user.setId( userId );
         user.setPassword( "password" );
         
         Set<String> roles = new HashSet<String>();

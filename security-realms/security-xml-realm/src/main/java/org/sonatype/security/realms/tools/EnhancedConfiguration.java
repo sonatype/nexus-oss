@@ -303,6 +303,6 @@ public class EnhancedConfiguration
 
     protected String getUserRoleMappingKey( final String userId, final String source )
     {
-        return userId + "|" + source;
+        return userId.toLowerCase() + "|" + source;
     }
 }
