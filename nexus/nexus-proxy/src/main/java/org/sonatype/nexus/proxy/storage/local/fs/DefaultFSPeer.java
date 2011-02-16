@@ -163,36 +163,43 @@ public class DefaultFSPeer
                           File toTarget )
         throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
     {
-        // create parents down to the file itself (this will make those if needed, otherwise return silently)
-        mkParentDirs( repository, toTarget );
-
-        if ( fromTarget.isDirectory() )
+        if ( fromTarget.exists() )
         {
-            try
-            {
-                // copy
-                FileUtils.copyDirectoryStructure( fromTarget, toTarget );
+            // create parents down to the file itself (this will make those if needed, otherwise return silently)
+            mkParentDirs( repository, toTarget );
 
-                // delete
-                FileUtils.forceDelete( fromTarget );
+            if ( fromTarget.isDirectory() )
+            {
+                try
+                {
+                    // copy
+                    FileUtils.copyDirectoryStructure( fromTarget, toTarget );
 
-                // update timestamp
-                toTarget.setLastModified( fromTarget.lastModified() );
+                    // delete
+                    FileUtils.forceDelete( fromTarget );
+
+                    // update timestamp
+                    toTarget.setLastModified( fromTarget.lastModified() );
+                }
+                catch ( IOException e )
+                {
+                    throw new LocalStorageException( "Error during moveDirectory", e );
+                }
             }
-            catch ( IOException e )
+            else if ( fromTarget.isFile() )
             {
-                throw new LocalStorageException( "Error during moveDirectory", e );
+                try
+                {
+                    FileUtils.rename( fromTarget, toTarget );
+                }
+                catch ( IOException e )
+                {
+                    throw new LocalStorageException( "Error during moveItem", e );
+                }
             }
-        }
-        else if ( fromTarget.isFile() )
-        {
-            try
+            else
             {
-                FileUtils.rename( fromTarget, toTarget );
-            }
-            catch ( IOException e )
-            {
-                throw new LocalStorageException( "Error during moveItem", e );
+                throw new ItemNotFoundException( from, repository );
             }
         }
         else
