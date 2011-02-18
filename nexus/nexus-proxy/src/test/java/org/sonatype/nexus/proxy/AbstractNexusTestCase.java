@@ -29,6 +29,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.inject.BeanScanning;
 
 /**
  * Abstract test case for nexus tests. It is customizing the context and helps with nexus configurations.
@@ -54,7 +55,8 @@ public abstract class AbstractNexusTestCase
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( true );
+        configuration.setAutoWiring( true );
+        configuration.setClassPathScanning( BeanScanning.ON.name() );
     }
 
     protected String getNexusSecurityConfiguration()

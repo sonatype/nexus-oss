@@ -24,6 +24,7 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.inject.BeanScanning;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -39,7 +40,8 @@ public class ClearPasswordTest
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( true );
+        configuration.setAutoWiring( true );
+        configuration.setClassPathScanning( BeanScanning.ON.name() );
     }
 
     private ApplicationConfigurationSource getConfigSource()

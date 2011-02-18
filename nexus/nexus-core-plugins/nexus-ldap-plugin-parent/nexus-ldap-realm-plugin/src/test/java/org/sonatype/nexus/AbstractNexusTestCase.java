@@ -32,6 +32,7 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.sonatype.inject.BeanScanning;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.security.ldap.realms.api.LdapRealmPlexusResourceConst;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
@@ -45,7 +46,8 @@ public abstract class AbstractNexusTestCase
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( true );
+        configuration.setAutoWiring( true );
+        configuration.setClassPathScanning( BeanScanning.ON.name() );
     }
 
     public static final String RUNTIME_CONFIGURATION_KEY = "runtime";

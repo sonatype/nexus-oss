@@ -20,6 +20,7 @@ package org.sonatype.nexus.jsecurity;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.inject.BeanScanning;
 import org.sonatype.security.usermanagement.DefaultPasswordGenerator;
 import org.sonatype.security.usermanagement.PasswordGenerator;
 
@@ -30,7 +31,8 @@ public class DefaultPasswordGeneratorTest
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( true );
+        configuration.setAutoWiring( true );
+        configuration.setClassPathScanning( BeanScanning.ON.name() );
     }
 
     protected DefaultPasswordGenerator pwGenerator;

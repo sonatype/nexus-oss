@@ -36,6 +36,7 @@ import org.sonatype.appcontext.AppContextFactory;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.PropertiesFileContextFiller;
 import org.sonatype.appcontext.SimpleBasedirDiscoverer;
+import org.sonatype.inject.BeanScanning;
 
 /**
  * This ServeletContextListener boots up Plexus in a webapp environment, if needed. It is safe to have it multiple times
@@ -72,7 +73,7 @@ public class PlexusContainerContextListener
                 ContainerConfiguration plexusConfiguration =
                     new DefaultContainerConfiguration().setName( context.getServletContextName() ).setContainerConfigurationURL(
                         buildConfigurationURL( context, PLEXUS_CONFIG_PARAM, DEFAULT_PLEXUS_CONFIG ) ).setContext(
-                        plexusContext ).setClassPathScanning( true ).setComponentVisibility(
+                        plexusContext ).setAutoWiring( true ).setClassPathScanning( BeanScanning.ON.name() ).setComponentVisibility(
                         PlexusConstants.GLOBAL_VISIBILITY );
                 ;
 

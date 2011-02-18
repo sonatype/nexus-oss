@@ -28,6 +28,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
+import org.sonatype.inject.BeanScanning;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
@@ -43,7 +44,8 @@ public class DefaultApplicationConfigurationUpgraderTest
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( true );
+        configuration.setAutoWiring( true );
+        configuration.setClassPathScanning( BeanScanning.ON.name() );
     }
 
     protected ApplicationConfigurationUpgrader configurationUpgrader;

@@ -23,13 +23,13 @@ import java.util.Map;
 
 import javax.inject.Singleton;
 
-import org.sonatype.guice.asm.AnnotationVisitor;
-import org.sonatype.guice.asm.ClassVisitor;
-import org.sonatype.guice.asm.Type;
 import org.sonatype.guice.bean.reflect.ClassSpace;
 import org.sonatype.guice.bean.scanners.ClassSpaceScanner;
 import org.sonatype.guice.bean.scanners.EmptyAnnotationVisitor;
 import org.sonatype.guice.bean.scanners.EmptyClassVisitor;
+import org.sonatype.guice.bean.scanners.asm.AnnotationVisitor;
+import org.sonatype.guice.bean.scanners.asm.ClassVisitor;
+import org.sonatype.guice.bean.scanners.asm.Type;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.plugin.Managed;

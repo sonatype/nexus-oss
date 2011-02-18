@@ -30,6 +30,7 @@ import junit.framework.Assert;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.inject.BeanScanning;
 import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
@@ -46,7 +47,8 @@ public class LdapUserManagerTest
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( true );
+        configuration.setAutoWiring( true );
+        configuration.setClassPathScanning( BeanScanning.ON.name() );
     }
 
     public static final String SECURITY_CONFIG_KEY = "security-xml-file";

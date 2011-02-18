@@ -30,6 +30,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.inject.BeanScanning;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -68,7 +69,8 @@ public abstract class AbstractNexusTestCase
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
         super.customizeContainerConfiguration( configuration );
-        configuration.setClassPathScanning( true );
+        configuration.setAutoWiring( true );
+        configuration.setClassPathScanning( BeanScanning.ON.name() );
     }
 
     protected boolean loadConfigurationAtSetUp()

@@ -61,6 +61,7 @@ import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.sonatype.inject.BeanScanning;
 import org.sonatype.nexus.rt.boot.ITAppBooterCustomizer;
 import org.sonatype.nexus.rt.prefs.FilePreferencesFactory;
 import org.sonatype.nexus.test.utils.DeployUtils;
@@ -1324,7 +1325,8 @@ public abstract class AbstractNexusIntegrationTest
             new DefaultContainerConfiguration().setName( "test" ).setContext( context ).setContainerConfiguration(
                 baseClass.getName().replace( '.', '/' ) + ".xml" );
 
-        containerConfiguration.setClassPathScanning( true );
+        containerConfiguration.setAutoWiring( true );
+        containerConfiguration.setClassPathScanning( BeanScanning.ON.name() );
 
         customizeContainerConfiguration( containerConfiguration );
 
