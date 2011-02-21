@@ -24,11 +24,16 @@ public class DefaultAhcProvider
 {
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
-
+    
     @Requirement
     private UserAgentBuilder userAgentBuilder;
 
     private AsyncHttpClient sharedClient;
+    
+    public synchronized void reset()
+    {
+        sharedClient = null;
+    }
 
     @Override
     public synchronized AsyncHttpClient getAsyncHttpClient()

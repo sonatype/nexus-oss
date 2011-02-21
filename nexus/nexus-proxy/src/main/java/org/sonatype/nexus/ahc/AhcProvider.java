@@ -14,6 +14,11 @@ import com.ning.http.client.AsyncHttpClientConfig;
 public interface AhcProvider
 {
     /**
+     * Forces the single (Nexus-wide) shared instance recreation, initiated usually by configuration change.
+     */
+    void reset();
+
+    /**
      * Provides single (Nexus-wide) shared and pre-configured instance of AsyncHttpClient to be used in various
      * components but NOT in RemoteRepositoryStorage.
      * 
