@@ -797,35 +797,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             }
             else if ( t instanceof AccessDeniedException )
             {
-                // TODO: a big fat problem here!
-                // this makes restlet code tied to Servlet code, and we what is happening here is VERY dirty!
-                HttpServletRequest servletRequest = ( (ServletCall) ( (HttpRequest) req ).getHttpCall() ).getRequest();
-
-                String scheme = (String) servletRequest.getAttribute( NexusHttpAuthenticationFilter.AUTH_SCHEME_KEY );
-
-                ChallengeScheme challengeScheme = null;
-
-                if ( NexusHttpAuthenticationFilter.FAKE_AUTH_SCHEME.equals( scheme ) )
-                {
-                    challengeScheme = new ChallengeScheme( "HTTP_NXBASIC", "NxBasic", "Fake basic HTTP authentication" );
-                }
-                else
-                {
-                    challengeScheme = ChallengeScheme.HTTP_BASIC;
-                }
-
-                String realm = (String) servletRequest.getAttribute( NexusHttpAuthenticationFilter.AUTH_REALM_KEY );
-
-                if ( servletRequest.getAttribute( NexusHttpAuthenticationFilter.ANONYMOUS_LOGIN ) != null )
-                {
-                    res.setStatus( Status.CLIENT_ERROR_UNAUTHORIZED );
-                }
-                else
-                {
-                    res.setStatus( Status.CLIENT_ERROR_FORBIDDEN );
-                }
-
-                res.getChallengeRequests().add( new ChallengeRequest( challengeScheme, realm ) );
+                challengeIfNeeded( req, res, (AccessDeniedException) t );
             }
             else
             {
@@ -879,5 +851,62 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 }
             }
         }
+    }
+
+    /**
+     * TODO: this code below should be removed. It is better than the one before (it actually reuses Shiro filter, and
+     * will not try to reassemble the Challenge anymore, but stil...
+     * 
+     * @param req
+     * @param res
+     * @param t
+     */
+    public static void challengeIfNeeded( Request req, Response res, AccessDeniedException t )
+    {
+        // TODO: a big fat problem here!
+        // this makes restlet code tied to Servlet code, and we what is happening here is VERY dirty!
+        HttpServletRequest servletRequest = ( (ServletCall) ( (HttpRequest) req ).getHttpCall() ).getRequest();
+
+        String scheme = (String) servletRequest.getAttribute( NexusHttpAuthenticationFilter.AUTH_SCHEME_KEY );
+
+        ChallengeScheme challengeScheme = null;
+
+        if ( NexusHttpAuthenticationFilter.FAKE_AUTH_SCHEME.equals( scheme ) )
+        {
+            challengeScheme = new ChallengeScheme( "HTTP_NXBASIC", "NxBasic", "Fake basic HTTP authentication" );
+        }
+        else
+        {
+            challengeScheme = ChallengeScheme.HTTP_BASIC;
+        }
+
+        String realm = (String) servletRequest.getAttribute( NexusHttpAuthenticationFilter.AUTH_REALM_KEY );
+
+        if ( servletRequest.getAttribute( NexusHttpAuthenticationFilter.ANONYMOUS_LOGIN ) != null )
+        {
+            res.setStatus( Status.CLIENT_ERROR_UNAUTHORIZED );
+        }
+        else
+        {
+            res.setStatus( Status.CLIENT_ERROR_FORBIDDEN );
+        }
+
+        res.getChallengeRequests().add( new ChallengeRequest( challengeScheme, realm ) );
+
+        // TODO: this below would be _slightly_ better.
+        // HttpServletRequest servletRequest = ( (ServletCall) ( (HttpRequest) req ).getHttpCall() ).getRequest();
+        //
+        // if ( servletRequest.getAttribute( NexusHttpAuthenticationFilter.ANONYMOUS_LOGIN ) != null )
+        // {
+        // // setting this flag to notify NexusHttpAuthenticationFilter that a challenge is needed
+        // // without actually _knowing_ what kind of challenge we use
+        // servletRequest.setAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE );
+        //
+        // res.setStatus( Status.CLIENT_ERROR_UNAUTHORIZED );
+        // }
+        // else
+        // {
+        // res.setStatus( Status.CLIENT_ERROR_FORBIDDEN );
+        // }
     }
 }

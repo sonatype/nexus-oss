@@ -60,6 +60,7 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
 import org.sonatype.nexus.rest.StorageFileItemRepresentation;
 import org.sonatype.nexus.rest.model.ArtifactCoordinate;
 import org.sonatype.security.SecuritySystem;
@@ -567,7 +568,7 @@ public abstract class AbstractArtifactPlexusResource
         }
         else if ( t instanceof AccessDeniedException )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, t.getMessage() );
+            AbstractResourceStoreContentPlexusResource.challengeIfNeeded( request, res, (AccessDeniedException) t );
         }
         else if ( t instanceof XmlPullParserException )
         {

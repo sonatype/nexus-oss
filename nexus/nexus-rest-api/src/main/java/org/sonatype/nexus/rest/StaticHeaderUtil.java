@@ -23,6 +23,12 @@ import org.restlet.data.Response;
 
 public class StaticHeaderUtil
 {
+    // cstamas:
+    // Um, this is NOT the way to do this. Representation#setExpirationDate()!!!
+    // Read APIDocs!
+    // These kind of trickeries should be AVOIDED! Adding directly headers to a response (that belong to entity in response body)
+    // without even knowing that a response have any entity is a way to hell! And bugs...
+    @Deprecated
     public static void addResponseHeaders( Response response )
     {
         Form responseHeaders = (Form) response.getAttributes().get("org.restlet.http.headers");   
