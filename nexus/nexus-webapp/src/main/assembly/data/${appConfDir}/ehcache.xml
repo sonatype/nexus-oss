@@ -55,7 +55,7 @@
             memoryStoreEvictionPolicy="LFU"
             />
 
-    <cache name="jsecurity-activeSessionCache"
+    <cache name="shiro-activeSessionCache"
             maxElementsInMemory="10000"
             eternal="false"
             timeToIdleSeconds="120"
