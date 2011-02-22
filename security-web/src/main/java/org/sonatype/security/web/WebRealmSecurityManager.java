@@ -11,6 +11,7 @@ import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -80,6 +81,9 @@ public class WebRealmSecurityManager
     public void init()
         throws ShiroException
     {
-        this.setSessionManager( new DefaultWebSessionManager() );
+        // use cacheing for the sessions, we can tune this with a props file per application if needed
+        DefaultWebSessionManager webSessionManager = new DefaultWebSessionManager();
+        webSessionManager.setSessionDAO( new EnterpriseCacheSessionDAO() );
+        this.setSessionManager( webSessionManager );
     }
 }
