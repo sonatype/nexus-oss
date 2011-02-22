@@ -472,10 +472,4 @@ public class NexusHttpAuthenticationFilter
         return this.getFilterConfig().getServletContext().getAttribute( key );
     }
 
-    public void afterCompletion( ServletRequest request, ServletResponse response, Exception exception )
-        throws Exception
-    {
-        getSubject( request, response ).logout();
-    }
-
 }
