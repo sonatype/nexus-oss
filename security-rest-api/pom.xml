@@ -11,7 +11,7 @@
 
   <properties>
     <plexus-restlet-bridge.version>1.9</plexus-restlet-bridge.version>
-    <base-security.version>2.1</base-security.version>
+    <base-security.version>2.2</base-security.version>
   </properties>
 
   <dependencies>
