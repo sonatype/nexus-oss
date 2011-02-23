@@ -72,7 +72,7 @@ public class UserBySourcePlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/plexus_user/*", "authcBasic,perms[security:users]" );
+        return new PathProtectionDescriptor( "/plexus_user/*/*", "authcBasic,perms[security:users]" );
     }
 
     @Override
