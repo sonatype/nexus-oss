@@ -163,6 +163,14 @@ public class AhcRemoteRepositoryStorage
 
             return result;
         }
+        catch ( ItemNotFoundException e )
+        {
+            throw e;
+        }
+        catch ( RemoteStorageException e )
+        {
+            throw e;
+        }
         catch ( Exception e )
         {
             throw new RemoteStorageException( e );
@@ -196,6 +204,15 @@ public class AhcRemoteRepositoryStorage
             // expected: 200 OK, 201 CREATED, 202 ACCEPTED, 204 NO_CONTENT
             validateResponse( repository, request, "PUT", itemUrl, response, 200, 201, 202, 204 );
         }
+        catch ( ItemNotFoundException e )
+        {
+            // rather unexpected response
+            throw new RemoteStorageException( e );
+        }
+        catch ( RemoteStorageException e )
+        {
+            throw e;
+        }
         catch ( Exception e )
         {
             throw new RemoteStorageException( e );
@@ -219,6 +236,14 @@ public class AhcRemoteRepositoryStorage
 
             // expected: 200 OK, 202 ACCEPTED, 204 NO_CONTENT
             validateResponse( repository, request, "DELETE", itemUrl, response, 200, 202, 204 );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            throw e;
+        }
+        catch ( RemoteStorageException e )
+        {
+            throw e;
         }
         catch ( Exception e )
         {
