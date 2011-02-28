@@ -26,8 +26,8 @@ import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.SecuritySystem;
 
 import com.sonatype.security.realms.url.config.model.Configuration;
-import com.sonatype.security.realms.url.config.model.io.xpp3.urlRealmConfigurationXpp3Reader;
-import com.sonatype.security.realms.url.config.model.io.xpp3.urlRealmConfigurationXpp3Writer;
+import com.sonatype.security.realms.url.config.model.io.xpp3.UrlRealmConfigurationXpp3Reader;
+import com.sonatype.security.realms.url.config.model.io.xpp3.UrlRealmConfigurationXpp3Writer;
 
 @Singleton
 @Named
@@ -63,7 +63,7 @@ public class DefaultUrlRealmConfiguration
             }   
             
             fileReader = new FileReader( this.getConfigFile() );
-            urlRealmConfigurationXpp3Reader reader = new urlRealmConfigurationXpp3Reader();
+            UrlRealmConfigurationXpp3Reader reader = new UrlRealmConfigurationXpp3Reader();
 
             configuration = reader.read( fileReader );
             
@@ -107,7 +107,7 @@ public class DefaultUrlRealmConfiguration
             
             fileWriter = new FileWriter( configFile );
 
-            urlRealmConfigurationXpp3Writer writer = new urlRealmConfigurationXpp3Writer();
+            UrlRealmConfigurationXpp3Writer writer = new UrlRealmConfigurationXpp3Writer();
             writer.write( fileWriter, this.configuration );
         }
         catch ( IOException e )
@@ -203,5 +203,19 @@ public class DefaultUrlRealmConfiguration
     private File getConfigFile()
     {
         return configurationFile;
+    }
+
+    public void clearCache()
+    {
+        lock.lock();
+        try
+        {
+            configuration = null;
+        }
+        finally
+        {
+            lock.unlock();
+        }
+        
     }
 }

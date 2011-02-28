@@ -12,4 +12,6 @@ public interface UrlRealmConfiguration
     void save() throws ConfigurationException;
 
     void updateConfiguration( Configuration configuration ) throws InvalidConfigurationException, ConfigurationException;
+    
+    void clearCache();
 }
