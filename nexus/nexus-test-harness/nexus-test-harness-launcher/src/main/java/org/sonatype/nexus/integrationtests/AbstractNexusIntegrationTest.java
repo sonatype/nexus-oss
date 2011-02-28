@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -705,9 +704,10 @@ public abstract class AbstractNexusIntegrationTest
 
         log.debug( "wow, this is working: " + artifactFile.getName() );
 
-        Gav gav =
-            new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(), 0,
-                new Date().getTime(), model.getName(), false, null, false, null );
+        final Gav gav =
+            new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null,
+                FileUtils.getExtension( artifactFile.getName() ), null, null, artifactFile.getName(), false, null,
+                false, null );
 
         // the Restlet Client does not support multipart forms:
         // http://restlet.tigris.org/issues/show_bug.cgi?id=71
