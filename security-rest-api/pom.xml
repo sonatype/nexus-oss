@@ -11,7 +11,7 @@
 
   <properties>
     <plexus-restlet-bridge.version>1.9</plexus-restlet-bridge.version>
-    <base-security.version>2.2</base-security.version>
+    <base-security.version>2.3-SNAPSHOT</base-security.version>
   </properties>
 
   <dependencies>
@@ -51,6 +51,27 @@
       <version>${base-security.version}</version>
       <scope>test</scope>
       <classifier>tests</classifier>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-web</artifactId>
+      <version>${base-security.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <!-- Using a simple jetty server -->
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-jetty-testsuite</artifactId>
+      <version>1.5</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Enunciate -->
