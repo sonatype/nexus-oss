@@ -19,7 +19,6 @@
 package org.sonatype.nexus.proxy.maven.uid;
 
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.uid.Attribute;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -44,15 +43,8 @@ public class IsMavenSnapshotArtifactAttribute
 
     protected boolean pathIsValidSnapshotGav( MavenRepository repository, String path )
     {
-        try
-        {
-            Gav gav = repository.getGavCalculator().pathToGav( path );
+        final Gav gav = repository.getGavCalculator().pathToGav( path );
 
-            return gav != null && gav.isSnapshot() && !gav.isHash() && !gav.isSignature();
-        }
-        catch ( IllegalArtifactCoordinateException e )
-        {
-            return false;
-        }
+        return gav != null && gav.isSnapshot() && !gav.isHash() && !gav.isSignature();
     }
 }

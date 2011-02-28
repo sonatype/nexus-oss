@@ -26,7 +26,6 @@ import java.util.Map;
 import org.apache.maven.index.artifact.ArtifactPackagingMapper;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.GavCalculator;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -89,9 +88,8 @@ public abstract class LayoutConverterShadowRepository
     /**
      * Repository kind.
      */
-    private RepositoryKind repositoryKind =
-        new DefaultRepositoryKind( MavenShadowRepository.class, Arrays
-            .asList( new Class<?>[] { MavenRepository.class } ) );
+    private RepositoryKind repositoryKind = new DefaultRepositoryKind( MavenShadowRepository.class,
+        Arrays.asList( new Class<?>[] { MavenRepository.class } ) );
 
     /**
      * ArtifactStoreHelper.
@@ -153,24 +151,15 @@ public abstract class LayoutConverterShadowRepository
     {
         return isMavenArtifactPath( item.getPath() );
     }
-    
+
     public boolean isMavenMetadata( StorageItem item )
     {
         return isMavenMetadataPath( item.getPath() );
     }
-    
+
     public boolean isMavenArtifactPath( String path )
     {
-        try
-        {
-            return getGavCalculator().pathToGav( path ) != null;
-        }
-        catch ( IllegalArtifactCoordinateException e )
-        {
-            // ignore it
-        }
-        
-        return false;
+        return getGavCalculator().pathToGav( path ) != null;
     }
 
     public abstract boolean isMavenMetadataPath( String path );
@@ -407,7 +396,6 @@ public abstract class LayoutConverterShadowRepository
      * @return
      */
     protected String transformM1toM2( String path )
-        throws IllegalArtifactCoordinateException
     {
         Gav gav = getM1GavCalculator().pathToGav( path );
 
@@ -440,7 +428,6 @@ public abstract class LayoutConverterShadowRepository
      * @return
      */
     protected String transformM2toM1( String path )
-        throws IllegalArtifactCoordinateException
     {
         Gav gav = getM2GavCalculator().pathToGav( path );
 
@@ -468,14 +455,7 @@ public abstract class LayoutConverterShadowRepository
     {
         String shadowPath = null;
 
-        try
-        {
-            shadowPath = transformMaster2Shadow( item.getPath() );
-        }
-        catch ( IllegalArtifactCoordinateException e )
-        {
-            getLogger().info( "Illegal artifact path: '" + item.getPath() + "'" + e.getMessage() );
-        }
+        shadowPath = transformMaster2Shadow( item.getPath() );
 
         if ( shadowPath != null )
         {
@@ -486,14 +466,15 @@ public abstract class LayoutConverterShadowRepository
             deleteItem( false, request );
 
             // we need to clean up empty shadow parent directories
-            String parentPath = request.getRequestPath().substring( 0, request.getRequestPath().lastIndexOf( item.getName() ) );
+            String parentPath =
+                request.getRequestPath().substring( 0, request.getRequestPath().lastIndexOf( item.getName() ) );
             ResourceStoreRequest parentRequest = new ResourceStoreRequest( parentPath );
-            
+
             while ( parentRequest != null )
             {
                 StorageItem parentItem = null;
                 parentItem = this.retrieveItem( false, parentRequest );
-                
+
                 // this should be a collection Item
                 if ( StorageCollectionItem.class.isInstance( parentItem ) )
                 {
@@ -515,8 +496,7 @@ public abstract class LayoutConverterShadowRepository
                     {
                         this.getLogger().debug(
                             "Failed to delete shadow parent: " + this.getId() + ":" + parentItem.getPath()
-                                + " Access Denied",
-                            e );
+                                + " Access Denied", e );
                         // exit loop
                         parentRequest = null;
                     }
@@ -524,8 +504,7 @@ public abstract class LayoutConverterShadowRepository
                     {
                         this.getLogger().debug(
                             "Failed to delete shadow parent: " + this.getId() + ":" + parentItem.getPath()
-                                + " does not exist",
-                            e );
+                                + " does not exist", e );
                         // exit loop
                         parentRequest = null;
                     }
@@ -544,14 +523,7 @@ public abstract class LayoutConverterShadowRepository
     {
         String shadowPath = null;
 
-        try
-        {
-            shadowPath = transformMaster2Shadow( item.getPath() );
-        }
-        catch ( IllegalArtifactCoordinateException e )
-        {
-            getLogger().info( "Illegal artifact path: '" + item.getPath() + "'" + e.getMessage() );
-        }
+        shadowPath = transformMaster2Shadow( item.getPath() );
 
         if ( shadowPath != null )
         {
@@ -578,8 +550,7 @@ public abstract class LayoutConverterShadowRepository
      * @param path the path
      * @return the shadow path
      */
-    protected abstract String transformMaster2Shadow( String path )
-        throws IllegalArtifactCoordinateException;
+    protected abstract String transformMaster2Shadow( String path );
 
     @Override
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
@@ -598,14 +569,7 @@ public abstract class LayoutConverterShadowRepository
             // if it is thrown by super.doRetrieveItem()
             String transformedPath = null;
 
-            try
-            {
-                transformedPath = transformShadow2Master( request.getRequestPath() );
-            }
-            catch ( IllegalArtifactCoordinateException e1 )
-            {
-                getLogger().info( "Illegal artifact path: '" + request.getRequestPath() + "'" + e.getMessage() );
-            }
+            transformedPath = transformShadow2Master( request.getRequestPath() );
 
             if ( transformedPath == null )
             {
@@ -653,7 +617,5 @@ public abstract class LayoutConverterShadowRepository
      * @param path the path
      * @return the master path
      */
-    protected abstract String transformShadow2Master( String path )
-        throws IllegalArtifactCoordinateException;
-
+    protected abstract String transformShadow2Master( String path );
 }

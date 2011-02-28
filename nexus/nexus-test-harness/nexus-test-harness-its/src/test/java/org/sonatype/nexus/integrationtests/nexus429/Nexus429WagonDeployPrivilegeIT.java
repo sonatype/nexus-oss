@@ -62,7 +62,7 @@ public class Nexus429WagonDeployPrivilegeIT
         throws Exception
     {
         Gav gav =
-            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
+            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false,
                      null, false, null );
         this.setTestRepositoryId( TEST_RELEASE_REPO );        
         this.deployPrivWithWagon( gav, this.getNexusTestRepoUrl() );
@@ -73,7 +73,7 @@ public class Nexus429WagonDeployPrivilegeIT
         throws Exception
     {
         Gav gav =
-            new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "", false,
+            new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "", 
                      false, null, false, null );
         this.setTestRepositoryId( TEST_SNAPSHOT_REPO );        
         this.deployPrivWithWagon( gav, this.getNexusTestRepoUrl() );

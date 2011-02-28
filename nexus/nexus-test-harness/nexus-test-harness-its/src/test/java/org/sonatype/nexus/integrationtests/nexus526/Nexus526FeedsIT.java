@@ -45,7 +45,7 @@ public class Nexus526FeedsIT
     {
         super( "nexus-test-harness-repo" );
         this.gav =
-            new Gav( this.getTestId(), "artifact1", "1.0.0", null, "jar", 0, new Date().getTime(), "Artifact 1", false,
+            new Gav( this.getTestId(), "artifact1", "1.0.0", null, "jar", 0, new Date().getTime(), "Artifact 1", 
                      false, null, false, null );
     }
 

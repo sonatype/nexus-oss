@@ -67,7 +67,6 @@ public class Nexus167ReleaseToSnapshotIT
             new Date().getTime(),
             "Simple Test Artifact",
             false,
-            false,
             null,
             false,
             null );
@@ -106,7 +105,6 @@ public class Nexus167ReleaseToSnapshotIT
             0,
             new Date().getTime(),
             "Simple Test Artifact",
-            false,
             false,
             null,
             false,
@@ -160,7 +158,6 @@ public class Nexus167ReleaseToSnapshotIT
             0,
             new Date().getTime(),
             "Simple Test Artifact",
-            false,
             false,
             null,
             false,

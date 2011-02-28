@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.apache.maven.index.artifact.ArtifactPackagingMapper;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
@@ -323,16 +322,7 @@ public abstract class AbstractMavenRepository
 
     public boolean isMavenArtifactPath( String path )
     {
-        try
-        {
-            return getGavCalculator().pathToGav( path ) != null;
-        }
-        catch ( IllegalArtifactCoordinateException e )
-        {
-            // ignore it
-        }
-
-        return false;
+        return getGavCalculator().pathToGav( path ) != null;
     }
 
     public abstract boolean isMavenMetadataPath( String path );

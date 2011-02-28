@@ -24,8 +24,6 @@ import java.util.List;
 
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
-import org.apache.maven.index.artifact.VersionUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -78,26 +76,16 @@ public class DefaultIndexArtifactFilter
 
             if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
             {
-                try
-                {
-                    MavenRepository mr = (MavenRepository) repository;
+                MavenRepository mr = (MavenRepository) repository;
 
-                    Gav gav =
-                        new Gav( artifactInfo.groupId, artifactInfo.artifactId, artifactInfo.version,
-                            artifactInfo.classifier, mr.getArtifactPackagingMapper().getExtensionForPackaging(
-                                artifactInfo.packaging ), null, null, null, VersionUtils
-                                .isSnapshot( artifactInfo.version ), false, null, false, null );
+                Gav gav =
+                    new Gav( artifactInfo.groupId, artifactInfo.artifactId, artifactInfo.version,
+                        artifactInfo.classifier, mr.getArtifactPackagingMapper().getExtensionForPackaging(
+                            artifactInfo.packaging ), null, null, null, false, null, false, null );
 
-                    ResourceStoreRequest req = new ResourceStoreRequest( mr.getGavCalculator().gavToPath( gav ) );
+                ResourceStoreRequest req = new ResourceStoreRequest( mr.getGavCalculator().gavToPath( gav ) );
 
-                    return this.nexusItemAuthorizer.authorizePath( mr, req, Action.read );
-                }
-                catch ( IllegalArtifactCoordinateException e )
-                {
-                    getLogger().info( "Illegal artifact coordinate, filter it anyway.\n" + e.getMessage() );
-
-                    return false;
-                }
+                return this.nexusItemAuthorizer.authorizePath( mr, req, Action.read );
             }
             else
             {

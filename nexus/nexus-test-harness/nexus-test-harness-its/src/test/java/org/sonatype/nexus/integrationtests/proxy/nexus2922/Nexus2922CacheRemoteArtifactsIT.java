@@ -25,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
@@ -58,7 +57,6 @@ public class Nexus2922CacheRemoteArtifactsIT
     }
 
     public Nexus2922CacheRemoteArtifactsIT()
-        throws IllegalArtifactCoordinateException
     {
         super( "release-proxy-repo-1" );
         GAV1 = GavUtil.newGav( "nexus2922", "artifact", "1.0.0" );

@@ -58,7 +58,7 @@ public class Nexus2302DeployEncodedFileIT
         throws Exception
     {
         Gav gav =
-            new Gav( "nexus2302", "artifact", "1.0", "c++", "jar", null, null, null, false, false, null, false, null );
+            new Gav( "nexus2302", "artifact", "1.0", "c++", "jar", null, null, null, false, null, false, null );
         testIt( gav );
     }
 
@@ -67,7 +67,7 @@ public class Nexus2302DeployEncodedFileIT
         throws Exception
     {
         Gav gav =
-            new Gav( "nexus2302", "artifact", "1++0", null, "jar", null, null, null, false, false, null, false, null );
+            new Gav( "nexus2302", "artifact", "1++0", null, "jar", null, null, null, false, null, false, null );
         testIt( gav );
     }
 
@@ -76,7 +76,7 @@ public class Nexus2302DeployEncodedFileIT
         throws Exception
     {
         Gav gav =
-            new Gav( "nexus2302", "artifact", "$dolar", "void", "jar", null, null, null, false, false, null, false,
+            new Gav( "nexus2302", "artifact", "$dolar", "void", "jar", null, null, null, false, null, false,
                 null );
         testIt( gav );
     }

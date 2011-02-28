@@ -42,7 +42,7 @@ public class Nexus602SearchSnapshotArtifactIT
         throws Exception
     {
         gav =
-            new Gav( "nexus602", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, false, false, null, false, null );
+            new Gav( "nexus602", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, false, null, false, null );
     }
 
     @Test

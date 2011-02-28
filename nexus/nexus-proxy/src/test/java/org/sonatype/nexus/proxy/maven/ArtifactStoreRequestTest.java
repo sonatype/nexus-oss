@@ -40,7 +40,7 @@ public class ArtifactStoreRequestTest
     
     public void testNoDots() throws Exception
     {
-        Gav gav = new Gav("nodots", "artifact", "1.0", null, "xml", null, null, null, false, false, null, false, null);
+        Gav gav = new Gav("nodots", "artifact", "1.0", null, "xml", null, null, null, false, null, false, null);
         MavenRepository mavenRepository = (MavenRepository) this.getRepositoryRegistry().getRepository( "repo1" );
         ArtifactStoreRequest request = new ArtifactStoreRequest( mavenRepository, gav, true, false );
         
@@ -49,7 +49,7 @@ public class ArtifactStoreRequestTest
     
     public void testDots() throws Exception
     {
-        Gav gav = new Gav("a.bunch.of.dots.yeah", "artifact", "1.0", null, "xml", null, null, null, false, false, null, false, null);
+        Gav gav = new Gav("a.bunch.of.dots.yeah", "artifact", "1.0", null, "xml", null, null, null, false, null, false, null);
         MavenRepository mavenRepository = (MavenRepository) this.getRepositoryRegistry().getRepository( "repo1" );
         ArtifactStoreRequest request = new ArtifactStoreRequest( mavenRepository, gav, true, false );
         
@@ -68,7 +68,7 @@ public class ArtifactStoreRequestTest
     
     public void testGroupStartsWithDot() throws Exception
     {
-        Gav gav = new Gav(".meta/foo/bar", "artifact", "1.0", null, "xml", null, null, null, false, false, null, false, null);
+        Gav gav = new Gav(".meta/foo/bar", "artifact", "1.0", null, "xml", null, null, null, false, null, false, null);
         MavenRepository mavenRepository = (MavenRepository) this.getRepositoryRegistry().getRepository( "repo1" );
         ArtifactStoreRequest request = new ArtifactStoreRequest( mavenRepository, gav, true, false );
         

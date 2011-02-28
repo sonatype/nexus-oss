@@ -188,7 +188,7 @@ public abstract class NexusMockTestCase
 
                 Gav gav =
                     new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(),
-                             0, new Date().getTime(), model.getName(), false, false, null, false, null );
+                             0, new Date().getTime(), model.getName(), false, null, false, null );
 
                 // the Restlet Client does not support multipart forms:
                 // http://restlet.tigris.org/issues/show_bug.cgi?id=71

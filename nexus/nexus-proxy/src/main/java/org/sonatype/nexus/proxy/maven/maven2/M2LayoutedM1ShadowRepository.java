@@ -19,7 +19,6 @@
 package org.sonatype.nexus.proxy.maven.maven2;
 
 import org.apache.maven.index.artifact.GavCalculator;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.index.artifact.M2ArtifactRecognizer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -93,13 +92,11 @@ public class M2LayoutedM1ShadowRepository
     }
 
     protected String transformMaster2Shadow( String path )
-        throws IllegalArtifactCoordinateException
     {
         return transformM1toM2( path );
     }
 
     protected String transformShadow2Master( String path )
-        throws IllegalArtifactCoordinateException
     {
         return transformM2toM1( path );
     }

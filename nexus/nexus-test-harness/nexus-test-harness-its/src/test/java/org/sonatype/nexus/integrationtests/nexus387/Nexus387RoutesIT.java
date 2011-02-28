@@ -50,7 +50,7 @@ public class Nexus387RoutesIT
 
         Gav gav =
             new Gav( this.getTestId() + ".exclusive", "exclusive", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "Simple Test Artifact", false, false, null, false, null );
+                     "Simple Test Artifact", false, null, false, null );
 
         try
         {
@@ -84,7 +84,7 @@ public class Nexus387RoutesIT
 
         Gav gav =
             new Gav( this.getTestId() + ".inclusive", "inclusive", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "Simple Test Artifact", false, false, null, false, null );
+                     "Simple Test Artifact", false, null, false, null );
 
         File artifact = this.downloadArtifactFromGroup( "inclusive-single", gav, "target/downloads/include" );
 
@@ -113,7 +113,7 @@ public class Nexus387RoutesIT
 
         Gav gav =
             new Gav( this.getTestId() + ".blocking", "blocking", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "Simple Test Artifact", false, false, null, false, null );
+                     "Simple Test Artifact", false, null, false, null );
 
         try
         {

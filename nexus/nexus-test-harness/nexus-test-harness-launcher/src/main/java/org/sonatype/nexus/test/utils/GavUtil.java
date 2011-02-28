@@ -23,22 +23,19 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.codehaus.plexus.util.StringUtils;
 
 public class GavUtil
 {
 
     public static Gav newGav( String groupId, String artifactId, String version )
-        throws IllegalArtifactCoordinateException
     {
         return newGav( groupId, artifactId, version, "jar" );
     }
 
     public static Gav newGav( String groupId, String artifactId, String version, String packging )
-        throws IllegalArtifactCoordinateException
     {
-        return new Gav( groupId, artifactId, version, null, packging, null, null, null, false, false, null, false, null );
+        return new Gav( groupId, artifactId, version, null, packging, null, null, null, false, null, false, null );
     }
 
     public static String getRelitivePomPath( Gav gav )

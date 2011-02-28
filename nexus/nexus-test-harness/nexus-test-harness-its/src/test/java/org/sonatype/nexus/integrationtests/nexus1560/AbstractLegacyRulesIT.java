@@ -47,9 +47,9 @@ public abstract class AbstractLegacyRulesIT
         throws Exception
     {
         this.gavArtifact1 =
-            new Gav( "nexus1560", "artifact", "1.0", null, "jar", null, null, null, false, false, null, false, null );
+            new Gav( "nexus1560", "artifact", "1.0", null, "jar", null, null, null, false, null, false, null );
         this.gavArtifact2 =
-            new Gav( "nexus1560", "artifact", "2.0", null, "jar", null, null, null, false, false, null, false, null );
+            new Gav( "nexus1560", "artifact", "2.0", null, "jar", null, null, null, false, null, false, null );
     }
 
     @Override

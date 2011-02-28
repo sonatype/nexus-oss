@@ -32,7 +32,6 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.GavCalculator;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.index.artifact.M2ArtifactRecognizer;
 import org.apache.maven.index.artifact.VersionUtils;
 import org.codehaus.plexus.component.annotations.Component;
@@ -142,19 +141,9 @@ public class M2Repository
                 return true;
             }
         }
+
         // we are using Gav to test the path
-        Gav gav = null;
-
-        try
-        {
-            gav = getGavCalculator().pathToGav( request.getRequestPath() );
-        }
-        catch ( IllegalArtifactCoordinateException e )
-        {
-            getLogger().info( "Illegal artifact path: '" + request.getRequestPath() + "'" + e.getMessage() );
-
-            return false;
-        }
+        final Gav gav = getGavCalculator().pathToGav( request.getRequestPath() );
 
         if ( gav == null )
         {
@@ -244,16 +233,7 @@ public class M2Repository
         }
 
         // we are using Gav to test the path
-        Gav gav = null;
-
-        try
-        {
-            gav = gavCalculator.pathToGav( item.getPath() );
-        }
-        catch ( IllegalArtifactCoordinateException e )
-        {
-            getLogger().info( "Illegal artifact path: '" + item.getPath() + "'" + e.getMessage() );
-        }
+        final Gav gav = getGavCalculator().pathToGav( item.getPath() );
 
         if ( gav == null )
         {

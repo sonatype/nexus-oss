@@ -64,7 +64,7 @@ public class Nexus169ReleaseMetaDataInSnapshotRepoIT
 
         Gav gav =
             new Gav( this.getTestId(), "simple-artifact", "1.0.4", null, "jar", 0, new Date().getTime(),
-                     "Simple Test Artifact", false, false, null, false, null );
+                     "Simple Test Artifact", false, null, false, null );
 
         // try to download it
         boolean fileWasDownloaded = true;

@@ -69,11 +69,11 @@ public class Nexus2351DisableRedeployUploadIT
 
         Gav gav1 =
             new Gav( this.getTestId(), "release-deploy", "1.0.0", null, "jar", 0, new Date().getTime(),
-                "release-deploy", false, false, null, false, null );
+                "release-deploy", false, null, false, null );
 
         Gav gav2 =
             new Gav( this.getTestId(), "release-deploy", "1.0.1", null, "jar", 0, new Date().getTime(),
-                "release-deploy", false, false, null, false, null );
+                "release-deploy", false, null, false, null );
         File mavenProject1 = getTestFile( "maven-project-1" );
         File mavenProject2 = getTestFile( "maven-project-2" );
         this.deployWithMavenExpectSuccess( mavenProject1, repoId );
@@ -112,7 +112,7 @@ public class Nexus2351DisableRedeployUploadIT
 
         Gav gav =
             new Gav( this.getTestId(), "release-deploy", "1.0.0", null, "jar", 0, new Date().getTime(),
-                "release-deploy", false, false, null, false, null );
+                "release-deploy", false, null, false, null );
 
         File fileToDeploy = getTestFile( "artifact.jar" );
 
@@ -146,7 +146,7 @@ public class Nexus2351DisableRedeployUploadIT
 
         Gav gav =
             new Gav( this.getTestId(), "disableReleaseReadOnlyWithUploadTest", "1.0.0", null, "jar", 0,
-                new Date().getTime(), "disableReleaseReadOnlyWithUploadTest", false, false, null, false, null );
+                new Date().getTime(), "disableReleaseReadOnlyWithUploadTest", false, null, false, null );
 
         File fileToDeploy = getTestFile( "artifact.jar" );
 
@@ -180,7 +180,7 @@ public class Nexus2351DisableRedeployUploadIT
 
         Gav gav =
             new Gav( this.getTestId(), "disableReleaseNoRedeployTest", "1.0.0", null, "jar", 0, new Date().getTime(),
-                "disableReleaseNoRedeployTest", false, false, null, false, null );
+                "disableReleaseNoRedeployTest", false, null, false, null );
 
         File fileToDeploy = getTestFile( "artifact.jar" );
 
@@ -200,11 +200,11 @@ public class Nexus2351DisableRedeployUploadIT
 
         Gav gav1 =
             new Gav( this.getTestId(), "release-deploy", "1.0.0", null, "jar", 0, new Date().getTime(),
-                "disableReleaseNoRedeployTest", false, false, null, false, null );
+                "disableReleaseNoRedeployTest", false, null, false, null );
 
         Gav gav2 =
             new Gav( this.getTestId(), "release-deploy", "1.0.1", null, "jar", 0, new Date().getTime(),
-                "disableReleaseNoRedeployTest", false, false, null, false, null );
+                "disableReleaseNoRedeployTest", false, null, false, null );
 
         File mavenProject1 = getTestFile( "maven-project-1" );
         File mavenProject2 = getTestFile( "maven-project-2" );

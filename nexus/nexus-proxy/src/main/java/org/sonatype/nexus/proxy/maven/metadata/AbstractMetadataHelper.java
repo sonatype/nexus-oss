@@ -32,7 +32,6 @@ import java.util.zip.ZipInputStream;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.GavCalculator;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.index.artifact.M2ArtifactRecognizer;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -168,17 +167,7 @@ abstract public class AbstractMetadataHelper
         String n = null;
         n = path.substring( path.lastIndexOf( '/' ) + 1 );
 
-        Gav gav = null;
-
-        try
-        {
-            gav = getGavCalculator().pathToGav( path );
-        }
-        catch ( IllegalArtifactCoordinateException e )
-        {
-            // not a M2 artifact
-            gav = null;
-        }
+        final Gav gav = getGavCalculator().pathToGav( path );
 
         if ( gav != null )
         {

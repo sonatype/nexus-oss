@@ -28,7 +28,6 @@ import java.util.Properties;
 import java.util.TimeZone;
 
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.index.context.IndexingContext;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.GavUtil;
@@ -72,7 +71,6 @@ public abstract class AbstractDeleteArtifactsIT
     //@BeforeClass
     @BeforeMethod
     public void init()
-        throws IllegalArtifactCoordinateException
     {
         artifact = getTestFile( "artifact.jar" );
         artifact1v1 = GavUtil.newGav( "nexus1954", "artifact1", "1.0" );

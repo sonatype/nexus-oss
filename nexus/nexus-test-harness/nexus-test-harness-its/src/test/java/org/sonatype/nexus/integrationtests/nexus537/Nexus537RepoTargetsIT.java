@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.restlet.data.Method;
@@ -102,32 +101,32 @@ public class Nexus537RepoTargetsIT
 
     
     @BeforeClass
-    public void setSecureTest() throws IllegalArtifactCoordinateException{    
+    public void setSecureTest() {    
         repo1BarArtifact =
             new Gav( this.getTestId(), "repo1-bar-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo1-bar-artifact", false, false, null, false, null );
+                     "repo1-bar-artifact", false, null, false, null );
         repo1FooArtifact =
             new Gav( this.getTestId(), "repo1-foo-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo1-foo-artifact", false, false, null, false, null );
+                     "repo1-foo-artifact", false, null, false, null );
         repo2BarArtifact =
             new Gav( this.getTestId(), "repo2-bar-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo2-bar-artifact", false, false, null, false, null );
+                     "repo2-bar-artifact", false, null, false, null );
         repo2FooArtifact =
             new Gav( this.getTestId(), "repo2-foo-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo2-foo-artifact", false, false, null, false, null );
+                     "repo2-foo-artifact", false, null, false, null );
 
         repo1BarArtifactDelete =
             new Gav( this.getTestId(), "repo1-bar-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo1-bar-artifact-delete", false, false, null, false, null );
+                     "repo1-bar-artifact-delete", false, null, false, null );
         repo1FooArtifactDelete =
             new Gav( this.getTestId(), "repo1-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo1-foo-artifact-delete", false, false, null, false, null );
+                     "repo1-foo-artifact-delete", false, null, false, null );
         repo2BarArtifactDelete =
             new Gav( this.getTestId(), "repo2-bar-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo2-bar-artifact-delete", false, false, null, false, null );
+                     "repo2-bar-artifact-delete", false, null, false, null );
         repo2FooArtifactDelete =
             new Gav( this.getTestId(), "repo2-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo2-foo-artifact-delete", false, false, null, false, null );
+                     "repo2-foo-artifact-delete", false, null, false, null );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 

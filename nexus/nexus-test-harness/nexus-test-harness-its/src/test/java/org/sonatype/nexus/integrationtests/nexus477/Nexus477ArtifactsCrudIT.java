@@ -51,7 +51,7 @@ public class Nexus477ArtifactsCrudIT
         throws Exception
     {
         Gav gav =
-            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
+            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false,
                      null, false, null );
 
         // Grab File used to deploy
@@ -86,7 +86,7 @@ public class Nexus477ArtifactsCrudIT
         throws Exception
     {
         Gav gav =
-            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
+            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, 
                      null, false, null );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -121,7 +121,7 @@ public class Nexus477ArtifactsCrudIT
         this.overwriteUserRole( "test-user", "read-test-role", "1" );
 
         Gav gav =
-            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
+            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, 
                      null, false, null );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );

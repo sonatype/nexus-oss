@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.index.artifact.VersionUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -104,16 +103,7 @@ public abstract class AbstractArtifactPlexusResource
             c = null;
         }
 
-        Gav gav = null;
-
-        try
-        {
-            gav = new Gav( g, a, v, c, e, null, null, null, VersionUtils.isSnapshot( v ), false, null, false, null );
-        }
-        catch ( IllegalArtifactCoordinateException ex )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Illegal artifact coordinate.", ex );
-        }
+        Gav gav = new Gav( g, a, v, c, e, null, null, null, false, null, false, null );
 
         ArtifactStoreRequest result = new ArtifactStoreRequest( mavenRepository, gav, localOnly, remoteOnly );
         

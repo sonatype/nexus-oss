@@ -26,8 +26,6 @@ import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.IteratorResultSet;
 import org.apache.maven.index.MatchHighlight;
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
-import org.apache.maven.index.artifact.VersionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Request;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -180,7 +178,7 @@ public abstract class AbstractIndexerNexusPlexusResource
                     Gav gav =
                         new Gav( ai.groupId, ai.artifactId, ai.version, ai.classifier,
                             mavenRepository.getArtifactPackagingMapper().getExtensionForPackaging( ai.packaging ),
-                            null, null, null, VersionUtils.isSnapshot( ai.version ), false, null, false, null );
+                            null, null, null, false, null, false, null );
 
                     ResourceStoreRequest req =
                         new ResourceStoreRequest( mavenRepository.getGavCalculator().gavToPath( gav ) );
@@ -191,12 +189,6 @@ public abstract class AbstractIndexerNexusPlexusResource
             catch ( NoSuchRepositoryException e )
             {
                 getLogger().warn( "No such repository: '" + ai.repository + "'.", e );
-
-                return null;
-            }
-            catch ( IllegalArtifactCoordinateException e )
-            {
-                getLogger().warn( "Illegal artifact coordinate.", e );
 
                 return null;
             }

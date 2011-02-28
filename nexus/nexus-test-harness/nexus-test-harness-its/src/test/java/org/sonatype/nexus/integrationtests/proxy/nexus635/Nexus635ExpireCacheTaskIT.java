@@ -40,7 +40,7 @@ public class Nexus635ExpireCacheTaskIT
 {
 
     private Gav GAV =
-        new Gav( "nexus635", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, true, false, null, false, null );
+        new Gav( "nexus635", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, false, null, false, null );
 
     public Nexus635ExpireCacheTaskIT()
         throws Exception

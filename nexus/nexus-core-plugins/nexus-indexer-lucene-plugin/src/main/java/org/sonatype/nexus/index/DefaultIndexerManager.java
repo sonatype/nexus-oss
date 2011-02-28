@@ -60,7 +60,6 @@ import org.apache.maven.index.MatchHighlightRequest;
 import org.apache.maven.index.NexusIndexer;
 import org.apache.maven.index.SearchType;
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.index.artifact.VersionUtils;
 import org.apache.maven.index.context.ContextMemberProvider;
 import org.apache.maven.index.context.DefaultIndexingContext;
@@ -595,16 +594,7 @@ public class DefaultIndexerManager
             // by calculating GAV we check wether the request is against a repo artifact at all
             Gav gav = null;
 
-            try
-            {
-                gav =
-                    ( (MavenRepository) repository ).getGavCalculator().pathToGav(
-                        item.getRepositoryItemUid().getPath() );
-            }
-            catch ( IllegalArtifactCoordinateException e )
-            {
-                gav = null;
-            }
+            gav = ( (MavenRepository) repository ).getGavCalculator().pathToGav( item.getRepositoryItemUid().getPath() );
 
             // signatures and hashes are not considered for processing
             // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
@@ -635,7 +625,7 @@ public class DefaultIndexerManager
                         {
                             ac = artifactContextProducer.getArtifactContext( context, file );
                         }
-                        catch ( IllegalArtifactCoordinateException e )
+                        catch ( IllegalArgumentException e )
                         {
                             // cannot create artifact context, forget it
                             return;
@@ -706,16 +696,7 @@ public class DefaultIndexerManager
             // by calculating GAV we check wether the request is against a repo artifact at all
             Gav gav = null;
 
-            try
-            {
-                gav =
-                    ( (MavenRepository) repository ).getGavCalculator().pathToGav(
-                        item.getRepositoryItemUid().getPath() );
-            }
-            catch ( IllegalArtifactCoordinateException e )
-            {
-                gav = null;
-            }
+            gav = ( (MavenRepository) repository ).getGavCalculator().pathToGav( item.getRepositoryItemUid().getPath() );
 
             // signatures and hashes are not considered for processing
             // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
@@ -741,7 +722,7 @@ public class DefaultIndexerManager
             {
                 ac = new ArtifactContext( null, null, null, ai, gav );
             }
-            catch ( IllegalArtifactCoordinateException e )
+            catch ( IllegalArgumentException e )
             {
                 // ac cannot be created, just forget it being indexed
                 return;

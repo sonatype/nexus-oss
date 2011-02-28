@@ -49,7 +49,7 @@ public abstract class Nexus1329AbstractCheckOnlyOneMirror
         server.start();
 
         Gav gav =
-            new Gav( "nexus1329", "sample", "1.0.0", null, "xml", null, null, null, false, false, null, false, null );
+            new Gav( "nexus1329", "sample", "1.0.0", null, "xml", null, null, null, false, null, false, null );
 
         File artifactFile = this.downloadArtifactFromRepository( REPO, gav, "./target/downloads/nexus1329" );
 

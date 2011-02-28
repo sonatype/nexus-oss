@@ -23,7 +23,6 @@ import java.io.IOException;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.model.Model;
 
 /**
@@ -39,8 +38,7 @@ public interface MetadataLocator
      * @param request
      * @return
      */
-    Gav getGavForRequest( ArtifactStoreRequest request )
-        throws IllegalArtifactCoordinateException;
+    Gav getGavForRequest( ArtifactStoreRequest request );
 
     /**
      * Constructs a Plugin elem for given request. It returns null if the artifacts's POM pointed out by request is not

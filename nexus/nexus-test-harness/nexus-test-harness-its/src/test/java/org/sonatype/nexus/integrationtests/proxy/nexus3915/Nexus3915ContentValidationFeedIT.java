@@ -8,7 +8,6 @@ import java.io.FileNotFoundException;
 import java.util.List;
 
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
@@ -30,7 +29,6 @@ public class Nexus3915ContentValidationFeedIT
 
     @BeforeMethod
     public void createGAV()
-        throws IllegalArtifactCoordinateException
     {
         gav = GavUtil.newGav( "nexus3915", "artifact", "1.0.0" );
     }

@@ -25,7 +25,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.index.artifact.VersionUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -55,19 +54,19 @@ public class DefaultMetadataManager
     private MetadataLocator metadataLocator;
 
     public void deployArtifact( ArtifactStoreRequest request )
-        throws IOException, IllegalArtifactCoordinateException
+        throws IOException
     {
         metadataUpdater.deployArtifact( request );
     }
 
     public void undeployArtifact( ArtifactStoreRequest request )
-        throws IOException, IllegalArtifactCoordinateException
+        throws IOException
     {
         metadataUpdater.undeployArtifact( request );
     }
 
     public Gav resolveArtifact( ArtifactStoreRequest gavRequest )
-        throws IOException, IllegalArtifactCoordinateException
+        throws IOException
     {
         MavenRepository repository = gavRequest.getMavenRepository();
 
@@ -81,8 +80,7 @@ public class DefaultMetadataManager
             gav =
                 new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(),
                     RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) ? "1-SNAPSHOT" : "1",
-                    gavRequest.getClassifier(), gavRequest.getExtension(), null, null, null,
-                    RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ), false, null, false, null );
+                    gavRequest.getClassifier(), gavRequest.getExtension(), null, null, null, false, null, false, null );
 
             version = resolveLatest( gavRequest, gav );
         }
@@ -92,8 +90,7 @@ public class DefaultMetadataManager
             gav =
                 new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(),
                     RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) ? "1-SNAPSHOT" : "1",
-                    gavRequest.getClassifier(), gavRequest.getExtension(), null, null, null,
-                    RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ), false, null, false, null );
+                    gavRequest.getClassifier(), gavRequest.getExtension(), null, null, null, false, null, false, null );
 
             version = resolveRelease( gavRequest, gav );
         }
@@ -107,7 +104,7 @@ public class DefaultMetadataManager
         {
             gav =
                 new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), version, gavRequest.getClassifier(),
-                    gavRequest.getExtension(), null, null, null, VersionUtils.isSnapshot( version ), false, null,
+                    gavRequest.getExtension(), null, null, null, false, null,
                     false, null );
 
             // if it is not "timestamped" version, try to get it
@@ -237,7 +234,7 @@ public class DefaultMetadataManager
     }
 
     public Gav resolveSnapshot( ArtifactStoreRequest gavRequest, Gav gav )
-        throws IOException, IllegalArtifactCoordinateException
+        throws IOException
     {
         MavenRepository repository = gavRequest.getMavenRepository();
 
@@ -283,7 +280,7 @@ public class DefaultMetadataManager
 
             Gav result =
                 new Gav( gav.getGroupId(), gav.getArtifactId(), latest, gav.getClassifier(), gav.getExtension(),
-                    gav.getSnapshotBuildNumber(), gav.getSnapshotTimeStamp(), gav.getName(), gav.isSnapshot(),
+                    gav.getSnapshotBuildNumber(), gav.getSnapshotTimeStamp(), gav.getName(),
                     gav.isHash(), gav.getHashType(), gav.isSignature(), gav.getSignatureType() );
 
             return result;

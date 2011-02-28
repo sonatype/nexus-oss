@@ -38,10 +38,10 @@ public class Nexus782UploadWithClassifierIT
 {
 
     private Gav artifactGav = new Gav( this.getTestId(), "same-pom", "1.2.5", null, "jar", 0, new Date().getTime(),
-                                       "same-pom", false, false, null, false, null );
+                                       "same-pom", false, null, false, null );
 
     private Gav artifactClassifierGav = new Gav( this.getTestId(), "same-pom", "1.2.5", "CLASSIFIER", "jar", 0,
-                                                 new Date().getTime(), "same-pom", false, false, null, false, null );
+                                                 new Date().getTime(), "same-pom", false, null, false, null );
 
     public Nexus782UploadWithClassifierIT()
         throws Exception

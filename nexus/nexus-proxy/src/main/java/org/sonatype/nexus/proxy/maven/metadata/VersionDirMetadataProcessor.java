@@ -29,7 +29,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.index.artifact.M2GavCalculator;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
@@ -103,10 +102,6 @@ public class VersionDirMetadataProcessor
 
             return md;
         }
-        catch ( IllegalArtifactCoordinateException e )
-        {
-            throw new IOException( e );
-        }
         catch ( MetadataException e )
         {
             throw new IOException( e );
@@ -114,7 +109,6 @@ public class VersionDirMetadataProcessor
     }
 
     private Collection<Gav> getGavs( String path, Collection<String> items )
-        throws IllegalArtifactCoordinateException
     {
         if ( !path.endsWith( "/" ) )
         {
@@ -126,8 +120,11 @@ public class VersionDirMetadataProcessor
         Collections.sort( (ArrayList<String>) items );
         for ( String item : items )
         {
-            Gav gav = calc.pathToGav( path + item );
-            gavs.add( gav );
+            final Gav gav = calc.pathToGav( path + item );
+            if ( gav != null )
+            {
+                gavs.add( gav );
+            }
         }
 
         return gavs;

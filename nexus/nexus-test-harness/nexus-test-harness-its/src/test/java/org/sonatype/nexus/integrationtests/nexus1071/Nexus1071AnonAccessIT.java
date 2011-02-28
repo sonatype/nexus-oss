@@ -50,7 +50,7 @@ public class Nexus1071AnonAccessIT
         throws Exception
     {
         Gav gav =
-            new Gav( this.getTestId(), "release-jar", "1", null, "jar", 0, new Date().getTime(), "Release Jar", false,
+            new Gav( this.getTestId(), "release-jar", "1", null, "jar", 0, new Date().getTime(), "Release Jar", 
                      false, null, false, null );
 
         File artifact = this.downloadArtifactFromGroup( "public", gav, "./target/downloaded-jars" );
@@ -77,7 +77,7 @@ public class Nexus1071AnonAccessIT
 
         Gav gav =
             new Gav( this.getTestId(), "release-jar-internal", "1", null, "jar", 0, new Date().getTime(),
-                     "Release Jar Internal", false, false, null, false, null );
+                     "Release Jar Internal", false, null, false, null );
         try
         {
             downloadArtifactFromRepository( "Internal", gav, "./target/downloaded-jars" );

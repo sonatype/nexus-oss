@@ -250,7 +250,7 @@ public class Nexus383SearchNGIT
 
         Gav gav =
             new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(), 0,
-                     new Date().getTime(), model.getName(), false, false, null, false, null );
+                     new Date().getTime(), model.getName(), false, null, false, null );
 
         // Multi repository deploy
         getDeployUtils().deployWithWagon( "http", deployUrl, fileToDeploy, this.getRelitiveArtifactPath( gav ) );

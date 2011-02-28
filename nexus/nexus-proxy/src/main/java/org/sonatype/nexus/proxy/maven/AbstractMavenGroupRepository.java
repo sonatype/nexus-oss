@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.maven.index.artifact.ArtifactPackagingMapper;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -71,7 +70,7 @@ public abstract class AbstractMavenGroupRepository
         {
             repositoryKind =
                 new DefaultRepositoryKind( GroupRepository.class,
-                                           Arrays.asList( new Class<?>[] { MavenGroupRepository.class } ) );
+                    Arrays.asList( new Class<?>[] { MavenGroupRepository.class } ) );
         }
         return repositoryKind;
     }
@@ -112,7 +111,7 @@ public abstract class AbstractMavenGroupRepository
         {
             return false;
         }
-        
+
         boolean result = false;
 
         for ( Repository repository : getMemberRepositories() )
@@ -134,14 +133,14 @@ public abstract class AbstractMavenGroupRepository
     public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
     {
         throw new UnsupportedOperationException(
-                                                 "Setting repository policy on a Maven group repository is not possible!" );
+            "Setting repository policy on a Maven group repository is not possible!" );
     }
-    
+
     public boolean isMavenArtifact( StorageItem item )
     {
         return isMavenArtifactPath( item.getPath() );
     }
-    
+
     public boolean isMavenMetadata( StorageItem item )
     {
         return isMavenMetadataPath( item.getPath() );
@@ -149,16 +148,7 @@ public abstract class AbstractMavenGroupRepository
 
     public boolean isMavenArtifactPath( String path )
     {
-        try
-        {
-            return getGavCalculator().pathToGav( path ) != null;
-        }
-        catch ( IllegalArtifactCoordinateException e )
-        {
-            // ignore it
-        }
-
-        return false;
+        return getGavCalculator().pathToGav( path ) != null;
     }
 
     public abstract boolean isMavenMetadataPath( String path );

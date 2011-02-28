@@ -58,7 +58,7 @@ public class Nexus175SnapshotDeployWrongPasswordIT
 
         // GAV
         Gav gav =
-            new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "", false,
+            new Gav( this.getTestId(), "artifact", "1.0.0-SNAPSHOT", null, "xml", 0, new Date().getTime(), "", 
                      false, null, false, null );
 
         // file to deploy

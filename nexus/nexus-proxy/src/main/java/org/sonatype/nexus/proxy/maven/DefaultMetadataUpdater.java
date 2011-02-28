@@ -27,7 +27,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -55,7 +54,7 @@ public class DefaultMetadataUpdater
     private MetadataLocator locator;
 
     public void deployArtifact( ArtifactStoreRequest request )
-        throws IOException, IllegalArtifactCoordinateException
+        throws IOException
     {
         if ( request.getGav().isHash() || request.getGav().isSignature()
             || StringUtils.isNotBlank( request.getGav().getClassifier() ) )
@@ -148,7 +147,7 @@ public class DefaultMetadataUpdater
     }
 
     public void undeployArtifact( ArtifactStoreRequest request )
-        throws IOException, IllegalArtifactCoordinateException
+        throws IOException
     {
         if ( request.getGav().isHash() || request.getGav().isSignature()
             || StringUtils.isNotBlank( request.getGav().getClassifier() ) )

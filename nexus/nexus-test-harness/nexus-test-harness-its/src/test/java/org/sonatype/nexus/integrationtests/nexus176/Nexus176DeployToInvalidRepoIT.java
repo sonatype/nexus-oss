@@ -59,7 +59,7 @@ public class Nexus176DeployToInvalidRepoIT
        
         Gav gav =
             new Gav( this.getTestId(), "simpleArtifact", "1.0.0", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null );
+                     new Date().getTime(), "Simple Test Artifact", false, null, false, null );
 
         // file to deploy
         File fileToDeploy =
@@ -102,7 +102,7 @@ public class Nexus176DeployToInvalidRepoIT
 
         Gav gav =
             new Gav( this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null  );
+                     new Date().getTime(), "Simple Test Artifact", false, null, false, null  );
 
         // file to deploy
         File fileToDeploy =
@@ -148,7 +148,7 @@ public class Nexus176DeployToInvalidRepoIT
 
         Gav gav =
             new Gav( this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null  );
+                     new Date().getTime(), "Simple Test Artifact", false, null, false, null  );
 
         // file to deploy
         File fileToDeploy =
@@ -193,7 +193,7 @@ public class Nexus176DeployToInvalidRepoIT
        
         Gav gav =
             new Gav( this.getTestId(), "simpleArtifact", "1.0.0-SNAPSHOT", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null  );
+                     new Date().getTime(), "Simple Test Artifact", false, null, false, null  );
 
         // file to deploy
         File fileToDeploy =
@@ -236,7 +236,7 @@ public class Nexus176DeployToInvalidRepoIT
 
         Gav gav =
             new Gav( this.getTestId(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null  );
+                     new Date().getTime(), "Simple Test Artifact", false, null, false, null  );
 
         // file to deploy
         File fileToDeploy =
@@ -282,7 +282,7 @@ public class Nexus176DeployToInvalidRepoIT
 
         Gav gav =
             new Gav( this.getTestId(), "uploadWithGav", "1.0.0-SNAPSHOT", null, "xml", 0,
-                     new Date().getTime(), "Simple Test Artifact", false, false, null, false, null  );
+                     new Date().getTime(), "Simple Test Artifact", false, null, false, null  );
 
         // file to deploy
         File fileToDeploy =

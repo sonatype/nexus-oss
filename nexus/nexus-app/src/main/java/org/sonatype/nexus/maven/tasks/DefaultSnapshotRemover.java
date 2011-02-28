@@ -655,7 +655,7 @@ public class DefaultSnapshotRemover
 
                             Gav releaseGav =
                                 new Gav( snapshotGav.getGroupId(), snapshotGav.getArtifactId(), releaseVersion,
-                                    snapshotGav.getClassifier(), snapshotGav.getExtension(), null, null, null, false, // snapshot
+                                    snapshotGav.getClassifier(), snapshotGav.getExtension(), null, null, null, 
                                     false, null, false, null );
 
                             String path = mrepository.getGavCalculator().gavToPath( releaseGav );

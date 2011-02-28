@@ -54,24 +54,24 @@ public class Nexus3615MavenInfoIT
     {
         // deploy releases
         Gav simpleJarGav =
-            new Gav( "nexus3615", "simpleJar", "1.0.1", null, "jar", null, null, null, false, false, null, false, null );
+            new Gav( "nexus3615", "simpleJar", "1.0.1", null, "jar", null, null, null, false, null, false, null );
         deployGav( simpleJarGav, getTestRepositoryId() );
         downloadAndVerify( simpleJarGav, getTestRepositoryId() );
 
         Gav withClassifierGav =
-            new Gav( "nexus3615", "simpleJar", "1.0.1", "classifier", "jar", null, null, null, false, false, null,
+            new Gav( "nexus3615", "simpleJar", "1.0.1", "classifier", "jar", null, null, null, false, null,
                 false, null );
         deployGav( withClassifierGav, getTestRepositoryId() );
         downloadAndVerify( withClassifierGav, getTestRepositoryId() );
 
         Gav withExtentionGav =
-            new Gav( "nexus3615", "simpleJar", "1.0.1", null, "extention", null, null, null, false, false, null, false,
+            new Gav( "nexus3615", "simpleJar", "1.0.1", null, "extention", null, null, null, false, null, false,
                 null );
         deployGav( withExtentionGav, getTestRepositoryId() );
         downloadAndVerify( withExtentionGav, getTestRepositoryId() );
 
         Gav withClassifierAndExtentionGav =
-            new Gav( "nexus3615", "simpleJar", "1.0.1", "classifier", "extention", null, null, null, false, false,
+            new Gav( "nexus3615", "simpleJar", "1.0.1", "classifier", "extention", null, null, null, false,
                 null, false, null );
         deployGav( withClassifierAndExtentionGav, getTestRepositoryId() );
         downloadAndVerify( withClassifierAndExtentionGav, getTestRepositoryId() );
@@ -89,25 +89,25 @@ public class Nexus3615MavenInfoIT
         // deploy releases
         Gav simpleJarGav =
             new Gav( "nexus3615", "simpleJar", "1.0.1-SNAPSHOT", null, "jar", 1, System.currentTimeMillis(), null,
-                true, false, null, false, null );
+                false, null, false, null );
         deployGav( simpleJarGav, REPO_TEST_HARNESS_SNAPSHOT_REPO );
         downloadAndVerify( simpleJarGav, REPO_TEST_HARNESS_SNAPSHOT_REPO );
 
         Gav withClassifierGav =
             new Gav( "nexus3615", "simpleJar", "1.0.1-SNAPSHOT", "classifier", "jar", 2, System.currentTimeMillis(),
-                null, true, false, null, false, null );
+                null, false, null, false, null );
         deployGav( withClassifierGav, REPO_TEST_HARNESS_SNAPSHOT_REPO );
         downloadAndVerify( withClassifierGav, REPO_TEST_HARNESS_SNAPSHOT_REPO );
 
         Gav withExtentionGav =
             new Gav( "nexus3615", "simpleJar", "1.0.1-SNAPSHOT", null, "extention", 3, System.currentTimeMillis(),
-                null, true, false, null, false, null );
+                null, false, null, false, null );
         deployGav( withExtentionGav, REPO_TEST_HARNESS_SNAPSHOT_REPO );
         downloadAndVerify( withExtentionGav, REPO_TEST_HARNESS_SNAPSHOT_REPO );
 
         Gav withClassifierAndExtentionGav =
             new Gav( "nexus3615", "simpleJar", "1.0.1-SNAPSHOT", "classifier", "extention", 4,
-                System.currentTimeMillis(), null, true, false, null, false, null );
+                System.currentTimeMillis(), null, false, null, false, null );
         deployGav( withClassifierAndExtentionGav, REPO_TEST_HARNESS_SNAPSHOT_REPO );
         downloadAndVerify( withClassifierAndExtentionGav, REPO_TEST_HARNESS_SNAPSHOT_REPO );
     }
@@ -141,12 +141,12 @@ public class Nexus3615MavenInfoIT
         throws Exception
     {
         Gav releaseNotFoundGav =
-            new Gav( "nexus3615", "notFound", "1.0.1", null, "jar", null, null, null, false, false, null, false, null );
+            new Gav( "nexus3615", "notFound", "1.0.1", null, "jar", null, null, null, false, null, false, null );
         Response response = downloadView( releaseNotFoundGav, "maven2", getTestRepositoryId() );
         Assert.assertEquals( response.getStatus().getCode(), 404, "Status found: " + response.getStatus() );
 
         Gav snapshotNotFoundGav =
-            new Gav( "nexus3615", "notFound", "1.0.1-SNAPSHOT", null, "jar", 1, System.currentTimeMillis(), null, true,
+            new Gav( "nexus3615", "notFound", "1.0.1-SNAPSHOT", null, "jar", 1, System.currentTimeMillis(), null, 
                 false, null, false, null );
         response = downloadView( snapshotNotFoundGav, "maven2", getTestRepositoryId() );
         Assert.assertEquals( response.getStatus().getCode(), 404, "Status found: " + response.getStatus() );

@@ -66,7 +66,7 @@ public class Nexus179RemoteRepoDownIT
 
         Gav gav =
             new Gav( this.getTestId(), "repo-down-test-artifact", "1.0.0", null, "xml", 0, new Date().getTime(),
-                     "Simple Test Artifact", false, false, null, false, null );
+                     "Simple Test Artifact", false, null, false, null );
 
         File localFile = this.getLocalFile( REPO_RELEASE_PROXY_REPO1, gav );
 
