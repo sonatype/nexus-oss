@@ -6,3 +6,5 @@
 .settings/
 .classpath
 target/
+.DS_Store
+security-model-xml/.DS_Store
