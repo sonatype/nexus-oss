@@ -15,6 +15,7 @@ package org.sonatype.security.authorization.xml;
 import java.util.List;
 
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 
 public class DefaultPrivilegeInheritanceManagerTest
@@ -26,7 +27,7 @@ public class DefaultPrivilegeInheritanceManagerTest
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( true );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
     
     protected void setUp()

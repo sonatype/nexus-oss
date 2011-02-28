@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.sonatype.security.model.CPrivilege;
@@ -29,7 +30,7 @@ public class ResourceMergingConfigurationManagerTest
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( true );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
     
     @Override

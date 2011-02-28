@@ -30,12 +30,6 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 public class SecurityXmlUserLocatorTest
     extends AbstractSecurityTestCase
 {
-
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        configuration.setClassPathScanning( true );
-    }
     
     public UserManager getUserManager()
         throws Exception

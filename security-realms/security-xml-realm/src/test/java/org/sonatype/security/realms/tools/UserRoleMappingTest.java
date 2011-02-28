@@ -19,6 +19,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
@@ -32,7 +33,7 @@ public class UserRoleMappingTest
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( true );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
     
     public ConfigurationManager getConfigManager()

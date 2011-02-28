@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
@@ -26,7 +27,7 @@ public abstract class AbstractWebSecurityTest
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( true );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
     
     @Override

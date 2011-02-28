@@ -17,7 +17,7 @@ import org.slf4j.Logger;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 
-import com.google.inject.internal.Nullable;
+import org.sonatype.inject.Nullable;
 
 /**
  * Componentize the Shiro DefaultSecurityManager, and sets up caching.

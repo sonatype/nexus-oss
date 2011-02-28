@@ -18,6 +18,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -34,7 +35,7 @@ public class DefaultConfigurationValidatorTest
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( true );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
     
     public void setUp()
