@@ -132,6 +132,10 @@
               <classifier>bundle</classifier>
               <type>zip</type>
             </plugin>
+            <jar>
+              <groupId>org.sonatype.security.realms</groupId>
+              <artifactId>security-url-realm</artifactId>
+            </jar>
           </nexusPluginsArtifacts>
         </configuration>
       </plugin>
@@ -224,6 +228,13 @@
     </dependency>
 
     <!-- Deps needed by some ITs (they use classes from these below) -->
+
+    <!-- NEXUS-2862 -->
+    <dependency>
+      <groupId>org.sonatype.security.realms</groupId>
+      <artifactId>security-url-realm</artifactId>
+      <version>${plexus-security.version}</version>
+    </dependency>
 
     <!-- NEXUS-2490 -->
     <dependency>
