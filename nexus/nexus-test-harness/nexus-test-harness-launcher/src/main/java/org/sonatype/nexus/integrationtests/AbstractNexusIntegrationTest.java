@@ -47,6 +47,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -60,7 +61,6 @@ import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.sonatype.inject.BeanScanning;
 import org.sonatype.nexus.rt.boot.ITAppBooterCustomizer;
 import org.sonatype.nexus.rt.prefs.FilePreferencesFactory;
 import org.sonatype.nexus.test.utils.DeployUtils;
@@ -522,16 +522,20 @@ public abstract class AbstractNexusIntegrationTest
         throws IOException
     {
         this.copyConfigFile( "nexus.xml", WORK_CONF_DIR );
-        
-        // this is comment out for now, this has been moved into an upgrade step, that will get hit the same system property is set
-        // we might need to enable this if we have any nexus.xml with version 1.4.5 (which would NOT hit the upgrade step)
+
+        // this is comment out for now, this has been moved into an upgrade step, that will get hit the same system
+        // property is set
+        // we might need to enable this if we have any nexus.xml with version 1.4.5 (which would NOT hit the upgrade
+        // step)
         // now we need to filter the nexus.xml to potentially change the default http provider
-//        if( System.getProperty( RemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY ) != null)
-//        {
-//            String providerString = "<provider>" + System.getProperty( RemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY ) + "</provider>";
-//            this.findReplaceInFile( new File( WORK_CONF_DIR, "nexus.xml" ), "<provider>apacheHttpClient3x</provider>", providerString );
-//        }
-        
+        // if( System.getProperty( RemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY ) != null)
+        // {
+        // String providerString = "<provider>" + System.getProperty(
+        // RemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY ) + "</provider>";
+        // this.findReplaceInFile( new File( WORK_CONF_DIR, "nexus.xml" ), "<provider>apacheHttpClient3x</provider>",
+        // providerString );
+        // }
+
         // copy security config
         this.copyConfigFile( "security.xml", WORK_CONF_DIR );
         this.copyConfigFile( "security-configuration.xml", WORK_CONF_DIR );
@@ -539,28 +543,29 @@ public abstract class AbstractNexusIntegrationTest
         this.copyConfigFile( "log4j.properties", WORK_CONF_DIR );
     }
 
-    protected void findReplaceInFile( File file, String findString, String replaceString ) throws IOException
+    protected void findReplaceInFile( File file, String findString, String replaceString )
+        throws IOException
     {
         BufferedReader bufferedFileReader = new BufferedReader( new FileReader( file ) );
         File tmpFile = new File( file.getAbsolutePath() + "-tmp" );
-        
+
         FileWriter writer = null;
-        
+
         try
         {
             writer = new FileWriter( tmpFile );
-            
+
             String line = null;
-            while( ( line = bufferedFileReader.readLine()) != null)
+            while ( ( line = bufferedFileReader.readLine() ) != null )
             {
                 writer.write( line.replaceAll( findString, replaceString ) );
                 writer.write( "\n" ); // new line
             }
-            
+
             // close the streams and move the file
             IOUtil.close( bufferedFileReader );
             IOUtil.close( writer );
-            
+
             FileUtils.rename( tmpFile, file );
         }
         finally
@@ -568,9 +573,9 @@ public abstract class AbstractNexusIntegrationTest
             IOUtil.close( bufferedFileReader );
             IOUtil.close( writer );
         }
-        
+
     }
-    
+
     protected static void cleanWorkDir()
         throws Exception
     {
@@ -1326,7 +1331,7 @@ public abstract class AbstractNexusIntegrationTest
                 baseClass.getName().replace( '.', '/' ) + ".xml" );
 
         containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( BeanScanning.ON.name() );
+        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_ON );
 
         customizeContainerConfiguration( containerConfiguration );
 

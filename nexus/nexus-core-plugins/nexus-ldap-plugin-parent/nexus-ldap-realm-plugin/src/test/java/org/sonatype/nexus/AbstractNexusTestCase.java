@@ -27,12 +27,12 @@ import java.io.OutputStream;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.sonatype.inject.BeanScanning;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.security.ldap.realms.api.LdapRealmPlexusResourceConst;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
@@ -47,7 +47,7 @@ public abstract class AbstractNexusTestCase
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
         configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( BeanScanning.ON.name() );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
     }
 
     public static final String RUNTIME_CONFIGURATION_KEY = "runtime";

@@ -23,12 +23,10 @@ import java.io.FileOutputStream;
 import java.io.StringWriter;
 import java.util.TimeZone;
 
-import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
-import org.sonatype.inject.BeanScanning;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
@@ -40,14 +38,6 @@ import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 public class DefaultApplicationConfigurationUpgraderTest
     extends AbstractNexusTestCase
 {
-
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( BeanScanning.ON.name() );
-    }
-
     protected ApplicationConfigurationUpgrader configurationUpgrader;
 
     private FileSecurityConfigurationSource securitySource;

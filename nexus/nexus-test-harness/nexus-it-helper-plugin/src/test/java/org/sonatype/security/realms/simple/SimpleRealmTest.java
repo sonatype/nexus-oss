@@ -33,10 +33,10 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.inject.BeanScanning;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.realms.tools.ConfigurationManager;
@@ -49,7 +49,7 @@ public class SimpleRealmTest
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
         configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( BeanScanning.ON.name() );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
     }
 
     private static java.io.File confdir = new File( "target/app-conf" );

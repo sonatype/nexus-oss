@@ -27,12 +27,10 @@ import javax.mail.internet.MimeMessage;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.sonatype.inject.BeanScanning;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
@@ -49,14 +47,6 @@ import com.icegreen.greenmail.util.ServerSetup;
 public class ForgotPasswordTest
     extends AbstractNexusTestCase
 {
-
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( BeanScanning.ON.name() );
-    }
-
     private GreenMail server;
 
     private int emailServerPort;

@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Random;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
@@ -66,6 +68,13 @@ public abstract class AbstractNexusTestCase
         ctx.put( WORK_CONFIGURATION_KEY, workHomeDir.getAbsolutePath() );
         ctx.put( APPS_CONFIGURATION_KEY, appsHomeDir.getAbsolutePath() );
         ctx.put( CONF_DIR_KEY, confHomeDir.getAbsolutePath() );
+    }
+    
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setAutoWiring( true );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
     }
 
     @Override

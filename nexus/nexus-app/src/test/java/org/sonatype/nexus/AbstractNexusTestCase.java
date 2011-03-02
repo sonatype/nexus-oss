@@ -25,12 +25,10 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.inject.BeanScanning;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -63,14 +61,6 @@ public abstract class AbstractNexusTestCase
 
         ctx.put( RUNTIME_CONFIGURATION_KEY, runtimeHomeDir.getAbsolutePath() );
         ctx.put( NEXUS_APP_CONFIGURATION_KEY, nexusappHomeDir.getAbsolutePath() );
-    }
-
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        super.customizeContainerConfiguration( configuration );
-        configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( BeanScanning.ON.name() );
     }
 
     protected boolean loadConfigurationAtSetUp()

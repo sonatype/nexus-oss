@@ -24,7 +24,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.sonatype.appbooter.PlexusAppBooter;
 import org.sonatype.appbooter.PlexusAppBooterCustomizer;
 import org.sonatype.appcontext.AppContext;
-import org.sonatype.inject.BeanScanning;
 
 /**
  * Nexus specific {@link PlexusAppBooterCustomizer}.
@@ -38,7 +37,7 @@ public final class NexusBooterCustomizer
 
     public void customizeContainerConfiguration( final PlexusAppBooter booter, final ContainerConfiguration config )
     {
-        config.setAutoWiring( true ).setClassPathScanning( BeanScanning.ON.name() ).setComponentVisibility(
+        config.setAutoWiring( true ).setClassPathScanning( PlexusConstants.SCANNING_ON ).setComponentVisibility(
             PlexusConstants.GLOBAL_VISIBILITY );
     }
 
