@@ -186,6 +186,13 @@
     
     <!-- Deps needed by actual IT modules (like nexus-test-harness-its), and are here just to ease their life (to not have to add all these over and over as deps) -->
 
+    <!-- XPP, is left out since we _import_ (yuck) deeps and loose transitive deeps! -->
+    <dependency>
+      <groupId>xpp3</groupId>
+      <artifactId>xpp3_min</artifactId>
+      <version>1.1.4c</version>
+    </dependency>
+
     <!-- The IT Helper Plugin -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
