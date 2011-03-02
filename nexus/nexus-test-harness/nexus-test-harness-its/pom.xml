@@ -1,24 +1,14 @@
-<!--
-
-    Copyright (c) 2008-2011 Sonatype, Inc.
-    All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
-
-    This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
-    Public License Version 3 as published by the Free Software Foundation.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
-    for more details.
-
-    You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
-    http://www.gnu.org/licenses.
-
-    Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
-    Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
-    All other trademarks are the property of their respective owners.
-
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<!-- Copyright (c) 2008-2011 Sonatype, Inc. All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions. 
+  This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General Public 
+  License Version 3 as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, 
+  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
+  GNU Affero General Public License Version 3 for more details. You should have received a copy of the GNU Affero General Public 
+  License Version 3 along with this program. If not, see http://www.gnu.org/licenses. Sonatype Nexus (TM) Open Source Version 
+  is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark 
+  of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their 
+  respective owners. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -38,6 +28,8 @@
     <product-version>${project.version}</product-version>
     <product-classifier>bundle</product-classifier>
     <product-type>zip</product-type>
+
+    <cargo.version>1.0.4</cargo.version>
   </properties>
 
   <build>
@@ -83,6 +75,21 @@
         </executions>
       </plugin>
 
+      <!-- To "recognize" nexus-plugin packaging -->
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <version>1.3</version>
+        <extensions>true</extensions>
+        <dependencies>
+          <dependency>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>app-lifecycle-nexus</artifactId>
+            <version>1.3</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
@@ -102,6 +109,8 @@
           </execution>
         </executions>
         <configuration>
+          <setupEmma>true</setupEmma>
+          <setupMaven>true</setupMaven>
           <nexusBundleArtifact>
             <groupId>${product-groupId}</groupId>
             <artifactId>${product-artifactId}</artifactId>
@@ -123,10 +132,6 @@
               <classifier>bundle</classifier>
               <type>zip</type>
             </plugin>
-            <jar>
-              <groupId>org.sonatype.security.realms</groupId>
-              <artifactId>security-url-realm</artifactId>
-            </jar>
           </nexusPluginsArtifacts>
         </configuration>
       </plugin>
@@ -158,24 +163,11 @@
           </excludes>
         </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.1</version>
-        <extensions>true</extensions>
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.1</version>
-          </dependency>
-        </dependencies>
-      </plugin>
     </plugins>
   </build>
 
   <dependencies>
+
     <!-- The IT Launcher -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -194,17 +186,50 @@
       </exclusions>
     </dependency>
 
-    <!-- NEXUS-2490 -->
+    <!-- TestNG used on runtime -->
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-lvo-plugin</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>5.11</version>
+      <classifier>jdk15</classifier>
       <exclusions>
         <exclusion>
           <groupId>junit</groupId>
           <artifactId>junit</artifactId>
         </exclusion>
+        <!-- <exclusion> -->
+        <!-- <groupId>com.google.inject</groupId> -->
+        <!-- <artifactId>guice</artifactId> -->
+        <!-- </exclusion> -->
       </exclusions>
+    </dependency>
+
+    <!-- Matchers et al -->
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
+      <version>1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-integration</artifactId>
+      <version>1.1</version>
+    </dependency>
+
+    <!-- Deps needed by some ITs (they use classes from these below) -->
+
+    <!-- NEXUS-2490 -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-lvo-plugin</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- NEXUS-2810 references this -->
@@ -227,77 +252,19 @@
       <artifactId>nexus-capabilities-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
     <!-- NEXUS-3947 ArchetypeCatalog -->
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>nexus-archetype-common</artifactId>
-      <version>1.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <version>5.11</version>
-      <classifier>jdk15</classifier>
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-        <!-- <exclusion> -->
-        <!-- <groupId>com.google.inject</groupId> -->
-        <!-- <artifactId>guice</artifactId> -->
-        <!-- </exclusion> -->
-      </exclusions>
-    </dependency>
-
-    <!-- for failsafe -->
-    <dependency>
-      <groupId>org.uncommons</groupId>
-      <artifactId>reportng</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <version>1.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <version>1.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-integration</artifactId>
-      <version>1.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-url-realm</artifactId>
-      <version>${plexus-security.version}</version>
-    </dependency>
-
-    <!-- cargo tests -->
-    <dependency>
-      <groupId>saxpath</groupId>
-      <artifactId>saxpath</artifactId>
-      <version>1.0-FCS</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-webapp</artifactId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-archetype-plugin</artifactId>
       <version>${project.version}</version>
-      <type>war</type>
     </dependency>
+
+    <!-- for Cargo ITs -->
     <dependency>
       <groupId>org.codehaus.cargo</groupId>
       <artifactId>cargo-core-api-generic</artifactId>
-      <version>1.0.4</version>
+      <version>${cargo.version}</version>
       <exclusions>
         <exclusion>
           <groupId>xml-apis</groupId>
@@ -310,23 +277,12 @@
       </exclusions>
     </dependency>
 
-    <dependency>
-      <groupId>org.codehaus.cargo</groupId>
-      <artifactId>cargo-core-container-tomcat</artifactId>
-      <version>1.0.4</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.cargo</groupId>
-      <artifactId>cargo-core-container-jetty</artifactId>
-      <version>1.0.4</version>
-    </dependency>
-    <!-- END cargo tests -->
   </dependencies>
 
   <profiles>
     <profile>
-    <id>ahc-provider</id>
-    <build>
+      <id>ahc-provider</id>
+      <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -336,13 +292,13 @@
                 <default.http.provider>async-http-client</default.http.provider>
               </systemPropertyVariables>
             </configuration>
-            </plugin>
-          </plugins>
-        </build>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
+
     <profile>
       <id>cargo</id>
-
       <build>
         <plugins>
           <plugin>
@@ -368,7 +324,6 @@
               </execution>
             </executions>
           </plugin>
-
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
@@ -435,6 +390,32 @@
           </plugin>
         </plugins>
       </build>
+      <dependencies>
+        <!-- cargo tests -->
+        <dependency>
+          <groupId>saxpath</groupId>
+          <artifactId>saxpath</artifactId>
+          <version>1.0-FCS</version>
+        </dependency>
+        <dependency>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-webapp</artifactId>
+          <version>${project.version}</version>
+          <type>war</type>
+        </dependency>
+
+        <dependency>
+          <groupId>org.codehaus.cargo</groupId>
+          <artifactId>cargo-core-container-tomcat</artifactId>
+          <version>${cargo.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.codehaus.cargo</groupId>
+          <artifactId>cargo-core-container-jetty</artifactId>
+          <version>${cargo.version}</version>
+        </dependency>
+        <!-- END cargo tests -->
+      </dependencies>
     </profile>
 
     <profile>
@@ -452,6 +433,7 @@
         </dependency>
       </dependencies>
     </profile>
+
     <profile>
       <id>skip-test-harness-tests</id>
       <build>
@@ -469,15 +451,13 @@
     <profile>
       <!-- http://www.yourkit.com/docs/80/help/agent.jsp -->
       <id>yourkit-profile</id>
-
       <activation>
         <property>
           <name>yourkit.home</name>
         </property>
       </activation>
-
-      <!-- This is the path on Velo's machine ;) <properties> <yourkit.home>C:\Arquivos de programas\YourKit Java Profiler 8.0.13</yourkit.home> </properties -->
-
+      <!-- This is the path on Velo's machine ;) <properties> <yourkit.home>C:\Arquivos de programas\YourKit Java Profiler 
+        8.0.13</yourkit.home> </properties -->
       <dependencies>
         <dependency>
           <groupId>com.yourkit</groupId>
@@ -500,4 +480,5 @@
       </build>
     </profile>
   </profiles>
+
 </project>

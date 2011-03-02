@@ -18,17 +18,18 @@
  */
 package org.sonatype.nexus.integrationtests.nexus507;
 
+import java.net.URL;
+
+import org.restlet.data.Method;
+import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.security.rest.model.RoleResource;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import com.meterware.httpunit.GetMethodWebRequest;
-import com.meterware.httpunit.WebConversation;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
 
 public class Nexus507UserTimeoutIT
     extends AbstractPrivilegeTest
@@ -51,7 +52,22 @@ public class Nexus507UserTimeoutIT
 
         // accessUrl( serviceURI );
 
-        WebConversation wc = new WebConversation();
+        TestContext context = TestContainer.getInstance().getTestContext();
+        context.setSecureTest( true );
+        context.setUsername( "test-admin" );
+        context.setPassword( "admin123" );
+        
+        Response response;
+        
+        response = RequestFacade.sendMessage( new URL( loginURI ), Method.GET, null  );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Unable to login " + response.getStatus() );
+
+        String userURI = nexusBaseUrl + "service/local/users/admin";
+        response = RequestFacade.sendMessage( new URL( userURI ), Method.GET, null  );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Unable to access users " + response.getStatus() );
+
+
+/*        WebConversation wc = new WebConversation();
         wc.setAuthorization( "test-admin", "admin123" );
         WebRequest req = new GetMethodWebRequest( loginURI );
         WebResponse resp = wc.getResponse( req );
@@ -61,7 +77,7 @@ public class Nexus507UserTimeoutIT
         req = new GetMethodWebRequest( userURI );
         resp = wc.getResponse( req );
         Assert.assertEquals( resp.getResponseCode(), 200, "Unable to access users " + resp.getResponseMessage() );
-
+*/
         this.printKnownErrorButDoNotFail( this.getClass(), "checkHtmlRequest" );
         //FIXME: the timeout was never configurable, this the below is going to fail.
 //        // W8 2' minutes to get timeout

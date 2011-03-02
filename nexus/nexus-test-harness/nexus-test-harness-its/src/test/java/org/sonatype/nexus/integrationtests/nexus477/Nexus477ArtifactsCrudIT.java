@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Date;
 
-import org.apache.http.HttpException;
 import org.apache.maven.index.artifact.Gav;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -116,7 +115,7 @@ public class Nexus477ArtifactsCrudIT
 
     @Test
     public void readTest()
-        throws IOException, URISyntaxException, HttpException, Exception
+        throws IOException, URISyntaxException, Exception
     {
         this.overwriteUserRole( "test-user", "read-test-role", "1" );
 

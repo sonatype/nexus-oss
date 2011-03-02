@@ -21,6 +21,7 @@ package org.sonatype.nexus.test.utils;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -31,11 +32,11 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
-import org.codehaus.plexus.archiver.zip.ZipEntry;
-import org.codehaus.plexus.archiver.zip.ZipOutputStream;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -310,7 +311,7 @@ public class FileTestingUtils
     {
         file.getParentFile().mkdirs();
 
-        ZipOutputStream zip = new ZipOutputStream( file );
+        ZipOutputStream zip = new ZipOutputStream( new FileOutputStream( file ) );
         zip.putNextEntry( new ZipEntry( "content.random" ) );
         for ( int i = 0; i < sizeInMB * 1024; i++ )
         {
