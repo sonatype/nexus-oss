@@ -59,6 +59,7 @@ public class SampleAppTest
             {
                 response = this.doGet( "sample/test", userId, "password" );
                 responseText = ( response.getEntity() != null ) ? response.getEntity().getText() : "";
+                
                 Assert.assertTrue( "Response: "+ response.getStatus() +"\n" + responseText + "\nredirect: "+ response.getLocationRef(), response.getStatus().isSuccess() );   
             }
         }

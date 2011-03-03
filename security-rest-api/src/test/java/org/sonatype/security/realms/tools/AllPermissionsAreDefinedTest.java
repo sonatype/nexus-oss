@@ -19,8 +19,6 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -33,14 +31,7 @@ import org.sonatype.security.model.Configuration;
 public class AllPermissionsAreDefinedTest
     extends AbstractSecurityTestCase
 {
-    
     private static String SECURITY_FILE = "./target/security.xml";
-    
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
-    }
     
     @Override
     protected void setUp()
