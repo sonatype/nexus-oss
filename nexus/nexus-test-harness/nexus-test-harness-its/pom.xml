@@ -250,10 +250,10 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- NEXUS-156 -->
+    <!-- NEXUS-156 (RRB perms) -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <artifactId>nexus-rrb-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>
 
