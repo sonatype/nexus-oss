@@ -37,7 +37,6 @@
 
   <modules>
     <module>nexus-parent</module>
-    <module>nexus-repository-metadata</module>
     <module>nexus</module> 
   </modules>
   
