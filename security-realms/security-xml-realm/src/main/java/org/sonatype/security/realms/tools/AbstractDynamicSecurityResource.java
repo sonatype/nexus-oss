@@ -12,29 +12,36 @@
  */
 package org.sonatype.security.realms.tools;
 
-import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.security.model.Configuration;
 
 /**
- * A StaticSecurityResource all for other components/plugins to contributes users/roles/privileges to the security
- * model.
+ * An abstract class that removes the boiler plate code of reading in the dynamic security configuration.
  * 
  * @author Brian Demers
  */
-@ExtensionPoint
-public interface StaticSecurityResource
+public abstract class AbstractDynamicSecurityResource
+    implements DynamicSecurityResource
 {
-    /**
-     * Gets the security configuration.
-     * @return
-     */
-    Configuration getConfiguration();
 
-    /**
-     * Marks the Configuration dirty so it can be reloaded.
-     * @deprecated Use DynamicSecurityResource instead
-     * @return
-     */
-    @Deprecated
-    boolean isDirty();
+    protected boolean dirty = true;
+
+    public boolean isDirty()
+    {
+        return dirty;
+    }
+
+    protected void setDirty( boolean dirty )
+    {
+        this.dirty = dirty;
+    }
+
+    protected abstract Configuration doGetConfiguration();
+    
+    public Configuration getConfiguration()
+    {
+        Configuration config = doGetConfiguration();
+        // unset the dirty flag
+        this.setDirty( false );
+        return config;
+    }
 }

@@ -35,7 +35,7 @@ public class DefaultConfigurationValidatorTest
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
     }
     
     public void setUp()

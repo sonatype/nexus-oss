@@ -16,13 +16,13 @@ import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.security.model.Configuration;
 
 /**
- * A StaticSecurityResource all for other components/plugins to contributes users/roles/privileges to the security
+ * A DynamicSecurityResource all for other components/plugins to contributes users/roles/privileges to the security
  * model.
  * 
  * @author Brian Demers
  */
 @ExtensionPoint
-public interface StaticSecurityResource
+public interface DynamicSecurityResource
 {
     /**
      * Gets the security configuration.
@@ -32,9 +32,7 @@ public interface StaticSecurityResource
 
     /**
      * Marks the Configuration dirty so it can be reloaded.
-     * @deprecated Use DynamicSecurityResource instead
      * @return
      */
-    @Deprecated
     boolean isDirty();
 }

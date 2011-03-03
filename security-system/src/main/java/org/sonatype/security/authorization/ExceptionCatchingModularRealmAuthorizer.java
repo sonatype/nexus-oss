@@ -244,6 +244,10 @@ public class ExceptionCatchingModularRealmAuthorizer
             {
                 logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
             }
+            catch ( Exception e )
+            {
+                logger.warn( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+            }
         }
 
         return combinedResult;

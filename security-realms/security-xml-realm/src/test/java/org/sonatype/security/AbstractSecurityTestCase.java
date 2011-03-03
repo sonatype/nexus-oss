@@ -43,7 +43,7 @@ public abstract class AbstractSecurityTestCase
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
     }
     
     @Override
