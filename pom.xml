@@ -10,10 +10,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-parent</artifactId>
-    <version>18</version>
-    <relativePath>../nexus-parent/pom.xml</relativePath>
+    <groupId>org.sonatype.spice</groupId>
+    <artifactId>spice-parent</artifactId>
+    <version>16</version>
+    <relativePath>../spice-parent/pom.xml</relativePath>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
@@ -31,6 +31,14 @@
     </license>
   </licenses>
 
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+    <sisu-inject.version>2.1.1</sisu-inject.version>
+    <plexus-component-metadata.version>1.5.5</plexus-component-metadata.version>
+    <plexus-utils.version>2.0.5</plexus-utils.version>
+  </properties>
+
   <modules>
     <module>nexus-repository-metadata-model</module>
     <module>nexus-repository-metadata-api</module>
@@ -38,6 +46,24 @@
 
   <dependencyManagement>
     <dependencies>
+
+      <!-- SISU and Plexus support (the version should be tied to SISU used ones!) -->
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-inject-plexus</artifactId>
+        <version>${sisu-inject.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-annotations</artifactId>
+        <version>${plexus-component-metadata.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>${plexus-utils.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-repository-metadata-model</artifactId>
@@ -61,15 +87,53 @@
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
+          <version>${plexus-component-metadata.version}</version>
+          <executions>
+            <execution>
+              <id>process-classes</id>
+              <goals>
+                <goal>generate-metadata</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>process-test-classes</id>
+              <goals>
+                <goal>generate-test-metadata</goal>
+              </goals>
+            </execution>
+          </executions>
         </plugin>
-
         <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
+          <groupId>org.codehaus.modello</groupId>
+          <artifactId>modello-maven-plugin</artifactId>
+          <version>1.4.1</version>
           <configuration>
-            <forkMode>never</forkMode>
+            <useJava5>true</useJava5>
           </configuration>
         </plugin>
-
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.3.2</version>
+          <configuration>
+            <source>1.5</source>
+            <target>1.5</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.1.1</version>
+          <executions>
+            <execution>
+              <id>attach-sources</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>jar-no-fork</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
         <plugin>
           <groupId>com.mycila.maven-license-plugin</groupId>
           <artifactId>maven-license-plugin</artifactId>
@@ -82,6 +146,7 @@
 
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
       </plugin>
     </plugins>
@@ -111,9 +176,9 @@
   </developers>
 
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus-repository-metadata</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-repository-metadata</developerConnection>
-    <url>http://svn.sonatype.org/nexus/trunk/nexus-repository-metadata</url>
+    <connection>scm:svn:http://svn.sonatype.org/spice/trunk/nexus-repository-metadata</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/nexus-repository-metadata</developerConnection>
+    <url>https://sventon.sonatype.org/repos/spice/list/trunk/nexus-repository-metadata/?revision=HEAD</url>
   </scm>
   
   <distributionManagement>
