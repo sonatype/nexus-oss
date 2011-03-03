@@ -83,27 +83,17 @@
   <dependencies>
 
     <!--
-     | Make sure the AOP enabled Guice JAR appears first
+     | Make sure Guice is compile scope (we compile against it here), and AOP enabled Guice JAR appears first
      -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-guice</artifactId>
-      <version>${sisu-guice.version}</version>
+      <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
       <artifactId>plexus-app-booter</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.sonatype.sisu</groupId>
-          <artifactId>sisu-guice</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>

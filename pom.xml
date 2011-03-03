@@ -36,6 +36,7 @@
   </properties>
 
   <modules>
+    <module>nexus-runtime-platform</module>
     <module>nexus-parent</module>
     <module>nexus</module> 
   </modules>

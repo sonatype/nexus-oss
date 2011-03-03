@@ -51,14 +51,9 @@
   </distributionManagement>
 
   <properties>
+    <runtime-platform.version>1-SNAPSHOT</runtime-platform.version>
     <nexus-site-base-url>https://repository.sonatype.org/content/sites/maven-sites/nexus-oss</nexus-site-base-url>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-    <sisu-guice.version>2.9.4</sisu-guice.version>
-    <sisu-inject.version>2.1.1</sisu-inject.version>
-    <sisu-inject-plexus.version>${sisu-inject.version}</sisu-inject-plexus.version>
-    <plexus-component-metadata.version>1.5.5</plexus-component-metadata.version>
-    <plexus-utils.version>2.0.5</plexus-utils.version>
 
     <jetty.version>6.1.19</jetty.version>
     <nexus.version>${project.version}</nexus.version>
@@ -68,21 +63,12 @@
   <dependencyManagement>
     <dependencies>
 
-      <!-- SISU and Plexus support (the version should be tied to SISU used ones!) -->
       <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-inject-plexus</artifactId>
-        <version>${sisu-inject-plexus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-annotations</artifactId>
-        <version>${plexus-component-metadata.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>${plexus-utils.version}</version>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-runtime-platform</artifactId>
+        <version>${runtime-platform.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
 
       <dependency>
@@ -287,7 +273,7 @@
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
-          <version>${plexus-component-metadata.version}</version>
+          <version>1.5.5</version>
           <executions>
             <execution>
               <id>process-classes</id>
