@@ -53,7 +53,8 @@
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-guice</artifactId>
         <version>2.9.4</version>
-        <scope>runtime</scope>
+        <classifier>no_aop</classifier>
+        <scope>compile</scope>
       </dependency>
       <dependency>
         <groupId>javax.inject</groupId>
