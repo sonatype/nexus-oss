@@ -27,7 +27,7 @@ import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserStatus;
 
-public class SampleAppTest
+public class SampleAppTestDisabled
     extends PlexusTestCase
 {
     private static String CONF_DIR = "target/plexus-work/conf";
