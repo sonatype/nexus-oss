@@ -27,11 +27,6 @@ public class IOUtils
     public static byte[] getBytesClassic( final int count, final InputStream is )
         throws IOException
     {
-        if ( is.available() < count )
-        {
-            return null;
-        }
-
         // Create the byte array to hold the data
         byte[] bytes = new byte[count];
 
