@@ -8,3 +8,4 @@
 .settings/
 .classpath
 target/
+security-realms/security-xml-realm/test-output
