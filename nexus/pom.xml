@@ -1262,12 +1262,14 @@
         <dependency>
           <groupId>org.codehaus.enunciate</groupId>
           <artifactId>enunciate-core</artifactId>
+          <scope>provided</scope>
           <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
           <!-- But nothing is using that annotation after build happened, and doco is generated -->
         </dependency>
         <dependency>
           <groupId>commons-beanutils</groupId>
           <artifactId>commons-beanutils-core</artifactId>
+          <scope>provided</scope>
         </dependency>
         <dependency>
           <groupId>org.codehaus.jackson</groupId>
