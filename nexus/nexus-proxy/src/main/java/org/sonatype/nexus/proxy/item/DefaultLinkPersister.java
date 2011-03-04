@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -33,9 +34,11 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 public class DefaultLinkPersister
     implements LinkPersister
 {
+    private static final String UTF8_CHARSET = "UTF-8";
+
     private static final String LINK_PREFIX = "LINK to ";
 
-    private static final String UTF8_CHARSET = "UTF-8";
+    private static final byte[] LINK_PREFIX_BYTES = LINK_PREFIX.getBytes( Charset.forName( UTF8_CHARSET ) );
 
     @Requirement
     private RepositoryItemUidFactory repositoryItemUidFactory;
@@ -45,30 +48,16 @@ public class DefaultLinkPersister
     {
         if ( locator != null )
         {
-            InputStream fis = null;
+            final byte[] buf = ContentLocatorUtils.getFirstBytes( LINK_PREFIX_BYTES.length, locator );
 
-            try
+            if ( buf != null )
             {
-                final byte[] buf = new byte[LINK_PREFIX.length()];
-
-                final byte[] link = LINK_PREFIX.getBytes( UTF8_CHARSET );
-
-                fis = locator.getContent();
-
-                boolean result = fis != null && fis.read( buf ) == LINK_PREFIX.length();
-
-                if ( result )
-                {
-                    result = Arrays.equals( buf, link );
-                }
-
-                return result;
+                return Arrays.equals( buf, LINK_PREFIX_BYTES );
             }
-            finally
+            else
             {
-                IOUtil.close( fis );
+                return false;
             }
-
         }
         else
         {
