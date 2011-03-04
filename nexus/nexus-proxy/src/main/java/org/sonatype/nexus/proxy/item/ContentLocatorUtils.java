@@ -13,7 +13,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 public class ContentLocatorUtils
 {
     private static final boolean USE_MMAP = SystemPropertiesHelper.getBoolean(
-        "org.sonatype.nexus.proxy.item.ContentLocatorUtils.useMmap", true );
+        "org.sonatype.nexus.proxy.item.ContentLocatorUtils.useMmap", false );
 
     /**
      * Reads up first bytes (count) from ContentLocator's content. It returns byte array of exact size of count, or null
