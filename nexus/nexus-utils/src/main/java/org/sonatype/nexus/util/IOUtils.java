@@ -15,17 +15,23 @@ import java.nio.channels.FileChannel.MapMode;
 public class IOUtils
 {
     /**
-     * Uses "old" IO's InputStream to read up exactly {@code count} bytes from provided input stream. Does not closes
-     * the passed in stream, just consumes provided count of bytes.
+     * Uses "old" IO's InputStream to read up exactly {@code count} bytes from provided input stream. If no IOException
+     * occurred during read, but {@code count} bytes could not be read up, returns null. Does not closes the passed in
+     * stream, just consumes provided count of bytes.
      * 
-     * @param count the count of bytes to read from stream
-     * @param is the stream to read from
-     * @return array of bytes having count length or null
-     * @throws IOException
+     * @param count the count of bytes to read from stream.
+     * @param is the stream to read from.
+     * @return array of bytes having exactly {@code count} length or null if not able to read up {@code count} bytes.
+     * @throws IOException in case of IO problem.
      */
     public static byte[] getBytesClassic( final int count, final InputStream is )
         throws IOException
     {
+        if ( is.available() < count )
+        {
+            return null;
+        }
+
         // Create the byte array to hold the data
         byte[] bytes = new byte[count];
 
@@ -37,23 +43,23 @@ public class IOUtils
             offset += numRead;
         }
 
-        // Ensure all the bytes have been read in
         if ( offset < bytes.length )
         {
-            throw new IOException( "Could not completely read file " );
+            return null;
         }
 
         return bytes;
     }
 
     /**
-     * Use NIO's mmap to load up exactly {@code count} bytes from provided FileInputStream. Does not closes the passed
-     * in stream, just consumes provided count of bytes.
+     * Use NIO's mmap to load up exactly {@code count} bytes from provided FileInputStream. If no IOException occurred
+     * during read, but {@code count} bytes could not be read up, returns null. Does not closes the passed in stream,
+     * just consumes provided count of bytes.
      * 
-     * @param count the count of bytes to read from stream
-     * @param is the stream to read from
-     * @return array of bytes having count length or null
-     * @throws IOException
+     * @param count the count of bytes to read from stream.
+     * @param fis the file input stream to read from.
+     * @return array of bytes having exactly {@code count} length or null if not able to read up {@code count} bytes.
+     * @throws IOException in case of IO problem.
      */
     public static byte[] getBytesNioMmap( final int count, final FileInputStream fis )
         throws IOException
