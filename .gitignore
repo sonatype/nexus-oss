@@ -6,6 +6,3 @@
 .settings/
 .classpath
 target/
-.DS_Store
-security-model-xml/.DS_Store
-security-realms/security-xml-realm/test-output/
