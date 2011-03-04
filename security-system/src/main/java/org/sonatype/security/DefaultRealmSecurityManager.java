@@ -39,19 +39,13 @@ public class DefaultRealmSecurityManager
     @Inject
     private Logger logger;
 
-    public DefaultRealmSecurityManager()
-    {
-        // set the realm authenticator, that will automatically deligate the authentication to all the realms.
-        FirstSuccessfulModularRealmAuthenticator realmAuthenticator = new FirstSuccessfulModularRealmAuthenticator();
-        realmAuthenticator.setAuthenticationStrategy( new FirstSuccessfulStrategy() );
-
-        // Authenticator
-        this.setAuthenticator( realmAuthenticator );
-    }
-
+    
     public void initialize()
         throws InitializationException
     {
+
+        this.setSessionManager( new DefaultSessionManager() );
+        
         // This could be injected
         // Authorizer
         ExceptionCatchingModularRealmAuthorizer authorizer =
@@ -68,11 +62,27 @@ public class DefaultRealmSecurityManager
             logger.warn( "No RolePermissionResolver is set" );
         }
         this.setAuthorizer( authorizer );
+        
+        // set the realm authenticator, that will automatically deligate the authentication to all the realms.
+        FirstSuccessfulModularRealmAuthenticator realmAuthenticator = new FirstSuccessfulModularRealmAuthenticator();
+        realmAuthenticator.setAuthenticationStrategy( new FirstSuccessfulStrategy() );
+
+        // Authenticator
+        this.setAuthenticator( realmAuthenticator );
+        
+        
     }
 
     public void init()
         throws ShiroException
     {
-        this.setSessionManager( new DefaultSessionManager() );
+        try
+        {
+            this.initialize();
+        }
+        catch ( InitializationException e )
+        {
+            throw new ShiroException("Failed to initialize " + this.getClass().getName(), e );
+        }
     }
 }

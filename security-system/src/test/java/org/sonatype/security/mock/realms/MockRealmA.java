@@ -175,4 +175,11 @@ public class MockRealmA
         // TODO Auto-generated method stub
         return false;
     }
+
+    public void checkRoles( PrincipalCollection subjectPrincipal, String... roleIdentifiers )
+        throws AuthorizationException
+    {
+        // TODO Auto-generated method stub
+        
+    }
 }
