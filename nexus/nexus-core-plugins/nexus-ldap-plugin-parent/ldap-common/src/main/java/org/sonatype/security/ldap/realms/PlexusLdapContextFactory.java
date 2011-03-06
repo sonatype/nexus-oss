@@ -70,10 +70,18 @@ public class PlexusLdapContextFactory
             .readConnectionInfo().getSystemPassword(), true );
     }
 
+    @Override
     public LdapContext getLdapContext( String username, String password )
         throws NamingException
     {
-        return this.getLdapContext( username, password, false ); 
+        return this.getLdapContext( username, password, false );
+    }
+    
+    @Override
+    public LdapContext getLdapContext( Object principal, Object credentials )
+        throws NamingException
+    {
+        return this.getLdapContext( principal.toString(), credentials.toString(), false );
     }
 
     private LdapContext getLdapContext( String username, String password, boolean systemLogin )
@@ -173,5 +181,4 @@ public class PlexusLdapContextFactory
     {
         this.ldapConfig = ldapConfig;
     }
-
 }

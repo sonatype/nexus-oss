@@ -205,6 +205,13 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
     public LdapContext getLdapContext(String username, String password) throws NamingException {
         return getLdapContext( username, password, false );
     }
+    
+    @Override
+    public LdapContext getLdapContext( Object principal, Object credentials )
+        throws NamingException
+    {
+        return getLdapContext( principal.toString(), credentials.toString(), false );
+    }
 
     public LdapContext getLdapContext(String username, String password, boolean systemContext) throws NamingException {
         if (searchBase == null) {

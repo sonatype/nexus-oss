@@ -67,6 +67,11 @@ public class TaskSecuritySubject implements Subject
     {
         // do nothing   
     }
+    
+    public void checkRoles( String... roleIdentifiers )
+    {
+       // do nothing
+    }
 
     public void checkRoles( Collection<String> roleIdentifiers )
         throws AuthorizationException

@@ -161,7 +161,7 @@
 
   <!-- Shortcuts for outnumbered deps :) -->
   <properties>
-    <maven.indexer.version>4.0.1-SNAPSHOT</maven.indexer.version>
+    <maven.indexer.version>4.0.1-SONATYPE-SNAPSHOT</maven.indexer.version>
     <maven.version>3.0.1</maven.version>
     <aether.version>1.8.1</aether.version>
 
@@ -169,7 +169,7 @@
     <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
     <plexus-security.version>2.3-SNAPSHOT</plexus-security.version>
-    <shiro.version>1.0.0-incubating</shiro.version>
+    <shiro.version>1.1.0</shiro.version>
     <slf4j.version>1.5.6</slf4j.version>
     <nexus.repository.metadata.version>1.1</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
