@@ -77,7 +77,7 @@ public class PlexusLdapContextFactory
         return this.getLdapContext( username, password, false );
     }
     
-    @Override
+    
     public LdapContext getLdapContext( Object principal, Object credentials )
         throws NamingException
     {

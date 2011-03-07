@@ -206,7 +206,7 @@ public class DefaultLdapContextFactory implements LdapContextFactory {
         return getLdapContext( username, password, false );
     }
     
-    @Override
+    
     public LdapContext getLdapContext( Object principal, Object credentials )
         throws NamingException
     {
