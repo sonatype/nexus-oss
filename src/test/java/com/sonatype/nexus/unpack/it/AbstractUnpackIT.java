@@ -9,17 +9,17 @@ package com.sonatype.nexus.unpack.it;
 
 import java.util.prefs.Preferences;
 
+import org.sonatype.licensing.product.ProductLicenseManager;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.testng.annotations.BeforeMethod;
 
-import com.sonatype.nexus.licensing.NexusLicenseBuilder;
-import com.sonatype.nexus.licensing.NexusLicensingManager;
+import com.sonatype.nexus.licensing.DefaultNexusLicenseBuilder;
 
 public abstract class AbstractUnpackIT
     extends AbstractNexusIntegrationTest
 {
 
-    protected NexusLicensingManager licenseManager;
+    protected ProductLicenseManager licenseManager;
 
     @Override
     @BeforeMethod
@@ -34,11 +34,11 @@ public abstract class AbstractUnpackIT
     protected void beforeStart()
         throws Exception
     {
-        licenseManager = lookup( NexusLicensingManager.class );
+        licenseManager = lookup( ProductLicenseManager.class );
         licenseManager.uninstallLicense();
 
-        Preferences.userRoot().node( NexusLicenseBuilder.PACKAGE ).remove( "trialEligible" );
-        Preferences.userRoot().node( NexusLicenseBuilder.PACKAGE ).sync();
+        Preferences.userRoot().node( DefaultNexusLicenseBuilder.PACKAGE ).remove( "trialEligible" );
+        Preferences.userRoot().node( DefaultNexusLicenseBuilder.PACKAGE ).sync();
 
     }
 }

@@ -8,13 +8,12 @@
 package com.sonatype.nexus.unpack.license;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.licensing.feature.AbstractFeature;
+import org.sonatype.licensing.feature.Feature;
 
-import com.sonatype.license.feature.AbstractPlexusFeature;
-import com.sonatype.license.feature.PlexusFeature;
-
-@Component( role = PlexusFeature.class, hint = UnpackPlexusFeature.ID )
-public class UnpackPlexusFeature
-    extends AbstractPlexusFeature
+@Component( role = Feature.class, hint = UnpackFeature.ID )
+public class UnpackFeature
+    extends AbstractFeature
 {
     public static final String ID = "Unpack";
 

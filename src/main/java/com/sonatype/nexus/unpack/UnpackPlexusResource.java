@@ -36,6 +36,9 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.sonatype.licensing.LicensingException;
+import org.sonatype.licensing.feature.Feature;
+import org.sonatype.licensing.product.ProductLicenseManager;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -49,10 +52,6 @@ import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-
-import com.sonatype.license.PlexusLicensingException;
-import com.sonatype.license.feature.PlexusFeature;
-import com.sonatype.nexus.licensing.NexusLicensingManager;
 
 /**
  * A REST Resource that accepts upload (zip file), and it simply explodes it in the root of the given repository.
@@ -68,11 +67,11 @@ public class UnpackPlexusResource
 {
     private static final String DELETE_BEFORE_UNPACK = "delete";
 
-    @Requirement( role = NexusLicensingManager.class )
-    private NexusLicensingManager licenseManager;
+    @Requirement( role = ProductLicenseManager.class )
+    private ProductLicenseManager licenseManager;
 
-    @Requirement( role = PlexusFeature.class, hint = "Unpack" )
-    private PlexusFeature feature;
+    @Requirement( role = Feature.class, hint = "Unpack" )
+    private Feature feature;
 
     public UnpackPlexusResource()
     {
@@ -118,7 +117,7 @@ public class UnpackPlexusResource
         {
             licenseManager.verifyLicenseAndFeature( feature );
         }
-        catch ( PlexusLicensingException e )
+        catch ( LicensingException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_PAYMENT_REQUIRED, e );
         }

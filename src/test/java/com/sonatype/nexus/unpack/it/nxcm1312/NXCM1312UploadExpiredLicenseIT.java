@@ -7,26 +7,33 @@
  */
 package com.sonatype.nexus.unpack.it.nxcm1312;
 
+import static org.testng.Assert.fail;
+
 import java.io.File;
 import java.util.prefs.Preferences;
 
+import org.sonatype.licensing.product.ProductLicenseManager;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
-import com.sonatype.nexus.licensing.NexusLicenseBuilder;
+import com.sonatype.nexus.licensing.DefaultNexusLicenseBuilder;
 import com.sonatype.nexus.unpack.it.AbstractUnpackIT;
 
 public class NXCM1312UploadExpiredLicenseIT
     extends AbstractUnpackIT
 {
+    protected ProductLicenseManager licenseManager;
 
     @Override
     protected void beforeStart()
         throws Exception
     {
-        Preferences.userRoot().node( NexusLicenseBuilder.PACKAGE ).putBoolean( "trialEligible", false );
-        Preferences.userRoot().node( NexusLicenseBuilder.PACKAGE ).remove( "license" );
-        Preferences.userRoot().node( NexusLicenseBuilder.PACKAGE ).sync();
+        licenseManager = lookup( ProductLicenseManager.class );
+        licenseManager.uninstallLicense();
+
+        Preferences.userRoot().node( DefaultNexusLicenseBuilder.PACKAGE ).putBoolean( "trialEligible", false );
+        Preferences.userRoot().node( DefaultNexusLicenseBuilder.PACKAGE ).remove( "license" );
+        Preferences.userRoot().node( DefaultNexusLicenseBuilder.PACKAGE ).sync();
     }
 
     @Test
@@ -37,6 +44,7 @@ public class NXCM1312UploadExpiredLicenseIT
         {
             getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "service/local/repositories/"
                 + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "license" );
+            fail( "License should be expired" );
         }
         catch ( org.apache.maven.wagon.TransferFailedException e )
         {
