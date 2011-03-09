@@ -8,13 +8,12 @@
 package com.sonatype.nexus.proxy.maven.site.license;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.licensing.feature.AbstractFeature;
+import org.sonatype.licensing.feature.Feature;
 
-import com.sonatype.license.feature.AbstractPlexusFeature;
-import com.sonatype.license.feature.PlexusFeature;
-
-@Component( role = PlexusFeature.class, hint = MavenSitePlexusFeature.ID )
-public class MavenSitePlexusFeature
-    extends AbstractPlexusFeature
+@Component( role = Feature.class, hint = MavenSiteFeature.ID )
+public class MavenSiteFeature
+    extends AbstractFeature
 {
     public static final String ID = "MavenSite";
 
