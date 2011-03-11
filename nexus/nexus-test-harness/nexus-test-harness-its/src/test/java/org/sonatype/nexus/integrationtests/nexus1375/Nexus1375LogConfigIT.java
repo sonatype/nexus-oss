@@ -44,7 +44,7 @@ public class Nexus1375LogConfigIT
         messageUtil = new LogConfigMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
 
         TestContainer.getInstance().getTestContext().setSecureTest( true );
-        
+
         TestContainer.getInstance().getTestContext().useAdminForRequests();
     }
 
@@ -62,7 +62,7 @@ public class Nexus1375LogConfigIT
 
         File actualLoggerLocation = new File( resource.getFileAppenderLocation() ).getCanonicalFile();
 
-        Assert.assertEquals( nexusLog.getAbsolutePath(), actualLoggerLocation.getAbsolutePath() );
+        Assert.assertTrue( nexusLog.getAbsoluteFile().equals( actualLoggerLocation.getAbsoluteFile() ) );
     }
 
     @Test
