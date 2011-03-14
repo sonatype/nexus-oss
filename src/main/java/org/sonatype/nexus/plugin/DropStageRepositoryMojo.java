@@ -18,12 +18,12 @@
  */
 package org.sonatype.nexus.plugin;
 
+import java.util.List;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageRepository;
-
-import java.util.List;
 
 /**
  * Drop a closed Nexus staging repository.
@@ -45,6 +45,11 @@ public class DropStageRepositoryMojo
      * @parameter expression="${nexus.drop.autoSelectOverride}" default-value="false"
      */
     private boolean dropAutoSelectOverride;
+
+    /**
+     * @parameter default-value="Staging Dropping ${project.build.finalName}" expression="${description}"
+     */
+    private String description;
 
     public void execute()
         throws MojoExecutionException
@@ -81,7 +86,7 @@ public class DropStageRepositoryMojo
 
             try
             {
-                client.dropRepository( repo );
+                client.dropRepository( repo, description );
             }
             catch ( RESTLightClientException e )
             {

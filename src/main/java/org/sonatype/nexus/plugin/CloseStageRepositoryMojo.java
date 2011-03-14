@@ -18,13 +18,13 @@
  */
 package org.sonatype.nexus.plugin;
 
+import java.util.List;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageRepository;
-
-import java.util.List;
 
 /**
  * Close a Nexus staging repository so it's available for use by Maven.
@@ -41,7 +41,7 @@ public class CloseStageRepositoryMojo
     /**
      * The description for the newly closed staging repository. This will show up in the Nexus UI.
      * 
-     * @parameter expression="${nexus.description}"
+     * @parameter default-value="Staging Closing ${project.build.finalName}" expression="${nexus.description}"
      */
     private String description;
 

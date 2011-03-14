@@ -52,7 +52,7 @@ public class PromoteToStageProfileMojo
     private Set<String> repositoryIds = new LinkedHashSet<String>();
 
     /**
-     * @parameter expression="${description}"
+     * @parameter default-value="Staging Promoting ${project.build.finalName}" expression="${description}"
      */
     private String description;
 

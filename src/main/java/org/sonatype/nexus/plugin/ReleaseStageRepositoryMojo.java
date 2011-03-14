@@ -18,13 +18,13 @@
  */
 package org.sonatype.nexus.plugin;
 
+import java.util.List;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageRepository;
-
-import java.util.List;
 
 /**
  * Release a finished Nexus staging repository into a permanent Nexus repository for general consumption.
@@ -51,6 +51,12 @@ public class ReleaseStageRepositoryMojo
      * @parameter expression="${targetRepositoryId}"
      */
     private String targetRepositoryId;
+
+
+    /**
+     * @parameter default-value="Staging Releasing ${project.build.finalName}" expression="${description}"
+     */
+    private String description;
 
     public void execute()
         throws MojoExecutionException
@@ -89,7 +95,7 @@ public class ReleaseStageRepositoryMojo
             
             try
             {
-                client.promoteRepository( repo, getTargetRepositoryId() );
+                client.promoteRepository( repo, getTargetRepositoryId(), description );
             }
             catch ( RESTLightClientException e )
             {
