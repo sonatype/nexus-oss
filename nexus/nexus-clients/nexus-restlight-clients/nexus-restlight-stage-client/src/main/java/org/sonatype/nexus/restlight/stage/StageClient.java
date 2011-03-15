@@ -19,7 +19,7 @@
 package org.sonatype.nexus.restlight.stage;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -204,45 +204,58 @@ public class StageClient
     public void finishRepository( final StageRepository repo, final String description )
         throws RESTLightClientException
     {
+        Element extras = processDescription( description );
+
+        performStagingAction( repo, STAGE_REPO_FINISH_ACTION, Arrays.asList( extras ) );
+    }
+
+    private Element processDescription( final String description )
+    {
+        if ( description == null )
+        {
+            return null;
+        }
+
         String descElementName =
             getVocabulary().getProperty( VocabularyKeys.PROMOTE_STAGE_REPO_DESCRIPTION_ELEMENT,
                 VocabularyKeys.SUPPRESS_ELEMENT_VALUE );
 
-        List<Element> extras;
         if ( !VocabularyKeys.SUPPRESS_ELEMENT_VALUE.equals( descElementName ) )
         {
             Element desc = new Element( REPO_DESCRIPTION_ELEMENT ).setText( description );
-            extras = Collections.singletonList( desc );
+            return desc;
         }
         else
         {
-            extras = null;
+            return null;
         }
-
-        performStagingAction( repo, STAGE_REPO_FINISH_ACTION, extras );
     }
 
     /**
      * Assuming the user has already queried Nexus for a valid {@link StageRepository} instance (details for a staging
      * repository), submit those details to Nexus to drop the repository.
      */
-    public void dropRepository( final StageRepository repo )
+    public void dropRepository( final StageRepository repo, final String description )
         throws RESTLightClientException
     {
-        performStagingAction( repo, STAGE_REPO_DROP_ACTION, null );
+        Element extras = processDescription( description );
+        performStagingAction( repo, STAGE_REPO_DROP_ACTION, Arrays.asList( extras ) );
     }
 
     /**
      * Assuming the user has already queried Nexus for a valid {@link StageRepository} instance (details for a staging
      * repository), submit those details to Nexus to promote the repository into the permanent repository with the
      * specified targetRepositoryId.
+     * 
+     * @param description
      */
-    public void promoteRepository( final StageRepository repo, final String targetRepositoryId )
+    public void promoteRepository( final StageRepository repo, final String targetRepositoryId, String description )
         throws RESTLightClientException
     {
         Element target = new Element( "targetRepositoryId" ).setText( targetRepositoryId );
+        Element extras = processDescription( description );
 
-        performStagingAction( repo, STAGE_REPO_PROMOTE_ACTION, Collections.singletonList( target ) );
+        performStagingAction( repo, STAGE_REPO_PROMOTE_ACTION, Arrays.asList( extras, target ) );
     }
 
     /**
