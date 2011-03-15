@@ -50,6 +50,9 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
+import org.sonatype.aether.util.version.GenericVersionScheme;
+import org.sonatype.aether.version.InvalidVersionSpecificationException;
+import org.sonatype.aether.version.Version;
 
 /**
  * <p>
@@ -178,7 +181,7 @@ public abstract class AbstractRESTLightClient
         return user;
     }
 
-    private void connect()
+    protected void connect()
         throws RESTLightClientException
     {
         client = new HttpClient();
@@ -306,28 +309,40 @@ public abstract class AbstractRESTLightClient
         }
     }
 
-    private List<String> getVocabilary( Map<String, List<String>> vocabManifest, String version )
+    protected List<String> getVocabilary( Map<String, List<String>> vocabManifest, String version )
     {
         if ( vocabManifest.containsKey( version ) )
         {
             return vocabManifest.get( version );
         }
 
-        String matchVocabilary = "default";
-        for ( String key : vocabManifest.keySet() )
+        try
         {
-            if ( "default".equals( key ) )
+            GenericVersionScheme scheme = new GenericVersionScheme();
+            Version gVersion = scheme.parseVersion( version );
+
+            String matchVocabilary = "default";
+            for ( String key : vocabManifest.keySet() )
             {
-                continue;
+                if ( "default".equals( key ) )
+                {
+                    continue;
+                }
+
+                if ( gVersion.compareTo( scheme.parseVersion( key ) ) >= 0 )
+                {
+                    matchVocabilary = key;
+                }
+
             }
 
-            if ( version.compareTo( key ) >= 0 )
-            {
-                matchVocabilary = key;
-            }
+            return vocabManifest.get( matchVocabilary );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            return null;
         }
 
-        return vocabManifest.get( matchVocabilary );
     }
 
     /**
