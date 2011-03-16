@@ -158,15 +158,15 @@ public class DefaultWastebasket
     public void purge( final Repository repository, final long age )
         throws IOException
     {
-        ResourceStoreRequest trashRoot =
+        ResourceStoreRequest req =
             new ResourceStoreRequest( getTrashPath( repository, RepositoryItemUid.PATH_ROOT ) );
-
+        
         if ( age == ALL )
         {
             // simple and fast way, no need for walker
             try
             {
-                repository.getLocalStorage().shredItem( repository, trashRoot );
+                repository.getLocalStorage().shredItem( repository, req );
             }
             catch ( ItemNotFoundException e )
             {
@@ -180,10 +180,14 @@ public class DefaultWastebasket
         else
         {
             // walker and walk and changes for age
-            if ( repository.getLocalStorage().containsItem( repository, trashRoot ) )
+            if ( repository.getLocalStorage().containsItem( repository, req ) )
             {
+                req.setRequestGroupLocalOnly( true );
+                
+                req.setRequestLocalOnly( true );
+                
                 DefaultWalkerContext ctx =
-                    new DefaultWalkerContext( repository, trashRoot, new AffirmativeStoreWalkerFilter() );
+                    new DefaultWalkerContext( repository, req, new AffirmativeStoreWalkerFilter() );
 
                 ctx.getProcessors().add( new WastebasketWalker( age ) );
 

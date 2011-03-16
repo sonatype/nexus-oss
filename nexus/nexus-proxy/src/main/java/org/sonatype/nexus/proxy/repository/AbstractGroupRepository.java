@@ -390,41 +390,44 @@ public abstract class AbstractGroupRepository
     {
         ArrayList<StorageItem> items = new ArrayList<StorageItem>();
 
-        for ( Repository repository : getRequestRepositories( request ) )
+        if ( !request.isRequestGroupLocalOnly() )
         {
-            if ( !request.getProcessedRepositories().contains( repository.getId() ) )
+            for ( Repository repository : getRequestRepositories( request ) )
             {
-                try
+                if ( !request.getProcessedRepositories().contains( repository.getId() ) )
                 {
-                    StorageItem item = repository.retrieveItem( false, request );
+                    try
+                    {
+                        StorageItem item = repository.retrieveItem( false, request );
 
-                    items.add( item );
+                        items.add( item );
+                    }
+                    catch ( StorageException e )
+                    {
+                        throw e;
+                    }
+                    catch ( IllegalOperationException e )
+                    {
+                        getLogger().warn( "Member repository request failed", e );
+                    }
+                    catch ( ItemNotFoundException e )
+                    {
+                        // that's okay
+                    }
                 }
-                catch ( StorageException e )
+                else
                 {
-                    throw e;
-                }
-                catch ( IllegalOperationException e )
-                {
-                    getLogger().warn( "Member repository request failed", e );
-                }
-                catch ( ItemNotFoundException e )
-                {
-                    // that's okay
-                }
-            }
-            else
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                        "Repository ID='"
-                            + repository.getId()
-                            + "' in group ID='"
-                            + this.getId()
-                            + "' was already processed during this request! This repository is skipped from processing. Request: "
-                            + request.toString() );
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                            "Repository ID='"
+                                + repository.getId()
+                                + "' in group ID='"
+                                + this.getId()
+                                + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                + request.toString() );
 
+                    }
                 }
             }
         }
