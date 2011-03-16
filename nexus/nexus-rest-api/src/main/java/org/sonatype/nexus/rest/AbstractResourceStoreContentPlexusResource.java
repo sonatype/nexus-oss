@@ -167,6 +167,21 @@ public abstract class AbstractResourceStoreContentPlexusResource
     public Object upload( Context context, Request request, Response response, List<FileItem> files )
         throws ResourceException
     {
+        // NEXUS-4151: Do not accept upload/deploy requests with media type (Content-Type) of
+        // "application/x-www-form-urlencoded", since ad 1, it's wrong, ad 2, we do know
+        // Jetty's Request object "eats" up it's body to parse request parameters, invoked
+        // way earlier in security filters
+        if ( request.isEntityAvailable() )
+        {
+            MediaType mt = request.getEntity().getMediaType();
+
+            if ( mt != null && MediaType.APPLICATION_WWW_FORM.isCompatible( mt ) )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Content-type of \"" + mt.toString()
+                    + "\" is not acceptable for uploads!" );
+            }
+        }
+
         try
         {
             ResourceStoreRequest req = getResourceStoreRequest( request );
