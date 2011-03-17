@@ -2,11 +2,11 @@ package org.sonatype.plexus.components.ehcache;
 
 import java.io.File;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.junit.Assert;
+import org.sonatype.guice.bean.containers.InjectedTestCase;
 
 public class DefaultEhCacheWrapperTest
-    extends PlexusTestCase
+    extends InjectedTestCase
 {
 
     public void testConfigFromClasspath()
@@ -23,11 +23,14 @@ public class DefaultEhCacheWrapperTest
 
         // it has to be Interpolated
         Assert.assertFalse( "The path is not interpolated? " + storePath,
-            storePath.contains( "${" ) || storePath.contains( "}" ) );
+                            storePath.contains( "${" ) || storePath.contains( "}" ) );
 
         // it has to point where we did set it (${basedir}/target/plexus-home/ehcache)
         Assert.assertEquals( "The store path does not point where we set it!",
-            getTestFile( "target/plexus-home/ehcache" ).getAbsoluteFile().getPath(), storePath );
+                             new File( getBasedir(), "target/plexus-home/ehcache" ).getAbsoluteFile().getPath(),
+                             storePath );
+        
+        cacheWrapper.stop();
     }
 
 }

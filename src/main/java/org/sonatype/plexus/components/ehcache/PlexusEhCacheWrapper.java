@@ -5,4 +5,6 @@ import net.sf.ehcache.CacheManager;
 public interface PlexusEhCacheWrapper
 {
     CacheManager getEhCacheManager();
+    
+    void stop();
 }
