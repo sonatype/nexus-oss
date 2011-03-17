@@ -27,8 +27,8 @@ public class DefaultEhCacheWrapperTest
 
         // it has to point where we did set it (${basedir}/target/plexus-home/ehcache)
         Assert.assertEquals( "The store path does not point where we set it!",
-                             new File( getBasedir(), "target/plexus-home/ehcache" ).getAbsoluteFile().getPath(),
-                             storePath );
+                             new File( getBasedir(), "target/plexus-home/ehcache" ).getAbsoluteFile().getPath().toLowerCase(),
+                             storePath.toLowerCase() );
         
         cacheWrapper.stop();
     }
