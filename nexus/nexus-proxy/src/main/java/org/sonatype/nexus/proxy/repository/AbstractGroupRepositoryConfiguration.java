@@ -67,7 +67,8 @@ public class AbstractGroupRepositoryConfiguration
     }
 
     @Override
-    public ValidationResponse doValidateChanges( ApplicationConfiguration applicationConfiguration, CoreConfiguration owner, Xpp3Dom config )
+    public ValidationResponse doValidateChanges( ApplicationConfiguration applicationConfiguration,
+                                                 CoreConfiguration owner, Xpp3Dom config )
     {
         ValidationResponse response = super.doValidateChanges( applicationConfiguration, owner, config );
 
@@ -86,11 +87,15 @@ public class AbstractGroupRepositoryConfiguration
         {
             ValidationMessage message =
                 new ValidationMessage( MEMBER_REPOSITORIES, "Group repository points to nonexistent members!",
-                                       "The source nexus repository is not existing." );
+                    "The source nexus repository is not existing." );
 
             response.addValidationError( message );
         }
-        
+
+        // we cannot check for cycles here, since this class is not a component and to unravel groups, you would need
+        // repo registry to do so. But the AbstractGroupRepository checks and does not allow itself to introduce cycles
+        // anyway.
+
         return response;
     }
 }

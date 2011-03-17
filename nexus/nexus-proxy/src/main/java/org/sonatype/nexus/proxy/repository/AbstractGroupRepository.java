@@ -308,18 +308,23 @@ public abstract class AbstractGroupRepository
     public void addMemberRepositoryId( String repositoryId )
         throws NoSuchRepositoryException, InvalidGroupingException
     {
+        // validate THEN modify
+        // this will throw NoSuchRepository if needed
         Repository repo = repoRegistry.getRepository( repositoryId );
 
-        if ( repo.getRepositoryContentClass().isCompatible( getRepositoryContentClass() ) )
-        {
-            getExternalConfiguration( true ).addMemberRepositoryId( repositoryId );
-        }
-        else
+        // check for cycles
+        List<String> memberIds = new ArrayList<String>( getExternalConfiguration( false ).getMemberRepositoryIds() );
+        memberIds.add( repo.getId() );
+        checkForCyclicReference( getId(), memberIds, getId() );
+
+        // check for compatibility
+        if ( !repo.getRepositoryContentClass().isCompatible( getRepositoryContentClass() ) )
         {
             throw new InvalidGroupingException( getRepositoryContentClass(), repo.getRepositoryContentClass() );
         }
 
-        checkForCyclicReference( getId(), getExternalConfiguration( true ).getMemberRepositoryIds(), getId() );
+        // if we are here, all is well
+        getExternalConfiguration( true ).addMemberRepositoryId( repo.getId() );
     }
 
     private void checkForCyclicReference( final String id, List<String> memberRepositoryIds, String path )
