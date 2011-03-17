@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
+import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -21,7 +22,8 @@ import org.sonatype.inject.Parameters;
 /**
  * The Class EhCacheCacheManager is a thin wrapper around EhCache, just to make things going.
  */
-@Named
+@Named( "default" )
+@Typed( PlexusEhCacheWrapper.class )
 public class DefaultEhCacheWrapper
     implements PlexusEhCacheWrapper
 {
