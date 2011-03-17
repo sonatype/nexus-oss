@@ -179,7 +179,7 @@ public class DefaultNexusConfiguration
             temporaryDirectory = null;
 
             globalLocalStorageContext = new DefaultLocalStorageContext( null );
-            
+
             // create global remote ctx
             // this one has no parent
             globalRemoteStorageContext = new DefaultRemoteStorageContext( null );
@@ -227,15 +227,15 @@ public class DefaultNexusConfiguration
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
-            
             String userId = null;
             Subject subject = securitySystem.getSubject();
-            if( subject != null && subject.getPrincipal() != null )
+            if ( subject != null && subject.getPrincipal() != null )
             {
                 userId = subject.getPrincipal().toString();
             }
 
-            applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges(), userId ) );
+            applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges(),
+                userId ) );
 
             return true;
         }
@@ -309,7 +309,7 @@ public class DefaultNexusConfiguration
     {
         return configurationSource.isConfigurationDefaulted();
     }
-    
+
     public LocalStorageContext getGlobalLocalStorageContext()
     {
         return globalLocalStorageContext;
@@ -340,7 +340,20 @@ public class DefaultNexusConfiguration
 
     public File getWorkingDirectory( String key )
     {
-        return new File( getWorkingDirectory(), key );
+        File keyedDirectory = new File( getWorkingDirectory(), key );
+
+        if ( !keyedDirectory.isDirectory() && !keyedDirectory.mkdirs() )
+        {
+            String message =
+                "\r\n******************************************************************************\r\n"
+                    + "* Could not create work directory [ " + keyedDirectory.toString() + "]!!!! *\r\n"
+                    + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
+                    + "******************************************************************************";
+
+            getLogger().fatalError( message );
+        }
+
+        return keyedDirectory;
     }
 
     public File getTemporaryDirectory()
