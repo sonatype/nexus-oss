@@ -1,6 +1,6 @@
 package org.sonatype.security.realms.tools;
 
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 import org.sonatype.security.model.Configuration;
 
 import com.google.inject.Inject;

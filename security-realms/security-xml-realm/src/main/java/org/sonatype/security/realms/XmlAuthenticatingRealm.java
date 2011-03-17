@@ -28,8 +28,6 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.inject.Description;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.ConfigurationManager;
@@ -38,7 +36,7 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
  * An Authentication Realm backed by an XML file see the security-model-xml module. This model defines users, roles, and
- * privileges.  This realm ONLY handles authentication.
+ * privileges. This realm ONLY handles authentication.
  * 
  * @author Brian Demers
  */
@@ -48,24 +46,24 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 @Description( value = "Xml Authenticating Realm" )
 public class XmlAuthenticatingRealm
     extends AuthorizingRealm
-    implements Initializable, Realm
+    implements Realm
 {
     public static final String ROLE = "XmlAuthenticatingRealm";
 
-    @Inject
-    @Named( value = "resourceMerging" )
     private ConfigurationManager configuration;
+
+    @Inject
+    public XmlAuthenticatingRealm( @Named( value = "resourceMerging" ) ConfigurationManager configuration )
+    {
+        super();
+        this.configuration = configuration;
+        setCredentialsMatcher( new Sha1ThenMd5CredentialsMatcher() );
+    }
 
     @Override
     public String getName()
     {
         return ROLE;
-    }
-
-    public void initialize()
-        throws InitializationException
-    {
-        setCredentialsMatcher( new Sha1ThenMd5CredentialsMatcher() );
     }
 
     @Override

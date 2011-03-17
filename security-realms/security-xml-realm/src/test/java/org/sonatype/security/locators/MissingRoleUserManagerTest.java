@@ -13,11 +13,11 @@
 package org.sonatype.security.locators;
 
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.context.Context;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -29,15 +29,14 @@ public class MissingRoleUserManagerTest
 
     public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
 
-    private static final String SECURITY_CONFIG_FILE_PATH = getBasedir()
+    private final String SECURITY_CONFIG_FILE_PATH = getBasedir()
         + "/target/test-classes/org/sonatype/jsecurity/locators/missingRoleTest-security.xml";
 
     @Override
-    protected void customizeContext( Context context )
+    public void configure( Properties properties )
     {
-        super.customizeContext( context );
-
-        context.put( PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH );
+        properties.put( PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH );
+        super.configure( properties );
     }
 
     // private Set<String> getXMLRoles() throws Exception

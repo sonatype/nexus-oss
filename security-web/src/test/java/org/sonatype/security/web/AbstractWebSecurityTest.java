@@ -3,21 +3,19 @@ package org.sonatype.security.web;
 import static org.easymock.EasyMock.replay;
 
 import java.io.File;
+import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.easymock.EasyMock;
+import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.security.SecuritySystem;
 
 public abstract class AbstractWebSecurityTest
-    extends PlexusTestCase
+    extends InjectedTestCase
 {
 
     protected File PLEXUS_HOME = new File( "./target/plexus-home/" );
@@ -25,33 +23,27 @@ public abstract class AbstractWebSecurityTest
     protected File APP_CONF = new File( PLEXUS_HOME, "conf" );
 
     @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    public void configure( Properties properties )
     {
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-    
-    @Override
-    protected void customizeContext( Context context )
-    {
-        super.customizeContext( context );
-        context.put( "application-conf", APP_CONF.getAbsolutePath() );
+        super.configure( properties );
+        properties.put( "application-conf", APP_CONF.getAbsolutePath() );
     }
 
     @Override
     protected void setUp()
         throws Exception
     {
+        super.setUp();
+        
         // delete the plexus home dir
         FileUtils.deleteDirectory( PLEXUS_HOME );
 
         this.getSecuritySystem().start();
-        
-        super.setUp();
     }
 
     protected SecuritySystem getSecuritySystem()
         throws Exception
-    {   
+    {
         return this.lookup( SecuritySystem.class );
     }
 
@@ -68,9 +60,9 @@ public abstract class AbstractWebSecurityTest
         replay( mockSession );
         replay( mockRequest );
 
-//        // we need to bind for the "web" impl of the PlexusSecurityManager to work
-//        WebUtils.bind( mockRequest );
-//        WebUtils.bind( mockResponse );
+        // // we need to bind for the "web" impl of the PlexusSecurityManager to work
+        // WebUtils.bind( mockRequest );
+        // WebUtils.bind( mockResponse );
     }
 
 }

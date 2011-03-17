@@ -18,20 +18,20 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Properties;
+
+import javax.inject.Inject;
 
 import org.apache.shiro.realm.Realm;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 
 public abstract class AbstractSecurityTestCase
-    extends PlexusTestCase
+    extends InjectedTestCase
 {
 
     public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
@@ -39,21 +39,18 @@ public abstract class AbstractSecurityTestCase
     protected File PLEXUS_HOME = new File( "./target/plexus_home" );
 
     protected File CONFIG_DIR = new File( PLEXUS_HOME, "conf" );
+    
+    @Inject
+    Map<String,Realm> realmMap;
 
     @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    public void configure( Properties properties )
     {
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
+        properties.put( "application-conf", CONFIG_DIR.getAbsolutePath() );
+        properties.put( "security-xml-file", CONFIG_DIR.getAbsolutePath() + "/security.xml" );
+        super.configure( properties );
     }
     
-    @Override
-    protected void customizeContext( Context context )
-    {
-        super.customizeContext( context );
-        context.put( "application-conf", CONFIG_DIR.getAbsolutePath() );
-        context.put( "security-xml-file", CONFIG_DIR.getAbsolutePath() + "/security.xml" );
-    }
-
     @Override
     protected void setUp()
         throws Exception
@@ -66,8 +63,6 @@ public abstract class AbstractSecurityTestCase
 
         SecurityConfigurationSource source = this.lookup( SecurityConfigurationSource.class, "file" );
         SecurityConfiguration config = source.loadConfiguration();
-
-        Map<String, Realm> realmMap = this.getContainer().lookupMap( Realm.class );
 
         config.setRealms( new ArrayList<String>( realmMap.keySet() ) );
         source.storeConfiguration();

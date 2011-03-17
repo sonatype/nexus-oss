@@ -14,17 +14,15 @@ package org.sonatype.security.realms;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.context.Context;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
@@ -34,157 +32,150 @@ import org.sonatype.security.realms.tools.DefaultConfigurationManager;
 import org.sonatype.security.usermanagement.StringDigester;
 
 public class XmlAuthenticatingRealmTest
-    extends PlexusTestCase
+    extends InjectedTestCase
 {
     public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
-    
-    private static final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/jsecurity/security.xml"; 
-    
+
+    private final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/jsecurity/security.xml";
+
     private File configFile = new File( SECURITY_CONFIG_FILE_PATH );
-    
+
     private XmlAuthenticatingRealm realm;
-    
+
     private DefaultConfigurationManager configurationManager;
-    
+
     @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    public void configure( Properties properties )
     {
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
+        properties.put( PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH );
+        super.configure( properties );
     }
-    
-    @Override
-    protected void customizeContext( Context context )
-    {
-        super.customizeContext( context );
-        
-        context.put( PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH );
-    }
-    
+
     @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
-        
-        realm = ( XmlAuthenticatingRealm ) lookup( Realm.class, "XmlAuthenticatingRealm" );
-        
-        configurationManager = ( DefaultConfigurationManager ) lookup( ConfigurationManager.class, "default" );
-        
+
+        realm = (XmlAuthenticatingRealm) lookup( Realm.class, "XmlAuthenticatingRealm" );
+
+        configurationManager = (DefaultConfigurationManager) lookup( ConfigurationManager.class, "default" );
+
         configurationManager.clearCache();
-        
+
         configFile.delete();
     }
-    
+
     public void testSuccessfulAuthentication()
         throws Exception
     {
         buildTestAuthenticationConfig( CUser.STATUS_ACTIVE );
-        
+
         UsernamePasswordToken upToken = new UsernamePasswordToken( "username", "password" );
-        
+
         AuthenticationInfo ai = realm.getAuthenticationInfo( upToken );
-        
-        String password = new String( (char[] ) ai.getCredentials() );
-        
-        assertEquals( StringDigester.getSha1Digest( "password" ), password );        
+
+        String password = new String( (char[]) ai.getCredentials() );
+
+        assertEquals( StringDigester.getSha1Digest( "password" ), password );
     }
-    
-    
+
     public void testCreateWithPassowrd()
-    throws Exception
+        throws Exception
     {
         buildTestAuthenticationConfig( CUser.STATUS_ACTIVE );
-        
+
         String clearPassword = "default-password";
-        
+
         CUser user = new CUser();
         user.setEmail( "testCreateWithPassowrdEmail@somewhere" );
         user.setFirstName( "testCreateWithPassowrdEmail" );
         user.setLastName( "testCreateWithPassowrdEmail" );
         user.setStatus( CUser.STATUS_ACTIVE );
         user.setId( "testCreateWithPassowrdEmailUserId" );
-        
+
         Set<String> roles = new HashSet<String>();
         roles.add( "role" );
-        
+
         configurationManager.createUser( user, clearPassword, roles );
-        
+
         UsernamePasswordToken upToken = new UsernamePasswordToken( "testCreateWithPassowrdEmailUserId", clearPassword );
-        
+
         AuthenticationInfo ai = realm.getAuthenticationInfo( upToken );
-        
-        String password = new String( (char[] ) ai.getCredentials() );
-        
-        assertEquals( StringDigester.getSha1Digest( clearPassword ), password );        
+
+        String password = new String( (char[]) ai.getCredentials() );
+
+        assertEquals( StringDigester.getSha1Digest( clearPassword ), password );
     }
-    
+
     public void testFailedAuthentication()
         throws Exception
     {
         buildTestAuthenticationConfig( CUser.STATUS_ACTIVE );
-        
+
         UsernamePasswordToken upToken = new UsernamePasswordToken( "username", "badpassword" );
-        
+
         try
         {
             realm.getAuthenticationInfo( upToken );
-            
+
             fail( "Authentication should have failed" );
         }
-        catch( AuthenticationException e )
+        catch ( AuthenticationException e )
         {
             // good
-        }   
+        }
     }
-    
+
     public void testDisabledAuthentication()
         throws Exception
     {
         buildTestAuthenticationConfig( CUser.STATUS_DISABLED );
-        
+
         UsernamePasswordToken upToken = new UsernamePasswordToken( "username", "password" );
-        
+
         try
         {
             realm.getAuthenticationInfo( upToken );
-            
+
             fail( "Authentication should have failed" );
         }
-        catch( AuthenticationException e )
+        catch ( AuthenticationException e )
         {
             // good
         }
     }
-    
-    private void buildTestAuthenticationConfig( String status ) throws InvalidConfigurationException
+
+    private void buildTestAuthenticationConfig( String status )
+        throws InvalidConfigurationException
     {
         CPrivilege priv = new CPrivilege();
         priv.setId( "priv" );
         priv.setName( "name" );
         priv.setDescription( "desc" );
         priv.setType( "method" );
-        
+
         CProperty prop = new CProperty();
         prop.setKey( "method" );
         prop.setValue( "read" );
         priv.addProperty( prop );
-        
+
         prop = new CProperty();
         prop.setKey( "permission" );
         prop.setValue( "somevalue" );
         priv.addProperty( prop );
-        
+
         configurationManager.createPrivilege( priv );
-        
+
         CRole role = new CRole();
         role.setName( "name" );
         role.setId( "role" );
         role.setDescription( "desc" );
         role.setSessionTimeout( 50 );
         role.addPrivilege( "priv" );
-        
+
         configurationManager.createRole( role );
-        
+
         CUser user = new CUser();
         user.setEmail( "dummyemail@somewhere" );
         user.setFirstName( "dummyFirstName" );
@@ -192,10 +183,10 @@ public class XmlAuthenticatingRealmTest
         user.setStatus( status );
         user.setId( "username" );
         user.setPassword( StringDigester.getSha1Digest( "password" ) );
-        
+
         Set<String> roles = new HashSet<String>();
         roles.add( "role" );
-        
+
         configurationManager.createUser( user, roles );
         configurationManager.save();
     }

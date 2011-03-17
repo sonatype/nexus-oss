@@ -6,30 +6,33 @@ import org.sonatype.security.email.SecurityEmailer;
 import org.sonatype.security.mock.MockEmailer;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
+import com.google.inject.Binder;
+
 public class EmailerTest
     extends AbstractSecurityTest
 {
+    private MockEmailer emailer = new MockEmailer();
+
+    @Override
+    public void configure( Binder binder )
+    {
+        binder.bind( SecurityEmailer.class ).toInstance( emailer );
+    }
 
     public void testForgotUsername()
         throws Exception
     {
-        // use our Mock emailer
-        MockEmailer emailer = (MockEmailer) this.lookup( SecurityEmailer.class );
-
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
 
         securitySystem.forgotUsername( "cdugas@sonatype.org" );
 
-        Assert.assertTrue( emailer.getForgotUserIds().contains( "cdugas" ) );
-        Assert.assertEquals( 1, emailer.getForgotUserIds().size() );
+        Assert.assertTrue( ( (MockEmailer) emailer ).getForgotUserIds().contains( "cdugas" ) );
+        Assert.assertEquals( 1, ( (MockEmailer) emailer ).getForgotUserIds().size() );
     }
 
     public void testDoNotRecoverAnonUserName()
         throws Exception
     {
-        // use our Mock emailer
-        MockEmailer emailer = (MockEmailer) this.lookup( SecurityEmailer.class );
-
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
 
         try

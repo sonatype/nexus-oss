@@ -12,6 +12,9 @@
  */
 package org.sonatype.security.realms.url;
 
+import java.util.Arrays;
+import java.util.Properties;
+
 import junit.framework.Assert;
 
 import org.apache.shiro.authc.AccountException;
@@ -21,7 +24,10 @@ import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.mortbay.jetty.servlet.DefaultServlet;
+import org.sonatype.jettytestsuite.ServletInfo;
 import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.jettytestsuite.WebappContext;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.realms.url.config.UrlRealmConfiguration;
 import org.sonatype.security.usermanagement.UserManager;
@@ -67,15 +73,16 @@ public class URLRealmTest
 
         URLRealm urlRealm = this.getRealm();
 
-//        AuthorizationInfo info = urlRealm.getAuthorizationInfo( new SimplePrincipalCollection( username, urlRealm
-//            .getName() ) );
-//        Assert.assertNotNull( info );
-//        Assert
-//            .assertTrue( "User does not have expected Role: " + DEFAULT_ROLE, info.getRoles().contains( DEFAULT_ROLE ) );
+        // AuthorizationInfo info = urlRealm.getAuthorizationInfo( new SimplePrincipalCollection( username, urlRealm
+        // .getName() ) );
+        // Assert.assertNotNull( info );
+        // Assert
+        // .assertTrue( "User does not have expected Role: " + DEFAULT_ROLE, info.getRoles().contains( DEFAULT_ROLE ) );
 
         try
         {
-            urlRealm.isPermitted( new SimplePrincipalCollection( "bob", urlRealm.getName() ), new WildcardPermission( "*" ) );
+            urlRealm.isPermitted( new SimplePrincipalCollection( "bob", urlRealm.getName() ),
+                                  new WildcardPermission( "*" ) );
             Assert.fail( "Expected AuthorizationException" );
         }
         catch ( AuthorizationException e )
@@ -131,15 +138,15 @@ public class URLRealmTest
         }
     }
 
-//    @Override
-//    protected void customizeContext( Context ctx )
-//    {
-//        super.customizeContext( ctx );
-////        ctx.put( "url-authentication-email-domain", "sonateyp.org" );
-////        ctx.put( "url-authentication-default-role", DEFAULT_ROLE );
-////        ctx.put( "authentication-url", "NOT_SET" ); // we cannot figure this out until after the container starts
-//
-//    }
+    // @Override
+    // protected void customizeContext( Context ctx )
+    // {
+    // super.customizeContext( ctx );
+    // // ctx.put( "url-authentication-email-domain", "sonateyp.org" );
+    // // ctx.put( "url-authentication-default-role", DEFAULT_ROLE );
+    // // ctx.put( "authentication-url", "NOT_SET" ); // we cannot figure this out until after the container starts
+    //
+    // }
 
     @Override
     protected void setUp()
@@ -147,15 +154,15 @@ public class URLRealmTest
     {
         super.setUp();
 
-        server = this.lookup( ServletServer.class );
+        server = getServletServer();
         // start the server
         server.start();
-        
+
         UrlRealmConfiguration urlRealmConfiguration = this.lookup( UrlRealmConfiguration.class );
         Configuration configuration = urlRealmConfiguration.getConfiguration();
         configuration.setDefaultRole( DEFAULT_ROLE );
         configuration.setEmailDomain( "sonateyp.org" );
-        configuration.setUrl( server.getUrl( AUTH_APP_NAME ) + "/"  ); // add the '/' to the end        
+        configuration.setUrl( server.getUrl( AUTH_APP_NAME ) + "/" ); // add the '/' to the end
     }
 
     @Override
@@ -164,6 +171,38 @@ public class URLRealmTest
     {
         server.stop();
         super.tearDown();
+    }
+
+    protected ServletServer getServletServer()
+        throws Exception
+    {
+        ServletServer server = new ServletServer();
+        server.setPort( 12345 );
+
+        WebappContext webapp = new WebappContext();
+        server.setWebappContexts( Arrays.asList( webapp ) );
+
+        webapp.setName( "auth_app" );
+        org.sonatype.jettytestsuite.AuthenticationInfo authInfo = new org.sonatype.jettytestsuite.AuthenticationInfo();
+        webapp.setAuthenticationInfo( authInfo );
+
+        authInfo.setAuthMethod( "BASIC" );
+        authInfo.setCredentialsFilePath( getBasedir() + "/target/test-classes/credentials.properties" );
+
+        ServletInfo servletInfo = new ServletInfo();
+        webapp.setServletInfos( Arrays.asList( servletInfo ) );
+
+        servletInfo.setMapping( "/*" );
+        servletInfo.setServletClass( DefaultServlet.class.getName() );
+
+        Properties params = new Properties();
+        servletInfo.setParameters( params );
+
+        params.put( "resourceBase", getBasedir() + "/target/test-classes/" );
+
+        server.initialize();
+
+        return server;
     }
 
 }

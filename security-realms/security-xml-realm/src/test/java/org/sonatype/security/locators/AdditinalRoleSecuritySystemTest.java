@@ -15,35 +15,43 @@ package org.sonatype.security.locators;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.context.Context;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.Role;
+import org.sonatype.security.realms.tools.StaticSecurityResource;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
+import com.google.inject.Binder;
+import com.google.inject.name.Names;
+
 public class AdditinalRoleSecuritySystemTest
     extends AbstractSecurityTestCase
 {
-
     public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
 
-    private static final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/test-classes/"
+    private final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/test-classes/"
         + AdditinalRoleSecuritySystemTest.class.getPackage().getName().replaceAll( "\\.", "\\/" )
         + "/additinalRoleTest-security.xml";
 
     @Override
-    protected void customizeContext( Context context )
+    public void configure( Properties properties )
     {
-        super.customizeContext( context );
-
-        context.put( PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH );
+        super.configure( properties );
+        properties.put( PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH );
+    }
+    
+    @Override
+    public void configure( Binder binder )
+    {
+        binder.bind( StaticSecurityResource.class ).annotatedWith( Names.named( "mock" ) ).to( MockStaticSecurityResource.class );
     }
 
     private Set<String> getXMLRoles()
@@ -70,7 +78,7 @@ public class AdditinalRoleSecuritySystemTest
         throws Exception
     {
         SecuritySystem userManager = this.getSecuritySystem();
-        UserSearchCriteria criteria = new UserSearchCriteria(null, null, "MockUserManagerA");
+        UserSearchCriteria criteria = new UserSearchCriteria( null, null, "MockUserManagerA" );
         Set<User> users = userManager.searchUsers( criteria );
 
         Map<String, User> userMap = this.toUserMap( users );
@@ -83,10 +91,10 @@ public class AdditinalRoleSecuritySystemTest
         Assert.assertTrue( roleIds.contains( "RoleA" ) );
         Assert.assertTrue( roleIds.contains( "RoleB" ) );
         Assert.assertTrue( roleIds.contains( "RoleC" ) );
-        Assert.assertTrue( "roles: "+ this.toRoleIdSet( user.getRoles() ), roleIds.contains( "Role1" ) );
+        Assert.assertTrue( "roles: " + this.toRoleIdSet( user.getRoles() ), roleIds.contains( "Role1" ) );
 
-        Assert.assertEquals("roles: "+ this.toRoleIdSet( user.getRoles() ), 4, user.getRoles().size() );
-        
+        Assert.assertEquals( "roles: " + this.toRoleIdSet( user.getRoles() ), 4, user.getRoles().size() );
+
         user = userMap.get( "dknudsen" );
         Assert.assertNotNull( user );
         Assert.assertEquals( 1, user.getRoles().size() );
@@ -110,7 +118,7 @@ public class AdditinalRoleSecuritySystemTest
         Assert.assertEquals( 0, user.getRoles().size() );
 
     }
-    
+
     public void testSearchEffectiveTrue()
         throws Exception
     {

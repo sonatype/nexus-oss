@@ -23,25 +23,27 @@ import org.apache.shiro.web.filter.mgt.FilterChainManager;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.servlet.IniShiroFilter;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
 
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
+
 /**
- * Extension of ShiroFilter that uses Plexus lookup to get the configuration, if any role param is given. Otherwise it
- * fallbacks to the standard stuff from JSecurityFilter.
+ * Extension of ShiroFilter that uses SISU (with Plexus if PlexusConstants.PLEXUS_KEY in context ) lookup to get the
+ * configuration, if any role param is given. Otherwise it fallbacks to the standard stuff from JSecurityFilter.
  * 
  * @author cstamas
  */
 public class ShiroSecurityFilter
     extends IniShiroFilter
 {
-
     private SecuritySystem securitySystem;
 
     private WebSecurityManager securityManager;
+
+    public static final String INJECTORY_KEY = "injector.key";
 
     @Override
     protected Map<String, ?> applySecurityManager( Ini ini )
@@ -60,21 +62,16 @@ public class ShiroSecurityFilter
         return securityManager;
     }
 
-    public PlexusContainer getPlexusContainer()
-    {
-        return (PlexusContainer) getContextAttribute( PlexusConstants.PLEXUS_KEY );
-    }
-
     @Override
     protected void configure()
         throws Exception
     {
-        SecurityConfigurationManager cfg = this.getPlexusContainer().lookup( SecurityConfigurationManager.class );
+        SecurityConfigurationManager cfg = getSecurityConfigurationManager();
         cfg.setSecurityManager( "web" );
 
         // start up security
         this.getSecuritySystem().start();
-        this.securityManager = (WebSecurityManager) this.getPlexusContainer().lookup( RealmSecurityManager.class, "web" );
+        this.securityManager = getWebSecurityManager();
 
         // call super
         super.configure();
@@ -82,7 +79,7 @@ public class ShiroSecurityFilter
         FilterChainManager filterChainManager =
             ( (PathMatchingFilterChainResolver) super.getFilterChainResolver() ).getFilterChainManager();
 
-        ProtectedPathManager protectedPathManager = this.getPlexusContainer().lookup( ProtectedPathManager.class );
+        ProtectedPathManager protectedPathManager = getProtectedPathManager();
         // this cannot be injected as long as the configuration comes from the servlet config.
         // TODO: push the ini config in its own file.
         if ( FilterChainManagerAware.class.isInstance( protectedPathManager ) )
@@ -91,13 +88,24 @@ public class ShiroSecurityFilter
         }
     }
 
-    @Override
-    protected boolean shouldNotFilter( ServletRequest request )
-        throws ServletException
+    private SecurityConfigurationManager getSecurityConfigurationManager()
+        throws Exception
     {
-        return !this.getSecuritySystem().isSecurityEnabled();
+        return getInstance( SecurityConfigurationManager.class );
     }
-    
+
+    private WebSecurityManager getWebSecurityManager()
+        throws Exception
+    {
+        return (WebSecurityManager) getInstance( RealmSecurityManager.class, "web" );
+    }
+
+    private ProtectedPathManager getProtectedPathManager()
+        throws Exception
+    {
+        return (ProtectedPathManager) getInstance( ProtectedPathManager.class );
+    }
+
     private SecuritySystem getSecuritySystem()
     {
         // lazy load it using the container
@@ -105,14 +113,45 @@ public class ShiroSecurityFilter
         {
             try
             {
-                this.securitySystem = this.getPlexusContainer().lookup( SecuritySystem.class );
+                this.securitySystem = getInstance( SecuritySystem.class );
             }
-            catch ( ComponentLookupException e )
+            catch ( Exception e )
             {
                 throw new IllegalStateException( "Failed to load the Security System.", e );
             }
         }
 
         return this.securitySystem;
+    }
+
+    protected <T> T getInstance( Class<T> clazz )
+        throws Exception
+    {
+        return getInstance( clazz, null );
+    }
+
+    protected <T> T getInstance( Class<T> clazz, String name )
+        throws Exception
+    {
+        if ( name == null )
+        {
+            return getInjector().getInstance( Key.get( clazz ) );
+        }
+        else
+        {
+            return getInjector().getInstance( Key.get( clazz, Names.named( name ) ) );
+        }
+    }
+
+    protected Injector getInjector()
+    {
+        return (Injector) getServletContext().getAttribute( INJECTORY_KEY );
+    }
+
+    @Override
+    protected boolean shouldNotFilter( ServletRequest request )
+        throws ServletException
+    {
+        return !this.getSecuritySystem().isSecurityEnabled();
     }
 }

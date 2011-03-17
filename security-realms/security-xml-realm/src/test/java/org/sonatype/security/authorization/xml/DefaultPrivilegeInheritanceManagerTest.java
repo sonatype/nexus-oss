@@ -14,66 +14,55 @@ package org.sonatype.security.authorization.xml;
 
 import java.util.List;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.guice.bean.containers.InjectedTestCase;
 
 public class DefaultPrivilegeInheritanceManagerTest
-    extends
-    PlexusTestCase
+    extends InjectedTestCase
 {
     private DefaultPrivilegeInheritanceManager manager;
-    
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-    
+
     protected void setUp()
         throws Exception
     {
         super.setUp();
-    
+
         manager = (DefaultPrivilegeInheritanceManager) this.lookup( PrivilegeInheritanceManager.class );
     }
-    
+
     public void testCreateInherit()
         throws Exception
     {
         List<String> methods = manager.getInheritedMethods( "create" );
-        
+
         assertTrue( methods.size() == 2 );
         assertTrue( methods.contains( "read" ) );
         assertTrue( methods.contains( "create" ) );
     }
-    
+
     public void testReadInherit()
         throws Exception
     {
         List<String> methods = manager.getInheritedMethods( "read" );
-        
+
         assertTrue( methods.size() == 1 );
         assertTrue( methods.contains( "read" ) );
     }
-    
- 
-    
+
     public void testUpdateInherit()
         throws Exception
     {
         List<String> methods = manager.getInheritedMethods( "update" );
-            
+
         assertTrue( methods.size() == 2 );
         assertTrue( methods.contains( "read" ) );
         assertTrue( methods.contains( "update" ) );
     }
-    
+
     public void testDeleteInherit()
         throws Exception
     {
         List<String> methods = manager.getInheritedMethods( "delete" );
-        
+
         assertTrue( methods.size() == 2 );
         assertTrue( methods.contains( "read" ) );
         assertTrue( methods.contains( "delete" ) );

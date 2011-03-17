@@ -11,13 +11,11 @@ import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.apache.shiro.util.Initializable;
 import org.slf4j.Logger;
+import org.sonatype.inject.Nullable;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
-
-import org.sonatype.inject.Nullable;
 
 /**
  * Componentize the Shiro DefaultSecurityManager, and sets up caching.
@@ -29,23 +27,26 @@ import org.sonatype.inject.Nullable;
 @Named( value = "default" )
 public class DefaultRealmSecurityManager
     extends DefaultSecurityManager
-    implements Initializable, org.apache.shiro.util.Initializable
+    implements Initializable
 {
-
-    @Inject
-    @Nullable
-    private RolePermissionResolver rolePermissionResolver;
-
-    @Inject
     private Logger logger;
-
+    private RolePermissionResolver rolePermissionResolver;
     
-    public void initialize()
-        throws InitializationException
+    @Inject
+    public DefaultRealmSecurityManager( Logger logger, @Nullable RolePermissionResolver rolePermissionResolver )
     {
-
+        super();
+        this.logger = logger;
+        this.rolePermissionResolver = rolePermissionResolver;
+        init();
+    }
+    
+    @Override
+    public void init()
+        throws ShiroException
+    {
         this.setSessionManager( new DefaultSessionManager() );
-        
+
         // This could be injected
         // Authorizer
         ExceptionCatchingModularRealmAuthorizer authorizer =
@@ -62,27 +63,12 @@ public class DefaultRealmSecurityManager
             logger.warn( "No RolePermissionResolver is set" );
         }
         this.setAuthorizer( authorizer );
-        
+
         // set the realm authenticator, that will automatically deligate the authentication to all the realms.
         FirstSuccessfulModularRealmAuthenticator realmAuthenticator = new FirstSuccessfulModularRealmAuthenticator();
         realmAuthenticator.setAuthenticationStrategy( new FirstSuccessfulStrategy() );
 
         // Authenticator
         this.setAuthenticator( realmAuthenticator );
-        
-        
-    }
-
-    public void init()
-        throws ShiroException
-    {
-        try
-        {
-            this.initialize();
-        }
-        catch ( InitializationException e )
-        {
-            throw new ShiroException("Failed to initialize " + this.getClass().getName(), e );
-        }
     }
 }

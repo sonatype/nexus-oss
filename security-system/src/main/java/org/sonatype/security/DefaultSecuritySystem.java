@@ -25,10 +25,6 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -65,49 +61,61 @@ import org.sonatype.security.usermanagement.UserStatus;
 @Typed( value = SecuritySystem.class )
 @Named( value = "default" )
 public class DefaultSecuritySystem
-    implements SecuritySystem, Initializable, EventListener
+    implements SecuritySystem, EventListener
 {
-    @Inject
     private SecurityConfigurationManager securityConfiguration;
 
-    @Inject
     private Map<String, RealmSecurityManager> securityManagers;
 
-    @Inject
     private PlexusEhCacheWrapper cacheWrapper;
 
-    @Inject
     private Map<String, UserManager> userManagerMap;
 
-    @Inject
     private Map<String, Realm> realmMap;
 
-    @Inject
     private Map<String, AuthorizationManager> authorizationManagers;
 
-    @Inject
     private PasswordGenerator passwordGenerator;
 
-    @Inject
     private ApplicationEventMulticaster eventMulticaster;
 
-    @Inject
     private Logger logger;
 
-    @Inject
     private List<SecurityEmailer> securityEmailers;
 
     private SecurityEmailer securityEmailer;
 
     private static final String ALL_ROLES_KEY = "all";
 
+    @Inject
+    public DefaultSecuritySystem( List<SecurityEmailer> securityEmailers, Logger logger,
+                                  ApplicationEventMulticaster eventMulticaster, PasswordGenerator passwordGenerator,
+                                  Map<String, AuthorizationManager> authorizationManagers, Map<String, Realm> realmMap,
+                                  SecurityConfigurationManager securityConfiguration,
+                                  Map<String, RealmSecurityManager> securityManagers,
+                                  PlexusEhCacheWrapper cacheWrapper, Map<String, UserManager> userManagerMap )
+    {
+        this.securityEmailers = securityEmailers;
+        this.logger = logger;
+        this.eventMulticaster = eventMulticaster;
+        this.passwordGenerator = passwordGenerator;
+        this.authorizationManagers = authorizationManagers;
+        this.realmMap = realmMap;
+        this.securityConfiguration = securityConfiguration;
+        this.securityManagers = securityManagers;
+        this.cacheWrapper = cacheWrapper;
+        this.userManagerMap = userManagerMap;
+
+        this.eventMulticaster.addEventListener( this );
+        SecurityUtils.setSecurityManager( this.getSecurityManager() );
+    }
+
     public Subject login( AuthenticationToken token )
         throws AuthenticationException
     {
         try
         {
-            Subject subject =
- new Subject.Builder( getSecurityManager() ).buildSubject();
+            Subject subject = new Subject.Builder( getSecurityManager() ).buildSubject();
             // TODO: consider doing something else here, read the javadoc for the login method
             subject.login( token );
             // Subject subject = this.getApplicationSecurityManager().login( null, token );
@@ -165,8 +173,7 @@ public class DefaultSecuritySystem
 
     public boolean[] isPermitted( PrincipalCollection principal, List<String> permissions )
     {
-        return this.getSecurityManager().isPermitted( principal,
-                                                                 permissions.toArray( new String[permissions.size()] ) );
+        return this.getSecurityManager().isPermitted( principal, permissions.toArray( new String[permissions.size()] ) );
     }
 
     public void checkPermission( PrincipalCollection principal, String permission )
@@ -188,8 +195,7 @@ public class DefaultSecuritySystem
     {
         try
         {
-            this.getSecurityManager().checkPermissions( principal,
-                                                                   permissions.toArray( new String[permissions.size()] ) );
+            this.getSecurityManager().checkPermissions( principal, permissions.toArray( new String[permissions.size()] ) );
         }
         catch ( org.apache.shiro.authz.AuthorizationException e )
         {
@@ -210,7 +216,7 @@ public class DefaultSecuritySystem
 
         for ( String realmId : realmIds )
         {
-            if( this.realmMap.containsKey( realmId ))
+            if ( this.realmMap.containsKey( realmId ) )
             {
                 realms.add( this.realmMap.get( realmId ) );
             }
@@ -439,11 +445,9 @@ public class DefaultSecuritySystem
                 try
                 {
                     foundUser = true;
-                    roleMappingUserManager.setUsersRoles(
-                                                          userId,
+                    roleMappingUserManager.setUsersRoles( userId,
                                                           source,
-                                                          RoleIdentifier.getRoleIdentifiersForSource(
-                                                                                                      tmpUserManager.getSource(),
+                                                          RoleIdentifier.getRoleIdentifiersForSource( tmpUserManager.getSource(),
                                                                                                       roleIdentifiers ) );
                 }
                 catch ( UserNotFoundException e )
@@ -533,7 +537,7 @@ public class DefaultSecuritySystem
             for ( UserManager tmpUserManager : this.userManagerMap.values() )
             {
                 Set<User> result = tmpUserManager.searchUsers( criteria );
-                if( result != null )
+                if ( result != null )
                 {
                     users.addAll( result );
                 }
@@ -848,7 +852,6 @@ public class DefaultSecuritySystem
     }
 
     public void start()
-        throws StartingException
     {
         // reload the config
         this.securityConfiguration.clearCache();
@@ -867,7 +870,6 @@ public class DefaultSecuritySystem
     }
 
     public void stop()
-        throws StoppingException
     {
         // we need to kill caches on stop
         getSecurityManager().destroy();
@@ -915,15 +917,6 @@ public class DefaultSecuritySystem
 
             this.setSecurityManagerRealms();
         }
-    }
-
-    public void initialize()
-        throws InitializationException
-    {
-        // add event handler
-        this.eventMulticaster.addEventListener( this );
-        SecurityUtils.setSecurityManager( this.getSecurityManager() );
-
     }
 
     public RealmSecurityManager getSecurityManager()

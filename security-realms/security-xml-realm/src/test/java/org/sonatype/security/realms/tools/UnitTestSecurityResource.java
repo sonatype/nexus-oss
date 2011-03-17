@@ -12,7 +12,9 @@
  */
 package org.sonatype.security.realms.tools;
 
+import javax.inject.Singleton;
 
+@Singleton
 public class UnitTestSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource

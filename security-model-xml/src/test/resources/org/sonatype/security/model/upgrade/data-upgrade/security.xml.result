@@ -3,7 +3,7 @@
   <version>2.0.4</version>
   <users>
     <user>
-      <id>admin-user</id>
+      <id>admin</id>
       <firstName>Administrator</firstName>
       <password>f865b53623b121fd34ee5426c792e5c33af8c227</password>
       <status>active</status>
@@ -88,7 +88,7 @@
   </roles>
   <userRoleMappings>
     <userRoleMapping>
-      <userId>admin-user</userId>
+      <userId>admin</userId>
       <source>default</source>
       <roles>
         <role>admin</role>

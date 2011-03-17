@@ -16,27 +16,27 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Properties;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.guice.bean.containers.InjectedTestCase;
 
 public abstract class AbstractSecurityConfigTest
-    extends PlexusTestCase
+    extends InjectedTestCase
 {
 
-    protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
+    protected final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
 
-    protected static final File CONF_HOME = new File( PLEXUS_HOME, "conf" );
-
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
+    protected final File CONF_HOME = new File( PLEXUS_HOME, "conf" );
     
+    @Override
+    public void configure( Properties properties )
+    {
+        properties.put( "security-xml-file", getSecurityConfiguration() );
+        super.configure( properties );
+    }
+
     protected void copyDefaultSecurityConfigToPlace()
         throws IOException
     {
@@ -101,12 +101,12 @@ public abstract class AbstractSecurityConfigTest
     @Override
     protected void setUp()
         throws Exception
-    {   
+    {
         super.setUp();
-        
+
         // delete the config dir
         FileUtils.deleteDirectory( PLEXUS_HOME );
-        
+
         // create conf dir
         CONF_HOME.mkdirs();
     }

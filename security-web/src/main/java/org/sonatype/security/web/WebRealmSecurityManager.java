@@ -14,8 +14,6 @@ import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.slf4j.Logger;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
@@ -31,27 +29,29 @@ import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthoriz
 @Named( value = "web" )
 public class WebRealmSecurityManager
     extends DefaultWebSecurityManager
-    implements Initializable, org.apache.shiro.util.Initializable
+    implements org.apache.shiro.util.Initializable
 {
-
-    @Inject
     private Map<String, RolePermissionResolver> rolePermissionResolverMap;
 
-    @Inject
     private Logger logger;
 
-    public WebRealmSecurityManager()
+    @Inject
+    public WebRealmSecurityManager( Logger logger, Map<String, RolePermissionResolver> rolePermissionResolverMap )
     {
+        this.logger = logger;
+        this.rolePermissionResolverMap = rolePermissionResolverMap;
+
         // set the realm authenticator, that will automatically deligate the authentication to all the realms.
         FirstSuccessfulModularRealmAuthenticator realmAuthenticator = new FirstSuccessfulModularRealmAuthenticator();
         realmAuthenticator.setAuthenticationStrategy( new FirstSuccessfulStrategy() );
 
         // Authenticator
         this.setAuthenticator( realmAuthenticator );
+
+        initialize();
     }
 
     public void initialize()
-        throws InitializationException
     {
         // This could be injected
         // Authorizer

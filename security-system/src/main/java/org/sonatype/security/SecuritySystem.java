@@ -8,8 +8,6 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
@@ -35,19 +33,13 @@ public interface SecuritySystem
 
     /**
      * Starts the SecuritySystem. Before this method is called the state is unknown.
-     * 
-     * @throws StartingException
      */
-    void start()
-        throws StartingException;
+    void start();
 
     /**
      * Stops the SecuritySystem. Provides a way to clean up resources.
-     * 
-     * @throws StoppingException
      */
-    void stop()
-        throws StoppingException;
+    void stop();
 
     // *********************
     // * authentication
@@ -453,8 +445,9 @@ public interface SecuritySystem
 
     /**
      * Returns the configured shiro SecurityManager
+     * 
      * @return
      */
     public RealmSecurityManager getSecurityManager();
-    
+
 }

@@ -14,11 +14,11 @@ package org.sonatype.security.locators.users;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.security.authorization.Role;
 
 public class RoleTest
-    extends PlexusTestCase
+    extends InjectedTestCase
 {
 
     public void testCompareDifferentId()
@@ -32,12 +32,12 @@ public class RoleTest
         roleB.setName( "ID2" );
         roleB.setRoleId( "ID2" );
         roleB.setSource( "source" );
-        
+
         Assert.assertEquals( -1, roleA.compareTo( roleB ) );
         Assert.assertEquals( 1, roleB.compareTo( roleA ) );
 
     }
-    
+
     public void testCompareDifferentSource()
     {
         Role roleA = new Role();
@@ -49,7 +49,7 @@ public class RoleTest
         roleB.setName( "ID1" );
         roleB.setRoleId( "ID1" );
         roleB.setSource( "source2" );
-        
+
         Assert.assertEquals( -1, roleA.compareTo( roleB ) );
         Assert.assertEquals( 1, roleB.compareTo( roleA ) );
 

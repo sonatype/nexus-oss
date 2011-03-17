@@ -24,8 +24,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -40,9 +40,11 @@ import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 @Typed( value = SecurityConfigurationValidator.class )
 @Named( value = "default" )
 public class DefaultConfigurationValidator
-    extends AbstractLogEnabled
     implements SecurityConfigurationValidator
 {
+    @Inject
+    private Logger logger;
+    
     @Inject
     private ConfigurationIdGenerator idGenerator;
 
@@ -114,37 +116,37 @@ public class DefaultConfigurationValidator
         // summary
         if ( response.getValidationErrors().size() > 0 || response.getValidationWarnings().size() > 0 )
         {
-            getLogger().error( "* * * * * * * * * * * * * * * * * * * * * * * * * *" );
+            logger.error( "* * * * * * * * * * * * * * * * * * * * * * * * * *" );
 
-            getLogger().error( "Security configuration has validation errors/warnings" );
+            logger.error( "Security configuration has validation errors/warnings" );
 
-            getLogger().error( "* * * * * * * * * * * * * * * * * * * * * * * * * *" );
+            logger.error( "* * * * * * * * * * * * * * * * * * * * * * * * * *" );
 
             if ( response.getValidationErrors().size() > 0 )
             {
-                getLogger().error( "The ERRORS:" );
+                logger.error( "The ERRORS:" );
 
                 for ( ValidationMessage msg : response.getValidationErrors() )
                 {
-                    getLogger().error( msg.toString() );
+                    logger.error( msg.toString() );
                 }
             }
 
             if ( response.getValidationWarnings().size() > 0 )
             {
-                getLogger().error( "The WARNINGS:" );
+                logger.error( "The WARNINGS:" );
 
                 for ( ValidationMessage msg : response.getValidationWarnings() )
                 {
-                    getLogger().error( msg.toString() );
+                    logger.error( msg.toString() );
                 }
             }
 
-            getLogger().error( "* * * * * * * * * * * * * * * * * * * * *" );
+            logger.error( "* * * * * * * * * * * * * * * * * * * * *" );
         }
         else
         {
-            getLogger().info( "Security configuration validated succesfully." );
+            logger.info( "Security configuration validated succesfully." );
         }
 
         return response;

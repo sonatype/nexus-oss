@@ -1,15 +1,13 @@
 package org.sonatype.security;
 
 import java.io.File;
+import java.util.Properties;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.guice.bean.containers.InjectedTestCase;
 
 public abstract class AbstractSecurityTest
-    extends PlexusTestCase
+    extends InjectedTestCase
 {
 
     protected File PLEXUS_HOME = new File( "./target/plexus-home/" );
@@ -17,33 +15,27 @@ public abstract class AbstractSecurityTest
     protected File APP_CONF = new File( PLEXUS_HOME, "conf" );
 
     @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    public void configure( Properties properties )
     {
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
-    }
-    
-    @Override
-    protected void customizeContext( Context context )
-    {
-        super.customizeContext( context );
-        context.put( "application-conf", APP_CONF.getAbsolutePath() );
+        properties.put( "application-conf", APP_CONF.getAbsolutePath() );
+        super.configure( properties );
     }
 
     @Override
     protected void setUp()
         throws Exception
     {
+        super.setUp();
+        
         // delete the plexus home dir
         FileUtils.deleteDirectory( PLEXUS_HOME );
 
         this.getSecuritySystem().start();
-        
-        super.setUp();
     }
 
     protected SecuritySystem getSecuritySystem()
         throws Exception
-    {   
+    {
         return this.lookup( SecuritySystem.class );
     }
 }

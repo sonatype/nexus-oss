@@ -6,12 +6,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import junit.framework.Assert;
 
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.codehaus.plexus.context.Context;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.AuthorizationException;
@@ -26,14 +26,13 @@ public class ExternalRoleMappedTest
     extends AbstractSecurityTestCase
 {
 
-    private static final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/plexus-home/conf/security.xml";
+    private final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/plexus-home/conf/security.xml";
 
     @Override
-    protected void customizeContext( Context context )
+    public void configure( Properties properties )
     {
-        super.customizeContext( context );
-
-        context.put( PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH );
+        properties.put( PLEXUS_SECURITY_XML_FILE, SECURITY_CONFIG_FILE_PATH );
+        super.configure( properties );
     }
 
     public void testUserHasPermissionFromExternalRole()

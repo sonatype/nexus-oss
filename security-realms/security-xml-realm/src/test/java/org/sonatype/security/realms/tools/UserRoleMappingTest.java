@@ -15,27 +15,19 @@ package org.sonatype.security.realms.tools;
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 
 public class UserRoleMappingTest
-    extends PlexusTestCase
+    extends InjectedTestCase
 {
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
-    }
-    
     public ConfigurationManager getConfigManager()
         throws Exception
     {
@@ -96,11 +88,10 @@ public class UserRoleMappingTest
     }
 
     @Override
-    protected void customizeContext( Context context )
+    public void configure( Properties properties )
     {
-        super.customizeContext( context );
-
-        context.put( "security-xml-file", "target/test-classes/org/sonatype/security/locators/security-test.xml" );
+        properties.put( "security-xml-file", "target/test-classes/org/sonatype/security/locators/security-test.xml" );
+        super.configure( properties );
     }
 
 }

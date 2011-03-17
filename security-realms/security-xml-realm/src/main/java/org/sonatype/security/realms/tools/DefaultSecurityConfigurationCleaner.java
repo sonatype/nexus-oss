@@ -15,10 +15,11 @@ package org.sonatype.security.realms.tools;
 import java.util.List;
 
 import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.slf4j.Logger;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
@@ -34,19 +35,21 @@ import org.sonatype.security.model.Configuration;
 @Typed( value = SecurityConfigurationCleaner.class )
 @Named( value = "default" )
 public class DefaultSecurityConfigurationCleaner
-    extends AbstractLogEnabled
     implements SecurityConfigurationCleaner
 {
+    @Inject
+    private Logger logger;
+
     public void privilegeRemoved( Configuration configuration, String privilegeId )
     {
-        getLogger().debug( "Cleaning privilege id " + privilegeId + " from roles." );
+        logger.debug( "Cleaning privilege id " + privilegeId + " from roles." );
         List<CRole> roles = configuration.getRoles();
 
         for ( CRole role : roles )
         {
             if ( role.getPrivileges().contains( privilegeId ) )
             {
-                getLogger().debug( "removing from role " + role.getId() );
+                logger.debug( "removing from role " + role.getId() );
                 role.getPrivileges().remove( privilegeId );
             }
         }
@@ -54,14 +57,14 @@ public class DefaultSecurityConfigurationCleaner
 
     public void roleRemoved( Configuration configuration, String roleId )
     {
-        getLogger().debug( "Cleaning role id " + roleId + " from users and roles." );
+        logger.debug( "Cleaning role id " + roleId + " from users and roles." );
         List<CRole> roles = configuration.getRoles();
 
         for ( CRole role : roles )
         {
             if ( role.getRoles().contains( roleId ) )
             {
-                getLogger().debug( "removing from role " + role.getId() );
+                logger.debug( "removing from role " + role.getId() );
                 role.getRoles().remove( roleId );
             }
         }
@@ -72,7 +75,7 @@ public class DefaultSecurityConfigurationCleaner
         {
             if ( mapping.getRoles().contains( roleId ) )
             {
-                getLogger().debug( "removing from user " + mapping.getUserId() );
+                logger.debug( "removing from user " + mapping.getUserId() );
                 mapping.removeRole( roleId );
             }
         }

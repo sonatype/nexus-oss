@@ -23,10 +23,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.slf4j.Logger;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.UnsupportedConfigurationVersionException;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
@@ -42,9 +42,11 @@ import org.sonatype.security.model.Configuration;
 @Typed( value = SecurityConfigurationUpgrader.class )
 @Named( value = "default" )
 public class DefaultSecurityConfigurationUpgrader
-    extends AbstractLogEnabled
     implements SecurityConfigurationUpgrader
 {
+    @Inject
+    private Logger logger;
+    
     @Inject
     private Map<String, SecurityUpgrader> upgraders;
     
@@ -91,7 +93,7 @@ public class DefaultSecurityConfigurationUpgrader
 
         if ( upgrader != null )
         {
-            getLogger().info(
+            logger.info(
                 "Upgrading old Security configuration file (version " + msg.getModelVersion() + ") from "
                     + file.getAbsolutePath() );
             
@@ -121,7 +123,7 @@ public class DefaultSecurityConfigurationUpgrader
                 upgrader = upgraders.get( msg.getModelVersion() );
             }
 
-            getLogger().info(
+            logger.info(
                 "Security configuration file upgraded to current version " + msg.getModelVersion() + " succesfully." );
 
             return (Configuration) msg.getConfiguration();
