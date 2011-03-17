@@ -32,6 +32,10 @@
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Indexer Lucene</name>
 
+  <properties>
+    <truezip.version>7.0-rc1</truezip.version>
+  </properties>
+
   <dependencies>
 
     <dependency>
@@ -45,6 +49,18 @@
           <artifactId>xml-apis</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+    <!-- ZipFacade -->
+    <dependency>
+      <groupId>de.schlichtherle.truezip</groupId>
+      <artifactId>truezip-file</artifactId>
+      <version>${truezip.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>de.schlichtherle.truezip</groupId>
+      <artifactId>truezip-driver-zip</artifactId>
+      <version>${truezip.version}</version>
     </dependency>
 
     <!-- Is in core -->
