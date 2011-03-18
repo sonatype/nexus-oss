@@ -132,6 +132,13 @@ public class CRepositoryCoreConfiguration
                 .addValidationError( new ValidationMessage( "id",
                                                             "Only letters, digits, underscores, hyphens, and dots are allowed in Repository ID" ) );
         }
+
+        // ID not 'all'
+        if ( "all".equals( cfg.getId() ) )
+        {
+            response.addValidationError( new ValidationMessage( "id", "Repository ID can't be 'all', reserved word" ) );
+        }
+
         // ID uniqueness
         List<CRepository> repositories = getApplicationConfiguration().getConfigurationModel().getRepositories();
 
