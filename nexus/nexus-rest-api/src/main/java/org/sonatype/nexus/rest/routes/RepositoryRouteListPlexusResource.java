@@ -106,46 +106,45 @@ public class RepositoryRouteListPlexusResource
 
         RepositoryRouteListResource resource = null;
 
-        try
+        for ( RepositoryPathMapping item : mappings.values() )
         {
-            for ( RepositoryPathMapping item : mappings.values() )
+            resource = new RepositoryRouteListResource();
+
+            if ( !item.getGroupId().equals( "*" ) )
             {
+                // XXX: added to check access to group
                 try
                 {
-                    resource = new RepositoryRouteListResource();
-
-                    if ( !item.getGroupId().equals( "*" ) )
-                    {
-                        // XXX: added to check access to group
-                        this.getRepositoryRegistry().getRepositoryWithFacet( item.getGroupId(), GroupRepository.class );
-                    }
-                    resource.setGroupId( item.getGroupId() );
-
-                    resource.setResourceURI( createChildReference( request, this, item.getId() ).toString() );
-
-                    resource.setRuleType( config2resourceType( item.getMappingType() ) );
-
-                    // XXX: cstamas -- a hack!
-                    resource.setPattern( item.getPatterns().get( 0 ).toString() );
-
-                    resource.setRepositories( getRepositoryRouteMemberRepositoryList( request.getResourceRef(), item
-                        .getMappedRepositories(), request ) );
-
-                    result.addData( resource );
+                    this.getRepositoryRegistry().getRepositoryWithFacet( item.getGroupId(), GroupRepository.class );
                 }
                 catch ( NoSuchRepositoryAccessException e )
                 {
-                    // we are listing the routes, we do not need to fail the list because only one entry is not
-                    // available to the user
-                    getLogger().debug( "Access Denied to Repository contained within route.", e );
+                    getLogger().debug(
+                        "Access Denied to Group '" + item.getGroupId() + "' contained within route: + '" + item.getId()
+                            + "'!", e );
+                    continue;
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    getLogger().warn(
+                        "Cannot find group '" + item.getGroupId() + "' declared within route: + '" + item.getId()
+                            + "'!", e );
+                    continue;
                 }
             }
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            getLogger().warn( "Cannot find a repository declared within a mapping!", e );
+            resource.setGroupId( item.getGroupId() );
 
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
+            resource.setResourceURI( createChildReference( request, this, item.getId() ).toString() );
+
+            resource.setRuleType( config2resourceType( item.getMappingType() ) );
+
+            // XXX: cstamas -- a hack!
+            resource.setPattern( item.getPatterns().get( 0 ).toString() );
+
+            resource.setRepositories( getRepositoryRouteMemberRepositoryList( request.getResourceRef(),
+                item.getMappedRepositories(), request, item.getId() ) );
+
+            result.addData( resource );
         }
 
         return result;

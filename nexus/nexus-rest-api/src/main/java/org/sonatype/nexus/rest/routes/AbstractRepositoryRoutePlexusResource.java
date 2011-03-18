@@ -26,9 +26,10 @@ import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
 import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType;
+import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 
@@ -58,14 +59,16 @@ public abstract class AbstractRepositoryRoutePlexusResource
      * @param listBase
      * @param reposList
      * @param request
+     * @param mapId
      * @return
      * @throws NoSuchRepositoryException
      * @throws ResourceException
      */
     protected List<RepositoryRouteMemberRepository> getRepositoryRouteMemberRepositoryList( Reference listBase,
                                                                                             List<String> reposList,
-                                                                                            Request request )
-        throws NoSuchRepositoryException, ResourceException
+                                                                                            Request request,
+                                                                                            String mapId )
+        throws ResourceException
     {
         List<RepositoryRouteMemberRepository> members =
             new ArrayList<RepositoryRouteMemberRepository>( reposList.size() );
@@ -86,7 +89,24 @@ public abstract class AbstractRepositoryRoutePlexusResource
             {
                 member.setId( repoId );
 
-                member.setName( getRepositoryRegistry().getRepository( repoId ).getName() );
+                try
+                {
+                    member.setName( getRepositoryRegistry().getRepository( repoId ).getName() );
+                }
+                catch ( NoSuchRepositoryAccessException e )
+                {
+                    // we are listing the routes, we do not need to fail the list because only one entry is not
+                    // available to the user
+                    getLogger().debug(
+                        "Access Denied to Repository '" + repoId + "' contained within route: + '" + mapId + "'!", e );
+                    continue;
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    getLogger().warn(
+                        "Cannot find repository '" + repoId + "' declared within route: + '" + mapId + "'!", e );
+                    continue;
+                }
 
                 member.setResourceURI( createChildReference( request, this, repoId ).toString() );
             }

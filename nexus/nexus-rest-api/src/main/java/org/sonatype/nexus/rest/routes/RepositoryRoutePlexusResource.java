@@ -136,7 +136,7 @@ public class RepositoryRoutePlexusResource
             resource.setPattern( route.getPatterns().get( 0 ).toString() );
 
             resource.setRepositories( getRepositoryRouteMemberRepositoryList( request.getResourceRef().getParentRef(),
-                                                                              route.getMappedRepositories(), request ) );
+                route.getMappedRepositories(), request, route.getId() ) );
 
             result = new RepositoryRouteResourceResponse();
 
