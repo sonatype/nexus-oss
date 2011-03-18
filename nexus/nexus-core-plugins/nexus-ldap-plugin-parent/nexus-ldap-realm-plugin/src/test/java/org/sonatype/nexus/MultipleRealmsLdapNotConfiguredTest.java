@@ -80,7 +80,9 @@ public class MultipleRealmsLdapNotConfiguredTest
         
      // xml user
         principals = new SimplePrincipalCollection();
-        principals.add( "deployment", new XmlAuthenticatingRealm().getName() );
+        // TODO: bdemers or dbradicich, this "fix" is wrong, it relies on imple details!
+        // was: principals.add( "deployment", new XmlAuthenticatingRealm().getName() );
+        principals.add( "deployment", XmlAuthenticatingRealm.ROLE );
         
         Assert.assertTrue( security.hasRole( principals, "deployment" ) );
         Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
@@ -101,7 +103,9 @@ public class MultipleRealmsLdapNotConfiguredTest
         
         // XML
         principals = new SimplePrincipalCollection();
-        principals.add( "test-user", new XmlAuthenticatingRealm().getName() );
+        // TODO: bdemers or dbradicich, this "fix" is wrong, it relies on imple details!
+        // was: principals.add( "test-user", new XmlAuthenticatingRealm().getName() );
+        principals.add( "test-user", XmlAuthenticatingRealm.ROLE );
         
         Assert.assertTrue( security.isPermitted( principals, "security:usersforgotpw:create" ) );
         Assert.assertFalse( security.isPermitted( principals, "security:usersforgotpw:delete" ) );
