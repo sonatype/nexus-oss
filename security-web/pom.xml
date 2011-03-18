@@ -18,6 +18,11 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+            <groupId>org.sonatype.sisu.inject</groupId>
+            <artifactId>guice-plexus-shim</artifactId>
+            <version>${sisu-inject-bean.version}</version>
+        </dependency>
+		<dependency>
 			<groupId>org.apache.shiro</groupId>
 			<artifactId>shiro-web</artifactId>
 			<version>${shiro.version}</version>

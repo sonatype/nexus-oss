@@ -23,6 +23,8 @@ import org.apache.shiro.web.filter.mgt.FilterChainManager;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.servlet.IniShiroFilter;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
 
@@ -133,19 +135,46 @@ public class ShiroSecurityFilter
     protected <T> T getInstance( Class<T> clazz, String name )
         throws Exception
     {
-        if ( name == null )
+        Injector injector = getInjector();
+
+        if ( injector != null )
         {
-            return getInjector().getInstance( Key.get( clazz ) );
+            if ( name == null )
+            {
+                return injector.getInstance( Key.get( clazz ) );
+            }
+            else
+            {
+                return injector.getInstance( Key.get( clazz, Names.named( name ) ) );
+            }
         }
-        else
+        
+        // support old plexus container as fallback, just in case
+        PlexusContainer plexusContainer = getPlexusContainer();
+
+        if ( plexusContainer != null )
         {
-            return getInjector().getInstance( Key.get( clazz, Names.named( name ) ) );
+            if ( name == null )
+            {
+                return plexusContainer.lookup( clazz );
+            }
+            else
+            {
+                return plexusContainer.lookup( clazz, name );
+            }
         }
+
+        return null;
     }
 
     protected Injector getInjector()
     {
         return (Injector) getServletContext().getAttribute( INJECTORY_KEY );
+    }
+
+    protected PlexusContainer getPlexusContainer()
+    {
+        return (PlexusContainer) getServletContext().getAttribute( PlexusConstants.PLEXUS_KEY );
     }
 
     @Override
