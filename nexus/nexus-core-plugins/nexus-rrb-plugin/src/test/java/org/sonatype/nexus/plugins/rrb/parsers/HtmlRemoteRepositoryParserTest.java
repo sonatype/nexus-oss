@@ -66,7 +66,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriFirstPost()
         throws Exception
     {
-        assertEquals( "http://local/central/", result.get( 0 ).getResourceURI() );
+        assertEquals( "central/", result.get( 0 ).getResourceURI() );
     }
 
     @Test
@@ -94,7 +94,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriSecondPost()
         throws Exception
     {
-        assertEquals( "http://local/centralm1/", result.get( 1 ).getResourceURI() );
+        assertEquals( "centralm1/", result.get( 1 ).getResourceURI() );
     }
 
     @Test
@@ -122,7 +122,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriThirdPost()
         throws Exception
     {
-        assertEquals( "http://local/maven/", result.get( 2 ).getResourceURI() );
+        assertEquals( "maven/", result.get( 2 ).getResourceURI() );
     }
 
     @Test
@@ -150,7 +150,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriFourthPost()
         throws Exception
     {
-        assertEquals( "http://local/file.jar", result.get( 3 ).getResourceURI() );
+        assertEquals( "file.jar", result.get( 3 ).getResourceURI() );
     }
 
     @Test
@@ -178,7 +178,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriFivthPost()
         throws Exception
     {
-        assertEquals( "http://local/file.txt", result.get( 4 ).getResourceURI() );
+        assertEquals( "file.txt", result.get( 4 ).getResourceURI() );
     }
 
     @Test
@@ -206,7 +206,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriSixthPost()
         throws Exception
     {
-        assertEquals( "http://local/file.txt", result.get( 5 ).getResourceURI() );
+        assertEquals( "file.txt", result.get( 5 ).getResourceURI() );
     }
 
     @Test
@@ -234,7 +234,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriSeventhPost()
         throws Exception
     {
-        assertEquals( "http://local/maven/", result.get( 6 ).getResourceURI() );
+        assertEquals( "maven/", result.get( 6 ).getResourceURI() );
     }
 
     @Test

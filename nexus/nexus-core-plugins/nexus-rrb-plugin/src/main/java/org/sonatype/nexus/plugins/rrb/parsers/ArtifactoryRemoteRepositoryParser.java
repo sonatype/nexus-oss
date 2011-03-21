@@ -139,18 +139,6 @@ public class ArtifactoryRemoteRepositoryParser extends
             relativePath = relativePath.substring( 1 );
         }
         
-        // the localUrl already contains part of the relative path, so strip that too
-        if( relativePath.startsWith( this.remotePath ) )
-        {
-            relativePath = relativePath.substring( this.remotePath.length() );
-            
-            // more path fun, we really should be using a lib for this, this is crazy
-            if( relativePath.startsWith( "/" ) )
-            {
-                relativePath = relativePath.substring( 1 );
-            }
-        }
-        
         String url;
         if( !this.localUrl.endsWith( "/" ) )
         {

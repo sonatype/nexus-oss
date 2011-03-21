@@ -126,7 +126,7 @@ public class RemoteBrowserResource
             MavenRepositoryReaderResponse data = new MavenRepositoryReaderResponse();
             // we really should not do the encoding here, but this is work around until NEXUS-4058 is fixed.
             data.setData( mr.extract( remotePath,
-                createRemoteResourceReference( request, id, remotePath ).toString( false, false ), proxyRepository, id ) );
+                createRemoteResourceReference( request, id, "" ).toString( false, false ), proxyRepository, id ) );
             logger.debug( "return value is {}", data.toString() );
 
             return data;

@@ -104,8 +104,8 @@ public class HtmlRemoteRepositoryParser
                 {
                     localUrl += "/";
                 }
-                rp.setResourceURI( localUrl + getLinkUrl( temp ) );
-                rp.setRelativePath( remotePath + getLinkUrl( temp ) );
+                rp.setResourceURI( getLinkUrl( temp ).replace( baseUrl, localUrl ) );
+                rp.setRelativePath( getLinkUrl( temp ).replace( baseUrl, "" ) );
                 if ( !rp.getRelativePath().startsWith( "/" ) )
                 {
                     rp.setRelativePath( "/" + rp.getRelativePath() );
