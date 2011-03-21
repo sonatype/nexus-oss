@@ -49,7 +49,7 @@ public class MavenRepositoryReader
     private final Logger logger = LoggerFactory.getLogger( MavenRepositoryReader.class );
 
     private String remotePath;
-    
+
     private String remoteUrl;
 
     private String localUrl;
@@ -72,10 +72,10 @@ public class MavenRepositoryReader
         this.proxyRepository = proxyRepository;
 
         this.id = id;
-        
+
         String baseRemoteUrl = proxyRepository.getRemoteUrl();
-        
-        if( !baseRemoteUrl.endsWith( "/" ) && !remotePath.startsWith( "/" ) )
+
+        if ( !baseRemoteUrl.endsWith( "/" ) && !remotePath.startsWith( "/" ) )
         {
             this.remoteUrl = baseRemoteUrl + "/" + remotePath;
         }
@@ -83,7 +83,7 @@ public class MavenRepositoryReader
         {
             this.remoteUrl = baseRemoteUrl + remotePath;
         }
-        
+
         StringBuilder html = getContent();
         if ( logger.isDebugEnabled() )
         {
@@ -103,13 +103,16 @@ public class MavenRepositoryReader
 
         if ( indata.indexOf( "<html " ) != -1 )
         {
-            //if title="Artifactory" then it is an Artifactory repo...
-            if ( indata.indexOf( "title=\"Artifactory\"" ) != -1 ) {
-            	logger.debug( "is Artifactory repository" );
-            	parser = new ArtifactoryRemoteRepositoryParser( remotePath, localUrl, id, baseUrl );
-            } else {
+            // if title="Artifactory" then it is an Artifactory repo...
+            if ( indata.indexOf( "title=\"Artifactory\"" ) != -1 )
+            {
+                logger.debug( "is Artifactory repository" );
+                parser = new ArtifactoryRemoteRepositoryParser( remotePath, localUrl, id, baseUrl );
+            }
+            else
+            {
                 logger.debug( "is html repository" );
-            	parser = new HtmlRemoteRepositoryParser( remotePath, localUrl, id, baseUrl );
+                parser = new HtmlRemoteRepositoryParser( remotePath, localUrl, id, baseUrl );
             }
         }
         else if ( indata.indexOf( "xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"" ) != -1
@@ -121,11 +124,13 @@ public class MavenRepositoryReader
                 logger.debug( "response from S3 repository contains error, need to find rootUrl" );
                 remoteUrl = findcreateNewUrl( indata );
                 indata = getContent();
-            } else if ( responseContainsError( indata ) && responseContainsAccessDenied( indata ) ) {
+            }
+            else if ( responseContainsError( indata ) && responseContainsAccessDenied( indata ) )
+            {
                 logger.debug( "response from S3 repository contains access denied response" );
                 indata = new StringBuilder();
             }
-            
+
             parser =
                 new S3RemoteRepositoryParser( remotePath, localUrl, id, baseUrl.replace( findRootUrl( indata ), "" ) );
         }
@@ -237,7 +242,7 @@ public class MavenRepositoryReader
         }
 
         method.getParams().setParameter( HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler( 3, false ) );
-        
+
         // allow a couple redirects
         client.getParams().setParameter( "http.protocol.max-redirects", new Integer( 3 ) );
 
@@ -274,16 +279,17 @@ public class MavenRepositoryReader
             method.releaseConnection();
         }
 
-        // here is the deal, For reasons I do not understand, S3 comes back with an empty response (and a 200), stripping off the last '/' 
-        //returns the error we are looking for (so we can do a query)
+        // here is the deal, For reasons I do not understand, S3 comes back with an empty response (and a 200),
+        // stripping off the last '/'
+        // returns the error we are looking for (so we can do a query)
         Header serverHeader = method.getResponseHeader( "Server" );
-        if( result.length() == 0 && serverHeader.getValue().equals( "AmazonS3" ) && this.remoteUrl.endsWith( "/" ) )
+        if ( result.length() == 0 && serverHeader.getValue().equals( "AmazonS3" ) && this.remoteUrl.endsWith( "/" ) )
         {
             this.remoteUrl = this.remoteUrl.substring( 0, this.remoteUrl.length() - 1 );
             // now just call it again
             return this.getContent();
         }
-        
+
         return result;
     }
 
