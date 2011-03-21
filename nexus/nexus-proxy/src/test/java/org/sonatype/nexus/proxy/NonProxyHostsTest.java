@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.proxy;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 
@@ -27,6 +28,7 @@ import org.apache.commons.httpclient.CustomMultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.jettytestsuite.ProxyServer;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -53,7 +55,7 @@ public class NonProxyHostsTest
         this.jettyTestsuiteEnvironmentBuilder = new M2TestsuiteEnvironmentBuilder( ss );
         return jettyTestsuiteEnvironmentBuilder;
     }
-    
+
     @Override
     public void customizeContext( Context ctx )
     {
@@ -68,6 +70,12 @@ public class NonProxyHostsTest
         throws Exception
     {
         super.setUp();
+
+        // Lesson1 - know what you want
+        // usually, you want to prepare the "playground", to be able to play by knowing the rules
+        FileUtils.copyDirectoryStructure( new File( getBasedir(), "target/test-classes/repo1" ), new File(
+            getBasedir(), "target/test-reposes/repo1" ) );
+
         proxyServer = lookup( ProxyServer.class );
         proxyServer.start();
 
@@ -83,11 +91,15 @@ public class NonProxyHostsTest
         {
             proxyServer.stop();
         }
-        
-        if( servletServer != null)
+
+        if ( servletServer != null )
         {
             servletServer.stop();
         }
+
+        // Lesson2 - be polite
+        // usually you also want to clean up
+        FileUtils.forceDelete( new File( getBasedir(), "target/test-reposes/repo1" ) );
     }
 
     public void testGlobalWithNoNonProxyHosts()
@@ -108,8 +120,9 @@ public class NonProxyHostsTest
         GetMethod get = new GetMethod( url );
         Assert.assertEquals( "status for URL: " + url, 200, httpClient.executeMethod( get ) );
 
-        Assert.assertTrue( "AccessUris does not contain: " + url + " actual uris: "
-            + this.proxyServer.getAccessedUris(), this.proxyServer.getAccessedUris().contains( url ) );
+        Assert.assertTrue(
+            "AccessUris does not contain: " + url + " actual uris: " + this.proxyServer.getAccessedUris(),
+            this.proxyServer.getAccessedUris().contains( url ) );
 
     }
 
@@ -132,7 +145,7 @@ public class NonProxyHostsTest
         GetMethod get = new GetMethod( url );
         Assert.assertEquals( "status for URL: " + url, 200, httpClient.executeMethod( get ) );
         Assert.assertEquals( "AccessUris should be empty, actual uris: " + this.proxyServer.getAccessedUris(), 0,
-                             this.proxyServer.getAccessedUris().size() );
+            this.proxyServer.getAccessedUris().size() );
     }
 
     public void testGlobalWithNonProxyHostsRegex()
@@ -154,7 +167,7 @@ public class NonProxyHostsTest
         GetMethod get = new GetMethod( url );
         Assert.assertEquals( "status for URL: " + url, 200, httpClient.executeMethod( get ) );
         Assert.assertEquals( "AccessUris should be empty, actual uris: " + this.proxyServer.getAccessedUris(), 0,
-                             this.proxyServer.getAccessedUris().size() );
+            this.proxyServer.getAccessedUris().size() );
     }
 
     private int getAFreePort()
@@ -183,8 +196,9 @@ public class NonProxyHostsTest
         }
         return port;
     }
-    
-    public void testRepoRemoteContext() throws Exception
+
+    public void testRepoRemoteContext()
+        throws Exception
     {
         ApplicationConfiguration nexusConfig = this.lookup( ApplicationConfiguration.class );
 
@@ -193,12 +207,13 @@ public class NonProxyHostsTest
         rps.setPort( this.proxyServer.getPort() );
         rps.getNonProxyHosts().add( ".*host" );
         nexusConfig.getGlobalRemoteStorageContext().setRemoteProxySettings( rps );
-        
+
         ProxyRepository repo = (ProxyRepository) getRepositoryRegistry().getRepository( "remote" );
         Assert.assertNotNull( repo.getRemoteStorageContext() );
-        
+
         Assert.assertEquals( 1, repo.getRemoteStorageContext().getRemoteProxySettings().getNonProxyHosts().size() );
-        Assert.assertEquals( nexusConfig.getGlobalRemoteStorageContext().getRemoteProxySettings().getNonProxyHosts(), repo.getRemoteStorageContext().getRemoteProxySettings().getNonProxyHosts() );
+        Assert.assertEquals( nexusConfig.getGlobalRemoteStorageContext().getRemoteProxySettings().getNonProxyHosts(),
+            repo.getRemoteStorageContext().getRemoteProxySettings().getNonProxyHosts() );
     }
 
 }
