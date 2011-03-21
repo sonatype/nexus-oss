@@ -127,7 +127,7 @@ public class Nexus2138RouteFilteringIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         response = RequestFacade.doGetRequest( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId() );
-        Assert.assertEquals( Status.CLIENT_ERROR_FORBIDDEN, response.getStatus() );
+        Assert.assertEquals( response.getStatus(), Status.CLIENT_ERROR_FORBIDDEN );
     }
 
     @Test
@@ -164,7 +164,7 @@ public class Nexus2138RouteFilteringIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         response = RequestFacade.doGetRequest( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId() );
-        Assert.assertEquals( Status.CLIENT_ERROR_FORBIDDEN, response.getStatus() );
+        Assert.assertEquals( response.getStatus(), Status.CLIENT_ERROR_FORBIDDEN );
     }
 
     private Response createRouteTest( String groupId, String... repoIds )

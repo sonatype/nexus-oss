@@ -146,13 +146,13 @@ public class RepositoryRoutePlexusResource
         {
             getLogger().debug( "Access Denied to a repository declared within a group!", e );
 
-            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN );
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, e );
         }
         catch ( NoSuchRepositoryException e )
         {
             getLogger().warn( "Cannot find a repository declared within a group!", e );
 
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
         }
         catch ( IndexOutOfBoundsException e )
         {

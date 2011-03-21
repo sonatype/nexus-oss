@@ -24,7 +24,6 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
-import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType;
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
@@ -61,14 +60,13 @@ public abstract class AbstractRepositoryRoutePlexusResource
      * @param request
      * @param mapId
      * @return
-     * @throws NoSuchRepositoryException
-     * @throws ResourceException
+     * @throws NoSuchRepositoryAccessException
      */
     protected List<RepositoryRouteMemberRepository> getRepositoryRouteMemberRepositoryList( Reference listBase,
                                                                                             List<String> reposList,
                                                                                             Request request,
                                                                                             String mapId )
-        throws ResourceException
+        throws NoSuchRepositoryAccessException
     {
         List<RepositoryRouteMemberRepository> members =
             new ArrayList<RepositoryRouteMemberRepository>( reposList.size() );
@@ -95,11 +93,7 @@ public abstract class AbstractRepositoryRoutePlexusResource
                 }
                 catch ( NoSuchRepositoryAccessException e )
                 {
-                    // we are listing the routes, we do not need to fail the list because only one entry is not
-                    // available to the user
-                    getLogger().debug(
-                        "Access Denied to Repository '" + repoId + "' contained within route: + '" + mapId + "'!", e );
-                    continue;
+                    throw e;
                 }
                 catch ( NoSuchRepositoryException e )
                 {

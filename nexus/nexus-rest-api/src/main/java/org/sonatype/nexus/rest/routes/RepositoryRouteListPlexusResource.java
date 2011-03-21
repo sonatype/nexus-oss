@@ -141,8 +141,18 @@ public class RepositoryRouteListPlexusResource
             // XXX: cstamas -- a hack!
             resource.setPattern( item.getPatterns().get( 0 ).toString() );
 
-            resource.setRepositories( getRepositoryRouteMemberRepositoryList( request.getResourceRef(),
-                item.getMappedRepositories(), request, item.getId() ) );
+            try
+            {
+                resource.setRepositories( getRepositoryRouteMemberRepositoryList( request.getResourceRef(),
+                    item.getMappedRepositories(), request, item.getId() ) );
+            }
+            catch ( NoSuchRepositoryAccessException e )
+            {
+                getLogger().debug(
+                    "Access Denied to Group '" + item.getGroupId() + "' contained within route: + '" + item.getId()
+                        + "'!", e );
+                continue;
+            }
 
             result.addData( resource );
         }
