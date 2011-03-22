@@ -11,9 +11,9 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 
 @Singleton
-@Typed( value = UserManagerFactory.class )
+@Typed( value = UserManagerFacade.class )
 @Named( "default" )
-public class UserManagerFactory
+public class UserManagerFacade
 {
     @Inject
     Map<String, UserManager> userManagers;
