@@ -23,13 +23,13 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.context.Context;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.Configuration;
+import org.sonatype.security.rest.users.AbstractSecurityRestTest;
 
 public class AllPermissionsAreDefinedTest
-    extends AbstractSecurityTestCase
+    extends AbstractSecurityRestTest
 {
     private static String SECURITY_FILE = "./target/security.xml";
     

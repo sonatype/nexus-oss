@@ -1,4 +1,5 @@
 package org.sonatype.security.rest.users;
+
 import java.io.File;
 
 import org.codehaus.plexus.ContainerConfiguration;
@@ -8,23 +9,26 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.security.SecuritySystem;
 
-
-public abstract class AbstractSecurityRestTest extends PlexusTestCase
+public abstract class AbstractSecurityRestTest
+    extends PlexusTestCase
 {
 
     protected static final String REALM_KEY = new MockUserManager().getSource();
 
     protected static final String WORK_DIR = "target/UserToRolePRTest";
 
-    protected static final String TEST_CONFIG = "target/test-classes/"+UserToRolePRTest.class.getName().replaceAll( "\\.", "\\/" ) +"-security.xml";
+    protected static final String TEST_CONFIG = "target/test-classes/"
+        + UserToRolePRTest.class.getName().replaceAll( "\\.", "\\/" ) + "-security.xml";
 
-    
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
         configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
+        configuration.setAutoWiring( true );
+
+        super.customizeContainerConfiguration( configuration );
     }
-    
+
     @Override
     protected void setUp()
         throws Exception
@@ -32,7 +36,7 @@ public abstract class AbstractSecurityRestTest extends PlexusTestCase
         super.setUp();
 
         FileUtils.copyFile( new File( TEST_CONFIG ), new File( WORK_DIR, "/conf/security.xml" ) );
-        
+
         // start security
         this.lookup( SecuritySystem.class ).start();
     }
@@ -46,5 +50,4 @@ public abstract class AbstractSecurityRestTest extends PlexusTestCase
         context.put( "security-xml-file", WORK_DIR + "/conf/security.xml" );
         context.put( "application-conf", WORK_DIR + "/conf/" );
     }
-    
 }

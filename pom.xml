@@ -37,6 +37,7 @@
 		<module>security-configuration</module>
 		<module>security-web</module>
 		<module>security-web-sample</module>
+		<module>security-rest</module>
 	</modules>
 
 	<dependencyManagement>
