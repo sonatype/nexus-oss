@@ -50,6 +50,7 @@ import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.RoleMappingUserManager;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserManagerFactory;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
@@ -69,7 +70,7 @@ public class DefaultSecuritySystem
 
     private PlexusEhCacheWrapper cacheWrapper;
 
-    private Map<String, UserManager> userManagerMap;
+    private UserManagerFactory userManagerFactory;
 
     private Map<String, Realm> realmMap;
 
@@ -93,7 +94,7 @@ public class DefaultSecuritySystem
                                   Map<String, AuthorizationManager> authorizationManagers, Map<String, Realm> realmMap,
                                   SecurityConfigurationManager securityConfiguration,
                                   Map<String, RealmSecurityManager> securityManagers,
-                                  PlexusEhCacheWrapper cacheWrapper, Map<String, UserManager> userManagerMap )
+                                  PlexusEhCacheWrapper cacheWrapper, UserManagerFactory userManagerFactory )
     {
         this.securityEmailers = securityEmailers;
         this.logger = logger;
@@ -104,9 +105,9 @@ public class DefaultSecuritySystem
         this.securityConfiguration = securityConfiguration;
         this.securityManagers = securityManagers;
         this.cacheWrapper = cacheWrapper;
-        this.userManagerMap = userManagerMap;
 
         this.eventMulticaster.addEventListener( this );
+        this.userManagerFactory = userManagerFactory;
         SecurityUtils.setSecurityManager( this.getSecurityManager() );
     }
 
@@ -286,17 +287,6 @@ public class DefaultSecuritySystem
     // * user management
     // *********************
 
-    private UserManager getUserManager( String sourceId )
-        throws NoSuchUserManagerException
-    {
-        if ( !this.userManagerMap.containsKey( sourceId ) )
-        {
-            throw new NoSuchUserManagerException( "UserManager with source: '" + sourceId + "' could not be found." );
-        }
-
-        return this.userManagerMap.get( sourceId );
-    }
-
     public User addUser( User user )
         throws NoSuchUserManagerException, InvalidConfigurationException
     {
@@ -314,7 +304,7 @@ public class DefaultSecuritySystem
 
         // first save the user
         // this is the UserManager that owns the user
-        UserManager userManager = this.getUserManager( user.getSource() );
+        UserManager userManager = userManagerFactory.getUserManager( user.getSource() );
 
         if ( !userManager.supportsWrite() )
         {
@@ -325,7 +315,7 @@ public class DefaultSecuritySystem
         userManager.addUser( user, password );
 
         // then save the users Roles
-        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        for ( UserManager tmpUserManager : userManagerFactory.getUserManagers().values() )
         {
             // skip the user manager that owns the user, we already did that
             // these user managers will only save roles
@@ -361,7 +351,7 @@ public class DefaultSecuritySystem
     {
         // first update the user
         // this is the UserManager that owns the user
-        UserManager userManager = this.getUserManager( user.getSource() );
+        UserManager userManager = userManagerFactory.getUserManager( user.getSource() );
 
         if ( !userManager.supportsWrite() )
         {
@@ -372,7 +362,7 @@ public class DefaultSecuritySystem
         userManager.updateUser( user );
 
         // then save the users Roles
-        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        for ( UserManager tmpUserManager : userManagerFactory.getUserManagers().values() )
         {
             // skip the user manager that owns the user, we already did that
             // these user managers will only save roles
@@ -418,7 +408,7 @@ public class DefaultSecuritySystem
     public void deleteUser( String userId, String source )
         throws UserNotFoundException, NoSuchUserManagerException
     {
-        UserManager userManager = this.getUserManager( source );
+        UserManager userManager = userManagerFactory.getUserManager( source );
         userManager.deleteUser( userId );
     }
 
@@ -437,7 +427,7 @@ public class DefaultSecuritySystem
 
         boolean foundUser = false;
 
-        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        for ( UserManager tmpUserManager : userManagerFactory.getUserManagers().values() )
         {
             if ( RoleMappingUserManager.class.isInstance( tmpUserManager ) )
             {
@@ -493,7 +483,7 @@ public class DefaultSecuritySystem
     {
         // first get the user
         // this is the UserManager that owns the user
-        UserManager userManager = this.getUserManager( source );
+        UserManager userManager = userManagerFactory.getUserManager( source );
         User user = userManager.getUser( userId );
 
         if ( user == null )
@@ -511,7 +501,7 @@ public class DefaultSecuritySystem
     {
         Set<User> users = new HashSet<User>();
 
-        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        for ( UserManager tmpUserManager : userManagerFactory.getUserManagers().values() )
         {
             users.addAll( tmpUserManager.listUsers() );
         }
@@ -534,7 +524,7 @@ public class DefaultSecuritySystem
         if ( StringUtils.isEmpty( criteria.getSource() ) )
         {
             // search all user managers
-            for ( UserManager tmpUserManager : this.userManagerMap.values() )
+            for ( UserManager tmpUserManager : userManagerFactory.getUserManagers().values() )
             {
                 Set<User> result = tmpUserManager.searchUsers( criteria );
                 if ( result != null )
@@ -547,7 +537,7 @@ public class DefaultSecuritySystem
         {
             try
             {
-                users.addAll( this.getUserManager( criteria.getSource() ).searchUsers( criteria ) );
+                users.addAll( userManagerFactory.getUserManager( criteria.getSource() ).searchUsers( criteria ) );
             }
             catch ( NoSuchUserManagerException e )
             {
@@ -577,11 +567,11 @@ public class DefaultSecuritySystem
     {
         List<UserManager> orderedLocators = new ArrayList<UserManager>();
 
-        List<UserManager> unOrderdLocators = new ArrayList<UserManager>( this.userManagerMap.values() );
+        List<UserManager> unOrderdLocators = new ArrayList<UserManager>( userManagerFactory.getUserManagers().values() );
 
         Map<String, UserManager> realmToUserManagerMap = new HashMap<String, UserManager>();
 
-        for ( UserManager userManager : this.userManagerMap.values() )
+        for ( UserManager userManager : userManagerFactory.getUserManagers().values() )
         {
             if ( userManager.getAuthenticationRealmName() != null )
             {
@@ -614,7 +604,7 @@ public class DefaultSecuritySystem
     private void addOtherRolesToUser( User user )
     {
         // then save the users Roles
-        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        for ( UserManager tmpUserManager : userManagerFactory.getUserManagers().values() )
         {
             // skip the user manager that owns the user, we already did that
             // these user managers will only have roles
@@ -696,7 +686,7 @@ public class DefaultSecuritySystem
 
         try
         {
-            UserManager userManager = this.getUserManager( user.getSource() );
+            UserManager userManager = userManagerFactory.getUserManager( user.getSource() );
             userManager.changePassword( userId, newPassword );
         }
         catch ( NoSuchUserManagerException e )
