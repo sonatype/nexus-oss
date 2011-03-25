@@ -7,7 +7,7 @@
     <queryString/>
   </globalConnectionSettings>
   <restApi>
-    <baseUrl>http://cipa-clb.fr.alcatel-lucent.com:8200/nexus</baseUrl>
+    <baseUrl>http://test:8200/nexus</baseUrl>
   </restApi>
   <httpProxy>
     <enabled>true</enabled>
@@ -37,7 +37,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>http://frmrssapp302.dc-m.alcatel-lucent.com/nexus/content/groups/public/</url>
+        <url>http://test/nexus/content/groups/public/</url>
       </remoteStorage>
       <externalConfiguration>
         <repositoryPolicy>RELEASE</repositoryPolicy>
@@ -69,7 +69,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>http://frmrssapp302.dc-m.alcatel-lucent.com/nexus/content/groups/thirdparty/</url>
+        <url>http://test/nexus/content/groups/thirdparty/</url>
       </remoteStorage>
       <externalConfiguration>
         <repositoryPolicy>RELEASE</repositoryPolicy>
@@ -100,7 +100,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>http://frmrssapp302.dc-m.alcatel-lucent.com/nexus/content/groups/enterprise/</url>
+        <url>http://test/nexus/content/groups/enterprise/</url>
       </remoteStorage>
       <externalConfiguration>
         <repositoryPolicy>RELEASE</repositoryPolicy>
@@ -159,7 +159,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>http://frmrssapp302.dc-m.alcatel-lucent.com/nexus/content/groups/enterprise-snapshots/</url>
+        <url>http://test/nexus/content/groups/enterprise-snapshots/</url>
       </remoteStorage>
       <externalConfiguration>
         <repositoryPolicy>SNAPSHOT</repositoryPolicy>
@@ -190,7 +190,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>http://frmrssapp302.dc-m.alcatel-lucent.com/nexus/content/groups/internal/</url>
+        <url>http://test/nexus/content/groups/internal/</url>
       </remoteStorage>
       <externalConfiguration>
         <repositoryPolicy>RELEASE</repositoryPolicy>
@@ -221,7 +221,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>http://shrdwin014.ad4.ad.alcatel.com:8200/nexus/content/repositories/test/</url>
+        <url>http://test:8200/nexus/content/repositories/test/</url>
       </remoteStorage>
       <externalConfiguration>
         <repositoryPolicy>RELEASE</repositoryPolicy>
@@ -293,7 +293,7 @@
     </repositoryTarget>
   </repositoryTargets>
   <smtpConfiguration>
-    <hostname>mail.alcatel-lucent.com</hostname>
+    <hostname>mail.test</hostname>
     <port>25</port>
     <username>smtp-username</username>
     <password>{IBmRfTmZrZEH32kbNpfy8or7/2013RU0SbZzyv2zL34=}</password>
