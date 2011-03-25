@@ -142,8 +142,8 @@ public class DefaultRequestRepositoryMapper
         else
         {
             throw new ConfigurationException( "The passed configuration object is of class \""
-                                              + configuration.getClass().getName() + "\" and not the required \""
-                                              + ApplicationConfiguration.class.getName() + "\"!" );
+                + configuration.getClass().getName() + "\" and not the required \""
+                + ApplicationConfiguration.class.getName() + "\"!" );
         }
     }
 
@@ -221,7 +221,7 @@ public class DefaultRequestRepositoryMapper
                 // add only those that are in initial resolvedRepositories list and that are non-user managed
                 // (preserve ordering)
                 if ( mapping.getMappedRepositories().size() == 1
-                     && "*".equals( mapping.getMappedRepositories().get( 0 ) ) )
+                    && "*".equals( mapping.getMappedRepositories().get( 0 ) ) )
                 {
                     for ( Repository repo : resolvedRepositories )
                     {
@@ -249,7 +249,7 @@ public class DefaultRequestRepositoryMapper
                 appliedMappings.add( mapping );
 
                 if ( mapping.getMappedRepositories().size() == 1
-                     && "*".equals( mapping.getMappedRepositories().get( 0 ) ) )
+                    && "*".equals( mapping.getMappedRepositories().get( 0 ) ) )
                 {
                     reposIdSet.clear();
 
@@ -290,9 +290,9 @@ public class DefaultRequestRepositoryMapper
             {
                 StringBuilder sb =
                     new StringBuilder( "Request for path \"" + request.toString()
-                                       + "\" with the initial list of processable repositories of \""
-                                       + ResourceStoreUtils.getResourceStoreListAsString( resolvedRepositories )
-                                       + "\" got these mappings applied:\n" );
+                        + "\" with the initial list of processable repositories of \""
+                        + ResourceStoreUtils.getResourceStoreListAsString( resolvedRepositories )
+                        + "\" got these mappings applied:\n" );
 
                 for ( RepositoryPathMapping mapping : appliedMappings )
                 {
@@ -305,7 +305,7 @@ public class DefaultRequestRepositoryMapper
                 {
                     getLogger().debug(
                         "Mapping for path [" + request.toString()
-                                        + "] excluded all storages from servicing the request." );
+                            + "] excluded all storages from servicing the request." );
                 }
                 else
                 {
@@ -328,7 +328,7 @@ public class DefaultRequestRepositoryMapper
         {
             getLogger().error(
                 "Some of the Routes contains references to non-existant repositories! Please check the following mappings: \""
-                                + appliedMappingsList.toString() + "\"." );
+                    + appliedMappingsList.toString() + "\"." );
 
             throw e;
         }
@@ -413,8 +413,8 @@ public class DefaultRequestRepositoryMapper
             throw new IllegalArgumentException( "Unknown route type: " + item.getRouteType() );
         }
 
-        return new RepositoryPathMapping( item.getId(), type, item.getGroupId(), item.getRoutePatterns(), item
-                        .getRepositories() );
+        return new RepositoryPathMapping( item.getId(), type, item.getGroupId(), item.getRoutePatterns(),
+            item.getRepositories() );
     }
 
     protected CPathMappingItem convert( RepositoryPathMapping item )
@@ -494,15 +494,20 @@ public class DefaultRequestRepositoryMapper
 
     public Map<String, RepositoryPathMapping> getMappings()
     {
-        List<CPathMappingItem> items = getCurrentConfiguration( false ).getPathMappings();
+        final HashMap<String, RepositoryPathMapping> result = new HashMap<String, RepositoryPathMapping>();
 
-        HashMap<String, RepositoryPathMapping> result = new HashMap<String, RepositoryPathMapping>( items.size() );
+        final CRepositoryGrouping config = getCurrentConfiguration( false );
 
-        for ( CPathMappingItem item : items )
+        if ( config != null )
         {
-            RepositoryPathMapping mapping = convert( item );
+            List<CPathMappingItem> items = config.getPathMappings();
 
-            result.put( mapping.getId(), mapping );
+            for ( CPathMappingItem item : items )
+            {
+                RepositoryPathMapping mapping = convert( item );
+
+                result.put( mapping.getId(), mapping );
+            }
         }
 
         return Collections.unmodifiableMap( result );
