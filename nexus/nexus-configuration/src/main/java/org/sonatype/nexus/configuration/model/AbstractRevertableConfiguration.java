@@ -68,14 +68,7 @@ public abstract class AbstractRevertableConfiguration
 
     public void setOriginalConfiguration( Object originalConfiguration )
     {
-        if ( originalConfiguration != null )
-        {
-            this.originalConfiguration = originalConfiguration;
-        }
-        else
-        {
-            this.originalConfiguration = getDefaultConfiguration();
-        }
+        this.originalConfiguration = originalConfiguration;
     }
 
     protected Object getChangedConfiguration()
@@ -182,11 +175,6 @@ public abstract class AbstractRevertableConfiguration
         {
             throw new InvalidConfigurationException( response );
         }
-    }
-
-    public Object getDefaultConfiguration()
-    {
-        return null;
     }
 
     public abstract ValidationResponse doValidateChanges( Object changedConfiguration );

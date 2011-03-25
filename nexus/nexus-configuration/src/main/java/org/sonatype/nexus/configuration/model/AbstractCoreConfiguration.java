@@ -33,7 +33,16 @@ public abstract class AbstractCoreConfiguration
 
     public AbstractCoreConfiguration( ApplicationConfiguration applicationConfiguration )
     {
-        setOriginalConfiguration( extractConfiguration( applicationConfiguration.getConfigurationModel() ) );
+        final Object extracted = extractConfiguration( applicationConfiguration.getConfigurationModel() );
+
+        if ( extracted != null )
+        {
+            setOriginalConfiguration( extracted );
+        }
+        else
+        {
+            setOriginalConfiguration( getDefaultConfiguration() );
+        }
 
         this.applicationConfiguration = applicationConfiguration;
     }
@@ -57,6 +66,11 @@ public abstract class AbstractCoreConfiguration
         }
 
         return externalConfiguration;
+    }
+
+    public Object getDefaultConfiguration()
+    {
+        return null;
     }
 
     @Override
