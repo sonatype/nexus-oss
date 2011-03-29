@@ -24,7 +24,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -113,6 +112,6 @@ public class PlexusRoleListPlexusResource
 
     protected String getSourceId( Request request )
     {
-        return request.getAttributes().get( SOURCE_ID_KEY ).toString();
+        return getRequestAttribute( request, SOURCE_ID_KEY );
     }
 }

@@ -12,6 +12,8 @@
  */
 package org.sonatype.security.rest;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -46,10 +48,10 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserStatus;
 
 /**
- * Base class of SecurityPlexusResources.  Contains error handling util methods and conversion between DTO and persistence model.  
+ * Base class of SecurityPlexusResources. Contains error handling util methods and conversion between DTO and
+ * persistence model.
  * 
  * @author bdemers
- *
  */
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
@@ -156,9 +158,9 @@ public abstract class AbstractSecurityPlexusResource
 
         return user;
     }
-    
+
     protected PlexusUserResource securityToRestModel( User user )
-    {       
+    {
         PlexusUserResource resource = new PlexusUserResource();
 
         resource.setUserId( user.getUserId() );
@@ -184,52 +186,53 @@ public abstract class AbstractSecurityPlexusResource
 
         return roleResource;
     }
-    
+
     protected List<PlexusUserResource> securityToRestModel( Set<User> users )
     {
         List<PlexusUserResource> restUsersList = new ArrayList<PlexusUserResource>();
-        
+
         for ( User user : users )
         {
             restUsersList.add( securityToRestModel( user ) );
         }
         return restUsersList;
     }
-    
 
     // TODO: come back to this, we need to change the PlexusRoleResource
     protected PlexusRoleResource securityToRestModel( RoleIdentifier role )
     {
-        // TODO: We shouldn't be looking up the role name here anyway... this should get pushed up to the SecuritySystem.
+        // TODO: We shouldn't be looking up the role name here anyway... this should get pushed up to the
+        // SecuritySystem.
         String roleName = role.getRoleId();
-        
+
         SecuritySystem securitySystem = this.getSecuritySystem();
 
         try
         {
-            AuthorizationManager authzManager = securitySystem.getAuthorizationManager( DEFAULT_SOURCE );           
+            AuthorizationManager authzManager = securitySystem.getAuthorizationManager( DEFAULT_SOURCE );
             roleName = authzManager.getRole( role.getRoleId() ).getName();
         }
-        catch( NoSuchAuthorizationManagerException e)
+        catch ( NoSuchAuthorizationManagerException e )
         {
-          this.getLogger().warn(
-          "Failed to lookup the users Role: " + role.getRoleId() + " source: "
-              + role.getSource() + " but the user has this role.", e );
+            this.getLogger().warn(
+                "Failed to lookup the users Role: " + role.getRoleId() + " source: " + role.getSource()
+                    + " but the user has this role.", e );
         }
         catch ( NoSuchRoleException e )
         {
-            // this is a Warning if the role's source is default, if its not, then we most of the time it would not be found anyway.
-            if( DEFAULT_SOURCE.equals( role.getSource() ))
+            // this is a Warning if the role's source is default, if its not, then we most of the time it would not be
+            // found anyway.
+            if ( DEFAULT_SOURCE.equals( role.getSource() ) )
             {
                 this.getLogger().warn(
-                    "Failed to lookup the users Role: " + role.getRoleId() + " source: "
-                        + role.getSource() + " but the user has this role.", e );
+                    "Failed to lookup the users Role: " + role.getRoleId() + " source: " + role.getSource()
+                        + " but the user has this role.", e );
             }
             else
             {
                 this.getLogger().debug(
-                    "Failed to lookup the users Role: " + role.getRoleId() + " source: "
-                        + role.getSource() + " falling back to the roleId for the role's name."  );
+                    "Failed to lookup the users Role: " + role.getRoleId() + " source: " + role.getSource()
+                        + " falling back to the roleId for the role's name." );
             }
         }
 
@@ -240,7 +243,7 @@ public abstract class AbstractSecurityPlexusResource
 
         return roleResource;
     }
-   
+
     protected Reference getContextRoot( Request request )
     {
         return this.referenceFactory.getContextRoot( request );
@@ -269,6 +272,30 @@ public abstract class AbstractSecurityPlexusResource
             response.addValidationError( new ValidationMessage( "status", "Users status is not valid." ) );
             throw new InvalidConfigurationException( response );
         }
+    }
+
+    protected String getRequestAttribute( final Request request, final String key )
+    {
+        return getRequestAttribute( request, key, true );
+    }
+
+    protected String getRequestAttribute( final Request request, final String key, final boolean decode )
+    {
+        final String value = request.getAttributes().get( key ).toString();
+
+        if ( decode )
+        {
+            try
+            {
+                return URLDecoder.decode( value, "UTF-8" );
+            }
+            catch ( UnsupportedEncodingException e )
+            {
+                getLogger().warn( "Failed to decode URL attribute.", e );
+            }
+        }
+
+        return value;
     }
 
 }

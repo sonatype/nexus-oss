@@ -33,10 +33,9 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
- * 
- * REST resource to reset a users password. Default implementations will generate and email a user password to the user.
- * <BR/>
- * This resource is similar to {@link UserForgotPasswordPlexusResource} except that a system administrator can reset other users passwords.
+ * REST resource to reset a users password. Default implementations will generate and email a user password to the user. <BR/>
+ * This resource is similar to {@link UserForgotPasswordPlexusResource} except that a system administrator can reset
+ * other users passwords.
  * 
  * @author tstevens
  */
@@ -74,18 +73,19 @@ public class UserResetPlexusResource
     {
         return new PathProtectionDescriptor( "/users_reset/*", "authcBasic,perms[security:usersreset]" );
     }
+
     /**
      * Reset a user's password.
+     * 
      * @param userId The id of the user.
      */
     @Override
     @DELETE
-    @ResourceMethodSignature( pathParams = { @PathParam( value = "userId" )} )
+    @ResourceMethodSignature( pathParams = { @PathParam( value = "userId" ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-
-        String userId = request.getAttributes().get( USER_ID_KEY ).toString();
+        final String userId = getRequestAttribute( request, USER_ID_KEY );
 
         try
         {

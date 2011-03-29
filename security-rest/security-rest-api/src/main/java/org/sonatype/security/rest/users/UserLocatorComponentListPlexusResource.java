@@ -87,7 +87,6 @@ public class UserLocatorComponentListPlexusResource
     @Override
     @GET
     @ResourceMethodSignature( output = PlexusComponentListResourceResponse.class )
-    @SuppressWarnings( "unchecked" )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -100,7 +99,7 @@ public class UserLocatorComponentListPlexusResource
 
         for ( String hint : userManagers.keySet() )
         {
-            ComponentDescriptor componentDescriptor =
+            ComponentDescriptor<?> componentDescriptor =
                 container.getComponentDescriptor( UserManager.class, UserManager.class.getName(), hint );
 
             PlexusComponentListResource resource = new PlexusComponentListResource();

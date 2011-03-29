@@ -88,7 +88,7 @@ public class UserPlexusResource
 
     protected String getUserId( Request request )
     {
-        return request.getAttributes().get( USER_ID_KEY ).toString();
+        return getRequestAttribute( request, USER_ID_KEY );
     }
 
     /**

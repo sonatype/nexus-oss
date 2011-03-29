@@ -22,7 +22,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -48,7 +47,7 @@ public class UserForgotIdPlexusResource
 {
 
     public static final String RESOURCE_URI = "/users_forgotid/{" + USER_EMAIL_KEY + "}";
-    
+
     public UserForgotIdPlexusResource()
     {
         this.setModifiable( true );
@@ -74,15 +73,16 @@ public class UserForgotIdPlexusResource
 
     /**
      * Email user his/her user Id.
+     * 
      * @param email The email address of the user.
      */
     @Override
     @POST
-    @ResourceMethodSignature( pathParams = {@PathParam( value = "email" ) } )
+    @ResourceMethodSignature( pathParams = { @PathParam( value = "email" ) } )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
-        String email = request.getAttributes().get( USER_EMAIL_KEY ).toString();
+        final String email = getRequestAttribute( request, USER_EMAIL_KEY );
 
         try
         {

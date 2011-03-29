@@ -22,7 +22,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -99,7 +98,7 @@ public class UserSearchByIdPlexusResource extends AbstractUserSearchPlexusResour
     
     protected String getSearchArg( Request request )
     {
-        return request.getAttributes().get( USER_ID_KEY ).toString();
+        return getRequestAttribute( request, USER_ID_KEY );
     }
     
 }

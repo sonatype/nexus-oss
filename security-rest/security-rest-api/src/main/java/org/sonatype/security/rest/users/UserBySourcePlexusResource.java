@@ -137,11 +137,11 @@ public class UserBySourcePlexusResource
     
     protected String getUserId( Request request )
     {
-        return request.getAttributes().get( USER_ID_KEY ).toString();
+        return getRequestAttribute( request, USER_ID_KEY );
     }
 
     protected String getUserSource( Request request )
     {
-        return request.getAttributes().get( USER_SOURCE_KEY ).toString();
+        return getRequestAttribute( request, USER_SOURCE_KEY );
     }
 }

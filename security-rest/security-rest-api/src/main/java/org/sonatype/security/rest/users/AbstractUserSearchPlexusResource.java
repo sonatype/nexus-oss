@@ -27,21 +27,23 @@ public abstract class AbstractUserSearchPlexusResource
 
     protected String getUserSource( Request request )
     {
-        String source = request.getAttributes().get( USER_SOURCE_KEY ).toString();
+        final String source = getRequestAttribute( request, USER_SOURCE_KEY );
+
         if ( "all".equalsIgnoreCase( source ) )
         {
             return null;
         }
+
         return source;
     }
 
     protected PlexusUserListResourceResponse search( UserSearchCriteria criteria )
     {
         PlexusUserListResourceResponse result = new PlexusUserListResourceResponse();
-        
+
         Set<User> users = this.getSecuritySystem().searchUsers( criteria );
         result.setData( this.securityToRestModel( users ) );
-        
+
         return result;
     }
 

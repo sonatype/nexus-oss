@@ -24,7 +24,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -35,7 +34,6 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.usermanagement.User;
-import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 
@@ -115,6 +113,6 @@ public class PlexusUserListPlexusResource
 
     protected String getUserSource( Request request )
     {
-        return request.getAttributes().get( USER_SOURCE_KEY ).toString();
+        return getRequestAttribute( request, USER_SOURCE_KEY );
     }
 }

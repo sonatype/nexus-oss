@@ -91,12 +91,12 @@ public class UserToRolePlexusResource
 
     protected String getUserId( Request request )
     {
-        return request.getAttributes().get( USER_ID_KEY ).toString();
+        return getRequestAttribute( request, USER_ID_KEY );
     }
 
     protected String getSourceId( Request request )
     {
-        return request.getAttributes().get( SOURCE_ID_KEY ).toString();
+        return getRequestAttribute( request, SOURCE_ID_KEY );
     }
 
     /**
