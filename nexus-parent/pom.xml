@@ -51,7 +51,7 @@
   </distributionManagement>
 
   <properties>
-    <runtime-platform.version>1-SNAPSHOT</runtime-platform.version>
+    <runtime-platform.version>1</runtime-platform.version>
     <nexus-site-base-url>https://repository.sonatype.org/content/sites/maven-sites/nexus-oss</nexus-site-base-url>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
