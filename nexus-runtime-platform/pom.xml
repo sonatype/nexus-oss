@@ -31,7 +31,7 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-runtime-platform</artifactId>
-  <version>1-SNAPSHOT</version>
+  <version>1</version>
 
   <packaging>pom</packaging>
   <name>Sonatype Nexus Runtime Platform</name>
@@ -98,4 +98,10 @@
     </dependency>
   </dependencies>
 
+
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/forge/tags/nexus-runtime-platform-1</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/forge/tags/nexus-runtime-platform-1</developerConnection>
+    <url>http://svn.sonatype.org/forge/tags/nexus-runtime-platform-1</url>
+  </scm>
 </project>
