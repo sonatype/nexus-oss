@@ -71,7 +71,6 @@ public class LdapAuthenticator
         try
         {
             ctx = ldapContextFactory.getLdapContext( user, pass );
-            ctx.getAttributes( "" );
         }
         catch ( javax.naming.AuthenticationException e )
         {
