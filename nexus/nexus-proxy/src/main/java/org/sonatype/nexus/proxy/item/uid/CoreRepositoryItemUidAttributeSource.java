@@ -44,6 +44,7 @@ public class CoreRepositoryItemUidAttributeSource
         attrs.put( IsHiddenAttribute.class, new IsHiddenAttribute() );
         attrs.put( IsMetadataMaintainedAttribute.class, new IsMetadataMaintainedAttribute() );
         attrs.put( IsRemotelyAccessibleAttribute.class, new IsRemotelyAccessibleAttribute() );
+        attrs.put( IsGroupLocalOnlyAttribute.class, new IsGroupLocalOnlyAttribute() );
 
         this.coreAttributes = Collections.unmodifiableMap( attrs );
     }

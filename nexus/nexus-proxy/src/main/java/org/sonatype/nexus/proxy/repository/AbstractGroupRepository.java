@@ -39,8 +39,10 @@ import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.uid.IsGroupLocalOnlyAttribute;
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.plexus.appevents.Event;
@@ -138,7 +140,12 @@ public abstract class AbstractGroupRepository
             // ignored
         }
 
-        if ( !request.isRequestGroupLocalOnly() )
+        RepositoryItemUid uid = createUid( request.getRequestPath() );
+
+        final boolean isRequestGroupLocalOnly =
+            request.isRequestGroupLocalOnly() || uid.getBooleanAttributeValue( IsGroupLocalOnlyAttribute.class );
+
+        if ( !isRequestGroupLocalOnly )
         {
             for ( Repository repo : getMemberRepositories() )
             {
@@ -222,7 +229,12 @@ public abstract class AbstractGroupRepository
 
         try
         {
-            if ( !request.isRequestGroupLocalOnly() )
+            RepositoryItemUid uid = createUid( request.getRequestPath() );
+
+            final boolean isRequestGroupLocalOnly =
+                request.isRequestGroupLocalOnly() || uid.getBooleanAttributeValue( IsGroupLocalOnlyAttribute.class );
+
+            if ( !isRequestGroupLocalOnly )
             {
                 for ( Repository repo : getRequestRepositories( request ) )
                 {
@@ -395,7 +407,12 @@ public abstract class AbstractGroupRepository
     {
         ArrayList<StorageItem> items = new ArrayList<StorageItem>();
 
-        if ( !request.isRequestGroupLocalOnly() )
+        RepositoryItemUid uid = createUid( request.getRequestPath() );
+
+        final boolean isRequestGroupLocalOnly =
+            request.isRequestGroupLocalOnly() || uid.getBooleanAttributeValue( IsGroupLocalOnlyAttribute.class );
+
+        if ( !isRequestGroupLocalOnly )
         {
             for ( Repository repository : getRequestRepositories( request ) )
             {
