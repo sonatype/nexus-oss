@@ -77,6 +77,12 @@ public class SearchNGIndexPlexusResource
     extends AbstractIndexerNexusPlexusResource
 {
     /**
+     * Capping the number of Lucene Documents to process, to avoid potention problems and DOS-like attacks. If someone
+     * needs more results, download the index instead and process it in-situ.
+     */
+    private static final int LUCENE_HIT_LIMIT = 5000;
+
+    /**
      * Hard upper limit of the count of search hits delivered over REST API. In short: how many rows user sees in UI
      * max. Note: this does not correspond to ArtifactInfo count! This is GA count that may be backed by a zillion
      * ArtifactInfos! Before (old resource) this was 200 (well, the max count of ROWS user would see was 200).
@@ -206,7 +212,6 @@ public class SearchNGIndexPlexusResource
         }
 
         Integer from = null;
-        Integer count = null;
         Boolean exact = null;
         String repositoryId = null;
         Boolean expandVersion = Boolean.FALSE;
@@ -224,15 +229,17 @@ public class SearchNGIndexPlexusResource
             }
         }
 
+        int count = LUCENE_HIT_LIMIT;
         if ( form.getFirstValue( "count" ) != null )
         {
             try
             {
-                count = Integer.valueOf( form.getFirstValue( "count" ) );
+                // capping the possible count
+                count = Math.min( LUCENE_HIT_LIMIT, Integer.valueOf( form.getFirstValue( "count" ) ) );
             }
             catch ( NumberFormatException e )
             {
-                count = null;
+                count = LUCENE_HIT_LIMIT;
             }
         }
 
@@ -335,9 +342,9 @@ public class SearchNGIndexPlexusResource
                             // the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
                             // and full result set is smaller than HIT_LIMIT
                             // then repeat without collapse
-                            if ( collapseResults && result.getData().size() < searchResult.getTotalHits()
+                            if ( collapseResults && result.getData().size() < searchResult.getTotalHitsCount()
                                 && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
-                                && searchResult.getTotalHits() < GA_HIT_LIMIT )
+                                && searchResult.getTotalHitsCount() < GA_HIT_LIMIT )
                             {
                                 collapseResults = false;
 
@@ -381,7 +388,7 @@ public class SearchNGIndexPlexusResource
             try
             {
                 repackIteratorSearchResponse( request, terms, result, collapseResults, from, count,
-                    IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE, null, null );
+                    IteratorSearchResponse.empty( null ), null, null );
             }
             catch ( NoSuchRepositoryException e )
             {
@@ -407,7 +414,7 @@ public class SearchNGIndexPlexusResource
     }
 
     private IteratorSearchResponse searchByTerms( final Map<String, String> terms, final String repositoryId,
-                                                  final Integer from, final Integer count, final Boolean exact,
+                                                  final Integer from, final int count, final Boolean exact,
                                                   final Boolean expandVersion, final Boolean collapseResults,
                                                   List<ArtifactInfoFilter> filters )
         throws NoSuchRepositoryException, ResourceException, IOException
@@ -465,13 +472,7 @@ public class SearchNGIndexPlexusResource
 
                 if ( searchResponse != null )
                 {
-                    if ( searchResponse.isHitLimitExceeded() )
-                    {
-                        searchResponse.close();
-
-                        return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
-                    }
-                    else if ( collapseResults && searchResponse.getTotalHits() < COLLAPSE_OVERRIDE_TRESHOLD )
+                    if ( collapseResults && searchResponse.getTotalHitsCount() < COLLAPSE_OVERRIDE_TRESHOLD )
                     {
                         searchResponse.close();
 
@@ -499,21 +500,19 @@ public class SearchNGIndexPlexusResource
     }
 
     protected void repackIteratorSearchResponse( Request request, Map<String, String> terms, SearchNGResponse response,
-                                                 boolean collapsed, Integer from, Integer count,
+                                                 boolean collapsed, Integer from, int count,
                                                  IteratorSearchResponse iterator,
                                                  SystemWideLatestVersionCollector systemWideCollector,
                                                  RepositoryWideLatestVersionCollector repositoryWideCollector )
         throws NoSuchRepositoryException, IOException
     {
-        response.setTooManyResults( iterator.isHitLimitExceeded() );
-
         response.setCollapsed( collapsed );
 
-        response.setTotalCount( iterator.getTotalHits() );
+        response.setTotalCount( iterator.getTotalHitsCount() );
 
         response.setFrom( from == null ? -1 : from.intValue() );
 
-        response.setCount( count == null ? -1 : count );
+        response.setCount( count == LUCENE_HIT_LIMIT ? -1 : count );
 
         // System.out.println( "** Query is \"" + iterator.getQuery().toString() + "\"." );
 
@@ -687,7 +686,7 @@ public class SearchNGIndexPlexusResource
                 // summary:
                 getSearchDiagnosticLogger().debug(
                     "Query terms \"" + terms + "\" (LQL \"" + iterator.getQuery().toString() + "\") matched total of "
-                        + iterator.getTotalHits() + " records, " + iterator.getTotalProcessedArtifactInfoCount()
+                        + iterator.getTotalHitsCount() + " records, " + iterator.getTotalProcessedArtifactInfoCount()
                         + " records were processed out of those, resulting in " + hits.size()
                         + " unique GA records. Lucene scored documents first=" + firstDocumentScore + ", last="
                         + lastDocumentScore + ". Main processing loop took "
@@ -800,6 +799,8 @@ public class SearchNGIndexPlexusResource
         {
             iterator.close();
         }
+
+        response.setTooManyResults( iterator.getTotalHitsCount() > count );
     }
 
     protected void addRepositoryDetails( Request request, SearchNGResponse response, Repository repository )

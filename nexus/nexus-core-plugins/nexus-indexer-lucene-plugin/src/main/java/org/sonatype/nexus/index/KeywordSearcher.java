@@ -85,7 +85,7 @@ public class KeywordSearcher
     {
         if ( !canHandle( terms ) )
         {
-            return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
+            return IteratorSearchResponse.empty( null );
         }
         
         return m_lucene.searchArtifactIterator( terms.get( TERM_KEYWORD ), repositoryId, from, count, hitLimit, uniqueRGA,

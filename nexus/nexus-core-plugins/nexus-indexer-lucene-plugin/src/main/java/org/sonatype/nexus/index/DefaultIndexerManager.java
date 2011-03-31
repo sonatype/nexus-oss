@@ -1454,9 +1454,16 @@ public class DefaultIndexerManager
             req.getContexts().add( context );
         }
 
-        if ( from != null )
+        // if ( from != null )
+        // {
+        // req.setStart( from );
+        // }
+
+        // MINDEXER-14: no hit limit anymore. But to make change least obtrusive, we set hitLimit as count 1st, and if
+        // user set count, it will override it anyway
+        if ( hitLimit != null )
         {
-            req.setStart( from );
+            req.setCount( hitLimit );
         }
 
         if ( count != null )
@@ -1464,10 +1471,10 @@ public class DefaultIndexerManager
             req.setCount( count );
         }
 
-        if ( hitLimit != null )
-        {
-            req.setResultHitLimit( hitLimit );
-        }
+        // if ( hitLimit != null )
+        // {
+        // req._setResultHitLimit( hitLimit );
+        // }
 
         try
         {
@@ -1527,9 +1534,16 @@ public class DefaultIndexerManager
             req.getContexts().add( context );
         }
 
-        if ( from != null )
+        // if ( from != null )
+        // {
+        // req.setStart( from );
+        // }
+
+        // MINDEXER-14: no hit limit anymore. But to make change least obtrusive, we set hitLimit as count 1st, and if
+        // user set count, it will override it anyway
+        if ( hitLimit != null )
         {
-            req.setStart( from );
+            req.setCount( hitLimit );
         }
 
         if ( count != null )
@@ -1537,10 +1551,10 @@ public class DefaultIndexerManager
             req.setCount( count );
         }
 
-        if ( hitLimit != null )
-        {
-            req.setResultHitLimit( hitLimit );
-        }
+        // if ( hitLimit != null )
+        // {
+        // req._setResultHitLimit( hitLimit );
+        // }
 
         try
         {
@@ -1624,9 +1638,16 @@ public class DefaultIndexerManager
             req.getContexts().add( context );
         }
 
-        if ( from != null )
+        // if ( from != null )
+        // {
+        // req.setStart( from );
+        // }
+
+        // MINDEXER-14: no hit limit anymore. But to make change least obtrusive, we set hitLimit as count 1st, and if
+        // user set count, it will override it anyway
+        if ( hitLimit != null )
         {
-            req.setStart( from );
+            req.setCount( hitLimit );
         }
 
         if ( count != null )
@@ -1634,10 +1655,10 @@ public class DefaultIndexerManager
             req.setCount( count );
         }
 
-        if ( hitLimit != null )
-        {
-            req.setResultHitLimit( hitLimit );
-        }
+        // if ( hitLimit != null )
+        // {
+        // req._setResultHitLimit( hitLimit );
+        // }
 
         try
         {
@@ -1770,14 +1791,16 @@ public class DefaultIndexerManager
             req.setStart( from );
         }
 
+        // MINDEXER-14: no hit limit anymore. But to make change least obtrusive, we set hitLimit as count 1st, and if
+        // user set count, it will override it anyway
+        if ( hitLimit != null )
+        {
+            req.setCount( hitLimit );
+        }
+
         if ( count != null )
         {
             req.setCount( count );
-        }
-
-        if ( hitLimit != null )
-        {
-            req.setResultHitLimit( hitLimit );
         }
 
         return req;

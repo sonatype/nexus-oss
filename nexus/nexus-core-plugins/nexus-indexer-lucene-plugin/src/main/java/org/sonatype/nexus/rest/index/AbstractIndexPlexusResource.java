@@ -170,42 +170,34 @@ public abstract class AbstractIndexPlexusResource
             {
                 try
                 {
+                    int countRequested = count == null ? HIT_LIMIT : count;
+                    
                     searchResult =
-                        searchByTerms( terms, getRepositoryId( request ), from, count == null ? 500 : count, exact,
+                        searchByTerms( terms, getRepositoryId( request ), from, countRequested, exact,
                             expandVersion, expandPackaging, expandClassifier, collapseResults );
 
-                    // non-identify search happened
-                    boolean tooManyResults = searchResult.isHitLimitExceeded();
+                    result.setTooManyResults( searchResult.getTotalHitsCount() > countRequested );
 
-                    result.setTooManyResults( tooManyResults );
-
-                    result.setTotalCount( searchResult.getTotalHits() );
+                    result.setTotalCount( searchResult.getTotalHitsCount() );
 
                     result.setFrom( from == null ? -1 : from.intValue() );
 
                     result.setCount( count == null ? -1 : count );
 
-                    if ( tooManyResults )
-                    {
-                        result.setData( new ArrayList<NexusArtifact>() );
-                    }
-                    else
-                    {
-                        result.setData( new ArrayList<NexusArtifact>( ai2NaColl( request, searchResult.getResults() ) ) );
+                    result.setData( new ArrayList<NexusArtifact>( ai2NaColl( request, searchResult.getResults() ) ) );
 
-                        // if we had collapseResults ON, and the totalHits are larger than actual (filtered) results,
-                        // and
-                        // the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
-                        // and full result set is smaller than HIT_LIMIT
-                        // then repeat without collapse
-                        if ( collapseResults && result.getData().size() < searchResult.getTotalHits()
-                            && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
-                            && searchResult.getTotalHits() < HIT_LIMIT )
-                        {
-                            collapseResults = false;
+                    // if we had collapseResults ON, and the totalHits are larger than actual (filtered) results,
+                    // and
+                    // the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
+                    // and full result set is smaller than HIT_LIMIT
+                    // then repeat without collapse
+                    if ( collapseResults && result.getData().size() < searchResult.getTotalHitsCount()
+                        && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
+                        && searchResult.getTotalHitsCount() < HIT_LIMIT )
+                    {
+                        collapseResults = false;
 
-                            continue;
-                        }
+                        continue;
                     }
 
                     // we came here, so we break the while-loop, we got what we need
@@ -332,13 +324,7 @@ public abstract class AbstractIndexPlexusResource
 
                 if ( searchResponse != null )
                 {
-                    if ( searchResponse.isHitLimitExceeded() )
-                    {
-                        searchResponse.close();
-
-                        return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
-                    }
-                    else if ( collapseResults && searchResponse.getTotalHits() < COLLAPSE_OVERRIDE_TRESHOLD )
+                    if ( collapseResults && searchResponse.getTotalHitsCount() < COLLAPSE_OVERRIDE_TRESHOLD )
                     {
                         searchResponse.close();
 

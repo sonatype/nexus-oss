@@ -113,7 +113,7 @@ public class MavenCoordinatesSearcher
     {
         if ( !canHandle( terms ) )
         {
-            return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
+            return IteratorSearchResponse.empty( null );
         }
 
         // if the user is querying against these fields, we want to return them properly
