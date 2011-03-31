@@ -19,6 +19,8 @@
 package org.sonatype.nexus.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
@@ -167,5 +169,62 @@ public class FileUtils
         }
         
         return null;
+    }
+
+    public static void move( File source, File destination )
+        throws IOException
+    {
+        if ( source == null )
+        {
+            throw new NullPointerException( "source can't be null" );
+        }
+        if ( destination == null )
+        {
+            throw new NullPointerException( "destination can't be null" );
+        }
+
+        if ( !source.exists() )
+        {
+            throw new FileNotFoundException( "Source file doesn't exists " + source );
+        }
+
+        destination.getParentFile().mkdirs();
+        if ( !destination.exists() )
+        {
+            if ( !source.renameTo( destination ) )
+            {
+                throw new IOException( "Failed to move '" + source + "' to '" + destination + "'" );
+            }
+        }
+        else if ( source.isFile() )
+        {
+            org.codehaus.plexus.util.FileUtils.forceDelete( destination );
+            if ( !source.renameTo( destination ) )
+            {
+                throw new IOException( "Failed to move '" + source + "' to '" + destination + "'" );
+            }
+        }
+        else if ( source.isDirectory() )
+        {
+            // the folder already exists the, so let's do a recursive move....
+            if ( destination.isFile() )
+            {
+                org.codehaus.plexus.util.FileUtils.forceDelete( destination );
+                if ( !source.renameTo( destination ) )
+                {
+                    throw new IOException( "Failed to move '" + source + "' to '" + destination + "'" );
+                }
+            }
+            else
+            {
+                String[] files = source.list();
+                for ( String file : files )
+                {
+                    move( new File( source, file ), new File( destination, file ) );
+                }
+
+                org.codehaus.plexus.util.FileUtils.forceDelete( source );
+            }
+        }
     }
 }

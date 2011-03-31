@@ -19,17 +19,14 @@
 package org.sonatype.nexus.proxy.wastebasket;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
+import org.slf4j.Logger;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -59,7 +56,7 @@ public class DefaultFSWastebasket
     private ApplicationEventMulticaster applicationEventMulticaster;
 
     @Requirement
-    private ApplicationConfiguration applicationConfiguration;
+    private Logger log;
 
     private File wastebasketDirectory;
 
@@ -183,55 +180,48 @@ public class DefaultFSWastebasket
                 }
 
                 File basketFile = getFileForItem( item );
+                basketFile.getParentFile().mkdirs();
 
-                if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
+                if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( ls.getClass() ) )
                 {
-                    basketFile.getParentFile().mkdirs();
-
-                    // a file or link, it is a simple File
-                    InputStream is = null;
-
-                    FileOutputStream fos = null;
+                    // an easy way, we have a File
+                    File itemFile = ( (DefaultFSLocalRepositoryStorage) ls ).getFileFromBase( repository, request );
 
                     try
                     {
-                        is = ( (StorageFileItem) item ).getInputStream();
-
-                        fos = new FileOutputStream( basketFile );
-
-                        IOUtil.copy( is, fos );
-
-                        fos.flush();
+                        org.sonatype.nexus.util.FileUtils.move( itemFile, basketFile );
                     }
-                    finally
+                    catch ( IOException e )
                     {
-                        IOUtil.close( is );
+                        log.warn( "Unable to move item, falling back to copy+delete: " + item.getPath(),
+                            log.isDebugEnabled() ? e : null );
 
-                        IOUtil.close( fos );
+                        if ( item instanceof StorageCollectionItem )
+                        {
+                            FileUtils.copyDirectory( itemFile, basketFile );
+                        }
+                        else if ( item instanceof StorageFileItem )
+                        {
+                            FileUtils.copyFile( itemFile, basketFile );
+                        }
+                        else
+                        {
+                            // TODO throw exception?
+                            log.error( "Unexpected item kind: " + item.getClass() );
+                        }
+                        ls.shredItem( repository, request );
                     }
+
                 }
-                else if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
+                else
                 {
-                    basketFile.mkdirs();
-
-                    // a collection (dir)
-                    if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( ls.getClass() ) )
-                    {
-                        // an easy way, we have a File
-                        File itemFile = ( (DefaultFSLocalRepositoryStorage) ls ).getFileFromBase( repository, request );
-
-                        FileUtils.copyDirectory( itemFile, basketFile );
-                    }
-                    else
-                    {
-                        // a hard way
-                        // TODO: walker and recursive deletions?
-                        // Currently, we have only the DefaultFSLocalRepositoryStorage implementation :)
-                    }
+                    // a hard way
+                    // TODO: walker and recursive deletions?
+                    // Currently, we have only the DefaultFSLocalRepositoryStorage implementation :)
+                    throw new UnsupportedStorageOperationException( "Unable to delete artifacts on a non-FSStorage" );
                 }
             }
 
-            ls.shredItem( repository, request );
         }
         catch ( ItemNotFoundException e )
         {
