@@ -28,7 +28,7 @@
   <description>Maven plugin used to interact with Nexus and Nexus Professional instances.</description>
   <properties>
     <forgeSiteUrl>dav:https://sites.sonatype.com/plugins/nexus-maven-plugin</forgeSiteUrl>
-    <restlight.version>1.10-SNAPSHOT</restlight.version>
+    <restlight.version>1.9.1-RC1</restlight.version>
     <mavenVersion>2.2.1</mavenVersion>
   </properties>
   <scm>
