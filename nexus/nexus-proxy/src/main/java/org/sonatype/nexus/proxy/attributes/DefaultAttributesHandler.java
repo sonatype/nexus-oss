@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -36,10 +37,12 @@ import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
 
 /**
  * The Class DefaultAttributesHandler.
@@ -76,9 +79,9 @@ public class DefaultAttributesHandler
      */
     @Requirement( role = StorageFileItemInspector.class )
     protected List<StorageFileItemInspector> fileItemInspectorList;
-    
+
     // ==
-    
+
     protected Logger getLogger()
     {
         return logger;
@@ -164,20 +167,13 @@ public class DefaultAttributesHandler
         {
             // we are fixing md if we can
 
-            InputStream is = null;
+            ContentLocator is = null;
 
             if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
             {
-                if ( ( (StorageFileItem) item ).isReusableStream() )
+                if ( ( (StorageFileItem) item ).getContentLocator().isReusable() )
                 {
-                    try
-                    {
-                        is = ( (StorageFileItem) item ).getInputStream();
-                    }
-                    catch ( IOException e )
-                    {
-                        is = null;
-                    }
+                    is = ( (StorageFileItem) item ).getContentLocator();
                 }
             }
 
@@ -185,9 +181,9 @@ public class DefaultAttributesHandler
         }
     }
 
-    public void storeAttributes( StorageItem item, InputStream inputStream )
+    public void storeAttributes( final StorageItem item, final ContentLocator content )
     {
-        if ( inputStream != null )
+        if ( content != null )
         {
             // resetting some important values
             if ( item.getRemoteChecked() == 0 )
@@ -203,7 +199,7 @@ public class DefaultAttributesHandler
             item.setExpired( false );
 
             // resetting the pluggable attributes
-            expandCustomItemAttributes( item, inputStream );
+            expandCustomItemAttributes( item, content );
         }
 
         getAttributeStorage().putAttribute( item );
@@ -262,7 +258,7 @@ public class DefaultAttributesHandler
     }
 
     public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request,
-                                           StorageItem storageItem )
+                                        StorageItem storageItem )
         throws ItemNotFoundException, LocalStorageException
     {
         // TODO: touch it only if this is user-originated request
@@ -291,44 +287,72 @@ public class DefaultAttributesHandler
      * @param item the item
      * @param inputStream the input stream
      */
-    protected void expandCustomItemAttributes( StorageItem item, InputStream inputStream )
+    protected void expandCustomItemAttributes( StorageItem item, ContentLocator content )
     {
-        File tmpFile = null;
-
-        try
+        // gather inspectors willing to participate first, to save file copying below
+        ArrayList<StorageFileItemInspector> handlingInspectors = new ArrayList<StorageFileItemInspector>();
+        for ( StorageFileItemInspector inspector : getFileItemInspectorList() )
         {
-            if ( inputStream != null )
+            if ( inspector.isHandled( item ) )
             {
-                OutputStream tmpFileStream = null;
-
-                try
-                {
-                    // unpack the file
-                    tmpFile =
-                        File.createTempFile( "px-" + item.getName(), ".tmp",
-                            applicationConfiguration.getTemporaryDirectory() );
-
-                    tmpFileStream = new FileOutputStream( tmpFile );
-
-                    IOUtils.copy( inputStream, tmpFileStream );
-
-                    tmpFileStream.flush();
-
-                    tmpFileStream.close();
-                }
-                finally
-                {
-                    IOUtil.close( inputStream );
-
-                    IOUtil.close( tmpFileStream );
-                }
+                handlingInspectors.add( inspector );
             }
         }
-        catch ( IOException ex )
-        {
-            getLogger().warn( "Could not create file from " + item.getRepositoryItemUid(), ex );
 
-            tmpFile = null;
+        if ( handlingInspectors.isEmpty() )
+        {
+            return;
+        }
+
+        getLogger().info(
+            "Doing a temporary copy of the item's content for expanding custom attributes. This should NOT happen, but is left in as \"fallback\"!" );
+
+        File tmpFile = null;
+
+        if ( content != null )
+        {
+            if ( content instanceof FileContentLocator )
+            {
+                tmpFile = ( (FileContentLocator) content ).getFile();
+            }
+            else
+            {
+                try
+                {
+                    InputStream inputStream = null;
+                    OutputStream tmpFileStream = null;
+
+                    try
+                    {
+                        // unpack the file
+                        tmpFile =
+                            File.createTempFile( "px-" + item.getName(), ".tmp",
+                                applicationConfiguration.getTemporaryDirectory() );
+
+                        inputStream = content.getContent();
+
+                        tmpFileStream = new FileOutputStream( tmpFile );
+
+                        IOUtils.copy( inputStream, tmpFileStream );
+
+                        tmpFileStream.flush();
+
+                        tmpFileStream.close();
+                    }
+                    finally
+                    {
+                        IOUtil.close( inputStream );
+
+                        IOUtil.close( tmpFileStream );
+                    }
+                }
+                catch ( IOException ex )
+                {
+                    getLogger().warn( "Could not create file from " + item.getRepositoryItemUid(), ex );
+
+                    tmpFile = null;
+                }
+            }
         }
 
         if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
@@ -340,7 +364,7 @@ public class DefaultAttributesHandler
                 try
                 {
                     // we should prepare a file for inspectors
-                    for ( StorageFileItemInspector inspector : getFileItemInspectorList() )
+                    for ( StorageFileItemInspector inspector : handlingInspectors )
                     {
                         if ( inspector.isHandled( item ) )
                         {

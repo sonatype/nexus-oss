@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apache.commons.codec.binary.Hex;
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.attributes.AbstractStorageFileItemInspector;
 import org.sonatype.nexus.proxy.attributes.StorageFileItemInspector;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -44,10 +45,11 @@ public class DigestCalculatingInspector
 {
 
     /** The digest md5 key. */
+    @Deprecated
     public static String DIGEST_MD5_KEY = "digest.md5";
 
     /** The digest sha1 key. */
-    public static String DIGEST_SHA1_KEY = "digest.sha1";
+    public static String DIGEST_SHA1_KEY = RequestContext.CTX_DIGEST_SHA1_KEY;
 
     public Set<String> getIndexableKeywords()
     {
@@ -59,7 +61,20 @@ public class DigestCalculatingInspector
 
     public boolean isHandled( StorageItem item )
     {
-        // handling all files
+        if ( item instanceof StorageFileItem )
+        {
+            if ( item.getItemContext().containsKey( RequestContext.CTX_DIGEST_SHA1_KEY ) )
+            {
+                item.getAttributes().put( DIGEST_SHA1_KEY,
+                    String.valueOf( item.getItemContext().get( RequestContext.CTX_DIGEST_SHA1_KEY ) ) );
+
+                // we did our job, we "lifted" the digest from context
+                return false;
+            }
+
+        }
+
+        // handling all files otherwise
         return true;
     }
 

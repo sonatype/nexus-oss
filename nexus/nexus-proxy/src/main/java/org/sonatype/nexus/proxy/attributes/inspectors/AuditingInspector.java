@@ -49,17 +49,25 @@ public class AuditingInspector
 
     public boolean isHandled( StorageItem item )
     {
-        return true;
+        if ( item instanceof StorageFileItem )
+        {
+            final StorageFileItem fitem = (StorageFileItem) item;
+
+            addIfExistsButDontContains( fitem, AccessManager.REQUEST_USER );
+
+            addIfExistsButDontContains( fitem, AccessManager.REQUEST_REMOTE_ADDRESS );
+
+            addIfExistsButDontContains( fitem, AccessManager.REQUEST_CONFIDENTIAL );
+        }
+
+        // don't do File copy for us, we done our job already
+        return false;
     }
 
     public void processStorageFileItem( StorageFileItem item, File file )
         throws Exception
     {
-        addIfExistsButDontContains( item, AccessManager.REQUEST_USER );
-
-        addIfExistsButDontContains( item, AccessManager.REQUEST_REMOTE_ADDRESS );
-
-        addIfExistsButDontContains( item, AccessManager.REQUEST_CONFIDENTIAL );
+        // noop
     }
 
     /**

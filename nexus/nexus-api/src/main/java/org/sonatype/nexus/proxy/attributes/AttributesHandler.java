@@ -18,11 +18,10 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
-import java.io.InputStream;
-
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -52,7 +51,7 @@ public interface AttributesHandler
      * @param item the item
      * @param inputStream the input stream
      */
-    void storeAttributes( StorageItem item, InputStream inputStream );
+    void storeAttributes( StorageItem item, ContentLocator content );
 
     /**
      * Removes the item attributes.

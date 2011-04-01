@@ -21,6 +21,8 @@ package org.sonatype.nexus.proxy.storage.local;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -30,10 +32,13 @@ import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreIteratorRequest;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.ChecksummingContentLocator;
 import org.sonatype.nexus.proxy.item.LinkPersister;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -180,4 +185,33 @@ public abstract class AbstractLocalRepositoryStorage
         throw new UnsupportedOperationException( "Iteration not supported!" );
     }
 
+    // ==
+
+    protected void prepareStorageFileItemForStore( final StorageFileItem item )
+        throws LocalStorageException
+    {
+        // repack digest keys if needed (from attributes to context), if this items comes from another repo it will
+        // have them
+        if ( item.getAttributes().containsKey( RequestContext.CTX_DIGEST_SHA1_KEY ) )
+        {
+            item.getItemContext().put( RequestContext.CTX_DIGEST_SHA1_KEY,
+                item.getAttributes().get( RequestContext.CTX_DIGEST_SHA1_KEY ) );
+        }
+
+        try
+        {
+            // replace content locator
+            ChecksummingContentLocator ccl =
+                new ChecksummingContentLocator( item.getContentLocator(), MessageDigest.getInstance( "SHA1" ),
+                    RequestContext.CTX_DIGEST_SHA1_KEY, item.getItemContext() );
+
+            item.setContentLocator( ccl );
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
+            throw new LocalStorageException(
+                "The JVM does not support SHA1 MessageDigest, that is essential for Nexus. We cannot write to local storage! Please run Nexus on JVM that does provide this.",
+                e );
+        }
+    }
 }

@@ -51,6 +51,9 @@ public class RequestContext
     /** Context key for condition "if-none-match" */
     public static final String CTX_CONDITION_IF_NONE_MATCH = "request.condition.ifNoneMatch";
 
+    /** The digest sha1 key. */
+    public static final String CTX_DIGEST_SHA1_KEY = "digest.sha1";
+
     /**
      * Context key to mark request as used for auth check only, so repo impl will know there is no work required (i.e.
      * interpolation, etc.)

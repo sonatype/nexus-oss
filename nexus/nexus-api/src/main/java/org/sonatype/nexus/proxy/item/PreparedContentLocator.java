@@ -33,7 +33,7 @@ public class PreparedContentLocator
 
     private final String mimeType;
 
-    public PreparedContentLocator( InputStream content, String mimeType )
+    public PreparedContentLocator( final InputStream content, final String mimeType )
     {
         this.content = content;
 

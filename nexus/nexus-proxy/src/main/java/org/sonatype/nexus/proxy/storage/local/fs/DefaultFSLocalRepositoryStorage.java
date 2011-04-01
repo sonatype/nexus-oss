@@ -22,7 +22,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +29,6 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -331,7 +329,11 @@ public class DefaultFSLocalRepositoryStorage
 
         if ( item instanceof StorageFileItem )
         {
-            cl = ( (StorageFileItem) item ).getContentLocator();
+            StorageFileItem fItem = (StorageFileItem) item;
+
+            prepareStorageFileItemForStore( fItem );
+            
+            cl = fItem.getContentLocator();
         }
         else if ( item instanceof StorageLinkItem )
         {
@@ -364,25 +366,10 @@ public class DefaultFSLocalRepositoryStorage
                 ( (StorageFileItem) item ).getMimeType() ) );
         }
 
-        InputStream mdis;
+        final ContentLocator mdis =
+            item instanceof StorageFileItem ? ( (StorageFileItem) item ).getContentLocator() : null;
 
-        try
-        {
-            mdis = item instanceof StorageFileItem ? ( (StorageFileItem) item ).getContentLocator().getContent() : null;
-        }
-        catch ( IOException e )
-        {
-            throw new LocalStorageException( "Was not able to open content locator just added!", e );
-        }
-
-        try
-        {
-            repository.getAttributesHandler().storeAttributes( item, mdis );
-        }
-        finally
-        {
-            IOUtil.close( mdis );
-        }
+        repository.getAttributesHandler().storeAttributes( item, mdis );
     }
 
     public void shredItem( Repository repository, ResourceStoreRequest request )
@@ -439,7 +426,7 @@ public class DefaultFSLocalRepositoryStorage
                 String newPath = ItemPathUtils.concatPaths( request.getRequestPath(), file.getName() );
 
                 request.pushRequestPath( newPath );
-                
+
                 ResourceStoreRequest collMemberReq = new ResourceStoreRequest( request );
 
                 result.add( retrieveItemFromFile( repository, collMemberReq, file ) );

@@ -48,7 +48,7 @@ public class RecreateAttributesWalker
             item.getAttributes().putAll( initialData );
         }
 
-        getRepository().getAttributesHandler().storeAttributes( item, item.getInputStream() );
+        getRepository().getAttributesHandler().storeAttributes( item, item.getContentLocator() );
     }
 
     public Repository getRepository()
