@@ -19,6 +19,7 @@
 package org.sonatype.nexus.proxy.storage.local.fs;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,6 +46,8 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 public class DefaultFSPeer
     implements FSPeer
 {
+    private static final String HIDDEN_TARGET_SUFFIX = ".nx-upload";
+
     @Requirement
     private Logger logger;
 
@@ -220,7 +223,14 @@ public class DefaultFSPeer
         {
             List<File> result = new ArrayList<File>();
 
-            File[] files = target.listFiles();
+            File[] files = target.listFiles( new FileFilter()
+            {
+                @Override
+                public boolean accept( File pathname )
+                {
+                    return !pathname.getName().endsWith( HIDDEN_TARGET_SUFFIX );
+                }
+            } );
 
             if ( files != null )
             {
@@ -259,7 +269,7 @@ public class DefaultFSPeer
 
     protected File getHiddenTarget( File target )
     {
-        File hiddenTarget = new File( target.getParentFile(), target.getName() + ".tmp" );
+        File hiddenTarget = new File( target.getParentFile(), target.getName() + HIDDEN_TARGET_SUFFIX );
 
         return hiddenTarget;
     }
