@@ -32,6 +32,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
@@ -424,6 +425,14 @@ public abstract class AbstractGroupRepository
 
                         items.add( item );
                     }
+                    catch ( ItemNotFoundException e )
+                    {
+                        // that's okay
+                    }
+                    catch ( RepositoryNotAvailableException e )
+                    {
+                        // that's fine, mute it
+                    }
                     catch ( StorageException e )
                     {
                         throw e;
@@ -431,10 +440,6 @@ public abstract class AbstractGroupRepository
                     catch ( IllegalOperationException e )
                     {
                         getLogger().warn( "Member repository request failed", e );
-                    }
-                    catch ( ItemNotFoundException e )
-                    {
-                        // that's okay
                     }
                 }
                 else
