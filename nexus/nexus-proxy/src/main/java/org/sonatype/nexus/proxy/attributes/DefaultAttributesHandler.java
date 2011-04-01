@@ -304,9 +304,6 @@ public class DefaultAttributesHandler
             return;
         }
 
-        getLogger().info(
-            "Doing a temporary copy of the item's content for expanding custom attributes. This should NOT happen, but is left in as \"fallback\"!" );
-
         File tmpFile = null;
 
         if ( content != null )
@@ -317,6 +314,11 @@ public class DefaultAttributesHandler
             }
             else
             {
+                getLogger().info(
+                    "Doing a temporary copy of the \""
+                        + item.getPath()
+                        + "\" item's content for expanding custom attributes. This should NOT happen, but is left in as \"fallback\"!" );
+
                 try
                 {
                     InputStream inputStream = null;
