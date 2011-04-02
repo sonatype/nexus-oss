@@ -46,7 +46,7 @@ public class DigestCalculatingInspector
 
     /** The digest md5 key. */
     @Deprecated
-    public static String DIGEST_MD5_KEY = "digest.md5";
+    public static String DIGEST_MD5_KEY = RequestContext.CTX_DIGEST_MD5_KEY;
 
     /** The digest sha1 key. */
     public static String DIGEST_SHA1_KEY = RequestContext.CTX_DIGEST_SHA1_KEY;
@@ -67,6 +67,10 @@ public class DigestCalculatingInspector
             {
                 item.getAttributes().put( DIGEST_SHA1_KEY,
                     String.valueOf( item.getItemContext().get( RequestContext.CTX_DIGEST_SHA1_KEY ) ) );
+
+                // do this one "blindly"
+                item.getAttributes().put( DIGEST_MD5_KEY,
+                    String.valueOf( item.getItemContext().get( RequestContext.CTX_DIGEST_MD5_KEY ) ) );
 
                 // we did our job, we "lifted" the digest from context
                 return false;

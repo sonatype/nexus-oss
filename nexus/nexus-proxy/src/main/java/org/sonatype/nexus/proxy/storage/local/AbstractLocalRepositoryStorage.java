@@ -190,27 +190,24 @@ public abstract class AbstractLocalRepositoryStorage
     protected void prepareStorageFileItemForStore( final StorageFileItem item )
         throws LocalStorageException
     {
-        // repack digest keys if needed (from attributes to context), if this items comes from another repo it will
-        // have them
-        if ( item.getAttributes().containsKey( RequestContext.CTX_DIGEST_SHA1_KEY ) )
-        {
-            item.getItemContext().put( RequestContext.CTX_DIGEST_SHA1_KEY,
-                item.getAttributes().get( RequestContext.CTX_DIGEST_SHA1_KEY ) );
-        }
-
         try
         {
             // replace content locator
-            ChecksummingContentLocator ccl =
+            ChecksummingContentLocator sha1cl =
                 new ChecksummingContentLocator( item.getContentLocator(), MessageDigest.getInstance( "SHA1" ),
                     RequestContext.CTX_DIGEST_SHA1_KEY, item.getItemContext() );
 
-            item.setContentLocator( ccl );
+            // md5 is deprecated but still calculated
+            ChecksummingContentLocator md5cl =
+                new ChecksummingContentLocator( sha1cl, MessageDigest.getInstance( "MD5" ),
+                    RequestContext.CTX_DIGEST_MD5_KEY, item.getItemContext() );
+
+            item.setContentLocator( md5cl );
         }
         catch ( NoSuchAlgorithmException e )
         {
             throw new LocalStorageException(
-                "The JVM does not support SHA1 MessageDigest, that is essential for Nexus. We cannot write to local storage! Please run Nexus on JVM that does provide this.",
+                "The JVM does not support SHA1 MessageDigest or MD5 MessageDigest, that is essential for Nexus. We cannot write to local storage! Please run Nexus on JVM that does provide these MessageDigests.",
                 e );
         }
     }

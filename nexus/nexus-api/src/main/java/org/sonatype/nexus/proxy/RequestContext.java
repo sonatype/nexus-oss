@@ -54,6 +54,10 @@ public class RequestContext
     /** The digest sha1 key. */
     public static final String CTX_DIGEST_SHA1_KEY = "digest.sha1";
 
+    /** The digest md5 key. @deprecated MD5 is deprecated, use SHA1. */
+    @Deprecated
+    public static final String CTX_DIGEST_MD5_KEY = "digest.md5";
+
     /**
      * Context key to mark request as used for auth check only, so repo impl will know there is no work required (i.e.
      * interpolation, etc.)
