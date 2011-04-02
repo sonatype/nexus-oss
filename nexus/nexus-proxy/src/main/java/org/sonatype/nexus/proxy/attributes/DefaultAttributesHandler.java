@@ -304,12 +304,14 @@ public class DefaultAttributesHandler
             return;
         }
 
+        boolean deleteTmpFile = false;
         File tmpFile = null;
 
         if ( content != null )
         {
             if ( content instanceof FileContentLocator )
             {
+                deleteTmpFile = false;
                 tmpFile = ( (FileContentLocator) content ).getFile();
             }
             else
@@ -318,6 +320,8 @@ public class DefaultAttributesHandler
                     "Doing a temporary copy of the \""
                         + item.getPath()
                         + "\" item's content for expanding custom attributes. This should NOT happen, but is left in as \"fallback\"!" );
+
+                deleteTmpFile = true;
 
                 try
                 {
@@ -385,7 +389,7 @@ public class DefaultAttributesHandler
                 }
                 finally
                 {
-                    if ( tmpFile != null )
+                    if ( deleteTmpFile && tmpFile != null )
                     {
                         tmpFile.delete();
                     }
