@@ -27,6 +27,13 @@ import java.io.InputStream;
 public interface StorageFileItem
     extends StorageItem
 {
+    /** The digest sha1 key used in item context and attributes. */
+    public static final String DIGEST_SHA1_KEY = "digest.sha1";
+
+    /** The digest md5 key used in item context and attributes. @deprecated MD5 is deprecated, use SHA1. */
+    @Deprecated
+    public static final String DIGEST_MD5_KEY = "digest.md5";
+
     /**
      * Gets the length.
      * 

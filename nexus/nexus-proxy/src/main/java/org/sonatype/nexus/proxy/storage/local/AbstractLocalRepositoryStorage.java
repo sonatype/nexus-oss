@@ -32,7 +32,6 @@ import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
-import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreIteratorRequest;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.ChecksummingContentLocator;
@@ -195,12 +194,12 @@ public abstract class AbstractLocalRepositoryStorage
             // replace content locator
             ChecksummingContentLocator sha1cl =
                 new ChecksummingContentLocator( item.getContentLocator(), MessageDigest.getInstance( "SHA1" ),
-                    RequestContext.CTX_DIGEST_SHA1_KEY, item.getItemContext() );
+                    StorageFileItem.DIGEST_SHA1_KEY, item.getItemContext() );
 
             // md5 is deprecated but still calculated
             ChecksummingContentLocator md5cl =
                 new ChecksummingContentLocator( sha1cl, MessageDigest.getInstance( "MD5" ),
-                    RequestContext.CTX_DIGEST_MD5_KEY, item.getItemContext() );
+                    StorageFileItem.DIGEST_MD5_KEY, item.getItemContext() );
 
             item.setContentLocator( md5cl );
         }
