@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-core-plugins</artifactId>
-    <version>1.9.1-RC2</version>
+    <version>1.9.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-plugin-console-plugin</artifactId>
