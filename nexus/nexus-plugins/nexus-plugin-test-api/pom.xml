@@ -24,7 +24,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-plugins</artifactId>
-    <version>1.9.1-SNAPSHOT</version>
+    <version>1.9.1-RC2</version>
   </parent>
 
   <!-- the version of maven's project object model -->
