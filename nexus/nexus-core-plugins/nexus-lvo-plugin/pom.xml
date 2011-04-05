@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-core-plugins</artifactId>
-    <version>1.9.1-RC3</version>
+    <version>1.9.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-lvo-plugin</artifactId>
@@ -17,9 +17,9 @@
   <description>Nexus LVO Plugin (Extension).</description>
 
   <scm>
-    <url>http://svn.sonatype.org/nexus-plugins/tags/nexus-1.9.1-RC3/trunk/nexus-lvo-plugin</url>
-    <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/tags/nexus-1.9.1-RC3/trunk/nexus-lvo-plugin</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/tags/nexus-1.9.1-RC3/trunk/nexus-lvo-plugin</developerConnection>
+    <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</url>
+    <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</developerConnection>
   </scm>
 
   <dependencies>

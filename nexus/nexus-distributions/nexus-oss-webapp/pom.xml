@@ -26,7 +26,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-distributions</artifactId>
-    <version>1.9.1-RC3</version>
+    <version>1.9.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-oss-webapp</artifactId>
