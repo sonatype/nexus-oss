@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>nexus-migration-plugin</artifactId>
-  <version>1.9.1-RC3</version>
+  <version>1.9.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Nexus Migration Plugin</name>
@@ -114,9 +114,9 @@
   </build>
   
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/tags/nexus-migration-plugin-1.9.1-RC3</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/tags/nexus-migration-plugin-1.9.1-RC3</developerConnection>
-    <url>http://svn.sonatype.org/nexus-plugins/tags/nexus-migration-plugin-1.9.1-RC3</url>
+    <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/trunk/nexus-migration-plugin</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/trunk/nexus-migration-plugin</developerConnection>
+    <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-migration-plugin</url>
   </scm>
   
 </project>
