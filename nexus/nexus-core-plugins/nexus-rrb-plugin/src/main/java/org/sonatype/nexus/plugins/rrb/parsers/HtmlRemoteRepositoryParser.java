@@ -29,26 +29,26 @@ public class HtmlRemoteRepositoryParser
     implements RemoteRepositoryParser
 {
 
-    private static final String[] EXCLUDES = { ">Skip to content<", ">Log in<", ">Products<", "Parent Directory", "?", ">../", ">..<", ">._.<", "-logo.png",
-	            ">Community<", ">Support<", ">Resources<", ">About us<", ">Downloads<", ">Documentation<", ">Resources<",
-	            ">About This Site<", ">Contact Us<", ">Legal Terms and Privacy Policy<", ">Log out<",
-	            ">IONA Technologies<", ">Site Index<", ">Skip to content<", ">Log In<"};
+    private static final String[] EXCLUDES = { ">Skip to content<", ">Log in<", ">Products<", "Parent Directory", "?",
+        ">../", ">..<", ">._.<", "-logo.png", ">Community<", ">Support<", ">Resources<", ">About us<", ">Downloads<",
+        ">Documentation<", ">Resources<", ">About This Site<", ">Contact Us<", ">Legal Terms and Privacy Policy<",
+        ">Log out<", ">IONA Technologies<", ">Site Index<", ">Skip to content<", ">Log In<" };
 
-	private final Logger logger = LoggerFactory.getLogger( HtmlRemoteRepositoryParser.class );
+    private final Logger logger = LoggerFactory.getLogger( HtmlRemoteRepositoryParser.class );
 
-	protected String localUrl;
-	
-	protected String remotePath;
-	
-	protected String linkStart = "<a ";
-	
-	protected String linkEnd = "/a>";
-	
-	protected String href = "href=\"";
-	
-	protected String id;
-	
-	protected String baseUrl;
+    protected String localUrl;
+
+    protected String remotePath;
+
+    protected String linkStart = "<a ";
+
+    protected String linkEnd = "/a>";
+
+    protected String href = "href=\"";
+
+    protected String id;
+
+    protected String baseUrl;
 
     public HtmlRemoteRepositoryParser( String remotePath, String localUrl, String id, String baseUrl )
     {
@@ -77,6 +77,19 @@ public class HtmlRemoteRepositoryParser
         int start = 0;
         int end = 0;
 
+        if ( !remotePath.endsWith( "/" ) )
+        {
+            remotePath += "/";
+        }
+        if ( remotePath.equals( "/" ) )
+        {
+            remotePath = "";
+        }
+        if ( !localUrl.endsWith( "/" ) )
+        {
+            localUrl += "/";
+        }
+
         do
         {
             RepositoryDirectory rp = new RepositoryDirectory();
@@ -96,16 +109,10 @@ public class HtmlRemoteRepositoryParser
                     rp.setLeaf( true );
                 }
                 rp.setText( getLinkName( temp ).replace( "/", "" ).trim() );
-                if ( !remotePath.endsWith( "/" ) )
-                {
-                    remotePath += "/";
-                }
-                if ( !localUrl.endsWith( "/" ) )
-                {
-                    localUrl += "/";
-                }
-                rp.setResourceURI( getLinkUrl( temp ).replace( baseUrl, localUrl ) );
-                rp.setRelativePath( getLinkUrl( temp ).replace( baseUrl, "" ) );
+                String uri = getLinkUrl( temp ).replace( baseUrl, localUrl );
+                uri = uri.startsWith( localUrl ) ? uri : localUrl + remotePath + uri;
+                rp.setResourceURI( uri );
+                rp.setRelativePath( uri.replace( localUrl, "" ) );
                 if ( !rp.getRelativePath().startsWith( "/" ) )
                 {
                     rp.setRelativePath( "/" + rp.getRelativePath() );
