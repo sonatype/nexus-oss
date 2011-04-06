@@ -685,7 +685,7 @@ public class SearchNGIndexPlexusResource
 
                 // summary:
                 getSearchDiagnosticLogger().debug(
-                    "Query terms \"" + terms + "\" (LQL \"" + iterator.getQuery().toString() + "\") matched total of "
+                    "Query terms \"" + terms + "\" (LQL \"" + iterator.getQuery() + "\") matched total of "
                         + iterator.getTotalHitsCount() + " records, " + iterator.getTotalProcessedArtifactInfoCount()
                         + " records were processed out of those, resulting in " + hits.size()
                         + " unique GA records. Lucene scored documents first=" + firstDocumentScore + ", last="

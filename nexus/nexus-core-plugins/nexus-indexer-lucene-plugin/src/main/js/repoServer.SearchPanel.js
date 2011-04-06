@@ -1,20 +1,19 @@
 /*
- * Copyright (c) 2008-2011 Sonatype, Inc.
- * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- *
- * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
- * Public License Version 3 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
- * for more details.
- *
- * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
- * http://www.gnu.org/licenses.
- *
- * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
- * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
- * All other trademarks are the property of their respective owners.
+ * Copyright (c) 2008-2011 Sonatype, Inc. All rights reserved. Includes the
+ * third-party code listed at
+ * http://www.sonatype.com/products/nexus/attributions. This program is free
+ * software: you can redistribute it and/or modify it only under the terms of
+ * the GNU Affero General Public License Version 3 as published by the Free
+ * Software Foundation. This program is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+ * General Public License Version 3 for more details. You should have received a
+ * copy of the GNU Affero General Public License Version 3 along with this
+ * program. If not, see http://www.gnu.org/licenses. Sonatype Nexus (TM) Open
+ * Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus
+ * are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache
+ * Foundation. M2Eclipse is a trademark of the Eclipse Foundation. All other
+ * trademarks are the property of their respective owners.
  */
 Sonatype.repoServer.SearchPanel = function(config) {
   var config = config || {};
@@ -150,11 +149,11 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
                 return repoList[i];
               }
             }
-            
+
             return null;
           };
 
-          var repoDetails = getRepoDetails( rec.data.artifactHits[hitIndex].repositoryId, rec.store.reader.jsonData.repoDetails);
+          var repoDetails = getRepoDetails(rec.data.artifactHits[hitIndex].repositoryId, rec.store.reader.jsonData.repoDetails);
 
           var payload = {
             data : {
@@ -391,7 +390,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
             }
           }
         }
-        
+
         this.lastbookmark = bookmark;
 
         return bookmark;
@@ -773,24 +772,24 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
                     searchPanel : panel,
                     width : 300
                   }, {
-                    xtype : Ext.isGecko3 ? 'button' : 'browsebutton',
+                    xtype : 'button',
                     text : 'Browse...',
                     searchPanel : panel,
                     tooltip : 'Click to select a file. It will not be uploaded to the ' + 'remote server, an SHA1 checksum is calculated locally and sent to ' + 'Nexus to find a match. This feature requires Java applet ' + 'support in your web browser.',
                     handler : function(b) {
+                      var filename = null;
+
                       if (!document.digestApplet)
                       {
                         b.searchPanel.grid.fetchMoreBar.addText('<div id="checksumContainer" style="width:10px">' + '<applet code="org/sonatype/nexus/applet/DigestApplet.class" ' + 'archive="' + Sonatype.config.resourcePath + '/digestapplet.jar" '
                             + 'width="1" height="1" name="digestApplet"></applet>' + '</div>');
                       }
-
-                      var filename = null;
-
-                      if (Ext.isGecko3)
+                      else
                       {
                         filename = document.digestApplet.selectFile();
                       }
-                      else
+
+                      if (!filename)
                       {
                         var fileInput = b.detachInputFile();
                         filename = fileInput.getValue();
