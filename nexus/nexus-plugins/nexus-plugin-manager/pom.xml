@@ -26,7 +26,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-plugins</artifactId>
-    <version>1.9.1-SNAPSHOT</version>
+    <version>1.9.1-RC1</version>
   </parent>
 
   <artifactId>nexus-plugin-manager</artifactId>
