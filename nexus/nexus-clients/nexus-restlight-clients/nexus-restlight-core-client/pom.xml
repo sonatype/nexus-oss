@@ -25,7 +25,7 @@
   <parent>
     <artifactId>nexus-restlight-clients</artifactId>
     <groupId>org.sonatype.nexus.restlight</groupId>
-    <version>1.9.1-RC1</version>
+    <version>1.9.1-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.nexus.restlight</groupId>
