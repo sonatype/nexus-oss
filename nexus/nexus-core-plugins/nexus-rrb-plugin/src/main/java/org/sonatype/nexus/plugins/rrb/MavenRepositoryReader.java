@@ -24,12 +24,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.rrb.parsers.ArtifactoryRemoteRepositoryParser;
@@ -37,8 +31,11 @@ import org.sonatype.nexus.plugins.rrb.parsers.HtmlRemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.RemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.S3RemoteRepositoryParser;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.HttpClientProxyUtil;
+
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Request;
+import com.ning.http.client.RequestBuilder;
+import com.ning.http.client.Response;
 
 /**
  * Class for retrieving directory data from remote repository. This class is not thread-safe!
@@ -47,6 +44,8 @@ public class MavenRepositoryReader
 {
 
     private final Logger logger = LoggerFactory.getLogger( MavenRepositoryReader.class );
+
+    private final AsyncHttpClient client;
 
     private String remotePath;
 
@@ -57,6 +56,11 @@ public class MavenRepositoryReader
     private ProxyRepository proxyRepository;
 
     private String id;
+
+    public MavenRepositoryReader( final AsyncHttpClient client )
+    {
+        this.client = client;
+    }
 
     /**
      * @param remotePath remote path added to the URL
@@ -220,92 +224,67 @@ public class MavenRepositoryReader
 
     private StringBuilder getContent()
     {
-        GetMethod method = null;
-
-        HttpClient client = new HttpClient();
-
-        if ( proxyRepository != null )
-        {
-            RemoteStorageContext rctx = proxyRepository.getRemoteStorageContext();
-            HttpClientProxyUtil.applyProxyToHttpClient( client, rctx, null ); // no logger to pass in
-        }
+        RequestBuilder builder = new RequestBuilder();
 
         if ( remoteUrl.indexOf( "?prefix" ) != -1 )
         {
-            method = new GetMethod( remoteUrl + "&delimiter=/" );
-            method.setFollowRedirects( true );
+            builder.setUrl( remoteUrl + "&delimiter=/" );
         }
         else
         {
-            method = new GetMethod( remoteUrl + "?delimiter=/" );
-            method.setFollowRedirects( true );
+            builder.setUrl( remoteUrl + "?delimiter=/" );
         }
 
-        method.getParams().setParameter( HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler( 3, false ) );
-
-        // allow a couple redirects
-        client.getParams().setParameter( "http.protocol.max-redirects", new Integer( 3 ) );
-
+        Response response = null;
         StringBuilder result = new StringBuilder();
 
         try
         {
-            doCall( method, client, result );
-        }
-        catch ( HttpException e )
-        {
-            method.setPath( method.getPath() + "/" );
-
-            try
-            {
-                doCall( method, client, result );
-            }
-            catch ( HttpException e1 )
-            {
-                logger.error( e.getMessage(), e );
-            }
-            catch ( IOException e1 )
-            {
-                logger.error( e.getMessage(), e );
-            }
+            response = doCall( builder.build(), result );
         }
         catch ( IOException e )
         {
             logger.error( e.getMessage(), e );
         }
-        finally
-        {
-            // Release the connection.
-            method.releaseConnection();
-        }
 
         // here is the deal, For reasons I do not understand, S3 comes back with an empty response (and a 200),
         // stripping off the last '/'
         // returns the error we are looking for (so we can do a query)
-        Header serverHeader = method.getResponseHeader( "Server" );
-        if ( result.length() == 0 && serverHeader.getValue().equals( "AmazonS3" ) && this.remoteUrl.endsWith( "/" ) )
+
+        String serverHeader = response != null ? response.getHeader( "Server" ) : null;
+        if ( result.length() == 0 && serverHeader != null && serverHeader.equalsIgnoreCase( "AmazonS3" )
+            && remoteUrl.endsWith( "/" ) )
         {
-            this.remoteUrl = this.remoteUrl.substring( 0, this.remoteUrl.length() - 1 );
+            remoteUrl = remoteUrl.substring( 0, remoteUrl.length() - 1 );
             // now just call it again
-            return this.getContent();
+            return getContent();
         }
 
         return result;
     }
 
-    private void doCall( GetMethod method, HttpClient client, StringBuilder result )
-        throws IOException, HttpException
+    private Response doCall( Request request, StringBuilder result )
+        throws IOException
     {
-        int responseCode;
-        responseCode = client.executeMethod( method );
-
-        logger.debug( "responseCode={}", responseCode );
-        BufferedReader reader = new BufferedReader( new InputStreamReader( method.getResponseBodyAsStream() ) );
-
-        String line = null;
-        while ( ( line = reader.readLine() ) != null )
+        try
         {
-            result.append( line + "\n" );
+            Response response = client.executeRequest( request ).get();
+            final int responseCode = response.getStatusCode();
+
+            logger.debug( "responseCode={}", responseCode );
+            BufferedReader reader = new BufferedReader( new InputStreamReader( response.getResponseBodyAsStream() ) );
+
+            String line = null;
+            while ( ( line = reader.readLine() ) != null )
+            {
+                result.append( line + "\n" );
+            }
+
+            return response;
+        }
+        catch ( Exception e )
+        {
+            throw new IOException( e );
         }
     }
 }

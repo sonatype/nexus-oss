@@ -46,7 +46,6 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.SimpleRemoteStorageContext;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -89,6 +88,8 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 
+import com.ning.http.client.AsyncHttpClient;
+
 /**
  * In this test we use example repo files that placed in the test resource catalogue To access these files locally via
  * MavenRepositoryReader that requires the http-protocol we start a Jetty server
@@ -109,7 +110,8 @@ public class MavenRepositoryReaderTest
     public void setUp()
         throws Exception
     {
-        reader = new MavenRepositoryReader();
+        final AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+        reader = new MavenRepositoryReader( asyncHttpClient );
 
         // Create a Jetty server with a handler that returns the content of the
         // given target (i.e. an emulated html, S3Repo, etc, file from the test
@@ -119,38 +121,37 @@ public class MavenRepositoryReaderTest
 
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
                 throws IOException, ServletException
-            {   
+            {
                 String path = target;
-                if( path.endsWith( "/" ) && StringUtils.isNotEmpty( request.getParameter( "prefix" ) ) )
+                if ( path.endsWith( "/" ) && StringUtils.isNotEmpty( request.getParameter( "prefix" ) ) )
                 {
                     String prefix = request.getParameter( "prefix" );
                     path = path + prefix.replaceAll( "/", "-" );
                 }
-                else if( target.endsWith( "/" ) )
+                else if ( target.endsWith( "/" ) )
                 {
                     // might need welcome pages later.
                     path += "root";
                 }
-                
+
                 response.setStatus( HttpServletResponse.SC_OK );
                 InputStream stream = this.getClass().getResourceAsStream( path );
-               
+
                 // added to make old tests work
-                // we need to fall back to the file name that matches 
-                if( stream == null && path.endsWith( "root" ))
+                // we need to fall back to the file name that matches
+                if ( stream == null && path.endsWith( "root" ) )
                 {
                     path = target;
                     stream = this.getClass().getResourceAsStream( path );
                 }
-                
-                if( stream == null )
+
+                if ( stream == null )
                 {
                     System.out.println( "Error handling: " + path );
                 }
-                
+
                 StringBuilder result = new StringBuilder();
                 BufferedReader reader = new BufferedReader( new InputStreamReader( stream ) );
-                
 
                 String line = null;
                 while ( ( line = reader.readLine() ) != null )
@@ -200,7 +201,7 @@ public class MavenRepositoryReaderTest
     public void testReadS3()
     {
         List<RepositoryDirectory> result =
-            reader.extract( "s3Example" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "s3Example", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 13, result.size() );
     }
 
@@ -208,26 +209,29 @@ public class MavenRepositoryReaderTest
     public void testReadProtectedS3()
     {
         // Fetched from URI http://coova-dev.s3.amazonaws.com/mvn/
-        // This S3 repo does _work_ (with maven and/or nexus proxying it), but it's setup (perms) does not allow "public browsing".
+        // This S3 repo does _work_ (with maven and/or nexus proxying it), but it's setup (perms) does not allow
+        // "public browsing".
         List<RepositoryDirectory> result =
-            reader.extract( "s3Example-foreign" , localUrl, new FakeProxyRepo( "http://coova-dev.s3.amazonaws.com/mvn/" ), "test" );
+            reader.extract( "s3Example-foreign", localUrl,
+                new FakeProxyRepo( "http://coova-dev.s3.amazonaws.com/mvn/" ), "test" );
         assertEquals( 0, result.size() );
     }
-    
+
     @Test( timeout = 5000 )
     public void testReadArtifactory()
     {
-    	//In this test the format of the local URL is important
-    	localUrl = "http://localhost:8081/nexus/service/local/repositories/ArtyJavaNet/remotebrowser/http://repo.jfrog.org/artifactory/java.net";
+        // In this test the format of the local URL is important
+        localUrl =
+            "http://localhost:8081/nexus/service/local/repositories/ArtyJavaNet/remotebrowser/http://repo.jfrog.org/artifactory/java.net";
         List<RepositoryDirectory> result =
-            reader.extract( "Artifactory.java.net.htm" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "Artifactory.java.net.htm", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 30, result.size() );
     }
 
     /**
-     * Below follows a set of tests of some typical existing repos. The respectively repo's top level is stored as a file
-     * in the ordinary test resource catalog. Each file has a name indicating the repo it is taken from and an extension
-     * with the date it was downloaded in the format YYYYMMDD.
+     * Below follows a set of tests of some typical existing repos. The respectively repo's top level is stored as a
+     * file in the ordinary test resource catalog. Each file has a name indicating the repo it is taken from and an
+     * extension with the date it was downloaded in the format YYYYMMDD.
      */
 
     @Test( timeout = 5000 )
@@ -235,57 +239,60 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://s3.amazonaws.com/maven.springframework.org
         List<RepositoryDirectory> result =
-            reader.extract( "/" , localUrl, new FakeProxyRepo( getRemoteUrl() + "Amazon_20100118" ), "test" );
+            reader.extract( "/", localUrl, new FakeProxyRepo( getRemoteUrl() + "Amazon_20100118" ), "test" );
         assertEquals( 997, result.size() );
-        
+
         for ( RepositoryDirectory repositoryDirectory : result )
         {
             assertFalse( repositoryDirectory.getRelativePath().contains( "prefix" ) );
             assertFalse( repositoryDirectory.getResourceURI().contains( "prefix" ) );
         }
     }
-    
+
     @Test( timeout = 5000 )
     public void testAmazon_20110112_slashCom()
     {
         // Fetched from URI http://repository.springsource.com/?prifix=maven/bundles/release&delimiter=/
         // and http://repository.springsource.com/maven/bundles/release/com
         List<RepositoryDirectory> result =
-            reader.extract( "/com/" , localUrl, new FakeProxyRepo( getRemoteUrl() + "Amazon_20110112/maven/bundles/release" ), "test" );
-        assertEquals( "Result: "+ result, 1, result.size() );
-        
+            reader.extract( "/com/", localUrl, new FakeProxyRepo( getRemoteUrl()
+                + "Amazon_20110112/maven/bundles/release" ), "test" );
+        assertEquals( "Result: " + result, 1, result.size() );
+
         RepositoryDirectory repositoryDirectory1 = result.get( 0 );
         Assert.assertFalse( repositoryDirectory1.isLeaf() );
         Assert.assertEquals( localUrl + "/com/springsource/", repositoryDirectory1.getResourceURI() );
         Assert.assertEquals( "/com/springsource/", repositoryDirectory1.getRelativePath() );
     }
-    
-    @Test//( timeout = 5000 )
+
+    @Test
+    // ( timeout = 5000 )
     public void testAmazon_20110112_slashRoot()
     {
         // Fetched from URI http://repository.springsource.com/?prifix=maven/bundles/release&delimiter=/
         // and http://repository.springsource.com/maven/bundles/release/
         List<RepositoryDirectory> result =
-            reader.extract( "/" , localUrl, new FakeProxyRepo( getRemoteUrl() + "Amazon_20110112/maven/bundles/release" ), "test" );
-        assertEquals( "Result: "+ result, 2, result.size() );
-        
+            reader.extract( "/", localUrl,
+                new FakeProxyRepo( getRemoteUrl() + "Amazon_20110112/maven/bundles/release" ), "test" );
+        assertEquals( "Result: " + result, 2, result.size() );
+
         RepositoryDirectory repositoryDirectory1 = result.get( 0 );
         Assert.assertFalse( repositoryDirectory1.isLeaf() );
         Assert.assertEquals( localUrl + "/com/", repositoryDirectory1.getResourceURI() );
         Assert.assertEquals( "/com/", repositoryDirectory1.getRelativePath() );
-        
+
         RepositoryDirectory repositoryDirectory2 = result.get( 1 );
         Assert.assertFalse( repositoryDirectory2.isLeaf() );
         Assert.assertEquals( localUrl + "/org/", repositoryDirectory2.getResourceURI() );
         Assert.assertEquals( "/org/", repositoryDirectory2.getRelativePath() );
     }
-    
+
     @Test( timeout = 5000 )
     public void testApache_Snapshots()
     {
         // Fetched from URI http://repository.apache.org/snapshots
         List<RepositoryDirectory> result =
-            reader.extract( "Apache_Snapshots_20100118" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "Apache_Snapshots_20100118", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 9, result.size() );
     }
 
@@ -294,7 +301,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://snapshots.repository.codehaus.org/
         List<RepositoryDirectory> result =
-            reader.extract( "Codehaus_Snapshots_20100118" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "Codehaus_Snapshots_20100118", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 3, result.size() );
     }
 
@@ -303,7 +310,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://google-caja.googlecode.com/svn/maven
         List<RepositoryDirectory> result =
-            reader.extract( "Google_Caja_20100118" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "Google_Caja_20100118", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 3, result.size() );
     }
 
@@ -312,7 +319,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://oauth.googlecode.com/svn/code/maven
         List<RepositoryDirectory> result =
-            reader.extract( "Google_Oauth_20100118" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "Google_Oauth_20100118", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 4, result.size() );
     }
 
@@ -321,8 +328,8 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://repository.jboss.org/maven2/
         List<RepositoryDirectory> result =
-            reader.extract( "JBoss_Maven_Release_Repository_20100118" , localUrl, new FakeProxyRepo( getRemoteUrl() ),
-                            "test" );
+            reader.extract( "JBoss_Maven_Release_Repository_20100118", localUrl, new FakeProxyRepo( getRemoteUrl() ),
+                "test" );
         assertEquals( 201, result.size() );
     }
 
@@ -331,7 +338,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://repo1.maven.org/maven2
         List<RepositoryDirectory> result =
-            reader.extract( "Maven_Central_20100118" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "Maven_Central_20100118", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 647, result.size() );
     }
 
@@ -340,7 +347,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://repository.sonatype.org/content/groups/forge
         List<RepositoryDirectory> result =
-            reader.extract( "Nexus_Repository_Manager_20100118" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "Nexus_Repository_Manager_20100118", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 173, result.size() );
     }
 
@@ -349,7 +356,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://www.eviware.com/repository/maven2/
         List<RepositoryDirectory> result =
-            reader.extract( "Eviwares_Maven_repo_20100118" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "Eviwares_Maven_repo_20100118", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 67, result.size() );
     }
 
@@ -358,7 +365,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://download.java.net/maven/1/
         List<RepositoryDirectory> result =
-            reader.extract( "java.net_repo_20100118" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "java.net_repo_20100118", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 94, result.size() );
     }
 
@@ -367,7 +374,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://repository.codehaus.org/
         List<RepositoryDirectory> result =
-            reader.extract( "Codehaus_20100118" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "Codehaus_20100118", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 5, result.size() );
     }
 
@@ -376,7 +383,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://download.java.net/maven/2/
         List<RepositoryDirectory> result =
-            reader.extract( "java.net2_20100118" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "java.net2_20100118", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 57, result.size() );
     }
 
@@ -385,7 +392,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://repo.open.iona.com/maven2/
         List<RepositoryDirectory> result =
-            reader.extract( "Open.iona.com_Releases_20100118" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "Open.iona.com_Releases_20100118", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 8, result.size() );
     }
 
@@ -400,7 +407,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://repository.springsource.com/
         List<RepositoryDirectory> result =
-            reader.extract( "Springsource_20100118" , localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
+            reader.extract( "Springsource_20100118", localUrl, new FakeProxyRepo( getRemoteUrl() ), "test" );
         assertEquals( 995, result.size() );
     }
 
@@ -411,16 +418,17 @@ public class MavenRepositoryReaderTest
     {
         return this.getRemoteUrl() + resourceName;
     }
-    
+
     private String getRemoteUrl()
     {
         return "http://" + nameOfConnector + "/";
     }
-    
-    
-    static class FakeProxyRepo implements ProxyRepository
+
+    static class FakeProxyRepo
+        implements ProxyRepository
     {
         private String remoteUrl;
+
         public FakeProxyRepo( String remoteUrl )
         {
             this.remoteUrl = remoteUrl;
@@ -447,7 +455,6 @@ public class MavenRepositoryReaderTest
         public void setId( String id )
         {
 
-            
         }
 
         public String getName()
@@ -459,7 +466,6 @@ public class MavenRepositoryReaderTest
         public void setName( String name )
         {
 
-            
         }
 
         public String getPathPrefix()
@@ -471,7 +477,6 @@ public class MavenRepositoryReaderTest
         public void setPathPrefix( String prefix )
         {
 
-            
         }
 
         public RepositoryKind getRepositoryKind()
@@ -543,7 +548,6 @@ public class MavenRepositoryReaderTest
         public void setNotFoundCacheTimeToLive( int notFoundCacheTimeToLive )
         {
 
-            
         }
 
         public PathCache getNotFoundCache()
@@ -555,38 +559,32 @@ public class MavenRepositoryReaderTest
         public void setNotFoundCache( PathCache notFoundcache )
         {
 
-            
         }
 
         public void maintainNotFoundCache( ResourceStoreRequest request )
             throws ItemNotFoundException
         {
 
-            
         }
 
         public void addToNotFoundCache( String path )
         {
 
-            
         }
 
         public void removeFromNotFoundCache( String path )
         {
 
-            
         }
 
         public void addToNotFoundCache( ResourceStoreRequest request )
         {
 
-            
         }
 
         public void removeFromNotFoundCache( ResourceStoreRequest request )
         {
 
-            
         }
 
         public boolean isNotFoundCacheActive()
@@ -598,7 +596,6 @@ public class MavenRepositoryReaderTest
         public void setNotFoundCacheActive( boolean notFoundCacheActive )
         {
 
-            
         }
 
         public AttributesHandler getAttributesHandler()
@@ -610,7 +607,6 @@ public class MavenRepositoryReaderTest
         public void setAttributesHandler( AttributesHandler attributesHandler )
         {
 
-            
         }
 
         public String getLocalUrl()
@@ -623,7 +619,6 @@ public class MavenRepositoryReaderTest
             throws StorageException
         {
 
-            
         }
 
         public LocalStatus getLocalStatus()
@@ -635,7 +630,6 @@ public class MavenRepositoryReaderTest
         public void setLocalStatus( LocalStatus val )
         {
 
-            
         }
 
         public LocalStorageContext getLocalStorageContext()
@@ -653,7 +647,6 @@ public class MavenRepositoryReaderTest
         public void setLocalStorage( LocalRepositoryStorage storage )
         {
 
-            
         }
 
         public PublishedMirrors getPublishedMirrors()
@@ -677,7 +670,6 @@ public class MavenRepositoryReaderTest
         public void setUserManaged( boolean val )
         {
 
-            
         }
 
         public boolean isExposed()
@@ -689,7 +681,6 @@ public class MavenRepositoryReaderTest
         public void setExposed( boolean val )
         {
 
-            
         }
 
         public boolean isBrowseable()
@@ -701,7 +692,6 @@ public class MavenRepositoryReaderTest
         public void setBrowseable( boolean val )
         {
 
-            
         }
 
         public RepositoryWritePolicy getWritePolicy()
@@ -713,7 +703,6 @@ public class MavenRepositoryReaderTest
         public void setWritePolicy( RepositoryWritePolicy writePolicy )
         {
 
-            
         }
 
         public boolean isIndexable()
@@ -725,7 +714,6 @@ public class MavenRepositoryReaderTest
         public void setIndexable( boolean val )
         {
 
-            
         }
 
         public boolean isSearchable()
@@ -737,19 +725,16 @@ public class MavenRepositoryReaderTest
         public void setSearchable( boolean val )
         {
 
-            
         }
 
         public void expireCaches( ResourceStoreRequest request )
         {
 
-            
         }
 
         public void expireNotFoundCaches( ResourceStoreRequest request )
         {
 
-            
         }
 
         public Collection<String> evictUnusedItems( ResourceStoreRequest request, long timestamp )
@@ -773,7 +758,6 @@ public class MavenRepositoryReaderTest
         public void setAccessManager( AccessManager accessManager )
         {
 
-            
         }
 
         public StorageItem retrieveItem( boolean fromTask, ResourceStoreRequest request )
@@ -788,7 +772,6 @@ public class MavenRepositoryReaderTest
             StorageException
         {
 
-            
         }
 
         public void moveItem( boolean fromTask, ResourceStoreRequest from, ResourceStoreRequest to )
@@ -796,7 +779,6 @@ public class MavenRepositoryReaderTest
             StorageException
         {
 
-            
         }
 
         public void deleteItem( boolean fromTask, ResourceStoreRequest request )
@@ -804,7 +786,6 @@ public class MavenRepositoryReaderTest
             StorageException
         {
 
-            
         }
 
         public Collection<StorageItem> list( boolean fromTask, ResourceStoreRequest request )
@@ -818,7 +799,6 @@ public class MavenRepositoryReaderTest
             throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
         {
 
-            
         }
 
         public Collection<StorageItem> list( boolean fromTask, StorageCollectionItem item )
@@ -840,7 +820,6 @@ public class MavenRepositoryReaderTest
             StorageException, AccessDeniedException
         {
 
-            
         }
 
         public void moveItem( ResourceStoreRequest from, ResourceStoreRequest to )
@@ -848,7 +827,6 @@ public class MavenRepositoryReaderTest
             StorageException, AccessDeniedException
         {
 
-            
         }
 
         public void deleteItem( ResourceStoreRequest request )
@@ -856,7 +834,6 @@ public class MavenRepositoryReaderTest
             StorageException, AccessDeniedException
         {
 
-            
         }
 
         public void storeItem( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
@@ -864,7 +841,6 @@ public class MavenRepositoryReaderTest
             StorageException, AccessDeniedException
         {
 
-            
         }
 
         public void createCollection( ResourceStoreRequest request, Map<String, String> userAttributes )
@@ -872,7 +848,6 @@ public class MavenRepositoryReaderTest
             StorageException, AccessDeniedException
         {
 
-            
         }
 
         public Collection<StorageItem> list( ResourceStoreRequest request )
@@ -892,7 +867,6 @@ public class MavenRepositoryReaderTest
             throws ConfigurationException
         {
 
-            
         }
 
         public boolean isDirty()
@@ -929,7 +903,6 @@ public class MavenRepositoryReaderTest
         public void setRepositoryStatusCheckerThread( Thread thread )
         {
 
-            
         }
 
         public long getCurrentRemoteStatusRetainTime()
@@ -953,7 +926,6 @@ public class MavenRepositoryReaderTest
         public void setProxyMode( ProxyMode val )
         {
 
-            
         }
 
         public int getItemMaxAge()
@@ -965,7 +937,6 @@ public class MavenRepositoryReaderTest
         public void setItemMaxAge( int itemMaxAge )
         {
 
-            
         }
 
         public boolean isFileTypeValidation()
@@ -977,7 +948,6 @@ public class MavenRepositoryReaderTest
         public void setFileTypeValidation( boolean doValidate )
         {
 
-            
         }
 
         public RepositoryStatusCheckMode getRepositoryStatusCheckMode()
@@ -989,7 +959,6 @@ public class MavenRepositoryReaderTest
         public void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode )
         {
 
-            
         }
 
         public boolean isAutoBlockActive()
@@ -1001,7 +970,6 @@ public class MavenRepositoryReaderTest
         public void setAutoBlockActive( boolean val )
         {
 
-            
         }
 
         public String getRemoteUrl()
@@ -1013,7 +981,6 @@ public class MavenRepositoryReaderTest
             throws StorageException
         {
 
-            
         }
 
         public DownloadMirrors getDownloadMirrors()
@@ -1031,7 +998,6 @@ public class MavenRepositoryReaderTest
         public void setRemoteConnectionSettings( RemoteConnectionSettings settings )
         {
 
-            
         }
 
         public RemoteAuthenticationSettings getRemoteAuthenticationSettings()
@@ -1043,7 +1009,6 @@ public class MavenRepositoryReaderTest
         public void setRemoteAuthenticationSettings( RemoteAuthenticationSettings settings )
         {
 
-            
         }
 
         public RemoteProxySettings getRemoteProxySettings()
@@ -1055,7 +1020,6 @@ public class MavenRepositoryReaderTest
         public void setRemoteProxySettings( RemoteProxySettings settings )
         {
 
-            
         }
 
         public ProxySelector getProxySelector()
@@ -1067,7 +1031,6 @@ public class MavenRepositoryReaderTest
         public void setProxySelector( ProxySelector proxySelector )
         {
 
-            
         }
 
         public boolean isItemAgingActive()
@@ -1079,12 +1042,11 @@ public class MavenRepositoryReaderTest
         public void setItemAgingActive( boolean value )
         {
 
-            
         }
 
         public RemoteStorageContext getRemoteStorageContext()
         {
-            DefaultRemoteStorageContext rsc = new DefaultRemoteStorageContext(null);
+            DefaultRemoteStorageContext rsc = new DefaultRemoteStorageContext( null );
             rsc.setRemoteProxySettings( new DefaultRemoteProxySettings() );
             rsc.setRemoteConnectionSettings( new DefaultRemoteConnectionSettings() );
             return rsc;
@@ -1099,7 +1061,6 @@ public class MavenRepositoryReaderTest
         public void setRemoteStorage( RemoteRepositoryStorage storage )
         {
 
-            
         }
 
         public Map<String, ItemContentValidator> getItemContentValidators()
@@ -1114,7 +1075,7 @@ public class MavenRepositoryReaderTest
 
             return null;
         }
-        
+
     }
 
 }
