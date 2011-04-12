@@ -6,6 +6,7 @@ import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -27,12 +28,19 @@ public class AhcProviderEventInspector
     @Override
     public boolean accepts( Event<?> evt )
     {
-        return evt instanceof ConfigurationChangeEvent;
+        return ( evt instanceof ConfigurationChangeEvent ) || ( evt instanceof NexusStoppedEvent );
     }
 
     @Override
     public void inspect( Event<?> evt )
     {
-        ahcProvider.reset();
+        if ( evt instanceof ConfigurationChangeEvent )
+        {
+            ahcProvider.reset();
+        }
+        else if ( evt instanceof NexusStoppedEvent )
+        {
+            ahcProvider.close();
+        }
     }
 }

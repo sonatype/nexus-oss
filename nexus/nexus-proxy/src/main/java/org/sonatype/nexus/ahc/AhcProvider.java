@@ -17,6 +17,11 @@ public interface AhcProvider
      * Forces the single (Nexus-wide) shared instance recreation, initiated usually by configuration change.
      */
     void reset();
+    
+    /**
+     * Performs resource cleanup.
+     */
+    void close();
 
     /**
      * Provides single (Nexus-wide) shared and pre-configured instance of AsyncHttpClient to be used in various
@@ -27,12 +32,12 @@ public interface AhcProvider
     AsyncHttpClient getAsyncHttpClient();
 
     /**
-     * Provides new pre-configured instance of AsyncHttpClient to be used with proxy-repository RemoteRepositoryStorage
-     * as transport.
+     * Provides new pre-configured instance of AsyncHttpClientConfig.Builder to be used with proxy-repository RemoteRepositoryStorage
+     * as transport, since they use separate instances.
      * 
      * @param repository
      * @param ctx
      * @return
      */
-    AsyncHttpClientConfig.Builder getAsyncHttpClient( ProxyRepository repository, RemoteStorageContext ctx );
+    AsyncHttpClientConfig.Builder getAsyncHttpClientConfigBuilder( ProxyRepository repository, RemoteStorageContext ctx );
 }

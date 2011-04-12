@@ -324,7 +324,7 @@ public class AhcRemoteRepositoryStorage
             oldClient.close();
         }
 
-        final AsyncHttpClientConfig.Builder clientConfigBuilder = ahcProvider.getAsyncHttpClient( repository, context );
+        final AsyncHttpClientConfig.Builder clientConfigBuilder = ahcProvider.getAsyncHttpClientConfigBuilder( repository, context );
 
         final AsyncHttpClient client = new AsyncHttpClient( clientConfigBuilder.build() );
 

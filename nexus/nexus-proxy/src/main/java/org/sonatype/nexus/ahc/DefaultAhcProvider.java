@@ -24,20 +24,42 @@ public class DefaultAhcProvider
 {
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
-    
+
     @Requirement
     private UserAgentBuilder userAgentBuilder;
 
-    private AsyncHttpClient sharedClient;
-    
+    private volatile AsyncHttpClient sharedClient;
+
+    private volatile boolean shutdown = false;
+
     public synchronized void reset()
     {
         sharedClient = null;
     }
 
+    public synchronized void close()
+    {
+        try
+        {
+            if ( sharedClient != null )
+            {
+                sharedClient.close();
+            }
+        }
+        finally
+        {
+            shutdown = true;
+        }
+    }
+
     @Override
     public synchronized AsyncHttpClient getAsyncHttpClient()
     {
+        if ( shutdown )
+        {
+            throw new IllegalStateException( "AHC provider was shut down, not serving client up anymore." );
+        }
+
         if ( sharedClient == null )
         {
             // TODO: nexus wide singleton or new instance per invocation?
@@ -53,8 +75,13 @@ public class DefaultAhcProvider
     }
 
     @Override
-    public Builder getAsyncHttpClient( final ProxyRepository repository, final RemoteStorageContext ctx )
+    public Builder getAsyncHttpClientConfigBuilder( final ProxyRepository repository, final RemoteStorageContext ctx )
     {
+        if ( shutdown )
+        {
+            throw new IllegalStateException( "AHC provider was shut down, not serving client up anymore." );
+        }
+
         final Builder result = getAsyncHttpClientConfigBuilder( ctx );
 
         result.setUserAgent( userAgentBuilder.formatRemoteRepositoryStorageUserAgentString( repository, ctx ) );
@@ -65,7 +92,7 @@ public class DefaultAhcProvider
         // limiting (with httpClient defaults) to prevent bashing of remote repositories
         result.setMaximumConnectionsPerHost( 20 );
         result.setMaximumConnectionsTotal( 20 );
-        
+
         // proxy-logic will handle retries
         result.setMaxRequestRetry( 0 );
 

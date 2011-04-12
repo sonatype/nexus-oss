@@ -157,7 +157,7 @@ public class RemoteBrowserResource
     protected AsyncHttpClient getHttpClient( final ProxyRepository proxyRepository )
     {
         final AsyncHttpClientConfig.Builder clientConfigBuilder =
-            ahcProvider.getAsyncHttpClient( proxyRepository, proxyRepository.getRemoteStorageContext() );
+            ahcProvider.getAsyncHttpClientConfigBuilder( proxyRepository, proxyRepository.getRemoteStorageContext() );
         clientConfigBuilder.setFollowRedirects( true );
         clientConfigBuilder.setMaximumNumberOfRedirects( 3 );
         clientConfigBuilder.setMaxRequestRetry( 2 );
