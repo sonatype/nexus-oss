@@ -244,7 +244,14 @@ public class MavenRepositoryReader
         }
         catch ( IOException e )
         {
-            logger.error( e.getMessage(), e );
+            if ( logger.isDebugEnabled() )
+            {
+                logger.warn( e.getMessage(), e );
+            }
+            else
+            {
+                logger.warn( e.getMessage() );
+            }
         }
 
         // here is the deal, For reasons I do not understand, S3 comes back with an empty response (and a 200),
