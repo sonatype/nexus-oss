@@ -1,50 +1,56 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<parent>
-		<groupId>org.sonatype.spice</groupId>
-		<artifactId>spice-parent</artifactId>
-		<version>15</version>
-	</parent>
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.sonatype.plexus</groupId>
-	<version>1.4-SNAPSHOT</version>
-	<name>Plexus Task Scheduler</name>
-	<artifactId>plexus-task-scheduler</artifactId>
-	<packaging>jar</packaging>
-	<scm>
-		<connection>scm:svn:http://svn.sonatype.org/spice/trunk/plexus-task-scheduler</connection>
-		<url>http://svn.sonatype.org/spice/trunk/plexus-task-scheduler</url>
-		<developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/plexus-task-scheduler</developerConnection>
-	</scm>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<dependencies>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-container-default</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-utils</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-component-annotations</artifactId>
-		</dependency>
-	</dependencies>
+  <modelVersion>4.0.0</modelVersion>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-component-metadata</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  <parent>
+    <groupId>org.sonatype.spice</groupId>
+    <artifactId>spice-parent</artifactId>
+    <version>15</version>
+  </parent>
+
+  <groupId>org.sonatype.plexus</groupId>
+  <artifactId>plexus-task-scheduler</artifactId>
+  <version>1.4-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>Plexus Task Scheduler</name>
+
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/spice/trunk/plexus-task-scheduler</connection>
+    <url>http://svn.sonatype.org/spice/trunk/plexus-task-scheduler</url>
+    <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/plexus-task-scheduler</developerConnection>
+  </scm>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-component-annotations</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
