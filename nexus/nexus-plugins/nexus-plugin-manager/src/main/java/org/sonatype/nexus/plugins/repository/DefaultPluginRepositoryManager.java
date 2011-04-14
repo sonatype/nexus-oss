@@ -18,12 +18,12 @@
  */
 package org.sonatype.nexus.plugins.repository;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -152,16 +152,24 @@ final class DefaultPluginRepositoryManager
 
     private NexusPluginRepository[] getRepositories( final boolean reverse )
     {
-        final Collection<NexusPluginRepository> values = repositoryMap.values();
-        final NexusPluginRepository[] array = values.toArray( new NexusPluginRepository[values.size()] );
+        final Set<NexusPluginRepository> sortedRepositories;
         if ( reverse )
         {
-            Arrays.sort( array, Collections.reverseOrder( REPOSITORY_COMPARATOR ) );
+            sortedRepositories = new TreeSet<NexusPluginRepository>( Collections.reverseOrder( REPOSITORY_COMPARATOR ) );
         }
         else
         {
-            Arrays.sort( array, REPOSITORY_COMPARATOR );
+            sortedRepositories = new TreeSet<NexusPluginRepository>( REPOSITORY_COMPARATOR );
         }
-        return array;
+
+        for ( final NexusPluginRepository repo : repositoryMap.values() )
+        {
+            if ( repo != this ) // avoid recursion since this is also a NexusPluginRepository
+            {
+                sortedRepositories.add( repo );
+            }
+        }
+
+        return sortedRepositories.toArray( new NexusPluginRepository[sortedRepositories.size()] );
     }
 }
