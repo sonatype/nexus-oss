@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.sonatype.spice</groupId>
     <artifactId>spice-parent</artifactId>
-    <version>15</version>
+    <version>17-SNAPSHOT</version>
   </parent>
 
   <groupId>org.sonatype.plexus</groupId>
@@ -14,26 +14,26 @@
   <version>1.4-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>Plexus Task Scheduler</name>
+  <name>SISU Task Scheduler</name>
 
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/spice/trunk/plexus-task-scheduler</connection>
-    <url>http://svn.sonatype.org/spice/trunk/plexus-task-scheduler</url>
-    <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/plexus-task-scheduler</developerConnection>
+    <connection>scm:git:git://github.com/sonatype/sisu-task-scheduler.git</connection>
+    <developerConnection>scm:git:ssh://github.com:sonatype/sisu-task-scheduler.git</developerConnection>
+    <url>https://github.com/sonatype/sisu-task-scheduler</url>
   </scm>
 
   <dependencies>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
     </dependency>
   </dependencies>
 
@@ -43,14 +43,7 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
+
 </project>
