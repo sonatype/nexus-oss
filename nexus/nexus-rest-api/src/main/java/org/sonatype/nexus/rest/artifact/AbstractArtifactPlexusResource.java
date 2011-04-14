@@ -121,6 +121,7 @@ public abstract class AbstractArtifactPlexusResource
         {
             result.getRequestContext().put( AccessManager.REQUEST_USER, subject.getPrincipal().toString() );
         }
+        result.getRequestContext().put( AccessManager.REQUEST_AGENT, request.getClientInfo().getAgent() );
 
         // this is HTTPS, get the cert and stuff it too for later
         if ( request.isConfidential() )

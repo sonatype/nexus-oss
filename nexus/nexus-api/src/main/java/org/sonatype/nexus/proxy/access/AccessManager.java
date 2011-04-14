@@ -55,6 +55,11 @@ public interface AccessManager
     String REQUEST_AUTHORIZED = "request.authorized";
 
     /**
+     * Key used for authenticated user agent in request.
+     */
+    String REQUEST_AGENT = "request.agent";
+
+    /**
      * The implementation of this method should throw AccessDeniedException or any subclass if it denies access.
      * 
      * @throws AccessDeniedException the access denied exception

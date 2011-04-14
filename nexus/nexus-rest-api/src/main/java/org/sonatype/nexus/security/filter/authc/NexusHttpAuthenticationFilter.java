@@ -225,7 +225,7 @@ public class NexusHttpAuthenticationFilter
                 getLogger().debug( "Successfully logged in as anonymous" );
             }
 
-            postAuthcEvent( request, getNexusConfiguration().getAnonymousUsername(), true );
+            postAuthcEvent( request, getNexusConfiguration().getAnonymousUsername(), getUserAgent( request ), true );
 
             return true;
         }
@@ -256,19 +256,19 @@ public class NexusHttpAuthenticationFilter
 
         recordAuthcEvent( request, msg );
 
-        postAuthcEvent( request, token.getPrincipal().toString(), true );
+        postAuthcEvent( request, token.getPrincipal().toString(), getUserAgent( request ), true );
 
         return true;
     }
 
-    private void postAuthcEvent( ServletRequest request, String username, boolean success )
+    private void postAuthcEvent( ServletRequest request, String username, String userAgent, boolean success )
     {
         try
         {
             ApplicationEventMulticaster multicaster = getPlexusContainer().lookup( ApplicationEventMulticaster.class );
 
             multicaster.notifyEventListeners( new NexusAuthenticationEvent( this, new AuthenticationItem( username,
-                RemoteIPFinder.findIP( (HttpServletRequest) request ), success ) ) );
+                RemoteIPFinder.findIP( (HttpServletRequest) request ), userAgent, success ) ) );
         }
         catch ( ComponentLookupException e )
         {
@@ -339,7 +339,7 @@ public class NexusHttpAuthenticationFilter
         recordAuthcEvent( request, msg );
         getLogger().debug( msg, ae );
 
-        postAuthcEvent( request, token.getPrincipal().toString(), false );
+        postAuthcEvent( request, token.getPrincipal().toString(), getUserAgent( request ), false );
 
         HttpServletResponse httpResponse = WebUtils.toHttp( response );
 
@@ -494,7 +494,7 @@ public class NexusHttpAuthenticationFilter
 
     protected boolean isStatelessClient( final ServletRequest request )
     {
-        final String userAgent = ( (HttpServletRequest) request ).getHeader( "User-Agent" );
+        final String userAgent = getUserAgent( request );
 
         if ( userAgent != null && userAgent.trim().length() > 0 )
         {
@@ -532,5 +532,15 @@ public class NexusHttpAuthenticationFilter
 
         // we can't decided for sure, let's return the safest
         return false;
+    }
+
+    private String getUserAgent( final ServletRequest request )
+    {
+        if ( request instanceof HttpServletRequest )
+        {
+            final String userAgent = ( (HttpServletRequest) request ).getHeader( "User-Agent" );
+            return userAgent;
+        }
+        return null;
     }
 }
