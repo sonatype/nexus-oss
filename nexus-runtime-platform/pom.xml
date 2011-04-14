@@ -37,7 +37,8 @@
   <name>Nexus : Runtime Platform</name>
 
   <properties>
-    <sisu-inject.version>2.1.1-NEXUS-4312</sisu-inject.version>
+    <sisu-inject.version>2.2.3</sisu-inject.version>
+    <sisu-guice.version>3.0.3</sisu-guice.version>
   </properties>
 
   <dependencyManagement>
@@ -52,14 +53,14 @@
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-guice</artifactId>
-        <version>2.9.4</version>
+        <version>${sisu-guice.version}</version>
         <classifier>no_aop</classifier>
         <scope>compile</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-guice</artifactId>
-        <version>2.9.4</version>
+        <version>${sisu-guice.version}</version>
         <scope>compile</scope>
       </dependency>
       <dependency>
