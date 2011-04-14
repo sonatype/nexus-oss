@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -186,6 +187,12 @@ public class M1Repository
         {
             super.enforceWritePolicy( request, action );
         }
+    }
+
+    @Override
+    protected Version getClientSupportedVersion( String userAgent )
+    {
+        return null;
     }
 
 }

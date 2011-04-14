@@ -52,6 +52,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.util.AlphanumComparator;
@@ -289,6 +290,32 @@ public class M2Repository
         {
             super.enforceWritePolicy( request, action );
         }
+    }
+
+    @Override
+    protected Version getClientSupportedVersion( String userAgent )
+    {
+        if ( userAgent == null )
+        {
+            return null;
+        }
+
+        if ( userAgent.startsWith( "Apache Ivy" ) )
+        {
+            return Version.V100;
+        }
+
+        if ( userAgent.startsWith( "Java" ) )
+        {
+            return Version.V100;
+        }
+
+        if ( userAgent.startsWith( "Apache-Maven/2" ) )
+        {
+            return Version.V100;
+        }
+
+        return Version.V110;
     }
 
 }

@@ -18,14 +18,19 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.index.artifact.ArtifactPackagingMapper;
+import org.apache.maven.index.artifact.M2ArtifactRecognizer;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -34,13 +39,21 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateMavenMetadata;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
+import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -397,8 +410,89 @@ public abstract class AbstractMavenRepository
             throw new ItemNotFoundException( request, this );
         }
 
+        String userAgent = (String) request.getRequestContext().get( AccessManager.REQUEST_AGENT );
+
+        if ( M2ArtifactRecognizer.isMetadata( request.getRequestPath() )
+            && ModelVersionUtility.LATEST_MODEL_VERSION.equals( getClientSupportedVersion( userAgent ) ) )
+        {
+            // metadata checksum files are calculated and cached as side-effect
+            // of doRetrieveMetadata.
+            final StorageFileItem mdItem;
+            if ( M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
+            {
+                mdItem = null;
+            }
+            else
+            {
+                mdItem = (StorageFileItem) super.doRetrieveItem( request );
+            }
+
+            InputStream inputStream = null;
+            try
+            {
+                inputStream = mdItem.getInputStream();
+
+                Metadata metadata = MetadataBuilder.read( inputStream );
+                Version requiredVersion = getClientSupportedVersion( userAgent );
+                Version metadataVersion = ModelVersionUtility.getModelVersion( metadata );
+
+                if ( requiredVersion == null || requiredVersion.equals( metadataVersion ) )
+                {
+                    return super.doRetrieveItem( request );
+                }
+
+                ModelVersionUtility.setModelVersion( metadata, requiredVersion );
+
+                ByteArrayOutputStream resultOutputStream = new ByteArrayOutputStream();
+
+                MetadataBuilder.write( metadata, resultOutputStream );
+
+                final byte[] content = resultOutputStream.toByteArray();
+
+                final DefaultStorageFileItem result;
+                if ( M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
+                {
+                    result = null;
+                }
+                else
+                {
+                    String mimeType = getMimeUtil().getMimeType( "maven-metadata.xml" );
+                    ContentLocator contentLocator = new ByteArrayContentLocator( content, mimeType );
+
+                    result = new DefaultStorageFileItem( this, request, true, false, contentLocator );
+                }
+
+                result.setLength( content.length );
+
+                result.setCreated( mdItem.getCreated() );
+
+                result.setModified( result.getCreated() );
+
+                return result;
+            }
+            catch ( IOException e )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().error( "Error parsing metadata, serving as retrieved", e );
+                }
+                else
+                {
+                    getLogger().error( "Error parsing metadata, serving as retrieved: " + e.getMessage() );
+                }
+
+                return super.doRetrieveItem( request );
+            }
+            finally
+            {
+                IOUtil.close( inputStream );
+            }
+        }
+
         return super.doRetrieveItem( request );
     }
+
+    protected abstract Version getClientSupportedVersion( String userAgent );
 
     @Override
     public void storeItem( boolean fromTask, StorageItem item )
