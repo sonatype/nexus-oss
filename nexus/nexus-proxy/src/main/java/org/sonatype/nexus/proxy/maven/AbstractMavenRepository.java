@@ -21,11 +21,14 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Hex;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.index.artifact.ArtifactPackagingMapper;
 import org.apache.maven.index.artifact.M2ArtifactRecognizer;
@@ -413,14 +416,26 @@ public abstract class AbstractMavenRepository
         String userAgent = (String) request.getRequestContext().get( AccessManager.REQUEST_AGENT );
 
         if ( M2ArtifactRecognizer.isMetadata( request.getRequestPath() )
-            && ModelVersionUtility.LATEST_MODEL_VERSION.equals( getClientSupportedVersion( userAgent ) ) )
+            && !ModelVersionUtility.LATEST_MODEL_VERSION.equals( getClientSupportedVersion( userAgent ) ) )
         {
             // metadata checksum files are calculated and cached as side-effect
             // of doRetrieveMetadata.
             final StorageFileItem mdItem;
             if ( M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
             {
-                mdItem = null;
+                String path = request.getRequestPath();
+                if ( request.getRequestPath().endsWith( ".md5" ) )
+                {
+                    path = path.substring( 0, path.length() - 4 );
+                }
+                else if ( request.getRequestPath().endsWith( ".sha1" ) )
+                {
+                    path = path.substring( 0, path.length() - 5 );
+                }
+                ResourceStoreRequest mdRequest = new ResourceStoreRequest( path );
+                mdRequest.getRequestContext().setParentContext( request.getRequestContext() );
+
+                mdItem = (StorageFileItem) super.doRetrieveItem( mdRequest );
             }
             else
             {
@@ -447,27 +462,34 @@ public abstract class AbstractMavenRepository
 
                 MetadataBuilder.write( metadata, resultOutputStream );
 
-                final byte[] content = resultOutputStream.toByteArray();
-
-                final DefaultStorageFileItem result;
+                final byte[] content;
                 if ( M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
                 {
-                    result = null;
+                    MessageDigest digest;
+                    if ( request.getRequestPath().endsWith( ".md5" ) )
+                    {
+                        digest = MessageDigest.getInstance( "md5" );
+                    }
+                    else
+                    {
+                        digest = MessageDigest.getInstance( "sha1" );
+                    }
+                    digest.update( resultOutputStream.toByteArray() );
+
+                    content = ( new String( Hex.encodeHex( digest.digest() ) ) + "\n" ).getBytes( "UTF-8" );
                 }
                 else
                 {
-                    String mimeType = getMimeUtil().getMimeType( "maven-metadata.xml" );
-                    ContentLocator contentLocator = new ByteArrayContentLocator( content, mimeType );
-
-                    result = new DefaultStorageFileItem( this, request, true, false, contentLocator );
+                    content = resultOutputStream.toByteArray();
                 }
 
+                String mimeType = getMimeUtil().getMimeType( request.getRequestPath() );
+                ContentLocator contentLocator = new ByteArrayContentLocator( content, mimeType );
+
+                DefaultStorageFileItem result = new DefaultStorageFileItem( this, request, true, false, contentLocator );
                 result.setLength( content.length );
-
                 result.setCreated( mdItem.getCreated() );
-
-                result.setModified( result.getCreated() );
-
+                result.setModified( System.currentTimeMillis() );
                 return result;
             }
             catch ( IOException e )
@@ -479,6 +501,19 @@ public abstract class AbstractMavenRepository
                 else
                 {
                     getLogger().error( "Error parsing metadata, serving as retrieved: " + e.getMessage() );
+                }
+
+                return super.doRetrieveItem( request );
+            }
+            catch ( NoSuchAlgorithmException e )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().error( "Invalid digest algorithm, serving as retrieved", e );
+                }
+                else
+                {
+                    getLogger().error( "Invalid digest algorithm, serving as retrieved: " + e.getMessage() );
                 }
 
                 return super.doRetrieveItem( request );

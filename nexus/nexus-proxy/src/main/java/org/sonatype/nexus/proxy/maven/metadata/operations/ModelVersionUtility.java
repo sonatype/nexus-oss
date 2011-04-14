@@ -36,6 +36,7 @@ public class ModelVersionUtility
         {
             case V100:
                 metadata.setModelVersion( null );
+                metadata.getVersioning().setSnapshotVersions( null );
                 break;
 
             case V110:
