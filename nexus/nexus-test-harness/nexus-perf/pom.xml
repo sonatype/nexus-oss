@@ -29,7 +29,7 @@
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-perf</artifactId>
   <packaging>pom</packaging>
-  <name>nexus-perf</name>
+  <name>Nexus : Test Harness : Perf</name>
   <description>Nexus Perf Parent</description>
   <build>
     <pluginManagement>

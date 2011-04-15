@@ -29,7 +29,8 @@
   <version>1-SNAPSHOT</version>
 
   <packaging>pom</packaging>
-  <name>Sonatype Nexus Aggregator</name>
+  <name>Nexus : Aggregator</name>
+  <description>Sonatype Nexus Aggregator</description>
 
   <properties>
     <nexus-site-base-url>https://repository.sonatype.org/content/sites/maven-sites/nexus-oss</nexus-site-base-url>

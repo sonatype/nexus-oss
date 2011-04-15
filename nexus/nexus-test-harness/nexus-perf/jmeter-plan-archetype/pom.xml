@@ -26,5 +26,5 @@
     <version>1.9-SNAPSHOT</version>
   </parent>
   <artifactId>jmeter-plan-archetype</artifactId>
-  <name>jmeter-plan-archetype</name>
+  <name>Nexus : Test Harness : JMeter Plan Archetype</name>
 </project>

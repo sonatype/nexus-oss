@@ -34,7 +34,7 @@
   <version>2-SNAPSHOT</version>
 
   <packaging>pom</packaging>
-  <name>Sonatype Nexus Runtime Platform</name>
+  <name>Nexus : Runtime Platform</name>
 
   <properties>
     <sisu-inject.version>2.1.1</sisu-inject.version>

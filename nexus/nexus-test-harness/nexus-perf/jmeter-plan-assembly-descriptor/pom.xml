@@ -26,5 +26,5 @@
     <version>1.9-SNAPSHOT</version>
   </parent>
   <artifactId>jmeter-plan-assembly-descriptor</artifactId>
-  <name>jmeter-plan-assembly-descriptor</name>
+  <name>Nexus : Test Harness : JMeter Plan Assembly Descriptor</name>
 </project>
