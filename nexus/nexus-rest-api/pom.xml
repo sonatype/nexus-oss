@@ -141,10 +141,6 @@
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-web</artifactId>
     </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
