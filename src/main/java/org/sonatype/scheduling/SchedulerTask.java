@@ -28,6 +28,4 @@ public interface SchedulerTask<T>
     String getParameter( String key );
 
     Map<String, String> getParameters();
-    
-    boolean isExposed();
 }

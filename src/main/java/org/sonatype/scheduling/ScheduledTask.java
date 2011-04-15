@@ -15,6 +15,7 @@ package org.sonatype.scheduling;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 
 import org.sonatype.scheduling.iterators.SchedulerIterator;
@@ -23,11 +24,19 @@ import org.sonatype.scheduling.schedules.Schedule;
 public interface ScheduledTask<T>
 {
     /**
-     * If the task is exposed for user control/view
+     * Returns the task if it is an instance of SchedulerTask<?> or null if that's not the case (there is just a Callable<?>).
+     * 
      * @return
      */
-    boolean isExposed();
-    
+    SchedulerTask<T> getSchedulerTask();
+
+    /**
+     * Returns the task (callable being run).
+     * 
+     * @return
+     */
+    Callable<T> getTask();
+
     /**
      * Returns a unique ID of the task.
      * 
@@ -101,8 +110,7 @@ public interface ScheduledTask<T>
      * @throws InterruptedException
      */
     T get()
-        throws ExecutionException,
-            InterruptedException;
+        throws ExecutionException, InterruptedException;
 
     /**
      * Gets the result of Callable, or null if it is "converted" from Runnable.

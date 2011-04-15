@@ -26,7 +26,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -48,9 +47,6 @@ public class DefaultScheduler
     implements Scheduler, Startable
 {
     @Requirement
-    private PlexusContainer plexusContainer;
-
-    @Requirement
     private TaskConfigManager taskConfig;
 
     private PlexusThreadFactory plexusThreadFactory;
@@ -68,20 +64,19 @@ public class DefaultScheduler
     {
         tasksMap = new HashMap<String, List<ScheduledTask<?>>>();
 
-        plexusThreadFactory = new PlexusThreadFactory( plexusContainer, threadPriority );
+        plexusThreadFactory = new PlexusThreadFactory( threadPriority );
 
-        scheduledExecutorService = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(
-            20,
-            plexusThreadFactory );
+        scheduledExecutorService =
+            (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, plexusThreadFactory );
     }
 
     public void stop()
         throws StoppingException
     {
         getScheduledExecutorService().shutdown();
-        
+
         getScheduledExecutorService().setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
-        
+
         getScheduledExecutorService().setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
 
         try
@@ -109,12 +104,13 @@ public class DefaultScheduler
             getLogger().info( "Termination interrupted", e );
         }
     }
-    
+
     public void initializeTasks()
     {
         taskConfig.initializeTasks( this );
     }
 
+    @Deprecated
     public SchedulerTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException
     {
@@ -218,16 +214,10 @@ public class DefaultScheduler
     }
 
     public <T> ScheduledTask<T> initialize( String id, String name, String type, Callable<T> callable,
-        Schedule schedule )
-    {
-        return schedule( id, name, type, callable, schedule, false );
-    }
-    
-    public <T> ScheduledTask<T> initialize( String id, String name, String type, Callable<T> callable,
-        Schedule schedule, boolean enabled )
+                                            Schedule schedule, boolean enabled )
     {
         return schedule( id, name, type, callable, schedule, enabled, false );
-    }  
+    }
 
     public ScheduledTask<Object> submit( String name, Runnable runnable )
     {
@@ -237,11 +227,7 @@ public class DefaultScheduler
     public ScheduledTask<Object> schedule( String name, Runnable runnable, Schedule schedule )
     {
         // use the name of the class as the type.
-        return schedule(
-            name,
-            runnable.getClass().getSimpleName(),
-            Executors.callable( runnable ),
-            schedule );
+        return schedule( name, runnable.getClass().getSimpleName(), Executors.callable( runnable ), schedule );
     }
 
     public <T> ScheduledTask<T> submit( String name, Callable<T> callable )
@@ -258,9 +244,9 @@ public class DefaultScheduler
     {
         return schedule( generateId(), name, type, callable, schedule, true );
     }
-    
+
     protected <T> ScheduledTask<T> schedule( String id, String name, String type, Callable<T> callable,
-        Schedule schedule, boolean enabled, boolean store )
+                                             Schedule schedule, boolean enabled, boolean store )
     {
         DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>( id, name, type, this, callable, schedule );
 
@@ -274,14 +260,13 @@ public class DefaultScheduler
     }
 
     protected <T> ScheduledTask<T> schedule( String id, String name, String type, Callable<T> callable,
-        Schedule schedule, boolean store )
+                                             Schedule schedule, boolean store )
     {
         return schedule( id, name, type, callable, schedule, true, store );
     }
 
     public <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
-        throws RejectedExecutionException,
-            NullPointerException
+        throws RejectedExecutionException, NullPointerException
     {
         // Simply add the task to config, will find existing by id, remove, then store new
         taskConfig.addTask( task );

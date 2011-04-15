@@ -20,6 +20,8 @@ package org.sonatype.scheduling;
 public class TaskExecutionException
     extends Exception
 {
+    private static final long serialVersionUID = 1364178345795897438L;
+
     public TaskExecutionException( String message )
     {
         super( message );

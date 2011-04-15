@@ -16,11 +16,34 @@ import java.util.Date;
 
 public interface SchedulerIterator
 {
-    void resetFrom( Date from );
-
+    /**
+     * Returns, or "peek"s the next run without updating internal state of iterator. Calling this method simultaneously
+     * will always return the same date of "next" run.
+     * 
+     * @return
+     */
     Date peekNext();
 
+    /**
+     * Returns the date of next run and updates internal state of the iterator: "steps" over just like Iterator.next().
+     * Calling this method simultaneously will always return new and new (different) dates of next run until it's
+     * depleted.
+     * 
+     * @return
+     */
     Date next();
 
+    /**
+     * Returns true when iterator is depleted, no more runs needed.
+     * 
+     * @return
+     */
     boolean isFinished();
+
+    /**
+     * Resets the scheduler internal state to start with from date passed in as parameter.
+     * 
+     * @param from
+     */
+    void resetFrom( Date from );
 }

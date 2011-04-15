@@ -61,8 +61,8 @@ public class DefaultScheduledTask<T>
 
     boolean manualRun;
 
-    public DefaultScheduledTask( String id, String name, String type, DefaultScheduler scheduler,
-        Callable<T> callable, Schedule schedule )
+    public DefaultScheduledTask( String id, String name, String type, DefaultScheduler scheduler, Callable<T> callable,
+                                 Schedule schedule )
     {
         super();
 
@@ -90,16 +90,24 @@ public class DefaultScheduledTask<T>
 
         this.manualRun = false;
     }
-    
-    public boolean isExposed()
+
+    public SchedulerTask<T> getSchedulerTask()
     {
-        if ( callable != null 
-            && SchedulerTask.class.isAssignableFrom( callable.getClass() ) )
+        final Callable<T> task = getTask();
+
+        if ( task != null && task instanceof SchedulerTask<?> )
         {
-            return ( ( SchedulerTask<T> ) callable ).isExposed();
+            return (SchedulerTask<T>) task;
         }
-        
-        return false;
+        else
+        {
+            return null;
+        }
+    }
+
+    public Callable<T> getTask()
+    {
+        return callable;
     }
 
     protected void start()
@@ -136,7 +144,7 @@ public class DefaultScheduledTask<T>
     {
         this.throwable = e;
     }
-    
+
     protected Callable<T> getCallable()
     {
         return callable;
@@ -197,8 +205,7 @@ public class DefaultScheduledTask<T>
     }
 
     public T get()
-        throws ExecutionException,
-            InterruptedException
+        throws ExecutionException, InterruptedException
     {
         return getFuture().get();
     }
@@ -254,10 +261,8 @@ public class DefaultScheduledTask<T>
 
                 getScheduler().taskRescheduled( this );
 
-                return getScheduler().getScheduledExecutorService().schedule(
-                    this,
-                    nextTime - System.currentTimeMillis(),
-                    TimeUnit.MILLISECONDS );
+                return getScheduler().getScheduledExecutorService().schedule( this,
+                    nextTime - System.currentTimeMillis(), TimeUnit.MILLISECONDS );
             }
             else
             {
@@ -269,7 +274,7 @@ public class DefaultScheduledTask<T>
         else
         {
             nextRun = null;
-            
+
             return null;
         }
     }
@@ -300,18 +305,19 @@ public class DefaultScheduledTask<T>
                     // simply reschedule itself for 10sec
                     nextRun = new Date( nextRun.getTime() + 10000 );
                 }
-                
+
                 setFuture( getScheduler().getScheduledExecutorService().schedule( this, 10000, TimeUnit.MILLISECONDS ) );
-                
+
                 setTaskState( TaskState.SLEEPING );
 
                 return result;
-            };
+            }
+            ;
         }
-        
+
         Future<T> nextFuture = null;
 
-        if ( ( isEnabled() || manualRun ) && getTaskState().isRunnable()) 
+        if ( ( isEnabled() || manualRun ) && getTaskState().isRunnable() )
         {
             setTaskState( TaskState.RUNNING );
 
@@ -321,7 +327,7 @@ public class DefaultScheduledTask<T>
             {
                 // Note that we need to do this prior to starting, so that the next run time will be updated properly
                 // Rather than having to wait for the task to finish
-                
+
                 // If manually running, just grab the previous future and use that or create a new one
                 if ( manualRun )
                 {
@@ -334,7 +340,7 @@ public class DefaultScheduledTask<T>
                 {
                     nextFuture = reschedule();
                 }
-                
+
                 result = getCallable().call();
 
                 if ( result != null )
@@ -345,7 +351,7 @@ public class DefaultScheduledTask<T>
             catch ( Throwable e )
             {
                 manualRun = false;
-                
+
                 setBrokenCause( e );
 
                 setTaskState( TaskState.BROKEN );
@@ -369,7 +375,7 @@ public class DefaultScheduledTask<T>
 
         if ( TaskState.BROKEN == getTaskState() )
         {
-            //do nothing, let user fix or delete it
+            // do nothing, let user fix or delete it
         }
         // If manually running or having future, park this task to submitted
         else if ( isManualRunScheduled() )
@@ -382,16 +388,16 @@ public class DefaultScheduledTask<T>
 
             setFuture( nextFuture );
         }
-        // If disabled (and not manually run), 
+        // If disabled (and not manually run),
         // put to waiting and reschedule for next time
-        // user may want to enable at some point, 
+        // user may want to enable at some point,
         // so still seeing the next run time may be handy
         else if ( !isEnabled() )
         {
             setTaskState( TaskState.WAITING );
-            
+
             nextFuture = reschedule();
-            
+
             setFuture( nextFuture );
         }
         else
@@ -469,9 +475,9 @@ public class DefaultScheduledTask<T>
     {
         if ( SchedulerTask.class.isAssignableFrom( getCallable().getClass() ) )
         {
-            return ( ( SchedulerTask<?> ) getCallable() ).getParameters();
+            return ( (SchedulerTask<?>) getCallable() ).getParameters();
         }
-        
+
         return Collections.emptyMap();
     }
 }

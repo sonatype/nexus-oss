@@ -15,8 +15,6 @@ package org.sonatype.scheduling;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.codehaus.plexus.PlexusContainer;
-
 public class PlexusThreadFactory
     implements ThreadFactory
 {
@@ -26,41 +24,34 @@ public class PlexusThreadFactory
 
     private final String namePrefix;
 
-    private final PlexusContainer plexusContainer;
-
     private final ThreadGroup schedulerThreadGroup;
-    
+
     private final int threadPriority;
 
-    public PlexusThreadFactory( PlexusContainer plexusContainer )
+    public PlexusThreadFactory()
     {
-      this( plexusContainer, Thread.MIN_PRIORITY );
+        this( Thread.MIN_PRIORITY );
     }
-    
-    public PlexusThreadFactory( PlexusContainer plexusContainer, int threadPriority )
+
+    public PlexusThreadFactory( int threadPriority )
     {
         super();
-
-        this.plexusContainer = plexusContainer;
 
         int poolNum = poolNumber.getAndIncrement();
 
         this.schedulerThreadGroup = new ThreadGroup( "Plexus scheduler #" + poolNum );
 
         this.namePrefix = "pxpool-" + poolNum + "-thread-";
-        
+
         this.threadPriority = threadPriority;
     }
 
     public Thread newThread( Runnable r )
     {
-        Thread result = new Thread( schedulerThreadGroup, r, namePrefix + threadNumber.getAndIncrement() );
-
-        // using plexusContainer.getLookupRealm() is NOT Thread pool friendly, it uses a ThreadLocal
-        // result.setContextClassLoader( plexusContainer.getLookupRealm() );
+        Thread result = new Thread( getSchedulerThreadGroup(), r, namePrefix + threadNumber.getAndIncrement() );
 
         result.setDaemon( false );
-        
+
         result.setPriority( this.threadPriority );
 
         return result;
@@ -70,5 +61,4 @@ public class PlexusThreadFactory
     {
         return this.schedulerThreadGroup;
     }
-
 }
