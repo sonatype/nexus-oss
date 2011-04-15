@@ -48,7 +48,7 @@ public class TaskUtil
                 true );
         }
 
-        if ( Thread.currentThread().isInterrupted() )
+        if ( Thread.interrupted() )
         {
             throw new TaskInterruptedException( "Thread \"" + Thread.currentThread().getName() + "\" is interrupted!",
                 false );

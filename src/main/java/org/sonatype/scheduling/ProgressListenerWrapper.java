@@ -68,6 +68,11 @@ public class ProgressListenerWrapper
 
     public void cancel()
     {
+        if ( wrapped != null )
+        {
+            wrapped.cancel();
+        }
+
         canceled = true;
     }
 }
