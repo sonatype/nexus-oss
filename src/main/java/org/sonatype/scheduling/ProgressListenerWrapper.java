@@ -28,6 +28,14 @@ public class ProgressListenerWrapper
         }
     }
 
+    public void working( String message, int work )
+    {
+        if ( wrapped != null )
+        {
+            wrapped.working( message, work );
+        }
+    }
+
     public void endTask( String message )
     {
         if ( wrapped != null )
