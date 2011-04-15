@@ -73,6 +73,8 @@ public class LoggingProgressListener
 
     public void cancel()
     {
+        logger.info( "{}: cancelled, bailing out (may take a while).", getStackedWorkunitNames() );
+
         this.cancelled = true;
     }
 
@@ -80,14 +82,7 @@ public class LoggingProgressListener
 
     protected String nvl( final String str )
     {
-        if ( str == null )
-        {
-            return "";
-        }
-        else
-        {
-            return str;
-        }
+        return String.valueOf( str );
     }
 
     protected String getStackedWorkunitNames()

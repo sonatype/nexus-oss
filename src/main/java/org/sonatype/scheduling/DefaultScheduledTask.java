@@ -177,6 +177,13 @@ public class DefaultScheduledTask<T>
 
     public void cancel()
     {
+        final SchedulerTask<?> task = getSchedulerTask();
+
+        if ( task != null )
+        {
+            task.getProgressListener().cancel();
+        }
+
         if ( getFuture() != null )
         {
             getFuture().cancel( true );

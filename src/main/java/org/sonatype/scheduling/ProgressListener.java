@@ -13,4 +13,6 @@ public interface ProgressListener
     public void endTask( String message );
 
     boolean isCancelled();
+    
+    void cancel();
 }

@@ -16,6 +16,11 @@ public abstract class AbstractSchedulerTask<T>
 
     private ProgressListenerWrapper progressListener = ProgressListenerWrapper.DEVNULL;
 
+    public ProgressListener getProgressListener()
+    {
+        return progressListener;
+    }
+
     public void addParameter( String key, String value )
     {
         getParameters().put( key, value );
@@ -59,11 +64,6 @@ public abstract class AbstractSchedulerTask<T>
         throws TaskInterruptedException
     {
         TaskUtil.checkInterruption();
-    }
-
-    protected ProgressListener getProgressListener()
-    {
-        return progressListener;
     }
 
     protected void setProgressListener( final ProgressListener progressListener )

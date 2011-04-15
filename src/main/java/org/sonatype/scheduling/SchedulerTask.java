@@ -19,6 +19,8 @@ import java.util.concurrent.Callable;
 public interface SchedulerTask<T>
     extends Callable<T>
 {
+    ProgressListener getProgressListener();
+
     boolean allowConcurrentSubmission( Map<String, List<ScheduledTask<?>>> currentActiveTasks );
 
     boolean allowConcurrentExecution( Map<String, List<ScheduledTask<?>>> currentActiveTasks );

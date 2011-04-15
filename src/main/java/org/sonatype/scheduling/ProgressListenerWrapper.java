@@ -7,6 +7,8 @@ public class ProgressListenerWrapper
 
     private final ProgressListener wrapped;
 
+    private volatile boolean canceled;
+
     public ProgressListenerWrapper( final ProgressListener wrapped )
     {
         this.wrapped = wrapped;
@@ -14,6 +16,8 @@ public class ProgressListenerWrapper
 
     public void beginTask( String name, int toDo )
     {
+        TaskUtil.checkInterruption();
+
         if ( wrapped != null )
         {
             wrapped.beginTask( name, toDo );
@@ -22,6 +26,8 @@ public class ProgressListenerWrapper
 
     public void working( int work )
     {
+        TaskUtil.checkInterruption();
+
         if ( wrapped != null )
         {
             wrapped.working( work );
@@ -30,6 +36,8 @@ public class ProgressListenerWrapper
 
     public void working( String message, int work )
     {
+        TaskUtil.checkInterruption();
+
         if ( wrapped != null )
         {
             wrapped.working( message, work );
@@ -38,6 +46,8 @@ public class ProgressListenerWrapper
 
     public void endTask( String message )
     {
+        TaskUtil.checkInterruption();
+
         if ( wrapped != null )
         {
             wrapped.endTask( message );
@@ -48,11 +58,16 @@ public class ProgressListenerWrapper
     {
         if ( wrapped != null )
         {
-            return wrapped.isCancelled();
+            return canceled || wrapped.isCancelled();
         }
         else
         {
-            return false;
+            return canceled;
         }
+    }
+
+    public void cancel()
+    {
+        canceled = true;
     }
 }
