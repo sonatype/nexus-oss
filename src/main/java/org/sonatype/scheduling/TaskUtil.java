@@ -27,7 +27,7 @@ public class TaskUtil
      * 
      * @return
      */
-    public static ProgressListener getCurrent()
+    public static ProgressListener getCurrentProgressListener()
     {
         return CURRENT.get();
     }
@@ -42,7 +42,7 @@ public class TaskUtil
     {
         Thread.yield();
 
-        if ( getCurrent().isCancelled() )
+        if ( getCurrentProgressListener().isCancelled() )
         {
             throw new TaskInterruptedException( "Thread \"" + Thread.currentThread().getName() + "\" is cancelled!",
                 true );
