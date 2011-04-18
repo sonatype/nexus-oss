@@ -139,9 +139,8 @@ public class Nexus4218MetadataModelVersionPerClientIT
         cl.createArg().setValue( getOverridableFile( "settings.xml" ).getCanonicalPath() );
         final File repo = new File( getTestFile( "m2" ), "repo" );
         cl.createArg().setValue( "-Dmaven.repo.local=" + repo.getCanonicalPath() );
-
-        cl.getSystemEnvVars().setProperty( "M2_HOME",
-            new File( bundle.getParentFile(), "maven-2.0.6" ).getAbsolutePath() );
+        final String m2Home = new File( bundle.getParentFile(), "maven-2.0.6" ).getAbsolutePath();
+        cl.addEnvironment( "M2_HOME", m2Home );
         int exit = CommandLineUtils.executeCommandLine( cl, out, out );
 
         assertEquals( exit, 0, sb.toString() );
