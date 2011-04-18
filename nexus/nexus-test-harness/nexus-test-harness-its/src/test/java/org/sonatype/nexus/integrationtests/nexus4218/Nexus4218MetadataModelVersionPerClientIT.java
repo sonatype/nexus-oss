@@ -44,11 +44,14 @@ public class Nexus4218MetadataModelVersionPerClientIT
         File repo = getTestFile( "repo" );
         FileUtils.copyDirectory( repo, new File( nexusWorkDir, "storage/nexus-test-harness-snapshot-repo" ) );
 
-        ScheduledServicePropertyResource p = new ScheduledServicePropertyResource();
-        p.setKey( "repositoryId" );
-        p.setValue( "fake-central" );
+        ScheduledServicePropertyResource r = new ScheduledServicePropertyResource();
+        r.setKey( RebuildMavenMetadataTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
+        r.setValue( REPO_TEST_HARNESS_SNAPSHOT_REPO );
 
-        TaskScheduleUtil.runTask( "RebuildMavenMetadata-Nexus1022", RebuildMavenMetadataTaskDescriptor.ID, p );
+        TaskScheduleUtil.runTask( "RebuildMavenMetadata-Nexus4218-snapshot", RebuildMavenMetadataTaskDescriptor.ID, r );
+
+        r.setValue( "fake-central" );
+        TaskScheduleUtil.runTask( "RebuildMavenMetadata-Nexus4218-central", RebuildMavenMetadataTaskDescriptor.ID, r );
         TaskScheduleUtil.waitForAllTasksToStop();
     }
 
@@ -60,7 +63,7 @@ public class Nexus4218MetadataModelVersionPerClientIT
             new Gav( "org.apache.maven", "apache-maven", "3.0.3", "bin", "tar.gz", null, null, null, false, null,
                 false, null );
         File bundle =
-            downloadArtifact( gav, "starget/downloads/nexus4218/" + gav.getArtifactId() + "-" + gav.getVersion() );
+            downloadArtifact( gav, "target/downloads/nexus4218/" + gav.getArtifactId() + "-" + gav.getVersion() );
 
         UnArchiver unArchive = lookup( ArchiverManager.class ).getUnArchiver( bundle );
         unArchive.setSourceFile( bundle );
@@ -136,6 +139,9 @@ public class Nexus4218MetadataModelVersionPerClientIT
         cl.createArg().setValue( getOverridableFile( "settings.xml" ).getCanonicalPath() );
         final File repo = new File( getTestFile( "m2" ), "repo" );
         cl.createArg().setValue( "-Dmaven.repo.local=" + repo.getCanonicalPath() );
+
+        cl.getSystemEnvVars().setProperty( "M2_HOME",
+            new File( bundle.getParentFile(), "maven-2.0.6" ).getAbsolutePath() );
         int exit = CommandLineUtils.executeCommandLine( cl, out, out );
 
         assertEquals( exit, 0, sb.toString() );
@@ -188,12 +194,6 @@ public class Nexus4218MetadataModelVersionPerClientIT
 
         assertEquals( exit, 0, sb.toString() );
         assertThat( sb.toString(), containsString( "nexus4218/md-test/0.1-SNAPSHOT/md-test-0.1-20110415.143359-7.txt" ) );
-
-        InputStream in =
-            new FileInputStream( new File( repo, "nexus4218/md-test/0.1-SNAPSHOT/maven-metadata-central.xml" ) );
-        Metadata md = new MetadataXpp3Reader().read( in );
-        in.close();
-        assertThat( md.getModelVersion(), anyOf( nullValue(), equalTo( "1.0.0" ) ) );
     }
 
 }
