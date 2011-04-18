@@ -39,10 +39,9 @@ import org.sonatype.scheduling.TaskState;
 public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
 {
-
     @Requirement
     private RepositoryRegistry repositoryRegistry;
-
+    
     @Deprecated
     public static String getIdFromPrefixedString( String prefix, String prefixedString )
     {

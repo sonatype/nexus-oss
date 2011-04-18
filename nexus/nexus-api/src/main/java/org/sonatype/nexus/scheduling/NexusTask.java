@@ -65,6 +65,8 @@ public interface NexusTask<T>
      * @return task name (or null if not available)
      */
     String getName();
+    
+    boolean isExposed();
 
     /**
      * Should an alert email be sent?

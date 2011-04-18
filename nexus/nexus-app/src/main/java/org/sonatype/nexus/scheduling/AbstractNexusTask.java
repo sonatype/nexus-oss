@@ -18,7 +18,6 @@
  */
 package org.sonatype.nexus.scheduling;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,27 +26,27 @@ import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.error.reporting.ErrorReportRequest;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.scheduling.AbstractSchedulerTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 
 public abstract class AbstractNexusTask<T>
-    extends AbstractLogEnabled
+    extends AbstractSchedulerTask<T>
     implements NexusTask<T>
 {
     public static final long A_DAY = 24L * 60L * 60L * 1000L;
 
     @Requirement
     private PlexusContainer plexusContainer;
-    
+
     @Requirement
     private ErrorReportingManager errorManager;
-    
+
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
 
@@ -55,20 +54,36 @@ public abstract class AbstractNexusTask<T>
     // Look below, nexus is looked up "lazily"
     private Nexus nexus = null;
 
-    private Map<String, String> parameters;
-
     private SystemProcess prc;
 
-    // override if you have a task that needs to hide itself
-    public boolean isExposed()
+    @Deprecated
+    protected AbstractNexusTask()
     {
-        return true;
+        this( null );
+    }
+
+    protected AbstractNexusTask( final String name )
+    {
+        if ( name == null || name.trim().length() == 0 )
+        {
+            TaskUtils.setName( this, getClass().getSimpleName() );
+        }
+        else
+        {
+            TaskUtils.setName( this, name );
+        }
     }
 
     // TODO: finish this thread!
     public RepositoryTaskActivityDescriptor getTaskActivityDescriptor()
     {
         return null;
+    }
+
+    public boolean isExposed()
+    {
+        // override to hide it
+        return true;
     }
 
     protected PlexusContainer getPlexusContainer()
@@ -91,26 +106,6 @@ public abstract class AbstractNexusTask<T>
         }
 
         return nexus;
-    }
-
-    public void addParameter( String key, String value )
-    {
-        getParameters().put( key, value );
-    }
-
-    public String getParameter( String key )
-    {
-        return getParameters().get( key );
-    }
-
-    public Map<String, String> getParameters()
-    {
-        if ( parameters == null )
-        {
-            parameters = new HashMap<String, String>();
-        }
-
-        return parameters;
     }
 
     /**
@@ -178,16 +173,16 @@ public abstract class AbstractNexusTask<T>
     {
         prc = getNexus().systemProcessStarted( getAction(), getMessage() );
 
-        beforeRun();
-
         T result = null;
 
-//        Subject subject = this.securitySystem.runAs( new SimplePrincipalCollection("admin", "") );
+        // Subject subject = this.securitySystem.runAs( new SimplePrincipalCollection("admin", "") );
         // TODO: do the above instead
         Subject subject = new TaskSecuritySubject();
         ThreadContext.bind( subject );
         try
         {
+            beforeRun();
+
             result = doRun();
 
             getNexus().systemProcessFinished( prc, getMessage() );
@@ -198,10 +193,11 @@ public abstract class AbstractNexusTask<T>
         }
         catch ( Exception e )
         {
+            // TODO: make feed recorder make less noise on TaskInterruptedException
             getNexus().systemProcessBroken( prc, e );
 
             // notify that there was a failure
-            applicationEventMulticaster.notifyEventListeners( new NexusTaskFailureEvent<T>( this, e) );
+            applicationEventMulticaster.notifyEventListeners( new NexusTaskFailureEvent<T>( this, e ) );
 
             if ( errorManager.isEnabled() )
             {
@@ -209,7 +205,7 @@ public abstract class AbstractNexusTask<T>
                 request.setThrowable( e );
                 request.getContext().put( "taskClass", getClass().getName() );
                 request.getContext().putAll( getParameters() );
-                
+
                 errorManager.handleError( request );
             }
 

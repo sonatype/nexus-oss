@@ -62,8 +62,8 @@ public class ScheduledServicePlexusResource
     extends AbstractScheduledServicePlexusResource
 {
     public static final String SCHEDULED_SERVICE_ID_KEY = "scheduledServiceId";
-    
-    public static final String RESOURCE_URI = "/schedules/{" + SCHEDULED_SERVICE_ID_KEY + "}"; 
+
+    public static final String RESOURCE_URI = "/schedules/{" + SCHEDULED_SERVICE_ID_KEY + "}";
 
     public ScheduledServicePlexusResource()
     {
@@ -100,8 +100,7 @@ public class ScheduledServicePlexusResource
      */
     @Override
     @GET
-    @ResourceMethodSignature( pathParams = { @PathParam( ScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY ) },
-                              output = ScheduledServiceResourceResponse.class )
+    @ResourceMethodSignature( pathParams = { @PathParam( ScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY ) }, output = ScheduledServiceResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -138,9 +137,7 @@ public class ScheduledServicePlexusResource
      */
     @Override
     @PUT
-    @ResourceMethodSignature( pathParams = { @PathParam( ScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY ) },
-                              input = ScheduledServiceResourceResponse.class,
-                              output = ScheduledServiceResourceStatusResponse.class )
+    @ResourceMethodSignature( pathParams = { @PathParam( ScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY ) }, input = ScheduledServiceResourceResponse.class, output = ScheduledServiceResourceStatusResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -231,7 +228,17 @@ public class ScheduledServicePlexusResource
     {
         try
         {
-            getNexusScheduler().getTaskById( getScheduledServiceId( request ) ).cancel();
+            boolean cancelOnly =
+                Boolean.valueOf( request.getResourceRef().getQueryAsForm().getFirstValue( "cancelOnly", "false" ) );
+
+            if ( cancelOnly )
+            {
+                getNexusScheduler().getTaskById( getScheduledServiceId( request ) ).cancelOnly();
+            }
+            else
+            {
+                getNexusScheduler().getTaskById( getScheduledServiceId( request ) ).cancel();
+            }
 
             response.setStatus( Status.SUCCESS_NO_CONTENT );
         }

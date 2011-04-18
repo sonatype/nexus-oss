@@ -110,12 +110,12 @@ public class PurgeTimeline
         else if ( getSubTypes().size() == 0 )
         {
             timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), getTypes(), null,
-                                     null );
+                null );
         }
         else
         {
             timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), getTypes(),
-                                     getSubTypes(), null );
+                getSubTypes(), null );
         }
 
         return null;
