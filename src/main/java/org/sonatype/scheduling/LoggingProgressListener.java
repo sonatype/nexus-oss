@@ -1,6 +1,7 @@
 package org.sonatype.scheduling;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.Iterator;
 
@@ -15,6 +16,8 @@ import org.slf4j.LoggerFactory;
 public class LoggingProgressListener
     implements ProgressListener
 {
+    private static final Workunit ROOT = new Workunit( "root", UNKNOWN );
+
     private final Logger logger;
 
     private final Deque<Workunit> workunits;
@@ -23,9 +26,22 @@ public class LoggingProgressListener
 
     public LoggingProgressListener( final String name )
     {
-        this.logger = LoggerFactory.getLogger( name );
-        this.workunits = new ArrayDeque<Workunit>();
+        this( LoggerFactory.getLogger( name ) );
+    }
+
+    public LoggingProgressListener( final Logger logger )
+    {
+        this.logger = logger;
+        this.workunits = new ArrayDeque<Workunit>( Arrays.asList( ROOT ) );
         this.cancelled = false;
+    }
+
+    protected void log( final String message, Object... param )
+    {
+        if ( logger != null )
+        {
+            logger.info( message, param );
+        }
     }
 
     public void beginTask( String name, int toDo )
@@ -34,11 +50,11 @@ public class LoggingProgressListener
 
         if ( UNKNOWN != toDo )
         {
-            logger.info( "{}: started ({} steps).", getStackedWorkunitNames(), toDo );
+            log( "{}: started ({} steps).", getStackedWorkunitNames(), toDo );
         }
         else
         {
-            logger.info( "{}: started.", getStackedWorkunitNames() );
+            log( "{}: started.", getStackedWorkunitNames() );
         }
     }
 
@@ -55,22 +71,25 @@ public class LoggingProgressListener
 
         if ( UNKNOWN != wu.getToDo() )
         {
-            logger.info(
+            log(
                 "{}: {} ({}/{})",
                 new Object[] { getStackedWorkunitNames(), nvl( message ), String.valueOf( wu.getDone() ),
                     String.valueOf( wu.getToDo() ) } );
         }
         else
         {
-            logger.info( "{}: {} ({})", new Object[] { getStackedWorkunitNames(), nvl( message ), wu.getDone() } );
+            log( "{}: {} ({})", new Object[] { getStackedWorkunitNames(), nvl( message ), wu.getDone() } );
         }
     }
 
     public void endTask( String message )
     {
-        logger.info( "{}: finished: {}", getStackedWorkunitNames(), nvl( message ) );
+        log( "{}: finished: {}", getStackedWorkunitNames(), nvl( message ) );
 
-        workunits.pop();
+        if ( workunits.size() > 1 )
+        {
+            workunits.pop();
+        }
     }
 
     public boolean isCancelled()
@@ -80,7 +99,7 @@ public class LoggingProgressListener
 
     public void cancel()
     {
-        logger.info( "{}: cancelled, bailing out (may take a while).", getStackedWorkunitNames() );
+        log( "{}: cancelled, bailing out (may take a while).", getStackedWorkunitNames() );
 
         this.cancelled = true;
     }
@@ -95,6 +114,9 @@ public class LoggingProgressListener
     protected String getStackedWorkunitNames()
     {
         Iterator<Workunit> wi = workunits.descendingIterator();
+        
+        // skip root
+        wi.next();
 
         if ( wi.hasNext() )
         {
