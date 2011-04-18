@@ -114,6 +114,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.scheduling.ProgressListener;
+import org.sonatype.scheduling.TaskUtil;
 
 /**
  * <p>
@@ -140,7 +142,7 @@ public class DefaultIndexerManager
 
     /** Context id local suffix */
     public static final String CTX_SUFIX = "-ctx";
-    
+
     /** Path prefix where index publishing happens */
     public static final String PUBLISHING_PATH_PREFIX = "/.index";
 
@@ -870,9 +872,14 @@ public class DefaultIndexerManager
 
             if ( fullReindex )
             {
+                TaskUtil.getCurrentProgressListener().beginTask( "Full reindex, purging indexes", 2 );
                 context.purge();
+                TaskUtil.getCurrentProgressListener().working( "Purged Lucene Index", 1 );
 
                 deleteIndexItems( repository );
+                TaskUtil.getCurrentProgressListener().working( "Purged Published Index", 1 );
+
+                TaskUtil.getCurrentProgressListener().endTask( "Done" );
             }
 
             if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
@@ -882,8 +889,10 @@ public class DefaultIndexerManager
 
             if ( !repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
             {
+                TaskUtil.getCurrentProgressListener().beginTask( "Reindexing local storage", ProgressListener.UNKNOWN );
                 // update always true, since we manually manage ctx purge
                 nexusIndexer.scan( context, fromPath, null, true );
+                TaskUtil.getCurrentProgressListener().endTask( "Done" );
             }
         }
         finally
@@ -1023,8 +1032,11 @@ public class DefaultIndexerManager
     protected boolean updateRemoteIndex( final ProxyRepository repository, boolean forceFullUpdate )
         throws IOException, IllegalOperationException, ItemNotFoundException
     {
+        TaskUtil.getCurrentProgressListener().beginTask( "Updating from remote", ProgressListener.UNKNOWN );
+
         // this will force remote check for newer files
         repository.expireCaches( new ResourceStoreRequest( PUBLISHING_PATH_PREFIX ) );
+        TaskUtil.getCurrentProgressListener().working( "Expired caches for remote index file download", 1 );
 
         IndexingContext context = getRepositoryIndexContext( repository );
 
@@ -1043,6 +1055,8 @@ public class DefaultIndexerManager
             public InputStream retrieve( String name )
                 throws IOException
             {
+                TaskUtil.getCurrentProgressListener().working( "Fetching " + name, 1 );
+
                 ResourceStoreRequest req = new ResourceStoreRequest( PUBLISHING_PATH_PREFIX + "/" + name );
 
                 try
@@ -1092,6 +1106,8 @@ public class DefaultIndexerManager
         }
 
         IndexUpdateResult result = indexUpdater.fetchAndUpdateIndex( updateRequest );
+
+        TaskUtil.getCurrentProgressListener().endTask( "Done" );
 
         return result.getTimestamp() != null;
     }
