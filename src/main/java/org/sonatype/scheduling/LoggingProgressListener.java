@@ -32,7 +32,14 @@ public class LoggingProgressListener
     {
         workunits.push( new Workunit( name, toDo ) );
 
-        logger.info( "{}: started.", getStackedWorkunitNames() );
+        if ( UNKNOWN != toDo )
+        {
+            logger.info( "{}: started ({} steps).", getStackedWorkunitNames(), toDo );
+        }
+        else
+        {
+            logger.info( "{}: started.", getStackedWorkunitNames() );
+        }
     }
 
     public void working( int workDone )
@@ -61,7 +68,7 @@ public class LoggingProgressListener
 
     public void endTask( String message )
     {
-        logger.info( "{}: ended: {}", getStackedWorkunitNames(), nvl( message ) );
+        logger.info( "{}: finished: {}", getStackedWorkunitNames(), nvl( message ) );
 
         workunits.pop();
     }

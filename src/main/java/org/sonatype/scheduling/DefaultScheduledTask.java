@@ -59,6 +59,8 @@ public class DefaultScheduledTask<T>
 
     private SchedulerIterator scheduleIterator;
 
+    private volatile ProgressListener progressListener;
+
     boolean manualRun;
 
     public DefaultScheduledTask( String id, String name, String type, DefaultScheduler scheduler, Callable<T> callable,
@@ -103,6 +105,11 @@ public class DefaultScheduledTask<T>
         {
             return null;
         }
+    }
+
+    public ProgressListener getProgressListener()
+    {
+        return progressListener;
     }
 
     public Callable<T> getTask()
@@ -177,16 +184,22 @@ public class DefaultScheduledTask<T>
 
     public void cancel()
     {
-        final SchedulerTask<?> task = getSchedulerTask();
+        cancel( false );
+    }
 
-        if ( task != null )
+    public void cancel( boolean interrupt )
+    {
+        final ProgressListener progressListener = getProgressListener();
+
+        if ( progressListener != null )
         {
-            task.getProgressListener().cancel();
+            getProgressListener().cancel();
         }
 
+        // to prevent starting it if not yet started
         if ( getFuture() != null )
         {
-            getFuture().cancel( true );
+            getFuture().cancel( interrupt );
         }
 
         setTaskState( TaskState.CANCELLED );
@@ -196,6 +209,14 @@ public class DefaultScheduledTask<T>
 
     public void reset()
     {
+        final ProgressListener progressListener = getProgressListener();
+
+        if ( progressListener != null )
+        {
+            getProgressListener().cancel();
+        }
+
+        // to prevent starting it if not yet started
         if ( getFuture() != null )
         {
             getFuture().cancel( false );
@@ -300,121 +321,133 @@ public class DefaultScheduledTask<T>
     public T call()
         throws Exception
     {
-        T result = null;
-
-        if ( SchedulerTask.class.isAssignableFrom( getCallable().getClass() ) )
+        try
         {
-            // check for execution
-            if ( !( (SchedulerTask<?>) getCallable() ).allowConcurrentExecution( getScheduler().getActiveTasks() ) )
+            this.progressListener = new LoggingProgressListener( getCallable().getClass().getSimpleName() );
+
+            TaskUtil.setCurrent( this.progressListener );
+
+            T result = null;
+
+            if ( getCallable() instanceof SchedulerTask )
             {
-                if ( nextRun != null )
+                // check for execution
+                if ( !( (SchedulerTask<?>) getCallable() ).allowConcurrentExecution( getScheduler().getActiveTasks() ) )
                 {
-                    // simply reschedule itself for 10sec
-                    nextRun = new Date( nextRun.getTime() + 10000 );
+                    if ( nextRun != null )
+                    {
+                        // simply reschedule itself for 10sec
+                        nextRun = new Date( nextRun.getTime() + 10000 );
+                    }
+
+                    setFuture( getScheduler().getScheduledExecutorService().schedule( this, 10000,
+                        TimeUnit.MILLISECONDS ) );
+
+                    setTaskState( TaskState.SLEEPING );
+
+                    return result;
                 }
-
-                setFuture( getScheduler().getScheduledExecutorService().schedule( this, 10000, TimeUnit.MILLISECONDS ) );
-
-                setTaskState( TaskState.SLEEPING );
-
-                return result;
             }
-            ;
-        }
 
-        Future<T> nextFuture = null;
+            Future<T> nextFuture = null;
 
-        if ( ( isEnabled() || manualRun ) && getTaskState().isRunnable() )
-        {
-            setTaskState( TaskState.RUNNING );
-
-            Date startDate = new Date();
-
-            try
+            if ( ( isEnabled() || manualRun ) && getTaskState().isRunnable() )
             {
-                // Note that we need to do this prior to starting, so that the next run time will be updated properly
-                // Rather than having to wait for the task to finish
+                setTaskState( TaskState.RUNNING );
 
-                // If manually running, just grab the previous future and use that or create a new one
-                if ( manualRun )
+                Date startDate = new Date();
+
+                try
                 {
-                    nextFuture = getFuture();
+                    // Note that we need to do this prior to starting, so that the next run time will be updated
+                    // properly
+                    // Rather than having to wait for the task to finish
 
+                    // If manually running, just grab the previous future and use that or create a new one
+                    if ( manualRun )
+                    {
+                        nextFuture = getFuture();
+
+                        manualRun = false;
+                    }
+                    // Otherwise, grab the next one
+                    else
+                    {
+                        nextFuture = reschedule();
+                    }
+
+                    result = getCallable().call();
+
+                    if ( result != null )
+                    {
+                        results.add( result );
+                    }
+                }
+                catch ( Throwable e )
+                {
                     manualRun = false;
-                }
-                // Otherwise, grab the next one
-                else
-                {
-                    nextFuture = reschedule();
-                }
 
-                result = getCallable().call();
+                    setBrokenCause( e );
 
-                if ( result != null )
+                    setTaskState( TaskState.BROKEN );
+
+                    if ( Exception.class.isAssignableFrom( e.getClass() ) )
+                    {
+                        // this is an exception, pass it further
+                        throw (Exception) e;
+                    }
+                    else
+                    {
+                        // this is a Throwable or Error instance, pack it into an exception and rethrow
+                        throw new TaskExecutionException( e );
+                    }
+                }
+                finally
                 {
-                    results.add( result );
+                    setLastRun( startDate );
                 }
             }
-            catch ( Throwable e )
+
+            if ( TaskState.BROKEN == getTaskState() )
             {
-                manualRun = false;
-
-                setBrokenCause( e );
-
-                setTaskState( TaskState.BROKEN );
-
-                if ( Exception.class.isAssignableFrom( e.getClass() ) )
-                {
-                    // this is an exception, pass it further
-                    throw (Exception) e;
-                }
-                else
-                {
-                    // this is a Throwable or Error instance, pack it into an exception and rethrow
-                    throw new TaskExecutionException( e );
-                }
+                // do nothing, let user fix or delete it
             }
-            finally
+            // If manually running or having future, park this task to submitted
+            else if ( isManualRunScheduled() )
             {
-                setLastRun( startDate );
+                setTaskState( TaskState.SUBMITTED );
             }
-        }
+            else if ( nextFuture != null )
+            {
+                setTaskState( TaskState.WAITING );
 
-        if ( TaskState.BROKEN == getTaskState() )
+                setFuture( nextFuture );
+            }
+            // If disabled (and not manually run),
+            // put to waiting and reschedule for next time
+            // user may want to enable at some point,
+            // so still seeing the next run time may be handy
+            else if ( !isEnabled() )
+            {
+                setTaskState( TaskState.WAITING );
+
+                nextFuture = reschedule();
+
+                setFuture( nextFuture );
+            }
+            else
+            {
+                setTaskState( TaskState.FINISHED );
+
+                getScheduler().removeFromTasksMap( this );
+            }
+
+            return result;
+        }
+        finally
         {
-            // do nothing, let user fix or delete it
+            TaskUtil.setCurrent( null );
         }
-        // If manually running or having future, park this task to submitted
-        else if ( isManualRunScheduled() )
-        {
-            setTaskState( TaskState.SUBMITTED );
-        }
-        else if ( nextFuture != null )
-        {
-            setTaskState( TaskState.WAITING );
-
-            setFuture( nextFuture );
-        }
-        // If disabled (and not manually run),
-        // put to waiting and reschedule for next time
-        // user may want to enable at some point,
-        // so still seeing the next run time may be handy
-        else if ( !isEnabled() )
-        {
-            setTaskState( TaskState.WAITING );
-
-            nextFuture = reschedule();
-
-            setFuture( nextFuture );
-        }
-        else
-        {
-            setTaskState( TaskState.FINISHED );
-
-            getScheduler().removeFromTasksMap( this );
-        }
-
-        return result;
     }
 
     // IteratingTask

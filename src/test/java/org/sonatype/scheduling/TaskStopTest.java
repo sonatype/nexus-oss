@@ -8,48 +8,48 @@ public class TaskStopTest
     extends PlexusTestCase
 {
     protected DefaultScheduler defaultScheduler;
-    
+
     public void setUp()
         throws Exception
     {
         super.setUp();
-    
+
         defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
     }
-    
+
     public void testStopTask()
         throws Exception
     {
         RunForeverCallable callable = new RunForeverCallable();
-        
+
         assertFalse( callable.isAllDone() );
-        
+
         ScheduledTask<Integer> task = defaultScheduler.submit( "Test Task", callable );
-        
+
         assertFalse( callable.isAllDone() );
-        
+
         // Give task a chance to get going for a bit
         callable.blockForStart();
-        
+
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
-        
+
         assertEquals( TaskState.RUNNING, task.getTaskState() );
-        
-        task.cancel();
-        
+
+        task.cancel( true );
+
         callable.blockForDone();
-        
+
         // Now check and see if task is still running...
         assertTrue( callable.isAllDone() );
     }
-    
+
     public class RunForeverCallable
         implements Callable<Integer>
-    {    
+    {
         private boolean allDone = false;
-        
+
         private boolean started = false;
-        
+
         public Integer call()
             throws Exception
         {
@@ -57,8 +57,8 @@ public class TaskStopTest
             {
                 while ( true )
                 {
-                    //Replace with Thread.yield() to see the problem.  The sleep state will
-                    //cause the thread to stop
+                    // Replace with Thread.yield() to see the problem. The sleep state will
+                    // cause the thread to stop
                     Thread.sleep( 1 );
                     started = true;
                 }
@@ -68,12 +68,12 @@ public class TaskStopTest
                 allDone = true;
             }
         }
-        
+
         public boolean isAllDone()
         {
             return allDone;
         }
-        
+
         public void blockForStart()
             throws Exception
         {
@@ -82,7 +82,7 @@ public class TaskStopTest
                 Thread.sleep( 10 );
             }
         }
-        
+
         public void blockForDone()
             throws Exception
         {

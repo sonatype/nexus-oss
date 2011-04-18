@@ -6,20 +6,13 @@ public class TaskUtil
     {
         protected ProgressListener initialValue()
         {
-            return ProgressListenerWrapper.DEVNULL;
+            return new ProgressListenerWrapper( null );
         }
     };
 
     protected static void setCurrent( ProgressListener progressListener )
     {
-        if ( progressListener == null )
-        {
-            CURRENT.set( ProgressListenerWrapper.DEVNULL );
-        }
-        else
-        {
-            CURRENT.set( progressListener );
-        }
+        CURRENT.set( new ProgressListenerWrapper( progressListener ) );
     }
 
     /**

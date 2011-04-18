@@ -24,11 +24,19 @@ import org.sonatype.scheduling.schedules.Schedule;
 public interface ScheduledTask<T>
 {
     /**
-     * Returns the task if it is an instance of SchedulerTask<?> or null if that's not the case (there is just a Callable<?>).
+     * Returns the task if it is an instance of SchedulerTask<?> or null if that's not the case (there is just a
+     * Callable<?>).
      * 
      * @return
      */
     SchedulerTask<T> getSchedulerTask();
+
+    /**
+     * Returns the progress listener of this run, if the task runs, otherwise null.
+     * 
+     * @return
+     */
+    ProgressListener getProgressListener();
 
     /**
      * Returns the task (callable being run).
@@ -88,6 +96,14 @@ public interface ScheduledTask<T>
      * Cancels the task and removes it from queue.
      */
     void cancel();
+
+    /**
+     * Cancels the task and removes it from queue (as {@link #cancel()} does), but if the passed in flag is {@code true}
+     * it will interrupt the thread too.
+     * 
+     * @param interrupt
+     */
+    void cancel( boolean interrupt );
 
     /**
      * Resets the task state and reschedules if needed.

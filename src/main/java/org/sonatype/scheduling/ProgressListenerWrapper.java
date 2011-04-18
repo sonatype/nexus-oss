@@ -3,11 +3,9 @@ package org.sonatype.scheduling;
 public class ProgressListenerWrapper
     implements ProgressListener
 {
-    public static final ProgressListenerWrapper DEVNULL = new ProgressListenerWrapper( null );
-
     private final ProgressListener wrapped;
 
-    private volatile boolean canceled;
+    private volatile boolean cancelled;
 
     public ProgressListenerWrapper( final ProgressListener wrapped )
     {
@@ -58,11 +56,11 @@ public class ProgressListenerWrapper
     {
         if ( wrapped != null )
         {
-            return canceled || wrapped.isCancelled();
+            return cancelled || wrapped.isCancelled();
         }
         else
         {
-            return canceled;
+            return cancelled;
         }
     }
 
@@ -73,6 +71,6 @@ public class ProgressListenerWrapper
             wrapped.cancel();
         }
 
-        canceled = true;
+        cancelled = true;
     }
 }

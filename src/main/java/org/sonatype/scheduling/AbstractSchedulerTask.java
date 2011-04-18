@@ -14,13 +14,6 @@ public abstract class AbstractSchedulerTask<T>
 
     private Map<String, String> parameters;
 
-    private ProgressListenerWrapper progressListener = ProgressListenerWrapper.DEVNULL;
-
-    public ProgressListener getProgressListener()
-    {
-        return progressListener;
-    }
-
     public void addParameter( String key, String value )
     {
         getParameters().put( key, value );
@@ -41,19 +34,10 @@ public abstract class AbstractSchedulerTask<T>
         return parameters;
     }
 
-    public final T call()
-        throws Exception
-    {
-        // set the listener to make access possible from legacy code
-        TaskUtil.setCurrent( progressListener );
-
-        return doCall();
-    }
+    public abstract T call()
+        throws Exception;
 
     // ==
-
-    protected abstract T doCall()
-        throws Exception;
 
     protected Logger getLogger()
     {
@@ -64,17 +48,5 @@ public abstract class AbstractSchedulerTask<T>
         throws TaskInterruptedException
     {
         TaskUtil.checkInterruption();
-    }
-
-    protected void setProgressListener( final ProgressListener progressListener )
-    {
-        if ( progressListener == null )
-        {
-            this.progressListener = ProgressListenerWrapper.DEVNULL;
-        }
-        else
-        {
-            this.progressListener = new ProgressListenerWrapper( progressListener );
-        }
     }
 }
