@@ -93,6 +93,11 @@ public interface ScheduledTask<T>
     void runNow();
 
     /**
+     * Cancels the task and does not removes it from queue (if it has schedule in future).
+     */
+    void cancelOnly();
+
+    /**
      * Cancels the task and removes it from queue.
      */
     void cancel();

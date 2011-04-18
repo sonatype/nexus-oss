@@ -182,12 +182,22 @@ public class DefaultScheduledTask<T>
         return scheduledAt;
     }
 
+    public void cancelOnly()
+    {
+        cancel( false, nextRun == null );
+    }
+
     public void cancel()
     {
         cancel( false );
     }
 
     public void cancel( boolean interrupt )
+    {
+        cancel( interrupt, true );
+    }
+
+    public void cancel( boolean interrupt, boolean remove )
     {
         final ProgressListener progressListener = getProgressListener();
 
@@ -202,9 +212,16 @@ public class DefaultScheduledTask<T>
             getFuture().cancel( interrupt );
         }
 
-        setTaskState( TaskState.CANCELLED );
+        if ( remove )
+        {
+            setTaskState( TaskState.CANCELLED );
 
-        getScheduler().removeFromTasksMap( this );
+            getScheduler().removeFromTasksMap( this );
+        }
+        else
+        {
+            setTaskState( TaskState.SUBMITTED );
+        }
     }
 
     public void reset()
