@@ -21,14 +21,11 @@ package org.sonatype.nexus.proxy.maven.maven2;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.codec.binary.Hex;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.index.artifact.GavCalculator;
 import org.apache.maven.index.artifact.M2ArtifactRecognizer;
@@ -65,6 +62,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.NexusMergeOperation;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.util.DigesterUtils;
 
 @Component( role = GroupRepository.class, hint = M2GroupRepository.ID, instantiationStrategy = "per-lookup", description = "Maven2 Repository Group" )
 public class M2GroupRepository
@@ -297,17 +295,13 @@ public class M2GroupRepository
             StorageItem item = createMergedMetadataItem( request, resultOutputStream.toByteArray(), items );
 
             // build checksum files
-            MessageDigest md5Digest = MessageDigest.getInstance( "md5" );
+            String md5Digest = DigesterUtils.getMd5Digest( resultOutputStream.toByteArray() );
 
-            MessageDigest sha1Digest = MessageDigest.getInstance( "sha1" );
+            String sha1Digest = DigesterUtils.getSha1Digest( resultOutputStream.toByteArray() );
 
-            md5Digest.update( resultOutputStream.toByteArray() );
+            storeMergedMetadataItemDigest( request, md5Digest, items, "MD5" );
 
-            sha1Digest.update( resultOutputStream.toByteArray() );
-
-            storeMergedMetadataItemDigest( request, md5Digest, items );
-
-            storeMergedMetadataItemDigest( request, sha1Digest, items );
+            storeMergedMetadataItemDigest( request, sha1Digest, items, "SHA1" );
 
             resultOutputStream.close();
 
@@ -329,22 +323,18 @@ public class M2GroupRepository
         {
             throw new LocalStorageException( "Got MetadataException during M2 metadata merging.", e );
         }
-        catch ( NoSuchAlgorithmException e )
-        {
-            throw new LocalStorageException( "Got NoSuchAlgorithmException during M2 metadata merging.", e );
-        }
     }
 
-    protected void storeMergedMetadataItemDigest( ResourceStoreRequest request, MessageDigest digest,
-                                                  List<StorageItem> sources )
+    protected void storeMergedMetadataItemDigest( ResourceStoreRequest request, String digest,
+                                                  List<StorageItem> sources, String algorithm )
         throws IOException, UnsupportedStorageOperationException, IllegalOperationException
     {
-        String digestFileName = request.getRequestPath() + "." + digest.getAlgorithm().toLowerCase();
+        String digestFileName = request.getRequestPath() + "." + algorithm.toLowerCase();
 
         // see nexus-configuration mime-types.properties (defaulted to text/plain, as central reports them)
         String mimeType = getMimeUtil().getMimeType( digestFileName );
 
-        byte[] bytes = ( new String( Hex.encodeHex( digest.digest() ) ) + "\n" ).getBytes( "UTF-8" );
+        byte[] bytes = ( digest + '\n' ).getBytes( "UTF-8" );
 
         ContentLocator contentLocator = new ByteArrayContentLocator( bytes, mimeType );
 

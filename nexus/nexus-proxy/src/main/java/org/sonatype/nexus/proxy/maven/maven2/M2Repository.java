@@ -20,6 +20,7 @@ package org.sonatype.nexus.proxy.maven.maven2;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -41,21 +42,29 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
+import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
+import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.util.AlphanumComparator;
+import org.sonatype.nexus.util.DigesterUtils;
 
 /**
  * The default M2Repository.
@@ -293,6 +302,119 @@ public class M2Repository
     }
 
     @Override
+    protected StorageItem doRetrieveItem( ResourceStoreRequest request )
+        throws IllegalOperationException, ItemNotFoundException, StorageException
+    {
+        if ( !shouldServeByPolicies( request ) )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    "The serving of item " + request.toString() + " is forbidden by Maven repository policy." );
+            }
+
+            throw new ItemNotFoundException( request, this );
+        }
+
+        String userAgent = (String) request.getRequestContext().get( AccessManager.REQUEST_AGENT );
+
+        if ( M2ArtifactRecognizer.isMetadata( request.getRequestPath() )
+            && !ModelVersionUtility.LATEST_MODEL_VERSION.equals( getClientSupportedVersion( userAgent ) ) )
+        {
+            // metadata checksum files are calculated and cached as side-effect
+            // of doRetrieveMetadata.
+            final StorageFileItem mdItem;
+            if ( M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
+            {
+                String path = request.getRequestPath();
+                if ( request.getRequestPath().endsWith( ".md5" ) )
+                {
+                    path = path.substring( 0, path.length() - 4 );
+                }
+                else if ( request.getRequestPath().endsWith( ".sha1" ) )
+                {
+                    path = path.substring( 0, path.length() - 5 );
+                }
+                ResourceStoreRequest mdRequest = new ResourceStoreRequest( path );
+                mdRequest.getRequestContext().setParentContext( request.getRequestContext() );
+
+                mdItem = (StorageFileItem) super.doRetrieveItem( mdRequest );
+            }
+            else
+            {
+                mdItem = (StorageFileItem) super.doRetrieveItem( request );
+            }
+
+            InputStream inputStream = null;
+            try
+            {
+                inputStream = mdItem.getInputStream();
+
+                Metadata metadata = MetadataBuilder.read( inputStream );
+                Version requiredVersion = getClientSupportedVersion( userAgent );
+                Version metadataVersion = ModelVersionUtility.getModelVersion( metadata );
+
+                if ( requiredVersion == null || requiredVersion.equals( metadataVersion ) )
+                {
+                    return super.doRetrieveItem( request );
+                }
+
+                ModelVersionUtility.setModelVersion( metadata, requiredVersion );
+
+                ByteArrayOutputStream mdOutput = new ByteArrayOutputStream();
+
+                MetadataBuilder.write( metadata, mdOutput );
+
+                final byte[] content;
+                if ( M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
+                {
+                    String digest;
+                    if ( request.getRequestPath().endsWith( ".md5" ) )
+                    {
+                        digest = DigesterUtils.getMd5Digest( mdOutput.toByteArray() );
+                    }
+                    else
+                    {
+                        digest = DigesterUtils.getSha1Digest( mdOutput.toByteArray() );
+                    }
+                    content = ( digest + '\n' ).getBytes( "UTF-8" );
+                }
+                else
+                {
+                    content = mdOutput.toByteArray();
+                }
+
+                String mimeType = getMimeUtil().getMimeType( request.getRequestPath() );
+                ContentLocator contentLocator = new ByteArrayContentLocator( content, mimeType );
+
+                DefaultStorageFileItem result = new DefaultStorageFileItem( this, request, true, false, contentLocator );
+                result.setLength( content.length );
+                result.setCreated( mdItem.getCreated() );
+                result.setModified( System.currentTimeMillis() );
+                return result;
+            }
+            catch ( IOException e )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().error( "Error parsing metadata, serving as retrieved", e );
+                }
+                else
+                {
+                    getLogger().error( "Error parsing metadata, serving as retrieved: " + e.getMessage() );
+                }
+
+                return super.doRetrieveItem( request );
+            }
+            finally
+            {
+                IOUtil.close( inputStream );
+            }
+        }
+
+        return super.doRetrieveItem( request );
+    }
+
     protected Version getClientSupportedVersion( String userAgent )
     {
         if ( userAgent == null )
