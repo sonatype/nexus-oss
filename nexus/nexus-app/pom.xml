@@ -112,6 +112,12 @@
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>plexus-swizzle</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>junit</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sonatype.spice</groupId>
@@ -121,7 +127,7 @@
     <!-- Testing -->
     <dependency>
       <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <artifactId>junit-dep</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

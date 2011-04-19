@@ -35,7 +35,7 @@
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <artifactId>junit-dep</artifactId>
       <!-- Override scope from dependencyManagement. -->
       <scope>compile</scope>
     </dependency>

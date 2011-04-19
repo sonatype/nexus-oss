@@ -21,7 +21,7 @@ package util;
 import java.io.IOException;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.hamcrest.MatcherAssert;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -51,7 +51,7 @@ public class GroovyConsoleMessageUtil
         Response response = RequestFacade.doGetRequest( "service/local/groovy_console" );
 
         String responeText = response.getEntity().getText();
-        Assert.assertTrue( "Expected sucess: Status was: " + response.getStatus() + "\nResponse:\n" + responeText,
+        MatcherAssert.assertThat( "Expected sucess: Status was: " + response.getStatus() + "\nResponse:\n" + responeText,
                            response.getStatus().isSuccess() );
 
         XStreamRepresentation representation = new XStreamRepresentation( xs, responeText, MediaType.APPLICATION_XML );
@@ -72,7 +72,7 @@ public class GroovyConsoleMessageUtil
         Response response = RequestFacade.sendMessage( "service/local/groovy_console", Method.POST, representation );
 
         String responeText = response.getEntity().getText();
-        Assert.assertTrue( "Expected sucess: Status was: " + response.getStatus() + "\nResponse:\n" + responeText,
+        MatcherAssert.assertThat( "Expected sucess: Status was: " + response.getStatus() + "\nResponse:\n" + responeText,
                            response.getStatus().isSuccess() );
 
     }

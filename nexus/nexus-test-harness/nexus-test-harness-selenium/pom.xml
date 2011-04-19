@@ -337,7 +337,7 @@
         </exclusion>
         <exclusion>
           <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
+          <artifactId>junit-dep</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -369,7 +369,7 @@
       <exclusions>
         <exclusion>
           <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
+          <artifactId>junit-dep</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -377,6 +377,7 @@
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
+      <!-- FIXME why is this the 5.10 version and not 5.11 -->
       <version>5.10</version>
       <classifier>jdk15</classifier>
       <exclusions>

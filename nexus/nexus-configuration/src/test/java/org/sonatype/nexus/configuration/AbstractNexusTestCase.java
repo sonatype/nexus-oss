@@ -31,6 +31,8 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
+import org.junit.After;
+import org.junit.Before;
 
 /**
  * Abstract test case for nexus tests. It is customizing the context and helps with nexus configurations.
@@ -38,7 +40,7 @@ import org.codehaus.plexus.util.io.RawInputStreamFacade;
  * @author cstamas
  */
 public abstract class AbstractNexusTestCase
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
 
@@ -77,10 +79,23 @@ public abstract class AbstractNexusTestCase
         configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
     }
 
+    @Before
+    public void setUpJUnit4()
+        throws Exception {
+        setUp();
+    }
+    
+    @After
+    public void tearDownJUnit4()
+        throws Exception {
+        tearDown();
+    }
+    
     @Override
     protected void setUp()
         throws Exception
     {
+        // keep since PlexusTestCase is not JUnit4 annotated
         super.setUp();
 
         // simply to make sure customizeContext is handled before anything else
@@ -96,6 +111,7 @@ public abstract class AbstractNexusTestCase
     protected void tearDown()
         throws Exception
     {
+        // keep since PlexusTestCase is not JUnit4 annotated
         super.tearDown();
 
         cleanDir( plexusHomeDir );

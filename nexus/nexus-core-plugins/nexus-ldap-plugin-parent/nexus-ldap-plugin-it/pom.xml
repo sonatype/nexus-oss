@@ -52,7 +52,14 @@
       </exclusions>
       <scope>test</scope>
     </dependency>
-
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit-dep</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
+    </dependency>
+    
     <dependency>
       <groupId>emma</groupId>
       <artifactId>emma</artifactId>
@@ -83,6 +90,12 @@
       <artifactId>nexus-test-harness-launcher</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>ant</artifactId>
+          <groupId>ant</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -97,12 +110,6 @@
       <artifactId>nexus-rest-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
@@ -143,6 +150,10 @@
         <exclusion>
           <groupId>org.slf4j</groupId>
           <artifactId>slf4j-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <artifactId>junit</artifactId>
+          <groupId>junit</groupId>
         </exclusion>
       </exclusions>
     </dependency>

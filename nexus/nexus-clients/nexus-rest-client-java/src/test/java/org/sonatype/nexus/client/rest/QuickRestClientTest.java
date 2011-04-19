@@ -20,7 +20,7 @@ package org.sonatype.nexus.client.rest;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.nexus.client.NexusClient;

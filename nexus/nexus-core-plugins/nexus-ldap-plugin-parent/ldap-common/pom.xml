@@ -88,6 +88,10 @@
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-container-default</artifactId>
         </exclusion>
+        <exclusion>
+          <artifactId>junit</artifactId>
+          <groupId>junit</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -111,7 +115,7 @@
 
     <dependency>
       <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <artifactId>junit-dep</artifactId>
     </dependency>
 
     <dependency>

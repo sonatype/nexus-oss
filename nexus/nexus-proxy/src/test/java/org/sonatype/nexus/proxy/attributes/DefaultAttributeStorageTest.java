@@ -22,6 +22,7 @@ import java.io.File;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -53,7 +54,8 @@ public class DefaultAttributeStorageTest
 
     protected File localStorageDirectory;
 
-    public void setUp()
+    @Override
+    protected void setUp()
         throws Exception
     {
         super.setUp();
@@ -93,6 +95,7 @@ public class DefaultAttributeStorageTest
         repository.configure( repoConf );
     }
 
+    @Test
     public void testSimplePutGet()
         throws Exception
     {

@@ -20,6 +20,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.config.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.Test;
 
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
@@ -44,6 +45,7 @@ public class DefaultCapabilityConfigurationTest
         configuration = lookup( CapabilityConfiguration.class );
     }
 
+    @Test
     public void testCrud()
         throws Exception
     {
