@@ -21,6 +21,7 @@ package org.sonatype.nexus.proxy.item;
 import java.util.Random;
 
 import junit.framework.TestCase;
+import org.junit.Test;
 
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -48,6 +49,7 @@ public class DefaultRepositoryItemUidTest
         super.tearDown();
     }
 
+    @Test
     public void testLocking()
     {
         Repository repository = new DummyRepository( "dummy" );
@@ -59,6 +61,7 @@ public class DefaultRepositoryItemUidTest
         verifyUidIsNotLocked( uid );
     }
 
+    @Test
     public void testMultiThreadedLocking()
         throws InterruptedException
     {

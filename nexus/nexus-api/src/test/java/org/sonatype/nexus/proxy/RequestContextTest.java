@@ -19,10 +19,12 @@
 package org.sonatype.nexus.proxy;
 
 import junit.framework.TestCase;
+import org.junit.Test;
 
 public class RequestContextTest
     extends TestCase
 {
+    @Test
     public void testNullParent()
     {
         RequestContext requestContext = new RequestContext( null );
@@ -32,6 +34,7 @@ public class RequestContextTest
         assertNull( requestContext.getParentContext() );
     }
 
+    @Test
     public void testValidParent()
     {
         RequestContext parentContext = new RequestContext( null );
@@ -47,6 +50,7 @@ public class RequestContextTest
         assertEquals( parentContext, requestContext.getParentContext() );
     }
 
+    @Test
     public void testSelfParent()
     {
         RequestContext requestContext = new RequestContext();
@@ -65,6 +69,7 @@ public class RequestContextTest
     }
 
     // 3-->2-->1-->3
+    @Test
     public void testSelfAncestor()
     {
         RequestContext requestContext1 = new RequestContext();

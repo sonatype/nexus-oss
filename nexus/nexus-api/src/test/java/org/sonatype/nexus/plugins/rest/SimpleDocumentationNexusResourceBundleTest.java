@@ -21,10 +21,12 @@ package org.sonatype.nexus.plugins.rest;
 import java.util.List;
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.junit.Test;
 
 public class SimpleDocumentationNexusResourceBundleTest
     extends PlexusTestCase
 {
+    @Test
     public void testDoc()
         throws Exception
     {
