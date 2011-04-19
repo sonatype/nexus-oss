@@ -1,12 +1,8 @@
-<!-- Copyright (c) 2008-2011 Sonatype, Inc. All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions. 
-  This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General Public 
-  License Version 3 as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the 
-  GNU Affero General Public License Version 3 for more details. You should have received a copy of the GNU Affero General Public 
-  License Version 3 along with this program. If not, see http://www.gnu.org/licenses. Sonatype Nexus (TM) Open Source Version 
-  is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark 
-  of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their 
-  respective owners. -->
+<!-- Copyright (c) 2008-2011 Sonatype, Inc. All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions. This program is free software: you can redistribute it and/or modify it only under the terms of the 
+  GNU Affero General Public License Version 3 as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+  PURPOSE. See the GNU Affero General Public License Version 3 for more details. You should have received a copy of the GNU Affero General Public License Version 3 along with this program. If not, see http://www.gnu.org/licenses. Sonatype Nexus (TM) Open Source 
+  Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective 
+  owners. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
@@ -49,19 +45,35 @@
           <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
           <extraArtifacts>
             <xml>org.apache.maven.plugins:maven-clean-plugin:2.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-compiler-plugin:2.0:maven-plugin</xml>
             <xml>org.apache.maven.plugins:maven-compiler-plugin:2.0.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-compiler-plugin:2.3.2:maven-plugin</xml>
             <xml>org.apache.maven.plugins:maven-dependency-plugin:2.0:maven-plugin</xml>
             <xml>org.apache.maven.plugins:maven-deploy-plugin:2.3:maven-plugin</xml>
             <xml>org.apache.maven.plugins:maven-deploy-plugin:2.4:maven-plugin</xml>
             <xml>org.apache.maven.plugins:maven-deploy-plugin:2.5:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-install-plugin:2.0:maven-plugin</xml>
             <xml>org.apache.maven.plugins:maven-install-plugin:2.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-install-plugin:2.3.1:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-jar-plugin:2.0:maven-plugin</xml>
             <xml>org.apache.maven.plugins:maven-jar-plugin:2.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-jar-plugin:2.3.1:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-resources-plugin:2.0:maven-plugin</xml>
             <xml>org.apache.maven.plugins:maven-resources-plugin:2.2:maven-plugin</xml>
             <xml>org.apache.maven.plugins:maven-resources-plugin:2.3:maven-plugin</xml>
             <xml>org.apache.maven.plugins:maven-resources-plugin:2.4:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-resources-plugin:2.4.3:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.0:maven-plugin</xml>
             <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.2:maven-plugin</xml>
             <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.3:maven-plugin</xml>
             <xml>org.apache.maven.plugins:maven-surefire-plugin:2.5:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.7.2:maven-plugin</xml>
+            <xml>org.apache.maven.surefire:surefire-junit3:2.7.2</xml>
+            <!-- nexus4218 -->
+            <xml>org.apache.maven:apache-maven:3.0.3:tar.gz:bin</xml>
+            <xml>org.apache.maven:apache-maven:2.0.6:tar.gz:bin</xml>
+            <xml>org.apache.ivy:apache-ivy:2.2.0:tar.gz:bin</xml>
+            <xml>org.codehaus.groovy:groovy:1.7.8</xml>
           </extraArtifacts>
         </configuration>
         <executions>
@@ -269,6 +281,29 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- NEXUS-4218 -->
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy</artifactId>
+      <version>1.7.8</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-archiver</artifactId>
+      <version>1.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+
     <!-- for Cargo ITs -->
     <dependency>
       <groupId>org.codehaus.cargo</groupId>
@@ -465,8 +500,7 @@
           <name>yourkit.home</name>
         </property>
       </activation>
-      <!-- This is the path on Velo's machine ;) <properties> <yourkit.home>C:\Arquivos de programas\YourKit Java Profiler 
-        8.0.13</yourkit.home> </properties -->
+      <!-- This is the path on Velo's machine ;) <properties> <yourkit.home>C:\Arquivos de programas\YourKit Java Profiler 8.0.13</yourkit.home> </properties -->
       <dependencies>
         <dependency>
           <groupId>com.yourkit</groupId>
