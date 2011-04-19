@@ -9,7 +9,7 @@ This is the Core codebase of Sonatype Nexus, aka "Nexus OSS".
 
 [Issue tracking](https://issues.sonatype.org/browse/NEXUS)
 
-[Public wiki](https://docs.sonatype.org/display/Nexus/Home)
+[Public wiki](https://docs.sonatype.com/display/SPRTNXOSS)
 
 Have fun,  
 Sonatype Team
