@@ -225,7 +225,7 @@ public class Upgrade143to144
             {
                 file = new File( url.toURI() );
             }
-            catch ( Throwable t )
+            catch ( Exception t )
             {
                 file = new File( url.getPath() );
             }

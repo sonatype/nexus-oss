@@ -464,7 +464,7 @@ public abstract class AbstractArtifactPlexusResource
                 }
             }
         }
-        catch ( Throwable t )
+        catch ( Exception t )
         {
             return buildUploadFailedHtmlResponse( t, request, response );
         }

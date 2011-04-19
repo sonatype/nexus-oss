@@ -116,7 +116,7 @@ public class DefaultWalker
 
                 context.getContext().put( WALKER_WALKED_COLLECTION_COUNT, collCount );
             }
-            catch ( Throwable e )
+            catch ( Exception e )
             {
                 context.stop( e );
 

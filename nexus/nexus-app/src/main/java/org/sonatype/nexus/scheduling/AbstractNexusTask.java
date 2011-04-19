@@ -34,7 +34,6 @@ import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.TaskExecutionException;
 import org.sonatype.scheduling.TaskState;
 
 public abstract class AbstractNexusTask<T>
@@ -197,7 +196,7 @@ public abstract class AbstractNexusTask<T>
 
             return result;
         }
-        catch ( Throwable e )
+        catch ( Exception e )
         {
             getNexus().systemProcessBroken( prc, e );
 
@@ -214,16 +213,7 @@ public abstract class AbstractNexusTask<T>
                 errorManager.handleError( request );
             }
 
-            if ( Exception.class.isAssignableFrom( e.getClass() ) )
-            {
-                // this is an exception, pass it further
-                throw (Exception) e;
-            }
-            else
-            {
-                // this is a Throwable or Error instance, pack it into an exception and rethrow
-                throw new TaskExecutionException( e );
-            }
+            throw e;
         }
         finally
         {

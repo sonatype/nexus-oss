@@ -156,7 +156,7 @@ public class FileUtils
                 {
                     return new File( url.toURI() );
                 }
-                catch ( Throwable t )
+                catch ( Exception t )
                 {
                     return new File( url.getPath() );
                 }

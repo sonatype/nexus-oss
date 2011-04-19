@@ -157,7 +157,7 @@ public class DefaultEventInspectorHost
                     ei.inspect( evt );
                 }
             }
-            catch ( Throwable e )
+            catch ( Exception e )
             {
                 logger.warn( "EventInspector implementation='" + ei.getClass().getName()
                     + "' had problem inspecting an event='" + evt.getClass() + "'", e );

@@ -550,7 +550,7 @@ public class DefaultRepositoryRouter
             catch ( NoSuchRepositoryException e )
             {
                 // obviously, the repoId (explodedPath[1]) points to some nonexistent repoID
-                throw new ItemNotFoundException( request );
+                throw new ItemNotFoundException( request, e );
             }
 
             result.setStrippedPrefix( ItemPathUtils.concatPaths( explodedPath[0], explodedPath[1] ) );

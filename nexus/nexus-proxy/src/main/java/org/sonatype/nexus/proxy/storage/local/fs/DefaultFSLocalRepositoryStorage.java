@@ -112,7 +112,7 @@ public class DefaultFSLocalRepositoryStorage
         {
             file = new File( url.toURI() );
         }
-        catch ( Throwable t )
+        catch ( Exception t )
         {
             file = new File( url.getPath() );
         }
@@ -264,7 +264,7 @@ public class DefaultFSLocalRepositoryStorage
 
                         target.delete();
 
-                        throw new ItemNotFoundException( request, repository );
+                        throw new ItemNotFoundException( request, repository, e );
                     }
                 }
                 else

@@ -21,6 +21,7 @@ package org.sonatype.nexus.proxy.item;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 public class ByteArrayContentLocator
     implements ContentLocator
@@ -29,9 +30,9 @@ public class ByteArrayContentLocator
 
     private final String mimeType;
 
-    public ByteArrayContentLocator( byte[] content, String mimeType )
+    public ByteArrayContentLocator( final byte[] content, final String mimeType )
     {
-        this.content = content;
+        this.content = Arrays.copyOf( content, content.length );
 
         this.mimeType = mimeType;
     }

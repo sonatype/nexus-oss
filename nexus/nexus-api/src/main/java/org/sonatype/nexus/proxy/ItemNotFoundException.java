@@ -71,6 +71,11 @@ public class ItemNotFoundException
         this( request, repository, null );
     }
 
+    public ItemNotFoundException( ResourceStoreRequest request, Throwable cause )
+    {
+        this( request, null, cause );
+    }
+
     public ItemNotFoundException( ResourceStoreRequest request, Repository repository, Throwable cause )
     {
         this( repository != null ? "Item not found on path \"" + request.toString() + "\" in repository \""
