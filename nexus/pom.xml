@@ -818,36 +818,14 @@
           </exclusion>
         </exclusions>
       </dependency>
-      <!-- perf4j and profiling -->
+      <!-- profiling -->
       <dependency>
         <groupId>com.carrotsearch</groupId>
         <artifactId>junit-benchmarks</artifactId>
         <version>0.3.0-SNAPSHOT</version>
         <scope>test</scope>
       </dependency>
-      <dependency>
-        <groupId>org.perf4j</groupId>
-        <artifactId>perf4j</artifactId>
-        <version>0.9.15-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.perf4j</groupId>
-        <artifactId>perf4j</artifactId>
-        <classifier>slf4jonly</classifier>
-        <version>0.9.15-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.aspectj</groupId>
-        <artifactId>aspectjweaver</artifactId>
-        <version>${aspectj.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.aspectj</groupId>
-        <artifactId>aspectjrt</artifactId>
-        <version>${aspectj.version}</version>
-      </dependency>
-
-
+ 
       <!-- The modules -->
       <dependency>
         <groupId>org.apache.maven.indexer</groupId>
@@ -1231,33 +1209,6 @@
           <configuration>
             <autoVersionSubmodules>true</autoVersionSubmodules>
           </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>aspectj-maven-plugin</artifactId>
-            <version>1.3.1</version>
-            <dependencies>
-                <dependency>
-                    <groupId>org.aspectj</groupId>
-                    <artifactId>aspectjtools</artifactId>
-                    <version>${aspectj.version}</version>
-                </dependency>
-            </dependencies>
-            <executions>
-                <execution>
-                    <goals>
-                        <goal>compile</goal>
-                        <goal>test-compile</goal>
-                    </goals>
-                    <configuration>
-                        <Xlint>ignore</Xlint>
-                        <XaddSerialVersionUID>true</XaddSerialVersionUID>
-                        <complianceLevel>1.6</complianceLevel>
-                        <source>1.6</source>
-                        <target>1.6</target>
-                    </configuration>
-                </execution>
-            </executions>
         </plugin>
       </plugins>
     </pluginManagement>

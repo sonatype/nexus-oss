@@ -83,16 +83,6 @@
       <artifactId>mime-util</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.perf4j</groupId>
-      <artifactId>perf4j</artifactId>
-      <classifier>slf4jonly</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.aspectj</groupId>
-      <artifactId>aspectjrt</artifactId>
-    </dependency>
-
     <!-- for marking extensions -->
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
@@ -106,9 +96,6 @@
       <scope>test</scope>
     </dependency>
 
-
-
-
   </dependencies>
 
   <build>
@@ -117,30 +104,7 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>aspectj-maven-plugin</artifactId>
-        <configuration>
-            <showWeaveInfo>true</showWeaveInfo>
-            <verbose>true</verbose>
-             <!--
-            <weaveDependencies>
-                <weaveDependency>
-                    <groupId>org.perf4j</groupId>
-                    <artifactId>perf4j</artifactId>
-                    <classifier>slf4jonly</classifier>
-                </weaveDependency>
-            </weaveDependencies>
-            -->
-            <aspectLibraries>
-                    <aspectLibrary>
-                        <groupId>org.perf4j</groupId>
-                        <artifactId>perf4j</artifactId>
-                        <classifier>slf4jonly</classifier>
-                    </aspectLibrary>
-                </aspectLibraries>
-        </configuration>
-      </plugin>
+      
     </plugins>
   </build>
 

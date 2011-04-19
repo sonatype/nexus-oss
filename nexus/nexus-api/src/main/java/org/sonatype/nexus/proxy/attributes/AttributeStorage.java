@@ -18,7 +18,6 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
-import org.perf4j.aop.Profiled;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -38,7 +37,6 @@ public interface AttributeStorage
      * @param uid the uid
      * @return the attributes
      */
-    @Profiled(logFailuresSeparately=true)
     AbstractStorageItem getAttributes( RepositoryItemUid uid );
 
     /**
@@ -46,7 +44,6 @@ public interface AttributeStorage
      * 
      * @param item the item
      */
-    @Profiled(logFailuresSeparately=true)
     void putAttribute( StorageItem item );
 
     /**
@@ -55,6 +52,5 @@ public interface AttributeStorage
      * @param uid the uid
      * @return true, if successful
      */
-    @Profiled(logFailuresSeparately=true)
     boolean deleteAttributes( RepositoryItemUid uid );
 }
