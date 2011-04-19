@@ -12,7 +12,17 @@ public class ProgressListenerWrapper
         this.wrapped = wrapped;
     }
 
-    public void beginTask( String name, int toDo )
+    public void beginTask( final String name )
+    {
+        TaskUtil.checkInterruption();
+
+        if ( wrapped != null )
+        {
+            wrapped.beginTask( name );
+        }
+    }
+
+    public void beginTask( final String name, final int toDo )
     {
         TaskUtil.checkInterruption();
 
@@ -22,17 +32,27 @@ public class ProgressListenerWrapper
         }
     }
 
-    public void working( int work )
+    public void working( final int workDone )
     {
         TaskUtil.checkInterruption();
 
         if ( wrapped != null )
         {
-            wrapped.working( work );
+            wrapped.working( workDone );
         }
     }
 
-    public void working( String message, int work )
+    public void working( final String message )
+    {
+        TaskUtil.checkInterruption();
+
+        if ( wrapped != null )
+        {
+            wrapped.working( message );
+        }
+    }
+
+    public void working( final String message, final int work )
     {
         TaskUtil.checkInterruption();
 
@@ -42,7 +62,7 @@ public class ProgressListenerWrapper
         }
     }
 
-    public void endTask( String message )
+    public void endTask( final String message )
     {
         TaskUtil.checkInterruption();
 
@@ -52,11 +72,11 @@ public class ProgressListenerWrapper
         }
     }
 
-    public boolean isCancelled()
+    public boolean isCanceled()
     {
         if ( wrapped != null )
         {
-            return cancelled || wrapped.isCancelled();
+            return cancelled || wrapped.isCanceled();
         }
         else
         {

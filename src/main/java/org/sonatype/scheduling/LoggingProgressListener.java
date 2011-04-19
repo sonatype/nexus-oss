@@ -16,13 +16,13 @@ import org.slf4j.LoggerFactory;
 public class LoggingProgressListener
     implements ProgressListener
 {
-    private static final Workunit ROOT = new Workunit( "root", UNKNOWN );
+    private static final Workunit ROOT = new Workunit( "root", UNKNOWN_WORKUNITS );
 
     private final Logger logger;
 
     private final Deque<Workunit> workunits;
 
-    private volatile boolean cancelled = false;
+    private volatile boolean canceled = false;
 
     public LoggingProgressListener( final String name )
     {
@@ -33,22 +33,19 @@ public class LoggingProgressListener
     {
         this.logger = logger;
         this.workunits = new ArrayDeque<Workunit>( Arrays.asList( ROOT ) );
-        this.cancelled = false;
+        this.canceled = false;
     }
 
-    protected void log( final String message, Object... param )
+    public void beginTask( final String name )
     {
-        if ( logger != null )
-        {
-            logger.info( message, param );
-        }
+        beginTask( name, UNKNOWN_WORKUNITS );
     }
 
-    public void beginTask( String name, int toDo )
+    public void beginTask( final String name, final int toDo )
     {
         workunits.push( new Workunit( name, toDo ) );
 
-        if ( UNKNOWN != toDo )
+        if ( UNKNOWN_WORKUNITS != toDo )
         {
             log( "{}: started ({} steps).", getStackedWorkunitNames(), toDo );
         }
@@ -58,31 +55,39 @@ public class LoggingProgressListener
         }
     }
 
-    public void working( int workDone )
+    public void working( final int workDone )
     {
-        workunits.peek().done( workDone );
+        working( null, workDone );
     }
 
-    public void working( String message, int workDone )
+    public void working( final String message )
+    {
+        working( message, 0 );
+    }
+
+    public void working( final String message, final int workDone )
     {
         final Workunit wu = workunits.peek();
 
         wu.done( workDone );
 
-        if ( UNKNOWN != wu.getToDo() )
+        if ( message != null && message.trim().length() > 0 )
         {
-            log(
-                "{}: {} ({}/{})",
-                new Object[] { getStackedWorkunitNames(), nvl( message ), String.valueOf( wu.getDone() ),
-                    String.valueOf( wu.getToDo() ) } );
-        }
-        else
-        {
-            log( "{}: {} ({})", new Object[] { getStackedWorkunitNames(), nvl( message ), wu.getDone() } );
+            if ( UNKNOWN_WORKUNITS != wu.getToDo() )
+            {
+                log(
+                    "{}: {} ({}/{})",
+                    new Object[] { getStackedWorkunitNames(), nvl( message ), String.valueOf( wu.getDone() ),
+                        String.valueOf( wu.getToDo() ) } );
+            }
+            else
+            {
+                log( "{}: {} ({})", new Object[] { getStackedWorkunitNames(), nvl( message ), wu.getDone() } );
+            }
         }
     }
 
-    public void endTask( String message )
+    public void endTask( final String message )
     {
         log( "{}: finished: {}", getStackedWorkunitNames(), nvl( message ) );
 
@@ -92,16 +97,16 @@ public class LoggingProgressListener
         }
     }
 
-    public boolean isCancelled()
+    public boolean isCanceled()
     {
-        return cancelled;
+        return canceled;
     }
 
     public void cancel()
     {
-        log( "{}: cancelled, bailing out (may take a while).", getStackedWorkunitNames() );
+        log( "{}: canceled, bailing out (may take a while).", getStackedWorkunitNames() );
 
-        this.cancelled = true;
+        this.canceled = true;
     }
 
     // ==
@@ -114,7 +119,7 @@ public class LoggingProgressListener
     protected String getStackedWorkunitNames()
     {
         Iterator<Workunit> wi = workunits.descendingIterator();
-        
+
         // skip root
         wi.next();
 
@@ -132,6 +137,14 @@ public class LoggingProgressListener
         else
         {
             return "";
+        }
+    }
+
+    protected void log( final String message, Object... param )
+    {
+        if ( logger != null )
+        {
+            logger.info( message, param );
         }
     }
 

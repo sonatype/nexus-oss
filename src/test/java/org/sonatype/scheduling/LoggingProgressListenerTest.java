@@ -33,7 +33,7 @@ public class LoggingProgressListenerTest
     {
         LoggingProgressListener pl = new LoggingProgressListener( "foo" );
 
-        pl.beginTask( "Task1", ProgressListener.UNKNOWN );
+        pl.beginTask( "Task1" );
 
         pl.working( 3 );
         

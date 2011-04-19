@@ -35,9 +35,9 @@ public class TaskUtil
     {
         Thread.yield();
 
-        if ( getCurrentProgressListener().isCancelled() )
+        if ( getCurrentProgressListener().isCanceled() )
         {
-            throw new TaskInterruptedException( "Thread \"" + Thread.currentThread().getName() + "\" is cancelled!",
+            throw new TaskInterruptedException( "Thread \"" + Thread.currentThread().getName() + "\" is canceled!",
                 true );
         }
 
