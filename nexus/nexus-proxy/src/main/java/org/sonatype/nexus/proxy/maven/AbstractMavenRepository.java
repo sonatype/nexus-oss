@@ -381,6 +381,23 @@ public abstract class AbstractMavenRepository
 
     // =================================================================================
     // DefaultRepository customizations
+    @Override
+    protected StorageItem doRetrieveItem( ResourceStoreRequest request )
+        throws IllegalOperationException, ItemNotFoundException, StorageException
+    {
+        if ( !shouldServeByPolicies( request ) )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    "The serving of item " + request.toString() + " is forbidden by Maven repository policy." );
+            }
+
+            throw new ItemNotFoundException( request, this );
+        }
+
+        return super.doRetrieveItem( request );
+    }
 
     @Override
     public void storeItem( boolean fromTask, StorageItem item )
