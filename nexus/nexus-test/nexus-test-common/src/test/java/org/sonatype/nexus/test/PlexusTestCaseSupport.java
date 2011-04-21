@@ -1,4 +1,4 @@
-package org.sonatype.nexus.configuration;
+package org.sonatype.nexus.test;
 
 import java.io.File;
 import java.io.InputStream;

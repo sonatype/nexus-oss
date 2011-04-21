@@ -36,7 +36,7 @@ package org.sonatype.security.ldap.upgrade.cipher;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Assert;
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 /**
  * Test the Plexus Cipher container

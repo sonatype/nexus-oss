@@ -25,12 +25,12 @@ import static org.easymock.EasyMock.replay;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 public class DefaultTargetRegistryTest
     extends PlexusTestCaseSupport

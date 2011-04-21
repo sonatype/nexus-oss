@@ -24,9 +24,9 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Test;
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.NexusMergeOperation;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 public class MergeOperationTest
     extends PlexusTestCaseSupport

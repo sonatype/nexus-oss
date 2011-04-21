@@ -32,9 +32,9 @@ import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.ldaptestsuite.LdapServer;
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.nexus.security.ldap.realms.api.LdapRealmPlexusResourceConst;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 

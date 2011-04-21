@@ -22,7 +22,7 @@ import java.io.File;
 import java.util.Collection;
 
 import org.junit.Test;
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil2;

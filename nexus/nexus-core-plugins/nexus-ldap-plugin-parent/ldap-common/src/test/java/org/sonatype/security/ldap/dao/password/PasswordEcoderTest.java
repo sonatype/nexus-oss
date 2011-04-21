@@ -20,7 +20,7 @@ package org.sonatype.security.ldap.dao.password;
 
 import junit.framework.Assert;
 
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 public class PasswordEcoderTest
     extends PlexusTestCaseSupport

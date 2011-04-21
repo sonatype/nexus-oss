@@ -24,7 +24,7 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.Role;
 

@@ -26,7 +26,7 @@ import java.util.Random;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;

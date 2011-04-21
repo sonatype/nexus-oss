@@ -24,13 +24,13 @@ import org.junit.Assert;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 public class QuickRestClientTest extends PlexusTestCaseSupport
 {

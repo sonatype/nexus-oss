@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 public class SimpleDocumentationNexusResourceBundleTest
     extends PlexusTestCaseSupport

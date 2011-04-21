@@ -28,7 +28,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.security.ldap.realms.persist.ConfigurationValidator;

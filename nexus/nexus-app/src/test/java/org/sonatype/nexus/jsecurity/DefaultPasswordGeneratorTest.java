@@ -20,7 +20,7 @@ package org.sonatype.nexus.jsecurity;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.junit.Test;
 import org.sonatype.security.usermanagement.DefaultPasswordGenerator;
 import org.sonatype.security.usermanagement.PasswordGenerator;

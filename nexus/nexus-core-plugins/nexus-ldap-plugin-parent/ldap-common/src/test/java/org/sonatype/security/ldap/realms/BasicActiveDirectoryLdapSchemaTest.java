@@ -22,7 +22,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.codehaus.plexus.context.Context;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;

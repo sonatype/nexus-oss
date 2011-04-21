@@ -23,7 +23,7 @@ import java.net.ServerSocket;
 
 import org.codehaus.plexus.context.Context;
 import org.junit.Test;
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 public class HttpGetDiscoveryStrategyTest
     extends PlexusTestCaseSupport

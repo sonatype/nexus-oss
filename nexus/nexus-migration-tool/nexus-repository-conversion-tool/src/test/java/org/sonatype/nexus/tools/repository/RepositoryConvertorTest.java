@@ -25,7 +25,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 /**
  * @author Juven Xu

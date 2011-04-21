@@ -20,7 +20,7 @@ package org.sonatype.security.ldap.dao.password;
 
 import junit.framework.Assert;
 
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.ldap.dao.password.PasswordEncoder;
 import org.sonatype.security.ldap.dao.password.hash.MD5Crypt;
 

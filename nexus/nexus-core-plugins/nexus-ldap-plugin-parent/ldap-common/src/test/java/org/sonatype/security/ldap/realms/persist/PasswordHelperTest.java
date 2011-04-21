@@ -20,7 +20,7 @@ package org.sonatype.security.ldap.realms.persist;
 
 import junit.framework.Assert;
 
-import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.ldap.realms.persist.PasswordHelper;
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
 
