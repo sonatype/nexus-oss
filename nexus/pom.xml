@@ -140,9 +140,11 @@
       <url>http://repository.sonatype.org/content/groups/forge</url>
       <snapshots>
         <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
       </snapshots>
       <releases>
         <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
       </releases>
     </repository>
   </repositories>
@@ -152,9 +154,11 @@
       <url>http://repository.sonatype.org/content/groups/forge</url>
       <snapshots>
         <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
       </snapshots>
       <releases>
         <enabled>true</enabled>
+        <updatePolicy>never</updatePolicy>
       </releases>
     </pluginRepository>
   </pluginRepositories>
@@ -922,6 +926,13 @@
         <classifier>tests</classifier>
         <scope>test</scope>
       </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-test-common</artifactId>
+        <version>${project.version}</version>
+        <classifier>tests</classifier>
+        <scope>test</scope>
+      </dependency>
 
       <!-- Plugins -->
 
@@ -1268,6 +1279,7 @@
     <module>nexus-webapp</module>
     <module>nexus-clients</module>
     <module>nexus-distributions</module>
+    <module>nexus-test</module>  
     <module>nexus-test-harness</module>
   </modules>
 
