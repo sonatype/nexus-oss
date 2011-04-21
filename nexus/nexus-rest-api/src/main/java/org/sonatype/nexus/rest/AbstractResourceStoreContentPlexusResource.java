@@ -483,8 +483,18 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
     private String getResourceUri( Request req, ContentListResource resource, StorageItem child )
     {
+        // NEXUS-4244: simply force both baseURLs, coming from nexus.xml and extracted from current request
+        // to end with slash ("/").
         Reference root = getContextRoot( req );
+        if ( StringUtils.isBlank( root.getPath() ) || !root.getPath().endsWith( "/" ) )
+        {
+            root.setPath( StringUtils.defaultString( root.getPath(), "" ) + "/" );
+        }
         Reference requestRoot = req.getRootRef();
+        if ( StringUtils.isBlank( requestRoot.getPath() ) || !requestRoot.getPath().endsWith( "/" ) )
+        {
+            requestRoot.setPath( StringUtils.defaultString( requestRoot.getPath(), "" ) + "/" );
+        }
 
         final Reference ref = req.getResourceRef().getTargetRef();
         String uri = ref.toString();
