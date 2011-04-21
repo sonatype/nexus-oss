@@ -29,6 +29,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.Test;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 

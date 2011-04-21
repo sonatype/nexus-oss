@@ -20,14 +20,13 @@ package org.sonatype.security.ldap.realms;
 
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.codehaus.plexus.context.Context;
+import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
@@ -65,7 +64,7 @@ public class BasicActiveDirectoryLdapSchemaTest
      * @see org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment#setUp()
      */
     @Override
-    public void setUp()
+    protected void setUp()
         throws Exception
     {
         // configure the logging

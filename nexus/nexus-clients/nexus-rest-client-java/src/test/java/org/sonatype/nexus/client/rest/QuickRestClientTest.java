@@ -23,9 +23,11 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.NexusArtifact;

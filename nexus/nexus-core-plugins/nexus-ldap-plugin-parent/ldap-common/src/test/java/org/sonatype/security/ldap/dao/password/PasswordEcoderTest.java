@@ -65,7 +65,6 @@ public class PasswordEcoderTest
 
         Assert.assertTrue( this.passwordEncoderManager.isPasswordValid( cryptPassword, password, null ) );
     }
-
     @Test
     public void testPlain()
     {
