@@ -31,8 +31,6 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
-import org.junit.After;
-import org.junit.Before;
 
 /**
  * Abstract test case for nexus tests. It is customizing the context and helps with nexus configurations.
@@ -77,18 +75,6 @@ public abstract class AbstractNexusTestCase
     {
         configuration.setAutoWiring( true );
         configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
-    }
-
-    @Before
-    public void setUpJUnit4()
-        throws Exception {
-        setUp();
-    }
-
-    @After
-    public void tearDownJUnit4()
-        throws Exception {
-        tearDown();
     }
 
     @Override
