@@ -117,6 +117,12 @@
       <groupId>junit</groupId>
       <artifactId>junit-dep</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <classifier>tests</classifier>
+    </dependency>
 
     <dependency>
       <groupId>javax.servlet</groupId>

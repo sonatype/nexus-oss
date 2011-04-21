@@ -22,12 +22,14 @@ import java.io.File;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.timeline.TimelineRecord;
 
 public class LegacyNexusTimelineTest
     extends AbstractTimelineTest
 {
+    @Test
     public void testMoveLegacyTimeline()
         throws Exception
     {
@@ -44,6 +46,7 @@ public class LegacyNexusTimelineTest
         assertTrue( !result.isEmpty() );
     }
 
+    @Test
     public void testDoNotMoveLegacyTimeline()
         throws Exception
     {

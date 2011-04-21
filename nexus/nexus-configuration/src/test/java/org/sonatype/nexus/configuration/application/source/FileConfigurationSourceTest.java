@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.junit.Test;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.source.FileConfigurationSource;
 import org.sonatype.nexus.util.FileUtils;
@@ -44,6 +45,7 @@ public class FileConfigurationSourceTest
         return getClass().getResourceAsStream( "/META-INF/nexus/default-oss-nexus.xml" );
     }
 
+    @Test
     public void testStoreConfiguration()
         throws Exception
     {
@@ -61,6 +63,7 @@ public class FileConfigurationSourceTest
         }
     }
 
+    @Test
     public void testIsConfigurationUpgraded()
         throws Exception
     {
@@ -71,6 +74,7 @@ public class FileConfigurationSourceTest
         assertEquals( false, configurationSource.isConfigurationUpgraded() );
     }
 
+    @Test
     public void testIsConfigurationDefaulted()
         throws Exception
     {
@@ -81,6 +85,7 @@ public class FileConfigurationSourceTest
         assertEquals( true, configurationSource.isConfigurationDefaulted() );
     }
 
+    @Test
     public void testIsConfigurationDefaultedShouldNot()
         throws Exception
     {
@@ -93,6 +98,7 @@ public class FileConfigurationSourceTest
         assertEquals( false, configurationSource.isConfigurationDefaulted() );
     }
 
+    @Test
     public void testGetDefaultsSource()
         throws Exception
     {
@@ -100,18 +106,19 @@ public class FileConfigurationSourceTest
 
         assertFalse( configurationSource.getDefaultsSource() == null );
     }
-    
+
+    @Test
     public void testNEXUS2212LoadValidConfig()
         throws Exception
     {
-        
+
         // copy the config into place
         File nexusConfigFile = FileUtils.getFileFromUrl( ClassLoader.getSystemClassLoader().getResource( "nexus-NEXUS-2212.xml" ).toString() );
         org.codehaus.plexus.util.FileUtils.copyFile( nexusConfigFile, new File( getWorkHomeDir(), "conf/nexus.xml") );
-        
+
         configurationSource = (FileConfigurationSource) getConfigurationSource();
         configurationSource.loadConfiguration();
         assertTrue( configurationSource.getValidationResponse().isValid()) ;
-        
+
     }
 }

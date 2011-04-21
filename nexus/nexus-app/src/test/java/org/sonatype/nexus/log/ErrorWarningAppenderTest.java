@@ -20,6 +20,7 @@ package org.sonatype.nexus.log;
 
 import java.io.File;
 
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.proxy.events.EventInspector;
@@ -64,6 +65,7 @@ public class ErrorWarningAppenderTest
         logger = this.getLoggerManager().getLoggerForComponent( LogManagerTest.class.getName() );
     }
 
+    @Test
     public void testAppenderMissing()
         throws Exception
     {

@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.configuration.application;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.application.events.GlobalRemoteConnectionSettingsChangedEvent;
@@ -31,6 +32,7 @@ public class DefaultGlobalRemoteConnectionSettingsTest
 {
 
     @SuppressWarnings( "unchecked" )
+    @Test
     public void testEvents()
         throws Exception
     {

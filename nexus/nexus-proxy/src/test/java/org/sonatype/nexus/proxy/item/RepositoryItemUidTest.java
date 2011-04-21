@@ -26,6 +26,7 @@ import static org.easymock.EasyMock.replay;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.junit.Test;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -50,6 +51,7 @@ public class RepositoryItemUidTest
         replay( repository );
     }
 
+    @Test
     public void testReleaseFromMemory()
         throws Exception
     {
@@ -99,6 +101,7 @@ public class RepositoryItemUidTest
         assertEquals( 0, factory.getUidCount( true ) );
     }
 
+    @Test
     public void testConcurrentLocksOfSameUid()
         throws Exception
     {

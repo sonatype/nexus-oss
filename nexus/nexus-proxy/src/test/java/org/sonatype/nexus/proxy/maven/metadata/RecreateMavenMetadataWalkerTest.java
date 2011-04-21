@@ -29,7 +29,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
@@ -272,6 +273,7 @@ public class RecreateMavenMetadataWalkerTest
         return md;
     }
 
+    @Test
     public void testRecreateMavenMetadataWalkerWalkerRelease()
         throws Exception
     {
@@ -281,6 +283,7 @@ public class RecreateMavenMetadataWalkerTest
 
     }
 
+    @Test
     public void testRecreateMavenMetadataWalkerWalkerSnapshot()
         throws Exception
     {
@@ -305,6 +308,7 @@ public class RecreateMavenMetadataWalkerTest
             "/nexus1332/artifact-interp-main/14.0.0-SNAPSHOT/maven-metadata.xml", false ) ) );
     }
 
+    @Test
     public void testRecreateMavenMetadataWalkerWalkerPlugin()
         throws Exception
     {
@@ -357,6 +361,7 @@ public class RecreateMavenMetadataWalkerTest
         assertTrue( "p243 is not enlisted as prefix!", contains );
     }
 
+    @Test
     public void testRebuildChecksumFiles()
         throws Exception
     {
@@ -378,6 +383,7 @@ public class RecreateMavenMetadataWalkerTest
             "/org/apache/maven/plugins/maven-metadata.xml.sha1", false ) ) );
     }
 
+    @Test
     public void testRemoveObsoleteFiles()
         throws Exception
     {
@@ -394,6 +400,7 @@ public class RecreateMavenMetadataWalkerTest
         validateResults( inhouseRelease, expected );
     }
 
+    @Test
     public void testArtifactDirMdCorrect()
         throws Exception
     {
@@ -426,6 +433,7 @@ public class RecreateMavenMetadataWalkerTest
         Assert.assertEquals( "2.0SNAPSHOT", md.getVersioning().getLatest() );
     }
 
+    @Test
     public void testArtifactDirMdIncorrect()
         throws Exception
     {
@@ -462,6 +470,7 @@ public class RecreateMavenMetadataWalkerTest
         Assert.assertTrue( md.getVersioning().getVersions().contains( "2.0" ) );
     }
 
+    @Test
     public void testVersionDirMdCorrect()
         throws Exception
     {
@@ -493,6 +502,7 @@ public class RecreateMavenMetadataWalkerTest
         Assert.assertTrue( "We have two snapshots", md.getVersioning().getSnapshotVersions().size() == 2 );
     }
 
+    @Test
     public void testVersionDirMdIncorrect()
         throws Exception
     {
@@ -530,6 +540,7 @@ public class RecreateMavenMetadataWalkerTest
         Assert.assertEquals( "1.1.0", md.getModelVersion() );
     }
 
+    @Test
     public void testGroupDirMdCorrect()
         throws Exception
     {
@@ -561,6 +572,7 @@ public class RecreateMavenMetadataWalkerTest
         Assert.assertEquals( oldTimestamp, timeStamp );
     }
 
+    @Test
     public void testGroupDirMdIncorrect()
         throws Exception
     {
@@ -618,6 +630,7 @@ public class RecreateMavenMetadataWalkerTest
         }
     }
 
+    @Test
     public void testGroupDirMdElementUniqueAndSorted()
         throws Exception
     {
@@ -640,6 +653,7 @@ public class RecreateMavenMetadataWalkerTest
         assertEquals( "maven-d1-plugin", ( md.getPlugins().get( 3 ) ).getArtifactId() );
     }
 
+    @Test
     public void testRecreatingOnBadPOM()
         throws Exception
     {
@@ -666,6 +680,7 @@ public class RecreateMavenMetadataWalkerTest
         // should see warning log here
     }
 
+    @Test
     public void testReleasePOMWithInterpolation()
         throws Exception
     {
@@ -683,6 +698,7 @@ public class RecreateMavenMetadataWalkerTest
         validateResults( inhouseRelease, expected );
     }
 
+    @Test
     public void testSnapshotPOMWithInterpolation()
         throws Exception
     {
@@ -696,6 +712,7 @@ public class RecreateMavenMetadataWalkerTest
         validateResults( inhouseSnapshot, expected );
     }
 
+    @Test
     public void testGroupPathIsArtifactPathAtTheSameTime()
         throws Exception
     {
@@ -717,6 +734,7 @@ public class RecreateMavenMetadataWalkerTest
         assertEquals( versions, md.getVersioning().getVersions() );
     }
 
+    @Test
     public void testMetadata0Bytes()
         throws Exception
     {

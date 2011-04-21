@@ -20,11 +20,10 @@ package org.sonatype.nexus.security.ldap.realms.api;
 
 import java.text.SimpleDateFormat;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.security.ldap.realms.api.XStreamInitalizer;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
@@ -38,7 +37,7 @@ import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
 import com.thoughtworks.xstream.XStream;
 
-public class MarshalUnmarchalTest extends TestCase
+public class MarshalUnmarchalTest
 {
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat( "MM/dd/yyyy" );
@@ -47,23 +46,23 @@ public class MarshalUnmarchalTest extends TestCase
 
     private XStream xstreamJSON;
 
+    @Before
     protected void setUp()
         throws Exception
     {
-        super.setUp();
-
         xstreamXML = new XStream( new LookAheadXppDriver() );
         new XStreamInitalizer().initXStream( xstreamXML );
 
 //        xstreamJSON = napp.doConfigureXstream( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
 //        new XStreamInitalizer().initXStream( xstreamJSON );
     }
-    
+
+    @Test
     public void testLdapConnectionInfoResponse() throws Exception
     {
         LdapConnectionInfoResponse resource = new LdapConnectionInfoResponse();
         LdapConnectionInfoDTO dto = new LdapConnectionInfoDTO();
-        
+
         resource.setData( dto );
 
         dto.setAuthScheme( "authScheme" );
@@ -74,19 +73,20 @@ public class MarshalUnmarchalTest extends TestCase
         dto.setSearchBase( "searchBase" );
         dto.setSystemPassword( "systemPassword" );
         dto.setSystemUsername( "systemUsername" );
-        
-        validateXmlHasNoPackageNames( resource );    
+
+        validateXmlHasNoPackageNames( resource );
     }
-    
-    
-    
+
+
+
+    @Test
     public void testLdapUserAndGroupConfigurationResponse() throws Exception
     {
         LdapUserAndGroupConfigurationResponse resource = new LdapUserAndGroupConfigurationResponse();
         LdapUserAndGroupConfigurationDTO dto = new LdapUserAndGroupConfigurationDTO();
-        
+
         resource.setData( dto );
-        
+
         dto.setUserMemberOfAttribute( "userMemberOfAttribute" );
         dto.setEmailAddressAttribute( "emailAddressAttribute" );
         dto.setGroupBaseDn( "groupBaseDn" );
@@ -101,10 +101,11 @@ public class MarshalUnmarchalTest extends TestCase
         dto.setUserPasswordAttribute( "userPasswordAttribute" );
         dto.setUserRealNameAttribute( "userRealNameAttribute" );
         dto.setUserSubtree( true );
-        
-        validateXmlHasNoPackageNames( resource );    
+
+        validateXmlHasNoPackageNames( resource );
     }
-    
+
+    @Test
     public void testLdapUserListResponse() throws Exception
     {
         LdapUserListResponse resource = new LdapUserListResponse();
@@ -116,25 +117,26 @@ public class MarshalUnmarchalTest extends TestCase
         dto1.setUserId( "userId1" );
         dto1.addRole( "role1" );
         dto1.addRole( "role2" );
-        
+
         LdapUserResponseDTO dto2 = new LdapUserResponseDTO();
         resource.addLdapUserRoleMapping( dto2 );
-        
+
         dto2.setEmail( "email2" );
         dto2.setName( "name2" );
         dto2.setUserId( "userId2" );
         dto2.addRole( "role3" );
         dto2.addRole( "role4" );
-        
-        validateXmlHasNoPackageNames( resource );    
+
+        validateXmlHasNoPackageNames( resource );
     }
-  
-    
+
+
+    @Test
     public void testLdapUserAndGroupConfigTestRequest() throws Exception
     {
         LdapUserAndGroupConfigTestRequest resource = new LdapUserAndGroupConfigTestRequest();
         LdapUserAndGroupConfigTestRequestDTO dto = new LdapUserAndGroupConfigTestRequestDTO();
-        
+
         resource.setData( dto );
 
         dto.setAuthScheme( "authScheme" );
@@ -159,15 +161,16 @@ public class MarshalUnmarchalTest extends TestCase
         dto.setUserPasswordAttribute( "userPasswordAttribute" );
         dto.setUserRealNameAttribute( "userRealNameAttribute" );
         dto.setUserSubtree( true );
-        
-        validateXmlHasNoPackageNames( resource );    
+
+        validateXmlHasNoPackageNames( resource );
     }
-    
+
+    @Test
     public void testLdapAuthenticationTestRequest() throws Exception
     {
         LdapAuthenticationTestRequest resource = new LdapAuthenticationTestRequest();
         LdapConnectionInfoDTO dto = new LdapConnectionInfoDTO();
-        
+
         resource.setData( dto );
 
         dto.setAuthScheme( "authScheme" );
@@ -178,11 +181,11 @@ public class MarshalUnmarchalTest extends TestCase
         dto.setSearchBase( "searchBase" );
         dto.setSystemPassword( "systemPassword" );
         dto.setSystemUsername( "systemUsername" );
-        
-        validateXmlHasNoPackageNames( resource );    
+
+        validateXmlHasNoPackageNames( resource );
     }
-    
-    
+
+
     private void validateXmlHasNoPackageNames( Object obj )
     {
         String xml = this.xstreamXML.toXML( obj );
@@ -199,10 +202,10 @@ public class MarshalUnmarchalTest extends TestCase
         // // print out each type of method, so i can rafb it
         // System.out.println( "\n\nClass: "+ obj.getClass() +"\n" );
         // System.out.println( xml+"\n" );
-        //        
+        //
         // Assert.assertFalse( "Found <string> XML: " + obj.getClass() + "\n" + xml, xml.contains( "<string>" ) );
 
     }
-    
-    
+
+
 }

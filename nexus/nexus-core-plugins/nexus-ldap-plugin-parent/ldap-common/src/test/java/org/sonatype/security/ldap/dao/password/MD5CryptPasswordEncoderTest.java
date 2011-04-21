@@ -20,13 +20,13 @@ package org.sonatype.security.ldap.dao.password;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.security.ldap.dao.password.PasswordEncoder;
 import org.sonatype.security.ldap.dao.password.hash.MD5Crypt;
 
 
 public class MD5CryptPasswordEncoderTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
 
     public void testEncryptAndVerify()
@@ -47,7 +47,7 @@ public class MD5CryptPasswordEncoderTest
 
         // System.out.println( "Check value: \'" + check + "\'" );
 
-        assertEquals( check, crypted );
+        Assert.assertEquals( check, crypted );
 
         Assert.assertTrue( encoder.isPasswordValid( crypted, "test", null ) );
     }

@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
@@ -38,6 +39,7 @@ public class LdapConnMd5Test
         return this.lookup( PlexusResource.class, "LdapConnectionInfoPlexusResource" );
     }
 
+    @Test
     public void testPutChangeConfig()
         throws Exception
     {

@@ -18,16 +18,10 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
-import junit.framework.Assert;
-
+import org.junit.Assert;
+import org.junit.Test;
 import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.junit.Test;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -35,6 +29,13 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author juven
@@ -67,6 +68,7 @@ public class DefaultSnapshotRemoverTest
         }
     }
 
+    @Test
     public void testNexus2234()
         throws Exception
     {
@@ -100,6 +102,7 @@ public class DefaultSnapshotRemoverTest
      * @see <a href='https://issues.sonatype.org/browse/NEXUS-1331'>https://issues.sonatype.org/browse/NEXUS-1331</a>
      * @throws Exception
      */
+    @Test
     public void testNexus1331()
         throws Exception
     {
@@ -133,6 +136,7 @@ public class DefaultSnapshotRemoverTest
 
     }
 
+    @Test
     public void testSnapshotRemoverRemoveReleased()
         throws Exception
     {
@@ -226,6 +230,7 @@ public class DefaultSnapshotRemoverTest
         validateResults( snapshots, expecting );
     }
 
+    @Test
     public void testSnapshotRemoverDoNotRemoveReleased()
         throws Exception
     {
@@ -290,9 +295,10 @@ public class DefaultSnapshotRemoverTest
 
     /**
      * Never touch maven metadata files in proxy repo
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void testProxyRepo()
         throws Exception
     {
@@ -318,9 +324,10 @@ public class DefaultSnapshotRemoverTest
 
     /**
      * When there are snapshot files and the metadata file is correct
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void testHostedRepoWithMdCorrect()
         throws Exception
     {
@@ -348,9 +355,10 @@ public class DefaultSnapshotRemoverTest
 
     /**
      * When all the snapshot files are removed, but there's other version
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void testHostedRepoWithMdRemoved1()
         throws Exception
     {
@@ -377,9 +385,10 @@ public class DefaultSnapshotRemoverTest
 
     /**
      * When all the snapshot files are removed, and all versions are removed
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void testHostedRepoWithMdRemoved2()
         throws Exception
     {
@@ -406,6 +415,7 @@ public class DefaultSnapshotRemoverTest
     /**
      * When the metadata is incorrect, fix it
      */
+    @Test
     public void testHostedRepoWithMdIncorrect()
         throws Exception
     {
@@ -434,9 +444,10 @@ public class DefaultSnapshotRemoverTest
 
     /**
      * When the metadata is missing, fix it
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void testHostedRepoWithMdMissing()
         throws Exception
     {
@@ -457,6 +468,7 @@ public class DefaultSnapshotRemoverTest
 
     }
 
+    @Test
     public void testMinToKeep()
         throws Exception
     {
@@ -503,6 +515,7 @@ public class DefaultSnapshotRemoverTest
         validateResults( snapshots, expecting );
     }
 
+    @Test
     public void testAllReposNotDoingRepoMoreThanOnce()
         throws Exception
     {
@@ -554,6 +567,7 @@ public class DefaultSnapshotRemoverTest
         validateResults( snapshots, expecting );
     }
 
+    @Test
     public void testGroup()
         throws Exception
     {
@@ -601,6 +615,7 @@ public class DefaultSnapshotRemoverTest
         validateResults( snapshots, expecting );
     }
 
+    @Test
     public void testContinueOnException()
         throws Exception
     {
@@ -631,6 +646,7 @@ public class DefaultSnapshotRemoverTest
     /**
      * @see <a href='https://issues.sonatype.org/browse/NEXUS-3148'>NEXUS-3148</a>
      */
+    @Test
     public void testEndWithSNAPSHOT()
         throws Exception
     {

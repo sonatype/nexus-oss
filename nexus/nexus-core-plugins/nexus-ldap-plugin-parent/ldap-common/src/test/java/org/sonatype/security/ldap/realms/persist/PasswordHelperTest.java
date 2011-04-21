@@ -20,13 +20,13 @@ package org.sonatype.security.ldap.realms.persist;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.security.ldap.realms.persist.PasswordHelper;
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
 
 
 public class PasswordHelperTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
 
     public PasswordHelper getPasswordHelper()

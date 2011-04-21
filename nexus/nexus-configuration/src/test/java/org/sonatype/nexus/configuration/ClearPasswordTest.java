@@ -20,9 +20,9 @@ package org.sonatype.nexus.configuration;
 
 import java.io.File;
 
-import junit.framework.Assert;
-
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -41,6 +41,7 @@ public class ClearPasswordTest
         return this.lookup( ApplicationConfigurationSource.class, "file" );
     }
 
+    @Test
     public void testDefaultConfig()
         throws Exception
     {
@@ -50,6 +51,7 @@ public class ClearPasswordTest
         this.doTestLogic();
     }
 
+    @Test
     public void testUpgrade()
         throws Exception
     {

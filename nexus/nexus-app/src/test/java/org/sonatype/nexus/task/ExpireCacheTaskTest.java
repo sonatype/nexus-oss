@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.task;
 
+import org.junit.Test;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -42,6 +43,7 @@ public class ExpireCacheTaskTest
         scheduler = lookup( NexusScheduler.class );
     }
 
+    @Test
     public void testBlockRepoInAGroup()
         // NEXUS-3798
         throws Exception

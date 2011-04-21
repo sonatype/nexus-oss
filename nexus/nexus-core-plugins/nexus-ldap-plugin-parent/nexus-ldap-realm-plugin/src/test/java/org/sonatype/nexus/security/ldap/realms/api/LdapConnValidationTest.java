@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.security.ldap.realms.api;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
@@ -51,6 +52,7 @@ public class LdapConnValidationTest
         return connectionInfo;
     }
 
+    @Test
     public void testNoHost()
         throws Exception
     {
@@ -77,6 +79,7 @@ public class LdapConnValidationTest
 
     }
 
+    @Test
     public void testMultipleErrors()
         throws Exception
     {

@@ -22,12 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import junit.framework.TestCase;
-
 import org.codehaus.plexus.util.FileUtils;
 
 public class WrapperEditorTest
-    extends TestCase
 {
     protected WrapperEditor prepareCase( String caseNum )
         throws IOException
@@ -49,6 +46,7 @@ public class WrapperEditorTest
         assertEquals( "wrapper.conf does not match!", FileUtils.loadFile( expectedResult ), FileUtils.loadFile( source ) );
     }
 
+    @Test
     public void testCase01()
         throws Exception
     {

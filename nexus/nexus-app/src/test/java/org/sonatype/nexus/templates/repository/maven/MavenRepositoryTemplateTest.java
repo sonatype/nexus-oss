@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.templates.repository.maven;
 
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
@@ -48,6 +49,7 @@ public class MavenRepositoryTemplateTest
         return nexus;
     }
 
+    @Test
     public void testAvailableRepositoryTemplateCount()
         throws Exception
     {
@@ -56,6 +58,7 @@ public class MavenRepositoryTemplateTest
         assertEquals( "Template count is wrong!", 12, templates.size() );
     }
 
+    @Test
     public void testSimpleSelection()
         throws Exception
     {

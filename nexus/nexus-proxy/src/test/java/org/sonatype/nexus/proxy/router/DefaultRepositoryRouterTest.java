@@ -24,7 +24,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
@@ -69,7 +70,7 @@ public class DefaultRepositoryRouterTest
         throws Exception
     {
         super.setUp();
-        
+
         applicationConfiguration = this.lookup( ApplicationConfiguration.class );
         applicationConfiguration.saveConfiguration();
 
@@ -108,6 +109,7 @@ public class DefaultRepositoryRouterTest
 
     }
 
+    @Test
     public void testRouterWithViewAccess()
         throws Exception
     {
@@ -127,6 +129,7 @@ public class DefaultRepositoryRouterTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testRouterWithNoViewAccess()
         throws Exception
     {
@@ -145,6 +148,7 @@ public class DefaultRepositoryRouterTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testFilterOutNonExposedRepositories()
         throws Exception
     {
@@ -186,6 +190,7 @@ public class DefaultRepositoryRouterTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testFilterOutNonExposedGroups()
         throws Exception
     {
@@ -213,6 +218,7 @@ public class DefaultRepositoryRouterTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testFilterOutNonExposedShadows()
         throws Exception
     {

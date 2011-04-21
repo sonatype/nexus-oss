@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.proxy;
 
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
@@ -57,6 +58,7 @@ public class RepoChecksumPolicyTest
         return item;
     }
 
+    @Test
     public void testPolicyIgnore()
         throws Exception
     {
@@ -100,6 +102,7 @@ public class RepoChecksumPolicyTest
             new ResourceStoreRequest( "/activemq-with-wrong-sha1/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
     }
 
+    @Test
     public void testPolicyWarn()
         throws Exception
     {
@@ -146,6 +149,7 @@ public class RepoChecksumPolicyTest
             new ResourceStoreRequest( "/activemq-with-wrong-sha1/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
     }
 
+    @Test
     public void testPolicyStrictIfExists()
         throws Exception
     {
@@ -201,6 +205,7 @@ public class RepoChecksumPolicyTest
             new ResourceStoreRequest( "/activemq-with-wrong-sha1/activemq-core/1.2/activemq-core-1.2.jar.sha1", true ) ) );
     }
 
+    @Test
     public void testPolicyStrict()
         throws Exception
     {

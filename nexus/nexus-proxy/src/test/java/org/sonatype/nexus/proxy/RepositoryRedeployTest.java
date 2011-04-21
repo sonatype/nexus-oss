@@ -20,6 +20,7 @@ package org.sonatype.nexus.proxy;
 
 import java.io.IOException;
 
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -47,7 +48,7 @@ public class RepositoryRedeployTest
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
 
         repo1.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE );
-        
+
         getApplicationConfiguration().saveConfiguration();
 
         return repo1;
@@ -62,6 +63,7 @@ public class RepositoryRedeployTest
         checkForFileAndMatchContents( item );
     }
 
+    @Test
     public void testSimple()
         throws Exception
     {

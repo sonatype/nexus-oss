@@ -22,15 +22,17 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.junit.Test;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 public class SimpleUserLocatorTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
 
+    @Test
     public void testLocatorLookup()
         throws Exception
     {
@@ -38,6 +40,7 @@ public class SimpleUserLocatorTest
         this.lookup( UserManager.class, "Simple" );
     }
 
+    @Test
     public void testSearch()
         throws Exception
     {
@@ -49,6 +52,7 @@ public class SimpleUserLocatorTest
         Assert.assertEquals( result.iterator().next().getUserId(), "admin-simple" );
     }
 
+    @Test
     public void testIdList()
         throws Exception
     {
@@ -63,6 +67,7 @@ public class SimpleUserLocatorTest
         Assert.assertEquals( 3, ids.size() );
     }
 
+    @Test
     public void testUserList()
         throws Exception
     {

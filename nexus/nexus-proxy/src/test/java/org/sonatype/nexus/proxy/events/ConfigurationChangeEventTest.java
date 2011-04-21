@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.proxy.events;
 
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.ConfigurationCommitEvent;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
@@ -40,6 +41,7 @@ public class ConfigurationChangeEventTest
         return new M2TestsuiteEnvironmentBuilder( ss );
     }
 
+    @Test
     public void testSimplePull()
         throws Exception
     {

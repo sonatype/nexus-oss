@@ -23,6 +23,7 @@ import java.io.File;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.codehaus.plexus.digest.Md5Digester;
 import org.codehaus.plexus.digest.Sha1Digester;
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -44,6 +45,7 @@ public class GroupingBehaviourTest
         return jettyTestsuiteEnvironmentBuilder;
     }
 
+    @Test
     public void testSpoofingNonMetadata()
         throws Exception
     {
@@ -95,6 +97,7 @@ public class GroupingBehaviourTest
         }
     }
 
+    @Test
     public void testSpoofingMetadata()
         throws Exception
     {
@@ -169,6 +172,7 @@ public class GroupingBehaviourTest
 
     }
 
+    @Test
     public void testMergingVersions()
         throws Exception
     {
@@ -226,6 +230,7 @@ public class GroupingBehaviourTest
 
     }
 
+    @Test
     public void testMergingPlugins()
         throws Exception
     {

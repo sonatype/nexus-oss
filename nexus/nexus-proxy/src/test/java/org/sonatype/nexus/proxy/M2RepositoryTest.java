@@ -24,7 +24,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.apache.maven.index.artifact.VersionUtils;
 import org.codehaus.plexus.util.FileUtils;
@@ -72,6 +73,7 @@ public class M2RepositoryTest
         return repo1;
     }
 
+    @Test
     public void testPoliciesWithRetrieve()
         throws Exception
     {
@@ -117,6 +119,7 @@ public class M2RepositoryTest
         }
     }
 
+    @Test
     public void testPoliciesWithStore()
         throws Exception
     {
@@ -175,6 +178,7 @@ public class M2RepositoryTest
         }
     }
 
+    @Test
     public void testShouldServeByPolicies()
         throws Exception
     {
@@ -243,6 +247,7 @@ public class M2RepositoryTest
         assertEquals( true, repository.shouldServeByPolicies( request ) );
     }
 
+    @Test
     public void testGetLatestVersionSimple()
         throws Exception
     {
@@ -256,6 +261,7 @@ public class M2RepositoryTest
         assertEquals( "1.1.2", repository.getLatestVersion( versions ) );
     }
 
+    @Test
     public void testGetLatestVersionClassifiers()
         throws Exception
     {
@@ -271,6 +277,7 @@ public class M2RepositoryTest
         assertEquals( "1.0-alpha-40", repository.getLatestVersion( versions ) );
     }
 
+    @Test
     public void testIsSnapshot()
         throws Exception
     {
@@ -282,12 +289,14 @@ public class M2RepositoryTest
         assertEquals( true, VersionUtils.isSnapshot( "1.0-alpha-25-20070518.002146-2" ) );
     }
 
+    @Test
     public void testExpiration_NEXUS1675()
         throws Exception
     {
         doTestExpiration( "/spoof/maven-metadata.xml", 0, 3, 5, 1 );
     }
 
+    @Test
     public void testExpiration_NEXUS3065()
         throws Exception
     {
@@ -393,6 +402,7 @@ public class M2RepositoryTest
         assertEquals( "Remote hits cound fail (2nd round)!", remoteHitsExpected2ndround, ch.getRequestCount() );
     }
 
+    @Test
     public void testLocalStorageChanges()
         throws Exception
     {
@@ -409,6 +419,7 @@ public class M2RepositoryTest
         assertTrue( "Should be the same!", changedUrl.equals( repository.getLocalUrl() ) );
     }
 
+    @Test
     public void testRemoteStorageChanges()
         throws Exception
     {
@@ -425,6 +436,7 @@ public class M2RepositoryTest
         assertTrue( "Should be the same!", changedUrl.equals( repository.getRemoteUrl() ) );
     }
 
+    @Test
     public void testProxyLastRequestedAttribute()
         throws Exception
     {
@@ -449,6 +461,7 @@ public class M2RepositoryTest
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
 
+    @Test
     public void testHostedLastRequestedAttribute()
         throws Exception
     {

@@ -21,11 +21,12 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 import java.io.IOException;
 import java.net.ServerSocket;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
+import org.junit.Test;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 
 public class HttpGetDiscoveryStrategyTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
 
     protected static final String PROXY_SERVER_PORT = "proxy.server.port";
@@ -60,6 +61,8 @@ public class HttpGetDiscoveryStrategyTest
         return port;
     }
 
+    // FIXME test is missing
+    @Test
     public void testSimple()
         throws Exception
     {

@@ -22,7 +22,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.codehaus.plexus.context.Context;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -38,7 +38,7 @@ import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 
 
 public class NestedUserActiveDirectoryLdapSchemaTest
-extends PlexusTestCase
+extends PlexusTestCaseSupport
 {
 
     private LdapConfiguration ldapConfiguration;
@@ -90,8 +90,8 @@ extends PlexusTestCase
         LdapAuthConfiguration configuration = this.ldapConfiguration.getLdapAuthConfiguration();
 
         LdapUser user = this.ldapUserManager.getUser( "tstevens", this.ldapContextFactory.getSystemLdapContext(), configuration );
-        assertEquals( "tstevens", user.getUsername() );
-        assertEquals( "Toby Stevens", user.getRealName() );
+        Assert.assertEquals( "tstevens", user.getUsername() );
+        Assert.assertEquals( "Toby Stevens", user.getRealName() );
 
         try
         {
@@ -99,7 +99,7 @@ extends PlexusTestCase
                 "intruder",
                 this.ldapContextFactory.getSystemLdapContext(),
                 configuration );
-            fail( "Expected NoSuchUserException" );
+            Assert.fail( "Expected NoSuchUserException" );
         }
         catch ( NoSuchLdapUserException e )
         {
@@ -115,7 +115,7 @@ extends PlexusTestCase
         Set<String> groups = this.ldapGroupManager.getGroupMembership( "tstevens", this.ldapContextFactory
             .getSystemLdapContext(), configuration );
 
-        assertTrue("Groups: "+ groups, groups.contains( "Administrators" ) );
+        Assert.assertTrue("Groups: "+ groups, groups.contains( "Administrators" ) );
     }
 
     public void testSuccessfulAuthentication()
@@ -126,12 +126,12 @@ extends PlexusTestCase
 
         AuthenticationInfo ai = realm.getAuthenticationInfo( upToken );
 
-        assertNull( ai.getCredentials() );
+        Assert.assertNull( ai.getCredentials() );
 
 //        String password = new String( (char[]) ai.getCredentials() );
 //
 //        // password is plain text
-//        assertEquals( "brianf123", password );
+//        Assert.assertEquals( "brianf123", password );
     }
 
     public void testWrongPassword()

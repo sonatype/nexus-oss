@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.junit.Test;
 import org.sonatype.timeline.TimelineRecord;
 
 public class DefaultNexusTimelineTest
@@ -44,6 +45,7 @@ public class DefaultNexusTimelineTest
         super.tearDown();
     }
 
+    @Test
     public void testSimpleTimestamp()
     {
         HashMap<String, String> data = new HashMap<String, String>();
@@ -79,6 +81,7 @@ public class DefaultNexusTimelineTest
         assertEquals( 2, res.size() );
     }
 
+    @Test
     public void testSimpleItem()
     {
         HashMap<String, String> data = new HashMap<String, String>();
@@ -146,6 +149,7 @@ public class DefaultNexusTimelineTest
         assertEquals( 2, res.size() );
     }
 
+    @Test
     public void testOrder()
     {
         HashMap<String, String> data = new HashMap<String, String>();

@@ -26,6 +26,7 @@ import java.util.TimeZone;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.junit.Test;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.Configuration;
@@ -109,6 +110,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         }
     }
 
+    @Test
     public void testFromDEC()
         throws Exception
     {
@@ -126,6 +128,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-001-1.xml" );
     }
 
+    @Test
     public void testFromDECDmz()
         throws Exception
     {
@@ -144,6 +147,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-001-2.xml" );
     }
 
+    @Test
     public void testFromDECInt()
         throws Exception
     {
@@ -161,6 +165,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-001-3.xml" );
     }
 
+    @Test
     public void testFrom100()
         throws Exception
     {
@@ -179,6 +184,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-100.xml" );
     }
 
+    @Test
     public void testFrom101()
         throws Exception
     {
@@ -197,6 +203,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-101.xml" );
     }
 
+    @Test
     public void testFrom103_1()
         throws Exception
     {
@@ -228,6 +235,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/103-1/security-configuration-103.xml" );
     }
 
+    @Test
     public void testFrom103_2()
         throws Exception
     {
@@ -248,6 +256,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/103-2/security-configuration-103.xml" );
     }
 
+    @Test
     public void testFrom104()
         throws Exception
     {
@@ -261,6 +270,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-104.xml" );
     }
 
+    @Test
     public void testFrom105()
         throws Exception
     {
@@ -274,6 +284,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-105.xml" );
     }
 
+    @Test
     public void testNEXUS1710()
         throws Exception
     {
@@ -288,6 +299,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus1710/security-configuration-1710.xml" );
     }
 
+    @Test
     public void testLookup()
         throws Exception
     {
@@ -323,6 +335,7 @@ public class DefaultApplicationConfigurationUpgraderTest
     //
     // }
 
+    @Test
     public void testMirrorsFrom108()
         throws Exception
     {
@@ -336,6 +349,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-108-with-mirrors.xml", configuration );
     }
 
+    @Test
     public void testFrom108()
         throws Exception
     {
@@ -349,6 +363,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-108.xml" );
     }
 
+    @Test
     public void testFrom142()
         throws Exception
     {
@@ -361,6 +376,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-142.xml", configuration );
     }
 
+    @Test
     public void testFrom143()
         throws Exception
     {

@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import junit.framework.Assert;
-
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -34,15 +32,17 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.Assert;
+import org.junit.Test;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 
 public class SimpleRealmTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
 
     @Override
@@ -59,6 +59,7 @@ public class SimpleRealmTest
      *
      * @throws Exception
      */
+    @Test
     public void testValidAuthentication()
         throws Exception
     {
@@ -75,6 +76,7 @@ public class SimpleRealmTest
      *
      * @throws Exception
      */
+    @Test
     public void testInvalidPasswordAuthentication()
         throws Exception
     {
@@ -96,6 +98,7 @@ public class SimpleRealmTest
      *
      * @throws Exception
      */
+    @Test
     public void testInvalidUserAuthentication()
         throws Exception
     {
@@ -119,6 +122,7 @@ public class SimpleRealmTest
      *
      * @throws Exception
      */
+    @Test
     public void testPrivileges()
         throws Exception
     {
@@ -135,6 +139,7 @@ public class SimpleRealmTest
      * Tests a valid privilege for an invalid user
      * @throws Exception
      */
+    @Test
     public void testPrivilegesInvalidUser()
         throws Exception
     {
@@ -152,22 +157,22 @@ public class SimpleRealmTest
     @Override
     protected void setUp()
         throws Exception
-    {        
+    {
         confdir.mkdirs();
         // copy the tests nexus.xml and security.xml to the correct location
         this.copyTestConfigToPlace();
-        
+
         // restart security
         this.lookup( ConfigurationManager.class ).clearCache();
         this.lookup( SecuritySystem.class ).start();
     }
-    
+
 
     @Override
     protected void customizeContext( Context ctx )
     {
         super.customizeContext( ctx );
-        
+
         ctx.put( "application-conf", confdir.getAbsolutePath() );
         ctx.put( "security-xml-file", confdir.getAbsolutePath() + "/security.xml" );
     }
@@ -193,7 +198,7 @@ public class SimpleRealmTest
             security = Thread.currentThread().getContextClassLoader().getResourceAsStream( "security.xml" );
             securityOut = new FileOutputStream( new File( confdir, "security.xml" ) );
             IOUtil.copy( security, securityOut);
-            
+
             securityConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "security-configuration.xml" );
             securityConfOut = new FileOutputStream( new File( confdir, "security-configuration.xml" ) );
             IOUtil.copy( securityConf, securityConfOut);

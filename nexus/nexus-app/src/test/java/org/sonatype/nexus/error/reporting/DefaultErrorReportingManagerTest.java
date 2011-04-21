@@ -29,7 +29,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.util.ExceptionUtils;
@@ -99,6 +100,7 @@ public class DefaultErrorReportingManagerTest
         nexusConfig.saveConfiguration();
     }
 
+    @Test
     public void testJiraAccess()
         throws Exception
     {
@@ -140,6 +142,7 @@ public class DefaultErrorReportingManagerTest
         Assert.assertEquals( 1, issues.size() );
     }
 
+    @Test
     public void testPackageFiles()
         throws Exception
     {
@@ -183,7 +186,7 @@ public class DefaultErrorReportingManagerTest
 
         assertNotNull( files );
         assertEquals( 6, files.length ); // TODO: was seven with the directory listing, but that was removed, as it OOM'd
-        
+
         files = unzipHomeDir.listFiles( new FileFilter(){
             public boolean accept( File pathname )
             {
@@ -192,15 +195,15 @@ public class DefaultErrorReportingManagerTest
                 {
                     return true;
                 }
-                
+
                 return false;
             }
         });
-        
+
         assertEquals( 1, files.length );
-        
+
         files = files[0].listFiles();
-        
+
         boolean file1found = false;
         boolean file2found = false;
         boolean file3found = false;
@@ -219,9 +222,9 @@ public class DefaultErrorReportingManagerTest
                 file3found = true;
             }
         }
-        
+
         assertTrue( file1found && file2found && file3found );
-        
+
         files = unzipHomeDir.listFiles( new FileFilter(){
             public boolean accept( File pathname )
             {
@@ -230,11 +233,11 @@ public class DefaultErrorReportingManagerTest
                 {
                     return true;
                 }
-                
+
                 return false;
             }
         });
-        
+
         files = files[0].listFiles( new FileFilter(){
            public boolean accept( File pathname )
             {
@@ -243,13 +246,13 @@ public class DefaultErrorReportingManagerTest
                {
                    return true;
                }
-               
+
                return false;
-            } 
+            }
         });
-        
+
         files = files[0].listFiles();
-        
+
         file1found = false;
         file2found = false;
         file3found = false;
@@ -268,7 +271,7 @@ public class DefaultErrorReportingManagerTest
                 file3found = true;
             }
         }
-        
+
         assertTrue( file1found && file2found && file3found );
     }
 
@@ -278,7 +281,7 @@ public class DefaultErrorReportingManagerTest
         new File( dir, "nexus.xml.bak" ).createNewFile();
         new File( dir, "security.xml.bak" ).createNewFile();
     }
-    
+
     private void addDirectory( String path, String[] filenames )
         throws Exception
     {
@@ -286,7 +289,7 @@ public class DefaultErrorReportingManagerTest
         File unzipDir = new File( unzipHomeDir, path );
         confDir.mkdirs();
         unzipDir.mkdirs();
-        
+
         for ( String filename : filenames ){
             new File( confDir, filename ).createNewFile();
         }
@@ -338,6 +341,7 @@ public class DefaultErrorReportingManagerTest
         }
     }
 
+    @Test
     public void testTaskFailure()
         throws Exception
     {

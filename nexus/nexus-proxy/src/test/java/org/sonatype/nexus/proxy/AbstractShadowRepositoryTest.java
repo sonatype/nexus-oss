@@ -20,7 +20,8 @@ package org.sonatype.nexus.proxy;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.configuration.ConfigurationException;

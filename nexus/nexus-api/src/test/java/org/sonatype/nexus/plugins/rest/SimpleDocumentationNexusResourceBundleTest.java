@@ -20,11 +20,12 @@ package org.sonatype.nexus.plugins.rest;
 
 import java.util.List;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.junit.Assert;
 import org.junit.Test;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 
 public class SimpleDocumentationNexusResourceBundleTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
     @Test
     public void testDoc()
@@ -33,7 +34,7 @@ public class SimpleDocumentationNexusResourceBundleTest
         NexusResourceBundle docBundle = lookup( NexusResourceBundle.class, "simpleTest" );
 
         List<StaticResource> resources = docBundle.getContributedResouces();
-        assertNotNull( resources );
-        assertEquals( 22, resources.size() );
+        Assert.assertNotNull( resources );
+        Assert.assertEquals( 22, resources.size() );
     }
 }

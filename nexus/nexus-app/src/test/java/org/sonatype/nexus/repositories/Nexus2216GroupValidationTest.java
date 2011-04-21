@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -47,6 +48,7 @@ public class Nexus2216GroupValidationTest
 
     // ==
 
+    @Test
     public void testInvertedOrdering()
         throws Exception
     {
@@ -62,14 +64,14 @@ public class Nexus2216GroupValidationTest
 
             MavenGroupRepository publicGroup =
                 repositoryRegistry.getRepositoryWithFacet( "public", MavenGroupRepository.class );
-            
+
             List<String> memberIds = new ArrayList<String>();
             for ( Repository repo : publicGroup.getMemberRepositories() )
             {
                 memberIds.add(  repo.getId() );
             }
             assertEquals( "Repo object list returned a different set of repos", publicGroup.getMemberRepositoryIds(), memberIds );
-            
+
             assertEquals( "The config should be correct, ids found are: "+ publicGroup.getMemberRepositoryIds(), 9, publicGroup.getMemberRepositories().size() );
         }
         catch ( Exception e )

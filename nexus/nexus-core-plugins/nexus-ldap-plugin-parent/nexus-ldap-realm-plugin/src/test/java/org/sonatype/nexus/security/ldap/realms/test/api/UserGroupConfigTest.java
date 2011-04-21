@@ -22,7 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -45,6 +46,7 @@ public class UserGroupConfigTest
         return this.lookup( PlexusResource.class, "LdapUserAndGroupConfigTestPlexusResource" );
     }
 
+    @Test
     public void testSuccess()
         throws Exception
     {
@@ -113,6 +115,7 @@ public class UserGroupConfigTest
         Assert.assertEquals( 0, jdcasey.getRoles().size() );
     }
 
+    @Test
     public void testSuccessWithLimit()
         throws Exception
     {
@@ -154,6 +157,7 @@ public class UserGroupConfigTest
         Assert.assertEquals( 3, usersListResponse.getLdapUserRoleMappings().size() );
     }
 
+    @Test
     public void testSuccessUsingLdapGroups()
         throws Exception
     {
@@ -230,6 +234,7 @@ public class UserGroupConfigTest
         Assert.assertEquals( 0, jdcasey.getRoles().size() );
     }
 
+    @Test
     public void testWithValidationFailure()
         throws Exception
     {
@@ -271,6 +276,7 @@ public class UserGroupConfigTest
 
     }
 
+    @Test
     public void testFailBadUserDN()
         throws Exception
     {
@@ -313,6 +319,7 @@ public class UserGroupConfigTest
 
     }
 
+    @Test
     public void testFailInvalidUserDN()
         throws Exception
     {
@@ -355,6 +362,7 @@ public class UserGroupConfigTest
         }
     }
 
+    @Test
     public void testInvalidConfigWithResults()
         throws Exception
     {
@@ -401,6 +409,7 @@ public class UserGroupConfigTest
         }
     }
 
+    @Test
     public void testBadConnInfoFailure()
         throws Exception
     {

@@ -24,7 +24,8 @@ import static org.easymock.EasyMock.replay;
 
 import java.util.Arrays;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.junit.Test;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
@@ -32,10 +33,10 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class DefaultTargetRegistryTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
     protected ApplicationConfiguration applicationConfiguration;
-    
+
     protected TargetRegistry targetRegistry;
 
     protected ContentClass maven1;
@@ -46,7 +47,7 @@ public class DefaultTargetRegistryTest
         throws Exception
     {
         super.setUp();
-        
+
         applicationConfiguration = lookup( ApplicationConfiguration.class );
 
         maven1 = new Maven1ContentClass();
@@ -69,7 +70,7 @@ public class DefaultTargetRegistryTest
         Target t3 = new Target( "maven1", "Maven1", maven1, Arrays.asList( new String[] { "/org\\.apache\\.maven.*" } ) );
 
         targetRegistry.addRepositoryTarget( t3 );
-        
+
         applicationConfiguration.saveConfiguration();
     }
 
@@ -79,6 +80,7 @@ public class DefaultTargetRegistryTest
         super.tearDown();
     }
 
+    @Test
     public void testSimpleM2()
     {
         // create a dummy
@@ -118,6 +120,7 @@ public class DefaultTargetRegistryTest
         assertEquals( 1, ts.getMatchedRepositoryIds().size() );
     }
 
+    @Test
     public void testSimpleM1()
     {
         // create a dummy

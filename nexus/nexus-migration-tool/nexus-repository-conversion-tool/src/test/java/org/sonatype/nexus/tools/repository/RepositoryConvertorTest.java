@@ -22,22 +22,26 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.sonatype.guice.bean.containers.InjectedTestCase;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 
 /**
  * @author Juven Xu
  */
 public class RepositoryConvertorTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
     private RepositoryConvertor convertor;
 
+    @Before
     public void setUp()
         throws Exception
     {
         convertor = (RepositoryConvertor) this.lookup( RepositoryConvertor.class );
     }
-    
+
     public void testConvertWithCopy()
         throws Exception
     {
@@ -46,11 +50,11 @@ public class RepositoryConvertorTest
 
         File targetReleasesRepo = new File( getBasedir(), "target/local-test-repo-releases" );
         File targetSnapshotsRepo = new File( getBasedir(), "target/local-test-repo-snapshots" );
-        
+
         convertor.convertRepositoryWithCopy( srcRepo, target );
-        
+
         Map<File, Boolean> expected = new LinkedHashMap<File, Boolean>();
-        
+
         expected.put( new File( targetReleasesRepo, "org/apache/maven/plugins/maven-javadoc-plugin/2.5/"), Boolean.TRUE );
         expected.put( new File( targetReleasesRepo, "org/apache/maven/plugins/maven-javadoc-plugin/2.5/maven-javadoc-plugin-2.5.jar"), Boolean.TRUE );
         expected.put( new File( targetReleasesRepo, "org/apache/maven/plugins/maven-javadoc-plugin/2.5/maven-javadoc-plugin-2.5.pom"), Boolean.TRUE );
@@ -59,10 +63,10 @@ public class RepositoryConvertorTest
         expected.put( new File( targetSnapshotsRepo, "org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-javadoc-plugin-2.5.1-20081013.050423-737.pom"), Boolean.TRUE );
         expected.put( new File( targetSnapshotsRepo,"org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-metadata-central.xml"), Boolean.FALSE);
         expected.put( new File( targetSnapshotsRepo,"org/apache/maven/plugins/maven-javadoc-plugin/2.5.1-SNAPSHOT/maven-metadata-central.xml.sha1"), Boolean.FALSE);
-        
+
         validateResult( expected );
     }
-    
+
     public void testConvertWithMove()
         throws Exception
     {
@@ -143,19 +147,19 @@ public class RepositoryConvertorTest
 
         validateResult( expected );
     }
-    
+
     public void testNonstandardVersionDirectory()
         throws Exception
     {
         File srcRepo = new File( getBasedir(), "target/test-classes/non-standard-repo" );
         File target = new File( getBasedir(), "target" );
-        
+
         File targetReleasesRepo = new File( getBasedir(), "target/non-standard-repo-releases" );
-        
+
         convertor.convertRepositoryWithCopy( srcRepo, target );
-        
+
         Map<File, Boolean> expected = new LinkedHashMap<File, Boolean>();
-        
+
         expected.put( new File(
             targetReleasesRepo,
             "org/jvnet/hudson/trilead-ssh2/build212-hudson-1-1/trilead-ssh2-build212-hudson-1-1-sources.jar" ), Boolean.TRUE );
@@ -192,7 +196,7 @@ public class RepositoryConvertorTest
         expected.put( new File(
             targetReleasesRepo,
             "org/jvnet/hudson/trilead-ssh2/maven-metadata.xml.sha1" ), Boolean.FALSE );
-   
+
         validateResult( expected );
     }
 
@@ -202,7 +206,7 @@ public class RepositoryConvertorTest
         {
             Boolean actual = new Boolean( file.exists() );
 
-            assertEquals( "For file: " + file.getAbsolutePath(), expected.get( file ), actual );
+            Assert.assertEquals( "For file: " + file.getAbsolutePath(), expected.get( file ), actual );
         }
     }
 }

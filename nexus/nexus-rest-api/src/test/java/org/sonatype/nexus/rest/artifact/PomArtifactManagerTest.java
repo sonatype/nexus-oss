@@ -22,18 +22,21 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
-
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import org.junit.Test;
+import org.junit.Ignore;
+
 public class PomArtifactManagerTest
-    extends TestCase
 {
+    @Test
     public void testDummy()
     {
 
     }
 
+    @Ignore
+    @Test
     public void OFFtestGenerateGAV()
         throws IOException,
             XmlPullParserException
@@ -56,6 +59,8 @@ public class PomArtifactManagerTest
         // assertTrue( "version should be 1.0", "1.0".equals( request.getVersion() ) );
     }
 
+    @Ignore
+    @Test
     public void OFFtestGenerateGAVComplex()
         throws IOException,
             XmlPullParserException

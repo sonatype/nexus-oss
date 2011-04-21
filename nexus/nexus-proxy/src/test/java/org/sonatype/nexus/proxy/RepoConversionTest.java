@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.proxy;
 
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
@@ -128,11 +129,12 @@ public class RepoConversionTest
         assertNotNull( "It should exists (heh, but NoSuchRepo exception should be thrown anyway)", afterTreatment );
     }
 
+    @Test
     public void testHosted2Proxy()
         throws Exception
     {
         Repository patient = getRepositoryRegistry().getRepositoryWithFacet( "inhouse", MavenHostedRepository.class );
-        
+
         assertTrue( "This repo should not be READ only!", RepositoryWritePolicy.READ_ONLY != patient.getWritePolicy() );
 
         convertHosted2Proxy( (MavenHostedRepository) patient );
@@ -143,6 +145,7 @@ public class RepoConversionTest
         assertTrue( "This repo should be READ only!", RepositoryWritePolicy.READ_ONLY == patient.getWritePolicy() );
     }
 
+    @Test
     public void testProxy2Hosted()
         throws Exception
     {
@@ -156,6 +159,7 @@ public class RepoConversionTest
             .isFacetAvailable( MavenHostedRepository.class ) );
     }
 
+    @Test
     public void testHosted2Proxy2Hosted()
         throws Exception
     {
@@ -169,6 +173,7 @@ public class RepoConversionTest
             .isFacetAvailable( MavenHostedRepository.class ) );
     }
 
+    @Test
     public void testProxy2Hosted2Proxy()
         throws Exception
     {

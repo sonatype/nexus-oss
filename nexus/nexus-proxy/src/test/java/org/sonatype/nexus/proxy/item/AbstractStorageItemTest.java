@@ -21,6 +21,7 @@ package org.sonatype.nexus.proxy.item;
 import static org.easymock.EasyMock.createMock;
 
 import org.easymock.EasyMock;
+import org.junit.Test;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -72,6 +73,7 @@ public abstract class AbstractStorageItemTest
         assertEquals( shouldBeParentPath, item.getParentPath() );
     }
 
+    @Test
     public void testDummy()
     {
         assertEquals( "a", "a" );

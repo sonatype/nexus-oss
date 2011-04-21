@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.proxy.walker;
 
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
@@ -53,6 +54,7 @@ public class WalkerTest
         return jettyTestsuiteEnvironmentBuilder;
     }
 
+    @Test
     public void testWalker()
         throws Exception
     {

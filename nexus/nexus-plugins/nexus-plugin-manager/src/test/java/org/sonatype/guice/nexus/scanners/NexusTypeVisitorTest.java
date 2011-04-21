@@ -28,9 +28,9 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import junit.framework.TestCase;
-
 import org.codehaus.plexus.component.annotations.Component;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.guice.bean.reflect.ClassSpace;
 import org.sonatype.guice.bean.reflect.DeferredClass;
 import org.sonatype.guice.bean.reflect.URLClassSpace;
@@ -42,7 +42,6 @@ import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.plugin.Managed;
 
 public class NexusTypeVisitorTest
-    extends TestCase
 {
     interface BadInterface
     {
@@ -193,6 +192,7 @@ public class NexusTypeVisitorTest
         }
     }
 
+    @Test
     public void testNexusTypeScanning()
         throws MalformedURLException
     {
@@ -201,37 +201,37 @@ public class NexusTypeVisitorTest
 
         final Map<Component, DeferredClass<?>> components = new HashMap<Component, DeferredClass<?>>();
         new ClassSpaceScanner( space ).accept( new NexusTypeVisitor( new TestListener( components ) ) );
-        assertEquals( 11, components.size() );
+        Assert.assertEquals( 11, components.size() );
 
         // non-extension so no automatic hinting...
-        assertEquals( BeanA.class,
+        Assert.assertEquals( BeanA.class,
                       components.get( new ComponentImpl( HostInterface0.class, Hints.DEFAULT_HINT, "singleton", "" ) ).load() );
-        assertEquals( BeanB.class,
+        Assert.assertEquals( BeanB.class,
                       components.get( new ComponentImpl( HostInterface1.class, BeanB.class.getName(), "per-lookup", "" ) ).load() );
-        assertEquals( BeanC.class,
+        Assert.assertEquals( BeanC.class,
                       components.get( new ComponentImpl( HostInterface2.class, BeanC.class.getName(), "singleton", "" ) ).load() );
         // non-component so API @Singleton ignored...
-        assertEquals( BeanD.class,
+        Assert.assertEquals( BeanD.class,
                       components.get( new ComponentImpl( UserInterface0.class, Hints.DEFAULT_HINT, "per-lookup", "" ) ).load() );
-        assertEquals( BeanE.class,
+        Assert.assertEquals( BeanE.class,
                       components.get( new ComponentImpl( UserInterface1.class, Hints.DEFAULT_HINT, "per-lookup", "" ) ).load() );
         final Class<?> duplicate =
             components.get( new ComponentImpl( UserInterface2.class, Hints.DEFAULT_HINT, "singleton", "" ) ).load();
 
         // duplicate binding, first-one wins... result may vary on different machines/OS's
-        assertTrue( duplicate.equals( BeanF.class ) || duplicate.equals( NamedBeanD.class ) );
+        Assert.assertTrue( duplicate.equals( BeanF.class ) || duplicate.equals( NamedBeanD.class ) );
 
-        assertEquals( NamedBeanA.class,
+        Assert.assertEquals( NamedBeanA.class,
                       components.get( new ComponentImpl( HostInterface1.class, "BeanA", "per-lookup", "" ) ).load() );
-        assertEquals( NamedBeanB.class,
+        Assert.assertEquals( NamedBeanB.class,
                       components.get( new ComponentImpl( HostInterface2.class, Hints.DEFAULT_HINT, "singleton", "" ) ).load() );
-        assertEquals( NamedBeanC.class,
+        Assert.assertEquals( NamedBeanC.class,
                       components.get( new ComponentImpl( UserInterface1.class, "BeanC", "per-lookup", "" ) ).load() );
 
-        assertEquals( ComponentBeanA.class,
+        Assert.assertEquals( ComponentBeanA.class,
                       components.get( new ComponentImpl( SubHostInterface1.class, ComponentBeanA.class.getName(),
                                                          "per-lookup", "" ) ).load() );
-        assertEquals( ComponentBeanB.class,
+        Assert.assertEquals( ComponentBeanB.class,
                       components.get( new ComponentImpl( SubUserInterface1.class, Hints.DEFAULT_HINT, "per-lookup", "" ) ).load() );
     }
 }

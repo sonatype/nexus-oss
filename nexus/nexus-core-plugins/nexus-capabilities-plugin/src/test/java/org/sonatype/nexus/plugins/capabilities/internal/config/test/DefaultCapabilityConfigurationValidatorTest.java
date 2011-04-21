@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.config.test;
 
+import org.junit.Test;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -42,6 +43,7 @@ public class DefaultCapabilityConfigurationValidatorTest
         validator = lookup( CapabilityConfigurationValidator.class );
     }
 
+    @Test
     public void testPassValidate()
     {
         CCapability cap = createValidCapability();
@@ -64,6 +66,7 @@ public class DefaultCapabilityConfigurationValidatorTest
         return cap;
     }
 
+    @Test
     public void testFailValidate()
     {
         CCapability cap = new CCapability();
@@ -75,6 +78,7 @@ public class DefaultCapabilityConfigurationValidatorTest
         assertEquals( 4, res.getValidationErrors().size() );
     }
 
+    @Test
     public void testPassValidateModel()
     {
         Configuration cfg = new Configuration();
@@ -85,6 +89,7 @@ public class DefaultCapabilityConfigurationValidatorTest
         assertTrue( res.getValidationErrors().isEmpty() );
     }
 
+    @Test
     public void testFailValidateModel()
     {
         ValidationRequest<Configuration> req = new ValidationRequest<Configuration>( null );

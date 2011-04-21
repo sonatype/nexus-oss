@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.task;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -48,6 +49,7 @@ public class EvictUnusedProxiedItemsTaskTest
         scheduler = (NexusScheduler) lookup( NexusScheduler.class );
     }
 
+    @Test
     public void testDeleteEmptyFolder()
         throws Exception
     {
@@ -120,6 +122,7 @@ public class EvictUnusedProxiedItemsTaskTest
         }
     }
 
+    @Test
     public void testRunAfterTouched()
         throws Exception
     {

@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Test;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
@@ -109,6 +110,7 @@ public class DefaultApplicationConfigurationValidatorTest
         }
     }
 
+    @Test
     public void testBad1()
         throws Exception
     {
@@ -149,6 +151,7 @@ public class DefaultApplicationConfigurationValidatorTest
      // XXX cstamas-merge assertFalse( response.isValid() );
     }
 
+    @Test
     public void testBad2()
         throws Exception
     {
@@ -188,6 +191,7 @@ public class DefaultApplicationConfigurationValidatorTest
      // XXX cstamas-merge  assertEquals( 0, response.getValidationWarnings().size() );
     }
 
+    @Test
     public void testNexus1710Bad()
         throws Exception
     {
@@ -212,6 +216,7 @@ public class DefaultApplicationConfigurationValidatorTest
         assertEquals( 0, response.getValidationWarnings().size() );
     }
 
+    @Test
     public void testNexus1710Good()
         throws Exception
     {
@@ -223,6 +228,6 @@ public class DefaultApplicationConfigurationValidatorTest
         assertTrue( response.isValid() );
 
         assertFalse( response.isModified() );
-        
+
     }
 }

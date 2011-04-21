@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
@@ -79,6 +80,7 @@ public class M1LayoutedM2ShadowRepositoryTest
 
     }
 
+    @Test
     public void testM1Shadows()
         throws Exception
     {
@@ -137,6 +139,7 @@ public class M1LayoutedM2ShadowRepositoryTest
 
     }
 
+    @Test
     public void testM1ShadowSync()
         throws Exception
     {
@@ -193,6 +196,7 @@ public class M1LayoutedM2ShadowRepositoryTest
         checkForFileAndMatchContents( item );
     }
 
+    @Test
     public void testProxyLastRequestedAttribute()
         throws Exception
     {

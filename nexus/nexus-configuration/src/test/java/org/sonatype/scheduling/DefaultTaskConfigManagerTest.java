@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.junit.Test;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
@@ -89,6 +90,7 @@ public class DefaultTaskConfigManagerTest
         applicationConfiguration = (ApplicationConfiguration) lookup( ApplicationConfiguration.class );
     }
 
+    @Test
     public void testStoreOnceSchedule()
         throws Exception
     {
@@ -98,6 +100,7 @@ public class DefaultTaskConfigManagerTest
         genericTestStore( SCHEDULE_TYPE_ONCE, scheduleProperties );
     }
 
+    @Test
     public void testStoreDailySchedule()
         throws Exception
     {
@@ -109,6 +112,7 @@ public class DefaultTaskConfigManagerTest
         genericTestStore( SCHEDULE_TYPE_DAILY, scheduleProperties );
     }
 
+    @Test
     public void testStoreWeeklySchedule()
         throws Exception
     {
@@ -120,6 +124,7 @@ public class DefaultTaskConfigManagerTest
         genericTestStore( SCHEDULE_TYPE_WEEKLY, scheduleProperties );
     }
 
+    @Test
     public void testStoreMonthlySchedule()
         throws Exception
     {
@@ -131,6 +136,7 @@ public class DefaultTaskConfigManagerTest
         genericTestStore( SCHEDULE_TYPE_MONTHLY, scheduleProperties );
     }
 
+    @Test
     public void testStoreAdvancedSchedule()
         throws Exception
     {
@@ -146,7 +152,7 @@ public class DefaultTaskConfigManagerTest
         try
         {
             task = createScheduledTask( createSchedule( scheduleType, scheduleProperties ) );
-            
+
             defaultManager.addTask( task );
 
             // loadConfig();
@@ -216,7 +222,7 @@ public class DefaultTaskConfigManagerTest
         return new DefaultScheduledTask<Integer>(
             "1",
             TASK_NAME,
-            callable.getClass().getSimpleName(), 
+            callable.getClass().getSimpleName(),
             //TODO this is only use for testing, but we are expecting that the TaskHint matches the Classname.
             defaultScheduler,
             callable,

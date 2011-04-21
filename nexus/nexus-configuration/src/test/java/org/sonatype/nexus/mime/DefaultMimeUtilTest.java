@@ -21,15 +21,17 @@ package org.sonatype.nexus.mime;
 import java.io.File;
 import java.util.Collection;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.junit.Test;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 
 import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil2;
 import eu.medsea.mimeutil.detector.ExtensionMimeDetector;
 
 public class DefaultMimeUtilTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
+
     protected MimeUtil mimeUtil;
 
     protected MimeUtil2 medseaMimeUtil;
@@ -61,6 +63,7 @@ public class DefaultMimeUtilTest
         return MimeUtil2.getMostSpecificMimeType( mimeTypes ).toString();
     }
 
+    @Test
     public void testSimple()
         throws Exception
     {
@@ -80,21 +83,22 @@ public class DefaultMimeUtilTest
         assertEquals( getMimeType( testFile ), mimeUtil.getMimeType( testFile ) );
     }
 
+    @Test
     public void testSimpleByName()
         throws Exception
     {
         String testFileName = null;
 
         testFileName = "pom.xml";
-        
+
         assertEquals( getMimeType( testFileName ), mimeUtil.getMimeType( testFileName ) );
 
         testFileName = "/some/path/pom.xml";
-        
+
         assertEquals( getMimeType( "pom.xml" ), mimeUtil.getMimeType( testFileName ) );
 
         testFileName = "\\some\\path\\pom.xml";
-        
+
         assertEquals( getMimeType( "pom.xml" ), mimeUtil.getMimeType( testFileName ) );
 
         testFileName = "DefaultMimeUtilTest.java";

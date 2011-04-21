@@ -24,6 +24,7 @@ import java.util.Set;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 
 /**
@@ -53,7 +54,7 @@ public class LogManagerTest
 
         logger = this.getLoggerManager().getLoggerForComponent( LogManagerTest.class.getName() );
     }
-    
+
     @Override
     protected void tearDown()
         throws Exception
@@ -62,6 +63,7 @@ public class LogManagerTest
         super.tearDown();
     }
 
+    @Test
     public void testLogConfig()
         throws Exception
     {
@@ -82,6 +84,7 @@ public class LogManagerTest
         assertEquals( "DEBUG, console", ( (SimpleLog4jConfig) manager.getLogConfig() ).getRootLogger() );
     }
 
+    @Test
     public void testGetLogFiles()
         throws Exception
     {

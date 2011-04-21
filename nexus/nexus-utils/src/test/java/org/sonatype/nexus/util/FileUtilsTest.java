@@ -26,36 +26,38 @@ import java.net.URL;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class FileUtilsTest
-    extends TestCase
 {
+    @Test
     public void testUNCPath()
         throws Exception
     {
         if ( FileUtils.isWindows() )
         {
             String filepath = "\\\\someserver\blah\blah\blah.jar";
-            assertTrue( FileUtils.validFileUrl( filepath ) );
+            Assert.assertTrue( FileUtils.validFileUrl( filepath ) );
 
             File file = new File( filepath );
-            assertTrue( FileUtils.validFile( file ) );
+            Assert.assertTrue( FileUtils.validFile( file ) );
 
             String badFilepath = "someserver\blah\blah\blah.jar";
-            assertFalse( FileUtils.validFileUrl( badFilepath ) );
+            Assert.assertFalse( FileUtils.validFileUrl( badFilepath ) );
 
             String urlFilepath = "file:////someserver/blah/blah.jar";
-            assertTrue( FileUtils.validFileUrl( filepath ) );
+            Assert.assertTrue( FileUtils.validFileUrl( filepath ) );
 
-            assertTrue( FileUtils.validFile( new File( new URL( urlFilepath ).getFile() ) ) );
+            Assert.assertTrue( FileUtils.validFile( new File( new URL( urlFilepath ).getFile() ) ) );
         }
         else
         {
-            assertTrue( true );
+            Assert.assertTrue( true );
         }
     }
 
+    @Test
     public void testMove()
         throws Exception
     {
@@ -67,9 +69,9 @@ public class FileUtilsTest
             File dir = new File( root, "a/b/c/d/e" );
             dir.mkdirs();
             FileUtils.move( new File( root, "a" ), new File( dest, "a" ) );
-            assertTrue( new File( dest, "a/b/c/d/e" ).isDirectory() );
-            assertFalse( dir.exists() );
-            assertFalse( new File( root, "a" ).exists() );
+            Assert.assertTrue( new File( dest, "a/b/c/d/e" ).isDirectory() );
+            Assert.assertFalse( dir.exists() );
+            Assert.assertFalse( new File( root, "a" ).exists() );
         }
 
         {
@@ -77,31 +79,31 @@ public class FileUtilsTest
             file.getParentFile().mkdirs();
             file.createNewFile();
             FileUtils.move( new File( root, "a" ), new File( dest, "a" ) );
-            assertTrue( new File( dest, "a/b/c/d/e" ).isDirectory() );
-            assertTrue( new File( dest, "a/file.txt" ).isFile() );
-            assertFalse( file.exists() );
-            assertFalse( new File( root, "a" ).exists() );
+            Assert.assertTrue( new File( dest, "a/b/c/d/e" ).isDirectory() );
+            Assert.assertTrue( new File( dest, "a/file.txt" ).isFile() );
+            Assert.assertFalse( file.exists() );
+            Assert.assertFalse( new File( root, "a" ).exists() );
         }
 
         {
             File dir2 = new File( root, "a/another" );
             dir2.mkdirs();
             FileUtils.move( new File( root, "a" ), new File( dest, "a" ) );
-            assertTrue( new File( dest, "a/b/c/d/e" ).isDirectory() );
-            assertTrue( new File( dest, "a/file.txt" ).isFile() );
-            assertTrue( new File( dest, "a/another" ).isDirectory() );
-            assertFalse( dir2.exists() );
-            assertFalse( new File( root, "a" ).exists() );
+            Assert.assertTrue( new File( dest, "a/b/c/d/e" ).isDirectory() );
+            Assert.assertTrue( new File( dest, "a/file.txt" ).isFile() );
+            Assert.assertTrue( new File( dest, "a/another" ).isDirectory() );
+            Assert.assertFalse( dir2.exists() );
+            Assert.assertFalse( new File( root, "a" ).exists() );
         }
 
         {
             File file = new File( root, "a/file.txt/i/t" );
             file.mkdirs();
             FileUtils.move( new File( root, "a" ), new File( dest, "a" ) );
-            assertTrue( new File( dest, "a/b/c/d/e" ).isDirectory() );
-            assertTrue( new File( dest, "a/file.txt/i/t" ).isDirectory() );
-            assertFalse( file.exists() );
-            assertFalse( new File( root, "a" ).exists() );
+            Assert.assertTrue( new File( dest, "a/b/c/d/e" ).isDirectory() );
+            Assert.assertTrue( new File( dest, "a/file.txt/i/t" ).isDirectory() );
+            Assert.assertFalse( file.exists() );
+            Assert.assertFalse( new File( root, "a" ).exists() );
         }
 
         {
@@ -109,40 +111,40 @@ public class FileUtilsTest
             file.getParentFile().mkdirs();
             file.createNewFile();
             FileUtils.move( new File( root, "a" ), new File( dest, "a" ) );
-            assertTrue( new File( dest, "a/b/c/d" ).isFile() );
-            assertFalse( new File( dest, "a/b/c/d/e" ).exists() );
-            assertFalse( file.exists() );
-            assertFalse( new File( root, "a" ).exists() );
+            Assert.assertTrue( new File( dest, "a/b/c/d" ).isFile() );
+            Assert.assertFalse( new File( dest, "a/b/c/d/e" ).exists() );
+            Assert.assertFalse( file.exists() );
+            Assert.assertFalse( new File( root, "a" ).exists() );
         }
 
         try
         {
             FileUtils.move( null, new File( dest, "a" ) );
-            fail();
+            Assert.fail();
         }
         catch ( NullPointerException e )
         {
-            assertTrue( e.getMessage().contains( "source" ) );
+            Assert.assertTrue( e.getMessage().contains( "source" ) );
         }
 
         try
         {
             FileUtils.move( new File( root, "a" ), null );
-            fail();
+            Assert.fail();
         }
         catch ( NullPointerException e )
         {
-            assertTrue( e.getMessage().contains( "destination" ) );
+            Assert.assertTrue( e.getMessage().contains( "destination" ) );
         }
 
         try
         {
             FileUtils.move( new File( root, "j" ), new File( dest, "j" ) );
-            fail();
+            Assert.fail();
         }
         catch ( FileNotFoundException e )
         {
-            assertTrue( e.getMessage().contains( "Source file doesn't exist" ) );
+            Assert.assertTrue( e.getMessage().contains( "Source file doesn't exist" ) );
         }
 
         // *nix doesn't lock files
@@ -159,11 +161,11 @@ public class FileUtilsTest
                 try
                 {
                     FileUtils.move( new File( root, "l" ), new File( dest, "l" ) );
-                    fail();
+                    Assert.fail();
                 }
                 catch ( IOException e )
                 {
-                    assertTrue( e.getMessage().contains( "Failed to move" ) );
+                    Assert.assertTrue( e.getMessage().contains( "Failed to move" ) );
                 }
                 finally
                 {
@@ -186,11 +188,11 @@ public class FileUtilsTest
                 try
                 {
                     FileUtils.move( new File( root, "a" ), new File( dest, "a" ) );
-                    fail();
+                    Assert.fail();
                 }
                 catch ( IOException e )
                 {
-                    assertTrue( e.getMessage().contains( "Failed to move" ) );
+                    Assert.assertTrue( e.getMessage().contains( "Failed to move" ) );
                 }
                 finally
                 {
@@ -213,11 +215,11 @@ public class FileUtilsTest
                 try
                 {
                     FileUtils.move( new File( root, "a" ), new File( dest, "a" ) );
-                    fail();
+                    Assert.fail();
                 }
                 catch ( IOException e )
                 {
-                    assertTrue( e.getMessage().contains( "Failed to move" ) );
+                    Assert.assertTrue( e.getMessage().contains( "Failed to move" ) );
                 }
                 finally
                 {

@@ -22,6 +22,7 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
@@ -74,6 +75,7 @@ public class M2LayoutedM1ShadowRepositoryTest
 
     }
 
+    @Test
     public void testProxyLastRequestedAttribute()
         throws Exception
     {

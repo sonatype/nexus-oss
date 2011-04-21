@@ -24,23 +24,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import junit.framework.Assert;
-
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.Assert;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.ldaptestsuite.LdapServer;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.nexus.security.ldap.realms.api.LdapRealmPlexusResourceConst;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
 public abstract class AbstractNexusTestCase
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
 
     @Override
@@ -117,7 +116,7 @@ public abstract class AbstractNexusTestCase
         this.copyStream( getClass().getResourceAsStream( "/test-conf/ldap.xml" ), new FileOutputStream(
             getNexusLdapConfiguration() ) );
     }
-    
+
     private void copyStream( InputStream is, OutputStream out )
         throws IOException
     {

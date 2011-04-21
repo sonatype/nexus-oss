@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.repositories;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -57,6 +58,7 @@ public class LimitedCountCreateRepositoryTest
         this.repositoryTypeRegistry = this.lookup( RepositoryTypeRegistry.class );
     }
 
+    @Test
     public void testLimitationDefaults()
         throws Exception
     {
@@ -72,6 +74,7 @@ public class LimitedCountCreateRepositoryTest
         createRepository( repoId + 3, false );
     }
 
+    @Test
     public void testDefaultLimitationOverstep()
         throws Exception
     {
@@ -106,6 +109,7 @@ public class LimitedCountCreateRepositoryTest
         createRepository( repoId + 6, false );
     }
 
+    @Test
     public void testTypeLimitationOverstep()
         throws Exception
     {

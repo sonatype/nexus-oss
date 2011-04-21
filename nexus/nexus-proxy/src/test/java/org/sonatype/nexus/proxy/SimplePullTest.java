@@ -20,7 +20,8 @@ package org.sonatype.nexus.proxy;
 
 import java.util.Collection;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.jettytestsuite.ServletServer;
@@ -48,6 +49,7 @@ public class SimplePullTest
         return jettyTestsuiteEnvironmentBuilder;
     }
 
+    @Test
     public void testSimplePull()
         throws Exception
     {
@@ -118,6 +120,7 @@ public class SimplePullTest
         assertEquals( 4, dir.size() );
     }
 
+    @Test
     public void testSimplePullWithRegardingToPathEnding()
         throws Exception
     {
@@ -177,6 +180,7 @@ public class SimplePullTest
         assertEquals( "/activemq/activemq-core/1.2", collItem.getParentPath() );
     }
 
+    @Test
     public void testSimplePush()
         throws Exception
     {
@@ -196,6 +200,7 @@ public class SimplePullTest
                 "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ) ) );
     }
 
+    @Test
     public void testSimplePullOfNonexistent()
         throws Exception
     {
@@ -223,6 +228,7 @@ public class SimplePullTest
         }
     }
 
+    @Test
     public void testSimplePullOfSlashEndedFilePaths()
         throws Exception
     {
@@ -250,6 +256,7 @@ public class SimplePullTest
         }
     }
 
+    @Test
     public void testSimpleWithRequestProcessorsNexus3990()
         throws Exception
     {

@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.io.InputStreamFacade;
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
@@ -72,6 +73,7 @@ public class DefaultNexusConfigurationTest
         return false;
     }
 
+    @Test
     public void testSaveConfiguration()
         throws Exception
     {
@@ -90,6 +92,7 @@ public class DefaultNexusConfigurationTest
         assertEquals( false, this.securitySystem.isSecurityEnabled() );
     }
 
+    @Test
     public void testSaveGlobalProxyConfiguration()
         throws Exception
     {
@@ -120,6 +123,7 @@ public class DefaultNexusConfigurationTest
 
     }
 
+    @Test
     public void testLoadConfiguration()
         throws Exception
     {
@@ -159,6 +163,7 @@ public class DefaultNexusConfigurationTest
         assertEquals( "smtp-host", nexusEmailer.getSMTPHostname() );
     }
 
+    @Test
     public void testGetConfiguration()
         throws Exception
     {
@@ -168,6 +173,7 @@ public class DefaultNexusConfigurationTest
         assertTrue( nexusConfiguration.getConfigurationModel() != null );
     }
 
+    @Test
     public void testGetDefaultConfigurationAsStream()
         throws Exception
     {
@@ -175,6 +181,7 @@ public class DefaultNexusConfigurationTest
             .getConfigurationSource().getDefaultsSource().getConfigurationAsStream() );
     }
 
+    @Test
     public void testGetAndReadConfigurationFiles()
         throws Exception
     {
@@ -207,6 +214,7 @@ public class DefaultNexusConfigurationTest
 
     }
 
+    @Test
     public void testNEXUS2212SaveInvalidConfig()
         throws Exception
     {

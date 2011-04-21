@@ -21,14 +21,13 @@ package org.sonatype.nexus.proxy.http;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class HttpRequestTest
-    extends TestCase
 {
-
+    @Test
     public void testSimple() throws IOException
     {
         StringBuffer sb = new StringBuffer();
@@ -46,18 +45,18 @@ public class HttpRequestTest
         sb.append( "Here comes the body" );
         sb.append( "\n" );
         sb.append( "And some more." );
-        
+
         ByteArrayInputStream bis = new ByteArrayInputStream(sb.toString().getBytes());;
         HttpRequest req = new HttpRequest();
         req.readInput( bis );
-        
-        assertEquals( "GET", req.getMethod() );
-        assertEquals( "http://repo1.maven.org/maven2/org/apache/lucene/lucene-core/2.3.1/lucene-core-2.3.1.pom", req.getUri() );
-        assertEquals( "HTTP/1.1", req.getHttpVersion() );
-        assertEquals( 3, req.getHeaders().size() );
-        assertEquals( "application/json", req.getHeaders().get( "accept" ) );
-        assertEquals( "someHeader", req.getHeaders().get( "someheader" ) );
-        assertEquals( "other", req.getHeaders().get( "otherheader" ) );
-        assertEquals( "Here comes the body\nAnd some more.", IOUtil.toString( req.getBody() ) );
+
+        Assert.assertEquals( "GET", req.getMethod() );
+        Assert.assertEquals( "http://repo1.maven.org/maven2/org/apache/lucene/lucene-core/2.3.1/lucene-core-2.3.1.pom", req.getUri() );
+        Assert.assertEquals( "HTTP/1.1", req.getHttpVersion() );
+        Assert.assertEquals( 3, req.getHeaders().size() );
+        Assert.assertEquals( "application/json", req.getHeaders().get( "accept" ) );
+        Assert.assertEquals( "someHeader", req.getHeaders().get( "someheader" ) );
+        Assert.assertEquals( "other", req.getHeaders().get( "otherheader" ) );
+        Assert.assertEquals( "Here comes the body\nAnd some more.", IOUtil.toString( req.getBody() ) );
     }
 }

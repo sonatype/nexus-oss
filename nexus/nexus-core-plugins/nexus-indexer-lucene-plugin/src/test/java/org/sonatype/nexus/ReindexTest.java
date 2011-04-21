@@ -36,6 +36,7 @@ import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.packer.IndexPacker;
 import org.apache.maven.index.packer.IndexPackingRequest;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.index.DefaultIndexerManager;
 import org.sonatype.nexus.index.IndexerManager;
@@ -143,9 +144,9 @@ public class ReindexTest
                     }
                 }
             }
-            
+
             ctx.optimize();
-            
+
             ctx.commit();
 
             // shift timestamp too
@@ -162,7 +163,7 @@ public class ReindexTest
 
     /**
      * Will reindex, shift if needed and publish indexes for a "remote" repository (published over jetty component).
-     * 
+     *
      * @param repositoryRoot
      * @param repositoryId
      * @param deleteIndexFiles
@@ -214,7 +215,7 @@ public class ReindexTest
             assertTrue( "Should find " + gid + ":" + aid + ":" + version, ais.size() > 0 );
 
             ArtifactInfo ai = ais.iterator().next();
-            
+
             assertEquals( gid, ai.groupId );
             assertEquals( aid, ai.artifactId );
             assertEquals( version, ai.version );
@@ -225,6 +226,7 @@ public class ReindexTest
         }
     }
 
+    @Test
     public void testHostedRepositoryReindex()
         throws Exception
     {
@@ -236,6 +238,7 @@ public class ReindexTest
             "nexus-indexer", "1.0-beta-4" );
     }
 
+    @Test
     public void testProxyRepositoryReindex()
         throws Exception
     {
@@ -251,6 +254,7 @@ public class ReindexTest
         validateIndexWithIdentify( true, "057b8740427ee6d7b0b60792751356cad17dc0d9", "log4j", "log4j", "1.2.12" );
     }
 
+    @Test
     public void testGroupReindex()
         throws Exception
     {
@@ -267,6 +271,7 @@ public class ReindexTest
         validateIndexWithIdentify( true, "057b8740427ee6d7b0b60792751356cad17dc0d9", "log4j", "log4j", "1.2.12" );
     }
 
+    @Test
     public void testCurrentIncrementalIndexes()
         throws Exception
     {
@@ -321,6 +326,7 @@ public class ReindexTest
         validateIndexWithIdentify( true, "f0a0d2e29ed910808c33135a3a5a51bba6358f7b", "log4j", "log4j", "1.2.15" );
     }
 
+    @Test
     public void testV1IncrementalIndexes()
         throws Exception
     {

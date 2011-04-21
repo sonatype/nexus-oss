@@ -20,6 +20,7 @@ package org.sonatype.nexus.proxy;
 
 import java.util.Collection;
 
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -35,7 +36,7 @@ public abstract class M2ResourceStoreTest
         throws Exception
     {
         ServletServer ss = (ServletServer) lookup( ServletServer.ROLE );
-        
+
         return new M2TestsuiteEnvironmentBuilder( ss );
     }
 
@@ -51,12 +52,14 @@ public abstract class M2ResourceStoreTest
         checkForFileAndMatchContents( item );
     }
 
+    @Test
     public void testRetrieveItem()
         throws Exception
     {
         retrieveItem();
     }
 
+    @Test
     public void testCopyItem()
         throws Exception
     {
@@ -77,6 +80,7 @@ public abstract class M2ResourceStoreTest
         checkForFileAndMatchContents( src, dest );
     }
 
+    @Test
     public void testMoveItem()
         throws Exception
     {
@@ -105,6 +109,7 @@ public abstract class M2ResourceStoreTest
         }
     }
 
+    @Test
     public void testDeleteItem()
         throws Exception
     {
@@ -126,6 +131,7 @@ public abstract class M2ResourceStoreTest
         }
     }
 
+    @Test
     public void testStoreItem()
         throws Exception
     {
@@ -146,6 +152,7 @@ public abstract class M2ResourceStoreTest
 
     }
 
+    @Test
     public void testCreateCollection()
         throws Exception
     {
@@ -167,6 +174,7 @@ public abstract class M2ResourceStoreTest
         assertTrue( getFile( getRepositoryRegistry().getRepository( "repo1" ), "/some/path" ).isDirectory() );
     }
 
+    @Test
     public void testList()
         throws Exception
     {
@@ -180,7 +188,7 @@ public abstract class M2ResourceStoreTest
         {
             System.out.println( item.getPath() );
         }
-        
+
         req = new ResourceStoreRequest( "/", true );
 
         StorageCollectionItem coll = (StorageCollectionItem) getResourceStore().retrieveItem( req );

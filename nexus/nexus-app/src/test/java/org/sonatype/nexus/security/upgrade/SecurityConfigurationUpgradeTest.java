@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 
-import junit.framework.Assert;
+import org.junit.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -40,11 +42,13 @@ public class SecurityConfigurationUpgradeTest
         this.copyResource( "/org/sonatype/nexus/security/upgrade/security.xml", getNexusSecurityConfiguration() );
     }
 
+    @Test
     public void testLoadComponent() throws Exception
     {
         Assert.assertNotNull( this.lookup( EventInspector.class, "SecurityUpgradeEventInspector" ) );
     }
 
+    @Test
     public void testSecurityUpgradeAndEvent()
         throws Exception
     {

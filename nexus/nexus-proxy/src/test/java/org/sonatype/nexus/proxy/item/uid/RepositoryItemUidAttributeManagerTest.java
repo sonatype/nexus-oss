@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -83,6 +84,7 @@ public class RepositoryItemUidAttributeManagerTest
         allAttributeClasses.addAll( mavenAttributeClasses );
     }
 
+    @Test
     public void testCoreAttributes()
         throws Exception
     {
@@ -99,6 +101,7 @@ public class RepositoryItemUidAttributeManagerTest
         validateAttributes( trashedFile, IsHiddenAttribute.class );
     }
 
+    @Test
     public void testMavenAttributes()
         throws Exception
     {

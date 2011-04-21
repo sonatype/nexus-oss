@@ -24,7 +24,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -47,6 +48,7 @@ public class LdapUserGroupConfNotConfiguredTest
         return this.lookup( PlexusResource.class, "LdapUserAndGroupsConfigurationPlexusResource" );
     }
 
+    @Test
     public void testGetNotConfigured()
         throws Exception
     {
@@ -107,6 +109,7 @@ public class LdapUserGroupConfNotConfiguredTest
 
     }
 
+    @Test
     public void testPutNotConfigured()
         throws Exception
     {

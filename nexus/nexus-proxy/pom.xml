@@ -132,6 +132,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <classifier>tests</classifier>
+    </dependency>
+    <dependency>
       <groupId>com.carrotsearch</groupId>
       <artifactId>junit-benchmarks</artifactId>
       <scope>test</scope>

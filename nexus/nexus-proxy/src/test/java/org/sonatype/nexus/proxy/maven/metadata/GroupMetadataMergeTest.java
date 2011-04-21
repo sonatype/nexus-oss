@@ -26,6 +26,7 @@ import java.util.Arrays;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.codehaus.plexus.digest.Md5Digester;
 import org.codehaus.plexus.digest.Sha1Digester;
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
@@ -54,6 +55,7 @@ public class GroupMetadataMergeTest
         return jettyTestsuiteEnvironmentBuilder;
     }
 
+    @Test
     public void testGMerge()
         throws Exception
     {
@@ -71,6 +73,7 @@ public class GroupMetadataMergeTest
         assertEquals( "surefire-report", ( md.getPlugins().get( 3 ) ).getPrefix() );
     }
 
+    @Test
     public void testGAMerge()
         throws Exception
     {
@@ -93,6 +96,7 @@ public class GroupMetadataMergeTest
         assertEquals( "20090620231210", md.getVersioning().getLastUpdated() );
     }
 
+    @Test
     public void testGAMerge2()
         throws Exception
     {
@@ -117,9 +121,10 @@ public class GroupMetadataMergeTest
 
     /**
      * Merge 3 GA maven-metadata.xml
-     * 
+     *
      * @throws Exception
      */
+    @Test
     public void testGA3Merge()
         throws Exception
     {
@@ -142,6 +147,7 @@ public class GroupMetadataMergeTest
         assertEquals( "20090720231210", md.getVersioning().getLastUpdated() );
     }
 
+    @Test
     public void testGA4Merge()
         throws Exception
     {
@@ -164,6 +170,7 @@ public class GroupMetadataMergeTest
         assertEquals( "20091119113313", md.getVersioning().getLastUpdated() );
     }
 
+    @Test
     public void testGAVMerge()
         throws Exception
     {
@@ -182,6 +189,7 @@ public class GroupMetadataMergeTest
         assertEquals( "20090527162714", md.getVersioning().getLastUpdated() );
     }
 
+    @Test
     public void testGAVMergeWithNewBuildNumberAndOldTimestamp()
         throws Exception
     {
@@ -200,6 +208,7 @@ public class GroupMetadataMergeTest
         assertEquals( "20090331203702", md.getVersioning().getLastUpdated() );
     }
 
+    @Test
     public void testChecksum()
         throws Exception
     {
@@ -232,6 +241,7 @@ public class GroupMetadataMergeTest
         }
     }
 
+    @Test
     public void testConflictMerge()
         throws Exception
     {
@@ -250,6 +260,7 @@ public class GroupMetadataMergeTest
         }
     }
 
+    @Test
     public void testReleasePolicy()
         throws Exception
     {
@@ -267,6 +278,7 @@ public class GroupMetadataMergeTest
         assertEquals( "20090720231210", md.getVersioning().getLastUpdated() );
     }
 
+    @Test
     public void testSnapshotPolicy()
         throws Exception
     {
@@ -284,6 +296,7 @@ public class GroupMetadataMergeTest
         assertEquals( "20090720231210", md.getVersioning().getLastUpdated() );
     }
 
+    @Test
     public void testV100V100MdMerge()
         throws Exception
     {
@@ -299,6 +312,7 @@ public class GroupMetadataMergeTest
         assertEquals( 0, md.getVersioning().getSnapshotVersions().size() );
     }
 
+    @Test
     public void testV110V110MdMerge()
         throws Exception
     {
@@ -314,6 +328,7 @@ public class GroupMetadataMergeTest
         assertEquals( 3, md.getVersioning().getSnapshotVersions().size() );
     }
 
+    @Test
     public void testV110V100MdMergeWithV110Newer()
         throws Exception
     {
@@ -330,6 +345,7 @@ public class GroupMetadataMergeTest
         assertEquals( "20110121213648", md.getVersioning().getSnapshotVersions().get( 0 ).getUpdated() );
     }
 
+    @Test
     public void testV110V100MdMergeWithV100Newer()
         throws Exception
     {

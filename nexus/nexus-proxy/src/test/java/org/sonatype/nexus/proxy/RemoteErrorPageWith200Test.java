@@ -21,7 +21,8 @@ package org.sonatype.nexus.proxy;
 import java.io.IOException;
 import java.io.InputStream;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.jettytestsuite.ServletServer;
@@ -63,6 +64,7 @@ public class RemoteErrorPageWith200Test
 
     }
 
+    @Test
     public void testRemoteReturnsErrorWith200StatusHeadersNotSet()
         throws ItemNotFoundException, IOException
     {
@@ -89,6 +91,7 @@ public class RemoteErrorPageWith200Test
         }
     }
 
+    @Test
     public void testRemoteReturnsErrorWith200StatusHeadersSet() throws RemoteAccessException, StorageException, ItemNotFoundException
     {
 

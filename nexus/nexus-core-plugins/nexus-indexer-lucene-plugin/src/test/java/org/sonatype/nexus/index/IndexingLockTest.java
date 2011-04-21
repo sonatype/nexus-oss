@@ -22,28 +22,29 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 public class IndexingLockTest
-    extends TestCase
 {
 
     private ReadWriteLock locker;
 
-    @Override
+    @Before
     protected void setUp()
         throws Exception
     {
-        super.setUp();
-
         locker = new ReentrantReadWriteLock();
     }
 
+    @Test
     public void testIndexLocking()
     {
         beginIndex();
     }
 
+    @Test
     public void testThreadIndexLocking() throws InterruptedException
     {
         new Thread( new Runnable()
@@ -80,7 +81,7 @@ public class IndexingLockTest
         try
         {
             hasLock = lock.tryLock();
-            assertFalse( hasLock );
+            Assert.assertFalse( hasLock );
         }
         finally
         {
@@ -108,7 +109,7 @@ public class IndexingLockTest
         Lock lock = locker.readLock();
         try
         {
-            assertTrue( lock.tryLock() );
+            Assert.assertTrue( lock.tryLock() );
         }
         finally
         {

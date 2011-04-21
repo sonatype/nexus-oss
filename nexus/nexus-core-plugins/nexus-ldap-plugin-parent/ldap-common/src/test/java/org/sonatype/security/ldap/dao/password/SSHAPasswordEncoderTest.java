@@ -22,10 +22,10 @@ import java.io.UnsupportedEncodingException;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 
 public class SSHAPasswordEncoderTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
     public void testVerify()
         throws Exception

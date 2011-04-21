@@ -20,6 +20,7 @@ package org.sonatype.nexus.proxy;
 
 import org.apache.commons.httpclient.CustomMultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.HttpClient;
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -43,11 +44,13 @@ public class SimpleRemoteLeakTest
         return jettyTestsuiteEnvironmentBuilder;
     }
 
+    @Test
     public void testNothing()
     {
         assertTrue( true );
     }
 
+    @Test
     public void testSimplerRemoteLeak()
         throws Exception
     {

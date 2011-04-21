@@ -28,13 +28,15 @@ import java.net.ServerSocket;
 import java.util.Collection;
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.NameFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.codehaus.classworlds.Launcher;
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.restlet.Application;
 import org.restlet.Client;
 import org.restlet.data.Protocol;
@@ -51,7 +53,6 @@ import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import com.thoughtworks.xstream.XStream;
 
 public class SimpleTest
-    extends TestCase
 {
     protected MockNexusEnvironment mockNexusEnvironment;
 
@@ -74,7 +75,7 @@ public class SimpleTest
         }
     }
 
-    @Override
+    @Before
     protected void setUp()
         throws Exception
     {
@@ -82,8 +83,6 @@ public class SimpleTest
         tamperPlexusProperties( bundleRoot );
 
         MockHelper.clearMocks();
-
-        super.setUp();
 
         mockNexusEnvironment = new MockNexusEnvironment( getAppBooter() );
 
@@ -95,10 +94,10 @@ public class SimpleTest
     {
         Collection<File> files =
             FileUtils.listFiles( basedir, new NameFileFilter( "plexus.properties" ), TrueFileFilter.TRUE );
-        assertEquals( 1, files.size() );
+        Assert.assertEquals( 1, files.size() );
 
         File pp = files.iterator().next();
-        assertTrue( pp.exists() );
+        Assert.assertTrue( pp.exists() );
 
         Properties p = new Properties();
         InputStream in = new FileInputStream( pp );
@@ -153,13 +152,11 @@ public class SimpleTest
         return plexusAppBooter;
     }
 
-    @Override
+    @After
     protected void tearDown()
         throws Exception
     {
         mockNexusEnvironment.stop();
-
-        super.tearDown();
     }
 
     /**
@@ -167,6 +164,7 @@ public class SimpleTest
      * 
      * @throws Exception
      */
+    @Test
     public void testStatusFine()
         throws Exception
     {
@@ -174,7 +172,7 @@ public class SimpleTest
 
         Response response = client.get( new Reference( "http://localhost:" + port + "/nexus/service/local/status" ) );
 
-        assertEquals( "We just started Nexus withount any tampering", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "We just started Nexus withount any tampering", 200, response.getStatus().getCode() );
     }
 
     /**
@@ -182,6 +180,7 @@ public class SimpleTest
      * 
      * @throws Exception
      */
+    @Test
     public void testStatusUnavailable()
         throws Exception
     {
@@ -191,7 +190,7 @@ public class SimpleTest
 
         Response response = client.get( new Reference( "http://localhost:" + port + "/nexus/service/local/status" ) );
 
-        assertEquals( "The status resource should be mocked", Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
+        Assert.assertEquals( "The status resource should be mocked", Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
                       response.getStatus().getCode() );
 
         MockHelper.checkAndClean();
@@ -219,7 +218,7 @@ public class SimpleTest
 
         Response response = client.get( new Reference( "http://localhost:" + port + "/nexus/service/local/status" ) );
 
-        assertEquals( 200, response.getStatus().getCode() );
+        Assert.assertEquals( 200, response.getStatus().getCode() );
 
         NexusApplication na =
             (NexusApplication) mockNexusEnvironment.getPlexusContainer().lookup( Application.class, "nexus" );
@@ -229,7 +228,7 @@ public class SimpleTest
         StatusResourceResponse responseUnmarshalled =
             (StatusResourceResponse) xmlXstream.fromXML( response.getEntity().getText(), new StatusResourceResponse() );
 
-        assertEquals( "Versions should match", mockResponse.getData().getVersion(),
+        Assert.assertEquals( "Versions should match", mockResponse.getData().getVersion(),
                       responseUnmarshalled.getData().getVersion() );
 
         MockHelper.checkAndClean();
@@ -250,7 +249,7 @@ public class SimpleTest
 
         Response response = client.get( new Reference( "http://localhost:" + port + "/nexus/service/local/status" ) );
 
-        assertEquals( "We just started Nexus withount any tampering", 200, response.getStatus().getCode() );
+        Assert.assertEquals( "We just started Nexus withount any tampering", 200, response.getStatus().getCode() );
 
         MockHelper.checkAndClean();
     }
@@ -264,7 +263,7 @@ public class SimpleTest
         try
         {
             MockHelper.checkAndClean();
-            fail();
+            Assert.fail();
         }
         catch ( AssertionError e )
         {
@@ -281,7 +280,7 @@ public class SimpleTest
         try
         {
             MockHelper.checkAndClean();
-            fail();
+            Assert.fail();
         }
         catch ( AssertionError e )
         {

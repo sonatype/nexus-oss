@@ -32,6 +32,7 @@ import org.apache.maven.index.creator.JarFileContentsIndexCreator;
 import org.apache.maven.index.creator.MavenArchetypeArtifactInfoIndexCreator;
 import org.apache.maven.index.creator.MavenPluginArtifactInfoIndexCreator;
 import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
+import org.junit.Test;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -67,6 +68,7 @@ public class Nexus3578IndexerManagerTest
     }
 
     // this one fails (see NEXUS-3578)
+    @Test
     public void testSnapshotJarPomOrder()
         throws Exception
     {
@@ -83,6 +85,7 @@ public class Nexus3578IndexerManagerTest
     }
 
     // this one works (see NEXUS-3578)
+    @Test
     public void testSnapshotPomJarOrder()
         throws Exception
     {
@@ -124,7 +127,7 @@ public class Nexus3578IndexerManagerTest
 
     /**
      * Uses the JARs checksum and GAVs to validate index content being updated.
-     * 
+     *
      * @throws Exception
      */
     protected void validate()

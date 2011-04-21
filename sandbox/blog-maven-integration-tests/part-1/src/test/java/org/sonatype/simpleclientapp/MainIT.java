@@ -20,18 +20,19 @@ package org.sonatype.simpleclientapp;
 
 import java.io.File;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class MainIT
-    extends TestCase
 {
 
+    @Test
     public void testExecute()
         throws Exception
     {
-        assertEquals( 0, execute( new String[] {} ) );
-        assertEquals( 1, execute( new String[] { "one" } ) );
-        assertEquals( 6, execute( new String[] { "one", "two", "three", "four", "five", "six" } ) );
+        Assert.assertEquals( 0, execute( new String[] {} ) );
+        Assert.assertEquals( 1, execute( new String[] { "one" } ) );
+        Assert.assertEquals( 6, execute( new String[] { "one", "two", "three", "four", "five", "six" } ) );
     }
 
     private int execute( String[] args )

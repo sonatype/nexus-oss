@@ -26,7 +26,7 @@ import java.util.Random;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -36,7 +36,7 @@ import org.junit.Before;
 
 /**
  * Abstract test case for nexus tests. It is customizing the context and helps with nexus configurations.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractNexusTestCase
@@ -71,7 +71,7 @@ public abstract class AbstractNexusTestCase
         ctx.put( APPS_CONFIGURATION_KEY, appsHomeDir.getAbsolutePath() );
         ctx.put( CONF_DIR_KEY, confHomeDir.getAbsolutePath() );
     }
-    
+
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
@@ -84,13 +84,13 @@ public abstract class AbstractNexusTestCase
         throws Exception {
         setUp();
     }
-    
+
     @After
     public void tearDownJUnit4()
         throws Exception {
         tearDown();
     }
-    
+
     @Override
     protected void setUp()
         throws Exception

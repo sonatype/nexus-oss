@@ -21,12 +21,14 @@ package org.sonatype.nexus.index;
 import java.io.File;
 import java.net.URL;
 
+import org.junit.Test;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 
 public class GroupReindexIndexerManagerTest
     extends AbstractIndexerManagerTest
 {
 
+    @Test
     public void testGroupReindex()
         throws Exception
     {

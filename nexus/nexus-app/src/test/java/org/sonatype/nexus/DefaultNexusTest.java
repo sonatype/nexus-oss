@@ -20,6 +20,7 @@ package org.sonatype.nexus;
 
 import java.util.Map;
 
+import org.junit.Test;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
@@ -63,6 +64,7 @@ public class DefaultNexusTest
         return false;
     }
 
+    @Test
     public void testRepositoryTemplates()
         throws Exception
     {
@@ -105,6 +107,7 @@ public class DefaultNexusTest
         // assertNotNull( getDefaultNexus().createFromTemplate( RepositoryTemplate.DEFAULT_VIRTUAL ) );
     }
 
+    @Test
     public void testListRepositoryContentClasses()
         throws Exception
     {
@@ -117,6 +120,7 @@ public class DefaultNexusTest
         assertTrue( plexusContentClasses.values().containsAll( contentClasses.values() ) );
     }
 
+    @Test
     public void testBounceNexus()
         throws Exception
     {

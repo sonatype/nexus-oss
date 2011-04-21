@@ -20,6 +20,7 @@ package org.sonatype.nexus.proxy.wastebasket;
 
 import java.io.File;
 
+import org.junit.Test;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 
 /**
@@ -29,7 +30,7 @@ public class DefaultFSWastebasketTest
     extends AbstractNexusTestCase
 {
     DefaultFSWastebasketForTest wastebasket;
-    
+
     private File trashDir = null;
     private File wastebasketDir = null;
 
@@ -38,26 +39,27 @@ public class DefaultFSWastebasketTest
         throws Exception
     {
         super.setUp();
-        
+
         trashDir = new File( getPlexusHomeDir(), "trash" );
         trashDir.mkdir();
-        
+
         wastebasketDir = new File( getPlexusHomeDir(), "wastebasket" );
         wastebasketDir.mkdir();
 
         wastebasket = new DefaultFSWastebasketForTest();
     }
-    
+
     @Override
     protected void tearDown()
         throws Exception
     {
         super.tearDown();
-        
+
         cleanDir( trashDir );
         cleanDir( wastebasketDir );
     }
 
+    @Test
     public void testDeleteFile()
         throws Exception
     {

@@ -23,17 +23,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.LinkedHashSet;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author juven
  */
 public class EnhancedPropertiesTest
-    extends TestCase
 {
 
     private static String LINE_SEPARATOR = System.getProperty( "line.separator" );
 
+    @Test
     public void testRead()
         throws Exception
     {
@@ -57,9 +58,10 @@ public class EnhancedPropertiesTest
             actual.add( value );
         }
 
-        assertEquals( expected, actual );
+        Assert.assertEquals( expected, actual );
     }
 
+    @Test
     public void testStore()
         throws Exception
     {
@@ -79,7 +81,7 @@ public class EnhancedPropertiesTest
 
         String expected = "# a comment" + LINE_SEPARATOR + "author=juv-away" + LINE_SEPARATOR + LINE_SEPARATOR + "#Juven Xu" + LINE_SEPARATOR
             + "date=Mar 11, 2009" + LINE_SEPARATOR;
-        assertEquals( expected, outStream.toString() );
+        Assert.assertEquals( expected, outStream.toString() );
 
         outStream.close();
 

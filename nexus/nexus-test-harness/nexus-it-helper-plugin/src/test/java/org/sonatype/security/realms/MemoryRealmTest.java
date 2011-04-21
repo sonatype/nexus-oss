@@ -18,64 +18,67 @@
  */
 package org.sonatype.security.realms;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.security.realms.MemoryRealm;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.Realm;
+import org.junit.Test;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 
 public class MemoryRealmTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
     private MemoryRealm realm;
-         
+
     @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
-        
+
         realm = ( MemoryRealm ) lookup( Realm.class, "MemoryRealm" );
     }
-    
+
+    @Test
     public void testSuccessfulAuthentication()
         throws Exception
     {
         UsernamePasswordToken upToken = new UsernamePasswordToken( "admin", "admin123" );
-        
+
         AuthenticationInfo ai = realm.getAuthenticationInfo( upToken );
-        
+
         String password = ( String ) ai.getCredentials();
-        
-        assertEquals( "admin123", password );        
+
+        assertEquals( "admin123", password );
     }
-    
+
+    @Test
     public void testFailedAuthentication()
         throws Exception
     {
         UsernamePasswordToken upToken = new UsernamePasswordToken( "admin", "badpassword" );
-        
+
         try
         {
             realm.getAuthenticationInfo( upToken );
-            
+
             fail( "Authentication should have failed" );
         }
         catch( AuthenticationException e )
         {
             // good
-        }   
+        }
     }
-    
+
+    @Test
     public void testAdminAuthorization()
         throws Exception
     {
         UsernamePasswordToken upToken = new UsernamePasswordToken( "admin", "admin123" );
-        
+
         AuthenticationInfo ai = realm.getAuthenticationInfo( upToken );
-        
+
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:status:read" ) ) );
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:authentication:read" ) ) );
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:settings:read" ) ) );
@@ -88,17 +91,18 @@ public class MemoryRealmTest
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:target:1:somerepo:create" ) ) );
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:target:1:somerepo:delete" ) ) );
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:target:1:somerepo:update" ) ) );
-        
+
         assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "junk" ) ) );
     }
-    
+
+    @Test
     public void testAnonymousAuthorization()
         throws Exception
     {
         UsernamePasswordToken upToken = new UsernamePasswordToken( "anonymous", "anonymous" );
-        
+
         AuthenticationInfo ai = realm.getAuthenticationInfo( upToken );
-        
+
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:status:read" ) ) );
         assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:authentication:read" ) ) );
         assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:settings:read" ) ) );
@@ -106,21 +110,22 @@ public class MemoryRealmTest
         assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:repositories:create" ) ) );
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:repositories:read" ) ) );
         assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:repositories:update" ) ) );
-        assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:repositories:delete" ) ) );        
+        assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:repositories:delete" ) ) );
         assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "junk" ) ) );
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:target:1:somerepo:read" ) ) );
         assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:target:1:somerepo:create" ) ) );
         assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:target:1:somerepo:delete" ) ) );
         assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:target:1:somerepo:update" ) ) );
     }
-    
+
+    @Test
     public void testDeploymentAuthorization()
         throws Exception
     {
         UsernamePasswordToken upToken = new UsernamePasswordToken( "deployment", "deployment123" );
-        
+
         AuthenticationInfo ai = realm.getAuthenticationInfo( upToken );
-        
+
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:status:read" ) ) );
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:authentication:read" ) ) );
         assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:settings:read" ) ) );
@@ -128,7 +133,7 @@ public class MemoryRealmTest
         assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:repositories:create" ) ) );
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:repositories:read" ) ) );
         assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:repositories:update" ) ) );
-        assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:repositories:delete" ) ) );        
+        assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:repositories:delete" ) ) );
         assertFalse( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "junk" ) ) );
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:target:1:somerepo:read" ) ) );
         assertTrue( realm.isPermitted( ai.getPrincipals(), new WildcardPermission( "nexus:target:1:somerepo:create" ) ) );

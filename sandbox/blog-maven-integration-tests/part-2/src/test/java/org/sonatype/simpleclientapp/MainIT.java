@@ -22,12 +22,11 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 public class MainIT
-    extends TestCase
 {
-
+    @Test
     public void testExecute()
         throws Exception
     {

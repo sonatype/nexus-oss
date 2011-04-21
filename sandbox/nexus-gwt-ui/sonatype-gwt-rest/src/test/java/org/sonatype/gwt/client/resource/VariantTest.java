@@ -18,12 +18,10 @@
  */
 package org.sonatype.gwt.client.resource;
 
-import junit.framework.TestCase;
-
 public class VariantTest
-    extends TestCase
 {
 
+    @Test
     public void testVariant()
     {
         Variant variant = new Variant("application/json; charset=UTF-8");

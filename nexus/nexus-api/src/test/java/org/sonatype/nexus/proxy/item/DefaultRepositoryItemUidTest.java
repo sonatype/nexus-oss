@@ -20,33 +20,25 @@ package org.sonatype.nexus.proxy.item;
 
 import java.util.Random;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class DefaultRepositoryItemUidTest
-    extends TestCase
 {
     private DummyRepositoryItemUidFactory factory;
 
     private Random random;
 
+    @Before
     protected void setUp()
         throws Exception
     {
-        super.setUp();
-
         this.factory = new DummyRepositoryItemUidFactory();
 
         this.random = new Random( System.currentTimeMillis() );
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
     }
 
     @Test
@@ -137,9 +129,9 @@ public class DefaultRepositoryItemUidTest
 
         String lockToString = uid.getContentLock().toString();
 
-        assertTrue( "We expect " + wc + " write locks but have " + lockToString,
+        Assert.assertTrue( "We expect " + wc + " write locks but have " + lockToString,
             lockToString.contains( "[Write locks = " + wc ) );
-        assertTrue( "We expect " + rc + " read locks but have " + lockToString,
+        Assert.assertTrue( "We expect " + rc + " read locks but have " + lockToString,
             lockToString.contains( ", Read locks = " + rc + "]" ) );
     }
 

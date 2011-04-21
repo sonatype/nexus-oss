@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -39,7 +40,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * AttributeStorage implementation driven by XStream.
- * 
+ *
  * @author cstamas
  */
 public class DefaultAttributesHandlerTest
@@ -91,6 +92,7 @@ public class DefaultAttributesHandlerTest
         repository.configure( repoConf );
     }
 
+    @Test
     public void testRecreateAttrs()
         throws Exception
     {
@@ -108,6 +110,7 @@ public class DefaultAttributesHandlerTest
         // ).exists() );
     }
 
+    @Test
     public void testRecreateAttrsWithCustomAttrs()
         throws Exception
     {

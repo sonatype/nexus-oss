@@ -25,13 +25,13 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 import org.apache.commons.lang.time.DateUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
@@ -180,7 +180,6 @@ import org.sonatype.security.rest.model.UserToRoleResourceRequest;
 import com.thoughtworks.xstream.XStream;
 
 public class TestMarshalUnmarchal
-    extends TestCase
 {
     private SimpleDateFormat dateFormat = new SimpleDateFormat( "MM/dd/yyyy" );
 
@@ -188,11 +187,10 @@ public class TestMarshalUnmarchal
 
     private XStream xstreamJSON;
 
-    @Override
+    @Before
     protected void setUp()
         throws Exception
     {
-        super.setUp();
 
         NexusApplication napp = new NexusApplication();
 
@@ -211,6 +209,7 @@ public class TestMarshalUnmarchal
         return xstreamJSON;
     }
 
+    @Test
     public void testErrorResponse()
     {
         ErrorResponse errorResponse = new ErrorResponse();
@@ -228,6 +227,7 @@ public class TestMarshalUnmarchal
 
     }
 
+    @Test
     public void testContentListDescribeResourceResponse()
         throws ParseException
     {
@@ -272,6 +272,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( response );
     }
 
+    @Test
     public void testContentListResourceResponse()
         throws ParseException
     {
@@ -310,6 +311,7 @@ public class TestMarshalUnmarchal
 
     }
 
+    @Test
     public void testRepositoryResource()
     {
         RepositoryResource repo = new RepositoryResource();
@@ -368,6 +370,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testRepositoryShadowResource()
     {
         RepositoryShadowResource repo = new RepositoryShadowResource();
@@ -390,6 +393,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testRepositoryProxyResource()
     {
         RepositoryProxyResource repo = new RepositoryProxyResource();
@@ -449,6 +453,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testRepositoryListResourceResponse()
     {
         RepositoryListResourceResponse listResourceResponse = new RepositoryListResourceResponse();
@@ -489,6 +494,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( listResourceResponse );
     }
 
+    @Test
     public void testRepositoryStatusResourceResponse()
     {
 
@@ -515,6 +521,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testRepositoryStatusListResourceResponse()
     {
         RepositoryStatusListResourceResponse resourceResponse = new RepositoryStatusListResourceResponse();
@@ -560,6 +567,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testRepositoryMetaResourceResponse()
     {
         RepositoryMetaResourceResponse resourceResponse = new RepositoryMetaResourceResponse();
@@ -585,6 +593,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testRepositoryGroupListResourceResponse()
     {
         RepositoryGroupListResourceResponse resourceResponse = new RepositoryGroupListResourceResponse();
@@ -612,6 +621,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testRepositoryGroupResourceResponse()
     {
         RepositoryGroupResourceResponse resourceResponse = new RepositoryGroupResourceResponse();
@@ -643,6 +653,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testRepositoryRouteListResourceResponse()
     {
         RepositoryRouteListResourceResponse resourceResponse = new RepositoryRouteListResourceResponse();
@@ -685,6 +696,7 @@ public class TestMarshalUnmarchal
 
     }
 
+    @Test
     public void testRepositoryRouteResourceResponse()
     {
         RepositoryRouteResourceResponse resourceResponse = new RepositoryRouteResourceResponse();
@@ -713,6 +725,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testGlobalConfigurationListResourceResponse()
     {
         GlobalConfigurationListResourceResponse resourceResponse = new GlobalConfigurationListResourceResponse();
@@ -732,6 +745,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testGlobalConfigurationResourceResponse()
     {
         GlobalConfigurationResourceResponse resourceResponse = new GlobalConfigurationResourceResponse();
@@ -790,6 +804,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testWastebasketResourceResponse()
     {
         WastebasketResourceResponse resourceResponse = new WastebasketResourceResponse();
@@ -806,6 +821,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testLogsListResourceResponse()
     {
         LogsListResourceResponse resourceResponse = new LogsListResourceResponse();
@@ -831,6 +847,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testConfigurationsListResourceResponse()
     {
         ConfigurationsListResourceResponse resourceResponse = new ConfigurationsListResourceResponse();
@@ -850,6 +867,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testFeedListResourceResponse()
     {
         FeedListResourceResponse resourceResponse = new FeedListResourceResponse();
@@ -869,6 +887,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testAuthenticationLoginResourceResponse()
     {
         AuthenticationLoginResourceResponse resourceResponse = new AuthenticationLoginResourceResponse();
@@ -888,6 +907,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testStatusResourceResponse()
         throws ParseException
     {
@@ -939,6 +959,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testScheduledServiceListResourceResponse()
     {
         ScheduledServiceListResourceResponse resourceResponse = new ScheduledServiceListResourceResponse();
@@ -977,6 +998,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testScheduledServiceResourceStatusResponse()
     {
         ScheduledServiceResourceStatus status = new ScheduledServiceResourceStatus();
@@ -1014,6 +1036,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resource );
     }
 
+    @Test
     public void testScheduledServiceBaseResource()
     {
         ScheduledServiceBaseResource resource = new ScheduledServiceBaseResource();
@@ -1042,6 +1065,7 @@ public class TestMarshalUnmarchal
 
     }
 
+    @Test
     public void testScheduledServiceOnceResource()
     {
         ScheduledServiceOnceResource resource = new ScheduledServiceOnceResource();
@@ -1071,6 +1095,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testScheduledServiceDailyResource()
     {
         ScheduledServiceDailyResource resource = new ScheduledServiceDailyResource();
@@ -1100,6 +1125,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testScheduledServiceAdvancedResource()
     {
         ScheduledServiceAdvancedResource resource = new ScheduledServiceAdvancedResource();
@@ -1128,6 +1154,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testScheduledServiceMonthlyResource()
     {
         ScheduledServiceMonthlyResource resource = new ScheduledServiceMonthlyResource();
@@ -1158,6 +1185,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testScheduledServiceWeeklyResource()
     {
         ScheduledServiceWeeklyResource resource = new ScheduledServiceWeeklyResource();
@@ -1188,6 +1216,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testScheduledServiceTypeResourceResponse()
     {
         ScheduledServiceTypeResourceResponse resourceResponse = new ScheduledServiceTypeResourceResponse();
@@ -1243,6 +1272,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testUserListResourceResponse()
     {
         UserListResourceResponse resourceResponse = new UserListResourceResponse();
@@ -1272,6 +1302,7 @@ public class TestMarshalUnmarchal
 
     }
 
+    @Test
     public void testUserResourceRequest()
     {
         UserResourceRequest resourceRequest = new UserResourceRequest();
@@ -1290,6 +1321,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceRequest );
     }
 
+    @Test
     public void testUserResourceResponse()
     {
         UserResourceResponse resourceResponse = new UserResourceResponse();
@@ -1308,6 +1340,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testUserForgotPasswordRequest()
     {
         UserForgotPasswordRequest request = new UserForgotPasswordRequest();
@@ -1322,6 +1355,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( request );
     }
 
+    @Test
     public void testUserChangePasswordRequest()
     {
         UserChangePasswordRequest request = new UserChangePasswordRequest();
@@ -1337,6 +1371,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( request );
     }
 
+    @Test
     public void testRoleListResourceResponse()
     {
         RoleListResourceResponse resourceResponse = new RoleListResourceResponse();
@@ -1369,6 +1404,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testRoleResourceRequest()
     {
         RoleResourceRequest resourceRequest = new RoleResourceRequest();
@@ -1389,6 +1425,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceRequest );
     }
 
+    @Test
     public void testRoleResourceResponse()
     {
         RoleResourceResponse resourceResponse = new RoleResourceResponse();
@@ -1409,6 +1446,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testPrivilegeTargetResource()
     {
         PrivilegeResourceRequest resourceRequest = new PrivilegeResourceRequest();
@@ -1429,6 +1467,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceRequest );
     }
 
+    @Test
     public void testPrivilegeListResourceResponse()
     {
         PrivilegeListResourceResponse resourceResponse = new PrivilegeListResourceResponse();
@@ -1531,6 +1570,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testPrivilegeStatusResource()
     {
         PrivilegeStatusResource appResource1 = new PrivilegeStatusResource();
@@ -1590,6 +1630,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testPrivilegeTypeResourceResponse()
     {
         PrivilegeTypeResourceResponse response = new PrivilegeTypeResourceResponse();
@@ -1638,6 +1679,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( response );
     }
 
+    @Test
     public void testNFCResourceResponse()
     {
         NFCResourceResponse resourceResponse = new NFCResourceResponse();
@@ -1676,6 +1718,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testRepositoryTargetListResourceResponse()
     {
         RepositoryTargetListResourceResponse resourceResponse = new RepositoryTargetListResourceResponse();
@@ -1699,6 +1742,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
+    @Test
     public void testRepositoryTargetResourceResponse()
     {
         RepositoryTargetResourceResponse resourceResponse = new RepositoryTargetResourceResponse();
@@ -1717,6 +1761,7 @@ public class TestMarshalUnmarchal
 
     }
 
+    @Test
     public void testRepositoryContentClassListResourceResponse()
     {
         RepositoryContentClassListResourceResponse resourceResponse = new RepositoryContentClassListResourceResponse();
@@ -1772,6 +1817,7 @@ public class TestMarshalUnmarchal
 
     }
 
+    @Test
     public void testUserToRoleResourceRequest()
     {
         UserToRoleResourceRequest resourceResponse = new UserToRoleResourceRequest();
@@ -1788,6 +1834,7 @@ public class TestMarshalUnmarchal
 
     }
 
+    @Test
     public void testPlexusUserResourceResponse()
     {
         PlexusUserResourceResponse resourceResponse = new PlexusUserResourceResponse();
@@ -1814,6 +1861,7 @@ public class TestMarshalUnmarchal
 
     }
 
+    @Test
     public void testPlexusUserListResourceResponse()
     {
         PlexusUserListResourceResponse resourceResponse = new PlexusUserListResourceResponse();
@@ -1858,6 +1906,7 @@ public class TestMarshalUnmarchal
 
     }
 
+    @Test
     public void testLogConfigResourceResponse()
     {
         LogConfigResourceResponse response = new LogConfigResourceResponse();
@@ -1874,6 +1923,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( response );
     }
 
+    @Test
     public void testMirrorResourceListResponse()
     {
         MirrorResourceListResponse response = new MirrorResourceListResponse();
@@ -1894,6 +1944,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( response );
     }
 
+    @Test
     public void testMirrorResourceListRequest()
     {
         MirrorResourceListRequest response = new MirrorResourceListRequest();
@@ -1914,6 +1965,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( response );
     }
 
+    @Test
     public void testMirrorStatusResourceListResponse()
     {
         MirrorStatusResourceListResponse response = new MirrorStatusResourceListResponse();
@@ -1936,6 +1988,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( response );
     }
 
+    @Test
     public void testSmtpSettingsResourceRequest()
     {
         SmtpSettingsResourceRequest request = new SmtpSettingsResourceRequest();
@@ -1956,6 +2009,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( request );
     }
 
+    @Test
     public void testErrorReportRequest()
     {
         ErrorReportRequest request = new ErrorReportRequest();
@@ -1970,6 +2024,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( request );
     }
 
+    @Test
     public void testErrorReportResponse()
     {
         ErrorReportResponse request = new ErrorReportResponse();
@@ -1983,6 +2038,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( request );
     }
 
+    @Test
     public void testArtifactResolveResourceResponse()
     {
         ArtifactResolveResourceResponse response = new ArtifactResolveResourceResponse();
@@ -2009,6 +2065,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( response );
     }
 
+    @Test
     public void testNexusRepositoryTypeListResourceResponse()
     {
         NexusRepositoryTypeListResourceResponse response = new NexusRepositoryTypeListResourceResponse();
@@ -2033,6 +2090,7 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( response );
     }
 
+    @Test
     public void testPlexusComponentListResourceResponse()
     {
         PlexusComponentListResourceResponse resourceResponse = new PlexusComponentListResourceResponse();
@@ -2052,6 +2110,7 @@ public class TestMarshalUnmarchal
 
     }
 
+    @Test
     public void testExternalRoleMappingResourceResponse()
     {
         ExternalRoleMappingResourceResponse resourceResponse = new ExternalRoleMappingResourceResponse();
@@ -2103,6 +2162,7 @@ public class TestMarshalUnmarchal
 
     }
 
+    @Test
     public void testPlexusRoleListPlexusResource()
     {
         PlexusRoleListResourceResponse resourceResponse = new PlexusRoleListResourceResponse();

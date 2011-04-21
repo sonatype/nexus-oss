@@ -25,10 +25,12 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.Test;
 
 public class DefaultStorageFileItemTest
     extends AbstractStorageItemTest
 {
+    @Test
     public void testNonVirtualFileSimple()
         throws Exception
     {
@@ -52,6 +54,7 @@ public class DefaultStorageFileItemTest
             .getBytes() ) ) );
     }
 
+    @Test
     public void testNonVirtualFileWithContentSimple()
         throws Exception
     {
@@ -74,6 +77,7 @@ public class DefaultStorageFileItemTest
         assertEquals( true, IOUtil.contentEquals( fis, new ByteArrayInputStream( "THIS IS CONTENT".getBytes() ) ) );
     }
 
+    @Test
     public void testNonVirtualFileDeep()
         throws Exception
     {
@@ -98,6 +102,7 @@ public class DefaultStorageFileItemTest
             .getBytes() ) ) );
     }
 
+    @Test
     public void testNonVirtualFileWithContentDeep()
         throws Exception
     {

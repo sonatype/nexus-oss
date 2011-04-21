@@ -20,7 +20,8 @@ package org.sonatype.nexus.proxy.repository.validator;
 
 import java.io.File;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
@@ -44,6 +45,7 @@ public class FileTypeValidationUtilTest
         return lookup( FileTypeValidatorHub.class );
     }
 
+    @Test
     public void testJar()
         throws Exception
     {
@@ -54,6 +56,7 @@ public class FileTypeValidationUtilTest
         doTest( "something/else/myapp.jar", "error.html", false );
     }
 
+    @Test
     public void testPom()
         throws Exception
     {
@@ -65,6 +68,7 @@ public class FileTypeValidationUtilTest
         doTest( "something/else/myapp.xml", "error.html", false );
     }
 
+    @Test
     public void testNonHandled()
         throws Exception
     {

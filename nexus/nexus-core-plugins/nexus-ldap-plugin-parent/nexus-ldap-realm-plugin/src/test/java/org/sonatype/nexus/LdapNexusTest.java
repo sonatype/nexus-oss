@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.SimplePrincipalCollection;
@@ -32,6 +33,7 @@ public class LdapNexusTest
     extends AbstractNexusTestCase
 {
 
+    @Test
     public void testAuthentication()
         throws Exception
     {
@@ -41,6 +43,7 @@ public class LdapNexusTest
         Assert.assertNotNull( security.authenticate( new UsernamePasswordToken( "cstamas", "cstamas123" ) ) );
     }
 
+    @Test
     public void testAuthenticationFailure()
         throws Exception
     {
@@ -57,6 +60,7 @@ public class LdapNexusTest
         }
     }
 
+    @Test
     public void testAuthorization()
         throws Exception
     {
@@ -70,6 +74,7 @@ public class LdapNexusTest
         Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
     }
 
+    @Test
     public void testAuthorizationPriv()
         throws Exception
     {

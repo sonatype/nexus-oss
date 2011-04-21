@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.proxy;
 
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -38,6 +39,7 @@ public class RemoteAuthTest
         return jettyTestsuiteEnvironmentBuilder;
     }
 
+    @Test
     public void testHttpAuths()
         throws Exception
     {

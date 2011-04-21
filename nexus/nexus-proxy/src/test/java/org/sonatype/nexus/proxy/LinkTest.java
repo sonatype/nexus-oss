@@ -20,6 +20,7 @@ package org.sonatype.nexus.proxy;
 
 import java.io.ByteArrayInputStream;
 
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
@@ -43,6 +44,7 @@ public class LinkTest
         return jettyTestsuiteEnvironmentBuilder;
     }
 
+    @Test
     public void testRepoLinks()
         throws Exception
     {

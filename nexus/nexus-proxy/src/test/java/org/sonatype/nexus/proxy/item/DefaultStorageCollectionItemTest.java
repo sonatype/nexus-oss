@@ -27,11 +27,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.junit.Test;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 
 public class DefaultStorageCollectionItemTest
     extends AbstractStorageItemTest
 {
+    @Test
     public void testNonVirtualCollectionSimple()
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
@@ -43,6 +45,7 @@ public class DefaultStorageCollectionItemTest
         checkAbstractStorageItem( repository, coll, false, "", "/", "/" );
     }
 
+    @Test
     public void testNonVirtualCollectionList()
         throws Exception
     {
@@ -77,6 +80,7 @@ public class DefaultStorageCollectionItemTest
         assertEquals( 3, items.size() );
     }
 
+    @Test
     public void testVirtualCollectionSimple()
     {
         replay( router );
@@ -85,6 +89,7 @@ public class DefaultStorageCollectionItemTest
         checkAbstractStorageItem( router, coll, true, "", "/", "/" );
     }
 
+    @Test
     public void testVirtualCollectionList()
         throws Exception
     {

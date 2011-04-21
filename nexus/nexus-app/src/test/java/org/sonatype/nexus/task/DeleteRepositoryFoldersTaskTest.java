@@ -20,25 +20,27 @@ package org.sonatype.nexus.task;
 
 import java.io.File;
 
+import org.junit.Test;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Test if the repo folders(storage, indexer, proxy attributes) were deleted correctly
- * 
+ *
  * @author juven
  */
 public class DeleteRepositoryFoldersTaskTest
     extends AbstractMavenRepoContentTests
 {
+    @Test
     public void testTrashRepositoryFolders()
         throws Exception
     {
         fillInRepo();
 
         String repoId = snapshots.getId();
-        
+
         DeleteRepositoryFoldersTask task = (DeleteRepositoryFoldersTask) lookup( SchedulerTask.class, DeleteRepositoryFoldersTask.class.getSimpleName() );
         task.setRepository( snapshots );
         task.setDeleteForever( false );
@@ -58,6 +60,7 @@ public class DeleteRepositoryFoldersTaskTest
         assertFalse( new File( trashDir, repoId + "-remote" ).exists() );
     }
 
+    @Test
     public void testDeleteForeverRepositoryFolders()
         throws Exception
     {

@@ -21,7 +21,8 @@ package org.sonatype.nexus;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.IOUtil;
@@ -38,6 +39,7 @@ public class MultipleRealmsLdapNotConfiguredTest
     extends AbstractNexusTestCase
 {
 
+    @Test
     public void testAuthentication()
         throws Exception
     {
@@ -54,15 +56,16 @@ public class MultipleRealmsLdapNotConfiguredTest
         {
             // expected
         }
-        
-        
+
+
         // xml should not
         Assert.assertNotNull( security.authenticate( new UsernamePasswordToken( "admin", "admin123" ) ) );
-        
+
         Assert.assertNotNull( security.authenticate( new UsernamePasswordToken( "deployment", "deployment123" ) ) );
-        
+
     }
 
+    @Test
     public void testAuthorization()
         throws Exception
     {
@@ -74,20 +77,21 @@ public class MultipleRealmsLdapNotConfiguredTest
         SimplePrincipalCollection principals = new SimplePrincipalCollection();
         principals.add( "cstamas", new NexusLdapAuthenticationRealm().getName() );
 
-        // if realm is not configured, the user should not be able to be authorized        
+        // if realm is not configured, the user should not be able to be authorized
         Assert.assertFalse( security.hasRole( principals, "developer" ) );
         Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
-        
+
      // xml user
         principals = new SimplePrincipalCollection();
         // TODO: bdemers or dbradicich, this "fix" is wrong, it relies on imple details!
         // was: principals.add( "deployment", new XmlAuthenticatingRealm().getName() );
         principals.add( "deployment", XmlAuthenticatingRealm.ROLE );
-        
+
         Assert.assertTrue( security.hasRole( principals, "deployment" ) );
         Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
     }
 
+    @Test
     public void testAuthorizationPriv()
         throws Exception
     {
@@ -100,16 +104,16 @@ public class MultipleRealmsLdapNotConfiguredTest
 
         // if realm is not configured, the user should not be able to be authorized
         Assert.assertFalse( security.isPermitted( principals, "security:usersforgotpw:create" ) );
-        
+
         // XML
         principals = new SimplePrincipalCollection();
         // TODO: bdemers or dbradicich, this "fix" is wrong, it relies on imple details!
         // was: principals.add( "test-user", new XmlAuthenticatingRealm().getName() );
         principals.add( "test-user", XmlAuthenticatingRealm.ROLE );
-        
+
         Assert.assertTrue( security.isPermitted( principals, "security:usersforgotpw:create" ) );
         Assert.assertFalse( security.isPermitted( principals, "security:usersforgotpw:delete" ) );
-        
+
         Assert.assertTrue( security.isPermitted( principals, "nexus:target:1:*:delete" ) );
     }
 
@@ -119,10 +123,10 @@ public class MultipleRealmsLdapNotConfiguredTest
     IOUtil.copy( getClass().getResourceAsStream( "/test-conf/security-configuration-multipleRealms.xml" ), new FileOutputStream(
         getSecurityConfiguration() ) );
 }
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sonatype.nexus.AbstractNexusTestCase#customizeContext(org.codehaus.plexus.context.Context)
      */
     @Override

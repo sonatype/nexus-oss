@@ -20,6 +20,7 @@ package org.sonatype.nexus.proxy;
 
 import java.util.Collection;
 
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -41,6 +42,7 @@ public class RepositoryEvictUnusedItemsTest
         return jettyTestsuiteEnvironmentBuilder;
     }
 
+    @Test
     public void testEvictUnusedItems()
         throws Exception
     {

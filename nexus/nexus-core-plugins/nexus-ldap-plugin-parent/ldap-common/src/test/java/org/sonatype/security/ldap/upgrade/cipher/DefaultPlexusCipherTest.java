@@ -34,11 +34,9 @@ package org.sonatype.security.ldap.upgrade.cipher;
  * under the License.
  */
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.security.ldap.upgrade.cipher.CryptoUtils;
-import org.sonatype.security.ldap.upgrade.cipher.PlexusCipher;
-import org.sonatype.security.ldap.upgrade.cipher.TestPlexusCipher;
+import org.junit.Assert;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 
 /**
  * Test the Plexus Cipher container
@@ -47,7 +45,7 @@ import org.sonatype.security.ldap.upgrade.cipher.TestPlexusCipher;
  * @version $Id$
  */
 public class DefaultPlexusCipherTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
     private String passPhrase = "foofoo";
 
@@ -75,7 +73,7 @@ public class DefaultPlexusCipherTest
             throw new Exception( "No default algoritm found in DefaultPlexusCipher" );
 
         String[] res = CryptoUtils.getCryptoImpls( "Cipher" );
-        assertNotNull( "No Cipher providers found in the current environment", res );
+        Assert.assertNotNull( "No Cipher providers found in the current environment", res );
 
         for ( String provider : res )
             if ( pc.algorithm.equalsIgnoreCase( provider ) )
@@ -89,7 +87,7 @@ public class DefaultPlexusCipherTest
         throws Exception
     {
         String[] res = CryptoUtils.getServiceTypes();
-        assertNotNull( "No Cipher providers found in the current environment", res );
+        Assert.assertNotNull( "No Cipher providers found in the current environment", res );
 
         for ( String provider : CryptoUtils.getCryptoImpls( "Cipher" ) )
             try
@@ -110,7 +108,7 @@ public class DefaultPlexusCipherTest
         throws Exception
     {
         String res = pc.decrypt( encStr, passPhrase );
-        assertEquals( "Decryption did not produce desired result", str, res );
+        Assert.assertEquals( "Decryption did not produce desired result", str, res );
     }
 
     // -------------------------------------------------------------
@@ -119,7 +117,7 @@ public class DefaultPlexusCipherTest
     {
         String xRes = pc.encrypt( str, passPhrase );
         String res = pc.decrypt( xRes, passPhrase );
-        assertEquals( "Encryption/Decryption did not produce desired result", str, res );
+        Assert.assertEquals( "Encryption/Decryption did not produce desired result", str, res );
     }
 
     // -------------------------------------------------------------
@@ -127,7 +125,7 @@ public class DefaultPlexusCipherTest
         throws Exception
     {
         String res = pc.decorate( "aaa" );
-        assertEquals( "Decoration failed", PlexusCipher.ENCRYPTED_STRING_DECORATION_START + "aaa"
+        Assert.assertEquals( "Decoration failed", PlexusCipher.ENCRYPTED_STRING_DECORATION_START + "aaa"
             + PlexusCipher.ENCRYPTED_STRING_DECORATION_STOP, res );
     }
 
@@ -138,7 +136,7 @@ public class DefaultPlexusCipherTest
         String res =
             pc.unDecorate( PlexusCipher.ENCRYPTED_STRING_DECORATION_START + "aaa"
                 + PlexusCipher.ENCRYPTED_STRING_DECORATION_STOP );
-        assertEquals( "Decoration failed", "aaa", res );
+        Assert.assertEquals( "Decoration failed", "aaa", res );
     }
     // -------------------------------------------------------------
     // -------------------------------------------------------------

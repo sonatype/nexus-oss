@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.repositories.metadata;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -29,6 +30,7 @@ public class RemoteMirrorDownloadTest
 {
     private ServletServer server;
 
+    @Test
     public void testRemoteMetadataDownload() throws Exception
     {
         NexusRepositoryMetadataHandler repoMetadata = this.lookup( NexusRepositoryMetadataHandler.class );
@@ -45,7 +47,7 @@ public class RemoteMirrorDownloadTest
         throws Exception
     {
         super.setUp();
-        
+
         server = this.lookup( ServletServer.class );
         server.start();
     }

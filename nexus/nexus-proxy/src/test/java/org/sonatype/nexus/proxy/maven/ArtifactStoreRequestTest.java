@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.apache.maven.index.artifact.Gav;
 import org.sonatype.jettytestsuite.ServletServer;
@@ -37,44 +38,48 @@ public class ArtifactStoreRequestTest
         ServletServer ss = (ServletServer) lookup( ServletServer.ROLE );
         return new M2TestsuiteEnvironmentBuilder( ss );
     }
-    
+
+    @Test
     public void testNoDots() throws Exception
     {
         Gav gav = new Gav("nodots", "artifact", "1.0", null, "xml", null, null, null, false, null, false, null);
         MavenRepository mavenRepository = (MavenRepository) this.getRepositoryRegistry().getRepository( "repo1" );
         ArtifactStoreRequest request = new ArtifactStoreRequest( mavenRepository, gav, true, false );
-        
+
         Assert.assertEquals( "/nodots/artifact/1.0/artifact-1.0.xml", request.getRequestPath() );
     }
-    
+
+    @Test
     public void testDots() throws Exception
     {
         Gav gav = new Gav("a.bunch.of.dots.yeah", "artifact", "1.0", null, "xml", null, null, null, false, null, false, null);
         MavenRepository mavenRepository = (MavenRepository) this.getRepositoryRegistry().getRepository( "repo1" );
         ArtifactStoreRequest request = new ArtifactStoreRequest( mavenRepository, gav, true, false );
-        
+
         Assert.assertEquals( "/a/bunch/of/dots/yeah/artifact/1.0/artifact-1.0.xml", request.getRequestPath() );
     }
-    
+
     // undefined extra dot
+//    @Test
 //    public void testExtraDot() throws Exception
 //    {
 //        Gav gav = new Gav("extra..dot", "artifact", "1.0", null, "xml", null, null, null, false, false, null, false, null);
 //        MavenRepository mavenRepository = (MavenRepository) this.getRepositoryRegistry().getRepository( "repo1" );
 //        ArtifactStoreRequest request = new ArtifactStoreRequest( mavenRepository, gav, true );
-//        
+//
 //        Assert.assertEquals( "/extra/dot/artifact/1.0/artifact-1.0.xml", request.getRequestPath() );
 //    }
-    
+
+    @Test
     public void testGroupStartsWithDot() throws Exception
     {
         Gav gav = new Gav(".meta/foo/bar", "artifact", "1.0", null, "xml", null, null, null, false, null, false, null);
         MavenRepository mavenRepository = (MavenRepository) this.getRepositoryRegistry().getRepository( "repo1" );
         ArtifactStoreRequest request = new ArtifactStoreRequest( mavenRepository, gav, true, false );
-        
+
         Assert.assertEquals( "/.meta/foo/bar/artifact/1.0/artifact-1.0.xml", request.getRequestPath() );
     }
-    
-    
+
+
 
 }

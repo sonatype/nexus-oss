@@ -18,60 +18,62 @@
  */
 package org.sonatype.nexus.email;
 
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 
 public class DefaultNexusEmailerTest
     extends AbstractNexusTestCase
 {
     private NexusEmailer emailer;
-    
+
     @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
-        
+
         emailer = lookup( NexusEmailer.class );
     }
-    
+
+    @Test
     public void testConfigChanged()
         throws Exception
     {
 /*        CSmtpConfiguration newSmtp = new CSmtpConfiguration();
         newSmtp.setHostname(  "1.2.3.4" );
-        
+
         assertTrue( emailer.configChanged( newSmtp ) );
-        
+
         newSmtp = new CSmtpConfiguration();
         newSmtp.setHostname( "1.2.3.4" );
         newSmtp.setPort( 1234 );
-        
+
         assertTrue( emailer.configChanged( newSmtp ) );
-        
+
         newSmtp = new CSmtpConfiguration();
         newSmtp.setHostname( "1.2.3.4" );
         newSmtp.setPort( 1234 );
         newSmtp.setSystemEmailAddress( "someemail" );
-        
+
         assertTrue( emailer.configChanged( newSmtp ) );
-        
+
         newSmtp = new CSmtpConfiguration();
         newSmtp.setHostname( "1.2.3.4" );
         newSmtp.setPort( 1234 );
         newSmtp.setSystemEmailAddress( "someemail" );
         newSmtp.setUsername( "username" );
-        
+
         assertTrue( emailer.configChanged( newSmtp ) );
-        
+
         newSmtp = new CSmtpConfiguration();
         newSmtp.setHostname( "1.2.3.4" );
         newSmtp.setPort( 1234 );
         newSmtp.setSystemEmailAddress( "someemail" );
         newSmtp.setUsername( "username" );
         newSmtp.setPassword( "password" );
-        
+
         assertTrue( emailer.configChanged( newSmtp ) );
-        
+
         newSmtp = new CSmtpConfiguration();
         newSmtp.setHostname( "1.2.3.4" );
         newSmtp.setPort( 1234 );
@@ -79,9 +81,9 @@ public class DefaultNexusEmailerTest
         newSmtp.setUsername( "username" );
         newSmtp.setPassword( "password" );
         newSmtp.setSslEnabled( true );
-        
+
         assertTrue( emailer.configChanged( newSmtp ) );
-        
+
         newSmtp = new CSmtpConfiguration();
         newSmtp.setHostname( "1.2.3.4" );
         newSmtp.setPort( 1234 );
@@ -90,9 +92,9 @@ public class DefaultNexusEmailerTest
         newSmtp.setPassword( "password" );
         newSmtp.setSslEnabled( true );
         newSmtp.setTlsEnabled( true );
-        
+
         assertTrue( emailer.configChanged( newSmtp ) );
-        
+
         assertFalse( emailer.configChanged( newSmtp ) );*/
     }
 }

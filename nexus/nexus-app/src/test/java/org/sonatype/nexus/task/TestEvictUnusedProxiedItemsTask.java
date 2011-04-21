@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.task;
 
+import org.junit.Test;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -28,7 +29,7 @@ public class TestEvictUnusedProxiedItemsTask
     extends AbstractMavenRepoContentTests
 {
     NexusScheduler scheduler;
-    
+
     @Override
     protected void setUp()
         throws Exception
@@ -36,17 +37,18 @@ public class TestEvictUnusedProxiedItemsTask
         super.setUp();
 
         nexusConfiguration.setSecurityEnabled( false );
-        
+
         nexusConfiguration.saveConfiguration();
-        
+
         scheduler = ( NexusScheduler ) lookup( NexusScheduler.class );
     }
 
+    @Test
     public void testDeleteEmptyFolder()
         throws Exception
     {
         fillInRepo();
-        
+
         while ( scheduler.getActiveTasks().size() > 0 )
         {
             Thread.sleep( 100 );
@@ -68,7 +70,7 @@ public class TestEvictUnusedProxiedItemsTask
             StorageItem storageItem = apacheSnapshots.retrieveItem( request );
 
             storageItem.setLastRequested( tsToBeKept );
-            
+
             apacheSnapshots.storeItem( false, storageItem );
         }
 
@@ -111,5 +113,5 @@ public class TestEvictUnusedProxiedItemsTask
             }
         }
     }
-    
+
 }

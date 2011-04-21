@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.proxy;
 
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -58,6 +59,7 @@ public class RepositoryExpireCacheTest
         checkForFileAndMatchContents( item );
     }
 
+    @Test
     public void testSimple()
         throws Exception
     {

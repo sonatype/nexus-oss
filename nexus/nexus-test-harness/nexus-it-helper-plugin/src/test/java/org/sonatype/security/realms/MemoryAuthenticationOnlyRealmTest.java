@@ -18,53 +18,55 @@
  */
 package org.sonatype.security.realms;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.security.realms.MemoryAuthenticationOnlyRealm;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
+import org.junit.Test;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 
 public class MemoryAuthenticationOnlyRealmTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
     private MemoryAuthenticationOnlyRealm realm;
-         
+
     @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
-        
+
         realm = ( MemoryAuthenticationOnlyRealm ) lookup( Realm.class, "MemoryAuthenticationOnlyRealm" );
     }
-    
+
+    @Test
     public void testSuccessfulAuthentication()
         throws Exception
     {
         UsernamePasswordToken upToken = new UsernamePasswordToken( "admin", "admin321" );
-        
+
         AuthenticationInfo ai = realm.getAuthenticationInfo( upToken );
-        
+
         String password = ( String ) ai.getCredentials();
-        
-        assertEquals( "admin321", password );        
+
+        assertEquals( "admin321", password );
     }
-    
+
+    @Test
     public void testFailedAuthentication()
         throws Exception
     {
         UsernamePasswordToken upToken = new UsernamePasswordToken( "admin", "admin123" );
-        
+
         try
         {
             realm.getAuthenticationInfo( upToken );
-            
+
             fail( "Authentication should have failed" );
         }
         catch( AuthenticationException e )
         {
             // good
-        }   
+        }
     }
 }

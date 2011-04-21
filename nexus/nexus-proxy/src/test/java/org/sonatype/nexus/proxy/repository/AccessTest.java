@@ -22,7 +22,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
@@ -88,6 +89,7 @@ public class AccessTest
         return this.jettyTestsuiteEnvironmentBuilder;
     }
 
+    @Test
     public void testGroupAccess()
         throws AuthenticationException, Exception
     {
@@ -110,6 +112,7 @@ public class AccessTest
 
     }
 
+    @Test
     public void testRepositoryAccess()
         throws AuthenticationException, Exception
     {

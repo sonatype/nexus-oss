@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.context.Context;
 import org.apache.shiro.authc.UsernamePasswordToken;
@@ -32,6 +33,7 @@ public class NotConfiguredLdapNexusTest
     extends AbstractNexusTestCase
 {
 
+    @Test
     public void testAuthentication()
         throws Exception
     {
@@ -49,6 +51,7 @@ public class NotConfiguredLdapNexusTest
         }
     }
 
+    @Test
     public void testAuthorization()
         throws Exception
     {
@@ -59,11 +62,12 @@ public class NotConfiguredLdapNexusTest
         principals.add( "cstamas", AbstractLdapAuthenticatingRealm.class.getName() );
 
         // if realm is not configured, the user should not be able to be authorized
-        
+
         Assert.assertFalse( security.hasRole( principals, "developer" ) );
         Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
     }
 
+    @Test
     public void testAuthorizationPriv()
         throws Exception
     {
@@ -79,7 +83,7 @@ public class NotConfiguredLdapNexusTest
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see com.sonatype.nexus.AbstractNexusTestCase#customizeContext(org.codehaus.plexus.context.Context)
      */
     @Override

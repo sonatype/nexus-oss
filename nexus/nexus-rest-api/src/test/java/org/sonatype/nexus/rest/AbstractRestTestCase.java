@@ -18,22 +18,20 @@
  */
 package org.sonatype.nexus.rest;
 
-import junit.framework.TestCase;
-
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 
 import com.thoughtworks.xstream.XStream;
 
+import org.junit.Before;
+
 public abstract class AbstractRestTestCase
-    extends TestCase
 {
     protected XStream xstream;
 
+    @Before
     protected void setUp()
         throws Exception
     {
-        super.setUp();
-
         // create and configure XStream for JSON
         xstream = new XStream( new JsonOrgHierarchicalStreamDriver() );
 

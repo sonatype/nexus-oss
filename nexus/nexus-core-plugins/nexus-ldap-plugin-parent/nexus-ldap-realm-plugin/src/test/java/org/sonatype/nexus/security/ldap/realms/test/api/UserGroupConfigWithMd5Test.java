@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.Request;
@@ -48,6 +49,7 @@ public class UserGroupConfigWithMd5Test
         return this.lookup( PlexusResource.class, "LdapUserAndGroupConfigTestPlexusResource" );
     }
 
+    @Test
     public void testSuccess()
         throws Exception
     {
@@ -121,6 +123,7 @@ public class UserGroupConfigWithMd5Test
         Assert.assertEquals( 0, jdcasey.getRoles().size() );
     }
 
+    @Test
     public void testSuccessUsingLdapGroups()
         throws Exception
     {
@@ -200,6 +203,7 @@ public class UserGroupConfigWithMd5Test
         Assert.assertEquals( 0, jdcasey.getRoles().size() );
     }
 
+    @Test
     public void testWithValidationFailure()
         throws Exception
     {
@@ -240,6 +244,7 @@ public class UserGroupConfigWithMd5Test
 
     }
 
+    @Test
     public void testFailBadUserDN()
         throws Exception
     {
@@ -285,6 +290,7 @@ public class UserGroupConfigWithMd5Test
 
     }
 
+    @Test
     public void testFailInvalidUserDN()
         throws Exception
     {
@@ -330,6 +336,7 @@ public class UserGroupConfigWithMd5Test
         }
     }
 
+    @Test
     public void testInvalidConfigWithResults()
         throws Exception
     {
@@ -379,6 +386,7 @@ public class UserGroupConfigWithMd5Test
         }
     }
 
+    @Test
     public void testBadConnInfoFailure()
         throws Exception
     {

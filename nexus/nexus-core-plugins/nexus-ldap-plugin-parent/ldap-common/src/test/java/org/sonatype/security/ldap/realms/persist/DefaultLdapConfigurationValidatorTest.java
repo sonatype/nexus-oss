@@ -28,7 +28,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.security.ldap.realms.persist.ConfigurationValidator;
@@ -39,34 +39,34 @@ import org.sonatype.security.ldap.realms.persist.ValidationResponse;
 import org.sonatype.security.ldap.realms.persist.model.Configuration;
 import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Reader;
 
-public class DefaultLdapConfigurationValidatorTest extends PlexusTestCase
+public class DefaultLdapConfigurationValidatorTest extends PlexusTestCaseSupport
 {
 
     @Override
-    protected void customizeContext( Context context ) 
+    protected void customizeContext( Context context )
     {
        super.customizeContext( context );
-       
-       String packageName = this.getClass().getPackage().getName(); 
+
+       String packageName = this.getClass().getPackage().getName();
        context.put( "test-path", getBasedir() +"/target/test-classes/"+ packageName.replace( '.', '/' )+ "/validation" );
     }
-    
+
     @SuppressWarnings("unchecked")
     public void testConf() throws Exception
     {
-        
+
         List<LdapConfigrationValidatorTestBean> beans = this.getContainer().lookupList( LdapConfigrationValidatorTestBean.class );
         ConfigurationValidator validator = lookup(ConfigurationValidator.class);
-        
+
         for ( LdapConfigrationValidatorTestBean testBean : beans )
         {
             ValidationResponse response = validator.validateModel( new ValidationRequest( this.getLdapConfiguration( testBean.getConfigFile() )) );
-            
+
             Assert.assertEquals( "Config File: "+ testBean.getConfigFile() +" errors:\n" +this.getDebugStringFromResponse( response ), testBean.getNumberOfErrors(), response.getValidationErrors().size() );
-            Assert.assertEquals( "Config File: "+ testBean.getConfigFile() +" warnings:" +this.getDebugStringFromResponse( response ), testBean.getNumberOfWarnings(), response.getValidationWarnings().size() );   
+            Assert.assertEquals( "Config File: "+ testBean.getConfigFile() +" warnings:" +this.getDebugStringFromResponse( response ), testBean.getNumberOfWarnings(), response.getValidationWarnings().size() );
         }
     }
-    
+
     private String getDebugStringFromResponse( ValidationResponse response )
     {
         StringBuffer buffer = new StringBuffer();
@@ -89,8 +89,8 @@ public class DefaultLdapConfigurationValidatorTest extends PlexusTestCase
         }
         return buffer.toString();
     }
-    
-    
+
+
     private Configuration getLdapConfiguration(File configFile) throws IOException, XmlPullParserException
     {
 
@@ -133,6 +133,6 @@ public class DefaultLdapConfigurationValidatorTest extends PlexusTestCase
         }
         return defaultConfig;
     }
-    
-    
+
+
 }

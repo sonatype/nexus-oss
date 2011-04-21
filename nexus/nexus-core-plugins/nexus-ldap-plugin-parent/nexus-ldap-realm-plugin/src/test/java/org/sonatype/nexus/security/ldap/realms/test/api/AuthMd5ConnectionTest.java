@@ -21,7 +21,8 @@ package org.sonatype.nexus.security.ldap.realms.test.api;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.Request;
@@ -44,6 +45,7 @@ public class AuthMd5ConnectionTest
         .lookup( PlexusResource.class, "LdapTestAuthenticationPlexusResource" );
 }
 
+    @Test
     public void testSuccess() throws Exception
     {
         PlexusResource resource = getResource();
@@ -66,6 +68,7 @@ public class AuthMd5ConnectionTest
         Assert.assertEquals( 204, response.getStatus().getCode() );
     }
 
+    @Test
     public void testSuccessWithPass() throws Exception
     {
         PlexusResource resource = getResource();
@@ -88,6 +91,7 @@ public class AuthMd5ConnectionTest
         Assert.assertEquals( 204, response.getStatus().getCode() );
     }
 
+    @Test
     public void testSuccessWithNoPass() throws Exception
     {
         PlexusResource resource = getResource();
@@ -110,6 +114,7 @@ public class AuthMd5ConnectionTest
         Assert.assertEquals( 204, response.getStatus().getCode() );
     }
 
+    @Test
     public void testFailure() throws Exception
     {
 
@@ -140,6 +145,7 @@ public class AuthMd5ConnectionTest
         }
     }
 
+    @Test
     public void testFailureWrongPass() throws Exception
     {
         PlexusResource resource = getResource();

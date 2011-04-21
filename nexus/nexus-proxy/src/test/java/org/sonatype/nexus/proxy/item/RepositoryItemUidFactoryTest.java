@@ -23,7 +23,8 @@ import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 import junit.framework.AssertionFailedError;
 
 import org.sonatype.jettytestsuite.ServletServer;
@@ -59,6 +60,7 @@ public class RepositoryItemUidFactoryTest
         factory = lookup( RepositoryItemUidFactory.class );
     }
 
+    @Test
     public void testDamianClaim()
         throws Exception
     {
@@ -93,6 +95,7 @@ public class RepositoryItemUidFactoryTest
         }
     }
 
+    @Test
     public void testHardAttack()
         throws Exception
     {

@@ -22,7 +22,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.codehaus.plexus.context.Context;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -38,7 +38,7 @@ import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 
 
 public class BasicActiveDirectoryLdapSchemaTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
 
     private LdapConfiguration ldapConfiguration;
@@ -75,9 +75,9 @@ public class BasicActiveDirectoryLdapSchemaTest
 
         this.ldapGroupManager = this.lookup( LdapGroupDAO.class );
         this.ldapConfiguration = this.lookup( LdapConfiguration.class );
-        
+
         // FIXME: this test is not autmated, and now it is BROKEN, but this needs bo be resolved, as the PlexusLdapContextFactory has been removed
-        
+
 //        this.ldapContextFactory = this.lookup( LdapContextFactory.class, "PlexusLdapContextFactory" );
         this.ldapUserManager = lookup( LdapUserDAO.class );
         this.realm = this.lookup( Realm.class, "LdapAuthenticatingRealm" );
@@ -90,14 +90,14 @@ public class BasicActiveDirectoryLdapSchemaTest
 
         LdapUser user =
             this.ldapUserManager.getUser( "jcoder", this.ldapContextFactory.getSystemLdapContext(), configuration );
-        assertEquals( "jcoder", user.getUsername() );
-        assertEquals( "Joe Coder", user.getRealName() );
+        Assert.assertEquals( "jcoder", user.getUsername() );
+        Assert.assertEquals( "Joe Coder", user.getRealName() );
 
         try
         {
             user =
                 this.ldapUserManager.getUser( "intruder", this.ldapContextFactory.getSystemLdapContext(), configuration );
-            fail( "Expected NoSuchUserException" );
+            Assert.fail( "Expected NoSuchUserException" );
         }
         catch ( NoSuchLdapUserException e )
         {
@@ -114,10 +114,10 @@ public class BasicActiveDirectoryLdapSchemaTest
             this.ldapGroupManager.getGroupMembership( "jcoder", this.ldapContextFactory.getSystemLdapContext(),
                                                       configuration );
 
-        assertTrue( groups.contains( "Users" ) );
-        assertTrue( groups.contains( "Backup Operators" ) );
-        assertTrue( groups.contains( "Pre-Windows 2000 Compatible Access" ) );
-        assertTrue( groups.contains( "Schema Admins" ) );
+        Assert.assertTrue( groups.contains( "Users" ) );
+        Assert.assertTrue( groups.contains( "Backup Operators" ) );
+        Assert.assertTrue( groups.contains( "Pre-Windows 2000 Compatible Access" ) );
+        Assert.assertTrue( groups.contains( "Schema Admins" ) );
     }
 
     public void testSuccessfulAuthentication()
@@ -128,12 +128,12 @@ public class BasicActiveDirectoryLdapSchemaTest
 
         AuthenticationInfo ai = realm.getAuthenticationInfo( upToken );
 
-        assertNull( ai.getCredentials() );
+        Assert.assertNull( ai.getCredentials() );
 
         // String password = new String( (char[]) ai.getCredentials() );
         //
         // // password is plain text
-        // assertEquals( "brianf123", password );
+        // Assert.assertEquals( "brianf123", password );
     }
 
     public void testWrongPassword()

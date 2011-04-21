@@ -22,14 +22,16 @@ import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.StringUtils;
+import org.junit.Test;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.NexusMergeOperation;
 
 public class MergeOperationTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
+    @Test
     public void testMergeNoLastUpdate()
         throws Exception
     {
@@ -43,6 +45,7 @@ public class MergeOperationTest
         validate( md2, false, false );
     }
 
+    @Test
     public void testMergeTargetLastUpdate()
         throws Exception
     {
@@ -56,6 +59,7 @@ public class MergeOperationTest
         validate( md2, true, true );
     }
 
+    @Test
     public void testMergeSourceLastUpdate()
         throws Exception
     {
@@ -69,6 +73,7 @@ public class MergeOperationTest
         validate( md2, true, false );
     }
 
+    @Test
     public void testMergeBothLastUpdate()
         throws Exception
     {
@@ -82,6 +87,7 @@ public class MergeOperationTest
         validate( md2, true, true );
     }
 
+    @Test
     public void testMergeReleaseAndSnapshot()
         throws Exception
     {
@@ -89,7 +95,7 @@ public class MergeOperationTest
         Metadata snapshot = getSnapshotMetadata();
         NexusMergeOperation mergeOp = new NexusMergeOperation( new MetadataOperand( release ) );
         mergeOp.perform( snapshot );
-        
+
         //check the snapshot metadata, which should now be merged
         assertEquals( "test", snapshot.getArtifactId() );
         assertEquals( "test", snapshot.getGroupId() );
@@ -102,13 +108,13 @@ public class MergeOperationTest
         assertNull( snapshot.getVersioning().getSnapshot() );
         assertNotNull( snapshot.getVersioning().getVersions() );
         assertTrue( snapshot.getVersioning().getVersions().containsAll( Arrays.asList( "1.1", "1.1-SNAPSHOT", "1.2-SNAPSHOT" ) ) );
-        
+
         //now do the merge in reverse
         release = getReleaseMetadata();
         snapshot = getSnapshotMetadata();
         mergeOp = new NexusMergeOperation( new MetadataOperand( snapshot ) );
         mergeOp.perform( release );
-        
+
         //check the release metadata, which should now be merged
         assertEquals( "test", release.getArtifactId() );
         assertEquals( "test", release.getGroupId() );
@@ -122,39 +128,39 @@ public class MergeOperationTest
         assertNotNull( release.getVersioning().getVersions() );
         assertTrue( release.getVersioning().getVersions().containsAll( Arrays.asList( "1.1", "1.1-SNAPSHOT", "1.2-SNAPSHOT" ) ) );
     }
-    
+
     private Metadata getReleaseMetadata()
     {
         Metadata releaseMetadata = new Metadata();
         releaseMetadata.setArtifactId( "test" );
         releaseMetadata.setGroupId( "test" );
-        
+
         Versioning versioning = new Versioning();
         versioning.addVersion( "1.1" );
         versioning.setLatest( "1.1" );
         versioning.setRelease( "1.1" );
         versioning.setLastUpdated( "1234567" );
-        
+
         releaseMetadata.setVersioning( versioning );
-        
+
         return releaseMetadata;
     }
-    
+
     private Metadata getSnapshotMetadata()
     {
         Metadata snapshotMetadata = new Metadata();
         snapshotMetadata.setArtifactId( "test" );
         snapshotMetadata.setGroupId( "test" );
-        
+
         Versioning versioning = new Versioning();
         versioning.addVersion( "1.1-SNAPSHOT" );
         versioning.addVersion( "1.2-SNAPSHOT" );
         versioning.setLatest( "1.2-SNAPSHOT" );
         versioning.setRelease( "" );
         versioning.setLastUpdated( "1234568" );
-        
+
         snapshotMetadata.setVersioning( versioning );
-        
+
         return snapshotMetadata;
     }
 

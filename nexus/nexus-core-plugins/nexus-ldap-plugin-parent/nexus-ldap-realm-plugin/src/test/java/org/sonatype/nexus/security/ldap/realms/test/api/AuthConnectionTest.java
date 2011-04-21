@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.security.ldap.realms.test.api;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -39,6 +40,7 @@ public class AuthConnectionTest
         return this.lookup( PlexusResource.class, "LdapTestAuthenticationPlexusResource" );
     }
 
+    @Test
     public void testSuccess()
         throws Exception
     {
@@ -61,6 +63,7 @@ public class AuthConnectionTest
         Assert.assertEquals( 204, response.getStatus().getCode() );
     }
 
+    @Test
     public void testSimpleSchemaWithNoPassFailure()
         throws Exception
     {
@@ -111,6 +114,7 @@ public class AuthConnectionTest
     // Assert.assertEquals( 204, response.getStatus().getCode() );
     // }
 
+    @Test
     public void testSuccessWithPass()
         throws Exception
     {
@@ -133,6 +137,7 @@ public class AuthConnectionTest
         Assert.assertEquals( 204, response.getStatus().getCode() );
     }
 
+    @Test
     public void testFailure()
         throws Exception
     {
@@ -163,6 +168,7 @@ public class AuthConnectionTest
         }
     }
 
+    @Test
     public void testFailureWrongPass()
         throws Exception
     {

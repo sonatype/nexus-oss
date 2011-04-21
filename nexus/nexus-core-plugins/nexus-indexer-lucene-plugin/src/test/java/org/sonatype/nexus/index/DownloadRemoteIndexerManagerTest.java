@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.context.IndexingContext;
+import org.junit.Test;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Response;
 import org.mortbay.jetty.Server;
@@ -94,7 +95,7 @@ public class DownloadRemoteIndexerManagerTest
         nexusConfiguration.saveConfiguration();
 
         Thread.sleep( 100 );
-        
+
         wairForAsyncEventsToCalmDown();
         waitForTasksToStop();
     }
@@ -110,6 +111,7 @@ public class DownloadRemoteIndexerManagerTest
         super.tearDown();
     }
 
+    @Test
     public void testRepoReindex()
         throws Exception
     {

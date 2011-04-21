@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -231,6 +232,7 @@ public class PathBasedRequestRepositoryMapperTest
         return requestRepositoryMapper;
     }
 
+    @Test
     public void testInclusionAndExclusion()
         throws Exception
     {
@@ -270,6 +272,7 @@ public class PathBasedRequestRepositoryMapperTest
 
     }
 
+    @Test
     public void testInclusionAndExclusionKeepsGroupOrdering()
         throws Exception
     {
@@ -319,7 +322,7 @@ public class PathBasedRequestRepositoryMapperTest
     /**
      * Empty rules are invalid, they are spitted out by validator anyway. This test is bad, and hence is turned off, but
      * it is left here for reference. (added 'dont' at the start)
-     * 
+     *
      * @throws Exception
      */
     public void dontTestEmptyRules()
@@ -370,6 +373,7 @@ public class PathBasedRequestRepositoryMapperTest
         assertEquals( 6, mappedRepositories.size() );
     }
 
+    @Test
     public void testBlockingRules()
         throws Exception
     {

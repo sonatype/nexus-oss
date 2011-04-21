@@ -23,20 +23,22 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.Test;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 public class Xpp3DomMergeTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
     private static final String XML_BASE =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?><externalConfiguration></externalConfiguration>";
 
+    @Test
     public void testMergeOfCollection()
         throws Exception
     {

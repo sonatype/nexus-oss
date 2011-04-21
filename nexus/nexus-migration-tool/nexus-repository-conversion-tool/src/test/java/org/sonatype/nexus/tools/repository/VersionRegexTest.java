@@ -18,16 +18,17 @@
  */
 package org.sonatype.nexus.tools.repository;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
- * 
+ *
  * @author Juven Xu
  *
  */
 public class VersionRegexTest
-    extends TestCase
 {
+    @Test
     public void testVersionRegex()
         throws Exception
     {
@@ -46,12 +47,12 @@ public class VersionRegexTest
 
         for ( String version : matchedVersions )
         {
-            assertTrue( version.matches( DefaultRepositoryConvertor.VERSION_REGEX ) );
+            Assert.assertTrue( version.matches( DefaultRepositoryConvertor.VERSION_REGEX ) );
         }
 
         for ( String version : unmatched )
         {
-            assertFalse( version.matches( DefaultRepositoryConvertor.VERSION_REGEX ) );
+            Assert.assertFalse( version.matches( DefaultRepositoryConvertor.VERSION_REGEX ) );
         }
     }
 }

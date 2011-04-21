@@ -18,11 +18,12 @@
  */
 package org.sonatype.nexus.util;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class NumberSequenceTest
-    extends TestCase
 {
+    @Test
     public void testConstantSequence()
     {
         long startValue = 10;
@@ -31,17 +32,18 @@ public class NumberSequenceTest
 
         for ( int i = 0; i < 20; i++ )
         {
-            assertEquals( startValue, cs.next() );
+            Assert.assertEquals( startValue, cs.next() );
         }
 
         cs.reset();
 
         for ( int i = 0; i < 20; i++ )
         {
-            assertEquals( startValue, cs.next() );
+            Assert.assertEquals( startValue, cs.next() );
         }
     }
 
+    @Test
     public void testFibonacciSequence()
     {
         int[] fibonacciNumbers = new int[] { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233 };
@@ -50,17 +52,18 @@ public class NumberSequenceTest
 
         for ( int f : fibonacciNumbers )
         {
-            assertEquals( f, fs.next() );
+            Assert.assertEquals( f, fs.next() );
         }
 
         fs.reset();
 
         for ( int f : fibonacciNumbers )
         {
-            assertEquals( f, fs.next() );
+            Assert.assertEquals( f, fs.next() );
         }
     }
 
+    @Test
     public void testFoxiedFibonacciSequence()
     {
         int[] fibonacciNumbers = new int[] { 10, 10, 20, 30, 50, 80, 130, 210, 340, 550, 890, 1440, 2330 };
@@ -69,14 +72,14 @@ public class NumberSequenceTest
 
         for ( int f : fibonacciNumbers )
         {
-            assertEquals( f, fs.next() );
+            Assert.assertEquals( f, fs.next() );
         }
 
         fs.reset();
 
         for ( int f : fibonacciNumbers )
         {
-            assertEquals( f, fs.next() );
+            Assert.assertEquals( f, fs.next() );
         }
     }
 }

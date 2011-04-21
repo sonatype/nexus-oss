@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.repositories;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.configuration.ConfigurationException;
@@ -53,6 +54,7 @@ public class CreateGroupRepositoryTest
         this.nexusConfiguration = this.lookup( NexusConfiguration.class );
     }
 
+    @Test
     public void testCreateRepo()
         throws Exception
     {
@@ -108,6 +110,7 @@ public class CreateGroupRepositoryTest
         Assert.assertTrue( "Group Repo is not in file.", found );
     }
 
+    @Test
     public void testCreateRepoWithInvalidMember()
         throws Exception
     {
@@ -157,6 +160,7 @@ public class CreateGroupRepositoryTest
         }
     }
 
+    @Test
     public void testCreateWithNoId()
         throws Exception
     {
@@ -184,6 +188,7 @@ public class CreateGroupRepositoryTest
         }
     }
 
+    @Test
     public void testCreateWithEmptyId()
         throws Exception
     {

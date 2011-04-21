@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
@@ -31,6 +32,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 public class DefaultRepositoryConfiguratorTest
     extends AbstractNexusTestCase
 {
+    @Test
     public void testExpireNFCOnUpdate()
         throws Exception
     {
@@ -66,6 +68,7 @@ public class DefaultRepositoryConfiguratorTest
         Assert.assertFalse( oldRepository.getNotFoundCache().contains( "test-path" ) );
     }
 
+    @Test
     public void testExpireNFCOnUpdateWithNFCDisabled()
         throws Exception
     {
@@ -99,6 +102,7 @@ public class DefaultRepositoryConfiguratorTest
         Assert.assertFalse( oldRepository.getNotFoundCache().contains( "test-path" ) );
     }
 
+    @Test
     public void testDoNotStoreDefaultLocalStorage()
         throws Exception
     {

@@ -18,20 +18,19 @@
  */
 package org.sonatype.nexus.proxy;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class RequestContextTest
-    extends TestCase
 {
     @Test
     public void testNullParent()
     {
         RequestContext requestContext = new RequestContext( null );
-        assertNull( requestContext.getParentContext() );
+        Assert.assertNull( requestContext.getParentContext() );
 
         requestContext.setParentContext( null );
-        assertNull( requestContext.getParentContext() );
+        Assert.assertNull( requestContext.getParentContext() );
     }
 
     @Test
@@ -39,33 +38,33 @@ public class RequestContextTest
     {
         RequestContext parentContext = new RequestContext( null );
         RequestContext requestContext = new RequestContext( parentContext );
-        assertEquals( parentContext, requestContext.getParentContext() );
+        Assert.assertEquals( parentContext, requestContext.getParentContext() );
 
         requestContext.setParentContext( null );
-        assertNull( requestContext.getParentContext() );
+        Assert.assertNull( requestContext.getParentContext() );
 
         requestContext = new RequestContext();
-        assertNull( requestContext.getParentContext() );
+        Assert.assertNull( requestContext.getParentContext() );
         requestContext.setParentContext( parentContext );
-        assertEquals( parentContext, requestContext.getParentContext() );
+        Assert.assertEquals( parentContext, requestContext.getParentContext() );
     }
 
     @Test
     public void testSelfParent()
     {
         RequestContext requestContext = new RequestContext();
-        assertNull( requestContext.getParentContext() );
+        Assert.assertNull( requestContext.getParentContext() );
 
         try
         {
             requestContext.setParentContext( requestContext );
-            fail( "Expected IllegalArgumentException" );
+            Assert.fail( "Expected IllegalArgumentException" );
         }
         catch ( IllegalArgumentException expected )
         {
         }
 
-        assertNull( requestContext.getParentContext() );
+        Assert.assertNull( requestContext.getParentContext() );
     }
 
     // 3-->2-->1-->3
@@ -73,21 +72,21 @@ public class RequestContextTest
     public void testSelfAncestor()
     {
         RequestContext requestContext1 = new RequestContext();
-        assertNull( requestContext1.getParentContext() );
+        Assert.assertNull( requestContext1.getParentContext() );
         RequestContext requestContext2 = new RequestContext( requestContext1 );
-        assertEquals( requestContext1, requestContext2.getParentContext() );
+        Assert.assertEquals( requestContext1, requestContext2.getParentContext() );
         RequestContext requestContext3 = new RequestContext( requestContext2 );
-        assertEquals( requestContext2, requestContext3.getParentContext() );
+        Assert.assertEquals( requestContext2, requestContext3.getParentContext() );
 
         try
         {
             requestContext1.setParentContext( requestContext3 );
-            fail( "Expected IllegalArgumentException" );
+            Assert.fail( "Expected IllegalArgumentException" );
         }
         catch ( IllegalArgumentException expected )
         {
         }
 
-        assertNull( requestContext1.getParentContext() );
+        Assert.assertNull( requestContext1.getParentContext() );
     }
 }

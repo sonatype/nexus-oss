@@ -118,8 +118,12 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit-dep</artifactId>
-      <version>4.7</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <classifier>tests</classifier>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

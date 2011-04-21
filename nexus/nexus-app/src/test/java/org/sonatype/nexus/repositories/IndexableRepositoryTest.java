@@ -18,10 +18,7 @@
  */
 package org.sonatype.nexus.repositories;
 
-import java.util.List;
-
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationMessage;
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -61,6 +58,7 @@ public class IndexableRepositoryTest
         return false;
     }
 
+    @Test
     public void testCreateIndexableM1()
         throws Exception
     {
@@ -84,6 +82,7 @@ public class IndexableRepositoryTest
         assertFalse( "The repository should be non-indexable!", repository.isIndexable() );
     }
 
+    @Test
     public void testCreateIndexableM2()
         throws Exception
     {
@@ -103,6 +102,7 @@ public class IndexableRepositoryTest
         repoTemplate.create();
     }
 
+    @Test
     public void testCreateNonIndexableM2()
         throws Exception
     {

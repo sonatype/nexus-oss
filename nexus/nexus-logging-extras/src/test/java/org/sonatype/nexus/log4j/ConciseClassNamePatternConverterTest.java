@@ -18,14 +18,16 @@
  */
 package org.sonatype.nexus.log4j;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
+
 
 /**
  * @author juven
  */
 public class ConciseClassNamePatternConverterTest
-    extends TestCase
 {
+    @Test
     public void testSimplify()
     {
         assertConciseClassName( "org.sonatype.Nexus", "org.sonatype.Nexus" );
@@ -40,7 +42,7 @@ public class ConciseClassNamePatternConverterTest
 
     protected void assertConciseClassName( String className, String conciseClassName )
     {
-        assertEquals( conciseClassName, AbstractConcisePatternConverter.simplify( className, 20 ) );
+        Assert.assertEquals( conciseClassName, AbstractConcisePatternConverter.simplify( className, 20 ) );
     }
     
 }

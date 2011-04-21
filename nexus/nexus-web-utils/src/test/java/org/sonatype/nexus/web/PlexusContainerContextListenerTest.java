@@ -22,7 +22,9 @@ import java.io.File;
 
 import javax.servlet.http.HttpServlet;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import com.meterware.httpunit.PostMethodWebRequest;
 import com.meterware.httpunit.WebRequest;
@@ -31,23 +33,21 @@ import com.meterware.servletunit.ServletRunner;
 import com.meterware.servletunit.ServletUnitClient;
 
 public class PlexusContainerContextListenerTest
-    extends TestCase
 {
     protected File webXml;
 
     protected ServletRunner servletRunner;
 
-    @Override
+    @Before
     protected void setUp()
         throws Exception
     {
-        super.setUp();
-
         webXml = new File( "src/test/resources/httpunit/WEB-INF/web.xml" );
 
         servletRunner = new ServletRunner( webXml, "/target/httpunit" );
     }
 
+    @Test
     public void testListener()
         throws Exception
     {
@@ -59,6 +59,6 @@ public class PlexusContainerContextListenerTest
 
         HttpServlet servlet = (HttpServlet) context.getServlet();
 
-        assertNotNull( servlet.getServletContext().getAttribute( "plexus" ) );
+        Assert.assertNotNull( servlet.getServletContext().getAttribute( "plexus" ) );
     }
 }

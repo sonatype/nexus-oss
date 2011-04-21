@@ -20,7 +20,8 @@ package org.sonatype.nexus.security.ldap.realms.api;
 
 import java.io.File;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.context.Context;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -41,6 +42,7 @@ public class LdapConnNotConfiguredTest
         return this.lookup( PlexusResource.class, "LdapConnectionInfoPlexusResource" );
     }
 
+    @Test
     public void testGetNotConfigured() throws Exception
     {
         PlexusResource resource = getResource();
@@ -52,6 +54,7 @@ public class LdapConnNotConfiguredTest
         Assert.assertEquals( new LdapConnectionInfoDTO(), response.getData() );
     }
 
+    @Test
     public void testPutNotConfigured() throws Exception
     {
         PlexusResource resource = getResource();
@@ -76,6 +79,7 @@ public class LdapConnNotConfiguredTest
     }
 
 
+    @Test
     public void testSetPasswordToFake() throws Exception
     {
 
@@ -110,6 +114,7 @@ public class LdapConnNotConfiguredTest
 
 
 
+    @Test
     public void testGetPasswordNullWhenNotSet() throws Exception
     {
         PlexusResource resource = getResource();

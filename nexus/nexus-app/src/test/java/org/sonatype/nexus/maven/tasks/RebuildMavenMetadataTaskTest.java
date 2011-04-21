@@ -21,6 +21,7 @@ package org.sonatype.nexus.maven.tasks;
 import java.io.File;
 
 import org.codehaus.plexus.util.DirectoryScanner;
+import org.junit.Test;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -68,6 +69,7 @@ public class RebuildMavenMetadataTaskTest
         return scanner.getIncludedFiles().length;
     }
 
+    @Test
     public void testOneRun()
         throws Exception
     {
@@ -95,6 +97,7 @@ public class RebuildMavenMetadataTaskTest
             countTotalBefore < countTotalAfter );
     }
 
+    @Test
     public void testOneRunWithSubpath()
         throws Exception
     {

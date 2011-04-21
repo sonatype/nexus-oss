@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.security.ldap.realms.api;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
@@ -57,6 +58,7 @@ public class LdapUserGroupConfValidationTest
         return userGroupConf;
     }
 
+    @Test
     public void testNoUserBaseDn()
         throws Exception
     {
@@ -73,6 +75,7 @@ public class LdapUserGroupConfValidationTest
         Assert.assertNull( result.getData().getUserBaseDn() );
     }
 
+    @Test
     public void testNoGroupBaseDn()
         throws Exception
     {
@@ -89,7 +92,8 @@ public class LdapUserGroupConfValidationTest
         Assert.assertNull( result.getData().getGroupBaseDn() );
 
     }
-    
+
+    @Test
     public void testNoUserIdAttrib()
     throws Exception
 {
@@ -117,6 +121,7 @@ public class LdapUserGroupConfValidationTest
 
 }
 
+    @Test
     public void testMultipleErrors()
         throws Exception
     {

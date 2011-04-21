@@ -18,20 +18,22 @@
  */
 package org.sonatype.simpleclientapp;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class MainTest
-    extends TestCase
 {
 
+    @Test
     public void testExecute()
     {
-        assertEquals( 0, Main.execute( null ) );
-        assertEquals( 0, Main.execute( new String[] {} ) );
-        assertEquals( 1, Main.execute( new String[] { "one" } ) );
-        assertEquals( 6, Main.execute( new String[] { "one", "two", "three", "four", "five", "six" } ) );
+        Assert.assertEquals( 0, Main.execute( null ) );
+        Assert.assertEquals( 0, Main.execute( new String[] {} ) );
+        Assert.assertEquals( 1, Main.execute( new String[] { "one" } ) );
+        Assert.assertEquals( 6, Main.execute( new String[] { "one", "two", "three", "four", "five", "six" } ) );
     }
 
+    @Test
     public void testNew()
     {
         new Main();

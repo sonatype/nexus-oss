@@ -21,6 +21,7 @@ package org.sonatype.nexus.log;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.util.EnhancedProperties;
 
@@ -68,6 +69,7 @@ public class LogConfigurationTest
         logConfiguration.save();
     }
 
+    @Test
     public void testLoad()
         throws Exception
     {
@@ -76,6 +78,7 @@ public class LogConfigurationTest
         assertTrue( config.containsKey( "log4j.rootLogger" ) );
     }
 
+    @Test
     public void testApply()
         throws Exception
     {
@@ -90,6 +93,7 @@ public class LogConfigurationTest
         assertFalse( Logger.getRootLogger().isDebugEnabled() );
     }
 
+    @Test
     public void testSave()
         throws Exception
     {

@@ -22,7 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.jettytestsuite.ServletServer;
@@ -43,7 +44,7 @@ public class M1RepositoryTest
     extends M1ResourceStoreTest
 {
     private static final long A_DAY = 24L * 60L * 60L * 1000L;
-    
+
     protected static final String SPOOF_RELEASE = "/spoof/poms/spoof-1.0.pom";
 
     protected static final String SPOOF_SNAPSHOT = "/spoof/poms/spoof-1.0-SNAPSHOT.pom";
@@ -70,12 +71,13 @@ public class M1RepositoryTest
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1-m1" );
 
         repo1.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE );
-        
+
         getApplicationConfiguration().saveConfiguration();
 
         return repo1;
     }
 
+    @Test
     public void testPoliciesWithRetrieve()
         throws Exception
     {
@@ -121,6 +123,7 @@ public class M1RepositoryTest
         }
     }
 
+    @Test
     public void testPoliciesWithStore()
         throws Exception
     {
@@ -180,10 +183,11 @@ public class M1RepositoryTest
         }
     }
 
+    @Test
     public void testProxyLastRequestedAttribute() throws Exception
     {
         M1Repository repository = (M1Repository) this.getRepositoryRegistry().getRepository( "repo1-m1" );
-        
+
         String item = "/spoof/poms/spoof-1.0.pom";
         ResourceStoreRequest request = new ResourceStoreRequest( item );
         request.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, "127.0.0.1" );
@@ -191,42 +195,43 @@ public class M1RepositoryTest
         long lastRequest =  System.currentTimeMillis() - 10 * A_DAY;
         storageItem.setLastRequested( lastRequest );
         repository.storeItem( false, storageItem );
-        
+
         // now request the object, the lastRequested timestamp should be updated
         StorageItem resultItem = repository.retrieveItem( request );
         Assert.assertTrue( resultItem.getLastRequested() + " > " + lastRequest, resultItem.getLastRequested() > lastRequest );
-        
+
         // check the shadow attributes
         AbstractStorageItem shadowStorageItem = repository.getAttributesHandler().getAttributeStorage().getAttributes( repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
-    
+
+    @Test
     public void testHostedLastRequestedAttribute() throws Exception
     {
         String itemPath = "/spoof/poms/spoof-1.0.pom";
-        
+
         M1Repository repository = (M1Repository) this.getRepositoryRegistry().getRepository( "inhouse" );
         File inhouseLocalStorageDir = new File( new URL(((CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration()).getConfiguration( false).getLocalStorage().getUrl() ).getFile());
-        
+
         File artifactFile = new File( inhouseLocalStorageDir, itemPath );
         artifactFile.getParentFile().mkdirs();
-        
+
         FileUtils.fileWrite( artifactFile.getAbsolutePath(), "Some Text so the file is not empty" );
-        
+
         ResourceStoreRequest request = new ResourceStoreRequest( itemPath );
         request.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, "127.0.0.1" );
         StorageItem storageItem = repository.retrieveItem( request );
         long lastRequest =  System.currentTimeMillis() - 10 * A_DAY;
         storageItem.setLastRequested( lastRequest );
         repository.storeItem( false, storageItem );
-        
+
         // now request the object, the lastRequested timestamp should be updated
         StorageItem resultItem = repository.retrieveItem( request );
         Assert.assertTrue( resultItem.getLastRequested() > lastRequest );
-        
+
         // check the shadow attributes
         AbstractStorageItem shadowStorageItem = repository.getAttributesHandler().getAttributeStorage().getAttributes( repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
-    
+
 }

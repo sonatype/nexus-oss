@@ -21,6 +21,7 @@ package org.sonatype.nexus.configuration.application.source;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.junit.Test;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 
 public class StaticConfigurationSourceTest
@@ -41,6 +42,7 @@ public class StaticConfigurationSourceTest
         return getClass().getResourceAsStream( "/META-INF/nexus/default-oss-nexus.xml" );
     }
 
+    @Test
     public void testStoreConfiguration()
         throws Exception
     {
@@ -60,6 +62,7 @@ public class StaticConfigurationSourceTest
         }
     }
 
+    @Test
     public void testIsConfigurationUpgraded()
         throws Exception
     {
@@ -70,6 +73,7 @@ public class StaticConfigurationSourceTest
         assertEquals( false, configurationSource.isConfigurationUpgraded() );
     }
 
+    @Test
     public void testIsConfigurationDefaulted()
         throws Exception
     {
@@ -80,6 +84,7 @@ public class StaticConfigurationSourceTest
         assertEquals( false, configurationSource.isConfigurationDefaulted() );
     }
 
+    @Test
     public void testGetDefaultsSource()
         throws Exception
     {

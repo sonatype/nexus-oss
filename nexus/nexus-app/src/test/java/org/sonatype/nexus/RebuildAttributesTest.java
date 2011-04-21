@@ -20,6 +20,7 @@ package org.sonatype.nexus;
 
 import java.io.IOException;
 
+import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -68,6 +69,7 @@ public class RebuildAttributesTest
         this.defaultNexus = defaultNexus;
     }
 
+    @Test
     public void testRepositoryRebuildAttributes()
         throws IOException
     {

@@ -22,7 +22,7 @@ import java.util.Arrays;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.codehaus.plexus.context.Context;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -33,11 +33,11 @@ import org.sonatype.security.ldap.dao.password.PasswordEncoderManager;
 
 
 public class SonatypeLdapTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
 
     private Realm realm;
-    
+
     private PasswordEncoderManager passwordManager;
 
     @Override
@@ -46,12 +46,12 @@ public class SonatypeLdapTest
     {
         super.setUp();
 
-        realm = this.lookup( Realm.class, "LdapAuthenticatingRealm" );        
+        realm = this.lookup( Realm.class, "LdapAuthenticatingRealm" );
         passwordManager = (PasswordEncoderManager) this.lookup( PasswordEncoderManager.class );
         passwordManager.setPreferredEncoding( "crypt" );
     }
-    
-    
+
+
     @Override
     protected void customizeContext( Context context )
     {
@@ -70,7 +70,7 @@ public class SonatypeLdapTest
         AuthenticationInfo ai = realm.getAuthenticationInfo( upToken );
 
          Assert.assertNotNull( ai );
-        
+
      }
 
     public void testWrongPassword()
@@ -86,7 +86,7 @@ public class SonatypeLdapTest
             // expected
         }
     }
-    
+
     public void testFailedAuthentication()
     {
 
@@ -101,27 +101,27 @@ public class SonatypeLdapTest
             // expected
         }
     }
-    
+
     public void BrokentestHasAllRoles()
     {
 
         Assert.assertFalse( this.doesUserHaveAllRoles( "brianf", "public", "releases" ) );
         Assert.assertTrue( this.doesUserHaveAllRoles( "jvanzyl", "wheel", "sonatype", "labs", "svn", "svn-labs", "sales", "sonatype-conf", "sonatype-jira", "book" ) );
-        
+
         Assert.assertTrue( this.doesUserHaveAllRoles( "tstevens", "svn" ) );
-        
+
         // expect failure
         Assert.assertFalse( this.doesUserHaveAllRoles( "cstamas", "public", "releases", "snapshots" ) );
-        
+
     }
 
     private boolean doesUserHaveAllRoles(String username, String ... roles)
     {
         SimplePrincipalCollection principals = new SimplePrincipalCollection();
         principals.add( username, this.realm.getName() );
-        
+
         return this.realm.hasAllRoles( principals, Arrays.asList( roles ) );
     }
-    
+
 
 }

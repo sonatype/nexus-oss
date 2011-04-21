@@ -20,12 +20,14 @@ package org.sonatype.nexus.proxy.cache;
 
 import java.util.Collection;
 
+import org.junit.Test;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 
 public class EhCacheCacheManagerTest
     extends AbstractNexusTestEnvironment
 {
 
+    @Test
     public void testGetCache()
         throws Exception
     {
@@ -36,6 +38,7 @@ public class EhCacheCacheManagerTest
         assertEquals( true, null != c );
     }
 
+    @Test
     public void testRemoveWithParents()
         throws Exception
     {
@@ -61,6 +64,7 @@ public class EhCacheCacheManagerTest
 
     }
 
+    @Test
     public void testPathAsKey()
         throws Exception
     {
@@ -87,6 +91,7 @@ public class EhCacheCacheManagerTest
         assertFalse( c.contains( "/com" ) );
     }
 
+    @Test
     public void testListKeys() throws Exception
     {
 
@@ -98,15 +103,15 @@ public class EhCacheCacheManagerTest
         c.put( "/com/sonatype", Boolean.TRUE );
         c.put( "/com/sonatype/nexus", Boolean.TRUE );
 
-        
+
         Collection<String> keys = c.listKeysInCache();
 
         // NOTE keys are stored with the front and end '/' removed
         assertTrue( "expected key not found, keys are: "+ keys, keys.contains( "com" ) );
         assertTrue( "expected key not found, keys are: "+ keys, keys.contains( "com/sonatype" ) );
         assertTrue( "expected key not found, keys are: "+ keys, keys.contains( "com/sonatype/nexus" ) );
-        
-        
+
+
     }
 
 }

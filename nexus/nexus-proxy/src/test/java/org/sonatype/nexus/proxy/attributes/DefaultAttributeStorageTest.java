@@ -39,7 +39,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * AttributeStorage implementation driven by XStream.
- * 
+ *
  * @author cstamas
  */
 public class DefaultAttributeStorageTest
@@ -114,6 +114,7 @@ public class DefaultAttributeStorageTest
         assertTrue( "kuku".equals( file1.getAttributes().get( "kuku" ) ) );
     }
 
+    @Test
     public void testSimplePutGetNEXUS3911()
         throws Exception
     {
@@ -136,7 +137,7 @@ public class DefaultAttributeStorageTest
         // reverted back to "old" attributes
         File attributeFile = new File( ((DefaultFSAttributeStorage)attributeStorage).getWorkingDirectory(), repository.getId() + "/a.txt" );
         // File attributeFile = new File( localStorageDirectory, ".nexus/attributes/a.txt" );
-        
+
         FileUtils.fileWrite( attributeFile.getAbsolutePath(), "<file" );
 
         // try to read it, we should not get NPE
@@ -152,6 +153,7 @@ public class DefaultAttributeStorageTest
         assertNull( "file1 is corrupt, hence it should be null!", file1 );
     }
 
+    @Test
     public void testSimplePutDelete()
         throws Exception
     {

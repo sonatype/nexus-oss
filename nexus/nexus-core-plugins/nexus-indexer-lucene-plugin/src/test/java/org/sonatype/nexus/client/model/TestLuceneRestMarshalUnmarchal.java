@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.client.model;
 
+import org.junit.Test;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.plexus.rest.xstream.AliasingListConverter;
@@ -30,17 +31,18 @@ public class TestLuceneRestMarshalUnmarchal
         throws Exception
     {
         super.setUp();
-        
+
         getJsonXStream().processAnnotations( SearchResponse.class );
         getXmlXStream().processAnnotations( SearchResponse.class );
-        
+
         getJsonXStream().registerLocalConverter( SearchResponse.class, "data", new AliasingListConverter( NexusArtifact.class,
             "artifact" ) );
-        
+
         getXmlXStream().registerLocalConverter( SearchResponse.class, "data", new AliasingListConverter( NexusArtifact.class,
             "artifact" ) );
     }
-    
+
+    @Test
     public void testSearchResponse()
     {
         SearchResponse response = new SearchResponse();

@@ -22,20 +22,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.M2GavCalculator;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author juven
  */
 public class MetadataHelperTest
-    extends TestCase
 {
 
+    @Test
     public void testVersioningArtifactDirectory()
         throws Exception
     {
@@ -72,10 +72,11 @@ public class MetadataHelperTest
         Metadata metadata = new Metadata();
         new ArtifactDirMetadataProcessor( null ).versioning( metadata, unorderedVersions );
 
-        assertEquals( orderedVersions, metadata.getVersioning().getVersions() );
+        Assert.assertEquals( orderedVersions, metadata.getVersioning().getVersions() );
 
     }
 
+    @Test
     public void testVersioningSnapshotVersionDirectory()
         throws Exception
     {
@@ -95,37 +96,37 @@ public class MetadataHelperTest
         metadata.setVersion( "1.2.0-SNAPSHOT" );
         new VersionDirMetadataProcessor( null ).versioning( metadata, toGavs( snapshotArtifacts ) );
 
-        assertEquals( "20081025.143218", metadata.getVersioning().getSnapshot().getTimestamp() );
-        assertEquals( 32, metadata.getVersioning().getSnapshot().getBuildNumber() );
+        Assert.assertEquals( "20081025.143218", metadata.getVersioning().getSnapshot().getTimestamp() );
+        Assert.assertEquals( 32, metadata.getVersioning().getSnapshot().getBuildNumber() );
 
         List<SnapshotVersion> snapshots = metadata.getVersioning().getSnapshotVersions();
-        assertEquals( 4, snapshots.size() );
+        Assert.assertEquals( 4, snapshots.size() );
 
         for ( SnapshotVersion snap : snapshots )
         {
             if ( snap.getClassifier() == null && "pom".equals( snap.getExtension() ) )
             {
-                assertEquals( "20081025143218", snap.getUpdated() );
-                assertEquals( "1.2.0-20081025.143218-32", snap.getVersion() );
+                Assert.assertEquals( "20081025143218", snap.getUpdated() );
+                Assert.assertEquals( "1.2.0-20081025.143218-32", snap.getVersion() );
             }
             else if ( snap.getClassifier() == null && "jar".equals( snap.getExtension() ) )
             {
-                assertEquals( "20081023152127", snap.getUpdated() );
-                assertEquals( "1.2.0-20081023.152127-4", snap.getVersion() );
+                Assert.assertEquals( "20081023152127", snap.getUpdated() );
+                Assert.assertEquals( "1.2.0-20081023.152127-4", snap.getVersion() );
             }
             else if ( snap.getClassifier() == null && "tar.gz".equals( snap.getExtension() ) )
             {
-                assertEquals( "20081022184527", snap.getUpdated() );
-                assertEquals( "1.2.0-20081022.184527-3", snap.getVersion() );
+                Assert.assertEquals( "20081022184527", snap.getUpdated() );
+                Assert.assertEquals( "1.2.0-20081022.184527-3", snap.getVersion() );
             }
             else if ( "sources".equals( snap.getClassifier() ) && "jar".equals( snap.getExtension() ) )
             {
-                assertEquals( "20081024111337", snap.getUpdated() );
-                assertEquals( "1.2.0-20081024.111337-23", snap.getVersion() );
+                Assert.assertEquals( "20081024111337", snap.getUpdated() );
+                Assert.assertEquals( "1.2.0-20081024.111337-23", snap.getVersion() );
             }
             else
             {
-                fail( "Unexpected e:" + snap.getExtension() + " c:" + snap.getClassifier() );
+                Assert.fail( "Unexpected e:" + snap.getExtension() + " c:" + snap.getClassifier() );
             }
         }
     }

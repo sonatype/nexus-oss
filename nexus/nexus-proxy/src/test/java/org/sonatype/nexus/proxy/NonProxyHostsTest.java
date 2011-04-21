@@ -22,7 +22,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.apache.commons.httpclient.CustomMultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.HttpClient;
@@ -102,6 +103,7 @@ public class NonProxyHostsTest
         FileUtils.forceDelete( new File( getBasedir(), "target/test-reposes/repo1" ) );
     }
 
+    @Test
     public void testGlobalWithNoNonProxyHosts()
         throws Exception
     {
@@ -126,6 +128,7 @@ public class NonProxyHostsTest
 
     }
 
+    @Test
     public void testGlobalWithNonProxyHosts()
         throws Exception
     {
@@ -148,6 +151,7 @@ public class NonProxyHostsTest
             this.proxyServer.getAccessedUris().size() );
     }
 
+    @Test
     public void testGlobalWithNonProxyHostsRegex()
         throws Exception
     {
@@ -197,6 +201,7 @@ public class NonProxyHostsTest
         return port;
     }
 
+    @Test
     public void testRepoRemoteContext()
         throws Exception
     {

@@ -23,6 +23,7 @@ import java.util.Collection;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
+import org.junit.Test;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
@@ -51,6 +52,7 @@ public class DefaultIndexerManagerTest
         super.tearDown();
     }
 
+    @Test
     public void testRepoReindex()
         throws Exception
     {
@@ -63,6 +65,7 @@ public class DefaultIndexerManagerTest
         assertTemporatyContexts( releases );
     }
 
+    @Test
     public void testRepoKeywordSearch()
         throws Exception
     {
@@ -75,6 +78,7 @@ public class DefaultIndexerManagerTest
         assertTemporatyContexts( releases );
     }
 
+    @Test
     public void testRepoSha1Search()
         throws Exception
     {
@@ -97,17 +101,18 @@ public class DefaultIndexerManagerTest
                 null, null, null );
 
         assertEquals( "There should be one hit!", 1, response.getTotalHits() );
-        
+
         response.close();
 
         // this will be SCORED search, since we have just part of the SHA1 checksum
         response = indexerManager.searchArtifactSha1ChecksumIterator( "86e12071021", null, null, null, null, null );
 
         assertEquals( "There should be still one hit!", 1, response.getTotalHits() );
-        
+
         response.close();
     }
 
+    @Test
     public void testInvalidRemoteUrl()
         throws Exception
     {

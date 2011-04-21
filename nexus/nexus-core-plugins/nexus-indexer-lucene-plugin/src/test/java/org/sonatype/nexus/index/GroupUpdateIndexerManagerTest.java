@@ -18,10 +18,13 @@
  */
 package org.sonatype.nexus.index;
 
+import org.junit.Test;
+
 public class GroupUpdateIndexerManagerTest
     extends AbstractIndexerManagerTest
 {
 
+    @Test
     public void testGroupUpdate()
         throws Exception
     {

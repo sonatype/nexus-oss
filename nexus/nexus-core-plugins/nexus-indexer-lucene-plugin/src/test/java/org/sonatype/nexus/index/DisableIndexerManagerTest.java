@@ -18,11 +18,14 @@
  */
 package org.sonatype.nexus.index;
 
+import org.junit.Test;
+
 
 public class DisableIndexerManagerTest
     extends AbstractIndexerManagerTest
 {
 
+    @Test
     public void testDisableIndex()
         throws Exception
     {

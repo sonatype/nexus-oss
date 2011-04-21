@@ -21,6 +21,7 @@ package org.sonatype.nexus.scheduling;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -53,6 +54,7 @@ public class DefaultNexusSchedulerTest
         super.tearDown();
     }
 
+    @Test
     public void testDoubleSubmission()
         throws Exception
     {
@@ -92,6 +94,7 @@ public class DefaultNexusSchedulerTest
         }
     }
 
+    @Test
     public void testDoubleSubmissionAllowed()
         throws Exception
     {
@@ -128,6 +131,7 @@ public class DefaultNexusSchedulerTest
         }
     }
 
+    @Test
     public void testGetAsThreadJoinner()
         throws Exception
     {
@@ -146,6 +150,7 @@ public class DefaultNexusSchedulerTest
         assertTrue( took > 1 );
     }
 
+    @Test
     public void testGetAsThreadJoinnerException()
         throws Exception
     {

@@ -1,12 +1,13 @@
 package org.sonatype.nexus.proxy.storage.remote;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
-import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.nexus.configuration.PlexusTestCaseSupport;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 
 public class RemoteProviderHintFactoryTest
-    extends PlexusTestCase
+    extends PlexusTestCaseSupport
 {
     private static final String FAKE_VALUE = "Foo-Bar";
 
@@ -19,8 +20,8 @@ public class RemoteProviderHintFactoryTest
         System.clearProperty( DefaultRemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY );
     }
 
-    public void testIt()
-        throws Exception
+    @Test
+    public void testIt() throws Exception
     {
         RemoteProviderHintFactory hintFactory = this.lookup( RemoteProviderHintFactory.class );
 
