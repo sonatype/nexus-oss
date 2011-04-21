@@ -188,7 +188,10 @@ public class RepositoryItemUidFactoryTest
 
             for ( RepositoryItemUid uid : uids )
             {
-                Assert.assertEquals( "Have to have same instance!",
+                // org.junit.Assert.assertEquals() fails here
+                // FIXME org.junit.Assert will complain if you use the two-argument assertEquals() with float or double, while junit.framework.Assert will silently autobox it.
+
+                junit.framework.Assert.assertEquals( "Have to have same instance!",
                     ( (DefaultRepositoryItemUid) firstUid ).toDebugString(),
                     ( (DefaultRepositoryItemUid) uid ).toDebugString() );
             }
