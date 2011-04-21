@@ -33,7 +33,7 @@ public class DefaultRepositoryItemUidTest
     private Random random;
 
     @Before
-    protected void setUp()
+    public void setUp()
         throws Exception
     {
         this.factory = new DummyRepositoryItemUidFactory();
