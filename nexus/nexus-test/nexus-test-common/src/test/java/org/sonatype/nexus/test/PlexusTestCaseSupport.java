@@ -18,7 +18,7 @@ import org.junit.Before;
  * A Support PlexusTestCase clone that does not extend JUnit TestCase, thereby allowing us to extend
  * this class like we did with JUnit 3x and use JUnit 4x annotations instead to design our tests.
  * <p>
- * This source is meant to be a near copy of the original {@link org.codehaus.plexus.PlexusTestCase}.
+ * This source is meant to be a near copy of the original {@link org.codehaus.plexus.PlexusTestCase}, sisu-2.1.1
  * <p>
  * The supporting asserts derived from JUnit's Assert class are deprecated here to encourage use of
  * the more modern alternative Hamcrest libraries.
@@ -97,7 +97,7 @@ public abstract class PlexusTestCaseSupport {
 
     /**
      * Allow custom test case implementations do augment the default container configuration before executing tests.
-     * 
+     *
      * @param containerConfiguration
      */
     protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
@@ -155,7 +155,7 @@ public abstract class PlexusTestCaseSupport {
      * Allow the retrieval of a container configuration that is based on the name of the test class being run. So if you
      * have a test class called org.foo.FunTest, then this will produce a resource name of org/foo/FunTest.xml which
      * would be used to configure the Plexus container before running your test.
-     * 
+     *
      * @param subname
      * @return
      */
@@ -267,10 +267,11 @@ public abstract class PlexusTestCaseSupport {
 
         return s.substring( 0, s.indexOf( "$" ) ) + ".xml";
     }
-    
+
+    // ========================= CUSTOM NEXUS =====================
     /**
      * Helper to call old JUnit 3x style {@link #setUp()}
-     * @throws Exception 
+     * @throws Exception
      */
     @Before
     public void setUpJunit() throws Exception {
@@ -279,7 +280,7 @@ public abstract class PlexusTestCaseSupport {
 
     /**
      * Helper to call old JUnit 3x style {@link #tearDown()}
-     * @throws Exception 
+     * @throws Exception
      */
     @After
     public void tearDownJunit() throws Exception {
@@ -287,7 +288,7 @@ public abstract class PlexusTestCaseSupport {
     }
 
     /**
-     * 
+     *
      * @deprecated Use {@link org.hamcrest.Assert#fail()} directly instead.
      */
     @Deprecated
@@ -296,7 +297,7 @@ public abstract class PlexusTestCaseSupport {
     }
 
     /**
-     * 
+     *
      * @deprecated Use {@link org.hamcrest.Assert#fail(java.lang.String)} directly instead.
      */
     @Deprecated
@@ -305,31 +306,31 @@ public abstract class PlexusTestCaseSupport {
     }
 
     /**
-     * 
+     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
     protected void assertTrue(boolean condition) {
         Assert.assertTrue(condition);
     }
-    
+
     /**
-     * 
+     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
     protected void assertTrue(String message, boolean condition) {
         Assert.assertTrue(message, condition);
     }
-    
+
     /**
-     * 
+     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
     protected void assertFalse(boolean condition) {
         Assert.assertFalse(condition);
     }
-    
+
     /**
-     * 
+     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
     protected void assertFalse(String message, boolean condition) {
@@ -337,15 +338,15 @@ public abstract class PlexusTestCaseSupport {
     }
 
     /**
-     * 
+     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
     protected void assertNotNull(Object obj) {
         Assert.assertNotNull( obj );
     }
-    
+
     /**
-     * 
+     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
     protected void assertNotNull(String message, Object obj) {
@@ -353,7 +354,7 @@ public abstract class PlexusTestCaseSupport {
     }
 
     /**
-     * 
+     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
     protected void assertNull(Object obj) {
@@ -361,7 +362,7 @@ public abstract class PlexusTestCaseSupport {
     }
 
     /**
-     * 
+     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
     protected void assertNull(String message, Object obj) {
@@ -369,7 +370,7 @@ public abstract class PlexusTestCaseSupport {
     }
 
     /**
-     * 
+     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
     protected void assertEquals(String message, Object expected, Object actual) {
@@ -377,7 +378,7 @@ public abstract class PlexusTestCaseSupport {
     }
 
     /**
-     * 
+     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
     protected void assertEquals(Object expected, Object actual) {
