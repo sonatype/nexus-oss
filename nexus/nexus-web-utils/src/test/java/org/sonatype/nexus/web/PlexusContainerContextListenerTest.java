@@ -39,7 +39,7 @@ public class PlexusContainerContextListenerTest
     protected ServletRunner servletRunner;
 
     @Before
-    protected void setUp()
+    public void setUp()
         throws Exception
     {
         webXml = new File( "src/test/resources/httpunit/WEB-INF/web.xml" );
