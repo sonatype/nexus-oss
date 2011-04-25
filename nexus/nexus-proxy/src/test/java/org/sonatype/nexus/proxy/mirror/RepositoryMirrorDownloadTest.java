@@ -144,7 +144,7 @@ public class RepositoryMirrorDownloadTest
         throws Exception
     {
         super.setUp();
-        
+
         remoteProviderHintFactory = lookup( RemoteProviderHintFactory.class );
     }
 
