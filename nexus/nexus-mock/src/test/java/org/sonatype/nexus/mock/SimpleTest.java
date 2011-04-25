@@ -153,7 +153,7 @@ public class SimpleTest
     }
 
     @After
-    protected void tearDown()
+    public void tearDown()
         throws Exception
     {
         mockNexusEnvironment.stop();
