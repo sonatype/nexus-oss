@@ -27,7 +27,7 @@ public class TestLuceneRestMarshalUnmarchal
     extends TestMarshalUnmarchal
 {
     @Override
-    protected void setUp()
+    public void setUp()
         throws Exception
     {
         super.setUp();
