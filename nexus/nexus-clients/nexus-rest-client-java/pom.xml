@@ -68,7 +68,7 @@
       <artifactId>log4j</artifactId>
       <version>1.2.14</version>
     </dependency>
-    
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit-dep</artifactId>
@@ -82,7 +82,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
-      <classifier>tests</classifier>
     </dependency>
 
 

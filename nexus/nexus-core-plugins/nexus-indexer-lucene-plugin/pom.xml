@@ -131,7 +131,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
-      <classifier>tests</classifier>
     </dependency>
 
     <!-- Because this is a nexus-plugin -->

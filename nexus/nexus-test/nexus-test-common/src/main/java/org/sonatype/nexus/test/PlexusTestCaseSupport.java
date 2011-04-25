@@ -10,6 +10,8 @@ import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.DefaultContext;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -374,7 +376,9 @@ public abstract class PlexusTestCaseSupport {
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
     protected void assertEquals(String message, Object expected, Object actual) {
-        Assert.assertEquals(message, expected, actual);
+        // don't use junit framework Assert due to autoboxing bug
+        MatcherAssert.assertThat(message, actual, Matchers.equalTo( expected ));
+
     }
 
     /**
@@ -382,6 +386,7 @@ public abstract class PlexusTestCaseSupport {
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
     protected void assertEquals(Object expected, Object actual) {
-        Assert.assertEquals(expected, actual);
+        // don't use junit framework Assert
+        MatcherAssert.assertThat( actual, Matchers.equalTo( expected ));
     }
 }

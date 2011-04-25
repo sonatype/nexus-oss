@@ -98,7 +98,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
-      <classifier>tests</classifier>
     </dependency>
 
   </dependencies>
@@ -109,7 +108,7 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
       </plugin>
-      
+
     </plugins>
   </build>
 
