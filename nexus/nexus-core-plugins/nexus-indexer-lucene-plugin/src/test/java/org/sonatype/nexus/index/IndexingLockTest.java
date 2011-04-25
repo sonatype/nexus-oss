@@ -32,7 +32,7 @@ public class IndexingLockTest
     private ReadWriteLock locker;
 
     @Before
-    protected void setUp()
+    public void setUp()
         throws Exception
     {
         locker = new ReentrantReadWriteLock();
