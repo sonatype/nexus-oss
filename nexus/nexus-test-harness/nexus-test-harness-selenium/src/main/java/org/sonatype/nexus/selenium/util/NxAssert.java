@@ -18,11 +18,11 @@
  */
 package org.sonatype.nexus.selenium.util;
 
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
 
@@ -36,9 +36,9 @@ import org.sonatype.nexus.mock.components.TwinPanel;
 public class NxAssert
 {
 
-    private static Matcher<Object> NULL()
+    private static Matcher<String> NULL()
     {
-        return anyOf( equalTo( "null" ), equalTo( "" ), nullValue() );
+        return anyOf( equalTo( "null" ), equalTo( "" ), nullValue( String.class ) );
     }
 
     public static final String THIS_FIELD_IS_REQUIRED = "This field is required";

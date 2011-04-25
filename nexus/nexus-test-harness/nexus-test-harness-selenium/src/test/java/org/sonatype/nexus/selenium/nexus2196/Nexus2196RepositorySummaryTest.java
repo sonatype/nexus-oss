@@ -18,9 +18,9 @@
  */
 package org.sonatype.nexus.selenium.nexus2196;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.text.StringContains.containsString;
+import static org.hamcrest.Matchers.containsString;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.mock.MockEvent;

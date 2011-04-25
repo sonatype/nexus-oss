@@ -2,7 +2,7 @@ package org.sonatype.nexus.integrationtests.nexus4038;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.collection.IsCollectionContaining.hasItem;
+import static org.hamcrest.Matchers.hasItem;
 import static org.testng.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -38,7 +38,8 @@ public class Nexus4038DeleteSystemFeedIT
         assertTrue( Status.isSuccess( getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_REPO, gav,
             getTestFile( "artifact.jar" ) ) ) );
 
-        // timeline resolution is _one second_, so to be sure that ordering is kept he keep gaps between operations bigger than one second 
+        // timeline resolution is _one second_, so to be sure that ordering is kept he keep gaps between operations
+        // bigger than one second
         Thread.sleep( 1100 );
         getEventInspectorsUtil().waitForCalmPeriod();
 
@@ -52,7 +53,8 @@ public class Nexus4038DeleteSystemFeedIT
         Status status = response.getStatus();
         Assert.assertTrue( status.isSuccess(), "Failed to delete " + gav + status );
 
-        // timeline resolution is _one second_, so to be sure that ordering is kept he keep gaps between operations bigger than one second 
+        // timeline resolution is _one second_, so to be sure that ordering is kept he keep gaps between operations
+        // bigger than one second
         Thread.sleep( 1100 );
         getEventInspectorsUtil().waitForCalmPeriod();
 

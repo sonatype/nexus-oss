@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.collection.IsCollectionContaining;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -42,8 +42,7 @@ public class NXCM2124CheckConsoleDocumentationIT
     {
         List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
 
-       MatcherAssert.assertThat( getPluginsNames( pluginInfos ),
-                                    IsCollectionContaining.hasItem( "Nexus : Core Plugins : Plugin Console" ) );
+        assertThat( getPluginsNames( pluginInfos ), hasItem( "Nexus : Core Plugins : Plugin Console" ) );
 
         PluginInfoDTO pluginConsolePlugin =
             this.getPluginInfoByName( pluginInfos, "Nexus : Core Plugins : Plugin Console" );

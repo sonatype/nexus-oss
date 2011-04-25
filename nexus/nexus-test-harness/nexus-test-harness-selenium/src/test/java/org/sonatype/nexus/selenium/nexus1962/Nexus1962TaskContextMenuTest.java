@@ -19,12 +19,12 @@
 package org.sonatype.nexus.selenium.nexus1962;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
 
 import java.util.Arrays;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.hamcrest.collection.IsCollectionContaining;
 import org.restlet.data.Status;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.MockResponse;
@@ -57,7 +57,7 @@ public class Nexus1962TaskContextMenuTest
     {
         task =
             nexusScheduler.schedule( "selenium-context-task",
-                                     nexusScheduler.createTaskInstance( EmptyTrashTask.class ), new ManualRunSchedule() );
+                nexusScheduler.createTaskInstance( EmptyTrashTask.class ), new ManualRunSchedule() );
     }
 
     @AfterMethod
@@ -91,7 +91,7 @@ public class Nexus1962TaskContextMenuTest
 
         // refresh
         tasks.contextMenuRefresh( 0 );
-        assertThat( Arrays.asList( scheduleGrid.getKeys() ), IsCollectionContaining.hasItems( uiTaskId ) );
+        assertThat( Arrays.asList( scheduleGrid.getKeys() ), hasItems( uiTaskId ) );
     }
 
     @Test
@@ -105,7 +105,7 @@ public class Nexus1962TaskContextMenuTest
 
         // run error
         MockHelper.expect( "/schedule_run/{scheduledServiceId}", new MockResponse( Status.CLIENT_ERROR_BAD_REQUEST,
-                                                                                   null ) );
+            null ) );
         tasks.contextMenuRun( uiTaskId );
         new MessageBox( selenium ).clickOk();
 

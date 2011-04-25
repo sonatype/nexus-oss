@@ -21,9 +21,8 @@ package org.sonatype.nexus.integrationtests.nexus637;
 import java.io.File;
 import java.util.Arrays;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.collection.IsCollectionContaining;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.PublishIndexesTaskDescriptor;
@@ -34,7 +33,7 @@ import org.testng.annotations.Test;
 
 /**
  * Test task Publish Indexes is working.
- * 
+ *
  * @author marvin
  */
 public class Nexus637PublishIndexIT
@@ -63,16 +62,13 @@ public class Nexus637PublishIndexIT
         if ( index.exists() )
         {
             // can't contain the OSS index
-            MatcherAssert.assertThat( Arrays.asList( index.list() ),
-                               CoreMatchers.not( IsCollectionContaining.hasItems( "nexus-maven-repository-index.gz",
-                                                                                  "nexus-maven-repository-index.gz.md5",
-                                                                                  "nexus-maven-repository-index.gz.sha1",
-                                                                                  "nexus-maven-repository-index.properties",
-                                                                                  "nexus-maven-repository-index.properties.md5",
-                                                                                  "nexus-maven-repository-index.properties.sha1",
-                                                                                  "nexus-maven-repository-index.zip",
-                                                                                  "nexus-maven-repository-index.zip.md5",
-                                                                                  "nexus-maven-repository-index.zip.sha1" ) ) );
+            assertThat(
+                Arrays.asList( index.list() ),
+                not( hasItems( "nexus-maven-repository-index.gz", "nexus-maven-repository-index.gz.md5",
+                    "nexus-maven-repository-index.gz.sha1", "nexus-maven-repository-index.properties",
+                    "nexus-maven-repository-index.properties.md5", "nexus-maven-repository-index.properties.sha1",
+                    "nexus-maven-repository-index.zip", "nexus-maven-repository-index.zip.md5",
+                    "nexus-maven-repository-index.zip.sha1" ) ) );
         }
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();

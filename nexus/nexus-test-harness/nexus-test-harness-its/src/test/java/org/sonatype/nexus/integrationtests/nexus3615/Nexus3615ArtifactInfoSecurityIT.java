@@ -18,13 +18,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3615;
 
+import static org.hamcrest.Matchers.hasItems;
 import static org.sonatype.nexus.integrationtests.AbstractPrivilegeTest.TEST_USER_NAME;
 import static org.sonatype.nexus.integrationtests.AbstractPrivilegeTest.TEST_USER_PASSWORD;
 
 import java.io.IOException;
 
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.collection.IsCollectionContaining;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.ArtifactInfoResource;
@@ -50,9 +50,10 @@ public class Nexus3615ArtifactInfoSecurityIT
     {
 
     }
-    
+
     @BeforeClass
-    public void setSecureTest(){
+    public void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
         XStream xstream = this.getXMLXStream();
         this.userUtil = new UserMessageUtil( this, xstream, MediaType.APPLICATION_XML );
@@ -135,8 +136,7 @@ public class Nexus3615ArtifactInfoSecurityIT
         Assert.assertEquals( "b354a0022914a48daf90b5b203f90077f6852c68", info.getSha1Hash() );
         // view priv no longer controls search results, only read priv
         Assert.assertEquals( 3, info.getRepositories().size() );
-        MatcherAssert.assertThat( getRepositoryId( info.getRepositories() ),
-                           IsCollectionContaining.hasItems( REPO_TEST_HARNESS_REPO ) );
+        MatcherAssert.assertThat( getRepositoryId( info.getRepositories() ), hasItems( REPO_TEST_HARNESS_REPO ) );
         Assert.assertEquals( "application/java-archive", info.getMimeType() );
         Assert.assertEquals( 1364, info.getSize() );
     }

@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.maven.it.util.StringUtils;
 import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.collection.IsCollectionContaining;
+import static org.hamcrest.Matchers.*;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -54,7 +54,7 @@ public class Nexus2810PluginConsoleIT
         List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
 
         MatcherAssert.assertThat( getPluginsNames( pluginInfos ),
-            IsCollectionContaining.hasItems( "Nexus : Core Plugins : Plugin Console", "Nexus Broken Plugin" ) );
+            hasItems( "Nexus : Core Plugins : Plugin Console", "Nexus Broken Plugin" ) );
 
         PluginInfoDTO pluginConsolePlugin =
             this.getPluginInfoByName( pluginInfos, "Nexus : Core Plugins : Plugin Console" );

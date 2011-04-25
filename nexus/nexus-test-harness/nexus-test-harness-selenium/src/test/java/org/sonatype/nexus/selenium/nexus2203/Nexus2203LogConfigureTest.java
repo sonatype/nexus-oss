@@ -18,9 +18,11 @@
  */
 package org.sonatype.nexus.selenium.nexus2203;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.instanceOf;
+
 import static org.sonatype.nexus.selenium.util.NxAssert.disabled;
 import static org.sonatype.nexus.selenium.util.NxAssert.requiredField;
 import static org.sonatype.nexus.selenium.util.NxAssert.valueEqualsTo;
@@ -103,22 +105,22 @@ public class Nexus2203LogConfigureTest
         logs.getRootLoggerLevel().setValue( newLevel );
         logs.getFileAppenderPattern().type( newPattern );
 
-        MockHelper.listen( "/log/config", new MockListener()
+        MockHelper.listen( "/log/config", new MockListener<LogConfigResourceResponse>()
         {
             @Override
-            protected void onPayload( Object payload, MockEvent evt )
+            protected void onPayload( final Object payload, final MockEvent evt )
             {
-                assertThat( payload, is( LogConfigResourceResponse.class ) );
-                LogConfigResource data = ( (LogConfigResourceResponse) payload ).getData();
+                assertThat( payload, is(instanceOf( LogConfigResourceResponse.class ) ));
+                final LogConfigResource data = ( (LogConfigResourceResponse) payload ).getData();
                 assertThat( data.getRootLoggerLevel(), equalTo( newLevel ) );
                 assertThat( data.getFileAppenderPattern(), equalTo( newPattern ) );
             }
 
             @Override
-            protected void onResult( Object result, MockEvent evt )
+            protected void onResult( final LogConfigResourceResponse result, final MockEvent evt )
             {
-                assertThat( result, is( LogConfigResourceResponse.class ) );
-                LogConfigResource data = ( (LogConfigResourceResponse) result ).getData();
+                assertThat( result, is(instanceOf( LogConfigResourceResponse.class ) ));
+                final LogConfigResource data = ( (LogConfigResourceResponse) result ).getData();
                 assertThat( data.getRootLoggerLevel(), equalTo( newLevel ) );
                 assertThat( data.getFileAppenderPattern(), equalTo( newPattern ) );
             }

@@ -18,8 +18,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3011;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.collection.IsCollectionContaining.hasItems;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.hasItems;
 import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
 
 import org.hamcrest.MatcherAssert;

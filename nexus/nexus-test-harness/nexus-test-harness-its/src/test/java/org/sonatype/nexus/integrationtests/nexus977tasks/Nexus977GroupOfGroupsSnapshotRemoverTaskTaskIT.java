@@ -18,13 +18,14 @@
  */
 package org.sonatype.nexus.integrationtests.nexus977tasks;
 
+import static org.hamcrest.Matchers.containsString;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
 
 import org.apache.maven.model.Model;
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.text.StringContains;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
@@ -99,7 +100,7 @@ public class Nexus977GroupOfGroupsSnapshotRemoverTaskTaskIT
         }
         catch ( FileNotFoundException e )
         {
-            MatcherAssert.assertThat( e.getMessage(), StringContains.containsString( "404" ) );
+            MatcherAssert.assertThat( e.getMessage(), containsString( "404" ) );
         }
 
     }

@@ -18,14 +18,15 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3638;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
+
 import java.net.URL;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.artifact.Gav;
-import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.text.StringContains;
 import org.sonatype.jettytestsuite.ControlledServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
@@ -68,7 +69,10 @@ public class Nexus3638IndexProxiedMavenPluginIT
     {
         final Gav gav = GavUtil.newGav( "org.apache.maven.plugins", "maven-invoker-plugin", "1.6-SNAPSHOT" );
 
-        downloadFile( new URL( "http://localhost:" + TestProperties.getInteger( "webproxy-server-port" )
+        downloadFile(
+            new URL(
+                "http://localhost:"
+                    + TestProperties.getInteger( "webproxy-server-port" )
                     + "/nexus3638/org/apache/maven/plugins/maven-invoker-plugin/1.6-SNAPSHOT/maven-invoker-plugin-1.6-20100922.124315-3.jar" ),
             "target/downloads/nexus3638" );
 
@@ -112,9 +116,8 @@ public class Nexus3638IndexProxiedMavenPluginIT
 
         String logContent = FileUtils.readFileToString( nexusLog );
         // NEXUS-3707
-        MatcherAssert.assertThat(
-            logContent,
-            CoreMatchers.not( StringContains.containsString( "Rename operation failed after -1 retries in -1 ms intervals" ) ) );
-        MatcherAssert.assertThat( logContent, CoreMatchers.not( StringContains.containsString( "java.util.zip.ZipException" ) ) );
+        MatcherAssert.assertThat( logContent,
+            not( containsString( "Rename operation failed after -1 retries in -1 ms intervals" ) ) );
+        MatcherAssert.assertThat( logContent, not( containsString( "java.util.zip.ZipException" ) ) );
     }
 }

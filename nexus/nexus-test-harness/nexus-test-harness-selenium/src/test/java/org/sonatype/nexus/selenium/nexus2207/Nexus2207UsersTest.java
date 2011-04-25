@@ -18,7 +18,7 @@
  */
 package org.sonatype.nexus.selenium.nexus2207;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.Collections;
@@ -98,7 +98,7 @@ public class Nexus2207UsersTest
         Assert.assertTrue( user.getFirstName().hasErrorText( "First Name cannot start with whitespace." ) );
         user.getFirstName().resetValue();
         user.getFirstName().type( "seluser" );
-        
+
         //FIXME
 //        NxAssert.requiredField( user.getFirstName(), "seluser" );
 //        NxAssert.requiredField( user.getLastName(), "seluser" );

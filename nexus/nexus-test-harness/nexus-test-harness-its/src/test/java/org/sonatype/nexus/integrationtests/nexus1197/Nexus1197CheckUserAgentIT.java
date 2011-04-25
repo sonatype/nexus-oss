@@ -22,8 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.FileNotFoundException;
 
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.text.StringContains;
+import static org.hamcrest.Matchers.*;
 import org.mortbay.jetty.Server;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
@@ -83,8 +82,7 @@ public class Nexus1197CheckUserAgentIT
 
         Assert.assertNotNull( userAgent );
         Assert.assertTrue( userAgent.startsWith( "Nexus/" ) );
-        assertThat( userAgent, CoreMatchers.anyOf( StringContains.containsString( "(OSS" ),
-                                                          StringContains.containsString( "(PRO" ) ) );
+        assertThat( userAgent, anyOf( containsString( "(OSS" ), containsString( "(PRO" ) ) );
 
     }
 

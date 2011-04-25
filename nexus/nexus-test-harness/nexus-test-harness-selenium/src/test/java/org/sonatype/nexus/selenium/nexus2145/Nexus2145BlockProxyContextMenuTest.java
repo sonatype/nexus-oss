@@ -18,12 +18,12 @@
  */
 package org.sonatype.nexus.selenium.nexus2145;
 
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.startsWith;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.hamcrest.text.StringStartsWith;
 import org.restlet.data.Status;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.MockResponse;
@@ -65,9 +65,10 @@ public class Nexus2145BlockProxyContextMenuTest
         // check on server
         assertThat( proxyRepo.getProxyMode(), equalTo( ProxyMode.BLOCKED_MANUAL ) );
         // check on UI
-        assertThat( repositories.getStatus( proxyRepo.getId() ),
-                    anyOf( equalTo( "In Service - Remote Manually Blocked and Available" ),
-                           equalTo( "In Service - Remote Manually Blocked and Unavailable" ) ) );
+        assertThat(
+            repositories.getStatus( proxyRepo.getId() ),
+            anyOf( equalTo( "In Service - Remote Manually Blocked and Available" ),
+                equalTo( "In Service - Remote Manually Blocked and Unavailable" ) ) );
 
         // allow proxy
         MockHelper.expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
@@ -86,7 +87,7 @@ public class Nexus2145BlockProxyContextMenuTest
         // check on server
         assertThat( proxyRepo.getProxyMode(), equalTo( ProxyMode.BLOCKED_AUTO ) );
         // check on UI
-        assertThat( repositories.getStatus( proxyRepo.getId() ), StringStartsWith.startsWith( "In Service" ) );
+        assertThat( repositories.getStatus( proxyRepo.getId() ), startsWith( "In Service" ) );
     }
 
 }

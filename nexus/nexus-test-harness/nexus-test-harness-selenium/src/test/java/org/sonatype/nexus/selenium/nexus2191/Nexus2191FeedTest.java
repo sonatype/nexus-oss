@@ -19,9 +19,9 @@
 package org.sonatype.nexus.selenium.nexus2191;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.hamcrest.text.StringStartsWith;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.FeedsTab;
 import org.testng.Assert;
@@ -44,7 +44,6 @@ public class Nexus2191FeedTest
         Assert.assertEquals( "Authentication", feeds.getFeedData( "title" ) );
         Assert.assertEquals( "", feeds.getFeedData( "author" ) );
         Assert.assertEquals( "", feeds.getFeedData( "content" ) );
-        assertThat( feeds.getFeedData( "description" ),
-                    StringStartsWith.startsWith( "Successfully authenticated user [admin]" ) );
+        assertThat( feeds.getFeedData( "description" ), startsWith( "Successfully authenticated user [admin]" ) );
     }
 }

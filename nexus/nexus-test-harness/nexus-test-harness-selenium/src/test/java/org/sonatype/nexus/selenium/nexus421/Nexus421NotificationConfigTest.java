@@ -18,11 +18,12 @@
  */
 package org.sonatype.nexus.selenium.nexus421;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.testng.Assert.assertNotNull;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -68,7 +69,7 @@ public class Nexus421NotificationConfigTest
                         else
                         {
                             assertThat( payload, not( nullValue() ) );
-                            assertThat( payload, is( GlobalConfigurationResourceResponse.class ) );
+                            assertThat( payload, is( instanceOf( GlobalConfigurationResourceResponse.class ) ) );
 
                             GlobalConfigurationResourceResponse resource =
                                 (GlobalConfigurationResourceResponse) payload;

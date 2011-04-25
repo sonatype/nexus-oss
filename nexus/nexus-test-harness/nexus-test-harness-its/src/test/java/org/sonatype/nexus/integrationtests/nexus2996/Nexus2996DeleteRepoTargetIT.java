@@ -19,7 +19,7 @@
 package org.sonatype.nexus.integrationtests.nexus2996;
 
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.collection.IsCollectionContaining;
+import static org.hamcrest.Matchers.hasItem;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
@@ -51,7 +51,7 @@ public class Nexus2996DeleteRepoTargetIT
         throws Exception
     {
         RepositoryTargetResource target = TargetMessageUtil.get( TARGET_ID );
-        MatcherAssert.assertThat( target.getPatterns(), IsCollectionContaining.hasItem( ".*" ) );
+        MatcherAssert.assertThat( target.getPatterns(), hasItem( ".*" ) );
 
         privUtil.assertExists( READ_PRIV_ID, CREATE_PRIV_ID, UPDATE_PRIV_ID, DELETE_PRIV_ID );
 

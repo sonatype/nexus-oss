@@ -27,7 +27,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.text.StringContains;
+import static org.hamcrest.Matchers.*;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
@@ -105,16 +105,16 @@ public class Nexus3699CapabilityIT
         assertTrue( touch.exists() );
 
         String content = FileUtils.readFileToString( touch );
-        MatcherAssert.assertThat( content, StringContains.containsString( "capabilities test!" ) );
-        MatcherAssert.assertThat( content, StringContains.containsString( "repo_nexus-test-harness-repo" ) );
+        MatcherAssert.assertThat( content, containsString( "capabilities test!" ) );
+        MatcherAssert.assertThat( content, containsString( "repo_nexus-test-harness-repo" ) );
 
         CapabilityResource cap = CapabilitiesMessageUtil.read( "4fde59a80f4" );
         setMessage( cap, "capability updated!" );
         CapabilitiesMessageUtil.update( cap );
 
         content = FileUtils.readFileToString( touch );
-        MatcherAssert.assertThat( content, StringContains.containsString( "capability updated!" ) );
-        MatcherAssert.assertThat( content, StringContains.containsString( "repo_nexus-test-harness-repo" ) );
+        MatcherAssert.assertThat( content, containsString( "capability updated!" ) );
+        MatcherAssert.assertThat( content, containsString( "repo_nexus-test-harness-repo" ) );
     }
 
     private void setMessage( CapabilityResource cap, String msg )

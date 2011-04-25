@@ -19,12 +19,12 @@
 package org.sonatype.nexus.selenium.nexus2209;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertTrue;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.hamcrest.text.StringContains;
 import org.sonatype.nexus.mock.MockEvent;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.NexusMockTestCase;
@@ -116,7 +116,7 @@ public class Nexus2209PrivilegesTest
 
             PrivilegeStatusResource data = result.getData().get( i );
 
-            assertThat( data.getName(), StringContains.containsString( name ) );
+            assertThat( data.getName(), containsString( name ) );
             NxAssert.valueEqualsTo( priv.getName(), data.getName() );
             NxAssert.valueEqualsTo( priv.getDescription(), description );
         }

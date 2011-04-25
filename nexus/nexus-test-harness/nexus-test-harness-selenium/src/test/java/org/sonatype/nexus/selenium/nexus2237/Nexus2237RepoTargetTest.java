@@ -18,12 +18,13 @@
  */
 package org.sonatype.nexus.selenium.nexus2237;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.hasItems;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.hamcrest.collection.IsCollectionContaining;
 import org.sonatype.nexus.mock.MockEvent;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.SeleniumTest;
@@ -82,7 +83,7 @@ public class Nexus2237RepoTargetTest
                 assertThat( payload, not( nullValue() ) );
                 RepositoryTargetResourceResponse result = (RepositoryTargetResourceResponse) payload;
 
-                assertThat( result.getData().getPatterns(), IsCollectionContaining.hasItems( pattern, pattern2 ) );
+                assertThat( result.getData().getPatterns(), hasItems( pattern, pattern2 ) );
             }
         } );
 

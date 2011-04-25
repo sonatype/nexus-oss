@@ -25,7 +25,7 @@ import java.util.List;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.collection.IsCollectionContaining;
+import static org.hamcrest.Matchers.hasItem;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -89,9 +89,9 @@ public class Nexus3045GroupRemovalIT
 
         RepositoryRouteResource route = routesUtil.getRoute( REPO_ROUTE_ID );
         Assert.assertNotNull( route );
-        MatcherAssert.assertThat( getRepoIds( route.getRepositories() ), IsCollectionContaining.hasItem( "thirdparty" ) );
+        MatcherAssert.assertThat( getRepoIds( route.getRepositories() ), hasItem( "thirdparty" ) );
         MatcherAssert.assertThat( getRepoIds( route.getRepositories() ),
-            CoreMatchers.not( IsCollectionContaining.hasItem( "releases" ) ) );
+            CoreMatchers.not( hasItem( "releases" ) ) );
     }
 
     private List<String> getRepoIds( List<RepositoryRouteMemberRepository> repositories )

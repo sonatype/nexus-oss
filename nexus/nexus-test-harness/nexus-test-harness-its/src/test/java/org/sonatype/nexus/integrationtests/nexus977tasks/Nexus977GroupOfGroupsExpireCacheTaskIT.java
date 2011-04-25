@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus977tasks;
 
+import static org.hamcrest.Matchers.containsString;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -25,7 +27,6 @@ import java.io.IOException;
 import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.text.StringContains;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
@@ -54,7 +55,7 @@ public class Nexus977GroupOfGroupsExpireCacheTaskIT
         repo.setKey( "repositoryId" );
         repo.setValue( "g4" );
         TaskScheduleUtil.runTask( "ExpireCacheTaskDescriptor-snapshot", ExpireCacheTaskDescriptor.ID, repo );
-        
+
         downloadArtifactFromRepository( "g4", gav, "target/downloads/nexus977tasks" );
     }
 
@@ -68,7 +69,7 @@ public class Nexus977GroupOfGroupsExpireCacheTaskIT
         }
         catch ( FileNotFoundException e )
         {
-            MatcherAssert.assertThat( e.getMessage(), StringContains.containsString( "404" ) );
+            MatcherAssert.assertThat( e.getMessage(), containsString( "404" ) );
         }
     }
 }

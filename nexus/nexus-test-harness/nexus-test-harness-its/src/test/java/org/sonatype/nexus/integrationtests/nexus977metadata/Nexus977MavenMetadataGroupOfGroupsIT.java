@@ -26,7 +26,7 @@ import java.util.List;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.collection.IsCollectionContaining;
+import static org.hamcrest.Matchers.hasItems;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
@@ -74,7 +74,6 @@ public class Nexus977MavenMetadataGroupOfGroupsIT
         IOUtil.close( in );
 
         List<String> versions = metadata.getVersioning().getVersions();
-        MatcherAssert.assertThat( versions,
-                                     IsCollectionContaining.hasItems( "1.5", "1.0.1", "1.0-SNAPSHOT", "0.8", "2.1" ) );
+        MatcherAssert.assertThat( versions, hasItems( "1.5", "1.0.1", "1.0-SNAPSHOT", "0.8", "2.1" ) );
     }
 }

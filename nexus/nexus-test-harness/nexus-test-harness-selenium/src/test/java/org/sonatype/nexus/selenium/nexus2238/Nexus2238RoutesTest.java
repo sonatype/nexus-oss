@@ -18,8 +18,8 @@
  */
 package org.sonatype.nexus.selenium.nexus2238;
 
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.codehaus.plexus.component.annotations.Component;

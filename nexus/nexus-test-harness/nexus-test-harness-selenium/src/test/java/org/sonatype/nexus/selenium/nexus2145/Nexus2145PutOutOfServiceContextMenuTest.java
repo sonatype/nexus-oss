@@ -18,11 +18,11 @@
  */
 package org.sonatype.nexus.selenium.nexus2145;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.hamcrest.text.StringStartsWith;
 import org.restlet.data.Status;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.MockResponse;
@@ -63,11 +63,11 @@ public class Nexus2145PutOutOfServiceContextMenuTest
         // check on server
         assertThat( hostedRepo.getLocalStatus(), equalTo( LocalStatus.OUT_OF_SERVICE ) );
         // check on UI
-        assertThat( repositories.getStatus( hostedRepo.getId() ), StringStartsWith.startsWith( "Out of Service" ) );
+        assertThat( repositories.getStatus( hostedRepo.getId() ), startsWith( "Out of Service" ) );
 
         // back to service
         MockHelper.expect( "/repositories/{repositoryId}/status", new MockResponse( Status.CLIENT_ERROR_BAD_REQUEST,
-                                                                                    null ) );
+            null ) );
         repositories.contextMenuPutInService( hostedRepo.getId() );
         new MessageBox( selenium ).clickOk();
 
@@ -83,7 +83,7 @@ public class Nexus2145PutOutOfServiceContextMenuTest
         // check on server
         assertThat( hostedRepo.getLocalStatus(), equalTo( LocalStatus.IN_SERVICE ) );
         // check on UI
-        assertThat( repositories.getStatus( hostedRepo.getId() ), StringStartsWith.startsWith( "In Service" ) );
+        assertThat( repositories.getStatus( hostedRepo.getId() ), startsWith( "In Service" ) );
     }
 
 }
