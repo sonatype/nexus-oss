@@ -25,6 +25,9 @@ import java.util.concurrent.Executors;
 
 import junit.framework.AssertionFailedError;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
@@ -80,7 +83,7 @@ public class RepositoryItemUidFactoryTest
         {
             e.printStackTrace();
             // damian wins
-            fail( "Beer for damian, please!" );
+            Assert.fail( "Beer for damian, please!" );
         }
         catch ( IllegalMonitorStateException e )
         {
@@ -91,32 +94,26 @@ public class RepositoryItemUidFactoryTest
         catch ( Exception e )
         {
             e.printStackTrace();
-            fail( "No beer for anyone" );
+            Assert.fail( "No beer for anyone" );
         }
+    }
+
+    @Test( expected = AssertionError.class )
+    public void testHardAttackWithBrokenFactoryThatShouldFail()
+        throws Exception
+    {
+        RepositoryItemUidFactory brokenFactory = lookup( RepositoryItemUidFactory.class, "broken" );
+        hardAttack( brokenFactory );
     }
 
     @Test
-    public void testHardAttack()
+    public void testHardAttackWithStandardFactoryThatShouldPass()
         throws Exception
     {
-        // try with the fixed one
         hardAttack( factory );
-
-        RepositoryItemUidFactory brokenFactory = lookup( RepositoryItemUidFactory.class, "broken" );
-
-        try
-        {
-            hardAttack( brokenFactory );
-
-            fail( "Test with broken factory should fail!" );
-        }
-        catch ( AssertionFailedError e )
-        {
-            // should fail
-        }
     }
 
-    public void hardAttack( RepositoryItemUidFactory factory )
+    protected void hardAttack( RepositoryItemUidFactory factory )
         throws Exception
     {
         final int count = 3000;
@@ -181,19 +178,15 @@ public class RepositoryItemUidFactoryTest
         {
             Collection<RepositoryItemUid> uids = uidMap.get( key );
 
-            Assert.assertEquals( "There should be as many UIDs for \"" + uids.iterator().next()
-                + "\" as many thread getting them!", threadPerPath, uids.size() );
+            assertThat( "There should be as many UIDs for \"" + uids.iterator().next()
+                + "\" as many thread getting them!", uids, hasSize( threadPerPath ) );
 
-            RepositoryItemUid firstUid = uids.iterator().next();
-
+            final RepositoryItemUid firstUid = uids.iterator().next();
+            final DefaultRepositoryItemUid expected = (DefaultRepositoryItemUid) firstUid;
             for ( RepositoryItemUid uid : uids )
             {
-                // org.junit.Assert.assertEquals() fails here
-                // FIXME org.junit.Assert will complain if you use the two-argument assertEquals() with float or double, while junit.framework.Assert will silently autobox it.
-
-                junit.framework.Assert.assertEquals( "Have to have same instance!",
-                    ( (DefaultRepositoryItemUid) firstUid ).toDebugString(),
-                    ( (DefaultRepositoryItemUid) uid ).toDebugString() );
+                DefaultRepositoryItemUid actual = (DefaultRepositoryItemUid) uid;
+                assertThat(actual, sameInstance( expected ) );
             }
         }
     }
