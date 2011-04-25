@@ -154,13 +154,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <version>4.5</version>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
   <build>
