@@ -29,7 +29,7 @@ public abstract class AbstractRestTestCase
     protected XStream xstream;
 
     @Before
-    protected void setUp()
+    public void setUp()
         throws Exception
     {
         // create and configure XStream for JSON

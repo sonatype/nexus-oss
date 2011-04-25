@@ -34,7 +34,7 @@ public class RemoveClassAttributeFromJsonStrings
     private XStream xstreamJSON;
 
     @Before
-    protected void setUp()
+    public void setUp()
         throws Exception
     {
         NexusApplication napp = new NexusApplication();

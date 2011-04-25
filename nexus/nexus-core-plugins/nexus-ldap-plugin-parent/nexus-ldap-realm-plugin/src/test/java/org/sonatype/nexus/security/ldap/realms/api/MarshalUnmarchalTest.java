@@ -47,7 +47,7 @@ public class MarshalUnmarchalTest
     private XStream xstreamJSON;
 
     @Before
-    protected void setUp()
+    public void setUp()
         throws Exception
     {
         xstreamXML = new XStream( new LookAheadXppDriver() );

@@ -76,7 +76,7 @@ public class SimpleTest
     }
 
     @Before
-    protected void setUp()
+    public void setUp()
         throws Exception
     {
         bundleRoot = MockNexusEnvironment.getBundleRoot( new File( "target/nexus-ui" ) );
@@ -161,7 +161,7 @@ public class SimpleTest
 
     /**
      * Here, we don't mock anything, we are relying on _real_ response from real Nexus
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -177,7 +177,7 @@ public class SimpleTest
 
     /**
      * We mock the status resource to be unavailable.
-     * 
+     *
      * @throws Exception
      */
     @Test
@@ -198,7 +198,7 @@ public class SimpleTest
 
     /**
      * We mock status response.
-     * 
+     *
      * @throws Exception
      */
     public void testStatusCustomContent()
@@ -236,7 +236,7 @@ public class SimpleTest
 
     /**
      * Here, we don't mock anything, we are just listening the _real_ response from real Nexus
-     * 
+     *
      * @throws Exception
      */
     public void testListenStatusFine()
