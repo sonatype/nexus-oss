@@ -90,16 +90,16 @@ public class RepositoryExpireCacheTest
         }
 
         // we have now two items in NFC
-        assertEquals( 2, getRepository().getNotFoundCache().getStatistics().getSize() );
+        assertEquals( 2L, getRepository().getNotFoundCache().getStatistics().getSize() );
 
         // remove one
         getRepository().expireCaches( new ResourceStoreRequest( "/activemq1/activemq-core", true ) );
 
-        assertEquals( 1, getRepository().getNotFoundCache().getStatistics().getSize() );
+        assertEquals( 1L, getRepository().getNotFoundCache().getStatistics().getSize() );
 
         getRepository().expireCaches( new ResourceStoreRequest( "/", true ) );
 
-        assertEquals( 0, getRepository().getNotFoundCache().getStatistics().getSize() );
+        assertEquals( 0L, getRepository().getNotFoundCache().getStatistics().getSize() );
 
         retrieveItem();
     }
