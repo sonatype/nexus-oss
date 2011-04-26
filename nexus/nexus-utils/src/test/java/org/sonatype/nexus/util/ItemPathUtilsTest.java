@@ -29,6 +29,7 @@ import org.junit.Test;
  */
 public class ItemPathUtilsTest
 {
+    @Test
     public void testGetLCPPathFromPair()
         throws Exception
     {

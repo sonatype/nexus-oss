@@ -36,6 +36,7 @@ package org.sonatype.security.ldap.upgrade.cipher;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 /**
@@ -57,7 +58,7 @@ public class DefaultPlexusCipherTest
 
     // -------------------------------------------------------------
     @Override
-    public void setUp()
+    protected void setUp()
         throws Exception
     {
         super.setUp();
@@ -66,6 +67,7 @@ public class DefaultPlexusCipherTest
     }
 
     // -------------------------------------------------------------
+    @Test
     public void testDefaultAlgorithmExists()
         throws Exception
     {
@@ -82,7 +84,7 @@ public class DefaultPlexusCipherTest
         throw new Exception( "Cannot find default algorithm " + pc.algorithm + " in the current environment." );
     }
 
-    // -------------------------------------------------------------
+    // intentionally not a test?
     public void stestFindDefaultAlgorithm()
         throws Exception
     {
@@ -103,7 +105,7 @@ public class DefaultPlexusCipherTest
             }
     }
 
-    // -------------------------------------------------------------
+    @Test
     public void testDecrypt()
         throws Exception
     {
@@ -111,7 +113,7 @@ public class DefaultPlexusCipherTest
         Assert.assertEquals( "Decryption did not produce desired result", str, res );
     }
 
-    // -------------------------------------------------------------
+    @Test
     public void testEncrypt()
         throws Exception
     {
@@ -120,7 +122,7 @@ public class DefaultPlexusCipherTest
         Assert.assertEquals( "Encryption/Decryption did not produce desired result", str, res );
     }
 
-    // -------------------------------------------------------------
+    @Test
     public void testDecorate()
         throws Exception
     {
@@ -129,7 +131,7 @@ public class DefaultPlexusCipherTest
             + PlexusCipher.ENCRYPTED_STRING_DECORATION_STOP, res );
     }
 
-    // -------------------------------------------------------------
+    @Test
     public void testUnDecorate()
         throws Exception
     {
@@ -138,6 +140,4 @@ public class DefaultPlexusCipherTest
                 + PlexusCipher.ENCRYPTED_STRING_DECORATION_STOP );
         Assert.assertEquals( "Decoration failed", "aaa", res );
     }
-    // -------------------------------------------------------------
-    // -------------------------------------------------------------
 }

@@ -28,70 +28,77 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.sonatype.security.ldap.realms.persist.ConfigurationValidator;
-import org.sonatype.security.ldap.realms.persist.ValidationMessage;
-import org.sonatype.security.ldap.realms.persist.ValidationRequest;
-import org.sonatype.security.ldap.realms.persist.ValidationResponse;
-
+import org.junit.Test;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.ldap.realms.persist.model.Configuration;
 import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Reader;
 
-public class DefaultLdapConfigurationValidatorTest extends PlexusTestCaseSupport
+public class DefaultLdapConfigurationValidatorTest
+    extends PlexusTestCaseSupport
 {
 
     @Override
     protected void customizeContext( Context context )
     {
-       super.customizeContext( context );
+        super.customizeContext( context );
 
-       String packageName = this.getClass().getPackage().getName();
-       context.put( "test-path", getBasedir() +"/target/test-classes/"+ packageName.replace( '.', '/' )+ "/validation" );
+        String packageName = this.getClass().getPackage().getName();
+        context.put( "test-path", getBasedir() + "/target/test-classes/" + packageName.replace( '.', '/' )
+            + "/validation" );
     }
 
-    @SuppressWarnings("unchecked")
-    public void testConf() throws Exception
+    @Test
+    public void testConf()
+        throws Exception
     {
 
-        List<LdapConfigrationValidatorTestBean> beans = this.getContainer().lookupList( LdapConfigrationValidatorTestBean.class );
-        ConfigurationValidator validator = lookup(ConfigurationValidator.class);
+        List<LdapConfigrationValidatorTestBean> beans =
+            this.getContainer().lookupList( LdapConfigrationValidatorTestBean.class );
+        ConfigurationValidator validator = lookup( ConfigurationValidator.class );
 
         for ( LdapConfigrationValidatorTestBean testBean : beans )
         {
-            ValidationResponse response = validator.validateModel( new ValidationRequest( this.getLdapConfiguration( testBean.getConfigFile() )) );
+            ValidationResponse response =
+                validator.validateModel( new ValidationRequest( this.getLdapConfiguration( testBean.getConfigFile() ) ) );
 
-            Assert.assertEquals( "Config File: "+ testBean.getConfigFile() +" errors:\n" +this.getDebugStringFromResponse( response ), testBean.getNumberOfErrors(), response.getValidationErrors().size() );
-            Assert.assertEquals( "Config File: "+ testBean.getConfigFile() +" warnings:" +this.getDebugStringFromResponse( response ), testBean.getNumberOfWarnings(), response.getValidationWarnings().size() );
+            Assert.assertEquals(
+                "Config File: " + testBean.getConfigFile() + " errors:\n" + this.getDebugStringFromResponse( response ),
+                testBean.getNumberOfErrors(), response.getValidationErrors().size() );
+            Assert.assertEquals(
+                "Config File: " + testBean.getConfigFile() + " warnings:" + this.getDebugStringFromResponse( response ),
+                testBean.getNumberOfWarnings(), response.getValidationWarnings().size() );
         }
     }
 
     private String getDebugStringFromResponse( ValidationResponse response )
     {
         StringBuffer buffer = new StringBuffer();
-        if(!response.getValidationErrors().isEmpty())
+        if ( !response.getValidationErrors().isEmpty() )
         {
             buffer.append( "Errors:" );
             for ( ValidationMessage message : response.getValidationErrors() )
             {
-                buffer.append("\t").append( message.getKey() ).append( " - " ).append( message.getMessage() ).append( "\n" );
+                buffer.append( "\t" ).append( message.getKey() ).append( " - " ).append( message.getMessage() ).append(
+                    "\n" );
             }
             buffer.append( "\n" );
         }
-        if(!response.getValidationWarnings().isEmpty())
+        if ( !response.getValidationWarnings().isEmpty() )
         {
             buffer.append( "Warnings:" );
             for ( ValidationMessage message : response.getValidationWarnings() )
             {
-                buffer.append("\t").append( message.getKey() ).append( " - " ).append( message.getMessage() ).append( "\n" );
+                buffer.append( "\t" ).append( message.getKey() ).append( " - " ).append( message.getMessage() ).append(
+                    "\n" );
             }
         }
         return buffer.toString();
     }
 
-
-    private Configuration getLdapConfiguration(File configFile) throws IOException, XmlPullParserException
+    private Configuration getLdapConfiguration( File configFile )
+        throws IOException, XmlPullParserException
     {
 
         Configuration defaultConfig = null;
@@ -133,6 +140,5 @@ public class DefaultLdapConfigurationValidatorTest extends PlexusTestCaseSupport
         }
         return defaultConfig;
     }
-
 
 }
