@@ -201,6 +201,7 @@ public class SimpleTest
      *
      * @throws Exception
      */
+    @Test
     public void testStatusCustomContent()
         throws Exception
     {
@@ -239,6 +240,7 @@ public class SimpleTest
      *
      * @throws Exception
      */
+    @Test
     public void testListenStatusFine()
         throws Exception
     {
@@ -254,6 +256,7 @@ public class SimpleTest
         MockHelper.checkAndClean();
     }
 
+    @Test
     public void testListenChecker()
         throws Exception
     {
@@ -271,6 +274,7 @@ public class SimpleTest
         }
     }
 
+    @Test
     public void testMockChecker()
         throws Exception
     {
