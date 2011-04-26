@@ -24,6 +24,7 @@ import java.net.ServerSocket;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.context.Context;
+import org.junit.Test;
 import org.restlet.data.Form;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -87,6 +88,7 @@ public class RemoteBrowserResourceAuthTest
 
     }
 
+    @Test
     public void testSiteWithAuth()
         throws Exception
     {
@@ -110,7 +112,7 @@ public class RemoteBrowserResourceAuthTest
         m2Repo.setRemoteUrl( remoteUrl );
         m2Repo.setRemoteAuthenticationSettings( new UsernamePasswordRemoteAuthenticationSettings( "admin", "admin" ) );
         m2Repo.commitChanges();
-        
+
         Reference rootRef = new Reference( "http://localhost:8081/nexus/service/local/repositories/" + repoId + "" );
         Reference resourceRef = new Reference( rootRef, "http://localhost:8081/nexus/service/local/repositories/" + repoId + "/" );
 
@@ -128,7 +130,7 @@ public class RemoteBrowserResourceAuthTest
 
          PlexusResource plexusResource = this.lookup( PlexusResource.class, RemoteBrowserResource.class.getName() );
          String jsonString = plexusResource.get( null, request, null, null ).toString();
-        
+
          // TODO: do some better validation then this
          Assert.assertTrue( jsonString.contains( "/auth-test/classes/" ) );
          Assert.assertTrue( jsonString.contains( "/auth-test/test-classes/" ) );

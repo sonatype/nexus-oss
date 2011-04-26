@@ -26,6 +26,7 @@ import junit.framework.Assert;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.Test;
 import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
 import org.sonatype.security.usermanagement.UserManager;
 
@@ -54,12 +55,10 @@ public class LdapUserManagerNotConfiguredTest
     {
         FileUtils.deleteDirectory( CONF_HOME );
         CONF_HOME.mkdirs();
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/test-conf/conf/security-configuration-no-ldap.xml" ),
+        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/conf/security-configuration-no-ldap.xml" ),
             new FileOutputStream( new File( CONF_HOME, "security.xml" ) ) );
 
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/test-conf/conf/security-configuration.xml" ),
+        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/conf/security-configuration.xml" ),
             new FileOutputStream( new File( CONF_HOME, "security-configuration.xml" ) ) );
 
         // IOUtil.copy(
@@ -69,6 +68,7 @@ public class LdapUserManagerNotConfiguredTest
         super.setUp();
     }
 
+    @Test
     public void testNotConfigured()
         throws Exception
     {

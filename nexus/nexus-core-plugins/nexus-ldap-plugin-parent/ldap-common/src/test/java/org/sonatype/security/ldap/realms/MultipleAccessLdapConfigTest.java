@@ -24,12 +24,12 @@ import javax.naming.NamingException;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.context.Context;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
+import org.codehaus.plexus.context.Context;
+import org.junit.Test;
 import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
 import org.sonatype.security.ldap.realms.persist.InvalidConfigurationException;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
-
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 
 public class MultipleAccessLdapConfigTest
@@ -56,6 +56,7 @@ public class MultipleAccessLdapConfigTest
         context.put( "application-conf", getBasedir() + "/target/test-classes/not-configured/" );
     }
 
+    @Test
     public void testConfigure()
         throws InvalidConfigurationException, NamingException
     {

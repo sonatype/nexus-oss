@@ -66,6 +66,7 @@ public class ItemPathUtilsTest
         Assert.assertEquals( expected, ItemPathUtils.getLCPPath( pathA, pathB ) );
     }
 
+    @Test
     public void testGetLCPPathFromCollection()
         throws Exception
     {

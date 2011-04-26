@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.rest.roles;
 
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.rest.AbstractRestTestCase;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
@@ -27,15 +28,15 @@ public class RoleTest
     extends AbstractRestTestCase
 {
 
+    @Test
     public void testRequest()
         throws Exception
     {
-        String jsonString = "{\"data\":{\"id\":null,\"name\":\"Test Role\",\"description\":\"This is a test role\",\"sessionTimeout\":50,"
-            + "\"roles\":[\"roleid\"],\"privileges\":[\"privid\"]}}}";
-        XStreamRepresentation representation = new XStreamRepresentation(
-            xstream,
-            jsonString,
-            MediaType.APPLICATION_JSON );
+        String jsonString =
+            "{\"data\":{\"id\":null,\"name\":\"Test Role\",\"description\":\"This is a test role\",\"sessionTimeout\":50,"
+                + "\"roles\":[\"roleid\"],\"privileges\":[\"privid\"]}}}";
+        XStreamRepresentation representation =
+            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
 
         RoleResourceRequest request = (RoleResourceRequest) representation.getPayload( new RoleResourceRequest() );
 

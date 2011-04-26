@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.rest.groups;
 
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.rest.AbstractRestTestCase;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
@@ -27,18 +28,17 @@ public class RepositoryGroupResponseTest
     extends AbstractRestTestCase
 {
 
+    @Test
     public void testRepoGroup()
         throws Exception
     {
         String jsonString = "{\"data\":[{\"id\":\"public-releases\",\"name\":\"public-releases11\"}]}";
 
-        XStreamRepresentation representation = new XStreamRepresentation(
-            xstream,
-            jsonString,
-            MediaType.APPLICATION_JSON );
+        XStreamRepresentation representation =
+            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
 
-        RepositoryGroupListResourceResponse response = (RepositoryGroupListResourceResponse) representation
-            .getPayload( new RepositoryGroupListResourceResponse() );
+        RepositoryGroupListResourceResponse response =
+            (RepositoryGroupListResourceResponse) representation.getPayload( new RepositoryGroupListResourceResponse() );
     }
 
 }

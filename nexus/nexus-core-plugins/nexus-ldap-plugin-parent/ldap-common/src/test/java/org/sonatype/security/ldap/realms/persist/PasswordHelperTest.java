@@ -20,10 +20,9 @@ package org.sonatype.security.ldap.realms.persist;
 
 import junit.framework.Assert;
 
+import org.junit.Test;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
-import org.sonatype.security.ldap.realms.persist.PasswordHelper;
 import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
-
 
 public class PasswordHelperTest
     extends PlexusTestCaseSupport
@@ -35,6 +34,7 @@ public class PasswordHelperTest
         return (PasswordHelper) this.lookup( PasswordHelper.class );
     }
 
+    @Test
     public void testValidPass()
         throws Exception
     {
@@ -45,6 +45,7 @@ public class PasswordHelperTest
         Assert.assertEquals( password, ph.decrypt( encodedPass ) );
     }
 
+    @Test
     public void testNullEncrypt()
         throws Exception
     {
@@ -52,6 +53,7 @@ public class PasswordHelperTest
         Assert.assertNull( ph.encrypt( null ) );
     }
 
+    @Test
     public void testNullDecrypt()
         throws Exception
     {
@@ -59,6 +61,7 @@ public class PasswordHelperTest
         Assert.assertNull( ph.decrypt( null ) );
     }
 
+    @Test
     public void testDecryptNonEncyprtedPassword()
         throws Exception
     {

@@ -22,6 +22,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.junit.Test;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -49,6 +50,7 @@ public class ComponentPlexusResourceTest
         return (PlexusComponentListResourceResponse) componentPlexusResource.get( null, request, null, null );
     }
 
+    @Test
     public void testInvalidRole()
         throws Exception
     {
@@ -63,6 +65,7 @@ public class ComponentPlexusResourceTest
         }
     }
 
+    @Test
     public void testValidRoleMultipleResults()
         throws Exception
     {
@@ -103,6 +106,7 @@ public class ComponentPlexusResourceTest
 
     }
 
+    @Test
     public void testValidRoleSingleResult()
         throws Exception
     {
@@ -116,6 +120,7 @@ public class ComponentPlexusResourceTest
         Assert.assertEquals( "test-hint", resource.getRoleHint() );
     }
 
+    @Test
     public void testNullDescriptionAndHint()
         throws Exception
     {
@@ -129,6 +134,7 @@ public class ComponentPlexusResourceTest
         Assert.assertEquals( "default", resource.getRoleHint() );
     }
 
+    @Test
     public void testEmptyDescriptionAndHint()
         throws Exception
     {

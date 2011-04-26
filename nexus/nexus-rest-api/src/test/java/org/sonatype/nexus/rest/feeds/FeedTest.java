@@ -24,6 +24,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.junit.Test;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -36,6 +37,7 @@ public class FeedTest
     extends AbstractNexusTestCase
 {
 
+    @Test
     public void testFeedSources()
         throws Exception
     {
@@ -50,7 +52,7 @@ public class FeedTest
         // Plexus loading this class
         // so subclassing to expose this method, sort of get around what i am trying to test.
 
-        //System.out.println( "feedResource: " + feedResource );
+        // System.out.println( "feedResource: " + feedResource );
 
         Field feedField = AbstractFeedPlexusResource.class.getDeclaredField( "feeds" );
         feedField.setAccessible( true );
@@ -58,14 +60,9 @@ public class FeedTest
 
         Assert.assertNotNull( feeds );
 
-        Method getFeedMethod = feedResource.getClass().getDeclaredMethod(
-            "getFeed",
-            Context.class,
-            Request.class,
-            String.class,
-            Integer.class,
-            Integer.class,
-            Map.class );
+        Method getFeedMethod =
+            feedResource.getClass().getDeclaredMethod( "getFeed", Context.class, Request.class, String.class,
+                Integer.class, Integer.class, Map.class );
 
         SyndFeed feed = (SyndFeed) getFeedMethod.invoke( feedResource, null, null, "brokenArtifacts", null, null, null );
 

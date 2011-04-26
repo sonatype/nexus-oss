@@ -29,6 +29,7 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.Test;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -51,16 +52,17 @@ public class ForgotPasswordTest
 
     private int emailServerPort;
 
+    @Test
     public void testRestPassword()
         throws Exception
     {
 
         this.copyDefaultConfigToPlace();
         this.setupEmailConfig();
-        
+
         NexusConfiguration nexusConfig = this.lookup( NexusConfiguration.class );
         nexusConfig.loadConfiguration( true );
-        
+
         String username = "admin";
 
         PlexusResource resetEmailPR = this.lookup( PlexusResource.class, "UserResetPlexusResource" );
@@ -73,7 +75,6 @@ public class ForgotPasswordTest
         // Need 1 message
         server.waitForIncomingEmail( 5000, 1 );
 
-        
         MimeMessage[] msgs = server.getReceivedMessages();
         Assert.assertTrue( "Expected email.", msgs != null && msgs.length > 0 );
         MimeMessage msg = msgs[0];
@@ -94,8 +95,7 @@ public class ForgotPasswordTest
     }
 
     private void setupEmailConfig()
-        throws IOException,
-            XmlPullParserException
+        throws IOException, XmlPullParserException
     {
         FileInputStream fis = null;
         Configuration config = null;
@@ -108,17 +108,17 @@ public class ForgotPasswordTest
 
             config.getSmtpConfiguration().setPort( this.emailServerPort );
             config.getSmtpConfiguration().setHostname( "localhost" );
-//            config.getSmtpConfiguration().setDebugMode( true );
+            // config.getSmtpConfiguration().setDebugMode( true );
 
         }
         finally
         {
             IOUtil.close( fis );
         }
-        
+
         // now write it back out
         FileWriter writer = null;
-        
+
         try
         {
             writer = new FileWriter( this.getNexusConfiguration() );
@@ -144,7 +144,7 @@ public class ForgotPasswordTest
         server = new GreenMail( smtp );
         server.setUser( "system@nexus.org", "smtp-username", "smtp-password" );
         server.start();
-        
+
         this.lookup( SecuritySystem.class ).start();
     }
 

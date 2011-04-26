@@ -29,6 +29,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Test;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -119,6 +120,7 @@ public class ProtectedRepositoryRegistryTest
         waitForTasksToStop();
     }
 
+    @Test
     public void testRegistryWithViewAccess()
         throws Exception
     {
@@ -134,6 +136,7 @@ public class ProtectedRepositoryRegistryTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testRegistryWithViewAccessFacet()
         throws Exception
     {
@@ -149,6 +152,7 @@ public class ProtectedRepositoryRegistryTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testRegistryWithViewAccessById()
         throws Exception
     {
@@ -163,6 +167,7 @@ public class ProtectedRepositoryRegistryTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testRegistryWithViewAccessByIdNoAccess()
         throws Exception
     {
@@ -181,6 +186,7 @@ public class ProtectedRepositoryRegistryTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testRegistryWithViewAccessFacetById()
         throws Exception
     {
@@ -195,6 +201,7 @@ public class ProtectedRepositoryRegistryTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testRegistryWithViewAccessFacetByIdNoAccess()
         throws Exception
     {
@@ -213,6 +220,7 @@ public class ProtectedRepositoryRegistryTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testRemoveWithAccess()
         throws Exception
     {
@@ -232,6 +240,7 @@ public class ProtectedRepositoryRegistryTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testRemoveWithoutAccess()
         throws Exception
     {
@@ -250,6 +259,7 @@ public class ProtectedRepositoryRegistryTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testRemoveSilentlyWithAccess()
         throws Exception
     {
@@ -269,6 +279,7 @@ public class ProtectedRepositoryRegistryTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testRemoveSilentlyWithoutAccess()
         throws Exception
     {
@@ -287,6 +298,7 @@ public class ProtectedRepositoryRegistryTest
         this.securitySystem.logout( subject );
     }
 
+    @Test
     public void testGetGroupsWithAccess()
         throws Exception
     {
@@ -316,8 +328,8 @@ public class ProtectedRepositoryRegistryTest
         throws Exception
     {
         Maven2HostedRepositoryTemplate template =
-            (Maven2HostedRepositoryTemplate) nexus.getRepositoryTemplates()
-                .getTemplates( Maven2HostedRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
+            (Maven2HostedRepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(
+                Maven2HostedRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
 
         template.getConfigurableRepository().setIndexable( false );
         template.getConfigurableRepository().setId( repoId );
@@ -329,8 +341,8 @@ public class ProtectedRepositoryRegistryTest
         throws Exception
     {
         Maven2GroupRepositoryTemplate template =
-            (Maven2GroupRepositoryTemplate) nexus.getRepositoryTemplates()
-                .getTemplates( Maven2GroupRepositoryTemplate.class ).pick();
+            (Maven2GroupRepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(
+                Maven2GroupRepositoryTemplate.class ).pick();
 
         template.getConfigurableRepository().setIndexable( false );
         template.getConfigurableRepository().setId( repoId );
@@ -342,8 +354,8 @@ public class ProtectedRepositoryRegistryTest
         throws Exception
     {
         Maven2HostedRepositoryTemplate template =
-            (Maven2HostedRepositoryTemplate) nexus.getRepositoryTemplates()
-                .getTemplates( Maven2HostedRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
+            (Maven2HostedRepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(
+                Maven2HostedRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
 
         template.getConfigurableRepository().setIndexable( false );
         template.getConfigurableRepository().setId( repoId );
@@ -353,8 +365,8 @@ public class ProtectedRepositoryRegistryTest
 
         // now for the shadow
         Maven2Maven1ShadowRepositoryTemplate shadowTemplate =
-            (Maven2Maven1ShadowRepositoryTemplate) nexus.getRepositoryTemplates()
-                .getTemplates( Maven2Maven1ShadowRepositoryTemplate.class ).pick();
+            (Maven2Maven1ShadowRepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(
+                Maven2Maven1ShadowRepositoryTemplate.class ).pick();
 
         shadowTemplate.getConfigurableRepository().setIndexable( false );
         shadowTemplate.getConfigurableRepository().setId( repoId + "-shadow" );

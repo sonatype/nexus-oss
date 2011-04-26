@@ -23,17 +23,17 @@ import java.util.SortedSet;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.context.Context;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
+import org.codehaus.plexus.context.Context;
+import org.junit.Test;
 import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.LdapUser;
 import org.sonatype.security.ldap.dao.NoSuchLdapGroupException;
 import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
-import org.sonatype.security.ldap.realms.LdapManager;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 
 public abstract class AbstractLdapSchemaTest
@@ -69,6 +69,7 @@ public abstract class AbstractLdapSchemaTest
         this.ldapManager = this.lookup( LdapManager.class );
     }
 
+    @Test
     public void testUserManager()
         throws Exception
     {
@@ -99,6 +100,7 @@ public abstract class AbstractLdapSchemaTest
         }
     }
 
+    @Test
     public void testGroupManager()
         throws Exception
     {
@@ -119,6 +121,7 @@ public abstract class AbstractLdapSchemaTest
         assertTrue( groups.contains( "snapshots" ) );
     }
 
+    @Test
     public void testSuccessfulAuthentication()
         throws Exception
     {
@@ -135,6 +138,7 @@ public abstract class AbstractLdapSchemaTest
         // assertEquals( "brianf123", password );
     }
 
+    @Test
     public void testWrongPassword()
         throws Exception
     {
@@ -149,6 +153,7 @@ public abstract class AbstractLdapSchemaTest
         }
     }
 
+    @Test
     public void testFailedAuthentication()
     {
 
@@ -169,6 +174,7 @@ public abstract class AbstractLdapSchemaTest
         return false;
     }
 
+    @Test
     public void testSearch()
         throws LdapDAOException
     {
@@ -196,6 +202,7 @@ public abstract class AbstractLdapSchemaTest
         assertEquals( 0, users.size() );
     }
 
+    @Test
     public void testGetAllGroups()
         throws LdapDAOException
     {
@@ -208,9 +215,9 @@ public abstract class AbstractLdapSchemaTest
 
     }
 
+    @Test
     public void testGetGroupName()
-        throws LdapDAOException,
-            NoSuchLdapGroupException
+        throws LdapDAOException, NoSuchLdapGroupException
     {
         assertEquals( "public", this.ldapManager.getGroupName( "public" ) );
         try

@@ -18,15 +18,15 @@
  */
 package org.sonatype.security.ldap.dao.password;
 
-import java.io.UnsupportedEncodingException;
-
 import junit.framework.Assert;
 
+import org.junit.Test;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 public class SSHAPasswordEncoderTest
     extends PlexusTestCaseSupport
 {
+    @Test
     public void testVerify()
         throws Exception
     {
@@ -36,10 +36,8 @@ public class SSHAPasswordEncoderTest
 
         Assert.assertTrue( encoder.isPasswordValid( encPassword, "password", null ) );
         Assert.assertTrue( encoder.isPasswordValid( "{ssha}FBProvj7X/SW+7nYtd83uX/noSQ6reGv", "password", null ) );
-        Assert.assertFalse( encoder.isPasswordValid(
-            "{ssha}FBProvj7X/SW+7nYtd83uX/noSQ6reGv",
-            "FBProvj7X/SW+7nYtd83uX/noSQ6reGv",
-            null ) );
+        Assert.assertFalse( encoder.isPasswordValid( "{ssha}FBProvj7X/SW+7nYtd83uX/noSQ6reGv",
+            "FBProvj7X/SW+7nYtd83uX/noSQ6reGv", null ) );
         Assert.assertFalse( encoder.isPasswordValid( encPassword, "Password", null ) );
         Assert.assertFalse( encoder.isPasswordValid( encPassword, "junk", null ) );
         Assert.assertFalse( encoder.isPasswordValid( encPassword, "", null ) );
@@ -49,6 +47,7 @@ public class SSHAPasswordEncoderTest
         Assert.assertFalse( encoder.isPasswordValid( "notValid", "password", null ) );
     }
 
+    @Test
     public void testEncode()
         throws Exception
     {
@@ -70,10 +69,8 @@ public class SSHAPasswordEncoderTest
 
         String clearPass = "foobar";
         Assert.assertTrue( encoder.isPasswordValid( encoder.encodePassword( clearPass, null ), clearPass, null ) );
-        Assert.assertTrue( encoder.isPasswordValid(
-            encoder.encodePassword( clearPass, "byte[]".getBytes() ),
-            clearPass,
-            null ) );
+        Assert.assertTrue( encoder.isPasswordValid( encoder.encodePassword( clearPass, "byte[]".getBytes() ),
+            clearPass, null ) );
 
         try
         {

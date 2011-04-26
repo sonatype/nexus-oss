@@ -31,6 +31,7 @@ import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.Test;
 import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
@@ -51,6 +52,7 @@ public class LdapUserManagerTest
     }
 
     public static final String SECURITY_CONFIG_KEY = "security-xml-file";
+
     public static final String LDAP_CONFIGURATION_KEY = "application-conf";
 
     protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
@@ -69,18 +71,15 @@ public class LdapUserManagerTest
         throws Exception
     {
         CONF_HOME.mkdirs();
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/test-conf/conf/security-users-in-both-realms.xml" ),
+        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/conf/security-users-in-both-realms.xml" ),
             new FileOutputStream( new File( CONF_HOME, "security.xml" ) ) );
 
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/test-conf/conf/security-configuration.xml" ),
+        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/conf/security-configuration.xml" ),
             new FileOutputStream( new File( CONF_HOME, "security-configuration.xml" ) ) );
-        
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/test-conf/conf/ldap.xml" ),
-            new FileOutputStream( new File( CONF_HOME, "ldap.xml" ) ) );
-        
+
+        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/conf/ldap.xml" ), new FileOutputStream( new File(
+            CONF_HOME, "ldap.xml" ) ) );
+
         super.setUp();
     }
 
@@ -96,10 +95,11 @@ public class LdapUserManagerTest
         return this.lookup( UserManager.class, "LDAP" );
     }
 
+    @Test
     public void testGetUserFromUserManager()
         throws Exception
-    {   
-        
+    {
+
         SecuritySystem securitySystem = this.getSecuritySystem();
         securitySystem.start();
         User user = securitySystem.getUser( "cstamas" );
@@ -115,11 +115,12 @@ public class LdapUserManagerTest
         Assert.assertEquals( 3, roleIds.size() );
     }
 
+    @Test
     public void testGetUserFromLocator()
         throws Exception
     {
         Assert.assertNotNull( this.lookup( LdapConfiguration.class ) );
-        
+
         UserManager userLocator = this.getUserManager();
         User user = userLocator.getUser( "cstamas" );
         Assert.assertNotNull( user );
@@ -128,6 +129,7 @@ public class LdapUserManagerTest
         Assert.assertEquals( "Tamas Cservenak", user.getName() );
     }
 
+    @Test
     public void testGetUserIds()
         throws Exception
     {
@@ -140,6 +142,7 @@ public class LdapUserManagerTest
         Assert.assertEquals( "Ids: " + userIds, 4, userIds.size() );
     }
 
+    @Test
     public void testSearch()
         throws Exception
     {
@@ -151,6 +154,7 @@ public class LdapUserManagerTest
         Assert.assertEquals( "Users: " + users, 2, users.size() );
     }
 
+    @Test
     public void testEffectiveSearch()
         throws Exception
     {
@@ -170,6 +174,7 @@ public class LdapUserManagerTest
         Assert.assertEquals( "Users: " + users, 1, users.size() );
     }
 
+    @Test
     public void testGetUsers()
         throws Exception
     {
@@ -222,11 +227,11 @@ public class LdapUserManagerTest
         return roleIds;
     }
 
+    @Test
     public void testOrderOfUserSearch()
         throws Exception
     {
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/test-conf/conf/security-users-in-both-realms.xml" ),
+        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/conf/security-users-in-both-realms.xml" ),
             new FileOutputStream( new File( CONF_HOME, "security.xml" ) ) );
 
         SecuritySystem securitySystem = this.getSecuritySystem();

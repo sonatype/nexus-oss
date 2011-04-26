@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.rest;
 
+import org.junit.Ignore;
+import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -51,12 +53,16 @@ public class Nexus2302Test
         assertEquals( uri, resourceStorePath );
     }
 
+    @Ignore
+    @Test
     public void testSimplePath()
     {
         // FIXME: skipped
         // doTestPathEncoding( "content/repositories/central/org/log4j/log4j/1.2.13/log4j-1.2.13.jar" );
     }
 
+    @Ignore
+    @Test
     public void testProblematicPath()
     {
         // doTestPathEncoding(

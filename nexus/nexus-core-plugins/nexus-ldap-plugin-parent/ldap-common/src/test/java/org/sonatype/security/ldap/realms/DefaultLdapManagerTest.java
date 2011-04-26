@@ -24,10 +24,9 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.context.Context;
+import org.junit.Test;
 import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
 import org.sonatype.security.ldap.dao.LdapUser;
-import org.sonatype.security.ldap.realms.LdapManager;
-
 
 public class DefaultLdapManagerTest
     extends AbstractLdapTestEnvironment
@@ -39,6 +38,7 @@ public class DefaultLdapManagerTest
         return (LdapManager) this.lookup( LdapManager.class );
     }
 
+    @Test
     public void testGetAll()
         throws Exception
     {
@@ -51,6 +51,7 @@ public class DefaultLdapManagerTest
         Assert.assertEquals( 3, ldapManager.getUsers( -1 ).size() );
     }
 
+    @Test
     public void testGetLimit()
         throws Exception
     {
@@ -59,23 +60,23 @@ public class DefaultLdapManagerTest
         Assert.assertEquals( 2, ldapManager.getUsers( 2 ).size() );
     }
 
-    public void testSort() throws Exception
+    @Test
+    public void testSort()
+        throws Exception
     {
         LdapManager ldapManager = this.getLdapManager();
 
         Set<LdapUser> users = ldapManager.getAllUsers();
         Assert.assertEquals( 3, users.size() );
-        
-        String[] orderedUsers = {"brianf", "cstamas", "jvanzyl"};
-        
+
+        String[] orderedUsers = { "brianf", "cstamas", "jvanzyl" };
+
         int index = 0;
         for ( LdapUser user : users )
         {
             Assert.assertEquals( orderedUsers[index++], user.getUsername() );
         }
-        
-        
-        
+
     }
 
     @Override

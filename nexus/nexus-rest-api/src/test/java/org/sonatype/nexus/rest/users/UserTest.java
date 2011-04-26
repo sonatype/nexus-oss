@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.rest.users;
 
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.rest.AbstractRestTestCase;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
@@ -27,15 +28,15 @@ public class UserTest
     extends AbstractRestTestCase
 {
 
+    @Test
     public void testRequest()
         throws Exception
     {
-        String jsonString = "{\"data\":{\"userId\":\"myuser\",\"firstName\":\"johnny test\",\"email\":\"test@email.com\",\"status\":\"active\","
-            + "\"roles\":[\"roleId\"]}}}";
-        XStreamRepresentation representation = new XStreamRepresentation(
-            xstream,
-            jsonString,
-            MediaType.APPLICATION_JSON );
+        String jsonString =
+            "{\"data\":{\"userId\":\"myuser\",\"firstName\":\"johnny test\",\"email\":\"test@email.com\",\"status\":\"active\","
+                + "\"roles\":[\"roleId\"]}}}";
+        XStreamRepresentation representation =
+            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
 
         UserResourceRequest request = (UserResourceRequest) representation.getPayload( new UserResourceRequest() );
 

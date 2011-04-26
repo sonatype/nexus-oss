@@ -22,20 +22,20 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
-import org.codehaus.plexus.context.Context;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.ldap.LdapContextFactory;
+import org.codehaus.plexus.context.Context;
+import org.junit.Test;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
 import org.sonatype.security.ldap.dao.LdapGroupDAO;
 import org.sonatype.security.ldap.dao.LdapUser;
 import org.sonatype.security.ldap.dao.LdapUserDAO;
 import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
-
 
 public class BasicActiveDirectoryLdapSchemaTest
     extends PlexusTestCaseSupport
@@ -76,13 +76,15 @@ public class BasicActiveDirectoryLdapSchemaTest
         this.ldapGroupManager = this.lookup( LdapGroupDAO.class );
         this.ldapConfiguration = this.lookup( LdapConfiguration.class );
 
-        // FIXME: this test is not autmated, and now it is BROKEN, but this needs bo be resolved, as the PlexusLdapContextFactory has been removed
+        // FIXME: this test is not autmated, and now it is BROKEN, but this needs bo be resolved, as the
+        // PlexusLdapContextFactory has been removed
 
-//        this.ldapContextFactory = this.lookup( LdapContextFactory.class, "PlexusLdapContextFactory" );
+        // this.ldapContextFactory = this.lookup( LdapContextFactory.class, "PlexusLdapContextFactory" );
         this.ldapUserManager = lookup( LdapUserDAO.class );
         this.realm = this.lookup( Realm.class, "LdapAuthenticatingRealm" );
     }
 
+    @Test
     public void testUserManager()
         throws Exception
     {
@@ -105,6 +107,7 @@ public class BasicActiveDirectoryLdapSchemaTest
         }
     }
 
+    @Test
     public void testGroupManager()
         throws Exception
     {
@@ -112,7 +115,7 @@ public class BasicActiveDirectoryLdapSchemaTest
 
         Set<String> groups =
             this.ldapGroupManager.getGroupMembership( "jcoder", this.ldapContextFactory.getSystemLdapContext(),
-                                                      configuration );
+                configuration );
 
         Assert.assertTrue( groups.contains( "Users" ) );
         Assert.assertTrue( groups.contains( "Backup Operators" ) );
@@ -120,6 +123,7 @@ public class BasicActiveDirectoryLdapSchemaTest
         Assert.assertTrue( groups.contains( "Schema Admins" ) );
     }
 
+    @Test
     public void testSuccessfulAuthentication()
         throws Exception
     {
@@ -136,6 +140,7 @@ public class BasicActiveDirectoryLdapSchemaTest
         // Assert.assertEquals( "brianf123", password );
     }
 
+    @Test
     public void testWrongPassword()
         throws Exception
     {
@@ -151,6 +156,7 @@ public class BasicActiveDirectoryLdapSchemaTest
         }
     }
 
+    @Test
     public void testFailedAuthentication()
     {
 

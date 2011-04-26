@@ -22,15 +22,15 @@ import java.util.Arrays;
 
 import junit.framework.Assert;
 
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
-import org.codehaus.plexus.context.Context;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.codehaus.plexus.context.Context;
+import org.junit.Test;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.ldap.dao.password.PasswordEncoderManager;
-
 
 public class SonatypeLdapTest
     extends PlexusTestCaseSupport
@@ -51,15 +51,13 @@ public class SonatypeLdapTest
         passwordManager.setPreferredEncoding( "crypt" );
     }
 
-
     @Override
     protected void customizeContext( Context context )
     {
-       context.put( "application-conf", getBasedir() +"/target/test-classes/sonatype-conf/conf/" );
+        context.put( "application-conf", getBasedir() + "/target/test-classes/sonatype-conf/conf/" );
     }
 
-
-
+    @Test
     public void testSuccessfulAuthentication()
         throws Exception
     {
@@ -69,12 +67,13 @@ public class SonatypeLdapTest
 
         AuthenticationInfo ai = realm.getAuthenticationInfo( upToken );
 
-         Assert.assertNotNull( ai );
+        Assert.assertNotNull( ai );
 
-     }
+    }
 
+    @Test
     public void testWrongPassword()
-    throws Exception
+        throws Exception
     {
         UsernamePasswordToken upToken = new UsernamePasswordToken( "tstevens", "JUNK" );
         try
@@ -87,6 +86,7 @@ public class SonatypeLdapTest
         }
     }
 
+    @Test
     public void testFailedAuthentication()
     {
 
@@ -106,7 +106,8 @@ public class SonatypeLdapTest
     {
 
         Assert.assertFalse( this.doesUserHaveAllRoles( "brianf", "public", "releases" ) );
-        Assert.assertTrue( this.doesUserHaveAllRoles( "jvanzyl", "wheel", "sonatype", "labs", "svn", "svn-labs", "sales", "sonatype-conf", "sonatype-jira", "book" ) );
+        Assert.assertTrue( this.doesUserHaveAllRoles( "jvanzyl", "wheel", "sonatype", "labs", "svn", "svn-labs",
+            "sales", "sonatype-conf", "sonatype-jira", "book" ) );
 
         Assert.assertTrue( this.doesUserHaveAllRoles( "tstevens", "svn" ) );
 
@@ -115,13 +116,12 @@ public class SonatypeLdapTest
 
     }
 
-    private boolean doesUserHaveAllRoles(String username, String ... roles)
+    private boolean doesUserHaveAllRoles( String username, String... roles )
     {
         SimplePrincipalCollection principals = new SimplePrincipalCollection();
         principals.add( username, this.realm.getName() );
 
         return this.realm.hasAllRoles( principals, Arrays.asList( roles ) );
     }
-
 
 }

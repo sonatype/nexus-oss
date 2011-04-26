@@ -23,8 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Before;
-import org.sonatype.guice.bean.containers.InjectedTestCase;
+import org.junit.Test;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 /**
@@ -35,13 +34,14 @@ public class RepositoryConvertorTest
 {
     private RepositoryConvertor convertor;
 
-    @Before
-    public void setUp()
+    protected void setUp()
         throws Exception
     {
+        super.setUp();
         convertor = (RepositoryConvertor) this.lookup( RepositoryConvertor.class );
     }
 
+    @Test
     public void testConvertWithCopy()
         throws Exception
     {
@@ -67,6 +67,7 @@ public class RepositoryConvertorTest
         validateResult( expected );
     }
 
+    @Test
     public void testConvertWithMove()
         throws Exception
     {
@@ -82,6 +83,7 @@ public class RepositoryConvertorTest
         validateResult( expected );
     }
 
+    @Test
     public void testNexus1667()
         throws Exception
     {
@@ -148,6 +150,7 @@ public class RepositoryConvertorTest
         validateResult( expected );
     }
 
+    @Test
     public void testNonstandardVersionDirectory()
         throws Exception
     {

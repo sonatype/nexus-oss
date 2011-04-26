@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.rest.repositories;
 
+import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.AbstractRestTestCase;
@@ -28,33 +29,37 @@ public class RepositoryResponseTest
     extends AbstractRestTestCase
 {
 
+    @Test
     public void testRepo()
         throws Exception
     {
-        String jsonString = "{\"data\" : {\"writePolicy\":\""+RepositoryWritePolicy.ALLOW_WRITE.name()+"\", \"browseable\":true,\"defaultLocalStorageUrl\":null,\"id\":\"test1\", \"indexable\":false,\"name\":\"test1\",\"notFoundCacheTTL\":1440,\"overrideLocalStorageUrl\":null,\"repoPolicy\":\"release\", \"repoType\":\"hosted\"}}";
+        String jsonString =
+            "{\"data\" : {\"writePolicy\":\""
+                + RepositoryWritePolicy.ALLOW_WRITE.name()
+                + "\", \"browseable\":true,\"defaultLocalStorageUrl\":null,\"id\":\"test1\", \"indexable\":false,\"name\":\"test1\",\"notFoundCacheTTL\":1440,\"overrideLocalStorageUrl\":null,\"repoPolicy\":\"release\", \"repoType\":\"hosted\"}}";
 
-        XStreamRepresentation representation = new XStreamRepresentation(
-            xstream,
-            jsonString,
-            MediaType.APPLICATION_JSON );
+        XStreamRepresentation representation =
+            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
 
-        RepositoryResourceResponse response = (RepositoryResourceResponse) representation
-            .getPayload( new RepositoryResourceResponse() );
+        RepositoryResourceResponse response =
+            (RepositoryResourceResponse) representation.getPayload( new RepositoryResourceResponse() );
 
     }
 
+    @Test
     public void testProxyRepo()
         throws Exception
     {
-        String jsonString = "{\"data\" : {\"writePolicy\":\""+RepositoryWritePolicy.ALLOW_WRITE.name()+"\", \"artifactMaxAge\":1440,\"browseable\":true,\"defaultLocalStorageUrl\":null,\"id\":\"test1\", \"indexable\":false,\"metadataMaxAge\":1440,\"name\":\"test1\",\"notFoundCacheTTL\":1440,\"overrideLocalStorageUrl\":null,\"repoPolicy\":\"release\", \"repoType\":\"proxy\"}}";
+        String jsonString =
+            "{\"data\" : {\"writePolicy\":\""
+                + RepositoryWritePolicy.ALLOW_WRITE.name()
+                + "\", \"artifactMaxAge\":1440,\"browseable\":true,\"defaultLocalStorageUrl\":null,\"id\":\"test1\", \"indexable\":false,\"metadataMaxAge\":1440,\"name\":\"test1\",\"notFoundCacheTTL\":1440,\"overrideLocalStorageUrl\":null,\"repoPolicy\":\"release\", \"repoType\":\"proxy\"}}";
 
-        XStreamRepresentation representation = new XStreamRepresentation(
-            xstream,
-            jsonString,
-            MediaType.APPLICATION_JSON );
+        XStreamRepresentation representation =
+            new XStreamRepresentation( xstream, jsonString, MediaType.APPLICATION_JSON );
 
-        RepositoryResourceResponse response = (RepositoryResourceResponse) representation
-            .getPayload( new RepositoryResourceResponse() );
+        RepositoryResourceResponse response =
+            (RepositoryResourceResponse) representation.getPayload( new RepositoryResourceResponse() );
 
     }
 

@@ -25,18 +25,14 @@ import java.util.Map;
 import javax.naming.Context;
 import javax.naming.ldap.InitialLdapContext;
 
+import org.junit.Test;
 import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
-import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
-import org.sonatype.security.ldap.dao.LdapUser;
-import org.sonatype.security.ldap.dao.LdapUserDAO;
-import org.sonatype.security.ldap.dao.NoSuchLdapUserException;
-
-
 
 public class LdapUserDAOTest
     extends AbstractLdapTestEnvironment
 {
 
+    @Test
     public void testSimple()
         throws Exception
     {

@@ -20,15 +20,15 @@ package org.sonatype.security.ldap.dao.password;
 
 import junit.framework.Assert;
 
+import org.junit.Test;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
-import org.sonatype.security.ldap.dao.password.PasswordEncoder;
 import org.sonatype.security.ldap.dao.password.hash.MD5Crypt;
-
 
 public class MD5CryptPasswordEncoderTest
     extends PlexusTestCaseSupport
 {
 
+    @Test
     public void testEncryptAndVerify()
         throws Exception
     {

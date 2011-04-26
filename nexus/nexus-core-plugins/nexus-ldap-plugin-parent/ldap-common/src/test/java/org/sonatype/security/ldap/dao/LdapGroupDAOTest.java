@@ -26,25 +26,30 @@ import java.util.Set;
 import javax.naming.Context;
 import javax.naming.ldap.InitialLdapContext;
 
+import org.junit.Test;
 import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
 
 public class LdapGroupDAOTest
     extends AbstractLdapTestEnvironment
 {
 
+    @Test
     public void testSimple()
         throws Exception
     {
         doTestWithGroupMemberFormat( "cn=${username},ou=people,o=sonatype" );
     }
 
+    @Test
     public void testUsingDNInGroupMemberFormat()
         throws Exception
     {
         doTestWithGroupMemberFormat( "${dn}" );
     }
 
-    protected void doTestWithGroupMemberFormat(String groupMemberFormat) throws Exception {
+    protected void doTestWithGroupMemberFormat( String groupMemberFormat )
+        throws Exception
+    {
         Map<String, Object> env = new HashMap<String, Object>();
         // Create a new context pointing to the overseas partition
         env.put( Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory" );

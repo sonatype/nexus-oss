@@ -21,6 +21,7 @@ package org.sonatype.nexus.rest.repositories;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.junit.Test;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -56,10 +57,11 @@ public class RepositoryCreateUpdateTest
         super.setUp();
 
         nexus = lookup( Nexus.class );
-        
+
         nexus.getNexusConfiguration().setSecurityEnabled( false );
     }
 
+    @Test
     public void testCreate()
         throws Exception
     {
@@ -67,7 +69,7 @@ public class RepositoryCreateUpdateTest
         RepositoryProxyResource result = this.sendAndGetResponse();
         //
         // CHECK RESULTS
-        // 
+        //
 
         Assert.assertEquals( "test-id", result.getId() );
         // Assert.assertEquals( true, result.isAllowWrite() );
@@ -115,12 +117,13 @@ public class RepositoryCreateUpdateTest
         Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER, resultAuth2.getPassword() );
         // Assert.assertEquals( "privateKey2", resultAuth2.getPrivateKey() );
         Assert.assertEquals( "username2", resultAuth2.getUsername() );
-        
+
         // NEXUS-1994 override local storage should be null
         Assert.assertNull( result.getOverrideLocalStorageUrl() );
         Assert.assertTrue( StringUtils.isNotEmpty( result.getDefaultLocalStorageUrl() ) );
     }
 
+    @Test
     public void testUpdate()
         throws Exception
     {
@@ -292,6 +295,7 @@ public class RepositoryCreateUpdateTest
         return result;
     }
 
+    @Test
     public void testCreateAuthNoProxy()
         throws Exception
     {
@@ -340,7 +344,7 @@ public class RepositoryCreateUpdateTest
             (RepositoryResourceResponse) plexusResource.post( null, request, response, repoRequest );
         RepositoryProxyResource result = (RepositoryProxyResource) repoResponse.getData();
 
-        // 
+        //
         // make sure proxy is null
         //
 
@@ -355,25 +359,27 @@ public class RepositoryCreateUpdateTest
         repoResponse = (RepositoryResourceResponse) updateResource.put( null, request, response, repoResponse );
         result = (RepositoryProxyResource) repoResponse.getData();
 
-        // 
+        //
         // make sure proxy is null
         //
 
         Assert.assertNull( result.getRemoteStorage().getHttpProxySettings() );
-        
+
         // NEXUS-1994 override local storage should be null
         Assert.assertNull( result.getOverrideLocalStorageUrl() );
         Assert.assertTrue( StringUtils.isNotEmpty( result.getDefaultLocalStorageUrl() ) );
     }
-    
+
+    @Test
     public void testUpdateLocalStorage()
         throws Exception
     {
 
         RepositoryProxyResource originalResource = this.sendAndGetResponse();
-        String newlocalStorage =  originalResource.getDefaultLocalStorageUrl().replaceAll( originalResource.getId(), "foo/bar" );
-        originalResource.setOverrideLocalStorageUrl(newlocalStorage );
-        
+        String newlocalStorage =
+            originalResource.getDefaultLocalStorageUrl().replaceAll( originalResource.getId(), "foo/bar" );
+        originalResource.setOverrideLocalStorageUrl( newlocalStorage );
+
         RepositoryPlexusResource plexusResource =
             (RepositoryPlexusResource) this.lookup( PlexusResource.class, "RepositoryPlexusResource" );
 
@@ -388,11 +394,11 @@ public class RepositoryCreateUpdateTest
         RepositoryResourceResponse repoResponse =
             (RepositoryResourceResponse) plexusResource.put( null, request, response, repoRequest );
         RepositoryProxyResource result = (RepositoryProxyResource) repoResponse.getData();
-        
+
         Assert.assertEquals( newlocalStorage, result.getOverrideLocalStorageUrl() );
-        
+
     }
-    
+
     private Request buildRequest()
     {
         Request request = new Request();
@@ -400,7 +406,7 @@ public class RepositoryCreateUpdateTest
 
         request.setRootRef( ref );
         request.setResourceRef( new Reference( ref, "repositories" ) );
-        
+
         return request;
     }
 

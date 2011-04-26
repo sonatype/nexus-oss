@@ -276,7 +276,7 @@ public abstract class PlexusTestCaseSupport {
      * @throws Exception
      */
     @Before
-    public void setUpJunit() throws Exception {
+    final public void setUpJunit() throws Exception {
         setUp();
     }
 
@@ -285,7 +285,7 @@ public abstract class PlexusTestCaseSupport {
      * @throws Exception
      */
     @After
-    public void tearDownJunit() throws Exception {
+    final public void tearDownJunit() throws Exception {
         tearDown();
     }
 
