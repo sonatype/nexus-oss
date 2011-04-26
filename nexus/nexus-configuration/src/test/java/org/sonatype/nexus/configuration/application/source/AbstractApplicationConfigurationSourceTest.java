@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.Test;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 
@@ -36,6 +37,7 @@ public abstract class AbstractApplicationConfigurationSourceTest
     protected abstract InputStream getOriginatingConfigurationInputStream()
         throws IOException;
 
+    @Test
     public void testConfigStream()
         throws Exception
     {
@@ -71,6 +73,7 @@ public abstract class AbstractApplicationConfigurationSourceTest
         }
     }
 
+    @Test
     public void testGetConfiguration()
         throws Exception
     {
