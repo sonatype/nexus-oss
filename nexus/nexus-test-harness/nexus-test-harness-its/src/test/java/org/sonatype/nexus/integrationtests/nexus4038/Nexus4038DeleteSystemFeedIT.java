@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.index.artifact.Gav;
+import org.hamcrest.MatcherAssert;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -18,6 +19,7 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.testng.Assert;
+import org.testng.AssertJUnit;
 import org.testng.annotations.Test;
 
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -65,12 +67,22 @@ public class Nexus4038DeleteSystemFeedIT
         Assert.assertTrue( entries.size() >= 2, "Expected more than 2 entries, but got " + entries.size() + " - "
             + entries );
 
+        final String expected = "deleted.Action was initiated by user \"" + TEST_USER_NAME + "\"";
+        boolean foundExpected = false;
         List<String> desc = new ArrayList<String>();
         for ( SyndEntry entry : entries )
         {
-            desc.add( entry.getDescription().getValue() );
+            final String val = entry.getDescription().getValue();
+            desc.add( val );
+            if(val.contains( expected )){
+                foundExpected = true;
+            }
         }
 
-        assertThat( desc, hasItem( containsString( "deleted.Action was initiated by user \"" + TEST_USER_NAME + "\"" ) ) );
+        // FIXME not sure why this does not compile atm on cmd line, eclipse seems happy
+        // assertThat( desc, hasItem( containsString( expected ) ) );
+        // HACK
+        assertThat("Did not find expected string in any value", foundExpected);
+
     }
 }
