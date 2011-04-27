@@ -2,6 +2,7 @@ package org.sonatype.nexus.proxy.storage.remote;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
  * This class allows for configuration of the default Remote Repository Provider hint/name. <BR/>
@@ -18,6 +19,7 @@ public class DefaultRemoteProviderHintFactory
      */
     public String getDefaultRoleHint()
     {
-        return System.getProperty( DEFAULT_HTTP_PROVIDER_KEY, CommonsHttpClientRemoteStorage.PROVIDER_STRING );
+        return SystemPropertiesHelper.getString( DEFAULT_HTTP_PROVIDER_KEY,
+            CommonsHttpClientRemoteStorage.PROVIDER_STRING );
     }
 }

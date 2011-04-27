@@ -113,6 +113,7 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
  * <p>
@@ -189,9 +190,7 @@ public class DefaultIndexerManager
     {
         // Note: this is needed and used in ITs only!
         // See org.sonatype.nexus.rt.boot.ITIndexerActivationEventInspector for details
-        boolean mavenIndexerBlockingCommits = Boolean.getBoolean( "mavenIndexerBlockingCommits" );
-
-        if ( mavenIndexerBlockingCommits )
+        if ( SystemPropertiesHelper.getBoolean( "mavenIndexerBlockingCommits", DefaultIndexingContext.BLOCKING_COMMIT ) )
         {
             DefaultIndexingContext.BLOCKING_COMMIT = true;
         }

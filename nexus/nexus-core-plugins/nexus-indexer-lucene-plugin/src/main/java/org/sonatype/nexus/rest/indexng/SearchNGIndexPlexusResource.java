@@ -68,6 +68,7 @@ import org.sonatype.nexus.rest.model.NexusNGArtifactLink;
 import org.sonatype.nexus.rest.model.NexusNGRepositoryDetail;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -93,8 +94,8 @@ public class SearchNGIndexPlexusResource
      * The actual limit value, that may be overridden by users using Java System Properties, and defaults to
      * DEFAULT_GA_HIT_LIMIT.
      */
-    private static final int GA_HIT_LIMIT =
-        Integer.getInteger( "plexus.search.ga.hit.limit", DEFAULT_GA_HIT_LIMIT ).intValue();
+    private static final int GA_HIT_LIMIT = SystemPropertiesHelper.getInteger( "plexus.search.ga.hit.limit",
+        DEFAULT_GA_HIT_LIMIT );
 
     /**
      * Time to spend in 1st processing loop before bail out. It defaults to 30sec (UI timeout is 60secs).
@@ -105,8 +106,8 @@ public class SearchNGIndexPlexusResource
      * The actual time limit to spend in search, that may be overridden by users using Java System Properties, and
      * defaults to DEFAULT_FIRST_LOOP_EXECUTION_TIME_LIMIT.
      */
-    private static final long FIRST_LOOP_EXECUTION_TIME_LIMIT = Long.getLong( "plexus.search.ga.firstLoopTime",
-        DEFAULT_FIRST_LOOP_EXECUTION_TIME_LIMIT );
+    private static final long FIRST_LOOP_EXECUTION_TIME_LIMIT = SystemPropertiesHelper.getLong(
+        "plexus.search.ga.firstLoopTime", DEFAULT_FIRST_LOOP_EXECUTION_TIME_LIMIT );
 
     /**
      * The default threshold of change size in relevance, from where we may "cut" the results.
@@ -116,7 +117,7 @@ public class SearchNGIndexPlexusResource
     /**
      * The threshold of change size in relevance, from where we may "cut" the results.
      */
-    private static final float DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD = (float) Integer.getInteger(
+    private static final float DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD = (float) SystemPropertiesHelper.getInteger(
         "plexus.search.ga.hit.relevanceDropThreshold", DEFAULT_DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD ) / 1000f;
 
     /**
@@ -127,7 +128,7 @@ public class SearchNGIndexPlexusResource
     /**
      * The treshold of change from the very 1st hit. from where we may "cut" the results.
      */
-    private static final float DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD = (float) Integer.getInteger(
+    private static final float DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD = (float) SystemPropertiesHelper.getInteger(
         "plexus.search.ga.hit.topRelevanceDropThreshold", DEFAULT_DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD ) / 1000f;
 
     /**
@@ -138,7 +139,7 @@ public class SearchNGIndexPlexusResource
     /**
      * The treshold, that is used to "uncollapse" the collapsed results (if less hits than threshold).
      */
-    private static final int COLLAPSE_OVERRIDE_TRESHOLD = Integer.getInteger(
+    private static final int COLLAPSE_OVERRIDE_TRESHOLD = SystemPropertiesHelper.getInteger(
         "plexus.search.ga.collapseOverrideThreshold", DEFAULT_COLLAPSE_OVERRIDE_TRESHOLD );
 
     public static final String RESOURCE_URI = "/lucene/search";

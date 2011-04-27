@@ -20,9 +20,9 @@ package org.sonatype.nexus.util;
 
 public class SystemPropertiesHelper
 {
-    public static int getInteger( String key, int defaultValue )
+    public final static int getInteger( final String key, final int defaultValue )
     {
-        String value = System.getProperty( key );
+        final String value = System.getProperty( key );
 
         if ( value == null || value.trim().length() == 0 )
         {
@@ -39,9 +39,28 @@ public class SystemPropertiesHelper
         }
     }
 
-    public static boolean getBoolean( String key, boolean defaultValue )
+    public final static long getLong( final String key, final long defaultValue )
     {
-        String value = System.getProperty( key );
+        final String value = System.getProperty( key );
+
+        if ( value == null || value.trim().length() == 0 )
+        {
+            return defaultValue;
+        }
+
+        try
+        {
+            return Long.valueOf( value );
+        }
+        catch ( NumberFormatException e )
+        {
+            return defaultValue;
+        }
+    }
+
+    public final static boolean getBoolean( final String key, final boolean defaultValue )
+    {
+        final String value = System.getProperty( key );
 
         if ( value == null || value.trim().length() == 0 )
         {
@@ -51,4 +70,8 @@ public class SystemPropertiesHelper
         return Boolean.valueOf( value );
     }
 
+    public final static String getString( final String key, final String defaultValue )
+    {
+        return System.getProperty( key, defaultValue );
+    }
 }
