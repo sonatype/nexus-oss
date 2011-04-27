@@ -21,7 +21,8 @@ public class RemoteProviderHintFactoryTest
     }
 
     @Test
-    public void testIt() throws Exception
+    public void testIt()
+        throws Exception
     {
         RemoteProviderHintFactory hintFactory = this.lookup( RemoteProviderHintFactory.class );
 

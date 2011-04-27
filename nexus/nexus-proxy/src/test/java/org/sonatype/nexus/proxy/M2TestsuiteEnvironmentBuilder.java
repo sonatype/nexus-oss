@@ -43,7 +43,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The Class JettyTestsuiteEnvironment.
- * 
+ *
  * @author cstamas
  */
 public class M2TestsuiteEnvironmentBuilder
@@ -103,7 +103,7 @@ public class M2TestsuiteEnvironmentBuilder
 
             // repo.setCacheManager( env.getCacheManager() );
             reposes.add( repo.getId() );
-            
+
             env.getApplicationConfiguration().getConfigurationModel().addRepository( repoConf );
 
             env.getRepositoryRegistry().addRepository( repo );

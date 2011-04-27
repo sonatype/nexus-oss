@@ -35,7 +35,7 @@ public class DefaultDownloadMirrorsTest
     extends AbstractNexusTestCase
 {
     protected ApplicationConfiguration applicationConfiguration;
-    
+
     protected RemoteProviderHintFactory remoteProviderHintFactory;
 
     @Override
@@ -45,7 +45,7 @@ public class DefaultDownloadMirrorsTest
         super.setUp();
 
         applicationConfiguration = lookup( ApplicationConfiguration.class );
-        
+
         remoteProviderHintFactory = lookup( RemoteProviderHintFactory.class );
     }
 

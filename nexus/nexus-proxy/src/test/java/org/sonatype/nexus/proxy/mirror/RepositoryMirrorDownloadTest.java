@@ -148,7 +148,7 @@ public class RepositoryMirrorDownloadTest
         remoteProviderHintFactory = lookup( RemoteProviderHintFactory.class );
     }
 
-    @Test
+     @Test
     public void testDownloadFromMirror()
         throws Exception
     {
@@ -616,7 +616,11 @@ public class RepositoryMirrorDownloadTest
         repoConf.getLocalStorage().setProvider( "file" );
 
         repoConf.setRemoteStorage( new CRemoteStorage() );
+<<<<<<< HEAD
         repoConf.getRemoteStorage().setProvider( remoteProviderHintFactory.getDefaultHttpRoleHint() );
+=======
+        repoConf.getRemoteStorage().setProvider( remoteProviderHintFactory.getDefaultRoleHint() );
+>>>>>>> NXCM-2766: Fixing all direct references to RRS
         repoConf.getRemoteStorage().setUrl( CANONICAL_URL );
         repoConf.getRemoteStorage().setConnectionSettings( new CRemoteConnectionSettings() );
         repoConf.getRemoteStorage().getConnectionSettings().setRetrievalRetryCount( 2 );

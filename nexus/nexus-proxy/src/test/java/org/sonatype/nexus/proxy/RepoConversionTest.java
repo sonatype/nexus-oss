@@ -33,7 +33,7 @@ public class RepoConversionTest
     extends AbstractProxyTestEnvironment
 {
     private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
-    
+
     private RemoteRepositoryStorage remoteRepositoryStorage;
 
     public void setUp()

@@ -66,7 +66,7 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * A resource list for Repository list.
- * 
+ *
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "RepositoryListPlexusResource" )
@@ -174,7 +174,7 @@ public class RepositoryListPlexusResource
     /**
      * Converting REST DTO + possible App model to App model. If app model is given, "update" happens, otherwise if
      * target is null, "create".
-     * 
+     *
      * @param model
      * @param target
      * @return app model, merged or created
@@ -284,7 +284,7 @@ public class RepositoryListPlexusResource
     /**
      * Converting REST DTO + possible App model to App model. If app model is given, "update" happens, otherwise if
      * target is null, "create".
-     * 
+     *
      * @param model
      * @param target
      * @return app model, merged or created
