@@ -40,7 +40,7 @@ public abstract class AbstractNexusTestCase
     private NexusScheduler nexusScheduler;
 
     private EventInspectorHost eventInspectorHost;
-
+    
     public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
 
     public static final String NEXUS_APP_CONFIGURATION_KEY = "nexus-app";

@@ -45,6 +45,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
@@ -79,6 +80,11 @@ public abstract class AbstractProxyTestEnvironment
 
     /** The remote repository storage. */
     private RemoteRepositoryStorage remoteRepositoryStorage;
+
+    /**
+     * The hint provider for remote repository storage.
+     */
+    private RemoteProviderHintFactory remoteProviderHintFactory;
 
     /** The root router */
     private RepositoryRouter rootRouter;
@@ -156,6 +162,16 @@ public abstract class AbstractProxyTestEnvironment
         this.remoteRepositoryStorage = remoteRepositoryStorage;
     }
 
+    public RemoteProviderHintFactory getRemoteProviderHintFactory()
+    {
+        return remoteProviderHintFactory;
+    }
+
+    public void setRemoteProviderHintFactory( RemoteProviderHintFactory remoteProviderHintFactory )
+    {
+        this.remoteProviderHintFactory = remoteProviderHintFactory;
+    }
+
     /**
      * Gets the logger.
      * 
@@ -219,8 +235,10 @@ public abstract class AbstractProxyTestEnvironment
         }
 
         localRepositoryStorage = lookup( LocalRepositoryStorage.class, "file" );
+        
+        remoteProviderHintFactory = lookup( RemoteProviderHintFactory.class );
 
-        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, "apacheHttpClient3x" );
+        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, remoteProviderHintFactory.getDefaultRoleHint() );
 
         rootRouter = lookup( RepositoryRouter.class );
 

@@ -88,7 +88,7 @@ public class M1TestsuiteEnvironmentBuilder
             exConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
 
             repoConf.setRemoteStorage( new CRemoteStorage() );
-            repoConf.getRemoteStorage().setProvider( "apacheHttpClient3x" );
+            repoConf.getRemoteStorage().setProvider( env.getRemoteProviderHintFactory().getDefaultRoleHint() );
             repoConf.getRemoteStorage().setUrl( getServletServer().getUrl( remoteRepo.getName() ) );
             repoConf.setIndexable( false );
 

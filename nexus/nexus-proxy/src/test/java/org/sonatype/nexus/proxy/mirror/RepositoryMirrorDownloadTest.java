@@ -64,6 +64,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 
 public class RepositoryMirrorDownloadTest
@@ -135,11 +136,15 @@ public class RepositoryMirrorDownloadTest
         public Class<? extends Exception> assertFailureType;
     }
 
+    protected RemoteProviderHintFactory remoteProviderHintFactory;
+
     @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
+        
+        remoteProviderHintFactory = lookup( RemoteProviderHintFactory.class );
     }
 
     public void testDownloadFromMirror()
@@ -600,7 +605,7 @@ public class RepositoryMirrorDownloadTest
         repoConf.getLocalStorage().setProvider( "file" );
 
         repoConf.setRemoteStorage( new CRemoteStorage() );
-        repoConf.getRemoteStorage().setProvider( "apacheHttpClient3x" );
+        repoConf.getRemoteStorage().setProvider( remoteProviderHintFactory.getDefaultRoleHint() );
         repoConf.getRemoteStorage().setUrl( CANONICAL_URL );
         repoConf.getRemoteStorage().setConnectionSettings( new CRemoteConnectionSettings() );
         repoConf.getRemoteStorage().getConnectionSettings().setRetrievalRetryCount( 2 );

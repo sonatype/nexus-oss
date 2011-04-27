@@ -25,6 +25,7 @@ import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.templates.repository.maven.Maven1GroupRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven1HostedRepositoryTemplate;
@@ -45,7 +46,7 @@ public class GroupUpdateTest
         
         nexus = lookup( Nexus.class );
         repoRegistry = lookup( RepositoryRegistry.class );
-        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, "apacheHttpClient3x" );
+        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, lookup(RemoteProviderHintFactory.class).getDefaultRoleHint() );
     }
     
     public void testUpdateGroup()

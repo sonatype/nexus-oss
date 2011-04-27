@@ -32,7 +32,7 @@ public class RepoConversionTest
     extends AbstractProxyTestEnvironment
 {
     private M2TestsuiteEnvironmentBuilder jettyTestsuiteEnvironmentBuilder;
-
+    
     private RemoteRepositoryStorage remoteRepositoryStorage;
 
     public void setUp()
@@ -40,7 +40,7 @@ public class RepoConversionTest
     {
         super.setUp();
 
-        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, "apacheHttpClient3x" );
+        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, getRemoteProviderHintFactory().getDefaultRoleHint() );
     }
 
     @Override

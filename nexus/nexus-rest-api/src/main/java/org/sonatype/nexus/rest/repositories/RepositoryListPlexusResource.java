@@ -48,6 +48,7 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
@@ -76,6 +77,9 @@ public class RepositoryListPlexusResource
     extends AbstractRepositoryPlexusResource
 {
     public static final String RESOURCE_URI = "/repositories";
+    
+    @Requirement
+    private RemoteProviderHintFactory remoteProviderHintFactory;
     
     // UGLY HACK, SEE BELOW
     @Requirement( role = TemplateProvider.class, hint = DefaultRepositoryTemplateProvider.PROVIDER_ID )
@@ -263,7 +267,7 @@ public class RepositoryListPlexusResource
 
                 appModel.getRemoteStorage().setUrl( remoteStorage.getRemoteStorageUrl() );
 
-                appModel.getRemoteStorage().setProvider( "apacheHttpClient3x" );
+                appModel.getRemoteStorage().setProvider( remoteProviderHintFactory.getDefaultRoleHint() );
             }
         }
 

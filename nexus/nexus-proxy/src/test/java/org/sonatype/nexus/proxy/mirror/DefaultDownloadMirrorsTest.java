@@ -28,12 +28,14 @@ import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.repository.Mirror;
-import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
+import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 
 public class DefaultDownloadMirrorsTest
     extends AbstractNexusTestCase
 {
     protected ApplicationConfiguration applicationConfiguration;
+    
+    protected RemoteProviderHintFactory remoteProviderHintFactory;
 
     @Override
     protected void setUp()
@@ -42,6 +44,8 @@ public class DefaultDownloadMirrorsTest
         super.setUp();
 
         applicationConfiguration = lookup( ApplicationConfiguration.class );
+        
+        remoteProviderHintFactory = lookup( RemoteProviderHintFactory.class );
     }
 
     public void testNoMirrors()
@@ -61,7 +65,7 @@ public class DefaultDownloadMirrorsTest
         DefaultCRepository conf = new DefaultCRepository();
         conf.setId( "kuku" );
         conf.setRemoteStorage( new CRemoteStorage() );
-        conf.getRemoteStorage().setProvider( CommonsHttpClientRemoteStorage.PROVIDER_STRING );
+        conf.getRemoteStorage().setProvider( remoteProviderHintFactory.getDefaultRoleHint() );
         conf.getRemoteStorage().setUrl( "http://repo1.maven.org/maven2/" );
         conf.setIndexable( false );
 
