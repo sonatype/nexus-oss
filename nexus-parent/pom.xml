@@ -38,9 +38,9 @@
   <url>${nexus-site-base-url}/nexus-parent</url>
 
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus-parent</connection>
-    <url>http://svn.sonatype.org/nexus/trunk/nexus-parent</url>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-parent</developerConnection>
+    <connection>scm:git:git://github.com/sonatype/nexus.git</connection>
+    <developerConnection>scm:git:git@github.com:sonatype/nexus.git</developerConnection>
+    <url>https://github.com/sonatype/nexus</url>
   </scm>
   
   <distributionManagement>
