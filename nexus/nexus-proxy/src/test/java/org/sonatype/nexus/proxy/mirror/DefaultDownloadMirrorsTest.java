@@ -65,7 +65,7 @@ public class DefaultDownloadMirrorsTest
         DefaultCRepository conf = new DefaultCRepository();
         conf.setId( "kuku" );
         conf.setRemoteStorage( new CRemoteStorage() );
-        conf.getRemoteStorage().setProvider( remoteProviderHintFactory.getDefaultRoleHint() );
+        conf.getRemoteStorage().setProvider( remoteProviderHintFactory.getDefaultHttpRoleHint() );
         conf.getRemoteStorage().setUrl( "http://repo1.maven.org/maven2/" );
         conf.setIndexable( false );
 

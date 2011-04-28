@@ -104,7 +104,7 @@ public class RemoteStorageSettingsInheritanceTest
                 exConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
 
                 repoConf.setRemoteStorage( new CRemoteStorage() );
-                repoConf.getRemoteStorage().setProvider( abstractProxyTestEnvironment.getRemoteProviderHintFactory().getDefaultRoleHint() );
+                repoConf.getRemoteStorage().setProvider( abstractProxyTestEnvironment.getRemoteProviderHintFactory().getDefaultHttpRoleHint() );
                 repoConf.getRemoteStorage().setUrl( "http://whatever.server/foo/but/be/a/valid/url" );
 
                 repo.configure( repoConf );

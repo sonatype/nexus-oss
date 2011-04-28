@@ -59,7 +59,7 @@ public class Maven1ProxyRepositoryTemplate
         repo.setProviderHint( "maven1" );
 
         repo.setRemoteStorage( new CRemoteStorage() );
-        repo.getRemoteStorage().setProvider( getTemplateProvider().getDefaultRemoteProviderHint() );
+        repo.getRemoteStorage().setProvider( getTemplateProvider().getRemoteProviderHintFactory().getDefaultHttpRoleHint() );
         repo.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root" );
 
         Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );

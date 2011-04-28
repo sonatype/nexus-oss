@@ -40,7 +40,7 @@ public class RepoConversionTest
     {
         super.setUp();
 
-        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, getRemoteProviderHintFactory().getDefaultRoleHint() );
+        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, getRemoteProviderHintFactory().getDefaultHttpRoleHint() );
     }
 
     @Override

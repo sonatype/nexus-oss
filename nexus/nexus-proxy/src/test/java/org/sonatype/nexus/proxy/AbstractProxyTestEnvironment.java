@@ -238,7 +238,7 @@ public abstract class AbstractProxyTestEnvironment
         
         remoteProviderHintFactory = lookup( RemoteProviderHintFactory.class );
 
-        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, remoteProviderHintFactory.getDefaultRoleHint() );
+        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, remoteProviderHintFactory.getDefaultHttpRoleHint() );
 
         rootRouter = lookup( RepositoryRouter.class );
 

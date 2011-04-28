@@ -605,7 +605,7 @@ public class RepositoryMirrorDownloadTest
         repoConf.getLocalStorage().setProvider( "file" );
 
         repoConf.setRemoteStorage( new CRemoteStorage() );
-        repoConf.getRemoteStorage().setProvider( remoteProviderHintFactory.getDefaultRoleHint() );
+        repoConf.getRemoteStorage().setProvider( remoteProviderHintFactory.getDefaultHttpRoleHint() );
         repoConf.getRemoteStorage().setUrl( CANONICAL_URL );
         repoConf.getRemoteStorage().setConnectionSettings( new CRemoteConnectionSettings() );
         repoConf.getRemoteStorage().getConnectionSettings().setRetrievalRetryCount( 2 );

@@ -33,6 +33,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
@@ -47,6 +48,9 @@ public abstract class AbstractProxyRepositoryConfigurator
 
     @Requirement
     private GlobalHttpProxySettings globalHttpProxySettings;
+
+    @Requirement
+    private RemoteProviderHintFactory remoteProviderHintFactory;
 
     @Override
     public void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
@@ -73,7 +77,8 @@ public abstract class AbstractProxyRepositoryConfigurator
                     RemoteRepositoryStorage oldRemoteStorage = prepository.getRemoteStorage();
 
                     RemoteRepositoryStorage configRemoteStorage =
-                        getRemoteRepositoryStorage( repo.getId(), repo.getRemoteStorage().getProvider() );
+                        getRemoteRepositoryStorage( repo.getId(), repo.getRemoteStorage().getUrl(),
+                            repo.getRemoteStorage().getProvider() );
 
                     // detect do we really need to set remote storage
                     if ( oldRemoteStorage == null || oldRemoteStorage != configRemoteStorage )
@@ -92,14 +97,12 @@ public abstract class AbstractProxyRepositoryConfigurator
 
                     if ( repo.getRemoteStorage().getAuthentication() != null )
                     {
-                        prepository.setRemoteAuthenticationSettings( authenticationInfoConverter
-                            .convertAndValidateFromModel( repo.getRemoteStorage().getAuthentication() ) );
+                        prepository.setRemoteAuthenticationSettings( authenticationInfoConverter.convertAndValidateFromModel( repo.getRemoteStorage().getAuthentication() ) );
                     }
 
                     if ( repo.getRemoteStorage().getConnectionSettings() != null )
                     {
-                        prepository.setRemoteConnectionSettings( globalRemoteConnectionSettings
-                            .convertAndValidateFromModel( repo.getRemoteStorage().getConnectionSettings() ) );
+                        prepository.setRemoteConnectionSettings( globalRemoteConnectionSettings.convertAndValidateFromModel( repo.getRemoteStorage().getConnectionSettings() ) );
                     }
 
                     if ( repo.getRemoteStorage().getHttpProxySettings() != null )
@@ -110,8 +113,7 @@ public abstract class AbstractProxyRepositoryConfigurator
                         }
                         else
                         {
-                            prepository.setRemoteProxySettings( globalHttpProxySettings
-                                .convertAndValidateFromModel( repo.getRemoteStorage().getHttpProxySettings() ) );
+                            prepository.setRemoteProxySettings( globalHttpProxySettings.convertAndValidateFromModel( repo.getRemoteStorage().getHttpProxySettings() ) );
                         }
                     }
                 }
@@ -193,14 +195,22 @@ public abstract class AbstractProxyRepositoryConfigurator
         }
     }
 
-    protected RemoteRepositoryStorage getRemoteRepositoryStorage( String repoId, String provider )
+    protected RemoteRepositoryStorage getRemoteRepositoryStorage( final String repoId, final String remoteUrl,
+                                                                  final String provider )
         throws InvalidConfigurationException
     {
         try
         {
-            return getPlexusContainer().lookup( RemoteRepositoryStorage.class, provider );
+            final String mungledHint = remoteProviderHintFactory.getRoleHint( remoteUrl, provider );
+
+            return getPlexusContainer().lookup( RemoteRepositoryStorage.class, mungledHint );
         }
         catch ( ComponentLookupException e )
+        {
+            throw new InvalidConfigurationException( "Repository " + repoId
+                + " have remote storage with unsupported provider: " + provider, e );
+        }
+        catch ( IllegalArgumentException e )
         {
             throw new InvalidConfigurationException( "Repository " + repoId
                 + " have remote storage with unsupported provider: " + provider, e );

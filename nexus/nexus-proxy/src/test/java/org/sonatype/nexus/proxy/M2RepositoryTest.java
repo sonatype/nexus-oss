@@ -335,19 +335,19 @@ public class M2RepositoryTest
 
         mdFile.setLastModified( System.currentTimeMillis() - ( 3L * 24L * 60L * 60L * 1000L ) );
 
-        Thread.sleep( 200 ); // wait for FS
+        Thread.sleep( 500 ); // wait for FS
 
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
         mdFile.setLastModified( System.currentTimeMillis() - ( 2L * 24L * 60L * 60L * 1000L ) );
 
-        Thread.sleep( 200 ); // wait for FS
+        Thread.sleep( 500 ); // wait for FS
 
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
         mdFile.setLastModified( System.currentTimeMillis() - ( 1L * 24L * 60L * 60L * 1000L ) );
 
-        Thread.sleep( 200 ); // wait for FS
+        Thread.sleep( 500 ); // wait for FS
 
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 

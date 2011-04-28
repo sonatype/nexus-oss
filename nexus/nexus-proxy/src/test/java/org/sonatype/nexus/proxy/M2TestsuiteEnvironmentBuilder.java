@@ -96,7 +96,7 @@ public class M2TestsuiteEnvironmentBuilder
             exConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
 
             repoConf.setRemoteStorage( new CRemoteStorage() );
-            repoConf.getRemoteStorage().setProvider( env.getRemoteProviderHintFactory().getDefaultRoleHint() );
+            repoConf.getRemoteStorage().setProvider( env.getRemoteProviderHintFactory().getDefaultHttpRoleHint() );
             repoConf.getRemoteStorage().setUrl( getServletServer().getUrl( remoteRepo.getName() ) );
 
             repo.configure( repoConf );

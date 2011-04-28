@@ -55,9 +55,9 @@ public abstract class AbstractRepositoryTemplateProvider
         return this.nexus.getNexusConfiguration().createRepository( repository );
     }
     
-    public String getDefaultRemoteProviderHint()
+    public RemoteProviderHintFactory getRemoteProviderHintFactory()
     {
-        return remoteProviderHintFactory.getDefaultRoleHint();
+        return remoteProviderHintFactory;
     }
 
     public Class<RepositoryTemplate> getTemplateClass()

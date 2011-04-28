@@ -28,9 +28,9 @@ public class RemoteProviderHintFactoryTest
         System.clearProperty( DefaultRemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY );
 
         // nothing set
-        Assert.assertEquals( CommonsHttpClientRemoteStorage.PROVIDER_STRING, hintFactory.getDefaultRoleHint() );
+        Assert.assertEquals( CommonsHttpClientRemoteStorage.PROVIDER_STRING, hintFactory.getDefaultHttpRoleHint() );
 
         System.setProperty( DefaultRemoteProviderHintFactory.DEFAULT_HTTP_PROVIDER_KEY, FAKE_VALUE );
-        Assert.assertEquals( FAKE_VALUE, hintFactory.getDefaultRoleHint() );
+        Assert.assertEquals( FAKE_VALUE, hintFactory.getDefaultHttpRoleHint() );
     }
 }

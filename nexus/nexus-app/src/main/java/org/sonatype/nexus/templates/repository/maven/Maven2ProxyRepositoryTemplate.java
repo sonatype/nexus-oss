@@ -43,8 +43,7 @@ public class Maven2ProxyRepositoryTemplate
 
     public M2RepositoryConfiguration getExternalConfiguration( boolean forWrite )
     {
-        return (M2RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
-            .getConfiguration( forWrite );
+        return (M2RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration().getConfiguration( forWrite );
     }
 
     @Override
@@ -59,7 +58,8 @@ public class Maven2ProxyRepositoryTemplate
         repo.setProviderHint( "maven2" );
 
         repo.setRemoteStorage( new CRemoteStorage() );
-        repo.getRemoteStorage().setProvider( getTemplateProvider().getDefaultRemoteProviderHint() );
+        repo.getRemoteStorage().setProvider(
+            getTemplateProvider().getRemoteProviderHintFactory().getDefaultHttpRoleHint() );
         repo.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root" );
 
         Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
@@ -76,7 +76,7 @@ public class Maven2ProxyRepositoryTemplate
 
         repo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
         repo.setNotFoundCacheTTL( 1440 );
-        
+
         if ( exConf.getRepositoryPolicy() != null && exConf.getRepositoryPolicy() == RepositoryPolicy.SNAPSHOT )
         {
             exConf.setArtifactMaxAge( 1440 );
@@ -90,18 +90,14 @@ public class Maven2ProxyRepositoryTemplate
         repo.setSearchable( true );
 
         CRepositoryCoreConfiguration result =
-            new CRepositoryCoreConfiguration(
-                                              getTemplateProvider().getApplicationConfiguration(),
-                                              repo,
-                                              new CRepositoryExternalConfigurationHolderFactory<M2RepositoryConfiguration>()
-                                              {
-                                                  public M2RepositoryConfiguration createExternalConfigurationHolder(
-                                                                                                                      CRepository config )
-                                                  {
-                                                      return new M2RepositoryConfiguration( (Xpp3Dom) config
-                                                          .getExternalConfiguration() );
-                                                  }
-                                              } );
+            new CRepositoryCoreConfiguration( getTemplateProvider().getApplicationConfiguration(), repo,
+                new CRepositoryExternalConfigurationHolderFactory<M2RepositoryConfiguration>()
+                {
+                    public M2RepositoryConfiguration createExternalConfigurationHolder( CRepository config )
+                    {
+                        return new M2RepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
+                    }
+                } );
 
         return result;
     }

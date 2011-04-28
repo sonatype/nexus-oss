@@ -46,7 +46,7 @@ public class GroupUpdateTest
         
         nexus = lookup( Nexus.class );
         repoRegistry = lookup( RepositoryRegistry.class );
-        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, lookup(RemoteProviderHintFactory.class).getDefaultRoleHint() );
+        remoteRepositoryStorage = lookup( RemoteRepositoryStorage.class, lookup(RemoteProviderHintFactory.class).getDefaultHttpRoleHint() );
     }
     
     public void testUpdateGroup()
