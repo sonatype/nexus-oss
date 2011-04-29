@@ -53,7 +53,10 @@ public class NexusRestletResource
         }
         catch ( ResourceException e )
         {
-            if ( Status.isServerError( e.getStatus().getCode() ) )
+            // NEXUS-4238
+            // if it's server error based on HTTP Code, but NOT when Nexus throws a known 502 
+            // (see org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource.handleException(Request, Response, Exception))
+            if ( Status.isServerError( e.getStatus().getCode() ) && Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode() != e.getStatus().getCode() )
             {
                 handleError( e );
             }
