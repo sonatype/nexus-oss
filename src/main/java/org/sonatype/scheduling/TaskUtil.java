@@ -10,9 +10,16 @@ public class TaskUtil
         }
     };
 
-    protected static void setCurrent( ProgressListener progressListener )
+    protected static void setCurrent( final ProgressListener progressListener )
     {
-        CURRENT.set( new ProgressListenerWrapper( progressListener ) );
+        if ( progressListener != null )
+        {
+            CURRENT.set( new CancellableProgressListenerWrapper( progressListener ) );
+        }
+        else
+        {
+            CURRENT.set( new ProgressListenerWrapper( null ) );
+        }
     }
 
     /**

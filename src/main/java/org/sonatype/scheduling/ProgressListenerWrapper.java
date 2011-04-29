@@ -5,8 +5,6 @@ public class ProgressListenerWrapper
 {
     private final ProgressListener wrapped;
 
-    private volatile boolean cancelled;
-
     public ProgressListenerWrapper( final ProgressListener wrapped )
     {
         this.wrapped = wrapped;
@@ -76,11 +74,11 @@ public class ProgressListenerWrapper
     {
         if ( wrapped != null )
         {
-            return cancelled || wrapped.isCanceled();
+            return wrapped.isCanceled();
         }
         else
         {
-            return cancelled;
+            return false;
         }
     }
 
@@ -90,7 +88,5 @@ public class ProgressListenerWrapper
         {
             wrapped.cancel();
         }
-
-        cancelled = true;
     }
 }
