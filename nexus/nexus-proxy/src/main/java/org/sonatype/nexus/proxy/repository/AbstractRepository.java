@@ -1176,8 +1176,7 @@ public abstract class AbstractRepository
     {
         if ( !this.getLocalStatus().shouldServiceRequest() )
         {
-            throw new IllegalRequestException( request, "Repository with ID='" + getId()
-                + "' is not available (localStatus=" + getLocalStatus().toString() + ")!" );
+            throw new RepositoryNotAvailableException( this );
         }
 
         // check for writing to read only repo
