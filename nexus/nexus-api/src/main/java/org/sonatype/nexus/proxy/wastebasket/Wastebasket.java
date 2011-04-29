@@ -23,7 +23,6 @@ import java.io.IOException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.statistics.DeferredLong;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
 public interface Wastebasket
@@ -48,7 +47,7 @@ public interface Wastebasket
      * @return
      * @throws IOException
      */
-    DeferredLong getTotalSize();
+    Long getTotalSize();
 
     /**
      * Empties the wastebasket.
@@ -73,7 +72,7 @@ public interface Wastebasket
      * @return
      * @throws IOException
      */
-    DeferredLong getSize( Repository repository );
+    Long getSize( Repository repository );
 
     /**
      * Empties the wastebasket.

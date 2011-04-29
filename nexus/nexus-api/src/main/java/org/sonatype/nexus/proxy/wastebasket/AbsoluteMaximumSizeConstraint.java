@@ -19,7 +19,6 @@
 package org.sonatype.nexus.proxy.wastebasket;
 
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.statistics.DeferredLong;
 
 public class AbsoluteMaximumSizeConstraint
     implements MaximumSizeConstraint
@@ -34,11 +33,11 @@ public class AbsoluteMaximumSizeConstraint
 
     public boolean isOverMaximum( SmartWastebasket wastebasket, Repository repository )
     {
-        DeferredLong wastebasketSize = wastebasket.getSize( repository );
+        Long wastebasketSize = wastebasket.getSize( repository );
 
-        if ( wastebasketSize.isDone() )
+        if ( wastebasketSize != null )
         {
-            return wastebasketSize.getValue() > maximumSizeInBytes;
+            return wastebasketSize > maximumSizeInBytes;
         }
         else
         {

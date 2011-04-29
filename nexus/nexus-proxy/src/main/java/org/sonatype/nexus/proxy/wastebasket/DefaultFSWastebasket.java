@@ -34,8 +34,6 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.statistics.DeferredLong;
-import org.sonatype.nexus.proxy.statistics.impl.DefaultDeferredLong;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
@@ -118,9 +116,10 @@ public class DefaultFSWastebasket
         this.deleteOperation = deleteOperation;
     }
 
-    public DeferredLong getTotalSize()
+    public Long getTotalSize()
     {
-        return new DefaultDeferredLong( FileUtils.sizeOfDirectory( getWastebasketDirectory() ) );
+        // TODO: read the repo stat for this!
+        return FileUtils.sizeOfDirectory( getWastebasketDirectory() );
     }
 
     public void purgeAll()
@@ -135,10 +134,10 @@ public class DefaultFSWastebasket
         removeForever( getWastebasketDirectory(), age );
     }
 
-    public DeferredLong getSize( Repository repository )
+    public Long getSize( Repository repository )
     {
-        return new DefaultDeferredLong( FileUtils.sizeOfDirectory( new File( getWastebasketDirectory(),
-            repository.getId() ) ) );
+        // TODO: read the repo stat for this!
+        return FileUtils.sizeOfDirectory( new File( getWastebasketDirectory(), repository.getId() ) );
     }
 
     public void purge( Repository repository )

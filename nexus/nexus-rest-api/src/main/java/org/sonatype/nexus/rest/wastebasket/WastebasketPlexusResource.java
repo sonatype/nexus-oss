@@ -32,7 +32,6 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.proxy.statistics.DeferredLong;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.WastebasketResource;
@@ -95,11 +94,11 @@ public class WastebasketPlexusResource
 
         resource.setItemCount( -1 );
 
-        DeferredLong totalSize = wastebasket.getTotalSize();
+        Long totalSize = wastebasket.getTotalSize();
 
-        if ( totalSize.isDone() )
+        if ( totalSize != null )
         {
-            resource.setSize( wastebasket.getTotalSize().getValue() );
+            resource.setSize( totalSize );
         }
         else
         {

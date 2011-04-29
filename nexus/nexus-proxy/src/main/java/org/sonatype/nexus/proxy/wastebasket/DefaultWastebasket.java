@@ -20,7 +20,6 @@ package org.sonatype.nexus.proxy.wastebasket;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -32,9 +31,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.statistics.DeferredLong;
-import org.sonatype.nexus.proxy.statistics.DeferredLongSum;
-import org.sonatype.nexus.proxy.statistics.impl.DefaultDeferredLong;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.walker.AffirmativeStoreWalkerFilter;
@@ -104,16 +100,21 @@ public class DefaultWastebasket
         this.deleteOperation = deleteOperation;
     }
 
-    public DeferredLong getTotalSize()
+    public Long getTotalSize()
     {
-        ArrayList<DeferredLong> sizes = new ArrayList<DeferredLong>();
+        Long totalSize = null;
 
         for ( Repository repository : getRepositoryRegistry().getRepositories() )
         {
-            sizes.add( getSize( repository ) );
-        }
+            Long repoWBSize = getSize( repository );
 
-        return new DeferredLongSum( sizes );
+            if ( repoWBSize != null )
+            {
+                totalSize += repoWBSize;
+            }
+        }
+        
+        return totalSize;
     }
 
     public void purgeAll()
@@ -144,9 +145,9 @@ public class DefaultWastebasket
         }
     }
 
-    public DeferredLong getSize( final Repository repository )
+    public Long getSize( final Repository repository )
     {
-        return new DefaultDeferredLong( -1L );
+        return null;
     }
 
     public void purge( final Repository repository )
@@ -158,9 +159,8 @@ public class DefaultWastebasket
     public void purge( final Repository repository, final long age )
         throws IOException
     {
-        ResourceStoreRequest req =
-            new ResourceStoreRequest( getTrashPath( repository, RepositoryItemUid.PATH_ROOT ) );
-        
+        ResourceStoreRequest req = new ResourceStoreRequest( getTrashPath( repository, RepositoryItemUid.PATH_ROOT ) );
+
         if ( age == ALL )
         {
             // simple and fast way, no need for walker
@@ -183,9 +183,9 @@ public class DefaultWastebasket
             if ( repository.getLocalStorage().containsItem( repository, req ) )
             {
                 req.setRequestGroupLocalOnly( true );
-                
+
                 req.setRequestLocalOnly( true );
-                
+
                 DefaultWalkerContext ctx =
                     new DefaultWalkerContext( repository, req, new AffirmativeStoreWalkerFilter() );
 
