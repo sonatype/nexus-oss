@@ -337,8 +337,6 @@
           <memberRepository>java.net-m2</memberRepository>
           <memberRepository>java.net-m1-m2</memberRepository>
           <memberRepository>google</memberRepository>
-          <memberRepository>apache-snapshots</memberRepository>
-          <memberRepository>codehaus-snapshots</memberRepository>
         </memberRepositories>
       </externalConfiguration>
     </repository>
