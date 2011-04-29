@@ -123,7 +123,8 @@ public class MacPluginEventInspector
             }
             catch ( RepositoryNotAvailableException e )
             {
-                logger.info( "Unable to install the generated archetype catalog, repository is out of service." );
+                logger.info( "Unable to install the generated archetype catalog, repository \""
+                    + e.getRepository().getId() + "\" is out of service." );
             }
             catch ( Exception e )
             {
