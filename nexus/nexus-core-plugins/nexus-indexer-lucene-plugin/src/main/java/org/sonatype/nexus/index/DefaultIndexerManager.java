@@ -113,7 +113,9 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
 
 /**
@@ -989,7 +991,6 @@ public class DefaultIndexerManager
 
         try
         {
-
             // just keep the context 'out of service' while indexing, will be added at end
             boolean shouldDownloadRemoteIndex = mpr.isDownloadRemoteIndexes();
 
@@ -999,23 +1000,36 @@ public class DefaultIndexerManager
             {
                 try
                 {
-                    getLogger().info( "Trying to get remote index for repository " + repository.getId() );
+                    getLogger().info(
+                        RepositoryStringUtils.getFormattedMessage( "Trying to get remote index for repository %s",
+                            repository ) );
 
                     hasRemoteIndex = updateRemoteIndex( repository, forceFullUpdate );
 
                     if ( hasRemoteIndex )
                     {
-                        getLogger().info( "Remote indexes updated successfully for repository " + repository.getId() );
+                        getLogger().info(
+                            RepositoryStringUtils.getFormattedMessage(
+                                "Remote indexes updated successfully for repository %s", repository ) );
                     }
                     else
                     {
                         getLogger().info(
-                            "Remote indexes unchanged (no update needed) for repository " + repository.getId() );
+                            RepositoryStringUtils.getFormattedMessage(
+                                "Remote indexes unchanged (no update needed) for repository %s", repository ) );
                     }
+                }
+                catch ( TaskInterruptedException e )
+                {
+                    getLogger().warn(
+                        RepositoryStringUtils.getFormattedMessage(
+                            "Cannot fetch remote index for repository %s, task cancelled.", repository ) );
                 }
                 catch ( Exception e )
                 {
-                    getLogger().warn( "Cannot fetch remote index for repository " + repository.getId(), e );
+                    getLogger().warn(
+                        RepositoryStringUtils.getFormattedMessage( "Cannot fetch remote index for repository %s",
+                            repository ), e );
                 }
             }
 
