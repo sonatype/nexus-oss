@@ -18,7 +18,6 @@
  */
 package org.sonatype.nexus.scheduling;
 
-
 public class ExceptionerNexusTask
     extends DummyWaitingNexusTask
 {

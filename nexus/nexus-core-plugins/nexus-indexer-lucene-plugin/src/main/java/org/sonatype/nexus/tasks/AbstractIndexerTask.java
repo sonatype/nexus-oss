@@ -71,10 +71,6 @@ public abstract class AbstractIndexerTask
                 {
                     handler.reindexRepository( getRepositoryId(), getResourceStorePath(), fullReindex );
                 }
-                else if ( getRepositoryGroupId() != null )
-                {
-                    handler.reindexRepository( getRepositoryGroupId(), getResourceStorePath(), fullReindex );
-                }
                 else
                 {
                     handler.reindexAllRepositories( getResourceStorePath(), fullReindex );
@@ -84,13 +80,14 @@ public abstract class AbstractIndexerTask
             {
                 // TODO: When we get to implement NEXUS-3977/NEXUS-1002 we'll be able to stop the indexing task when the
                 // repo is deleted, so this exception handling/warning won't be needed anymore.
-                if ( getRepositoryId() != null || getRepositoryGroupId() != null )
+                if ( getRepositoryId() != null )
                 {
                     getLogger().warn(
-                        "Repository "
-                            + ( getRepositoryId() != null ? getRepositoryId() : "group " + getRepositoryGroupId() )
-                            + " was not found. It's likely that the repository was deleted while either the repair or the update index task was running." );
+                        "Repository with ID=\""
+                            + getRepositoryId()
+                            + "\" was not found. It's likely that the repository was deleted while either the repair or the update index task was running." );
                 }
+
                 throw nsre;
             }
         }
@@ -107,12 +104,7 @@ public abstract class AbstractIndexerTask
     @Override
     protected String getMessage()
     {
-        if ( getRepositoryGroupId() != null )
-        {
-            return action + " repository group index \"" + getRepositoryGroupName() + "\" from path "
-                + getResourceStorePath() + " and below.";
-        }
-        else if ( getRepositoryId() != null )
+        if ( getRepositoryId() != null )
         {
             return action + " repository index \"" + getRepositoryName() + "\" from path " + getResourceStorePath()
                 + " and below.";

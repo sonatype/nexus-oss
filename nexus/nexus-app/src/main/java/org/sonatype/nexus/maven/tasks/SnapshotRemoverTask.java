@@ -19,6 +19,7 @@
 package org.sonatype.nexus.maven.tasks;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
@@ -38,6 +39,9 @@ public class SnapshotRemoverTask
     public static final int DEFAULT_MIN_SNAPSHOTS_TO_KEEP = 0;
 
     public static final int DEFAULT_OLDER_THAN_DAYS = -1;
+
+    @Requirement
+    private SnapshotRemover snapshotRemover;
 
     @Override
     protected String getRepositoryFieldId()
@@ -98,7 +102,7 @@ public class SnapshotRemoverTask
             new SnapshotRemovalRequest( getRepositoryId(), getMinSnapshotsToKeep(), getRemoveOlderThanDays(),
                 isRemoveIfReleaseExists() );
 
-        return getNexus().removeSnapshots( req );
+        return snapshotRemover.removeSnapshots( req );
     }
 
     @Override

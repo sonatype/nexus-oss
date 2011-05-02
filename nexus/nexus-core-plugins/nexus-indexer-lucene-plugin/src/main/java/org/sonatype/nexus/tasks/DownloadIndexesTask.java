@@ -56,10 +56,6 @@ public class DownloadIndexesTask
             {
                 indexerManager.downloadRepositoryIndex( getRepositoryId() );
             }
-            else if ( getRepositoryGroupId() != null )
-            {
-                indexerManager.downloadRepositoryIndex( getRepositoryGroupId() );
-            }
             else
             {
                 indexerManager.downloadAllIndex();
@@ -82,11 +78,7 @@ public class DownloadIndexesTask
     @Override
     protected String getMessage()
     {
-        if ( getRepositoryGroupId() != null )
-        {
-            return "Downloading indexes for repository group " + getRepositoryGroupName();
-        }
-        else if ( getRepositoryId() != null )
+        if ( getRepositoryId() != null )
         {
             return "Downloading indexes for repository " + getRepositoryName();
         }

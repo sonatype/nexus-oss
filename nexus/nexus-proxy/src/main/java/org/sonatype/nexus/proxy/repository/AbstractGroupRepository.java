@@ -46,7 +46,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsGroupLocalOnlyAttribute;
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.utils.RepositoryUtils;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -433,8 +433,8 @@ public abstract class AbstractGroupRepository
                     catch ( RepositoryNotAvailableException e )
                     {
                         getLogger().debug(
-                            "Member repository " + RepositoryUtils.getLoggedNameString( e.getRepository() )
-                                + " is not available, request failed." );
+                            RepositoryStringUtils.getFormattedMessage(
+                                "Member repository %s is not available, request failed.", e.getRepository() ) );
                     }
                     catch ( StorageException e )
                     {

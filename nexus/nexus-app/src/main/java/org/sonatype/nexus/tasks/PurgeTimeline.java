@@ -46,7 +46,7 @@ public class PurgeTimeline
 
     @Requirement
     private NexusTimeline timeline;
-
+    
     public int getPurgeOlderThan()
     {
         return Integer.parseInt( getParameters().get( PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID ) );
@@ -110,12 +110,12 @@ public class PurgeTimeline
         else if ( getSubTypes().size() == 0 )
         {
             timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), getTypes(), null,
-                                     null );
+                null );
         }
         else
         {
             timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), getTypes(),
-                                     getSubTypes(), null );
+                getSubTypes(), null );
         }
 
         return null;

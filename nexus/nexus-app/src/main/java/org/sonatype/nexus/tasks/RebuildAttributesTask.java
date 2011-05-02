@@ -19,11 +19,13 @@
 package org.sonatype.nexus.tasks;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
@@ -63,7 +65,12 @@ public class RebuildAttributesTask
         }
         else
         {
-            getNexus().rebuildAttributesAllRepositories( req );
+            List<Repository> reposes = getRepositoryRegistry().getRepositories();
+
+            for ( Repository repo : reposes )
+            {
+                repo.recreateAttributes( req, null );
+            }
         }
 
         return null;

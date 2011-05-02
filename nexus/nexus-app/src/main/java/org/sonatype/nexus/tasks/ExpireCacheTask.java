@@ -21,6 +21,7 @@ package org.sonatype.nexus.tasks;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
@@ -58,7 +59,13 @@ public class ExpireCacheTask
         }
         else
         {
-            getNexus().expireAllCaches( new ResourceStoreRequest( getResourceStorePath() ) );
+            for ( Repository repository : getRepositoryRegistry().getRepositories() )
+            {
+                if ( repository.getLocalStatus().shouldServiceRequest() )
+                {
+                    repository.expireCaches( req );
+                }
+            }
         }
 
         return null;

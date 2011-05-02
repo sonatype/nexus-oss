@@ -53,10 +53,6 @@ public class OptimizeIndexTask
         {
             indexManager.optimizeRepositoryIndex( getRepositoryId() );
         }
-        else if ( getRepositoryGroupId() != null )
-        {
-            indexManager.optimizeRepositoryIndex( getRepositoryGroupId() );
-        }
         else
         {
             indexManager.optimizeAllRepositoriesIndex();
@@ -74,11 +70,7 @@ public class OptimizeIndexTask
     @Override
     protected String getMessage()
     {
-        if ( getRepositoryGroupId() != null )
-        {
-            return "Optimizing repository group " + getRepositoryGroupName() + " index.";
-        }
-        else if ( getRepositoryId() != null )
+        if ( getRepositoryId() != null )
         {
             return "Optimizing repository " + getRepositoryName() + " index.";
         }

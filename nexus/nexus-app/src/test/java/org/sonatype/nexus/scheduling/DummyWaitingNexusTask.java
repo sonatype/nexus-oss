@@ -22,9 +22,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sonatype.scheduling.AbstractSchedulerTask;
 import org.sonatype.scheduling.ScheduledTask;
 
 public class DummyWaitingNexusTask
+    extends AbstractSchedulerTask<Object>
     implements NexusTask<Object>
 {
     private boolean allowConcurrentSubmission = false;

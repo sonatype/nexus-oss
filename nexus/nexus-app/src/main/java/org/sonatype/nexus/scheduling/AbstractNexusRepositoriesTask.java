@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.util.StringUtils;
@@ -39,10 +40,12 @@ import org.sonatype.scheduling.TaskState;
 public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
 {
-
+    @Requirement
+    private PlexusContainer plexusContainer;
+    
     @Requirement
     private RepositoryRegistry repositoryRegistry;
-
+    
     @Deprecated
     public static String getIdFromPrefixedString( String prefix, String prefixedString )
     {
@@ -130,7 +133,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
         for ( String taskType : activeTasks.keySet() )
         {
             ComponentDescriptor<?> cd =
-                getPlexusContainer().getComponentDescriptor( SchedulerTask.class, SchedulerTask.class.getName(),
+                plexusContainer.getComponentDescriptor( SchedulerTask.class, SchedulerTask.class.getName(),
                     taskType );
 
             if ( cd != null )

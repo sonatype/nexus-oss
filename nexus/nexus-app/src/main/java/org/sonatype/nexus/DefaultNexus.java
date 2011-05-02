@@ -377,6 +377,7 @@ public class DefaultNexus
         return response;
     }
 
+    @Deprecated
     public void expireAllCaches( ResourceStoreRequest request )
     {
         for ( Repository repository : repositoryRegistry.getRepositories() )
@@ -399,6 +400,7 @@ public class DefaultNexus
                                                                                                                              fullReindex ) ) );
     }
 
+    @Deprecated
     public Collection<String> evictAllUnusedProxiedItems( ResourceStoreRequest req, long timestamp )
         throws IOException
     {
@@ -415,6 +417,7 @@ public class DefaultNexus
         return result;
     }
 
+    @Deprecated
     public void rebuildMavenMetadataAllRepositories( ResourceStoreRequest req )
         throws IOException
     {
@@ -429,6 +432,7 @@ public class DefaultNexus
         }
     }
 
+    @Deprecated
     public void rebuildAttributesAllRepositories( ResourceStoreRequest req )
         throws IOException
     {
@@ -440,6 +444,7 @@ public class DefaultNexus
         }
     }
 
+    @Deprecated
     public SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
         throws NoSuchRepositoryException, IllegalArgumentException
     {
@@ -478,31 +483,37 @@ public class DefaultNexus
 
     // creating
 
+    @Deprecated
     public void addNexusArtifactEvent( NexusArtifactEvent nae )
     {
         feedRecorder.addNexusArtifactEvent( nae );
     }
 
+    @Deprecated
     public void addSystemEvent( String action, String message )
     {
         feedRecorder.addSystemEvent( action, message );
     }
 
+    @Deprecated
     public void addAuthcAuthzEvent( AuthcAuthzEvent evt )
     {
         feedRecorder.addAuthcAuthzEvent( evt );
     }
 
+    @Deprecated
     public SystemProcess systemProcessStarted( String action, String message )
     {
         return feedRecorder.systemProcessStarted( action, message );
     }
 
+    @Deprecated
     public void systemProcessFinished( SystemProcess prc, String finishMessage )
     {
         feedRecorder.systemProcessFinished( prc, finishMessage );
     }
 
+    @Deprecated
     public void systemProcessBroken( SystemProcess prc, Throwable e )
     {
         feedRecorder.systemProcessBroken( prc, e );

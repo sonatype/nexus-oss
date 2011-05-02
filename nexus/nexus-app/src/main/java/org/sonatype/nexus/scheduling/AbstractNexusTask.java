@@ -18,51 +18,54 @@
  */
 package org.sonatype.nexus.scheduling;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.error.reporting.ErrorReportRequest;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
+import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.scheduling.AbstractSchedulerTask;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskState;
 
 public abstract class AbstractNexusTask<T>
-    extends AbstractLogEnabled
+    extends AbstractSchedulerTask<T>
     implements NexusTask<T>
 {
     public static final long A_DAY = 24L * 60L * 60L * 1000L;
 
     @Requirement
-    private PlexusContainer plexusContainer;
-    
-    @Requirement
     private ErrorReportingManager errorManager;
-    
+
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
-
-    // DO NOT ADD @REQ here, since you will introduce a cycle
-    // Look below, nexus is looked up "lazily"
-    private Nexus nexus = null;
-
-    private Map<String, String> parameters;
+    
+    @Requirement
+    private FeedRecorder feedRecorder;
 
     private SystemProcess prc;
 
-    // override if you have a task that needs to hide itself
-    public boolean isExposed()
+    protected AbstractNexusTask()
     {
-        return true;
+        this( null );
+    }
+
+    protected AbstractNexusTask( final String name )
+    {
+        if ( name == null || name.trim().length() == 0 )
+        {
+            TaskUtils.setName( this, getClass().getSimpleName() );
+        }
+        else
+        {
+            TaskUtils.setName( this, name );
+        }
     }
 
     // TODO: finish this thread!
@@ -71,46 +74,10 @@ public abstract class AbstractNexusTask<T>
         return null;
     }
 
-    protected PlexusContainer getPlexusContainer()
+    public boolean isExposed()
     {
-        return plexusContainer;
-    }
-
-    protected Nexus getNexus()
-    {
-        if ( nexus == null )
-        {
-            try
-            {
-                nexus = getPlexusContainer().lookup( Nexus.class );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new IllegalStateException( "Cannot fetch Nexus from container!", e );
-            }
-        }
-
-        return nexus;
-    }
-
-    public void addParameter( String key, String value )
-    {
-        getParameters().put( key, value );
-    }
-
-    public String getParameter( String key )
-    {
-        return getParameters().get( key );
-    }
-
-    public Map<String, String> getParameters()
-    {
-        if ( parameters == null )
-        {
-            parameters = new HashMap<String, String>();
-        }
-
-        return parameters;
+        // override to hide it
+        return true;
     }
 
     /**
@@ -176,21 +143,21 @@ public abstract class AbstractNexusTask<T>
     public final T call()
         throws Exception
     {
-        prc = getNexus().systemProcessStarted( getAction(), getMessage() );
-
-        beforeRun();
+        prc = feedRecorder.systemProcessStarted( getAction(), getMessage() );
 
         T result = null;
 
-//        Subject subject = this.securitySystem.runAs( new SimplePrincipalCollection("admin", "") );
+        // Subject subject = this.securitySystem.runAs( new SimplePrincipalCollection("admin", "") );
         // TODO: do the above instead
         Subject subject = new TaskSecuritySubject();
         ThreadContext.bind( subject );
         try
         {
+            beforeRun();
+
             result = doRun();
 
-            getNexus().systemProcessFinished( prc, getMessage() );
+            feedRecorder.systemProcessFinished( prc, getMessage() );
 
             afterRun();
 
@@ -198,22 +165,32 @@ public abstract class AbstractNexusTask<T>
         }
         catch ( Exception e )
         {
-            getNexus().systemProcessBroken( prc, e );
-
-            // notify that there was a failure
-            applicationEventMulticaster.notifyEventListeners( new NexusTaskFailureEvent<T>( this, e) );
-
-            if ( errorManager.isEnabled() )
+            if ( e instanceof TaskInterruptedException )
             {
-                ErrorReportRequest request = new ErrorReportRequest();
-                request.setThrowable( e );
-                request.getContext().put( "taskClass", getClass().getName() );
-                request.getContext().putAll( getParameters() );
-                
-                errorManager.handleError( request );
-            }
+                // just return, nothing happened just task cancelled
+                feedRecorder.systemProcessCanceled( prc, getMessage() );
 
-            throw e;
+                return null;
+            }
+            else
+            {
+                feedRecorder.systemProcessBroken( prc, e );
+
+                // notify that there was a failure
+                applicationEventMulticaster.notifyEventListeners( new NexusTaskFailureEvent<T>( this, e ) );
+
+                if ( errorManager.isEnabled() )
+                {
+                    ErrorReportRequest request = new ErrorReportRequest();
+                    request.setThrowable( e );
+                    request.getContext().put( "taskClass", getClass().getName() );
+                    request.getContext().putAll( getParameters() );
+
+                    errorManager.handleError( request );
+                }
+
+                throw e;
+            }
         }
         finally
         {

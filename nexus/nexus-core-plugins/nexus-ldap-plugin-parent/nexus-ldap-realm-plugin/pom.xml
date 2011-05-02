@@ -188,7 +188,6 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <extensions>true</extensions>
       </plugin>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>

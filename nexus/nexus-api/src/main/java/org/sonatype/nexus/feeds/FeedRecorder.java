@@ -138,6 +138,8 @@ public interface FeedRecorder
 
     void systemProcessFinished( SystemProcess prc, String finishMessage );
 
+    void systemProcessCanceled( SystemProcess prc, String cancelMessage );
+
     void systemProcessBroken( SystemProcess prc, Throwable e );
 
     // reading

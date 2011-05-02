@@ -484,6 +484,15 @@ public class DefaultFeedRecorder
         getLogger().info( prc.getMessage() );
     }
 
+    public void systemProcessCanceled( SystemProcess prc, String cancelMessage )
+    {
+        prc.canceled( cancelMessage );
+
+        addToTimeline( prc );
+
+        getLogger().info( prc.getMessage() );
+    }
+
     public void systemProcessBroken( SystemProcess prc, Throwable e )
     {
         prc.broken( e );

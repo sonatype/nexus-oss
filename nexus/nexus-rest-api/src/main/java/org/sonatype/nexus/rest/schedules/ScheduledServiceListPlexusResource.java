@@ -46,11 +46,13 @@ import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
+import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
@@ -65,7 +67,7 @@ import org.sonatype.scheduling.schedules.Schedule;
 public class ScheduledServiceListPlexusResource
     extends AbstractScheduledServicePlexusResource
 {
-    public static final String RESOURCE_URI = "/schedules"; 
+    public static final String RESOURCE_URI = "/schedules";
 
     public ScheduledServiceListPlexusResource()
     {
@@ -89,21 +91,21 @@ public class ScheduledServiceListPlexusResource
     {
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:tasks]" );
     }
-    
+
     private boolean isAllTasks( Request request )
     {
         Form form = request.getResourceRef().getQueryAsForm();
-        
+
         if ( form != null )
         {
             String result = form.getFirstValue( "allTasks" );
-            
+
             if ( result != null )
             {
                 return result.equalsIgnoreCase( "true" );
             }
         }
-        
+
         return false;
     }
 
@@ -119,7 +121,7 @@ public class ScheduledServiceListPlexusResource
         throws ResourceException
     {
         boolean allTasks = isAllTasks( request );
-        
+
         Map<String, List<ScheduledTask<?>>> tasksMap = getNexusScheduler().getAllTasks();
 
         ScheduledServiceListResourceResponse result = new ScheduledServiceListResourceResponse();
@@ -130,13 +132,22 @@ public class ScheduledServiceListPlexusResource
 
             for ( ScheduledTask<?> task : tasks )
             {
-                if ( allTasks || task.isExposed() )
+                boolean isExposed = true;
+
+                SchedulerTask<?> st = task.getSchedulerTask();
+
+                if ( st != null && st instanceof NexusTask<?> )
+                {
+                    isExposed = ( (NexusTask<?>) st ).isExposed();
+                }
+
+                if ( allTasks || isExposed )
                 {
                     if ( getLogger().isDebugEnabled() )
                     {
                         getLogger().debug( "Building task '" + task.getName() + "' of type '" + task.getType() + "'." );
                     }
-                    
+
                     String lastRunResult = "n/a";
 
                     if ( task.getLastRun() != null )
@@ -150,8 +161,9 @@ public class ScheduledServiceListPlexusResource
                     item.setName( task.getName() );
                     item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
                     item.setTypeId( task.getType() );
-                    ScheduledTaskDescriptor descriptor = getNexusConfiguration().getScheduledTaskDescriptor( task.getType() );
-                    if ( descriptor != null ) 
+                    ScheduledTaskDescriptor descriptor =
+                        getNexusConfiguration().getScheduledTaskDescriptor( task.getType() );
+                    if ( descriptor != null )
                     {
                         item.setTypeName( descriptor.getName() );
                     }
@@ -192,17 +204,15 @@ public class ScheduledServiceListPlexusResource
 
                 if ( schedule != null )
                 {
-                    task = getNexusScheduler().schedule(
-                        getModelName( serviceResource ),
-                        getModelNexusTask( serviceResource, request ),
-                        schedule );
+                    task =
+                        getNexusScheduler().schedule( getModelName( serviceResource ),
+                            getModelNexusTask( serviceResource, request ), schedule );
                 }
                 else
                 {
-                    task = getNexusScheduler().schedule(
-                        getModelName( serviceResource ),
-                        getModelNexusTask( serviceResource, request ),
-                        new ManualRunSchedule() );
+                    task =
+                        getNexusScheduler().schedule( getModelName( serviceResource ),
+                            getModelNexusTask( serviceResource, request ), new ManualRunSchedule() );
                 }
 
                 task.setEnabled( serviceResource.isEnabled() );
@@ -234,9 +244,7 @@ public class ScheduledServiceListPlexusResource
             {
                 getLogger().warn( "Unable to parse data for task " + getModelName( serviceResource ) );
 
-                throw new PlexusResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    e.getMessage(),
+                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(),
                     getNexusErrorResponse( "cronCommand", e.getMessage() ) );
             }
             catch ( InvalidConfigurationException e )
