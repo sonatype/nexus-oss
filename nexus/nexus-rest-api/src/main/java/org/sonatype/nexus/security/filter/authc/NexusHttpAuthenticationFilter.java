@@ -486,7 +486,12 @@ public class NexusHttpAuthenticationFilter
     {
         if ( isStatelessClient( request ) )
         {
-            getSubject( request, response ).logout();
+            Subject subject = getSubject( request, response );
+            // the subject should never be null, but the session might be
+            if( subject != null && subject.getSession( false ) != null )
+            {
+                subject.logout();
+            }
         }
     }
 
