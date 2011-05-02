@@ -511,9 +511,7 @@
         <executions>
           <execution>
             <configuration>
-              <!--
-              <backgroundImage>${basedir}/src/main/jettyconsole/insight.jpg</backgroundImage>
-              -->
+              <backgroundImage>${basedir}/src/main/jettyconsole/background-image-nexus.jpg</backgroundImage>
               <additionalDependencies>
                 <additionalDependency>
                   <artifactId>jetty-console-jettyxml-plugin</artifactId>
