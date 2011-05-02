@@ -23,16 +23,15 @@ import java.util.Map;
 
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.error.reporting.ErrorReportRequest;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
+import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.scheduling.AbstractSchedulerTask;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskState;
 
 public abstract class AbstractNexusTask<T>
@@ -42,21 +41,16 @@ public abstract class AbstractNexusTask<T>
     public static final long A_DAY = 24L * 60L * 60L * 1000L;
 
     @Requirement
-    private PlexusContainer plexusContainer;
-
-    @Requirement
     private ErrorReportingManager errorManager;
 
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
-
-    // DO NOT ADD @REQ here, since you will introduce a cycle
-    // Look below, nexus is looked up "lazily"
-    private Nexus nexus = null;
+    
+    @Requirement
+    private FeedRecorder feedRecorder;
 
     private SystemProcess prc;
 
-    @Deprecated
     protected AbstractNexusTask()
     {
         this( null );
@@ -84,28 +78,6 @@ public abstract class AbstractNexusTask<T>
     {
         // override to hide it
         return true;
-    }
-
-    protected PlexusContainer getPlexusContainer()
-    {
-        return plexusContainer;
-    }
-
-    protected Nexus getNexus()
-    {
-        if ( nexus == null )
-        {
-            try
-            {
-                nexus = getPlexusContainer().lookup( Nexus.class );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new IllegalStateException( "Cannot fetch Nexus from container!", e );
-            }
-        }
-
-        return nexus;
     }
 
     /**
@@ -171,7 +143,7 @@ public abstract class AbstractNexusTask<T>
     public final T call()
         throws Exception
     {
-        prc = getNexus().systemProcessStarted( getAction(), getMessage() );
+        prc = feedRecorder.systemProcessStarted( getAction(), getMessage() );
 
         T result = null;
 
@@ -185,7 +157,7 @@ public abstract class AbstractNexusTask<T>
 
             result = doRun();
 
-            getNexus().systemProcessFinished( prc, getMessage() );
+            feedRecorder.systemProcessFinished( prc, getMessage() );
 
             afterRun();
 
@@ -193,23 +165,32 @@ public abstract class AbstractNexusTask<T>
         }
         catch ( Exception e )
         {
-            // TODO: make feed recorder make less noise on TaskInterruptedException
-            getNexus().systemProcessBroken( prc, e );
-
-            // notify that there was a failure
-            applicationEventMulticaster.notifyEventListeners( new NexusTaskFailureEvent<T>( this, e ) );
-
-            if ( errorManager.isEnabled() )
+            if ( e instanceof TaskInterruptedException )
             {
-                ErrorReportRequest request = new ErrorReportRequest();
-                request.setThrowable( e );
-                request.getContext().put( "taskClass", getClass().getName() );
-                request.getContext().putAll( getParameters() );
+                // just return, nothing happened just task cancelled
+                feedRecorder.systemProcessCanceled( prc, getMessage() );
 
-                errorManager.handleError( request );
+                return null;
             }
+            else
+            {
+                feedRecorder.systemProcessBroken( prc, e );
 
-            throw e;
+                // notify that there was a failure
+                applicationEventMulticaster.notifyEventListeners( new NexusTaskFailureEvent<T>( this, e ) );
+
+                if ( errorManager.isEnabled() )
+                {
+                    ErrorReportRequest request = new ErrorReportRequest();
+                    request.setThrowable( e );
+                    request.getContext().put( "taskClass", getClass().getName() );
+                    request.getContext().putAll( getParameters() );
+
+                    errorManager.handleError( request );
+                }
+
+                throw e;
+            }
         }
         finally
         {

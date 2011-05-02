@@ -32,7 +32,7 @@ public class SystemProcess
 {
     enum Status
     {
-        STARTED, FINISHED, BROKEN
+        STARTED, FINISHED, BROKEN, CANCELED
     };
 
     /**
@@ -74,6 +74,15 @@ public class SystemProcess
         this.finished = new Date();
 
         this.status = Status.FINISHED;
+
+        this.finishedMessage = message;
+    }
+    
+    public void canceled( String message )
+    {
+        this.finished = new Date();
+
+        this.status = Status.CANCELED;
 
         this.finishedMessage = message;
     }
@@ -168,6 +177,10 @@ public class SystemProcess
                 else if ( Status.FINISHED.equals( status ) )
                 {
                     sb.append( ", finished successfully on " ).append( finished.toString() );
+                }
+                else if ( Status.CANCELED.equals( status ) )
+                {
+                    sb.append( ", canceled on " ).append( finished.toString() );
                 }
             }
             else

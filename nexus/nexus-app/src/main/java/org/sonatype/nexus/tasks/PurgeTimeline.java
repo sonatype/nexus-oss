@@ -46,7 +46,7 @@ public class PurgeTimeline
 
     @Requirement
     private NexusTimeline timeline;
-
+    
     public int getPurgeOlderThan()
     {
         return Integer.parseInt( getParameters().get( PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID ) );

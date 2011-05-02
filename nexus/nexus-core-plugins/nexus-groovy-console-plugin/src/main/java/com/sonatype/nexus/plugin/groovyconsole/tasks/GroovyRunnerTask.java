@@ -81,11 +81,7 @@ public class GroovyRunnerTask
     @Override
     protected String getMessage()
     {
-        if ( getRepositoryGroupId() != null )
-        {
-            return "Running Groovy Task on " + getRepositoryGroupName();
-        }
-        else if ( getRepositoryId() != null )
+        if ( getRepositoryId() != null )
         {
             return "Running Groovy Task on " + getRepositoryName();
         }

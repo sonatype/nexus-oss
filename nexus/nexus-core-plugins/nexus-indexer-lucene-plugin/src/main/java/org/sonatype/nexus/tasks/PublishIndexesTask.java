@@ -56,10 +56,6 @@ public class PublishIndexesTask
             {
                 indexerManager.publishRepositoryIndex( getRepositoryId() );
             }
-            else if ( getRepositoryGroupId() != null )
-            {
-                indexerManager.publishRepositoryIndex( getRepositoryGroupId() );
-            }
             else
             {
                 indexerManager.publishAllIndex();
@@ -82,11 +78,7 @@ public class PublishIndexesTask
     @Override
     protected String getMessage()
     {
-        if ( getRepositoryGroupId() != null )
-        {
-            return "Publishing indexes for repository group " + getRepositoryGroupName();
-        }
-        else if ( getRepositoryId() != null )
+        if ( getRepositoryId() != null )
         {
             return "Publishing indexes for repository " + getRepositoryName();
         }

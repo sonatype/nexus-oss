@@ -129,4 +129,11 @@ public class SimpleFeedRecorder
         return Collections.emptyList();
     }
 
+    @Override
+    public void systemProcessCanceled( SystemProcess prc, String cancelMessage )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

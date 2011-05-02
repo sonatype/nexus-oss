@@ -18,14 +18,18 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import java.util.List;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.scheduling.SchedulerTask;
+import org.sonatype.scheduling.TaskUtil;
 
 /**
  * @author Juven Xu
@@ -35,13 +39,13 @@ public class RebuildMavenMetadataTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
     public static final String REBUILD_MAVEN_METADATA_ACTION = "REBUILD_MAVEN_METADATA";
-    
+
     @Override
     protected String getRepositoryFieldId()
     {
         return RebuildMavenMetadataTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
     }
-    
+
     @Override
     protected String getRepositoryPathFieldId()
     {
@@ -57,7 +61,19 @@ public class RebuildMavenMetadataTask
         // no repo id, then do all repos
         if ( StringUtils.isEmpty( getRepositoryId() ) )
         {
-            getNexus().rebuildMavenMetadataAllRepositories( req );
+            List<MavenRepository> reposes = getRepositoryRegistry().getRepositoriesWithFacet( MavenRepository.class );
+
+            TaskUtil.getCurrentProgressListener().beginTask( "Recreating Maven Metadata on all Maven repositories",
+                reposes.size() );
+
+            for ( MavenRepository repo : reposes )
+            {
+                TaskUtil.getCurrentProgressListener().working(
+                    RepositoryStringUtils.getFormattedMessage( "Recreating Maven Metadata on %s", repo ), 1 );
+                repo.recreateMavenMetadata( req );
+            }
+
+            TaskUtil.getCurrentProgressListener().endTask( "Done" );
         }
         else
         {
@@ -68,12 +84,19 @@ public class RebuildMavenMetadataTask
             {
                 MavenRepository mavenRepository = repository.adaptToFacet( MavenRepository.class );
 
+                TaskUtil.getCurrentProgressListener().beginTask(
+                    RepositoryStringUtils.getFormattedMessage( "Recreating Maven Metadata on %s", mavenRepository ) );
+
                 mavenRepository.recreateMavenMetadata( req );
+
+                TaskUtil.getCurrentProgressListener().endTask( "Done" );
             }
             else
             {
-                getLogger().debug( "Repository \"" + repository.getName() + "\" (id=" + repository.getId()
-                                       + ") is not a Maven repository. Will not rebuild maven metadata." );
+                getLogger().info(
+                    RepositoryStringUtils.getFormattedMessage(
+                        "Repository %s is not a Maven repository. Will not rebuild maven metadata, but the task seems wrongly configured!",
+                        repository ) );
             }
         }
 

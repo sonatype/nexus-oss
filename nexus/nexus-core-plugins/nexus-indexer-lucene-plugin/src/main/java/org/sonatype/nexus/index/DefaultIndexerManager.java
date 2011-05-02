@@ -114,7 +114,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-import org.sonatype.scheduling.ProgressListener;
 import org.sonatype.scheduling.TaskUtil;
 
 /**

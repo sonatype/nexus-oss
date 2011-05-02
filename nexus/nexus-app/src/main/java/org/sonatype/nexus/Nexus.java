@@ -115,21 +115,26 @@ public interface Nexus
     NexusStreamResponse getApplicationLogAsStream( String logFile, long fromByte, long bytesCount )
         throws IOException;
 
+    @Deprecated
     void expireAllCaches( ResourceStoreRequest request );
 
     @Deprecated
     void reindexAllRepositories( String path, boolean fullReindex )
         throws IOException;
 
+    @Deprecated
     void rebuildAttributesAllRepositories( ResourceStoreRequest request )
         throws IOException;
 
+    @Deprecated
     void rebuildMavenMetadataAllRepositories( ResourceStoreRequest request )
         throws IOException;
 
+    @Deprecated
     Collection<String> evictAllUnusedProxiedItems( ResourceStoreRequest request, long timestamp )
         throws IOException;
 
+    @Deprecated
     SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
         throws NoSuchRepositoryException, IllegalArgumentException;
 
@@ -174,16 +179,22 @@ public interface Nexus
 
     // creating
 
+    @Deprecated
     void addNexusArtifactEvent( NexusArtifactEvent nae );
 
+    @Deprecated
     void addSystemEvent( String action, String message );
 
+    @Deprecated
     void addAuthcAuthzEvent( AuthcAuthzEvent evt );
 
+    @Deprecated
     SystemProcess systemProcessStarted( String action, String message );
 
+    @Deprecated
     void systemProcessFinished( SystemProcess prc, String finishMessage );
 
+    @Deprecated
     void systemProcessBroken( SystemProcess prc, Throwable e );
 
     // reading

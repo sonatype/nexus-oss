@@ -18,11 +18,13 @@
  */
 package org.sonatype.nexus.tasks;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
@@ -50,7 +52,7 @@ public class EvictUnusedProxiedItemsTask
     public void setEvictOlderCacheItemsThen( int evictOlderCacheItemsThen )
     {
         getParameters().put( EvictUnusedItemsTaskDescriptor.OLDER_THAN_FIELD_ID,
-                             Integer.toString( evictOlderCacheItemsThen ) );
+            Integer.toString( evictOlderCacheItemsThen ) );
     }
 
     @Override
@@ -67,7 +69,14 @@ public class EvictUnusedProxiedItemsTask
         }
         else
         {
-            return getNexus().evictAllUnusedProxiedItems( req, olderThan );
+            ArrayList<String> result = new ArrayList<String>();
+
+            for ( Repository repository : getRepositoryRegistry().getRepositories() )
+            {
+                result.addAll( repository.evictUnusedItems( req, olderThan ) );
+            }
+
+            return result;
         }
     }
 
