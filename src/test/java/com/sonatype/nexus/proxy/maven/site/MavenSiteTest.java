@@ -12,6 +12,7 @@ import java.io.FileReader;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.IOUtil;
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -25,6 +26,7 @@ public class MavenSiteTest
     extends AbstractNexusTestCase
 {
 
+    @Test
     public void testCreateSiteRepoWithTemplate()
         throws Exception
     {
@@ -63,12 +65,12 @@ public class MavenSiteTest
                 siteRepo = cRepo;
             }
         }
-        
+
         Assert.assertNotNull( "Could not find the site repo in: " + this.getNexusConfiguration(), siteRepo );
 
         Assert.assertEquals( "Maven Sites", siteRepo.getName() );
 //        Assert.assertNull( siteRepo.getExternalConfiguration() );
-        
+
         // there are too many places that check null, so for now, this cannot be null
         Assert.assertNotNull( siteRepo.getExternalConfiguration() );
 
