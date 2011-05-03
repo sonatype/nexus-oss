@@ -29,6 +29,8 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.scheduling.TaskInterruptedException;
 
 /**
  * The Class Walker.
@@ -62,21 +64,49 @@ public class DefaultWalker
                 "Start walking on ResourceStore " + context.getRepository().getId() + " from path '" + fromPath + "'." );
         }
 
-        // user may call stop()
-        beforeWalk( context );
-
-        if ( context.isStopped() )
-        {
-            reportWalkEnd( context, fromPath );
-
-            return;
-        }
-
-        StorageItem item = null;
-
         try
         {
+            // user may call stop()
+            beforeWalk( context );
+
+            if ( context.isStopped() )
+            {
+                reportWalkEnd( context, fromPath );
+
+                return;
+            }
+
+            StorageItem item = null;
+
             item = context.getRepository().retrieveItem( true, context.getResourceStoreRequest() );
+
+            int collCount = 0;
+
+            if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
+            {
+                try
+                {
+                    WalkerFilter filter =
+                        context.getFilter() != null ? context.getFilter() : new DefaultStoreWalkerFilter();
+
+                    collCount = walkRecursive( 0, context, filter, (StorageCollectionItem) item );
+
+                    context.getContext().put( WALKER_WALKED_COLLECTION_COUNT, collCount );
+                }
+                catch ( Exception e )
+                {
+                    context.stop( e );
+
+                    reportWalkEnd( context, fromPath );
+
+                    return;
+                }
+            }
+
+            if ( !context.isStopped() )
+            {
+                afterWalk( context );
+            }
         }
         catch ( ItemNotFoundException ex )
         {
@@ -86,48 +116,12 @@ public class DefaultWalker
             }
 
             context.stop( ex );
-
-            reportWalkEnd( context, fromPath );
-
-            return;
         }
         catch ( Exception ex )
         {
             getLogger().warn( "Got exception while doing retrieve, bailing out.", ex );
 
             context.stop( ex );
-
-            reportWalkEnd( context, fromPath );
-
-            return;
-        }
-
-        int collCount = 0;
-
-        if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
-        {
-            try
-            {
-                WalkerFilter filter =
-                    context.getFilter() != null ? context.getFilter() : new DefaultStoreWalkerFilter();
-
-                collCount = walkRecursive( 0, context, filter, (StorageCollectionItem) item );
-
-                context.getContext().put( WALKER_WALKED_COLLECTION_COUNT, collCount );
-            }
-            catch ( Exception e )
-            {
-                context.stop( e );
-
-                reportWalkEnd( context, fromPath );
-
-                return;
-            }
-        }
-
-        if ( !context.isStopped() )
-        {
-            afterWalk( context );
         }
 
         reportWalkEnd( context, fromPath );
@@ -141,6 +135,12 @@ public class DefaultWalker
             if ( context.getStopCause() == null )
             {
                 getLogger().debug( "Walker was stopped programatically, not because of error." );
+            }
+            else if ( context.getStopCause() instanceof TaskInterruptedException )
+            {
+                getLogger().info(
+                    RepositoryStringUtils.getFormattedMessage( "Canceled walking on repository %s from path=\""
+                        + fromPath + "\", cause: " + context.getStopCause().getMessage(), context.getRepository() ) );
             }
             else
             {

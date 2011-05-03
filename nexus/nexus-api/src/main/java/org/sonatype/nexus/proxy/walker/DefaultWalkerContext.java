@@ -123,10 +123,7 @@ public class DefaultWalkerContext
 
     public boolean isStopped()
     {
-        if ( TaskUtil.getCurrentProgressListener().isCanceled() )
-        {
-            this.running = false;
-        }
+        TaskUtil.checkInterruption();
 
         return !running;
     }
