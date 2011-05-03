@@ -46,7 +46,13 @@
     </dependency>
     <dependency>
       <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <artifactId>junit-dep</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <version>${nexus.oss.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
