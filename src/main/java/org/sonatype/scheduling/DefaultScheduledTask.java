@@ -463,6 +463,8 @@ public class DefaultScheduledTask<T>
         }
         finally
         {
+            this.progressListener = null;
+
             TaskUtil.setCurrent( null );
         }
     }

@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A simple progress listener that logs messages into SLF4J API.
+ * A simple progress listener that logs messages into SLF4J API at Info level.
  * 
  * @author cstamas
  */
@@ -104,7 +104,16 @@ public class LoggingProgressListener
 
     public void cancel()
     {
-        log( "{}: canceled, bailing out (may take a while).", getStackedWorkunitNames() );
+        final String wus = getStackedWorkunitNames();
+
+        if ( wus != null && wus.trim().length() > 0 )
+        {
+            log( "{}: canceled, bailing out (may take a while).", wus );
+        }
+        else
+        {
+            log( "Task canceled, bailing out (may take a while)." );
+        }
 
         this.canceled = true;
     }
@@ -144,7 +153,10 @@ public class LoggingProgressListener
     {
         if ( logger != null )
         {
-            logger.info( message, param );
+            if ( logger.isInfoEnabled() )
+            {
+                logger.info( message, param );
+            }
         }
     }
 
