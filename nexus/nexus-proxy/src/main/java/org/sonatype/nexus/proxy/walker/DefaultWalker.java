@@ -108,9 +108,8 @@ public class DefaultWalker
         {
             try
             {
-                WalkerFilter filter = context.getFilter() != null
-                    ? context.getFilter()
-                    : new DefaultStoreWalkerFilter();
+                WalkerFilter filter =
+                    context.getFilter() != null ? context.getFilter() : new DefaultStoreWalkerFilter();
 
                 collCount = walkRecursive( 0, context, filter, (StorageCollectionItem) item );
 
@@ -155,13 +154,12 @@ public class DefaultWalker
                 else
                 {
                     getLogger().info(
-                        "Aborted walking on repository ID='" + context.getRepository().getId() + "' from path='" + fromPath
-                            + "', cause:",
-                        context.getStopCause() );
+                        "Aborted walking on repository ID='" + context.getRepository().getId() + "' from path='"
+                            + fromPath + "', cause:", context.getStopCause() );
                 }
-    
-                throw new WalkerException( context, "Aborted walking on repository ID='" + context.getRepository().getId()
-                    + "' from path='" + fromPath + "'." );
+
+                throw new WalkerException( context, "Aborted walking on repository ID='"
+                    + context.getRepository().getId() + "' from path='" + fromPath + "'." );
             }
         }
         else
@@ -177,11 +175,8 @@ public class DefaultWalker
     }
 
     protected final int walkRecursive( int collCount, WalkerContext context, WalkerFilter filter,
-        StorageCollectionItem coll )
-        throws AccessDeniedException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+                                       StorageCollectionItem coll )
+        throws AccessDeniedException, IllegalOperationException, ItemNotFoundException, StorageException
     {
         if ( context.isStopped() )
         {

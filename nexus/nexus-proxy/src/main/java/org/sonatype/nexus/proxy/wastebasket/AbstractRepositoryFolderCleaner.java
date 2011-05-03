@@ -25,6 +25,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.scheduling.TaskUtil;
 
 public abstract class AbstractRepositoryFolderCleaner
     implements RepositoryFolderCleaner
@@ -87,12 +88,16 @@ public abstract class AbstractRepositoryFolderCleaner
     // deleting other files even if it reaches a locked file first.
     protected static void deleteFilesRecursively( File folder )
     {
+        TaskUtil.checkInterruption();
+        
         // First check if it's a directory to avoid future misuse.
         if ( folder.isDirectory() )
         {
             File[] files = folder.listFiles();
             for ( File file : files )
             {
+                TaskUtil.checkInterruption();
+                
                 if ( file.isDirectory() )
                 {
                     deleteFilesRecursively( file );

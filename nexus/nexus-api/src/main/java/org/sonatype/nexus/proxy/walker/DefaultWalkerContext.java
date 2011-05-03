@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.scheduling.TaskUtil;
 
 public class DefaultWalkerContext
     implements WalkerContext
@@ -56,7 +57,7 @@ public class DefaultWalkerContext
     }
 
     public DefaultWalkerContext( Repository store, ResourceStoreRequest request, WalkerFilter filter,
-        boolean localOnly, boolean collectionsOnly )
+                                 boolean localOnly, boolean collectionsOnly )
     {
         super();
 
@@ -122,6 +123,11 @@ public class DefaultWalkerContext
 
     public boolean isStopped()
     {
+        if ( TaskUtil.getCurrentProgressListener().isCanceled() )
+        {
+            this.running = false;
+        }
+
         return !running;
     }
 

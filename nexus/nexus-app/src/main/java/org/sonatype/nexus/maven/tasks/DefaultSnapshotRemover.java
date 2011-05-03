@@ -61,6 +61,7 @@ import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.util.ItemPathUtils;
+import org.sonatype.scheduling.TaskUtil;
 
 /**
  * The Class SnapshotRemoverJob. After a succesful run, the job guarantees that there will remain at least
@@ -136,7 +137,7 @@ public class DefaultSnapshotRemover
             return false;
         }
 
-        if ( LocalStatus.OUT_OF_SERVICE.equals( repository.getLocalStatus() ) )
+        if ( !repository.getLocalStatus().shouldServiceRequest() )
         {
             getLogger().debug( "Skipping '" + repository.getId() + "' the repository is out of service" );
             return false;
@@ -164,6 +165,8 @@ public class DefaultSnapshotRemover
     protected SnapshotRemovalRepositoryResult removeSnapshotsFromMavenRepository( MavenRepository repository,
                                                                                   SnapshotRemovalRequest request )
     {
+        TaskUtil.checkInterruption();
+        
         SnapshotRemovalRepositoryResult result = new SnapshotRemovalRepositoryResult( repository.getId(), 0, 0, true );
 
         if ( !repository.getLocalStatus().shouldServiceRequest() )
