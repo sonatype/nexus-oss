@@ -50,6 +50,6 @@ public class MavenSiteTemplateProvider
         throws InitializationException
     {
         repositoryTypeRegistry.registerRepositoryTypeDescriptors( new RepositoryTypeDescriptor(
-            WebSiteRepository.class.getName(), "maven-site", "sites" ) );
+            WebSiteRepository.class, "maven-site", "sites" ) );
     }
 }
