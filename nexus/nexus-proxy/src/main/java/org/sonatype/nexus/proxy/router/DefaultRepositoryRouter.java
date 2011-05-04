@@ -504,20 +504,11 @@ public class DefaultRepositoryRouter
             // we have kind information ("repositories" vs "groups" etc)
             for ( RepositoryTypeDescriptor rtd : repositoryTypeRegistry.getRegisteredRepositoryTypeDescriptors() )
             {
-                try
+                if ( rtd.getPrefix().equals( explodedPath[0] ) )
                 {
-                    if ( rtd.getPrefix().equals( explodedPath[0] ) )
-                    {
-                        kind = (Class<Repository>) Class.forName( rtd.getRole() );
+                    kind = rtd.getRole();
 
-                        break;
-                    }
-                }
-                catch ( ClassNotFoundException e )
-                {
-                    getLogger().info(
-                        "RepositoryType with role='" + rtd.getRole()
-                            + "' is registered, but not found on classpath, skipping it.", e );
+                    break;
                 }
             }
 
@@ -635,28 +626,18 @@ public class DefaultRepositoryRouter
 
             for ( RepositoryTypeDescriptor rtd : repositoryTypeRegistry.getRegisteredRepositoryTypeDescriptors() )
             {
-                try
+                // check is there any repo registered
+                if ( !repositoryRegistry.getRepositoriesWithFacet( rtd.getRole() ).isEmpty() )
                 {
-                    // check is there any repo registered
-                    if ( !repositoryRegistry.getRepositoriesWithFacet( Class.forName( rtd.getRole() ) ).isEmpty() )
-                    {
-                        ResourceStoreRequest req =
-                            new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(),
-                                rtd.getPrefix() ) );
+                    ResourceStoreRequest req =
+                        new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(), rtd.getPrefix() ) );
 
-                        DefaultStorageCollectionItem repositories =
-                            new DefaultStorageCollectionItem( this, req, true, false );
+                    DefaultStorageCollectionItem repositories =
+                        new DefaultStorageCollectionItem( this, req, true, false );
 
-                        repositories.getItemContext().putAll( request.getRequestContext() );
+                    repositories.getItemContext().putAll( request.getRequestContext() );
 
-                        result.add( repositories );
-                    }
-                }
-                catch ( ClassNotFoundException e )
-                {
-                    getLogger().info(
-                        "RepositoryType with role='" + rtd.getRole()
-                            + "' is registered, but not found on classpath, skipping it.", e );
+                    result.add( repositories );
                 }
             }
 
@@ -665,32 +646,21 @@ public class DefaultRepositoryRouter
         else if ( route.getRequestDepth() == 1 )
         {
             // 2nd level
-            List<Repository> repositories = null;
+            List<? extends Repository> repositories = null;
 
-            Class<Repository> kind = null;
+            Class<? extends Repository> kind = null;
 
             for ( RepositoryTypeDescriptor rtd : repositoryTypeRegistry.getRegisteredRepositoryTypeDescriptors() )
             {
-                try
+                if ( route.getStrippedPrefix().startsWith( "/" + rtd.getPrefix() ) )
                 {
-                    if ( route.getStrippedPrefix().startsWith( "/" + rtd.getPrefix() ) )
-                    {
-                        kind = (Class<Repository>) Class.forName( rtd.getRole() );
+                    kind = rtd.getRole();
 
-                        repositories = repositoryRegistry.getRepositoriesWithFacet( kind );
+                    repositories = repositoryRegistry.getRepositoriesWithFacet( kind );
 
-                        break;
-                    }
-                }
-                catch ( ClassNotFoundException e )
-                {
-                    getLogger().info(
-                        "RepositoryType with role='" + rtd.getRole()
-                            + "' is registered, but not found on classpath, skipping it.", e );
+                    break;
                 }
             }
-
-            repositories.get( 0 ).isExposed();
 
             // if no prefix matched, Item not found
             if ( repositories == null || repositories.isEmpty() )
@@ -700,7 +670,7 @@ public class DefaultRepositoryRouter
 
             // filter access to the repositories
             // NOTE: do this AFTER the null/empty check so we return an empty list vs. an ItemNotFound
-            repositories = this.filterAccessToRepositories( repositories );
+            repositories = filterAccessToRepositories( repositories );
 
             ArrayList<StorageItem> result = new ArrayList<StorageItem>( repositories.size() );
 
@@ -741,7 +711,7 @@ public class DefaultRepositoryRouter
         }
     }
 
-    private List<Repository> filterAccessToRepositories( Collection<Repository> repositories )
+    private List<Repository> filterAccessToRepositories( Collection<? extends Repository> repositories )
     {
         if ( repositories == null )
         {

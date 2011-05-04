@@ -59,40 +59,41 @@ public class DefaultRepositoryTypeRegistry
 
     private Map<String, ContentClass> repoCachedContentClasses = new HashMap<String, ContentClass>();
 
-    private Multimap<String, RepositoryTypeDescriptor> repositoryTypeDescriptorsMap;
+    private Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> repositoryTypeDescriptorsMap;
 
     protected Logger getLogger()
     {
         return logger;
     }
 
-    protected Multimap<String, RepositoryTypeDescriptor> getRepositoryTypeDescriptors()
+    protected Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> getRepositoryTypeDescriptors()
     {
         synchronized ( this )
         {
             // maybe the previous who was blocking us already did the job
             if ( repositoryTypeDescriptorsMap == null )
             {
-                Multimap<String, RepositoryTypeDescriptor> result = Multimaps.newArrayListMultimap();
+                Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> result =
+                    Multimaps.newArrayListMultimap();
 
                 // fill in the defaults
-                String role = null;
+                Class<? extends Repository> role = null;
 
-                role = Repository.class.getName();
+                role = Repository.class;
 
                 result.put( role, new RepositoryTypeDescriptor( role, M1Repository.ID, "repositories",
                     RepositoryType.UNLIMITED_INSTANCES ) );
                 result.put( role, new RepositoryTypeDescriptor( role, M2Repository.ID, "repositories",
                     RepositoryType.UNLIMITED_INSTANCES ) );
 
-                role = ShadowRepository.class.getName();
+                role = ShadowRepository.class;
 
                 result.put( role, new RepositoryTypeDescriptor( role, M1LayoutedM2ShadowRepository.ID, "shadows",
                     RepositoryType.UNLIMITED_INSTANCES ) );
                 result.put( role, new RepositoryTypeDescriptor( role, M2LayoutedM1ShadowRepository.ID, "shadows",
                     RepositoryType.UNLIMITED_INSTANCES ) );
 
-                role = GroupRepository.class.getName();
+                role = GroupRepository.class;
 
                 result.put( role, new RepositoryTypeDescriptor( role, M1GroupRepository.ID, "groups",
                     RepositoryType.UNLIMITED_INSTANCES ) );
@@ -108,6 +109,7 @@ public class DefaultRepositoryTypeRegistry
 
                 this.repositoryTypeDescriptorsMap = result;
             }
+
             return repositoryTypeDescriptorsMap;
         }
     }
@@ -155,28 +157,27 @@ public class DefaultRepositoryTypeRegistry
     {
         return Collections.unmodifiableMap( new HashMap<String, ContentClass>( contentClasses ) );
     }
-    
+
     public Set<String> getCompatibleContentClasses( ContentClass contentClass )
     {
         Set<String> compatibles = new HashSet<String>();
-        
+
         for ( ContentClass cc : contentClasses.values() )
         {
-            if ( cc.isCompatible( contentClass )
-                || contentClass.isCompatible( cc ) )
+            if ( cc.isCompatible( contentClass ) || contentClass.isCompatible( cc ) )
             {
                 compatibles.add( cc.getId() );
             }
         }
-        
+
         return compatibles;
     }
 
-    public Set<String> getRepositoryRoles()
+    public Set<Class<? extends Repository>> getRepositoryRoles()
     {
         Set<RepositoryTypeDescriptor> rtds = getRegisteredRepositoryTypeDescriptors();
 
-        HashSet<String> result = new HashSet<String>( rtds.size() );
+        HashSet<Class<? extends Repository>> result = new HashSet<Class<? extends Repository>>( rtds.size() );
 
         for ( RepositoryTypeDescriptor rtd : rtds )
         {
@@ -186,7 +187,7 @@ public class DefaultRepositoryTypeRegistry
         return Collections.unmodifiableSet( result );
     }
 
-    public Set<String> getExistingRepositoryHints( String role )
+    public Set<String> getExistingRepositoryHints( Class<? extends Repository> role )
     {
         if ( !getRepositoryTypeDescriptors().containsKey( role ) )
         {
@@ -203,7 +204,7 @@ public class DefaultRepositoryTypeRegistry
         return result;
     }
 
-    public RepositoryTypeDescriptor getRepositoryTypeDescriptor( String role, String hint )
+    public RepositoryTypeDescriptor getRepositoryTypeDescriptor( Class<? extends Repository> role, String hint )
     {
         if ( !getRepositoryTypeDescriptors().containsKey( role ) )
         {
@@ -221,8 +222,39 @@ public class DefaultRepositoryTypeRegistry
         return null;
     }
 
+    @Deprecated
+    public RepositoryTypeDescriptor getRepositoryTypeDescriptor( String role, String hint )
+    {
+        Class<? extends Repository> roleClass = null;
+
+        for ( Class<? extends Repository> registeredClass : getRepositoryTypeDescriptors().keySet() )
+        {
+            if ( registeredClass.getName().equals( role ) )
+            {
+                roleClass = registeredClass;
+
+                break;
+            }
+        }
+
+        if ( roleClass == null )
+        {
+            return null;
+        }
+
+        for ( RepositoryTypeDescriptor rtd : getRepositoryTypeDescriptors().get( roleClass ) )
+        {
+            if ( rtd.getHint().equals( hint ) )
+            {
+                return rtd;
+            }
+        }
+
+        return null;
+    }
+
     // TODO: solve this single place to cease the requirement for PlexusContainer!
-    public ContentClass getRepositoryContentClass( String role, String hint )
+    public ContentClass getRepositoryContentClass( Class<? extends Repository> role, String hint )
     {
         if ( !getRepositoryRoles().contains( role ) )
         {
@@ -239,11 +271,11 @@ public class DefaultRepositoryTypeRegistry
         }
         else
         {
-            if ( container.hasComponent( Repository.class, role, hint ) )
+            if ( container.hasComponent( role, hint ) )
             {
                 try
                 {
-                    Repository repository = container.lookup( Repository.class, role, hint );
+                    Repository repository = container.lookup( role, hint );
 
                     result = repository.getRepositoryContentClass();
 

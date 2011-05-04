@@ -28,6 +28,7 @@ import org.sonatype.guice.plexus.binders.PlexusTypeBinder;
 import org.sonatype.guice.plexus.scanners.PlexusTypeListener;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 import com.google.inject.Binder;
 
@@ -73,12 +74,13 @@ public final class NexusTypeBinder
         repositoryType = type;
     }
 
+    @SuppressWarnings( "unchecked" )
     public void hear( final Component component, final DeferredClass<?> clazz, final Object source )
     {
         plexusTypeBinder.hear( component, clazz, source );
         if ( null != repositoryType )
         {
-            descriptors.add( new RepositoryTypeDescriptor( component.role().getName(), component.hint(),
+            descriptors.add( new RepositoryTypeDescriptor( (Class<? extends Repository>) component.role(), component.hint(),
                                                            repositoryType.pathPrefix(),
                                                            repositoryType.repositoryMaxInstanceCount() ) );
 

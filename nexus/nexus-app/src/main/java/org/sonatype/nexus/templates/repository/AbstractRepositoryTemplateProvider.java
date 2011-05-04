@@ -26,6 +26,7 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteProviderHintFactory;
@@ -45,7 +46,7 @@ public abstract class AbstractRepositoryTemplateProvider
 
     @Requirement
     private Nexus nexus;
-    
+
     @Requirement
     private RemoteProviderHintFactory remoteProviderHintFactory;
 
@@ -54,7 +55,7 @@ public abstract class AbstractRepositoryTemplateProvider
     {
         return this.nexus.getNexusConfiguration().createRepository( repository );
     }
-    
+
     public RemoteProviderHintFactory getRemoteProviderHintFactory()
     {
         return remoteProviderHintFactory;
@@ -77,10 +78,12 @@ public abstract class AbstractRepositoryTemplateProvider
 
     public ManuallyConfiguredRepositoryTemplate createManuallyTemplate( CRepositoryCoreConfiguration configuration )
     {
-        ContentClass contentClass =
-            repositoryTypeRegistry.getRepositoryContentClass(
+        RepositoryTypeDescriptor rtd =
+            repositoryTypeRegistry.getRepositoryTypeDescriptor(
                 configuration.getConfiguration( false ).getProviderRole(),
                 configuration.getConfiguration( false ).getProviderHint() );
+
+        ContentClass contentClass = repositoryTypeRegistry.getRepositoryContentClass( rtd.getRole(), rtd.getHint() );
 
         return new ManuallyConfiguredRepositoryTemplate( this, "manual", "Manually created template", contentClass,
             null, configuration );

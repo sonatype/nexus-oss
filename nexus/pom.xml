@@ -975,6 +975,10 @@
             <groupId>xml-apis</groupId>
             <artifactId>xml-apis</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>

@@ -112,12 +112,6 @@
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>plexus-swizzle</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>junit</artifactId>
-          <groupId>junit</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sonatype.spice</groupId>

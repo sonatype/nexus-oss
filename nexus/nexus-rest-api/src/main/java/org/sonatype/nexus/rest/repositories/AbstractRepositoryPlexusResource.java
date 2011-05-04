@@ -152,21 +152,6 @@ public abstract class AbstractRepositoryPlexusResource
         return rs == null ? null : rs.toString();
     }
 
-    // CLEAN
-    protected String _getRepoFormat( String role, String hint )
-    {
-        ContentClass cc = repositoryTypeRegistry.getRepositoryContentClass( role, hint );
-
-        if ( cc != null )
-        {
-            return cc.getId();
-        }
-        else
-        {
-            return null;
-        }
-    }
-
     // clean
     public String getRestRepoType( Repository repository )
     {

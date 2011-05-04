@@ -21,6 +21,8 @@ package org.sonatype.nexus.proxy.registry;
 import java.util.Map;
 import java.util.Set;
 
+import org.sonatype.nexus.proxy.repository.Repository;
+
 /**
  * This is the registry of known repository types. Just like RepositoryRegistry holds the "active" instances of
  * Repositories, this registry does the discovery of them. Hint: we are using String for role intentionally, to be able
@@ -56,7 +58,7 @@ public interface RepositoryTypeRegistry
      * 
      * @return a set of repository type descriptors or empty set.
      */
-    Set<String> getRepositoryRoles();
+    Set<Class<? extends Repository>> getRepositoryRoles();
 
     /**
      * Returns the set of hints for the given repository role.
@@ -64,7 +66,7 @@ public interface RepositoryTypeRegistry
      * @param role
      * @return a set of repository hints or empty set.
      */
-    Set<String> getExistingRepositoryHints( String role );
+    Set<String> getExistingRepositoryHints( Class<? extends Repository> role );
 
     /**
      * Returns the type descriptor for the given role+hint combination.
@@ -73,6 +75,9 @@ public interface RepositoryTypeRegistry
      * @param hint
      * @return the type descriptor or null if there is none for this combination of role and hint.
      */
+    RepositoryTypeDescriptor getRepositoryTypeDescriptor( Class<? extends Repository> role, String hint );
+
+    @Deprecated
     RepositoryTypeDescriptor getRepositoryTypeDescriptor( String role, String hint );
 
     /**
@@ -97,5 +102,5 @@ public interface RepositoryTypeRegistry
      * @param hint
      * @return the content class instance or null if repository does not exists.
      */
-    ContentClass getRepositoryContentClass( String role, String hint );
+    ContentClass getRepositoryContentClass( Class<? extends Repository> role, String hint );
 }

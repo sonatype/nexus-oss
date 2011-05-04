@@ -56,7 +56,8 @@ public interface Repository
 {
     /**
      * Returns the repository's "provider" role. These are getters only, and application is NOT able to change these
-     * values runtime!
+     * values runtime! Note: this is a FQN of a class, that is used to "register" the component with container, and the
+     * class might reside in core but also in a plugin (separate child classloader!).
      * 
      * @return
      */
@@ -315,7 +316,7 @@ public interface Repository
      * @param val the val
      */
     void setLocalStatus( LocalStatus val );
-    
+
     /**
      * Returns repository specific local storage context.
      * 

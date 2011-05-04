@@ -635,17 +635,27 @@ public class DefaultNexusConfiguration
 
         if ( null == rtd )
         {
-            rtd =
-                new RepositoryTypeDescriptor( repositoryModel.getProviderRole(), repositoryModel.getProviderHint(),
-                    "repositories", RepositoryType.UNLIMITED_INSTANCES );
+            // rtd =
+            // new RepositoryTypeDescriptor( repositoryModel.getProviderRole(), repositoryModel.getProviderHint(),
+            // "repositories", RepositoryType.UNLIMITED_INSTANCES );
+            //
+            // getLogger().warn(
+            // "Your Nexus instance contains a plugin, that contributes repository type " + rtd.toString()
+            // + " to Nexus, "
+            // + "but fails to properly register it (and it is not using Nexus Plugin API annotations either). "
+            // + "Please contact plugin developers to update their plugin! Registering the type on-the-fly." );
+            //
+            // repositoryTypeRegistry.registerRepositoryTypeDescriptors( rtd );
 
-            getLogger().warn(
-                "Your Nexus instance contains a plugin, that contributes repository type " + rtd.toString()
-                    + " to Nexus, "
-                    + "but fails to properly register it (and it is not using Nexus Plugin API annotations either). "
-                    + "Please contact plugin developers to update their plugin! Registering the type on-the-fly." );
+            String msg =
+                String.format(
+                    "Repository \"%s\" (repoId=%s) cannot be created. It's repository type %s:%s is unknown to Nexus Core. It is probably contributed by an old Nexus plugin. Please contact plugin developers to upgrade the plugin, to register the new repository type properly!",
+                    repositoryModel.getName(), repositoryModel.getId(), repositoryModel.getProviderRole(),
+                    repositoryModel.getProviderHint() );
 
-            repositoryTypeRegistry.registerRepositoryTypeDescriptors( rtd );
+            getLogger().error( msg );
+
+            throw new ConfigurationException( msg );
         }
 
         if ( rtd.getRepositoryMaxInstanceCount() != RepositoryType.UNLIMITED_INSTANCES )

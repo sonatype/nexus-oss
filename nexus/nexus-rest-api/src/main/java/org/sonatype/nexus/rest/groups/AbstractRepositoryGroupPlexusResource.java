@@ -205,7 +205,7 @@ public abstract class AbstractRepositoryGroupPlexusResource
         try
         {
             ContentClass contentClass =
-                repositoryTypeRegistry.getRepositoryContentClass( GroupRepository.class.getName(), model.getProvider() );
+                repositoryTypeRegistry.getRepositoryContentClass( GroupRepository.class, model.getProvider() );
 
             RepositoryTemplate template =
                 (RepositoryTemplate) getNexus().getRepositoryTemplates().getTemplates( GroupRepository.class,

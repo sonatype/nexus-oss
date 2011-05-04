@@ -118,7 +118,7 @@ public final class PluginDescriptor
 
             for ( final RepositoryTypeDescriptor type : repositoryTypes )
             {
-                buf.append( "         * Repository type \"" ).append( type.getRole() );
+                buf.append( "         * Repository type \"" ).append( type.getRole().getName() );
                 buf.append( "\", to be published at path \"" ).append( type.getPrefix() ).append( "\"" ).append( LS );
             }
         }

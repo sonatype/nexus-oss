@@ -186,7 +186,7 @@ public abstract class AbstractNexusPlexusResource
 
             for ( RepositoryTypeDescriptor desc : repoTypeRegistry.getRegisteredRepositoryTypeDescriptors() )
             {
-                if ( NexusCompat.getRepositoryProviderRole( repo ).equals( desc.getRole() ) )
+                if ( NexusCompat.getRepositoryProviderRole( repo ).equals( desc.getRole().getName() ) )
                 {
                     return createReference( getContextRoot( request ), "content/" + desc.getPrefix() + "/" + repoId ).getTargetRef();
                 }

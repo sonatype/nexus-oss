@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.plugins.RepositoryType;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * A simple descriptor for all roles implementing a Nexus Repository.
@@ -30,7 +31,7 @@ import org.sonatype.nexus.plugins.RepositoryType;
  */
 public class RepositoryTypeDescriptor
 {
-    private final String role;
+    private final Class<? extends Repository> role;
 
     private final String hint;
 
@@ -40,12 +41,13 @@ public class RepositoryTypeDescriptor
 
     private AtomicInteger instanceCount = new AtomicInteger( 0 );
 
-    public RepositoryTypeDescriptor( String role, String hint, String prefix )
+    public RepositoryTypeDescriptor( Class<? extends Repository> role, String hint, String prefix )
     {
         this( role, hint, prefix, RepositoryType.UNLIMITED_INSTANCES );
     }
 
-    public RepositoryTypeDescriptor( String role, String hint, String prefix, int repositoryMaxInstanceCount )
+    public RepositoryTypeDescriptor( Class<? extends Repository> role, String hint, String prefix,
+                                     int repositoryMaxInstanceCount )
     {
         this.role = role;
 
@@ -56,7 +58,7 @@ public class RepositoryTypeDescriptor
         this.repositoryMaxInstanceCount = repositoryMaxInstanceCount;
     }
 
-    public String getRole()
+    public Class<? extends Repository> getRole()
     {
         return role;
     }
@@ -105,7 +107,7 @@ public class RepositoryTypeDescriptor
 
         RepositoryTypeDescriptor other = (RepositoryTypeDescriptor) o;
 
-        return StringUtils.equals( getRole(), other.getRole() ) && StringUtils.equals( getHint(), other.getHint() )
+        return getRole().equals( other.getRole() ) && StringUtils.equals( getHint(), other.getHint() )
             && StringUtils.equals( getPrefix(), other.getPrefix() );
     }
 
@@ -124,6 +126,6 @@ public class RepositoryTypeDescriptor
 
     public String toString()
     {
-        return "RepositoryType=(" + getRole() + ":" + getHint() + ")";
+        return "RepositoryType=(" + getRole().getName() + ":" + getHint() + ")";
     }
 }
