@@ -25,6 +25,7 @@
     <plexus-cipher.version>1.6</plexus-cipher.version>
     <plugin-host-api.version>1.0.0</plugin-host-api.version>
     <sisu-inject-bean.version>2.2.0</sisu-inject-bean.version>
+    <slf4j.version>1.6.1</slf4j.version>
   </properties>
 
 
@@ -118,12 +119,12 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
-        <version>1.6.1</version>
+        <version>${slf4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.6.1</version>
+        <version>${slf4j.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
@@ -149,7 +150,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>1.6.1</version>
+        <version>${slf4j.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
