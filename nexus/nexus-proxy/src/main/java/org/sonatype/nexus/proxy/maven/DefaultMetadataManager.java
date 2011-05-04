@@ -19,6 +19,8 @@
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -104,8 +106,7 @@ public class DefaultMetadataManager
         {
             gav =
                 new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), version, gavRequest.getClassifier(),
-                    gavRequest.getExtension(), null, null, null, false, null,
-                    false, null );
+                    gavRequest.getExtension(), null, null, null, false, null, false, null );
 
             // if it is not "timestamped" version, try to get it
             if ( gav.isSnapshot() && gav.getVersion().equals( gav.getBaseVersion() ) )
@@ -166,7 +167,6 @@ public class DefaultMetadataManager
         }
     }
 
-    @SuppressWarnings( "unchecked" )
     protected String resolveRelease( ArtifactStoreRequest gavRequest, Gav gav )
         throws IOException
     {
@@ -262,6 +262,10 @@ public class DefaultMetadataManager
 
         String latest = null;
 
+        Long buildTs = null;
+
+        Integer buildNo = null;
+
         Snapshot current = gavMd.getVersioning().getSnapshot();
 
         if ( current != null )
@@ -269,6 +273,10 @@ public class DefaultMetadataManager
             latest = gav.getBaseVersion();
 
             latest = latest.replace( SNAPSHOT_VERSION, current.getTimestamp() + "-" + current.getBuildNumber() );
+
+            buildTs = getTimestampForMdTsString( current.getTimestamp() );
+
+            buildNo = current.getBuildNumber();
         }
 
         if ( !StringUtils.isEmpty( latest ) && VersionUtils.isSnapshot( latest ) )
@@ -280,14 +288,27 @@ public class DefaultMetadataManager
 
             Gav result =
                 new Gav( gav.getGroupId(), gav.getArtifactId(), latest, gav.getClassifier(), gav.getExtension(),
-                    gav.getSnapshotBuildNumber(), gav.getSnapshotTimeStamp(), gav.getName(),
-                    gav.isHash(), gav.getHashType(), gav.isSignature(), gav.getSignatureType() );
+                    buildNo, buildTs, gav.getName(), gav.isHash(), gav.getHashType(), gav.isSignature(),
+                    gav.getSignatureType() );
 
             return result;
         }
         else
         {
             return gav;
+        }
+    }
+
+    public static Long getTimestampForMdTsString( final String tsString )
+    {
+        try
+        {
+            SimpleDateFormat df = new SimpleDateFormat( "yyyyMMdd.HHmmss" );
+            return Long.valueOf( df.parse( tsString ).getTime() );
+        }
+        catch ( ParseException e )
+        {
+            return null;
         }
     }
 }
