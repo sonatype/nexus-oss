@@ -56,23 +56,6 @@ public abstract class AbstractLoginPlexusResource
 
         AuthenticationLoginResourceResponse result = new AuthenticationLoginResourceResponse();
 
-        String username = resource.getClientPermissions().getLoggedInUsername();
-
-        if ( StringUtils.isNotEmpty( username ) )
-        {
-            // look up the realm of the user
-            try
-            {
-                User user = this.getSecuritySystem().getUser( username );
-                String source = ( user != null ) ? user.getSource() : null;
-                resource.getClientPermissions().setLoggedInUserSource( source );
-            }
-            catch ( UserNotFoundException e )
-            {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
-            }
-        }
-
         result.setData( resource );
 
         return result;
