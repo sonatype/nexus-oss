@@ -18,9 +18,9 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * A Shadow Repository is a special repository type that usually points to a master repository and transforms it in some
@@ -28,7 +28,7 @@ import org.sonatype.plugin.ExtensionPoint;
  * 
  * @author cstamas
  */
-@ExtensionPoint
+@RepositoryType( pathPrefix = "shadows" )
 public interface ShadowRepository
     extends Repository
 {
@@ -53,8 +53,7 @@ public interface ShadowRepository
      * @throws IncompatibleMasterRepositoryException
      */
     void setMasterRepositoryId( String masterRepositoryId )
-        throws NoSuchRepositoryException,
-            IncompatibleMasterRepositoryException;
+        throws NoSuchRepositoryException, IncompatibleMasterRepositoryException;
 
     /**
      * Gets sync at startup.

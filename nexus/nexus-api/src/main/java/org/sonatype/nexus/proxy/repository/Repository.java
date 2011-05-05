@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.sonatype.nexus.configuration.Configurable;
+import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStore;
@@ -42,7 +43,6 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
-import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * Repository interface used by Proximity. It is an extension of ResourceStore iface, allowing to make direct
@@ -50,7 +50,7 @@ import org.sonatype.plugin.ExtensionPoint;
  * 
  * @author cstamas
  */
-@ExtensionPoint
+@RepositoryType( pathPrefix = "repositories" )
 public interface Repository
     extends ResourceStore, Configurable
 {
