@@ -23,9 +23,7 @@ import java.util.Collection;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
-import org.sonatype.plugin.Managed;
 
-@Managed
 public interface CapabilityConfiguration
 {
 

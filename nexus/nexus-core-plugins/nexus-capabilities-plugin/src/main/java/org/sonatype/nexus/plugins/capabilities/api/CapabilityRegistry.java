@@ -18,9 +18,6 @@
  */
 package org.sonatype.nexus.plugins.capabilities.api;
 
-import org.sonatype.plugin.Managed;
-
-@Managed
 public interface CapabilityRegistry
 {
 

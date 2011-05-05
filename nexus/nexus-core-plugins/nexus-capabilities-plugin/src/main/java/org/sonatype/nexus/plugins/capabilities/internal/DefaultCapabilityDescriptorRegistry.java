@@ -20,6 +20,7 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 
 import java.util.List;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -27,6 +28,7 @@ import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescript
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 
 @Singleton
+@Named
 public class DefaultCapabilityDescriptorRegistry
     implements CapabilityDescriptorRegistry
 {

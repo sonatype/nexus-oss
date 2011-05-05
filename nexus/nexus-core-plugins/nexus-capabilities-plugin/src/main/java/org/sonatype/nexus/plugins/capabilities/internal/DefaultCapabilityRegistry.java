@@ -21,6 +21,7 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -29,6 +30,7 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 
 @Singleton
+@Named
 public class DefaultCapabilityRegistry
     implements CapabilityRegistry
 {

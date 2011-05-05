@@ -18,9 +18,6 @@
  */
 package org.sonatype.nexus.plugins.capabilities.api.descriptor;
 
-import org.sonatype.plugin.Managed;
-
-@Managed
 public interface CapabilityDescriptorRegistry
 {
 
