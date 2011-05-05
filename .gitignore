@@ -10,3 +10,4 @@
 .classpath
 target/
 security-realms/security-xml-realm/test-output
+security-realms/security-kenai-realm/test-output

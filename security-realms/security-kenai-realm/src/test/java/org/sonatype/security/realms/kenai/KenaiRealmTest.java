@@ -22,8 +22,6 @@ import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
-import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.mortbay.jetty.servlet.DefaultServlet;
@@ -32,7 +30,6 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.jettytestsuite.WebappContext;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
-import org.sonatype.security.usermanagement.UserManager;
 
 import com.sonatype.security.realms.kenai.config.model.Configuration;
 
