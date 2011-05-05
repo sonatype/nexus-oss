@@ -54,7 +54,8 @@
     <runtime-platform.version>1</runtime-platform.version>
     <nexus-site-base-url>https://repository.sonatype.org/content/sites/maven-sites/nexus-oss</nexus-site-base-url>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
+    <!-- failsafe plugin picks this up among others -->
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <jetty.version>6.1.19</jetty.version>
     <nexus.version>${project.version}</nexus.version>
     <debug-js>false</debug-js>
