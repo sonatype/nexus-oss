@@ -77,11 +77,24 @@ public abstract class AbstractRepositoryTemplateProvider
     }
 
     public ManuallyConfiguredRepositoryTemplate createManuallyTemplate( CRepositoryCoreConfiguration configuration )
+        throws ConfigurationException
     {
+        final CRepository repoConfig = configuration.getConfiguration( false );
+
         RepositoryTypeDescriptor rtd =
-            repositoryTypeRegistry.getRepositoryTypeDescriptor(
-                configuration.getConfiguration( false ).getProviderRole(),
-                configuration.getConfiguration( false ).getProviderHint() );
+            repositoryTypeRegistry.getRepositoryTypeDescriptor( repoConfig.getProviderRole(),
+                repoConfig.getProviderHint() );
+
+        if ( rtd == null )
+        {
+            final String msg =
+                String.format(
+                    "Repository being created \"%s\" (repoId=%s) has corresponding type that is not registered in Core: Repository type %s:%s is unknown to Nexus Core. It is probably contributed by an old Nexus plugin. Please contact plugin developers to upgrade the plugin, and register the new repository type(s) properly!",
+                    repoConfig.getName(), repoConfig.getId(), repoConfig.getProviderRole(),
+                    repoConfig.getProviderHint() );
+
+            throw new ConfigurationException( msg );
+        }
 
         ContentClass contentClass = repositoryTypeRegistry.getRepositoryContentClass( rtd.getRole(), rtd.getHint() );
 
