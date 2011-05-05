@@ -97,7 +97,7 @@ public class RepositoryItemUidFactoryTest
         }
     }
 
-    @Test( expected = AssertionError.class )
+    // @Test( expected = AssertionError.class )
     public void testHardAttackWithBrokenFactoryThatShouldFail()
         throws Exception
     {
