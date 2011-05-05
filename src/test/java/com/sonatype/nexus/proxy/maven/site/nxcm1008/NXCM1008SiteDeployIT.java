@@ -10,7 +10,8 @@ package com.sonatype.nexus.proxy.maven.site.nxcm1008;
 import java.io.File;
 import java.net.URL;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;

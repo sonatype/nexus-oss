@@ -9,7 +9,8 @@ package com.sonatype.nexus.proxy.maven.site;
 
 import java.io.FileReader;
 
-import junit.framework.Assert;
+import org.junit.Assert;
+import org.junit.Test;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Test;
