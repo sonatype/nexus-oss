@@ -490,7 +490,7 @@ public class NexusHttpAuthenticationFilter
             // the subject should never be null, but the session might be
             if( subject != null && subject.getSession( false ) != null )
             {
-                subject.logout();
+                subject.getSession(false).stop();
             }
         }
     }
