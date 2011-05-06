@@ -10,7 +10,6 @@ package com.sonatype.nexus.proxy.maven.site.nxcm1008;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Test;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
