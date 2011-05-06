@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -45,7 +45,7 @@ public abstract class AbstractRepositoryTemplateProvider
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
     @Requirement
-    private Nexus nexus;
+    private NexusConfiguration nexusConfiguration;
 
     @Requirement
     private RemoteProviderHintFactory remoteProviderHintFactory;
@@ -53,7 +53,7 @@ public abstract class AbstractRepositoryTemplateProvider
     protected Repository createRepository( CRepository repository )
         throws ConfigurationException, IOException
     {
-        return this.nexus.getNexusConfiguration().createRepository( repository );
+        return nexusConfiguration.createRepository( repository );
     }
 
     public RemoteProviderHintFactory getRemoteProviderHintFactory()
