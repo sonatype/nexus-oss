@@ -36,7 +36,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 @Component( role = WebSiteRepository.class, hint = "maven-site", instantiationStrategy = "per-lookup", description = "Maven Site Repository" )
 public class DefaultMavenSiteRepository
     extends AbstractWebSiteRepository
-    implements MavenSiteRepository
+    implements MavenSiteRepository, WebSiteRepository
 {
     @Requirement( hint = "maven-site" )
     private ContentClass contentClass;
@@ -84,19 +84,19 @@ public class DefaultMavenSiteRepository
     {
         return repositoryConfigurator;
     }
-    
+
     @Override
     public void storeItem( boolean fromTask, StorageItem item )
-    throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
-    {   
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
+    {
         // strip the '.' from the path
         if ( AbstractStorageItem.class.isAssignableFrom( item.getClass() ) )
         {
-            String normalizedPath =  FileUtils.normalize( item.getPath() );
+            String normalizedPath = FileUtils.normalize( item.getPath() );
             AbstractStorageItem fileItem = (AbstractStorageItem) item;
             fileItem.setPath( normalizedPath );
         }
-        
+
         super.storeItem( fromTask, item );
-    }    
+    }
 }
