@@ -38,7 +38,7 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk16</artifactId>
-      <version>136</version>
+      <version>1.45</version>
     </dependency>
 
     <dependency>
@@ -116,11 +116,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit-dep</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
     </dependency>
 
     <dependency>
