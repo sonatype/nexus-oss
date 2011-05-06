@@ -30,6 +30,7 @@ import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.AbstractPluginTestCase;
+import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
@@ -51,6 +52,9 @@ public class RemoteBrowserResourceAuthTest
         super.setUp();
 
         this.server = this.lookup( ServletServer.class );
+
+        // ping nexus to wake up
+        lookup( Nexus.class );
     }
 
     @Override
@@ -114,26 +118,27 @@ public class RemoteBrowserResourceAuthTest
         m2Repo.commitChanges();
 
         Reference rootRef = new Reference( "http://localhost:8081/nexus/service/local/repositories/" + repoId + "" );
-        Reference resourceRef = new Reference( rootRef, "http://localhost:8081/nexus/service/local/repositories/" + repoId + "/" );
+        Reference resourceRef =
+            new Reference( rootRef, "http://localhost:8081/nexus/service/local/repositories/" + repoId + "/" );
 
         // now call the REST resource
         Request request = new Request();
-        request.setRootRef( rootRef );
+        request.setRootRef( new Reference( "http://localhost:8081/nexus/" ) );
         request.setOriginalRef( rootRef );
         request.setResourceRef( resourceRef );
         request.getAttributes().put( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY, repoId );
         Form form = new Form();
         form.add( "Accept", "application/json" );
-        form.add( "Referer", "http://localhost:8081/nexus/index.html#view-repositories;"+repoId );
+        form.add( "Referer", "http://localhost:8081/nexus/index.html#view-repositories;" + repoId );
         form.add( "Host", " localhost:8081" );
-        request.getAttributes().put( "org.restlet.http.headers", form);
+        request.getAttributes().put( "org.restlet.http.headers", form );
 
-         PlexusResource plexusResource = this.lookup( PlexusResource.class, RemoteBrowserResource.class.getName() );
-         String jsonString = plexusResource.get( null, request, null, null ).toString();
+        PlexusResource plexusResource = this.lookup( PlexusResource.class, RemoteBrowserResource.class.getName() );
+        String jsonString = plexusResource.get( null, request, null, null ).toString();
 
-         // TODO: do some better validation then this
-         Assert.assertTrue( jsonString.contains( "/auth-test/classes/" ) );
-         Assert.assertTrue( jsonString.contains( "/auth-test/test-classes/" ) );
+        // TODO: do some better validation then this
+        Assert.assertTrue( jsonString.contains( "/auth-test/classes/" ) );
+        Assert.assertTrue( jsonString.contains( "/auth-test/test-classes/" ) );
 
     }
 
