@@ -120,9 +120,6 @@
 
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <configuration>
-          <junitArtifactName>none:none</junitArtifactName>
-        </configuration>
       </plugin>
 
       <plugin>
