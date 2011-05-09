@@ -75,7 +75,15 @@ public class DefaultRemoteProviderHintFactory
             return getHttpRoleHint( hint );
         }
 
-        throw new IllegalArgumentException( "No known remote repository storage provider for remote URL " + remoteUrl );
+        if ( StringUtils.isBlank( hint ) )
+        {
+            throw new IllegalArgumentException( "RemoteRepositoryStorage hint cannot be null!" );
+        }
+
+        logger.info( "Returning supplied \"{}\" hint for remote URL {}.",
+            new Object[] { remoteUrl, hint } );
+
+        return hint;
     }
 
     public String getDefaultHttpRoleHint()
