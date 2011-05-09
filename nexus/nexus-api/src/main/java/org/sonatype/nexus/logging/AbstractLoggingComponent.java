@@ -22,6 +22,7 @@ import javax.inject.Inject;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Coming from Plexus, do not use this! Use {@code @Inject org.slf4j.Logger} instead!
@@ -37,6 +38,12 @@ public abstract class AbstractLoggingComponent
 
     protected Logger getLogger()
     {
+        if ( logger == null )
+        {
+            // fallback to this, in case of UTs?
+            logger = LoggerFactory.getLogger( this.getClass() );
+        }
+        
         return logger;
     }
 }
