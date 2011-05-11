@@ -21,6 +21,7 @@ package org.sonatype.nexus.proxy;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
+import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeManager;
 import org.sonatype.scheduling.Scheduler;
 import org.sonatype.security.SecuritySystem;
 
@@ -46,6 +47,9 @@ public abstract class AbstractNexusTestEnvironment
         cacheManager = lookup( CacheManager.class );
 
         repositoryItemUidFactory = lookup( RepositoryItemUidFactory.class );
+
+        // rebuild cache
+        lookup( RepositoryItemUidAttributeManager.class ).reset();
 
         mimeUtil = lookup( MimeUtil.class );
 

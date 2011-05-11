@@ -56,7 +56,7 @@ public class DefaultRepositoryItemUidAttributeManager
         return (T) attributes.get( attributeKey );
     }
 
-    public void reset()
+    public synchronized void reset()
     {
         attributes.clear();
 
