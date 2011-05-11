@@ -18,10 +18,13 @@
  */
 package org.sonatype.nexus.proxy.item.uid;
 
+import java.util.ArrayList;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.slf4j.Logger;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
 /**
@@ -34,21 +37,47 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 public class DefaultRepositoryItemUidAttributeManager
     implements RepositoryItemUidAttributeManager
 {
+    @Requirement
+    private Logger logger;
+
     @Requirement( role = RepositoryItemUidAttributeSource.class )
     private Map<String, RepositoryItemUidAttributeSource> attributeSources;
 
+    private final Map<Class<?>, Attribute<?>> attributes;
+
+    public DefaultRepositoryItemUidAttributeManager()
+    {
+        this.attributes = new ConcurrentHashMap<Class<?>, Attribute<?>>();
+    }
+
+    @SuppressWarnings( "unchecked" )
     public <T extends Attribute<?>> T getAttribute( final Class<T> attributeKey, final RepositoryItemUid subject )
     {
-        for ( RepositoryItemUidAttributeSource attributeSource : attributeSources.values() )
-        {
-            T attribute = attributeSource.getAttribute( attributeKey, subject );
+        return (T) attributes.get( attributeKey );
+    }
 
-            if ( attribute != null )
+    public void reset()
+    {
+        attributes.clear();
+
+        final ArrayList<String> sources = new ArrayList<String>( attributeSources.size() );
+
+        for ( Map.Entry<String, RepositoryItemUidAttributeSource> attributeSourceEntry : attributeSources.entrySet() )
+        {
+            sources.add( attributeSourceEntry.getKey() );
+
+            Map<Class<?>, Attribute<?>> attrs = attributeSourceEntry.getValue().getAttributes();
+
+            if ( attrs != null )
             {
-                return attribute;
+                attributes.putAll( attrs );
             }
         }
 
-        return null;
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( "Registered {} UID Attributes coming from following sources: {}",
+                new Object[] { attributes.size(), sources.toString() } );
+        }
     }
 }

@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.proxy.item.uid;
 
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import java.util.Map;
+
 import org.sonatype.plugin.ExtensionPoint;
 
 import com.google.inject.Singleton;
@@ -33,9 +34,9 @@ import com.google.inject.Singleton;
 public interface RepositoryItemUidAttributeSource
 {
     /**
-     * This method should return the attribute corresponding to attributeKey or return null if key is not known for it.
+     * Returns the map of attributes coming from this source.
      * 
      * @return
      */
-    <T extends Attribute<?>> T getAttribute( Class<T> attributeKey, RepositoryItemUid subject );
+    Map<Class<?>, Attribute<?>> getAttributes();
 }

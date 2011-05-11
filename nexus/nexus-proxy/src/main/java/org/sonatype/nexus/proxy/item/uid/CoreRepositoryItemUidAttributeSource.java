@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
 /**
  * The source for attributes implemented in Nexus Core.
@@ -50,9 +49,8 @@ public class CoreRepositoryItemUidAttributeSource
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public <T extends Attribute<?>> T getAttribute( Class<T> attributeKey, RepositoryItemUid subject )
+    public Map<Class<?>, Attribute<?>> getAttributes()
     {
-        return (T) coreAttributes.get( attributeKey );
+        return coreAttributes;
     }
 }

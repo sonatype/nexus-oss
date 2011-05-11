@@ -27,5 +27,18 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
  */
 public interface RepositoryItemUidAttributeManager
 {
+    /**
+     * Returns the attribute belonging to passed in key or {@code null} if no such attribute.
+     * 
+     * @param <T>
+     * @param attributeKey
+     * @param subject
+     * @return
+     */
     <T extends Attribute<?>> T getAttribute( Class<T> attributeKey, RepositoryItemUid subject );
+
+    /**
+     * Causes to recollect all registered attributes.
+     */
+    void reset();
 }
