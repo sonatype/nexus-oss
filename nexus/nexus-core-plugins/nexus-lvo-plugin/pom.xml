@@ -16,12 +16,6 @@
   <name>Nexus : Core Plugins : LVO Plugin</name>
   <description>Nexus LVO Plugin (Extension).</description>
 
-  <scm>
-    <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</url>
-    <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</developerConnection>
-  </scm>
-
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

@@ -98,10 +98,4 @@
     </dependency>
   </dependencies>
 
-  <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus-runtime-platform</connection>
-    <url>http://svn.sonatype.org/nexus/trunk/nexus-runtime-platform</url>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-runtime-platform</developerConnection>
-  </scm>
-
 </project>
