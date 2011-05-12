@@ -1,20 +1,19 @@
 /*
- * Copyright (c) 2008-2011 Sonatype, Inc.
- * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- *
- * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
- * Public License Version 3 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
- * for more details.
- *
- * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
- * http://www.gnu.org/licenses.
- *
- * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
- * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
- * All other trademarks are the property of their respective owners.
+ * Copyright (c) 2008-2011 Sonatype, Inc. All rights reserved. Includes the
+ * third-party code listed at
+ * http://www.sonatype.com/products/nexus/attributions. This program is free
+ * software: you can redistribute it and/or modify it only under the terms of
+ * the GNU Affero General Public License Version 3 as published by the Free
+ * Software Foundation. This program is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+ * General Public License Version 3 for more details. You should have received a
+ * copy of the GNU Affero General Public License Version 3 along with this
+ * program. If not, see http://www.gnu.org/licenses. Sonatype Nexus (TM) Open
+ * Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus
+ * are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache
+ * Foundation. M2Eclipse is a trademark of the Eclipse Foundation. All other
+ * trademarks are the property of their respective owners.
  */
 /*
  * Service Schedule Edit/Create panel layout and controller
@@ -53,12 +52,31 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
           scope : this,
           handler : this.deleteHandler
         }),
+    stopAction : new Ext.Action({
+          text : 'Stop',
+          scope : this,
+          handler : this.stopHandler
+        }),
     run : new Ext.Action({
           text : 'Run',
           scope : this,
           handler : this.runHandler
         })
   };
+
+  this.stopButton = new Ext.Button({
+    id : 'schedule-stop-btn',
+    text : 'Stop',
+    icon : Sonatype.config.resourcePath + '/images/icons/stop.png',
+    cls : 'x-btn-text-icon',
+    scope : this,
+    handler : this.stopHandler,
+    disabled : true
+      /*
+       * FIXME need to check with tamas what is the correct permission ,disabled :
+       * !this.sp.checkPermission('nexus:tasksstop', this.sp.PUT)
+       */
+    });
 
   // Methods that will take the incoming json data and map over to the ui
   // controls
@@ -240,7 +258,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
                     var newRec = new this.repositoryOrGroupRecordConstructor({
                           id : item.data.id,
                           name : item.data.name + ' (Repo)'
-                        },  item.id);
+                        }, item.id);
                     this.repoOrGroupDataStore.add([newRec]);
                   }, this);
               var allRec = new this.repositoryRecordConstructor({
@@ -273,9 +291,9 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
             fn : function() {
               this.repositoryGroupDataStore.each(function(item, i, len) {
                     var newRec = new this.repositoryOrGroupRecordConstructor({
-                          id :  item.data.id,
+                          id : item.data.id,
                           name : item.data.name + ' (Group)'
-                        },  item.id);
+                        }, item.id);
                     this.repoOrGroupDataStore.add([newRec]);
                   }, this);
             },
@@ -871,7 +889,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
               scope : this,
               handler : this.deleteHandler,
               disabled : !this.sp.checkPermission('nexus:tasks', this.sp.DELETE)
-            }],
+            }, this.stopButton],
 
         // grid view options
         ds : this.schedulesDataStore,
@@ -993,7 +1011,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                 cls : 'x-form-invalid-msg'
               });
           tree.errorEl.setWidth(elp.getWidth(true)); // note removed -20 like
-                                                      // on form fields
+          // on form fields
         }
         tree.invalid = true;
         tree.errorEl.update(tree.invalidText);
@@ -1125,7 +1143,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               name : 'New Scheduled Task',
               resourceURI : 'new'
             }, id); // use "new_schedule_" id instead of resourceURI like the
-                    // reader does
+        // reader does
         this.schedulesDataStore.insert(0, [newRec]);
         this.schedulesGridPanel.getSelectionModel().selectRow(0);
       },
@@ -1167,7 +1185,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             // select as a param
             Sonatype.MessageBox.getDialog().on('show', function() {
                   this.focusEl = this.buttons[2]; // ack! we're offset dependent
-                                                  // here
+                  // here
                   this.focus();
                 }, Sonatype.MessageBox.getDialog(), {
                   single : true
@@ -1244,13 +1262,44 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         }
       },
 
+      stopHandler : function() {
+        if (this.ctxRecord || this.schedulesGridPanel.getSelectionModel().hasSelection())
+        {
+          var rec = this.ctxRecord ? this.ctxRecord : this.schedulesGridPanel.getSelectionModel().getSelected();
+
+          Ext.Ajax.request({
+                callback : this.stopCallback,
+                cbPassThru : {
+                  resourceId : rec.id
+                },
+                scope : this,
+                method : 'DELETE',
+                url : rec.data.resourceURI,
+                params : {
+                  cancelOnly : true
+                }
+              });
+        }
+      },
+
+      stopCallback : function(options, isSuccess, response) {
+        if (isSuccess)
+        {
+          this.reloadAll();
+        }
+        else
+        {
+          Sonatype.utils.connectionError(response, 'The server did not delete the task.', null, null, true);
+        }
+      },
+
       runHandler : function() {
         if (this.ctxRecord && this.ctxRecord.data.resourceURI != 'new')
         {
           var rec = this.ctxRecord;
           Sonatype.MessageBox.getDialog().on('show', function() {
                 this.focusEl = this.buttons[2]; // ack! we're offset dependent
-                                                // here
+                // here
                 this.focus();
               }, Sonatype.MessageBox.getDialog(), {
                 single : true
@@ -1341,8 +1390,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             var newRec = new this.scheduleRecordConstructor(dataObj, action.options.fpanel.id);
 
             this.schedulesDataStore.remove(this.schedulesDataStore.getById(action.options.fpanel.id)); // remove
-                                                                                                        // old
-                                                                                                        // one
+            // old
+            // one
             this.schedulesDataStore.addSorted(newRec);
             this.schedulesGridPanel.getSelectionModel().selectRecords([newRec], false);
 
@@ -1449,8 +1498,17 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       },
 
       rowSelect : function(selectionModel, index, rec) {
+        if (!(rec.data.status == 'SUBMITTED' || rec.data.status == 'WAITING' || rec.data.status == 'BROKEN'))
+        {
+          this.stopButton.enable();
+        }
+        else
+        {
+          this.stopButton.disable();
+        }
+
         var id = rec.id; // note: rec.id is unique for new resources and equal
-                          // to resourceURI for existing ones
+        // to resourceURI for existing ones
         var formPanel = this.formCards.findById(id);
         var schedulePanel = null;
 
@@ -1579,6 +1637,14 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ) && (this.ctxRecord.data.status == 'SUBMITTED' || this.ctxRecord.data.status == 'WAITING' || this.ctxRecord.data.status == 'BROKEN'))
         {
           menu.add(this.actions.run);
+        }
+
+        if (
+        // FIXME need to check with tamas what is the correct permission,
+        // this.sp.checkPermission('nexus:tasksstop', this.sp.PUT) &&
+        !(this.ctxRecord.data.status == 'SUBMITTED' || this.ctxRecord.data.status == 'WAITING' || this.ctxRecord.data.status == 'BROKEN'))
+        {
+          menu.add(this.actions.stopAction);
         }
 
         menu.on('hide', this.contextHide, this);
@@ -1800,7 +1866,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         return outputArr;
       },
       exportServicePropertiesHelper : function(val, fpanel) {
-      	return FormFieldExporter(fpanel, '_service-type-config-card-panel', 'serviceProperties_', this.customTypes);
+        return FormFieldExporter(fpanel, '_service-type-config-card-panel', 'serviceProperties_', this.customTypes);
       },
       importStartDateHelper : function(val, srcObj, fpanel) {
         var selectedStartDate = "";
@@ -1869,7 +1935,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         weekdayBox.setValue(arr);
 
         return arr; // return arr, even if empty to comply with sonatypeLoad
-                    // data modifier requirement
+        // data modifier requirement
       },
       importMonthlyRecurringDayHelper : function(arr, srcObj, fpanel) {
         // simply look at each item, and select the proper checkbox
@@ -1886,7 +1952,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         return arr;
       },
       importServicePropertiesHelper : function(val, srcObj, fpanel) {
-      	FormFieldImporter(srcObj, fpanel, 'serviceProperties_', this.customTypes);
-      	return val;
+        FormFieldImporter(srcObj, fpanel, 'serviceProperties_', this.customTypes);
+        return val;
       }
     });
