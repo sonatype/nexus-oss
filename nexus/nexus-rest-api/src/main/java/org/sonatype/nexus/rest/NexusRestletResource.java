@@ -20,6 +20,7 @@ package org.sonatype.nexus.rest;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
@@ -36,35 +37,33 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.RestletResource;
 
 public class NexusRestletResource
-    extends RestletResource
-{
-    public NexusRestletResource( Context context, Request request, Response response, PlexusResource delegate )
-    {
+    extends RestletResource {
+
+    public NexusRestletResource( Context context, Request request, Response response, PlexusResource delegate ) {
         super( context, request, response, delegate );
     }
 
     @Override
     public Representation represent( Variant variant )
-        throws ResourceException
-    {
-        try
-        {
+        throws ResourceException {
+        try {
             return super.represent( variant );
-        }
-        catch ( ResourceException e )
-        {
-            // NEXUS-4238
-            // if it's server error based on HTTP Code, but NOT when Nexus throws a known 502 
+        } catch ( ResourceException e ) {
+            // NEXUS-4238, NEXUS-4290
+            // if it's server error based on HTTP Code, but NOT when Nexus throws a known 503 
             // (see org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource.handleException(Request, Response, Exception))
-            if ( Status.isServerError( e.getStatus().getCode() ) && Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode() != e.getStatus().getCode() )
-            {
+            final Status status = e.getStatus();
+            if ( status == null ) {
                 handleError( e );
+            } else {
+                final int code = status.getCode();
+                if ( Status.isServerError( code ) && Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode() != code ) {
+                    handleError( e );
+                }
             }
 
             throw e;
-        }
-        catch ( RuntimeException e )
-        {
+        } catch ( RuntimeException e ) {
             handleError( e );
 
             throw e;
@@ -73,23 +72,16 @@ public class NexusRestletResource
 
     @Override
     public void acceptRepresentation( Representation representation )
-        throws ResourceException
-    {
-        try
-        {
+        throws ResourceException {
+        try {
             super.acceptRepresentation( representation );
-        }
-        catch ( ResourceException e )
-        {
-            if ( Status.isServerError( e.getStatus().getCode() ) )
-            {
+        } catch ( ResourceException e ) {
+            if ( Status.isServerError( e.getStatus().getCode() ) ) {
                 handleError( e );
             }
 
             throw e;
-        }
-        catch ( RuntimeException e )
-        {
+        } catch ( RuntimeException e ) {
             handleError( e );
 
             throw e;
@@ -98,23 +90,16 @@ public class NexusRestletResource
 
     @Override
     public void storeRepresentation( Representation representation )
-        throws ResourceException
-    {
-        try
-        {
+        throws ResourceException {
+        try {
             super.storeRepresentation( representation );
-        }
-        catch ( ResourceException e )
-        {
-            if ( Status.isServerError( e.getStatus().getCode() ) )
-            {
+        } catch ( ResourceException e ) {
+            if ( Status.isServerError( e.getStatus().getCode() ) ) {
                 handleError( e );
             }
 
             throw e;
-        }
-        catch ( RuntimeException e )
-        {
+        } catch ( RuntimeException e ) {
             handleError( e );
 
             throw e;
@@ -123,56 +108,41 @@ public class NexusRestletResource
 
     @Override
     public void removeRepresentations()
-        throws ResourceException
-    {
-        try
-        {
+        throws ResourceException {
+        try {
             super.removeRepresentations();
-        }
-        catch ( ResourceException e )
-        {
-            if ( Status.isServerError( e.getStatus().getCode() ) )
-            {
+        } catch ( ResourceException e ) {
+            if ( Status.isServerError( e.getStatus().getCode() ) ) {
                 handleError( e );
             }
-
             throw e;
-        }
-        catch ( RuntimeException e )
-        {
+        } catch ( RuntimeException e ) {
             handleError( e );
 
             throw e;
         }
     }
 
-    protected void handleError( Throwable throwable )
-    {
+    protected void handleError( Throwable throwable ) {
+        Context c = getContext();
+        ConcurrentMap<String, Object> attrs = c.getAttributes();
         ErrorReportingManager manager =
-            (ErrorReportingManager) getContext().getAttributes().get( ErrorReportingManager.class.getName() );
+            ( ErrorReportingManager ) attrs.get( ErrorReportingManager.class.getName() );
 
-        if ( manager != null )
-        {
+        if ( manager != null ) {
             ErrorReportRequest request = new ErrorReportRequest();
 
             request.getContext().putAll( getContext().getAttributes() );
 
             request.setThrowable( throwable );
 
-            try
-            {
+            try {
                 manager.handleError( request );
-            }
-            catch ( IssueSubmissionException e )
-            {
+            } catch ( IssueSubmissionException e ) {
                 getLogger().log( Level.SEVERE, "Unable to submit error report to jira", e );
-            }
-            catch ( IOException e )
-            {
+            } catch ( IOException e ) {
                 getLogger().log( Level.SEVERE, "Unable to submit error report to jira", e );
-            }
-            catch ( GeneralSecurityException e )
-            {
+            } catch ( GeneralSecurityException e ) {
                 getLogger().log( Level.SEVERE, "Unable to submit error report to jira", e );
             }
         }
