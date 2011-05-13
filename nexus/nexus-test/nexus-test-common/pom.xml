@@ -51,6 +51,13 @@
       <artifactId>hamcrest-core</artifactId>
       <scope>compile</scope>
     </dependency>
+    <!-- this is here as a convenience to projects using test common -->
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>compile</scope>
+      <version>1.8.5</version>
+    </dependency>
   </dependencies>
 
 </project>
