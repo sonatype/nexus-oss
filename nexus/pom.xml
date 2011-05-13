@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-parent</artifactId>
-    <version>20</version>
+    <version>21-SNAPSHOT</version>
     <relativePath>../nexus-parent/pom.xml</relativePath>
   </parent>
 
@@ -1043,9 +1043,7 @@
                     <exclude>velocity:velocity-dep:jar:1.4</exclude>
                   </excludes>
                   <message>Velocity 1.4 is banned, Velocity 1.5 should be used!
-                    You probably added a dependency that is
-                    missing
-                    the exclusions.
+                    You probably added a dependency that is missing the exclusions.
                   </message>
                 </bannedDependencies>
                 <bannedDependencies>
@@ -1103,6 +1101,13 @@
                     <exclude>junit:junit</exclude>
                   </excludes>
                   <message>junit:junit includes old versions of hamcrest; use junit:junit-dep instead.</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.mockito:mockito-all</exclude>
+                  </excludes>
+                  <message>mockito-all includes third party classes within it - use mockito-core instead</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <searchTransitive>true</searchTransitive>
