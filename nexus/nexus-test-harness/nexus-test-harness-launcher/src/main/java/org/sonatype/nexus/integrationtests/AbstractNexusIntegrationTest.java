@@ -613,29 +613,47 @@ public abstract class AbstractNexusIntegrationTest
     }
 
     /**
-     * This is a "switchboard" to detech HOW to deploy. For now, just using the protocol from POM's
-     * DistributionManagement section and invoking the getWagonHintForDeployProtocol(String protocol) to get the wagon
-     * hint.
+     * Deploys all the provided files needed before IT actually starts.
      * 
      * @throws Exception
      */
     protected void deployArtifacts()
         throws Exception
     {
+        // test the test directory
+        File projectsDir = getTestResourceAsFile( "projects" );
+
+        deployArtifacts( projectsDir );
+    }
+
+    /**
+     * This is a "switchboard" to detech HOW to deploy. For now, just using the protocol from POM's
+     * DistributionManagement section and invoking the getWagonHintForDeployProtocol(String protocol) to get the wagon
+     * hint.
+     * 
+     * @throws Exception
+     */
+    protected void deployArtifacts( final File projectsDir )
+        throws Exception
+    {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        // test the test directory
-        File projectsDir = this.getTestResourceAsFile( "projects" );
         log.debug( "projectsDir: " + projectsDir );
 
         // if null there is nothing to deploy...
-        if ( projectsDir != null )
+        if ( projectsDir != null && projectsDir.isDirectory() )
         {
 
             // we have the parent dir, for each child (one level) we need to grab the pom.xml out of it and parse it,
             // and then deploy the artifact, sounds like fun, right!
 
-            File[] projectFolders = projectsDir.listFiles( MavenProjectFileFilter.INSTANCE );
+            final File[] projectFolders = projectsDir.listFiles( MavenProjectFileFilter.INSTANCE );
+
+            if ( projectFolders == null )
+            {
+                // bail out
+                return;
+            }
 
             // to achieve same ordering on different OSes
             Arrays.sort( projectFolders );
