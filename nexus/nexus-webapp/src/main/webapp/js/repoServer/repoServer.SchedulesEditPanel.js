@@ -67,7 +67,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
   this.stopButton = new Ext.Button({
     id : 'schedule-stop-btn',
     text : 'Stop',
-    icon : Sonatype.config.resourcePath + '/images/icons/stop.png',
+    icon : Sonatype.config.resourcePath + '/js/filetree/img/silk/icons/stop.png',
     cls : 'x-btn-text-icon',
     scope : this,
     handler : this.stopHandler,
@@ -77,6 +77,16 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
        * !this.sp.checkPermission('nexus:tasksstop', this.sp.PUT)
        */
     });
+
+  this.runButton = new Ext.Button({
+        id : 'schedule-run-btn',
+        text : 'Run',
+        icon : Sonatype.config.resourcePath + '/js/filetree/img/silk/icons/accept.png',
+        cls : 'x-btn-text-icon',
+        scope : this,
+        handler : this.runHandler,
+        disabled : true
+      });
 
   // Methods that will take the incoming json data and map over to the ui
   // controls
@@ -889,7 +899,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
               scope : this,
               handler : this.deleteHandler,
               disabled : !this.sp.checkPermission('nexus:tasks', this.sp.DELETE)
-            }, this.stopButton],
+            }, this.runButton, this.stopButton],
 
         // grid view options
         ds : this.schedulesDataStore,
@@ -984,6 +994,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
       // Dump the currently stored data and requery for everything
       reloadAll : function() {
+        this.runButton.disable();
+        this.stopButton.disable();
+
         this.schedulesDataStore.removeAll();
         this.schedulesDataStore.reload();
         this.repoOrGroupDataStore.removeAll();
@@ -1495,12 +1508,23 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       },
 
       rowSelect : function(selectionModel, index, rec) {
-        if (!(rec.data.status == 'SUBMITTED' || rec.data.status == 'WAITING' || rec.data.status == 'BROKEN'))
+        var status = rec.data.status;
+        if (rec.data.name.substring(0, 4) != 'New ')
+        {
+          this.runButton.disable();
+          this.stopButton.disable();
+        }
+        else if (!(status == 'SUBMITTED' || status == 'WAITING' || status == 'BROKEN'))
         {
           this.stopButton.enable();
+          this.runButton.disable();
         }
         else
         {
+          if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ))
+          {
+            this.runButton.enable();
+          }
           this.stopButton.disable();
         }
 
