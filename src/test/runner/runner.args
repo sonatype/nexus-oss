@@ -1,0 +1,3 @@
+--workingDirectory=../../../target/runner
+--repositories=http://localhost:8081/nexus/content/shadows/central-osgi/
+scan-file:file:bundles

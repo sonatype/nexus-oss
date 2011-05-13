@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2008-2011 Sonatype, Inc.
+
+    All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
+    Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
+    M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<assemblies>
+
+  <assembly>
+
+    <properties>
+      <debugSuspend>n</debugSuspend>
+    </properties>
+
+    <extends>
+      <extend>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-oss-webapp</artifactId>
+        <version>1.5.1-SNAPSHOT</version>
+        <classifier>bundle</classifier>
+        <type>xml</type>
+      </extend>
+    </extends>
+
+    <cars>
+      <car>
+        <groupId>org.sonatype.runtime.cars</groupId>
+        <artifactId>car-remote-debug</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+        <type>zip</type>
+      </car>
+    </cars>
+
+    <itars>
+      <itar>
+        <groupId>com.sonatype.nexus.plugin</groupId>
+        <artifactId>nexus-bundle-maker-plugin</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+        <virtual>true</virtual>
+        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository</outputDirectory>
+        <unpack>true</unpack>
+      </itar>
+    </itars>
+
+  </assembly>
+
+</assemblies>
