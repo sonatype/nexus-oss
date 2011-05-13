@@ -1274,10 +1274,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                 },
                 scope : this,
                 method : 'DELETE',
-                url : rec.data.resourceURI,
-                params : {
-                  cancelOnly : true
-                }
+                url : rec.data.resourceURI + '?cancelOnly=true'
               });
         }
       },
