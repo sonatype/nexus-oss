@@ -21,8 +21,8 @@ package org.sonatype.nexus.security;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -42,13 +42,14 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.Configuration;
-import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
-import org.sonatype.security.realms.tools.StaticSecurityResource;
+import org.sonatype.security.realms.tools.AbstractDynamicSecurityResource;
+import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.DynamicSecurityResource;
 
-@Component( role = StaticSecurityResource.class, hint = "NexusViewSecurityResource" )
+@Component( role = DynamicSecurityResource.class, hint = "NexusViewSecurityResource" )
 public class NexusViewSecurityResource
-    extends AbstractStaticSecurityResource
-    implements EventListener, Initializable
+    extends AbstractDynamicSecurityResource
+    implements EventListener, Initializable, DynamicSecurityResource
 {
     @Requirement
     private RepositoryRegistry repoRegistry;
@@ -59,14 +60,11 @@ public class NexusViewSecurityResource
     @Requirement
     private RepositoryTypeRegistry repoTypeRegistry;
 
-    @Override
-    public String getResourcePath()
-    {
-        return null;
-    }
+    @Requirement( hint = "default" )
+    private ConfigurationManager configManager;
 
     @Override
-    public Configuration getConfiguration()
+    public Configuration doGetConfiguration()
     {
         Configuration configuration = new Configuration();
 
@@ -132,7 +130,7 @@ public class NexusViewSecurityResource
     {
         CPrivilege priv = new CPrivilege();
 
-        priv.setId( "repository-" + ( repoId.equals( "*" ) ? "all" : repoId ) );
+        priv.setId( createPrivilegeId( repoId ) );
         priv.setName( name );
         priv.setDescription( description );
         priv.setType( RepositoryViewPrivilegeDescriptor.TYPE );
@@ -145,12 +143,23 @@ public class NexusViewSecurityResource
         return priv;
     }
 
+    private String createPrivilegeId( String repoId )
+    {
+        return "repository-" + ( repoId.equals( "*" ) ? "all" : repoId );
+    }
+
     public void onEvent( Event<?> event )
     {
         if ( RepositoryRegistryEventAdd.class.isAssignableFrom( event.getClass() )
             || RepositoryRegistryEventRemove.class.isAssignableFrom( event.getClass() ) )
         {
             setDirty( true );
+        }
+
+        if ( event instanceof RepositoryRegistryEventRemove )
+        {
+            String repoId = ( (RepositoryRegistryEventRemove) event ).getRepository().getId();
+            configManager.cleanRemovedPrivilege( createPrivilegeId( repoId ) );
         }
     }
 
@@ -159,4 +168,5 @@ public class NexusViewSecurityResource
     {
         this.eventMulticaster.addEventListener( this );
     }
+
 }
