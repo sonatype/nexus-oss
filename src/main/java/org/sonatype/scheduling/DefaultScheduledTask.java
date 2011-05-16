@@ -184,7 +184,7 @@ public class DefaultScheduledTask<T>
 
     public void cancelOnly()
     {
-        cancel( false, nextRun == null );
+        cancel( false, getScheduleIterator().isFinished() );
     }
 
     public void cancel()
