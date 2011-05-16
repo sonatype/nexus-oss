@@ -480,64 +480,6 @@ public class NexusHttpAuthenticationFilter
         return this.getFilterConfig().getServletContext().getAttribute( key );
     }
 
-    @Override
-    public void afterCompletion( ServletRequest request, ServletResponse response, Exception exception )
-        throws Exception
-    {
-        if ( isStatelessClient( request ) )
-        {
-            Subject subject = getSubject( request, response );
-            // the subject should never be null, but the session might be
-            if( subject != null && subject.getSession( false ) != null )
-            {
-                subject.getSession(false).stop();
-            }
-        }
-    }
-
-    // ==
-
-    protected boolean isStatelessClient( final ServletRequest request )
-    {
-        final String userAgent = getUserAgent( request );
-
-        if ( userAgent != null && userAgent.trim().length() > 0 )
-        {
-            // maven 2.0.10+
-            if ( userAgent.startsWith( "Apache-Maven" ) )
-            {
-                return true;
-            }
-
-            // maven pre 2.0.10 and all Java based clients relying on java.net.UrlConnection
-            if ( userAgent.startsWith( "Java/" ) )
-            {
-                return true;
-            }
-
-            // ivy
-            if ( userAgent.startsWith( "Apache Ivy/" ) )
-            {
-                return true;
-            }
-
-            // curl
-            if ( userAgent.startsWith( "curl/" ) )
-            {
-                return true;
-            }
-
-            // wget
-            if ( userAgent.startsWith( "Wget/" ) )
-            {
-                return true;
-            }
-
-        }
-
-        // we can't decided for sure, let's return the safest
-        return false;
-    }
 
     private String getUserAgent( final ServletRequest request )
     {

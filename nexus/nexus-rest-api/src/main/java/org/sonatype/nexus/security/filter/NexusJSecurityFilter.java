@@ -22,6 +22,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.security.configuration.SecurityConfigurationManager;
 import org.sonatype.security.web.ShiroSecurityFilter;
 
 /**
@@ -49,5 +50,11 @@ public class NexusJSecurityFilter
     protected Object getAttribute( String key )
     {
         return this.getFilterConfig().getServletContext().getAttribute( key );
+    }
+    
+    @Override
+    protected String getWebSecurityManagerName()
+    {
+        return "nexus";
     }
 }
