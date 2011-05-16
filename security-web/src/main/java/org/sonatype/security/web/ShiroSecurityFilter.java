@@ -69,7 +69,7 @@ public class ShiroSecurityFilter
         throws Exception
     {
         SecurityConfigurationManager cfg = getSecurityConfigurationManager();
-        cfg.setSecurityManager( "web" );
+        cfg.setSecurityManager( getWebSecurityManagerName() );
 
         // start up security
         this.getSecuritySystem().start();
@@ -89,8 +89,13 @@ public class ShiroSecurityFilter
             ( (FilterChainManagerAware) protectedPathManager ).setFilterChainManager( filterChainManager );
         }
     }
+    
+    protected String getWebSecurityManagerName()
+    {
+        return "web";
+    }
 
-    private SecurityConfigurationManager getSecurityConfigurationManager()
+    protected SecurityConfigurationManager getSecurityConfigurationManager()
         throws Exception
     {
         return getInstance( SecurityConfigurationManager.class );
@@ -99,7 +104,7 @@ public class ShiroSecurityFilter
     private WebSecurityManager getWebSecurityManager()
         throws Exception
     {
-        return (WebSecurityManager) getInstance( RealmSecurityManager.class, "web" );
+        return (WebSecurityManager) getInstance( RealmSecurityManager.class, getWebSecurityManagerName() );
     }
 
     private ProtectedPathManager getProtectedPathManager()
