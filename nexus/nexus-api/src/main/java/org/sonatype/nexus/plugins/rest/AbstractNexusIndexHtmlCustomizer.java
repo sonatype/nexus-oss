@@ -26,21 +26,25 @@ import java.util.Properties;
 public class AbstractNexusIndexHtmlCustomizer
     implements NexusIndexHtmlCustomizer
 {
+    @Override
     public String getPreHeadContribution( Map<String, Object> context )
     {
         return null;
     }
 
+    @Override
     public String getPostHeadContribution( Map<String, Object> context )
     {
         return null;
     }
 
+    @Override
     public String getPreBodyContribution( Map<String, Object> context )
     {
         return null;
     }
 
+    @Override
     public String getPostBodyContribution( Map<String, Object> context )
     {
         return null;
