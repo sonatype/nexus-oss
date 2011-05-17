@@ -21,6 +21,7 @@ package org.sonatype.nexus.mock.coverage;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.mock.TestSupport;
 import org.sonatype.nexus.plugins.rest.AbstractNexusIndexHtmlCustomizer;
 import org.sonatype.nexus.plugins.rest.NexusIndexHtmlCustomizer;
 
@@ -32,6 +33,11 @@ public class CoverageNexusIndexHtmlCustomizer
     @Override
     public String getPreHeadContribution( Map<String, Object> context )
     {
-        return "<script src=\"jscoverage.js?\" type=\"text/javascript\" charset=\"utf-8\"></script>";
+        if(TestSupport.isJSCoverageEnabled())
+        {
+            return "<script src=\"jscoverage.js?\" type=\"text/javascript\" charset=\"utf-8\"></script>";
+        }
+        return "";
+        
     }
 }

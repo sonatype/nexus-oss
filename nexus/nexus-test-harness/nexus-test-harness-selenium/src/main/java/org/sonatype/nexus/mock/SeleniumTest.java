@@ -59,11 +59,12 @@ public abstract class SeleniumTest
     extends NexusMockTestCase
 
 {
+    
     protected Selenium selenium;
 
     protected MainPage main;
 
-    private static JsonReportHandler handler;
+    private static JsonReportHandler jsonReporthandler;
 
     @BeforeClass
     public void createSelenium()
@@ -183,24 +184,33 @@ public abstract class SeleniumTest
         }
     }
 
-    @BeforeSuite
+    
+    
+    @BeforeSuite()
     public void coverageInit()
         throws ComponentLookupException
     {
-        handler = lookup( JsonReportHandler.class );
+        if(TestSupport.isJSCoverageEnabled())
+        {
+            jsonReporthandler = lookup( JsonReportHandler.class );
+        }
     }
 
     protected void getCoverage()
         throws IOException
     {
-        try
+        if(TestSupport.isJSCoverageEnabled())
         {
-            handler.appendResults( selenium.getEval( "window.jscoverage_serializeCoverageToJSON()" ) );
-            handler.persist();
-        }
-        catch ( SeleniumException e )
-        {
-            // ignore probably coverage was turned off
+            Assert.assertNotNull(jsonReporthandler); //sanity
+            try
+            {
+                jsonReporthandler.appendResults( selenium.getEval( "window.jscoverage_serializeCoverageToJSON()" ) );
+                jsonReporthandler.persist();
+            }
+            catch ( SeleniumException e )
+            {
+                // ignore probably coverage was turned off
+            }
         }
     }
 
@@ -216,6 +226,7 @@ public abstract class SeleniumTest
         // wait for the login-link to change
         ThreadUtils.waitFor( new ThreadUtils.WaitCondition()
         {
+            @Override
             public boolean checkCondition( long elapsedTimeInMs )
             {
                 return !main.loginLinkAvailable();
@@ -244,13 +255,13 @@ public abstract class SeleniumTest
             testLogs.mkdirs();
 
             File[] logs = logsDir.listFiles();
-            for ( File log : logs )
+            for ( File logFile : logs )
             {
                 try
                 {
-                    FileUtils.copyFile( log, new File( testLogs, log.getName() + testName ) );
+                    FileUtils.copyFile( logFile, new File( testLogs, logFile.getName() + testName ) );
 
-                    FileUtils.writeStringToFile( log, "" );
+                    FileUtils.writeStringToFile( logFile, "" );
                 }
                 catch ( IOException e )
                 {
