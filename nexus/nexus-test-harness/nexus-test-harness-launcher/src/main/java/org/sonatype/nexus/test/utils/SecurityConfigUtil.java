@@ -19,7 +19,6 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.File;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +37,7 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.security.realms.tools.DynamicSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 import org.sonatype.security.rest.model.PrivilegeProperty;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
@@ -331,6 +331,12 @@ public class SecurityConfigUtil
             addStaticSecurity( configuration, reader, "/META-INF/nexus-archive-browser-plugin-security.xml" );
             addStaticSecurity( configuration, reader, "/META-INF/nexus-rrb-plugin-security.xml" );
 
+            List<DynamicSecurityResource> dynamic =
+                getTest().getITPlexusContainer().lookupList( DynamicSecurityResource.class );
+            for ( DynamicSecurityResource resource : dynamic )
+            {
+                addStaticSecurity( configuration, resource.getConfiguration() );
+            }
         }
         catch ( Exception e )
         {
