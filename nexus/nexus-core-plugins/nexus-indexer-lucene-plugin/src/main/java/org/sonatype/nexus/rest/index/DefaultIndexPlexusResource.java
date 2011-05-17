@@ -40,7 +40,7 @@ public class DefaultIndexPlexusResource
     extends AbstractIndexPlexusResource
 {
     public static final String RESOURCE_URI = "/data_index";
-    
+
     @Override
     public String getResourceUri()
     {
@@ -58,13 +58,14 @@ public class DefaultIndexPlexusResource
     {
         return true;
     }
-    
+
     /**
-     * <em>This resource is deprecated, please use {@link SearchNGIndexPlexusResource} resource instead!</em> Search against all repositories using provided parameters.  Note there are a few different types of searches you can perform.
-     * If you provide the 'q' query parameter, a keyword search will be performed.
-     * If you provide the 'g, a, v, p or c' query parameters, a maven coordinate search will be performed.
-     * If you provide the 'cn' query parameter, a classname search will be performed.
-     * If you provide the 'sha1' query parameter, a checksum search will be performed.
+     * <em>This resource is deprecated, please use {@link SearchNGIndexPlexusResource} resource on path {@code /lucene/search} instead!</em>
+     * Search against all repositories using provided parameters. Note there are a few different types of searches you
+     * can perform. If you provide the 'q' query parameter, a keyword search will be performed. If you provide the 'g,
+     * a, v, p or c' query parameters, a maven coordinate search will be performed. If you provide the 'cn' query
+     * parameter, a classname search will be performed. If you provide the 'sha1' query parameter, a checksum search
+     * will be performed.
      * 
      * @param q provide this param for a keyword search (g, a, v, p, c, cn, sha1 params will be ignored).
      * @param sha1 provide this param for a checksum search (g, a, v, p, c, cn params will be ignored).
@@ -76,21 +77,13 @@ public class DefaultIndexPlexusResource
      * @param c classifier to perform a maven search against (can be combined with g, a, v & p params as well).
      * @param from result index to start retrieving results from.
      * @param count number of results to have returned to you.
-     * @deprecated This resource is deprectated, please use {@link SearchNGIndexPlexusResource} instead!
+     * @deprecated Use {@link SearchNGIndexPlexusResource} instead (resource path {@code /lucene/search})!
      */
     @Override
     @GET
-    @ResourceMethodSignature( queryParams = { @QueryParam( "q" ),
-                                              @QueryParam( "g" ), 
-                                              @QueryParam( "a" ), 
-                                              @QueryParam( "v" ), 
-                                              @QueryParam( "p" ), 
-                                              @QueryParam( "c" ),
-                                              @QueryParam( "cn" ),
-                                              @QueryParam( "sha1" ), 
-                                              @QueryParam( "from" ), 
-                                              @QueryParam( "count" ) }, 
-                              output = SearchResponse.class )
+    @ResourceMethodSignature( queryParams = { @QueryParam( "q" ), @QueryParam( "g" ), @QueryParam( "a" ),
+        @QueryParam( "v" ), @QueryParam( "p" ), @QueryParam( "c" ), @QueryParam( "cn" ), @QueryParam( "sha1" ),
+        @QueryParam( "from" ), @QueryParam( "count" ) }, output = SearchResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
