@@ -1361,6 +1361,10 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           this.alreadyDeferred = true;
           this.runCallback.defer(500, this, [options, isSuccess, response]);
         }
+        else
+        {
+          this.reloadAll();
+        }
       },
 
       // (Ext.form.BasicForm, Ext.form.Action)
@@ -1508,8 +1512,11 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       },
 
       rowSelect : function(selectionModel, index, rec) {
+        this.ctxRow = this.schedulesGridPanel.view.getRow(index);
+        this.ctxRecord = this.schedulesGridPanel.store.getAt(index);
+
         var status = rec.data.status;
-        if (rec.data.name.substring(0, 4) != 'New ')
+        if (rec.data.name.substring(0, 4) == 'New ')
         {
           this.runButton.disable();
           this.stopButton.disable();
@@ -1524,6 +1531,10 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ))
           {
             this.runButton.enable();
+          }
+          else
+          {
+            this.runButton.disable();
           }
           this.stopButton.disable();
         }
