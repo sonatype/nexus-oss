@@ -29,6 +29,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.rest.indexng.SearchNGIndexPlexusResource;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -59,7 +60,7 @@ public class DefaultIndexPlexusResource
     }
     
     /**
-     * Search against all repositories using provided parameters.  Note there are a few different types of searches you can perform.
+     * <em>This resource is deprecated, please use {@link SearchNGIndexPlexusResource} resource instead!</em> Search against all repositories using provided parameters.  Note there are a few different types of searches you can perform.
      * If you provide the 'q' query parameter, a keyword search will be performed.
      * If you provide the 'g, a, v, p or c' query parameters, a maven coordinate search will be performed.
      * If you provide the 'cn' query parameter, a classname search will be performed.
@@ -75,6 +76,7 @@ public class DefaultIndexPlexusResource
      * @param c classifier to perform a maven search against (can be combined with g, a, v & p params as well).
      * @param from result index to start retrieving results from.
      * @param count number of results to have returned to you.
+     * @deprecated This resource is deprectated, please use {@link SearchNGIndexPlexusResource} instead!
      */
     @Override
     @GET
