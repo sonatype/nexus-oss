@@ -261,6 +261,10 @@ public class GlobalConfigurationPlexusResource
                         // lookup old password
                         String oldPassword = getNexusEmailer().getSMTPPassword();
 
+                        if ( settings.getPassword() == null )
+                        {
+                            settings.setPassword( "" );
+                        }
                         getNexusEmailer().setSMTPPassword( this.getActualPassword( settings.getPassword(), oldPassword ) );
 
                         getNexusEmailer().setSMTPPort( settings.getPort() );
@@ -269,6 +273,10 @@ public class GlobalConfigurationPlexusResource
 
                         getNexusEmailer().setSMTPTlsEnabled( settings.isTlsEnabled() );
 
+                        if ( settings.getUsername() == null )
+                        {
+                            settings.setUsername( "" );
+                        }
                         getNexusEmailer().setSMTPUsername( settings.getUsername() );
 
                         getNexusEmailer().setSMTPSystemEmailAddress(
