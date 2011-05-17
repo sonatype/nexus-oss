@@ -66,8 +66,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
 
   this.stopButton = new Ext.Button({
     id : 'schedule-stop-btn',
-    text : 'Stop',
-    icon : Sonatype.config.resourcePath + '/js/filetree/img/silk/icons/stop.png',
+    text : 'Cancel',
+    icon : Sonatype.config.resourcePath + '/images/icons/time_delete.png',
     cls : 'x-btn-text-icon',
     scope : this,
     handler : this.stopHandler,
@@ -81,7 +81,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
   this.runButton = new Ext.Button({
         id : 'schedule-run-btn',
         text : 'Run',
-        icon : Sonatype.config.resourcePath + '/js/filetree/img/silk/icons/accept.png',
+        icon : Sonatype.config.resourcePath + '/images/icons/time_go.png',
         cls : 'x-btn-text-icon',
         scope : this,
         handler : this.runHandler,
@@ -891,7 +891,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
               scope : this,
               handler : this.addResourceHandler,
               disabled : !this.sp.checkPermission('nexus:tasks', this.sp.CREATE)
-            }, {
+            }, this.runButton, this.stopButton, {
               id : 'schedule-delete-btn',
               text : 'Delete',
               icon : Sonatype.config.resourcePath + '/images/icons/delete.png',
@@ -899,7 +899,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
               scope : this,
               handler : this.deleteHandler,
               disabled : !this.sp.checkPermission('nexus:tasks', this.sp.DELETE)
-            }, this.runButton, this.stopButton],
+            }],
 
         // grid view options
         ds : this.schedulesDataStore,
