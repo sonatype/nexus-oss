@@ -187,4 +187,18 @@ public class DefaultStorageFileItem
     {
         return getAttributes().containsKey( ContentGenerator.CONTENT_GENERATOR_ID );
     }
+
+    // ==
+
+    public String toString()
+    {
+        if ( isContentGenerated() )
+        {
+            return String.format( "%s (file, contentGenerator=%s)", super.toString(), getContentGeneratorId() );
+        }
+        else
+        {
+            return String.format( "%s (file)", super.toString() );
+        }
+    }
 }

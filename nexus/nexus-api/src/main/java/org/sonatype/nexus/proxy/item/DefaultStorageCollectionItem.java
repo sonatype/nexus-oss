@@ -49,7 +49,7 @@ public class DefaultStorageCollectionItem
      * @param canWrite the can write
      */
     public DefaultStorageCollectionItem( Repository repository, ResourceStoreRequest request, boolean canRead,
-        boolean canWrite )
+                                         boolean canWrite )
     {
         super( repository, request, canRead, canWrite );
     }
@@ -78,7 +78,7 @@ public class DefaultStorageCollectionItem
      * @param canWrite the can write
      */
     public DefaultStorageCollectionItem( RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
-        boolean canWrite )
+                                         boolean canWrite )
     {
         super( router, request, canRead, canWrite );
     }
@@ -102,11 +102,8 @@ public class DefaultStorageCollectionItem
      * @see org.sonatype.nexus.item.StorageCollectionItem#list()
      */
     public Collection<StorageItem> list()
-        throws AccessDeniedException,
-            NoSuchResourceStoreException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+        throws AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException, ItemNotFoundException,
+        StorageException
     {
         if ( isVirtual() )
         {
@@ -143,4 +140,12 @@ public class DefaultStorageCollectionItem
             }
         }
     }
+
+    // --
+
+    public String toString()
+    {
+        return String.format( "%s (coll)", super.toString() );
+    }
+
 }

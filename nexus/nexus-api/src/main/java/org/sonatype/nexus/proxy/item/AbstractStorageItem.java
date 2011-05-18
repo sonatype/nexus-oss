@@ -451,4 +451,18 @@ public abstract class AbstractStorageItem
         return this.getClass().isAssignableFrom( item.getClass() );
     }
 
+    // ==
+
+    public String toString()
+    {
+        if ( isVirtual() )
+        {
+            return getPath();
+        }
+        else
+        {
+            return getRepositoryItemUid().toString();
+        }
+    }
+
 }

@@ -46,7 +46,7 @@ public class DefaultStorageLinkItem
      * @param targetUid the target uid
      */
     public DefaultStorageLinkItem( Repository repository, ResourceStoreRequest request, boolean canRead,
-        boolean canWrite, RepositoryItemUid targetUid )
+                                   boolean canWrite, RepositoryItemUid targetUid )
     {
         super( repository, request, canRead, canWrite );
 
@@ -64,7 +64,7 @@ public class DefaultStorageLinkItem
      * @deprecated supply resourceStoreRequest always
      */
     public DefaultStorageLinkItem( Repository repository, String path, boolean canRead, boolean canWrite,
-        RepositoryItemUid targetUid )
+                                   RepositoryItemUid targetUid )
     {
         this( repository, new ResourceStoreRequest( path, true, false ), canRead, canWrite, targetUid );
     }
@@ -79,7 +79,7 @@ public class DefaultStorageLinkItem
      * @param targetUid the target uid
      */
     public DefaultStorageLinkItem( RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
-        boolean canWrite, RepositoryItemUid targetUid )
+                                   boolean canWrite, RepositoryItemUid targetUid )
     {
         super( router, request, canRead, canWrite );
 
@@ -109,4 +109,17 @@ public class DefaultStorageLinkItem
         }
     }
 
+    // ==
+
+    public String toString()
+    {
+        if ( getTarget() != null )
+        {
+            return String.format( "%s (link to %s)", super.toString(), getTarget().toString() );
+        }
+        else
+        {
+            return String.format( "%s (link NO-TARGET)", super.toString() );
+        }
+    }
 }
