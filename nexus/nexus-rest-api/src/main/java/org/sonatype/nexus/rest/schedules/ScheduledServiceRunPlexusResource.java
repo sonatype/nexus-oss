@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.rest.schedules;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -49,7 +50,12 @@ import org.sonatype.scheduling.TaskState;
 public class ScheduledServiceRunPlexusResource
     extends AbstractScheduledServicePlexusResource
 {
-    public static final String RESOURCE_URI = "/schedule_run/{" + SCHEDULED_SERVICE_ID_KEY + "}"; 
+    public static final String RESOURCE_URI = "/schedule_run/{" + SCHEDULED_SERVICE_ID_KEY + "}";
+
+    public ScheduledServiceRunPlexusResource()
+    {
+        setModifiable( true );
+    }
 
     @Override
     public Object getPayloadInstance()
@@ -70,20 +76,19 @@ public class ScheduledServiceRunPlexusResource
     }
 
     /**
-     * Run the specified scheduled task right now.  Will then be rescheduled upon completion for normal run.
+     * Run the specified scheduled task right now. Will then be rescheduled upon completion for normal run.
      * 
      * @param scheduledServiceId The scheduled task to access.
      */
     @Override
     @GET
-    @ResourceMethodSignature( pathParams = { @PathParam( AbstractScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY ) },
-                              output = ScheduledServiceResourceStatusResponse.class )
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY ) }, output = ScheduledServiceResourceStatusResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         ScheduledServiceResourceStatusResponse result = null;
 
-        String scheduledServiceId = request.getAttributes().get( SCHEDULED_SERVICE_ID_KEY ).toString();
+        final String scheduledServiceId = getScheduledServiceId( request );
 
         try
         {
@@ -121,4 +126,33 @@ public class ScheduledServiceRunPlexusResource
         }
     }
 
+    /**
+     * Cancel the execution of an existing scheduled task.
+     * 
+     * @param scheduledServiceId The scheduled task to cancel.
+     */
+    @Override
+    @DELETE
+    @ResourceMethodSignature( pathParams = { @PathParam( ScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY ) } )
+    public void delete( Context context, Request request, Response response )
+        throws ResourceException
+    {
+        try
+        {
+            getNexusScheduler().getTaskById( getScheduledServiceId( request ) ).cancelOnly();
+
+            response.setStatus( Status.SUCCESS_NO_CONTENT );
+        }
+        catch ( NoSuchTaskException e )
+        {
+            response.setStatus( Status.CLIENT_ERROR_NOT_FOUND, "Scheduled service not found!" );
+        }
+    }
+
+    // ==
+
+    protected String getScheduledServiceId( Request request )
+    {
+        return request.getAttributes().get( SCHEDULED_SERVICE_ID_KEY ).toString();
+    }
 }
