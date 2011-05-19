@@ -228,17 +228,7 @@ public class ScheduledServicePlexusResource
     {
         try
         {
-            boolean cancelOnly =
-                Boolean.valueOf( request.getResourceRef().getQueryAsForm().getFirstValue( "cancelOnly", "false" ) );
-
-            if ( cancelOnly )
-            {
-                getNexusScheduler().getTaskById( getScheduledServiceId( request ) ).cancelOnly();
-            }
-            else
-            {
-                getNexusScheduler().getTaskById( getScheduledServiceId( request ) ).cancel();
-            }
+            getNexusScheduler().getTaskById( getScheduledServiceId( request ) ).cancel();
 
             response.setStatus( Status.SUCCESS_NO_CONTENT );
         }
