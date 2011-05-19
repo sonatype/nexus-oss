@@ -36,10 +36,6 @@ public class PlexusObjectFactory
 
     private static final PlexusContainer container;
 
-    public static final PlexusContainer getContainer()
-    {
-        return container;
-    }
 
     static
     {
@@ -53,6 +49,11 @@ public class PlexusObjectFactory
         }
     }
 
+    public static PlexusContainer getContainer()
+    {
+        return container;
+    }
+    
     private static synchronized PlexusContainer setupContainer()
         throws Exception
     {
@@ -107,13 +108,14 @@ public class PlexusObjectFactory
 
         plexusAppBooter.startContainer();
 
-        PlexusContainer container = plexusAppBooter.getContainer();
-        return container;
+        PlexusContainer c = plexusAppBooter.getContainer();
+        return c;
     }
 
     private static final long serialVersionUID = -45456541236971L;
 
     @SuppressWarnings( "unchecked" )
+    @Override
     public Object newInstance( Constructor constructor, Object... params )
     {
         String role = constructor.getDeclaringClass().getName();
