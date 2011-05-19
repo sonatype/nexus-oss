@@ -497,39 +497,4 @@ public abstract class AbstractMavenRepository
             // huh?
         }
     }
-
-    @Override
-    protected void markItemRemotelyChecked( ResourceStoreRequest request )
-        throws StorageException, ItemNotFoundException
-    {
-        super.markItemRemotelyChecked( request );
-
-        try
-        {
-            request.pushRequestPath( request.getRequestPath() + ".sha1" );
-
-            if ( getLocalStorage().containsItem( this, request ) )
-            {
-                super.markItemRemotelyChecked( request );
-            }
-        }
-        finally
-        {
-            request.popRequestPath();
-        }
-
-        try
-        {
-            request.pushRequestPath( request.getRequestPath() + ".md5" );
-
-            if ( getLocalStorage().containsItem( this, request ) )
-            {
-                super.markItemRemotelyChecked( request );
-            }
-        }
-        finally
-        {
-            request.popRequestPath();
-        }
-    }
 }
