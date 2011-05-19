@@ -11,16 +11,31 @@
  *******************************************************************************/
 package org.sonatype.nexus.plugins.mavenbridge;
 
-import java.io.File;
-import java.util.Map;
+import java.util.List;
 
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingException;
+import org.apache.maven.model.building.ModelSource;
+import org.sonatype.aether.collection.DependencyCollectionException;
+import org.sonatype.aether.graph.Dependency;
+import org.sonatype.aether.graph.DependencyNode;
+import org.sonatype.aether.resolution.ArtifactResolutionException;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 public interface NexusMavenBridge
 {
-
-    Model buildModel( File pom, Map<String, String> repositories )
+    Model buildModel( ModelSource pom, List<MavenRepository> repositories )
         throws ModelBuildingException;
 
+    DependencyNode collectDependencies( Dependency node, List<MavenRepository> repositories )
+        throws DependencyCollectionException, ArtifactResolutionException;
+
+    DependencyNode resolveDependencies( Dependency node, List<MavenRepository> repositories )
+        throws DependencyCollectionException, ArtifactResolutionException;
+
+    DependencyNode collectDependencies( Model model, List<MavenRepository> repositories )
+        throws DependencyCollectionException, ArtifactResolutionException;
+
+    DependencyNode resolveDependencies( Model model, List<MavenRepository> repositories )
+        throws DependencyCollectionException, ArtifactResolutionException;
 }
