@@ -292,7 +292,7 @@ public class KenaiRealm
 
         Request request = new Request();
 
-        request.setResourceRef( this.kenaiRealmConfiguration.getConfiguration().getBaseUrl() + "api/projects/mine.json" );
+        request.setResourceRef( this.kenaiRealmConfiguration.getConfiguration().getBaseUrl() + "api/projects/mine.json?full=true" );
         request.setMethod( Method.GET );
         request.setChallengeResponse( authentication );
 
