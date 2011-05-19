@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.sonatype.spice</groupId>
     <artifactId>spice-parent</artifactId>
-    <version>15</version>
+    <version>16</version>
   </parent>
   <groupId>org.sonatype.security</groupId>
   <artifactId>security-parent</artifactId>
@@ -26,6 +26,7 @@
     <plugin-host-api.version>1.0.0</plugin-host-api.version>
     <sisu-inject-bean.version>2.2.0</sisu-inject-bean.version>
     <slf4j.version>1.6.1</slf4j.version>
+    <plexus.version>1.5.5</plexus.version>
   </properties>
 
 
