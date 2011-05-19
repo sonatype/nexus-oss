@@ -42,7 +42,7 @@
     <developerConnection>scm:git:git@github.com:sonatype/nexus.git</developerConnection>
     <url>https://github.com/sonatype/nexus</url>
   </scm>
-  
+
   <distributionManagement>
     <site>
       <id>forge-sites</id>
@@ -51,7 +51,7 @@
   </distributionManagement>
 
   <properties>
-    <runtime-platform.version>1</runtime-platform.version>
+    <runtime-platform.version>2-SNAPSHOT</runtime-platform.version>
     <nexus-site-base-url>https://repository.sonatype.org/content/sites/maven-sites/nexus-oss</nexus-site-base-url>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- failsafe plugin picks this up among others -->
@@ -348,7 +348,7 @@
           <artifactId>nexus-test-environment-maven-plugin</artifactId>
           <version>1.6</version>
         </plugin>
-        
+
         <!-- Manually run with: mvn clean license:format -N -->
         <plugin>
           <groupId>com.mycila.maven-license-plugin</groupId>
