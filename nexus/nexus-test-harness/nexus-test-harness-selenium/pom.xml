@@ -227,7 +227,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <!-- this is a compile dependency but will only get activated if jscoverage profile is active -->
     <dependency>
       <groupId>org.sonatype.spice</groupId>
@@ -248,7 +248,7 @@
         </exclusion>
       </exclusions>
     </dependency>
-        
+
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
@@ -303,8 +303,8 @@
   </dependencies>
 
   <profiles>
-    
-    
+
+
     <profile>
       <id>jscoverage</id>
       <build>
@@ -410,7 +410,7 @@
             </configuration>
           </plugin>
           <plugin>
-            <artifactId>failsafe-maven-plugin</artifactId>
+            <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <systemPropertyVariables>
                 <jscoverage>true</jscoverage>
@@ -420,9 +420,9 @@
         </plugins>
       </build>
     </profile>
-    
-    
-    
+
+
+
     <profile>
       <activation>
         <property>
