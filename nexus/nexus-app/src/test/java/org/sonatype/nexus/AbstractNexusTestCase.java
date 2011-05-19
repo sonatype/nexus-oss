@@ -40,7 +40,7 @@ public abstract class AbstractNexusTestCase
     private NexusScheduler nexusScheduler;
 
     private EventInspectorHost eventInspectorHost;
-    
+
     public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
 
     public static final String NEXUS_APP_CONFIGURATION_KEY = "nexus-app";
@@ -82,18 +82,7 @@ public abstract class AbstractNexusTestCase
 
         if ( loadConfigurationAtSetUp() )
         {
-            System.out.println( "== Shutting down SECURITY!" );
-
-            nexusConfiguration = this.lookup( NexusConfiguration.class );
-
-            nexusConfiguration.loadConfiguration( false );
-
-            // TODO: SEE WHY IS SEC NOT STARTING? (Max, JSec changes)
-            nexusConfiguration.setSecurityEnabled( false );
-
-            nexusConfiguration.saveConfiguration();
-
-            System.out.println( "== Shutting down SECURITY!" );
+            shutDownSecurity();
         }
     }
 
@@ -107,6 +96,23 @@ public abstract class AbstractNexusTestCase
 
         cleanDir( runtimeHomeDir );
         cleanDir( nexusappHomeDir );
+    }
+
+    protected void shutDownSecurity()
+        throws Exception
+    {
+        System.out.println( "== Shutting down SECURITY!" );
+
+        nexusConfiguration = this.lookup( NexusConfiguration.class );
+
+        nexusConfiguration.loadConfiguration( false );
+
+        // TODO: SEE WHY IS SEC NOT STARTING? (Max, JSec changes)
+        nexusConfiguration.setSecurityEnabled( false );
+
+        nexusConfiguration.saveConfiguration();
+
+        System.out.println( "== Shutting down SECURITY!" );
     }
 
     protected void killActiveTasks()
