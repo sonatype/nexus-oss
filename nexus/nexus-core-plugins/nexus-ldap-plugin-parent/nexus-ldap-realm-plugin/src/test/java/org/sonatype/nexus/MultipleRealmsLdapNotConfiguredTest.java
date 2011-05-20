@@ -21,18 +21,15 @@ package org.sonatype.nexus;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.util.IOUtil;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.util.IOUtil;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
-
-import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
 import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
 public class MultipleRealmsLdapNotConfiguredTest
@@ -57,7 +54,6 @@ public class MultipleRealmsLdapNotConfiguredTest
             // expected
         }
 
-
         // xml should not
         Assert.assertNotNull( security.authenticate( new UsernamePasswordToken( "admin", "admin123" ) ) );
 
@@ -81,7 +77,7 @@ public class MultipleRealmsLdapNotConfiguredTest
         Assert.assertFalse( security.hasRole( principals, "developer" ) );
         Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
 
-     // xml user
+        // xml user
         principals = new SimplePrincipalCollection();
         // TODO: bdemers or dbradicich, this "fix" is wrong, it relies on imple details!
         // was: principals.add( "deployment", new XmlAuthenticatingRealm().getName() );
@@ -117,16 +113,16 @@ public class MultipleRealmsLdapNotConfiguredTest
         Assert.assertTrue( security.isPermitted( principals, "nexus:target:1:*:delete" ) );
     }
 
+    @Override
     protected void copyDefaultConfigToPlace()
-    throws IOException
-{
-    IOUtil.copy( getClass().getResourceAsStream( "/test-conf/security-configuration-multipleRealms.xml" ), new FileOutputStream(
-        getSecurityConfiguration() ) );
-}
+        throws IOException
+    {
+        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/security-configuration-multipleRealms.xml" ),
+            new FileOutputStream( getSecurityConfiguration() ) );
+    }
 
     /*
      * (non-Javadoc)
-     *
      * @see com.sonatype.nexus.AbstractNexusTestCase#customizeContext(org.codehaus.plexus.context.Context)
      */
     @Override

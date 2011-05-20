@@ -22,7 +22,7 @@
 <!-- Default nexus security configuration -->
 <!-- used as default config source -->
 <security>
-	<version>2.0.4</version>
+	<version>2.0.5</version>
 	<users>
 		<user>
 			<id>admin</id>
@@ -56,7 +56,7 @@
 			<userId>admin</userId>
 			<source>default</source>
 			<roles>
-				<role>admin</role>
+				<role>nexus-admin</role>
 			</roles>
 		</userRoleMapping>
 		<userRoleMapping>
