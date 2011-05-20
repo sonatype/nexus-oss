@@ -32,9 +32,9 @@
     <mavenVersion>2.2.1</mavenVersion>
   </properties>
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/plugins/trunk/nexus-maven-plugin</connection>
-    <url>http://svn.sonatype.org/plugins/trunk/nexus-maven-plugin</url>
-    <developerConnection>scm:svn:https://svn.sonatype.org/plugins/trunk/nexus-maven-plugin</developerConnection>
+    <connection>scm:svn:git://github.com/sonatype/nexus-maven-plugin.git</connection>
+    <url>https://github.com/sonatype/nexus-maven-plugin</url>
+    <developerConnection>scm:git:git@github.com:sonatype/nexus-maven-plugin.git</developerConnection>
   </scm>
   <mailingLists>
     <mailingList>
