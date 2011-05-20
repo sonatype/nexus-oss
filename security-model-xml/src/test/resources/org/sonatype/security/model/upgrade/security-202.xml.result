@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <security>
-  <version>2.0.4</version>
+  <version>2.0.5</version>
   <users>
     <user>
       <id>admin</id>
@@ -26,6 +26,32 @@
       <email>changeme2@yourcompany.com</email>
     </user>
   </users>
+  <roles>
+    <role>
+      <id>admin</id>
+      <name>Admin</name>
+      <description>Deprecated admin role, use nexus-admin instead</description>
+      <roles>
+        <role>nexus-admin</role>
+      </roles>
+    </role>
+    <role>
+      <id>developer</id>
+      <name>Developer</name>
+      <description>Deprecated developer role, use nexus-developer instead</description>
+      <roles>
+        <role>nexus-developer</role>
+      </roles>
+    </role>
+    <role>
+      <id>deployer</id>
+      <name>Deployer</name>
+      <description>Deprecated deployer role, use nexus-deployer instead</description>
+      <roles>
+        <role>nexus-deployer</role>
+      </roles>
+    </role>
+  </roles>
   <userRoleMappings>
     <userRoleMapping>
       <userId>admin</userId>

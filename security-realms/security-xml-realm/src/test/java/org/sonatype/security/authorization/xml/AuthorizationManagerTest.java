@@ -3,7 +3,6 @@ package org.sonatype.security.authorization.xml;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -69,7 +68,7 @@ public class AuthorizationManagerTest
         Assert.assertTrue( roleMap.containsKey( "role1" ) );
         Assert.assertTrue( roleMap.containsKey( "role2" ) );
         Assert.assertTrue( roleMap.containsKey( "role3" ) );
-        Assert.assertEquals( 3, roles.size() );
+        Assert.assertEquals( 6, roles.size() );
 
         Role role3 = roleMap.get( "role3" );
 
@@ -355,7 +354,7 @@ public class AuthorizationManagerTest
     {
         Map<String, String> props = new HashMap<String, String>();
 
-        for ( CProperty prop : (List<CProperty>) secPriv.getProperties() )
+        for ( CProperty prop : secPriv.getProperties() )
         {
             props.put( prop.getKey(), prop.getValue() );
         }

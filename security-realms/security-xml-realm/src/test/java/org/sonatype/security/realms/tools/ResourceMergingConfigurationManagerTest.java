@@ -51,7 +51,7 @@ public class ResourceMergingConfigurationManagerTest
     {
         super.setUp();
 
-        manager = (ConfigurationManager) lookup( ConfigurationManager.class, "resourceMerging" );
+        manager = lookup( ConfigurationManager.class, "resourceMerging" );
     }
 
     public void testRoleMerging()
@@ -85,7 +85,7 @@ public class ResourceMergingConfigurationManagerTest
         assertEquals( 60, other.getSessionTimeout() );
 
         // all roles
-        assertEquals( 8, roles.size() );
+        assertEquals( 11, roles.size() );
 
     }
 
