@@ -292,7 +292,9 @@ public class KenaiRealm
 
         Request request = new Request();
 
-        request.setResourceRef( this.kenaiRealmConfiguration.getConfiguration().getBaseUrl() + "api/projects/mine.json?full=true" );
+        // FIXME: waiting for response from kenai team on how to get a non-paginated response
+        // If that is not possible we will need to add support for paged results.
+        request.setResourceRef( this.kenaiRealmConfiguration.getConfiguration().getBaseUrl() + "api/projects/mine.json?size=100" );
         request.setMethod( Method.GET );
         request.setChallengeResponse( authentication );
 
