@@ -68,7 +68,7 @@ public class AuthorizationManagerTest
         Assert.assertTrue( roleMap.containsKey( "role1" ) );
         Assert.assertTrue( roleMap.containsKey( "role2" ) );
         Assert.assertTrue( roleMap.containsKey( "role3" ) );
-        Assert.assertEquals( 6, roles.size() );
+        Assert.assertEquals( 3, roles.size() );
 
         Role role3 = roleMap.get( "role3" );
 

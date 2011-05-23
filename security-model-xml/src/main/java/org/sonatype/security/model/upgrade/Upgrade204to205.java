@@ -25,7 +25,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.v2_0_4.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.model.v2_0_5.upgrade.BasicVersionUpgrade;
 
@@ -73,28 +72,6 @@ public class Upgrade204to205
             (org.sonatype.security.model.v2_0_4.Configuration) message.getConfiguration();
 
         org.sonatype.security.model.Configuration newc = new BasicVersionUpgrade().upgradeConfiguration( oldc );
-
-        CRole admin = new CRole();
-        admin.setDescription( "Deprecated admin role, use nexus-admin instead" );
-        admin.setId( "admin" );
-        admin.setName( "Admin" );
-        admin.setReadOnly( false );
-        admin.addRole( "nexus-admin" );
-        newc.addRole( admin );
-        CRole developer = new CRole();
-        developer.setDescription( "Deprecated developer role, use nexus-developer instead" );
-        developer.setId( "developer" );
-        developer.setName( "Developer" );
-        developer.setReadOnly( false );
-        developer.addRole( "nexus-developer" );
-        newc.addRole( developer );
-        CRole deployer = new CRole();
-        deployer.setDescription( "Deprecated deployer role, use nexus-deployer instead" );
-        deployer.setId( "deployer" );
-        deployer.setName( "Deployer" );
-        deployer.setReadOnly( false );
-        deployer.addRole( "nexus-deployer" );
-        newc.addRole( deployer );
 
         newc.setVersion( org.sonatype.security.model.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.security.model.Configuration.MODEL_VERSION );

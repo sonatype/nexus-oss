@@ -85,7 +85,7 @@ public class ResourceMergingConfigurationManagerTest
         assertEquals( 60, other.getSessionTimeout() );
 
         // all roles
-        assertEquals( 11, roles.size() );
+        assertEquals( 8, roles.size() );
 
     }
 
