@@ -515,6 +515,7 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
         {
           var currClassifier = treePanel.root.childNodes[i].attributes.payload.classifier;
           var currExtension = treePanel.root.childNodes[i].attributes.payload.extension;
+          
           if (classifier == currClassifier && extension == currExtension)
           {
             return true;
@@ -623,6 +624,22 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
           p = filename.substring(extensionIndex + 1);
           e = filename.substring(extensionIndex + 1);
           filename = filename.substring(0, extensionIndex);
+          
+          if (e == 'asc')
+          {
+	          var primaryExtensionIndex = filename.substring(0, extensionIndex ).lastIndexOf('.');
+	          var primaryExtension = '';
+	          if ( primaryExtensionIndex >= 0 )
+	          {
+		          primaryExtension = filename.substring(primaryExtensionIndex + 1);
+	          }
+	          
+	          if ( /^[a-z]*$/.test(primaryExtension) )
+	          {
+	        	  e = primaryExtension + '.' + e;
+	        	  filename = filename.substring(0, primaryExtensionIndex);
+	          }
+          }
         }
 
         // match the path to guess the group
