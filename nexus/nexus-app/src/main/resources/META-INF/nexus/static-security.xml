@@ -70,7 +70,7 @@
             <privileges />
             <roles>
                 <role>ui-basic</role>
-                <role>deployment</role>
+                <role>nexus-deployment</role>
             </roles>
         </role>
         <role>

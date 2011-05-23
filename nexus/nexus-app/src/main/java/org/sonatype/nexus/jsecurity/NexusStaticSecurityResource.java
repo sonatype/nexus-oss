@@ -19,7 +19,6 @@
 package org.sonatype.nexus.jsecurity;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
@@ -28,6 +27,7 @@ public class NexusStaticSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
+    @Override
     public String getResourcePath()
     {
         return "/META-INF/nexus/static-security.xml";
