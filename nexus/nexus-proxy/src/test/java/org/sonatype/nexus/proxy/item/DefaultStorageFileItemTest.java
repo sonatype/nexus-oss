@@ -25,6 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.codehaus.plexus.util.IOUtil;
+import org.easymock.IAnswer;
 import org.junit.Test;
 
 public class DefaultStorageFileItemTest
@@ -35,12 +36,17 @@ public class DefaultStorageFileItemTest
         throws Exception
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/a.txt" ) )
-            .andReturn( new DefaultRepositoryItemUid( null, repository, "/a.txt" ) );
+        expect( repository.createUid( "/a.txt" ) ).andAnswer( new IAnswer<RepositoryItemUid>()
+        {
+            @Override
+            public RepositoryItemUid answer()
+                throws Throwable
+            {
+                return getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
+            }
+        } );
 
         replay( repository );
-
-        getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
 
         //
 
@@ -50,8 +56,8 @@ public class DefaultStorageFileItemTest
 
         // content
         InputStream is = file.getInputStream();
-        assertEquals( true, IOUtil.contentEquals( is, new ByteArrayInputStream( file.getRepositoryItemUid().getPath()
-            .getBytes() ) ) );
+        assertEquals( true,
+            IOUtil.contentEquals( is, new ByteArrayInputStream( file.getRepositoryItemUid().getPath().getBytes() ) ) );
     }
 
     @Test
@@ -59,12 +65,17 @@ public class DefaultStorageFileItemTest
         throws Exception
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/a.txt" ) )
-            .andReturn( new DefaultRepositoryItemUid( null, repository, "/a.txt" ) );
+        expect( repository.createUid( "/a.txt" ) ).andAnswer( new IAnswer<RepositoryItemUid>()
+        {
+            @Override
+            public RepositoryItemUid answer()
+                throws Throwable
+            {
+                return getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
+            }
+        } );
 
         replay( repository );
-
-        getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
 
         //
 
@@ -82,12 +93,17 @@ public class DefaultStorageFileItemTest
         throws Exception
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andReturn(
-            new DefaultRepositoryItemUid( null, repository, "/some/dir/hierarchy/a.txt" ) );
+        expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andAnswer( new IAnswer<RepositoryItemUid>()
+        {
+            @Override
+            public RepositoryItemUid answer()
+                throws Throwable
+            {
+                return getRepositoryItemUidFactory().createUid( repository, "/some/dir/hierarchy/a.txt" );
+            }
+        } );
 
         replay( repository );
-
-        getRepositoryItemUidFactory().createUid( repository, "/some/dir/hierarchy/a.txt" );
 
         //
 
@@ -98,8 +114,8 @@ public class DefaultStorageFileItemTest
 
         // content
         InputStream is = file.getInputStream();
-        assertEquals( true, IOUtil.contentEquals( is, new ByteArrayInputStream( file.getRepositoryItemUid().getPath()
-            .getBytes() ) ) );
+        assertEquals( true,
+            IOUtil.contentEquals( is, new ByteArrayInputStream( file.getRepositoryItemUid().getPath().getBytes() ) ) );
     }
 
     @Test
@@ -107,12 +123,17 @@ public class DefaultStorageFileItemTest
         throws Exception
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andReturn(
-            new DefaultRepositoryItemUid( null, repository, "/some/dir/hierarchy/a.txt" ) );
+        expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andAnswer( new IAnswer<RepositoryItemUid>()
+        {
+            @Override
+            public RepositoryItemUid answer()
+                throws Throwable
+            {
+                return getRepositoryItemUidFactory().createUid( repository, "/some/dir/hierarchy/a.txt" );
+            }
+        } );
 
         replay( repository );
-
-        getRepositoryItemUidFactory().createUid( repository, "/some/dir/hierarchy/a.txt" );
 
         //
 

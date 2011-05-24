@@ -18,7 +18,6 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.uid.Attribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -38,6 +37,13 @@ public interface RepositoryItemUid
     String PATH_ROOT = PATH_SEPARATOR;
 
     /**
+     * Returns string usable as "key".
+     * 
+     * @return
+     */
+    String getKey();
+
+    /**
      * Gets the repository that is the origin of the item identified by this UID.
      * 
      * @return
@@ -52,31 +58,11 @@ public interface RepositoryItemUid
     String getPath();
 
     /**
-     * Locks this UID for action. Will perform lock upgrade is needed (read -> write). It is the responsibility of
-     * caller to use lock/unlock properly (ie. boxing of calls).
+     * Creates a uidLock. Caller has to explicitly release it after using it, otherwise coder creates memory leaks in Nexus!
      * 
-     * @param action
+     * @return
      */
-    void lock( Action action );
-
-    /**
-     * Unlocks UID. It is the responsibility of caller to use lock/unlock properly (ie. boxing of calls).
-     * 
-     * @param action
-     */
-    void unlock();
-
-    /**
-     * Locks attributes of item belonging to this UID for action. Will perform lock upgrade is needed (read -> write).
-     * 
-     * @param action
-     */
-    void lockAttributes( Action action );
-
-    /**
-     * Unlocks attributes of item belonging to this UID.
-     */
-    void unlockAttributes();
+    RepositoryItemUidLock createLock();
 
     /**
      * Gets an "attribute" from this UID.

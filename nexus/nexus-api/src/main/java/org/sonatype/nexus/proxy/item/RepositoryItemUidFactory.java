@@ -18,8 +18,6 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import java.util.Map;
-
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -47,9 +45,17 @@ public interface RepositoryItemUidFactory
         throws IllegalArgumentException, NoSuchRepositoryException;
 
     /**
-     * Returns a snapshot of the active UID maps. Keys are UID string representations, while values are actual UIDs.
+     * Creates a shared UIDLock based on a uid reference.
      * 
+     * @param uid
      * @return
      */
-    Map<String, RepositoryItemUid> getActiveUidMapSnapshot();
+    RepositoryItemUidLock createUidLock( RepositoryItemUid uid );
+
+    /**
+     * Releases a shared UIDLock.
+     * 
+     * @param uid
+     */
+    void releaseUidLock( RepositoryItemUidLock uidLock );
 }

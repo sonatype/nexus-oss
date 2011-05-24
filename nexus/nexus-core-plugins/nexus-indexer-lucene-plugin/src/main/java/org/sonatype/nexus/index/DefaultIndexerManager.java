@@ -99,6 +99,7 @@ import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
@@ -610,7 +611,9 @@ public class DefaultIndexerManager
                 return;
             }
 
-            item.getRepositoryItemUid().lock( Action.read );
+            final RepositoryItemUidLock uidLock =  item.getRepositoryItemUid().createLock();
+            
+            uidLock.lock( Action.read );
 
             try
             {
@@ -659,7 +662,8 @@ public class DefaultIndexerManager
             }
             finally
             {
-                item.getRepositoryItemUid().unlock();
+                uidLock.unlock();
+                uidLock.release();
             }
         }
     }
@@ -744,7 +748,9 @@ public class DefaultIndexerManager
             // NEXUS-814: we should not delete always
             if ( !item.getItemContext().containsKey( SnapshotRemover.MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV ) )
             {
-                item.getRepositoryItemUid().lock( Action.read );
+                final RepositoryItemUidLock uidLock = item.getRepositoryItemUid().createLock();
+                
+                uidLock.lock( Action.read );
 
                 try
                 {
@@ -752,7 +758,8 @@ public class DefaultIndexerManager
                 }
                 finally
                 {
-                    item.getRepositoryItemUid().unlock();
+                    uidLock.unlock();
+                    uidLock.release();
                 }
             }
             else

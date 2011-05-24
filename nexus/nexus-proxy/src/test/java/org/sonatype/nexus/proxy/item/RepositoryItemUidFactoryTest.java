@@ -18,17 +18,8 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.junit.Assert;
 import org.junit.Test;
-
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
-
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
@@ -36,9 +27,6 @@ import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
 public class RepositoryItemUidFactoryTest
     extends AbstractProxyTestEnvironment
@@ -63,177 +51,58 @@ public class RepositoryItemUidFactoryTest
     }
 
     @Test
-    public void testDamianClaim()
+    public void testSameLockResourceInstance()
         throws Exception
     {
         Repository repository = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );
 
         RepositoryItemUid uid = factory.createUid( repository, "/some/blammo/poth" );
 
-        uid.lock( Action.read );
+        DefaultRepositoryItemUidLock uidLock1 = (DefaultRepositoryItemUidLock) uid.createLock();
 
-        uid.unlock();
+        DefaultRepositoryItemUidLock uidLock2 = (DefaultRepositoryItemUidLock) uid.createLock();
 
-        try
-        {
-            uid.unlock();
-        }
-        catch ( NullPointerException e )
-        {
-            e.printStackTrace();
-            // damian wins
-            Assert.fail( "Beer for damian, please!" );
-        }
-        catch ( IllegalMonitorStateException e )
-        {
-            e.printStackTrace();
-            // cstamas wins
-            // fail( "Beer for cstamas, please!" );
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-            Assert.fail( "No beer for anyone" );
-        }
-    }
+        uidLock1.lock( Action.read );
 
-    // @Test( expected = AssertionError.class )
-    public void testHardAttackWithBrokenFactoryThatShouldFail()
-        throws Exception
-    {
-        RepositoryItemUidFactory brokenFactory = lookup( RepositoryItemUidFactory.class, "broken" );
-        hardAttack( brokenFactory );
+        // They share SAME lock
+        Assert.assertNotSame( "UIDLock instances should be different", uidLock1, uidLock2 );
+        Assert.assertSame( "UIDLock lock instances should be same", uidLock1.getContentLock(),
+            uidLock2.getContentLock() );
+        Assert.assertEquals( "Since invoked from same UT thread, both should say we have lock held",
+            uidLock1.getContentLock().hasLocksHeld(), uidLock2.getContentLock().hasLocksHeld() );
     }
 
     @Test
-    public void testHardAttackWithStandardFactoryThatShouldPass()
+    public void testRelease()
         throws Exception
     {
-        hardAttack( factory );
-    }
-
-    protected void hardAttack( RepositoryItemUidFactory factory )
-        throws Exception
-    {
-        final int count = 3000;
-        final int threadPerPath = 4;
-
-        ExecutorService es = Executors.newFixedThreadPool( 50 );
-
         Repository repository = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );
 
-        // prepare content, create UID but almost instantly make them GCed
-        System.out.println( "Create UIDs to be GCed... " );
+        RepositoryItemUid uid = factory.createUid( repository, "/some/blammo/poth" );
 
-        for ( int i = 0; i < count; i++ )
+        DefaultRepositoryItemUidLock uidLock1 = (DefaultRepositoryItemUidLock) uid.createLock();
+
+        uidLock1.lock( Action.read );
+
+        Assert.assertTrue( "Since locked it should say we have lock held", uidLock1.getContentLock().hasLocksHeld() );
+
+        uidLock1.unlock();
+
+        Assert.assertFalse( "Since unlocked it should say we have no lock held",
+            uidLock1.getContentLock().hasLocksHeld() );
+
+        uidLock1.release();
+
+        try
         {
-            factory.createUid( repository, "/some/path/" + i );
+            uidLock1.unlock();
+
+            Assert.fail( "Reusing a released instance of UIDLock is a no-go" );
         }
-        System.gc();
-
-        long ser = 1;
-
-        ArrayList<FactoryCreateUidTester> testers =
-            new ArrayList<RepositoryItemUidFactoryTest.FactoryCreateUidTester>();
-
-        for ( int i = 0; i < count; i++ )
+        catch ( IllegalStateException e )
         {
-            RepositoryItemUid uid = factory.createUid( repository, "/some/path/" + i );
-
-            for ( int j = 0; j < threadPerPath; j++ )
-            {
-                FactoryCreateUidTester tester = new FactoryCreateUidTester( ser++, factory, uid );
-
-                es.execute( tester );
-
-                testers.add( tester );
-            }
-        }
-
-        Thread.sleep( 1000 );
-
-        // and finally, compare
-        // all elements under same key should be equal!
-        System.out.println();
-        System.out.println( "Waiting for all threads to finish... " );
-
-        es.shutdown();
-
-        while ( !es.isTerminated() )
-        {
-            Thread.sleep( 1000 );
-        }
-
-        System.out.println( "Checking results... " );
-
-        Multimap<String, RepositoryItemUid> uidMap = Multimaps.newArrayListMultimap();
-
-        for ( FactoryCreateUidTester tester : testers )
-        {
-            uidMap.putAll( tester.getUidMap() );
-        }
-
-        for ( String key : uidMap.keySet() )
-        {
-            Collection<RepositoryItemUid> uids = uidMap.get( key );
-
-            assertThat( "There should be as many UIDs for \"" + uids.iterator().next()
-                + "\" as many thread getting them!", uids, hasSize( threadPerPath ) );
-
-            final RepositoryItemUid firstUid = uids.iterator().next();
-            final DefaultRepositoryItemUid expected = (DefaultRepositoryItemUid) firstUid;
-            for ( RepositoryItemUid uid : uids )
-            {
-                DefaultRepositoryItemUid actual = (DefaultRepositoryItemUid) uid;
-                assertThat(actual, sameInstance( expected ) );
-            }
+            // good
         }
     }
 
-    public static final class FactoryCreateUidTester
-        implements Runnable
-    {
-        private final long serial;
-
-        private final RepositoryItemUidFactory factory;
-
-        private final Repository repository;
-
-        private final String path;
-
-        private final Multimap<String, RepositoryItemUid> uidMap;
-
-        public FactoryCreateUidTester( long serial, RepositoryItemUidFactory factory, RepositoryItemUid uid )
-        {
-            this.serial = serial;
-
-            this.factory = factory;
-
-            this.repository = uid.getRepository();
-
-            this.path = uid.getPath();
-
-            this.uidMap = Multimaps.newArrayListMultimap();
-        }
-
-        public Multimap<String, RepositoryItemUid> getUidMap()
-        {
-            return uidMap;
-        }
-
-        public void run()
-        {
-            if ( serial % 100 == 0 )
-            {
-                System.out.print( "." );
-
-                System.gc();
-            }
-
-            RepositoryItemUid uid = factory.createUid( repository, path );
-
-            // need to sync here, since all thread access this same multimap
-            uidMap.put( uid.getPath(), uid );
-        }
-    }
 }

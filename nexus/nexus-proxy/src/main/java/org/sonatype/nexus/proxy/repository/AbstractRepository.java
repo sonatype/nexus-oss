@@ -64,6 +64,7 @@ import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.ReadLockingContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -758,9 +759,11 @@ public abstract class AbstractRepository
 
         maintainNotFoundCache( request );
 
-        RepositoryItemUid uid = createUid( request.getRequestPath() );
+        final RepositoryItemUid uid = createUid( request.getRequestPath() );
 
-        uid.lock( Action.read );
+        final RepositoryItemUidLock uidLock = uid.createLock();
+
+        uidLock.lock( Action.read );
 
         try
         {
@@ -833,7 +836,8 @@ public abstract class AbstractRepository
         }
         finally
         {
-            uid.unlock();
+            uidLock.unlock();
+            uidLock.release();
         }
     }
 
@@ -852,13 +856,16 @@ public abstract class AbstractRepository
 
         maintainNotFoundCache( from );
 
-        RepositoryItemUid fromUid = createUid( from.getRequestPath() );
+        final RepositoryItemUid fromUid = createUid( from.getRequestPath() );
 
-        RepositoryItemUid toUid = createUid( to.getRequestPath() );
+        final RepositoryItemUid toUid = createUid( to.getRequestPath() );
+        
+        final RepositoryItemUidLock fromUidLock = fromUid.createLock();
 
-        fromUid.lock( Action.read );
+        final RepositoryItemUidLock toUidLock = toUid.createLock();
 
-        toUid.lock( getResultingActionOnWrite( to ) );
+        fromUidLock.lock( Action.read );
+        toUidLock.lock( Action.create );
 
         try
         {
@@ -887,9 +894,11 @@ public abstract class AbstractRepository
         }
         finally
         {
-            toUid.unlock();
+            toUidLock.unlock();
+            toUidLock.release();
 
-            fromUid.unlock();
+            fromUidLock.unlock();
+            fromUidLock.release();
         }
     }
 
@@ -926,9 +935,11 @@ public abstract class AbstractRepository
 
         maintainNotFoundCache( request );
 
-        RepositoryItemUid uid = createUid( request.getRequestPath() );
+        final RepositoryItemUid uid = createUid( request.getRequestPath() );
+        
+        final RepositoryItemUidLock uidLock = uid.createLock();
 
-        uid.lock( Action.delete );
+        uidLock.lock( Action.delete );
 
         try
         {
@@ -972,7 +983,8 @@ public abstract class AbstractRepository
         }
         finally
         {
-            uid.unlock();
+            uidLock.unlock();
+            uidLock.release();
         }
     }
 
@@ -989,12 +1001,14 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this );
         }
 
-        RepositoryItemUid uid = createUid( item.getPath() );
+        final RepositoryItemUid uid = createUid( item.getPath() );
+        
+        final RepositoryItemUidLock uidLock = uid.createLock();
 
         // replace UID to own one
         item.setRepositoryItemUid( uid );
 
-        uid.lock( getResultingActionOnWrite( new ResourceStoreRequest( item ) ) );
+        uidLock.lock( Action.create );
 
         try
         {
@@ -1003,7 +1017,8 @@ public abstract class AbstractRepository
         }
         finally
         {
-            uid.unlock();
+            uidLock.unlock();
+            uidLock.release();
         }
 
         // remove the "request" item from n-cache if there
@@ -1064,7 +1079,8 @@ public abstract class AbstractRepository
         return items;
     }
 
-    public RepositoryItemUid createUid( String path )
+    @Override
+    public RepositoryItemUid createUid( final String path )
     {
         return getRepositoryItemUidFactory().createUid( this, path );
     }

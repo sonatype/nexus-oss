@@ -52,6 +52,7 @@ import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeSet;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.mirror.DefaultDownloadMirrors;
@@ -808,7 +809,9 @@ public abstract class AbstractProxyRepository
                     "Caching item " + item.getRepositoryItemUid().toString() + " in local storage of repository." );
             }
 
-            item.getRepositoryItemUid().lock( getResultingActionOnWrite( new ResourceStoreRequest( item ) ) );
+            final RepositoryItemUidLock itemLock = item.getRepositoryItemUid().createLock();
+            
+            itemLock.lock( Action.create );
 
             try
             {
@@ -821,7 +824,8 @@ public abstract class AbstractProxyRepository
             }
             finally
             {
-                item.getRepositoryItemUid().unlock();
+                itemLock.unlock();
+                itemLock.release();
             }
 
             getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventCache( this, result ) );
@@ -873,9 +877,11 @@ public abstract class AbstractProxyRepository
         // if proxy and need to go remote, we want to _protect_ ourselves from
         // serving up partial downloads...
 
-        RepositoryItemUid itemUid = createUid( request.getRequestPath() );
+        final RepositoryItemUid itemUid = createUid( request.getRequestPath() );
+        
+        final RepositoryItemUidLock itemUidLock = itemUid.createLock();
 
-        itemUid.lock( Action.read );
+        itemUidLock.lock( Action.read );
 
         try
         {
@@ -915,7 +921,7 @@ public abstract class AbstractProxyRepository
                 // will we actually fetch it (since aging != remote file changed!)
                 // BUT, from this point on, we want to _serialize_ access, so upgrade to CREATE lock
 
-                itemUid.lock( Action.create );
+                itemUidLock.lock( Action.create );
 
                 try
                 {
@@ -945,15 +951,15 @@ public abstract class AbstractProxyRepository
                 }
                 finally
                 {
-                    itemUid.unlock();
+                    itemUidLock.unlock();
                 }
             }
         }
         finally
         {
-            itemUid.unlock();
+            itemUidLock.unlock();
+            itemUidLock.release();
         }
-
     }
 
     protected StorageItem doRetrieveItem0( ResourceStoreRequest request, AbstractStorageItem localItem )
@@ -1265,10 +1271,12 @@ public abstract class AbstractProxyRepository
     protected AbstractStorageItem doRetrieveRemoteItem( ResourceStoreRequest request )
         throws ItemNotFoundException, RemoteAccessException, StorageException
     {
-        RepositoryItemUid itemUid = createUid( request.getRequestPath() );
+        final RepositoryItemUid itemUid = createUid( request.getRequestPath() );
+
+        final RepositoryItemUidLock itemUidLock = itemUid.createLock();
 
         // all this remote download happens in exclusive lock
-        itemUid.lock( Action.create );
+        itemUidLock.lock( Action.create );
 
         try
         {
@@ -1446,7 +1454,8 @@ public abstract class AbstractProxyRepository
         }
         finally
         {
-            itemUid.unlock();
+            itemUidLock.unlock();
+            itemUidLock.release();
         }
     }
 

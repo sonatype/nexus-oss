@@ -38,6 +38,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageCompositeFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsMetadataMaintainedAttribute;
@@ -98,7 +99,7 @@ public class DefaultFSAttributeStorage
         applicationEventMulticaster.addEventListener( this );
     }
 
-    public void onEvent( Event<?> evt )
+    public void onEvent( final Event<?> evt )
     {
         if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {
@@ -141,12 +142,12 @@ public class DefaultFSAttributeStorage
         return workingDirectory;
     }
 
-    public void setWorkingDirectory( File baseDir )
+    public void setWorkingDirectory( final File baseDir )
     {
         this.workingDirectory = baseDir;
     }
 
-    protected boolean IsMetadataMaintained( RepositoryItemUid uid )
+    protected boolean IsMetadataMaintained( final RepositoryItemUid uid )
     {
         Boolean isMetadataMaintained = uid.getAttributeValue( IsMetadataMaintainedAttribute.class );
 
@@ -161,7 +162,7 @@ public class DefaultFSAttributeStorage
         }
     }
 
-    public boolean deleteAttributes( RepositoryItemUid uid )
+    public boolean deleteAttributes( final RepositoryItemUid uid )
     {
         if ( !IsMetadataMaintained( uid ) )
         {
@@ -169,7 +170,9 @@ public class DefaultFSAttributeStorage
             return false;
         }
 
-        uid.lockAttributes( Action.delete );
+        final RepositoryItemUidLock uidLock = uid.createLock();
+
+        uidLock.lock( Action.delete );
 
         try
         {
@@ -195,11 +198,12 @@ public class DefaultFSAttributeStorage
         }
         finally
         {
-            uid.unlockAttributes();
+            uidLock.unlock();
+            uidLock.release();
         }
     }
 
-    public AbstractStorageItem getAttributes( RepositoryItemUid uid )
+    public AbstractStorageItem getAttributes( final RepositoryItemUid uid )
     {
         if ( !IsMetadataMaintained( uid ) )
         {
@@ -207,7 +211,9 @@ public class DefaultFSAttributeStorage
             return null;
         }
 
-        uid.lockAttributes( Action.read );
+        final RepositoryItemUidLock uidLock = uid.createLock();
+
+        uidLock.lock( Action.read );
 
         try
         {
@@ -232,7 +238,8 @@ public class DefaultFSAttributeStorage
         }
         finally
         {
-            uid.unlockAttributes();
+            uidLock.unlock();
+            uidLock.release();
         }
     }
 
@@ -244,9 +251,11 @@ public class DefaultFSAttributeStorage
             return;
         }
 
-        RepositoryItemUid origUid = item.getRepositoryItemUid();
+        final RepositoryItemUid origUid = item.getRepositoryItemUid();
 
-        origUid.lockAttributes( Action.create );
+        final RepositoryItemUidLock uidLock = origUid.createLock();
+
+        uidLock.lock( Action.create );
 
         try
         {
@@ -317,7 +326,8 @@ public class DefaultFSAttributeStorage
         }
         finally
         {
-            origUid.unlockAttributes();
+            uidLock.unlock();
+            uidLock.release();
         }
     }
 
@@ -331,10 +341,10 @@ public class DefaultFSAttributeStorage
      * @return the attributes
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    protected AbstractStorageItem doGetAttributes( RepositoryItemUid uid )
+    protected AbstractStorageItem doGetAttributes( final RepositoryItemUid uid )
         throws IOException
     {
-        File target = getFileFromBase( uid );
+        final File target = getFileFromBase( uid );
 
         AbstractStorageItem result = null;
 
@@ -427,10 +437,10 @@ public class DefaultFSAttributeStorage
      * @param isCollection the is collection
      * @return the file from base
      */
-    protected File getFileFromBase( RepositoryItemUid uid )
+    protected File getFileFromBase( final RepositoryItemUid uid )
         throws IOException
     {
-        File repoBase = new File( getWorkingDirectory(), uid.getRepository().getId() );
+        final File repoBase = new File( getWorkingDirectory(), uid.getRepository().getId() );
 
         File result = null;
 

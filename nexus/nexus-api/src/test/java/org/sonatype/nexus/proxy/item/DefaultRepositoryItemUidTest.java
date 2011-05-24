@@ -53,6 +53,41 @@ public class DefaultRepositoryItemUidTest
         verifyUidIsNotLocked( uid );
     }
 
+    // does not stand anymore and proves nothing
+    // @Test
+    // public void testIllegalMonitorStateException()
+    // {
+    // // see NXCM-2905: this test produces the very same stack trace to be found there.
+    // // While this is the actual symptom, it is not the actual problem sadly.
+    // // The problem is in Factory, that hands out in some circumstances NEW
+    // // instances of UIDs, while it should not do that.
+    //
+    // // dummy repo
+    // final Repository repository = new DummyRepository( "dummy" );
+    // OldDefaultRepositoryItemUid uid;
+    //
+    // // "simulate" we get an UID from factory
+    // uid = new OldDefaultRepositoryItemUid( factory, repository, "/some/path.txt" );
+    //
+    // // do some locking
+    // uid.lock( Action.read );
+    //
+    // // now tricky part, we "simulate" how factory hands us a _new_ instance instead of the existing one
+    // uid = new OldDefaultRepositoryItemUid( factory, repository, "/some/path.txt" );
+    //
+    // try
+    // {
+    // // continue using it and kaboom, IllegalMonitorStateException
+    // uid.lock( Action.create );
+    //
+    // Assert.fail( "We expect IllegalMonitorState exception!" );
+    // }
+    // catch ( IllegalMonitorStateException e )
+    // {
+    // // good
+    // }
+    // }
+
     @Test
     public void testMultiThreadedLocking()
         throws InterruptedException
@@ -127,7 +162,7 @@ public class DefaultRepositoryItemUidTest
         // Warning: this trick is to present overall lock counts, and not owned by the current thread (before anyone
         // says "there is an API for this")
 
-        String lockToString = uid.getContentLock().toString();
+        String lockToString = ( (DefaultRepositoryItemUidLock) uid.createLock() ).getContentLock().toString();
 
         Assert.assertTrue( "We expect " + wc + " write locks but have " + lockToString,
             lockToString.contains( "[Write locks = " + wc ) );
@@ -143,29 +178,33 @@ public class DefaultRepositoryItemUidTest
      */
     public static void lockingSteps1( RepositoryItemUid uid, Sleeper sleeper )
     {
+        RepositoryItemUidLock uidLock = uid.createLock();
+
         // 1st lock is READ
-        uid.lock( Action.read );
+        uidLock.lock( Action.read );
         sleep( sleeper );
 
         // 2nd lock is UPGRADE
-        uid.lock( Action.create );
+        uidLock.lock( Action.create );
         sleep( sleeper );
 
         // 3rd lock is NOOP, since we already have WRITE lock but READ is requested (write is "stronger")
-        uid.lock( Action.read );
+        uidLock.lock( Action.read );
         sleep( sleeper );
 
         // 3rd level unlock
-        uid.unlock();
+        uidLock.unlock();
         sleep( sleeper );
 
         // 2nd level unlock
-        uid.unlock();
+        uidLock.unlock();
         sleep( sleeper );
 
         // 1st level unlock
-        uid.unlock();
+        uidLock.unlock();
         sleep( sleeper );
+
+        uidLock.release();
     }
 
     /**
@@ -174,13 +213,17 @@ public class DefaultRepositoryItemUidTest
      */
     public static void lockingSteps2( RepositoryItemUid uid, Sleeper sleeper )
     {
+        RepositoryItemUidLock uidLock = uid.createLock();
+
         // 1st lock is READ
-        uid.lock( Action.read );
+        uidLock.lock( Action.read );
         sleep( sleeper );
 
         // 1st level unlock
-        uid.unlock();
+        uidLock.unlock();
         sleep( sleeper );
+
+        uidLock.release();
     }
 
     /**
@@ -189,13 +232,17 @@ public class DefaultRepositoryItemUidTest
      */
     public static void lockingSteps3( RepositoryItemUid uid, Sleeper sleeper )
     {
+        RepositoryItemUidLock uidLock = uid.createLock();
+
         // 1st lock is WRITE
-        uid.lock( Action.create );
+        uidLock.lock( Action.create );
         sleep( sleeper );
 
         // 1st level unlock
-        uid.unlock();
+        uidLock.unlock();
         sleep( sleeper );
+
+        uidLock.release();
     }
 
     public static void sleep( Sleeper sleeper )

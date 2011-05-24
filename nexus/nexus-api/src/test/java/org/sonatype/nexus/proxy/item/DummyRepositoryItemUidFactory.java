@@ -27,18 +27,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class DummyRepositoryItemUidFactory
     implements RepositoryItemUidFactory
 {
-    private Map<String, DefaultRepositoryItemUid> uids = new HashMap<String, DefaultRepositoryItemUid>();
-
-    public synchronized DefaultRepositoryItemUid createUid( Repository repository, String path )
+    public DefaultRepositoryItemUid createUid( Repository repository, String path )
     {
-        String key = repository.getId() + ":" + path;
-
-        if ( !uids.containsKey( key ) )
-        {
-            uids.put( key, new DefaultRepositoryItemUid( this, repository, path ) );
-        }
-
-        return uids.get( key );
+        return new DefaultRepositoryItemUid( this, repository, path );
     }
 
     public RepositoryItemUid createUid( String uidStr )
@@ -48,8 +39,25 @@ public class DummyRepositoryItemUidFactory
             "This dummy factory does not supports this method (it needs repo registry et al)" );
     }
 
-    public Map<String, RepositoryItemUid> getActiveUidMapSnapshot()
+    private Map<String, LockResource> locks = new HashMap<String, LockResource>();
+
+    @Override
+    public synchronized RepositoryItemUidLock createUidLock( RepositoryItemUid uid )
     {
-        return new HashMap<String, RepositoryItemUid>( uids );
+        LockResource lock = locks.get( uid.getKey() );
+
+        if ( lock == null )
+        {
+            lock = new SimpleLockResource();
+        }
+
+        return new DefaultRepositoryItemUidLock( this, uid, lock );
+    }
+
+    @Override
+    public void releaseUidLock( RepositoryItemUidLock uidLock )
+    {
+        // noop
+        // we should count refs here and remove from map, but gnaw
     }
 }

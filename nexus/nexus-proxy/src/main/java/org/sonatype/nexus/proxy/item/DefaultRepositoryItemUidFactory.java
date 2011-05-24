@@ -18,13 +18,7 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import java.lang.ref.WeakReference;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -48,12 +42,8 @@ public class DefaultRepositoryItemUidFactory
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    private final HashMap<String, WeakReference<RepositoryItemUid>> itemUidMap =
-        new HashMap<String, WeakReference<RepositoryItemUid>>();
-
-    private final ReentrantLock uidCreateLock = new ReentrantLock();
-
-    public RepositoryItemUid createUid( Repository repository, String path )
+    @Override
+    public RepositoryItemUid createUid( final Repository repository, String path )
     {
         // path corrections
         if ( !StringUtils.isEmpty( path ) )
@@ -68,43 +58,11 @@ public class DefaultRepositoryItemUidFactory
             path = RepositoryItemUid.PATH_ROOT;
         }
 
-        final String key = repository.getId() + ":" + path;
-
-        RepositoryItemUid toBeReturned = null;
-
-        uidCreateLock.lock();
-
-        try
-        {
-            // try to get it 1st
-            WeakReference<RepositoryItemUid> ref = itemUidMap.get( key );
-
-            if ( ref != null )
-            {
-                toBeReturned = ref.get();
-
-                if ( toBeReturned != null )
-                {
-                    cleanUpItemUidMap( false );
-
-                    return toBeReturned;
-                }
-            }
-
-            // not here, then put it
-            RepositoryItemUid newGuy = new DefaultRepositoryItemUid( this, repository, path );
-
-            itemUidMap.put( key, new WeakReference<RepositoryItemUid>( newGuy ) );
-
-            return newGuy;
-        }
-        finally
-        {
-            uidCreateLock.unlock();
-        }
+        return new DefaultRepositoryItemUid( this, repository, path );
     }
 
-    public RepositoryItemUid createUid( String uidStr )
+    @Override
+    public RepositoryItemUid createUid( final String uidStr )
         throws IllegalArgumentException, NoSuchRepositoryException
     {
         if ( uidStr.indexOf( ":" ) > -1 )
@@ -130,75 +88,79 @@ public class DefaultRepositoryItemUidFactory
         }
     }
 
-    public Map<String, RepositoryItemUid> getActiveUidMapSnapshot()
-    {
-        return Collections.emptyMap();
-    }
+    // ==
 
-    /**
-     * Used in UTs only, NOT public method! This method call should be called from UTs only, not from production code
-     * since it interferes with locking!
-     * 
-     * @return
-     */
-    public int getUidCount( boolean forceClean )
+    private HashMap<String, Holder> locks = new HashMap<String, Holder>();
+
+    public synchronized RepositoryItemUidLock createUidLock( final RepositoryItemUid uid )
     {
-        if ( forceClean )
+        final String key = uid.getKey();
+
+        Holder holder;
+
+        if ( locks.containsKey( key ) )
         {
-            cleanUpItemUidMap( true );
+            holder = locks.get( key );
+        }
+        else
+        {
+            holder = new Holder( new SimpleLockResource() );
+
+            locks.put( uid.getKey(), holder );
         }
 
-        return itemUidMap.size();
+        holder.incRefCount();
+
+        return new DefaultRepositoryItemUidLock( this, uid, holder.getLockResource() );
+    }
+
+    public synchronized void releaseUidLock( final RepositoryItemUidLock uidLock )
+    {
+        final String key = uidLock.getRepositoryItemUid().getKey();
+
+        Holder holder = locks.get( key );
+
+        if ( holder.decRefCount() )
+        {
+            // TODO: some protection here
+            locks.remove( key );
+        }
     }
 
     // ==
 
-    // =v=v=v=v=v=v= This part here probably needs polishing: the retention should depend on load too =v=v=v=v=v=v=
-
-    private static final long ITEM_UID_MAP_RETENTION_TIME = 5000;
-
-    private volatile long lastClearedItemUidMap;
-
-    private final ReentrantLock cleanupLock = new ReentrantLock();
-
-    private void cleanUpItemUidMap( boolean force )
+    private static class Holder
     {
-        // just try to lock it. If we cannot lock it, leave it, since some other thread is
-        // already doing cleanup. But even if we do succeed in locking the cleanupLock, we have the
-        // time barrier, that have to be true, to do actual cleanup.
-        if ( cleanupLock.tryLock() )
+        private final LockResource lockResource;
+
+        private int refCount;
+
+        public Holder( LockResource lockResource )
         {
-            // we are in, that means no one else is doing cleanup, and also that
-            // we acquired the lock in the same time.
-            // still, it is undecided yet, will we actually perform the cleanup, since
-            // we have a time barrier to pass also (unless force=true).
-            try
+            this.lockResource = lockResource;
+
+            this.refCount = 0;
+        }
+
+        public boolean decRefCount()
+        {
+            if ( refCount > 0 )
             {
-                long now = System.currentTimeMillis();
-
-                if ( force || ( now - lastClearedItemUidMap > ITEM_UID_MAP_RETENTION_TIME ) )
-                {
-                    lastClearedItemUidMap = now;
-
-                    for ( Iterator<ConcurrentMap.Entry<String, WeakReference<RepositoryItemUid>>> i =
-                        itemUidMap.entrySet().iterator(); i.hasNext(); )
-                    {
-                        ConcurrentMap.Entry<String, WeakReference<RepositoryItemUid>> entry = i.next();
-
-                        if ( entry.getValue().get() == null )
-                        {
-                            i.remove();
-                        }
-                    }
-                }
+                refCount--;
             }
-            finally
-            {
-                cleanupLock.unlock();
-            }
+
+            return refCount == 0;
+        }
+
+        public void incRefCount()
+        {
+            refCount++;
+        }
+
+        public LockResource getLockResource()
+        {
+            return lockResource;
         }
     }
-
-    // =^=^=^=^=^=^= This part here probably needs polishing: the retention should depend on load too =^=^=^=^=^=^=
 
 }

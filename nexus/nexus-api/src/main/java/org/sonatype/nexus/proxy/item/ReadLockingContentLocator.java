@@ -37,7 +37,7 @@ public class ReadLockingContentLocator
 
     private final ContentLocator wrappedLocator;
 
-    public ReadLockingContentLocator( RepositoryItemUid wrappedUid, ContentLocator wrappedLocator )
+    public ReadLockingContentLocator( final RepositoryItemUid wrappedUid, final ContentLocator wrappedLocator )
     {
         this.wrappedUid = wrappedUid;
 
@@ -47,23 +47,27 @@ public class ReadLockingContentLocator
     public InputStream getContent()
         throws IOException
     {
-        wrappedUid.lock( Action.read );
+        final RepositoryItemUidLock lock = wrappedUid.createLock();
+
+        lock.lock( Action.read );
 
         try
         {
-            return new ReadLockingInputStream( wrappedUid, wrappedLocator.getContent() );
+            return new ReadLockingInputStream( lock, wrappedLocator.getContent() );
         }
         catch ( IOException e )
         {
-            wrappedUid.unlock();
-
+            lock.unlock();
+            lock.release();
+            
             throw e;
         }
         catch ( Exception e )
         {
-            wrappedUid.unlock();
-
-            // wrap it 
+            lock.unlock();
+            lock.release();
+            
+            // wrap it
             IOException w = new IOException( e.getMessage() );
             w.initCause( e );
             throw w;
@@ -85,13 +89,13 @@ public class ReadLockingContentLocator
     private class ReadLockingInputStream
         extends WrappingInputStream
     {
-        private volatile RepositoryItemUid wrappedUid;
+        private volatile RepositoryItemUidLock lock;
 
-        public ReadLockingInputStream( RepositoryItemUid wrappedUid, InputStream wrappedStream )
+        public ReadLockingInputStream( final RepositoryItemUidLock lock, final InputStream wrappedStream )
         {
             super( wrappedStream );
 
-            this.wrappedUid = wrappedUid;
+            this.lock = lock;
         }
 
         @Override
@@ -104,11 +108,12 @@ public class ReadLockingContentLocator
             }
             finally
             {
-                if ( wrappedUid != null )
+                if ( lock != null )
                 {
-                    wrappedUid.unlock();
+                    lock.unlock();
+                    lock.release();
 
-                    wrappedUid = null;
+                    lock = null;
                 }
             }
         }

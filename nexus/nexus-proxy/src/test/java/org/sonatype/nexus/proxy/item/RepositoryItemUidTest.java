@@ -26,6 +26,8 @@ import static org.easymock.EasyMock.replay;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.access.Action;
@@ -50,7 +52,34 @@ public class RepositoryItemUidTest
 
         replay( repository );
     }
+    
+    @Test
+    public void testKey()
+    {
+        DefaultRepositoryItemUidFactory factory = (DefaultRepositoryItemUidFactory) getRepositoryItemUidFactory();
 
+        RepositoryItemUid uid = factory.createUid( repository, "/a.txt" );
+
+        Assert.assertEquals( repository.getId() + ":/a.txt", uid.getKey() );
+    }
+
+    @Test
+    public void testEquality()
+    {
+        DefaultRepositoryItemUidFactory factory = (DefaultRepositoryItemUidFactory) getRepositoryItemUidFactory();
+
+        RepositoryItemUid uid1 = factory.createUid( repository, "/a.txt" );
+
+        RepositoryItemUid uid2 = factory.createUid( repository, "/a.txt" );
+        
+        Assert.assertNotSame( uid1, uid2 );
+        
+        Assert.assertEquals( uid1, uid2 );
+
+        Assert.assertEquals( uid1.hashCode(), uid2.hashCode() );
+    }
+
+    /*
     @Test
     public void testReleaseFromMemory()
         throws Exception
@@ -206,4 +235,5 @@ public class RepositoryItemUidTest
             }
         }
     }
+    */
 }

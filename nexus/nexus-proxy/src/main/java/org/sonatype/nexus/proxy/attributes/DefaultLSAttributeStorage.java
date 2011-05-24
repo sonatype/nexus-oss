@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageCompositeFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -105,7 +106,9 @@ public class DefaultLSAttributeStorage
             return false;
         }
 
-        uid.lockAttributes( Action.delete );
+        final RepositoryItemUidLock uidLock = uid.createLock();
+        
+        uidLock.lock( Action.delete );
 
         try
         {
@@ -142,7 +145,8 @@ public class DefaultLSAttributeStorage
         }
         finally
         {
-            uid.unlockAttributes();
+            uidLock.unlock();
+            uidLock.release();
         }
     }
 
@@ -154,7 +158,9 @@ public class DefaultLSAttributeStorage
             return null;
         }
 
-        uid.lockAttributes( Action.read );
+        final RepositoryItemUidLock uidLock = uid.createLock();
+
+        uidLock.lock( Action.read );
 
         try
         {
@@ -179,7 +185,8 @@ public class DefaultLSAttributeStorage
         }
         finally
         {
-            uid.unlockAttributes();
+            uidLock.unlock();
+            uidLock.release();
         }
     }
 
@@ -193,7 +200,9 @@ public class DefaultLSAttributeStorage
 
         RepositoryItemUid origUid = item.getRepositoryItemUid();
 
-        origUid.lockAttributes( Action.create );
+        final RepositoryItemUidLock uidLock = origUid.createLock();
+
+        uidLock.lock( Action.create );
 
         try
         {
@@ -254,7 +263,8 @@ public class DefaultLSAttributeStorage
         }
         finally
         {
-            origUid.unlockAttributes();
+            uidLock.unlock();
+            uidLock.release();
         }
     }
 
