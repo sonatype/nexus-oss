@@ -18,6 +18,13 @@
  */
 package org.sonatype.nexus.plugin;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
@@ -38,13 +45,6 @@ import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 import org.sonatype.plexus.components.sec.dispatcher.model.io.xpp3.SecurityConfigurationXpp3Writer;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 
 public class CloseStageRepositoryMojoTest
     extends AbstractNexusMojoTest
@@ -297,7 +297,7 @@ public class CloseStageRepositoryMojoTest
         conversation.add( finishPost );
 
         repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
-        repoListGet.setExactURI( StageClient.PROFILES_PATH );
+        repoListGet.setExactURI( StageClient.PROFILES_EVALUATE_PATH );
         repoListGet.setResponseDocument( readTestDocumentResource( "finish/profile-list-closed.xml" ) );
 
         conversation.add( repoListGet );
