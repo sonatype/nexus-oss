@@ -124,7 +124,7 @@ public class StageClient
 
         Document doc = get( PROFILES_EVALUATE_PATH, params );
 
-        return parseStageRepositories( doc, DATA_XPATH, true, true );
+        return parseStageRepositories( doc, STAGE_REPO_LIST_XPATH, true, true );
     }
 
     /**
