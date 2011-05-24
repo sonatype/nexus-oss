@@ -838,7 +838,7 @@
               if (baseUrlMismatch && Sonatype.lib.Permissions.checkPermission('nexus:settings', Sonatype.lib.Permissions.READ))
               {
                 Sonatype.utils.postWelcomePageAlert('<b>WARNING:</b> ' + 'Base URL setting of <a href="' + baseUrl + '">' + baseUrl + '</a> ' + 'does not match your actual URL! ' + 'If you\'re running Apache mod_proxy, here\'s '
-                    + '<a href="http://nexus.sonatype.org/about/faq.html#' + 'QHowcanIintegrateNexuswithApacheHttpdandModProxy">' + 'more information</a> on configuring Nexus with it.');
+                    + '<a href="http://nexus.sonatype.org/wiki/ApacheHttpdandModProxy">' + 'more information</a> on configuring Nexus with it.' );
               }
 
               Sonatype.Events.fireEvent('nexusStatus');
