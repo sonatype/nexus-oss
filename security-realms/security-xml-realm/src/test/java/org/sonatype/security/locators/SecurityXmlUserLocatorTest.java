@@ -54,7 +54,7 @@ public class SecurityXmlUserLocatorTest
         Assert.assertTrue( userIds.contains( "anonymous" ) );
         Assert.assertTrue( userIds.contains( "admin" ) );
 
-        Assert.assertEquals( 3, userIds.size() );
+        Assert.assertEquals( 4, userIds.size() );
     }
 
     public void testListUsers()
@@ -69,7 +69,7 @@ public class SecurityXmlUserLocatorTest
         Assert.assertTrue( userMap.containsKey( "anonymous" ) );
         Assert.assertTrue( userMap.containsKey( "admin" ) );
 
-        Assert.assertEquals( 3, users.size() );
+        Assert.assertEquals( 4, users.size() );
     }
 
     public void testGetUser()
@@ -90,6 +90,25 @@ public class SecurityXmlUserLocatorTest
         Assert.assertEquals( 2, roleMap.size() );
     }
 
+    public void testGetUserWithEmptyRole()
+        throws Exception
+    {
+        UserManager userLocator = this.getUserManager();
+        User testUser = userLocator.getUser( "test-user-with-empty-role" );
+
+        Assert.assertEquals( "Test User With Empty Role", testUser.getName() );
+        Assert.assertEquals( "test-user-with-empty-role", testUser.getUserId() );
+        Assert.assertEquals( "empty-role@yourcompany.com", testUser.getEmailAddress() );
+
+        // test roles
+        Map<String, RoleIdentifier> roleMap = this.toRoleMap( testUser.getRoles() );
+
+        Assert.assertTrue( roleMap.containsKey( "empty-role" ) );
+        Assert.assertTrue( roleMap.containsKey( "role1" ) );
+        Assert.assertTrue( roleMap.containsKey( "role2" ) );
+        Assert.assertEquals( 3, roleMap.size() );
+    }
+    
     public void testSearchUser()
         throws Exception
     {
@@ -99,8 +118,9 @@ public class SecurityXmlUserLocatorTest
         Map<String, User> userMap = this.toUserMap( users );
 
         Assert.assertTrue( userMap.containsKey( "test-user" ) );
+        Assert.assertTrue( userMap.containsKey( "test-user-with-empty-role" ) );
 
-        Assert.assertEquals( 1, users.size() );
+        Assert.assertEquals( 2, users.size() );
     }
 
     private Map<String, RoleIdentifier> toRoleMap( Set<RoleIdentifier> roles )

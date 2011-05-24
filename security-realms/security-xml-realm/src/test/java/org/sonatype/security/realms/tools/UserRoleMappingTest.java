@@ -53,6 +53,40 @@ public class UserRoleMappingTest
         Assert.assertTrue( mapping.getRoles().contains( "role2" ) );
         Assert.assertEquals( 2, mapping.getRoles().size() );
     }
+    
+    public void testGetUserWithEmptyRole()
+        throws Exception
+    {
+        ConfigurationManager config = this.getConfigManager();
+
+        CUser user = config.readUser( "test-user-with-empty-role" );
+        Assert.assertEquals( user.getId(), "test-user-with-empty-role" );
+        Assert.assertEquals( user.getEmail(), "empty-role@yourcompany.com" );
+        Assert.assertEquals( user.getFirstName(), "Test" );
+        Assert.assertEquals( user.getLastName(), "User With Empty Role" );
+        Assert.assertEquals( user.getPassword(), "b2a0e378437817cebdf753d7dff3dd75483af9e0" );
+        Assert.assertEquals( user.getStatus(), "active" );
+
+        CUserRoleMapping mapping = config.readUserRoleMapping( "test-user-with-empty-role", "default" );
+
+        Assert.assertTrue( mapping.getRoles().contains( "empty-role" ) );
+        Assert.assertTrue( mapping.getRoles().contains( "role1" ) );
+        Assert.assertTrue( mapping.getRoles().contains( "role2" ) );
+        Assert.assertEquals( 3, mapping.getRoles().size() );
+        
+        // try to update empty role
+        config.updateUserRoleMapping( mapping );
+        config.save();
+        config.clearCache();
+        
+        // make sure we still have the role mappings
+        mapping = config.readUserRoleMapping( "test-user-with-empty-role", "default" );
+
+        Assert.assertTrue( mapping.getRoles().contains( "empty-role" ) );
+        Assert.assertTrue( mapping.getRoles().contains( "role1" ) );
+        Assert.assertTrue( mapping.getRoles().contains( "role2" ) );
+        Assert.assertEquals( 3, mapping.getRoles().size() );
+    }
 
     public void testUpdateUsersRoles()
         throws Exception
@@ -60,7 +94,7 @@ public class UserRoleMappingTest
         ConfigurationManager config = this.getConfigManager();
 
         // make sure we have exactly 4 user role mappings
-        Assert.assertEquals( 4, config.listUserRoleMappings().size() );
+        Assert.assertEquals( 5, config.listUserRoleMappings().size() );
 
         // get the test-user and add a role
         CUser user = config.readUser( "test-user" );
@@ -73,7 +107,7 @@ public class UserRoleMappingTest
         config.updateUser( user, new HashSet<String>( roles ) );
 
         // make sure we have exactly 4 user role mappings
-        Assert.assertEquals( 4, config.listUserRoleMappings().size() );
+        Assert.assertEquals( 5, config.listUserRoleMappings().size() );
     }
 
     @Override

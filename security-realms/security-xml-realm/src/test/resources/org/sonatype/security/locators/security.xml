@@ -23,6 +23,15 @@
 			
 		</user>
 		<user>
+			<id>test-user-with-empty-role</id>
+			<name>Test User With Empty Role</name>
+			<!-- deployment123 -->
+			<password>b2a0e378437817cebdf753d7dff3dd75483af9e0</password>
+			<status>active</status>
+			<email>empty-role@yourcompany.com</email>
+			
+		</user>
+		<user>
 			<id>anonymous</id>
 			<name>Anonynmous User</name>
 			<!-- anonymous -->
@@ -63,6 +72,12 @@
         <privilege>1</privilege>
         <privilege>4</privilege>
       </privileges>
+    </role>
+    <role>
+      <id>empty-role</id>
+      <name>Empty Role</name>
+      <description>Empty Role</description>
+      <sessionTimeout>60</sessionTimeout>
     </role>
   </roles>
   
@@ -156,6 +171,17 @@
 			<userId>test-user</userId>
 			<source>default</source>
 			<roles>
+				<role>role1</role>
+				<role>role2</role>
+			</roles>
+
+		</userRoleMapping>
+		
+		<userRoleMapping>
+			<userId>test-user-with-empty-role</userId>
+			<source>default</source>
+			<roles>
+			    <role>empty-role</role>
 				<role>role1</role>
 				<role>role2</role>
 			</roles>
