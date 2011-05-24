@@ -90,17 +90,6 @@ public class DefaultRepositoryItemUidLock
     @Override
     public void release()
     {
-        // This below is problematic: this is untrue, since new INSTANCES will be asked for, but they will all use
-        // _shared_ lock.
-        // Hence, a boxed use will try to release it, but since it's unaware of being boxed, will not be able to.
-        // TODO: think about this more...
-        //
-        // if ( contentLock.hasLocksHeld() )
-        // {
-        // throw new IllegalStateException(
-        // "This instance of DefaultRepositoryItemUidLock still has locks associated with caller thread!" );
-        // }
-
         if ( released.compareAndSet( 0, 1 ) )
         {
             factory.releaseUidLock( this );
