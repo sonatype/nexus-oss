@@ -24,7 +24,6 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -107,7 +106,7 @@ public class StageClientTest
     public void queryOpenRepositoryForGAVAndUser()
         throws JDOMException, IOException, RESTLightClientException
     {
-        setupOpenReposConversation();
+        setupEvaluateOpenReposConversation();
 
         StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
 
@@ -130,7 +129,7 @@ public class StageClientTest
     public void finishRepository()
         throws JDOMException, IOException, RESTLightClientException
     {
-        setupOpenReposConversation();
+        setupEvaluateOpenReposConversation();
 
         POSTFixture finishPost = new POSTFixture( getExpectedUser(), getExpectedPassword() );
 
@@ -235,7 +234,7 @@ public class StageClientTest
     public void queryClosedRepositoryForGAVAndUser()
         throws JDOMException, IOException, RESTLightClientException
     {
-        setupClosedReposConversation();
+        setupEvaluateClosedReposConversation();
 
         StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
 
@@ -336,11 +335,69 @@ public class StageClientTest
 
         fixture.getConversation().add( repoListGet );
 
+        // GETFixture repoEvalListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
+        // repoEvalListGet.setExactURI( StageClient.PROFILES_EVALUATE_PATH );
+        // repoEvalListGet.setResponseDocument( readTestDocumentResource( "profile-list.xml" ) );
+        //
+        // fixture.getConversation().add( repoEvalListGet );
+
         GETFixture reposGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         reposGet.setExactURI( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1" );
         reposGet.setResponseDocument( readTestDocumentResource( "profile-repo-list.xml" ) );
 
         fixture.getConversation().add( reposGet );
+    }
+
+    private void setupEvaluateOpenReposConversation()
+        throws JDOMException, IOException
+    {
+        initConversation();
+
+        GETFixture repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
+        repoListGet.setExactURI( StageClient.PROFILES_EVALUATE_PATH );
+        repoListGet.setResponseDocument( readTestDocumentResource( "profile-list.xml" ) );
+
+        fixture.getConversation().add( repoListGet );
+
+        // GETFixture repoEvalListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
+        // repoEvalListGet.setExactURI( StageClient.PROFILES_EVALUATE_PATH );
+        // repoEvalListGet.setResponseDocument( readTestDocumentResource( "profile-list.xml" ) );
+        //
+        // fixture.getConversation().add( repoEvalListGet );
+
+        GETFixture reposGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
+        reposGet.setExactURI( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1" );
+        reposGet.setResponseDocument( readTestDocumentResource( "profile-repo-list.xml" ) );
+
+        fixture.getConversation().add( reposGet );
+    }
+
+    private void setupEvaluateClosedReposConversation()
+        throws JDOMException, IOException
+    {
+        List<RESTTestFixture> conversation = new ArrayList<RESTTestFixture>();
+
+        conversation.add( getVersionCheckFixture() );
+
+        GETFixture repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
+        repoListGet.setExactURI( StageClient.PROFILES_EVALUATE_PATH );
+        repoListGet.setResponseDocument( readTestDocumentResource( "profile-list-closed.xml" ) );
+
+        conversation.add( repoListGet );
+
+        // GETFixture repoEvalListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
+        // repoEvalListGet.setExactURI( StageClient.PROFILES_EVALUATE_PATH );
+        // repoEvalListGet.setResponseDocument( readTestDocumentResource( "profile-list-closed.xml" ) );
+        //
+        // conversation.add( repoEvalListGet );
+
+        GETFixture reposGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
+        reposGet.setExactURI( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1" );
+        reposGet.setResponseDocument( readTestDocumentResource( "profile-repo-list-closed.xml" ) );
+
+        conversation.add( reposGet );
+
+        fixture.setConversation( conversation );
     }
 
     private void setupClosedReposConversation()
@@ -355,6 +412,12 @@ public class StageClientTest
         repoListGet.setResponseDocument( readTestDocumentResource( "profile-list-closed.xml" ) );
 
         conversation.add( repoListGet );
+
+        // GETFixture repoEvalListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
+        // repoEvalListGet.setExactURI( StageClient.PROFILES_EVALUATE_PATH );
+        // repoEvalListGet.setResponseDocument( readTestDocumentResource( "profile-list-closed.xml" ) );
+        //
+        // conversation.add( repoEvalListGet );
 
         GETFixture reposGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         reposGet.setExactURI( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1" );

@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethodBase;
+import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -741,6 +742,7 @@ public abstract class AbstractRESTLightClient
             return;
         }
 
+        List<NameValuePair> q = new ArrayList<NameValuePair>();
         for ( Map.Entry<String, ? extends Object> entry : requestParams.entrySet() )
         {
             if ( entry.getValue() instanceof Collection )
@@ -762,7 +764,11 @@ public abstract class AbstractRESTLightClient
             {
                 method.addRequestHeader( entry.getKey(), String.valueOf( entry.getValue() ) );
             }
+
+            q.add( new NameValuePair( entry.getKey(), String.valueOf( entry.getValue() ) ) );
         }
+
+        method.setQueryString( q.toArray( new NameValuePair[0] ) );
     }
 
     /**

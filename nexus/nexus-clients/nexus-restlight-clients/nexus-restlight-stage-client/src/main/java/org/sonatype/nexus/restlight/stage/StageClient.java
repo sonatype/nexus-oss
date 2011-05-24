@@ -43,6 +43,8 @@ public class StageClient
 
     public static final String PROFILES_PATH = SVC_BASE + "/staging/profiles";
 
+    public static final String PROFILES_EVALUATE_PATH = SVC_BASE + "/staging/profile_evaluate";
+
     public static final String PROFILE_REPOS_PATH_PREFIX = SVC_BASE + "/staging/profile_repositories/";
 
     public static final String STAGE_REPO_FINISH_ACTION = "/finish";
@@ -81,6 +83,8 @@ public class StageClient
 
     private static final String STAGE_REPO_XPATH = "//stagingProfile";
 
+    private static final String DATA_XPATH = "//data";
+
     private static final String STAGE_REPO_DETAIL_XPATH = "//stagingProfileRepository";
 
     private static final String BUILD_PROMOTION_PROFILES_XPATH = "//stagingProfile[mode=\"GROUP\"]";
@@ -118,9 +122,9 @@ public class StageClient
         Map<String, String> params = new HashMap<String, String>();
         mapCoord( groupId, artifactId, version, params );
 
-        Document doc = get( PROFILES_PATH, params );
+        Document doc = get( PROFILES_EVALUATE_PATH, params );
 
-        return parseStageRepositories( doc, STAGE_REPO_XPATH, true, true );
+        return parseStageRepositories( doc, DATA_XPATH, true, true );
     }
 
     /**
@@ -136,7 +140,7 @@ public class StageClient
         Map<String, String> params = new HashMap<String, String>();
         mapCoord( groupId, artifactId, version, params );
 
-        Document doc = get( PROFILES_PATH, params );
+        Document doc = get( PROFILES_EVALUATE_PATH, params );
 
         List<StageRepository> ids = parseStageRepositories( doc, STAGE_REPO_XPATH, true, true );
         if ( ids == null || ids.isEmpty() )
@@ -176,7 +180,7 @@ public class StageClient
         Map<String, String> params = new HashMap<String, String>();
         mapCoord( groupId, artifactId, version, params );
 
-        Document doc = get( PROFILES_PATH, params );
+        Document doc = get( PROFILES_EVALUATE_PATH, params );
 
         return parseStageRepositories( doc, STAGE_REPO_XPATH, false, true );
     }
