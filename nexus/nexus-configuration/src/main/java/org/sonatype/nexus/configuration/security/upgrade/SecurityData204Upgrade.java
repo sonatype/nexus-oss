@@ -50,9 +50,9 @@ public class SecurityData204Upgrade
         developer.addRole( "nexus-developer" );
         cfg.addRole( developer );
         CRole deployer = new CRole();
-        deployer.setDescription( "Deprecated deployer role, use nexus-deployer instead" );
+        deployer.setDescription( "Deprecated deployment role, use nexus-deployment instead" );
         deployer.setId( "deployment" );
-        deployer.setName( "Deployer" );
+        deployer.setName( "Deployment" );
         deployer.setReadOnly( false );
         deployer.addRole( "nexus-deployment" );
         cfg.addRole( deployer );

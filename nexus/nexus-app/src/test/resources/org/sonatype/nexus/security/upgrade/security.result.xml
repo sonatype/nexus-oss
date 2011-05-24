@@ -89,7 +89,7 @@
     </role>
     <role>
       <id>admin</id>
-      <name>Admin</name>
+      <name>Nexus Administrator Role</name>
       <description>Deprecated admin role, use nexus-admin instead</description>
       <roles>
         <role>nexus-admin</role>
@@ -104,11 +104,11 @@
       </roles>
     </role>
     <role>
-      <id>deployer</id>
-      <name>Deployer</name>
-      <description>Deprecated deployer role, use nexus-deployer instead</description>
+      <id>deployment</id>
+      <name>Deployment</name>
+      <description>Deprecated deployment role, use nexus-deployment instead</description>
       <roles>
-        <role>nexus-deployer</role>
+        <role>nexus-deployment</role>
       </roles>
     </role>
   </roles>
