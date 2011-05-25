@@ -26,8 +26,12 @@ public class NexusSecureHttpAuthenticationFilter
 {
     private PasswordDecryptor passwordDecryptor;
 
-    protected PasswordDecryptor getPasswordDecryptor()
+    protected void onFilterConfigSet()
+        throws Exception
     {
+        super.onFilterConfigSet();
+
+        // set pwdDecryptor if we have it
         if ( passwordDecryptor == null && getPlexusContainer().hasComponent( PasswordDecryptor.class ) )
         {
             try
@@ -39,7 +43,10 @@ public class NexusSecureHttpAuthenticationFilter
                 // ignore it? There is none set
             }
         }
+    }
 
+    protected PasswordDecryptor getPasswordDecryptor()
+    {
         return passwordDecryptor;
     }
 

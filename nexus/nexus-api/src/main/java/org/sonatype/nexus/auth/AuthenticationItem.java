@@ -20,15 +20,15 @@ package org.sonatype.nexus.auth;
 
 public class AuthenticationItem
 {
-    private String userid;
+    private final String userid;
 
-    private String remoteIP;
+    private final String remoteIP;
 
-    private boolean success;
+    private final boolean success;
 
-    private String userAgent;
+    private final String userAgent;
 
-    public AuthenticationItem( String userid, String remoteIP, String userAgent, boolean success )
+    public AuthenticationItem( final String userid, final String remoteIP, final String userAgent, final boolean success )
     {
         this.userid = userid;
         this.remoteIP = remoteIP;
@@ -54,5 +54,53 @@ public class AuthenticationItem
     public boolean isSuccess()
     {
         return success;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ( ( remoteIP == null ) ? 0 : remoteIP.hashCode() );
+        result = prime * result + ( success ? 1231 : 1237 );
+        result = prime * result + ( ( userAgent == null ) ? 0 : userAgent.hashCode() );
+        result = prime * result + ( ( userid == null ) ? 0 : userid.hashCode() );
+        return result;
+    }
+
+    @Override
+    public boolean equals( Object obj )
+    {
+        if ( this == obj )
+            return true;
+        if ( obj == null )
+            return false;
+        if ( getClass() != obj.getClass() )
+            return false;
+        AuthenticationItem other = (AuthenticationItem) obj;
+        if ( remoteIP == null )
+        {
+            if ( other.remoteIP != null )
+                return false;
+        }
+        else if ( !remoteIP.equals( other.remoteIP ) )
+            return false;
+        if ( success != other.success )
+            return false;
+        if ( userAgent == null )
+        {
+            if ( other.userAgent != null )
+                return false;
+        }
+        else if ( !userAgent.equals( other.userAgent ) )
+            return false;
+        if ( userid == null )
+        {
+            if ( other.userid != null )
+                return false;
+        }
+        else if ( !userid.equals( other.userid ) )
+            return false;
+        return true;
     }
 }

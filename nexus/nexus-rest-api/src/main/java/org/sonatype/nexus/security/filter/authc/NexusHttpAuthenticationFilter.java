@@ -18,16 +18,12 @@
  */
 package org.sonatype.nexus.security.filter.authc;
 
-import java.util.Date;
-
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExpiredCredentialsException;
@@ -41,13 +37,11 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.Nexus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.auth.AuthenticationItem;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.feeds.AuthcAuthzEvent;
-import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.rest.RemoteIPFinder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
@@ -63,13 +57,50 @@ public class NexusHttpAuthenticationFilter
 
     public static final String ANONYMOUS_LOGIN = "nexus.anonynmous";
 
-    private final Log logger = LogFactory.getLog( this.getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
     private boolean fakeAuthScheme;
 
-    private AuthcAuthzEvent currentAuthcEvt;
+    // this comes from attributes set by plexus helper listener (nexus-web-utils module)
+    protected PlexusContainer plexusContainer;
 
-    protected Log getLogger()
+    // this comes from Plexus IoC but we need to "lift" them manually, no injection here
+    private NexusConfiguration nexusConfiguration;
+
+    // this comes from Plexus IoC but we need to "lift" them manually, no injection here
+    private ApplicationEventMulticaster applicationEventMulticaster;
+
+    protected void onFilterConfigSet()
+        throws Exception
+    {
+        super.onFilterConfigSet();
+
+        plexusContainer = (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
+
+        // this might be null, at least the old removed code was prepared for it (why? when? -- cstamas)
+        try
+        {
+            applicationEventMulticaster = plexusContainer.lookup( ApplicationEventMulticaster.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+            applicationEventMulticaster = null;
+        }
+
+        nexusConfiguration = plexusContainer.lookup( NexusConfiguration.class );
+    }
+
+    protected PlexusContainer getPlexusContainer()
+    {
+        return plexusContainer;
+    }
+
+    protected NexusConfiguration getNexusConfiguration()
+    {
+        return nexusConfiguration;
+    }
+
+    protected Logger getLogger()
     {
         return logger;
     }
@@ -97,21 +128,6 @@ public class NexusHttpAuthenticationFilter
             setAuthcScheme( HttpServletRequest.BASIC_AUTH );
             setAuthzScheme( HttpServletRequest.BASIC_AUTH );
         }
-    }
-
-    protected Nexus getNexus()
-    {
-        return (Nexus) getAttribute( Nexus.class.getName() );
-    }
-
-    protected NexusConfiguration getNexusConfiguration()
-    {
-        return (NexusConfiguration) getAttribute( NexusConfiguration.class.getName() );
-    }
-
-    protected PlexusContainer getPlexusContainer()
-    {
-        return (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
     }
 
     @Override
@@ -246,99 +262,29 @@ public class NexusHttpAuthenticationFilter
         return false;
     }
 
+    private void postAuthcEvent( ServletRequest request, String username, String userAgent, boolean success )
+    {
+        if ( applicationEventMulticaster != null )
+        {
+            applicationEventMulticaster.notifyEventListeners( new NexusAuthenticationEvent( this,
+                new AuthenticationItem( username, RemoteIPFinder.findIP( (HttpServletRequest) request ), userAgent,
+                    success ) ) );
+        }
+    }
+
     @Override
     protected boolean onLoginSuccess( AuthenticationToken token, Subject subject, ServletRequest request,
                                       ServletResponse response )
     {
-        String msg =
-            "Successfully authenticated user [" + token.getPrincipal() + "] from IP Address "
-                + RemoteIPFinder.findIP( (HttpServletRequest) request );
-
-        recordAuthcEvent( request, msg );
-
         postAuthcEvent( request, token.getPrincipal().toString(), getUserAgent( request ), true );
 
         return true;
-    }
-
-    private void postAuthcEvent( ServletRequest request, String username, String userAgent, boolean success )
-    {
-        try
-        {
-            ApplicationEventMulticaster multicaster = getPlexusContainer().lookup( ApplicationEventMulticaster.class );
-
-            multicaster.notifyEventListeners( new NexusAuthenticationEvent( this, new AuthenticationItem( username,
-                RemoteIPFinder.findIP( (HttpServletRequest) request ), userAgent, success ) ) );
-        }
-        catch ( ComponentLookupException e )
-        {
-            getLogger().error( "Unable to lookup component", e );
-        }
-    }
-
-    private void recordAuthcEvent( ServletRequest request, String msg )
-    {
-        // to make feeds entries be more concise, ignore similar events which occurs in a small period of time
-        if ( isSimilarEvent( msg ) )
-        {
-            return;
-        }
-
-        getLogger().debug( msg );
-
-        AuthcAuthzEvent evt = new AuthcAuthzEvent( new Date(), FeedRecorder.SYSTEM_AUTHC, msg );
-
-        String ip = RemoteIPFinder.findIP( (HttpServletRequest) request );
-
-        if ( ip != null )
-        {
-            evt.getEventContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, ip );
-        }
-
-        Nexus nexus = getNexus();
-
-        if ( nexus != null )
-        {
-            try
-            {
-                getNexus().addAuthcAuthzEvent( evt );
-            }
-            catch ( Exception e )
-            {
-                // just neglect it, it should not disturb actual authc operation
-            }
-        }
-
-        currentAuthcEvt = evt;
-    }
-
-    private boolean isSimilarEvent( String msg )
-    {
-        if ( currentAuthcEvt == null )
-        {
-            return false;
-        }
-
-        if ( currentAuthcEvt.getMessage().equals( msg )
-            && ( System.currentTimeMillis() - currentAuthcEvt.getEventDate().getTime() < 2000L ) )
-        {
-            return true;
-        }
-
-        return false;
     }
 
     @Override
     protected boolean onLoginFailure( AuthenticationToken token, AuthenticationException ae, ServletRequest request,
                                       ServletResponse response )
     {
-        String msg =
-            "Unable to authenticate user [" + token.getPrincipal() + "] from IP Address "
-                + RemoteIPFinder.findIP( (HttpServletRequest) request );
-
-        recordAuthcEvent( request, msg );
-        getLogger().debug( msg, ae );
-
         postAuthcEvent( request, token.getPrincipal().toString(), getUserAgent( request ), false );
 
         HttpServletResponse httpResponse = WebUtils.toHttp( response );
@@ -361,10 +307,10 @@ public class NexusHttpAuthenticationFilter
             {
                 getSubject( request, response ).logout();
             }
-            catch( UnknownSessionException e )
+            catch ( UnknownSessionException e )
             {
                 // we need to prevent log spam, just log this as trace
-                this.logger.trace( "Failed to find session for anonymous user.", e );
+                getLogger().trace( "Failed to find session for anonymous user.", e );
             }
             if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
             {
@@ -475,19 +421,22 @@ public class NexusHttpAuthenticationFilter
         return new String[] { parts[0], decoded.substring( parts[0].length() + 1 ) };
     }
 
+    // ==
+
     protected Object getAttribute( String key )
     {
-        return this.getFilterConfig().getServletContext().getAttribute( key );
+        return getFilterConfig().getServletContext().getAttribute( key );
     }
-
 
     private String getUserAgent( final ServletRequest request )
     {
         if ( request instanceof HttpServletRequest )
         {
             final String userAgent = ( (HttpServletRequest) request ).getHeader( "User-Agent" );
+
             return userAgent;
         }
+
         return null;
     }
 }
