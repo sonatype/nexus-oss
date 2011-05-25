@@ -47,7 +47,10 @@ public interface RepositoryItemUidLock
         throws IllegalStateException;
 
     /**
-     * Unlocks UID. It is the responsibility of caller to use lock/unlock properly (ie. boxing of calls).
+     * Unlocks UID. It is the responsibility of caller to use lock/unlock properly (ie. boxing of calls). Last unlock on
+     * this lock also releases the lock. After being released, you need to acquire a new instance of lock, since this
+     * instance {@link #lock(Action)} and {@link #unlock()} methods will refuse to work anymore and throw
+     * {@link IllegalStateException} when invoked.
      * 
      * @throws IllegalStateException if invoked after this lock object is released.
      */
@@ -55,10 +58,9 @@ public interface RepositoryItemUidLock
         throws IllegalStateException;
 
     /**
-     * Releases this lock resource, marking the instance as "unused" or "not needed anymore" by the thread that
-     * initially acquired it to perform locking with it. Once an instance is marked as "released", all the methods above
-     * will start throwing {@link IllegalStateException}! Calling release multiple times has no effect, the actual
-     * resource release happens only at first call, next calls are essentially noops.
+     * Returns true if this instance has been released.
+     * 
+     * @return
      */
-    void release();
+    boolean isReleased();
 }

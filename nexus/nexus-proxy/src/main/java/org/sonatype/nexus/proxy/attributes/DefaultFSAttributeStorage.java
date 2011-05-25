@@ -170,7 +170,7 @@ public class DefaultFSAttributeStorage
             return false;
         }
 
-        final RepositoryItemUidLock uidLock = uid.createLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.delete );
 
@@ -199,7 +199,6 @@ public class DefaultFSAttributeStorage
         finally
         {
             uidLock.unlock();
-            uidLock.release();
         }
     }
 
@@ -211,7 +210,7 @@ public class DefaultFSAttributeStorage
             return null;
         }
 
-        final RepositoryItemUidLock uidLock = uid.createLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.read );
 
@@ -239,7 +238,6 @@ public class DefaultFSAttributeStorage
         finally
         {
             uidLock.unlock();
-            uidLock.release();
         }
     }
 
@@ -253,7 +251,7 @@ public class DefaultFSAttributeStorage
 
         final RepositoryItemUid origUid = item.getRepositoryItemUid();
 
-        final RepositoryItemUidLock uidLock = origUid.createLock();
+        final RepositoryItemUidLock uidLock = origUid.getLock();
 
         uidLock.lock( Action.create );
 
@@ -327,7 +325,6 @@ public class DefaultFSAttributeStorage
         finally
         {
             uidLock.unlock();
-            uidLock.release();
         }
     }
 

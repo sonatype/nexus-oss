@@ -56,11 +56,13 @@ public class RepositoryItemUidFactoryTest
     {
         Repository repository = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );
 
-        RepositoryItemUid uid = factory.createUid( repository, "/some/blammo/poth" );
+        RepositoryItemUid uid1 = factory.createUid( repository, "/some/blammo/poth" );
 
-        DefaultRepositoryItemUidLock uidLock1 = (DefaultRepositoryItemUidLock) uid.createLock();
+        RepositoryItemUid uid2 = factory.createUid( repository, "/some/blammo/poth" );
 
-        DefaultRepositoryItemUidLock uidLock2 = (DefaultRepositoryItemUidLock) uid.createLock();
+        DefaultRepositoryItemUidLock uidLock1 = (DefaultRepositoryItemUidLock) uid1.getLock();
+
+        DefaultRepositoryItemUidLock uidLock2 = (DefaultRepositoryItemUidLock) uid2.getLock();
 
         uidLock1.lock( Action.read );
 
@@ -80,7 +82,7 @@ public class RepositoryItemUidFactoryTest
 
         RepositoryItemUid uid = factory.createUid( repository, "/some/blammo/poth" );
 
-        DefaultRepositoryItemUidLock uidLock1 = (DefaultRepositoryItemUidLock) uid.createLock();
+        DefaultRepositoryItemUidLock uidLock1 = (DefaultRepositoryItemUidLock) uid.getLock();
 
         uidLock1.lock( Action.read );
 
@@ -91,7 +93,8 @@ public class RepositoryItemUidFactoryTest
         Assert.assertFalse( "Since unlocked it should say we have no lock held",
             uidLock1.getContentLock().hasLocksHeld() );
 
-        uidLock1.release();
+        // unlock above released it too
+        // uidLock1.release();
 
         try
         {

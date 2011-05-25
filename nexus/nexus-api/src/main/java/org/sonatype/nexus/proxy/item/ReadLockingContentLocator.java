@@ -47,7 +47,7 @@ public class ReadLockingContentLocator
     public InputStream getContent()
         throws IOException
     {
-        final RepositoryItemUidLock lock = wrappedUid.createLock();
+        final RepositoryItemUidLock lock = wrappedUid.getLock();
 
         lock.lock( Action.read );
 
@@ -58,15 +58,13 @@ public class ReadLockingContentLocator
         catch ( IOException e )
         {
             lock.unlock();
-            lock.release();
-            
+
             throw e;
         }
         catch ( Exception e )
         {
             lock.unlock();
-            lock.release();
-            
+
             // wrap it
             IOException w = new IOException( e.getMessage() );
             w.initCause( e );
@@ -111,10 +109,28 @@ public class ReadLockingContentLocator
                 if ( lock != null )
                 {
                     lock.unlock();
-                    lock.release();
 
                     lock = null;
                 }
+            }
+        }
+
+        @Override
+        public void finalize()
+            throws Throwable
+        {
+            try
+            {
+                if ( lock != null )
+                {
+                    lock.unlock();
+
+                    lock = null;
+                }
+            }
+            finally
+            {
+                super.finalize();
             }
         }
     }

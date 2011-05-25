@@ -611,7 +611,7 @@ public class DefaultIndexerManager
                 return;
             }
 
-            final RepositoryItemUidLock uidLock =  item.getRepositoryItemUid().createLock();
+            final RepositoryItemUidLock uidLock =  item.getRepositoryItemUid().getLock();
             
             uidLock.lock( Action.read );
 
@@ -663,7 +663,6 @@ public class DefaultIndexerManager
             finally
             {
                 uidLock.unlock();
-                uidLock.release();
             }
         }
     }
@@ -748,7 +747,7 @@ public class DefaultIndexerManager
             // NEXUS-814: we should not delete always
             if ( !item.getItemContext().containsKey( SnapshotRemover.MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV ) )
             {
-                final RepositoryItemUidLock uidLock = item.getRepositoryItemUid().createLock();
+                final RepositoryItemUidLock uidLock = item.getRepositoryItemUid().getLock();
                 
                 uidLock.lock( Action.read );
 
@@ -759,7 +758,6 @@ public class DefaultIndexerManager
                 finally
                 {
                     uidLock.unlock();
-                    uidLock.release();
                 }
             }
             else

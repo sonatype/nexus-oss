@@ -58,11 +58,28 @@ public interface RepositoryItemUid
     String getPath();
 
     /**
-     * Creates a uidLock. Caller has to explicitly release it after using it, otherwise coder creates memory leaks in Nexus!
+     * Gets the lock corresponding to this UID. Lock is lazily created, and re-created if needed. All this is
+     * transparent to the coder, as long as usual locking patterns and correct coding is applied, something like:
+     * 
+     * <pre>
+     *   uid = ...
+     *   
+     *   RepositoryItemUidLock uidLock = uid.getLock();
+     *   
+     *   uidLock.lock(Action.create);
+     *   try {
+     *     ...
+     *   } finally {
+     *     uidLock.unlock();
+     *   }
+     * </pre>
+     * 
+     * As you can see on {@link RepositoryItemUidLock#unlock()} method javadoc, last of the boxed unlocks (if any boxing
+     * at all, simply last invocation) also releases the lazily created lock.
      * 
      * @return
      */
-    RepositoryItemUidLock createLock();
+    RepositoryItemUidLock getLock();
 
     /**
      * Gets an "attribute" from this UID.

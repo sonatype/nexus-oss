@@ -94,8 +94,6 @@ public class DefaultRepositoryItemUidTest
     {
         Repository repository = new DummyRepository( "dummy" );
 
-        DefaultRepositoryItemUid uid = factory.createUid( repository, "/some/path.txt" );
-
         Sleeper sleeper1 = new Sleeper()
         {
             public void sleep()
@@ -126,11 +124,15 @@ public class DefaultRepositoryItemUidTest
             }
         };
 
-        LockingThreadSteps1 t1 = new LockingThreadSteps1( uid, 100, sleeper1 );
-        LockingThreadSteps2 t2 = new LockingThreadSteps2( uid, 100, sleeper1 );
-        LockingThreadSteps3 t3 = new LockingThreadSteps3( uid, 100, sleeper2 );
-        LockingThreadSteps1 t4 = new LockingThreadSteps1( uid, 100, sleeper2 );
-        LockingThreadSteps1 t5 = new LockingThreadSteps1( uid, 100, null );
+        LockingThreadSteps1 t1 =
+            new LockingThreadSteps1( factory.createUid( repository, "/some/path.txt" ), 100, sleeper1 );
+        LockingThreadSteps2 t2 =
+            new LockingThreadSteps2( factory.createUid( repository, "/some/path.txt" ), 100, sleeper1 );
+        LockingThreadSteps3 t3 =
+            new LockingThreadSteps3( factory.createUid( repository, "/some/path.txt" ), 100, sleeper2 );
+        LockingThreadSteps1 t4 =
+            new LockingThreadSteps1( factory.createUid( repository, "/some/path.txt" ), 100, sleeper2 );
+        LockingThreadSteps1 t5 = new LockingThreadSteps1( factory.createUid( repository, "/some/path.txt" ), 100, null );
 
         t1.start();
         t2.start();
@@ -147,7 +149,9 @@ public class DefaultRepositoryItemUidTest
         t5.join();
 
         // we have to have "clean" UID (not locked)
-        verifyUidIsNotLocked( uid );
+        // since they cover same key (repo + path), the lock under the hood is same, so
+        // checking only one of them is actaully checking all of them
+        verifyUidIsNotLocked( t1.getUid() );
     }
 
     // verification steps
@@ -162,7 +166,7 @@ public class DefaultRepositoryItemUidTest
         // Warning: this trick is to present overall lock counts, and not owned by the current thread (before anyone
         // says "there is an API for this")
 
-        String lockToString = ( (DefaultRepositoryItemUidLock) uid.createLock() ).getContentLock().toString();
+        String lockToString = ( (DefaultRepositoryItemUidLock) uid.getLock() ).getContentLock().toString();
 
         Assert.assertTrue( "We expect " + wc + " write locks but have " + lockToString,
             lockToString.contains( "[Write locks = " + wc ) );
@@ -178,7 +182,7 @@ public class DefaultRepositoryItemUidTest
      */
     public static void lockingSteps1( RepositoryItemUid uid, Sleeper sleeper )
     {
-        RepositoryItemUidLock uidLock = uid.createLock();
+        RepositoryItemUidLock uidLock = uid.getLock();
 
         // 1st lock is READ
         uidLock.lock( Action.read );
@@ -203,8 +207,6 @@ public class DefaultRepositoryItemUidTest
         // 1st level unlock
         uidLock.unlock();
         sleep( sleeper );
-
-        uidLock.release();
     }
 
     /**
@@ -213,7 +215,7 @@ public class DefaultRepositoryItemUidTest
      */
     public static void lockingSteps2( RepositoryItemUid uid, Sleeper sleeper )
     {
-        RepositoryItemUidLock uidLock = uid.createLock();
+        RepositoryItemUidLock uidLock = uid.getLock();
 
         // 1st lock is READ
         uidLock.lock( Action.read );
@@ -222,8 +224,6 @@ public class DefaultRepositoryItemUidTest
         // 1st level unlock
         uidLock.unlock();
         sleep( sleeper );
-
-        uidLock.release();
     }
 
     /**
@@ -232,7 +232,7 @@ public class DefaultRepositoryItemUidTest
      */
     public static void lockingSteps3( RepositoryItemUid uid, Sleeper sleeper )
     {
-        RepositoryItemUidLock uidLock = uid.createLock();
+        RepositoryItemUidLock uidLock = uid.getLock();
 
         // 1st lock is WRITE
         uidLock.lock( Action.create );
@@ -241,8 +241,6 @@ public class DefaultRepositoryItemUidTest
         // 1st level unlock
         uidLock.unlock();
         sleep( sleeper );
-
-        uidLock.release();
     }
 
     public static void sleep( Sleeper sleeper )
@@ -281,6 +279,11 @@ public class DefaultRepositoryItemUidTest
             this.count = count;
 
             this.sleeper = sleeper;
+        }
+
+        public DefaultRepositoryItemUid getUid()
+        {
+            return uid;
         }
 
         public void run()

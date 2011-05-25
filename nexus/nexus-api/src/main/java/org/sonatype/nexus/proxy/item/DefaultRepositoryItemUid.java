@@ -40,6 +40,9 @@ public class DefaultRepositoryItemUid
     /** the string representation, that is immutable just as UID instance is */
     private final String stringRepresentation;
 
+    /** Lazily created */
+    private RepositoryItemUidLock lock;
+
     protected DefaultRepositoryItemUid( final RepositoryItemUidFactory factory, final Repository repository,
                                         final String path )
     {
@@ -52,6 +55,8 @@ public class DefaultRepositoryItemUid
         this.path = path;
 
         this.stringRepresentation = getRepository().getId() + ":" + getPath();
+
+        this.lock = null;
     }
 
     public RepositoryItemUidFactory getRepositoryItemUidFactory()
@@ -78,9 +83,14 @@ public class DefaultRepositoryItemUid
     }
 
     @Override
-    public RepositoryItemUidLock createLock()
+    public synchronized RepositoryItemUidLock getLock()
     {
-        return factory.createUidLock( this );
+        if ( lock == null || lock.isReleased() )
+        {
+            lock = factory.createUidLock( this );
+        }
+
+        return lock;
     }
 
     @Override

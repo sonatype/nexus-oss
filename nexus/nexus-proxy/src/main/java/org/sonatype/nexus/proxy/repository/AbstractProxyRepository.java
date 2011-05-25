@@ -809,7 +809,7 @@ public abstract class AbstractProxyRepository
                     "Caching item " + item.getRepositoryItemUid().toString() + " in local storage of repository." );
             }
 
-            final RepositoryItemUidLock itemLock = item.getRepositoryItemUid().createLock();
+            final RepositoryItemUidLock itemLock = item.getRepositoryItemUid().getLock();
             
             itemLock.lock( Action.create );
 
@@ -825,7 +825,6 @@ public abstract class AbstractProxyRepository
             finally
             {
                 itemLock.unlock();
-                itemLock.release();
             }
 
             getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventCache( this, result ) );
@@ -879,7 +878,7 @@ public abstract class AbstractProxyRepository
 
         final RepositoryItemUid itemUid = createUid( request.getRequestPath() );
         
-        final RepositoryItemUidLock itemUidLock = itemUid.createLock();
+        final RepositoryItemUidLock itemUidLock = itemUid.getLock();
 
         itemUidLock.lock( Action.read );
 
@@ -958,7 +957,6 @@ public abstract class AbstractProxyRepository
         finally
         {
             itemUidLock.unlock();
-            itemUidLock.release();
         }
     }
 
@@ -1273,7 +1271,7 @@ public abstract class AbstractProxyRepository
     {
         final RepositoryItemUid itemUid = createUid( request.getRequestPath() );
 
-        final RepositoryItemUidLock itemUidLock = itemUid.createLock();
+        final RepositoryItemUidLock itemUidLock = itemUid.getLock();
 
         // all this remote download happens in exclusive lock
         itemUidLock.lock( Action.create );
@@ -1455,7 +1453,6 @@ public abstract class AbstractProxyRepository
         finally
         {
             itemUidLock.unlock();
-            itemUidLock.release();
         }
     }
 

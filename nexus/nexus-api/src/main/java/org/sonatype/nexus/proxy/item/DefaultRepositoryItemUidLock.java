@@ -75,6 +75,7 @@ public class DefaultRepositoryItemUidLock
         }
     }
 
+    @Override
     public void unlock()
         throws IllegalStateException
     {
@@ -85,15 +86,29 @@ public class DefaultRepositoryItemUidLock
         }
 
         contentLock.unlock();
+
+        if ( !contentLock.hasLocksHeld() )
+        {
+            release();
+        }
     }
 
     @Override
-    public void release()
+    public boolean isReleased()
+    {
+        return released.get() != 0;
+    }
+
+    protected boolean release()
     {
         if ( released.compareAndSet( 0, 1 ) )
         {
             factory.releaseUidLock( this );
+
+            return true;
         }
+
+        return false;
     }
 
     // ==
@@ -102,15 +117,14 @@ public class DefaultRepositoryItemUidLock
 
     private static Logger logger = LoggerFactory.getLogger( DefaultRepositoryItemUidLock.class );
 
+    @Override
     public void finalize()
         throws Throwable
     {
         try
         {
-            if ( released.compareAndSet( 0, 1 ) )
+            if ( release() )
             {
-                factory.releaseUidLock( this );
-
                 logger.error( "Memory leak: UIDLock for UID {} not released properly, lock status is {}!",
                     getRepositoryItemUid(), contentLock.toString() );
             }

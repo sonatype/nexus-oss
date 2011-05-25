@@ -761,7 +761,7 @@ public abstract class AbstractRepository
 
         final RepositoryItemUid uid = createUid( request.getRequestPath() );
 
-        final RepositoryItemUidLock uidLock = uid.createLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.read );
 
@@ -837,7 +837,6 @@ public abstract class AbstractRepository
         finally
         {
             uidLock.unlock();
-            uidLock.release();
         }
     }
 
@@ -860,9 +859,9 @@ public abstract class AbstractRepository
 
         final RepositoryItemUid toUid = createUid( to.getRequestPath() );
         
-        final RepositoryItemUidLock fromUidLock = fromUid.createLock();
+        final RepositoryItemUidLock fromUidLock = fromUid.getLock();
 
-        final RepositoryItemUidLock toUidLock = toUid.createLock();
+        final RepositoryItemUidLock toUidLock = toUid.getLock();
 
         fromUidLock.lock( Action.read );
         toUidLock.lock( Action.create );
@@ -895,10 +894,8 @@ public abstract class AbstractRepository
         finally
         {
             toUidLock.unlock();
-            toUidLock.release();
 
             fromUidLock.unlock();
-            fromUidLock.release();
         }
     }
 
@@ -937,7 +934,7 @@ public abstract class AbstractRepository
 
         final RepositoryItemUid uid = createUid( request.getRequestPath() );
         
-        final RepositoryItemUidLock uidLock = uid.createLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.delete );
 
@@ -984,7 +981,6 @@ public abstract class AbstractRepository
         finally
         {
             uidLock.unlock();
-            uidLock.release();
         }
     }
 
@@ -1003,7 +999,7 @@ public abstract class AbstractRepository
 
         final RepositoryItemUid uid = createUid( item.getPath() );
         
-        final RepositoryItemUidLock uidLock = uid.createLock();
+        final RepositoryItemUidLock uidLock = uid.getLock();
 
         // replace UID to own one
         item.setRepositoryItemUid( uid );
@@ -1018,7 +1014,6 @@ public abstract class AbstractRepository
         finally
         {
             uidLock.unlock();
-            uidLock.release();
         }
 
         // remove the "request" item from n-cache if there
