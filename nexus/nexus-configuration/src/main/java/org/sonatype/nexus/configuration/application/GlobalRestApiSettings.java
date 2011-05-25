@@ -38,5 +38,4 @@ public interface GlobalRestApiSettings
     void setUITimeout( int uiTimeout );
 
     int getUITimeout();
-
 }

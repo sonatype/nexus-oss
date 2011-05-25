@@ -35,11 +35,6 @@ public class DefaultGlobalRestApiSettings
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
-    public void disable()
-    {
-        ( (CGlobalRestApiCoreConfiguration) getCurrentCoreConfiguration() ).nullifyConfig();
-    }
-
     @Override
     protected ApplicationConfiguration getApplicationConfiguration()
     {
@@ -51,7 +46,7 @@ public class DefaultGlobalRestApiSettings
     {
         return null;
     }
-    
+
     @Override
     protected void initializeConfiguration()
         throws ConfigurationException
@@ -84,59 +79,94 @@ public class DefaultGlobalRestApiSettings
         }
     }
 
-    public String getBaseUrl()
-    {
-        return getCurrentConfiguration( false ).getBaseUrl();
-    }
-
-    public boolean isForceBaseUrl()
-    {
-        return getCurrentConfiguration( false ).isForceBaseUrl();
-    }
-
-    public void setBaseUrl( String baseUrl )
-    {
-        if ( !isEnabled() )
-        {
-            this.initConfig();
-        }
-
-        getCurrentConfiguration( true ).setBaseUrl( baseUrl );
-
-    }
-
-    public void setForceBaseUrl( boolean forceBaseUrl )
-    {
-        if ( !isEnabled() )
-        {
-            this.initConfig();
-        }
-
-        getCurrentConfiguration( true ).setForceBaseUrl( forceBaseUrl );
-    }
-
-    public boolean isEnabled()
-    {
-        return getCurrentConfiguration( false ) != null;
-    }
-
     protected void initConfig()
     {
         ( (CGlobalRestApiCoreConfiguration) getCurrentCoreConfiguration() ).initConfig();
     }
 
+    @Override
     public String getName()
     {
         return "Global Rest Api Settings";
     }
 
+    // ==
+
+    @Override
+    public void disable()
+    {
+        ( (CGlobalRestApiCoreConfiguration) getCurrentCoreConfiguration() ).nullifyConfig();
+    }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return getCurrentConfiguration( false ) != null;
+    }
+
+    @Override
+    public void setForceBaseUrl( boolean forceBaseUrl )
+    {
+        if ( !isEnabled() )
+        {
+            initConfig();
+        }
+
+        getCurrentConfiguration( true ).setForceBaseUrl( forceBaseUrl );
+    }
+
+    @Override
+    public boolean isForceBaseUrl()
+    {
+        if ( !isEnabled() )
+        {
+            return false;
+        }
+        
+        return getCurrentConfiguration( false ).isForceBaseUrl();
+    }
+
+    @Override
+    public void setBaseUrl( String baseUrl )
+    {
+        if ( !isEnabled() )
+        {
+            initConfig();
+        }
+
+        getCurrentConfiguration( true ).setBaseUrl( baseUrl );
+    }
+
+    @Override
+    public String getBaseUrl()
+    {
+        if ( !isEnabled() )
+        {
+            return null;
+        }
+        
+        return getCurrentConfiguration( false ).getBaseUrl();
+    }
+
+    @Override
     public void setUITimeout( int uiTimeout )
     {
+        if ( !isEnabled() )
+        {
+            initConfig();
+        }
+
         getCurrentConfiguration( true ).setUiTimeout( uiTimeout );
     }
 
+    @Override
     public int getUITimeout()
     {
+        if ( !isEnabled() )
+        {
+            return 0;
+        }
+
         return getCurrentConfiguration( false ).getUiTimeout();
     }
 
