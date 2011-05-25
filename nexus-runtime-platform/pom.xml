@@ -37,7 +37,7 @@
   <name>Nexus Runtime Platform</name>
 
   <properties>
-    <sisu-inject.version>2.1.1</sisu-inject.version>
+    <sisu-inject.version>2.1.1-NEXUS-4312</sisu-inject.version>
   </properties>
 
   <dependencyManagement>
