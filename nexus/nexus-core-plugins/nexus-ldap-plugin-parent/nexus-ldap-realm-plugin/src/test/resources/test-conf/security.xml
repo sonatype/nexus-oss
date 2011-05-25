@@ -44,7 +44,7 @@
 			<userId>deployment</userId>
 			<source>default</source>
 			<roles>
-				<role>deployment</role>
+				<role>nx-deployment</role>
                 <role>repo-all-full</role>
 			</roles>
 		</userRoleMapping>
@@ -52,14 +52,14 @@
 			<userId>admin</userId>
 			<source>default</source>
 			<roles>
-				<role>admin</role>
+				<role>nx-admin</role>
 			</roles>
 		</userRoleMapping>
 		<userRoleMapping>
 			<userId>test-user</userId>
 			<source>default</source>
 			<roles>
-				<role>deployment</role>
+				<role>nx-deployment</role>
                 <role>repo-all-full</role>
 				<role>anonymous</role>
 			</roles>
@@ -77,14 +77,14 @@
 			<source>LDAP</source>
 			<roles>
 				<role>anonymous</role>
-				<role>developer</role>
+				<role>nx-developer</role>
 			</roles>
 		</userRoleMapping>
 		<userRoleMapping>
 			<userId>brianf</userId>
 			<source>LDAP</source>
 			<roles>
-				<role>admin</role>
+				<role>nx-admin</role>
 			</roles>
 		</userRoleMapping>
 	</userRoleMappings>

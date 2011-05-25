@@ -87,37 +87,13 @@
         <role>deployment-customized</role>
       </roles>
     </role>
-    <role>
-      <id>admin</id>
-      <name>Nexus Administrator Role</name>
-      <description>Deprecated admin role, use nexus-admin instead</description>
-      <roles>
-        <role>nexus-admin</role>
-      </roles>
-    </role>
-    <role>
-      <id>developer</id>
-      <name>Developer</name>
-      <description>Deprecated developer role, use nexus-developer instead</description>
-      <roles>
-        <role>nexus-developer</role>
-      </roles>
-    </role>
-    <role>
-      <id>deployment</id>
-      <name>Deployment</name>
-      <description>Deprecated deployment role, use nexus-deployment instead</description>
-      <roles>
-        <role>nexus-deployment</role>
-      </roles>
-    </role>
   </roles>
   <userRoleMappings>
     <userRoleMapping>
       <userId>admin</userId>
       <source>default</source>
       <roles>
-        <role>admin</role>
+        <role>nx-admin</role>
       </roles>
     </userRoleMapping>
     <userRoleMapping>

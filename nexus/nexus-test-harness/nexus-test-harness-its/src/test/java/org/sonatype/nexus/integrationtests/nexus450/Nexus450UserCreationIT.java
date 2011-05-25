@@ -75,7 +75,7 @@ public class Nexus450UserCreationIT
         resource.setFirstName( "Marvin Velo" );
         resource.setEmail( "velo@earth.com" );
         resource.setStatus( "active" );
-        resource.addRole( "admin" );
+        resource.addRole( "nx-admin" );
         userUtil.createUser( resource );
 
         // get email

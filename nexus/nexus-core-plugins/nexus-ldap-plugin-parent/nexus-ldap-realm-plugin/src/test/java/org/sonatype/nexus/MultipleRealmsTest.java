@@ -60,7 +60,7 @@ public class MultipleRealmsTest
         SimplePrincipalCollection principals = new SimplePrincipalCollection();
         principals.add( "cstamas", new NexusLdapAuthenticationRealm().getName() );
 
-        Assert.assertTrue( security.hasRole( principals, "developer" ) );
+        Assert.assertTrue( security.hasRole( principals, "nx-developer" ) );
         Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
 
         // xml user
@@ -70,7 +70,7 @@ public class MultipleRealmsTest
         // was: principals.add( "deployment", new XmlAuthenticatingRealm().getName() );
         principals.add( "deployment", XmlAuthenticatingRealm.ROLE );
 
-        Assert.assertTrue( security.hasRole( principals, "deployment" ) );
+        Assert.assertTrue( security.hasRole( principals, "nx-deployment" ) );
         Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
 
     }

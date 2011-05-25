@@ -9,7 +9,7 @@
       <status>active</status>
       <email>changeme@yourcompany.com</email>
       <roles>
-        <role>nexus-admin</role>
+        <role>nx-admin</role>
       </roles>
     </user>
     <user>
@@ -19,7 +19,7 @@
       <status>active</status>
       <email>changeme1@yourcompany.com</email>
       <roles>
-        <role>nexus-deployment</role>
+        <role>nx-deployment</role>
         <role>repo-all-full</role>
         <role>repo-all-full</role>
       </roles>

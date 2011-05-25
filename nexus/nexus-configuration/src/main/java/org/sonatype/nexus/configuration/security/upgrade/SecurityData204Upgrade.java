@@ -12,12 +12,15 @@
  */
 package org.sonatype.nexus.configuration.security.upgrade;
 
+import java.util.List;
+
 import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.upgrade.AbstractDataUpgrader;
 import org.sonatype.security.model.upgrade.SecurityDataUpgrader;
@@ -30,32 +33,34 @@ public class SecurityData204Upgrade
     implements SecurityDataUpgrader
 {
 
+    private static final String[] DEPRECATED_ROLES = new String[] { "admin", "deployment", "developer" };
+
     @Override
     public void doUpgrade( Configuration cfg )
         throws ConfigurationIsCorruptedException
     {
+        for ( CRole role : cfg.getRoles() )
+        {
+            updateDeprecatedRoles( role.getRoles() );
+        }
 
-        CRole admin = new CRole();
-        admin.setDescription( "Deprecated admin role, use nexus-admin instead" );
-        admin.setId( "admin" );
-        admin.setName( "Nexus Administrator Role" );
-        admin.setReadOnly( false );
-        admin.addRole( "nexus-admin" );
-        cfg.addRole( admin );
-        CRole developer = new CRole();
-        developer.setDescription( "Deprecated developer role, use nexus-developer instead" );
-        developer.setId( "developer" );
-        developer.setName( "Developer" );
-        developer.setReadOnly( false );
-        developer.addRole( "nexus-developer" );
-        cfg.addRole( developer );
-        CRole deployer = new CRole();
-        deployer.setDescription( "Deprecated deployment role, use nexus-deployment instead" );
-        deployer.setId( "deployment" );
-        deployer.setName( "Deployment" );
-        deployer.setReadOnly( false );
-        deployer.addRole( "nexus-deployment" );
-        cfg.addRole( deployer );
+        for ( CUserRoleMapping map : cfg.getUserRoleMappings() )
+        {
+            updateDeprecatedRoles( map.getRoles() );
+        }
+    }
+
+    private void updateDeprecatedRoles( List<String> roles )
+    {
+        for ( String role : DEPRECATED_ROLES )
+        {
+            if ( roles.contains( role ) )
+            {
+                roles.remove( role );
+                roles.add( "nx-" + role );
+            }
+        }
+
     }
 
 }

@@ -49,7 +49,7 @@ public class Nexus1563ExternalRealmsLoginIT
         role.setName( "Role role-123" );
         role.setDescription( "Role role-123 external map" );
         role.setSessionTimeout( 60 );
-        role.addRole( "admin" );
+        role.addRole( "nx-admin" );
         testContext.useAdminForRequests();
         roleUtil.createRole( role );
 

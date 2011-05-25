@@ -63,7 +63,7 @@ public class Nexus1239UserSearchPermissionIT
 
         PlexusRoleResource role = roles.get( 0 );
         Assert.assertEquals( "Nexus Administrator Role", role.getName() );
-        Assert.assertEquals( "admin", role.getRoleId() );
+        Assert.assertEquals( "nx-admin", role.getRoleId() );
         Assert.assertEquals( "default", role.getSource() );
     }
 

@@ -66,9 +66,9 @@ uniqueMember: uid=jvanzyl,ou=people,o=sonatype
 uniqueMember: uid=brianf,ou=people,o=sonatype 
 description: Releases group
 
-dn: cn=developer,ou=groups,o=sonatype
+dn: cn=nx-developer,ou=groups,o=sonatype
 objectClass: groupOfUniqueNames
-cn: developer
+cn: nx-developer
 uniqueMember: uid=jvanzyl,ou=people,o=sonatype 
 uniqueMember: uid=cstamas,ou=people,o=sonatype 
 description: Snapshots group

@@ -74,7 +74,7 @@ public class MultipleRealmsLdapNotConfiguredTest
         principals.add( "cstamas", new NexusLdapAuthenticationRealm().getName() );
 
         // if realm is not configured, the user should not be able to be authorized
-        Assert.assertFalse( security.hasRole( principals, "developer" ) );
+        Assert.assertFalse( security.hasRole( principals, "nx-developer" ) );
         Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
 
         // xml user
@@ -83,7 +83,7 @@ public class MultipleRealmsLdapNotConfiguredTest
         // was: principals.add( "deployment", new XmlAuthenticatingRealm().getName() );
         principals.add( "deployment", XmlAuthenticatingRealm.ROLE );
 
-        Assert.assertTrue( security.hasRole( principals, "deployment" ) );
+        Assert.assertTrue( security.hasRole( principals, "nx-deployment" ) );
         Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
     }
 

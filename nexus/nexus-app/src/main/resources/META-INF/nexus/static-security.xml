@@ -25,7 +25,7 @@
     <version>2.0.2</version>
     <roles>
         <role>
-            <id>nexus-admin</id>
+            <id>nx-admin</id>
             <name>Nexus Administrator Role</name>
             <description>Administration role for Nexus</description>
             <sessionTimeout>30</sessionTimeout>
@@ -36,7 +36,7 @@
             <roles />
         </role>
         <role>
-            <id>nexus-deployment</id>
+            <id>nx-deployment</id>
             <name>Nexus Deployment Role</name>
             <description>Deployment role for Nexus</description>
             <sessionTimeout>60</sessionTimeout>
@@ -63,14 +63,14 @@
             </roles>
         </role>
         <role>
-            <id>nexus-developer</id>
+            <id>nx-developer</id>
             <name>Nexus Developer Role</name>
             <description>Developer role for Nexus</description>
             <sessionTimeout>30</sessionTimeout>
             <privileges />
             <roles>
                 <role>ui-basic</role>
-                <role>nexus-deployment</role>
+                <role>nx-deployment</role>
             </roles>
         </role>
         <role>

@@ -167,7 +167,7 @@ public class Nxcm58NexusCommonUseJsonIT
         UserToRoleResource ldapUser = new UserToRoleResource();
         ldapUser.setUserId( "cstamas" );
         ldapUser.setSource( "LDAP" );
-        ldapUser.addRole( "admin" );
+        ldapUser.addRole( "nx-admin" );
         Response response = userUtil.sendMessage( Method.PUT, ldapUser, "LDAP" );
         Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() + "\nresponse: "
             + response.getEntity().getText() );

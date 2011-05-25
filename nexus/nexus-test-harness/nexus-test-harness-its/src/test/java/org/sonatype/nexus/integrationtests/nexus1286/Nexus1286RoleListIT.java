@@ -57,7 +57,7 @@ public class Nexus1286RoleListIT
         List<PlexusRoleResource> roles = roleUtil.getRoles( "default" );
 
         Set<String> ids = this.getRoleIds( roles );
-        Assert.assertTrue( ids.contains( "admin" ) );
+        Assert.assertTrue( ids.contains( "nx-admin" ) );
         Assert.assertTrue( ids.contains( "anonymous" ) );
 
     }
@@ -70,7 +70,7 @@ public class Nexus1286RoleListIT
         List<PlexusRoleResource> roles = roleUtil.getRoles( "all" );
 
         Set<String> ids = this.getRoleIds( roles );
-        Assert.assertTrue( ids.contains( "admin" ) );
+        Assert.assertTrue( ids.contains( "nx-admin" ) );
         Assert.assertTrue( ids.contains( "anonymous" ) );
     }
 

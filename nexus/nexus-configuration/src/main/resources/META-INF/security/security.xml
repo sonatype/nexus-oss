@@ -56,7 +56,7 @@
 			<userId>admin</userId>
 			<source>default</source>
 			<roles>
-				<role>nexus-admin</role>
+				<role>nx-admin</role>
 			</roles>
 		</userRoleMapping>
 		<userRoleMapping>

@@ -42,7 +42,7 @@ public class Nexus650ChangePasswordAndRebootIT
     @Test
     public void changePasswordAndReboot() throws Exception
     {
-        this.giveUserRole( TEST_USER_NAME, "admin" );
+        this.giveUserRole( TEST_USER_NAME, "nx-admin" );
 
         TestContext context = TestContainer.getInstance().getTestContext();
 

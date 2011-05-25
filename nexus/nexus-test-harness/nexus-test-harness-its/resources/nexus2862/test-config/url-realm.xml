@@ -21,6 +21,6 @@
 -->
 <urlRealmConfiguration>
 	<url>http://localhost:${proxy.server.port}</url>
-	<defaultRole>admin</defaultRole>
+	<defaultRole>nx-admin</defaultRole>
 	<emailDomain>sonatype.com</emailDomain>	
 </urlRealmConfiguration>

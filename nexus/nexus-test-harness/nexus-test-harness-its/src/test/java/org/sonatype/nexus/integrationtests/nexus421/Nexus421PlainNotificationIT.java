@@ -96,7 +96,7 @@ public class Nexus421PlainNotificationIT
         notificationSettings.setEmailAddresses( "pipi1@wherever.com,pipi2@wherever.com" );
 
         // this is ROLE!
-        notificationSettings.getRoles().add( "admin" );
+        notificationSettings.getRoles().add( "nx-admin" );
 
         // enable notification
         notificationSettings.setEnabled( true );
