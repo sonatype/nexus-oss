@@ -154,6 +154,70 @@ public class DefaultRepositoryItemUidTest
         verifyUidIsNotLocked( t1.getUid() );
     }
 
+    @Test
+    public void testMultiThreadedLockingSharedUid()
+        throws InterruptedException
+    {
+        Repository repository = new DummyRepository( "dummy" );
+
+        Sleeper sleeper1 = new Sleeper()
+        {
+            public void sleep()
+            {
+                try
+                {
+                    Thread.sleep( Math.abs( random.nextLong() % 100 ) );
+                }
+                catch ( InterruptedException e )
+                {
+                    // noop
+                }
+            }
+        };
+
+        Sleeper sleeper2 = new Sleeper()
+        {
+            public void sleep()
+            {
+                try
+                {
+                    Thread.sleep( Math.abs( random.nextLong() % 75 ) );
+                }
+                catch ( InterruptedException e )
+                {
+                    // noop
+                }
+            }
+        };
+
+        final DefaultRepositoryItemUid uid = factory.createUid( repository, "/some/path.txt" );
+
+        LockingThreadSteps1 t1 = new LockingThreadSteps1( uid, 100, sleeper1 );
+        LockingThreadSteps2 t2 = new LockingThreadSteps2( uid, 100, sleeper1 );
+        LockingThreadSteps3 t3 = new LockingThreadSteps3( uid, 100, sleeper2 );
+        LockingThreadSteps1 t4 = new LockingThreadSteps1( uid, 100, sleeper2 );
+        LockingThreadSteps1 t5 = new LockingThreadSteps1( uid, 100, null );
+
+        t1.start();
+        t2.start();
+        t3.start();
+        t4.start();
+        t5.start();
+
+        Thread.sleep( 1000 );
+
+        t1.join();
+        t2.join();
+        t3.join();
+        t4.join();
+        t5.join();
+
+        // we have to have "clean" UID (not locked)
+        // since they cover same key (repo + path), the lock under the hood is same, so
+        // checking only one of them is actaully checking all of them
+        verifyUidIsNotLocked( t1.getUid() );
+    }
+
     // verification steps
 
     public void verifyUidIsNotLocked( DefaultRepositoryItemUid uid )

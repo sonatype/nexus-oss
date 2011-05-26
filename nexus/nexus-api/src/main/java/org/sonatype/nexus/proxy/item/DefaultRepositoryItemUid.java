@@ -41,7 +41,7 @@ public class DefaultRepositoryItemUid
     private final String stringRepresentation;
 
     /** Lazily created */
-    private RepositoryItemUidLock lock;
+    private final ThreadLocal<RepositoryItemUidLock> tlLock;
 
     protected DefaultRepositoryItemUid( final RepositoryItemUidFactory factory, final Repository repository,
                                         final String path )
@@ -56,7 +56,7 @@ public class DefaultRepositoryItemUid
 
         this.stringRepresentation = getRepository().getId() + ":" + getPath();
 
-        this.lock = null;
+        this.tlLock = new ThreadLocal<RepositoryItemUidLock>();
     }
 
     public RepositoryItemUidFactory getRepositoryItemUidFactory()
@@ -85,12 +85,12 @@ public class DefaultRepositoryItemUid
     @Override
     public synchronized RepositoryItemUidLock getLock()
     {
-        if ( lock == null || lock.isReleased() )
+        if ( tlLock.get() == null || tlLock.get().isReleased() )
         {
-            lock = factory.createUidLock( this );
+            tlLock.set( factory.createUidLock( this ) );
         }
 
-        return lock;
+        return tlLock.get();
     }
 
     @Override
