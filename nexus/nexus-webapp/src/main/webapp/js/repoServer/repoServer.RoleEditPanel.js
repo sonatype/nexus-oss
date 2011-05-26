@@ -1,20 +1,19 @@
 /*
- * Copyright (c) 2008-2011 Sonatype, Inc.
- * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- *
- * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
- * Public License Version 3 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
- * for more details.
- *
- * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
- * http://www.gnu.org/licenses.
- *
- * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
- * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
- * All other trademarks are the property of their respective owners.
+ * Copyright (c) 2008-2011 Sonatype, Inc. All rights reserved. Includes the
+ * third-party code listed at
+ * http://www.sonatype.com/products/nexus/attributions. This program is free
+ * software: you can redistribute it and/or modify it only under the terms of
+ * the GNU Affero General Public License Version 3 as published by the Free
+ * Software Foundation. This program is distributed in the hope that it will be
+ * useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero
+ * General Public License Version 3 for more details. You should have received a
+ * copy of the GNU Affero General Public License Version 3 along with this
+ * program. If not, see http://www.gnu.org/licenses. Sonatype Nexus (TM) Open
+ * Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus
+ * are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache
+ * Foundation. M2Eclipse is a trademark of the Eclipse Foundation. All other
+ * trademarks are the property of their respective owners.
  */
 /*
  * Role Edit/Create panel layout and controller
@@ -260,8 +259,8 @@ Sonatype.repoServer.ExternapRoleMappingPopup = function(config) {
                     store : this.roleStore,
                     displayField : 'name',
                     valueField : 'roleId',
-                    editable : false,
-                    forceSelection : true,
+                    editable : true,
+                    forceSelection : false,
                     mode : 'local',
                     triggerAction : 'all',
                     lastQuery : '',
@@ -272,7 +271,7 @@ Sonatype.repoServer.ExternapRoleMappingPopup = function(config) {
               buttons : [{
                     text : 'Create Mapping',
                     formBind : true,
-                    handler : this.createRoleMapping,
+                    handler : this.validateRoleMapping,
                     scope : this,
                     disabled : true
                   }, {
@@ -294,7 +293,28 @@ Ext.extend(Sonatype.repoServer.ExternapRoleMappingPopup, Ext.Window, {
         roleCombo.store.filter('source', rec.data.roleHint);
       },
 
-      createRoleMapping : function(button, e) {
+      validateRoleMapping : function(button, e) {
+        var roleId = this.find('name', 'roleId')[0].getValue();
+        var sourceId = this.find('name', 'source')[0].getValue();
+
+        Ext.Ajax.request({
+              url : Sonatype.config.servicePath + '/external_role_map/' + sourceId + '/' + roleId,
+              callback : function(options, isSuccess, response) {
+                if (isSuccess)
+                {
+                  this.createRoleMapping();
+                }
+                else
+                {
+                  this.find('name', 'roleId')[0].markInvalid('Role not found!');
+                }
+              },
+              scope : this,
+              method : 'GET',
+              suppressStatus : '404'
+            });
+      },
+      createRoleMapping : function() {
         if (this.hostPanel)
         {
           var roleId = this.find('name', 'roleId')[0].getValue();

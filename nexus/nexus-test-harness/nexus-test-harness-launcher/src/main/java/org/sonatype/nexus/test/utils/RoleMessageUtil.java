@@ -19,7 +19,6 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
-
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -31,8 +30,8 @@ import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.security.rest.model.ExternalRoleMappingListResourceResponse;
 import org.sonatype.security.rest.model.ExternalRoleMappingResource;
-import org.sonatype.security.rest.model.ExternalRoleMappingResourceResponse;
 import org.sonatype.security.rest.model.PlexusRoleListResourceResponse;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.RoleListResourceResponse;
@@ -231,9 +230,9 @@ public class RoleMessageUtil
         Assert.assertTrue( response.getStatus().isSuccess(),
                            "Status: " + response.getStatus() + "\nResponse:\n" + responseString );
 
-        ExternalRoleMappingResourceResponse result =
-            (ExternalRoleMappingResourceResponse) this.parseResponseText( responseString,
-                                                                          new ExternalRoleMappingResourceResponse() );
+        ExternalRoleMappingListResourceResponse result =
+            (ExternalRoleMappingListResourceResponse) this.parseResponseText( responseString,
+                new ExternalRoleMappingListResourceResponse() );
 
         return result.getData();
     }

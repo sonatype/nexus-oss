@@ -148,8 +148,8 @@ import org.sonatype.security.rest.model.AuthenticationClientPermissions;
 import org.sonatype.security.rest.model.AuthenticationLoginResource;
 import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.security.rest.model.ClientPermission;
+import org.sonatype.security.rest.model.ExternalRoleMappingListResourceResponse;
 import org.sonatype.security.rest.model.ExternalRoleMappingResource;
-import org.sonatype.security.rest.model.ExternalRoleMappingResourceResponse;
 import org.sonatype.security.rest.model.PlexusRoleListResourceResponse;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
@@ -2113,7 +2113,7 @@ public class TestMarshalUnmarchal
     @Test
     public void testExternalRoleMappingResourceResponse()
     {
-        ExternalRoleMappingResourceResponse resourceResponse = new ExternalRoleMappingResourceResponse();
+        ExternalRoleMappingListResourceResponse resourceResponse = new ExternalRoleMappingListResourceResponse();
 
         ExternalRoleMappingResource resource1 = new ExternalRoleMappingResource();
         resourceResponse.addData( resource1 );

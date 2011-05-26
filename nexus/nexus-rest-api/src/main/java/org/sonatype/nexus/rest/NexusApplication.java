@@ -126,6 +126,7 @@ import org.sonatype.plexus.rest.xstream.HtmlEscapeStringConverter;
 import org.sonatype.security.rest.model.AuthenticationClientPermissions;
 import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.security.rest.model.ClientPermission;
+import org.sonatype.security.rest.model.ExternalRoleMappingListResourceResponse;
 import org.sonatype.security.rest.model.ExternalRoleMappingResource;
 import org.sonatype.security.rest.model.ExternalRoleMappingResourceResponse;
 import org.sonatype.security.rest.model.PlexusRoleListResourceResponse;
@@ -462,10 +463,11 @@ public class NexusApplication
         xstream.registerLocalConverter( PlexusUserListResourceResponse.class, "data",
                                         new AliasingListConverter( PlexusUserResource.class, "plexus-user" ) );
 
+        xstream.processAnnotations( ExternalRoleMappingListResourceResponse.class );
         xstream.processAnnotations( ExternalRoleMappingResourceResponse.class );
         xstream.processAnnotations( ExternalRoleMappingResource.class );
 
-        xstream.registerLocalConverter( ExternalRoleMappingResourceResponse.class, "data",
+        xstream.registerLocalConverter( ExternalRoleMappingListResourceResponse.class, "data",
                                         new AliasingListConverter( ExternalRoleMappingResource.class, "mapping" ) );
         xstream.registerLocalConverter( ExternalRoleMappingResource.class, "mappedRoles",
                                         new AliasingListConverter( PlexusRoleResource.class, "plexus-role" ) );
