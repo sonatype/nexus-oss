@@ -957,7 +957,6 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
         }
       });
   this.schedulesGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
-  this.schedulesGridPanel.on('rowcontextmenu', this.contextClick, this);
 
   Sonatype.repoServer.SchedulesEditPanel.superclass.constructor.call(this, {
         layout : 'border',
@@ -1642,55 +1641,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         // always set active
         this.formCards.getLayout().setActiveItem(formPanel);
         formPanel.doLayout();
-      },
-
-      contextClick : function(grid, index, e) {
-        this.contextHide();
-
-        if (e.target.nodeName == 'A')
-          return; // no menu on links
-
-        this.ctxRow = this.schedulesGridPanel.view.getRow(index);
-        this.ctxRecord = this.schedulesGridPanel.store.getAt(index);
-        Ext.fly(this.ctxRow).addClass('x-node-ctx');
-
-        // @todo: would be faster to pre-render the six variations of the menu
-        // for whole instance
-        var menu = new Ext.menu.Menu({
-              id : 'schedules-grid-ctx',
-              items : [this.actions.refresh]
-            });
-
-        if (this.sp.checkPermission('nexus:tasks', this.sp.DELETE))
-        {
-          menu.add(this.actions.deleteAction);
-        }
-
-        if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ) && (this.ctxRecord.data.status == 'SUBMITTED' || this.ctxRecord.data.status == 'WAITING' || this.ctxRecord.data.status == 'BROKEN'))
-        {
-          menu.add(this.actions.run);
-        }
-
-        if (
-        // FIXME need to check with tamas what is the correct permission,
-        // this.sp.checkPermission('nexus:tasksstop', this.sp.PUT) &&
-        !(this.ctxRecord.data.status == 'SUBMITTED' || this.ctxRecord.data.status == 'WAITING' || this.ctxRecord.data.status == 'BROKEN'))
-        {
-          menu.add(this.actions.stopAction);
-        }
-
-        menu.on('hide', this.contextHide, this);
-        e.stopEvent();
-        menu.showAt(e.getXY());
-      },
-
-      contextHide : function() {
-        if (this.ctxRow)
-        {
-          Ext.fly(this.ctxRow).removeClass('x-node-ctx');
-          this.ctxRow = null;
-          this.ctxRecord = null;
-        }
       },
 
       serviceTypeSelectHandler : function(combo, record, index) {
