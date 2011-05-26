@@ -56,7 +56,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * 
  * @author cstamas
  */
-public class SimpleLockResource
+class SimpleLockResource
     implements LockResource
 {
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();

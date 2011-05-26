@@ -18,53 +18,27 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.access.Action;
 
 public class DefaultRepositoryItemUidLock
     implements RepositoryItemUidLock
 {
-    private final RepositoryItemUidFactory factory;
-
-    private final RepositoryItemUid uid;
+    private final String key;
 
     private final LockResource contentLock;
 
-    private final AtomicInteger released;
-
-    protected DefaultRepositoryItemUidLock( final RepositoryItemUidFactory factory, final RepositoryItemUid uid,
-                                            final LockResource contentLock )
+    protected DefaultRepositoryItemUidLock( final String key, final LockResource contentLock )
     {
         super();
 
-        this.factory = factory;
-
-        this.uid = uid;
+        this.key = key;
 
         this.contentLock = contentLock;
-
-        this.released = new AtomicInteger( 0 );
-    }
-
-    @Override
-    public RepositoryItemUid getRepositoryItemUid()
-    {
-        return uid;
     }
 
     @Override
     public void lock( final Action action )
-        throws IllegalStateException
     {
-        if ( released.get() != 0 )
-        {
-            throw new IllegalStateException(
-                "This instance of DefaultRepositoryItemUidLock has been released, it is not usable for locking anymore!" );
-        }
-
         if ( action.isReadAction() )
         {
             contentLock.lockShared();
@@ -77,62 +51,39 @@ public class DefaultRepositoryItemUidLock
 
     @Override
     public void unlock()
-        throws IllegalStateException
     {
-        if ( released.get() != 0 )
-        {
-            throw new IllegalStateException(
-                "This instance of DefaultRepositoryItemUidLock has been released, it is not usable for locking anymore!" );
-        }
-
         contentLock.unlock();
-
-        if ( !contentLock.hasLocksHeld() )
-        {
-            release();
-        }
-    }
-
-    @Override
-    public boolean isReleased()
-    {
-        return released.get() != 0;
-    }
-
-    protected boolean release()
-    {
-        if ( released.compareAndSet( 0, 1 ) )
-        {
-            factory.releaseUidLock( this );
-
-            return true;
-        }
-
-        return false;
     }
 
     // ==
 
-    // this below is mere for "transition period" to ease debugging or leak detection
-
-    private static Logger logger = LoggerFactory.getLogger( DefaultRepositoryItemUidLock.class );
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ( ( key == null ) ? 0 : key.hashCode() );
+        return result;
+    }
 
     @Override
-    public void finalize()
-        throws Throwable
+    public boolean equals( Object obj )
     {
-        try
+        if ( this == obj )
+            return true;
+        if ( obj == null )
+            return false;
+        if ( getClass() != obj.getClass() )
+            return false;
+        DefaultRepositoryItemUidLock other = (DefaultRepositoryItemUidLock) obj;
+        if ( key == null )
         {
-            if ( release() )
-            {
-                logger.error( "Memory leak: UIDLock for UID {} not released properly, lock status is {}!",
-                    getRepositoryItemUid(), contentLock.toString() );
-            }
+            if ( other.key != null )
+                return false;
         }
-        finally
-        {
-            super.finalize();
-        }
+        else if ( !key.equals( other.key ) )
+            return false;
+        return true;
     }
 
     // for Debug/tests vvv

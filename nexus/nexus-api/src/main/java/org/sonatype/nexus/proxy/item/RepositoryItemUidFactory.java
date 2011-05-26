@@ -51,11 +51,4 @@ public interface RepositoryItemUidFactory
      * @return
      */
     RepositoryItemUidLock createUidLock( RepositoryItemUid uid );
-
-    /**
-     * Releases a shared UIDLock.
-     * 
-     * @param uid
-     */
-    void releaseUidLock( RepositoryItemUidLock uidLock );
 }

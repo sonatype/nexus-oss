@@ -28,39 +28,17 @@ import org.sonatype.nexus.proxy.access.Action;
 public interface RepositoryItemUidLock
 {
     /**
-     * Returns the UID this lock belongs to.
-     * 
-     * @return
-     */
-    RepositoryItemUid getRepositoryItemUid();
-
-    /**
      * Locks this UID for a given action. Will perform lock upgrade is needed (read -> write). Lock upgrade (ie. create
      * action locking happens after read action already locked) happens, but does not happen atomically! Lock upgrade is
      * actually release all (if any) read lock and then acquire write lock. Once you have exclusive lock, then only you
      * can be sure for unique access.
      * 
      * @param action
-     * @throws IllegalStateException if invoked after this lock object is released.
      */
-    void lock( Action action )
-        throws IllegalStateException;
+    void lock( Action action );
 
     /**
-     * Unlocks UID. It is the responsibility of caller to use lock/unlock properly (ie. boxing of calls). Last unlock on
-     * this lock also releases the lock. After being released, you need to acquire a new instance of lock, since this
-     * instance {@link #lock(Action)} and {@link #unlock()} methods will refuse to work anymore and throw
-     * {@link IllegalStateException} when invoked.
-     * 
-     * @throws IllegalStateException if invoked after this lock object is released.
+     * Unlocks UID. It is the responsibility of caller to use lock/unlock properly (ie. boxing of calls).
      */
-    void unlock()
-        throws IllegalStateException;
-
-    /**
-     * Returns true if this instance has been released.
-     * 
-     * @return
-     */
-    boolean isReleased();
+    void unlock();
 }

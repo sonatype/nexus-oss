@@ -18,46 +18,15 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 public class DummyRepositoryItemUidFactory
-    implements RepositoryItemUidFactory
+    extends AbstractRepositoryItemUidFactory
 {
-    public DefaultRepositoryItemUid createUid( Repository repository, String path )
-    {
-        return new DefaultRepositoryItemUid( this, repository, path );
-    }
-
-    public RepositoryItemUid createUid( String uidStr )
+    public DefaultRepositoryItemUid createUid( String uidStr )
         throws IllegalArgumentException, NoSuchRepositoryException
     {
         throw new UnsupportedOperationException(
             "This dummy factory does not supports this method (it needs repo registry et al)" );
-    }
-
-    private Map<String, LockResource> locks = new HashMap<String, LockResource>();
-
-    @Override
-    public synchronized RepositoryItemUidLock createUidLock( RepositoryItemUid uid )
-    {
-        LockResource lock = locks.get( uid.getKey() );
-
-        if ( lock == null )
-        {
-            lock = new SimpleLockResource();
-        }
-
-        return new DefaultRepositoryItemUidLock( this, uid, lock );
-    }
-
-    @Override
-    public void releaseUidLock( RepositoryItemUidLock uidLock )
-    {
-        // noop
-        // we should count refs here and remove from map, but gnaw
     }
 }

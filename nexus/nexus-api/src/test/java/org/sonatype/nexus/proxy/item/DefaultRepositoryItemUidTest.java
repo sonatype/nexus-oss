@@ -148,6 +148,8 @@ public class DefaultRepositoryItemUidTest
         t4.join();
         t5.join();
 
+        System.out.println("done");
+
         // we have to have "clean" UID (not locked)
         // since they cover same key (repo + path), the lock under the hood is same, so
         // checking only one of them is actaully checking all of them
@@ -211,6 +213,8 @@ public class DefaultRepositoryItemUidTest
         t3.join();
         t4.join();
         t5.join();
+        
+        System.out.println("done");
 
         // we have to have "clean" UID (not locked)
         // since they cover same key (repo + path), the lock under the hood is same, so
@@ -355,6 +359,11 @@ public class DefaultRepositoryItemUidTest
             for ( int i = 0; i < count; i++ )
             {
                 doIt( i, uid, sleeper );
+
+                if ( i % 20 == 0 )
+                {
+                    System.out.print( "." );
+                }
             }
         }
 

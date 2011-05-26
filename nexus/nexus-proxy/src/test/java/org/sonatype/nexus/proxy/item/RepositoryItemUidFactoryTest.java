@@ -18,34 +18,31 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
-import org.sonatype.nexus.proxy.EnvironmentBuilder;
-import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
+import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class RepositoryItemUidFactoryTest
-    extends AbstractProxyTestEnvironment
+    extends AbstractNexusTestEnvironment
 {
     protected RepositoryItemUidFactory factory;
 
-    @Override
-    protected EnvironmentBuilder getEnvironmentBuilder()
-        throws Exception
-    {
-        ServletServer ss = (ServletServer) lookup( ServletServer.ROLE );
-
-        return new M2TestsuiteEnvironmentBuilder( ss );
-    }
+    protected Repository repository;
 
     public void setUp()
         throws Exception
     {
         super.setUp();
+
+        repository = EasyMock.createNiceMock( Repository.class );
+        expect( repository.getId() ).andReturn( "repo1" ).anyTimes();
+        replay( repository );
 
         factory = lookup( RepositoryItemUidFactory.class );
     }
@@ -54,8 +51,6 @@ public class RepositoryItemUidFactoryTest
     public void testSameLockResourceInstance()
         throws Exception
     {
-        Repository repository = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );
-
         RepositoryItemUid uid1 = factory.createUid( repository, "/some/blammo/poth" );
 
         RepositoryItemUid uid2 = factory.createUid( repository, "/some/blammo/poth" );
@@ -67,7 +62,7 @@ public class RepositoryItemUidFactoryTest
         uidLock1.lock( Action.read );
 
         // They share SAME lock
-        Assert.assertNotSame( "UIDLock instances should be different", uidLock1, uidLock2 );
+        Assert.assertSame( "UIDLock instances should be different", uidLock1, uidLock2 );
         Assert.assertSame( "UIDLock lock instances should be same", uidLock1.getContentLock(),
             uidLock2.getContentLock() );
         Assert.assertEquals( "Since invoked from same UT thread, both should say we have lock held",
@@ -78,8 +73,13 @@ public class RepositoryItemUidFactoryTest
     public void testRelease()
         throws Exception
     {
-        Repository repository = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );
-
+        // Explanation: before, there was a "release" on locks, when not used anymore, but it prevent patterns exactly
+        // as in here:
+        // obtain an instance of lock, and once released, it's _unusable_ (was throwing IllegalStatusEx).
+        // Later, a cosmetic improvement was suggested by Alin, to make last unlock() invocation actually release too,
+        // but
+        // it did not change the fact, released lock instance is unusable.
+        // Finally, code was modified to not require release.
         RepositoryItemUid uid = factory.createUid( repository, "/some/blammo/poth" );
 
         DefaultRepositoryItemUidLock uidLock1 = (DefaultRepositoryItemUidLock) uid.getLock();
@@ -93,19 +93,72 @@ public class RepositoryItemUidFactoryTest
         Assert.assertFalse( "Since unlocked it should say we have no lock held",
             uidLock1.getContentLock().hasLocksHeld() );
 
+        // now again
+
+        uidLock1.lock( Action.read );
+
+        Assert.assertTrue( "Since locked it should say we have lock held", uidLock1.getContentLock().hasLocksHeld() );
+
+        uidLock1.unlock();
+
+        Assert.assertFalse( "Since unlocked it should say we have no lock held",
+            uidLock1.getContentLock().hasLocksHeld() );
+
         // unlock above released it too
         // uidLock1.release();
 
-        try
-        {
-            uidLock1.unlock();
-
-            Assert.fail( "Reusing a released instance of UIDLock is a no-go" );
-        }
-        catch ( IllegalStateException e )
-        {
-            // good
-        }
+        // No more release, hence no more IllegalStateEx either.
+        // try
+        // {
+        // uidLock1.unlock();
+        //
+        // Assert.fail( "Reusing a released instance of UIDLock is a no-go" );
+        // }
+        // catch ( IllegalStateException e )
+        // {
+        // // good
+        // }
     }
 
+    @Test
+    public void testWeakHashMapIsWorkingAsExpected()
+    {
+        // we create many _different_ keyed uids and corresponding locks
+        int size = 0;
+
+        size = ( (DefaultRepositoryItemUidFactory) factory ).locksInMap();
+
+        Assert.assertTrue( "We should have nothing in weak map: " + size, size == 0 );
+
+        for ( int i = 0; i < 10000; i++ )
+        {
+            factory.createUid( repository, "/some/blammo/poth/" + String.valueOf( i ) ).getLock();
+        }
+
+        size = ( (DefaultRepositoryItemUidFactory) factory ).locksInMap();
+
+        Assert.assertTrue( "We should have less than 10k in weak map: " + size, size <= 10000 && size > 0 );
+
+        System.gc();
+
+        for ( int i = 10000; i < 20000; i++ )
+        {
+            factory.createUid( repository, "/some/blammo/poth/" + String.valueOf( i ) ).getLock();
+        }
+
+        size = ( (DefaultRepositoryItemUidFactory) factory ).locksInMap();
+
+        Assert.assertTrue( "We should have less than 10k in weak map: " + size, size <= 10000 && size > 0 );
+
+        System.gc();
+
+        for ( int i = 20000; i < 30000; i++ )
+        {
+            factory.createUid( repository, "/some/blammo/poth/" + String.valueOf( i ) ).getLock();
+        }
+
+        size = ( (DefaultRepositoryItemUidFactory) factory ).locksInMap();
+
+        Assert.assertTrue( "We should have less than 10k in weak map: " + size, size <= 10000 && size > 0 );
+    }
 }

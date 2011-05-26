@@ -42,7 +42,7 @@ package org.sonatype.nexus.proxy.item;
  * 
  * @author cstamas
  */
-public interface LockResource
+interface LockResource
 {
     /**
      * Acquires a shared lock. Blocks until successful.
