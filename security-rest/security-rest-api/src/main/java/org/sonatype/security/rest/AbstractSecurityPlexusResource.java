@@ -149,7 +149,7 @@ public abstract class AbstractSecurityPlexusResource
         user.setSource( DEFAULT_SOURCE );
 
         Set<RoleIdentifier> roles = new HashSet<RoleIdentifier>();
-        for ( String roleId : (List<String>) resource.getRoles() )
+        for ( String roleId : resource.getRoles() )
         {
             roles.add( new RoleIdentifier( DEFAULT_SOURCE, roleId ) );
         }
@@ -179,6 +179,11 @@ public abstract class AbstractSecurityPlexusResource
 
     protected PlexusRoleResource securityToRestModel( Role role )
     {
+        if ( role == null )
+        {
+            return null;
+        }
+
         PlexusRoleResource roleResource = new PlexusRoleResource();
         roleResource.setRoleId( role.getRoleId() );
         roleResource.setName( role.getName() );
