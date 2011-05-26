@@ -31,7 +31,7 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-runtime-platform</artifactId>
-  <version>2-SNAPSHOT</version>
+  <version>1.9.2-SNAPSHOT</version>
 
   <packaging>pom</packaging>
   <name>Nexus Runtime Platform</name>
