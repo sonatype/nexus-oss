@@ -24,7 +24,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.codehaus.plexus.context.Context;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.AbstractNexusLdapTestCase;
 import org.sonatype.nexus.security.ldap.realms.api.LdapRealmPlexusResourceConst;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
@@ -34,7 +34,7 @@ import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
 
 public class LdapConnNotConfiguredTest
-    extends AbstractNexusTestCase
+    extends AbstractNexusLdapTestCase
 {
 
     private PlexusResource getResource() throws Exception
@@ -63,7 +63,7 @@ public class LdapConnNotConfiguredTest
         LdapConnectionInfoDTO connectionInfo = new LdapConnectionInfoDTO();
         response.setData( connectionInfo );
         connectionInfo.setHost( "localhost" );
-        connectionInfo.setPort( 12345 );
+        connectionInfo.setPort( this.getLdapPort() );
         connectionInfo.setSearchBase( "o=sonatype" );
         connectionInfo.setSystemPassword( "secret" );
         connectionInfo.setSystemUsername( "uid=admin,ou=system" );
@@ -89,7 +89,7 @@ public class LdapConnNotConfiguredTest
         LdapConnectionInfoDTO connectionInfo = new LdapConnectionInfoDTO();
         response.setData( connectionInfo );
         connectionInfo.setHost( "localhost" );
-        connectionInfo.setPort( 12345 );
+        connectionInfo.setPort( this.getLdapPort() );
         connectionInfo.setSearchBase( "o=sonatype" );
         connectionInfo.setSystemPassword( LdapRealmPlexusResourceConst.FAKE_PASSWORD );
         connectionInfo.setSystemUsername( "uid=admin,ou=system" );
@@ -123,7 +123,7 @@ public class LdapConnNotConfiguredTest
         LdapConnectionInfoDTO connectionInfo = new LdapConnectionInfoDTO();
         response.setData( connectionInfo );
         connectionInfo.setHost( "localhost" );
-        connectionInfo.setPort( 12345 );
+        connectionInfo.setPort( this.getLdapPort() );
         connectionInfo.setSearchBase( "o=sonatype" );
 //        connectionInfo.setSystemPassword( "secret" );
 //        connectionInfo.setSystemUsername( "uid=admin,ou=system" );

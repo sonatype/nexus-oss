@@ -23,13 +23,12 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.context.Context;
 import org.junit.Test;
-import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
+import org.sonatype.security.ldap.AbstractLdapTest;
 import org.sonatype.security.ldap.dao.LdapUser;
 
 public class DefaultLdapManagerTest
-    extends AbstractLdapTestEnvironment
+    extends AbstractLdapTest
 {
 
     private LdapManager getLdapManager()
@@ -77,11 +76,5 @@ public class DefaultLdapManagerTest
             Assert.assertEquals( orderedUsers[index++], user.getUsername() );
         }
 
-    }
-
-    @Override
-    protected void customizeContext( Context context )
-    {
-        context.put( "application-conf", getBasedir() + "/target/test-classes/test-conf/conf/" );
     }
 }

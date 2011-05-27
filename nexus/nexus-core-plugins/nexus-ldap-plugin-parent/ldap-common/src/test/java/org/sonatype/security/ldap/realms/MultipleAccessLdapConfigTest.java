@@ -73,7 +73,7 @@ public class MultipleAccessLdapConfigTest
         // now configure the relam
         CConnectionInfo connectionInfo = new CConnectionInfo();
         connectionInfo.setHost( "localhost" );
-        connectionInfo.setPort( 12345 );
+        connectionInfo.setPort( this.getLdapServer().getPort() );
         connectionInfo.setAuthScheme( "none" );
         connectionInfo.setSearchBase( "o=sonatype" );
         connectionInfo.setProtocol( "ldap" );

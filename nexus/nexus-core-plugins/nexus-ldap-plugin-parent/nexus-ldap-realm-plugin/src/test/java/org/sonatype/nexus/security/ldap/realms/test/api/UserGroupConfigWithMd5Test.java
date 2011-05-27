@@ -31,7 +31,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.AbstractNexusLdapTestCase;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserListResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserResponseDTO;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequest;
@@ -40,7 +40,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 
 
 public class UserGroupConfigWithMd5Test
-    extends AbstractNexusTestCase
+    extends AbstractNexusLdapTestCase
 {
 
     private PlexusResource getResource()
@@ -59,7 +59,7 @@ public class UserGroupConfigWithMd5Test
         testRequest.setData( dto );
 
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setSystemPassword( "secret" );
         dto.setSystemUsername( "admin" );
@@ -133,7 +133,7 @@ public class UserGroupConfigWithMd5Test
         testRequest.setData( dto );
 
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setSystemPassword( "secret" );
         dto.setSystemUsername( "admin" );
@@ -214,7 +214,7 @@ public class UserGroupConfigWithMd5Test
 
         // dto.setProtocol( "ldap" );
         // dto.setHost( "localhost" );
-        // dto.setPort( 12345 );
+        // dto.setPort( this.getLdapPort() );
         // dto.setSearchBase( "o=sonatype" );
         // dto.setAuthScheme( "none" );
 
@@ -254,7 +254,7 @@ public class UserGroupConfigWithMd5Test
         testRequest.setData( dto );
 
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setSystemPassword( "secret" );
         dto.setSystemUsername( "admin" );
@@ -300,7 +300,7 @@ public class UserGroupConfigWithMd5Test
         testRequest.setData( dto );
 
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setSystemPassword( "secret" );
         dto.setSystemUsername( "admin" );
@@ -346,7 +346,7 @@ public class UserGroupConfigWithMd5Test
         testRequest.setData( dto );
 
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setSystemPassword( "secret" );
         dto.setSystemUsername( "admin" );
@@ -396,7 +396,7 @@ public class UserGroupConfigWithMd5Test
         testRequest.setData( dto );
 
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setSystemPassword( "secret" );
         dto.setSystemUsername( "admin" );

@@ -41,7 +41,7 @@ public class DynamicGroupsTest
         Map<String, Object> env = new HashMap<String, Object>();
         // Create a new context pointing to the overseas partition
         env.put( Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory" );
-        env.put( Context.PROVIDER_URL, "ldap://localhost:12345/o=sonatype" );
+        env.put( Context.PROVIDER_URL, "ldap://localhost:" + this.getLdapServer().getPort() + "/o=sonatype" );
         env.put( Context.SECURITY_PRINCIPAL, "uid=admin,ou=system" );
         env.put( Context.SECURITY_CREDENTIALS, "secret" );
         env.put( Context.SECURITY_AUTHENTICATION, "simple" );
@@ -106,7 +106,7 @@ public class DynamicGroupsTest
         Map<String, Object> env = new HashMap<String, Object>();
         // Create a new context pointing to the overseas partition
         env.put( Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory" );
-        env.put( Context.PROVIDER_URL, "ldap://localhost:12345/o=sonatype" );
+        env.put( Context.PROVIDER_URL, "ldap://localhost:" + this.getLdapServer().getPort() + "/o=sonatype" );
         env.put( Context.SECURITY_PRINCIPAL, "uid=admin,ou=system" );
         env.put( Context.SECURITY_CREDENTIALS, "secret" );
         env.put( Context.SECURITY_AUTHENTICATION, "simple" );
@@ -157,7 +157,7 @@ public class DynamicGroupsTest
         Map<String, Object> env = new HashMap<String, Object>();
         // Create a new context pointing to the overseas partition
         env.put( Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory" );
-        env.put( Context.PROVIDER_URL, "ldap://localhost:12345/o=sonatype" );
+        env.put( Context.PROVIDER_URL, "ldap://localhost:" + this.getLdapServer().getPort() + "/o=sonatype" );
         env.put( Context.SECURITY_PRINCIPAL, "uid=admin,ou=system" );
         env.put( Context.SECURITY_CREDENTIALS, "secret" );
         env.put( Context.SECURITY_AUTHENTICATION, "simple" );
@@ -214,7 +214,7 @@ public class DynamicGroupsTest
         Map<String, Object> env = new HashMap<String, Object>();
         // Create a new context pointing to the overseas partition
         env.put( Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory" );
-        env.put( Context.PROVIDER_URL, "ldap://localhost:12345/o=sonatype" );
+        env.put( Context.PROVIDER_URL, "ldap://localhost:" + this.getLdapServer().getPort() + "/o=sonatype" );
         env.put( Context.SECURITY_PRINCIPAL, "uid=admin,ou=system" );
         env.put( Context.SECURITY_CREDENTIALS, "secret" );
         env.put( Context.SECURITY_AUTHENTICATION, "simple" );

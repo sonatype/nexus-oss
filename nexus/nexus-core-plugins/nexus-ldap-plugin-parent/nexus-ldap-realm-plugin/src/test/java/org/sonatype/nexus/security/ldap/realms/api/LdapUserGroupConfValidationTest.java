@@ -21,7 +21,7 @@ package org.sonatype.nexus.security.ldap.realms.api;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.AbstractNexusLdapTestCase;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -30,7 +30,7 @@ import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
 
 public class LdapUserGroupConfValidationTest
-    extends AbstractNexusTestCase
+    extends AbstractNexusLdapTestCase
 {
 
     private PlexusResource getResource()

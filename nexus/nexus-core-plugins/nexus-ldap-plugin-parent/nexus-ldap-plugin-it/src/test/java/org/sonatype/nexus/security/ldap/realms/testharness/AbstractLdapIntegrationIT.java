@@ -20,7 +20,12 @@ package org.sonatype.nexus.security.ldap.realms.testharness;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.junit.Assert;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -55,10 +60,14 @@ public abstract class AbstractLdapIntegrationIT
     {
         super.copyConfigFiles();
 
-        // copy ldap.xml to work dir
-        this.copyConfigFile( "ldap.xml", WORK_CONF_DIR );
-
         this.copyConfigFile( "test.ldif", LDIF_DIR );
+        
+        // copy ldap.xml to work dir
+        Map<String, String> interpolationMap = new HashMap<String, String>();
+        interpolationMap.put( "port", Integer.toString( this.getLdapPort() ) );
+        
+        this.copyConfigFile( "ldap.xml", interpolationMap, WORK_CONF_DIR );
+
     }
 
     protected boolean deleteLdapConfig()
@@ -70,12 +79,33 @@ public abstract class AbstractLdapIntegrationIT
         }
         return true;
     }
+    
+    protected int getLdapPort()
+    {
+        if( this.ldapServer == null )
+        {
+            try
+            {
+                beforeLdapTests();
+            }
+            catch ( Exception e )
+            {
+                e.printStackTrace();
+                Assert.fail( "Failed to initilize ldap server: "+ e.getMessage() );
+            }
+        }
+        return this.ldapServer.getPort();
+    }
 
     @BeforeMethod
     public void beforeLdapTests()
         throws Exception
     {
-        this.ldapServer = (LdapServer) this.lookup( LdapServer.ROLE );
+        if( this.ldapServer == null )
+        {
+            this.ldapServer = (LdapServer) this.lookup( LdapServer.ROLE );
+        }
+        
         if ( !this.ldapServer.isStarted() )
         {
             this.ldapServer.start();

@@ -18,19 +18,21 @@
  */
 package org.sonatype.nexus.security.ldap.realms.api;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.AbstractNexusLdapTestCase;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 
 public class LdapConnMd5Test
-    extends AbstractNexusTestCase
+    extends AbstractNexusLdapTestCase
 {
 
     private PlexusResource getResource()
@@ -50,7 +52,7 @@ public class LdapConnMd5Test
         LdapConnectionInfoDTO connectionInfo = new LdapConnectionInfoDTO();
         response.setData( connectionInfo );
         connectionInfo.setHost( "localhost" );
-        connectionInfo.setPort( 12345 );
+        connectionInfo.setPort( this.getLdapPort() );
         connectionInfo.setSearchBase( "o=sonatype" );
         connectionInfo.setSystemPassword( "secret" );
         connectionInfo.setSystemUsername( "admin" );
@@ -70,8 +72,9 @@ public class LdapConnMd5Test
     protected void copyDefaultLdapConfigToPlace()
         throws IOException
     {
-        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/md5-ldap.xml" ),
-                     new FileOutputStream( getNexusLdapConfiguration() ) );
+        InputStream in = getClass().getResourceAsStream( "/test-conf/md5-ldap.xml" );
+        this.interpolateLdapXml( in, new File( getNexusLdapConfiguration() ) );
+        IOUtil.close( in );
     }
 
 }

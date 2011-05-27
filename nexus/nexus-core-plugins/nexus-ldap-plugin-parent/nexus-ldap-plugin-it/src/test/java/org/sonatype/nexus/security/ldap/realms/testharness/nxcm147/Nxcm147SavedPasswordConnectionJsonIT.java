@@ -66,7 +66,7 @@ public class Nxcm147SavedPasswordConnectionJsonIT
         LdapConnectionInfoDTO dto = new LdapConnectionInfoDTO();
         dto.setAuthScheme( "simple" );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setProtocol( "ldap" );
         dto.setSearchBase( "o=sonatype" );
         dto.setSystemUsername( "uid=admin,ou=system" );

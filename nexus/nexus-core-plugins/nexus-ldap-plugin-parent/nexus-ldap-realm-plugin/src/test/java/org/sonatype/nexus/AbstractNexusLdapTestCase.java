@@ -22,13 +22,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.util.HashMap;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.junit.Assert;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.ldaptestsuite.LdapServer;
@@ -38,7 +42,7 @@ import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
-public abstract class AbstractNexusTestCase
+public abstract class AbstractNexusLdapTestCase
     extends PlexusTestCaseSupport
 {
 
@@ -113,8 +117,21 @@ public abstract class AbstractNexusTestCase
     protected void copyDefaultLdapConfigToPlace()
     throws IOException
     {
-        this.copyStream( getClass().getResourceAsStream( "/test-conf/ldap.xml" ), new FileOutputStream(
-            getNexusLdapConfiguration() ) );
+        InputStream in = getClass().getResourceAsStream( "/test-conf/ldap.xml" );
+        this.interpolateLdapXml( in, new File( getNexusLdapConfiguration() ) );
+        IOUtil.close( in );
+    }
+    
+    protected void interpolateLdapXml( InputStream inputStream, File outputFile )
+        throws IOException
+    {
+        HashMap<String, String> interpolationMap = new HashMap<String, String>();
+        interpolationMap.put( "port", Integer.toString( this.getLdapPort() ) );
+
+        Reader reader = new InterpolationFilterReader( new InputStreamReader( inputStream ), interpolationMap );
+        OutputStream out = new FileOutputStream( outputFile );
+        IOUtil.copy( reader, out );
+        IOUtil.close( out );
     }
 
     private void copyStream( InputStream is, OutputStream out )
@@ -131,6 +148,12 @@ public abstract class AbstractNexusTestCase
         }
     }
 
+    protected int getLdapPort()
+    {
+        Assert.assertNotNull( "LDAP server is not initialized yet.", ldapServer );
+        return ldapServer.getPort();
+    }
+    
     protected boolean loadConfigurationAtSetUp()
     {
         return true;
@@ -151,6 +174,9 @@ public abstract class AbstractNexusTestCase
         WORK_HOME.mkdirs();
         CONF_HOME.mkdirs();
 
+        // startup the LDAP server.
+        ldapServer = (LdapServer) lookup( LdapServer.ROLE );
+        
         if ( loadConfigurationAtSetUp() )
         {
             this.copyDefaultConfigToPlace();
@@ -158,8 +184,6 @@ public abstract class AbstractNexusTestCase
             this.copyDefaultLdapConfigToPlace();
         }
 
-        // startup the LDAP server.
-        ldapServer = (LdapServer) lookup( LdapServer.ROLE );
     }
 
     protected String getErrorString( ErrorResponse errorResponse, int index )

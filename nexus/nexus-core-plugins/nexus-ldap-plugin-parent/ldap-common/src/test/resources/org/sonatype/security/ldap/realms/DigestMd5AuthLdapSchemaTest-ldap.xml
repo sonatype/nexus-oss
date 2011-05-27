@@ -6,7 +6,7 @@
     <authScheme>DIGEST-MD5</authScheme>
     <protocol>ldap</protocol>
     <host>localhost</host>
-    <port>12345</port>
+    <port>${port}</port>
     <realm>localhost</realm>
   </connectionInfo>
   <userAndGroupConfig>

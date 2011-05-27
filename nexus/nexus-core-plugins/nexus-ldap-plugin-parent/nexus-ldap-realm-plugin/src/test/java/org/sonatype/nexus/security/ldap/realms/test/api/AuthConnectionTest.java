@@ -24,14 +24,14 @@ import org.junit.Test;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.AbstractNexusLdapTestCase;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapAuthenticationTestRequest;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 
 public class AuthConnectionTest
-    extends AbstractNexusTestCase
+    extends AbstractNexusLdapTestCase
 {
 
     private PlexusResource getResource()
@@ -50,7 +50,7 @@ public class AuthConnectionTest
         testRequest.setData( dto );
         dto.setAuthScheme( "none" );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setProtocol( "ldap" );
         dto.setSearchBase( "o=sonatype" );
         // dto.setSystemUsername( systemUsername );
@@ -73,7 +73,7 @@ public class AuthConnectionTest
         testRequest.setData( dto );
         dto.setAuthScheme( "simple" );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setProtocol( "ldap" );
         dto.setSearchBase( "o=sonatype" );
         // dto.setSystemUsername( systemUsername );
@@ -124,7 +124,7 @@ public class AuthConnectionTest
         testRequest.setData( dto );
         dto.setAuthScheme( "simple" );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setProtocol( "ldap" );
         dto.setSearchBase( "o=sonatype" );
         dto.setSystemUsername( "uid=admin,ou=system" );
@@ -178,7 +178,7 @@ public class AuthConnectionTest
         testRequest.setData( dto );
         dto.setAuthScheme( "simple" );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setProtocol( "ldap" );
         dto.setSearchBase( "o=sonatype" );
         dto.setSystemUsername( "uid=admin,ou=system" );

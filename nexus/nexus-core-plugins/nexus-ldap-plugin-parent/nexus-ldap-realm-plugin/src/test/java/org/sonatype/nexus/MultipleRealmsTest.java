@@ -32,7 +32,7 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
 public class MultipleRealmsTest
-    extends AbstractNexusTestCase
+    extends AbstractNexusLdapTestCase
 {
 
     @Test

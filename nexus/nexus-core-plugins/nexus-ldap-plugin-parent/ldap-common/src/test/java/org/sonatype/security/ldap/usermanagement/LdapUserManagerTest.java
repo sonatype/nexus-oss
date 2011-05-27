@@ -29,12 +29,11 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Test;
-import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;
+import org.sonatype.security.ldap.AbstractLdapTest;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
@@ -42,45 +41,24 @@ import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 public class LdapUserManagerTest
-    extends AbstractLdapTestEnvironment
+    extends AbstractLdapTest
 {
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
         configuration.setAutoWiring( true );
         configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
-    }
-
-    public static final String SECURITY_CONFIG_KEY = "security-xml-file";
-
-    public static final String LDAP_CONFIGURATION_KEY = "application-conf";
-
-    protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
-
-    protected static final File CONF_HOME = new File( PLEXUS_HOME, "conf" );
-
-    @Override
-    protected void customizeContext( Context ctx )
-    {
-        ctx.put( SECURITY_CONFIG_KEY, new File( CONF_HOME, "security.xml" ).getAbsolutePath() );
-        ctx.put( LDAP_CONFIGURATION_KEY, CONF_HOME.getAbsolutePath() );
-    }
+    }   
 
     @Override
     public void setUp()
         throws Exception
     {
-        CONF_HOME.mkdirs();
-        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/conf/security-users-in-both-realms.xml" ),
-            new FileOutputStream( new File( CONF_HOME, "security.xml" ) ) );
-
-        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/conf/security-configuration.xml" ),
-            new FileOutputStream( new File( CONF_HOME, "security-configuration.xml" ) ) );
-
-        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/conf/ldap.xml" ), new FileOutputStream( new File(
-            CONF_HOME, "ldap.xml" ) ) );
-
         super.setUp();
+
+        this.copyResourceToFile("/test-conf/conf/security-users-in-both-realms.xml", new File( CONF_HOME, "security.xml" ) );
+        
+        this.copyResourceToFile("/test-conf/conf/security-configuration.xml", new File( CONF_HOME, "security-configuration.xml" ) );
     }
 
     private SecuritySystem getSecuritySystem()
@@ -231,7 +209,8 @@ public class LdapUserManagerTest
     public void testOrderOfUserSearch()
         throws Exception
     {
-        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/conf/security-users-in-both-realms.xml" ),
+        IOUtil.copy(
+            getClass().getResourceAsStream( "/test-conf/conf/security-users-in-both-realms.xml" ),
             new FileOutputStream( new File( CONF_HOME, "security.xml" ) ) );
 
         SecuritySystem securitySystem = this.getSecuritySystem();

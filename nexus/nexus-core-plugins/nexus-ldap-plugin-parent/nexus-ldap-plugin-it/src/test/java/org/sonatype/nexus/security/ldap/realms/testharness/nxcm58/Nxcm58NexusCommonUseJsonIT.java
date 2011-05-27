@@ -93,7 +93,7 @@ public class Nxcm58NexusCommonUseJsonIT
         dto = new LdapConnectionInfoDTO();
         dto.setAuthScheme( "none" );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setProtocol( "ldap" );
         dto.setSearchBase( "o=sonatype" );
 

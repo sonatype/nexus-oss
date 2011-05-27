@@ -33,7 +33,7 @@ import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
 public class MultipleRealmsLdapNotConfiguredTest
-    extends AbstractNexusTestCase
+    extends AbstractNexusLdapTestCase
 {
 
     @Test

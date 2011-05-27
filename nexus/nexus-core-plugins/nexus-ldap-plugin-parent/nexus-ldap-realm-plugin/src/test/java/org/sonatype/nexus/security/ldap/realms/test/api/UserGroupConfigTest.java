@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.AbstractNexusLdapTestCase;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserListResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserResponseDTO;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequest;
@@ -37,7 +37,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 
 
 public class UserGroupConfigTest
-    extends AbstractNexusTestCase
+    extends AbstractNexusLdapTestCase
 {
 
     private PlexusResource getResource()
@@ -57,7 +57,7 @@ public class UserGroupConfigTest
 
         dto.setProtocol( "ldap" );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setAuthScheme( "none" );
 
@@ -129,7 +129,7 @@ public class UserGroupConfigTest
 
         dto.setProtocol( "ldap" );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setAuthScheme( "none" );
 
@@ -168,7 +168,7 @@ public class UserGroupConfigTest
 
         dto.setProtocol( "ldap" );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setAuthScheme( "none" );
 
@@ -245,7 +245,7 @@ public class UserGroupConfigTest
 
         // dto.setProtocol( "ldap" );
         // dto.setHost( "localhost" );
-        // dto.setPort( 12345 );
+        // dto.setPort( this.getLdapPort() );
         // dto.setSearchBase( "o=sonatype" );
         // dto.setAuthScheme( "none" );
 
@@ -287,7 +287,7 @@ public class UserGroupConfigTest
 
         dto.setProtocol( "ldap" );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setAuthScheme( "none" );
 
@@ -330,7 +330,7 @@ public class UserGroupConfigTest
 
         dto.setProtocol( "ldap" );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setAuthScheme( "none" );
 
@@ -373,7 +373,7 @@ public class UserGroupConfigTest
 
         dto.setProtocol( "ldap" );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setAuthScheme( "none" );
 
@@ -420,7 +420,7 @@ public class UserGroupConfigTest
 
         dto.setProtocol( "ldap" );
         dto.setHost( "localhost" );
-        dto.setPort( 123456 );
+        dto.setPort( 54321 ); // bad port
         dto.setSearchBase( "o=sonatype" );
         dto.setAuthScheme( "none" );
 

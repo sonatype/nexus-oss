@@ -28,14 +28,14 @@ import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.AbstractNexusLdapTestCase;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapAuthenticationTestRequest;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 
 public class AuthMd5ConnectionTest
-    extends AbstractNexusTestCase
+    extends AbstractNexusLdapTestCase
 {
 
     private PlexusResource getResource()
@@ -53,7 +53,7 @@ public class AuthMd5ConnectionTest
         LdapConnectionInfoDTO dto = new LdapConnectionInfoDTO();
         testRequest.setData( dto );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setSystemPassword( "secret" );
         dto.setSystemUsername( "admin" );
@@ -76,7 +76,7 @@ public class AuthMd5ConnectionTest
         LdapConnectionInfoDTO dto = new LdapConnectionInfoDTO();
         testRequest.setData( dto );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setSystemPassword( "secret" );
         dto.setSystemUsername( "uid=admin,ou=system" );
@@ -99,7 +99,7 @@ public class AuthMd5ConnectionTest
         LdapConnectionInfoDTO dto = new LdapConnectionInfoDTO();
         testRequest.setData( dto );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
 //        dto.setSystemPassword( "secret" );
 //        dto.setSystemUsername( "uid=admin,ou=system" );
@@ -123,7 +123,7 @@ public class AuthMd5ConnectionTest
         LdapConnectionInfoDTO dto = new LdapConnectionInfoDTO();
         testRequest.setData( dto );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
 //        dto.setSystemPassword( "secret" );
 //        dto.setSystemUsername( "admin" );
@@ -153,7 +153,7 @@ public class AuthMd5ConnectionTest
         LdapConnectionInfoDTO dto = new LdapConnectionInfoDTO();
         testRequest.setData( dto );
         dto.setHost( "localhost" );
-        dto.setPort( 12345 );
+        dto.setPort( this.getLdapPort() );
         dto.setSearchBase( "o=sonatype" );
         dto.setSystemPassword( "JUNK" );
         dto.setSystemUsername( "admin" );

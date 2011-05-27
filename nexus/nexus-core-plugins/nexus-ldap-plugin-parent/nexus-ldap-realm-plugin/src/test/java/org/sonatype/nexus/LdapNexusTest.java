@@ -30,7 +30,7 @@ import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
 
 public class LdapNexusTest
-    extends AbstractNexusTestCase
+    extends AbstractNexusLdapTestCase
 {
 
     @Test

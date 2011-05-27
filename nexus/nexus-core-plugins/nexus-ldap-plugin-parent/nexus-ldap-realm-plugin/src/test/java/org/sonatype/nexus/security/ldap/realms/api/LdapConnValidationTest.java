@@ -21,7 +21,7 @@ package org.sonatype.nexus.security.ldap.realms.api;
 import org.junit.Assert;
 import org.junit.Test;
 
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.AbstractNexusLdapTestCase;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -30,7 +30,7 @@ import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
 
 public class LdapConnValidationTest
-    extends AbstractNexusTestCase
+    extends AbstractNexusLdapTestCase
 {
 
     private PlexusResource getResource()
@@ -43,7 +43,7 @@ public class LdapConnValidationTest
     {
         LdapConnectionInfoDTO connectionInfo = new LdapConnectionInfoDTO();
         connectionInfo.setHost( "localhost" );
-        connectionInfo.setPort( 12345 );
+        connectionInfo.setPort( this.getLdapPort() );
         connectionInfo.setSearchBase( "o=sonatype" );
         connectionInfo.setSystemPassword( "secret" );
         connectionInfo.setSystemUsername( "uid=admin,ou=system" );
