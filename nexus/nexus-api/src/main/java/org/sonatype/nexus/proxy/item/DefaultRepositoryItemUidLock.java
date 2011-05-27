@@ -54,6 +54,11 @@ public class DefaultRepositoryItemUidLock
     {
         contentLock.unlock();
     }
+    
+    public boolean hasLocksHeld()
+    {
+        return contentLock.hasLocksHeld();
+    }
 
     // ==
 

@@ -58,17 +58,17 @@ public abstract class AbstractRepositoryItemUidFactory
 
     // ==
 
-    private WeakHashMap<RepositoryItemUidLock, WeakReference<RepositoryItemUidLock>> locks =
-        new WeakHashMap<RepositoryItemUidLock, WeakReference<RepositoryItemUidLock>>();
+    private WeakHashMap<DefaultRepositoryItemUidLock, WeakReference<DefaultRepositoryItemUidLock>> locks =
+        new WeakHashMap<DefaultRepositoryItemUidLock, WeakReference<DefaultRepositoryItemUidLock>>();
 
     @Override
-    public synchronized RepositoryItemUidLock createUidLock( final RepositoryItemUid uid )
+    public synchronized DefaultRepositoryItemUidLock createUidLock( final RepositoryItemUid uid )
     {
         final String key = new String( uid.getKey() );
 
-        final RepositoryItemUidLock newLock = new DefaultRepositoryItemUidLock( key, new SimpleLockResource() );
+        final DefaultRepositoryItemUidLock newLock = new DefaultRepositoryItemUidLock( key, new SimpleLockResource() );
 
-        final WeakReference<RepositoryItemUidLock> oldLockRef = locks.get( newLock );
+        final WeakReference<DefaultRepositoryItemUidLock> oldLockRef = locks.get( newLock );
 
         if ( oldLockRef != null )
         {
@@ -80,7 +80,7 @@ public abstract class AbstractRepositoryItemUidFactory
             }
         }
 
-        locks.put( newLock, new WeakReference<RepositoryItemUidLock>( newLock ) );
+        locks.put( newLock, new WeakReference<DefaultRepositoryItemUidLock>( newLock ) );
 
         return newLock;
     }

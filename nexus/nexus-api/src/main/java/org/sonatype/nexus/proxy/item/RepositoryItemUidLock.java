@@ -41,4 +41,11 @@ public interface RepositoryItemUidLock
      * Unlocks UID. It is the responsibility of caller to use lock/unlock properly (ie. boxing of calls).
      */
     void unlock();
+
+    /**
+     * Returns true if current thread has locks already on this UID lock.
+     * 
+     * @return
+     */
+    boolean hasLocksHeld();
 }
