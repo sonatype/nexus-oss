@@ -148,7 +148,7 @@ public class RepositoryItemUidFactoryTest
 
         size = ( (DefaultRepositoryItemUidFactory) factory ).locksInMap();
 
-        Assert.assertTrue( "We should have less than 10k in weak map: " + size, size <= 10000 && size > 0 );
+        Assert.assertTrue( "We should have less than 10k in weak map: " + size, size <= 20000 && size > 0 );
 
         System.gc();
 
@@ -159,6 +159,6 @@ public class RepositoryItemUidFactoryTest
 
         size = ( (DefaultRepositoryItemUidFactory) factory ).locksInMap();
 
-        Assert.assertTrue( "We should have less than 10k in weak map: " + size, size <= 10000 && size > 0 );
+        Assert.assertTrue( "We should have less than 10k in weak map: " + size, size <= 30000 && size > 0 );
     }
 }
