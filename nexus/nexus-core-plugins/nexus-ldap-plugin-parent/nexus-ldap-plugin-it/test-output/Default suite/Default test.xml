@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite hostname="Echoplex.local" name="org.sonatype.nexus.security.ldap.realms.testharness.nexus3244.Nexus3244ClearConfigWhenChangeIT" tests="1" failures="0" timestamp="27 May 2011 17:49:12 GMT" time="22.048" errors="0">
-  <testcase name="testConfigIsUpdatedWhenChanged" time="1.119" classname="org.sonatype.nexus.security.ldap.realms.testharness.nexus3244.Nexus3244ClearConfigWhenChangeIT"/>
-</testsuite>
