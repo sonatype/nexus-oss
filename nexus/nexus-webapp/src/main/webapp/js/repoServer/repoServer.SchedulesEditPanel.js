@@ -1286,7 +1286,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                 },
                 scope : this,
                 method : 'DELETE',
-                url : rec.data.resourceURI + '?cancelOnly=true'
+                url : Sonatype.config.repos.urls.scheduleRun + '/' + rec.data.id + '?cancelOnly=true'
               });
         }
       },
