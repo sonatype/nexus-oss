@@ -82,6 +82,11 @@ public class NexusStatusUtil
     public void start( String testId )
         throws Exception
     {
+        if ( checkPort() )
+        {
+            throw new NexusIllegalStateException( "Ports in use!!!" );
+        }
+
         int totalWaitCycles = 200 * 5; // 200 sec
         int retryStartCycles = 50 * 5; // 50 sec
         int pollingFreq = 200; // 200 ms
@@ -166,10 +171,32 @@ public class NexusStatusUtil
 
     public boolean isNexusRunning()
     {
+        if ( checkPort() )
+        {
+            return true;
+        }
+
+        try
+        {
+            getNexusStatus();
+            log.debug( "nexus is running." );
+            return true;
+        }
+        catch ( NexusIllegalStateException e )
+        {
+            log.debug( "nexus application port is open, but not yet responding to requests." );
+            return false;
+        }
+
+    }
+
+    private boolean checkPort()
+    {
         Socket sock = null;
         try
         {
             sock = new Socket("localhost", AbstractNexusIntegrationTest.nexusApplicationPort);
+            return true;
         }
         catch ( UnknownHostException e1 )
         {
@@ -194,19 +221,6 @@ public class NexusStatusUtil
                 }
             }
         }
-
-        try
-        {
-            getNexusStatus();
-            log.debug( "nexus is running." );
-            return true;
-        }
-        catch ( NexusIllegalStateException e )
-        {
-            log.debug( "nexus application port is open, but not yet responding to requests." );
-            return false;
-        }
-
     }
 
     public boolean isNexusStopped()
