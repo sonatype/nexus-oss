@@ -197,7 +197,7 @@ public class DefaultScheduledTask<T>
         cancel( interrupt, true );
     }
 
-    public void cancel( boolean interrupt, boolean remove )
+    public void cancel( boolean interrupt, boolean noMoreScheduledExecutions )
     {
         final ProgressListener progressListener = getProgressListener();
 
@@ -212,11 +212,10 @@ public class DefaultScheduledTask<T>
             getFuture().cancel( interrupt );
         }
 
-        if ( remove )
-        {
-            setTaskState( TaskState.CANCELLED );
 
-            getScheduler().removeFromTasksMap( this );
+        if ( noMoreScheduledExecutions )
+        {
+	        setTaskState( TaskState.CANCELLED );
         }
         else
         {

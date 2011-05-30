@@ -43,10 +43,50 @@ public class TaskStopTest
         assertTrue( callable.isAllDone() );
     }
 
+    public void testCancelWaitForFinishExecution()
+        throws Exception
+    {
+        RunForeverCallable callable = new RunForeverCallable( 500 );
+
+        assertFalse( callable.isAllDone() );
+
+        ScheduledTask<Integer> task = defaultScheduler.submit( "Test Task", callable );
+
+        assertFalse( callable.isAllDone() );
+
+        callable.blockForStart();
+
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+
+        assertEquals( TaskState.RUNNING, task.getTaskState() );
+
+        task.cancelOnly();
+
+        assertFalse( "task was killed immediately", callable.isAllDone() );
+        assertFalse( "running task was eagerly removed", defaultScheduler.getAllTasks().isEmpty() );
+
+        callable.blockForDone();
+
+        assertTrue( "task was not done", callable.isAllDone() );
+        assertTrue( "task not removed", defaultScheduler.getAllTasks().isEmpty() );
+    }
+
     public class RunForeverCallable
         implements Callable<Integer>
     {
         private boolean allDone = false;
+
+        private int runTicks;
+
+        public RunForeverCallable()
+        {
+            this.runTicks = Integer.MAX_VALUE;
+        }
+
+        public RunForeverCallable( int ticks )
+        {
+            this.runTicks = ticks;
+        }
 
         private boolean started = false;
 
@@ -55,18 +95,22 @@ public class TaskStopTest
         {
             try
             {
-                while ( true )
+                int ticks = 0;
+                while ( ticks++ < runTicks )
                 {
                     // Replace with Thread.yield() to see the problem. The sleep state will
                     // cause the thread to stop
                     Thread.sleep( 1 );
                     started = true;
                 }
+                System.out.println( "done running" );
             }
             finally
             {
                 allDone = true;
             }
+
+            return null;
         }
 
         public boolean isAllDone()
