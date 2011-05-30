@@ -34,7 +34,7 @@ public class RepositoryStatusCheckerThread
 
     public RepositoryStatusCheckerThread( final Logger logger, final ProxyRepository repository )
     {
-        super();
+        super( "RepositoryStatusChecker-" + repository.getId() );
 
         this.logger = logger;
 
