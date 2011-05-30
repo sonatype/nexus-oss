@@ -29,7 +29,7 @@
   <version>1.9.2-SNAPSHOT</version>
 
   <packaging>pom</packaging>
-  <name>Nexus Aggregator</name>
+  <name>Nexus : Aggregator</name>
   <description>Sonatype Nexus Aggregator</description>
 
   <properties>
@@ -57,19 +57,24 @@
             <useDefaultExcludes>false</useDefaultExcludes>
             <includes>
               <include>**/*.java</include>
-              <include>**/*.js</include>
               <include>**/*.vm</include>
               <include>**/*.xml</include>
               <include>**/*.groovy</include>
-              <include>**/*.aj</include>
+              <include>**/*.aj</include>   
+              <include>**/*.css</include>
+              <include>**/*.html</include>
+              <include>**/*.js</include>
             </includes>
             <excludes>
+              <exclude>**/target/**</exclude>
               <exclude>**/ext-2.3/**</exclude>
               <exclude>**/js/filetree/**</exclude>
               <exclude>**/editarea_0_8_2/**</exclude>
+              <!-- FIXME is this really a good idea excluding all test resources? -->
               <exclude>**/src/test/resources/**</exclude>
               <exclude>**/nexus-repository-metadata/**</exclude>
-              <exclude>**/gwt/ext/ui/**.js</exclude>
+              <exclude>**/gwt/ext/ui/**/*.js</exclude>
+              <exclude>**/gwt/ext/ui/**/*.css</exclude>
               <exclude>**/nexus/nexus-test-harness/nexus-test-harness-its/resources/**</exclude>
             </excludes>
             <mapping>
