@@ -150,6 +150,9 @@ public class DefaultNexusConfiguration
     /** The map with per-repotype limitations */
     private Map<RepositoryTypeDescriptor, Integer> repositoryMaxInstanceCountLimits;
 
+    @Requirement
+    private List<ConfigurationModifier> configurationModifiers;
+
     // ==
 
     protected Logger getLogger()
@@ -173,6 +176,17 @@ public class DefaultNexusConfiguration
             getLogger().info( "Loading Nexus Configuration..." );
 
             configurationSource.loadConfiguration();
+
+            boolean modified = false;
+            for ( ConfigurationModifier modifier : configurationModifiers )
+            {
+                modified |= modifier.apply( configurationSource.getConfiguration() );
+            }
+
+            if ( modified )
+            {
+                configurationSource.storeConfiguration();
+            }
 
             configurationDirectory = null;
 
