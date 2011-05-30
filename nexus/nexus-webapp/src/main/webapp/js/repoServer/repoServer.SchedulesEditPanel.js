@@ -1514,6 +1514,9 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         this.ctxRow = this.schedulesGridPanel.view.getRow(index);
         this.ctxRecord = this.schedulesGridPanel.store.getAt(index);
 
+        this.runButton.disable();
+        this.stopButton.disable();
+
         var status = rec.data.status;
         if (rec.data.name.substring(0, 4) == 'New ')
         {
@@ -1522,7 +1525,14 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         }
         else if (!(status == 'SUBMITTED' || status == 'WAITING' || status == 'BROKEN'))
         {
-          this.stopButton.enable();
+          if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ))
+          {
+            this.stopButton.enable();
+          }
+          else
+          {
+            this.stopButton.disable();
+          }
           this.runButton.disable();
         }
         else
