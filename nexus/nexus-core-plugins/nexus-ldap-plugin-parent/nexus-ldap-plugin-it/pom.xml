@@ -230,6 +230,7 @@
         <configuration>
           <!-- workaround for a bug in apache LDAP server which leaks ~1M of heap during each restart -->
           <argLine>-Xmx256M</argLine>
+          <forkMode>always</forkMode>
         </configuration>
       </plugin>
 
