@@ -11,7 +11,7 @@
   <artifactId>nexus-maven-plugin</artifactId>
   <version>1.8-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
-  <name>Nexus Plugin for Maven</name>
+  <name>Nexus : Maven Plugin</name>
   <licenses>
     <license>
       <name>GPL</name>
