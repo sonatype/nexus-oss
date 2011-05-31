@@ -1305,6 +1305,7 @@
     <module>nexus-webapp</module>
     <module>nexus-clients</module>
     <module>nexus-distributions</module>
+    <module>nexus-stories</module>
     <module>nexus-test</module>
     <module>nexus-test-harness</module>
   </modules>
