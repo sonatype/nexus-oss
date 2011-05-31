@@ -75,6 +75,8 @@ public class KenaiRealm
     @Inject
     private KenaiRealmConfiguration kenaiRealmConfiguration;
 
+    private static final int PAGE_SIZE = 200;
+
     private Cache<Object, Object> authenticatingCache = null;
 
     private String DEFAULT_AUTHENTICATION_CACHE_POSTFIX = "-authentication";
@@ -227,11 +229,11 @@ public class KenaiRealm
             {
                 if ( this.isAuthorizationCachingEnabled() )
                 {
-                    AuthorizationInfo authorizationInfo =
-                        this.buildAuthorizationInfoFromResponseText( response.getEntity().getText() );
-
-                    Object authorizationCacheKey =
-                        this.getAuthorizationCacheKey( new SimplePrincipalCollection( username, this.getName() ) );
+                    AuthorizationInfo authorizationInfo = this.buildAuthorizationInfo( username, password, response ); 
+                        
+                    Object authorizationCacheKey = this.getAuthorizationCacheKey( new SimplePrincipalCollection(
+                        username,
+                        this.getName() ) );
                     this.getAvailableAuthorizationCache().put( authorizationCacheKey, authorizationInfo );
 
                 }
@@ -240,25 +242,65 @@ public class KenaiRealm
             }
             catch ( IOException e )
             {
-                this.logger.warn( "Failed to read response", e );
+                this.logger.error( "Failed to read response", e );
             }
             catch ( JSONException e )
             {
-                this.logger.warn( "Failed to read response", e );
+                this.logger.error( "Failed to read response", e );
             }
         }
-        this.logger.debug( "Failed to authenticate user: {} for url: {} status: {}", new Object[] { username,
-            response.getRequest().getResourceRef(), response.getStatus() } );
+        this.logger.debug( "Failed to authenticate user: {} for url: {} status: {}", new Object[] {
+            username,
+            response.getRequest().getResourceRef(),
+            response.getStatus() } );
         return false;
     }
 
-    private AuthorizationInfo buildAuthorizationInfoFromResponseText( String responseText )
+    private AuthorizationInfo buildAuthorizationInfo( String username, String password, Response response )
+        throws JSONException,
+            IOException
+    {
+        SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+        // add the default role
+        authorizationInfo.addRole( this.kenaiRealmConfiguration.getConfiguration().getDefaultRole() );
+
+        // initial page
+        JSONObject jsonObject = buildJsonObjectFromResponse( response );
+
+        // collect roles from json object
+        Set<String> roles = this.buildRoleSetFromJsonObject( jsonObject );
+        authorizationInfo.addRoles( roles );
+
+        // check for pages
+        while ( jsonObject.has( "next" ) && jsonObject.getString( "next" ) != "null" )
+        {
+            String pagedURL = jsonObject.getString( "next" );
+            this.logger.debug( "Next page of Kenai project info: {}", pagedURL );
+            // make another remote request
+            response = this.makeRemoteRequest( username, password, pagedURL );
+            jsonObject = buildJsonObjectFromResponse( response );
+            authorizationInfo.addRoles( this.buildRoleSetFromJsonObject( jsonObject ) );
+        }
+
+        return authorizationInfo;
+    }
+
+    private JSONObject buildJsonObjectFromResponse( Response response ) throws JSONException, IOException
+    {
+        if ( response.getStatus().isSuccess() )
+        {
+            return new JSONObject( response.getEntity().getText() );
+        }
+        else
+        {
+            throw new AuthenticationException( "Error retriving response, status code: " + response.getStatus() );
+        }
+    }
+
+    private Set<String> buildRoleSetFromJsonObject( JSONObject jsonObject )
         throws JSONException
     {
         Set<String> roles = new HashSet<String>();
-        roles.add( this.kenaiRealmConfiguration.getConfiguration().getDefaultRole() );
-
-        JSONObject jsonObject = new JSONObject( responseText );
         JSONArray projectArray = jsonObject.getJSONArray( "projects" );
 
         for ( int ii = 0; ii < projectArray.length(); ii++ )
@@ -279,11 +321,16 @@ public class KenaiRealm
             }
         }
 
-        return new SimpleAuthorizationInfo( roles );
-
+        return roles;
     }
 
     private Response makeRemoteRequest( String username, String password )
+    {
+        return makeRemoteRequest( username, password, this.kenaiRealmConfiguration.getConfiguration().getBaseUrl()
+            + "api/projects/mine.json?size=" + PAGE_SIZE );
+    }
+
+    private Response makeRemoteRequest( String username, String password, String url )
     {
         Client restClient = new Client( new Context(), Protocol.HTTP );
 
@@ -294,7 +341,7 @@ public class KenaiRealm
 
         // FIXME: waiting for response from kenai team on how to get a non-paginated response
         // If that is not possible we will need to add support for paged results.
-        request.setResourceRef( this.kenaiRealmConfiguration.getConfiguration().getBaseUrl() + "api/projects/mine.json?size=100" );
+        request.setResourceRef( url );
         request.setMethod( Method.GET );
         request.setChallengeResponse( authentication );
 
@@ -348,15 +395,18 @@ public class KenaiRealm
             if ( cacheManager != null )
             {
                 String cacheName = getAuthorizationCacheName();
-                this.logger.debug( "CacheManager [{}] has been configured.  Building authorization cache named [{}]",
-                                   cacheManager, cacheName );
+                this.logger.debug(
+                    "CacheManager [{}] has been configured.  Building authorization cache named [{}]",
+                    cacheManager,
+                    cacheName );
 
                 Cache<Object, AuthorizationInfo> value = cacheManager.getCache( cacheName );
                 this.setAuthorizationCache( value );
             }
             else
             {
-                this.logger.info( "No cache or cacheManager properties have been set.  Authorization cache cannot be obtained." );
+                this.logger
+                    .info( "No cache or cacheManager properties have been set.  Authorization cache cannot be obtained." );
 
             }
         }

@@ -24,7 +24,6 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.mortbay.jetty.servlet.DefaultServlet;
 import org.sonatype.jettytestsuite.ServletInfo;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.jettytestsuite.WebappContext;
@@ -46,7 +45,12 @@ public class KenaiRealmTest
     private final static String DEFAULT_ROLE = "default-url-role";
 
     private static final String AUTH_APP_NAME = "auth_app";
-
+    
+    protected int getTotalNumberOfProjects()
+    {
+        return 302;
+    }
+    
     private Realm getRealm()
         throws Exception
     {
@@ -71,7 +75,7 @@ public class KenaiRealmTest
         // this will fail unless the user auth is cached from a login
         try
         {
-            kenaiRealm.checkRole( new SimplePrincipalCollection( username, kenaiRealm.getName() ), "lg3d-incubator" );
+            kenaiRealm.checkRole( new SimplePrincipalCollection( username, kenaiRealm.getName() ), "project-252" );
             Assert.fail( "Expected AuthorizationException" );
         }
         catch ( AuthorizationException e )
@@ -81,7 +85,12 @@ public class KenaiRealmTest
 
         AuthenticationInfo info = kenaiRealm.getAuthenticationInfo( new UsernamePasswordToken( username, password ) );
         Assert.assertNotNull( info );
-        kenaiRealm.checkRole( new SimplePrincipalCollection( username, kenaiRealm.getName() ), "lg3d-incubator" );
+        
+        // check all roles
+        for ( int ii = 0; ii < getTotalNumberOfProjects(); ii++ )
+        {
+            kenaiRealm.checkRole( new SimplePrincipalCollection( username, kenaiRealm.getName() ), "project-" + ii );
+        }
 
     }
 
@@ -165,9 +174,10 @@ public class KenaiRealmTest
         webapp.setServletInfos( Arrays.asList( servletInfo ) );
 
         servletInfo.setMapping( "/*" );
-        servletInfo.setServletClass( DefaultServlet.class.getName() );
+        servletInfo.setServletClass( KenaiMockServlet.class.getName() );
 
         Properties params = new Properties();
+        params.setProperty( KenaiMockServlet.TOTAL_PROJECTS_KEY, Integer.toString( getTotalNumberOfProjects() ) );
         servletInfo.setParameters( params );
 
         params.put( "resourceBase", getBasedir() + "/target/test-classes/data/" );
@@ -194,7 +204,7 @@ public class KenaiRealmTest
         configuration.setBaseUrl( server.getUrl( AUTH_APP_NAME ) + "/" ); // add the '/' to the end
         // kenaiRealmConfiguration.updateConfiguration( configuration );
     }
-
+    
     @Override
     protected void tearDown()
         throws Exception
