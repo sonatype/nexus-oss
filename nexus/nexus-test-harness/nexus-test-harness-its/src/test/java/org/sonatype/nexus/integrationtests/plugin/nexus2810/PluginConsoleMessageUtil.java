@@ -20,11 +20,12 @@ package org.sonatype.nexus.integrationtests.plugin.nexus2810;
 
 import java.io.IOException;
 import java.util.List;
-
-import org.apache.log4j.Logger;
+;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoListResponseDTO;
@@ -42,7 +43,7 @@ public class PluginConsoleMessageUtil
 
     private static XStream xmlXstream;
 
-    private static final Logger LOGGER = Logger.getLogger( PluginConsoleMessageUtil.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( PluginConsoleMessageUtil.class );
 
     static
     {

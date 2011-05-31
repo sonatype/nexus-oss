@@ -23,12 +23,13 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
@@ -53,7 +54,7 @@ public class PrivilegesMessageUtil
 
     private MediaType mediaType;
 
-    private Logger log = Logger.getLogger( getClass() );
+    private Logger log = LoggerFactory.getLogger( getClass() );
 
     public PrivilegesMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {

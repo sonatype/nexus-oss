@@ -23,8 +23,9 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -48,7 +49,7 @@ public class NexusConfigUtil
         super( test );
     }
 
-    private static Logger log = Logger.getLogger( NexusConfigUtil.class );
+    private static Logger log = LoggerFactory.getLogger( NexusConfigUtil.class );
 
     public Configuration getNexusConfig()
         throws IOException

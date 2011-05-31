@@ -21,8 +21,11 @@ package org.sonatype.nexus.test.utils;
 import java.io.IOException;
 
 
-import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.LogConfigResource;
 import org.sonatype.nexus.rest.model.LogConfigResourceResponse;
@@ -35,7 +38,7 @@ import com.thoughtworks.xstream.XStream;
  */
 public class LogConfigMessageUtil
 {
-    private static final Logger LOG = Logger.getLogger( LogConfigMessageUtil.class );
+    private static final Logger LOG = LoggerFactory.getLogger( LogConfigMessageUtil.class );
 
     private static final String SERVICE_URL = "service/local/log/config";
 

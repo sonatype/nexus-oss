@@ -25,11 +25,12 @@ import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -62,7 +63,7 @@ public class RepositoryMessageUtil
 
     private MediaType mediaType;
 
-    private static final Logger LOG = Logger.getLogger( RepositoryMessageUtil.class );
+    private static final Logger LOG = LoggerFactory.getLogger( RepositoryMessageUtil.class );
 
     public RepositoryMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {

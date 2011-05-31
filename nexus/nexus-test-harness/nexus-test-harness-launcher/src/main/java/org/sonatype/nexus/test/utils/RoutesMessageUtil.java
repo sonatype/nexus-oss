@@ -28,13 +28,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.hamcrest.text.IsEmptyString;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -59,7 +60,7 @@ public class RoutesMessageUtil
 
     private MediaType mediaType;
 
-    private static final Logger LOG = Logger.getLogger( RoutesMessageUtil.class );
+    private static final Logger LOG = LoggerFactory.getLogger( RoutesMessageUtil.class );
 
     public RoutesMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {

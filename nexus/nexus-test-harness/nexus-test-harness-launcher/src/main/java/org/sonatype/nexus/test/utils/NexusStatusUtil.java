@@ -26,8 +26,10 @@ import java.net.UnknownHostException;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.log4j.Logger;
 import org.sonatype.nexus.SystemState;
+import org.restlet.data.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
@@ -37,9 +39,9 @@ import org.testng.Assert;
 /**
  * Simple util class
  */
-public class NexusStatusUtil {
-
-    protected static Logger log = Logger.getLogger(NexusStatusUtil.class);
+public class NexusStatusUtil
+{
+    protected static Logger log = LoggerFactory.getLogger( NexusStatusUtil.class );
     private ThreadedPlexusAppBooterService APP_BOOTER_SERVICE = null;
 
     public boolean isNexusRESTStarted()

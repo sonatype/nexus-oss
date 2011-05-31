@@ -22,10 +22,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilitiesPlexusResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
@@ -41,9 +42,9 @@ import static org.hamcrest.Matchers.*;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import com.thoughtworks.xstream.XStream;
 
-public class CapabilitiesMessageUtil {
-
-    private static final Logger LOG = Logger.getLogger(TaskScheduleUtil.class);
+public class CapabilitiesMessageUtil
+{
+    private static final Logger LOG = LoggerFactory.getLogger( TaskScheduleUtil.class );
     private static XStream xstream;
 
     static {

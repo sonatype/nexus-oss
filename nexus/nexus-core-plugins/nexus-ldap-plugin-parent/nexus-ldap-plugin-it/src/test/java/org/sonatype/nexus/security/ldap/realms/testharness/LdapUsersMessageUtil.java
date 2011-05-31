@@ -21,10 +21,11 @@ package org.sonatype.nexus.security.ldap.realms.testharness;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserListResponse;
@@ -46,7 +47,7 @@ public class LdapUsersMessageUtil extends ITUtil
 
     private MediaType mediaType;
 
-    private static final Logger LOG = Logger.getLogger( LdapUsersMessageUtil.class );
+    private static final Logger LOG = LoggerFactory.getLogger( LdapUsersMessageUtil.class );
 
     public LdapUsersMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {

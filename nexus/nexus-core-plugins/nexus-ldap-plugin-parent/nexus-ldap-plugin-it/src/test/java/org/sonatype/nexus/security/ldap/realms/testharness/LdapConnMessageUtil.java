@@ -20,10 +20,11 @@ package org.sonatype.nexus.security.ldap.realms.testharness;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.security.ldap.realms.api.LdapRealmPlexusResourceConst;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
@@ -45,7 +46,7 @@ public class LdapConnMessageUtil
 
     private MediaType mediaType;
 
-    private static final Logger LOG = Logger.getLogger( GroupMessageUtil.class );
+    private static final Logger LOG = LoggerFactory.getLogger( GroupMessageUtil.class );
 
     public LdapConnMessageUtil( XStream xstream, MediaType mediaType )
     {

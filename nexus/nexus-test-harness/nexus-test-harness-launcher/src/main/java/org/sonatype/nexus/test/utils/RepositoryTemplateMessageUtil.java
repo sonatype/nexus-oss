@@ -20,8 +20,10 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
+import org.restlet.data.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
@@ -31,7 +33,7 @@ import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 
 public class RepositoryTemplateMessageUtil
 {
-    private static final Logger LOG = Logger.getLogger( RepositoryTemplateMessageUtil.class );
+    private static final Logger LOG = LoggerFactory.getLogger( RepositoryTemplateMessageUtil.class );
 
     public static final String TEMPLATE_PROXY_SNAPSHOT = "default_proxy_snapshot";
 

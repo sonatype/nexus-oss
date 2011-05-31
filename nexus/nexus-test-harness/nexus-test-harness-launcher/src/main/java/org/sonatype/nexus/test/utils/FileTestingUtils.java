@@ -36,11 +36,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simple File testing utilities.
@@ -48,7 +49,7 @@ import org.codehaus.plexus.util.InterpolationFilterReader;
 public class FileTestingUtils
 {
 
-    private static final Logger LOG = Logger.getLogger( FileTestingUtils.class );
+    private static final Logger LOG = LoggerFactory.getLogger( FileTestingUtils.class );
 
     private static final int BUFFER_SIZE = 0x1000;
 
@@ -56,7 +57,7 @@ public class FileTestingUtils
 
     /**
      * Creates a SHA1 hash from a file.
-     * 
+     *
      * @param file The file to be digested.
      * @return An SHA1 hash based on the contents of the file.
      * @throws IOException
@@ -81,7 +82,7 @@ public class FileTestingUtils
 
     /**
      * Creates a SHA1 hash from a url.
-     * 
+     *
      * @param url The URL to opened and digested.
      * @return An SHA1 hash based on the contents of the URL.
      * @throws IOException
@@ -105,7 +106,7 @@ public class FileTestingUtils
 
     /**
      * Creates a SHA1 hash from the contents of a String.
-     * 
+     *
      * @param data the String to be digested.
      * @return An SHA1 hash based on the contents of the String.
      * @throws IOException
@@ -121,7 +122,7 @@ public class FileTestingUtils
 
     /**
      * Creates a SHA1 hash from an InputStream.
-     * 
+     *
      * @param in Inputstream to be digested.
      * @returnn SHA1 hash based on the contents of the stream.
      * @throws IOException

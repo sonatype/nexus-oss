@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Arrays;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.log4j.Logger;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
@@ -37,6 +36,8 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.Commandline;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.plexus.classworlds.io.ClassworldsConfWriter;
@@ -57,7 +58,7 @@ import org.sonatype.plexus.classworlds.validator.ClassworldsValidationResult;
 public class WagonDeployer
 {
     private PlexusContainer plexusContainer;
-    
+
     private String protocol = "http";
 
     private String username;
@@ -70,7 +71,7 @@ public class WagonDeployer
 
     private String artifactPath;
 
-    private static final Logger LOG = Logger.getLogger( WagonDeployer.class );
+    private static final Logger LOG = LoggerFactory.getLogger( WagonDeployer.class );
 
     public WagonDeployer( PlexusContainer plexusContainer, String protocol, String username, String password,
                           String repositoryUrl, File fileToDeploy, String artifactPath )

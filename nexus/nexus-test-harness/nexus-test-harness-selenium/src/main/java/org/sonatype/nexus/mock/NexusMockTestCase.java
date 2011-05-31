@@ -26,7 +26,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.log4j.Logger;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -41,6 +40,8 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.appbooter.PlexusAppBooter;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
@@ -66,7 +67,7 @@ public abstract class NexusMockTestCase
 
     protected String testName;
 
-    protected static Logger log = Logger.getLogger( NexusMockTestCase.class );
+    protected static Logger log = LoggerFactory.getLogger( NexusMockTestCase.class );
 
     @Requirement
     private PlexusContainer container = PlexusObjectFactory.getContainer();

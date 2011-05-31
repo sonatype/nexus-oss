@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Client;
 import org.restlet.Context;
@@ -40,6 +39,8 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 import org.restlet.resource.StringRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
 import org.sonatype.nexus.rest.NexusApplication;
@@ -64,7 +65,7 @@ public class RestClientHelper
 
     private static final String SERVICE_URL_PART = "service/local/";
 
-    private Logger logger = Logger.getLogger( getClass() );
+    private Logger logger = LoggerFactory.getLogger( getClass() );
 
     private XStream xstream;
 
@@ -79,7 +80,7 @@ public class RestClientHelper
 
         NexusApplication napp = new NexusApplication();
         xstream = napp.doConfigureXstream( new XStream( new LookAheadXppDriver() ) );
-        
+
         XStreamInitializer.init( xstream );
     }
 

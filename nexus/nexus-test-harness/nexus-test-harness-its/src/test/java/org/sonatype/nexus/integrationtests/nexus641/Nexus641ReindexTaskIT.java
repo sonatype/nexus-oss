@@ -23,7 +23,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -39,7 +40,7 @@ import org.testng.annotations.Test;
 public class Nexus641ReindexTaskIT
     extends AbstractNexusIntegrationTest
 {
-    protected static Logger logger = Logger.getLogger( Nexus641ReindexTaskIT.class );
+    protected static Logger logger = LoggerFactory.getLogger( Nexus641ReindexTaskIT.class );
 
     private File repositoryPath = new File( nexusWorkDir, "storage/"+ this.getTestRepositoryId() );
 

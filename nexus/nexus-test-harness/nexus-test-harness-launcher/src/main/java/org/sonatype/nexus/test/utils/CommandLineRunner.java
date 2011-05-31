@@ -18,19 +18,21 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.codehaus.plexus.util.cli.StreamPumper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CommandLineRunner
 {
 
-    private static final Logger LOG = Logger.getLogger( CommandLineRunner.class );
+    private static final Logger LOG = LoggerFactory.getLogger( CommandLineRunner.class );
     private final StringBuffer buffer = new StringBuffer();
-    
-    
+
+
     public int executeAndWait( Commandline cli ) throws CommandLineException, InterruptedException
     {
         Process p = null;
@@ -62,7 +64,7 @@ public class CommandLineRunner
             errPumper.start();
 
             return p.waitFor();
-            
+
         }
         finally
         {
@@ -77,10 +79,10 @@ public class CommandLineRunner
             }
         }
     }
-    
+
     public String getConsoleOutput()
     {
         return this.buffer.toString();
     }
-    
+
 }

@@ -24,11 +24,12 @@ import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.resource.StringRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
@@ -48,7 +49,7 @@ public class UserMessageUtil
 
     private MediaType mediaType;
 
-    private static final Logger LOG = Logger.getLogger( UserMessageUtil.class );
+    private static final Logger LOG = LoggerFactory.getLogger( UserMessageUtil.class );
 
     public UserMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {

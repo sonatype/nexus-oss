@@ -18,16 +18,17 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import org.apache.log4j.Logger;
-
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.ServerSetup;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EmailUtil
 {
     public static final int EMAIL_SERVER_PORT;
 
-    private static final Logger log = Logger.getLogger( EmailUtil.class );
+    private static final Logger log = LoggerFactory.getLogger( EmailUtil.class );
 
     public static final String USER_USERNAME = "smtp-username";
 

@@ -30,8 +30,9 @@ import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.apache.log4j.Logger;
 import org.apache.maven.index.artifact.Gav;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -40,7 +41,7 @@ import org.sonatype.nexus.integrationtests.TestContext;
 public class DeployUtils
     extends ITUtil
 {
-    private static final Logger LOG = Logger.getLogger( DeployUtils.class );
+    private static final Logger LOG = LoggerFactory.getLogger( DeployUtils.class );
 
     public DeployUtils( AbstractNexusIntegrationTest test )
     {
@@ -84,7 +85,7 @@ public class DeployUtils
 
         String extention = gav.getExtension() != null ? gav.getExtension() : "";
         String classifier = gav.getClassifier() != null ? gav.getClassifier() : "";
-        
+
         Part[] parts =
             { new StringPart( "r", repositoryId ), new StringPart( "g", gav.getGroupId() ),
                 new StringPart( "a", gav.getArtifactId() ), new StringPart( "v", gav.getVersion() ),

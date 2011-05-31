@@ -18,8 +18,6 @@
  */
 package org.sonatype.nexus.restlight.testharness;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
@@ -28,6 +26,8 @@ import org.jdom.output.XMLOutputter;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Enumeration;
@@ -141,7 +141,7 @@ public class PUTFixture
                 throws IOException,
                     ServletException
             {
-                Logger logger = LogManager.getLogger( PUTFixture.class );
+                Logger logger = LoggerFactory.getLogger( PUTFixture.class );
 
                 if ( !"put".equalsIgnoreCase( request.getMethod() ) )
                 {

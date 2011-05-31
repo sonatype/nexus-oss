@@ -39,9 +39,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.index.artifact.Gav;
@@ -63,6 +60,8 @@ import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.nexus.rt.boot.ITAppBooterCustomizer;
 import org.sonatype.nexus.rt.prefs.FilePreferencesFactory;
@@ -140,7 +139,7 @@ public abstract class AbstractNexusIntegrationTest
 
     protected static final String nexusLogDir;
 
-    protected static Logger log = Logger.getLogger( AbstractNexusIntegrationTest.class );
+    protected static Logger log = LoggerFactory.getLogger( AbstractNexusIntegrationTest.class );
 
     // Install the file preferences, to have them used from IT but also from embedded Nexus too.
     static
@@ -254,22 +253,19 @@ public abstract class AbstractNexusIntegrationTest
         this.testRepositoryId = testRepositoryId;
         // this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
 
+        // This is leftover code, here to serve as warning as something that needs ligration from log4j
         InputStream is = null;
-
         Properties props = new Properties();
         try
         {
             is = getClass().getResourceAsStream( "/log4j.properties" );
-
             if ( is != null )
             {
-                props.load( is );
-                PropertyConfigurator.configure( props );
+                log.error("/log4j.properties detected that used to be loaded as part of ITs, now it is being ignored."
+                    + " You may want to tweak the IT in question with suitable logging configuration.");      
+                //props.load( is );
+                //PropertyConfigurator.configure( props );
             }
-        }
-        catch ( IOException e )
-        {
-            e.printStackTrace();
         }
         finally
         {
@@ -338,7 +334,8 @@ public abstract class AbstractNexusIntegrationTest
                 this.copyConfigFiles();
 
                 // At this point we have the final log4j config for the IT, switch log4j to use it.
-                PropertyConfigurator.configure( WORK_CONF_DIR + "/log4j.properties" );
+                // FIXME: Investigate how to do this with logback instead if reqired
+                //PropertyConfigurator.configure( WORK_CONF_DIR + "/log4j.properties" );
 
                 // TODO: Below, Nexus configuration upgrade happens! But this is insane, since it is the IT that
                 // upgrades
@@ -417,6 +414,10 @@ public abstract class AbstractNexusIntegrationTest
 
     // == below methods are NOT participating in @Before/@After stuff
 
+    /**
+     * 
+     * @throws IOException 
+     */
     private void setupLog4j()
         throws IOException
     {
@@ -478,7 +479,7 @@ public abstract class AbstractNexusIntegrationTest
         properties.putIfNew( "log4j.appender.logfile.Append", "true" );
         properties.putIfNew( "log4j.appender.logfile.MaxBackupIndex", "30" );
         properties.putIfNew( "log4j.appender.logfile.MaxFileSize", "10MB" );
-        properties.putIfNew( "log4j.appender.logfile.layout", PatternLayout.class.getName() );
+        properties.putIfNew( "log4j.appender.logfile.layout", "org.apache.log4j.PatternLayout" );
         properties.putIfNew( "log4j.appender.logfile.layout.ConversionPattern",
             "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
 
@@ -823,7 +824,7 @@ public abstract class AbstractNexusIntegrationTest
         catch ( Exception e )
         {
             e.printStackTrace();
-            log.fatal( e.getMessage(), e );
+            log.error( e.getMessage(), e );
             if ( nexusLog.exists() )
             {
                 File testNexusLog = new File( nexusLogDir, getTestId() + "/nexus.log" );

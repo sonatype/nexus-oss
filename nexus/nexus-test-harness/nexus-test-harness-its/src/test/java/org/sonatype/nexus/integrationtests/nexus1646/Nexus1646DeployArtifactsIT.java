@@ -21,11 +21,12 @@ package org.sonatype.nexus.integrationtests.nexus1646;
 import java.io.File;
 import java.io.FileInputStream;
 
-import org.apache.log4j.Logger;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.test.utils.GavUtil;
@@ -37,7 +38,7 @@ import com.thoughtworks.xstream.XStream;
 public class Nexus1646DeployArtifactsIT
     extends AbstractNexusIntegrationTest
 {
-    protected static Logger logger = Logger.getLogger( Nexus1646DeployArtifactsIT.class );
+    protected static Logger logger = LoggerFactory.getLogger( Nexus1646DeployArtifactsIT.class );
 
     @Test
     public void deployPlainArtifact()

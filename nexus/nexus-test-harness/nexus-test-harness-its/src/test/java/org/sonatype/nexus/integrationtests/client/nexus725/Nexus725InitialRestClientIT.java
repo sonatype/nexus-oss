@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.client.NexusConnectionException;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -47,7 +48,7 @@ public class Nexus725InitialRestClientIT
     extends AbstractPrivilegeTest
 {
 
-    protected static Logger logger = Logger.getLogger( Nexus725InitialRestClientIT.class );
+    protected static Logger logger = LoggerFactory.getLogger( Nexus725InitialRestClientIT.class );
 
     private NexusClient getConnectedNexusClient()
         throws Exception
@@ -60,7 +61,7 @@ public class Nexus725InitialRestClientIT
 
         return client;
     }
-    
+
     @BeforeClass
     public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );

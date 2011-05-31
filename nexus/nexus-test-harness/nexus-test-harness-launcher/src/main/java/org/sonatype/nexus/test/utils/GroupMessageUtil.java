@@ -25,10 +25,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -51,7 +52,7 @@ public class GroupMessageUtil
 
     private MediaType mediaType;
 
-    private static final Logger LOG = Logger.getLogger( GroupMessageUtil.class );
+    private static final Logger LOG = LoggerFactory.getLogger( GroupMessageUtil.class );
 
     public GroupMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {

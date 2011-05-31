@@ -18,8 +18,6 @@
  */
 package org.sonatype.nexus.restlight.testharness;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -27,6 +25,8 @@ import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Enumeration;
@@ -172,7 +172,7 @@ extends AbstractRESTTestFixture
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * If the client request isn't a GET method, return a 400 HTTP response code. If the expected request headers don't
      * match those supplied by the client request, return a 400 HTTP response code. If the URI doesn't match one or more
      * of the URI expectations, or the response document is null, a 404 HTTP response code is returned. If everything
@@ -186,7 +186,7 @@ extends AbstractRESTTestFixture
             public void handle( final String target, final HttpServletRequest request, final HttpServletResponse response, final int dispatch )
             throws IOException, ServletException
             {
-                Logger logger = LogManager.getLogger( GETFixture.class );
+                Logger logger = LoggerFactory.getLogger( GETFixture.class );
 
                 if ( !"get".equalsIgnoreCase( request.getMethod() ) )
                 {

@@ -41,7 +41,6 @@ import org.apache.commons.httpclient.SimpleHttpConnectionManager;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.apache.log4j.Logger;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.Matcher;
@@ -59,6 +58,8 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
 
@@ -76,7 +77,7 @@ public class RequestFacade
 
     public static final String SERVICE_LOCAL = "service/local/";
 
-    private static final Logger LOG = Logger.getLogger( RequestFacade.class );
+    private static final Logger LOG = LoggerFactory.getLogger( RequestFacade.class );
 
     private static final Client client;
 

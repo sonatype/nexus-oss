@@ -23,11 +23,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.After;
 import org.junit.Before;
 import org.restlet.data.MediaType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
@@ -50,7 +51,7 @@ import com.thoughtworks.xstream.XStream;
 public abstract class AbstractPrivilegeTest
     extends AbstractNexusIntegrationTest
 {
-    protected static Logger LOG = Logger.getLogger( AbstractPrivilegeTest.class );
+    protected static Logger LOG = LoggerFactory.getLogger( AbstractPrivilegeTest.class );
 
     public static final String TEST_USER_NAME = "test-user";
 

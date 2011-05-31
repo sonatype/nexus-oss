@@ -19,13 +19,13 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
-
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListRequest;
@@ -45,7 +45,7 @@ public class MirrorMessageUtils
 
     private MediaType mediaType;
 
-    private static final Logger LOG = Logger.getLogger( MirrorMessageUtils.class );
+    private static final Logger LOG = LoggerFactory.getLogger( MirrorMessageUtils.class );
 
     public MirrorMessageUtils( XStream xstream, MediaType mediaType )
     {

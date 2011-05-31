@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.time.StopWatch;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -34,7 +35,7 @@ public class Nexus748MultipleStart
     extends AbstractNexusIntegrationTest
 {
 
-    protected static Logger logger = Logger.getLogger( Nexus748MultipleStart.class );
+    protected static Logger logger = LoggerFactory.getLogger( Nexus748MultipleStart.class );
 
     @Test
     public void multipleStartTest()

@@ -18,8 +18,6 @@
  */
 package org.sonatype.nexus.restlight.testharness;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
@@ -29,6 +27,8 @@ import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Enumeration;
@@ -208,7 +208,7 @@ extends AbstractRESTTestFixture
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * If the client request isn't a POST method, return a 400 HTTP response code. If the expected request headers don't
      * match those supplied by the client request, return a 400 HTTP response code. If the request document expectation
      * is specified and the client request body doesn't match, a 400 HTTP response code (400 is used if the request body
@@ -223,7 +223,7 @@ extends AbstractRESTTestFixture
             public void handle( final String target, final HttpServletRequest request, final HttpServletResponse response, final int dispatch )
             throws IOException, ServletException
             {
-                Logger logger = LogManager.getLogger( POSTFixture.class );
+                Logger logger = LoggerFactory.getLogger( POSTFixture.class );
 
                 if ( !"post".equalsIgnoreCase( request.getMethod() ) )
                 {

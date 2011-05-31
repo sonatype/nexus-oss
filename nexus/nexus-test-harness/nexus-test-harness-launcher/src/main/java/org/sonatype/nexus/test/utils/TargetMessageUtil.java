@@ -27,12 +27,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -53,7 +54,7 @@ public class TargetMessageUtil
 
     private MediaType mediaType;
 
-    private static final Logger LOG = Logger.getLogger( TargetMessageUtil.class );
+    private static final Logger LOG = LoggerFactory.getLogger( TargetMessageUtil.class );
 
     public TargetMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {

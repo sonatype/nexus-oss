@@ -20,17 +20,16 @@ package org.sonatype.nexus.restlight.testharness;
 
 import java.net.ServerSocket;
 
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
+
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.HandlerWrapper;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SecurityHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * Base implementation for {@link RESTTestFixture} that supplies the methods for managing and retrieving information
@@ -94,21 +93,24 @@ public abstract class AbstractRESTTestFixture
         this.debugEnabled = debugEnabled;
     }
 
+    /**
+     * This is currently broken anyways!
+     */
     protected void setupLogging()
     {
-        if ( !LogManager.getRootLogger().getAllAppenders().hasMoreElements() )
-        {
-            LogManager.getRootLogger().addAppender( new ConsoleAppender( new SimpleLayout() ) );
-        }
-
-        if ( isDebugEnabled() )
-        {
-            LogManager.getRootLogger().setLevel( Level.DEBUG );
-        }
-        else
-        {
-            LogManager.getRootLogger().setLevel( Level.INFO );
-        }
+//        if ( !LogManager.getRootLogger().getAllAppenders().hasMoreElements() )
+//        {
+//            LogManager.getRootLogger().addAppender( new ConsoleAppender( new SimpleLayout() ) );
+//        }
+//
+//        if ( isDebugEnabled() )
+//        {
+//            LogManager.getRootLogger().setLevel( Level.DEBUG );
+//        }
+//        else
+//        {
+//            LogManager.getRootLogger().setLevel( Level.INFO );
+//        }
     }
 
     /**
@@ -119,7 +121,7 @@ public abstract class AbstractRESTTestFixture
     {
         setupLogging();
 
-        Logger logger = LogManager.getLogger( getClass() );
+        Logger logger = LoggerFactory.getLogger( getClass() );
 
         String portStr = System.getProperty( TEST_PORT_SYSPROP );
 
@@ -183,7 +185,7 @@ public abstract class AbstractRESTTestFixture
     public void stopServer()
         throws Exception
     {
-        LogManager.getLogger( getClass() ).info( "Stopping test server." );
+        LoggerFactory.getLogger( getClass() ).info( "Stopping test server." );
 
         if ( server != null && server.isStarted() )
         {

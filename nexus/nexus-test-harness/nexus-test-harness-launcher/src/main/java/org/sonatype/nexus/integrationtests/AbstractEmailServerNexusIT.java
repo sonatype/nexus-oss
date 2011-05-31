@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.integrationtests;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -30,7 +31,7 @@ public abstract class AbstractEmailServerNexusIT
     extends AbstractNexusIntegrationTest
 {
 
-    private static final Logger LOG = Logger.getLogger( AbstractEmailServerNexusIT.class );
+    private static final Logger LOG = LoggerFactory.getLogger( AbstractEmailServerNexusIT.class );
 
     private static int emailServerPort;
 
@@ -58,12 +59,12 @@ public abstract class AbstractEmailServerNexusIT
         LOG.debug( "Stoping e-mail server" );
         server.stop();
     }
-    
+
     protected boolean waitForMail( int count )
     {
         return waitForMail( count, 5000 );
     }
-    
+
     protected boolean waitForMail( int count, long timeout )
     {
         try

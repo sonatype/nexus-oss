@@ -18,14 +18,14 @@
  */
 package org.sonatype.nexus.restlight.testharness;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Enumeration;
@@ -134,7 +134,7 @@ public class DELETEFixture
                 throws IOException,
                     ServletException
             {
-                Logger logger = LogManager.getLogger( GETFixture.class );
+                Logger logger = LoggerFactory.getLogger( GETFixture.class );
 
                 if ( !"delete".equalsIgnoreCase( request.getMethod() ) )
                 {

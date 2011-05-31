@@ -37,7 +37,7 @@ public class SeleniumJUnitRunner
     //extends BlockJUnit4ClassRunner
 {
 /*
-    protected static Logger log = Logger.getLogger( SeleniumJUnitRunner.class );
+    protected static Logger log = LoggerFactory.getLogger( SeleniumJUnitRunner.class );
 
     public SeleniumJUnitRunner( Class<?> klass )
         throws InitializationError

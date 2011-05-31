@@ -18,12 +18,12 @@
  */
 package org.sonatype.nexus.restlight.testharness;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletResponse;
  * encapsulates a series of other {@link RESTTestFixture} instances in a particular order. As client
  * requests are handled, the next fixture in order is used to validate the request and send back
  * a response. Each traversed fixture is tracked, allowing this fixture to determine whether the
- * full expected conversation took place, as an additional validation step for the client test. 
+ * full expected conversation took place, as an additional validation step for the client test.
  */
 public class ConversationalFixture
     extends AbstractRESTTestFixture
@@ -93,7 +93,7 @@ public class ConversationalFixture
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * The {@link Handler} instance returned here tracks an index in the fixture's conversation list. Each successive
      * client request it receives, it attempts to pull out a corresponding fixture instance, and delegate the request to
      * that fixture. If the client makes more requests than there are fixtures in the conversation, the handler returns
@@ -111,7 +111,7 @@ public class ConversationalFixture
             public void handle( final String target, final HttpServletRequest request, final HttpServletResponse response, final int dispatch )
             throws IOException, ServletException
             {
-                Logger logger = LogManager.getLogger( ConversationalFixture.class );
+                Logger logger = LoggerFactory.getLogger( ConversationalFixture.class );
 
                 if ( conversation == null || conversation.isEmpty() )
                 {
