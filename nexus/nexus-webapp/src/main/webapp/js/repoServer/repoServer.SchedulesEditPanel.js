@@ -1063,7 +1063,18 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             dataModifiers : this.submitDataModFuncs[serviceSchedule],
             serviceDataObj : Sonatype.repoServer.referenceData.schedule[serviceSchedule],
             isNew : isNew,
-            scope : this
+            scope : this,
+            success : function() {
+              if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ))
+              {
+                this.runButton.enable();
+              }
+              else
+              {
+                this.runButton.disable();
+              }
+              this.stopButton.disable();
+            }
               // extra option to send to callback, instead of conditioning on
               // method
             });
