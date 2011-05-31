@@ -13,6 +13,8 @@
 package org.sonatype.security;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -24,6 +26,8 @@ import javax.inject.Inject;
 
 import org.apache.shiro.realm.Realm;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
@@ -78,5 +82,22 @@ public abstract class AbstractSecurityTestCase
         Reader fr = new InputStreamReader( is );
 
         return reader.read( fr );
+    }
+
+    protected Configuration getSecurityConfiguration()
+        throws IOException, XmlPullParserException
+    {
+        // now lets check the XML file for the user and the role mapping
+        SecurityConfigurationXpp3Reader secReader = new SecurityConfigurationXpp3Reader();
+        FileReader fileReader = null;
+        try
+        {
+            fileReader = new FileReader( new File( CONFIG_DIR, "security.xml" ) );
+            return secReader.read( fileReader );
+        }
+        finally
+        {
+            IOUtil.close( fileReader );
+        }
     }
 }
