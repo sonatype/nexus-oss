@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.obr;
 
@@ -14,8 +25,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
@@ -54,14 +65,14 @@ public class DefaultObrPluginConfiguration
         return configMap;
     }
 
-    private static Map<String, String> loadConfiguration( File file )
+    private static Map<String, String> loadConfiguration( final File file )
     {
-        Map<String, String> newConfig = new HashMap<String, String>();
+        final Map<String, String> newConfig = new HashMap<String, String>();
 
-        Properties properties = PropertyUtils.loadProperties( file );
-        for ( Entry<?, ?> e : properties.entrySet() )
+        final Properties properties = PropertyUtils.loadProperties( file );
+        for ( final Entry<?, ?> e : properties.entrySet() )
         {
-            String key = StringUtils.defaultString( e.getKey(), null );
+            final String key = StringUtils.defaultString( e.getKey(), null );
             if ( key != null )
             {
                 newConfig.put( key, StringUtils.defaultString( e.getValue(), null ) );
@@ -83,7 +94,7 @@ public class DefaultObrPluginConfiguration
 
             IOUtil.copy( is, os );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             getLogger().warn( "Could not write the OBR plugin configuration to path " + configFile.getAbsolutePath(), e );
         }
@@ -94,7 +105,7 @@ public class DefaultObrPluginConfiguration
         }
     }
 
-    private boolean getBoolean( String key )
+    private boolean getBoolean( final String key )
     {
         return Boolean.valueOf( getConfiguration().get( key ) );
     }

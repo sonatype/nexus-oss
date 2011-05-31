@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.obr.proxy;
 
@@ -15,9 +26,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.osgi.service.obr.Resource;
-import org.sonatype.licensing.LicensingException;
-import org.sonatype.licensing.feature.Feature;
-import org.sonatype.licensing.product.ProductLicenseManager;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -49,21 +57,20 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.plexus.appevents.Event;
 
-
 @Component( role = Repository.class, hint = ObrRepository.ROLE_HINT, instantiationStrategy = "per-lookup", description = "OBR" )
 public class ObrRepository
     extends AbstractProxyRepository
     implements ObrProxyRepository, ObrHostedRepository, Repository
 {
     public static final String ROLE_HINT = "obr-proxy";
-    
+
     @Requirement( hint = ObrContentClass.ID )
     private ContentClass obrContentClass;
 
     @Requirement
     private ObrRepositoryConfigurator obrRepositoryConfigurator;
 
-    private RepositoryKind obrRepositoryKind =
+    private final RepositoryKind obrRepositoryKind =
         new MutableProxyRepositoryKind( this, null, new DefaultRepositoryKind( ObrHostedRepository.class, null ),
                                         new DefaultRepositoryKind( ObrProxyRepository.class, null ) );
 
@@ -72,12 +79,6 @@ public class ObrRepository
 
     @Requirement( hint = "obr-bindex" )
     private ObrMetadataSource obrMetadataSource;
-
-    @Requirement( role = ProductLicenseManager.class )
-    private ProductLicenseManager licenseManager;
-
-    @Requirement( role = Feature.class, hint = "Obr" )
-    private Feature feature;
 
     public ContentClass getRepositoryContentClass()
     {
@@ -100,7 +101,7 @@ public class ObrRepository
     {
         return new CRepositoryExternalConfigurationHolderFactory<ObrRepositoryConfiguration>()
         {
-            public ObrRepositoryConfiguration createExternalConfigurationHolder( CRepository config )
+            public ObrRepositoryConfiguration createExternalConfigurationHolder( final CRepository config )
             {
                 return new ObrRepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
             }
@@ -108,23 +109,23 @@ public class ObrRepository
     }
 
     @Override
-    protected ObrRepositoryConfiguration getExternalConfiguration( boolean forModification )
+    protected ObrRepositoryConfiguration getExternalConfiguration( final boolean forModification )
     {
         return (ObrRepositoryConfiguration) super.getExternalConfiguration( forModification );
     }
 
     @Override
-    public void setLocalUrl( String localUrl )
+    public void setLocalUrl( final String localUrl )
         throws StorageException
     {
         super.setLocalUrl( localUrl );
     }
 
     @Override
-    public void setRemoteUrl( String remoteUrl )
+    public void setRemoteUrl( final String remoteUrl )
         throws StorageException
     {
-        String[] siteAndPath = ObrUtils.splitObrSiteAndPath( remoteUrl, false );
+        final String[] siteAndPath = ObrUtils.splitObrSiteAndPath( remoteUrl, false );
 
         // does the remoteUrl have obrPath at the end?
         if ( siteAndPath[1] == null )
@@ -134,7 +135,7 @@ public class ObrRepository
             {
                 // it is not set, this is an error
                 throw new StorageException(
-                    "Cannot set OBR URL! The OBR metadata path is not set, please specify a full URL including the OBR metadata file!" );
+                                            "Cannot set OBR URL! The OBR metadata path is not set, please specify a full URL including the OBR metadata file!" );
             }
         }
         else
@@ -152,7 +153,7 @@ public class ObrRepository
         return getExternalConfiguration( false ).getObrPath();
     }
 
-    public void setObrPath( String obrPath )
+    public void setObrPath( final String obrPath )
     {
         getExternalConfiguration( true ).setObrPath( obrPath );
     }
@@ -162,20 +163,20 @@ public class ObrRepository
         return getExternalConfiguration( false ).getMetadataMaxAge();
     }
 
-    public void setMetadataMaxAge( int metadataMaxAge )
+    public void setMetadataMaxAge( final int metadataMaxAge )
     {
         getExternalConfiguration( true ).setMetadataMaxAge( metadataMaxAge );
     }
 
     @Override
-    public Collection<StorageItem> list( boolean fromTask, StorageCollectionItem item )
+    public Collection<StorageItem> list( final boolean fromTask, final StorageCollectionItem item )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         return ObrUtils.augmentListedItems( item.getRepositoryItemUid(), super.list( fromTask, item ) );
     }
 
     @Override
-    protected StorageItem doRetrieveItem( ResourceStoreRequest request )
+    protected StorageItem doRetrieveItem( final ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         if ( getRemoteUrl() != null )
@@ -187,84 +188,66 @@ public class ObrRepository
         try
         {
             // treat expired items just like not found items
-            StorageItem item = super.doRetrieveItem( request );
+            final StorageItem item = super.doRetrieveItem( request );
 
             if ( !item.isExpired() )
             {
                 return item;
             }
         }
-        catch ( ItemNotFoundException e )
+        catch ( final ItemNotFoundException e )
         {
             // drop through...
         }
 
-        try
+        if ( ObrUtils.isObrMetadataRequest( request ) )
         {
-            licenseManager.verifyLicenseAndFeature( feature );
+            final StorageItem backingItem = ObrUtils.getCachedItem( createUid( getObrPath() ) );
 
-            if ( ObrUtils.isObrMetadataRequest( request ) )
+            if ( null == backingItem )
             {
-                StorageItem backingItem = ObrUtils.getCachedItem( createUid( getObrPath() ) );
+                // completely blank OBR so we need to rebuild it from scratch
+                final RepositoryItemUid uid = createUid( "/" );
 
-                if ( null == backingItem )
-                {
-                    // completely blank OBR so we need to rebuild it from scratch
-                    RepositoryItemUid uid = createUid( "/" );
-
-                    ObrUtils.buildObr( obrMetadataSource, uid, this, getWalker() );
-                }
-                else
-                {
-                    // copy over the original OBR
-                    return refreshObr( backingItem );
-                }
+                ObrUtils.buildObr( obrMetadataSource, uid, this, getWalker() );
             }
-            else if ( request.getRequestPath().startsWith( CacheableResource.BUNDLES_PATH ) )
+            else
             {
-                StorageItem cachedItem = doCacheBundle( request );
-
-                if ( null != cachedItem )
-                {
-                    return cachedItem;
-                }
+                // copy over the original OBR
+                return refreshObr( backingItem );
             }
         }
-        catch ( LicensingException e )
+        else if ( request.getRequestPath().startsWith( CacheableResource.BUNDLES_PATH ) )
         {
-            getLogger().warn( "Nexus PRO license expired! " + e.getMessage() );
+            final StorageItem cachedItem = doCacheBundle( request );
+
+            if ( null != cachedItem )
+            {
+                return cachedItem;
+            }
         }
 
         return super.doRetrieveItem( request );
     }
 
     @Override
-    protected AbstractStorageItem doRetrieveRemoteItem( ResourceStoreRequest request )
+    protected AbstractStorageItem doRetrieveRemoteItem( final ResourceStoreRequest request )
         throws ItemNotFoundException, RemoteAccessException, StorageException
     {
-        try
+        if ( ObrUtils.isObrMetadataRequest( request ) )
         {
-            licenseManager.verifyLicenseAndFeature( feature );
+            final ResourceStoreRequest metadataRequest = new ResourceStoreRequest( getObrPath() );
 
-            if ( ObrUtils.isObrMetadataRequest( request ) )
-            {
-                ResourceStoreRequest metadataRequest = new ResourceStoreRequest( getObrPath() );
-
-                return refreshObr( getRemoteStorage().retrieveItem( this, metadataRequest, getRemoteUrl() ) );
-            }
-            else if ( request.getRequestPath().startsWith( CacheableResource.BUNDLES_PATH ) )
-            {
-                AbstractStorageItem cachedItem = doCacheBundle( request );
-
-                if ( null != cachedItem )
-                {
-                    return cachedItem;
-                }
-            }
+            return refreshObr( getRemoteStorage().retrieveItem( this, metadataRequest, getRemoteUrl() ) );
         }
-        catch ( LicensingException e )
+        else if ( request.getRequestPath().startsWith( CacheableResource.BUNDLES_PATH ) )
         {
-            getLogger().warn( "Nexus PRO license expired! " + e.getMessage() );
+            final AbstractStorageItem cachedItem = doCacheBundle( request );
+
+            if ( null != cachedItem )
+            {
+                return cachedItem;
+            }
         }
 
         return super.doRetrieveRemoteItem( request );
@@ -277,68 +260,64 @@ public class ObrRepository
      * @return the cached bundle
      * @throws StorageException
      */
-    private AbstractStorageItem doCacheBundle( ResourceStoreRequest request )
+    private AbstractStorageItem doCacheBundle( final ResourceStoreRequest request )
         throws StorageException
     {
         try
         {
             // attempt to map path to the absolute URL
-            String url = getAbsoluteBundleUrl( request.getRequestPath() );
+            final String url = getAbsoluteBundleUrl( request.getRequestPath() );
             if ( url != null )
             {
                 // in order to properly use remote storage here, we need 2 things
-                // a baseUrl and the relative url.  The baseUrl is passed in as string
+                // a baseUrl and the relative url. The baseUrl is passed in as string
                 // param, the relativeUrl is pulled from the ResourceStoreRequest.
                 // so in simplest terms, i am taking the full absoluteUrl, chopping off
                 // everything except the filename to get teh baseUrl, and using that
                 // then updating the ResourceStoreRequest to use only the filename for relativePath
-                String baseUrl = url.substring( 0, url.lastIndexOf( "/" ) );
-                String fileName = url.substring( url.lastIndexOf( "/" ) );
-                
+                final String baseUrl = url.substring( 0, url.lastIndexOf( "/" ) );
+                final String fileName = url.substring( url.lastIndexOf( "/" ) );
+
                 request.pushRequestPath( fileName );
-                AbstractStorageItem item = getRemoteStorage().retrieveItem( this, request, baseUrl );
+                final AbstractStorageItem item = getRemoteStorage().retrieveItem( this, request, baseUrl );
                 request.popRequestPath();
-                
-                //update the repositoryItemUid, as it will contain the request path with only the filename
+
+                // update the repositoryItemUid, as it will contain the request path with only the filename
                 item.setRepositoryItemUid( createUid( request.getRequestPath() ) );
-                
+
                 return doCacheItem( item );
             }
 
             return null; // not found, this might be a real path in the original OBR
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new StorageException( e );
         }
-        catch ( ItemNotFoundException e )
+        catch ( final ItemNotFoundException e )
         {
             throw new StorageException( e );
         }
     }
 
     @Override
-    public void onEvent( Event<?> evt )
+    public void onEvent( final Event<?> evt )
     {
-        boolean adding = evt instanceof RepositoryItemEventStore;
+        final boolean adding = evt instanceof RepositoryItemEventStore;
         if ( adding || evt instanceof RepositoryItemEventDelete )
         {
-            RepositoryItemEvent itemEvt = (RepositoryItemEvent) evt;
-            
+            final RepositoryItemEvent itemEvt = (RepositoryItemEvent) evt;
+
             try
             {
-                Resource resource = obrMetadataSource.buildResource( ObrUtils.getCachedItem( itemEvt.getItemUid() ) );
+                final Resource resource =
+                    obrMetadataSource.buildResource( ObrUtils.getCachedItem( itemEvt.getItemUid() ) );
                 if ( resource != null )
                 {
-                    licenseManager.verifyLicenseAndFeature( feature );
                     ObrUtils.updateObr( obrMetadataSource, ObrUtils.createObrUid( this ), resource, adding );
                 }
             }
-            catch ( LicensingException e )
-            {
-                getLogger().warn( "Nexus PRO license expired! " + e.getMessage() );
-            }
-            catch ( Exception e )
+            catch ( final Exception e )
             {
                 getLogger().warn( "Problem updating OBR " + getId(), e );
             }
@@ -355,15 +334,15 @@ public class ObrRepository
      * @throws ItemNotFoundException
      * @throws StorageException
      */
-    private AbstractStorageItem refreshObr( StorageItem backingItem )
+    private AbstractStorageItem refreshObr( final StorageItem backingItem )
         throws StorageException, ItemNotFoundException
     {
-        RepositoryItemUid obrUid = ObrUtils.createObrUid( this );
+        final RepositoryItemUid obrUid = ObrUtils.createObrUid( this );
         StorageItem obrItem = ObrUtils.getCachedItem( obrUid );
 
         if ( null == obrItem || obrItem.getModified() < backingItem.getModified() )
         {
-            boolean caching = obrConfiguration.isBundleCacheActive();
+            final boolean caching = obrConfiguration.isBundleCacheActive();
 
             ObrResourceReader reader = null;
             ObrResourceWriter writer = null;
@@ -387,7 +366,7 @@ public class ObrRepository
 
                 writer.complete(); // the OBR is only updated once the stream is complete and closed
             }
-            catch ( IOException e )
+            catch ( final IOException e )
             {
                 throw new StorageException( e );
             }
@@ -415,7 +394,7 @@ public class ObrRepository
      * @param path cached bundle location
      * @return the remote bundle URL
      */
-    private String getAbsoluteBundleUrl( String path )
+    private String getAbsoluteBundleUrl( final String path )
     {
         ObrResourceReader reader = null;
 
@@ -431,7 +410,7 @@ public class ObrRepository
                 }
             }
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             getLogger().warn( "Problem reading OBR metadata from repository " + getId(), e );
         }
@@ -444,7 +423,7 @@ public class ObrRepository
     }
 
     @Override
-    protected boolean isOld( StorageItem item )
+    protected boolean isOld( final StorageItem item )
     {
         if ( ObrUtils.isObrMetadataRequest( new ResourceStoreRequest( item ) ) )
         {
@@ -455,7 +434,7 @@ public class ObrRepository
     }
 
     @Override
-    protected boolean isRemoteStorageReachable( ResourceStoreRequest request )
+    protected boolean isRemoteStorageReachable( final ResourceStoreRequest request )
     {
         getLogger().debug( "isRemoteStorageReachable: RepositoryId=" + getId() + ": Trying to access " + getObrPath() );
         request.setRequestPath( getObrPath() );
@@ -464,16 +443,14 @@ public class ObrRepository
             // We cannot use getRemoteStorage().isReachable() here because that forces the request path to be "/"
             if ( getRemoteStorage().containsItem( this, request ) )
             {
-                getLogger().debug(
-                                   "isRemoteStorageReachable: RepositoryId=" + getId() + ": Successfully accessed "
+                getLogger().debug( "isRemoteStorageReachable: RepositoryId=" + getId() + ": Successfully accessed "
                                        + getObrPath() );
                 return true;
             }
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
-            getLogger().debug(
-                               "isRemoteStorageReachable: RepositoryId=" + getId()
+            getLogger().debug( "isRemoteStorageReachable: RepositoryId=" + getId()
                                    + ": Caught exception while trying to access " + getObrPath(), e );
         }
 

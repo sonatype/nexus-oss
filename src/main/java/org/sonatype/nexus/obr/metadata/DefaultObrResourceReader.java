@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.obr.metadata;
 
@@ -21,18 +32,17 @@ import org.osgi.service.obr.Resource;
 import org.sonatype.nexus.obr.util.ObrUtils;
 import org.sonatype.nexus.proxy.InvalidItemContentException;
 
-
 /**
  * Default {@link ObrResourceReader} that can handle OBR referrals.
  */
 public class DefaultObrResourceReader
     implements ObrResourceReader
 {
-    private boolean relative;
+    private final boolean relative;
 
-    private Map<String, ObrParser> visited;
+    private final Map<String, ObrParser> visited;
 
-    private List<URL> breadcrumbs;
+    private final List<URL> breadcrumbs;
 
     private ObrParser parser;
 
@@ -43,7 +53,7 @@ public class DefaultObrResourceReader
      * @param relative use relative URIs?
      * @throws IOException
      */
-    public DefaultObrResourceReader( ObrSite site, boolean relative )
+    public DefaultObrResourceReader( final ObrSite site, final boolean relative )
         throws IOException
     {
         this.relative = relative;
@@ -61,10 +71,10 @@ public class DefaultObrResourceReader
      * @param depth the maximum depth
      * @throws IOException
      */
-    private void visit( ObrSite site, int depth )
+    private void visit( final ObrSite site, final int depth )
         throws IOException
     {
-        URL nextMetadataUrl = site.getMetadataUrl();
+        final URL nextMetadataUrl = site.getMetadataUrl();
 
         if ( isNewSite( nextMetadataUrl ) )
         {
@@ -72,7 +82,7 @@ public class DefaultObrResourceReader
             {
                 pushReferral( nextMetadataUrl, new DefaultObrParser( site, depth, relative ) );
             }
-            catch ( XmlPullParserException e )
+            catch ( final XmlPullParserException e )
             {
                 throw new InvalidItemContentException( "Error parsing OBR header", e );
             }
@@ -85,7 +95,7 @@ public class DefaultObrResourceReader
      * @param url the OBR URL
      * @return true if we have not yet visited this URL, otherwise false
      */
-    private boolean isNewSite( URL url )
+    private boolean isNewSite( final URL url )
     {
         return !visited.containsKey( url.toExternalForm() );
     }
@@ -96,7 +106,7 @@ public class DefaultObrResourceReader
      * @param url the OBR URL
      * @return the parser for the given OBR
      */
-    private ObrParser getParser( URL url )
+    private ObrParser getParser( final URL url )
     {
         return visited.get( url.toExternalForm() );
     }
@@ -109,7 +119,7 @@ public class DefaultObrResourceReader
      * @throws IOException
      * @throws XmlPullParserException
      */
-    private void pushReferral( URL url, ObrParser nextParser )
+    private void pushReferral( final URL url, final ObrParser nextParser )
         throws XmlPullParserException, IOException
     {
         visited.put( url.toExternalForm(), nextParser );
@@ -175,7 +185,7 @@ public class DefaultObrResourceReader
 
             return parser.parseResource();
         }
-        catch ( XmlPullParserException e )
+        catch ( final XmlPullParserException e )
         {
             throw new InvalidItemContentException( "Error parsing OBR resource", e );
         }
@@ -193,8 +203,8 @@ public class DefaultObrResourceReader
         {
             parser.require( XmlPullParser.START_TAG, null, "referral" );
 
-            String url = parser.getAttributeValue( null, "url" );
-            String depth = parser.getAttributeValue( null, "depth" );
+            final String url = parser.getAttributeValue( null, "url" );
+            final String depth = parser.getAttributeValue( null, "depth" );
 
             parser.nextTag();
             parser.require( XmlPullParser.END_TAG, null, "referral" );
@@ -204,7 +214,7 @@ public class DefaultObrResourceReader
                 visit( new ReferencedObrSite( new URL( parser.getMetadataUrl(), url ) ), calculateMaxDepth( depth ) );
             }
         }
-        catch ( XmlPullParserException e )
+        catch ( final XmlPullParserException e )
         {
             throw new InvalidItemContentException( "Error parsing OBR referral", e );
         }
@@ -216,19 +226,19 @@ public class DefaultObrResourceReader
      * @param depth the requested depth
      * @return the new maximum depth
      */
-    private int calculateMaxDepth( String depth )
+    private int calculateMaxDepth( final String depth )
     {
         try
         {
             return Math.min( parser.getMaxDepth(), breadcrumbs.size() + Integer.parseInt( depth ) );
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             return Integer.MAX_VALUE;
         }
     }
 
-    public int read( CharBuffer cb )
+    public int read( final CharBuffer cb )
         throws IOException
     {
         // just here to complete the Reader API, it's not actually used
@@ -237,19 +247,19 @@ public class DefaultObrResourceReader
         {
             parser.nextToken();
         }
-        catch ( XmlPullParserException e )
+        catch ( final XmlPullParserException e )
         {
             throw new InvalidItemContentException( "Error parsing XML token", e );
         }
 
-        int n = cb.length();
+        final int n = cb.length();
         cb.append( parser.getText() );
         return cb.length() - n;
     }
 
     public void close()
     {
-        for ( ObrParser p : visited.values() )
+        for ( final ObrParser p : visited.values() )
         {
             ObrUtils.close( p );
         }

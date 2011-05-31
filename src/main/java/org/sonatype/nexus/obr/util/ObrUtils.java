@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.obr.util;
 
@@ -48,7 +59,6 @@ import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 
-
 /**
  * Various utility methods specific to handling OBRs.
  */
@@ -87,14 +97,14 @@ public final class ObrUtils
      * @param item the item
      * @return true if it might be an OSGi bundle, otherwise false
      */
-    public static boolean acceptItem( StorageItem item )
+    public static boolean acceptItem( final StorageItem item )
     {
         if ( null == item || item instanceof StorageCollectionItem )
         {
             return false; // ignore directories
         }
 
-        RepositoryItemUid uid = item.getRepositoryItemUid();
+        final RepositoryItemUid uid = item.getRepositoryItemUid();
 
         if ( IGNORE_ITEM_PATH_PATTERN.matcher( uid.getPath() ).matches() )
         {
@@ -115,7 +125,7 @@ public final class ObrUtils
      * @param request the resource request
      * @return true if this request is for OBR metadata, otherwise false
      */
-    public static boolean isObrMetadataRequest( ResourceStoreRequest request )
+    public static boolean isObrMetadataRequest( final ResourceStoreRequest request )
     {
         return OBR_PATH.equals( request.getRequestPath() );
     }
@@ -126,7 +136,7 @@ public final class ObrUtils
      * @param repository the Nexus repository
      * @return a new UID pointing to the OBR metadata
      */
-    public static RepositoryItemUid createObrUid( Repository repository )
+    public static RepositoryItemUid createObrUid( final Repository repository )
     {
         return repository.createUid( OBR_PATH );
     }
@@ -137,15 +147,15 @@ public final class ObrUtils
      * @param url the local or remote URL
      * @return an array containing the site and the OBR metadata path
      */
-    public static String[] splitObrSiteAndPath( String url )
+    public static String[] splitObrSiteAndPath( final String url )
     {
         return splitObrSiteAndPath( url, true );
     }
 
-    public static String[] splitObrSiteAndPath( String url, boolean useDefaultIfNotSet )
+    public static String[] splitObrSiteAndPath( final String url, final boolean useDefaultIfNotSet )
     {
         // is this a Nexus managed OBR?
-        int i = url.lastIndexOf( OBR_PATH );
+        final int i = url.lastIndexOf( OBR_PATH );
         if ( i >= 0 )
         {
             return new String[] { url.substring( 0, i + 1 ), OBR_PATH };
@@ -155,7 +165,7 @@ public final class ObrUtils
         if ( !url.startsWith( "file:" ) || !new File( url ).isDirectory() )
         {
             // attempt to find the split between site and metadata path
-            Matcher matcher = OBR_SITE_AND_PATH_PATTERN.matcher( url );
+            final Matcher matcher = OBR_SITE_AND_PATH_PATTERN.matcher( url );
             if ( matcher.matches() )
             {
                 return new String[] { matcher.group( 1 ), '/' + matcher.group( 2 ) };
@@ -164,9 +174,9 @@ public final class ObrUtils
 
         if ( useDefaultIfNotSet )
         {
-        // assume OBR metadata is in repository.xml
-        return new String[] { url, "/repository.xml" };
-    }
+            // assume OBR metadata is in repository.xml
+            return new String[] { url, "/repository.xml" };
+        }
         else
         {
             return new String[] { url, null };
@@ -180,28 +190,28 @@ public final class ObrUtils
      * @return the file item containing OBR metadata
      * @throws StorageException
      */
-    public static StorageFileItem retrieveObrItem( Repository repository )
+    public static StorageFileItem retrieveObrItem( final Repository repository )
         throws StorageException
     {
-        ResourceStoreRequest request = new ResourceStoreRequest( OBR_PATH );
+        final ResourceStoreRequest request = new ResourceStoreRequest( OBR_PATH );
 
         try
         {
-            StorageItem item = repository.retrieveItem( request );
+            final StorageItem item = repository.retrieveItem( request );
             if ( item instanceof StorageFileItem )
             {
                 return (StorageFileItem) item;
             }
         }
-        catch ( ItemNotFoundException e )
+        catch ( final ItemNotFoundException e )
         {
             // OBR metadata is missing, so drop through and provide blank repository
         }
-        catch ( IllegalOperationException e )
+        catch ( final IllegalOperationException e )
         {
             throw new StorageException( e );
         }
-        catch ( AccessDeniedException e )
+        catch ( final AccessDeniedException e )
         {
             throw new StorageException( e );
         }
@@ -215,24 +225,24 @@ public final class ObrUtils
      * @param uid the item UID
      * @return the file item, null if there was a problem retrieving it
      */
-    public static StorageFileItem getCachedItem( RepositoryItemUid uid )
+    public static StorageFileItem getCachedItem( final RepositoryItemUid uid )
     {
-        Repository repository = uid.getRepository();
+        final Repository repository = uid.getRepository();
 
         try
         {
-            ResourceStoreRequest request = new ResourceStoreRequest( uid.getPath() );
-            StorageItem item = repository.getLocalStorage().retrieveItem( repository, request );
+            final ResourceStoreRequest request = new ResourceStoreRequest( uid.getPath() );
+            final StorageItem item = repository.getLocalStorage().retrieveItem( repository, request );
             if ( item instanceof StorageFileItem )
             {
                 return (StorageFileItem) item;
             }
         }
-        catch ( ItemNotFoundException e )
+        catch ( final ItemNotFoundException e )
         {
             // drop through
         }
-        catch ( StorageException e )
+        catch ( final StorageException e )
         {
             // drop through
         }
@@ -246,9 +256,9 @@ public final class ObrUtils
      * @param path the starting path
      * @return the relative path to root
      */
-    public static String getPathToRoot( String path )
+    public static String getPathToRoot( final String path )
     {
-        String normalizedPath = FileUtils.normalize( StringUtils.stripStart( path, "/" ) );
+        final String normalizedPath = FileUtils.normalize( StringUtils.stripStart( path, "/" ) );
         return StringUtils.repeat( "../", StringUtils.countMatches( normalizedPath, "/" ) );
     }
 
@@ -259,14 +269,14 @@ public final class ObrUtils
      * @param metadataPath the metadata path
      * @return a relative {@link UrlTransformer}
      */
-    public static UrlTransformer getUrlChomper( URL rootUrl, String metadataPath )
+    public static UrlTransformer getUrlChomper( final URL rootUrl, final String metadataPath )
     {
         final String rootUrlPattern = '^' + Pattern.quote( rootUrl.toExternalForm() ) + "/*";
         final String pathFromMetadataToRoot = getPathToRoot( metadataPath );
 
         return new UrlTransformer()
         {
-            public String transform( URL url )
+            public String transform( final URL url )
             {
                 return url.toExternalForm().replaceFirst( rootUrlPattern, pathFromMetadataToRoot );
             }
@@ -283,20 +293,21 @@ public final class ObrUtils
      * @param walker the repository walker
      * @throws StorageException
      */
-    public static void buildObr( final ObrMetadataSource source, RepositoryItemUid uid, Repository target, Walker walker )
+    public static void buildObr( final ObrMetadataSource source, final RepositoryItemUid uid, final Repository target,
+                                 final Walker walker )
         throws StorageException
     {
         final ObrResourceWriter writer = source.getWriter( uid );
 
         try
         {
-            AbstractFileWalkerProcessor obrProcessor = new AbstractFileWalkerProcessor()
+            final AbstractFileWalkerProcessor obrProcessor = new AbstractFileWalkerProcessor()
             {
                 @Override
-                protected void processFileItem( WalkerContext context, StorageFileItem item )
+                protected void processFileItem( final WalkerContext context, final StorageFileItem item )
                     throws IOException
                 {
-                    Resource resource = source.buildResource( item );
+                    final Resource resource = source.buildResource( item );
                     if ( null != resource )
                     {
                         writer.append( resource );
@@ -304,14 +315,14 @@ public final class ObrUtils
                 }
             };
 
-            ResourceStoreRequest request = new ResourceStoreRequest( "/" );
-            DefaultWalkerContext ctx = new DefaultWalkerContext( target, request, new ObrWalkerFilter() );
+            final ResourceStoreRequest request = new ResourceStoreRequest( "/" );
+            final DefaultWalkerContext ctx = new DefaultWalkerContext( target, request, new ObrWalkerFilter() );
             ctx.getProcessors().add( obrProcessor );
             walker.walk( ctx );
 
             writer.complete(); // the OBR is only updated once the stream is complete and closed
         }
-        catch ( WalkerException e )
+        catch ( final WalkerException e )
         {
             writer.complete();
         }
@@ -330,7 +341,8 @@ public final class ObrUtils
      * @param adding true when adding/updating, false when removing
      * @throws StorageException
      */
-    public static void updateObr( ObrMetadataSource source, RepositoryItemUid uid, Resource resource, boolean adding )
+    public static void updateObr( final ObrMetadataSource source, final RepositoryItemUid uid, final Resource resource,
+                                  boolean adding )
         throws StorageException
     {
         ObrResourceWriter writer = null;
@@ -363,7 +375,7 @@ public final class ObrUtils
 
             writer.complete(); // the OBR is only updated once the stream is complete and closed
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new StorageException( e );
         }
@@ -382,13 +394,14 @@ public final class ObrUtils
      * @param items the original list of items
      * @return augmented list of items
      */
-    public static Collection<StorageItem> augmentListedItems( RepositoryItemUid uid, Collection<StorageItem> items )
+    public static Collection<StorageItem> augmentListedItems( final RepositoryItemUid uid,
+                                                              final Collection<StorageItem> items )
     {
-        Repository repository = uid.getRepository();
+        final Repository repository = uid.getRepository();
         ResourceStoreRequest request;
 
-        Collection<StorageItem> augmentedItems = new ArrayList<StorageItem>( items );
-        LocalRepositoryStorage storage = repository.getLocalStorage();
+        final Collection<StorageItem> augmentedItems = new ArrayList<StorageItem>( items );
+        final LocalRepositoryStorage storage = repository.getLocalStorage();
 
         try
         {
@@ -398,7 +411,7 @@ public final class ObrUtils
                 if ( !storage.containsItem( repository, request ) )
                 {
                     // need to create /.meta so we can safely traverse into it later on...
-                    StorageItem metaDir = new DefaultStorageCollectionItem( repository, request, true, true );
+                    final StorageItem metaDir = new DefaultStorageCollectionItem( repository, request, true, true );
                     storage.storeItem( repository, metaDir );
                     augmentedItems.add( metaDir );
                 }
@@ -409,13 +422,13 @@ public final class ObrUtils
                 if ( !storage.containsItem( repository, request ) )
                 {
                     // add a temporary storage item to the list (don't actually store it)
-                    ContentLocator content = new StringContentLocator( "<repository/>" );
-                    StorageItem obrFile = new DefaultStorageFileItem( repository, request, true, true, content );
+                    final ContentLocator content = new StringContentLocator( "<repository/>" );
+                    final StorageItem obrFile = new DefaultStorageFileItem( repository, request, true, true, content );
                     augmentedItems.add( obrFile );
                 }
             }
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             // ignore
         }
@@ -428,13 +441,13 @@ public final class ObrUtils
      * 
      * @param closeable the {@link Closeable} to be closed
      */
-    public static void close( Closeable closeable )
+    public static void close( final Closeable closeable )
     {
         try
         {
             closeable.close();
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             // ignore
         }

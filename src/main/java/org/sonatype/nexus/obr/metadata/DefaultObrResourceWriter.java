@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.obr.metadata;
 
@@ -32,24 +43,23 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
 
-
 /**
  * Default {@link ObrResourceWriter} that writes to an item in a Nexus repository.
  */
 public class DefaultObrResourceWriter
     implements ObrResourceWriter
 {
-    private File file;
-    
-    private MimeUtil mimeUtil;
+    private final File file;
 
-    private PrintWriter pw;
+    private final MimeUtil mimeUtil;
 
-    private Repository repository;
+    private final PrintWriter pw;
 
-    private String path;
+    private final Repository repository;
 
-    private UrlTransformer urlTransformer;
+    private final String path;
+
+    private final UrlTransformer urlTransformer;
 
     private boolean isComplete = false;
 
@@ -60,11 +70,11 @@ public class DefaultObrResourceWriter
      * @param temporaryDirectory
      * @throws IOException
      */
-    public DefaultObrResourceWriter( RepositoryItemUid uid, File temporaryDirectory, MimeUtil mimeUtil )
+    public DefaultObrResourceWriter( final RepositoryItemUid uid, final File temporaryDirectory, final MimeUtil mimeUtil )
         throws IOException
     {
         this.mimeUtil = mimeUtil;
-        
+
         // use a temporary file while we are streaming resources
         file = File.createTempFile( "obr", ".xml", temporaryDirectory );
         pw = new PrintWriter( new BufferedWriter( new OutputStreamWriter( new FileOutputStream( file ), "UTF-8" ) ) );
@@ -76,8 +86,8 @@ public class DefaultObrResourceWriter
         urlTransformer = ObrUtils.getUrlChomper( new URL( "file:" ), path );
 
         // name will be enclosed by ' so replace any occurrences in the name
-        String name = StringUtils.replace( repository.getName(), '\'', '`' );
-        long now = System.currentTimeMillis();
+        final String name = StringUtils.replace( repository.getName(), '\'', '`' );
+        final long now = System.currentTimeMillis();
 
         // standard header, assumes UTF-8 output
         pw.print( "<?xml version='1.0' encoding='utf-8'?>\n" );
@@ -85,7 +95,7 @@ public class DefaultObrResourceWriter
         pw.print( "<repository name='" + name + "' lastmodified='" + now + "'>" );
     }
 
-    public void append( Resource resource )
+    public void append( final Resource resource )
         throws IOException
     {
         if ( isComplete )
@@ -96,19 +106,19 @@ public class DefaultObrResourceWriter
         ResourceImpl.toXML( resource, urlTransformer ).print( 0, pw );
     }
 
-    public Appendable append( CharSequence csq )
+    public Appendable append( final CharSequence csq )
     {
         // just here to complete the Writer API, it's not actually used
         return pw.append( csq );
     }
 
-    public Appendable append( char c )
+    public Appendable append( final char c )
     {
         // just here to complete the Writer API, it's not actually used
         return pw.append( c );
     }
 
-    public Appendable append( CharSequence csq, int start, int end )
+    public Appendable append( final CharSequence csq, final int start, final int end )
     {
         // just here to complete the Writer API, it's not actually used
         return pw.append( csq, start, end );
@@ -134,18 +144,18 @@ public class DefaultObrResourceWriter
             throw new StorageException( "OBR metadata is not complete" );
         }
 
-        ResourceStoreRequest request = new ResourceStoreRequest( path );
-        ContentLocator content = new FileContentLocator( file, mimeUtil.getMimeType( file ) );
+        final ResourceStoreRequest request = new ResourceStoreRequest( path );
+        final ContentLocator content = new FileContentLocator( file, mimeUtil.getMimeType( file ) );
 
         try
         {
             repository.storeItem( false, new DefaultStorageFileItem( repository, request, true, true, content ) );
         }
-        catch ( IllegalOperationException e )
+        catch ( final IllegalOperationException e )
         {
             throw new StorageException( e );
         }
-        catch ( UnsupportedStorageOperationException e )
+        catch ( final UnsupportedStorageOperationException e )
         {
             throw new StorageException( e );
         }

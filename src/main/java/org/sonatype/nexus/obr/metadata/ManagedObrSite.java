@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.obr.metadata;
 
@@ -25,9 +36,9 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 public class ManagedObrSite
     extends AbstractObrSite
 {
-    private StorageFileItem item;
+    private final StorageFileItem item;
 
-    private URL url;
+    private final URL url;
 
     /**
      * Creates a managed OBR site based on the given metadata item inside Nexus.
@@ -35,7 +46,7 @@ public class ManagedObrSite
      * @param item the metadata item
      * @throws StorageException
      */
-    public ManagedObrSite( StorageFileItem item )
+    public ManagedObrSite( final StorageFileItem item )
         throws StorageException
     {
         this.item = item;
@@ -49,18 +60,18 @@ public class ManagedObrSite
      * @return the absolute URL
      * @throws StorageException
      */
-    private static URL getAbsoluteUrlFromBase( StorageFileItem item )
+    private static URL getAbsoluteUrlFromBase( final StorageFileItem item )
         throws StorageException
     {
-        RepositoryItemUid uid = item.getRepositoryItemUid();
+        final RepositoryItemUid uid = item.getRepositoryItemUid();
 
-        Repository repository = uid.getRepository();
-        ResourceStoreRequest request = new ResourceStoreRequest( uid.getPath() );
+        final Repository repository = uid.getRepository();
+        final ResourceStoreRequest request = new ResourceStoreRequest( uid.getPath() );
 
         if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
-            ProxyRepository proxyRepository = repository.adaptToFacet( ProxyRepository.class );
-            RemoteRepositoryStorage storage = proxyRepository.getRemoteStorage();
+            final ProxyRepository proxyRepository = repository.adaptToFacet( ProxyRepository.class );
+            final RemoteRepositoryStorage storage = proxyRepository.getRemoteStorage();
             if ( storage != null )
             {
                 return storage.getAbsoluteUrlFromBase( proxyRepository, request );

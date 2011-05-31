@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.obr.metadata;
 
@@ -24,7 +35,6 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 
-
 /**
  * Bindex based {@link ObrMetadataSource} component.
  */
@@ -38,24 +48,24 @@ public class DefaultObrMetadataSource
 
     @Requirement
     private NexusConfiguration nexusConfiguration;
-    
+
     @Requirement
     private MimeUtil mimeUtil;
 
-    public ObrResourceReader getReader( ObrSite site )
+    public ObrResourceReader getReader( final ObrSite site )
         throws StorageException
     {
         try
         {
             return new DefaultObrResourceReader( site, obrConfiguration.isBundleCacheActive() );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new StorageException( e );
         }
     }
 
-    public Resource buildResource( StorageFileItem item )
+    public Resource buildResource( final StorageFileItem item )
     {
         if ( !ObrUtils.acceptItem( item ) )
         {
@@ -69,15 +79,15 @@ public class DefaultObrMetadataSource
             is = item.getInputStream();
             if ( is != null )
             {
-                RepositoryItemUid uid = item.getRepositoryItemUid();
-                BundleInfo info = new BundleInfo( null, is, "file:" + uid.getPath(), item.getLength() );
+                final RepositoryItemUid uid = item.getRepositoryItemUid();
+                final BundleInfo info = new BundleInfo( null, is, "file:" + uid.getPath(), item.getLength() );
                 if ( info.isOSGiBundle() )
                 {
                     return info.build();
                 }
             }
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             getLogger().warn( "Unable to generate OBR metadata for item " + item.getRepositoryItemUid(), e );
         }
@@ -89,14 +99,14 @@ public class DefaultObrMetadataSource
         return null;
     }
 
-    public ObrResourceWriter getWriter( RepositoryItemUid uid )
+    public ObrResourceWriter getWriter( final RepositoryItemUid uid )
         throws StorageException
     {
         try
         {
             return new DefaultObrResourceWriter( uid, nexusConfiguration.getTemporaryDirectory(), mimeUtil );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new StorageException( e );
         }
