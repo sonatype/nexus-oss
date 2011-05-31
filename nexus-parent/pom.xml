@@ -34,7 +34,7 @@
   <version>21-SNAPSHOT</version>
 
   <packaging>pom</packaging>
-  <name>Nexus Parent</name>
+  <name>Nexus : Parent</name>
   <url>${nexus-site-base-url}/nexus-parent</url>
 
   <scm>
