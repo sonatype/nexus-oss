@@ -19,16 +19,18 @@
 package org.sonatype.nexus.proxy.wastebasket;
 
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
+import org.sonatype.nexus.proxy.walker.SilentWalker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerProcessor;
 
 public class WastebasketWalker
     extends AbstractWalkerProcessor
-    implements WalkerProcessor
+    implements WalkerProcessor, SilentWalker
 {
 
     private long age;
@@ -40,7 +42,6 @@ public class WastebasketWalker
 
     @Override
     public void processItem( WalkerContext ctx, StorageItem item )
-        throws Exception
     {
         long now = System.currentTimeMillis();
         long limitDate = now - age;
@@ -56,6 +57,10 @@ public class WastebasketWalker
                 // silent
             }
             catch ( UnsupportedStorageOperationException e )
+            {
+                // silent?
+            }
+            catch ( LocalStorageException e )
             {
                 // silent?
             }
