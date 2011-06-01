@@ -286,7 +286,7 @@ public class SecurityXmlUserManager
                     }
                     catch ( UserNotFoundException e )
                     {
-                        this.logger.warn( "User: '" + roleMapping.getUserId() + "' of source: '"
+                        this.logger.debug( "User: '" + roleMapping.getUserId() + "' of source: '"
                             + roleMapping.getSource() + "' could not be found.", e );
                     }
                     catch ( NoSuchUserManagerException e )
