@@ -1535,6 +1535,11 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           this.runButton.disable();
           this.stopButton.disable();
         }
+	else if ( status == 'CANCELLED' )
+	{
+	    this.stopButton.disable();
+	    this.runButton.disable();
+	}
         else if (!(status == 'SUBMITTED' || status == 'WAITING' || status == 'BROKEN'))
         {
           if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ))
