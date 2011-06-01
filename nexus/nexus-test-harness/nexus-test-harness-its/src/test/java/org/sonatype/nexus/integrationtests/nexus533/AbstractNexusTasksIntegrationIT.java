@@ -143,8 +143,17 @@ public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledService
         Assert.assertTrue( status.isSuccess() );
 
         // delete is not working, see NEXUS-572
-        Configuration nexusConfig = getNexusConfigUtil().getNexusConfig();
-        Assert.assertTrue( nexusConfig.getTasks().isEmpty() );
+        // This is not true anymore, since NEXUS-3977, cancel() does NOT remove task from config, as this IT originally
+        // checked,
+        // that is left to DefaultScheduledTask upon exiting from call() method.
+        // Hence, this IT is failing now, since it checks for removal from config, that does not happen immediately (but
+        // sometime in the future)
+        
+        // This is more correct to do
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        // Configuration nexusConfig = getNexusConfigUtil().getNexusConfig();
+        // Assert.assertTrue( nexusConfig.getTasks().isEmpty() );
     }
 
 }
