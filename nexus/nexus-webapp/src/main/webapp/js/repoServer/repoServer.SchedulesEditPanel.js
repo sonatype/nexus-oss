@@ -1243,41 +1243,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       deleteCallback : function(options, isSuccess, response) {
         if (isSuccess)
         {
-          var resourceId = options.cbPassThru.resourceId;
-          var formLayout = this.formCards.getLayout();
-          var gridSelectModel = this.schedulesGridPanel.getSelectionModel();
-          var store = this.schedulesGridPanel.getStore();
-
-          if (formLayout.activeItem.id == resourceId)
-          {
-            this.formCards.remove(resourceId, true);
-            if (this.formCards.items.length > 0)
-            {
-              formLayout.setActiveItem(this.formCards.items.length - 1);
-              // select the coordinating row in the grid, or none if back to
-              // default
-              var i = store.indexOfId(formLayout.activeItem.id);
-              if (i >= 0)
-              {
-                gridSelectModel.selectRow(i);
-              }
-              else
-              {
-                gridSelectModel.clearSelections();
-              }
-            }
-            else
-            {
-              formLayout.setActiveItem(0);
-              gridSelectModel.clearSelections();
-            }
-          }
-          else
-          {
-            this.formCards.remove(resourceId, true);
-          }
-
-          store.remove(store.getById(resourceId));
+          this.reloadAll();
         }
         else
         {
@@ -1547,24 +1513,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           this.runButton.disable();
           this.stopButton.disable();
         }
-        else if (status == 'CANCELLED')
+        else if (status == 'CANCELING')
         {
           this.stopButton.disable();
           this.runButton.disable();
         }
-        else if (!(status == 'SUBMITTED' || status == 'WAITING' || status == 'BROKEN'))
-        {
-          if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ))
-          {
-            this.stopButton.enable();
-          }
-          else
-          {
-            this.stopButton.disable();
-          }
-          this.runButton.disable();
-        }
-        else
+        else if (status == 'WAITING')
         {
           if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ))
           {
@@ -1575,6 +1529,18 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             this.runButton.disable();
           }
           this.stopButton.disable();
+        }
+        else
+        {
+          if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ))
+          {
+            this.stopButton.enable();
+          }
+          else
+          {
+            this.stopButton.disable();
+          }
+          this.runButton.disable();
         }
 
         var id = rec.id; // note: rec.id is unique for new resources and equal
