@@ -63,6 +63,10 @@ public class DefaultScheduledTask<T>
 
     boolean manualRun;
 
+    private long duration;
+
+    private TaskState lastStatus;
+
     public DefaultScheduledTask( String id, String name, String type, DefaultScheduler scheduler, Callable<T> callable,
                                  Schedule schedule )
     {
@@ -282,6 +286,16 @@ public class DefaultScheduledTask<T>
         this.lastRun = new Date( lastRun.getTime() + 20 );
     }
 
+    protected void setLastStatus( TaskState lastStatus )
+    {
+        this.lastStatus = lastStatus;
+    }
+
+    protected void setDuration( long duration )
+    {
+        this.duration = duration;
+    }
+
     protected Future<T> reschedule()
     {
         if ( !isManualRunScheduled() )
@@ -392,12 +406,14 @@ public class DefaultScheduledTask<T>
                         nextFuture = reschedule();
                     }
 
+                    setLastRun( startDate );
                     result = getCallable().call();
 
                     if ( result != null )
                     {
                         results.add( result );
                     }
+                    setLastStatus( TaskState.FINISHED );
                 }
                 catch ( Throwable e )
                 {
@@ -405,6 +421,7 @@ public class DefaultScheduledTask<T>
 
                     setBrokenCause( e );
 
+                    setLastStatus( TaskState.BROKEN );
                     setTaskState( TaskState.BROKEN );
 
                     if ( Exception.class.isAssignableFrom( e.getClass() ) )
@@ -420,7 +437,7 @@ public class DefaultScheduledTask<T>
                 }
                 finally
                 {
-                    setLastRun( startDate );
+                    setDuration( new Date().getTime() - startDate.getTime() );
                 }
             }
 
@@ -473,6 +490,16 @@ public class DefaultScheduledTask<T>
     public Date getLastRun()
     {
         return lastRun;
+    }
+
+    public TaskState getLastStatus()
+    {
+        return lastStatus;
+    }
+
+    public Long getDuration()
+    {
+        return duration;
     }
 
     public Date getNextRun()
@@ -538,4 +565,5 @@ public class DefaultScheduledTask<T>
 
         return Collections.emptyMap();
     }
+
 }

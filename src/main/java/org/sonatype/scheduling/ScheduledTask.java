@@ -148,6 +148,20 @@ public interface ScheduledTask<T>
     Date getLastRun();
 
     /**
+     * Returns the last run date of task, if any. Null otherwise.
+     * 
+     * @return
+     */
+    TaskState getLastStatus();
+
+    /**
+     * How much time last execution took in miliseconds
+     * 
+     * @return
+     */
+    Long getDuration();
+
+    /**
      * Returns the next run date of task.
      * 
      * @return
