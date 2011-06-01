@@ -153,7 +153,7 @@ public class ScheduledServiceListPlexusResource
                     item.setLastRunResult( getLastRunResult( task ) );
                     item.setId( task.getId() );
                     item.setName( task.getName() );
-                    item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
+                    item.setStatus( StringUtils.capitalise( task.getTaskState().getReadableState() ) );
                     item.setTypeId( task.getType() );
                     ScheduledTaskDescriptor descriptor =
                         getNexusConfiguration().getScheduledTaskDescriptor( task.getType() );
@@ -219,7 +219,7 @@ public class ScheduledServiceListPlexusResource
                 // Just need to update the id, as the incoming data is a POST w/ no id
                 resourceStatus.getResource().setId( task.getId() );
                 resourceStatus.setResourceURI( createChildReference( request, this, task.getId() ).toString() );
-                resourceStatus.setStatus( task.getTaskState().toString() );
+                resourceStatus.setStatus( task.getTaskState().getReadableState() );
                 resourceStatus.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
                 resourceStatus.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
                 resourceStatus.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
