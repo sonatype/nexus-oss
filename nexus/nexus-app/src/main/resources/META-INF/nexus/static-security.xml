@@ -1286,12 +1286,12 @@
               <privilege>
             <id>68</id>
             <type>method</type>
-            <name>Scheduled Tasks - (run)</name>
-            <description>Give permission to run existing scheduled tasks manually.</description>
+            <name>Scheduled Tasks - (run,stop)</name>
+            <description>Give permission to run and stop existing scheduled tasks manually.</description>
             <properties>
                 <property>
                     <key>method</key>
-                    <value>read</value>
+                    <value>read,delete</value>
                 </property>
                 <property>
                     <key>permission</key>
