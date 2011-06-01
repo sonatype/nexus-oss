@@ -333,10 +333,11 @@ Ext.extend(Sonatype.repoServer.ExternapRoleMappingPopup, Ext.Window, {
                   }], 0);
           handler();
 
+          var name = roleRec == null ? roleId :roleRec.data.name; 
           var defaultData = {
             id : roleId,
-            name : roleRec.data.name,
-            description : 'External mapping for ' + roleRec.data.name + ' (' + sourceId + ')'
+            name : name,
+            description : 'External mapping for ' + name + ' (' + sourceId + ')'
           };
 
           this.hostPanel.cardPanel.getLayout().activeItem.find('name', 'id')[0].disable();
