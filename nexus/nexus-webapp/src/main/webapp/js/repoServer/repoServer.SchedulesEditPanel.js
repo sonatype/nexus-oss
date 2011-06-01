@@ -1290,14 +1290,27 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         {
           var rec = this.ctxRecord ? this.ctxRecord : this.schedulesGridPanel.getSelectionModel().getSelected();
 
-          Ext.Ajax.request({
-                callback : this.stopCallback,
-                cbPassThru : {
-                  resourceId : rec.id
-                },
+          Sonatype.MessageBox.show({
+                animEl : this.schedulesGridPanel.getEl(),
+                title : 'Cancel Scheduled Task?',
+                msg : 'Cancel the ' + rec.get('name') + ' scheduled task?',
+                buttons : Sonatype.MessageBox.YESNO,
                 scope : this,
-                method : 'DELETE',
-                url : Sonatype.config.repos.urls.scheduleRun + '/' + rec.data.id + '?cancelOnly=true'
+                icon : Sonatype.MessageBox.QUESTION,
+                fn : function(btnName) {
+                  if (btnName == 'yes' || btnName == 'ok')
+                  {
+                    Ext.Ajax.request({
+                          callback : this.stopCallback,
+                          cbPassThru : {
+                            resourceId : rec.id
+                          },
+                          scope : this,
+                          method : 'DELETE',
+                          url : Sonatype.config.repos.urls.scheduleRun + '/' + rec.data.id + '?cancelOnly=true'
+                        });
+                  }
+                }
               });
         }
       },
