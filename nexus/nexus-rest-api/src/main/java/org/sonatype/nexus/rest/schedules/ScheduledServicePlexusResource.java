@@ -49,7 +49,6 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
-import org.sonatype.scheduling.TaskState;
 
 /**
  * @author tstevens
@@ -185,7 +184,7 @@ public class ScheduledServicePlexusResource
                 resourceStatus.setResourceURI( createChildReference( request, this, task.getId() ).toString() );
                 resourceStatus.setStatus( task.getTaskState().toString() );
                 resourceStatus.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
-                resourceStatus.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
+                resourceStatus.setLastRunResult( getLastRunResult( task ) );
                 resourceStatus.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
                 resourceStatus.setNextRunTime( task.getNextRun() == null ? "n/a" : task.getNextRun().toString() );
 

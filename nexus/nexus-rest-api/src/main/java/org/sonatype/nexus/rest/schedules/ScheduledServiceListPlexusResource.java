@@ -148,15 +148,9 @@ public class ScheduledServiceListPlexusResource
                         getLogger().debug( "Building task '" + task.getName() + "' of type '" + task.getType() + "'." );
                     }
 
-                    String lastRunResult = "n/a";
-
-                    if ( task.getLastRun() != null )
-                    {
-                        lastRunResult = TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok";
-                    }
                     ScheduledServiceListResource item = new ScheduledServiceListResource();
                     item.setResourceURI( createChildReference( request, this, task.getId() ).toString() );
-                    item.setLastRunResult( lastRunResult );
+                    item.setLastRunResult( getLastRunResult( task ) );
                     item.setId( task.getId() );
                     item.setName( task.getName() );
                     item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );

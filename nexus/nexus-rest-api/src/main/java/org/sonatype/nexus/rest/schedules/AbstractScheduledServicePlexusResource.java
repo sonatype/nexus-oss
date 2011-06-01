@@ -50,6 +50,7 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.scheduling.TaskUtils;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.iterators.MonthlySchedulerIterator;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
@@ -343,7 +344,7 @@ public abstract class AbstractScheduledServicePlexusResource
     {
         String serviceType = model.getTypeId();
 
-        NexusTask<?> task = (NexusTask<?>) getNexusScheduler().createTaskInstance( serviceType );
+        NexusTask<?> task = getNexusScheduler().createTaskInstance( serviceType );
 
         for( Iterator iter = model.getProperties().iterator(); iter.hasNext(); )
         {
@@ -586,4 +587,36 @@ public abstract class AbstractScheduledServicePlexusResource
         return nextRunTime;
     }
 
+    protected String getLastRunResult( ScheduledTask<?> task )
+    {
+        String lastRunResult = "n/a";
+
+        if ( task.getLastStatus() != null )
+        {
+            lastRunResult = TaskState.BROKEN.equals( task.getLastStatus() ) ? "Error" : "Ok";
+            if ( task.getDuration() != 0 )
+            {
+                long milliseconds = task.getDuration();
+                int seconds = (int) ( ( milliseconds / 1000 ) % 60 );
+                int minutes = (int) ( ( milliseconds / 1000 ) / 60 );
+                int hours = (int) ( ( milliseconds / 1000 ) / 3600 );
+
+                lastRunResult += " [";
+                if ( hours != 0 )
+                {
+                    lastRunResult += hours;
+                    lastRunResult += "h";
+                }
+                if ( minutes != 0 || minutes != 0 )
+                {
+                    lastRunResult += minutes;
+                    lastRunResult += "m";
+                }
+                lastRunResult += seconds;
+                lastRunResult += "s";
+                lastRunResult += "]";
+            }
+        }
+        return lastRunResult;
+    }
 }
