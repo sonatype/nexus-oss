@@ -24,37 +24,44 @@ public enum TaskState
     /**
      * Submitted, not runned yet.
      */
-    SUBMITTED, // -> RUNNING, CANCELLED
+    SUBMITTED( "WAITING" ), // -> RUNNING, CANCELLED
 
     /**
      * Is currently running.
      */
-    RUNNING, // -> WAITING, FINISHED, BROKEN, CANCELLED, SLEEPING
+    RUNNING( "RUNNING" ), // -> WAITING, FINISHED, BROKEN, CANCELLED, SLEEPING
 
     /**
      * Should run but is blocked by another clashing task. Will try to run later.
      */
-    SLEEPING, // -> RUNNING
+    SLEEPING( "BLOCKED" ), // -> RUNNING
 
     /**
      * Was running and is finished. Waiting for next execution.
      */
-    WAITING, // -> RUNNING, CANCELLED
+    WAITING( "WAITING" ), // -> RUNNING, CANCELLED
 
     /**
      * Was running and is finished. No more execution scheduled.
      */
-    FINISHED, // END
+    FINISHED( "WAITING" ), // END
 
     /**
      * Was running and is broken.
      */
-    BROKEN, // END
+    BROKEN( "WAITING" ), // END
 
     /**
      * Was running and is cancelled.
      */
-    CANCELLED; // END
+    CANCELLED( "CANCELING" ); // END
+
+    private final String readableState;
+
+    TaskState( String readableState )
+    {
+        this.readableState = readableState;
+    }
     
     public boolean isRunnable()
     {
@@ -76,5 +83,10 @@ public enum TaskState
         /* I don't think BROKEN should apply, broken simply means an exception was thrown.
          * So what?  let the user attempt to do it again, maybe an fs perm problem that they resolved */
         return this.equals( FINISHED ) || this.equals( CANCELLED );
+    }
+
+    public String getReadableState()
+    {
+        return readableState;
     }
 }
