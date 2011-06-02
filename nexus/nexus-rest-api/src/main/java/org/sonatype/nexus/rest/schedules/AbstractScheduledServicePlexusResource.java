@@ -613,13 +613,13 @@ public abstract class AbstractScheduledServicePlexusResource
             case WAITING:
             case FINISHED:
             case BROKEN:
-                return "WAITING";
+                return "Waiting";
             case RUNNING:
-                return "RUNNING";
+                return "Running";
             case SLEEPING:
-                return "BLOCKED";
+                return "Blocked";
             case CANCELLED:
-                return "CANCELING";
+                return "Canceling";
             default:
                 throw new IllegalStateException();
         }

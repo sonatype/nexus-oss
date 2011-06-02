@@ -1524,12 +1524,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           this.runButton.disable();
           this.stopButton.disable();
         }
-        else if (status == 'CANCELING')
+        else if (status == 'Canceling')
         {
           this.stopButton.disable();
           this.runButton.disable();
         }
-        else if (status == 'WAITING')
+        else if (status == 'Waiting')
         {
           if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ))
           {
@@ -1654,7 +1654,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           this.formCards.add(formPanel);
         }
 
-        if (!status || status == 'WAITING' || status == '')
+        if (!status || status == 'Waiting' || status == '')
         {
           this.disableEditingHeader.setVisible(false);
           formPanel.enable();
