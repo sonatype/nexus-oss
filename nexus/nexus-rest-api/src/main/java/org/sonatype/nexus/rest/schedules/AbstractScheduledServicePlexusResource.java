@@ -120,35 +120,35 @@ public abstract class AbstractScheduledServicePlexusResource
 
     protected String getScheduleShortName( Schedule schedule )
     {
-        if( ManualRunSchedule.class.isAssignableFrom( schedule.getClass() ) )
+        if ( ManualRunSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
             return SCHEDULE_TYPE_MANUAL;
         }
-        else if( RunNowSchedule.class.isAssignableFrom( schedule.getClass() ) )
+        else if ( RunNowSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
             return SCHEDULE_TYPE_RUN_NOW;
         }
-        else if( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
+        else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
             return SCHEDULE_TYPE_ONCE;
         }
-        else if( HourlySchedule.class.isAssignableFrom( schedule.getClass() ) )
+        else if ( HourlySchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
             return SCHEDULE_TYPE_HOURLY;
         }
-        else if( DailySchedule.class.isAssignableFrom( schedule.getClass() ) )
+        else if ( DailySchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
             return SCHEDULE_TYPE_DAILY;
         }
-        else if( WeeklySchedule.class.isAssignableFrom( schedule.getClass() ) )
+        else if ( WeeklySchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
             return SCHEDULE_TYPE_WEEKLY;
         }
-        else if( MonthlySchedule.class.isAssignableFrom( schedule.getClass() ) )
+        else if ( MonthlySchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
             return SCHEDULE_TYPE_MONTHLY;
         }
-        else if( CronSchedule.class.isAssignableFrom( schedule.getClass() ) )
+        else if ( CronSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
             return SCHEDULE_TYPE_ADVANCED;
         }
@@ -172,9 +172,9 @@ public abstract class AbstractScheduledServicePlexusResource
     {
         List<ScheduledServicePropertyResource> list = new ArrayList<ScheduledServicePropertyResource>();
 
-        for( String key : map.keySet() )
+        for ( String key : map.keySet() )
         {
-            if( !TaskUtils.isPrivateProperty( key ) )
+            if ( !TaskUtils.isPrivateProperty( key ) )
             {
                 ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
                 prop.setKey( key );
@@ -190,9 +190,9 @@ public abstract class AbstractScheduledServicePlexusResource
     {
         List<String> list = new ArrayList<String>();
 
-        for( Integer day : days )
+        for ( Integer day : days )
         {
-            switch( day.intValue() )
+            switch ( day.intValue() )
             {
                 case 1:
                 {
@@ -239,33 +239,33 @@ public abstract class AbstractScheduledServicePlexusResource
     {
         Set<Integer> set = new HashSet<Integer>();
 
-        for( String day : days )
+        for ( String day : days )
         {
-            if( "sunday".equals( day ) )
+            if ( "sunday".equals( day ) )
             {
                 set.add( new Integer( 1 ) );
             }
-            else if( "monday".equals( day ) )
+            else if ( "monday".equals( day ) )
             {
                 set.add( new Integer( 2 ) );
             }
-            else if( "tuesday".equals( day ) )
+            else if ( "tuesday".equals( day ) )
             {
                 set.add( new Integer( 3 ) );
             }
-            else if( "wednesday".equals( day ) )
+            else if ( "wednesday".equals( day ) )
             {
                 set.add( new Integer( 4 ) );
             }
-            else if( "thursday".equals( day ) )
+            else if ( "thursday".equals( day ) )
             {
                 set.add( new Integer( 5 ) );
             }
-            else if( "friday".equals( day ) )
+            else if ( "friday".equals( day ) )
             {
                 set.add( new Integer( 6 ) );
             }
-            else if( "saturday".equals( day ) )
+            else if ( "saturday".equals( day ) )
             {
                 set.add( new Integer( 7 ) );
             }
@@ -278,9 +278,9 @@ public abstract class AbstractScheduledServicePlexusResource
     {
         List<String> list = new ArrayList<String>();
 
-        for( Integer day : days )
+        for ( Integer day : days )
         {
-            if( MonthlySchedulerIterator.LAST_DAY_OF_MONTH.equals( day ) )
+            if ( MonthlySchedulerIterator.LAST_DAY_OF_MONTH.equals( day ) )
             {
                 list.add( "last" );
             }
@@ -297,9 +297,9 @@ public abstract class AbstractScheduledServicePlexusResource
     {
         Set<Integer> set = new HashSet<Integer>();
 
-        for( String day : days )
+        for ( String day : days )
         {
-            if( "last".equals( day ) )
+            if ( "last".equals( day ) )
             {
                 set.add( MonthlySchedulerIterator.LAST_DAY_OF_MONTH );
             }
@@ -325,7 +325,7 @@ public abstract class AbstractScheduledServicePlexusResource
             cal.add( Calendar.HOUR_OF_DAY, timeCalendar.get( Calendar.HOUR_OF_DAY ) );
             cal.add( Calendar.MINUTE, timeCalendar.get( Calendar.MINUTE ) );
         }
-        catch( ParseException e )
+        catch ( ParseException e )
         {
             cal = null;
         }
@@ -339,14 +339,13 @@ public abstract class AbstractScheduledServicePlexusResource
     }
 
     public NexusTask<?> getModelNexusTask( ScheduledServiceBaseResource model, Request request )
-        throws IllegalArgumentException,
-               ResourceException
+        throws IllegalArgumentException, ResourceException
     {
         String serviceType = model.getTypeId();
 
         NexusTask<?> task = getNexusScheduler().createTaskInstance( serviceType );
 
-        for( Iterator iter = model.getProperties().iterator(); iter.hasNext(); )
+        for ( Iterator iter = model.getProperties().iterator(); iter.hasNext(); )
         {
             ScheduledServicePropertyResource prop = (ScheduledServicePropertyResource) iter.next();
             task.addParameter( prop.getKey(), prop.getValue() );
@@ -369,11 +368,9 @@ public abstract class AbstractScheduledServicePlexusResource
         nowCal.setTime( new Date() );
 
         // This is checking just the year/month/day, time isn't of concern right now
-        if( cal.before( nowCal )
+        if ( cal.before( nowCal )
             && ( cal.get( Calendar.YEAR ) != nowCal.get( Calendar.YEAR )
-                 || cal.get( Calendar.MONTH ) != nowCal.get( Calendar.MONTH )
-                 || cal.get( Calendar.DAY_OF_YEAR ) != nowCal
-            .get( Calendar.DAY_OF_YEAR ) ) )
+                || cal.get( Calendar.MONTH ) != nowCal.get( Calendar.MONTH ) || cal.get( Calendar.DAY_OF_YEAR ) != nowCal.get( Calendar.DAY_OF_YEAR ) ) )
         {
             ValidationResponse vr = new ApplicationValidationResponse();
             ValidationMessage vm = new ValidationMessage( "startDate", "Date cannot be in the past." );
@@ -385,7 +382,7 @@ public abstract class AbstractScheduledServicePlexusResource
     public void validateTime( String key, Date date )
         throws InvalidConfigurationException
     {
-        if( date.before( new Date() ) )
+        if ( date.before( new Date() ) )
         {
             ValidationResponse vr = new ApplicationValidationResponse();
             ValidationMessage vm = new ValidationMessage( key, "Time cannot be in the past." );
@@ -395,55 +392,47 @@ public abstract class AbstractScheduledServicePlexusResource
     }
 
     public Schedule getModelSchedule( ScheduledServiceBaseResource model )
-        throws ParseException,
-               InvalidConfigurationException
+        throws ParseException, InvalidConfigurationException
     {
         Schedule schedule = null;
 
-        if( ScheduledServiceAdvancedResource.class.isAssignableFrom( model.getClass() ) )
+        if ( ScheduledServiceAdvancedResource.class.isAssignableFrom( model.getClass() ) )
         {
             schedule = new CronSchedule( ( (ScheduledServiceAdvancedResource) model ).getCronCommand() );
         }
-        else if( ScheduledServiceMonthlyResource.class.isAssignableFrom( model.getClass() ) )
+        else if ( ScheduledServiceMonthlyResource.class.isAssignableFrom( model.getClass() ) )
         {
-            Date date = parseDate(
-                ( (ScheduledServiceMonthlyResource) model ).getStartDate(),
-                ( (ScheduledServiceMonthlyResource) model ).getRecurringTime()
-            );
+            Date date =
+                parseDate( ( (ScheduledServiceMonthlyResource) model ).getStartDate(),
+                    ( (ScheduledServiceMonthlyResource) model ).getRecurringTime() );
 
             // validateStartDate( ( (ScheduledServiceMonthlyResource) model ).getStartDate() );
 
             // validateTime( "recurringTime", date );
 
-            schedule = new MonthlySchedule(
-                date,
-                null,
-                formatRecurringDayOfMonth( ( (ScheduledServiceMonthlyResource) model ).getRecurringDay() )
-            );
+            schedule =
+                new MonthlySchedule( date, null,
+                    formatRecurringDayOfMonth( ( (ScheduledServiceMonthlyResource) model ).getRecurringDay() ) );
         }
-        else if( ScheduledServiceWeeklyResource.class.isAssignableFrom( model.getClass() ) )
+        else if ( ScheduledServiceWeeklyResource.class.isAssignableFrom( model.getClass() ) )
         {
-            Date date = parseDate(
-                ( (ScheduledServiceWeeklyResource) model ).getStartDate(),
-                ( (ScheduledServiceWeeklyResource) model ).getRecurringTime()
-            );
+            Date date =
+                parseDate( ( (ScheduledServiceWeeklyResource) model ).getStartDate(),
+                    ( (ScheduledServiceWeeklyResource) model ).getRecurringTime() );
 
             // validateStartDate( ( (ScheduledServiceWeeklyResource) model ).getStartDate() );
 
             // validateTime( "recurringTime", date );
 
-            schedule = new WeeklySchedule(
-                date,
-                null,
-                formatRecurringDayOfWeek( ( (ScheduledServiceWeeklyResource) model ).getRecurringDay() )
-            );
+            schedule =
+                new WeeklySchedule( date, null,
+                    formatRecurringDayOfWeek( ( (ScheduledServiceWeeklyResource) model ).getRecurringDay() ) );
         }
-        else if( ScheduledServiceDailyResource.class.isAssignableFrom( model.getClass() ) )
+        else if ( ScheduledServiceDailyResource.class.isAssignableFrom( model.getClass() ) )
         {
-            Date date = parseDate(
-                ( (ScheduledServiceDailyResource) model ).getStartDate(),
-                ( (ScheduledServiceDailyResource) model ).getRecurringTime()
-            );
+            Date date =
+                parseDate( ( (ScheduledServiceDailyResource) model ).getStartDate(),
+                    ( (ScheduledServiceDailyResource) model ).getRecurringTime() );
 
             // validateStartDate( ( (ScheduledServiceDailyResource) model ).getStartDate() );
 
@@ -451,12 +440,11 @@ public abstract class AbstractScheduledServicePlexusResource
 
             schedule = new DailySchedule( date, null );
         }
-        else if( ScheduledServiceHourlyResource.class.isAssignableFrom( model.getClass() ) )
+        else if ( ScheduledServiceHourlyResource.class.isAssignableFrom( model.getClass() ) )
         {
-            Date date = parseDate(
-                ( (ScheduledServiceHourlyResource) model ).getStartDate(),
-                ( (ScheduledServiceHourlyResource) model ).getStartTime()
-            );
+            Date date =
+                parseDate( ( (ScheduledServiceHourlyResource) model ).getStartDate(),
+                    ( (ScheduledServiceHourlyResource) model ).getStartTime() );
 
             // validateStartDate( ( (ScheduledServiceHourlyResource) model ).getStartDate() );
 
@@ -464,22 +452,19 @@ public abstract class AbstractScheduledServicePlexusResource
 
             schedule = new HourlySchedule( date, null );
         }
-        else if( ScheduledServiceOnceResource.class.isAssignableFrom( model.getClass() ) )
+        else if ( ScheduledServiceOnceResource.class.isAssignableFrom( model.getClass() ) )
         {
-            Date date = parseDate(
-                ( (ScheduledServiceOnceResource) model ).getStartDate(),
-                ( (ScheduledServiceOnceResource) model ).getStartTime()
-            );
+            Date date =
+                parseDate( ( (ScheduledServiceOnceResource) model ).getStartDate(),
+                    ( (ScheduledServiceOnceResource) model ).getStartTime() );
 
             validateStartDate( ( (ScheduledServiceOnceResource) model ).getStartDate() );
 
             validateTime( "startTime", date );
 
-            schedule = new OnceSchedule( parseDate(
-                ( (ScheduledServiceOnceResource) model ).getStartDate(),
-                ( (ScheduledServiceOnceResource) model ).getStartTime()
-            )
-            );
+            schedule =
+                new OnceSchedule( parseDate( ( (ScheduledServiceOnceResource) model ).getStartDate(),
+                    ( (ScheduledServiceOnceResource) model ).getStartTime() ) );
         }
         else
         {
@@ -493,12 +478,12 @@ public abstract class AbstractScheduledServicePlexusResource
     {
         ScheduledServiceBaseResource resource = null;
 
-        if( RunNowSchedule.class.isAssignableFrom( task.getSchedule().getClass() )
+        if ( RunNowSchedule.class.isAssignableFrom( task.getSchedule().getClass() )
             || ManualRunSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
         {
             resource = new ScheduledServiceBaseResource();
         }
-        else if( OnceSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+        else if ( OnceSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
         {
             resource = new ScheduledServiceOnceResource();
 
@@ -508,7 +493,7 @@ public abstract class AbstractScheduledServicePlexusResource
             res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
             res.setStartTime( formatTime( taskSchedule.getStartDate() ) );
         }
-        else if( HourlySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+        else if ( HourlySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
         {
             resource = new ScheduledServiceHourlyResource();
 
@@ -518,7 +503,7 @@ public abstract class AbstractScheduledServicePlexusResource
             res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
             res.setStartTime( formatTime( taskSchedule.getStartDate() ) );
         }
-        else if( DailySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+        else if ( DailySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
         {
             resource = new ScheduledServiceDailyResource();
 
@@ -528,7 +513,7 @@ public abstract class AbstractScheduledServicePlexusResource
             res.setStartDate( formatDate( taskSchedule.getStartDate() ) );
             res.setRecurringTime( formatTime( taskSchedule.getStartDate() ) );
         }
-        else if( WeeklySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+        else if ( WeeklySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
         {
             resource = new ScheduledServiceWeeklyResource();
 
@@ -539,7 +524,7 @@ public abstract class AbstractScheduledServicePlexusResource
             res.setRecurringTime( formatTime( taskSchedule.getStartDate() ) );
             res.setRecurringDay( formatRecurringDayOfWeek( taskSchedule.getDaysToRun() ) );
         }
-        else if( MonthlySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+        else if ( MonthlySchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
         {
             resource = new ScheduledServiceMonthlyResource();
 
@@ -550,7 +535,7 @@ public abstract class AbstractScheduledServicePlexusResource
             res.setRecurringTime( formatTime( taskSchedule.getStartDate() ) );
             res.setRecurringDay( formatRecurringDayOfMonth( taskSchedule.getDaysToRun() ) );
         }
-        else if( CronSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
+        else if ( CronSchedule.class.isAssignableFrom( task.getSchedule().getClass() ) )
         {
             resource = new ScheduledServiceAdvancedResource();
 
@@ -560,7 +545,7 @@ public abstract class AbstractScheduledServicePlexusResource
             res.setCronCommand( taskSchedule.getCronString() );
         }
 
-        if( resource != null )
+        if ( resource != null )
         {
             resource.setId( task.getId() );
             resource.setEnabled( task.isEnabled() );
@@ -579,7 +564,7 @@ public abstract class AbstractScheduledServicePlexusResource
         String nextRunTime = "n/a";
 
         // Run now type tasks should never have a next run time
-        if( !task.getSchedule().getClass().isAssignableFrom( RunNowSchedule.class ) && task.getNextRun() != null )
+        if ( !task.getSchedule().getClass().isAssignableFrom( RunNowSchedule.class ) && task.getNextRun() != null )
         {
             nextRunTime = task.getNextRun().toString();
         }
@@ -619,4 +604,25 @@ public abstract class AbstractScheduledServicePlexusResource
         }
         return lastRunResult;
     }
+
+    protected String getReadableState( TaskState taskState )
+    {
+        switch ( taskState )
+        {
+            case SUBMITTED:
+            case WAITING:
+            case FINISHED:
+            case BROKEN:
+                return "WAITING";
+            case RUNNING:
+                return "RUNNING";
+            case SLEEPING:
+                return "BLOCKED";
+            case CANCELLED:
+                return "CANCELING";
+            default:
+                throw new IllegalStateException();
+        }
+    }
+
 }
