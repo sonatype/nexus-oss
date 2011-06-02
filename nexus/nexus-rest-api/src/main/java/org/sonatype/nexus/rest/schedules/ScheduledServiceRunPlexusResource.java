@@ -103,7 +103,8 @@ public class ScheduledServiceRunPlexusResource
                 ScheduledServiceResourceStatus resourceStatus = new ScheduledServiceResourceStatus();
                 resourceStatus.setResource( resource );
                 resourceStatus.setResourceURI( createChildReference( request, this, task.getId() ).toString() );
-                resourceStatus.setStatus( getReadableState( task.getTaskState() ) );
+                resourceStatus.setStatus( task.getTaskState().toString() );
+                resourceStatus.setReadableStatus( getReadableState( task.getTaskState() ) );
                 resourceStatus.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
                 resourceStatus.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
                 resourceStatus.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );

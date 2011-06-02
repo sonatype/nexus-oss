@@ -1744,6 +1744,13 @@
           <description>The status of the scheduled service (running, broken, etc.).</description>
         </field>
         <field>
+          <name>readableStatus</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The status of the scheduled service (running, broken, etc.).</description>
+        </field>
+        <field>
           <name>schedule</name>
           <version>1.0.0+</version>
           <type>String</type>
@@ -1835,6 +1842,13 @@
           <type>String</type>
           <required>true</required>
           <description>The status of the scheduled service.</description>
+        </field>
+        <field>
+          <name>readableStatus</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The status of the scheduled service (running, broken, etc.).</description>
         </field>
         <field>
           <name>nextRunTime</name>

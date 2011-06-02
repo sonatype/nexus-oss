@@ -190,7 +190,8 @@ public class ScheduledServicePlexusResource
                 // Just need to update the id, as the incoming data is a POST w/ no id
                 resourceStatus.getResource().setId( task.getId() );
                 resourceStatus.setResourceURI( createChildReference( request, this, task.getId() ).toString() );
-                resourceStatus.setStatus( getReadableState( task.getTaskState() ) );
+                resourceStatus.setStatus( task.getTaskState().toString() );
+                resourceStatus.setReadableStatus( getReadableState( task.getTaskState() ) );
                 resourceStatus.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
                 resourceStatus.setLastRunResult( getLastRunResult( task ) );
                 resourceStatus.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );

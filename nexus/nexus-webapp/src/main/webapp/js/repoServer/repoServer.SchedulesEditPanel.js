@@ -240,7 +240,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
       }, {
         name : 'typeId'
       }, {
-        name : 'status'
+        name : 'readableStatus'
       }, {
         name : 'alertEmail'
       }, {
@@ -937,7 +937,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
               id : 'schedule-config-service-type-col'
             }, {
               header : 'Status',
-              dataIndex : 'status',
+              dataIndex : 'readableStatus',
               width : 175,
               id : 'schedule-config-service-status-col'
             }, {
@@ -1393,7 +1393,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                     return false;
                   })).data.name,
               typeId : receivedData.resource.typeId,
-              status : receivedData.status,
+              readableStatus : receivedData.readableStatus,
               alertEmail : receivedData.resource.alertEmail,
               schedule : receivedData.resource.schedule,
               nextRunTime : receivedData.nextRunTime,
@@ -1469,7 +1469,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                 })).data.name);
         rec.set('alertEmail', receivedData.resource.alertEmail);
         rec.set('schedule', receivedData.resource.schedule);
-        rec.set('status', receivedData.status);
+        rec.set('readableStatus', receivedData.readableStatus);
         rec.set('nextRunTime', receivedData.nextRunTime);
         rec.set('lastRunTime', receivedData.lastRunTime);
         rec.set('lastRunResult', receivedData.lastRunResult);
@@ -1518,18 +1518,18 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         this.runButton.disable();
         this.stopButton.disable();
 
-        var status = rec.data.status;
+        var readableStatus = rec.data.readableStatus;
         if (rec.data.name.substring(0, 4) == 'New ')
         {
           this.runButton.disable();
           this.stopButton.disable();
         }
-        else if (status == 'Cancelling')
+        else if (readableStatus == 'Cancelling')
         {
           this.stopButton.disable();
           this.runButton.disable();
         }
-        else if (status == 'Waiting')
+        else if (readableStatus == 'Waiting')
         {
           if (this.sp.checkPermission('nexus:tasksrun', this.sp.READ))
           {
@@ -1654,7 +1654,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           this.formCards.add(formPanel);
         }
 
-        if (!status || status == 'Waiting' || status == '')
+        if (!readableStatus || readableStatus == 'Waiting' || readableStatus == '')
         {
           this.disableEditingHeader.setVisible(false);
           formPanel.enable();
