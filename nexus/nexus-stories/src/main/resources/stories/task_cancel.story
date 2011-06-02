@@ -1,5 +1,3 @@
-Here are some stories based on testing and discussion so far
-
 Story: Cancelling a running task.
 
 Narrative:
@@ -7,12 +5,6 @@ Narrative:
 In order to protect a stable Nexus from long running scheduled tasks which are consuming resources
 As a Nexus Administrator
 I want to Cancel a running task
-
-Scenario: Cancelling a running internal task
-!-- todo are there any restrictions with this?
-
-Scenario: Cancelling a SLEEPING task
-!-- is cancelling a SLEEPING task the same as a RUNNING task?
 
 Scenario: Task User interface
 
@@ -24,7 +16,19 @@ Given a User is viewing the Scheduled Tasks UI
 When no task is selected
 Then the Cancel button becomes disabled
 
-Scenario: Cancelling a running task
+Scenario: Cancelling a RUNNING internal task
+
+!-- An Example of this task is when download indexes is enabled on a repository
+Given a running task created and started internally by Nexus is displayed
+When the running internal task is selected
+Then  the Cancel button becomes enabled
+
+Scenario: Cancelling a task that is already being cancelled
+Given a running task created and started internally by Nexus is displayed
+When the running internal task is selected
+Then  the Cancel button becomes enabled
+
+Scenario: Cancelling a RUNNING user created task
 
 Given a RUNNING task is selected
 When a user clicks the Cancel button
