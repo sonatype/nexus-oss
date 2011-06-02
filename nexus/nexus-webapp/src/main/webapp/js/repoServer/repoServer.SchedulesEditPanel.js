@@ -88,6 +88,17 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
         disabled : true
       });
 
+  this.disableEditingHeader = new Ext.Panel({
+        id : 'disablingMsg',
+        name : 'disablingMsg',
+        layout : 'table',
+        hidden : true,
+        style : 'font-size: 18px; padding: 5px 0px 5px 15px',
+        items : [{
+              html : '<b>This is scheduled to be run.  It can\'t be edited or deleted.</b><br><hr/>'
+            }]
+      });
+
   // Methods that will take the incoming json data and map over to the ui
   // controls
   this.loadDataModFuncs = {
@@ -361,7 +372,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
       labelSeparator : ''
     },
 
-    items : [{
+    items : [/* this.disableEditingHeader, */{
           xtype : 'hidden',
           name : 'id'
         }, {
@@ -1641,6 +1652,17 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           this.formDataLoader(formPanel, rec.data.resourceURI, this.loadDataModFuncs[rec.data.schedule]);
 
           this.formCards.add(formPanel);
+        }
+
+        if (!status || status == 'WAITING' || status == '')
+        {
+          this.disableEditingHeader.setVisible(false);
+          formPanel.enable();
+        }
+        else
+        {
+          this.disableEditingHeader.setVisible(true);
+          formPanel.disable();
         }
 
         // always set active

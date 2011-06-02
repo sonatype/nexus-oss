@@ -49,6 +49,7 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.TaskState;
 
 /**
  * @author tstevens
@@ -154,6 +155,13 @@ public class ScheduledServicePlexusResource
                 // task schedule (even to another type)
                 // task params
                 ScheduledTask<?> task = getNexusScheduler().getTaskById( getScheduledServiceId( request ) );
+                TaskState state = task.getTaskState();
+                if ( TaskState.RUNNING.equals( state ) || TaskState.CANCELLED.equals( state )
+                    || TaskState.SLEEPING.equals( state ) )
+                {
+                    throw new ResourceException( Status.CLIENT_ERROR_CONFLICT,
+                        "Task can't be edited while it is being executed or it is in line to be executed" );
+                }
 
                 task.setEnabled( resource.isEnabled() );
 
