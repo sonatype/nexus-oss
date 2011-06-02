@@ -24,45 +24,38 @@ public enum TaskState
     /**
      * Submitted, not runned yet.
      */
-    SUBMITTED( "WAITING" ), // -> RUNNING, CANCELLED
+    SUBMITTED, // -> RUNNING, CANCELLED
 
     /**
      * Is currently running.
      */
-    RUNNING( "RUNNING" ), // -> WAITING, FINISHED, BROKEN, CANCELLED, SLEEPING
+    RUNNING, // -> WAITING, FINISHED, BROKEN, CANCELLED, SLEEPING
 
     /**
      * Should run but is blocked by another clashing task. Will try to run later.
      */
-    SLEEPING( "BLOCKED" ), // -> RUNNING
+    SLEEPING, // -> RUNNING
 
     /**
      * Was running and is finished. Waiting for next execution.
      */
-    WAITING( "WAITING" ), // -> RUNNING, CANCELLED
+    WAITING, // -> RUNNING, CANCELLED
 
     /**
      * Was running and is finished. No more execution scheduled.
      */
-    FINISHED( "WAITING" ), // END
+    FINISHED, // END
 
     /**
      * Was running and is broken.
      */
-    BROKEN( "WAITING" ), // END
+    BROKEN, // END
 
     /**
      * Was running and is cancelled.
      */
-    CANCELLED( "CANCELING" ); // END
+    CANCELLED; // END
 
-    private final String readableState;
-
-    TaskState( String readableState )
-    {
-        this.readableState = readableState;
-    }
-    
     public boolean isRunnable()
     {
         return this.equals( SUBMITTED ) || this.equals( RUNNING ) || this.equals( SLEEPING ) || this.equals( WAITING ) || this.equals( BROKEN );
@@ -85,8 +78,4 @@ public enum TaskState
         return this.equals( FINISHED ) || this.equals( CANCELLED );
     }
 
-    public String getReadableState()
-    {
-        return readableState;
-    }
 }
