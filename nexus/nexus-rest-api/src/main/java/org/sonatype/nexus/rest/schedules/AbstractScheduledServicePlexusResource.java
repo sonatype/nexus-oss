@@ -619,7 +619,7 @@ public abstract class AbstractScheduledServicePlexusResource
             case SLEEPING:
                 return "Blocked";
             case CANCELLED:
-                return "Canceling";
+                return "Cancelling";
             default:
                 throw new IllegalStateException();
         }

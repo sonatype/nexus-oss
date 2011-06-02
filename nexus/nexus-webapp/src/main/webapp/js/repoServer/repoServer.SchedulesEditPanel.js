@@ -1119,7 +1119,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           gridSelectModel.clearSelections();
         }
 
-        // delete row from grid if canceling a new repo form
+        // delete row from grid if cancelling a new repo form
         if (formInfoObj.isNew)
         {
           store.remove(store.getById(formInfoObj.formPanel.id));
@@ -1524,7 +1524,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
           this.runButton.disable();
           this.stopButton.disable();
         }
-        else if (status == 'Canceling')
+        else if (status == 'Cancelling')
         {
           this.stopButton.disable();
           this.runButton.disable();
