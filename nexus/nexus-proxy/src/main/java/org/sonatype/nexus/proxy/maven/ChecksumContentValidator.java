@@ -19,11 +19,8 @@
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -150,16 +147,7 @@ public class ChecksumContentValidator
             // read checksum
             try
             {
-                InputStream hashItemContent = hashItem.getInputStream();
-
-                try
-                {
-                    remoteHash = StringUtils.chomp( IOUtil.toString( hashItemContent ) ).trim().split( " " )[0];
-                }
-                finally
-                {
-                    IOUtil.close( hashItemContent );
-                }
+                remoteHash = MUtils.readDigestFromFileItem( hashItem );
             }
             catch ( IOException e )
             {
