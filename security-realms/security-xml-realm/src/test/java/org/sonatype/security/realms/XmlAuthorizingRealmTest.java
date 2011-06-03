@@ -43,7 +43,7 @@ public class XmlAuthorizingRealmTest
     extends AbstractSecurityTestCase
 {
 
-    private final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/jsecurity/security.xml";
+    private final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/security/security.xml";
 
     private File configFile = new File( SECURITY_CONFIG_FILE_PATH );
 
