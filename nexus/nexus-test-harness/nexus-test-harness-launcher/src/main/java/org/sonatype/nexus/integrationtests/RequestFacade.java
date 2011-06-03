@@ -153,7 +153,26 @@ public class RequestFacade
         return downloadedFile;
     }
 
-    public static HttpMethod executeHTTPClientMethod( URL url, HttpMethod method )
+    /**
+     * Execute a HTTPClient method in the context of a test. ie {@link TestContainer#getTestContext()}  
+     */
+    public static HttpMethod executeHTTPClientMethod(HttpMethod method)
+        throws HttpException,
+            IOException
+    {
+        return executeHTTPClientMethod(method, true);
+    }
+    
+    /**
+     * Execute a HTTPClient method, optionally in the context of a test. ie {@link TestContainer#getTestContext()}
+     * 
+     * @param method the method to execute
+     * @param useTestContext if true, execute this request in the context of a Test, false means ignore the testContext settings
+     * @return the HttpMethod instance passed into this method
+     * @throws HttpException
+     * @throws IOException 
+     */
+    public static HttpMethod executeHTTPClientMethod(HttpMethod method, final boolean useTestContext)
         throws HttpException,
             IOException
     {
@@ -161,19 +180,23 @@ public class RequestFacade
         HttpClient client = new HttpClient();
         client.getHttpConnectionManager().getParams().setConnectionTimeout( 5000 );
 
-        // check the text context to see if this is a secure test
-        TestContext context = TestContainer.getInstance().getTestContext();
-        if ( context.isSecureTest() )
+        if(useTestContext)
         {
-            client.getState().setCredentials(
-                AuthScope.ANY,
-                new UsernamePasswordCredentials( context.getUsername(), context.getPassword() ) );
+            // check the text context to see if this is a secure test
+            TestContext context = TestContainer.getInstance().getTestContext();
+            if ( context.isSecureTest() )
+            {
+                client.getState().setCredentials(
+                    AuthScope.ANY,
+                    new UsernamePasswordCredentials( context.getUsername(), context.getPassword() ) );
 
-            List<String> authPrefs = new ArrayList<String>( 1 );
-            authPrefs.add( AuthPolicy.BASIC );
-            client.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
-            client.getParams().setAuthenticationPreemptive( true );
+                List<String> authPrefs = new ArrayList<String>( 1 );
+                authPrefs.add( AuthPolicy.BASIC );
+                client.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
+                client.getParams().setAuthenticationPreemptive( true );
+            }
         }
+        
         try
         {
             client.executeMethod( method );

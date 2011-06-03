@@ -93,7 +93,7 @@ public class DeployUtils
 
         filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
 
-        return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost ).getStatusCode();
+        return RequestFacade.executeHTTPClientMethod(filePost ).getStatusCode();
 
     }
 
@@ -140,7 +140,7 @@ public class DeployUtils
         LOG.debug( "\tpom: " + pomFile );
         LOG.debug( "\tfileToDeploy: " + fileToDeploy );
 
-        return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost );
+        return RequestFacade.executeHTTPClientMethod(filePost );
     }
 
     public int deployUsingPomWithRest( String restServiceURL, String repositoryId, File fileToDeploy, File pomFile,
@@ -172,6 +172,6 @@ public class DeployUtils
         LOG.debug( "\thasPom: true" );
         LOG.debug( "\tpom: " + pomFile );
 
-        return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost );
+        return RequestFacade.executeHTTPClientMethod(filePost );
     }
 }
