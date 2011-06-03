@@ -429,6 +429,11 @@ public class DefaultScheduledTask<T>
                     setLastStatus( TaskState.BROKEN );
                     setTaskState( TaskState.BROKEN );
 
+                    if ( !isManualRunScheduled() && nextFuture == null && isEnabled() )
+                    {
+                        getScheduler().removeFromTasksMap( this );
+                    }
+
                     if ( Exception.class.isAssignableFrom( e.getClass() ) )
                     {
                         // this is an exception, pass it further
