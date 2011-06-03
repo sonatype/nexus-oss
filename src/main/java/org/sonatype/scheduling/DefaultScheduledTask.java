@@ -201,7 +201,7 @@ public class DefaultScheduledTask<T>
         cancel( interrupt, true );
     }
 
-    public void cancel( boolean interrupt, boolean noMoreScheduledExecutions )
+    public void cancel( boolean interrupt, boolean removeTask )
     {
         final ProgressListener progressListener = getProgressListener();
 
@@ -216,10 +216,15 @@ public class DefaultScheduledTask<T>
             getFuture().cancel( interrupt );
         }
 
-
-        if ( noMoreScheduledExecutions )
+        if ( removeTask )
         {
-	        setTaskState( TaskState.CANCELLED );
+            // if this task is not running, it can be immediately removed from task map
+            // else set to cancelled and wait for the #call() method to exit (and remove the task then)
+            if ( !getTaskState().equals( TaskState.RUNNING ) )
+            {
+                getScheduler().removeFromTasksMap( this );
+            }
+            setTaskState( TaskState.CANCELLED );
         }
         else
         {
