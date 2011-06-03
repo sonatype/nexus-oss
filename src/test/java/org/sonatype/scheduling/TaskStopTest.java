@@ -3,6 +3,7 @@ package org.sonatype.scheduling;
 import java.util.concurrent.Callable;
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.scheduling.schedules.ManualRunSchedule;
 
 public class TaskStopTest
     extends PlexusTestCase
@@ -43,7 +44,7 @@ public class TaskStopTest
         assertTrue( callable.isAllDone() );
     }
 
-    public void testCancelWaitForFinishExecution()
+    public void testCancelOnlyWaitForFinishExecution()
         throws Exception
     {
         RunForeverCallable callable = new RunForeverCallable( 500 );
@@ -69,6 +70,54 @@ public class TaskStopTest
 
         assertTrue( "task was not done", callable.isAllDone() );
         assertTrue( "task not removed", defaultScheduler.getAllTasks().isEmpty() );
+    }
+
+    public void testCancelDoesNotRemoveRunningTask()
+        throws Exception
+    {
+        RunForeverCallable callable = new RunForeverCallable( 500 );
+
+        assertFalse( callable.isAllDone() );
+
+        ScheduledTask<Integer> task = defaultScheduler.submit( "Test Task", callable );
+
+        assertFalse( callable.isAllDone() );
+
+        callable.blockForStart();
+
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+
+        assertEquals( TaskState.RUNNING, task.getTaskState() );
+
+        task.cancel();
+
+        assertFalse( "task was killed immediately", callable.isAllDone() );
+        assertFalse( "running task was eagerly removed", defaultScheduler.getAllTasks().isEmpty() );
+
+        callable.blockForDone();
+
+        assertTrue( "task was not done", callable.isAllDone() );
+        assertTrue( "task not removed", defaultScheduler.getAllTasks().isEmpty() );
+    }
+
+    public void testCancelRemovesIdleTask()
+    {
+        RunForeverCallable callable = new RunForeverCallable( 500 );
+
+        assertFalse( callable.isAllDone() );
+
+        ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", callable, new ManualRunSchedule() );
+
+        assertFalse( callable.isAllDone() );
+
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+
+        assertEquals( TaskState.SUBMITTED, task.getTaskState() );
+
+        task.cancel();
+
+        assertTrue( "idle task was not removed", defaultScheduler.getAllTasks().isEmpty() );
+        assertFalse( "task was killed immediately", callable.isAllDone() );
     }
 
     public class RunForeverCallable
