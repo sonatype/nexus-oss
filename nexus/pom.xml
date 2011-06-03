@@ -22,13 +22,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-parent</artifactId>
-    <version>1.9.3-SNAPSHOT</version>
-    <relativePath>../nexus-parent/pom.xml</relativePath>
+    <parent>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>7</version>
+    <relativePath />
   </parent>
 
+  <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus</artifactId>
   <packaging>pom</packaging>
   <name>Nexus</name>
@@ -164,51 +165,80 @@
     </pluginRepository>
   </pluginRepositories>
 
-  <!-- Shortcuts for outnumbered deps :) -->
   <properties>
-    <maven.indexer.version>4.1.1</maven.indexer.version>
-    <maven.version>3.0.1</maven.version>
+    <debug-js>false</debug-js>
+    <nexus-site-base-url>https://repository.sonatype.org/content/sites/maven-sites/nexus-oss</nexus-site-base-url>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <nexus.version>${project.version}</nexus.version>
+
+    <!-- version properties -->
     <aether.version>1.8.1</aether.version>
-
+    <applifecycle.version>1.4</applifecycle.version>
     <aspectj.version>1.6.11</aspectj.version>
-    <spice-timeline.version>2.0</spice-timeline.version>
-    <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
-    <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
-    <plexus-security.version>2.4</plexus-security.version>
-    <shiro.version>1.1.0</shiro.version>
-
-    <slf4j.version>1.6.1</slf4j.version>
-    <log4j.version>1.2.14</log4j.version>
-    <logback.version>0.9.29</logback.version>
-
-    <nexus.repository.metadata.version>1.1</nexus.repository.metadata.version>
-    <!-- Shared with nexus-client, hence it is properties'ed -->
-    <plexus.restlet.bridge.version>1.18-SNAPSHOT</plexus.restlet.bridge.version>
-    <micromailer.version>1.1.1-SNAPSHOT</micromailer.version>
-    <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
-    <plexus-jetty6.version>1.7</plexus-jetty6.version>
-    <plexus-jetty7.version>1.0-SNAPSHOT</plexus-jetty7.version>
-    <plexus-task-scheduler.version>1.4.2</plexus-task-scheduler.version>
-    <plexus-digest.version>1.1</plexus-digest.version>
-    <plexus-cli.version>1.2</plexus-cli.version>
-    <plexus-interpolation.version>1.6</plexus-interpolation.version>
-    <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
-    <plexus-velocity.version>1.1.7</plexus-velocity.version>
     <commons-beanutils.baseVersion>1.7.0</commons-beanutils.baseVersion>
     <commons-beanutils.version>${commons-beanutils.baseVersion}-SONATYPE</commons-beanutils.version>
-    <plexus-ehcache.version>1.3</plexus-ehcache.version>
-    <plexus-jetty-testsuite.version>1.7</plexus-jetty-testsuite.version>
-    <plexus-app-events.version>1.0.0</plexus-app-events.version>
-    <plexus-swizzle.version>1.2</plexus-swizzle.version>
-    <spice-utils.version>1.0.0</spice-utils.version>
     <enunciate.version>1.20</enunciate.version>
+    <jetty.version>6.1.19</jetty.version>
+    <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
+    <log4j.version>1.2.14</log4j.version>
+    <logback.version>0.9.29</logback.version>
+    <maven.indexer.version>4.1.1</maven.indexer.version>
+    <maven.version>3.0.1</maven.version>
+    <micromailer.version>1.1.1-SNAPSHOT</micromailer.version>
+    <nexus.repository.metadata.version>1.1</nexus.repository.metadata.version>
+    <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
+    <plexus-app-events.version>1.0.0</plexus-app-events.version>
+    <plexus-cli.version>1.2</plexus-cli.version>
+    <plexus-digest.version>1.1</plexus-digest.version>
+    <plexus-ehcache.version>1.3</plexus-ehcache.version>
+    <plexus-interpolation.version>1.6</plexus-interpolation.version>
+    <plexus-jetty6.version>1.7</plexus-jetty6.version>
+    <plexus-jetty7.version>1.0-SNAPSHOT</plexus-jetty7.version>
+    <plexus-jetty-testsuite.version>1.7</plexus-jetty-testsuite.version>
+    <plexus.restlet.bridge.version>1.18-SNAPSHOT</plexus.restlet.bridge.version>
+    <plexus-security.version>2.4</plexus-security.version>
+    <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
+    <plexus-swizzle.version>1.2</plexus-swizzle.version>
+    <plexus-task-scheduler.version>1.4.2</plexus-task-scheduler.version>
+    <plexus-velocity.version>1.1.7</plexus-velocity.version>
+    <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
+    <shiro.version>1.1.0</shiro.version>
+    <slf4j.version>1.6.1</slf4j.version>
+    <spice-timeline.version>2.0</spice-timeline.version>
+    <spice-utils.version>1.0.0</spice-utils.version>
     <surefire.version>2.8.1</surefire.version>
-    <applifecycle.version>1.4</applifecycle.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+
       <!-- Platform -->
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-runtime-platform</artifactId>
+        <version>1.9.3-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.plugin</groupId>
+        <artifactId>plugin-api</artifactId>
+        <version>1.0.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.plugin</groupId>
+        <artifactId>plugin-host-api</artifactId>
+        <version>1.0.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.plugin</groupId>
+        <artifactId>plugin-gleaner</artifactId>
+        <version>1.0.3</version>
+      </dependency>
+
+
       <dependency>
         <groupId>org.sonatype.appbooter.plexus-booters</groupId>
         <artifactId>plexus-app-booter</artifactId>
@@ -264,6 +294,29 @@
         <type>tar.gz</type>
         <!--make sure this doesn't get into any classpaths -->
         <scope>provided</scope>
+      </dependency>
+
+
+      <!-- Jetty -->
+      <dependency>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>jetty</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>jetty-client</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>jetty-sslengine</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>jetty-util</artifactId>
+        <version>${jetty.version}</version>
       </dependency>
 
       <!-- Plexus et al -->
@@ -1150,14 +1203,32 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.0</version>
         <executions>
+        <execution>
+            <id>enforce-java</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>[3.0,)</version>
+                </requireMavenVersion>
+                <requireJavaVersion>
+                  <version>[1.6,)</version>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
           <execution>
             <goals>
               <goal>enforce</goal>
             </goals>
             <!-- we don't need these until JUST BEFORE integration testing, so moving to a later phase to get out of the way of m2eclipse. <phase>compile</phase> -->
-            <id>enforce</id>
+            <id>enforce-dependencies</id>
             <configuration>
               <rules>
                 <bannedDependencies>
@@ -1282,6 +1353,16 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -1312,9 +1393,120 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+
     </plugins>
+
     <pluginManagement>
       <plugins>
+
+      <!-- Manually run with: mvn clean com.mycila.maven-license-plugin:maven-license-plugin:1.9.0:format -->
+        <plugin>
+          <groupId>com.mycila.maven-license-plugin</groupId>
+          <artifactId>maven-license-plugin</artifactId>
+          <version>1.9.0</version>
+          <configuration>
+            <header>nexus/header.txt</header>
+            <strictCheck>true</strictCheck>
+            <useDefaultExcludes>false</useDefaultExcludes>
+            <includes>
+              <include>**/*.java</include>
+              <include>**/*.vm</include>
+              <include>**/*.xml</include>
+              <include>**/*.groovy</include>
+              <include>**/*.aj</include>
+              <include>**/*.css</include>
+              <include>**/*.html</include>
+              <include>**/*.js</include>
+            </includes>
+            <excludes>
+              <exclude>**/target/**</exclude>
+              <exclude>**/ext-2.3/**</exclude>
+              <exclude>**/js/filetree/**</exclude>
+              <exclude>**/editarea_0_8_2/**</exclude>
+              <!-- FIXME is this really a good idea excluding all test resources? -->
+              <exclude>**/src/test/resources/**</exclude>
+              <exclude>**/nexus-repository-metadata/**</exclude>
+              <exclude>**/gwt/ext/ui/**/*.js</exclude>
+              <exclude>**/gwt/ext/ui/**/*.css</exclude>
+              <exclude>**/nexus/nexus-test-harness/nexus-test-harness-its/resources/**</exclude>
+            </excludes>
+            <mapping>
+              <vm>XML_STYLE</vm>
+              <groovy>JAVADOC_STYLE</groovy>
+              <aj>JAVADOC_STYLE</aj>
+            </mapping>
+            <properties>
+              <year>2011</year>
+            </properties>
+            <!-- this is important for muti-module project -->
+            <!-- <aggregate>true</aggregate> -->
+          </configuration>
+      </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-metadata</artifactId>
+          <version>1.5.5</version>
+          <executions>
+            <execution>
+              <id>process-classes</id>
+              <goals>
+                <goal>generate-metadata</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>process-test-classes</id>
+              <goals>
+                <goal>generate-test-metadata</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+                <plugin>
+          <groupId>org.codehaus.modello</groupId>
+          <artifactId>modello-maven-plugin</artifactId>
+          <version>1.4.1</version>
+          <configuration>
+            <useJava5>true</useJava5>
+          </configuration>
+        </plugin>
+
+         <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>yuicompressor-maven-plugin</artifactId>
+          <version>0.0.1</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>aggregate</goal>
+                </goals>
+                <configuration>
+                  <nosuffix>true</nosuffix>
+                  <nomunge>true</nomunge>
+                  <nominify>${debug-js}</nominify>
+                  <jswarn>false</jswarn>
+                  <insertNewLine>true</insertNewLine>
+                  <disableOptimizations>true</disableOptimizations>
+                </configuration>
+              </execution>
+            </executions>
+        </plugin>
+
+         <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-test-environment-maven-plugin</artifactId>
+          <version>1.6</version>
+        </plugin>
+
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
@@ -1331,6 +1523,30 @@
             </dependency>
           </dependencies>
         </plugin>
+
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.4</version>
+          <configuration>
+            <escapeWindowsPaths>true</escapeWindowsPaths>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+          <version>2.6</version>
+          <configuration>
+            <downloadSources>true</downloadSources>
+            <downloadJavadocs>true</downloadJavadocs>
+            <projectNameTemplate>[artifactId]-[version]</projectNameTemplate>
+            <wtpmanifest>true</wtpmanifest>
+            <wtpapplicationxml>true</wtpapplicationxml>
+            <wtpversion>2.0</wtpversion>
+            <manifest>${basedir}/src/main/resources/META-INF/MANIFEST.MF</manifest>
+          </configuration>
+        </plugin>
+
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>retrotranslator-maven-plugin</artifactId>
@@ -1491,6 +1707,31 @@
         </pluginManagement>
       </build>
     </profile>
+
+    <profile>
+      <id>quick</id>
+      <properties>
+        <test>void</test>
+        <it.test>void</it.test>
+        <failIfNoTests>false</failIfNoTests>
+        <invoker.skip>true</invoker.skip>
+        <source.skip>true</source.skip>
+        <enunciate.skip>true</enunciate.skip>
+        <tattletale.skip>true</tattletale.skip>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-test-environment-maven-plugin</artifactId>
+            <configuration>
+              <testSkip>true</testSkip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <profile>
       <id>enunciate</id>
       <activation>
@@ -1561,16 +1802,48 @@
               <configFile>enunciate.xml</configFile>
             </configuration>
           </plugin>
+
+       <plugin>
+        <groupId>com.mycila.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+      </plugin>
         </plugins>
       </build>
     </profile>
+   <!-- 
+         Nexus quick build profiles:
+
+         effects of -Pquick: tests will be compiled but not run, n-t-e-p will assemble the test environments
+         effects of -Dquick: tests will not be compiled, n-t-e-p and other test-related plugins will be skipped entirely
+    -->
     <profile>
-      <id>no-attach-tests</id>
+      <id>quick</id>
       <activation>
         <property>
           <name>quick</name>
         </property>
       </activation>
+      <properties>
+        <test>void</test>
+        <it.test>void</it.test>
+        <failIfNoTests>false</failIfNoTests>
+        <invoker.skip>true</invoker.skip>
+        <source.skip>true</source.skip>
+        <enunciate.skip>true</enunciate.skip>
+        <tattletale.skip>true</tattletale.skip>
+        <test-env.skip>true</test-env.skip>
+      </properties>
+    </profile>
+    <profile>
+      <id>skipTests</id>
+      <activation>
+        <property>
+          <name>quick</name>
+        </property>
+      </activation>
+      <properties>
+        <maven.test.skip>true</maven.test.skip>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -1580,6 +1853,193 @@
               <execution>
                 <id>attach-test-jar</id>
                 <phase>none</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <!-- Does not stir anything, hence is always active -->
+        <!-- Note: before, it was activated by presence of "m2e.version" property that is not set anymore -->
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <!-- "new" M2E like 1.0 "IndIgor" -->
+            <plugin>
+              <groupId>org.eclipse.m2e</groupId>
+              <artifactId>lifecycle-mapping</artifactId>
+              <version>1.0.0</version>
+              <configuration>
+                <lifecycleMappingMetadata>
+                  <pluginExecutions>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.codehaus.plexus</groupId>
+                        <artifactId>plexus-component-metadata</artifactId>
+                        <versionRange>[1.5.5,)</versionRange>
+                        <goals>
+                          <goal>merge-metadata</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <execute/>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>modello-plugin-upgrade</artifactId>
+                        <versionRange>[1.0,)</versionRange>
+                        <goals>
+                          <goal>upgrade</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <execute/>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <versionRange>[2.0,)</versionRange>
+                        <goals>
+                          <goal>unpack</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore/>
+                      </action>
+                    </pluginExecution>
+                  </pluginExecutions>
+                </lifecycleMappingMetadata>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+
+        <plugins>
+          <plugin>
+            <!-- "oldie" M2E like 0.12.x -->
+            <groupId>org.maven.ide.eclipse</groupId>
+            <artifactId>lifecycle-mapping</artifactId>
+            <version>0.9.9</version>
+            <configuration>
+              <mappingId>customizable</mappingId>
+              <configurators>
+                <configurator id="org.maven.ide.eclipse.jdt.javaConfigurator" />
+                <configurator id="org.maven.ide.eclipse.modello.modelloConfigurator" />
+                <configurator id="org.maven.ide.eclipse.plexus.annotations.plexusConfigurator" />
+                <configurator id="org.maven.ide.eclipse.mavenarchiver.pomProperties" />
+              </configurators>
+              <mojoExecutions>
+                <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
+                <mojoExecution>org.sonatype.plugins:yuicompressor-maven-plugin::</mojoExecution>
+              </mojoExecutions>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+     <profile>
+      <id>coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-clean-plugin</artifactId>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>${basedir}</directory>
+                  <includes>
+                    <include>coverage.ec</include>
+                  </includes>
+                  <followSymlinks>true</followSymlinks>
+                </fileset>
+              </filesets>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.sonatype.maven.plugin</groupId>
+            <artifactId>emma-maven-plugin</artifactId>
+            <version>1.2</version>
+            <executions>
+              <execution>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>instrument</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.8.1</version>
+            <configuration>
+              <classesDirectory>${project.build.directory}/generated-classes/emma/classes</classesDirectory>
+              <systemPropertyVariables>
+                <java.io.tmpdir>${project.build.directory}/surefire-tmp</java.io.tmpdir>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.sonatype.maven.plugin</groupId>
+            <artifactId>emma4it-maven-plugin</artifactId>
+            <version>1.3</version>
+            <executions>
+              <execution>
+                <id>instrument</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>instrument</goal>
+                </goals>
+                <configuration>
+                  <jarSets>
+                    <jarSet>
+                      <directory>${project.build.directory}/nexus</directory>
+                      <includes>
+                        <include>**/nexus*.jar</include>
+                      </includes>
+                    </jarSet>
+                  </jarSets>
+                </configuration>
+              </execution>
+              <execution>
+                <id>merge</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>merge</goal>
+                </goals>
+                <configuration>
+                  <searchPath>${basedir}</searchPath>
+                </configuration>
+              </execution>
+              <execution>
+                <id>report</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+                <configuration>
+                  <sourceSets>
+                    <sourceSet>
+                      <directory>${basedir}</directory>
+                      <includes>
+                        <include>**/src/main/java/</include>
+                      </includes>
+                    </sourceSet>
+                  </sourceSets>
+                </configuration>
               </execution>
             </executions>
           </plugin>
