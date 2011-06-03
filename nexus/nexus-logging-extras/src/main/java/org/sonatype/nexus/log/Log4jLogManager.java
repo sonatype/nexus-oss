@@ -19,8 +19,10 @@
 package org.sonatype.nexus.log;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +35,8 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.LimitedInputStream;
+import org.sonatype.nexus.NexusStreamResponse;
 import org.sonatype.nexus.util.EnhancedProperties;
 
 /**
@@ -46,7 +50,15 @@ public class Log4jLogManager
     implements LogManager
 {
     @Requirement
+    private org.slf4j.Logger logger;
+    
+    @Requirement
     private LogConfiguration<EnhancedProperties> logConfiguration;
+    
+    protected org.slf4j.Logger getLogger()
+    {
+        return logger;
+    }
 
     public Log4jLogManager()
     {
@@ -178,4 +190,81 @@ public class Log4jLogManager
 
         logConfiguration.save();
     }
+
+    public Collection<NexusStreamResponse> getApplicationLogFiles()
+        throws IOException
+    {
+        getLogger().debug( "List log files." );
+
+        Set<File> files = getLogFiles();
+
+        ArrayList<NexusStreamResponse> result = new ArrayList<NexusStreamResponse>( files.size() );
+
+        for ( File file : files )
+        {
+            NexusStreamResponse response = new NexusStreamResponse();
+
+            response.setName( file.getName() );
+
+            // TODO:
+            response.setMimeType( "text/plain" );
+
+            response.setSize( file.length() );
+
+            response.setInputStream( null );
+
+            result.add( response );
+        }
+
+        return result;
+    }
+
+    /**
+     * Retrieves a stream to the requested log file. This method ensures that the file is rooted in the log folder to
+     * prevent browsing of the file system.
+     * 
+     * @param logFile path of the file to retrieve
+     * @returns InputStream to the file or null if the file is not allowed or doesn't exist.
+     */
+    public NexusStreamResponse getApplicationLogAsStream( String logFile, long from, long count )
+        throws IOException
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Retrieving " + logFile + " log file." );
+        }
+
+        if ( logFile.contains( File.pathSeparator ) )
+        {
+            getLogger().warn( "Nexus refuses to retrive log files with path separators in its name." );
+
+            return null;
+        }
+
+        File log = getLogFile( logFile );
+
+        if ( log == null || !log.exists() )
+        {
+            getLogger().warn( "Log file does not exist: [" + logFile + "]" );
+
+            return null;
+        }
+
+        NexusStreamResponse response = new NexusStreamResponse();
+
+        response.setName( logFile );
+
+        response.setMimeType( "text/plain" );
+
+        response.setSize( log.length() );
+
+        response.setFromByte( from );
+
+        response.setBytesCount( count );
+
+        response.setInputStream( new LimitedInputStream( new FileInputStream( log ), from, count ) );
+
+        return response;
+    }
+
 }

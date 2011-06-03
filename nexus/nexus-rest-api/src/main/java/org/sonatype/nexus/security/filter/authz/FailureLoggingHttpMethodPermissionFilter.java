@@ -25,10 +25,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authz.HttpMethodPermissionFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
@@ -47,11 +47,11 @@ public class FailureLoggingHttpMethodPermissionFilter
     extends HttpMethodPermissionFilter
 {
 
-    private final Log logger = LogFactory.getLog( this.getClass() );
+    private final Logger logger = LoggerFactory.getLogger( this.getClass() );
 
     private AuthcAuthzEvent currentAuthzEvt;
 
-    protected Log getLogger()
+    protected Logger getLogger()
     {
         return logger;
     }

@@ -29,6 +29,7 @@ import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Form;
@@ -39,6 +40,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.NexusStreamResponse;
+import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.representation.InputStreamRepresentation;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -59,6 +61,12 @@ public class LogsPlexusResource
     public static final String FILE_NAME_KEY = "fileName";
     
     public static final String RESOURCE_URI = "/logs/{" + FILE_NAME_KEY + "}"; 
+
+    /**
+     * The LogFile Manager
+     */
+    @Requirement
+    private LogManager logManager;
 
     @Override
     public List<Variant> getVariants()
@@ -123,7 +131,7 @@ public class LogsPlexusResource
         NexusStreamResponse result;
         try
         {
-            result = getNexus().getApplicationLogAsStream( logFile, from, count );
+            result = logManager.getApplicationLogAsStream( logFile, from, count );
         }
         catch ( IOException e )
         {

@@ -20,7 +20,10 @@ package org.sonatype.nexus.log;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Set;
+
+import org.sonatype.nexus.NexusStreamResponse;
 
 /**
  * LogManager.
@@ -42,5 +45,11 @@ public interface LogManager
     boolean isUserEdited();
 
     void setLogConfig( LogConfig logConfig )
+        throws IOException;
+
+    Collection<NexusStreamResponse> getApplicationLogFiles()
+        throws IOException;
+
+    NexusStreamResponse getApplicationLogAsStream( String logFile, long fromByte, long bytesCount )
         throws IOException;
 }

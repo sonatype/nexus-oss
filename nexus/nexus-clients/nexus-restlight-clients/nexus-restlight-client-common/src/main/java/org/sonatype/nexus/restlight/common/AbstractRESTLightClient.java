@@ -42,7 +42,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
-import org.apache.log4j.LogManager;
 import org.codehaus.plexus.util.IOUtil;
 import org.jdom.Document;
 import org.jdom.JDOMException;
@@ -51,6 +50,8 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.aether.util.version.GenericVersionScheme;
 import org.sonatype.aether.version.InvalidVersionSpecificationException;
 import org.sonatype.aether.version.Version;
@@ -124,6 +125,8 @@ public abstract class AbstractRESTLightClient
      * </p>
      */
     protected static final String VOCAB_MANIFEST = "vocabulary.lst";
+    
+    private Logger logger = LoggerFactory.getLogger( getClass() );
 
     private final String baseUrl;
 
@@ -220,7 +223,7 @@ public abstract class AbstractRESTLightClient
 
         if ( stream == null )
         {
-            LogManager.getLogger( getClass() ).debug(
+            logger.debug(
                 "Cannot locate REST vocabulary variants manifest on classpath: " + vocabBasepath + VOCAB_MANIFEST
                     + ". Vocabularies will not be loaded." );
             return;
@@ -304,7 +307,7 @@ public abstract class AbstractRESTLightClient
         }
         else
         {
-            LogManager.getLogger( getClass() ).debug(
+            logger.debug(
                 "Cannot locate REST vocabulary variants in manifest file: " + vocabBasepath + VOCAB_MANIFEST
                     + ". No vocabulary will be loaded." );
         }
@@ -558,7 +561,7 @@ public abstract class AbstractRESTLightClient
                                final Document body, final boolean expectResponseBody )
         throws RESTLightClientException
     {
-        LogManager.getLogger( getClass().getName() ).debug( "Posting to: '" + path + "'" );
+        logger.debug( "Posting to: '" + path + "'" );
 
         PostMethod method = new PostMethod( formatUrl( baseUrl, path ) );
         method.addRequestHeader( "Content-Type", "application/xml" );
@@ -653,7 +656,7 @@ public abstract class AbstractRESTLightClient
                               final Document body, final boolean expectResponseBody )
         throws RESTLightClientException
     {
-        LogManager.getLogger( getClass().getName() ).debug( "Putting to: '" + path + "'" );
+        logger.debug( "Putting to: '" + path + "'" );
 
         PutMethod method = new PutMethod( baseUrl + path );
 

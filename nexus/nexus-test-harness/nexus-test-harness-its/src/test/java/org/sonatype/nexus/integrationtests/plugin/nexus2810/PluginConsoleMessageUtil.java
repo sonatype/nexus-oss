@@ -20,7 +20,7 @@ package org.sonatype.nexus.integrationtests.plugin.nexus2810;
 
 import java.io.IOException;
 import java.util.List;
-;
+
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;

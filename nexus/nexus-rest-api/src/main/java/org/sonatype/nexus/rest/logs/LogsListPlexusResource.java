@@ -27,12 +27,14 @@ import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.NexusStreamResponse;
+import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
@@ -51,6 +53,12 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class LogsListPlexusResource
     extends AbstractNexusPlexusResource
 {
+    /**
+     * The LogFile Manager
+     */
+    @Requirement
+    private LogManager logManager;
+
     public static final String RESOURCE_URI = "/logs"; 
     @Override
     public Object getPayloadInstance()
@@ -85,7 +93,7 @@ public class LogsListPlexusResource
 
         try
         {
-            Collection<NexusStreamResponse> logFiles = getNexus().getApplicationLogFiles();
+            Collection<NexusStreamResponse> logFiles = logManager.getApplicationLogFiles();
 
             for ( NexusStreamResponse logFile : logFiles )
             {
