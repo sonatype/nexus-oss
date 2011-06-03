@@ -120,6 +120,41 @@ public class TaskStopTest
         assertFalse( "task was killed immediately", callable.isAllDone() );
     }
 
+    public void testCancelledRunningTaskWithScheduleIsRemovedLater()
+        throws Exception
+    {
+        RunForeverCallable callable = new RunForeverCallable( 500 );
+
+        assertFalse( callable.isAllDone() );
+
+        ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", callable, new ManualRunSchedule() );
+
+        assertFalse( callable.isAllDone() );
+
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+
+        assertEquals( TaskState.SUBMITTED, task.getTaskState() );
+
+        task.runNow();
+
+        callable.blockForStart();
+
+        assertEquals( TaskState.RUNNING, task.getTaskState() );
+
+        task.cancel();
+
+        assertEquals( TaskState.CANCELLED, task.getTaskState() );
+
+        callable.blockForDone();
+
+        // let task finish call()
+        Thread.sleep( 500 );
+
+        assertTrue( "task was not removed", defaultScheduler.getAllTasks().isEmpty() );
+        assertTrue( "task was killed immediately", callable.isAllDone() );
+
+    }
+
     public class RunForeverCallable
         implements Callable<Integer>
     {

@@ -481,7 +481,10 @@ public class DefaultScheduledTask<T>
             else
             {
                 setTaskState( TaskState.FINISHED );
+            }
 
+            if ( getTaskState().isEndingState() /* FINISHED or CANCELLED */)
+            {
                 getScheduler().removeFromTasksMap( this );
             }
 
