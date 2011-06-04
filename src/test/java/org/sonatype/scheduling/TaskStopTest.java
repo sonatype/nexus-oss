@@ -63,10 +63,14 @@ public class TaskStopTest
 
         task.cancelOnly();
 
+        assertEquals( TaskState.CANCELLING, task.getTaskState() );
+
         assertFalse( "task was killed immediately", callable.isAllDone() );
         assertFalse( "running task was eagerly removed", defaultScheduler.getAllTasks().isEmpty() );
 
         callable.blockForDone();
+
+        assertEquals( TaskState.CANCELLED, task.getTaskState() );
 
         assertTrue( "task was not done", callable.isAllDone() );
         assertTrue( "task not removed", defaultScheduler.getAllTasks().isEmpty() );
@@ -91,10 +95,14 @@ public class TaskStopTest
 
         task.cancel();
 
+        assertEquals( TaskState.CANCELLING, task.getTaskState() );
+
         assertFalse( "task was killed immediately", callable.isAllDone() );
         assertFalse( "running task was eagerly removed", defaultScheduler.getAllTasks().isEmpty() );
 
         callable.blockForDone();
+
+        assertEquals( TaskState.CANCELLED, task.getTaskState() );
 
         assertTrue( "task was not done", callable.isAllDone() );
         assertTrue( "task not removed", defaultScheduler.getAllTasks().isEmpty() );
@@ -143,9 +151,11 @@ public class TaskStopTest
 
         task.cancel();
 
-        assertEquals( TaskState.CANCELLED, task.getTaskState() );
+        assertEquals( TaskState.CANCELLING, task.getTaskState() );
 
         callable.blockForDone();
+
+        assertEquals( TaskState.CANCELLED, task.getTaskState() );
 
         // let task finish call()
         Thread.sleep( 500 );

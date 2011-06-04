@@ -67,6 +67,8 @@ public class DefaultScheduledTask<T>
 
     private TaskState lastStatus;
 
+    private boolean toBeRemoved = false;
+
     public DefaultScheduledTask( String id, String name, String type, DefaultScheduler scheduler, Callable<T> callable,
                                  Schedule schedule )
     {
@@ -204,6 +206,8 @@ public class DefaultScheduledTask<T>
     public void cancel( boolean interrupt, boolean removeTask )
     {
         final ProgressListener progressListener = getProgressListener();
+        TaskState originalState = getTaskState();
+        setTaskState( TaskState.CANCELLING );
 
         if ( progressListener != null )
         {
@@ -216,20 +220,15 @@ public class DefaultScheduledTask<T>
             getFuture().cancel( interrupt );
         }
 
-        if ( removeTask )
+        setToBeRemoved( removeTask );
+
+        // if this task is not running, it can be immediately removed from task map
+        if ( removeTask && !originalState.isExecuting() )
         {
-            // if this task is not running, it can be immediately removed from task map
-            // else set to cancelled and wait for the #call() method to exit (and remove the task then)
-            if ( !getTaskState().equals( TaskState.RUNNING ) )
-            {
-                getScheduler().removeFromTasksMap( this );
-            }
             setTaskState( TaskState.CANCELLED );
+            getScheduler().removeFromTasksMap( this );
         }
-        else
-        {
-            setTaskState( TaskState.SUBMITTED );
-        }
+
     }
 
     public void reset()
@@ -455,6 +454,10 @@ public class DefaultScheduledTask<T>
             {
                 // do nothing, let user fix or delete it
             }
+            else if ( isToBeRemoved() )
+            {
+                setTaskState( TaskState.CANCELLED );
+            }
             // If manually running or having future, park this task to submitted
             else if ( isManualRunScheduled() )
             {
@@ -477,6 +480,11 @@ public class DefaultScheduledTask<T>
                 nextFuture = reschedule();
 
                 setFuture( nextFuture );
+            }
+            // this execution was the last execution (no other if-clause triggered)
+            else if ( TaskState.CANCELLING.equals( getTaskState() ) )
+            {
+                setTaskState( TaskState.CANCELLED );
             }
             else
             {
@@ -577,6 +585,16 @@ public class DefaultScheduledTask<T>
         }
 
         return Collections.emptyMap();
+    }
+
+    public boolean isToBeRemoved()
+    {
+        return toBeRemoved;
+    }
+
+    public void setToBeRemoved( boolean toBeRemoved )
+    {
+        this.toBeRemoved = toBeRemoved;
     }
 
 }

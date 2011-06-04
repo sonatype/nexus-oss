@@ -12,10 +12,10 @@
  */
 package org.sonatype.scheduling;
 
+
 /**
- * Enum for describing task state. It is a state machine: starting state is SUBMITTED, finishing states are FINISHED,
- * BROKEN and CANCELLED. Scheduled tasks are jumping between RUNNING and WAITING until finished, cancelled or error
- * (broken).
+ * Enum for describing task state. It is a state machine: starting state is SUBMITTED, finishing states are FINISHED and
+ * CANCELLED. Scheduled tasks are jumping between RUNNING and WAITING until finished, cancelled or error (broken).
  * 
  * @author cstamas
  */
@@ -24,22 +24,27 @@ public enum TaskState
     /**
      * Submitted, not runned yet.
      */
-    SUBMITTED, // -> RUNNING, CANCELLED
+    SUBMITTED, // -> RUNNING, CANCELLING
 
     /**
      * Is currently running.
      */
-    RUNNING, // -> WAITING, FINISHED, BROKEN, CANCELLED, SLEEPING
+    RUNNING, // -> WAITING, FINISHED, BROKEN, CANCELLING, SLEEPING
+
+    /**
+     * Was cancelled but is currently running.
+     */
+    CANCELLING, // -> WAITING, BROKEN, CANCELLED
 
     /**
      * Should run but is blocked by another clashing task. Will try to run later.
      */
-    SLEEPING, // -> RUNNING
+    SLEEPING, // -> RUNNING, CANCELLING
 
     /**
      * Was running and is finished. Waiting for next execution.
      */
-    WAITING, // -> RUNNING, CANCELLED
+    WAITING, // -> RUNNING, CANCELLING
 
     /**
      * Was running and is finished. No more execution scheduled.
@@ -54,7 +59,7 @@ public enum TaskState
     /**
      * Was running and is cancelled.
      */
-    CANCELLED; // END
+    CANCELLED, ; // END
 
     public boolean isRunnable()
     {
@@ -63,12 +68,18 @@ public enum TaskState
     
     public boolean isActiveOrSubmitted()
     {
-        return this.equals( SUBMITTED ) || this.equals( RUNNING ) || this.equals( SLEEPING ) || this.equals( WAITING );
+        return this.equals( SUBMITTED ) || this.equals( RUNNING ) || this.equals( SLEEPING ) || this.equals( WAITING )
+            || this.equals( CANCELLING );
     }
     
     public boolean isActive()
     {
-        return this.equals( RUNNING ) || this.equals( SLEEPING ) || this.equals( WAITING );
+        return this.equals( RUNNING ) || this.equals( SLEEPING ) || this.equals( WAITING ) || this.equals( CANCELLING );
+    }
+
+    public boolean isExecuting()
+    {
+        return this.equals( RUNNING ) || this.equals( CANCELLING );
     }
 
     public boolean isEndingState()
