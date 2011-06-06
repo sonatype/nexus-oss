@@ -228,9 +228,18 @@ public class URLRealm
         request.setChallengeResponse( authentication );
 
         Response response = restClient.handle( request );
-        this.logger.debug( "User: " + username + " url validation status: " + response.getStatus() );
-
-        return response.getStatus().isSuccess();
+        try
+        {
+            this.logger.debug( "User: " + username + " url validation status: " + response.getStatus() );
+            return response.getStatus().isSuccess();
+        }
+        finally
+        {
+            if ( response != null )
+            {
+                response.release();
+            }
+        }
     }
 
     /*

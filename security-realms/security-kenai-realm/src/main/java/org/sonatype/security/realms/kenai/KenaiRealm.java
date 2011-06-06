@@ -223,14 +223,15 @@ public class KenaiRealm
     {
         Response response = this.makeRemoteRequest( username, password );
 
-        if ( response.getStatus().isSuccess() )
+        try
         {
-            try
+            if ( response.getStatus().isSuccess() )
             {
                 if ( this.isAuthorizationCachingEnabled() )
                 {
-                    AuthorizationInfo authorizationInfo = this.buildAuthorizationInfo( username, password, response ); 
-                        
+                    AuthorizationInfo authorizationInfo = this.buildAuthorizationInfo( username, password, response
+                        .getEntity().getText() );
+
                     Object authorizationCacheKey = this.getAuthorizationCacheKey( new SimplePrincipalCollection(
                         username,
                         this.getName() ) );
@@ -240,15 +241,23 @@ public class KenaiRealm
 
                 return true;
             }
-            catch ( IOException e )
+        }
+        catch ( IOException e )
+        {
+            this.logger.error( "Failed to read response", e );
+        }
+        catch ( JSONException e )
+        {
+            this.logger.error( "Failed to read response", e );
+        }
+        finally
+        {
+            if ( response != null )
             {
-                this.logger.error( "Failed to read response", e );
-            }
-            catch ( JSONException e )
-            {
-                this.logger.error( "Failed to read response", e );
+                response.release();
             }
         }
+
         this.logger.debug( "Failed to authenticate user: {} for url: {} status: {}", new Object[] {
             username,
             response.getRequest().getResourceRef(),
@@ -256,7 +265,7 @@ public class KenaiRealm
         return false;
     }
 
-    private AuthorizationInfo buildAuthorizationInfo( String username, String password, Response response )
+    private AuthorizationInfo buildAuthorizationInfo( String username, String password, String responseText )
         throws JSONException,
             IOException
     {
@@ -265,7 +274,7 @@ public class KenaiRealm
         authorizationInfo.addRole( this.kenaiRealmConfiguration.getConfiguration().getDefaultRole() );
 
         // initial page
-        JSONObject jsonObject = buildJsonObjectFromResponse( response );
+        JSONObject jsonObject = buildJsonObject( responseText );
 
         // collect roles from json object
         Set<String> roles = this.buildRoleSetFromJsonObject( jsonObject );
@@ -277,24 +286,44 @@ public class KenaiRealm
             String pagedURL = jsonObject.getString( "next" );
             this.logger.debug( "Next page of Kenai project info: {}", pagedURL );
             // make another remote request
-            response = this.makeRemoteRequest( username, password, pagedURL );
-            jsonObject = buildJsonObjectFromResponse( response );
-            authorizationInfo.addRoles( this.buildRoleSetFromJsonObject( jsonObject ) );
+            Response response = null;
+            try
+            {
+                response = this.makeRemoteRequest( username, password, pagedURL );
+                jsonObject = buildJsonObject( response );
+                authorizationInfo.addRoles( this.buildRoleSetFromJsonObject( jsonObject ) );
+            }
+            finally
+            {
+                if ( response != null )
+                {
+                    response.release();
+                }
+            }
         }
 
         return authorizationInfo;
     }
 
-    private JSONObject buildJsonObjectFromResponse( Response response ) throws JSONException, IOException
+    private JSONObject buildJsonObject( Response response )
+        throws JSONException,
+            IOException
     {
         if ( response.getStatus().isSuccess() )
         {
-            return new JSONObject( response.getEntity().getText() );
+            return this.buildJsonObject( response.getEntity().getText() );
         }
         else
         {
             throw new AuthenticationException( "Error retriving response, status code: " + response.getStatus() );
         }
+    }
+
+    private JSONObject buildJsonObject( String responseText )
+        throws JSONException,
+            IOException
+    {
+        return new JSONObject( responseText );
     }
 
     private Set<String> buildRoleSetFromJsonObject( JSONObject jsonObject )
