@@ -220,6 +220,20 @@ public class DefaultScheduledTask<T>
             getFuture().cancel( interrupt );
         }
 
+        if ( originalState.equals( TaskState.SLEEPING ) )
+        {
+            // remove one-shots
+            if ( getScheduleIterator().isFinished() )
+            {
+                removeTask = true;
+            }
+            else
+            {
+                reschedule();
+                setTaskState( TaskState.WAITING );
+            }
+        }
+
         setToBeRemoved( removeTask );
 
         // if this task is not running, it can be immediately removed from task map

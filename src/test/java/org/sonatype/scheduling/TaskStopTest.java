@@ -1,9 +1,15 @@
 package org.sonatype.scheduling;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.codehaus.plexus.PlexusTestCase;
+import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
+import org.sonatype.scheduling.schedules.RunNowSchedule;
 
 public class TaskStopTest
     extends PlexusTestCase
@@ -70,6 +76,9 @@ public class TaskStopTest
 
         callable.blockForDone();
 
+        // let state machine catch up
+        Thread.sleep( 100 );
+
         assertEquals( TaskState.CANCELLED, task.getTaskState() );
 
         assertTrue( "task was not done", callable.isAllDone() );
@@ -101,6 +110,9 @@ public class TaskStopTest
         assertFalse( "running task was eagerly removed", defaultScheduler.getAllTasks().isEmpty() );
 
         callable.blockForDone();
+
+        // let state machine catch up
+        Thread.sleep( 100 );
 
         assertEquals( TaskState.CANCELLED, task.getTaskState() );
 
@@ -155,6 +167,9 @@ public class TaskStopTest
 
         callable.blockForDone();
 
+        // let state machine catch up
+        Thread.sleep( 100 );
+
         assertEquals( TaskState.CANCELLED, task.getTaskState() );
 
         // let task finish call()
@@ -163,6 +178,131 @@ public class TaskStopTest
         assertTrue( "task was not removed", defaultScheduler.getAllTasks().isEmpty() );
         assertTrue( "task was killed immediately", callable.isAllDone() );
 
+    }
+
+    public void testCancelRemovesBlockedOneShotTasks()
+        throws Exception
+    {
+        RunForeverTask callable = new RunForeverTask( 5000 );
+
+        assertFalse( callable.isAllDone() );
+
+        ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", callable, new RunNowSchedule() );
+
+        callable.blockForStart();
+
+        RunForeverTask blockedCallable = new RunForeverTask( 5000 );
+        ScheduledTask<Integer> blockedTask =
+            defaultScheduler.schedule( "Blocked Task", blockedCallable, new RunNowSchedule() );
+
+        // let scheduler catch up
+        Thread.sleep( 600 );
+
+        assertEquals( TaskState.SLEEPING, blockedTask.getTaskState() );
+
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+        assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
+
+        blockedTask.cancelOnly();
+
+        assertEquals( TaskState.CANCELLED, blockedTask.getTaskState() );
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+        assertEquals( 1, defaultScheduler.getAllTasks().get( task.getType() ).size() );
+
+        task.cancel( true );
+        callable.blockForDone();
+        Thread.sleep( 50 );
+        assertEquals( 0, defaultScheduler.getAllTasks().size() );
+    }
+
+    public void testCancelReschedulesBlockedTasks()
+        throws Exception
+    {
+        RunForeverTask callable = new RunForeverTask( 3000 );
+
+        assertFalse( callable.isAllDone() );
+
+        ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", callable, new RunNowSchedule() );
+
+        // let scheduler catch up
+        Thread.sleep( 500 );
+
+        RunForeverTask blockedCallable = new RunForeverTask( 3000 );
+        Calendar cal = Calendar.getInstance();
+        cal.add( Calendar.WEEK_OF_YEAR, 1 );
+        ScheduledTask<Integer> blockedTask =
+            defaultScheduler.schedule( "Blocked Task", blockedCallable, new DailySchedule( new Date(), cal.getTime() ) );
+        
+        blockedTask.runNow();
+
+        // let scheduler catch up
+        Thread.sleep( 500 );
+
+        assertEquals( TaskState.SLEEPING, blockedTask.getTaskState() );
+
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+        assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
+
+        blockedTask.cancelOnly();
+
+        assertEquals( TaskState.WAITING, blockedTask.getTaskState() );
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+        assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
+        assertFalse( blockedTask.getScheduleIterator().isFinished() );
+
+        task.cancel( true );
+        callable.blockForDone();
+
+        assertEquals( TaskState.WAITING, blockedTask.getTaskState() );
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+        assertEquals( 1, defaultScheduler.getAllTasks().get( task.getType() ).size() );
+
+        blockedTask.cancel();
+        Thread.sleep( 50 );
+        assertEquals( 0, defaultScheduler.getAllTasks().size() );
+    }
+
+    public void testCancellingStateBlocksTasks()
+        throws Exception
+    {
+        RunForeverTask callable = new RunForeverTask( 2000 );
+
+        assertFalse( callable.isAllDone() );
+        assertEquals( 0, defaultScheduler.getAllTasks().size() );
+
+        ScheduledTask<Integer> task = defaultScheduler.submit( "Test Task", callable );
+
+        callable.blockForStart();
+        
+        task.cancelOnly();
+        assertEquals( TaskState.CANCELLING, task.getTaskState() );
+
+        RunForeverTask blockedCallable = new RunForeverTask( 5000 );
+        ScheduledTask<Integer> blockedTask =
+            defaultScheduler.schedule( "Blocked Task", blockedCallable, new RunNowSchedule() );
+
+        // let scheduler catch up
+        Thread.sleep( 600 );
+
+        assertFalse( blockedCallable.isStarted() );
+        assertEquals( TaskState.SLEEPING, blockedTask.getTaskState() );
+
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+        assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
+
+        blockedTask.cancel();
+        assertFalse( blockedCallable.isStarted() );
+
+        assertEquals( TaskState.CANCELLED, blockedTask.getTaskState() );
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+        assertEquals( 1, defaultScheduler.getAllTasks().get( task.getType() ).size() );
+
+        // task is already cancelled without interruption, so we have to wait for normal completion
+        // task.cancel( true );
+
+        callable.blockForDone();
+
+        assertEquals( 0, defaultScheduler.getAllTasks().size() );
     }
 
     public class RunForeverCallable
@@ -212,6 +352,11 @@ public class TaskStopTest
             return allDone;
         }
 
+        public boolean isStarted()
+        {
+            return started;
+        }
+
         public void blockForStart()
             throws Exception
         {
@@ -229,6 +374,58 @@ public class TaskStopTest
                 Thread.sleep( 10 );
             }
         }
+    }
+    
+    public class RunForeverTask
+        extends RunForeverCallable
+        implements SchedulerTask<Integer>
+    {
+
+        public RunForeverTask()
+        {
+            super();
+        }
+
+        public RunForeverTask( int i )
+        {
+            super( i );
+        }
+
+        public boolean allowConcurrentSubmission( Map<String, List<ScheduledTask<?>>> currentActiveTasks )
+        {
+            return true;
+        }
+
+        public boolean allowConcurrentExecution( Map<String, List<ScheduledTask<?>>> currentActiveTasks )
+        {
+            for ( List<ScheduledTask<?>> list : currentActiveTasks.values() )
+            {
+                for ( ScheduledTask<?> task : list )
+                {
+                    if ( task.getTaskState().isExecuting() )
+                    {
+                        System.out.println( "concurrent execution not allowed" );
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        public void addParameter( String key, String value )
+        {
+        }
+
+        public String getParameter( String key )
+        {
+            return null;
+        }
+
+        public Map<String, String> getParameters()
+        {
+            return null;
+        }
+
     }
 
 }
