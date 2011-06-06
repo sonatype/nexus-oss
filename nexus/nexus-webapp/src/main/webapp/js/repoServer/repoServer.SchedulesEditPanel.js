@@ -95,7 +95,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
         cls : 'x-btn-text-icon',
         scope : this,
         handler : this.deleteHandler,
-        disabled : !this.sp.checkPermission('nexus:tasks', this.sp.DELETE)
+        disabled : true
       });
 
   this.disableEditingHeader = new Ext.Panel({
