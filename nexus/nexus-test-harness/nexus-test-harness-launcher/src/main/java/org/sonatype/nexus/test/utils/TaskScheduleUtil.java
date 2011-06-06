@@ -237,6 +237,15 @@ public class TaskScheduleUtil
         return response.getStatus();
     }
 
+    public static Status cancel( String taskId )
+        throws IOException
+    {
+        String serviceURI = "service/local/schedule_run/" + taskId;
+        Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
+
+        return response.getStatus();
+    }
+
     public static void runTask( String typeId, ScheduledServicePropertyResource... properties )
         throws Exception
     {
