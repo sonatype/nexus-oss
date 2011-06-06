@@ -88,6 +88,16 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
         disabled : true
       });
 
+  this.deleteButton = new Ext.Button({
+        id : 'schedule-delete-btn',
+        text : 'Delete',
+        icon : Sonatype.config.resourcePath + '/images/icons/delete.png',
+        cls : 'x-btn-text-icon',
+        scope : this,
+        handler : this.deleteHandler,
+        disabled : !this.sp.checkPermission('nexus:tasks', this.sp.DELETE)
+      });
+
   this.disableEditingHeader = new Ext.Panel({
         id : 'disablingMsg',
         name : 'disablingMsg',
@@ -902,15 +912,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
               scope : this,
               handler : this.addResourceHandler,
               disabled : !this.sp.checkPermission('nexus:tasks', this.sp.CREATE)
-            }, this.runButton, this.stopButton, {
-              id : 'schedule-delete-btn',
-              text : 'Delete',
-              icon : Sonatype.config.resourcePath + '/images/icons/delete.png',
-              cls : 'x-btn-text-icon',
-              scope : this,
-              handler : this.deleteHandler,
-              disabled : !this.sp.checkPermission('nexus:tasks', this.sp.DELETE)
-            }],
+            }, this.runButton, this.stopButton, this.deleteButton],
 
         // grid view options
         ds : this.schedulesDataStore,
@@ -1006,6 +1008,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       reloadAll : function() {
         this.runButton.disable();
         this.stopButton.disable();
+        this.deleteButton.disable();
 
         this.schedulesDataStore.removeAll();
         this.schedulesDataStore.reload();
@@ -1517,6 +1520,14 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
         this.runButton.disable();
         this.stopButton.disable();
+        if (this.sp.checkPermission('nexus:tasks', this.sp.DELETE))
+        {
+            this.deleteButton.enable();
+        }
+        else
+        {
+            this.deleteButton.disable();
+        }
 
         var readableStatus = rec.data.readableStatus;
         if (rec.data.name.substring(0, 4) == 'New ')
@@ -1528,6 +1539,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         {
           this.stopButton.disable();
           this.runButton.disable();
+          this.deleteButton.disable();
         }
         else if (readableStatus == 'Waiting')
         {
