@@ -618,8 +618,10 @@ public abstract class AbstractScheduledServicePlexusResource
                 return "Running";
             case SLEEPING:
                 return "Blocked";
-            case CANCELLED:
+            case CANCELLING:
                 return "Cancelling";
+            case CANCELLED:
+                return "Cancelled";
             default:
                 throw new IllegalStateException();
         }

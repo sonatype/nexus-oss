@@ -35,7 +35,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.DefaultScheduledTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
-import org.sonatype.scheduling.TaskState;
 
 public abstract class AbstractNexusRepositoriesTask<T>
     extends AbstractNexusTask<T>
@@ -146,8 +145,8 @@ public abstract class AbstractNexusRepositoriesTask<T>
 
                     for ( ScheduledTask<?> task : tasks )
                     {
-                        // check against RUNNING intersection
-                        if ( TaskState.RUNNING.equals( task.getTaskState() )
+                        // check against RUNNING or CANCELLING intersection
+                        if ( task.getTaskState().isExecuting()
                             && DefaultScheduledTask.class.isAssignableFrom( task.getClass() )
                             && repositorySetIntersectionIsNotEmpty( task.getTaskParams().get( getRepositoryFieldId() ) ) )
                         {
