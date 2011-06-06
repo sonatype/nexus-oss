@@ -50,31 +50,117 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.Representation;
 
+/**
+ * HTTP Request helper.
+ * <p>
+ * <b>IMPORTANT</b>: Any {@link Response} instances returned from methods here should have their {@link Response#release()} method called in a finally block
+ * when you are done with it.
+ * 
+ */
 public class RequestFacade
 {
     public static final String SERVICE_LOCAL = "service/local/";
 
     private static final Logger LOG = Logger.getLogger( RequestFacade.class );
-
+    
+    /**
+     * Null safe method to release a Response ( its streams and sockets )
+     */
+    public static void releaseResponse(final Response response){
+        if(response != null){
+            response.release();
+         }
+    }
+    
+    /**
+     * Sends a GET request to the specified uri and returns the text of the entity.
+     * <p>
+     * Using this method is RECOMMENDED if you simply want the text of a response and nothing more since 
+     * this method ensures proper cleanup of any sockets, streams, etc., by releasing the response.
+     * <p>
+     * Of course the entire response text is buffered in memory so use this wisely.
+     * 
+     * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
+     * @return the complete response body text, or possibly null if no entity in the response
+     */
+    public static String doGetRequestEntityText(final String serviceURIpart) throws IOException{
+        Response response = null;
+        try {
+            response = doGetRequest(serviceURIpart);
+            Representation rep = response.getEntity();
+            if(rep != null){
+                return rep.getText();
+            }
+        }finally{
+            releaseResponse(response);
+        }
+        return null;
+    }
+    
+    /**
+     * Send a message to a resource as a GET request and return the response.
+     * <p>
+     * Ensure you explicity clean up the response entity returned by this method by calling
+     * {@link Response#release()}}
+     * 
+     * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
+     * @return the response of the request
+     * @throws IOException if there is a problem communicating the response
+     */
     public static Response doGetRequest( String serviceURIpart )
         throws IOException
     {
         return sendMessage( serviceURIpart, Method.GET );
     }
 
+    /**
+     * Send a message to a resource and return the response.
+    * <p>
+     * Ensure you explicity clean up the response entity returned by this method by calling
+     * {@link Response#release()}}
+     
+     * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
+     * @param method the method type of the request
+     * @return the response of the request
+     * @throws IOException if there is a problem communicating the response
+     */
     public static Response sendMessage( String serviceURIpart, Method method )
         throws IOException
     {
         return sendMessage( serviceURIpart, method, null );
     }
 
+    /**
+     * Send a message to a resource and return the response.
+     * <p>
+     * Ensure you explicity clean up the response entity returned by this method by calling
+     * {@link Response#release()}}
+      
+     * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
+     * @param method the method type of the request
+     * @param representation the representation to map the response to, may be null
+     * @return the response of the request
+     * @throws IOException if there is a problem communicating the response
+     */
     public static Response sendMessage( String serviceURIpart, Method method, Representation representation )
         throws IOException
     {
         String serviceURI = AbstractNexusIntegrationTest.nexusBaseUrl + serviceURIpart;
         return sendMessage( new URL( serviceURI ), method, representation );
     }
-
+    
+    /**
+     * Send a message to a resource and return the response.
+     * <p>
+     * Ensure you explicity clean up the response entity returned by this method by calling
+     * {@link Response#release()}}
+     * 
+     * @param url the absolute url of the resource to request
+     * @param method the method type of the request
+     * @param representation the representation to map the response to, may be null
+     * @return the response of the request
+     * @throws IOException if there is a problem communicating the response
+     */
     public static Response sendMessage( URL url, Method method, Representation representation )
         throws IOException
     {
@@ -118,16 +204,23 @@ public class RequestFacade
         return client.handle( request );
     }
 
+    /**
+     * Download a file at a url and save it to the target file location specified by targetFile.
+     * @param url the url to fetch the file from
+     * @param targetFile the location where to save the download
+     * @return a File instance for the saved file
+     * @throws IOException if there is a problem saving the file
+     */
     public static File downloadFile( URL url, String targetFile )
         throws IOException
     {
         OutputStream out = null;
         InputStream in = null;
         File downloadedFile = new File( targetFile );
-
+        Response response = null;
         try
         {
-            Response response = sendMessage( url, Method.GET, null );
+            response = sendMessage( url, Method.GET, null );
 
             if ( !response.getStatus().isSuccess() )
             {
@@ -149,12 +242,15 @@ public class RequestFacade
         {
             IOUtil.close( in );
             IOUtil.close( out );
+            releaseResponse(response);
         }
         return downloadedFile;
     }
 
     /**
-     * Execute a HTTPClient method in the context of a test. ie {@link TestContainer#getTestContext()}  
+     * Execute a HTTPClient method in the context of a test. ie it will use {@link TestContainer#getTestContext()} to make decisions how to execute.
+     * <p>
+     * NOTE: Before being returned, {@link HttpMethod#releaseConnection()} is called on the {@link HttpMethod} instance, therefore subsequent calls to get response body as string may return nulls.
      */
     public static HttpMethod executeHTTPClientMethod(HttpMethod method)
         throws HttpException,
@@ -165,6 +261,8 @@ public class RequestFacade
     
     /**
      * Execute a HTTPClient method, optionally in the context of a test. ie {@link TestContainer#getTestContext()}
+     * <p>
+     * NOTE: Before being returned, {@link HttpMethod#releaseConnection()} is called on the {@link HttpMethod} instance, therefore subsequent calls to get response body as string may return nulls.
      * 
      * @param method the method to execute
      * @param useTestContext if true, execute this request in the context of a Test, false means ignore the testContext settings
@@ -172,11 +270,9 @@ public class RequestFacade
      * @throws HttpException
      * @throws IOException 
      */
-    public static HttpMethod executeHTTPClientMethod(HttpMethod method, final boolean useTestContext)
-        throws HttpException,
-            IOException
+    public static HttpMethod executeHTTPClientMethod(final HttpMethod method, final boolean useTestContext)
+        throws HttpException, IOException
     {
-
         HttpClient client = new HttpClient();
         client.getHttpConnectionManager().getParams().setConnectionTimeout( 5000 );
 
@@ -200,7 +296,7 @@ public class RequestFacade
         try
         {
             client.executeMethod( method );
-            method.getResponseBodyAsString();
+            method.getResponseBodyAsString(); //forced consumption of response I guess
             return method;
         }
         finally
@@ -209,6 +305,7 @@ public class RequestFacade
         }
     }
 
+    
     public static AuthenticationInfo getWagonAuthenticationInfo()
     {
         AuthenticationInfo authInfo = null;
