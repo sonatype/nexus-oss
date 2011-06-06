@@ -156,7 +156,7 @@ public class ScheduledServicePlexusResource
                 // task params
                 ScheduledTask<?> task = getNexusScheduler().getTaskById( getScheduledServiceId( request ) );
                 TaskState state = task.getTaskState();
-                if ( TaskState.RUNNING.equals( state ) || TaskState.CANCELLED.equals( state )
+                if ( TaskState.RUNNING.equals( state ) || TaskState.CANCELLING.equals( state )
                     || TaskState.SLEEPING.equals( state ) )
                 {
                     throw new ResourceException( Status.CLIENT_ERROR_CONFLICT,
