@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.integrationtests;
 
+import com.google.common.base.Preconditions;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,7 +29,8 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
@@ -80,21 +82,22 @@ public class RequestFacade
      * <p>
      * Of course the entire response text is buffered in memory so use this wisely.
      * 
-     * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
-     * @return the complete response body text, or possibly null if no entity in the response
+     * @param serviceURIpart the non-null part of the uri to fetch that is appended to the Nexus base URI.
+     * @return the complete response body text
+     * @throws NullPointerException if serviceURIpart is null
      */
     public static String doGetRequestEntityText(final String serviceURIpart) throws IOException{
+        Preconditions.checkNotNull(serviceURIpart);
         Response response = null;
         try {
             response = doGetRequest(serviceURIpart);
             Representation rep = response.getEntity();
-            if(rep != null){
-                return rep.getText();
-            }
+            // using assertThat since this is a test util always expecting entity since we are expecting the text from the entity
+            assertThat(rep, notNullValue()); 
+            return rep.getText();
         }finally{
             releaseResponse(response);
         }
-        return null;
     }
     
     /**
