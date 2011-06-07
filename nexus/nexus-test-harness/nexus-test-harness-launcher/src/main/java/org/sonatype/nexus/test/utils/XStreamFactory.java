@@ -34,25 +34,33 @@ import com.thoughtworks.xstream.converters.basic.StringConverter;
  */
 public class XStreamFactory
 {
+    // FIXME we would like to cache in the default case but provide also an option to get something others can customize
+    //private static XStream xmlXStream;
+    //private static XStream jsonXStream;
+    
     public static XStream getXmlXStream()
     {
-        XStream xs = new XStream( new LookAheadXppDriver() );
+        //if(xmlXStream == null)
+        //{
+            XStream xmlXStream = new XStream( new LookAheadXppDriver() );
+            initXStream( xmlXStream );   
+        //}
 
-        initXStream( xs );
-
-        return xs;
+        return xmlXStream;
     }
 
     public static XStream getJsonXStream()
     {
-        XStream xs = new XStream( new JsonOrgHierarchicalStreamDriver() );
+        //if(jsonXStream == null)
+        //{
+            XStream jsonXStream = new XStream( new JsonOrgHierarchicalStreamDriver() );
 
-        // for JSON, we use a custom converter for Maps
-        xs.registerConverter( new PrimitiveKeyedMapConverter( xs.getMapper() ) );
+            // for JSON, we use a custom converter for Maps
+            jsonXStream.registerConverter( new PrimitiveKeyedMapConverter( jsonXStream.getMapper() ) );
 
-        initXStream( xs );
-
-        return xs;
+            initXStream( jsonXStream );
+        //}
+        return jsonXStream;
     }
     
     private static void initXStream( XStream xstream )
