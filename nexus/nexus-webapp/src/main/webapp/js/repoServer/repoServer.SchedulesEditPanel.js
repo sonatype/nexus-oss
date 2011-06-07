@@ -40,30 +40,6 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
 
   this.customTypes = {};
 
-  this.actions = {
-    refresh : new Ext.Action({
-          text : 'Refresh',
-          iconCls : 'st-icon-refresh',
-          scope : this,
-          handler : this.reloadAll
-        }),
-    deleteAction : new Ext.Action({
-          text : 'Delete',
-          scope : this,
-          handler : this.deleteHandler
-        }),
-    stopAction : new Ext.Action({
-          text : 'Stop',
-          scope : this,
-          handler : this.stopHandler
-        }),
-    run : new Ext.Action({
-          text : 'Run',
-          scope : this,
-          handler : this.runHandler
-        })
-  };
-
   this.stopButton = new Ext.Button({
     id : 'schedule-stop-btn',
     text : 'Cancel',
@@ -72,11 +48,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
     scope : this,
     handler : this.stopHandler,
     disabled : true
-      /*
-       * FIXME need to check with tamas what is the correct permission ,disabled :
-       * !this.sp.checkPermission('nexus:tasksstop', this.sp.PUT)
-       */
-    });
+      });
 
   this.runButton = new Ext.Button({
         id : 'schedule-run-btn',
