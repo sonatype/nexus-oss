@@ -56,7 +56,7 @@ public class LogConfigMessageUtil
     public LogConfigResource getLogConfig()
         throws IOException
     {
-        String responseText = RequestFacade.doGetRequest( SERVICE_URL ).getEntity().getText();
+        final String responseText = RequestFacade.doGetForText( SERVICE_URL );
 
         LOG.debug( "responseText: \n" + responseText );
 

@@ -18,20 +18,21 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1806;
 
-import static org.sonatype.nexus.test.utils.EmailUtil.USER_EMAIL;
-import static org.sonatype.nexus.test.utils.EmailUtil.USER_PASSWORD;
-import static org.sonatype.nexus.test.utils.EmailUtil.USER_USERNAME;
-
 import java.io.IOException;
 
 import javax.mail.internet.MimeMessage;
 
-import org.restlet.data.Response;
-import org.restlet.data.Status;
+import static org.hamcrest.MatcherAssert.*;
+import org.restlet.data.Method;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.nexus.test.utils.EmailUtil;
-import org.sonatype.nexus.test.utils.SettingsMessageUtil;
+import static org.sonatype.nexus.test.utils.EmailUtil.USER_EMAIL;
+import static org.sonatype.nexus.test.utils.EmailUtil.USER_PASSWORD;
+import static org.sonatype.nexus.test.utils.EmailUtil.USER_USERNAME;
+import static org.sonatype.nexus.test.utils.SettingsMessageUtil.*;
+import org.sonatype.nexus.test.utils.NexusRequest;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -92,11 +93,7 @@ public class Nexus1806ValidateSmtpConfigurationIT
         smtpSettings.setPassword( EmailUtil.USER_PASSWORD );
         smtpSettings.setSystemEmailAddress( EmailUtil.USER_EMAIL );
         smtpSettings.setTestEmail( "test_user@sonatype.org" );
-        Response response = SettingsMessageUtil.validateSmtpResponse( smtpSettings );
-
-        String text = response.getEntity().getText();
-        Status status = response.getStatus();
-        Assert.assertEquals( status.getCode(), 400, "Unable to validate e-mail " + status + "\n" + text );
+        assertThat(new NexusRequest(CHECK_SMTP_SETTINGS_SERVICE, Method.PUT, setData(smtpSettings)), respondsWithStatusCode(400));
     }
 
     @Test
@@ -121,8 +118,7 @@ public class Nexus1806ValidateSmtpConfigurationIT
         smtpSettings.setPassword( USER_PASSWORD );
         smtpSettings.setSystemEmailAddress( email );
         smtpSettings.setTestEmail( "test_user@sonatype.org" );
-        Status status = SettingsMessageUtil.validateSmtp( smtpSettings );
-        Assert.assertEquals( status.getCode(), 400, "Unable to validate e-mail " + status );
+        assertThat(new NexusRequest(CHECK_SMTP_SETTINGS_SERVICE, Method.PUT, setData(smtpSettings)), respondsWithStatusCode(400));
     }
 
     private void run( int port, GreenMail server )
@@ -135,9 +131,8 @@ public class Nexus1806ValidateSmtpConfigurationIT
         smtpSettings.setPassword( EmailUtil.USER_PASSWORD );
         smtpSettings.setSystemEmailAddress( EmailUtil.USER_EMAIL );
         smtpSettings.setTestEmail( "test_user@sonatype.org" );
-        Response res = SettingsMessageUtil.validateSmtpResponse( smtpSettings );
-        Assert.assertTrue( res.getStatus().isSuccess(), "Unable to validate e-mail " + res.getStatus() + "\n"
-            + res.getEntity().getText() );
+        
+        assertThat(new NexusRequest(CHECK_SMTP_SETTINGS_SERVICE, Method.PUT, setData(smtpSettings)), respondsWithSuccess());
 
         server.waitForIncomingEmail( 5000, 1 );
 
