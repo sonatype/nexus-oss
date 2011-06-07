@@ -22,30 +22,59 @@ public class NXCM1148SiteDownloadIT
     extends AbstractMavenNexusIT
 {
     @Test
-    public void testCssMimeType() throws Exception
+    public void testCssMimeType()
+        throws Exception
     {
         this.setTestRepositoryId( "nxcm1148site" );
 
-        Response response = RequestFacade.doGetRequest( RequestFacade.SERVICE_LOCAL + "repositories/"+ this.getTestRepositoryId() +"/content/project/css/site.css" );
-        Assert.assertTrue( response.getStatus().isSuccess() );
+        Response response = null;
+        try
+        {
+            response = RequestFacade.doGetRequest( RequestFacade.SERVICE_LOCAL + "repositories/"
+                + this.getTestRepositoryId() + "/content/project/css/site.css" );
+            Assert.assertTrue( response.getStatus().isSuccess() );
 
-        Assert.assertEquals(MediaType.TEXT_CSS, response.getEntity().getMediaType() );
+            Assert.assertEquals( MediaType.TEXT_CSS, response.getEntity().getMediaType() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 
-
     @Test
-    public void testDirectoryListing() throws Exception
+    public void testDirectoryListing()
+        throws Exception
     {
         this.setTestRepositoryId( "nxcm1148site" );
-        Response response = RequestFacade.doGetRequest( RequestFacade.SERVICE_LOCAL + "repositories/"+ this.getTestRepositoryId() +"/content/project/" );
-        Assert.assertTrue( response.getStatus().isSuccess() );
-        Assert.assertEquals(MediaType.APPLICATION_XML, response.getEntity().getMediaType() );
-        Assert.assertTrue( response.getEntity().getText().contains( "<content-item>" ) );
+        Response response = null;
+        try
+        {
+            response = RequestFacade.doGetRequest( RequestFacade.SERVICE_LOCAL + "repositories/"
+                + this.getTestRepositoryId() + "/content/project/" );
+            Assert.assertTrue( response.getStatus().isSuccess() );
+            Assert.assertEquals( MediaType.APPLICATION_XML, response.getEntity().getMediaType() );
+            Assert.assertTrue( response.getEntity().getText().contains( "<content-item>" ) );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
 
-        response = RequestFacade.sendMessage( new URL( this.getBaseNexusUrl() + "content/sites/"+ this.getTestRepositoryId() + "/project/"), Method.GET, null );
-        Assert.assertTrue( response.getStatus().isSuccess() );
-        Assert.assertEquals(MediaType.TEXT_HTML, response.getEntity().getMediaType() );
-        Assert.assertTrue( response.getEntity().getText().contains( "<html" ) );
+        try
+        {
+            response = RequestFacade.sendMessage(
+                new URL( this.getBaseNexusUrl() + "content/sites/" + this.getTestRepositoryId() + "/project/" ),
+                Method.GET,
+                null );
+            Assert.assertTrue( response.getStatus().isSuccess() );
+            Assert.assertEquals( MediaType.TEXT_HTML, response.getEntity().getMediaType() );
+            Assert.assertTrue( response.getEntity().getText().contains( "<html" ) );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
 
     }
 }

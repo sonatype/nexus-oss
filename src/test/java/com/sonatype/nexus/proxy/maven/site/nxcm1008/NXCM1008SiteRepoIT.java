@@ -43,36 +43,44 @@ public class NXCM1008SiteRepoIT
         // need to make sure the site plugin is in the repoType resource
 
         String serviceURI = RequestFacade.SERVICE_LOCAL + "components/repo_types";
-        Response response = RequestFacade.doGetRequest( serviceURI );
-
-        String responseText = response.getEntity().getText();
-
-        Assert.assertTrue( "Could not get repoTypes: " + response.getStatus() + ":\n" + responseText, response
-            .getStatus().isSuccess() );
-
-        XStreamRepresentation representation = new XStreamRepresentation(
-            this.getXMLXStream(),
-            responseText,
-            MediaType.APPLICATION_XML );
-
-        NexusRepositoryTypeListResourceResponse resourceResponse = (NexusRepositoryTypeListResourceResponse) representation
-            .getPayload( new NexusRepositoryTypeListResourceResponse() );
-
-        Assert.assertNotNull( "Resource Response shouldn't be null", resourceResponse );
-        List<NexusRepositoryTypeListResource> repoTypes = resourceResponse.getData();
-
-        boolean found = false;
-        // now make sure the site is in here
-        for ( NexusRepositoryTypeListResource repoType : repoTypes )
+        Response response = null;
+        try
         {
-            if ( repoType.getFormat().equals( "maven-site" ) )
+            response = RequestFacade.doGetRequest( serviceURI );
+
+            String responseText = response.getEntity().getText();
+
+            Assert.assertTrue( "Could not get repoTypes: " + response.getStatus() + ":\n" + responseText, response
+                .getStatus().isSuccess() );
+
+            XStreamRepresentation representation = new XStreamRepresentation(
+                this.getXMLXStream(),
+                responseText,
+                MediaType.APPLICATION_XML );
+
+            NexusRepositoryTypeListResourceResponse resourceResponse = (NexusRepositoryTypeListResourceResponse) representation
+                .getPayload( new NexusRepositoryTypeListResourceResponse() );
+
+            Assert.assertNotNull( "Resource Response shouldn't be null", resourceResponse );
+            List<NexusRepositoryTypeListResource> repoTypes = resourceResponse.getData();
+
+            boolean found = false;
+            // now make sure the site is in here
+            for ( NexusRepositoryTypeListResource repoType : repoTypes )
             {
-                // found it
-                found = true;
-                break;
+                if ( repoType.getFormat().equals( "maven-site" ) )
+                {
+                    // found it
+                    found = true;
+                    break;
+                }
             }
+            Assert.assertTrue( "maven-site not found in list", found );
         }
-        Assert.assertTrue( "maven-site not found in list", found );
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
 
     }
 
@@ -87,11 +95,13 @@ public class NXCM1008SiteRepoIT
         resource.setName( "createSiteRepo-Name" );
         resource.setProviderRole( WebSiteRepository.class.getName() );
         resource.setProvider( "maven-site" );
-//        resource.setFormat( "maven2" );
+        // resource.setFormat( "maven2" );
         resource.setRepoPolicy( RepositoryPolicy.MIXED.name() ); // TODO: this shouldn't be required
 
-        RepositoryMessageUtil messageUtil =
-            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        RepositoryMessageUtil messageUtil = new RepositoryMessageUtil(
+            this,
+            this.getJsonXStream(),
+            MediaType.APPLICATION_JSON );
         // this also validates
         // TODO: No, it's not: it uses RepositoryTypeRegistry from _this_ plexus container,
         // while Nexus (where the new repo type is registered) runs in Guice!
