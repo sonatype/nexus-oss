@@ -61,7 +61,13 @@ public class NexusStatusUtil {
         }
 
         final int statusCode = method.getStatusCode();
-        if (statusCode != 200) {
+        // 200 if anonymous access is enabled
+        // 401 if nexus is running but anonymous access is disabled
+        if( statusCode == 401 )
+        {
+            return true;
+        }
+        else if ( statusCode != 200 ) {
             debug("Status check returned status " + statusCode);
             return false;
         }
