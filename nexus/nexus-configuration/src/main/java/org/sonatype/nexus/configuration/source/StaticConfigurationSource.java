@@ -81,4 +81,13 @@ public class StaticConfigurationSource
         return false;
     }
 
+    /**
+     * This method will always throw UnsupportedOperationException, since StaticConfigurationSource is read only.
+     */
+    public void backupConfiguration()
+        throws IOException
+    {
+        throw new UnsupportedOperationException( "The NexusDefaultsConfigurationSource is static source!" );
+    }
+
 }

@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.configuration.source;
 
+import java.io.IOException;
+
 import org.sonatype.configuration.source.ConfigurationSource;
 import org.sonatype.nexus.configuration.model.Configuration;
 
@@ -37,4 +39,13 @@ public interface ApplicationConfigurationSource
      * @return a config source that is default source for this config or null
      */
     ApplicationConfigurationSource getDefaultsSource();
+
+    /**
+     * Backup the current configuration.
+     * 
+     * @throws IOException
+     */
+    void backupConfiguration()
+        throws IOException;
+
 }

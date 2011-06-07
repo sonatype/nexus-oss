@@ -213,6 +213,7 @@ public class FileConfigurationSource
         return new FileInputStream( getConfigurationFile() );
     }
 
+    @Override
     public ApplicationConfigurationSource getDefaultsSource()
     {
         return nexusDefaults;
@@ -235,10 +236,7 @@ public class FileConfigurationSource
 
         getLogger().info( "Creating backup from the old file and saving the upgraded configuration." );
 
-        // backup the file
-        File backup = new File( file.getParentFile(), file.getName() + ".bak" );
-
-        FileUtils.copyFile( file, backup );
+        backupConfiguration();
 
         // set the upgradeInstance to warn Nexus about this
         setConfigurationUpgraded( true );
@@ -344,5 +342,15 @@ public class FileConfigurationSource
     public boolean isConfigurationDefaulted()
     {
         return configurationDefaulted;
+    }
+
+    public void backupConfiguration()
+        throws IOException
+    {
+        File file = getConfigurationFile();
+
+        // backup the file
+        File backup = new File( file.getParentFile(), file.getName() + ".bak" );
+        FileUtils.copyFile( file, backup );
     }
 }

@@ -185,6 +185,7 @@ public class DefaultNexusConfiguration
 
             if ( modified )
             {
+                configurationSource.backupConfiguration();
                 configurationSource.storeConfiguration();
             }
 
