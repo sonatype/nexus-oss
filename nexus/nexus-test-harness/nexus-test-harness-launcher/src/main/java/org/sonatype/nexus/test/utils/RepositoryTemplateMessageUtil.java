@@ -20,15 +20,14 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 
-
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.testng.Assert;
+import static org.hamcrest.Matchers.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 
 public class RepositoryTemplateMessageUtil
 {
@@ -41,13 +40,8 @@ public class RepositoryTemplateMessageUtil
     public RepositoryBaseResource getTemplate( String id )
         throws IOException
     {
-        Response response = RequestFacade.doGetRequest( "service/local/templates/repositories/" + id );
-
-        String responseText = response.getEntity().getText();
-        if ( response.getStatus().isError() )
-        {
-            Assert.fail( "Error on request: " + response.getStatus() + "\n" + responseText );
-        }
+        String responseText = RequestFacade.doGetForText("service/local/templates/repositories/" + id
+            , not(inError()));
 
         LOG.debug( "responseText: \n" + responseText );
 
