@@ -38,7 +38,8 @@ import org.sonatype.security.rest.model.RoleListResourceResponse;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.RoleResourceRequest;
 import org.testng.Assert;
-
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
 import com.thoughtworks.xstream.XStream;
 
 public class RoleMessageUtil
@@ -60,16 +61,19 @@ public class RoleMessageUtil
     public RoleResource createRole( RoleResource role )
         throws IOException
     {
-        Response response = this.sendMessage( Method.POST, role );
-        String responseString = response.getEntity().getText();
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create role: " + response.getStatus() + " - " + responseString );
+        Response response = null;
+        String entityText;
+        try {
+            response = this.sendMessage( Method.POST, role );
+            entityText = response.getEntity().getText();
+            assertThat("Could not create role", response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
         }
 
+
         // get the Resource object
-        RoleResource responseResource = this.getResourceFromResponse( responseString );
+        RoleResource responseResource = this.getResourceFromResponse( entityText );
 
         // make sure the id != null
         Assert.assertNotNull( responseResource.getId(), "Result:\n" + this.xStream.toXML( responseResource ) );
@@ -93,11 +97,15 @@ public class RoleMessageUtil
     public RoleResource getRole( String roleId )
         throws IOException
     {
-        Response response = this.sendMessage( Method.GET, null, roleId );
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not find role: " + roleId + " got: " + response.getStatus() );
+        Response response = null;
+        String entityText;
+        try {
+            response = this.sendMessage( Method.GET, null, roleId );
+            entityText = response.getEntity().getText();
+            assertThat("Could not find role", response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
         }
 
         // get the Resource object
@@ -134,7 +142,7 @@ public class RoleMessageUtil
 
     /**
      * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     * 
+     *
      * @return
      * @throws IOException
      */
@@ -142,16 +150,18 @@ public class RoleMessageUtil
     public List<RoleResource> getList()
         throws IOException
     {
-
-        Response response = RequestFacade.doGetRequest( "service/local/roles" );
-
-        String responseText = response.getEntity().getText();
-
-        Assert.assertTrue( response.getStatus().isSuccess(),
-                           "Request failed: " + response.getStatus() + "\n" + responseText );
+        Response response = null;
+        String entityText;
+        try {
+            response = RequestFacade.doGetRequest( "service/local/roles" );
+            entityText = response.getEntity().getText();
+            assertThat(response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
+        }
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), entityText, MediaType.APPLICATION_XML );
 
         RoleListResourceResponse resourceResponse =
             (RoleListResourceResponse) representation.getPayload( new RoleListResourceResponse() );
@@ -198,23 +208,21 @@ public class RoleMessageUtil
         representation.setPayload( request );
 
         String serviceURI = "service/local/roles/" + role.getId();
-        Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
-
-        return response.getStatus();
+        return RequestFacade.doPutForStatus(serviceURI, representation, null);
     }
 
     public RoleResource findRole( String roleId )
         throws IOException
     {
-        Response response = this.sendMessage( Method.GET, null, roleId );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            return null;
+        Response response = null;
+        try {
+            response = this.sendMessage( Method.GET, null, roleId );
+            RoleResource resource = this.getResourceFromResponse( response );
+            assertThat(response, isSuccessful());
+            return resource;
+        } finally {
+            RequestFacade.releaseResponse(response);
         }
-
-        // get the Resource object
-        return this.getResourceFromResponse( response );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -223,15 +231,18 @@ public class RoleMessageUtil
     {
         // external_role_map
         String uriPart = RequestFacade.SERVICE_LOCAL + "external_role_map/" + source;
-
-        Response response =
-            RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
-        String responseString = response.getEntity().getText();
-        Assert.assertTrue( response.getStatus().isSuccess(),
-                           "Status: " + response.getStatus() + "\nResponse:\n" + responseString );
+        Response response = null;
+        String entityText;
+        try {
+            response = RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
+            entityText = response.getEntity().getText();
+            assertThat(response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
+        }
 
         ExternalRoleMappingListResourceResponse result =
-            (ExternalRoleMappingListResourceResponse) this.parseResponseText( responseString,
+            (ExternalRoleMappingListResourceResponse) this.parseResponseText( entityText,
                 new ExternalRoleMappingListResourceResponse() );
 
         return result.getData();
@@ -244,16 +255,20 @@ public class RoleMessageUtil
         // plexus_roles
         String uriPart = RequestFacade.SERVICE_LOCAL + "plexus_roles/" + source;
 
-        Response response =
-            RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
-        String responseString = response.getEntity().getText();
-        Assert.assertTrue( response.getStatus().isSuccess(),
-                           "Status: " + response.getStatus() + "\nResponse:\n" + responseString );
 
-        LOG.debug( "response: " + responseString );
+        Response response = null;
+        String entityText;
+        try {
+            response = RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
+            entityText = response.getEntity().getText();
+            assertThat(response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
+        }
+        LOG.debug( "response: " + entityText );
 
         PlexusRoleListResourceResponse result =
-            (PlexusRoleListResourceResponse) this.parseResponseText( responseString,
+            (PlexusRoleListResourceResponse) this.parseResponseText( entityText,
                                                                      new PlexusRoleListResourceResponse() );
 
         return result.getData();
