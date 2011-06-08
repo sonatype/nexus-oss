@@ -60,9 +60,7 @@ public class TaskScheduleUtil
         representation.setPayload( request );
 
         String serviceURI = "service/local/schedules";
-        Response response = RequestFacade.sendMessage( serviceURI, Method.POST, representation );
-
-        return response.getStatus();
+        return RequestFacade.doPostForStatus(serviceURI, representation);
     }
 
     public static ScheduledServiceListResource getTask( String name )
@@ -95,16 +93,22 @@ public class TaskScheduleUtil
     private static List<ScheduledServiceListResource> getTaskRequest( String uri )
         throws IOException
     {
-        Response response = RequestFacade.doGetRequest( uri );
-
-        if ( response.getStatus().isError() )
-        {
-            LOG.error( response.getStatus().toString() );
-            return Collections.emptyList();
+        Response response = null;
+        String entityText;
+        try {
+            response = RequestFacade.doGetRequest( uri );
+            if ( response.getStatus().isError() )
+            {
+                LOG.error( response.getStatus().toString() );
+                return Collections.emptyList();
+            }
+            entityText = response.getEntity().getText();
+        } finally {
+            RequestFacade.releaseResponse(response);
         }
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
+            new XStreamRepresentation( xstream, entityText, MediaType.APPLICATION_XML );
 
         ScheduledServiceListResourceResponse scheduleResponse =
             (ScheduledServiceListResourceResponse) representation.getPayload( new ScheduledServiceListResourceResponse() );
@@ -163,18 +167,18 @@ public class TaskScheduleUtil
             uri += "&taskType=" + taskType;
         }
 
-        final Response response = RequestFacade.doGetRequest( uri );
+        Status status = RequestFacade.doGetForStatus(uri);
 
-        if ( response.getStatus().getCode() != Status.SUCCESS_OK.getCode() )
+        if ( !status.isSuccess() )
         {
-            throw new IOException( "The taskhelper REST resource reported an error (" + response.getStatus().toString()
+            throw new IOException( "The taskhelper REST resource reported an error (" + status.toString()
                 + "), bailing out!" );
         }
     }
 
     /**
      * Blocks while waiting for a task to finish.
-     * 
+     *
      * @param name
      * @return
      * @throws Exception
@@ -195,13 +199,14 @@ public class TaskScheduleUtil
             uri += "&name=" + name;
         }
 
-        final Response response = RequestFacade.doGetRequest( uri );
+        Status status = RequestFacade.doGetForStatus(uri);
 
-        if ( response.getStatus().getCode() != Status.SUCCESS_OK.getCode() )
+        if ( !status.isSuccess() )
         {
-            throw new IOException( "The taskhelper REST resource reported an error (" + response.getStatus().toString()
+            throw new IOException( "The taskhelper REST resource reported an error (" + status.toString()
                 + "), bailing out!" );
         }
+
     }
 
     public static Status update( ScheduledServiceBaseResource task )
@@ -214,36 +219,28 @@ public class TaskScheduleUtil
         representation.setPayload( request );
 
         String serviceURI = "service/local/schedules/" + task.getId();
-        Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
-
-        return response.getStatus();
+        return RequestFacade.doPutForStatus(serviceURI, representation, null);
     }
 
     public static Status deleteTask( String id )
         throws IOException
     {
         String serviceURI = "service/local/schedules/" + id;
-        Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-
-        return response.getStatus();
+        return RequestFacade.doDeleteForStatus( serviceURI, null);
     }
 
     public static Status run( String taskId )
         throws IOException
     {
         String serviceURI = "service/local/schedule_run/" + taskId;
-        Response response = RequestFacade.doGetRequest( serviceURI );
-
-        return response.getStatus();
+        return RequestFacade.doGetForStatus(serviceURI);
     }
 
     public static Status cancel( String taskId )
         throws IOException
     {
         String serviceURI = "service/local/schedule_run/" + taskId;
-        Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-
-        return response.getStatus();
+        return RequestFacade.doDeleteForStatus( serviceURI, null);
     }
 
     public static void runTask( String typeId, ScheduledServicePropertyResource... properties )

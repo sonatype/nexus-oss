@@ -227,7 +227,6 @@ public class RequestFacade {
      * @throws IOException
      */
     public static Status doPutForStatus(final String serviceURIpart, final XStreamRepresentation representation, Matcher<Response> matcher) throws IOException {
-        Preconditions.checkNotNull(serviceURIpart);
         Response response = null;
         try {
             response = RequestFacade.sendMessage(toNexusURL(serviceURIpart), Method.PUT, representation, matcher);
@@ -259,10 +258,39 @@ public class RequestFacade {
         }
     }
 
+     public static Status doPostForStatus(final String serviceURIpart, final Representation representation)
+         throws IOException {
+        return doPostForStatus(serviceURIpart,representation, null);
+     }
+
+     public static Status doPostForStatus(final String serviceURIpart,final Representation representation, Matcher<Response> responseMatcher) throws IOException {
+        Response response = null;
+        try {
+            response = RequestFacade.sendMessage(serviceURIpart, Method.POST, representation, responseMatcher);
+            Status status = response.getStatus();
+            assertThat(status, notNullValue());
+            return status;
+        } finally {
+            releaseResponse(response);
+        }
+    }
+
     public static void doDelete(final String serviceURIpart, Matcher<Response> responseMatcher) throws IOException {
         Response response = null;
         try {
             response = sendMessage(toNexusURL(serviceURIpart), Method.DELETE, null, responseMatcher);
+        } finally {
+            releaseResponse(response);
+        }
+    }
+
+    public static Status doDeleteForStatus(final String serviceURIpart, Matcher<Response> responseMatcher) throws IOException {
+        Response response = null;
+        try {
+            response = sendMessage(toNexusURL(serviceURIpart), Method.DELETE, null, responseMatcher);
+            Status status = response.getStatus();
+            assertThat(status, notNullValue());
+            return status;
         } finally {
             releaseResponse(response);
         }
