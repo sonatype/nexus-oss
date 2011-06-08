@@ -51,7 +51,9 @@ public class RepositoryStatusMessageUtil
         status.setLocalStatus( LocalStatus.IN_SERVICE.name() );
         return changeStatus( status );
     }
-
+    /**
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+     */
     public static Response changeStatus( RepositoryStatusResource status )
         throws IOException
     {
