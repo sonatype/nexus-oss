@@ -142,6 +142,10 @@ public class RequestFacade {
         return doGetForText(serviceURIpart, null);
     }
 
+     public static String doGetForText(final String serviceURIpart, final org.hamcrest.Matcher<Response> responseMatcher) throws IOException {
+        return doGetForText(serviceURIpart, null);
+    }
+
     /**
      * Gets the response text, asserting that the entity is not null, and also applying any specified assertions on the response instance.
      * @param serviceURIpart
@@ -149,11 +153,11 @@ public class RequestFacade {
      * @return
      * @throws IOException
      */
-    public static String doGetForText(final String serviceURIpart, org.hamcrest.Matcher<Response> responseMatcher) throws IOException {
+    public static String doGetForText(final String serviceURIpart, final XStreamRepresentation representation, org.hamcrest.Matcher<Response> responseMatcher) throws IOException {
         Preconditions.checkNotNull(serviceURIpart);
         Response response = null;
         try {
-            response = sendMessage(toNexusURL(serviceURIpart), Method.GET, null, null);
+            response = sendMessage(toNexusURL(serviceURIpart), Method.GET, representation, null);
             response = doGetRequest(serviceURIpart);
             final Representation entity = response.getEntity();
             assertThat(entity, notNullValue());

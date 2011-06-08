@@ -34,7 +34,9 @@ import org.sonatype.nexus.rest.model.MirrorStatusResource;
 import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
-
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import com.thoughtworks.xstream.XStream;
 
 public class MirrorMessageUtils
@@ -59,18 +61,10 @@ public class MirrorMessageUtils
 
         String serviceURI = "service/local/repository_mirrors/" + repositoryId;
 
-        Response response = RequestFacade.sendMessage( serviceURI, Method.GET, representation );
+        String responseText = RequestFacade.doGetForText(serviceURI, representation, isSuccessful());
+        LOG.debug( " getResourceFromResponse: " + responseText );
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not get mirrors: " + response.getStatus() + ":\n" + responseText );
-        }
-
-        String responseString = response.getEntity().getText();
-        LOG.debug( " getResourceFromResponse: " + responseString );
-
-        representation = new XStreamRepresentation( xstream, responseString, mediaType );
+        representation = new XStreamRepresentation( xstream, responseText, mediaType );
 
         // this
         MirrorResourceListResponse resourceResponse =
@@ -96,18 +90,10 @@ public class MirrorMessageUtils
         // now set the payload
         representation.setPayload( resourceRequest );
 
-        Response response = RequestFacade.sendMessage( serviceURI, Method.POST, representation );
+        String responseText = RequestFacade.doPostForText(serviceURI, representation, isSuccessful());
+        LOG.debug( " getResourceFromResponse: " + responseText );
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not set mirrors: " + response.getStatus() + ":\n" + responseText );
-        }
-
-        String responseString = response.getEntity().getText();
-        LOG.debug( " getResourceFromResponse: " + responseString );
-
-        representation = new XStreamRepresentation( xstream, responseString, mediaType );
+        representation = new XStreamRepresentation( xstream, responseText, mediaType );
 
         // this
         MirrorResourceListResponse resourceResponse =
@@ -136,18 +122,11 @@ public class MirrorMessageUtils
 
         String serviceURI = "service/local/repository_mirrors_status/" + repositoryId;
 
-        Response response = RequestFacade.sendMessage( serviceURI, Method.GET, representation );
+        String responseText = RequestFacade.doGetForText(serviceURI, representation, isSuccessful());
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not get mirrors status: " + response.getStatus() + ":\n" + responseText );
-        }
+        LOG.debug( " getResourceFromResponse: " + responseText);
 
-        String responseString = response.getEntity().getText();
-        LOG.debug( " getResourceFromResponse: " + responseString );
-
-        representation = new XStreamRepresentation( xstream, responseString, mediaType );
+        representation = new XStreamRepresentation( xstream, responseText, mediaType );
 
         // this
         MirrorStatusResourceListResponse resourceResponse =
@@ -170,18 +149,10 @@ public class MirrorMessageUtils
 
         String serviceURI = "service/local/repository_predefined_mirrors/" + repositoryId;
 
-        Response response = RequestFacade.sendMessage( serviceURI, Method.GET, representation );
+        String responseText = RequestFacade.doGetForText(serviceURI, representation, isSuccessful());
+        LOG.debug( " getResourceFromResponse: " + responseText );
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not get predefined mirrors: " + response.getStatus() + ":\n" + responseText );
-        }
-
-        String responseString = response.getEntity().getText();
-        LOG.debug( " getResourceFromResponse: " + responseString );
-
-        representation = new XStreamRepresentation( xstream, responseString, mediaType );
+        representation = new XStreamRepresentation( xstream, responseText, mediaType );
 
         // this
         MirrorResourceListResponse resourceResponse =
