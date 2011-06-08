@@ -582,9 +582,9 @@ public abstract class AbstractScheduledServicePlexusResource
             if ( task.getDuration() != 0 )
             {
                 long milliseconds = task.getDuration();
-                int seconds = (int) ( ( milliseconds / 1000 ) % 60 );
-                int minutes = (int) ( ( milliseconds / 1000 ) / 60 );
                 int hours = (int) ( ( milliseconds / 1000 ) / 3600 );
+                int minutes = (int) ( ( milliseconds / 1000 ) / 60 - hours * 60 );
+                int seconds = (int) ( ( milliseconds / 1000 ) % 60 );
 
                 lastRunResult += " [";
                 if ( hours != 0 )
@@ -592,7 +592,7 @@ public abstract class AbstractScheduledServicePlexusResource
                     lastRunResult += hours;
                     lastRunResult += "h";
                 }
-                if ( minutes != 0 || minutes != 0 )
+                if ( minutes != 0 || hours != 0 )
                 {
                     lastRunResult += minutes;
                     lastRunResult += "m";
