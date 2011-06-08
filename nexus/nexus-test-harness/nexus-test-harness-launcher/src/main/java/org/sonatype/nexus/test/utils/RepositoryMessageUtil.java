@@ -44,6 +44,9 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -76,15 +79,15 @@ public class RepositoryMessageUtil
     public RepositoryBaseResource createRepository( RepositoryBaseResource repo, boolean validate )
         throws IOException
     {
-        Response response = this.sendMessage( Method.POST, repo );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not create Repository: " + response.getStatus() + ":\n" + responseText );
+        Response response = null;
+        RepositoryBaseResource responseResource;
+        try {
+            response = this.sendMessage( Method.POST, repo );
+            assertThat(response, isSuccessful());
+            responseResource = this.getRepositoryBaseResourceFromResponse( response );
+        } finally {
+            RequestFacade.releaseResponse(response);
         }
-
-        RepositoryBaseResource responseResource = this.getRepositoryBaseResourceFromResponse( response );
 
         if ( validate )
         {
@@ -159,14 +162,7 @@ public class RepositoryMessageUtil
     public RepositoryBaseResource getRepository( String repoId )
         throws IOException
     {
-
-        Response response = RequestFacade.doGetRequest( SERVICE_PART + "/" + repoId );
-        String responseText = response.getEntity().getText();
-        if ( response.getStatus().isError() )
-        {
-            Assert.fail( "Error on request: " + response.getStatus() + "\n" + responseText );
-        }
-
+        final String responseText = RequestFacade.doGetForText(SERVICE_PART + "/" + repoId, not(inError()));
         LOG.debug( "responseText: \n" + responseText );
 
         // this should use call to: getResourceFromResponse
@@ -188,15 +184,16 @@ public class RepositoryMessageUtil
     public RepositoryBaseResource updateRepo( RepositoryBaseResource repo, boolean validate )
         throws IOException
     {
-        Response response = this.sendMessage( Method.PUT, repo );
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not update user: " + response.getStatus() + "\n" + responseText );
+        Response response = null;
+        RepositoryBaseResource responseResource;
+        try {
+            response = this.sendMessage( Method.PUT, repo );
+            assertThat("Could not update user", response, isSuccessful());
+            responseResource = this.getRepositoryBaseResourceFromResponse( response );
+        } finally {
+            RequestFacade.releaseResponse(response);
         }
-
-        RepositoryBaseResource responseResource = this.getRepositoryBaseResourceFromResponse( response );
 
         if ( validate )
         {
@@ -206,6 +203,9 @@ public class RepositoryMessageUtil
         return responseResource;
     }
 
+    /**
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+     */
     public Response sendMessage( Method method, RepositoryBaseResource resource, String id )
         throws IOException
     {
@@ -238,6 +238,9 @@ public class RepositoryMessageUtil
         return RequestFacade.sendMessage( serviceURI, method, representation );
     }
 
+    /**
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+     */
     public Response sendMessage( Method method, RepositoryBaseResource resource )
         throws IOException
     {
@@ -246,14 +249,14 @@ public class RepositoryMessageUtil
 
     /**
      * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     * 
+     *
      * @return
      * @throws IOException
      */
     public List<RepositoryListResource> getList()
         throws IOException
     {
-        String responseText = RequestFacade.doGetRequest( SERVICE_PART ).getEntity().getText();
+        String responseText = RequestFacade.doGetForText( SERVICE_PART );
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
@@ -269,7 +272,7 @@ public class RepositoryMessageUtil
     public List<RepositoryListResource> getAllList()
         throws IOException
     {
-        String responseText = RequestFacade.doGetRequest( ALL_SERVICE_PART ).getEntity().getText();
+        String responseText = RequestFacade.doGetForText( ALL_SERVICE_PART );
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
@@ -407,10 +410,8 @@ public class RepositoryMessageUtil
             {
                 serviceURI = "service/local/data_index/repositories/" + repo + "/content";
             }
-
-            Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
-            Status status = response.getStatus();
-            Assert.assertTrue( status.isSuccess(), "Fail to update " + repo + " repository index " + status );
+            Status status = RequestFacade.doDeleteForStatus(serviceURI, null);
+            assertThat( "Fail to update " + repo + " repository index " + status, status, isSuccess());
         }
 
         // let s w8 a few time for indexes
@@ -440,12 +441,18 @@ public class RepositoryMessageUtil
             uri = uri + "?forceCheck=true";
         }
 
-        Response response = RequestFacade.sendMessage( uri, Method.GET );
-        Status status = response.getStatus();
-        Assert.assertTrue( status.isSuccess(), "Fail to getStatus for '" + repoId + "' repository" + status );
+        Response response = null;
+        final String responseText;
+        try {
+            response = RequestFacade.sendMessage( uri, Method.GET );
+            responseText = response.getEntity().getText();
+            assertThat("Fail to getStatus for '" + repoId + "' repository", response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
+        }
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( this.xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
+            new XStreamRepresentation( this.xstream, responseText, MediaType.APPLICATION_XML );
 
         RepositoryStatusResourceResponse resourceResponse =
             (RepositoryStatusResourceResponse) representation.getPayload( new RepositoryStatusResourceResponse() );
@@ -463,12 +470,16 @@ public class RepositoryMessageUtil
         resourceResponse.setData( repoStatus );
         representation.setPayload( resourceResponse );
 
-        Response response = RequestFacade.sendMessage( uriPart, Method.PUT, representation );
-        Status status = response.getStatus();
-        Assert.assertTrue( status.isSuccess(),
-            "Fail to update '" + repoStatus.getId() + "' repository status " + status + "\nResponse:\n"
-                + response.getEntity().getText() + "\nrepresentation:\n" + representation.getText() );
-
+        Response response = null;
+        final String responseText;
+        try {
+            response = RequestFacade.sendMessage( uriPart, Method.PUT, representation );
+            responseText = response.getEntity().getText();
+            assertThat("Fail to update '" + repoStatus.getId() + "' repository status " + response.getStatus() + "\nResponse:\n"
+                + responseText + "\nrepresentation:\n" + representation.getText(), response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
+        }
     }
 
     /**
@@ -482,11 +493,8 @@ public class RepositoryMessageUtil
     {
         String serviceURI = "service/local/repositories/" + repoId + "/index_content/";
 
-        Response response = RequestFacade.doGetRequest( serviceURI );
-        String responseText = response.getEntity().getText();
-        Status status = response.getStatus();
-        Assert.assertTrue( status.isSuccess(), responseText + status );
-
+        String responseText = RequestFacade.doGetForText(serviceURI, isSuccessful());
+        
         XStreamRepresentation re =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
         ContentListResourceResponse resourceResponse =
