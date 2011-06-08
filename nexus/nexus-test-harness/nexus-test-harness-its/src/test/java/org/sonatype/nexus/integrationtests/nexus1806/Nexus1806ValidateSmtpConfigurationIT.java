@@ -22,16 +22,12 @@ import java.io.IOException;
 
 import javax.mail.internet.MimeMessage;
 
-import static org.hamcrest.MatcherAssert.*;
-import org.restlet.data.Method;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.nexus.test.utils.EmailUtil;
 import static org.sonatype.nexus.test.utils.EmailUtil.USER_EMAIL;
 import static org.sonatype.nexus.test.utils.EmailUtil.USER_PASSWORD;
 import static org.sonatype.nexus.test.utils.EmailUtil.USER_USERNAME;
-import static org.sonatype.nexus.test.utils.SettingsMessageUtil.*;
-import org.sonatype.nexus.test.utils.NexusRequest;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.Assert;
@@ -42,7 +38,9 @@ import org.testng.annotations.Test;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
-
+import org.restlet.data.Status;
+import org.sonatype.nexus.test.utils.SettingsMessageUtil;
+import static org.hamcrest.MatcherAssert.*;
 public class Nexus1806ValidateSmtpConfigurationIT
     extends AbstractNexusIntegrationTest
 {
@@ -93,7 +91,8 @@ public class Nexus1806ValidateSmtpConfigurationIT
         smtpSettings.setPassword( EmailUtil.USER_PASSWORD );
         smtpSettings.setSystemEmailAddress( EmailUtil.USER_EMAIL );
         smtpSettings.setTestEmail( "test_user@sonatype.org" );
-        assertThat(new NexusRequest(CHECK_SMTP_SETTINGS_SERVICE, Method.PUT, setData(smtpSettings)), respondsWithStatusCode(400));
+        Status status = SettingsMessageUtil.save(smtpSettings);
+        assertThat(status, hasStatusCode(400));
     }
 
     @Test
@@ -118,7 +117,8 @@ public class Nexus1806ValidateSmtpConfigurationIT
         smtpSettings.setPassword( USER_PASSWORD );
         smtpSettings.setSystemEmailAddress( email );
         smtpSettings.setTestEmail( "test_user@sonatype.org" );
-        assertThat(new NexusRequest(CHECK_SMTP_SETTINGS_SERVICE, Method.PUT, setData(smtpSettings)), respondsWithStatusCode(400));
+        Status status = SettingsMessageUtil.save(smtpSettings);
+        assertThat(status, hasStatusCode(400));
     }
 
     private void run( int port, GreenMail server )
@@ -131,8 +131,9 @@ public class Nexus1806ValidateSmtpConfigurationIT
         smtpSettings.setPassword( EmailUtil.USER_PASSWORD );
         smtpSettings.setSystemEmailAddress( EmailUtil.USER_EMAIL );
         smtpSettings.setTestEmail( "test_user@sonatype.org" );
-        
-        assertThat(new NexusRequest(CHECK_SMTP_SETTINGS_SERVICE, Method.PUT, setData(smtpSettings)), respondsWithSuccess());
+
+        Status status = SettingsMessageUtil.save(smtpSettings);
+        assertThat(status, isSuccess());
 
         server.waitForIncomingEmail( 5000, 1 );
 

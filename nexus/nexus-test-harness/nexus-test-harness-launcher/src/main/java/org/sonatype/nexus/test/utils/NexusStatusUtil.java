@@ -26,14 +26,12 @@ import java.net.UnknownHostException;
 import org.apache.commons.httpclient.HttpException;
 
 import org.apache.log4j.Logger;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.nexus.test.launcher.ThreadedPlexusAppBooterService;
 import org.testng.Assert;
 
-import com.thoughtworks.xstream.XStream;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.sonatype.nexus.SystemState;
 
@@ -47,79 +45,68 @@ public class NexusStatusUtil {
 
     public boolean isNexusRESTStarted()
         throws NexusIllegalStateException {
-
         final String statusURI = AbstractNexusIntegrationTest.nexusBaseUrl + RequestFacade.SERVICE_LOCAL + "status";
-
         // by not using test context we are only checking anonymously - this may not be a good idea, not sure
-        org.apache.commons.httpclient.HttpMethod method;
-        try {
-            method = RequestFacade.executeHTTPClientMethod(new GetMethod(statusURI), false);
-        } catch (HttpException ex) {
-            throw new NexusIllegalStateException();
-        } catch (IOException ex) {
-            throw new NexusIllegalStateException();
-        }
+        org.apache.commons.httpclient.HttpMethod method = null;
+        try{
+            try {
+                method = RequestFacade.executeHTTPClientMethod(new GetMethod(statusURI), false);
+            } catch (HttpException ex) {
+                throw new NexusIllegalStateException("Problem executing status request: ", ex);
+            } catch (IOException ex) {
+                throw new NexusIllegalStateException("Problem executing status request: ", ex);
+            }
 
-        final int statusCode = method.getStatusCode();
-        // 200 if anonymous access is enabled
-        // 401 if nexus is running but anonymous access is disabled
-        if( statusCode == 401 )
-        {
+            final int statusCode = method.getStatusCode();
+            // 200 if anonymous access is enabled
+            // 401 if nexus is running but anonymous access is disabled
+            if( statusCode == 401 )
+            {
+                return true;
+            }
+            else if ( statusCode != 200 )
+            {
+                debug("Status check returned status " + statusCode);
+                return false;
+            }
+
+
+            String entityText;
+            try {
+                entityText = method.getResponseBodyAsString();
+            } catch (IOException e) {
+                throw new NexusIllegalStateException("Unable to retrieve nexus status body", e);
+            }
+
+            StatusResourceResponse status = (StatusResourceResponse) XStreamUtil.DEFAULT_XML_XSTREAM.fromXML(entityText);
+            if (!SystemState.STARTED.toString().equals(status.getData().getState())) {
+                debug("Status check returned system state " + status.getData().getState());
+                return false;
+            }
+
             return true;
+        } finally {
+            if(method != null){
+                method.releaseConnection(); //request facade does this but just making sure
+            }
         }
-        else if ( statusCode != 200 ) {
-            debug("Status check returned status " + statusCode);
-            return false;
-        }
-
-        final XStream xstream = XStreamFactory.getXmlXStream();
-        String entityText;
-        try {
-            entityText = method.getResponseBodyAsString();
-        } catch (IOException e) {
-            throw new NexusIllegalStateException("Unable to retrieve nexus status ", e);
-        }
-
-        StatusResourceResponse status = (StatusResourceResponse) xstream.fromXML(entityText);
-        if (!SystemState.STARTED.toString().equals(status.getData().getState())) {
-            debug("Status check returned system state " + status.getData().getState());
-            return false;
-        }
-
-        return true;
 
     }
 
     /**
-     * 
-     * @return
-     * @throws NexusIllegalStateException 
+     * Get Nexus Status, failing if the request response is not successfully returned.
+     * @return the status resource
+     * @throws NexusIllegalStateException
      */
     public StatusResourceResponse getNexusStatus()
         throws NexusIllegalStateException {
-        Response response;
         try {
-            response = RequestFacade.doGetRequest("service/local/status");
-        } catch (IOException e) {
-            throw new NexusIllegalStateException("Unable to retrieve nexus status", e);
+            String entityText = RequestFacade.doGetForText("service/local/status", NexusRequestMatchers.isSuccessful());
+            StatusResourceResponse status = (StatusResourceResponse) XStreamUtil.DEFAULT_XML_XSTREAM.fromXML(entityText);
+            return status;
+        } catch (IOException ex) {
+            throw new NexusIllegalStateException("Could not get nexus status", ex);
         }
-
-        if (!response.getStatus().isSuccess()) {
-            throw new NexusIllegalStateException("Error retrieving current status " + response.getStatus().toString());
-        }
-        XStream xstream = XStreamFactory.getXmlXStream();
-
-        String entityText;
-        try {
-            entityText = response.getEntity().getText();
-        } catch (IOException e) {
-            throw new NexusIllegalStateException("Unable to retrieve nexus status " + new XStream().toXML(response),
-                e);
-        }
-
-        StatusResourceResponse status = (StatusResourceResponse) xstream.fromXML(entityText);
-
-        return status;
     }
 
     public void start(String testId)
@@ -215,7 +202,7 @@ public class NexusStatusUtil {
     }
 
     /**
-     * This is a hack because due to magic log4j property reloading we lose normal log output sent to logger 
+     * This is a hack because due to magic log4j property reloading we lose normal log output sent to logger
      * @param msg the msg to log at debug level
      */
     private void debug(final String msg) {
@@ -225,7 +212,7 @@ public class NexusStatusUtil {
     }
 
     /**
-     * 
+     *
      * @param port the port to check for being open
      * @param portName the name of the port we are checking
      * @return true if port is open, false if not

@@ -1,5 +1,6 @@
 package org.sonatype.nexus.test.utils;
 
+import com.thoughtworks.xstream.XStream;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -10,7 +11,6 @@ import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.rest.model.NexusResponse;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 
@@ -26,25 +26,14 @@ public class NexusRequest {
     private String responseText;
     private Throwable throwable;
     private Object resource;
-
-//    public NexusRequest(final String uriPart, final Method method, final NexusResponse nexusResponse) {
-//        Preconditions.checkNotNull(uriPart);
-//        Preconditions.checkNotNull(method);
-//        Preconditions.checkNotNull(nexusResponse);
-//        final String completeURL = AbstractNexusIntegrationTest.nexusBaseUrl + uriPart;
-//        try {
-//            this.url = new URL(completeURL);
-//        } catch (MalformedURLException ex) {
-//            throw new IllegalArgumentException(uriPart + " is not a valid URL to send a request too", ex);
-//        }
-//        this.method = method;
-//        this.nexusResponse = nexusResponse;
-//    }
+    // custom XStream instance
+    private XStream xStream;
+    private String text = "";
     
     public NexusRequest(final String uriPart, final Method method, final Object resource) {
         Preconditions.checkNotNull(uriPart);
         Preconditions.checkNotNull(method);
-        Preconditions.checkNotNull(resource);
+        // Preconditions.checkNotNull(resource);
         final String completeURL = AbstractNexusIntegrationTest.nexusBaseUrl + uriPart;
         try {
             this.url = new URL(completeURL);
@@ -53,6 +42,31 @@ public class NexusRequest {
         }
         this.method = method;
         this.resource = resource;
+    }
+    
+    public NexusRequest(final String uriPart, final Method method) {
+        Preconditions.checkNotNull(uriPart);
+        Preconditions.checkNotNull(method);
+        final String completeURL = AbstractNexusIntegrationTest.nexusBaseUrl + uriPart;
+        try {
+            this.url = new URL(completeURL);
+        } catch (MalformedURLException ex) {
+            throw new IllegalArgumentException(completeURL + " is not a valid URL to send a request too", ex);
+        }
+        this.method = method;
+    }
+    
+    public NexusRequest(final String uriPart, final Method method, final XStream customXStream) {
+        Preconditions.checkNotNull(uriPart);
+        Preconditions.checkNotNull(method);
+        final String completeURL = AbstractNexusIntegrationTest.nexusBaseUrl + uriPart;
+        try {
+            this.url = new URL(completeURL);
+        } catch (MalformedURLException ex) {
+            throw new IllegalArgumentException(completeURL + " is not a valid URL to send a request too", ex);
+        }
+        this.method = method;
+        this.xStream = customXStream;
     }
 
     
@@ -65,7 +79,7 @@ public class NexusRequest {
     public boolean assertStatusCode(final int expectedStatusCode){
         Response response = null;
         try {
-            response = RequestFacade.sendMessage(url, method, XStreamUtil.toRepresentation(resource));
+            response = RequestFacade.sendMessage(url, method, XStreamUtil.toRepresentation(this.xStream, this.text, this.resource));
             this.status = response.getStatus();
             assertThat(this.status, notNullValue());
             if (this.status.getCode() != expectedStatusCode) {
@@ -84,7 +98,7 @@ public class NexusRequest {
     public boolean assertSuccess(){
         Response response = null;
         try {
-            response = RequestFacade.sendMessage(url, method, XStreamUtil.toRepresentation(resource));
+            response = RequestFacade.sendMessage(url, method, XStreamUtil.toRepresentation(this.xStream, this.text, this.resource));
             this.status = response.getStatus();
             assertThat(this.status, notNullValue());
             if (!this.status.isSuccess()) {
@@ -118,7 +132,10 @@ public class NexusRequest {
         if(status != null){
             str.append(status.toString()).append("\nfor ");
         }
-        str.append(this.url.toString()).append(" ").append(this.method.getName()).append(" of ").append(this.resource.getClass());
+        str.append(this.url.toString()).append(" ").append(this.method.getName());
+        if(this.resource != null){
+            str.append(" of ").append(this.resource.getClass());
+        }
         return str.toString();
     }
     

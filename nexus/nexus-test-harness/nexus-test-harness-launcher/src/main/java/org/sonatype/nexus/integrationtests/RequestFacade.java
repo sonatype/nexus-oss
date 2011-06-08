@@ -41,6 +41,8 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.log4j.Logger;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.codehaus.plexus.util.IOUtil;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.data.ChallengeResponse;
@@ -54,27 +56,53 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.sonatype.nexus.rest.model.NexusResponse;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 /**
- * HTTP Request helper.
+ * HTTP Request helper (trying to hide any mention of the actual request implementation.)
  * <p>
  * <b>IMPORTANT</b>: Any {@link Response} instances returned from methods here should have their {@link Response#release()} method called in a finally block
  * when you are done with it.
- * 
+ *
  */
 public class RequestFacade {
 
     public static final String SERVICE_LOCAL = "service/local/";
     private static final Logger LOG = Logger.getLogger(RequestFacade.class);
-    private static final XStream xstream;
-    
+    private static final XStream XML_XSTREAM;
+
     // FIXME - why doesn't XStreamFactory keep a static reference to its own goop
-    static{
-        xstream = XStreamFactory.getXmlXStream();
+    static {
+        XML_XSTREAM = XStreamFactory.getXmlXStream();
     }
-    
+
+    /**
+     * Extract text from response
+     * @param response
+     * @return
+     * @throws IOException
+     */
+    private static String extractText(final Response response) throws IOException {
+        final Representation entity = response.getEntity();
+        assertThat(entity, notNullValue());
+        final String responseText = entity.getText();
+        return responseText;
+    }
+
+    /**
+     * Extract status from response
+     * @param response
+     * @return
+     * @throws IOException
+     */
+    private static Status extractStatus(final Response response) throws IOException {
+        Status status = response.getStatus();
+        assertThat(status, notNullValue());
+        return status;
+    }
+
     /**
      * Null safe method to release a Response ( its streams and sockets )
      * @param response release the response if not null
@@ -84,60 +112,55 @@ public class RequestFacade {
             response.release();
         }
     }
-    
-    
+
+    /**
+     * Convert a serviceURIPart to a URL
+     * @param serviceURIPart
+     * @return
+     * @throws IOException
+     */
+    public static URL toNexusURL(final String serviceURIPart) throws IOException {
+        Preconditions.checkNotNull(serviceURIPart);
+        final String serviceURI = AbstractNexusIntegrationTest.nexusBaseUrl + serviceURIPart;
+        return new URL(serviceURI);
+
+    }
 
     /**
      * Sends a GET request to the specified uri and returns the text of the entity.
      * <p>
-     * Using this method is RECOMMENDED if you simply want the text of a response and nothing more since 
+     * Using this method is RECOMMENDED if you simply want the text of a response and nothing more since
      * this method ensures proper cleanup of any sockets, streams, etc., by releasing the response.
      * <p>
      * Of course the entire response text is buffered in memory so use this wisely.
-     * 
+     *
      * @param serviceURIpart the non-null part of the uri to fetch that is appended to the Nexus base URI.
      * @return the complete response body text
      * @throws NullPointerException if serviceURIpart is null
      */
     public static String doGetForText(final String serviceURIpart) throws IOException {
-        Preconditions.checkNotNull(serviceURIpart);
-        Response response = null;
-        try {
-            response = doGetRequest(serviceURIpart);
-            Representation rep = response.getEntity();
-            // using assertThat since this is a test util always expecting entity since we are expecting the text from the entity
-            assertThat(rep, notNullValue());
-            return rep.getText();
-        } finally {
-            releaseResponse(response);
-        }
+        return doGetForText(serviceURIpart, null);
     }
 
     /**
-     * Sends a GET request to the specified uri and returns the text of the entity. <b>Also asserts that the response indicates a success status.</b>
-     * <p>
-     * Using this method is RECOMMENDED if you simply want the text of a response and nothing more since 
-     * this method ensures proper cleanup of any sockets, streams, etc., by releasing the response.
-     * <p>
-     * Of course the entire response text is buffered in memory so use this wisely.
-     * 
-     * @param serviceURIpart the non-null part of the uri to fetch that is appended to the Nexus base URI.
-     * @return the complete response body text
-     * @throws NullPointerException if serviceURIpart is null
+     * Gets the response text, asserting that the entity is not null, and also applying any specified assertions on the response instance.
+     * @param serviceURIpart
+     * @param responseMatcher
+     * @return
+     * @throws IOException
      */
-    public static String doGetForTextWithSuccess(final String serviceURIpart) throws IOException {
+    public static String doGetForText(final String serviceURIpart, org.hamcrest.Matcher<Response> responseMatcher) throws IOException {
         Preconditions.checkNotNull(serviceURIpart);
         Response response = null;
         try {
+            response = sendMessage(toNexusURL(serviceURIpart), Method.GET, null, null);
             response = doGetRequest(serviceURIpart);
             final Representation entity = response.getEntity();
-            // using assertThat since this is a test util always expecting entity since we are expecting the text from the entity
             assertThat(entity, notNullValue());
             final String responseText = entity.getText();
-            final Status status = response.getStatus();
-            assertThat(status, notNullValue());
-            assertThat("Response status did not indicate success: " + status + "\n"
-                + responseText, status.isSuccess(), is(true));
+            if (responseMatcher != null) {
+                assertThat(response, responseMatcher);
+            }
             return responseText;
         } finally {
             releaseResponse(response);
@@ -145,100 +168,104 @@ public class RequestFacade {
     }
 
     /**
-     * Sends a GET request to the specified uri and returns the {@link XStreamRepresentation} of the entity. <b>Also asserts that the response indicates a success status.</b>
-     * <p>
-     * Using this method is RECOMMENDED if you simply want the text of a response and nothing more since 
-     * this method ensures proper cleanup of any sockets, streams, etc., by releasing the response.
-     * <p>
-     * Of course the entire response text is buffered in memory here so use this wisely.
-     * 
-     * @param serviceURIpart the non-null part of the uri to fetch that is appended to the Nexus base URI.
-     * @return the complete response body text
-     * @throws NullPointerException if serviceURIpart is null
-     */
-    public static XStreamRepresentation doGetForXStreamRepresentationWithSuccess(final String serviceURIpart) throws IOException {
-        final String responseText = doGetForTextWithSuccess(serviceURIpart);
-        return new XStreamRepresentation(xstream,responseText,MediaType.APPLICATION_XML);
-    }
-    
-    /**
-     * Put the NexusResponse and return the response status.
+     * GET the status of a request at the specified uri part, asserting that the returned status is not null.
      * @param serviceURIpart
-     * @param nexusResponse
-     * @return the response status
-     * @throws IOException 
+     * @return
+     * @throws IOException
      */
-    public static Status doPutForStatus(final String serviceURIpart, final NexusResponse nexusResponse) throws IOException {
+    public static Status doGetForStatus(final String serviceURIpart) throws IOException {
         Preconditions.checkNotNull(serviceURIpart);
-        Preconditions.checkNotNull(nexusResponse);
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
-        representation.setPayload( nexusResponse );
         Response response = null;
         try {
-            response = RequestFacade.sendMessage( serviceURIpart, Method.PUT, representation );
-            return response.getStatus();
-        } finally {
-            releaseResponse(response);
-        }
-    }
-    
-    // assertThat(new NexusServiceRequest(serviceURIpart, nexusResponse), respondsWithStatus(400));
-    
-    /**
-     * PUT to a resource, validating the response indicates success. If not success, the failure will include information as to why.
-     */
-    public static void doPutWithSuccess(final String serviceURIpart, final NexusResponse nexusResponse) throws IOException {
-        Preconditions.checkNotNull(serviceURIpart);
-        Preconditions.checkNotNull(nexusResponse);
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
-        representation.setPayload( nexusResponse );
-        Response response = null;
-        try {
-            response = doPutRequest( serviceURIpart, representation );
-            final Status status = response.getStatus();
+            response = RequestFacade.sendMessage(serviceURIpart, Method.GET);
+            Status status = response.getStatus();
             assertThat(status, notNullValue());
-            final boolean successful = status.isSuccess();
-            if(!successful){
-                final Representation entity = response.getEntity();
-                assertThat("Problem getting Entity to debug why request was not successful", entity, notNullValue());
-                final String responseText = entity.getText(); // only getting this to help debug status
-                assertThat("Response status did not indicate success: " + status + "\n" + responseText, successful, is(true));
-            }
+            return status;
         } finally {
             releaseResponse(response);
         }
     }
 
     /**
-     * Send a message to a resource as a PUT request and return the response.
-     * <p>
-     * Ensure you explicity clean up the response entity returned by this method by calling
-     * {@link Response#release()}}
-     * 
-     * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
-     * @param representation the payload to send with the PUT request
-     * @return the response of the request
-     * @throws IOException if there is a problem communicating the response
-     */
-    public static Response doPutRequest(String serviceURIpart, final Representation representation)
-        throws IOException {
-        Preconditions.checkNotNull(representation);
-        return sendMessage(serviceURIpart, Method.PUT, representation);
-    }
-    
-    /**
+     * FIXME this is used everywhere
      * Send a message to a resource as a GET request and return the response.
      * <p>
      * Ensure you explicity clean up the response entity returned by this method by calling
      * {@link Response#release()}}
-     * 
+     *
      * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
      * @return the response of the request
      * @throws IOException if there is a problem communicating the response
      */
-    public static Response doGetRequest(String serviceURIpart)
+    public static Response doGetRequest(final String serviceURIpart)
         throws IOException {
         return sendMessage(serviceURIpart, Method.GET);
+    }
+
+    /**
+     * Sends a GET request to the specified uri and returns the {@link XStreamRepresentation} of the entity. <b>Also asserts that the response indicates a success status.</b>
+     * <p>
+     * Using this method is RECOMMENDED if you simply want the text of a response and nothing more since
+     * this method ensures proper cleanup of any sockets, streams, etc., by releasing the response.
+     * <p>
+     * Of course the entire response text is buffered in memory here so use this wisely.
+     *
+     * @param serviceURIpart the non-null part of the uri to fetch that is appended to the Nexus base URI.
+     * @return the complete response body text
+     * @throws NullPointerException if serviceURIpart is null
+     */
+    public static XStreamRepresentation doGetForXStreamRepresentationWithSuccess(final String serviceURIpart) throws IOException {
+        final String responseText = doGetForText(serviceURIpart, isSuccessful());
+        return new XStreamRepresentation(XML_XSTREAM, responseText, MediaType.APPLICATION_XML);
+    }
+
+    /**
+     * PUT a representation to the specified URI
+     * @param serviceURIpart
+     * @param representation
+     * @return
+     * @throws IOException
+     */
+    public static Status doPutForStatus(final String serviceURIpart, final XStreamRepresentation representation, Matcher<Response> matcher) throws IOException {
+        Preconditions.checkNotNull(serviceURIpart);
+        Response response = null;
+        try {
+            response = RequestFacade.sendMessage(toNexusURL(serviceURIpart), Method.PUT, representation, matcher);
+            return extractStatus(response);
+        } finally {
+            releaseResponse(response);
+        }
+    }
+
+    public static String doPutForText(final String serviceURIpart, final Representation representation, Matcher<Response> responseMatcher)
+        throws IOException {
+        Response response = null;
+        try {
+            response = sendMessage(toNexusURL(serviceURIpart), Method.PUT, representation, responseMatcher);
+            return extractText(response);
+        } finally {
+            releaseResponse(response);
+        }
+    }
+
+    public static String doPostForText(final String serviceURIpart, final Representation representation, Matcher<Response> responseMatcher)
+        throws IOException {
+        Response response = null;
+        try {
+            response = sendMessage(toNexusURL(serviceURIpart), Method.POST, representation, responseMatcher);
+            return extractText(response);
+        } finally {
+            releaseResponse(response);
+        }
+    }
+
+    public static void doDelete(final String serviceURIpart, Matcher<Response> responseMatcher) throws IOException {
+        Response response = null;
+        try {
+            response = sendMessage(toNexusURL(serviceURIpart), Method.DELETE, null, responseMatcher);
+        } finally {
+            releaseResponse(response);
+        }
     }
 
     /**
@@ -246,7 +273,7 @@ public class RequestFacade {
      * <p>
      * Ensure you explicity clean up the response entity returned by this method by calling
      * {@link Response#release()}}
-    
+
      * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
      * @param method the method type of the request
      * @return the response of the request
@@ -262,7 +289,7 @@ public class RequestFacade {
      * <p>
      * Ensure you explicity clean up the response entity returned by this method by calling
      * {@link Response#release()}}
-    
+
      * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
      * @param method the method type of the request
      * @param representation the representation to map the response to, may be null
@@ -271,10 +298,17 @@ public class RequestFacade {
      */
     public static Response sendMessage(final String serviceURIpart, final Method method, final Representation representation)
         throws IOException {
-        Preconditions.checkNotNull(serviceURIpart);
-        Preconditions.checkNotNull(method);
-        final String serviceURI = AbstractNexusIntegrationTest.nexusBaseUrl + serviceURIpart;
-        return sendMessage(new URL(serviceURI), method, representation);
+        return sendMessage(toNexusURL(serviceURIpart), method, representation);
+    }
+
+    public static Response sendMessage(final URL url, final Method method, final Representation representation)
+        throws IOException {
+        return sendMessage(url, method, representation, null);
+    }
+
+    public static Response sendMessage(final String uriPart, final Method method, final Representation representation, Matcher<Response> matcher)
+        throws IOException {
+        return sendMessage(toNexusURL(uriPart), method, representation, matcher);
     }
 
     /**
@@ -282,19 +316,20 @@ public class RequestFacade {
      * <p>
      * Ensure you explicity clean up the response entity returned by this method by calling
      * {@link Response#release()}}
-     * 
+     *
      * @param url the absolute url of the resource to request
      * @param method the method type of the request
      * @param representation the representation to map the response to, may be null
      * @return the response of the request
      * @throws IOException if there is a problem communicating the response
      */
-    public static Response sendMessage(final URL url, final Method method, final Representation representation)
+    public static Response sendMessage(final URL url, final Method method, final Representation representation, org.hamcrest.Matcher<Response> matchers)
         throws IOException {
 
         Preconditions.checkNotNull(url);
         Preconditions.checkNotNull(method);
-        
+        // represenation may be null
+        // matchers may be null
         final Request request = new Request();
         request.setResourceRef(url.toString());
         request.setMethod(method);
@@ -327,7 +362,11 @@ public class RequestFacade {
         Client client = new Client(ctx, Protocol.HTTP);
 
         LOG.debug("sendMessage: " + method.getName() + " " + url);
-        return client.handle(request);
+        Response response = client.handle(request);
+        if (matchers != null) {
+            assertThat(response, matchers);
+        }
+        return response;
     }
 
     /**
@@ -382,12 +421,12 @@ public class RequestFacade {
      * Execute a HTTPClient method, optionally in the context of a test. ie {@link TestContainer#getTestContext()}
      * <p>
      * NOTE: Before being returned, {@link HttpMethod#releaseConnection()} is called on the {@link HttpMethod} instance, therefore subsequent calls to get response body as string may return nulls.
-     * 
+     *
      * @param method the method to execute
      * @param useTestContext if true, execute this request in the context of a Test, false means ignore the testContext settings
      * @return the HttpMethod instance passed into this method
      * @throws HttpException
-     * @throws IOException 
+     * @throws IOException
      */
     public static HttpMethod executeHTTPClientMethod(final HttpMethod method, final boolean useTestContext)
         throws HttpException, IOException {

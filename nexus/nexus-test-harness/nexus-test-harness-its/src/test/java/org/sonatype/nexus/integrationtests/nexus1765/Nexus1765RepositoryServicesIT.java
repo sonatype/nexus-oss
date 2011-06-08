@@ -19,19 +19,20 @@
 package org.sonatype.nexus.integrationtests.nexus1765;
 
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 public class Nexus1765RepositoryServicesIT
     extends AbstractPrivilegeTest
@@ -40,21 +41,21 @@ public class Nexus1765RepositoryServicesIT
     public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
-    
+
     @Test
     public void testGetRepoStatus()
         throws Exception
     {
         this.giveUserPrivilege( TEST_USER_NAME, "55" ); //nexus:repostatus:read
-        
         // use test user
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         String repoId = this.getTestRepositoryId();
-        Response response = RequestFacade.doGetRequest( RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/status" );
+        String uriPart = RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/status";
 
-        Assert.assertEquals( response.getStatus().getCode(), 403, "Status: " + response.getStatus() );
+        final Status status = RequestFacade.doGetForStatus(uriPart);
+        assertThat(status, hasStatusCode(403));
     }
 
     @Test
@@ -64,7 +65,7 @@ public class Nexus1765RepositoryServicesIT
 
         this.giveUserPrivilege( TEST_USER_NAME, "55" ); //nexus:repostatus:read
         this.giveUserPrivilege( TEST_USER_NAME, "56" ); //nexus:repostatus:update
-        
+
         String repoId = this.getTestRepositoryId();
 
         RepositoryStatusResource repoStatus = repoUtil.getStatus( repoId );
@@ -81,13 +82,10 @@ public class Nexus1765RepositoryServicesIT
         RepositoryStatusResourceResponse resourceResponse = new RepositoryStatusResourceResponse();
         resourceResponse.setData( repoStatus );
         representation.setPayload( resourceResponse );
-        
-        Response response = RequestFacade.sendMessage(
-            RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/status",
-            Method.PUT,
-            representation );
 
-        Assert.assertEquals( response.getStatus().getCode(), 403, "Status: " + response.getStatus() );
+        final String uriPart = RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/status";
+        final Status status = RequestFacade.doPutForStatus(uriPart, representation, respondsWithStatusCode(403));
+        //assertThat(status, hasStatusCode(403));
     }
 
     @Test
@@ -95,49 +93,48 @@ public class Nexus1765RepositoryServicesIT
         throws Exception
     {
         this.giveUserPrivilege( TEST_USER_NAME, "67" ); //nexus:repometa:read
-        
+
         // use test user
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         String repoId = this.getTestRepositoryId();
-        Response response = RequestFacade.doGetRequest( RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/meta" );
+        String uriPart = RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/meta";
 
-        Assert.assertEquals( response.getStatus().getCode(), 403, "Status: " + response.getStatus() );
+        final Status status = RequestFacade.doGetForStatus(uriPart);
+        assertThat(status, hasStatusCode(403));
     }
-    
+
     @Test
     public void testGetRepoContent()
         throws Exception
     {
         this.giveUserPrivilege( TEST_USER_NAME, "T1" ); //read all M2
-        
+
         // use test user
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         String repoId = this.getTestRepositoryId();
-        Response response = RequestFacade.doGetRequest( RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/content/" );
-
-        // NOTE this will succeed, as you don't need view priv to retrieve content from repo
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
+        String uriPart = RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/content/";
+        final Status status = RequestFacade.doGetForStatus(uriPart);
+        assertThat(status, isSuccess());
     }
-    
+
     @Test
     public void testGetRepoIndexContent()
         throws Exception
     {
         this.giveUserPrivilege( TEST_USER_NAME, "T1" ); //read all M2
-        
+
         // use test user
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         String repoId = this.getTestRepositoryId();
-        Response response = RequestFacade.doGetRequest( RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/index_content/" );
-
-        // NOTE this will succeed, as you don't need view priv to retrieve index content from repo
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
+        String uriPart = RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/index_content/";
+        final Status status = RequestFacade.doGetForStatus(uriPart);
+        assertThat(status, isSuccess());
     }
-    
+
 }

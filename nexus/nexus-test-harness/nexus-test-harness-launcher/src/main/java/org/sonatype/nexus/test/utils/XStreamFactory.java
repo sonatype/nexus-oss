@@ -29,51 +29,37 @@ import com.thoughtworks.xstream.converters.basic.StringConverter;
 
 /**
  * XStream factory for Nexus Core. It gives away a preconfigured XStream to communicate with Core REST Resources.
- * 
+ *
  * @author cstamas
  */
-public class XStreamFactory
-{
-    // FIXME we would like to cache in the default case but provide also an option to get something others can customize
-    //private static XStream xmlXStream;
-    //private static XStream jsonXStream;
-    
-    public static XStream getXmlXStream()
-    {
-        //if(xmlXStream == null)
-        //{
-            XStream xmlXStream = new XStream( new LookAheadXppDriver() );
-            initXStream( xmlXStream );   
-        //}
+public class XStreamFactory {
+
+    public static XStream getXmlXStream() {
+        XStream xmlXStream = new XStream(new LookAheadXppDriver());
+        initXStream(xmlXStream);
 
         return xmlXStream;
     }
 
-    public static XStream getJsonXStream()
-    {
-        //if(jsonXStream == null)
-        //{
-            XStream jsonXStream = new XStream( new JsonOrgHierarchicalStreamDriver() );
+    public static XStream getJsonXStream() {
+        XStream jsonXStream = new XStream(new JsonOrgHierarchicalStreamDriver());
 
-            // for JSON, we use a custom converter for Maps
-            jsonXStream.registerConverter( new PrimitiveKeyedMapConverter( jsonXStream.getMapper() ) );
+        // for JSON, we use a custom converter for Maps
+        jsonXStream.registerConverter(new PrimitiveKeyedMapConverter(jsonXStream.getMapper()));
 
-            initXStream( jsonXStream );
-        //}
+        initXStream(jsonXStream);
         return jsonXStream;
     }
-    
-    private static void initXStream( XStream xstream )
-    {
+
+    private static void initXStream(XStream xstream) {
 
         NexusApplication napp = new NexusApplication();
 
-        napp.doConfigureXstream( xstream );
+        napp.doConfigureXstream(xstream);
 
-        XStreamInitializer.init( xstream );
-        
+        XStreamInitializer.init(xstream);
+
         // Nexus replaces the String converter with one that escape HTML, we do NOT want that on the IT client.
-        xstream.registerConverter( new StringConverter() );
+        xstream.registerConverter(new StringConverter());
     }
-
 }

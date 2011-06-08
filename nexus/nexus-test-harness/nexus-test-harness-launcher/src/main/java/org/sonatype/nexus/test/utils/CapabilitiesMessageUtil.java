@@ -36,120 +36,78 @@ import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRespo
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
-
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import com.thoughtworks.xstream.XStream;
 
-public class CapabilitiesMessageUtil
-{
-    private static final Logger LOG = Logger.getLogger( TaskScheduleUtil.class );
+public class CapabilitiesMessageUtil {
 
+    private static final Logger LOG = Logger.getLogger(TaskScheduleUtil.class);
     private static XStream xstream;
 
-    static
-    {
+    static {
         xstream = XStreamFactory.getXmlXStream();
-        new CapabilitiesPlexusResource( null, null ).configureXStream( xstream );
+        new CapabilitiesPlexusResource(null, null).configureXStream(xstream);
     }
 
     public static List<CapabilityListItemResource> list()
-        throws IOException
-    {
-        Response response = RequestFacade.doGetRequest( "service/local/capabilities" );
-
-        if ( response.getStatus().isError() )
-        {
-            LOG.error( response.getStatus().toString() );
-            return Collections.emptyList();
-        }
-
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
-
+        throws IOException {
+        String entityText = RequestFacade.doGetForText("service/local/capabilities", not(inError()));
+        XStreamRepresentation representation = new XStreamRepresentation(xstream, entityText, MediaType.APPLICATION_XML);
         CapabilitiesListResponseResource scheduleResponse =
-            (CapabilitiesListResponseResource) representation.getPayload( new CapabilitiesListResponseResource() );
-
+            (CapabilitiesListResponseResource) representation.getPayload(new CapabilitiesListResponseResource());
         return scheduleResponse.getData();
     }
 
-    public static CapabilityListItemResource create( CapabilityResource capability )
-        throws IOException
-    {
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
-
+    public static CapabilityListItemResource create(final CapabilityResource capability)
+        throws IOException {
+        XStreamRepresentation representation = new XStreamRepresentation(xstream, "", MediaType.APPLICATION_XML);
         CapabilityRequestResource envelope = new CapabilityRequestResource();
-        envelope.setData( capability );
+        envelope.setData(capability);
+        representation.setPayload(envelope);
 
-        representation.setPayload( envelope );
-
-        Response response = RequestFacade.sendMessage( "service/local/capabilities", Method.POST, representation );
-
-        if ( response.getStatus().isError() )
-        {
-            Assert.fail( response.getStatus().toString() );
-        }
-
-        representation = new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
-
+        final String entityText = RequestFacade.doPostForText("service/local/capabilities", representation, not(inError()));
+        representation = new XStreamRepresentation(xstream, entityText, MediaType.APPLICATION_XML);
         CapabilityStatusResponseResource scheduleResponse =
-            (CapabilityStatusResponseResource) representation.getPayload( new CapabilityStatusResponseResource() );
-
+            (CapabilityStatusResponseResource) representation.getPayload(new CapabilityStatusResponseResource());
         return scheduleResponse.getData();
     }
 
-    public static CapabilityResource read( String id )
-        throws IOException
-    {
-        Response response = RequestFacade.doGetRequest( "service/local/capabilities/" + id );
-
-        if ( response.getStatus().isError() )
-        {
-            Assert.fail( response.getStatus().toString() );
-        }
-
+    public static CapabilityResource read(String id)
+        throws IOException {
+        String uriPart = "service/local/capabilities/" + id;
+        String entityText = RequestFacade.doGetForText(uriPart, not(inError()));
         XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
+            new XStreamRepresentation(xstream, entityText, MediaType.APPLICATION_XML);
 
         CapabilityResponseResource scheduleResponse =
-            (CapabilityResponseResource) representation.getPayload( new CapabilityResponseResource() );
+            (CapabilityResponseResource) representation.getPayload(new CapabilityResponseResource());
 
         return scheduleResponse.getData();
     }
 
-    public static CapabilityListItemResource update( CapabilityResource resource )
-        throws IOException
-    {
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
-
+    public static CapabilityListItemResource update(CapabilityResource resource)
+        throws IOException {
+        XStreamRepresentation representation = new XStreamRepresentation(xstream, "", MediaType.APPLICATION_XML);
         CapabilityRequestResource envelope = new CapabilityRequestResource();
-        envelope.setData( resource );
+        envelope.setData(resource);
+        representation.setPayload(envelope);
 
-        representation.setPayload( envelope );
+        String uriPart = "service/local/capabilities/" + resource.getId();
+        String text = RequestFacade.doPutForText(uriPart, representation, not(inError()));
+            RequestFacade.sendMessage("service/local/capabilities/" + resource.getId(), Method.PUT, representation);
 
-        Response response =
-            RequestFacade.sendMessage( "service/local/capabilities/" + resource.getId(), Method.PUT, representation );
-
-        if ( response.getStatus().isError() )
-        {
-            Assert.fail( response.getStatus().toString() );
-        }
-
-        representation = new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
+        representation = new XStreamRepresentation(xstream, text, MediaType.APPLICATION_XML);
 
         CapabilityStatusResponseResource scheduleResponse =
-            (CapabilityStatusResponseResource) representation.getPayload( new CapabilityStatusResponseResource() );
+            (CapabilityStatusResponseResource) representation.getPayload(new CapabilityStatusResponseResource());
 
         return scheduleResponse.getData();
     }
 
-    public static void delete( String id )
-        throws IOException
-    {
-        Response response = RequestFacade.sendMessage( "service/local/capabilities/" + id, Method.DELETE );
-
-        if ( response.getStatus().isError() )
-        {
-            Assert.fail( response.getStatus().toString() );
-        }
+    public static void delete(String id)
+        throws IOException {
+        RequestFacade.doDelete("service/local/capabilities/" + id, not(inError()));
     }
-
 }
