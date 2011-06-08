@@ -36,7 +36,9 @@ import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
-
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import com.thoughtworks.xstream.XStream;
 
 public class GroupMessageUtil
@@ -146,12 +148,8 @@ public class GroupMessageUtil
         throws IOException
     {
 
-        Response response = RequestFacade.doGetRequest( SERVICE_PART + "/" + groupId );
-        String responseText = response.getEntity().getText();
+        String responseText = RequestFacade.doGetForText(SERVICE_PART + "/" + groupId, isSuccessful());
         LOG.debug( "responseText: \n" + responseText );
-
-        Assert.assertTrue( response.getStatus().isSuccess(),
-            "Failed to return Group: " + groupId + "\nResponse:\n" + responseText );
 
         // this should use call to: getResourceFromResponse
         XStreamRepresentation representation =
@@ -166,27 +164,32 @@ public class GroupMessageUtil
     public RepositoryGroupResource updateGroup( RepositoryGroupResource group )
         throws IOException
     {
-        Response response = this.sendMessage( Method.PUT, group );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not update user: " + response.getStatus() + "\n" + responseText );
+        Response response = null;
+        RepositoryGroupResource responseResource;
+        try {
+            response = this.sendMessage( Method.PUT, group );
+            responseResource = this.getResourceFromResponse( response );
+            assertThat(response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
         }
-
-        RepositoryGroupResource responseResource = this.getResourceFromResponse( response );
-
         this.validateResourceResponse( group, responseResource );
 
         return responseResource;
     }
 
+    /**
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+     */
     public Response sendMessage( Method method, RepositoryGroupResource resource )
         throws IOException
     {
         return this.sendMessage( method, resource, resource.getId() );
     }
 
+    /**
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+     */
     public Response sendMessage( Method method, RepositoryGroupResource resource, String id )
         throws IOException
     {
@@ -216,7 +219,8 @@ public class GroupMessageUtil
     public List<RepositoryGroupListResource> getList()
         throws IOException
     {
-        String responseText = RequestFacade.doGetRequest( SERVICE_PART ).getEntity().getText();
+
+        String responseText = RequestFacade.doGetForText( SERVICE_PART);
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
