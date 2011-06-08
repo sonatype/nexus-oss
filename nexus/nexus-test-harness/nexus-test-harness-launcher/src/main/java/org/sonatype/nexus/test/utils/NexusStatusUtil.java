@@ -78,7 +78,7 @@ public class NexusStatusUtil {
                 throw new NexusIllegalStateException("Unable to retrieve nexus status body", e);
             }
 
-            StatusResourceResponse status = (StatusResourceResponse) XStreamUtil.DEFAULT_XML_XSTREAM.fromXML(entityText);
+            StatusResourceResponse status = (StatusResourceResponse) XStreamFactory.getXmlXStream().fromXML(entityText);
             if (!SystemState.STARTED.toString().equals(status.getData().getState())) {
                 debug("Status check returned system state " + status.getData().getState());
                 return false;
@@ -102,7 +102,7 @@ public class NexusStatusUtil {
         throws NexusIllegalStateException {
         try {
             String entityText = RequestFacade.doGetForText("service/local/status", NexusRequestMatchers.isSuccessful());
-            StatusResourceResponse status = (StatusResourceResponse) XStreamUtil.DEFAULT_XML_XSTREAM.fromXML(entityText);
+            StatusResourceResponse status = (StatusResourceResponse) XStreamFactory.getXmlXStream().fromXML(entityText);
             return status;
         } catch (IOException ex) {
             throw new NexusIllegalStateException("Could not get nexus status", ex);
