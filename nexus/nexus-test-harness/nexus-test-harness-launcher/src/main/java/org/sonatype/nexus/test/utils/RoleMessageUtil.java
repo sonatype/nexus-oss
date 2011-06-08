@@ -99,25 +99,28 @@ public class RoleMessageUtil
     {
 
         Response response = null;
-        String entityText;
         try {
             response = this.sendMessage( Method.GET, null, roleId );
-            entityText = response.getEntity().getText();
+            RoleResource resource = this.getResourceFromResponse( response );
             assertThat("Could not find role", response, isSuccessful());
+            return resource;
         } finally {
             RequestFacade.releaseResponse(response);
         }
-
-        // get the Resource object
-        return this.getResourceFromResponse( response );
     }
 
+    /**
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+     */
     public Response sendMessage( Method method, RoleResource resource )
         throws IOException
     {
         return this.sendMessage( method, resource, resource.getId() );
     }
 
+    /**
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+     */
     private Response sendMessage( Method method, RoleResource resource, String id )
         throws IOException
     {
