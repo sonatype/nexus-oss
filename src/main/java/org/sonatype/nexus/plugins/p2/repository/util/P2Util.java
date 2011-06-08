@@ -22,10 +22,10 @@ public class P2Util
     {
         if ( coordinate == null )
         {
-            Properties props = new Properties();
+            final Properties props = new Properties();
 
-            InputStream is =
-                P2Util.class.getResourceAsStream( "/META-INF/maven/com.sonatype.nexus.plugin/nexus-p2-plugin/pom.properties" );
+            final InputStream is =
+                P2Util.class.getResourceAsStream( "/META-INF/maven/org.sonatype.nexus.plugins/nexus-p2-repository-plugin/pom.properties" );
 
             if ( is != null )
             {
@@ -33,14 +33,15 @@ public class P2Util
                 {
                     props.load( is );
                 }
-                catch ( IOException e )
+                catch ( final IOException e )
                 {
                     throw new RuntimeException( e.getMessage(), e );
                 }
             }
 
             coordinate =
-                new GAVCoordinate( "com.sonatype.nexus.plugin", "nexus-p2-plugin", props.getProperty( "version" ) );
+                new GAVCoordinate( "org.sonatype.nexus.plugins", "nexus-p2-repository-plugin",
+                    props.getProperty( "version" ) );
         }
         return coordinate;
     }
