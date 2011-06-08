@@ -9,29 +9,29 @@
 
 -->
 <?metadataRepository class='org.eclipse.equinox.internal.p2.metadata.repository.LocalMetadataRepository' version='1.0.0'?>
-<repository name='Unnamed - com.sonatype.nexus.plugin.p2:com.sonatype.nexus.p2.its.site2:eclipse-update-site:1.0.0' type='org.eclipse.equinox.internal.p2.metadata.repository.LocalMetadataRepository' version='1'>
+<repository name='Unnamed - org.sonatype.nexus.plugins.it.p2.repository:org.sonatype.nexus.plugins.p2.repository.its.site2:eclipse-update-site:1.0.0' type='org.eclipse.equinox.internal.p2.metadata.repository.LocalMetadataRepository' version='1'>
   <properties size='2'>
     <property name='p2.compressed' value='false'/>
     <property name='p2.timestamp' value='1226951255367'/>
   </properties>
   <units size='4'>
-    <unit id='com.sonatype.nexus.p2.its.feature2.feature.jar' version='1.0.0'>
-      <update id='com.sonatype.nexus.p2.its.feature2.feature.jar' range='[0.0.0,1.0.0)' severity='0'/>
+    <unit id='org.sonatype.nexus.plugins.p2.repository.its.feature2.feature.jar' version='1.0.0'>
+      <update id='org.sonatype.nexus.plugins.p2.repository.its.feature2.feature.jar' range='[0.0.0,1.0.0)' severity='0'/>
       <properties size='3'>
-        <property name='org.eclipse.equinox.p2.name' value='com.sonatype.nexus.p2.its.feature2'/>
+        <property name='org.eclipse.equinox.p2.name' value='org.sonatype.nexus.plugins.p2.repository.its.feature2'/>
         <property name='org.eclipse.equinox.p2.description' value='[Enter Feature Description here.]'/>
         <property name='org.eclipse.equinox.p2.description.url' value='http://www.example.com/description'/>
       </properties>
       <provides size='3'>
-        <provided namespace='org.eclipse.equinox.p2.iu' name='com.sonatype.nexus.p2.its.feature2.feature.jar' version='1.0.0'/>
+        <provided namespace='org.eclipse.equinox.p2.iu' name='org.sonatype.nexus.plugins.p2.repository.its.feature2.feature.jar' version='1.0.0'/>
         <provided namespace='org.eclipse.equinox.p2.eclipse.type' name='feature' version='1.0.0'/>
-        <provided namespace='org.eclipse.update.feature' name='com.sonatype.nexus.p2.its.feature2' version='1.0.0'/>
+        <provided namespace='org.eclipse.update.feature' name='org.sonatype.nexus.plugins.p2.repository.its.feature2' version='1.0.0'/>
       </provides>
       <filter>
         (org.eclipse.update.install.features=true)
       </filter>
       <artifacts size='1'>
-        <artifact classifier='org.eclipse.update.feature' id='com.sonatype.nexus.p2.its.feature2' version='1.0.0'/>
+        <artifact classifier='org.eclipse.update.feature' id='org.sonatype.nexus.plugins.p2.repository.its.feature2' version='1.0.0'/>
       </artifacts>
       <touchpoint id='org.eclipse.equinox.p2.osgi' version='1.0.0'/>
       <touchpointData size='1'>
@@ -72,20 +72,20 @@
         </instructions>
       </touchpointData>
     </unit>
-    <unit id='com.sonatype.nexus.p2.its.feature2.feature.group' version='1.0.0' singleton='false'>
-      <update id='com.sonatype.nexus.p2.its.feature2.feature.group' range='[0.0.0,1.0.0)' severity='0'/>
+    <unit id='org.sonatype.nexus.plugins.p2.repository.its.feature2.feature.group' version='1.0.0' singleton='false'>
+      <update id='org.sonatype.nexus.plugins.p2.repository.its.feature2.feature.group' range='[0.0.0,1.0.0)' severity='0'/>
       <properties size='4'>
-        <property name='org.eclipse.equinox.p2.name' value='com.sonatype.nexus.p2.its.feature2'/>
+        <property name='org.eclipse.equinox.p2.name' value='org.sonatype.nexus.plugins.p2.repository.its.feature2'/>
         <property name='org.eclipse.equinox.p2.description' value='[Enter Feature Description here.]'/>
         <property name='org.eclipse.equinox.p2.description.url' value='http://www.example.com/description'/>
         <property name='org.eclipse.equinox.p2.type.group' value='true'/>
       </properties>
       <provides size='1'>
-        <provided namespace='org.eclipse.equinox.p2.iu' name='com.sonatype.nexus.p2.its.feature2.feature.group' version='1.0.0'/>
+        <provided namespace='org.eclipse.equinox.p2.iu' name='org.sonatype.nexus.plugins.p2.repository.its.feature2.feature.group' version='1.0.0'/>
       </provides>
       <requires size='2'>
-        <required namespace='org.eclipse.equinox.p2.iu' name='com.sonatype.nexus.p2.its.feature.feature.group' range='[1.0.0,2.0.0)'/>
-        <required namespace='org.eclipse.equinox.p2.iu' name='com.sonatype.nexus.p2.its.feature2.feature.jar' range='[1.0.0,1.0.0]'>
+        <required namespace='org.eclipse.equinox.p2.iu' name='org.sonatype.nexus.plugins.p2.repository.its.feature.feature.group' range='[1.0.0,2.0.0)'/>
+        <required namespace='org.eclipse.equinox.p2.iu' name='org.sonatype.nexus.plugins.p2.repository.its.feature2.feature.jar' range='[1.0.0,1.0.0]'>
           <filter>
             (org.eclipse.update.install.features=true)
           </filter>

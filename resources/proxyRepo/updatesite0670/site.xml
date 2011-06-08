@@ -8,5 +8,5 @@
 
 -->
 <site>
-  <feature id="com.sonatype.nexus.p2.its.feature" url="features/com.sonatype.nexus.p2.its.feature_1.0.0.jar" version="1.0.0"/>
+  <feature id="org.sonatype.nexus.plugins.p2.repository.its.feature" url="features/org.sonatype.nexus.plugins.p2.repository.its.feature_1.0.0.jar" version="1.0.0"/>
 </site>

@@ -11,12 +11,12 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
-	  <groupId>com.sonatype.nexus.plugin.p2</groupId>
+	  <groupId>org.sonatype.nexus.plugins.it.p2.repository</groupId>
 	  <artifactId>nexus-p2-its-data</artifactId>
     <version>1.2.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>com.sonatype.nexus.p2.its.bundle</artifactId>
+  <artifactId>org.sonatype.nexus.plugins.p2.repository.its.bundle</artifactId>
   <version>1.0.1</version>
   <packaging>eclipse-plugin</packaging>
 </project>
