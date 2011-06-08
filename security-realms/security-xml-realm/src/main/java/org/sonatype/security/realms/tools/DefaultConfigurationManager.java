@@ -62,6 +62,10 @@ public class DefaultConfigurationManager
     @Inject
     private SecurityConfigurationCleaner configCleaner;
 
+    @Inject
+    private List<SecurityConfigurationModifier> configurationModifiers;
+
+
     public List<CPrivilege> listPrivileges()
     {
         return Collections.unmodifiableList( getConfiguration().getPrivileges() );
@@ -404,7 +408,7 @@ public class DefaultConfigurationManager
     {
         if ( privilege != null && privilege.getProperties() != null )
         {
-            for ( CProperty prop : (List<CProperty>) privilege.getProperties() )
+            for ( CProperty prop : privilege.getProperties() )
             {
                 if ( prop.getKey().equals( key ) )
                 {
@@ -545,11 +549,24 @@ public class DefaultConfigurationManager
         }
     }
 
+    @Override
     protected Configuration doGetConfiguration()
     {
         try
         {
             this.configurationSource.loadConfiguration();
+
+            boolean modified = false;
+            for ( SecurityConfigurationModifier modifier : configurationModifiers )
+            {
+                modified |= modifier.apply( configurationSource.getConfiguration() );
+            }
+
+            if ( modified )
+            {
+                configurationSource.backupConfiguration();
+                configurationSource.storeConfiguration();
+            }
 
             return this.configurationSource.getConfiguration();
         }

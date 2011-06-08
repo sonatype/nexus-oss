@@ -148,6 +148,7 @@ public class FileModelConfigurationSource
         return new FileInputStream( getConfigurationFile() );
     }
 
+    @Override
     public SecurityModelConfigurationSource getDefaultsSource()
     {
         return securityDefaults;
@@ -171,9 +172,7 @@ public class FileModelConfigurationSource
         getLogger().info( "Creating backup from the old file and saving the upgraded configuration." );
 
         // backup the file
-        File backup = new File( file.getParentFile(), file.getName() + ".bak" );
-
-        FileUtils.copyFile( file, backup );
+        backupConfiguration();
 
         // set the upgradeInstance to warn the application about this
         setConfigurationUpgraded( true );
@@ -265,6 +264,17 @@ public class FileModelConfigurationSource
     public boolean isConfigurationDefaulted()
     {
         return configurationDefaulted;
+    }
+
+    @Override
+    public void backupConfiguration()
+        throws IOException
+    {
+        File file = getConfigurationFile();
+
+        File backup = new File( file.getParentFile(), file.getName() + ".bak" );
+
+        FileUtils.copyFile( file, backup );
     }
 
 }

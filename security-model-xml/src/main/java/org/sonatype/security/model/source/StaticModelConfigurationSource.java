@@ -86,4 +86,11 @@ public class StaticModelConfigurationSource
         return false;
     }
 
+    @Override
+    public void backupConfiguration()
+        throws IOException
+    {
+        throw new UnsupportedOperationException( "The SecurityDefaultsConfigurationSource is a read only source!" );
+    }
+
 }

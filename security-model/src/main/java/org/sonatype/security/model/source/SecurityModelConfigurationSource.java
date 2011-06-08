@@ -29,4 +29,7 @@ public interface SecurityModelConfigurationSource extends ConfigurationSource<Co
 
     InputStream getConfigurationAsStream() throws IOException;
 
+    void backupConfiguration()
+        throws IOException;
+
 }
