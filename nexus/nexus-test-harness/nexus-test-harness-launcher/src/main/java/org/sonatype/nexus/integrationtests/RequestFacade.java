@@ -142,8 +142,8 @@ public class RequestFacade {
         return doGetForText(serviceURIpart, null);
     }
 
-     public static String doGetForText(final String serviceURIpart, final org.hamcrest.Matcher<Response> responseMatcher) throws IOException {
-        return doGetForText(serviceURIpart, null);
+    public static String doGetForText(final String serviceURIpart, final org.hamcrest.Matcher<Response> responseMatcher) throws IOException {
+        return doGetForText(serviceURIpart, null, responseMatcher);
     }
 
     /**
