@@ -23,14 +23,11 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.LogConfigResource;
 import org.sonatype.nexus.rest.model.LogConfigResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.testng.Assert;
-
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -82,12 +79,6 @@ public class LogConfigMessageUtil
 
         LOG.debug( "requestText: \n" + representation.getText() );
 
-        Response response = RequestFacade.sendMessage( SERVICE_URL, Method.PUT, representation );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not update log config: " + response.getStatus() + "\n" + responseText );
-        }
+        RequestFacade.doPut(SERVICE_URL, representation, isSuccessful());
     }
 }

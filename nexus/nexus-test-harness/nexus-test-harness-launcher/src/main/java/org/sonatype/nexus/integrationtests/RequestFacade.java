@@ -223,6 +223,15 @@ public class RequestFacade {
         return new XStreamRepresentation(XML_XSTREAM, responseText, MediaType.APPLICATION_XML);
     }
 
+    public static void doPut(final String serviceURIpart, final XStreamRepresentation representation, Matcher<Response> matcher) throws IOException {
+        Response response = null;
+        try {
+            response = RequestFacade.sendMessage(toNexusURL(serviceURIpart), Method.PUT, representation, matcher);
+        } finally {
+            releaseResponse(response);
+        }
+    }
+
     /**
      * PUT a representation to the specified URI
      * @param serviceURIpart
