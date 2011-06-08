@@ -38,9 +38,10 @@ import org.sonatype.security.rest.model.UserListResourceResponse;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
 import org.testng.Assert;
-
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import com.thoughtworks.xstream.XStream;
-
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 public class UserMessageUtil
     extends ITUtil
 {
@@ -93,15 +94,10 @@ public class UserMessageUtil
         throws IOException
     {
 
-        Response response = RequestFacade.doGetRequest( "service/local/users/" + userId );
-        String responseText = response.getEntity().getText();
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Error retrieving user '" + userId + "' \n" + responseText );
-        }
+        String entityText = RequestFacade.doGetForText("service/local/users/" + userId, isSuccessful());
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), entityText, MediaType.APPLICATION_XML );
 
         UserResourceRequest resourceResponse =
             (UserResourceRequest) representation.getPayload( new UserResourceRequest() );
@@ -112,12 +108,12 @@ public class UserMessageUtil
     public UserResource updateUser( UserResource user )
         throws IOException
     {
-        Response response = this.sendMessage( Method.PUT, user );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not update user: " + response.getStatus() + "\n" + responseText );
+        Response response = null;
+        try {
+            response = this.sendMessage( Method.PUT, user );
+            assertThat(response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
         }
 
         // get the Resource object
@@ -135,7 +131,9 @@ public class UserMessageUtil
         getTest().getSecurityConfigUtil().verifyUser( user );
         return responseResource;
     }
-
+    /**
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+     */
     public Response sendMessage( Method method, UserResource resource )
         throws IOException
     {
@@ -157,7 +155,7 @@ public class UserMessageUtil
 
     /**
      * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     * 
+     *
      * @return
      * @throws IOException
      */
@@ -165,17 +163,13 @@ public class UserMessageUtil
     public List<UserResource> getList()
         throws IOException
     {
-        Response response = RequestFacade.doGetRequest( "service/local/users" );
-        String responseText = response.getEntity().getText();
+        String responseText = RequestFacade.doGetForText("service/local/users", isSuccessful());
         LOG.debug( "responseText: \n" + responseText );
 
         // must use the XML xstream even if we 'thought' we wanted to use JSON, because REST client doesn't listen to
         // the MediaType in some situations.
         XStreamRepresentation representation =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
-
-        // make sure we have a success
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() + "\n" + responseText );
 
         UserListResourceResponse resourceResponse =
             (UserListResourceResponse) representation.getPayload( new UserListResourceResponse() );
@@ -214,14 +208,18 @@ public class UserMessageUtil
         // plexus_users
         String uriPart = RequestFacade.SERVICE_LOCAL + "plexus_users/" + source;
 
-        Response response =
-            RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
-        String responseString = response.getEntity().getText();
-        Assert.assertTrue( response.getStatus().isSuccess(),
-                           "Status: " + response.getStatus() + "\nResponse:\n" + responseString );
+        Response response = null;
+        String entityText;
+        try {
+            response = RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
+            entityText = response.getEntity().getText();
+            assertThat(response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
+        }
 
         PlexusUserListResourceResponse result =
-            (PlexusUserListResourceResponse) this.parseResponseText( responseString,
+            (PlexusUserListResourceResponse) this.parseResponseText( entityText,
                                                                      new PlexusUserListResourceResponse() );
 
         return result.getData();
@@ -235,14 +233,18 @@ public class UserMessageUtil
         // plexus_user
         String uriPart = RequestFacade.SERVICE_LOCAL + "plexus_user/" + sourcePart + userId;
 
-        Response response =
-            RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
-        String responseString = response.getEntity().getText();
-        Assert.assertTrue( response.getStatus().isSuccess(),
-                           "Status: " + response.getStatus() + "\nResponse:\n" + responseString );
+        Response response = null;
+        String entityText;
+        try {
+            response = RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
+            entityText = response.getEntity().getText();
+            assertThat(response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
+        }
 
         PlexusUserResourceResponse result =
-            (PlexusUserResourceResponse) this.parseResponseText( responseString, new PlexusUserResourceResponse() );
+            (PlexusUserResourceResponse) this.parseResponseText( entityText, new PlexusUserResourceResponse() );
 
         return result.getData();
     }
@@ -260,35 +262,39 @@ public class UserMessageUtil
         // user_search
         String uriPart = RequestFacade.SERVICE_LOCAL + "user_search/" + source + "/" + userId;
 
-        Response response =
-            RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
-        String responseString = response.getEntity().getText();
-        Assert.assertTrue( response.getStatus().isSuccess(),
-                           "Status: " + response.getStatus() + "\nResponse:\n" + responseString );
+        Response response = null;
+        String entityText;
+        try {
+            response = RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
+            entityText = response.getEntity().getText();
+            assertThat(response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
+        }
 
         PlexusUserListResourceResponse result =
-            (PlexusUserListResourceResponse) this.parseResponseText( responseString,
+            (PlexusUserListResourceResponse) this.parseResponseText( entityText,
                                                                      new PlexusUserListResourceResponse() );
 
         return result.getData();
     }
 
     /**
+     * Delete the user, asserting the user was deleted successfully by checking the response status code
      * @param userId
      * @return Returns true when the user was deleted and false when it was not deleted
-     * @throws Exception
+     * @throws IOException problem with operation
+     * @throws IllegalArgumentException if you try to delete the 'anonymous' user id
      */
-    public static boolean removeUser( String userId )
+    public static void removeUser( String userId )
         throws IOException
     {
-
         if ( "anonymous".equals( userId ) )
         {
             throw new IllegalArgumentException( "Unable to delete anonymous user" );
         }
+        RequestFacade.doDelete("service/local/users/" + userId, isSuccessful());
 
-        Status status = RequestFacade.sendMessage( "service/local/users/" + userId, Method.DELETE ).getStatus();
-        return status.isSuccess();
     }
 
     /**
