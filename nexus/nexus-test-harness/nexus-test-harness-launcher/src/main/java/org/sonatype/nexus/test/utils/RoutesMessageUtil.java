@@ -43,6 +43,9 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.testng.Assert;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -67,11 +70,20 @@ public class RoutesMessageUtil
     public RepositoryRouteResource getRoute( String routeId )
         throws IOException
     {
-        Response response = getRouteResponse( routeId );
-
-        return this.getResourceFromResponse( response );
+        Response response = null;
+        try {
+            response = getRouteResponse( routeId );
+            RepositoryRouteResource r = this.getResourceFromResponse( response );
+            assertThat(response, isSuccessful());
+            return r;
+        } finally {
+            RequestFacade.releaseResponse(response);
+        }
     }
 
+    /**
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+     */
     public Response getRouteResponse( String routeId )
         throws IOException
     {
@@ -79,6 +91,9 @@ public class RoutesMessageUtil
         return response;
     }
 
+    /**
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+     */
     public Response sendMessage( Method method, RepositoryRouteResource resource )
         throws IOException
     {
@@ -188,12 +203,9 @@ public class RoutesMessageUtil
     {
         String serviceURI = "service/local/repo_routes";
 
-        Response response = RequestFacade.doGetRequest( serviceURI );
-        Status status = response.getStatus();
-        Assert.assertTrue( status.isSuccess(), "Unable to get routes: " + status.getDescription() );
-
+        String entityText = RequestFacade.doGetForText(serviceURI, isSuccessful());
         XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), response.getEntity().getText(),
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), entityText,
                                        MediaType.APPLICATION_XML );
 
         RepositoryRouteListResourceResponse resourceResponse =
