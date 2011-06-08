@@ -1,0 +1,5 @@
+#Eclipse Product File
+#Fri Nov 14 14:00:02 EST 2008
+version=1.0.0
+name=nexus-p2-its-product
+id=org.eclipse.equinox.p2.director.app.product

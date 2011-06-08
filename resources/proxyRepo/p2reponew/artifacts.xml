@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+
+    Copyright (c) 2008-2011 Sonatype, Inc.
+
+    All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
+    Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
+    M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<?artifactRepository class='org.eclipse.equinox.internal.p2.artifact.repository.simple.SimpleArtifactRepository' version='1.0.0'?>
+<repository name='Unnamed - p2 repo new Artifacts' type='org.eclipse.equinox.p2.artifact.repository.simpleRepository' version='1'>
+  <properties size='2'>
+    <property name='p2.compressed' value='false'/>
+    <property name='p2.timestamp' value='1226685725919'/>
+  </properties>
+  <mappings size='3'>
+    <rule filter='(&amp; (classifier=osgi.bundle))' output='${repoUrl}/plugins/${id}_${version}.jar'/>
+    <rule filter='(&amp; (classifier=binary))' output='${repoUrl}/binary/${id}_${version}'/>
+    <rule filter='(&amp; (classifier=org.eclipse.update.feature))' output='${repoUrl}/features/${id}_${version}.jar'/>
+  </mappings>
+  <artifacts size='1'>
+  <artifact classifier='osgi.bundle' id='com.sonatype.nexus.p2.its.bundle' version='1.0.1'>
+    <properties size='6'>
+      <property name='artifact.size' value='1815'/>
+      <property name='download.size' value='1815'/>
+      <property name='download.md5' value='becd474bb30f91eab9acc77fe2126053'/>
+      <property name='maven-artifactId' value='com.sonatype.nexus.p2.its.bundle'/>
+      <property name='maven-groupId' value='com.sonatype.nexus.plugin.p2'/>
+      <property name='maven-version' value='1.0.1'/>
+    </properties>
+  </artifact>
+  </artifacts>
+</repository>

@@ -1,0 +1,34 @@
+<plexus>
+  <components>
+    
+    <component>
+      <role>com.sonatype.nexus.p2.lineup.resolver.P2LineupResolver</role>
+      <implementation>com.sonatype.nexus.p2.lineup.persist.MockP2LineupResolver</implementation>
+    </component>
+    
+    <component>
+      <role>org.sonatype.nexus.configuration.application.GlobalRestApiSettings</role>
+      <implementation>com.sonatype.nexus.p2.lineup.persist.MockGlobalRestApiSettings</implementation>
+    </component>
+    
+    <component>
+      <role>org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage</role>
+      <role-hint>mock</role-hint>
+      <implementation>com.sonatype.nexus.p2.proxy.MockRemoteStorage</implementation>
+      <isolated-realm>false</isolated-realm>
+      <requirements>
+        <requirement>
+          <role>org.sonatype.nexus.ApplicationStatusSource</role>
+          <role-hint>default</role-hint>
+          <field-name>applicationStatusSource</field-name>
+        </requirement>
+        <requirement>
+          <role>org.sonatype.nexus.mime.MimeUtil</role>
+          <role-hint>default</role-hint>
+          <field-name>mimeUtil</field-name>
+        </requirement>
+      </requirements>
+    </component>
+    
+  </components>
+</plexus>

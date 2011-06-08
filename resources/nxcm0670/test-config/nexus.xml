@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2008-2011 Sonatype, Inc.
+
+    All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
+    Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
+    M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<nexusConfiguration>
+  <version>1.0.8</version>
+
+  <smtpConfiguration>
+    <host>localhost</host>
+    <port>${email-server-port}</port>
+    <sslEnabled>false</sslEnabled>
+    <tlsEnabled>false</tlsEnabled>
+    <username>smtp-username</username>
+    <password>smtp-password</password>
+    <debugMode>false</debugMode>
+    <systemEmailAddress>system@nexus.org</systemEmailAddress>
+  </smtpConfiguration>
+
+  <security>
+    <enabled>false</enabled>
+    <anonymousAccessEnabled>true</anonymousAccessEnabled>
+    <anonymousUsername>anonymous</anonymousUsername>
+    <anonymousPassword>anonymous</anonymousPassword>
+    <realms>
+      <realm>XmlAuthenticatingRealm</realm>
+      <realm>XmlAuthorizingRealm</realm>
+    </realms>
+  </security>
+
+  <globalConnectionSettings />
+
+  <restApi />
+
+  <httpProxy />
+
+  <routing>
+    <groups />
+  </routing>
+
+  <repositories>
+    <repository>
+      <id>updatesiteproxy</id>
+      <name>updatesiteproxy</name>
+      <type>eclipse-update-site</type>
+      <remoteStorage>
+        <url>${proxy-repo-base-url}updatesite0670</url>
+      </remoteStorage>
+    </repository>
+  </repositories>
+
+  <repositoryShadows>
+  </repositoryShadows>
+
+  <repositoryGrouping>
+  </repositoryGrouping>
+
+  <repositoryTargets>
+  </repositoryTargets>
+
+  <tasks>
+    <task>
+      <id>1</id>
+      <name>UpdateSiteMirrorTask</name>
+      <enabled>true</enabled>
+      <type>UpdateSiteMirrorTask</type>
+      <status>SUBMITTED</status>
+      <schedule>
+        <type>manual</type>
+      </schedule>
+      <properties>
+        <property>
+          <key>ForceMirror</key>
+          <value>true</value>
+        </property>
+        <property>
+          <key>repositoryOrGroupId</key>
+          <value>repo_updatesiteproxy</value>
+        </property>
+      </properties>
+    </task>
+  </tasks>
+
+</nexusConfiguration>

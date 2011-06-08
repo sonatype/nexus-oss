@@ -1,0 +1,254 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+
+    Copyright (c) 2008-2011 Sonatype, Inc.
+
+    All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
+    Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
+    M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<?artifactRepository version='1.1.0'?>
+<repository name='download cache' type='org.eclipse.equinox.p2.artifact.repository.simpleRepository' version='1.0.0'>
+  <properties size='2'>
+    <property name='p2.system' value='true'/>
+    <property name='p2.timestamp' value='1276090085766'/>
+  </properties>
+  <mappings size='3'>
+    <rule filter='(&amp; (classifier=osgi.bundle))' output='${repoUrl}/plugins/${id}_${version}.jar'/>
+    <rule filter='(&amp; (classifier=binary))' output='${repoUrl}/binary/${id}_${version}'/>
+    <rule filter='(&amp; (classifier=org.eclipse.update.feature))' output='${repoUrl}/features/${id}_${version}.jar'/>
+  </mappings>
+  <artifacts size='46'>
+    <artifact classifier='binary' id='org.eclipse.rcp_root' version='3.6.0.v20100519-9OArFKvFtsd7W8Z8vYDgRSS'>
+      <properties size='1'>
+        <property name='download.size' value='40199'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.cvs_root' version='1.2.0.v20100427-7B77FKs8sF7B77RAI4HJFF'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp.configuration_root.cocoa.macosx.x86_64' version='1.0.0.I20100603-1500'>
+      <properties size='1'>
+        <property name='download.size' value='40418'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.platform_root' version='3.5.1.R35x_v20090910-9gEeG1_FthkNDSP2odXdThaOu9GFDPn83DGB7'>
+      <properties size='1'>
+        <property name='download.size' value='52057'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.jdt_root' version='3.6.0.v20100520-0800-7z8XFUJFMTfCW8oRvdIkqis9H155'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp_root' version='3.6.0.v20100519-9OAqFKvFtsd7E2Z8uDEdcWTC'>
+      <properties size='1'>
+        <property name='download.size' value='39847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp.configuration_root.cocoa.macosx.x86_64' version='1.0.0.I20100516-0800'>
+      <properties size='1'>
+        <property name='download.size' value='40418'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp_root' version='3.6.0.v20100519-9OArFKvFtsd7WLUKgwEZXSS'>
+      <properties size='1'>
+        <property name='download.size' value='40847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp_root' version='3.6.0.v20100519-9OAqFKvFtsd7DwU8uDDeZSTC'>
+      <properties size='1'>
+        <property name='download.size' value='39847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.jdt_root' version='3.6.0.v20100520-0800-7z8XFUJFMTfCWAoRviIlqis9H155'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.cvs_root' version='1.2.0.v20100427-7B77FKs8sF7B77SDS5CV75'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.jdt_root' version='3.6.0.v20100526-0800-7z8XFUJFMTfCWGoVu7Kltsu9H155'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.platform_root' version='3.6.0.v20100602-9gF78GpqFt6trOGhL5t0nJy5fyGHKrwNY'>
+      <properties size='1'>
+        <property name='download.size' value='40847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.platform_root' version='3.6.0.v20100512-9gF78GpqFt6trMPh87WykimfHYlaz0O_XWL'>
+      <properties size='1'>
+        <property name='download.size' value='39847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.jdt_root' version='3.6.0.v20100518-0800-7z8XFUJFMTfCW6oRnXIkqis9H155'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.jdt_root' version='3.6.0.v20100526-0800-7z8XFUJFMTfCWCoS0NIkqis9H155'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp_root' version='3.6.0.v20100519-9OArFKvFtsd7WLUKh-DcYTS'>
+      <properties size='1'>
+        <property name='download.size' value='40847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.cvs_root' version='1.2.0.v20100427-7B77FKs8sF7B77R9Q4HJFF'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp.configuration_root.cocoa.macosx.x86_64' version='1.0.0.I20100608-0911'>
+      <properties size='1'>
+        <property name='download.size' value='40418'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.cvs_root' version='1.2.0.v20100427-7B77FKs8sF7B77R9O4HJFF'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.platform_root' version='3.6.0.v20100512-9gF78GpqFt6trMPh89aykhooMYvJ-RheoD'>
+      <properties size='1'>
+        <property name='download.size' value='39847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.platform_root' version='3.6.0.v20100512-9gF78GpqFsgprFPh7yX6fc_rLuz0eIyiZYa'>
+      <properties size='1'>
+        <property name='download.size' value='39847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.jdt_root' version='3.5.1.r351_v20090810-0600-7r88FEoFI0WTo6Az-1qFRHm37ChJ'>
+      <properties size='1'>
+        <property name='download.size' value='8076'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp_root' version='3.6.0.v20100427-9KAjFKvFs-Uz-4YX1oLDhUVS'>
+      <properties size='1'>
+        <property name='download.size' value='39847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.cvs_root' version='1.2.0.v20100427-7B77FKs8sF7B77RAN4HJFF'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp_root' version='3.6.0.v20100427-9KAjFKvFs-Uz-4QX1m8DgXVS'>
+      <properties size='1'>
+        <property name='download.size' value='39847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.cvs_root' version='1.2.0.v20100427-7B77FKs8sF7B77SDX4GW85'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp.configuration_root.cocoa.macosx.x86_64' version='1.0.0.I20100520-1744'>
+      <properties size='1'>
+        <property name='download.size' value='40418'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp.configuration_root.cocoa.macosx.x86_64' version='1.0.0.M20090917-0800'>
+      <properties size='1'>
+        <property name='download.size' value='40181'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.platform_root' version='3.6.0.v20100602-9gF78GpqFt6trOGhL60z0oEx3fz-JKNwxPY'>
+      <properties size='1'>
+        <property name='download.size' value='40847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.jdt_root' version='3.6.0.v20100520-0800-7z8XFUJFMTfCW8oRvdJkums9H155'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp_root' version='3.6.0.v20100519-9OAqFKvFtsd7E2Z8vDDeZSTC'>
+      <properties size='1'>
+        <property name='download.size' value='39847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.cvs_root' version='1.2.0.v20100427-7B77FKs8sF7B77RAI5GNJF'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.emf.ecore_root' version='2.6.0.v20100429-1251'>
+      <properties size='1'>
+        <property name='download.size' value='8492'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.jdt_root' version='3.6.0.v20100526-0800-7z8XFUJFMTfCWGoVuHImpms9H155'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.platform_root' version='3.6.0.v20100527-0800-9gF78GpqFt6trOGhCMBz0p0syLlJrz0GU_i'>
+      <properties size='1'>
+        <property name='download.size' value='40199'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.platform_root' version='3.6.0.v20100512-9gF78GpqFsgprEYh7z-T6dcirDtyc5yhbYa'>
+      <properties size='1'>
+        <property name='download.size' value='39847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp_root' version='3.5.1.R35x_v20090811-9SA0FxVFqE70OL1ARMrfcO6e7BA6'>
+      <properties size='1'>
+        <property name='download.size' value='52057'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.jdt_root' version='3.6.0.v20100513-0800-7z8XFUJFMTfCW6oRmyIkqis9H155'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.platform_root' version='3.6.0.v20100512-9gF78GpqFt6trMPh89Rz-jmqnMYpK-UpioD'>
+      <properties size='1'>
+        <property name='download.size' value='39847'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp.configuration_root.cocoa.macosx.x86_64' version='1.0.0.I20100518-0800'>
+      <properties size='1'>
+        <property name='download.size' value='40418'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.cvs_root' version='1.2.0.v20100427-7B77FKs8sF7B77RFW4FV75'>
+      <properties size='1'>
+        <property name='download.size' value='8825'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp.configuration_root.cocoa.macosx.x86_64' version='1.0.0.I20100520-0800'>
+      <properties size='1'>
+        <property name='download.size' value='40418'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp.configuration_root.cocoa.macosx.x86_64' version='1.0.0.I20100525-0800'>
+      <properties size='1'>
+        <property name='download.size' value='40418'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp.configuration_root.cocoa.macosx.x86_64' version='1.0.0.I20100527-0800'>
+      <properties size='1'>
+        <property name='download.size' value='40418'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.cvs_root' version='1.1.101.R35x_v20090811-7E79FEd9KKF5H2YDWFLLBL01A16'>
+      <properties size='1'>
+        <property name='download.size' value='8076'/>
+      </properties>
+    </artifact>
+  </artifacts>
+</repository>

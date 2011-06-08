@@ -1,0 +1,29 @@
+<!--
+
+    Copyright (c) 2008-2011 Sonatype, Inc.
+
+    All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
+    Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
+    M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+
+-->
+<assembly>
+  <id>bundle</id>
+
+  <formats>
+    <format>zip</format>
+  </formats>
+
+  <baseDirectory>/</baseDirectory>
+
+  <dependencySets>
+    <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
+      <unpack>true</unpack>
+      <includes>
+        <include>com.sonatype.components:nexus-p2-runtime</include>
+      </includes>
+      <outputDirectory>${project.artifactId}-${project.version}/p2</outputDirectory>
+    </dependencySet>
+  </dependencySets>
+</assembly>

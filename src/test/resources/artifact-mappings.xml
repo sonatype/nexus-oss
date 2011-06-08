@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<repositories size="1">
+  <repository uri="http://localhost:54581/remote/junit">
+    <artifact md5="499b073781f5a046c3557cb6a78f76c8" remotePath="/plugins/org.mortbay.jetty.util_6.1.15.v200905182336.jar"/>
+    <artifact remotePath="/plugins/org.mortbay.jetty.util_6.1.15.v200905182336.jar.pack.gz"/>
+    <artifact remotePath="/plugins/javax.servlet_2.5.0.v200806031605.jar.pack.gz"/>
+    <artifact md5="d7b7443f5699d4f9f643efced0010766" remotePath="/plugins/javax.servlet_2.5.0.v200806031605.jar"/>
+  </repository>
+</repositories>
