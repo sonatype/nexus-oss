@@ -289,7 +289,6 @@ public class SearchMessageUtil
         Response response = null;
         try {
             response = RequestFacade.doGetRequest( "service/local/identify/sha1/" + sha1 );
-            assertThat(response, isSuccessful());
             if ( response.getStatus().isSuccess() )
             {
                 XStreamRepresentation representation =
