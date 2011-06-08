@@ -51,7 +51,9 @@ import org.sonatype.nexus.tasks.descriptors.RepairIndexTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
-
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import com.thoughtworks.xstream.XStream;
 
 public class SearchMessageUtil
@@ -70,7 +72,7 @@ public class SearchMessageUtil
 
     /**
      * Main entry point used by other exposed methods. Do NOT expose this method, never ever.
-     * 
+     *
      * @param queryArgs
      * @param repositoryId
      * @param asKeywords
@@ -120,7 +122,7 @@ public class SearchMessageUtil
 
     /**
      * Uses XStream to unmarshall the DTOs.
-     * 
+     *
      * @param queryArgs
      * @param repositoryId
      * @param asKeywords
@@ -130,14 +132,18 @@ public class SearchMessageUtil
     private List<NexusArtifact> doSearchFor( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
         throws IOException
     {
-        Response response = doSearchForR( queryArgs, repositoryId, searchType );
-
-        String responseText = response.getEntity().getText();
-
-        Assert.assertTrue( response.getStatus().isSuccess(), "Search failure:\n" + responseText );
+        Response response = null;
+        String entityText;
+        try {
+            response = doSearchForR( queryArgs, repositoryId, searchType );
+            entityText = response.getEntity().getText();
+            assertThat(response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
+        }
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( xstream, entityText, MediaType.APPLICATION_XML );
 
         SearchResponse searchResponde = (SearchResponse) representation.getPayload( new SearchResponse() );
 
@@ -164,10 +170,9 @@ public class SearchMessageUtil
         return doSearchFor( queryArgs, repositoryId, searchType );
     }
 
-    // QUICK ("simple" query)
-
     /**
      * Returns "low" Restlet response to access response HTTP Code.
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
      */
     public Response searchFor_response( String query )
         throws IOException
@@ -282,19 +287,25 @@ public class SearchMessageUtil
     {
         // GET /identify/sha1/8b1b85d04eea979c33109ea42808b7d3f6d355ab (is log4j:log4j:1.2.13)
 
-        Response response = RequestFacade.doGetRequest( "service/local/identify/sha1/" + sha1 );
+        Response response = null;
+        try {
+            response = RequestFacade.doGetRequest( "service/local/identify/sha1/" + sha1 );
+            assertThat(response, isSuccessful());
+            if ( response.getStatus().isSuccess() )
+            {
+                XStreamRepresentation representation =
+                    new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
 
-        if ( response.getStatus().isSuccess() )
-        {
-            XStreamRepresentation representation =
-                new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
+                return (NexusArtifact) representation.getPayload( new NexusArtifact() );
+            }
+            else
+            {
+                return null;
+            }
+        } finally {
+            RequestFacade.releaseResponse(response);
+        }
 
-            return (NexusArtifact) representation.getPayload( new NexusArtifact() );
-        }
-        else
-        {
-            return null;
-        }
     }
 
     // SWITCHES ALLOW*
@@ -342,16 +353,8 @@ public class SearchMessageUtil
         throws IOException
     {
         String serviceURI = "service/local/repositories/" + repositoryName;
-        final Response response = RequestFacade.doGetRequest( serviceURI );
-
-        if ( response.getStatus().isError() )
-        {
-            Assert.assertFalse( response.getStatus().isError(), "Unable do retrieve repository: " + repositoryName
-                + "\n" + response.getStatus() );
-        }
-        String responseText = response.getEntity().getText();
-
-        RepositoryResourceResponse repository = (RepositoryResourceResponse) xstream.fromXML( responseText );
+        String entityText = RequestFacade.doGetForText(serviceURI, isSuccessful());
+        RepositoryResourceResponse repository = (RepositoryResourceResponse) xstream.fromXML( entityText );
         return (RepositoryResource) repository.getData();
     }
 
@@ -365,8 +368,7 @@ public class SearchMessageUtil
         repositoryResponse.setData( repository );
         representation.setPayload( repositoryResponse );
 
-        Status status = RequestFacade.sendMessage( serviceURI, Method.PUT, representation ).getStatus();
-        Assert.assertEquals( Status.SUCCESS_OK.getCode(), status.getCode() );
+        RequestFacade.doPutForStatus(serviceURI, representation, isSuccessful());
 
     }
 
@@ -417,18 +419,19 @@ public class SearchMessageUtil
     public ArtifactInfoResource getInfo( String repositoryId, String itemPath )
         throws IOException
     {
-        Response res =
-            RequestFacade.sendMessage( "content/repositories/" + repositoryId + "/" + itemPath + "?describe=info",
-                Method.GET, new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML ) );
-
-        String responseText = res.getEntity().getText();
-        if ( !res.getStatus().isSuccess() )
-        {
-            Assert.fail( res.getStatus() + "\n" + responseText );
+        Response response = null;
+        String entityText;
+        try {
+            response = RequestFacade.sendMessage( "content/repositories/" + repositoryId + "/" + itemPath + "?describe=info",
+                Method.GET, new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML ));
+            entityText = response.getEntity().getText();
+            assertThat(response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
         }
 
         XStreamRepresentation rep =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), entityText, MediaType.APPLICATION_XML );
         ArtifactInfoResourceResponse info =
             (ArtifactInfoResourceResponse) rep.getPayload( new ArtifactInfoResourceResponse() );
 
@@ -440,7 +443,7 @@ public class SearchMessageUtil
 
     /**
      * Main entry point used by other exposed methods. Do NOT expose this method, never ever.
-     * 
+     *
      * @param queryArgs
      * @param repositoryId
      * @param asKeywords
@@ -485,7 +488,7 @@ public class SearchMessageUtil
 
     /**
      * Uses XStream to unmarshall the DTOs.
-     * 
+     *
      * @param queryArgs
      * @param repositoryId
      * @param asKeywords
@@ -495,14 +498,18 @@ public class SearchMessageUtil
     private SearchNGResponse doNGSearchFor( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
         throws IOException
     {
-        Response response = doNGSearchForR( queryArgs, repositoryId, searchType );
-
-        String responseText = response.getEntity().getText();
-
-        Assert.assertTrue( response.getStatus().isSuccess(), "Search failure:\n" + responseText );
+        Response response = null;
+        String entityText;
+        try {
+            response = doNGSearchForR( queryArgs, repositoryId, searchType );
+            entityText = response.getEntity().getText();
+            assertThat(response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
+        }
 
         XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( xstream, entityText, MediaType.APPLICATION_XML );
 
         SearchNGResponse searchResponse = (SearchNGResponse) representation.getPayload( new SearchNGResponse() );
 
@@ -648,16 +655,10 @@ public class SearchMessageUtil
             serviceURI = serviceURI + "versionHint=" + versionIdHint + "&";
         }
 
-        Response response = RequestFacade.doGetRequest( serviceURI );
-
-        String responseText = response.getEntity().getText();
-
-        Status status = response.getStatus();
-
-        Assert.assertTrue( status.isSuccess(), responseText + status );
+        String entityText = RequestFacade.doGetForText( serviceURI, isSuccessful() );
 
         XStreamRepresentation re =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), entityText, MediaType.APPLICATION_XML );
 
         IndexBrowserTreeViewResponseDTO resourceResponse =
             (IndexBrowserTreeViewResponseDTO) re.getPayload( new IndexBrowserTreeViewResponseDTO() );
