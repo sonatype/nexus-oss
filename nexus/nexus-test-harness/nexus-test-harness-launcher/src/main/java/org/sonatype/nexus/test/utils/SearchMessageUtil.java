@@ -53,7 +53,6 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
 import com.thoughtworks.xstream.XStream;
 
 public class SearchMessageUtil

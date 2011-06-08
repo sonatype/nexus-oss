@@ -44,7 +44,6 @@ import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.testng.Assert;
 import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 
 import com.thoughtworks.xstream.XStream;

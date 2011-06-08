@@ -42,7 +42,9 @@ import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
-
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import com.thoughtworks.xstream.XStream;
 
 public class TargetMessageUtil
@@ -70,14 +72,18 @@ public class TargetMessageUtil
     public RepositoryTargetResource saveTarget( RepositoryTargetResource target, boolean update )
         throws IOException
     {
-        Response response = this.sendMessage( update ? Method.PUT : Method.POST, target );
-        String responseText = response.getEntity().getText();
-
-        Assert.assertTrue( response.getStatus().isSuccess(), "Could not save Repository Target: " + response.getStatus() + "\nResponse Text:\n"
-                + responseText + "\n" + xstream.toXML( target ) );
+        Response response = null;
+        String entityText;
+        try {
+            response = this.sendMessage( update ? Method.PUT : Method.POST, target );
+            entityText = response.getEntity().getText();
+            assertThat(response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
+        }
 
         // get the Resource object
-        RepositoryTargetResource responseResource = this.getResourceFromResponse( responseText );
+        RepositoryTargetResource responseResource = this.getResourceFromResponse( entityText );
 
         // validate
         // make sure the id != null
@@ -95,7 +101,9 @@ public class TargetMessageUtil
 
         return responseResource;
     }
-
+    /**
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+     */
     public Response sendMessage( Method method, RepositoryTargetResource resource )
         throws IOException
     {
@@ -119,7 +127,7 @@ public class TargetMessageUtil
         throws IOException
     {
 
-        String responseText = RequestFacade.doGetRequest( "service/local/repo_targets" ).getEntity().getText();
+        String responseText = RequestFacade.doGetForText("service/local/repo_targets", isSuccessful());
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
@@ -283,8 +291,7 @@ public class TargetMessageUtil
     public static RepositoryTargetResource get( String targetId )
         throws IOException
     {
-        String responseText =
-            RequestFacade.doGetRequest( "service/local/repo_targets/" + targetId ).getEntity().getText();
+        String responseText = RequestFacade.doGetForText("service/local/repo_targets/");
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
@@ -296,10 +303,15 @@ public class TargetMessageUtil
         return resourceResponse.getData();
     }
 
-    public static Response delete( String targetId )
+    /**
+     * Deletes the target id and ensures the delete was successful
+     * @param targetId
+     * @throws IOException
+     */
+    public static void delete( String targetId )
         throws IOException
     {
-        return RequestFacade.sendMessage( "service/local/repo_targets/" + targetId, Method.DELETE );
+        RequestFacade.doDelete("service/local/repo_targets/" + targetId, isSuccessful());
     }
 
 }

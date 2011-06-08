@@ -55,8 +55,8 @@ public class Nexus2996DeleteRepoTargetIT
 
         privUtil.assertExists( READ_PRIV_ID, CREATE_PRIV_ID, UPDATE_PRIV_ID, DELETE_PRIV_ID );
 
-        Assert.assertTrue( TargetMessageUtil.delete( TARGET_ID ).getStatus().isSuccess() );
-
+        TargetMessageUtil.delete(TARGET_ID);
+        
         privUtil.assertNotExists( READ_PRIV_ID, CREATE_PRIV_ID, UPDATE_PRIV_ID, DELETE_PRIV_ID );
     }
 }
