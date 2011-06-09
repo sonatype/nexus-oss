@@ -302,7 +302,7 @@ public abstract class AbstractNexusIntegrationTest
      * static, so we don't have access to the package name of the running tests. We are going to use the package name to
      * find resources for additional setup. NOTE: With this setup running multiple Test at the same time is not
      * possible.
-     * 
+     *
      * @throws Exception
      */
     @BeforeMethod( alwaysRun = true )
@@ -614,7 +614,7 @@ public abstract class AbstractNexusIntegrationTest
 
     /**
      * Deploys all the provided files needed before IT actually starts.
-     * 
+     *
      * @throws Exception
      */
     protected void deployArtifacts()
@@ -630,7 +630,7 @@ public abstract class AbstractNexusIntegrationTest
      * This is a "switchboard" to detech HOW to deploy. For now, just using the protocol from POM's
      * DistributionManagement section and invoking the getWagonHintForDeployProtocol(String protocol) to get the wagon
      * hint.
-     * 
+     *
      * @throws Exception
      */
     protected void deployArtifacts( final File projectsDir )
@@ -694,7 +694,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Does "protocol to wagon hint" converion: the default is just return the same, but maybe some test wants to
      * override this.
-     * 
+     *
      * @param deployProtocol
      * @return
      */
@@ -706,7 +706,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Deploys with given Wagon (hint is provided), to deployUrl. It is caller matter to adjust those two (ie. deployUrl
      * with file: protocol to be deployed with file wagon would be error). Model is supplied since it is read before.
-     * 
+     *
      * @param wagonHint
      * @param deployUrl
      * @param model
@@ -894,7 +894,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     * 
+     *
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -913,7 +913,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     * 
+     *
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -1055,22 +1055,29 @@ public abstract class AbstractNexusIntegrationTest
         String serviceURI =
             "service/local/artifact/maven/redirect?r=" + repository + "&g=" + gav.getGroupId() + "&a="
                 + gav.getArtifactId() + "&v=" + Reference.encode( gav.getVersion() ) + c;
-        Response response = RequestFacade.doGetRequest( serviceURI );
-        Status status = response.getStatus();
-        if ( status.isError() )
-        {
-            throw new FileNotFoundException( status + ": (" + status.getCode() + ")" );
+
+        Response response = null;
+        final Status status;
+        try {
+            response = RequestFacade.doGetRequest( serviceURI );
+            status = response.getStatus();
+            if ( status.isError() )
+            {
+                throw new FileNotFoundException( status + ": (" + status.getCode() + ")" );
+            }
+
+            Assert.assertEquals( 301, status.getCode(), "Snapshot download should redirect to a new file\n "
+                + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription() );
+
+            Reference redirectRef = response.getRedirectRef();
+            Assert.assertNotNull( redirectRef, "Snapshot download should redirect to a new file "
+                + response.getRequest().getResourceRef().toString() );
+
+            serviceURI = redirectRef.toString();
+
+        } finally {
+            RequestFacade.releaseResponse(response);
         }
-
-        Assert.assertEquals( 301, status.getCode(), "Snapshot download should redirect to a new file\n "
-            + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription() );
-
-        Reference redirectRef = response.getRedirectRef();
-        Assert.assertNotNull( redirectRef, "Snapshot download should redirect to a new file "
-            + response.getRequest().getResourceRef().toString() );
-
-        serviceURI = redirectRef.toString();
-
         File file = FileUtils.createTempFile( gav.getArtifactId(), '.' + gav.getExtension(), parentDir );
         RequestFacade.downloadFile( new URL( serviceURI ), file.getAbsolutePath() );
 
@@ -1093,22 +1100,22 @@ public abstract class AbstractNexusIntegrationTest
             this.getBaseNexusUrl() + REPOSITORY_RELATIVE_URL + repoId + "/" + gav.getGroupId() + "/"
                 + gav.getArtifactId() + "/maven-metadata.xml";
 
-        Response response = RequestFacade.sendMessage( new URL( url ), Method.GET, null );
-        if ( response.getStatus().isError() )
-        {
-            return null;
-        }
-
-        InputStream stream = response.getEntity().getStream();
-        try
-        {
+        Response response = null;
+        InputStream stream = null;
+        try {
+            response = RequestFacade.sendMessage( new URL( url ), Method.GET, null );
+            if ( response.getStatus().isError() )
+            {
+                return null;
+            }
+            stream = response.getEntity().getStream();
             MetadataXpp3Reader metadataReader = new MetadataXpp3Reader();
             return metadataReader.read( stream );
-        }
-        finally
-        {
+        } finally {
+            RequestFacade.releaseResponse(response);
             IOUtil.close( stream );
         }
+
     }
 
     protected File downloadArtifact( Gav gav, String targetDirectory )
@@ -1170,32 +1177,35 @@ public abstract class AbstractNexusIntegrationTest
     {
         String serviceURI = "service/local/repositories/" + repository + "/content/" + groupOrArtifactPath;
 
-        Response response = RequestFacade.doGetRequest( serviceURI );
-        if ( response.getStatus().equals( Status.CLIENT_ERROR_NOT_FOUND ) )
+        Status status = RequestFacade.doGetForStatus(serviceURI);
+        if ( status.equals( Status.CLIENT_ERROR_NOT_FOUND ) )
         {
             log.debug( "It was not deleted because it didn't exist " + serviceURI );
             return true;
         }
 
-        log.debug( "deleting: " + serviceURI );
-        response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
 
-        boolean deleted = response.getStatus().isSuccess();
+        // ---
+        log.debug( "deleting: " + serviceURI );
+        status = RequestFacade.doDeleteForStatus(serviceURI, null);
+        boolean deleted = status.isSuccess();
 
         if ( !deleted )
         {
-            log.debug( "Failed to delete: " + serviceURI + "  - Status: " + response.getStatus() );
+            log.debug( "Failed to delete: " + serviceURI + "  - Status: " + status );
         }
 
         // fake it because the artifact doesn't exist
         // TODO: clean this up.
-        if ( response.getStatus().getCode() == 404 )
+        if ( status.getCode() == 404 )
         {
             deleted = true;
         }
 
         return deleted;
     }
+
+
 
     public String getBaseNexusUrl()
     {
