@@ -1466,7 +1466,15 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         // }
         else if (action.failureType == Ext.form.Action.CONNECT_FAILURE)
         {
-          Sonatype.utils.connectionError(action.response, 'There is an error communicating with the server.')
+          if (action.response.responseText.indexOf("There is no task with ID=") > -1 )
+          {
+            Sonatype.MessageBox.alert('Selected task was removed', 'The selected task was removed in the backgrond.');
+            this.reloadAll();
+          }
+          else
+          {
+            Sonatype.utils.connectionError(action.response, 'There is an error communicating with the server.');
+          }
         }
         else if (action.failureType == Ext.form.Action.LOAD_FAILURE)
         {
