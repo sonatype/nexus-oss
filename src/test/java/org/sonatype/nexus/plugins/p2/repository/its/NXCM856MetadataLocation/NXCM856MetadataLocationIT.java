@@ -46,16 +46,15 @@ public class NXCM856MetadataLocationIT
     {
 
         deploy( new File( getOverridableFile( "p2artifacts" ), "nexus-p2-its-bundle/pom.xml" ),
-            "org.sonatype.nexus.plugins.it.p2.repository", // groupId
-            "org.sonatype.nexus.plugins.p2.repository.its.bundle", // artifactId
+            "com.sonatype.nexus.plugin.p2", // groupId
+            "com.sonatype.nexus.p2.its.bundle", // artifactId
             "1.0.0", // version
             "pom" // packaging
         );
 
         deploy( new File( getOverridableFile( "p2artifacts" ),
-            "nexus-p2-its-bundle/org.sonatype.nexus.plugins.p2.repository.its.bundle_1.0.0.jar" ),
-            "org.sonatype.nexus.plugins.it.p2.repository", // groupId
-            "org.sonatype.nexus.plugins.p2.repository.its.bundle", // artifactId
+            "nexus-p2-its-bundle/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" ), "com.sonatype.nexus.plugin.p2", // groupId
+            "com.sonatype.nexus.p2.its.bundle", // artifactId
             "1.0.0", // version
             "jar" // packaging
         );
@@ -77,8 +76,8 @@ public class NXCM856MetadataLocationIT
                 System.err.println( gav.toExternalForm() );
             }
 
-            Assert.assertTrue( projectGAVs.contains( new GAV( "org.sonatype.nexus.plugins.it.p2.repository", // groupId
-                "org.sonatype.nexus.plugins.p2.repository.its.bundle", // artifactId
+            Assert.assertTrue( projectGAVs.contains( new GAV( "com.sonatype.nexus.plugin.p2", // groupId
+                "com.sonatype.nexus.p2.its.bundle", // artifactId
                 "1.0.0" // version
             ) ) );
         }

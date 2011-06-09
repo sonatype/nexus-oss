@@ -58,11 +58,11 @@ public class NXCM794WebProxiedP2IT
     {
         super.p2repository();
 
-        String artifactUrl = baseProxyURL + "p2repo/features/org.sonatype.nexus.plugins.p2.repository.its.feature_1.0.0.jar";
+        String artifactUrl = baseProxyURL + "p2repo/features/com.sonatype.nexus.p2.its.feature_1.0.0.jar";
         Assert.assertTrue( "Proxy was not accessed: " + artifactUrl + " - accessed: " + server.getAccessedUris(),
                            server.getAccessedUris().contains( artifactUrl ) );
 
-        artifactUrl = baseProxyURL + "p2repo/plugins/org.sonatype.nexus.plugins.p2.repository.its.bundle_1.0.0.jar";
+        artifactUrl = baseProxyURL + "p2repo/plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar";
         Assert.assertTrue( "Proxy was not accessed: " + artifactUrl + " - accessed: " + server.getAccessedUris(),
                            server.getAccessedUris().contains( artifactUrl ) );
     }

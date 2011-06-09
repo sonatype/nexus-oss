@@ -22,7 +22,7 @@
     <rule filter='(&amp; (classifier=bar))' output='bar.foo'/>
   </mappings>
   <artifacts size='1'>
-    <artifact classifier='osgi.bundle' id='org.sonatype.nexus.plugins.p2.repository.its.bundle' version='1.0.0'>
+    <artifact classifier='osgi.bundle' id='com.sonatype.nexus.p2.its.bundle' version='1.0.0'>
       <properties size='3'>
         <property name='artifact.size' value='2644'/>
         <property name='download.size' value='2644'/>

@@ -13,28 +13,27 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 
-
 public class NXCM128P2GroupIT
     extends AbstractNexusProxyP2IntegrationIT
 {
 
     @Test
-    public void make() throws Exception {
-        File installDir = new File("target/eclipse/nxcm0128");
+    public void make()
+        throws Exception
+    {
+        final File installDir = new File( "target/eclipse/nxcm0128" );
 
-        installUsingP2(
-            getGroupUrl( "p2group" ),
-            "org.sonatype.nexus.plugins.p2.repository.its.feature2.feature.group",
+        installUsingP2( getGroupUrl( "p2group" ), "com.sonatype.nexus.p2.its.feature2.feature.group",
             installDir.getCanonicalPath() );
 
-        File feature = new File(installDir, "features/org.sonatype.nexus.plugins.p2.repository.its.feature_1.0.0");
-        Assert.assertTrue(feature.exists() && feature.isDirectory());
+        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
+        Assert.assertTrue( feature.exists() && feature.isDirectory() );
 
-        File feature2 = new File(installDir, "features/org.sonatype.nexus.plugins.p2.repository.its.feature2_1.0.0");
-        Assert.assertTrue(feature2.exists() && feature2.isDirectory());
+        final File feature2 = new File( installDir, "features/com.sonatype.nexus.p2.its.feature2_1.0.0" );
+        Assert.assertTrue( feature2.exists() && feature2.isDirectory() );
 
-        File bundle = new File(installDir, "plugins/org.sonatype.nexus.plugins.p2.repository.its.bundle_1.0.0.jar");
-        Assert.assertTrue(bundle.canRead());
+        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
+        Assert.assertTrue( bundle.canRead() );
     }
 
 }

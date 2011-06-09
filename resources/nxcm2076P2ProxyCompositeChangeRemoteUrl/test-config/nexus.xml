@@ -57,33 +57,6 @@
         <repositoryPolicy>release</repositoryPolicy>
       </externalConfiguration>
     </repository>
-
-    <repository>
-      <id>nx-p2lineup</id>
-      <name>nx-p2lineup</name>
-      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
-      <providerHint>P2.Lineup</providerHint>
-      <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
-      <notFoundCacheTTL>1440</notFoundCacheTTL>
-      <userManaged>true</userManaged>
-      <exposed>true</exposed>
-      <browseable>true</browseable>
-      <writePolicy>READ_ONLY</writePolicy>
-      <searchable>true</searchable>
-      <localStorage>
-        <provider>file</provider>
-      </localStorage>
-      <externalConfiguration>
-        <proxyMode>ALLOW</proxyMode>
-        <artifactMaxAge>1440</artifactMaxAge>
-        <itemMaxAge>1440</itemMaxAge>
-        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
-        <downloadRemoteIndex>false</downloadRemoteIndex>
-        <checksumPolicy>WARN</checksumPolicy>
-        <repositoryPolicy>release</repositoryPolicy>
-      </externalConfiguration>
-    </repository>
   </repositories>
   <repositoryGrouping />
   <repositoryTargets>
@@ -107,14 +80,6 @@
       <id>maven2</id>
       <name>All (maven2)</name>
       <contentClass>maven2</contentClass>
-      <patterns>
-        <pattern>.*</pattern>
-      </patterns>
-    </repositoryTarget>
-    <repositoryTarget>
-      <id>P2.Lineup</id>
-      <name>All (P2.Lineup)</name>
-      <contentClass>P2.Lineup</contentClass>
       <patterns>
         <pattern>.*</pattern>
       </patterns>

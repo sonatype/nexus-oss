@@ -9,8 +9,8 @@
 
 -->
 <feature
-      id="org.sonatype.nexus.plugins.p2.repository.its.feature3"
-      label="org.sonatype.nexus.plugins.p2.repository.its.feature3"
+      id="com.sonatype.nexus.p2.its.feature3"
+      label="com.sonatype.nexus.p2.its.feature3"
       version="1.0.0">
 
    <description url="http://www.example.com/description">
@@ -29,7 +29,7 @@
    </requires>
 
    <plugin
-         id="org.sonatype.nexus.plugins.p2.repository.its.bundle3"
+         id="com.sonatype.nexus.p2.its.bundle3"
          download-size="0"
          install-size="0"
          version="1.0.0"

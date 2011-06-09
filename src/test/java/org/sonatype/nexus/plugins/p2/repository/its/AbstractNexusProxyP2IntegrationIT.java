@@ -32,9 +32,6 @@ public abstract class AbstractNexusProxyP2IntegrationIT
     {
         super.customizeContainerConfiguration( configuration );
         configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
-
-        // to force creating the proxies/lineups with no onboarding plugin
-        System.setProperty( "p2.lineups.create", "true" );
     }
 
     protected static ServletServer server;

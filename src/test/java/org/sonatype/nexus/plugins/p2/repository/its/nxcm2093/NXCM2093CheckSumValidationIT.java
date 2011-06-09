@@ -45,7 +45,7 @@ public class NXCM2093CheckSumValidationIT
 
         try
         {
-            installUsingP2( getNexusTestRepoUrl(), "org.sonatype.nexus.plugins.p2.repository.its.feature.feature.group",
+            installUsingP2( getNexusTestRepoUrl(), "com.sonatype.nexus.p2.its.feature.feature.group",
                             installDir.getCanonicalPath(), null, null, null, "-Declipse.p2.MD5Check=false" );
             Assert.fail();
         }
@@ -53,7 +53,7 @@ public class NXCM2093CheckSumValidationIT
         {
             assertThat(
                                FileUtils.fileRead( nexusLog ),
-                               containsString( "Validation failed due: The artifact /features/org.sonatype.nexus.plugins.p2.repository.its.feature_1.0.0.jar and it's remote checksums does not match in repository p2brokenchecksum! The checksumPolicy of repository forbids downloading of it." ) );
+                               containsString( "Validation failed due: The artifact /features/com.sonatype.nexus.p2.its.feature_1.0.0.jar and it's remote checksums does not match in repository p2brokenchecksum! The checksumPolicy of repository forbids downloading of it." ) );
         }
 
         RepositoryMessageUtil repoUtil = new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );

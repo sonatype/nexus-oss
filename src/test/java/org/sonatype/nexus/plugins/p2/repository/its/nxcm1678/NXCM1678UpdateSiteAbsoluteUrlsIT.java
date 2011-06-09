@@ -32,7 +32,7 @@ public class NXCM1678UpdateSiteAbsoluteUrlsIT
         TaskScheduleUtil.run( "1" );
         TaskScheduleUtil.waitForAllTasksToStop();
 
-        Assert.assertTrue( new File( nexusDir, "features/org.sonatype.nexus.plugins.p2.repository.its.feature_1.0.0.jar" ).exists() );
-        Assert.assertTrue( new File( nexusDir, "plugins/org.sonatype.nexus.plugins.p2.repository.its.bundle_1.0.0.jar" ).exists() );
+        Assert.assertTrue( new File( nexusDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0.jar" ).exists() );
+        Assert.assertTrue( new File( nexusDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" ).exists() );
     }
 }

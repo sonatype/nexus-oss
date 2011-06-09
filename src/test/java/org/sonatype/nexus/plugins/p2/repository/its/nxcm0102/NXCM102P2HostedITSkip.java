@@ -28,15 +28,15 @@ public class NXCM102P2HostedITSkip
 
         deploy( new File( getOverridableFile( "p2artifacts" ), "nexus-p2-its-bundle/pom.xml" ),
             "org.sonatype.nexus.plugins.it.p2.repository", // groupId
-            "org.sonatype.nexus.plugins.p2.repository.its.bundle", // artifactId
+            "com.sonatype.nexus.p2.its.bundle", // artifactId
             "1.0.0", // version
             "pom" // packaging
         );
 
         deploy( new File( getOverridableFile( "p2artifacts" ),
-            "nexus-p2-its-bundle/org.sonatype.nexus.plugins.p2.repository.its.bundle_1.0.0.jar" ),
+            "nexus-p2-its-bundle/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" ),
             "org.sonatype.nexus.plugins.it.p2.repository", // groupId
-            "org.sonatype.nexus.plugins.p2.repository.its.bundle", // artifactId
+            "com.sonatype.nexus.p2.its.bundle", // artifactId
             "1.0.0", // version
             "jar" // packaging
         );
@@ -46,9 +46,9 @@ public class NXCM102P2HostedITSkip
 
         final File installDir = new File( "target/eclipse/nxcm0102" );
 
-        installUsingP2( nexusTestRepoUrl, "org.sonatype.nexus.plugins.p2.repository.its.bundle", installDir.getCanonicalPath() );
+        installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.bundle", installDir.getCanonicalPath() );
 
-        final File bundle = new File( installDir, "plugins/org.sonatype.nexus.plugins.p2.repository.its.bundle_1.0.0.jar" );
+        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
         Assert.assertTrue( bundle.canRead() );
     }
 

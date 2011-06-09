@@ -32,14 +32,14 @@ public class NXCM670UpdateSiteProxyRefreshIT
         TaskScheduleUtil.run( "1" );
         TaskScheduleUtil.waitForAllTasksToStop();
 
-        Assert.assertTrue( new File( nexusDir, "plugins/org.sonatype.nexus.plugins.p2.repository.its.bundle_1.0.0.jar").exists() );
+        Assert.assertTrue( new File( nexusDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar").exists() );
 
         FileUtils.copyFile( new File( remoteDir, "site-empty.xml"), new File( remoteDir, "site.xml") );
 
         TaskScheduleUtil.run( "1" );
         TaskScheduleUtil.waitForAllTasksToStop();
 
-        Assert.assertFalse( new File( nexusDir, "plugins/org.sonatype.nexus.plugins.p2.repository.its.bundle_1.0.0.jar").exists() );
+        Assert.assertFalse( new File( nexusDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar").exists() );
 
     }
 }

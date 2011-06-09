@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-
 public class NXCM792UpdateSiteWithTransitiveDependenciesProxyIT
     extends AbstractNexusProxyP2IntegrationIT
 {
@@ -24,31 +23,31 @@ public class NXCM792UpdateSiteWithTransitiveDependenciesProxyIT
     }
 
     @Test
-    public void updatesiteproxy() throws Exception {
+    public void updatesiteproxy()
+        throws Exception
+    {
         /*
-         * feature3 includes bundle3 that depends on bundle.
-         * bundle3->bundle dependency is not discovered by standard p2 runtime
+         * feature3 includes bundle3 that depends on bundle. bundle3->bundle dependency is not discovered by standard p2
+         * runtime
          */
 
-        String nexusTestRepoUrl = getNexusTestRepoUrl();
+        final String nexusTestRepoUrl = getNexusTestRepoUrl();
 
-        File installDir = new File("target/eclipse/nxcm0792");
+        final File installDir = new File( "target/eclipse/nxcm0792" );
 
         TaskScheduleUtil.run( "1" );
         TaskScheduleUtil.waitForAllTasksToStop();
 
-        installUsingP2(
-            nexusTestRepoUrl,
-            "org.sonatype.nexus.plugins.p2.repository.its.feature3.feature.group",
+        installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature3.feature.group",
             installDir.getCanonicalPath() );
 
-        File feature3 = new File(installDir, "features/org.sonatype.nexus.plugins.p2.repository.its.feature3_1.0.0");
-        Assert.assertTrue(feature3.exists() && feature3.isDirectory());
+        final File feature3 = new File( installDir, "features/com.sonatype.nexus.p2.its.feature3_1.0.0" );
+        Assert.assertTrue( feature3.exists() && feature3.isDirectory() );
 
-        File bundle = new File(installDir, "plugins/org.sonatype.nexus.plugins.p2.repository.its.bundle_1.0.0.jar");
-        Assert.assertTrue(bundle.canRead());
+        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
+        Assert.assertTrue( bundle.canRead() );
 
-        File bundle3 = new File(installDir, "plugins/org.sonatype.nexus.plugins.p2.repository.its.bundle3_1.0.0.jar");
-        Assert.assertTrue(bundle3.canRead());
+        final File bundle3 = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" );
+        Assert.assertTrue( bundle3.canRead() );
     }
 }

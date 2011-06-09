@@ -43,16 +43,16 @@ public class NXCM2076P2ProxyCompositeChangeRemoteUrlIT
             downloadFile( new URL( getRepositoryUrl( REPOSITORY_ID ) + "artifacts.xml" ),
                           "target/downloads/nxcm2076/artifactsBeforeChange.xml" );
         String artifactsXml = FileUtils.fileRead( artifactsXmlFile );
-        Assert.assertTrue( artifactsXml.contains( "id=\"org.sonatype.nexus.plugins.p2.repository.its.bundle\"" ) );
-        Assert.assertFalse( artifactsXml.contains( "id=\"org.sonatype.nexus.plugins.p2.repository.its.bundle3\"" ) );
+        Assert.assertTrue( artifactsXml.contains( "id=\"com.sonatype.nexus.p2.its.bundle\"" ) );
+        Assert.assertFalse( artifactsXml.contains( "id=\"com.sonatype.nexus.p2.its.bundle3\"" ) );
 
         try
         {
             downloadFile( new URL( getRepositoryUrl( REPOSITORY_ID )
-                + "plugins/org.sonatype.nexus.plugins.p2.repository.its.bundle3_1.0.0.jar" ),
-                          "target/downloads/nxcm2076/org.sonatype.nexus.plugins.p2.repository.its.bundle3_1.0.0.jar" );
+                + "plugins/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" ),
+                          "target/downloads/nxcm2076/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" );
             Assert.fail( "Expected FileNotFoundException for " + getRepositoryUrl( REPOSITORY_ID )
-                + "plugins/org.sonatype.nexus.plugins.p2.repository.its.bundle3_1.0.0.jar" );
+                + "plugins/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" );
         }
         catch ( FileNotFoundException expected )
         {
@@ -72,11 +72,11 @@ public class NXCM2076P2ProxyCompositeChangeRemoteUrlIT
             downloadFile( new URL( getRepositoryUrl( REPOSITORY_ID ) + "artifacts.xml" ),
                           "target/downloads/nxcm2076/artifactsAfterChange.xml" );
         artifactsXml = FileUtils.fileRead( artifactsXmlFile );
-        Assert.assertFalse( artifactsXml.contains( "id=\"org.sonatype.nexus.plugins.p2.repository.its.bundle\"" ) );
-        Assert.assertTrue( artifactsXml.contains( "id=\"org.sonatype.nexus.plugins.p2.repository.its.bundle3\"" ) );
+        Assert.assertFalse( artifactsXml.contains( "id=\"com.sonatype.nexus.p2.its.bundle\"" ) );
+        Assert.assertTrue( artifactsXml.contains( "id=\"com.sonatype.nexus.p2.its.bundle3\"" ) );
 
         downloadFile( new URL( getRepositoryUrl( REPOSITORY_ID )
-            + "plugins/org.sonatype.nexus.plugins.p2.repository.its.bundle3_1.0.0.jar" ),
-                      "target/downloads/nxcm2076/org.sonatype.nexus.plugins.p2.repository.its.bundle3_1.0.0.jar" );
+            + "plugins/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" ),
+                      "target/downloads/nxcm2076/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" );
     }
 }

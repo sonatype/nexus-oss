@@ -9,8 +9,8 @@
 
 -->
 <feature
-      id="org.sonatype.nexus.plugins.p2.repository.its.feature2"
-      label="org.sonatype.nexus.plugins.p2.repository.its.feature2"
+      id="com.sonatype.nexus.p2.its.feature2"
+      label="com.sonatype.nexus.p2.its.feature2"
       version="1.0.0">
 
    <description url="http://www.example.com/description">
@@ -26,7 +26,7 @@
    </license>
 
    <requires>
-      <import feature="org.sonatype.nexus.plugins.p2.repository.its.feature" version="1.0.0"/>
+      <import feature="com.sonatype.nexus.p2.its.feature" version="1.0.0"/>
    </requires>
 
 </feature>

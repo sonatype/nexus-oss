@@ -22,7 +22,7 @@
   </mappings>
   <artifacts size='2'>
     <!-- The same artifact, packed and unpacked -->
-    <artifact classifier='osgi.bundle' id='org.sonatype.nexus.plugins.p2.repository.its.bundle' version='1.0.0'>
+    <artifact classifier='osgi.bundle' id='com.sonatype.nexus.p2.its.bundle' version='1.0.0'>
       <processing size='1'>
         <step id='org.eclipse.equinox.p2.processing.Pack200Unpacker' required='true'/>
       </processing>
@@ -32,7 +32,7 @@
         <property name='format' value='packed'/>
       </properties>
     </artifact>
-    <artifact classifier='osgi.bundle' id='org.sonatype.nexus.plugins.p2.repository.its.bundle' version='1.0.0'>
+    <artifact classifier='osgi.bundle' id='com.sonatype.nexus.p2.its.bundle' version='1.0.0'>
       <properties size='3'>
         <property name='artifact.size' value='2644'/>
         <property name='download.size' value='2644'/>

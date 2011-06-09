@@ -10,13 +10,13 @@
 -->
 <?artifactRepository version='1.1.0'?>
 <artifacts size='1'>
-  <artifact classifier='osgi.bundle' id='org.sonatype.nexus.plugins.p2.repository.its.bundle3' version='1.0.0'>
+  <artifact classifier='osgi.bundle' id='com.sonatype.nexus.p2.its.bundle3' version='1.0.0'>
     <properties size='6'>
       <property name='artifact.size' value='1860'/>
       <property name='download.size' value='1860'/>
       <property name='download.md5' value='aa3f7e28c36787891e82dc87daec4837'/>
-      <property name='maven-artifactId' value='org.sonatype.nexus.plugins.p2.repository.its.bundle3'/>
-      <property name='maven-groupId' value='org.sonatype.nexus.plugins.it.p2.repository'/>
+      <property name='maven-artifactId' value='com.sonatype.nexus.p2.its.bundle3'/>
+      <property name='maven-groupId' value='com.sonatype.nexus.plugin.p2'/>
       <property name='maven-version' value='1.0.0'/>
     </properties>
   </artifact>

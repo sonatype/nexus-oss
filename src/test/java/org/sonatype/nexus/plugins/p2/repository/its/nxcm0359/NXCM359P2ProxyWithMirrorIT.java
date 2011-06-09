@@ -45,13 +45,13 @@ public class NXCM359P2ProxyWithMirrorIT
 
         File installDir = new File( "target/eclipse/nxcm0359" );
 
-        installUsingP2( nexusTestRepoUrl, "org.sonatype.nexus.plugins.p2.repository.its.feature.feature.group", installDir
+        installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group", installDir
             .getCanonicalPath() );
 
-        File feature = new File( installDir, "features/org.sonatype.nexus.plugins.p2.repository.its.feature_1.0.0" );
+        File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
         Assert.assertTrue( feature.exists() && feature.isDirectory() );
 
-        File bundle = new File( installDir, "plugins/org.sonatype.nexus.plugins.p2.repository.its.bundle_1.0.0.jar" );
+        File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
         Assert.assertTrue( bundle.canRead() );
     }
 }

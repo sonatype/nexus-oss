@@ -80,11 +80,6 @@ public interface P2Constants
     String PROP_BASE_URL = "nexus.baseURL";
 
     /**
-     * Property used to skip interpolation for P2lineup repository requests.
-     */
-    String PROP_SKIP_INTERPOLATION = "skip-interpolation";
-
-    /**
      * Property key used to mark format of artifact.
      */
     String ARTIFACT_PROP_FORMAT = "format";
