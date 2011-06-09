@@ -157,8 +157,8 @@ public class RequestFacade {
         Preconditions.checkNotNull(serviceURIpart);
         Response response = null;
         try {
+            // deliberately passing null for matcher since we do the check after getting the text below.
             response = sendMessage(toNexusURL(serviceURIpart), Method.GET, representation, null);
-            response = doGetRequest(serviceURIpart);
             final Representation entity = response.getEntity();
             assertThat(entity, notNullValue());
             final String responseText = entity.getText();
