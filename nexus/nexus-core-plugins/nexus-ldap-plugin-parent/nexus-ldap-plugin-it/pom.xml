@@ -52,14 +52,13 @@
       </exclusions>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <version>4.8.2</version>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>emma</groupId>
       <artifactId>emma</artifactId>
