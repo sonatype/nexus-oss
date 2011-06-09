@@ -102,8 +102,7 @@ public class ErrorReportUtil
         representation.setPayload( request );
 
         String serviceURI = "service/local/error_reporting";
-        Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
-        return response;
+        return RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
     }
 
     public static void cleanErrorBundleDir( String directory )

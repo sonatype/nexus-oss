@@ -21,11 +21,7 @@ package util;
 import java.io.IOException;
 import java.util.List;
 
-import org.hamcrest.MatcherAssert;
-
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
@@ -33,6 +29,7 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import com.sonatype.nexus.plugin.groovyconsole.rest.dto.GroovyScriptDTO;
 import com.sonatype.nexus.plugin.groovyconsole.rest.dto.GroovyScriptResponseDTO;
 import com.thoughtworks.xstream.XStream;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 
 public class GroovyConsoleMessageUtil
 {
@@ -48,13 +45,9 @@ public class GroovyConsoleMessageUtil
     public static List<GroovyScriptDTO> getScripts()
         throws IOException
     {
-        Response response = RequestFacade.doGetRequest( "service/local/groovy_console" );
+        String responseText = RequestFacade.doGetForText("service/local/groovy_console", isSuccessful());
 
-        String responeText = response.getEntity().getText();
-        MatcherAssert.assertThat( "Expected sucess: Status was: " + response.getStatus() + "\nResponse:\n" + responeText,
-                           response.getStatus().isSuccess() );
-
-        XStreamRepresentation representation = new XStreamRepresentation( xs, responeText, MediaType.APPLICATION_XML );
+        XStreamRepresentation representation = new XStreamRepresentation( xs, responseText, MediaType.APPLICATION_XML );
         GroovyScriptResponseDTO listRepsonse =
             (GroovyScriptResponseDTO) representation.getPayload( new GroovyScriptResponseDTO() );
 
@@ -67,13 +60,10 @@ public class GroovyConsoleMessageUtil
     {
         XStreamRepresentation representation = new XStreamRepresentation( xs, "", MediaType.APPLICATION_XML );
         representation.setPayload( groovyScriptDTO );
+        // FIXME use logger?
         System.out.println( xs.toXML( groovyScriptDTO ) );
 
-        Response response = RequestFacade.sendMessage( "service/local/groovy_console", Method.POST, representation );
-
-        String responeText = response.getEntity().getText();
-        MatcherAssert.assertThat( "Expected sucess: Status was: " + response.getStatus() + "\nResponse:\n" + responeText,
-                           response.getStatus().isSuccess() );
+        RequestFacade.doPost("service/local/groovy_console", representation, isSuccessful());
 
     }
 }

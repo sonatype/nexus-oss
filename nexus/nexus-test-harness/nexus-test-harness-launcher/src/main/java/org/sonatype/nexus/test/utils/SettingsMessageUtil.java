@@ -29,7 +29,9 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.nexus.rest.model.SmtpSettingsResourceRequest;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 public class SettingsMessageUtil
 {
     private static XStream xstream;
@@ -49,8 +51,9 @@ public class SettingsMessageUtil
         throws IOException
     {
         Preconditions.checkNotNull(wrapper);
-        final XStreamRepresentation xmlRepresentation = RequestFacade.doGetForXStreamRepresentationWithSuccess("service/local/global_settings/current");
-        final GlobalConfigurationResourceResponse configResponse = (GlobalConfigurationResourceResponse) xmlRepresentation.getPayload( wrapper );
+        String responseText = RequestFacade.doGetForText("service/local/global_settings/current", isSuccessful());
+        final XStreamRepresentation rep = new XStreamRepresentation(xstream, responseText, MediaType.APPLICATION_XML);
+        final GlobalConfigurationResourceResponse configResponse = (GlobalConfigurationResourceResponse) rep.getPayload( wrapper );
         return configResponse.getData();
     }
 

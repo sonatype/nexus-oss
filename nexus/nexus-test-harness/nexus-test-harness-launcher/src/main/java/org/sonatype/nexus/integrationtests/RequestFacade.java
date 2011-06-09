@@ -260,6 +260,12 @@ public class RequestFacade {
         }
     }
 
+    public static void doPost(final String serviceURIpart, final Representation representation,Matcher<Response> responseMatcher)
+         throws IOException {
+        RequestFacade.sendMessage( serviceURIpart, Method.POST, representation, responseMatcher );
+        //return doPostForStatus(serviceURIpart,representation, null);
+     }
+
     public static String doPostForText(final String serviceURIpart, final Representation representation, Matcher<Response> responseMatcher)
         throws IOException {
         Response response = null;
