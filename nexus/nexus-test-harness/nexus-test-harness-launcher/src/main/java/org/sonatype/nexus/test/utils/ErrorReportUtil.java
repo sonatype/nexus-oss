@@ -80,6 +80,9 @@ public class ErrorReportUtil
         return null;
     }
 
+    /**
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+     */
     public static Response generateProblemResponse( String title, String description, String jiraUser,
                                                     String jiraPassword )
         throws IOException

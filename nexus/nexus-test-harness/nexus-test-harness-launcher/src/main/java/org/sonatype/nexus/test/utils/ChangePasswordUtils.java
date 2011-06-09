@@ -55,8 +55,7 @@ public class ChangePasswordUtils
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
         representation.setPayload( request );
 
-        Response response = RequestFacade.sendMessage( serviceURI, Method.POST, representation );
-        return response.getStatus();
+        return RequestFacade.doPostForStatus(serviceURI, representation);
 
     }
 
@@ -75,9 +74,7 @@ public class ChangePasswordUtils
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
         representation.setPayload( request );
 
-        Response response = RequestFacade.sendMessage( serviceURI, Method.POST, representation );
-        return response.getStatus();
-
+        return RequestFacade.doPostForStatus(serviceURI, representation);
     }
 
 }
