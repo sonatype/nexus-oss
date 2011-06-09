@@ -291,7 +291,7 @@ public class TargetMessageUtil
     public static RepositoryTargetResource get( String targetId )
         throws IOException
     {
-        String responseText = RequestFacade.doGetForText("service/local/repo_targets/");
+        String responseText = RequestFacade.doGetForText("service/local/repo_targets/" + targetId);
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =
