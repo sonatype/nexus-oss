@@ -206,23 +206,6 @@ public class RequestFacade {
         return sendMessage(serviceURIpart, Method.GET);
     }
 
-    /**
-     * Sends a GET request to the specified uri and returns the {@link XStreamRepresentation} of the entity. <b>Also asserts that the response indicates a success status.</b>
-     * <p>
-     * Using this method is RECOMMENDED if you simply want the text of a response and nothing more since
-     * this method ensures proper cleanup of any sockets, streams, etc., by releasing the response.
-     * <p>
-     * Of course the entire response text is buffered in memory here so use this wisely.
-     *
-     * @param serviceURIpart the non-null part of the uri to fetch that is appended to the Nexus base URI.
-     * @return the complete response body text
-     * @throws NullPointerException if serviceURIpart is null
-     */
-    public static XStreamRepresentation doGetForXStreamRepresentationWithSuccess(final String serviceURIpart) throws IOException {
-        final String responseText = doGetForText(serviceURIpart, isSuccessful());
-        return new XStreamRepresentation(XML_XSTREAM, responseText, MediaType.APPLICATION_XML);
-    }
-
     public static void doPut(final String serviceURIpart, final XStreamRepresentation representation, Matcher<Response> matcher) throws IOException {
         Response response = null;
         try {
