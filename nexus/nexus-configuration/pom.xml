@@ -113,13 +113,14 @@
             </goals>
             <configuration>
               <useJava5>true</useJava5>
-              <version>1.4.5</version>
+              <version>1.4.6</version>
               <packagedVersions>
                 <packagedVersion>1.4.0</packagedVersion>
                 <packagedVersion>1.4.1</packagedVersion>
                 <packagedVersion>1.4.2</packagedVersion>
                 <packagedVersion>1.4.3</packagedVersion>
                 <packagedVersion>1.4.4</packagedVersion>
+                <packagedVersion>1.4.5</packagedVersion>
               </packagedVersions>
               <models>
                 <model>src/main/mdo/nexus.xml</model>
@@ -148,6 +149,44 @@
               </packagedVersions>
               <models>
                 <model>src/main/mdo/nexus-old.xml</model>
+              </models>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <packageWithVersion>false</packageWithVersion>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <!-- TODO remove when upgrade generator is merged into modello -->
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>modello-plugin-upgrade</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>upgrade</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <version>1.4.6</version>
+              <packagedVersions>
+                <packagedVersion>1.4.0</packagedVersion>
+                <packagedVersion>1.4.1</packagedVersion>
+                <packagedVersion>1.4.2</packagedVersion>
+                <packagedVersion>1.4.3</packagedVersion>
+                <packagedVersion>1.4.4</packagedVersion>
+                <packagedVersion>1.4.5</packagedVersion>
+              </packagedVersions>
+              <models>
+                <model>src/main/mdo/nexus.xml</model>
               </models>
             </configuration>
           </execution>

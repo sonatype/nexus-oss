@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.configuration.security.upgrade;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.inject.Typed;
@@ -39,7 +40,7 @@ public class SecurityData204Upgrade
     implements SecurityDataUpgrader
 {
 
-    private static final String[] DEPRECATED_ROLES = new String[] { "admin", "deployment", "developer" };
+    private static final List<String> DEPRECATED_ROLES = Arrays.asList( "admin", "deployment", "developer" );
 
     @Override
     public void doUpgrade( Configuration cfg )
@@ -56,17 +57,16 @@ public class SecurityData204Upgrade
         }
     }
 
-    private void updateDeprecatedRoles( List<String> roles )
+    public static void updateDeprecatedRoles( List<String> roles )
     {
-        for ( String role : DEPRECATED_ROLES )
+        for ( int i = 0; i < roles.size(); i++ )
         {
-            if ( roles.contains( role ) )
+            String role = roles.get( i );
+            if ( DEPRECATED_ROLES.contains( role ) )
             {
-                roles.remove( role );
-                roles.add( "nx-" + role );
+                roles.set( i, "nx-" + role );
             }
         }
-
     }
 
 }
