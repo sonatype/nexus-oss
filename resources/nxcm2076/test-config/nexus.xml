@@ -28,8 +28,8 @@
   </routing>
   <repositories>
     <repository>
-      <id>p2proxyComposite</id>
-      <name>My p2proxy test repository</name>
+      <id>nxcm2076</id>
+      <name>nxcm2076</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>

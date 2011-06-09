@@ -21,17 +21,19 @@ public class NXCM1995MetadataCacheIT
     extends AbstractNexusProxyP2IntegrationIT
 {
 
-    private static final String REPO = "p2proxy";
+    public NXCM1995MetadataCacheIT()
+    {
+        super( "nxcm1995" );
+    }
 
     @Ignore
     @Test
-    public void make()
+    public void test()
         throws Exception
     {
         // check original content
         final File f1 =
-            downloadFile( new URL( getRepositoryUrl( REPO ) + "/content.xml" ),
-                "target/downloads/nxcm1995/1/content.xml" );
+            downloadFile( new URL( getNexusTestRepoUrl() + "/content.xml" ), "target/downloads/nxcm1995/1/content.xml" );
         Assert.assertTrue( f1.exists() );
         String c = FileUtils.fileRead( f1 );
         Assert.assertTrue( c.contains( "com.adobe.flexbuilder.utils.osnative.win" ) );
@@ -39,7 +41,7 @@ public class NXCM1995MetadataCacheIT
 
         // check original artifact
         final File a1 =
-            downloadFile( new URL( getRepositoryUrl( REPO ) + "/artifacts.xml" ),
+            downloadFile( new URL( getNexusTestRepoUrl() + "/artifacts.xml" ),
                 "target/downloads/nxcm1995/1/artifacts.xml" );
         Assert.assertTrue( a1.exists() );
         String a = FileUtils.fileRead( a1 );
@@ -77,8 +79,7 @@ public class NXCM1995MetadataCacheIT
 
         // make sure nexus has the right content after metadata cache expires
         final File f2 =
-            downloadFile( new URL( getRepositoryUrl( REPO ) + "/content.xml" ),
-                "target/downloads/nxcm1995/2/content.xml" );
+            downloadFile( new URL( getNexusTestRepoUrl() + "/content.xml" ), "target/downloads/nxcm1995/2/content.xml" );
         Assert.assertTrue( f2.exists() );
         c = FileUtils.fileRead( f2 );
         Assert.assertFalse( c.contains( "com.adobe.flexbuilder.utils.osnative.win" ) );
@@ -88,7 +89,7 @@ public class NXCM1995MetadataCacheIT
 
         // make sure nexus has the right content after metadata cache expires
         final File a2 =
-            downloadFile( new URL( getRepositoryUrl( REPO ) + "/artifacts.xml" ),
+            downloadFile( new URL( getNexusTestRepoUrl() + "/artifacts.xml" ),
                 "target/downloads/nxcm1995/2/artifacts.xml" );
         Assert.assertTrue( a2.exists() );
         a = FileUtils.fileRead( a2 );

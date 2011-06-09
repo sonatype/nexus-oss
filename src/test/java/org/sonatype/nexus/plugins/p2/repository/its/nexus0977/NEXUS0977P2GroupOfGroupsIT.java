@@ -12,15 +12,21 @@ import java.net.URL;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 
-
 public class NEXUS0977P2GroupOfGroupsIT
     extends AbstractNexusProxyP2IntegrationIT
 {
 
+    public NEXUS0977P2GroupOfGroupsIT()
+    {
+        super( "nexus0977" );
+    }
+
     @Test
-    public void groupOfGroups()
+    public void test()
         throws Exception
     {
-        downloadFile( new URL( getRepositoryUrl( "g1" ) + "/content.xml" ), "target/downloads/nxcm1995/1/content.xml" );
+        downloadFile( new URL( getRepositoryUrl( "nexus0977g1" ) + "/content.xml" ),
+            "target/downloads/nexus0977/content.xml" );
     }
+
 }

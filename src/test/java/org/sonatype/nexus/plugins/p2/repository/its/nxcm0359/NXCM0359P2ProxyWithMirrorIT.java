@@ -14,44 +14,43 @@ import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 import org.sonatype.nexus.test.utils.TestProperties;
 
-
-public class NXCM359P2ProxyWithMirrorIT
+public class NXCM0359P2ProxyWithMirrorIT
     extends AbstractNexusProxyP2IntegrationIT
 {
-    public NXCM359P2ProxyWithMirrorIT()
+    public NXCM0359P2ProxyWithMirrorIT()
     {
-        super( "p2proxywithmirror" );
+        super( "nxcm0359" );
     }
 
     @Override
     public void startProxy()
         throws Exception
     {
-        String proxyRepoBaseUrl = TestProperties.getString( "proxy.repo.base.url" );
+        final String proxyRepoBaseUrl = TestProperties.getString( "proxy.repo.base.url" );
 
         replaceInFile( "target/nexus/proxy-repo/p2repowithmirror/artifacts.xml", "${proxy-repo-base-url}",
-                       proxyRepoBaseUrl );
+            proxyRepoBaseUrl );
         replaceInFile( "target/nexus/proxy-repo/p2repowithmirror/mirrors.xml", "${proxy-repo-base-url}",
-                       proxyRepoBaseUrl );
+            proxyRepoBaseUrl );
 
         super.startProxy();
     }
 
     @Test
-    public void testProxyWithMirror()
+    public void test()
         throws Exception
     {
-        String nexusTestRepoUrl = getNexusTestRepoUrl();
+        final String nexusTestRepoUrl = getNexusTestRepoUrl();
 
-        File installDir = new File( "target/eclipse/nxcm0359" );
+        final File installDir = new File( "target/eclipse/nxcm0359" );
 
-        installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group", installDir
-            .getCanonicalPath() );
+        installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
+            installDir.getCanonicalPath() );
 
-        File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
+        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
         Assert.assertTrue( feature.exists() && feature.isDirectory() );
 
-        File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
+        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
         Assert.assertTrue( bundle.canRead() );
     }
 }

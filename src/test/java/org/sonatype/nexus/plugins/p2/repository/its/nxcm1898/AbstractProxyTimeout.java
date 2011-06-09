@@ -12,12 +12,10 @@ import java.io.IOException;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-
 
 public abstract class AbstractProxyTimeout
     extends AbstractNexusProxyP2IntegrationIT
@@ -25,11 +23,9 @@ public abstract class AbstractProxyTimeout
 
     public AbstractProxyTimeout()
     {
-        super( "p2proxy" );
-        //System.setProperty( "org.eclipse.ecf.provider.filetransfer.retrieve.readTimeout", "30000" );
+        super( "nxcm1898" );
+        // System.setProperty( "org.eclipse.ecf.provider.filetransfer.retrieve.readTimeout", "30000" );
     }
-
-
 
     @Override
     public void startProxy()
@@ -42,6 +38,7 @@ public abstract class AbstractProxyTimeout
         }
     }
 
+    @Override
     @After
     public void stopProxy()
         throws Exception
@@ -53,26 +50,25 @@ public abstract class AbstractProxyTimeout
         }
     }
 
-
-    protected void doTest( int timeout )
+    protected void doTest( final int timeout )
         throws IOException, Exception
     {
-        String nexusTestRepoUrl = getNexusTestRepoUrl();
+        final String nexusTestRepoUrl = getNexusTestRepoUrl();
 
-        File installDir = new File( "target/eclipse/nxcm1898" );
+        final File installDir = new File( "target/eclipse/nxcm1898" );
 
         // give it a good amount of time
-        GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+        final GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
         settings.getGlobalConnectionSettings().setConnectionTimeout( timeout );
         SettingsMessageUtil.save( settings );
 
         installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
-                        installDir.getCanonicalPath() );
+            installDir.getCanonicalPath() );
 
-        File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
+        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
         Assert.assertTrue( feature.exists() && feature.isDirectory() );
 
-        File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
+        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
         Assert.assertTrue( bundle.canRead() );
 
     }

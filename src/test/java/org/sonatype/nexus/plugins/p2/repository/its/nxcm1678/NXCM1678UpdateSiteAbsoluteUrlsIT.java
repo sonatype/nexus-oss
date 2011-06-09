@@ -14,20 +14,19 @@ import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-
 public class NXCM1678UpdateSiteAbsoluteUrlsIT
     extends AbstractNexusProxyP2IntegrationIT
 {
     public NXCM1678UpdateSiteAbsoluteUrlsIT()
     {
-        super( "updatesiteproxy" );
+        super( "nxcm1678" );
     }
 
     @Test
-    public void testSiteWithAbsoluteUrls()
+    public void test()
         throws Exception
     {
-        File nexusDir = new File( nexusWorkDir, "storage/updatesiteproxy" );
+        final File nexusDir = new File( nexusWorkDir, "storage/nxcm1678" );
 
         TaskScheduleUtil.run( "1" );
         TaskScheduleUtil.waitForAllTasksToStop();

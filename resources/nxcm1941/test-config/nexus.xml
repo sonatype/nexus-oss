@@ -45,8 +45,8 @@
 
   <repositories>
     <repository>
-      <id>p2proxywithmirror</id>
-      <name>p2proxywithmirror</name>
+      <id>nxcm1941</id>
+      <name>nxcm1941</name>
       <type>p2</type>
       <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>

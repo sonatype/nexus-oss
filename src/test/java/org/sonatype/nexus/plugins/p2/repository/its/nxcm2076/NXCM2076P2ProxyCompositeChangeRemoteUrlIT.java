@@ -20,46 +20,43 @@ import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-
 public class NXCM2076P2ProxyCompositeChangeRemoteUrlIT
     extends AbstractNexusProxyP2IntegrationIT
 {
-    private static final String REPOSITORY_ID = "p2proxyComposite";
-
-    private RepositoryMessageUtil repoUtil;
+    private final RepositoryMessageUtil repoUtil;
 
     public NXCM2076P2ProxyCompositeChangeRemoteUrlIT()
         throws Exception
     {
-        repoUtil =
-            new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
+        super( "nxcm2076" );
+        repoUtil = new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @Test
-    public void testChangeRemoteUrl()
+    public void test()
         throws Exception
     {
         File artifactsXmlFile =
-            downloadFile( new URL( getRepositoryUrl( REPOSITORY_ID ) + "artifacts.xml" ),
-                          "target/downloads/nxcm2076/artifactsBeforeChange.xml" );
+            downloadFile( new URL( getNexusTestRepoUrl() + "artifacts.xml" ),
+                "target/downloads/nxcm2076/artifactsBeforeChange.xml" );
         String artifactsXml = FileUtils.fileRead( artifactsXmlFile );
         Assert.assertTrue( artifactsXml.contains( "id=\"com.sonatype.nexus.p2.its.bundle\"" ) );
         Assert.assertFalse( artifactsXml.contains( "id=\"com.sonatype.nexus.p2.its.bundle3\"" ) );
 
         try
         {
-            downloadFile( new URL( getRepositoryUrl( REPOSITORY_ID )
-                + "plugins/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" ),
-                          "target/downloads/nxcm2076/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" );
-            Assert.fail( "Expected FileNotFoundException for " + getRepositoryUrl( REPOSITORY_ID )
+            downloadFile( new URL( getNexusTestRepoUrl() + "plugins/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" ),
+                "target/downloads/nxcm2076/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" );
+            Assert.fail( "Expected FileNotFoundException for " + getNexusTestRepoUrl()
                 + "plugins/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" );
         }
-        catch ( FileNotFoundException expected )
+        catch ( final FileNotFoundException expected )
         {
         }
 
         // Change the remote url
-        RepositoryProxyResource p2ProxyRepo = (RepositoryProxyResource) repoUtil.getRepository( REPOSITORY_ID );
+        final RepositoryProxyResource p2ProxyRepo =
+            (RepositoryProxyResource) repoUtil.getRepository( getTestRepositoryId() );
         String remoteUrl = p2ProxyRepo.getRemoteStorage().getRemoteStorageUrl();
         System.out.println( remoteUrl );
         remoteUrl = remoteUrl.replace( "p2repoCompositeContentAndArtifacts", "nxcm2076" );
@@ -69,14 +66,13 @@ public class NXCM2076P2ProxyCompositeChangeRemoteUrlIT
         TaskScheduleUtil.waitForAllTasksToStop();
 
         artifactsXmlFile =
-            downloadFile( new URL( getRepositoryUrl( REPOSITORY_ID ) + "artifacts.xml" ),
-                          "target/downloads/nxcm2076/artifactsAfterChange.xml" );
+            downloadFile( new URL( getNexusTestRepoUrl() + "artifacts.xml" ),
+                "target/downloads/nxcm2076/artifactsAfterChange.xml" );
         artifactsXml = FileUtils.fileRead( artifactsXmlFile );
         Assert.assertFalse( artifactsXml.contains( "id=\"com.sonatype.nexus.p2.its.bundle\"" ) );
         Assert.assertTrue( artifactsXml.contains( "id=\"com.sonatype.nexus.p2.its.bundle3\"" ) );
 
-        downloadFile( new URL( getRepositoryUrl( REPOSITORY_ID )
-            + "plugins/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" ),
-                      "target/downloads/nxcm2076/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" );
+        downloadFile( new URL( getNexusTestRepoUrl() + "plugins/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" ),
+            "target/downloads/nxcm2076/com.sonatype.nexus.p2.its.bundle3_1.0.0.jar" );
     }
 }

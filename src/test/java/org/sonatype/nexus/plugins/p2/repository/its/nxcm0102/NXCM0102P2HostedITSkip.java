@@ -14,15 +14,15 @@ import org.junit.Assert;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 import org.sonatype.nexus.test.utils.GavUtil;
 
-public class NXCM102P2HostedITSkip
+public class NXCM0102P2HostedITSkip
     extends AbstractNexusProxyP2IntegrationIT
 {
-    public NXCM102P2HostedITSkip()
+    public NXCM0102P2HostedITSkip()
     {
-        super( "p2shadow" );
+        super( "nxcm0102" );
     }
 
-    public void make()
+    public void test()
         throws Exception
     {
 

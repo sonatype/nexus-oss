@@ -45,8 +45,8 @@
 
   <repositories>
     <repository>
-      <id>m2hosted</id>
-      <name>m2hosted</name>
+      <id>nxcm0856</id>
+      <name>nxcm0856</name>
       <type>maven2</type>
       <allowWrite>true</allowWrite>
       <artifactMaxAge>-1</artifactMaxAge>

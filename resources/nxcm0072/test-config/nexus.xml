@@ -45,8 +45,8 @@
 
   <repositories>
     <repository>
-      <id>p2proxy</id>
-      <name>p2proxy</name>
+      <id>nxcm0072</id>
+      <name>nxcm0072</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repo</url>

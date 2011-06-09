@@ -28,8 +28,8 @@
   </routing>
   <repositories>
     <repository>
-      <id>p2brokenchecksum</id>
-      <name>p2brokenchecksum</name>
+      <id>nxcm2093-bad-checksum</id>
+      <name>nxcm2093-bad-checksum</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
@@ -58,8 +58,8 @@
       </externalConfiguration>
     </repository>
     <repository>
-      <id>p2okchecksum</id>
-      <name>p2okchecksum</name>
+      <id>nxcm2093-ok-checksum</id>
+      <name>nxcm2093-ok-checksum</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>

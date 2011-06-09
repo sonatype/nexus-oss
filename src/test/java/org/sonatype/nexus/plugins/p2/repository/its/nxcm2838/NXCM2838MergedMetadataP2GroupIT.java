@@ -3,39 +3,31 @@ package org.sonatype.nexus.plugins.p2.repository.its.nxcm2838;
 import java.io.File;
 import java.net.URL;
 
-import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 
-
 public class NXCM2838MergedMetadataP2GroupIT
     extends AbstractNexusProxyP2IntegrationIT
 {
-    private static final String P2_GROUP_REPO = "p2group";
-
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    public NXCM2838MergedMetadataP2GroupIT()
     {
-        super.customizeContainerConfiguration( configuration );
-
-        // to stop creating the proxies/lineups with no onboarding plugin
-        System.setProperty( "p2.lineups.create", "false" );
+        super( "nxcm2838" );
     }
 
     @Test
-    public void testNXCM2838MergedMetadataP2GroupIT()
+    public void test()
         throws Exception
     {
-        File artifactsXmlFile = new File( "target/downloads/NXCM2838MergedMetadataP2GroupIT/artifacts.xml" );
+        final File artifactsXmlFile = new File( "target/downloads/nxcm2838/artifacts.xml" );
         Assert.assertFalse( artifactsXmlFile.exists() );
 
-        downloadFile( new URL( getRepositoryUrl( P2_GROUP_REPO ) + "artifacts.xml" ),
+        downloadFile( new URL( getGroupUrl( getTestRepositoryId() ) + "artifacts.xml" ),
             artifactsXmlFile.getAbsolutePath() );
         Assert.assertTrue( artifactsXmlFile.exists() );
 
-        String artifactsXmlContent = FileUtils.fileRead( artifactsXmlFile );
+        final String artifactsXmlContent = FileUtils.fileRead( artifactsXmlFile );
 
         // for easer debug
         // System.out.println( "*****" );

@@ -45,8 +45,8 @@
 
   <repositories>
     <repository>
-      <id>proxyAuthenticatedP2RepoBadPassword</id>
-      <name>proxyAuthenticatedP2RepoBadPassword</name>
+      <id>meclipse0465x02</id>
+      <name>meclipse0465x02</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repo</url>

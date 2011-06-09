@@ -28,8 +28,8 @@
   </routing>
   <repositories>
     <repository>
-      <id>p2proxymeclipse1299P2CompositeRepoMergeRules</id>
-      <name>p2proxy</name>
+      <id>meclipse1299</id>
+      <name>meclipse1299</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>

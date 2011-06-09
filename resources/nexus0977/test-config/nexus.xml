@@ -27,8 +27,8 @@
   </routing>
   <repositories>
     <repository>
-      <id>p2</id>
-      <name>p2</name>
+      <id>nexus0977</id>
+      <name>nexus0977</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
@@ -58,8 +58,8 @@
       </externalConfiguration>
     </repository>
     <repository>
-      <id>g1</id>
-      <name>g1</name>
+      <id>nexus0977g1</id>
+      <name>nexus0977g1</name>
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
@@ -76,13 +76,13 @@
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>
-          <memberRepository>g2</memberRepository>
+          <memberRepository>nexus0977g2</memberRepository>
         </memberRepositories>
       </externalConfiguration>
     </repository>
     <repository>
-      <id>g2</id>
-      <name>g2</name>
+      <id>nexus0977g2</id>
+      <name>nexus0977g2</name>
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
@@ -99,13 +99,13 @@
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>
-          <memberRepository>g3</memberRepository>
+          <memberRepository>nexus0977g3</memberRepository>
         </memberRepositories>
       </externalConfiguration>
     </repository>
     <repository>
-      <id>g3</id>
-      <name>g3</name>
+      <id>nexus0977g3</id>
+      <name>nexus0977g3</name>
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
@@ -122,13 +122,13 @@
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>
-          <memberRepository>g4</memberRepository>
+          <memberRepository>nexus0977g4</memberRepository>
         </memberRepositories>
       </externalConfiguration>
     </repository>
     <repository>
-      <id>g4</id>
-      <name>g4</name>
+      <id>nexus0977g4</id>
+      <name>nexus0977g4</name>
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
@@ -145,7 +145,7 @@
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>
-          <memberRepository>p2</memberRepository>
+          <memberRepository>nexus0977</memberRepository>
         </memberRepositories>
       </externalConfiguration>
     </repository>

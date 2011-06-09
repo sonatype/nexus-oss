@@ -45,8 +45,8 @@
 
   <repositories>
     <repository>
-      <id>updatesiteproxy</id>
-      <name>updatesiteproxy</name>
+      <id>nxcm0581</id>
+      <name>nxcm0581</name>
       <type>eclipse-update-site</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}updatesite</url>
@@ -80,7 +80,7 @@
         </property>
         <property>
           <key>repositoryOrGroupId</key>
-          <value>repo_updatesiteproxy</value>
+          <value>repo_nxcm0581</value>
         </property>
       </properties>
     </task>

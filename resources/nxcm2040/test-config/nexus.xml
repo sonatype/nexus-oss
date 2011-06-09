@@ -45,8 +45,8 @@
 
   <repositories>
     <repository>
-      <id>p2proxyCompositeContentAndArtifacts</id>
-      <name>p2proxyCompositeContentAndArtifacts</name>
+      <id>nxcm2040</id>
+      <name>nxcm2040</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repoCompositeContentAndArtifacts</url>

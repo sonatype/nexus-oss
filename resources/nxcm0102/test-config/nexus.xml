@@ -55,8 +55,8 @@
 
   <repositoryShadows>
     <repositoryShadow>
-      <id>p2shadow</id>
-      <name>p2shadow</name>
+      <id>nxcm0102</id>
+      <name>nxcm0102</name>
       <shadowOf>m2hosted</shadowOf>
       <type>m2-p2-shadow</type>
     </repositoryShadow>

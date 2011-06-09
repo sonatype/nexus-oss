@@ -10,35 +10,31 @@ package org.sonatype.nexus.plugins.p2.repository.its.meclipse1299;
 import java.io.File;
 import java.net.URL;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.codehaus.plexus.util.FileUtils;
-import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
-
 
 public class MECLIPSE1299P2CompositeRepoMergeRulesIT
     extends AbstractNexusProxyP2IntegrationIT
 {
-    private static final String TEST_REPO_ID = "p2proxymeclipse1299P2CompositeRepoMergeRules";
-
     public MECLIPSE1299P2CompositeRepoMergeRulesIT()
     {
-        super( TEST_REPO_ID );
+        super( "meclipse1299" );
     }
 
     @Test
-    public void p2ProxyCompositeContentAndArtifacts()
+    public void test()
         throws Exception
     {
-        File artifactsXmlFile = new File("target/downloads/meclipse1299P2CompositeRepoMergeRules/artifacts.xml");
+        final File artifactsXmlFile = new File( "target/downloads/meclipse1299/artifacts.xml" );
         Assert.assertFalse( artifactsXmlFile.exists() );
 
-        downloadFile( new URL( getRepositoryUrl( TEST_REPO_ID ) + "/artifacts.xml" ), artifactsXmlFile.getAbsolutePath() );
+        downloadFile( new URL( getRepositoryUrl( getTestRepositoryId() ) + "/artifacts.xml" ),
+            artifactsXmlFile.getAbsolutePath() );
         Assert.assertTrue( artifactsXmlFile.exists() );
 
-        String artifactsXmlContent = FileUtils.fileRead( artifactsXmlFile );
+        final String artifactsXmlContent = FileUtils.fileRead( artifactsXmlFile );
         Assert.assertTrue( artifactsXmlContent.contains( "<mappings size=\"5\">" ) );
         Assert.assertTrue( artifactsXmlContent.contains( "<rule output=\"${repoUrl}/plugins/${id}_${version}.jar\" filter=\"(&amp; (classifier=osgi.bundle))\" />" ) );
         Assert.assertTrue( artifactsXmlContent.contains( "<rule output=\"${repoUrl}/binary/${id}_${version}\" filter=\"(&amp; (classifier=binary))\" />" ) );

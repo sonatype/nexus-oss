@@ -45,8 +45,8 @@
 
   <repositories>
     <repository>
-      <id>p2proxy</id>
-      <name>p2proxy</name>
+      <id>nxcm0128-1</id>
+      <name>nxcm0128-1</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repo</url>
@@ -54,8 +54,8 @@
     </repository>
 
     <repository>
-      <id>p2proxy2</id>
-      <name>p2proxy2</name>
+      <id>nxcm0128-2</id>
+      <name>nxcm0128-2</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repo2</url>
@@ -70,12 +70,12 @@
   <repositoryGrouping>
     <repositoryGroups>
       <repositoryGroup>
-	      <groupId>p2group</groupId>
+	    <groupId>nxcm0128</groupId>
         <type>p2</type>
-	      <name>p2group</name>
+	    <name>nxcm0128</name>
         <repositories>
-          <repository>p2proxy</repository>
-          <repository>p2proxy2</repository>
+          <repository>nxcm0128-1</repository>
+          <repository>nxcm0128-2</repository>
         </repositories>
       </repositoryGroup>
     </repositoryGroups>

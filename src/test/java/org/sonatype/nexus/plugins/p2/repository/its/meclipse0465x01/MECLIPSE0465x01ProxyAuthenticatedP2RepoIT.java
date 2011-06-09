@@ -18,26 +18,24 @@ public class MECLIPSE0465x01ProxyAuthenticatedP2RepoIT
 {
     public MECLIPSE0465x01ProxyAuthenticatedP2RepoIT()
     {
-        super( "proxyAuthenticatedP2Repo" );
+        super( "meclipse0465x01" );
     }
 
     @Test
-    public void MECLIPSE465ProxyAuthenticatedP2Repo()
+    public void test()
         throws Exception
     {
         final String nexusTestRepoUrl = getNexusTestRepoUrl();
 
-        final File installDir = new File( "target/eclipse/meclipse0465" );
+        final File installDir = new File( "target/eclipse/meclipse0465x01" );
 
         installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
             installDir.getCanonicalPath() );
 
-        final File feature =
-            new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
+        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
         Assert.assertTrue( feature.exists() && feature.isDirectory() );
 
-        final File bundle =
-            new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
+        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
         Assert.assertTrue( bundle.canRead() );
 
         final File eclipseSecureStorage = new File( "target/nexus/nexus-work-dir/conf/eclipse.secure_storage" );

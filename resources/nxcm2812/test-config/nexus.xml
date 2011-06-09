@@ -27,8 +27,8 @@
   </routing>
   <repositories>
     <repository>
-      <id>p2</id>
-      <name>p2</name>
+      <id>nxcm2812</id>
+      <name>nxcm2812</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>

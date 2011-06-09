@@ -9,7 +9,6 @@ package org.sonatype.nexus.plugins.p2.repository.its.nxcm1916;
 
 import java.io.IOException;
 
-
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -21,18 +20,17 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
-
 public class NXCM1916CRUDP2RepositoryIT
     extends AbstractNexusProxyP2IntegrationIT
 {
 
-    private RepositoryMessageUtil messageUtil;
+    private final RepositoryMessageUtil messageUtil;
 
     public NXCM1916CRUDP2RepositoryIT()
         throws ComponentLookupException
     {
-        this.messageUtil =
-            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        super( "nxcm1916" );
+        messageUtil = new RepositoryMessageUtil( this, getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test
@@ -40,7 +38,7 @@ public class NXCM1916CRUDP2RepositoryIT
         throws IOException
     {
 
-        RepositoryResource resource = new RepositoryResource();
+        final RepositoryResource resource = new RepositoryResource();
 
         resource.setId( "createTestRepo" );
         resource.setRepoType( "hosted" );
@@ -49,7 +47,7 @@ public class NXCM1916CRUDP2RepositoryIT
         resource.setFormat( "p2" );
         resource.setRepoPolicy( RepositoryPolicy.MIXED.name() );
 
-        this.messageUtil.createRepository( resource );
+        messageUtil.createRepository( resource );
     }
 
     @Test
@@ -57,7 +55,7 @@ public class NXCM1916CRUDP2RepositoryIT
         throws IOException
     {
 
-        RepositoryResource resource = new RepositoryResource();
+        final RepositoryResource resource = new RepositoryResource();
 
         resource.setId( "readTestRepo" );
         resource.setRepoType( "hosted" );
@@ -66,11 +64,11 @@ public class NXCM1916CRUDP2RepositoryIT
         resource.setFormat( "p2" );
         resource.setRepoPolicy( RepositoryPolicy.MIXED.name() );
 
-        this.messageUtil.createRepository( resource );
+        messageUtil.createRepository( resource );
 
-        RepositoryResource responseRepo = (RepositoryResource) this.messageUtil.getRepository( resource.getId() );
+        final RepositoryResource responseRepo = (RepositoryResource) messageUtil.getRepository( resource.getId() );
 
-        this.messageUtil.validateResourceResponse( resource, responseRepo );
+        messageUtil.validateResourceResponse( resource, responseRepo );
 
     }
 
@@ -88,11 +86,11 @@ public class NXCM1916CRUDP2RepositoryIT
         resource.setFormat( "p2" );
         resource.setRepoPolicy( RepositoryPolicy.MIXED.name() );
 
-        resource = (RepositoryResource) this.messageUtil.createRepository( resource );
+        resource = (RepositoryResource) messageUtil.createRepository( resource );
 
         resource.setName( "updated repo" );
 
-        this.messageUtil.updateRepo( resource );
+        messageUtil.updateRepo( resource );
 
     }
 
@@ -109,9 +107,9 @@ public class NXCM1916CRUDP2RepositoryIT
         resource.setFormat( "p2" );
         resource.setRepoPolicy( RepositoryPolicy.MIXED.name() );
 
-        resource = (RepositoryResource) this.messageUtil.createRepository( resource );
+        resource = (RepositoryResource) messageUtil.createRepository( resource );
 
-        Response response = this.messageUtil.sendMessage( Method.DELETE, resource );
+        final Response response = messageUtil.sendMessage( Method.DELETE, resource );
 
         if ( !response.getStatus().isSuccess() )
         {

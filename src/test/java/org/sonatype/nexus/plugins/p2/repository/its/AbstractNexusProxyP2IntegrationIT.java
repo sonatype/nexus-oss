@@ -42,11 +42,6 @@ public abstract class AbstractNexusProxyP2IntegrationIT
         localStorageDir = TestProperties.getString( "proxy.repo.base.dir" );
     }
 
-    protected AbstractNexusProxyP2IntegrationIT()
-    {
-        super();
-    }
-
     protected AbstractNexusProxyP2IntegrationIT( final String testRepositoryId )
     {
         super( testRepositoryId );

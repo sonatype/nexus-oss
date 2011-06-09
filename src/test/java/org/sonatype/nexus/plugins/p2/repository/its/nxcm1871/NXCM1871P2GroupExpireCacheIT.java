@@ -23,15 +23,19 @@ public class NXCM1871P2GroupExpireCacheIT
     extends AbstractNexusProxyP2IntegrationIT
 {
 
-    private static final String GROUP = "p2group";
+    public NXCM1871P2GroupExpireCacheIT()
+    {
+        super( "nxcm1871" );
+    }
 
     @Test
-    public void make()
+    public void test()
         throws Exception
     {
         // check original content
         final File f1 =
-            downloadFile( new URL( getGroupUrl( GROUP ) + "/content.xml" ), "target/downloads/nxcm1871/1/content.xml" );
+            downloadFile( new URL( getGroupUrl( getTestRepositoryId() ) + "/content.xml" ),
+                "target/downloads/nxcm1871/1/content.xml" );
         Assert.assertTrue( f1.exists() );
         String c = FileUtils.fileRead( f1 );
         Assert.assertTrue( c.contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) );
@@ -51,13 +55,14 @@ public class NXCM1871P2GroupExpireCacheIT
 
         final ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setKey( "repositoryId" );
-        prop.setValue( GROUP );
+        prop.setValue( getTestRepositoryId() );
 
         TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, prop );
 
         // make sure nexus has the right content after reindex
         final File f2 =
-            downloadFile( new URL( getGroupUrl( GROUP ) + "/content.xml" ), "target/downloads/nxcm1871/2/content.xml" );
+            downloadFile( new URL( getGroupUrl( getTestRepositoryId() ) + "/content.xml" ),
+                "target/downloads/nxcm1871/2/content.xml" );
         Assert.assertTrue( f2.exists() );
         c = FileUtils.fileRead( f2 );
         Assert.assertFalse( c.contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) );

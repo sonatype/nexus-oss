@@ -45,16 +45,17 @@
 
   <repositories>
     <repository>
-      <id>p2repo</id>
-      <name>p2repo</name>
+      <id>nxcm0792-1</id>
+      <name>nxcm0792-1</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repo</url>
       </remoteStorage>
     </repository>
+    
     <repository>
-      <id>updatesitetransitive</id>
-      <name>updatesitetransitive</name>
+      <id>nxcm0792-2</id>
+      <name>nxcm0792-2</name>
       <type>eclipse-update-site</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}updatesitetransitive</url>
@@ -68,12 +69,12 @@
   <repositoryGrouping>
     <repositoryGroups>
       <repositoryGroup>
-        <groupId>p2group</groupId>
+        <groupId>nxcm0792</groupId>
         <type>p2</type>
-        <name>p2group</name>
+        <name>nxcm0792</name>
         <repositories>
-          <repository>p2repo</repository>
-          <repository>updatesitetransitive</repository>
+          <repository>nxcm0792-1</repository>
+          <repository>nxcm0792-2</repository>
         </repositories>
       </repositoryGroup>
     </repositoryGroups>
@@ -99,7 +100,7 @@
         </property>
         <property>
           <key>repositoryOrGroupId</key>
-          <value>repo_updatesitetransitive</value>
+          <value>repo_nxcm0792-2</value>
         </property>
       </properties>
     </task>

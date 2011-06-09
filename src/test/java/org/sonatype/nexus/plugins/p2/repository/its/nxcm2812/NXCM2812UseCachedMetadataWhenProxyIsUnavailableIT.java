@@ -18,24 +18,23 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 
-
-public class NXCM2812IT
+public class NXCM2812UseCachedMetadataWhenProxyIsUnavailableIT
     extends AbstractNexusProxyP2IntegrationIT
 {
 
-    public NXCM2812IT()
+    public NXCM2812UseCachedMetadataWhenProxyIsUnavailableIT()
     {
-        super( "p2" );
+        super( "nxcm2812" );
     }
 
     @Test
-    public void testUseCachedMetadataWhenProxyIsUnavailable()
+    public void test()
         throws IOException, Exception
     {
-        String url = "content/repositories/p2/content.xml";
+        final String url = "content/repositories/" + getTestRepositoryId() + "/content.xml";
 
         // init local storage
-        Response content = RequestFacade.sendMessage( url, Method.GET );
+        final Response content = RequestFacade.sendMessage( url, Method.GET );
         Assert.assertTrue( content.getEntity().getText().contains( "<?metadataRepository" ) );
         assertInstallation();
 
@@ -43,7 +42,7 @@ public class NXCM2812IT
         replaceProxy();
 
         // check delivery from local storage
-        Response content2 = RequestFacade.sendMessage( url, Method.GET );
+        final Response content2 = RequestFacade.sendMessage( url, Method.GET );
         Assert.assertTrue( content2.getEntity().getText().contains( "<?metadataRepository" ) );
         assertInstallation();
     }
@@ -51,16 +50,16 @@ public class NXCM2812IT
     private void assertInstallation()
         throws IOException, Exception
     {
-        File installDir = new File( "target/eclipse/nxcm2812" );
+        final File installDir = new File( "target/eclipse/nxcm2812" );
         FileUtils.deleteDirectory( installDir );
 
         installUsingP2( getNexusTestRepoUrl(), "com.sonatype.nexus.p2.its.feature.feature.group",
             installDir.getCanonicalPath() );
 
-        File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
+        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
         Assert.assertTrue( feature.exists() && feature.isDirectory() );
 
-        File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
+        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
         Assert.assertTrue( bundle.canRead() );
     }
 
@@ -73,10 +72,11 @@ public class NXCM2812IT
         {
 
             @Override
-            public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+            public void handle( final String target, final HttpServletRequest request,
+                                final HttpServletResponse response, final int dispatch )
                 throws IOException, ServletException
             {
-                for ( String path : P2Constants.METADATA_FILE_PATHS )
+                for ( final String path : P2Constants.METADATA_FILE_PATHS )
                 {
                     if ( target.endsWith( path ) )
                     {

@@ -19,59 +19,54 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
-
 public class NXCM1960SetProxy2IT
-extends AbstractNexusProxyP2IntegrationIT
+    extends AbstractNexusProxyP2IntegrationIT
 {
 
     public NXCM1960SetProxy2IT()
     {
-        super( "p2proxy" );
+        super( "nxcm1960" );
     }
 
     @Test
     @Ignore
-    public void setTheProxyServer()
+    public void test()
         throws Exception
     {
         setupProxyConfig( "INVALID" );
 
-        String nexusTestRepoUrl = getNexusTestRepoUrl();
+        final String nexusTestRepoUrl = getNexusTestRepoUrl();
 
-        File installDir = new File("target/eclipse/nxcm1960");
+        final File installDir = new File( "target/eclipse/nxcm1960" );
 
         try
         {
-            installUsingP2(
-                nexusTestRepoUrl,
-                "com.sonatype.nexus.p2.its.feature.feature.group",
+            installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
                 installDir.getCanonicalPath() );
             Assert.fail( "expected Exception" );
         }
-        catch(Exception e)
+        catch ( final Exception e )
         {
             // expected
         }
 
         setupProxyConfig( "localhost" );
 
-        installUsingP2(
-                       nexusTestRepoUrl,
-                       "com.sonatype.nexus.p2.its.feature.feature.group",
-                       installDir.getCanonicalPath() );
+        installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
+            installDir.getCanonicalPath() );
         Assert.fail( "expected Exception" );
 
-        File feature = new File(installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0");
-        Assert.assertTrue(feature.exists() && feature.isDirectory());
+        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
+        Assert.assertTrue( feature.exists() && feature.isDirectory() );
 
-        File bundle = new File(installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar");
-        Assert.assertTrue(bundle.canRead());
+        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
+        Assert.assertTrue( bundle.canRead() );
     }
 
-    private void setupProxyConfig(String nonProxyHost )
+    private void setupProxyConfig( final String nonProxyHost )
         throws IOException
     {
-        GlobalConfigurationResource resource = SettingsMessageUtil.getCurrentSettings();
+        final GlobalConfigurationResource resource = SettingsMessageUtil.getCurrentSettings();
 
         RemoteHttpProxySettings proxy = resource.getGlobalHttpProxySettings();
 
@@ -86,7 +81,7 @@ extends AbstractNexusProxyP2IntegrationIT
         proxy.getNonProxyHosts().clear();
         proxy.addNonProxyHost( nonProxyHost );
 
-        Status status = SettingsMessageUtil.save( resource );
+        final Status status = SettingsMessageUtil.save( resource );
 
         Assert.assertTrue( status.isSuccess() );
     }

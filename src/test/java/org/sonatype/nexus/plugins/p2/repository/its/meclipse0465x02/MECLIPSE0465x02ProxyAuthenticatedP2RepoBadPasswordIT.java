@@ -19,16 +19,16 @@ public class MECLIPSE0465x02ProxyAuthenticatedP2RepoBadPasswordIT
 {
     public MECLIPSE0465x02ProxyAuthenticatedP2RepoBadPasswordIT()
     {
-        super( "proxyAuthenticatedP2RepoBadPassword" );
+        super( "meclipse0465x02" );
     }
 
     @Test
-    public void MECLIPSE465ProxyAuthenticatedP2RepoBadPassword()
+    public void test()
         throws Exception
     {
         final String nexusTestRepoUrl = getNexusTestRepoUrl();
 
-        final File installDir = new File( "target/eclipse/meclipse0465BadPassword" );
+        final File installDir = new File( "target/eclipse/meclipse0465x02" );
 
         try
         {
@@ -39,19 +39,16 @@ public class MECLIPSE0465x02ProxyAuthenticatedP2RepoBadPasswordIT
         catch ( final P2ITException e )
         {
             if ( !e.getMessage().contains(
-                "No repository found at " + getBaseNexusUrl()
-                    + "content/repositories/proxyAuthenticatedP2RepoBadPassword/" ) )
+                "No repository found at " + getBaseNexusUrl() + "content/repositories/meclipse0465x02/" ) )
             {
                 throw e;
             }
         }
 
-        final File feature =
-            new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
+        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
         Assert.assertFalse( feature.exists() );
 
-        final File bundle =
-            new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
+        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
         Assert.assertFalse( bundle.canRead() );
     }
 }

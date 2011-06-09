@@ -14,16 +14,16 @@ import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-public class NXCM792UpdateSiteWithTransitiveDependenciesProxyIT
+public class NXCM0792UpdateSiteWithTransitiveDependenciesProxyIT
     extends AbstractNexusProxyP2IntegrationIT
 {
-    public NXCM792UpdateSiteWithTransitiveDependenciesProxyIT()
+    public NXCM0792UpdateSiteWithTransitiveDependenciesProxyIT()
     {
-        super( "p2group" );
+        super( "nxcm0792" );
     }
 
     @Test
-    public void updatesiteproxy()
+    public void test()
         throws Exception
     {
         /*

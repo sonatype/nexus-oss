@@ -45,56 +45,56 @@
 
   <repositories>
     <repository>
-      <id>p2proxycontentxml</id>
-      <name>p2proxycontentxml</name>
+      <id>nxcm1691-content-xml</id>
+      <name>nxcm1691-content-xml</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repoteststatus/contentxml</url>
       </remoteStorage>
     </repository>
     <repository>
-      <id>p2proxycontentjar</id>
-      <name>p2proxycontentjar</name>
+      <id>nxcm1691-content-jar</id>
+      <name>nxcm1691-content-jar</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repoteststatus/contentjar</url>
       </remoteStorage>
     </repository>
     <repository>
-      <id>p2proxyartifactsxml</id>
-      <name>p2proxyartifactsxml</name>
+      <id>nxcm1691-artifacts-xml</id>
+      <name>nxcm1691-artifacts-xml</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repoteststatus/artifactsxml</url>
       </remoteStorage>
     </repository>
     <repository>
-      <id>p2proxyartifactsjar</id>
-      <name>p2proxyartifactsjar</name>
+      <id>nxcm1691-artifacts-jar</id>
+      <name>nxcm1691-artifacts-jar</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repoteststatus/artifactsjar</url>
       </remoteStorage>
     </repository>
     <repository>
-      <id>p2proxycompositeArtifactsxml</id>
-      <name>p2proxycompositeArtifactsxml</name>
+      <id>nxcm1691-compositeArtifacts-xml</id>
+      <name>nxcm1691-compositeArtifacts-xml</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repoteststatus/compositeArtifactsxml</url>
       </remoteStorage>
     </repository>
     <repository>
-      <id>p2proxycompositeArtifactsjar</id>
-      <name>p2proxycompositeArtifactsjar</name>
+      <id>nxcm1691-compositeArtifacts-jar</id>
+      <name>nxcm1691-compositeArtifacts-jar</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repoteststatus/compositeArtifactsjar</url>
       </remoteStorage>
     </repository>
     <repository>
-      <id>notp2</id>
-      <name>notp2</name>
+      <id>nxcm1691-not-p2</id>
+      <name>nxcm1691-not-p2</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repoteststatus/notp2</url>

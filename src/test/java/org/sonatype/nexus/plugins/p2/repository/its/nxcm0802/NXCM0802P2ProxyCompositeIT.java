@@ -13,32 +13,29 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 
-
-public class NXCM802P2ProxyCompositeIT
+public class NXCM0802P2ProxyCompositeIT
     extends AbstractNexusProxyP2IntegrationIT
 {
-    public NXCM802P2ProxyCompositeIT()
+    public NXCM0802P2ProxyCompositeIT()
     {
-        super( "p2proxycomposite" );
+        super( "nxcm0802" );
     }
 
     @Test
-    public void p2ProxyComposite()
+    public void test()
         throws Exception
     {
-        String nexusTestRepoUrl = getNexusTestRepoUrl();
+        final String nexusTestRepoUrl = getNexusTestRepoUrl();
 
-        File installDir = new File( "target/eclipse/nxcm0802" );
+        final File installDir = new File( "target/eclipse/nxcm0802" );
 
-        installUsingP2(
-            nexusTestRepoUrl,
-            "com.sonatype.nexus.p2.its.feature.feature.group",
+        installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
             installDir.getCanonicalPath() );
 
-        File feature = new File(installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0");
-        Assert.assertTrue(feature.exists() && feature.isDirectory());
+        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
+        Assert.assertTrue( feature.exists() && feature.isDirectory() );
 
-        File bundle = new File(installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar");
-        Assert.assertTrue(bundle.canRead());
+        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
+        Assert.assertTrue( bundle.canRead() );
     }
 }

@@ -12,11 +12,8 @@ import org.sonatype.jettytestsuite.ServletServer;
 public abstract class AbstractNexusProxyP2SecureIntegrationIT
     extends AbstractNexusProxyP2IntegrationIT
 {
-    protected AbstractNexusProxyP2SecureIntegrationIT()
-    {
-    }
 
-    protected AbstractNexusProxyP2SecureIntegrationIT( String testRepositoryId )
+    protected AbstractNexusProxyP2SecureIntegrationIT( final String testRepositoryId )
     {
         super( testRepositoryId );
     }
@@ -25,7 +22,7 @@ public abstract class AbstractNexusProxyP2SecureIntegrationIT
     public void startProxy()
         throws Exception
     {
-        ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE, "secure" );
+        final ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE, "secure" );
         server.start();
     }
 
@@ -33,7 +30,7 @@ public abstract class AbstractNexusProxyP2SecureIntegrationIT
     public void stopProxy()
         throws Exception
     {
-        ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE, "secure" );
+        final ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE, "secure" );
         server.stop();
     }
 }

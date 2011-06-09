@@ -45,8 +45,8 @@
 
   <repositories>
     <repository>
-      <id>p2proxycompositewithmirror</id>
-      <name>p2proxycompositewithmirror</name>
+      <id>meclipse0393</id>
+      <name>meclipse0393</name>
       <type>p2</type>
       <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>

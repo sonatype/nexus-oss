@@ -27,7 +27,7 @@ public class NXCM0856MetadataLocationIT
 {
     public NXCM0856MetadataLocationIT()
     {
-        super( "m2hosted" );
+        super( "nxcm0856" );
     }
 
     public static class TestTychoRepositoryIndex
@@ -41,7 +41,7 @@ public class NXCM0856MetadataLocationIT
     }
 
     @Test
-    public void make()
+    public void test()
         throws Exception
     {
 
@@ -93,8 +93,7 @@ public class NXCM0856MetadataLocationIT
     {
         final Gav gav = GavUtil.newGav( groupId, artifactId, version, packaging );
 
-        getDeployUtils().deployWithWagon( "http", getRepositoryUrl( "m2hosted" ), artifactFile,
-            getRelitiveArtifactPath( gav ) );
+        getDeployUtils().deployWithWagon( "http", getNexusTestRepoUrl(), artifactFile, getRelitiveArtifactPath( gav ) );
     }
 
 }

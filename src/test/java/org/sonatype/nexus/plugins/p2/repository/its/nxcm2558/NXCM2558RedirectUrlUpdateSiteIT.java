@@ -19,42 +19,41 @@ import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteMirrorTaskD
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-
 public class NXCM2558RedirectUrlUpdateSiteIT
     extends AbstractNexusProxyP2IntegrationIT
 {
 
     public NXCM2558RedirectUrlUpdateSiteIT()
     {
-        super( "updatesiteproxy" );
+        super( "nxcm2558" );
     }
 
     @Test
-    public void updatesiteproxy()
+    public void test()
         throws Exception
     {
-        String nexusTestRepoUrl = getNexusTestRepoUrl();
+        final String nexusTestRepoUrl = getNexusTestRepoUrl();
 
-        File installDir = new File( "target/eclipse/nxcm2558" );
+        final File installDir = new File( "target/eclipse/nxcm2558" );
 
-        ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
+        final ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setKey( UpdateSiteMirrorTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
-        repo.setValue( "updatesiteproxy" );
+        repo.setValue( getTestRepositoryId() );
         TaskScheduleUtil.runTask( UpdateSiteMirrorTask.ROLE_HINT, repo );
         // wait for the tasks
         TaskScheduleUtil.waitForAllTasksToStop();
 
-        Response response =
-            RequestFacade.doGetRequest( "content/repositories/" + this.getTestRepositoryId() + "/features/" );
+        final Response response =
+            RequestFacade.doGetRequest( "content/repositories/" + getTestRepositoryId() + "/features/" );
         Assert.assertTrue( "expected success: " + response.getStatus(), response.getStatus().isSuccess() );
 
         installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
             installDir.getCanonicalPath() );
 
-        File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
+        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
         Assert.assertTrue( feature.exists() && feature.isDirectory() );
 
-        File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
+        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
         Assert.assertTrue( bundle.canRead() );
     }
 

@@ -28,8 +28,8 @@
   </routing>
   <repositories>
     <repository>
-      <id>p2proxy</id>
-      <name>p2proxy</name>
+      <id>nxcm2838-1</id>
+      <name>nxcm2838-1</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
@@ -58,8 +58,8 @@
       </externalConfiguration>
     </repository>
     <repository>
-      <id>p2proxy2</id>
-      <name>p2proxy2</name>
+      <id>nxcm2838-2</id>
+      <name>nxcm2838-2</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
@@ -88,8 +88,8 @@
       </externalConfiguration>
     </repository>
     <repository>
-      <id>p2repoNxcm2838</id>
-      <name>p2repoNxcm2838</name>
+      <id>nxcm2838-3</id>
+      <name>nxcm2838-3</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
@@ -118,8 +118,8 @@
       </externalConfiguration>
     </repository>
     <repository>
-      <id>p2group</id>
-      <name>p2group</name>
+      <id>nxcm2838</id>
+      <name>nxcm2838</name>
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
       <providerHint>p2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
@@ -135,9 +135,9 @@
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>
-          <memberRepository>p2proxy</memberRepository>
-          <memberRepository>p2proxy2</memberRepository>
-          <memberRepository>p2repoNxcm2838</memberRepository>
+          <memberRepository>nxcm2838-1</memberRepository>
+          <memberRepository>nxcm2838-2</memberRepository>
+          <memberRepository>nxcm2838-3</memberRepository>
         </memberRepositories>
       </externalConfiguration>
     </repository>

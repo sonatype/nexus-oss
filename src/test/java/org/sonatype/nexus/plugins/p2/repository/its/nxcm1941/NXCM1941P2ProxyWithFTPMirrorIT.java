@@ -15,13 +15,12 @@ import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 import org.sonatype.nexus.test.utils.TestProperties;
 
-
 public class NXCM1941P2ProxyWithFTPMirrorIT
     extends AbstractNexusProxyP2IntegrationIT
 {
     public NXCM1941P2ProxyWithFTPMirrorIT()
     {
-        super( "p2proxywithmirror" );
+        super( "nxcm1941" );
     }
 
     @Override
@@ -30,32 +29,32 @@ public class NXCM1941P2ProxyWithFTPMirrorIT
     {
         super.copyTestResources();
 
-        String proxyRepoBaseUrl = TestProperties.getString( "proxy.repo.base.url" );
+        final String proxyRepoBaseUrl = TestProperties.getString( "proxy.repo.base.url" );
         Assert.assertTrue( proxyRepoBaseUrl.startsWith( "http://" ) );
 
         replaceInFile( "target/nexus/proxy-repo/p2repowithftpmirror/artifacts.xml", "${proxy-repo-base-url}",
-                       proxyRepoBaseUrl );
+            proxyRepoBaseUrl );
         replaceInFile( "target/nexus/proxy-repo/p2repowithftpmirror/mirrors.xml", "${proxy-repo-base-url}",
-                       proxyRepoBaseUrl );
+            proxyRepoBaseUrl );
         replaceInFile( "target/nexus/proxy-repo/p2repowithftpmirror/mirrors.xml", "${ftp-proxy-repo-base-url}", "ftp"
             + proxyRepoBaseUrl.substring( 4 ) );
     }
 
     @Test
-    public void testProxyWithFTPMirror()
+    public void test()
         throws Exception
     {
-        String nexusTestRepoUrl = getNexusTestRepoUrl();
+        final String nexusTestRepoUrl = getNexusTestRepoUrl();
 
-        File installDir = new File( "target/eclipse/nxcm1491" );
+        final File installDir = new File( "target/eclipse/nxcm1941" );
 
-        installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group", installDir
-            .getCanonicalPath() );
+        installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
+            installDir.getCanonicalPath() );
 
-        File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
+        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
         Assert.assertTrue( feature.exists() && feature.isDirectory() );
 
-        File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
+        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
         Assert.assertTrue( bundle.canRead() );
     }
 }

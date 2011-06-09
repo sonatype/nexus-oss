@@ -45,8 +45,8 @@
 
   <repositories>
     <repository>
-      <id>proxyAuthenticatedP2Repo</id>
-      <name>proxyAuthenticatedP2Repo</name>
+      <id>meclipse0465x01</id>
+      <name>meclipse0465x01</name>
       <type>p2</type>
       <remoteStorage>
         <url>${proxy-repo-base-url}p2repo</url>

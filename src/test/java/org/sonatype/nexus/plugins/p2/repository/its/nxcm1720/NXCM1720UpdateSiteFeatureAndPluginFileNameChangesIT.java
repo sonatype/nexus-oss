@@ -19,14 +19,14 @@ public class NXCM1720UpdateSiteFeatureAndPluginFileNameChangesIT
 {
     public NXCM1720UpdateSiteFeatureAndPluginFileNameChangesIT()
     {
-        super( "updatesiteproxy" );
+        super( "nxcm1720" );
     }
 
     @Test
-    public void testSiteWithAbsoluteUrls()
+    public void test()
         throws Exception
     {
-        final File nexusDir = new File( nexusWorkDir, "storage/updatesiteproxy" );
+        final File nexusDir = new File( nexusWorkDir, "storage/nxcm1720" );
 
         TaskScheduleUtil.run( "1" );
         TaskScheduleUtil.waitForAllTasksToStop();

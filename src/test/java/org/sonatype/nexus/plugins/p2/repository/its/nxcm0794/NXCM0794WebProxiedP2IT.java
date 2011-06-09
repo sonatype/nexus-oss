@@ -7,20 +7,19 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm0794;
 
+import java.io.File;
 import java.net.URL;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Test;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.jettytestsuite.ProxyServer;
-import org.sonatype.nexus.plugins.p2.repository.its.nxcm0072.NXCM72P2ProxyIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 import org.sonatype.nexus.test.utils.TestProperties;
 
-
-public class NXCM794WebProxiedP2IT
-    extends NXCM72P2ProxyIT
+public class NXCM0794WebProxiedP2IT
+    extends AbstractNexusProxyP2IntegrationIT
 {
 
     private static String baseProxyURL;
@@ -32,6 +31,11 @@ public class NXCM794WebProxiedP2IT
         baseProxyURL = TestProperties.getString( "proxy.repo.base.url" );
     }
 
+    public NXCM0794WebProxiedP2IT()
+    {
+        super( "nxcm0794" );
+    }
+
     @Before
     public void startWebProxy()
         throws Exception
@@ -41,7 +45,7 @@ public class NXCM794WebProxiedP2IT
 
         // ensuring the proxy is working!!!
         Assert.assertTrue( downloadFile( new URL( baseProxyURL + "p2repo/artifacts.xml" ),
-                                         "./target/nxcm794/artifacts.xml.temp" ).exists() );
+            "./target/downloads/nxcm0794/artifacts.xml.temp" ).exists() );
     }
 
     @After
@@ -51,19 +55,29 @@ public class NXCM794WebProxiedP2IT
         server.stop();
     }
 
-    @Override
     @Test
-    public void p2repository()
+    public void test()
         throws Exception
     {
-        super.p2repository();
+        final String nexusTestRepoUrl = getNexusTestRepoUrl();
+
+        final File installDir = new File( "target/eclipse/nxcm0794" );
+
+        installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
+            installDir.getCanonicalPath() );
+
+        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
+        Assert.assertTrue( feature.exists() && feature.isDirectory() );
+
+        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
+        Assert.assertTrue( bundle.canRead() );
 
         String artifactUrl = baseProxyURL + "p2repo/features/com.sonatype.nexus.p2.its.feature_1.0.0.jar";
         Assert.assertTrue( "Proxy was not accessed: " + artifactUrl + " - accessed: " + server.getAccessedUris(),
-                           server.getAccessedUris().contains( artifactUrl ) );
+            server.getAccessedUris().contains( artifactUrl ) );
 
         artifactUrl = baseProxyURL + "p2repo/plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar";
         Assert.assertTrue( "Proxy was not accessed: " + artifactUrl + " - accessed: " + server.getAccessedUris(),
-                           server.getAccessedUris().contains( artifactUrl ) );
+            server.getAccessedUris().contains( artifactUrl ) );
     }
 }
