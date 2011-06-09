@@ -51,7 +51,7 @@
       <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repocompositewithmirror</url>
+        <url>${proxy-repo-base-url}meclipse0393</url>
       </remoteStorage>
     </repository>
   </repositories>

@@ -49,7 +49,7 @@
       <name>nxcm0128-1</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repo</url>
+        <url>${proxy-repo-base-url}nxcm0128-1</url>
       </remoteStorage>
     </repository>
 
@@ -58,7 +58,7 @@
       <name>nxcm0128-2</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repo2</url>
+        <url>${proxy-repo-base-url}nxcm0128-2</url>
       </remoteStorage>
     </repository>
 

@@ -45,7 +45,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>${proxy-repo-base-url}p2repoCompositeContentAndArtifacts</url>
+        <url>${proxy-repo-base-url}nxcm2076-1</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>

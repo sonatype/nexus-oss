@@ -49,7 +49,7 @@
       <name>nxcm0802</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repocompositeartifacts</url>
+        <url>${proxy-repo-base-url}nxcm0802</url>
       </remoteStorage>
     </repository>
   </repositories>

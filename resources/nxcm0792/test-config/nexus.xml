@@ -49,7 +49,7 @@
       <name>nxcm0792-1</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repo</url>
+        <url>${proxy-repo-base-url}nxcm0792-1</url>
       </remoteStorage>
     </repository>
     
@@ -58,7 +58,7 @@
       <name>nxcm0792-2</name>
       <type>eclipse-update-site</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}updatesitetransitive</url>
+        <url>${proxy-repo-base-url}nxcm0792-2</url>
       </remoteStorage>
     </repository>
   </repositories>

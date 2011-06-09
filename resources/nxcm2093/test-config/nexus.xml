@@ -45,7 +45,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>${proxy-repo-base-url}p2brokenchecksum</url>
+        <url>${proxy-repo-base-url}nxcm2093-bad-checksum</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -75,7 +75,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>${proxy-repo-base-url}p2okchecksum</url>
+        <url>${proxy-repo-base-url}nxcm2093-ok-checksum</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>

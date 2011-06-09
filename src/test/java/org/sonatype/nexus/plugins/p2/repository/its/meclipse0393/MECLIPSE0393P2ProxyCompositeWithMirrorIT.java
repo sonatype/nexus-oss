@@ -30,15 +30,15 @@ public class MECLIPSE0393P2ProxyCompositeWithMirrorIT
         super.copyTestResources();
         final String proxyRepoBaseUrl = TestProperties.getString( "proxy.repo.base.url" );
 
-        replaceInFile( localStorageDir + "/p2repocompositewithmirror/memberrepo1/artifacts.xml",
-            "${proxy-repo-base-url}", proxyRepoBaseUrl );
-        replaceInFile( localStorageDir + "/p2repocompositewithmirror/memberrepo2/artifacts.xml",
-            "${proxy-repo-base-url}", proxyRepoBaseUrl );
+        replaceInFile( localStorageDir + "/meclipse0393/memberrepo1/artifacts.xml", "${proxy-repo-base-url}",
+            proxyRepoBaseUrl );
+        replaceInFile( localStorageDir + "/meclipse0393/memberrepo2/artifacts.xml", "${proxy-repo-base-url}",
+            proxyRepoBaseUrl );
 
-        replaceInFile( localStorageDir + "/p2repocompositewithmirror/memberrepo1/mirrors.xml",
-            "${proxy-repo-base-url}", proxyRepoBaseUrl );
-        replaceInFile( localStorageDir + "/p2repocompositewithmirror/memberrepo2/mirrors.xml",
-            "${proxy-repo-base-url}", proxyRepoBaseUrl );
+        replaceInFile( localStorageDir + "/meclipse0393/memberrepo1/mirrors.xml", "${proxy-repo-base-url}",
+            proxyRepoBaseUrl );
+        replaceInFile( localStorageDir + "/meclipse0393/memberrepo2/mirrors.xml", "${proxy-repo-base-url}",
+            proxyRepoBaseUrl );
     }
 
     @Test

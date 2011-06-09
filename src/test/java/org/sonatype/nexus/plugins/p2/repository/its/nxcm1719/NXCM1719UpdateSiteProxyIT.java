@@ -37,7 +37,7 @@ public class NXCM1719UpdateSiteProxyIT
 
         final File installDir = new File( "target/eclipse/nxcm1719" );
 
-        final String correctURL = TestProperties.getString( "proxy-repo-base-url" ) + "updatesite/";
+        final String correctURL = TestProperties.getString( "proxy-repo-base-url" ) + "nxcm1719/";
         TaskScheduleUtil.waitForAllTasksToStop();
 
         // try

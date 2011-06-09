@@ -9,7 +9,7 @@
 
 -->
 <?artifactRepository version='1.1.0'?>
-<repository name='file:/S:/ssp2/p2repo/ - artifacts' type='org.eclipse.equinox.p2.artifact.repository.simpleRepository' version='1'>
+<repository name='nxcm1995-memberrepo1' type='org.eclipse.equinox.p2.artifact.repository.simpleRepository' version='1'>
   <properties size='2'>
     <property name='p2.timestamp' value='1260296204916'/>
     <property name='p2.compressed' value='true'/>

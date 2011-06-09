@@ -55,7 +55,7 @@
       <name>nxcm0794</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repo</url>
+        <url>${proxy-repo-base-url}nxcm0794</url>
       </remoteStorage>
     </repository>
   </repositories>

@@ -32,11 +32,9 @@ public class NXCM1941P2ProxyWithFTPMirrorIT
         final String proxyRepoBaseUrl = TestProperties.getString( "proxy.repo.base.url" );
         Assert.assertTrue( proxyRepoBaseUrl.startsWith( "http://" ) );
 
-        replaceInFile( "target/nexus/proxy-repo/p2repowithftpmirror/artifacts.xml", "${proxy-repo-base-url}",
-            proxyRepoBaseUrl );
-        replaceInFile( "target/nexus/proxy-repo/p2repowithftpmirror/mirrors.xml", "${proxy-repo-base-url}",
-            proxyRepoBaseUrl );
-        replaceInFile( "target/nexus/proxy-repo/p2repowithftpmirror/mirrors.xml", "${ftp-proxy-repo-base-url}", "ftp"
+        replaceInFile( "target/nexus/proxy-repo/nxcm1941/artifacts.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl );
+        replaceInFile( "target/nexus/proxy-repo/nxcm1941/mirrors.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl );
+        replaceInFile( "target/nexus/proxy-repo/nxcm1941/mirrors.xml", "${ftp-proxy-repo-base-url}", "ftp"
             + proxyRepoBaseUrl.substring( 4 ) );
     }
 

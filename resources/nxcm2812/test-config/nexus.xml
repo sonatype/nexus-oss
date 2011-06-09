@@ -45,7 +45,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>${proxy-repo-base-url}p2repo</url>
+        <url>${proxy-repo-base-url}nxcm2812</url>
       </remoteStorage>
       <externalConfiguration>
         <artifactMaxAge>0</artifactMaxAge>

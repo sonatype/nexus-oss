@@ -49,7 +49,7 @@
       <name>nxcm1691-content-xml</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repoteststatus/contentxml</url>
+        <url>${proxy-repo-base-url}nxcm1691/contentxml</url>
       </remoteStorage>
     </repository>
     <repository>
@@ -57,7 +57,7 @@
       <name>nxcm1691-content-jar</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repoteststatus/contentjar</url>
+        <url>${proxy-repo-base-url}nxcm1691/contentjar</url>
       </remoteStorage>
     </repository>
     <repository>
@@ -65,7 +65,7 @@
       <name>nxcm1691-artifacts-xml</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repoteststatus/artifactsxml</url>
+        <url>${proxy-repo-base-url}nxcm1691/artifactsxml</url>
       </remoteStorage>
     </repository>
     <repository>
@@ -73,7 +73,7 @@
       <name>nxcm1691-artifacts-jar</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repoteststatus/artifactsjar</url>
+        <url>${proxy-repo-base-url}nxcm1691/artifactsjar</url>
       </remoteStorage>
     </repository>
     <repository>
@@ -81,7 +81,7 @@
       <name>nxcm1691-compositeArtifacts-xml</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repoteststatus/compositeArtifactsxml</url>
+        <url>${proxy-repo-base-url}nxcm1691/compositeArtifactsxml</url>
       </remoteStorage>
     </repository>
     <repository>
@@ -89,7 +89,7 @@
       <name>nxcm1691-compositeArtifacts-jar</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repoteststatus/compositeArtifactsjar</url>
+        <url>${proxy-repo-base-url}nxcm1691/compositeArtifactsjar</url>
       </remoteStorage>
     </repository>
     <repository>
@@ -97,7 +97,7 @@
       <name>nxcm1691-not-p2</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repoteststatus/notp2</url>
+        <url>${proxy-repo-base-url}nxcm1691/notp2</url>
       </remoteStorage>
     </repository>
   </repositories>

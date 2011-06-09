@@ -44,7 +44,7 @@ public class NXCM0794WebProxiedP2IT
         server.start();
 
         // ensuring the proxy is working!!!
-        Assert.assertTrue( downloadFile( new URL( baseProxyURL + "p2repo/artifacts.xml" ),
+        Assert.assertTrue( downloadFile( new URL( baseProxyURL + "nxcm0794/artifacts.xml" ),
             "./target/downloads/nxcm0794/artifacts.xml.temp" ).exists() );
     }
 
@@ -72,11 +72,11 @@ public class NXCM0794WebProxiedP2IT
         final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
         Assert.assertTrue( bundle.canRead() );
 
-        String artifactUrl = baseProxyURL + "p2repo/features/com.sonatype.nexus.p2.its.feature_1.0.0.jar";
+        String artifactUrl = baseProxyURL + "nxcm0794/features/com.sonatype.nexus.p2.its.feature_1.0.0.jar";
         Assert.assertTrue( "Proxy was not accessed: " + artifactUrl + " - accessed: " + server.getAccessedUris(),
             server.getAccessedUris().contains( artifactUrl ) );
 
-        artifactUrl = baseProxyURL + "p2repo/plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar";
+        artifactUrl = baseProxyURL + "nxcm0794/plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar";
         Assert.assertTrue( "Proxy was not accessed: " + artifactUrl + " - accessed: " + server.getAccessedUris(),
             server.getAccessedUris().contains( artifactUrl ) );
     }

@@ -49,7 +49,7 @@
       <name>nxcm1381</name>
       <type>eclipse-update-site</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}updatesite1381</url>
+        <url>${proxy-repo-base-url}nxcm1381</url>
       </remoteStorage>
     </repository>
   </repositories>

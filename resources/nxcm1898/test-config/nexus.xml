@@ -49,7 +49,7 @@
       <name>nxcm1898</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repo</url>
+        <url>${proxy-repo-base-url}nxcm1898</url>
       </remoteStorage>
     </repository>
   </repositories>

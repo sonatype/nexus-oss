@@ -51,7 +51,7 @@
       <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repowithmirror</url>
+        <url>${proxy-repo-base-url}nxcm0359</url>
       </remoteStorage>
     </repository>
   </repositories>

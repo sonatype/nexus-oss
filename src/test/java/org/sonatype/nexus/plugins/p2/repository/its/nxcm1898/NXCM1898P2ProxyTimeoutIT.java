@@ -14,7 +14,7 @@ public class NXCM1898P2ProxyTimeoutIT
     extends AbstractProxyTimeout
 {
     @Test
-    public void p2repository2secs()
+    public void test()
         throws Exception
     {
         Assert.assertTrue( true );

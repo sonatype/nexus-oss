@@ -59,7 +59,7 @@ public class NXCM2076P2ProxyCompositeChangeRemoteUrlIT
             (RepositoryProxyResource) repoUtil.getRepository( getTestRepositoryId() );
         String remoteUrl = p2ProxyRepo.getRemoteStorage().getRemoteStorageUrl();
         System.out.println( remoteUrl );
-        remoteUrl = remoteUrl.replace( "p2repoCompositeContentAndArtifacts", "nxcm2076" );
+        remoteUrl = remoteUrl.replace( "nxcm2076-1", "nxcm2076-2" );
         p2ProxyRepo.getRemoteStorage().setRemoteStorageUrl( remoteUrl );
         repoUtil.updateRepo( p2ProxyRepo, false );
 

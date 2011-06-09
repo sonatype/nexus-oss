@@ -49,7 +49,7 @@
       <name>meclipse0465x01</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repo</url>
+        <url>${proxy-repo-base-url}meclipse0465x01</url>
         <authentication>
           <!-- username and password must match the settings in resources/default-config/realm.properties -->
           <username>admin</username>

@@ -28,10 +28,8 @@ public class NXCM0359P2ProxyWithMirrorIT
     {
         final String proxyRepoBaseUrl = TestProperties.getString( "proxy.repo.base.url" );
 
-        replaceInFile( "target/nexus/proxy-repo/p2repowithmirror/artifacts.xml", "${proxy-repo-base-url}",
-            proxyRepoBaseUrl );
-        replaceInFile( "target/nexus/proxy-repo/p2repowithmirror/mirrors.xml", "${proxy-repo-base-url}",
-            proxyRepoBaseUrl );
+        replaceInFile( "target/nexus/proxy-repo/nxcm0359/artifacts.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl );
+        replaceInFile( "target/nexus/proxy-repo/nxcm0359/mirrors.xml", "${proxy-repo-base-url}", proxyRepoBaseUrl );
 
         super.startProxy();
     }

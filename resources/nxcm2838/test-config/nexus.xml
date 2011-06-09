@@ -45,7 +45,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>${proxy-repo-base-url}p2repo/</url>
+        <url>${proxy-repo-base-url}nxcm2838-1/</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -75,7 +75,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>${proxy-repo-base-url}p2repo2/</url>
+        <url>${proxy-repo-base-url}nxcm2838-2/</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -105,7 +105,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>${proxy-repo-base-url}p2repoNxcm2838/</url>
+        <url>${proxy-repo-base-url}nxcm2838-3/</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>

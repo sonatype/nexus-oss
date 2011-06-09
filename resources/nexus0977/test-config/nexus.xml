@@ -45,7 +45,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>${proxy-repo-base-url}p2repo</url>
+        <url>${proxy-repo-base-url}nexus0977</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>

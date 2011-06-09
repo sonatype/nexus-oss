@@ -49,7 +49,7 @@
       <name>nxcm2040</name>
       <type>p2</type>
       <remoteStorage>
-        <url>${proxy-repo-base-url}p2repoCompositeContentAndArtifacts</url>
+        <url>${proxy-repo-base-url}nxcm2040</url>
       </remoteStorage>
     </repository>
   </repositories>

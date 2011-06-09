@@ -45,7 +45,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>${proxy-repo-base-url}meclipse1299P2CompositeRepoMergeRules/</url>
+        <url>${proxy-repo-base-url}meclipse1299/</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
