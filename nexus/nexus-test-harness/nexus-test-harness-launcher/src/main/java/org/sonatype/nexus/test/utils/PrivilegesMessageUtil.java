@@ -40,6 +40,9 @@ import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
 import org.testng.Assert;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -62,15 +65,16 @@ public class PrivilegesMessageUtil
     public List<PrivilegeStatusResource> createPrivileges( PrivilegeResource resource )
         throws IOException
     {
-        Response response = this.sendMessage( Method.POST, resource );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not create privilege: " + response.getStatus() );
+        Response response = null;
+        List<PrivilegeStatusResource> statusResources;
+        try {
+            response = this.sendMessage( Method.POST, resource );
+            statusResources = this.getResourceListFromResponse( response );
+            assertThat(response, isSuccessful());
+        } finally {
+            RequestFacade.releaseResponse(response);
         }
 
-        // get the Resource object
-        List<PrivilegeStatusResource> statusResources = this.getResourceListFromResponse( response );
         getTest().getSecurityConfigUtil().verifyPrivileges( statusResources );
 
         return statusResources;

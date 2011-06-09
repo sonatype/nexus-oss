@@ -70,8 +70,6 @@ public class RoleMessageUtil
         } finally {
             RequestFacade.releaseResponse(response);
         }
-
-
         // get the Resource object
         RoleResource responseResource = this.getResourceFromResponse( entityText );
 
@@ -186,8 +184,6 @@ public class RoleMessageUtil
         throws IOException
     {
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
-
-        // this
         RoleResourceRequest roleResourceRequest =
             (RoleResourceRequest) representation.getPayload( new RoleResourceRequest() );
 
@@ -214,15 +210,23 @@ public class RoleMessageUtil
         return RequestFacade.doPutForStatus(serviceURI, representation, null);
     }
 
+    /**
+     *
+     * @param roleId the role id to find
+     * @return null if role not found, otherwise the resource
+     * @throws IOException
+     */
     public RoleResource findRole( String roleId )
         throws IOException
     {
         Response response = null;
         try {
             response = this.sendMessage( Method.GET, null, roleId );
-            RoleResource resource = this.getResourceFromResponse( response );
-            assertThat(response, isSuccessful());
-            return resource;
+            if ( !response.getStatus().isSuccess() )
+            {
+                return null;
+            }
+            return this.getResourceFromResponse( response );
         } finally {
             RequestFacade.releaseResponse(response);
         }

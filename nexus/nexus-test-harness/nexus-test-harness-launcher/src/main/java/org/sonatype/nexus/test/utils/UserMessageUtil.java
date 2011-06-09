@@ -109,15 +109,14 @@ public class UserMessageUtil
         throws IOException
     {
         Response response = null;
+        UserResource responseResource;
         try {
             response = this.sendMessage( Method.PUT, user );
+            responseResource = this.getResourceFromResponse( response );
             assertThat(response, isSuccessful());
         } finally {
             RequestFacade.releaseResponse(response);
         }
-
-        // get the Resource object
-        UserResource responseResource = this.getResourceFromResponse( response );
 
         // make sure the id != null
 
