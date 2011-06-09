@@ -15,10 +15,10 @@ import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
 import org.sonatype.nexus.test.utils.TestProperties;
 
-public class MECLIPSE393P2ProxyCompositeWithMirrorIT
+public class MECLIPSE0393P2ProxyCompositeWithMirrorIT
     extends AbstractNexusProxyP2IntegrationIT
 {
-    public MECLIPSE393P2ProxyCompositeWithMirrorIT()
+    public MECLIPSE0393P2ProxyCompositeWithMirrorIT()
     {
         super( "p2proxycompositewithmirror" );
     }

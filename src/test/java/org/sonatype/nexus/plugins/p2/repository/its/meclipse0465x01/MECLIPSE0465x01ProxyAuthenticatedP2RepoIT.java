@@ -5,7 +5,7 @@
  * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
  * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.p2.repository.its.meclipse0465;
+package org.sonatype.nexus.plugins.p2.repository.its.meclipse0465x01;
 
 import java.io.File;
 
@@ -13,10 +13,10 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2SecureIntegrationIT;
 
-public class MECLIPSE465ProxyAuthenticatedP2RepoIT
+public class MECLIPSE0465x01ProxyAuthenticatedP2RepoIT
     extends AbstractNexusProxyP2SecureIntegrationIT
 {
-    public MECLIPSE465ProxyAuthenticatedP2RepoIT()
+    public MECLIPSE0465x01ProxyAuthenticatedP2RepoIT()
     {
         super( "proxyAuthenticatedP2Repo" );
     }
