@@ -1,0 +1,15 @@
+.project
+.settings/
+nexus-migration-plugin-artifactory-bridge/.classpath
+nexus-migration-plugin-artifactory-bridge/.project
+nexus-migration-plugin-artifactory-bridge/target/
+nexus-migration-plugin-artifactory/.classpath
+nexus-migration-plugin-artifactory/target/
+nexus-migration-plugin-configuration/.classpath
+nexus-migration-plugin-configuration/target/
+nexus-migration-plugin-packaging/.classpath
+nexus-migration-plugin-test-harness/target/
+nexus-migration-plugin-packaging/target/
+nexus-migration-plugin-test-harness/.classpath
+nexus-migration-plugin-test-harness/test-output/
+target/
