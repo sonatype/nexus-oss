@@ -61,7 +61,7 @@ public class Nexus1560LegacyAllowRulesIT
         String downloadUrl =
             REPOSITORY_RELATIVE_URL + REPO_TEST_HARNESS_REPO + "/" + getRelitiveArtifactPath( gavArtifact1 );
 
-        Status status = download( downloadUrl ).getStatus();
+        Status status = download( downloadUrl );
         Assert.assertTrue( status.isSuccess(), "Unable to download artifact from repository " + status );
     }
 
@@ -72,7 +72,7 @@ public class Nexus1560LegacyAllowRulesIT
         String downloadUrl =
             GROUP_REPOSITORY_RELATIVE_URL + NEXUS1560_GROUP + "/" + getRelitiveArtifactPath( gavArtifact1 );
 
-        Status status = download( downloadUrl ).getStatus();
+        Status status = download( downloadUrl );
         Assert.assertEquals( status.getCode(), 403, "Unable to download artifact from repository: " + status );
     }
 
@@ -112,7 +112,7 @@ public class Nexus1560LegacyAllowRulesIT
         String downloadUrl =
             GROUP_REPOSITORY_RELATIVE_URL + NEXUS1560_GROUP + "/" + getRelitiveArtifactPath( gavArtifact2 );
 
-        failDownload( downloadUrl );
+        assertDownloadFails( downloadUrl );
     }
 
     @Test
@@ -122,7 +122,7 @@ public class Nexus1560LegacyAllowRulesIT
         String downloadUrl =
             REPOSITORY_RELATIVE_URL + REPO_TEST_HARNESS_REPO + "/" + getRelitiveArtifactPath( gavArtifact2 );
 
-        failDownload( downloadUrl );
+        assertDownloadFails( downloadUrl );
     }
 
     @Test
@@ -132,7 +132,7 @@ public class Nexus1560LegacyAllowRulesIT
         String downloadUrl =
             REPOSITORY_RELATIVE_URL + REPO_TEST_HARNESS_REPO2 + "/" + getRelitiveArtifactPath( gavArtifact2 );
 
-        failDownload( downloadUrl );
+        assertDownloadFails( downloadUrl );
     }
 
 }

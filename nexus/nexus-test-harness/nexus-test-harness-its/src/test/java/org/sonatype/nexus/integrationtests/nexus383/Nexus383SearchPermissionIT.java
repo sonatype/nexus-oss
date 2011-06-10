@@ -20,8 +20,10 @@ package org.sonatype.nexus.integrationtests.nexus383;
 
 import java.util.List;
 
+import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.testng.Assert;
@@ -75,8 +77,18 @@ public class Nexus383SearchPermissionIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // NOT Should be able to find artifacts
-        Status status = getSearchMessageUtil().searchFor_response( "nexus383" ).getStatus();
-        Assert.assertEquals( 401, status.getCode() );
+        Response response = null;
+
+        try
+        {
+            response = getSearchMessageUtil().searchFor_response( "nexus383" );
+            Status status = response.getStatus();
+            Assert.assertEquals( 401, status.getCode() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
 
     }
 

@@ -50,7 +50,7 @@ public class Nexus1560LegacyAllowGroupRulesIT
         
         String downloadUrl = GROUP_REPOSITORY_RELATIVE_URL + NEXUS1560_GROUP + "/" + getRelitiveArtifactPath( gavArtifact1 );
 
-        successDownload( downloadUrl );
+        assertDownloadSucceeds( downloadUrl );
     }
 
     @Test
@@ -63,7 +63,7 @@ public class Nexus1560LegacyAllowGroupRulesIT
         String downloadUrl =
             REPOSITORY_RELATIVE_URL + REPO_TEST_HARNESS_REPO + "/" + getRelitiveArtifactPath( gavArtifact1 );
 
-        successDownload( downloadUrl );
+        assertDownloadSucceeds( downloadUrl );
     }
 
 }

@@ -142,14 +142,29 @@ public class Nexus3615MavenInfoIT
     {
         Gav releaseNotFoundGav =
             new Gav( "nexus3615", "notFound", "1.0.1", null, "jar", null, null, null, false, null, false, null );
-        Response response = downloadView( releaseNotFoundGav, "maven2", getTestRepositoryId() );
-        Assert.assertEquals( response.getStatus().getCode(), 404, "Status found: " + response.getStatus() );
+        Response response = null;
+        try
+        {
+            response = downloadView( releaseNotFoundGav, "maven2", getTestRepositoryId() );
+            Assert.assertEquals( response.getStatus().getCode(), 404, "Status found: " + response.getStatus() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
 
-        Gav snapshotNotFoundGav =
-            new Gav( "nexus3615", "notFound", "1.0.1-SNAPSHOT", null, "jar", 1, System.currentTimeMillis(), null, 
-                false, null, false, null );
-        response = downloadView( snapshotNotFoundGav, "maven2", getTestRepositoryId() );
-        Assert.assertEquals( response.getStatus().getCode(), 404, "Status found: " + response.getStatus() );
+        try
+        {
+            Gav snapshotNotFoundGav =
+                new Gav( "nexus3615", "notFound", "1.0.1-SNAPSHOT", null, "jar", 1, System.currentTimeMillis(), null,
+                    false, null, false, null );
+            response = downloadView( snapshotNotFoundGav, "maven2", getTestRepositoryId() );
+            Assert.assertEquals( response.getStatus().getCode(), 404, "Status found: " + response.getStatus() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 
     private void downloadAndVerify( Gav gav, String repoId )
@@ -187,16 +202,21 @@ public class Nexus3615MavenInfoIT
     {
         XStream xstream = getXMLXStream();
 
-        Response response = downloadView( gav, "maven2", repoId );
+        Response response = null;
+        try
+        {
+            response = downloadView( gav, "maven2", repoId );
+            String responseText = response.getEntity().getText();
+            Assert.assertEquals( 200, response.getStatus().getCode() );
+            Maven2ArtifactInfoResource data =
+                ( (Maven2ArtifactInfoResourceRespose) xstream.fromXML( responseText ) ).getData();
+            return data;
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
 
-        String responseText = response.getEntity().getText();
-
-        Assert.assertEquals( 200, response.getStatus().getCode() );
-
-        Maven2ArtifactInfoResource data =
-            ( (Maven2ArtifactInfoResourceRespose) xstream.fromXML( responseText ) ).getData();
-
-        return data;
     }
 
     private String buildExpectedDepBlock( Gav gav )

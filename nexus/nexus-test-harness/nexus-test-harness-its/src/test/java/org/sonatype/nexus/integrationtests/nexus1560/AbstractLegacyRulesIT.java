@@ -68,31 +68,36 @@ public abstract class AbstractLegacyRulesIT
         TaskScheduleUtil.runTask( "nexus1560-repo2", RebuildMavenMetadataTaskDescriptor.ID, repo2 );
     }
 
-    protected Response download( String downloadUrl )
+    protected Status download( String downloadUrl )
         throws IOException
     {
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        return RequestFacade.doGetRequest( downloadUrl );
+        Response response = null;
+        try
+        {
+            response = RequestFacade.doGetRequest( downloadUrl );
+            return response.getStatus();
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 
-    protected Response failDownload( String downloadUrl )
+    protected void assertDownloadFails( String downloadUrl )
         throws IOException
     {
-        Response response = download( downloadUrl );
-        Status status = response.getStatus();
-        Assert.assertTrue( status.isError(), "Unable to download artifact from repository: " + status );
-        return response;
+        Status status = download( downloadUrl );
+        Assert.assertTrue( status.isError(), "Artifact should not have been able to be downloaded: " + status );
     }
 
-    protected Response successDownload( String downloadUrl )
+    protected void assertDownloadSucceeds( String downloadUrl )
     throws IOException
     {
-        Response response = download( downloadUrl );
-        Status status = response.getStatus();
+        Status status = download( downloadUrl );
         Assert.assertTrue( status.isSuccess(), "Unable to download artifact from repository: " + status );
-        return response;
     }
 
 }

@@ -42,8 +42,17 @@ public class Nexus810PackageNamesInRestMessagesIT extends AbstractNexusIntegrati
     public void checkForPackageNamesInResponse() throws IOException
     {
         // I like simple tests
-        Response response = RequestFacade.doGetRequest( "service/local/schedule_types" );
-        String responseText = response.getEntity().getText();
-        Assert.assertFalse( responseText.contains( "org.sonatype." ), "Found package names in response." );
+        Response response = null;
+
+        try
+        {
+            response = RequestFacade.doGetRequest( "service/local/schedule_types" );
+            String responseText = response.getEntity().getText();
+            Assert.assertFalse( responseText.contains( "org.sonatype." ), "Found package names in response." );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 }

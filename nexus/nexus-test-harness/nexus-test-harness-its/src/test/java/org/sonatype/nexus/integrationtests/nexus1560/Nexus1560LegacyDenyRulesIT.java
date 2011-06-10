@@ -38,7 +38,7 @@ public class Nexus1560LegacyDenyRulesIT
         String downloadUrl =
             REPOSITORY_RELATIVE_URL + REPO_TEST_HARNESS_REPO + "/" + getRelitiveArtifactPath( gavArtifact1 );
 
-        failDownload( downloadUrl );
+        assertDownloadFails( downloadUrl );
     }
 
     @Test
@@ -48,7 +48,7 @@ public class Nexus1560LegacyDenyRulesIT
         String downloadUrl =
             GROUP_REPOSITORY_RELATIVE_URL + NEXUS1560_GROUP + "/" + getRelitiveArtifactPath( gavArtifact1 );
 
-        failDownload( downloadUrl );
+        assertDownloadFails( downloadUrl );
     }
 
     @Test
@@ -57,7 +57,7 @@ public class Nexus1560LegacyDenyRulesIT
     {
         String downloadUrl = GROUP_REPOSITORY_RELATIVE_URL + NEXUS1560_GROUP + "/nexus1560/artifact/maven-metadata.xml";
 
-        failDownload( downloadUrl );
+        assertDownloadFails( downloadUrl );
     }
 
     @Test
@@ -67,7 +67,7 @@ public class Nexus1560LegacyDenyRulesIT
         String downloadUrl =
             GROUP_REPOSITORY_RELATIVE_URL + NEXUS1560_GROUP + "/" + getRelitiveArtifactPath( gavArtifact2 );
 
-        failDownload( downloadUrl );
+        assertDownloadFails( downloadUrl );
     }
 
     @Test
@@ -77,7 +77,7 @@ public class Nexus1560LegacyDenyRulesIT
         String downloadUrl =
             REPOSITORY_RELATIVE_URL + REPO_TEST_HARNESS_REPO + "/" + getRelitiveArtifactPath( gavArtifact2 );
 
-        failDownload( downloadUrl );
+        assertDownloadFails( downloadUrl );
     }
 
     @Test
@@ -87,7 +87,7 @@ public class Nexus1560LegacyDenyRulesIT
         String downloadUrl =
             REPOSITORY_RELATIVE_URL + REPO_TEST_HARNESS_REPO2 + "/" + getRelitiveArtifactPath( gavArtifact2 );
 
-        failDownload( downloadUrl );
+        assertDownloadFails( downloadUrl );
     }
 
 }
