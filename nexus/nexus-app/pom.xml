@@ -99,6 +99,11 @@
       <groupId>org.sonatype.spice</groupId>
       <artifactId>plexus-swizzle</artifactId>
     </dependency>
+    <!-- Swizzle needs it -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>plexus-encryptor</artifactId>

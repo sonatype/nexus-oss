@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.PropertyConfigurator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -63,7 +62,7 @@ public class Log4jLogConfiguration
             props.put( e.getKey(), e.getValue() );
         }
 
-        PropertyConfigurator.configure( props );
+        // PropertyConfigurator.configure( props );
     }
 
     public EnhancedProperties getConfig()

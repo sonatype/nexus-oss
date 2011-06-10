@@ -19,6 +19,7 @@
 package org.sonatype.nexus.integrationtests.nexus606;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -50,11 +51,11 @@ public class Nexus606DownloadLogsAndConfigFilesIT
 {
 
     @BeforeClass
-    public void setSecureTest(){
+    public void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
-    
-    @SuppressWarnings( "unchecked" )
+
     @Test
     public void getLogsTest()
         throws Exception
@@ -75,8 +76,7 @@ public class Nexus606DownloadLogsAndConfigFilesIT
             LogsListResource logResource = iter.next();
 
             // check the contents of each log now...
-            // FIXME not possible to do that right now, we did cheat log4j to move the log files around
-            // this.downloadAndConfirmLog( logResource.getResourceURI(), logResource.getName() );
+            this.downloadAndConfirmLog( logResource.getResourceURI(), logResource.getName() );
         }
     }
 
@@ -134,9 +134,19 @@ public class Nexus606DownloadLogsAndConfigFilesIT
         {
             downloadedLog.append( (char) bReader.read() );
         }
-        String logOnDisk = FileUtils.fileRead( nexusLog );
-        Assert.assertTrue( logOnDisk.contains( downloadedLog ), "Downloaded log should be similar to log file from disk.\nNOTE: its possible the file could have rolled over.\nTrying to match:\n"
-                                                   + downloadedLog );
+
+        Assert.assertTrue( downloadedLog.length() > 0 );
+
+        final File nexusLog = getNexusLogFile();
+
+        if ( nexusLog != null )
+        {
+            String logOnDisk = FileUtils.fileRead( nexusLog );
+            Assert.assertTrue(
+                logOnDisk.contains( downloadedLog ),
+                "Downloaded log should be similar to log file from disk.\nNOTE: its possible the file could have rolled over.\nTrying to match:\n"
+                    + downloadedLog );
+        }
     }
 
     private ConfigurationsListResource getConfigFromList( List<ConfigurationsListResource> configList, String name )

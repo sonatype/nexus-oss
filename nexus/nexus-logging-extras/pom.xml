@@ -50,15 +50,15 @@
       <scope>compile</scope>
     </dependency>
 
-    <!-- We configure Log4j in programmatic way, so we need this -->
+    <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
       <scope>compile</scope>
     </dependency>
 

@@ -165,7 +165,7 @@ public abstract class AbstractNexusLdapTestCase
     {
         super.setUp();
 
-     // configure the logging
+        // configure the logging
         SLF4JBridgeHandler.install();
 
         FileUtils.deleteDirectory( PLEXUS_HOME );
@@ -198,6 +198,9 @@ public abstract class AbstractNexusLdapTestCase
         ldapServer.stop();
 
         ldapServer = null;
+
+        // configure the logging
+        SLF4JBridgeHandler.uninstall();
 
         super.tearDown();
     }

@@ -176,7 +176,11 @@
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
     <plexus-security.version>2.4</plexus-security.version>
     <shiro.version>1.1.0</shiro.version>
+
     <slf4j.version>1.6.1</slf4j.version>
+    <log4j.version>1.2.14</log4j.version>
+    <logback.version>0.9.29</logback.version>
+
     <nexus.repository.metadata.version>1.1</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
     <plexus.restlet.bridge.version>1.17</plexus.restlet.bridge.version>
@@ -190,7 +194,6 @@
     <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
     <plexus-velocity.version>1.1.7</plexus-velocity.version>
     <commons-beanutils.version>1.7.0-SONATYPE</commons-beanutils.version>
-    <log4j.version>1.2.14</log4j.version>
     <plexus-ehcache.version>1.3</plexus-ehcache.version>
     <plexus-jetty-testsuite.version>1.7</plexus-jetty-testsuite.version>
     <plexus-app-events.version>1.0.0</plexus-app-events.version>
@@ -574,6 +577,13 @@
         <groupId>log4j</groupId>
         <artifactId>log4j</artifactId>
         <version>${log4j.version}</version>
+        <type>jar</type>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>${logback.version}</version>
         <type>jar</type>
         <scope>runtime</scope>
       </dependency>
@@ -1003,6 +1013,10 @@
           <exclusion>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

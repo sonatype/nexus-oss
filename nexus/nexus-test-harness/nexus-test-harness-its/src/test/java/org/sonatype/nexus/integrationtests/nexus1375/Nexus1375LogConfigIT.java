@@ -60,9 +60,9 @@ public class Nexus1375LogConfigIT
 
         Assert.assertEquals( "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n", resource.getFileAppenderPattern() );
 
-        File actualLoggerLocation = new File( resource.getFileAppenderLocation() ).getCanonicalFile();
-
-        Assert.assertTrue( nexusLog.getAbsoluteFile().equals( actualLoggerLocation.getAbsoluteFile() ) );
+        // exposing actual OS file location over REST is very bad idea...
+        // File actualLoggerLocation = new File( resource.getFileAppenderLocation() ).getCanonicalFile();
+        // Assert.assertTrue( nexusLog.getAbsoluteFile().equals( actualLoggerLocation.getAbsoluteFile() ) );
     }
 
     @Test

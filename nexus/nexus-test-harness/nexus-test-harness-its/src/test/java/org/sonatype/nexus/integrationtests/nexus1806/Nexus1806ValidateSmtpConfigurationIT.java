@@ -60,7 +60,7 @@ public class Nexus1806ValidateSmtpConfigurationIT
 
         changedServer = new GreenMail( smtp );
         changedServer.setUser( USER_EMAIL, USER_USERNAME, USER_PASSWORD );
-        log.debug( "Starting e-mail server" );
+        staticLog.debug( "Starting e-mail server" );
         changedServer.start();
 
         originalServer = EmailUtil.startEmailServer();

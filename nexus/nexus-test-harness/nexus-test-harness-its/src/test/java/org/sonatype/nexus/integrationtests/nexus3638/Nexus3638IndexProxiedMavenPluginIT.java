@@ -21,6 +21,7 @@ package org.sonatype.nexus.integrationtests.nexus3638;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 
+import java.io.File;
 import java.net.URL;
 import java.util.List;
 
@@ -114,10 +115,15 @@ public class Nexus3638IndexProxiedMavenPluginIT
         Assert.assertFalse( items.isEmpty() );
         Assert.assertEquals( "maven-plugin", items.get( 0 ).getPackaging() );
 
-        String logContent = FileUtils.readFileToString( nexusLog );
-        // NEXUS-3707
-        MatcherAssert.assertThat( logContent,
-            not( containsString( "Rename operation failed after -1 retries in -1 ms intervals" ) ) );
-        MatcherAssert.assertThat( logContent, not( containsString( "java.util.zip.ZipException" ) ) );
+        final File nexusLog = getNexusLogFile();
+
+        if ( nexusLog != null )
+        {
+            String logContent = FileUtils.readFileToString( nexusLog );
+            // NEXUS-3707
+            MatcherAssert.assertThat( logContent,
+                not( containsString( "Rename operation failed after -1 retries in -1 ms intervals" ) ) );
+            MatcherAssert.assertThat( logContent, not( containsString( "java.util.zip.ZipException" ) ) );
+        }
     }
 }

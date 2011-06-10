@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.log4j.PropertyConfigurator;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -45,7 +44,7 @@ public class LogConfigListener
 
     private static final String KEY_NEXUS_WORK_DIR = "plexus.nexus-work";
 
-    private static final String RELATIVE_PATH_LOG_CONF = "conf/log4j.properties";
+    private static final String RELATIVE_PATH_LOG_CONF = "conf/logback.xml";
 
     private Handler[] originalHandlers;
 
@@ -84,14 +83,9 @@ public class LogConfigListener
 
     private void setUpJULHandlerOriginal()
     {
+        SLF4JBridgeHandler.uninstall();
+
         Logger julLogger = LogManager.getLogManager().getLogger( "" );
-
-        Handler[] slf4jHandlers = julLogger.getHandlers();
-
-        for ( Handler handler : slf4jHandlers )
-        {
-            julLogger.removeHandler( handler );
-        }
 
         for ( Handler handler : originalHandlers )
         {
@@ -126,20 +120,20 @@ public class LogConfigListener
 
         try
         {
-            URL configUrl = this.getClass().getResource( "/META-INF/log/log4j.properties" );
+            URL configUrl = this.getClass().getResource( "/META-INF/log/logback.xml" );
 
             FileUtils.copyURLToFile( configUrl, logConfigFile );
         }
         catch ( IOException e )
         {
-            throw new IllegalStateException( "Could not create default log4j.properties into "
+            throw new IllegalStateException( "Could not create default logback.xml into "
                 + logConfigFile.getAbsolutePath(), e );
         }
     }
 
     private void initializeLogConfig( String location )
     {
-        PropertyConfigurator.configure( location );
+        // PropertyConfigurator.configure( location );
     }
 
 }

@@ -27,7 +27,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
@@ -37,7 +36,6 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
@@ -77,7 +75,6 @@ import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
-import org.sonatype.nexus.util.EnhancedProperties;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
@@ -139,7 +136,9 @@ public abstract class AbstractNexusIntegrationTest
 
     protected static final String nexusLogDir;
 
-    protected static Logger log = LoggerFactory.getLogger( AbstractNexusIntegrationTest.class );
+    protected Logger log = LoggerFactory.getLogger( getClass() );
+
+    protected static Logger staticLog = LoggerFactory.getLogger( AbstractNexusIntegrationTest.class );
 
     // Install the file preferences, to have them used from IT but also from embedded Nexus too.
     static
@@ -152,8 +151,6 @@ public abstract class AbstractNexusIntegrationTest
      */
     private boolean verifyNexusConfigBeforeStart = true;
 
-    protected File nexusLog;
-
     static
     {
         nexusApplicationPort = TestProperties.getInteger( "nexus.application.port" );
@@ -164,6 +161,9 @@ public abstract class AbstractNexusIntegrationTest
         nexusLogDir = TestProperties.getString( "nexus.log.dir" );
         nexusBaseUrl = TestProperties.getString( "nexus.base.url" );
         baseNexusUrl = nexusBaseUrl;
+        
+        // configure the logging
+        SLF4JBridgeHandler.install();
     }
 
     // == instance utils
@@ -253,27 +253,27 @@ public abstract class AbstractNexusIntegrationTest
         this.testRepositoryId = testRepositoryId;
         // this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
 
-        // This is leftover code, here to serve as warning as something that needs ligration from log4j
-        InputStream is = null;
-        Properties props = new Properties();
-        try
-        {
-            is = getClass().getResourceAsStream( "/log4j.properties" );
-            if ( is != null )
-            {
-                log.error("/log4j.properties detected that used to be loaded as part of ITs, now it is being ignored."
-                    + " You may want to tweak the IT in question with suitable logging configuration.");      
-                //props.load( is );
-                //PropertyConfigurator.configure( props );
-            }
-        }
-        finally
-        {
-            IOUtil.close( is );
-        }
-
-        // configure the logging
-        SLF4JBridgeHandler.install();
+//        // This is leftover code, here to serve as warning as something that needs ligration from log4j
+//        InputStream is = null;
+//        Properties props = new Properties();
+//        try
+//        {
+//            is = getClass().getResourceAsStream( "/log4j.properties" );
+//            if ( is != null )
+//            {
+//                log.error("/log4j.properties detected that used to be loaded as part of ITs, now it is being ignored."
+//                    + " You may want to tweak the IT in question with suitable logging configuration.");      
+//                //props.load( is );
+//                //PropertyConfigurator.configure( props );
+//            }
+//        }
+//        finally
+//        {
+//            IOUtil.close( is );
+//        }
+//
+//        // configure the logging
+//        SLF4JBridgeHandler.install();
 
         // redirect filePrefs
         FilePreferencesFactory.setPreferencesFile( ITAppBooterCustomizer.getFilePrefsFile(
@@ -289,7 +289,7 @@ public abstract class AbstractNexusIntegrationTest
     {
         startProfiler();
 
-        log.debug( "staticOncePerClassSetUp" );
+        staticLog.debug( "staticOncePerClassSetUp" );
 
         // hacky state machine
         NEEDS_INIT = true;
@@ -321,7 +321,8 @@ public abstract class AbstractNexusIntegrationTest
                 // tell the console what we are doing, now that there is no output its
                 log.info( "Running Test: " + getClass().getSimpleName() );
 
-                setupLog4j();
+                // NOT DOING ANYMORE
+                // setupLog4j();
 
                 // clean common work dir
                 beforeStartClean();
@@ -414,93 +415,98 @@ public abstract class AbstractNexusIntegrationTest
 
     // == below methods are NOT participating in @Before/@After stuff
 
-    /**
-     * 
-     * @throws IOException 
-     */
-    private void setupLog4j()
-        throws IOException
+//    /**
+//     * 
+//     * @throws IOException 
+//     */
+//    private void setupLog4j()
+//        throws IOException
+//    {
+//        File defaultLog4j = new File( TestProperties.getFile( "default-configs" ), "log4j.properties" );
+//        // File confLog4j = new File( nexusWorkDir, "conf/log4j.properties" );
+//
+//        updateLog4j( defaultLog4j );
+//        // updateLog4j( confLog4j );
+//    }
+//
+//    private void updateLog4j( File log4jFile )
+//        throws IOException
+//    {
+//        EnhancedProperties properties = new EnhancedProperties();
+//        if ( log4jFile.exists() )
+//        {
+//            FileInputStream input = new FileInputStream( log4jFile );
+//            properties.load( input );
+//            IOUtil.close( input );
+//        }
+//
+//        attachPropertiesToLog( properties );
+//
+//        String newFileName = this.getTestId() + "/test-config/log4j.properties";
+//        File newLog4JFile = new File( TestProperties.getString( "test.resources.folder" ), newFileName );
+//        newLog4JFile.getParentFile().mkdirs();
+//        FileOutputStream output = new FileOutputStream( newLog4JFile );
+//        try
+//        {
+//            properties.store( output );
+//        }
+//        finally
+//        {
+//            IOUtil.close( output );
+//        }
+//    }
+//
+//    protected void attachPropertiesToLog( EnhancedProperties properties )
+//        throws IOException
+//    {
+//        nexusLog = new File( nexusLogDir, getTestId() + "/nexus.log" );
+//        nexusLog.getParentFile().mkdirs();
+//        if ( !nexusLog.exists() )
+//        {
+//            nexusLog.createNewFile();
+//        }
+//
+//        properties.putIfNew( "log4j.rootLogger", "DEBUG, logfile" );
+//
+//        properties.remove( "log4j.logger.org.apache.commons" );
+//        properties.remove( "log4j.logger.httpclient" );
+//        properties.remove( "log4j.logger.org.apache.http" );
+//        properties.remove( "log4j.logger.org.sonatype.nexus" );
+//        properties.remove( "log4j.logger.org.sonatype.nexus.rest.NexusApplication" );
+//        properties.remove( "log4j.logger.org.restlet" );
+//
+//        properties.putIfNew( "log4j.appender.logfile", "org.apache.log4j.RollingFileAppender" );
+//        properties.putIfNew( "log4j.appender.logfile.File", nexusLog.getAbsolutePath().replace( '\\', '/' ) );
+//        properties.putIfNew( "log4j.appender.logfile.Append", "true" );
+//        properties.putIfNew( "log4j.appender.logfile.MaxBackupIndex", "30" );
+//        properties.putIfNew( "log4j.appender.logfile.MaxFileSize", "10MB" );
+//        properties.putIfNew( "log4j.appender.logfile.layout", "org.apache.log4j.PatternLayout" );
+//        properties.putIfNew( "log4j.appender.logfile.layout.ConversionPattern",
+//            "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
+//
+//        File testMigrationLog = new File( nexusLogDir, getTestId() + "/migration.log" );
+//        testMigrationLog.getParentFile().mkdirs();
+//        if ( !testMigrationLog.exists() )
+//        {
+//            testMigrationLog.createNewFile();
+//        }
+//
+//        properties.putIfNew( "log4j.logger.org.sonatype.nexus.plugin.migration", "DEBUG, migrationlogfile" );
+//
+//        properties.putIfNew( "log4j.appender.migrationlogfile", "org.apache.log4j.DailyRollingFileAppender" );
+//        properties.putIfNew( "log4j.appender.migrationlogfile.File",
+//            testMigrationLog.getAbsolutePath().replace( '\\', '/' ) );
+//        properties.putIfNew( "log4j.appender.migrationlogfile.Append", "true" );
+//        properties.putIfNew( "log4j.appender.migrationlogfile.DatePattern", "'.'yyyy-MM-dd" );
+//        properties.putIfNew( "log4j.appender.migrationlogfile.layout", "org.apache.log4j.PatternLayout" );
+//        properties.putIfNew( "log4j.appender.migrationlogfile.layout.ConversionPattern",
+//            "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
+//
+//    }
+    
+    protected File getNexusLogFile()
     {
-        File defaultLog4j = new File( TestProperties.getFile( "default-configs" ), "log4j.properties" );
-        // File confLog4j = new File( nexusWorkDir, "conf/log4j.properties" );
-
-        updateLog4j( defaultLog4j );
-        // updateLog4j( confLog4j );
-    }
-
-    private void updateLog4j( File log4jFile )
-        throws IOException
-    {
-        EnhancedProperties properties = new EnhancedProperties();
-        if ( log4jFile.exists() )
-        {
-            FileInputStream input = new FileInputStream( log4jFile );
-            properties.load( input );
-            IOUtil.close( input );
-        }
-
-        attachPropertiesToLog( properties );
-
-        String newFileName = this.getTestId() + "/test-config/log4j.properties";
-        File newLog4JFile = new File( TestProperties.getString( "test.resources.folder" ), newFileName );
-        newLog4JFile.getParentFile().mkdirs();
-        FileOutputStream output = new FileOutputStream( newLog4JFile );
-        try
-        {
-            properties.store( output );
-        }
-        finally
-        {
-            IOUtil.close( output );
-        }
-    }
-
-    protected void attachPropertiesToLog( EnhancedProperties properties )
-        throws IOException
-    {
-        nexusLog = new File( nexusLogDir, getTestId() + "/nexus.log" );
-        nexusLog.getParentFile().mkdirs();
-        if ( !nexusLog.exists() )
-        {
-            nexusLog.createNewFile();
-        }
-
-        properties.putIfNew( "log4j.rootLogger", "DEBUG, logfile" );
-
-        properties.remove( "log4j.logger.org.apache.commons" );
-        properties.remove( "log4j.logger.httpclient" );
-        properties.remove( "log4j.logger.org.apache.http" );
-        properties.remove( "log4j.logger.org.sonatype.nexus" );
-        properties.remove( "log4j.logger.org.sonatype.nexus.rest.NexusApplication" );
-        properties.remove( "log4j.logger.org.restlet" );
-
-        properties.putIfNew( "log4j.appender.logfile", "org.apache.log4j.RollingFileAppender" );
-        properties.putIfNew( "log4j.appender.logfile.File", nexusLog.getAbsolutePath().replace( '\\', '/' ) );
-        properties.putIfNew( "log4j.appender.logfile.Append", "true" );
-        properties.putIfNew( "log4j.appender.logfile.MaxBackupIndex", "30" );
-        properties.putIfNew( "log4j.appender.logfile.MaxFileSize", "10MB" );
-        properties.putIfNew( "log4j.appender.logfile.layout", "org.apache.log4j.PatternLayout" );
-        properties.putIfNew( "log4j.appender.logfile.layout.ConversionPattern",
-            "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
-
-        File testMigrationLog = new File( nexusLogDir, getTestId() + "/migration.log" );
-        testMigrationLog.getParentFile().mkdirs();
-        if ( !testMigrationLog.exists() )
-        {
-            testMigrationLog.createNewFile();
-        }
-
-        properties.putIfNew( "log4j.logger.org.sonatype.nexus.plugin.migration", "DEBUG, migrationlogfile" );
-
-        properties.putIfNew( "log4j.appender.migrationlogfile", "org.apache.log4j.DailyRollingFileAppender" );
-        properties.putIfNew( "log4j.appender.migrationlogfile.File",
-            testMigrationLog.getAbsolutePath().replace( '\\', '/' ) );
-        properties.putIfNew( "log4j.appender.migrationlogfile.Append", "true" );
-        properties.putIfNew( "log4j.appender.migrationlogfile.DatePattern", "'.'yyyy-MM-dd" );
-        properties.putIfNew( "log4j.appender.migrationlogfile.layout", "org.apache.log4j.PatternLayout" );
-        properties.putIfNew( "log4j.appender.migrationlogfile.layout.ConversionPattern",
-            "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
-
+        return new File( "target/logs/nexus.log" );
     }
 
     protected void beforeStartClean()
@@ -824,13 +830,7 @@ public abstract class AbstractNexusIntegrationTest
         catch ( Exception e )
         {
             e.printStackTrace();
-            log.error( e.getMessage(), e );
-            if ( nexusLog.exists() )
-            {
-                File testNexusLog = new File( nexusLogDir, getTestId() + "/nexus.log" );
-                testNexusLog.getParentFile().mkdirs();
-                FileUtils.copyFile( nexusLog, testNexusLog );
-            }
+            staticLog.error( e.getMessage(), e );
             throw e;
         }
     }
@@ -838,7 +838,7 @@ public abstract class AbstractNexusIntegrationTest
     protected static void stopNexus()
         throws Exception
     {
-        log.info( "stopping Nexus" );
+        staticLog.info( "stopping Nexus" );
 
         getNexusStatusUtil().stop();
     }
@@ -936,7 +936,7 @@ public abstract class AbstractNexusIntegrationTest
 
     public static File getResource( String resource )
     {
-        log.debug( "Looking for resource: " + resource );
+        staticLog.debug( "Looking for resource: " + resource );
         // URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
 
         File rootDir = new File( TestProperties.getString( "test.resources.folder" ) );
@@ -947,7 +947,7 @@ public abstract class AbstractNexusIntegrationTest
             return null;
         }
 
-        log.debug( "found: " + file );
+        staticLog.debug( "found: " + file );
 
         return file;
     }
@@ -964,7 +964,7 @@ public abstract class AbstractNexusIntegrationTest
         }
         catch ( Exception e )
         {
-            log.info( "Profiler not present" );
+            staticLog.info( "Profiler not present" );
             return;
         }
 
