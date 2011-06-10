@@ -114,9 +114,9 @@
   </build>
   
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/trunk/nexus-migration-plugin</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/trunk/nexus-migration-plugin</developerConnection>
-    <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-migration-plugin</url>
+    <connection>scm:git:git://github.com/sonatype/nexus-migration-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:sonatype/nexus-migration-plugin.git</developerConnection>
+    <url>https://github.com/sonatype/nexus-migration-plugin</url>
   </scm>
   
 </project>
