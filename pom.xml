@@ -18,7 +18,7 @@
 
   <scm>
     <connection>scm:git:git://github.com/sonatype/sisu-task-scheduler.git</connection>
-    <developerConnection>scm:git:ssh://github.com:sonatype/sisu-task-scheduler.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:sonatype/sisu-task-scheduler.git</developerConnection>
     <url>https://github.com/sonatype/sisu-task-scheduler</url>
   </scm>
 
