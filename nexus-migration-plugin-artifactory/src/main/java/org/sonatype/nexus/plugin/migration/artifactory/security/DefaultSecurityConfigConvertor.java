@@ -349,7 +349,7 @@ public class DefaultSecurityConfigConvertor
 
                 if ( artifactoryUser.isAdmin() )
                 {
-                    map.addRole( "admin" );
+                    map.addRole( "nx-admin" );
                 }
                 else
                 {

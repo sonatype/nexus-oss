@@ -58,7 +58,7 @@ public class Nexus3301MavenDownloadRedirectSecurityIT
         AbstractMavenNexusIT.cleanRepository( new File( TestProperties.getString( "maven.local.repo" ) ), getTestId() );
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        replaceUserRole( TEST_USER_NAME, "admin" );
+        replaceUserRole( TEST_USER_NAME, "nx-admin" );
 
         download();
     }

@@ -227,7 +227,7 @@ public class SecurityConfigConvertorTest
         Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
         Assert.assertEquals( "active", user.getStatus() );
 
-        Assert.assertTrue( map.getRoles().contains( "admin" ) );
+        Assert.assertTrue( map.getRoles().contains( "nx-admin" ) );
     }
 
     @Test
@@ -281,7 +281,7 @@ public class SecurityConfigConvertorTest
         Assert.assertEquals( 0, repoTargetList.size() );
 
         final Iterator<Entry<CUser, CUserRoleMapping>> entries = userList.entrySet().iterator();
-        Assert.assertTrue( entries.next().getValue().getRoles().contains( "admin" ) );
+        Assert.assertTrue( entries.next().getValue().getRoles().contains( "nx-admin" ) );
         Assert.assertTrue( entries.next().getValue().getRoles().contains( "group" ) );
         Assert.assertTrue( entries.next().getValue().getRoles().contains( "anonymous" ) );
 

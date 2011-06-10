@@ -62,7 +62,7 @@ public class Nexus3301MavenDeployRedirectSecurityIT
         throws Exception
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        replaceUserRole( TEST_USER_NAME, "admin" );
+        replaceUserRole( TEST_USER_NAME, "nx-admin" );
 
         deploy();
     }
