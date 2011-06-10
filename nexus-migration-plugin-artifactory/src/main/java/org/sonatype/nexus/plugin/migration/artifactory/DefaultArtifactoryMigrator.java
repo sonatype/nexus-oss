@@ -479,13 +479,13 @@ public class DefaultArtifactoryMigrator
             members.add( repoId );
         }
         exConf.setMemberRepositoryIds( members );
-
-        ManuallyConfiguredRepositoryTemplate template =
-            repositoryTemplateProvider.createManuallyTemplate( new CRepositoryCoreConfiguration(
-                repositoryTemplateProvider.getApplicationConfiguration(), group, null ) );
-
         try
         {
+            
+            ManuallyConfiguredRepositoryTemplate template = repositoryTemplateProvider
+                .createManuallyTemplate( new CRepositoryCoreConfiguration( repositoryTemplateProvider
+                    .getApplicationConfiguration(), group, null ) );
+
             Repository r = template.create();
             this.nexusConfiguration.saveConfiguration();
             return r.adaptToFacet( GroupRepository.class );
@@ -655,12 +655,13 @@ public class DefaultArtifactoryMigrator
 
         }
 
-        ManuallyConfiguredRepositoryTemplate template =
-            repositoryTemplateProvider.createManuallyTemplate( new CRepositoryCoreConfiguration(
-                repositoryTemplateProvider.getApplicationConfiguration(), nexusRepo, null ) );
 
         try
         {
+            ManuallyConfiguredRepositoryTemplate template = repositoryTemplateProvider
+                .createManuallyTemplate( new CRepositoryCoreConfiguration( repositoryTemplateProvider
+                    .getApplicationConfiguration(), nexusRepo, null ) );
+
             Repository r = template.create();
             this.nexusConfiguration.saveConfiguration();
             return r;
@@ -853,12 +854,12 @@ public class DefaultArtifactoryMigrator
         exConf.setMasterRepositoryId( shadowOfRepoId );
         exConf.setSynchronizeAtStartup( true );
 
-        ManuallyConfiguredRepositoryTemplate template =
-            repositoryTemplateProvider.createManuallyTemplate( new CRepositoryCoreConfiguration(
-                repositoryTemplateProvider.getApplicationConfiguration(), shadowRepo, null ) );
-
         try
         {
+            ManuallyConfiguredRepositoryTemplate template = repositoryTemplateProvider
+                .createManuallyTemplate( new CRepositoryCoreConfiguration( repositoryTemplateProvider
+                    .getApplicationConfiguration(), shadowRepo, null ) );
+        
             Repository r = template.create();
             this.nexusConfiguration.saveConfiguration();
             return r.adaptToFacet( ShadowRepository.class );

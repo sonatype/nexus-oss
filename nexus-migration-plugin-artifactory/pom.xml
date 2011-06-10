@@ -121,6 +121,12 @@
       <scope>test</scope>
       <version>${nexus.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <scope>test</scope>
+      <version>${nexus.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>commons-io</groupId>
