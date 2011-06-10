@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-parent</artifactId>
-    <version>21-SNAPSHOT</version>
+    <version>21-RC1</version>
     <relativePath>../nexus-parent/pom.xml</relativePath>
   </parent>
 
@@ -166,7 +166,7 @@
 
   <!-- Shortcuts for outnumbered deps :) -->
   <properties>
-    <maven.indexer.version>4.1.1-SNAPSHOT</maven.indexer.version>
+    <maven.indexer.version>4.1.1</maven.indexer.version>
     <maven.version>3.0.1</maven.version>
     <aether.version>1.8.1</aether.version>
 
@@ -174,7 +174,7 @@
     <spice-timeline.version>2.0</spice-timeline.version>
     <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
-    <plexus-security.version>2.4-SNAPSHOT</plexus-security.version>
+    <plexus-security.version>2.4</plexus-security.version>
     <shiro.version>1.1.0</shiro.version>
     <slf4j.version>1.6.1</slf4j.version>
     <nexus.repository.metadata.version>1.1</nexus.repository.metadata.version>
@@ -183,7 +183,7 @@
     <micromailer.version>1.1.0</micromailer.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
-    <plexus-task-scheduler.version>1.4-SNAPSHOT</plexus-task-scheduler.version>
+    <plexus-task-scheduler.version>1.4</plexus-task-scheduler.version>
     <plexus-digest.version>1.1</plexus-digest.version>
     <plexus-cli.version>1.2</plexus-cli.version>
     <plexus-interpolation.version>1.6</plexus-interpolation.version>
@@ -197,7 +197,8 @@
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
     <spice-utils.version>1.0.0</spice-utils.version>
     <enunciate.version>1.20</enunciate.version>
-    <surefire.version>2.8.2-SONATYPE-SNAPSHOT</surefire.version>
+    <surefire.version>2.8.1</surefire.version>
+    <applifecycle.version>1.4</applifecycle.version>
   </properties>
 
   <dependencyManagement>
@@ -828,7 +829,7 @@
       <dependency>
         <groupId>com.carrotsearch</groupId>
         <artifactId>junit-benchmarks</artifactId>
-        <version>0.3.0-SNAPSHOT</version>
+        <version>0.3.0-SONATYPE</version>
         <scope>test</scope>
       </dependency>
       <!-- h2 used by junit benchmarks to store perf data -->
@@ -1277,9 +1278,9 @@
   </reporting>
 
   <scm>
-    <connection>scm:git:git://github.com/sonatype/nexus.git</connection>
-    <developerConnection>scm:git:git@github.com:sonatype/nexus.git</developerConnection>
-    <url>https://github.com/sonatype/nexus</url>
+    <connection>scm:git:git://github.com/sonatype/app-lifecycle.git</connection>
+    <developerConnection>scm:git:git@github.com:sonatype/app-lifecycle.git</developerConnection>
+    <url>https://github.com/sonatype/app-lifecycle</url>
   </scm>
 
   <distributionManagement>
