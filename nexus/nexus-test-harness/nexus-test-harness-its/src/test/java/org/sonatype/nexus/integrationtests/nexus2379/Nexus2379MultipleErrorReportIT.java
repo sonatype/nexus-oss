@@ -18,7 +18,6 @@
  */
 package org.sonatype.nexus.integrationtests.nexus2379;
 
-import org.restlet.data.Method;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.ErrorReportUtil;
@@ -39,7 +38,7 @@ public class Nexus2379MultipleErrorReportIT
     public void validateMultipleErrors()
         throws Exception
     {        
-        RequestFacade.sendMessage( "service/local/exception?status=500", Method.GET, null );
+        RequestFacade.doGet( "service/local/exception?status=500", null );
         
         ErrorReportUtil.validateZipContents( nexusWorkDir );
         
@@ -47,47 +46,13 @@ public class Nexus2379MultipleErrorReportIT
         
         ErrorReportUtil.validateNoZip( nexusWorkDir );
         
-        RequestFacade.sendMessage( "service/local/exception?status=500", Method.GET, null );
-        
-        ErrorReportUtil.validateNoZip( nexusWorkDir );
-        
-        RequestFacade.sendMessage( "service/local/exception?status=500", Method.GET, null );
-        
-        ErrorReportUtil.validateNoZip( nexusWorkDir );
-        
-        RequestFacade.sendMessage( "service/local/exception?status=500", Method.GET, null );
-        
-        ErrorReportUtil.validateNoZip( nexusWorkDir );
-        
-        RequestFacade.sendMessage( "service/local/exception?status=500", Method.GET, null );
-        
-        ErrorReportUtil.validateNoZip( nexusWorkDir );
-        
-        RequestFacade.sendMessage( "service/local/exception?status=500", Method.GET, null );
-        
-        ErrorReportUtil.validateNoZip( nexusWorkDir );
-        
-        RequestFacade.sendMessage( "service/local/exception?status=500", Method.GET, null );
-        
-        ErrorReportUtil.validateNoZip( nexusWorkDir );
-        
-        RequestFacade.sendMessage( "service/local/exception?status=500", Method.GET, null );
-        
-        ErrorReportUtil.validateNoZip( nexusWorkDir );
-        
-        RequestFacade.sendMessage( "service/local/exception?status=500", Method.GET, null );
-        
-        ErrorReportUtil.validateNoZip( nexusWorkDir );
-        
-        RequestFacade.sendMessage( "service/local/exception?status=500", Method.GET, null );
-        
-        ErrorReportUtil.validateNoZip( nexusWorkDir );
-        
-        RequestFacade.sendMessage( "service/local/exception?status=500", Method.GET, null );
-        
-        ErrorReportUtil.validateNoZip( nexusWorkDir );
-        
-        RequestFacade.sendMessage( "service/local/exception?status=501", Method.GET, null );
+        for ( int i = 0; i < 10; i++ )
+        {
+            RequestFacade.doGet( "service/local/exception?status=500", null );
+            ErrorReportUtil.validateNoZip( nexusWorkDir );
+        }
+
+        RequestFacade.doGet( "service/local/exception?status=501", null );
         
         ErrorReportUtil.validateZipContents( nexusWorkDir );
     }

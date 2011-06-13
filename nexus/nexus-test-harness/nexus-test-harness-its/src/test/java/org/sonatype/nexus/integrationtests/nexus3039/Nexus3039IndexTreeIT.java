@@ -18,13 +18,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3039;
 
+import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+
 import org.restlet.data.MediaType;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class Nexus3039IndexTreeIT
@@ -38,9 +38,7 @@ public class Nexus3039IndexTreeIT
         String repoId = this.getTestRepositoryId();
 
         // get the index tree
-        Response response =
-            RequestFacade.doGetRequest( RequestFacade.SERVICE_LOCAL + "repositories/" + repoId + "/index_content/" );
-        Assert.assertEquals( 200, response.getStatus().getCode() );
+        RequestFacade.doGet( RequestFacade.SERVICE_LOCAL + "repositories/" + repoId + "/index_content/" );
 
         RepositoryMessageUtil repoUtil =
             new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
@@ -50,9 +48,8 @@ public class Nexus3039IndexTreeIT
         repoUtil.updateRepo( resource );
 
         // get the index tree
-        response =
-            RequestFacade.doGetRequest( RequestFacade.SERVICE_LOCAL + "repositories/" + repoId + "/index_content/" );
-        Assert.assertEquals( 404, response.getStatus().getCode() );
+        RequestFacade.doGet( RequestFacade.SERVICE_LOCAL + "repositories/" + repoId + "/index_content/",
+            respondsWithStatusCode( 404 ) );
 
     }
 
@@ -63,9 +60,7 @@ public class Nexus3039IndexTreeIT
         String repoId = "public";
 
         // get the index tree
-        Response response =
-            RequestFacade.doGetRequest( RequestFacade.SERVICE_LOCAL + "repo_groups/" + repoId + "/index_content/" );
-        Assert.assertEquals( 200, response.getStatus().getCode() );
+        RequestFacade.doGet( RequestFacade.SERVICE_LOCAL + "repo_groups/" + repoId + "/index_content/" );
     }
 
 }
