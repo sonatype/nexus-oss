@@ -130,11 +130,18 @@ public class Nexus874SecurityRealmReplacementIT
     public void getNexusStatus()
         throws IOException
     {
-        Response response = RequestFacade.doGetRequest( "service/local/status" );
-
-        if ( !response.getStatus().isSuccess() )
+        Response response = null;
+        try
         {
-            throw new ConnectException( response.getStatus().toString() );
+            response = RequestFacade.doGetRequest( "service/local/status" );
+            if ( !response.getStatus().isSuccess() )
+            {
+                throw new ConnectException( response.getStatus().toString() );
+            }
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
         }
     }
 

@@ -18,41 +18,36 @@
  */
 package org.sonatype.nexus.integrationtests.nexus810;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+
 import java.io.IOException;
 
+import org.hamcrest.Matcher;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
  * Checks to make sure the tasks don't have packages in the type field.
  */
-public class Nexus810PackageNamesInRestMessagesIT extends AbstractNexusIntegrationTest
+public class Nexus810PackageNamesInRestMessagesIT
+    extends AbstractNexusIntegrationTest
 {
     @BeforeClass
-    public void setSecureTest(){
+    public void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
-    
-    @Test
-    public void checkForPackageNamesInResponse() throws IOException
-    {
-        // I like simple tests
-        Response response = null;
 
-        try
-        {
-            response = RequestFacade.doGetRequest( "service/local/schedule_types" );
-            String responseText = response.getEntity().getText();
-            Assert.assertFalse( responseText.contains( "org.sonatype." ), "Found package names in response." );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+    @Test
+    public void checkForPackageNamesInResponse()
+        throws IOException
+    {
+        Matcher<Response> matcher = allOf( isSuccessful(), not( responseText( containsString( "org.sonatype." ) ) ) );
+        RequestFacade.doGet( "service/local/schedule_types", matcher );
     }
 }

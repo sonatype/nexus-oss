@@ -18,14 +18,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus383;
 
+import java.util.HashMap;
 import java.util.List;
 
-import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
-import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.NexusArtifact;
+import org.sonatype.nexus.test.utils.NexusRequestMatchers;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -37,21 +36,22 @@ public class Nexus383SearchPermissionIT
     extends AbstractPrivilegeTest
 {
     @BeforeClass
-    public void setSecureTest(){
+    public void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
-    
+
     @Test
     public void withPermission()
         throws Exception
     {
-        if( printKnownErrorButDoNotFail( Nexus383SearchPermissionIT.class, "withPermission" ))
+        if ( printKnownErrorButDoNotFail( Nexus383SearchPermissionIT.class, "withPermission" ) )
         {
             return;
         }
 
         overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-search", "1", "2" /* login */, "6", "14",
-                           "17" /* search */, "19", "44", "54", "55", "57", "58", "59", "T1", "T2" );
+            "17" /* search */, "19", "44", "54", "55", "57", "58", "59", "T1", "T2" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -65,7 +65,7 @@ public class Nexus383SearchPermissionIT
     public void withoutSearchPermission()
         throws Exception
     {
-        if( printKnownErrorButDoNotFail( Nexus383SearchPermissionIT.class, "withoutSearchPermission" ))
+        if ( printKnownErrorButDoNotFail( Nexus383SearchPermissionIT.class, "withoutSearchPermission" ) )
         {
             return;
         }
@@ -77,19 +77,11 @@ public class Nexus383SearchPermissionIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // NOT Should be able to find artifacts
-        Response response = null;
+        HashMap<String, String> queryArgs = new HashMap<String, String>();
 
-        try
-        {
-            response = getSearchMessageUtil().searchFor_response( "nexus383" );
-            Status status = response.getStatus();
-            Assert.assertEquals( 401, status.getCode() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        queryArgs.put( "q", "nexus383" );
 
+        getSearchMessageUtil().searchFor( queryArgs, NexusRequestMatchers.respondsWithStatusCode( 401 ) );
     }
 
     // @Test

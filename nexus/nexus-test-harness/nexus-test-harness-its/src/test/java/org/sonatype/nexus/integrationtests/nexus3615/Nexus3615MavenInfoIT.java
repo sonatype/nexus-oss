@@ -18,12 +18,14 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3615;
 
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.maven.index.artifact.Gav;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResource;
@@ -59,20 +61,18 @@ public class Nexus3615MavenInfoIT
         downloadAndVerify( simpleJarGav, getTestRepositoryId() );
 
         Gav withClassifierGav =
-            new Gav( "nexus3615", "simpleJar", "1.0.1", "classifier", "jar", null, null, null, false, null,
-                false, null );
+            new Gav( "nexus3615", "simpleJar", "1.0.1", "classifier", "jar", null, null, null, false, null, false, null );
         deployGav( withClassifierGav, getTestRepositoryId() );
         downloadAndVerify( withClassifierGav, getTestRepositoryId() );
 
         Gav withExtentionGav =
-            new Gav( "nexus3615", "simpleJar", "1.0.1", null, "extention", null, null, null, false, null, false,
-                null );
+            new Gav( "nexus3615", "simpleJar", "1.0.1", null, "extention", null, null, null, false, null, false, null );
         deployGav( withExtentionGav, getTestRepositoryId() );
         downloadAndVerify( withExtentionGav, getTestRepositoryId() );
 
         Gav withClassifierAndExtentionGav =
-            new Gav( "nexus3615", "simpleJar", "1.0.1", "classifier", "extention", null, null, null, false,
-                null, false, null );
+            new Gav( "nexus3615", "simpleJar", "1.0.1", "classifier", "extention", null, null, null, false, null,
+                false, null );
         deployGav( withClassifierAndExtentionGav, getTestRepositoryId() );
         downloadAndVerify( withClassifierAndExtentionGav, getTestRepositoryId() );
     }
@@ -121,19 +121,16 @@ public class Nexus3615MavenInfoIT
             getTestFile( "pom.xml" ), "foo/bar" );
 
         // now get the info for it
-        Response response =
-            RequestFacade.doGetRequest( "service/local/repositories/" + getTestRepositoryId() + "/content/"
-                + "foo/bar" + "?describe=maven2" );
-        String responseText = response.getEntity().getText();
-        Assert.assertEquals( response.getStatus().getCode(), 404, "Response was: " + responseText );
-
+        String serviceURIpart =
+            "service/local/repositories/" + getTestRepositoryId() + "/content/" + "foo/bar" + "?describe=maven2";
+        RequestFacade.doGet( serviceURIpart, respondsWithStatusCode( 404 ) );
     }
 
     public void deployGav( Gav gav, String repoId )
         throws Exception
     {
-        new DeployUtils( this ).deployWithWagon( "http", getRepositoryUrl( repoId ),
-            getTestFile( "simpleJar.jar" ), getRelitiveArtifactPath( gav ) );
+        new DeployUtils( this ).deployWithWagon( "http", getRepositoryUrl( repoId ), getTestFile( "simpleJar.jar" ),
+            getRelitiveArtifactPath( gav ) );
     }
 
     @Test
@@ -142,29 +139,14 @@ public class Nexus3615MavenInfoIT
     {
         Gav releaseNotFoundGav =
             new Gav( "nexus3615", "notFound", "1.0.1", null, "jar", null, null, null, false, null, false, null );
-        Response response = null;
-        try
-        {
-            response = downloadView( releaseNotFoundGav, "maven2", getTestRepositoryId() );
-            Assert.assertEquals( response.getStatus().getCode(), 404, "Status found: " + response.getStatus() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        RequestFacade.doGetForStatus( getServiceUriPart( releaseNotFoundGav, "maven2", getTestRepositoryId() ),
+            hasStatusCode( 404 ) );
 
-        try
-        {
-            Gav snapshotNotFoundGav =
-                new Gav( "nexus3615", "notFound", "1.0.1-SNAPSHOT", null, "jar", 1, System.currentTimeMillis(), null,
-                    false, null, false, null );
-            response = downloadView( snapshotNotFoundGav, "maven2", getTestRepositoryId() );
-            Assert.assertEquals( response.getStatus().getCode(), 404, "Status found: " + response.getStatus() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        Gav snapshotNotFoundGav =
+            new Gav( "nexus3615", "notFound", "1.0.1-SNAPSHOT", null, "jar", 1, System.currentTimeMillis(), null,
+                false, null, false, null );
+        RequestFacade.doGetForStatus( getServiceUriPart( snapshotNotFoundGav, "maven2", getTestRepositoryId() ),
+            hasStatusCode( 404 ) );
     }
 
     private void downloadAndVerify( Gav gav, String repoId )
@@ -202,21 +184,9 @@ public class Nexus3615MavenInfoIT
     {
         XStream xstream = getXMLXStream();
 
-        Response response = null;
-        try
-        {
-            response = downloadView( gav, "maven2", repoId );
-            String responseText = response.getEntity().getText();
-            Assert.assertEquals( 200, response.getStatus().getCode() );
-            Maven2ArtifactInfoResource data =
-                ( (Maven2ArtifactInfoResourceRespose) xstream.fromXML( responseText ) ).getData();
-            return data;
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        String responseText = RequestFacade.doGetForText( getServiceUriPart( gav, "maven2", repoId ), isSuccessful() );
 
+        return ( (Maven2ArtifactInfoResourceRespose) xstream.fromXML( responseText ) ).getData();
     }
 
     private String buildExpectedDepBlock( Gav gav )
@@ -243,13 +213,10 @@ public class Nexus3615MavenInfoIT
         return buffer.toString();
     }
 
-    private Response downloadView( Gav gav, String describeKey, String repoId )
-        throws IOException
+    private String getServiceUriPart( Gav gav, String describeKey, String repoId )
+        throws FileNotFoundException
     {
-        Response response =
-            RequestFacade.doGetRequest( "service/local/repositories/" + repoId + "/content/"
-                + getRelitiveArtifactPath( gav ) + "?describe=" + describeKey );
-
-        return response;
+        return "service/local/repositories/" + repoId + "/content/" + getRelitiveArtifactPath( gav ) + "?describe="
+            + describeKey;
     }
 }

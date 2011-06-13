@@ -25,12 +25,12 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.util.StringUtils;
 import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
+import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -87,11 +87,7 @@ public class Nexus2923SearchResultDownloadLinkIT
     private void assertLinkAvailable( String link )
         throws Exception
     {
-        Response response = RequestFacade.sendMessage( new URL( link ), Method.GET, null );
-
-        Assert.assertEquals(
-            response.getStatus().getCode(),
-            301,
-            "Invalid link: '" + link + "' response code is '" + response.getStatus().getCode() + "'" );
+        // use sendMessage because this is a non-service-URL (?)
+        RequestFacade.sendMessage( new URL( link ), Method.GET, null, ResponseMatchers.respondsWithStatusCode( 301 ) ).release();
     }
 }

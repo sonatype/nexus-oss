@@ -18,7 +18,10 @@
  */
 package org.sonatype.nexus.integrationtests;
 
-import static org.testng.Assert.fail;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+import static org.testng.Assert.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -1038,7 +1041,6 @@ public abstract class AbstractNexusIntegrationTest
         return GavUtil.getRelitiveArtifactPath( groupId, artifactId, version, extension, classifier );
     }
 
-    @SuppressWarnings( "deprecation" )
     public File downloadSnapshotArtifact( String repository, Gav gav, File parentDir )
         throws IOException
     {
@@ -1057,27 +1059,19 @@ public abstract class AbstractNexusIntegrationTest
                 + gav.getArtifactId() + "&v=" + Reference.encode( gav.getVersion() ) + c;
 
         Response response = null;
-        final Status status;
         try {
             response = RequestFacade.doGetRequest( serviceURI );
-            status = response.getStatus();
-            if ( status.isError() )
-            {
-                throw new FileNotFoundException( status + ": (" + status.getCode() + ")" );
-            }
+            assertThat( response, allOf( isSuccessful(), respondsWithStatusCode( 301 ) ) );
 
-            Assert.assertEquals( 301, status.getCode(), "Snapshot download should redirect to a new file\n "
-                + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription() );
-
-            Reference redirectRef = response.getRedirectRef();
-            Assert.assertNotNull( redirectRef, "Snapshot download should redirect to a new file "
-                + response.getRequest().getResourceRef().toString() );
+            Reference redirectRef = response.getLocationRef();
+            assertThat( "Snapshot download should redirect to a new file "
+                + response.getRequest().getResourceRef().toString(), redirectRef, notNullValue() );
 
             serviceURI = redirectRef.toString();
-
         } finally {
             RequestFacade.releaseResponse(response);
         }
+
         File file = FileUtils.createTempFile( gav.getArtifactId(), '.' + gav.getExtension(), parentDir );
         RequestFacade.downloadFile( new URL( serviceURI ), file.getAbsolutePath() );
 

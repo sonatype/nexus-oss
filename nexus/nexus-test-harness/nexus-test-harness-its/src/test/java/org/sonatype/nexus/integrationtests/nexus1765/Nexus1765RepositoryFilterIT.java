@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1765;
 
+import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+
 import java.util.List;
 
 import org.restlet.data.Method;
@@ -81,10 +83,7 @@ public class Nexus1765RepositoryFilterIT
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        String repoId = this.getTestRepositoryId();
-        Response response = RequestFacade.doGetRequest( "service/local/repositories/" + repoId );
-
-        Assert.assertEquals( response.getStatus().getCode(), 403, "Status: " + response.getStatus() );
+        RequestFacade.doGet( "service/local/repositories/" + getTestRepositoryId(), respondsWithStatusCode( 403 ) );
     }
 
     @Test
@@ -92,9 +91,7 @@ public class Nexus1765RepositoryFilterIT
         throws Exception
     {
 
-        String repoId = this.getTestRepositoryId();
-
-        RepositoryBaseResource repo = this.repoUtil.getRepository( repoId );
+        RepositoryBaseResource repo = repoUtil.getRepository( getTestRepositoryId() );
         repo.setName( "new name" );
 
         // use test user

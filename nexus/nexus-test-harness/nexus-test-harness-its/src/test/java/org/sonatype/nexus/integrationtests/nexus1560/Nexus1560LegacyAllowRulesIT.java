@@ -25,9 +25,9 @@ import java.net.URL;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
+import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -61,8 +61,7 @@ public class Nexus1560LegacyAllowRulesIT
         String downloadUrl =
             REPOSITORY_RELATIVE_URL + REPO_TEST_HARNESS_REPO + "/" + getRelitiveArtifactPath( gavArtifact1 );
 
-        Status status = download( downloadUrl );
-        Assert.assertTrue( status.isSuccess(), "Unable to download artifact from repository " + status );
+        download( downloadUrl, ResponseMatchers.isSuccessful() );
     }
 
     @Test
@@ -72,8 +71,7 @@ public class Nexus1560LegacyAllowRulesIT
         String downloadUrl =
             GROUP_REPOSITORY_RELATIVE_URL + NEXUS1560_GROUP + "/" + getRelitiveArtifactPath( gavArtifact1 );
 
-        Status status = download( downloadUrl );
-        Assert.assertEquals( status.getCode(), 403, "Unable to download artifact from repository: " + status );
+        download( downloadUrl, ResponseMatchers.respondsWithStatusCode( 403 ) );
     }
 
     @Test( expectedExceptions = FileNotFoundException.class )

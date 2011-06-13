@@ -21,15 +21,15 @@ package org.sonatype.nexus.integrationtests.nexus1560;
 import java.io.IOException;
 
 import org.apache.maven.index.artifact.Gav;
+import org.hamcrest.Matcher;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.test.utils.NexusRequestMatchers;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 
 public abstract class AbstractLegacyRulesIT
@@ -68,36 +68,25 @@ public abstract class AbstractLegacyRulesIT
         TaskScheduleUtil.runTask( "nexus1560-repo2", RebuildMavenMetadataTaskDescriptor.ID, repo2 );
     }
 
-    protected Status download( String downloadUrl )
+    protected void download( String downloadUrl, Matcher<Response> matcher )
         throws IOException
     {
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        Response response = null;
-        try
-        {
-            response = RequestFacade.doGetRequest( downloadUrl );
-            return response.getStatus();
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        RequestFacade.doGet( downloadUrl, matcher );
     }
 
     protected void assertDownloadFails( String downloadUrl )
         throws IOException
     {
-        Status status = download( downloadUrl );
-        Assert.assertTrue( status.isError(), "Artifact should not have been able to be downloaded: " + status );
+        download( downloadUrl, NexusRequestMatchers.inError() );
     }
 
     protected void assertDownloadSucceeds( String downloadUrl )
     throws IOException
     {
-        Status status = download( downloadUrl );
-        Assert.assertTrue( status.isSuccess(), "Unable to download artifact from repository: " + status );
+        download( downloadUrl, NexusRequestMatchers.isSuccessful() );
     }
 
 }

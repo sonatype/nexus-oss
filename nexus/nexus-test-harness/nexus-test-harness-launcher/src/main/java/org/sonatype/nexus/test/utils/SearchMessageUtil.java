@@ -18,8 +18,13 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,6 +32,8 @@ import java.util.Map.Entry;
 import org.apache.maven.index.SearchType;
 import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.util.StringUtils;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matcher;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
@@ -51,8 +58,7 @@ import org.sonatype.nexus.tasks.descriptors.RepairIndexTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
+
 import com.thoughtworks.xstream.XStream;
 
 public class SearchMessageUtil
@@ -78,7 +84,8 @@ public class SearchMessageUtil
      * @return
      * @throws Exception
      */
-    private Response doSearchForR( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
+    private String doSearchForR( Map<String, String> queryArgs, String repositoryId, SearchType searchType,
+                                 Matcher<Response>... matchers )
         throws IOException
     {
         StringBuffer serviceURI = null;
@@ -115,72 +122,56 @@ public class SearchMessageUtil
         }
 
         log.info( "Search serviceURI " + serviceURI );
+        
+        List<Matcher<? super Response>> list = new LinkedList<Matcher<? super Response>>();
+        list.add( NexusRequestMatchers.isSuccessful() );
+        list.addAll( Arrays.asList( matchers ) );
 
-        return RequestFacade.doGetRequest( serviceURI.toString() );
+        return RequestFacade.doGetForText( serviceURI.toString(), CoreMatchers.allOf( list ) );
     }
 
     /**
      * Uses XStream to unmarshall the DTOs.
-     *
+     * 
      * @param queryArgs
      * @param repositoryId
+     * @param matchers
      * @param asKeywords
      * @return
      * @throws IOException
      */
-    private List<NexusArtifact> doSearchFor( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
+    private List<NexusArtifact> doSearchFor( Map<String, String> queryArgs, String repositoryId, SearchType searchType,
+                                             Matcher<Response>... matchers )
         throws IOException
     {
-        Response response = null;
-        String entityText;
-        try {
-            response = doSearchForR( queryArgs, repositoryId, searchType );
-            entityText = response.getEntity().getText();
-            assertThat(response, isSuccessful());
-        } finally {
-            RequestFacade.releaseResponse(response);
-        }
+        String entityText = doSearchForR( queryArgs, repositoryId, searchType, matchers );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, entityText, MediaType.APPLICATION_XML );
 
-        SearchResponse searchResponde = (SearchResponse) representation.getPayload( new SearchResponse() );
-
-        return searchResponde.getData();
+        return ( (SearchResponse) representation.getPayload( new SearchResponse() ) ).getData();
     }
 
     // LOW LEVEL METHODS
 
-    public List<NexusArtifact> searchFor( Map<String, String> queryArgs )
+    public List<NexusArtifact> searchFor( Map<String, String> queryArgs, Matcher<Response>... matchers )
         throws IOException
     {
-        return searchFor( queryArgs, null, null );
+        return searchFor( queryArgs, null, null, matchers );
     }
 
-    public List<NexusArtifact> searchFor( Map<String, String> queryArgs, String repositoryId )
+    public List<NexusArtifact> searchFor( Map<String, String> queryArgs, String repositoryId,
+                                          Matcher<Response>... matchers )
         throws IOException
     {
-        return searchFor( queryArgs, repositoryId, null );
+        return searchFor( queryArgs, repositoryId, null, matchers );
     }
 
-    public List<NexusArtifact> searchFor( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
+    public List<NexusArtifact> searchFor( Map<String, String> queryArgs, String repositoryId, SearchType searchType,
+                                          Matcher<Response>... matchers )
         throws IOException
     {
-        return doSearchFor( queryArgs, repositoryId, searchType );
-    }
-
-    /**
-     * Returns "low" Restlet response to access response HTTP Code.
-     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
-     */
-    public Response searchFor_response( String query )
-        throws IOException
-    {
-        HashMap<String, String> queryArgs = new HashMap<String, String>();
-
-        queryArgs.put( "q", query );
-
-        return doSearchForR( queryArgs, null, null );
+        return doSearchFor( queryArgs, repositoryId, searchType, matchers );
     }
 
     public List<NexusArtifact> searchFor( String query )
@@ -448,7 +439,7 @@ public class SearchMessageUtil
      * @return
      * @throws Exception
      */
-    private Response doNGSearchForR( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
+    private String doNGSearchForR( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
         throws IOException
     {
         StringBuffer serviceURI = new StringBuffer( "service/local/lucene/search?" );
@@ -481,7 +472,7 @@ public class SearchMessageUtil
 
         log.info( "Search serviceURI " + serviceURI );
 
-        return RequestFacade.doGetRequest( serviceURI.toString() );
+        return RequestFacade.doGetForText( serviceURI.toString() );
     }
 
     /**
@@ -496,15 +487,7 @@ public class SearchMessageUtil
     private SearchNGResponse doNGSearchFor( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
         throws IOException
     {
-        Response response = null;
-        String entityText;
-        try {
-            response = doNGSearchForR( queryArgs, repositoryId, searchType );
-            entityText = response.getEntity().getText();
-            assertThat(response, isSuccessful());
-        } finally {
-            RequestFacade.releaseResponse(response);
-        }
+        String entityText = doNGSearchForR( queryArgs, repositoryId, searchType );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, entityText, MediaType.APPLICATION_XML );

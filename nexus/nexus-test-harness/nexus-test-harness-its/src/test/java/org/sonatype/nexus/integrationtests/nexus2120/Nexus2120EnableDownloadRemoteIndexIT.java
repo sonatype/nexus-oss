@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.List;
 
 import org.restlet.data.MediaType;
-import org.restlet.data.Response;
 import org.sonatype.jettytestsuite.ControlledServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -98,32 +97,21 @@ public class Nexus2120EnableDownloadRemoteIndexIT
 
         // first try, download remote index set to false
         Assert.assertTrue( repoUrls.isEmpty(), "nexus should not download remote indexes!!! " + repoUrls );
+
         // server changed here, a 404 is no longer returned if index_context is empty, 404 will only be returned
         // if index_context does not exist (or repo does not exist)
-        Response response = null;
-        try
-        {
-            response = RequestFacade.doGetRequest( URI );
-            Assert.assertTrue( response.getStatus().isSuccess(),
-                "Error downloading index content\n" + response.getStatus() );
+        String content = RequestFacade.doGetForText( URI );
 
-            XStream xstream = XStreamFactory.getXmlXStream();
+        XStream xstream = XStreamFactory.getXmlXStream();
 
-            xstream.processAnnotations( IndexBrowserTreeNode.class );
-            xstream.processAnnotations( IndexBrowserTreeViewResponseDTO.class );
+        xstream.processAnnotations( IndexBrowserTreeNode.class );
+        xstream.processAnnotations( IndexBrowserTreeViewResponseDTO.class );
 
-            XStreamRepresentation re =
-                new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
-            IndexBrowserTreeViewResponseDTO resourceResponse =
-                (IndexBrowserTreeViewResponseDTO) re.getPayload( new IndexBrowserTreeViewResponseDTO() );
+        XStreamRepresentation re = new XStreamRepresentation( xstream, content, MediaType.APPLICATION_XML );
+        IndexBrowserTreeViewResponseDTO resourceResponse =
+            (IndexBrowserTreeViewResponseDTO) re.getPayload( new IndexBrowserTreeViewResponseDTO() );
 
-            Assert.assertTrue( resourceResponse.getData().getChildren().isEmpty(),
-                "index response should have 0 entries" );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        Assert.assertTrue( resourceResponse.getData().getChildren().isEmpty(), "index response should have 0 entries" );
 
         // I changed my mind, I do wanna remote index
         basic.setDownloadRemoteIndexes( true );
@@ -136,15 +124,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
         // did nexus downloaded indexes?
         Assert.assertTrue( repoUrls.contains( "/repository/.index/nexus-maven-repository-index.gz" ),
             "nexus should download remote indexes!!! " + repoUrls );
-        try
-        {
-            response = RequestFacade.doGetRequest( URI );
-            Assert.assertTrue( response.getStatus().isSuccess(),
-                "Error downloading index content\n" + response.getStatus() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+
+        RequestFacade.doGet( URI );
     }
 }

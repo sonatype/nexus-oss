@@ -56,11 +56,19 @@ public class Nexus1961IndexContentIT
     {
         String serviceURI = "service/local/repositories/" + REPO_TEST_HARNESS_REPO + "/index_content/";
 
-        Response response = RequestFacade.doGetRequest( serviceURI );
-        String responseText = response.getEntity().getText();
-        Status status = response.getStatus();
-        Assert.assertTrue( status.isSuccess(), responseText + status );
-
+        Response response = null;
+        String responseText;
+        try
+        {
+            response = RequestFacade.doGetRequest( serviceURI );
+            responseText = response.getEntity().getText();
+            Status status = response.getStatus();
+            Assert.assertTrue( status.isSuccess(), responseText + status );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
         XStream xstream = XStreamFactory.getXmlXStream();
 
         xstream.processAnnotations( IndexBrowserTreeNode.class );

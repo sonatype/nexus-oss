@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3045;
 
+import static org.hamcrest.Matchers.hasItem;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,11 +27,11 @@ import java.util.List;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
-import static org.hamcrest.Matchers.hasItem;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
@@ -71,10 +73,20 @@ public class Nexus3045GroupRemovalIT
         Assert.assertNotNull( routesUtil.getRoute( GROUP_ROUTE_ID ) );
 
         RepositoryGroupResource resource = this.groupUtil.getGroup( "public" );
-        Response response = this.groupUtil.sendMessage( Method.DELETE, resource );
-        Assert.assertTrue( response.getStatus().isSuccess() );
+        Response response = null;
+        try
+        {
+            response = this.groupUtil.sendMessage( Method.DELETE, resource );
+            Assert.assertTrue( response.getStatus().isSuccess() );
+            RequestFacade.releaseResponse( response );
 
-        Assert.assertEquals( 404, routesUtil.getRouteResponse( GROUP_ROUTE_ID ).getStatus().getCode() );
+            response = routesUtil.getRouteResponse( GROUP_ROUTE_ID );
+            Assert.assertEquals( 404, response.getStatus().getCode() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 
     @Test

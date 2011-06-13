@@ -108,7 +108,14 @@ public class Nexus2138RouteFilteringIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         response = RequestFacade.doGetRequest( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId() );
-        Assert.assertEquals( Status.CLIENT_ERROR_FORBIDDEN, response.getStatus() );
+        try
+        {
+            Assert.assertEquals( Status.CLIENT_ERROR_FORBIDDEN, response.getStatus() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 
     @Test
@@ -127,7 +134,14 @@ public class Nexus2138RouteFilteringIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         response = RequestFacade.doGetRequest( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId() );
-        Assert.assertEquals( response.getStatus(), Status.CLIENT_ERROR_FORBIDDEN );
+        try
+        {
+            Assert.assertEquals( response.getStatus(), Status.CLIENT_ERROR_FORBIDDEN );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 
     @Test
@@ -145,7 +159,14 @@ public class Nexus2138RouteFilteringIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         response = RequestFacade.doGetRequest( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId() );
-        Assert.assertEquals( Status.CLIENT_ERROR_FORBIDDEN, response.getStatus() );
+        try
+        {
+            Assert.assertEquals( Status.CLIENT_ERROR_FORBIDDEN, response.getStatus() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 
     @Test
@@ -164,7 +185,14 @@ public class Nexus2138RouteFilteringIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         response = RequestFacade.doGetRequest( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId() );
-        Assert.assertEquals( response.getStatus(), Status.CLIENT_ERROR_FORBIDDEN );
+        try
+        {
+            Assert.assertEquals( response.getStatus(), Status.CLIENT_ERROR_FORBIDDEN );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 
     private Response createRouteTest( String groupId, String... repoIds )
