@@ -18,6 +18,9 @@
  */
 package org.sonatype.nexus.integrationtests.nexus2138;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+
 import java.util.List;
 
 import org.restlet.data.Method;
@@ -42,11 +45,9 @@ public class Nexus2138RouteFilteringIT
         throws Exception
     {
         // create some test routes
-        Response response = this.createRouteTest( "public", this.getTestRepositoryId() );
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
+        this.createRouteTest( "public", this.getTestRepositoryId() );
 
-        response = this.createRouteTest( "public", this.getTestRepositoryId(), "nexus-test-harness-release-repo" );
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
+        this.createRouteTest( "public", this.getTestRepositoryId(), "nexus-test-harness-release-repo" );
 
         this.giveUserRole( TEST_USER_NAME, "ui-routing-admin" );
 
@@ -64,8 +65,7 @@ public class Nexus2138RouteFilteringIT
         
         this.giveUserRole( TEST_USER_NAME, "ui-routing-admin" );
 
-        Response response = this.createRouteTest( "public", this.getTestRepositoryId() );
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
+        this.createRouteTest( "public", this.getTestRepositoryId() );
 
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + "public" );
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + this.getTestRepositoryId() );
@@ -73,7 +73,7 @@ public class Nexus2138RouteFilteringIT
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        List<RepositoryRouteListResource> routes = this.routeUtil.getList();
+        List<RepositoryRouteListResource> routes = RoutesMessageUtil.getList();
         Assert.assertEquals( 1, routes.size() );
         Assert.assertEquals( "public", routes.get( 0 ).getGroupId() );
     }
@@ -85,13 +85,12 @@ public class Nexus2138RouteFilteringIT
         this.giveUserRole( TEST_USER_NAME, "ui-routing-admin" );
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + this.getTestRepositoryId() );
 
-        Response response = this.createRouteTest( "public", this.getTestRepositoryId() );
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
+        this.createRouteTest( "public", this.getTestRepositoryId() );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        Assert.assertEquals( 0, this.routeUtil.getList().size() );
+        Assert.assertEquals( 0, RoutesMessageUtil.getList().size() );
     }
 
     @Test
@@ -100,22 +99,14 @@ public class Nexus2138RouteFilteringIT
     {
         this.giveUserRole( TEST_USER_NAME, "ui-routing-admin" );
 
-        Response response = this.createRouteTest( "public", this.getTestRepositoryId() );
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
-        RepositoryRouteResource routeResource = this.routeUtil.getResourceFromResponse( response );
+        String response = this.createRouteTest( "public", this.getTestRepositoryId() );
+        RepositoryRouteResource routeResource = this.routeUtil.getResourceFromText( response );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        response = RequestFacade.doGetRequest( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId() );
-        try
-        {
-            Assert.assertEquals( Status.CLIENT_ERROR_FORBIDDEN, response.getStatus() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        RequestFacade.doGet( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId(),
+            respondsWithStatusCode( Status.CLIENT_ERROR_FORBIDDEN.getCode() ) );
     }
 
     @Test
@@ -126,22 +117,14 @@ public class Nexus2138RouteFilteringIT
 
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + "public" );
 
-        Response response = this.createRouteTest( "public", this.getTestRepositoryId() );
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
-        RepositoryRouteResource routeResource = this.routeUtil.getResourceFromResponse( response );
+        String response = this.createRouteTest( "public", this.getTestRepositoryId() );
+        RepositoryRouteResource routeResource = this.routeUtil.getResourceFromText( response );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        response = RequestFacade.doGetRequest( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId() );
-        try
-        {
-            Assert.assertEquals( response.getStatus(), Status.CLIENT_ERROR_FORBIDDEN );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        RequestFacade.doGet( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId(),
+            respondsWithStatusCode( Status.CLIENT_ERROR_FORBIDDEN.getCode() ) );
     }
 
     @Test
@@ -151,22 +134,14 @@ public class Nexus2138RouteFilteringIT
         this.giveUserRole( TEST_USER_NAME, "ui-routing-admin" );
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + this.getTestRepositoryId() );
 
-        Response response = this.createRouteTest( "public", this.getTestRepositoryId() );
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
-        RepositoryRouteResource routeResource = this.routeUtil.getResourceFromResponse( response );
+        String response = this.createRouteTest( "public", this.getTestRepositoryId() );
+        RepositoryRouteResource routeResource = this.routeUtil.getResourceFromText( response );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        response = RequestFacade.doGetRequest( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId() );
-        try
-        {
-            Assert.assertEquals( Status.CLIENT_ERROR_FORBIDDEN, response.getStatus() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        RequestFacade.doGet( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId(),
+            respondsWithStatusCode( Status.CLIENT_ERROR_FORBIDDEN.getCode() ) );
     }
 
     @Test
@@ -177,25 +152,18 @@ public class Nexus2138RouteFilteringIT
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + "public" );
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + this.getTestRepositoryId() );
 
-        Response response = this.createRouteTest( "public", this.getTestRepositoryId(), "nexus-test-harness-release-repo" );
-        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
-        RepositoryRouteResource routeResource = this.routeUtil.getResourceFromResponse( response );
+        String response =
+            this.createRouteTest( "public", this.getTestRepositoryId(), "nexus-test-harness-release-repo" );
+        RepositoryRouteResource routeResource = this.routeUtil.getResourceFromText( response );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        response = RequestFacade.doGetRequest( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId() );
-        try
-        {
-            Assert.assertEquals( response.getStatus(), Status.CLIENT_ERROR_FORBIDDEN );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        RequestFacade.doGet( RoutesMessageUtil.SERVICE_PART + "/" + routeResource.getId(),
+            respondsWithStatusCode( Status.CLIENT_ERROR_FORBIDDEN.getCode() ) );
     }
 
-    private Response createRouteTest( String groupId, String... repoIds )
+    private String createRouteTest( String groupId, String... repoIds )
         throws Exception
     {
         RepositoryRouteResource routeResource = new RepositoryRouteResource();
@@ -210,6 +178,17 @@ public class Nexus2138RouteFilteringIT
             routeResource.addRepository( memberRepoReleases );
         }
 
-        return this.routeUtil.sendMessage( Method.POST, routeResource );
+        Response response = this.routeUtil.sendMessage( Method.POST, routeResource );
+        try
+        {
+            assertThat( response, isSuccessful() );
+            return response.getEntity().getText();
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
+
+
     }
 }

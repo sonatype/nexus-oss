@@ -174,16 +174,7 @@ public class Nexus1765RepositoryFilterIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         String repoId = "public";
-        Response response = null;
-        try
-        {
-            response = RequestFacade.doGetRequest( GroupMessageUtil.SERVICE_PART + "/" + repoId );
-            Assert.assertEquals( response.getStatus().getCode(), 403, "Status: " + response.getStatus() );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        RequestFacade.doGet( GroupMessageUtil.SERVICE_PART + "/" + repoId, respondsWithStatusCode( 403 ) );
     }
     
     @Test

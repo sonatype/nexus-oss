@@ -23,17 +23,16 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import org.apache.commons.httpclient.HttpException;
 
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Logger;
+import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.nexus.test.launcher.ThreadedPlexusAppBooterService;
 import org.testng.Assert;
-
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.sonatype.nexus.SystemState;
 
 /**
  * Simple util class
@@ -101,7 +100,7 @@ public class NexusStatusUtil {
     public StatusResourceResponse getNexusStatus()
         throws NexusIllegalStateException {
         try {
-            String entityText = RequestFacade.doGetForText("service/local/status", NexusRequestMatchers.isSuccessful());
+            String entityText = RequestFacade.doGetForText( "service/local/status" );
             StatusResourceResponse status = (StatusResourceResponse) XStreamFactory.getXmlXStream().fromXML(entityText);
             return status;
         } catch (IOException ex) {

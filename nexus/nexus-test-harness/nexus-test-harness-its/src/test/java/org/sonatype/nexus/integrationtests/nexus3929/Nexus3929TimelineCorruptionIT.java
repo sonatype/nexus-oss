@@ -18,15 +18,15 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3929;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+import static org.testng.Assert.*;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
 import org.testng.annotations.BeforeMethod;
@@ -71,8 +71,7 @@ public class Nexus3929TimelineCorruptionIT
     public void login()
         throws Exception
     {
-        Status s = UserCreationUtil.login();
-        assertTrue( s.isSuccess() );
+        assertThat( UserCreationUtil.login(), isSuccess() );
     }
 
     @Test

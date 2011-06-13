@@ -18,6 +18,9 @@
  */
 package org.sonatype.nexus.integrationtests.nexus504;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
@@ -27,7 +30,6 @@ import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.RoleResource;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -48,9 +50,10 @@ public class Nexus504ChangeRoleIT
     private static final String NEXUS504_ROLE = "nexus504-role";
 
     private RoleMessageUtil roleUtil;
-    
+
     @BeforeClass
-    public void setSecureTest(){
+    public void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -75,22 +78,20 @@ public class Nexus504ChangeRoleIT
         testContext.setUsername( NEXUS504_USER );
         testContext.setPassword( TEST_USER_PASSWORD );
 
-        Status status = UserCreationUtil.login();
-        Assert.assertEquals( status.getCode(), 403, "User should not be able to login " );
+        assertThat( UserCreationUtil.login(), hasStatusCode( 403 ) );
 
         // add login privilege to role
         testContext.useAdminForRequests();
 
         RoleResource role = roleUtil.getRole( NEXUS504_ROLE );
         role.addPrivilege( "2"/* login */);
-        status = RoleMessageUtil.update( role );
-        Assert.assertTrue( status.isSuccess(),
-                           "Unable to add login privilege to role " + NEXUS504_ROLE + "\n" + status.getDescription() );
+        assertThat( "Unable to add login privilege to role " + NEXUS504_ROLE + "\n"
+            + RoleMessageUtil.update( role ).getDescription(), RoleMessageUtil.update( role ), isSuccess() );
 
         // try to login again
         testContext.setUsername( NEXUS504_USER );
         testContext.setPassword( TEST_USER_PASSWORD );
-        status = UserCreationUtil.login();
-        Assert.assertEquals( status.getCode(), 200, "User should be able to login " );
+        Status status2 = UserCreationUtil.login();
+        assertThat( status2, hasStatusCode( 200 ) );
     }
 }

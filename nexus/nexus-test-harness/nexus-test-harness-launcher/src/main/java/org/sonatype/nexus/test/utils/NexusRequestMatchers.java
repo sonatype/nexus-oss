@@ -1,5 +1,8 @@
 package org.sonatype.nexus.test.utils;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+
 import java.io.IOException;
 
 import org.hamcrest.CoreMatchers;
@@ -8,6 +11,7 @@ import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.TypeSafeMatcher;
+import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
@@ -159,7 +163,7 @@ public class NexusRequestMatchers
 
     }
 
-    public static class TextMatches
+    public static class ResponseTextMatches
         extends BaseResponseMatcher
     {
 
@@ -167,7 +171,7 @@ public class NexusRequestMatchers
 
         private IOException exception;
 
-        public TextMatches( Matcher<String> matcher )
+        public ResponseTextMatches( Matcher<String> matcher )
         {
             this.matcher = matcher;
         }
@@ -201,6 +205,52 @@ public class NexusRequestMatchers
                 return false;
             }
             return matcher.matches( responseText );
+        }
+
+    }
+
+    public static class RedirectLocationMatches
+        extends BaseResponseMatcher
+    {
+
+        private final Matcher<String> matcher;
+
+        public RedirectLocationMatches( Matcher<String> matcher )
+        {
+            this.matcher = matcher;
+        }
+
+        @Override
+        public void describeTo( Description description )
+        {
+                description.appendText( "redirect location is " ).appendDescriptionOf( matcher );
+        }
+
+        @Override
+        protected boolean matchesSafely( Response item )
+        {
+            final Reference ref = item.getLocationRef();
+            MatcherAssert.assertThat( ref, notNullValue() );
+            return matcher.matches( ref.toString() );
+        }
+    }
+
+    public static class IsRedirecting
+        extends BaseResponseMatcher
+    {
+
+        @Override
+        public void describeTo( Description description )
+        {
+            description.appendText( "redirecting" );
+        }
+
+        @Override
+        protected boolean matchesSafely( Response item )
+        {
+            Status status = item.getStatus();
+            assertThat( status, notNullValue() );
+            return status.isRedirection();
         }
 
     }
@@ -248,9 +298,9 @@ public class NexusRequestMatchers
     }
 
     @Factory
-    public static <T> TextMatches textMatches( Matcher<String> matcher )
+    public static <T> ResponseTextMatches textMatches( Matcher<String> matcher )
     {
-        return new TextMatches( matcher );
+        return new ResponseTextMatches( matcher );
     }
 
 }

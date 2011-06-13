@@ -184,7 +184,7 @@ public class Nexus3615MavenInfoIT
     {
         XStream xstream = getXMLXStream();
 
-        String responseText = RequestFacade.doGetForText( getServiceUriPart( gav, "maven2", repoId ), isSuccessful() );
+        String responseText = RequestFacade.doGetForText( getServiceUriPart( gav, "maven2", repoId ) );
 
         return ( (Maven2ArtifactInfoResourceRespose) xstream.fromXML( responseText ) ).getData();
     }

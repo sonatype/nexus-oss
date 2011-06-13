@@ -32,7 +32,7 @@ public class UserCreationUtil
     {
         String serviceURI = "service/local/authentication/login";
 
-        return RequestFacade.doGetRequest( serviceURI ).getStatus();
+        return RequestFacade.doGetForStatus( serviceURI, null );
     }
 
     public static Status login( String username, String password )
@@ -44,11 +44,17 @@ public class UserCreationUtil
         return login();
     }
 
-    public static Status logout()
-        throws IOException
+    /**
+     * Log out the current user and assert a successful request.
+     * 
+     * @throws IOException
+     * @throws AssertionError
+     */
+    public static void logout()
+        throws IOException, AssertionError
     {
         String serviceURI = "service/local/authentication/logout";
-        return RequestFacade.doGetRequest( serviceURI ).getStatus();
+        RequestFacade.doGet( serviceURI );
     }
 
 }

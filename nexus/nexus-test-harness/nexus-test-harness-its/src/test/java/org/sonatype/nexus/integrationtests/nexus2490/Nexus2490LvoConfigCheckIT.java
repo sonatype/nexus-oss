@@ -20,7 +20,6 @@ package org.sonatype.nexus.integrationtests.nexus2490;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.lvo.api.dto.LvoConfigDTO;
@@ -50,10 +49,8 @@ public class Nexus2490LvoConfigCheckIT
     private void updateConfig( boolean enabled )
         throws Exception
     {
-        XStreamRepresentation representation = new XStreamRepresentation(
-            getJsonXStream(),
-            "",
-            MediaType.APPLICATION_JSON );
+        XStreamRepresentation representation =
+            new XStreamRepresentation( getJsonXStream(), "", MediaType.APPLICATION_JSON );
 
         LvoConfigRequest request = new LvoConfigRequest();
 
@@ -63,26 +60,19 @@ public class Nexus2490LvoConfigCheckIT
 
         representation.setPayload( request );
 
-        Assert.assertTrue( RequestFacade
-            .sendMessage( "service/local/lvo_config", Method.PUT, representation ).getStatus().isSuccess() );
+        Assert.assertTrue( RequestFacade.sendMessage( "service/local/lvo_config", Method.PUT, representation ).getStatus().isSuccess() );
     }
 
     private boolean isEnabled()
         throws Exception
     {
-        Response response = RequestFacade.doGetRequest( "service/local/lvo_config" );
+        String responseText = RequestFacade.doGetForText( "service/local/lvo_config" );
 
-        if ( response.getStatus().isSuccess() )
-        {
-            XStreamRepresentation representation = new XStreamRepresentation( getXMLXStream(), response
-                .getEntity().getText(), MediaType.APPLICATION_XML );
+        XStreamRepresentation representation =
+            new XStreamRepresentation( getXMLXStream(), responseText, MediaType.APPLICATION_XML );
 
-            LvoConfigResponse resp = (LvoConfigResponse) representation.getPayload( new LvoConfigResponse() );
-            
-            return resp.getData().isEnabled();
-        }
-        
-        Assert.fail( "Message not handles properly" );
-        return false;
+        LvoConfigResponse resp = (LvoConfigResponse) representation.getPayload( new LvoConfigResponse() );
+
+        return resp.getData().isEnabled();
     }
 }

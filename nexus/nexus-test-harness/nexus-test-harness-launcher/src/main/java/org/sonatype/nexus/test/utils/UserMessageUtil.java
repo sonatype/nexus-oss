@@ -18,15 +18,16 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import java.io.IOException;
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -38,10 +39,8 @@ import org.sonatype.security.rest.model.UserListResourceResponse;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
 import org.testng.Assert;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+
 import com.thoughtworks.xstream.XStream;
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
 public class UserMessageUtil
     extends ITUtil
 {
@@ -94,7 +93,7 @@ public class UserMessageUtil
         throws IOException
     {
 
-        String entityText = RequestFacade.doGetForText("service/local/users/" + userId, isSuccessful());
+        String entityText = RequestFacade.doGetForText( "service/local/users/" + userId );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), entityText, MediaType.APPLICATION_XML );
@@ -162,7 +161,7 @@ public class UserMessageUtil
     public List<UserResource> getList()
         throws IOException
     {
-        String responseText = RequestFacade.doGetForText("service/local/users", isSuccessful());
+        String responseText = RequestFacade.doGetForText( "service/local/users" );
         LOG.debug( "responseText: \n" + responseText );
 
         // must use the XML xstream even if we 'thought' we wanted to use JSON, because REST client doesn't listen to

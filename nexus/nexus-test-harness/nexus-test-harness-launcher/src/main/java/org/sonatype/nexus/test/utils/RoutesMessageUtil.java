@@ -18,8 +18,11 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import java.io.IOException;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Iterator;
@@ -27,6 +30,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.hamcrest.text.IsEmptyString;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -43,8 +47,6 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.testng.Assert;
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -72,9 +74,10 @@ public class RoutesMessageUtil
         Response response = null;
         try {
             response = getRouteResponse( routeId );
-            RepositoryRouteResource r = this.getResourceFromResponse( response );
+
             assertThat(response, isSuccessful());
-            return r;
+
+            return this.getResourceFromText( response.getEntity().getText() );
         } finally {
             RequestFacade.releaseResponse(response);
         }
@@ -113,15 +116,24 @@ public class RoutesMessageUtil
         return RequestFacade.sendMessage( serviceURI, method, representation );
     }
 
+    /**
+     * Use {@link #getResourceFromText(String)} instead.
+     */
+    @Deprecated
     public RepositoryRouteResource getResourceFromResponse( Response response )
         throws IOException
     {
         String responseString = response.getEntity().getText();
         LOG.debug( "responseText: " + responseString );
 
-        Assert.assertFalse( StringUtils.isEmpty( responseString ), "Response text was empty." );
         Assert.assertTrue( response.getStatus().isSuccess(), response.getStatus() + "\n" + responseString );
 
+        return getResourceFromText( responseString );
+    }
+
+    public RepositoryRouteResource getResourceFromText( String responseString )
+    {
+        assertThat( responseString, not( IsEmptyString.isEmptyOrNullString() ) );
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
         RepositoryRouteResourceResponse resourceResponse =
@@ -202,7 +214,7 @@ public class RoutesMessageUtil
     {
         String serviceURI = "service/local/repo_routes";
 
-        String entityText = RequestFacade.doGetForText(serviceURI, isSuccessful());
+        String entityText = RequestFacade.doGetForText( serviceURI );
         XStreamRepresentation representation =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), entityText,
                                        MediaType.APPLICATION_XML );

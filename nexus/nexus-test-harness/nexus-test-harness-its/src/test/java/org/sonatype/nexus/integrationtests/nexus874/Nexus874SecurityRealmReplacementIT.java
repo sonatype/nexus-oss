@@ -18,12 +18,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus874;
 
+import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+
 import java.io.IOException;
 import java.net.ConnectException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.data.MediaType;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -130,18 +131,14 @@ public class Nexus874SecurityRealmReplacementIT
     public void getNexusStatus()
         throws IOException
     {
-        Response response = null;
         try
         {
-            response = RequestFacade.doGetRequest( "service/local/status" );
-            if ( !response.getStatus().isSuccess() )
-            {
-                throw new ConnectException( response.getStatus().toString() );
-            }
+            RequestFacade.doGet( "service/local/status" );
         }
-        finally
+        catch ( AssertionError e )
         {
-            RequestFacade.releaseResponse( response );
+            // unsuccessful response
+            throw new ConnectException( e.getMessage() );
         }
     }
 
@@ -182,20 +179,16 @@ public class Nexus874SecurityRealmReplacementIT
 
         String serviceURI = "service/local/schedules";
 
-        Response response = RequestFacade.doGetRequest( "service/local/repo_targets" );
-        Assert.assertEquals( 403, response.getStatus().getCode() );
+        RequestFacade.doGet( "service/local/repo_targets", respondsWithStatusCode( 403 ) );
 
-        response = RequestFacade.doGetRequest( serviceURI );
-        Assert.assertEquals( 403, response.getStatus().getCode() );
+        RequestFacade.doGet( serviceURI, respondsWithStatusCode( 403 ) );
 
         TestContainer.getInstance().getTestContext().setUsername( "anonymous" );
         TestContainer.getInstance().getTestContext().setPassword( "anonymous" );
 
-        response = RequestFacade.doGetRequest( "service/local/repo_targets" );
-        Assert.assertEquals( 403, response.getStatus().getCode() );
+        RequestFacade.doGet( "service/local/repo_targets", respondsWithStatusCode( 403 ) );
 
-        response = RequestFacade.doGetRequest( serviceURI );
-        Assert.assertEquals( 403, response.getStatus().getCode() );
+        RequestFacade.doGet( serviceURI, respondsWithStatusCode( 403 ) );
 
     }
 }

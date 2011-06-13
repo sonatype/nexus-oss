@@ -18,6 +18,9 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1765;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
@@ -26,13 +29,10 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
 
 public class Nexus1765RepositoryServicesIT
     extends AbstractPrivilegeTest
@@ -54,8 +54,7 @@ public class Nexus1765RepositoryServicesIT
         String repoId = this.getTestRepositoryId();
         String uriPart = RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/status";
 
-        final Status status = RequestFacade.doGetForStatus(uriPart);
-        assertThat(status, hasStatusCode(403));
+        RequestFacade.doGet( uriPart, respondsWithStatusCode( 403 ) );
     }
 
     @Test
@@ -84,8 +83,7 @@ public class Nexus1765RepositoryServicesIT
         representation.setPayload( resourceResponse );
 
         final String uriPart = RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/status";
-        final Status status = RequestFacade.doPutForStatus(uriPart, representation, respondsWithStatusCode(403));
-        //assertThat(status, hasStatusCode(403));
+        RequestFacade.doPutForStatus( uriPart, representation, respondsWithStatusCode( 403 ) );
     }
 
     @Test
@@ -101,8 +99,7 @@ public class Nexus1765RepositoryServicesIT
         String repoId = this.getTestRepositoryId();
         String uriPart = RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/meta";
 
-        final Status status = RequestFacade.doGetForStatus(uriPart);
-        assertThat(status, hasStatusCode(403));
+        RequestFacade.doGet( uriPart, respondsWithStatusCode( 403 ) );
     }
 
     @Test

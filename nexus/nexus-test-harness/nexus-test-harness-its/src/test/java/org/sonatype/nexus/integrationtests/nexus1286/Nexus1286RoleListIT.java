@@ -18,13 +18,14 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1286;
 
+import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.restlet.data.MediaType;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
@@ -43,10 +44,7 @@ public class Nexus1286RoleListIT
     {
         String uriPart = RequestFacade.SERVICE_LOCAL + "plexus_roles/" + "INVALID";
 
-        Response response = RequestFacade.doGetRequest( uriPart );
-
-        Assert.assertEquals( 404, response.getStatus().getCode() );
-
+        RequestFacade.doGet( uriPart, respondsWithStatusCode( 404 ) );
     }
 
     @Test

@@ -18,14 +18,14 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
@@ -60,7 +60,7 @@ public class TaskScheduleUtil
         representation.setPayload( request );
 
         String serviceURI = "service/local/schedules";
-        return RequestFacade.doPostForStatus(serviceURI, representation);
+        return RequestFacade.doPostForStatus( serviceURI, representation );
     }
 
     public static ScheduledServiceListResource getTask( String name )
@@ -93,27 +93,24 @@ public class TaskScheduleUtil
     private static List<ScheduledServiceListResource> getTaskRequest( String uri )
         throws IOException
     {
-        Response response = null;
-        String entityText;
-        try {
-            response = RequestFacade.doGetRequest( uri );
-            if ( response.getStatus().isError() )
-            {
-                LOG.error( response.getStatus().toString() );
-                return Collections.emptyList();
-            }
-            entityText = response.getEntity().getText();
-        } finally {
-            RequestFacade.releaseResponse(response);
+        try
+        {
+            String entityText = RequestFacade.doGetForText( uri, isSuccessful() );
+            XStreamRepresentation representation =
+                new XStreamRepresentation( xstream, entityText, MediaType.APPLICATION_XML );
+
+            ScheduledServiceListResourceResponse scheduleResponse =
+                (ScheduledServiceListResourceResponse) representation.getPayload( new ScheduledServiceListResourceResponse() );
+
+            return scheduleResponse.getData();
+        }
+        catch ( AssertionError e )
+        {
+            // unsuccessful GET
+            LOG.error( e );
+            return Collections.emptyList();
         }
 
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, entityText, MediaType.APPLICATION_XML );
-
-        ScheduledServiceListResourceResponse scheduleResponse =
-            (ScheduledServiceListResourceResponse) representation.getPayload( new ScheduledServiceListResourceResponse() );
-
-        return scheduleResponse.getData();
     }
 
     public static String getStatus( String name )
@@ -167,7 +164,7 @@ public class TaskScheduleUtil
             uri += "&taskType=" + taskType;
         }
 
-        Status status = RequestFacade.doGetForStatus(uri);
+        Status status = RequestFacade.doGetForStatus( uri );
 
         if ( !status.isSuccess() )
         {
@@ -178,7 +175,7 @@ public class TaskScheduleUtil
 
     /**
      * Blocks while waiting for a task to finish.
-     *
+     * 
      * @param name
      * @return
      * @throws Exception
@@ -199,7 +196,7 @@ public class TaskScheduleUtil
             uri += "&name=" + name;
         }
 
-        Status status = RequestFacade.doGetForStatus(uri);
+        Status status = RequestFacade.doGetForStatus( uri );
 
         if ( !status.isSuccess() )
         {
@@ -219,28 +216,28 @@ public class TaskScheduleUtil
         representation.setPayload( request );
 
         String serviceURI = "service/local/schedules/" + task.getId();
-        return RequestFacade.doPutForStatus(serviceURI, representation, null);
+        return RequestFacade.doPutForStatus( serviceURI, representation, null );
     }
 
     public static Status deleteTask( String id )
         throws IOException
     {
         String serviceURI = "service/local/schedules/" + id;
-        return RequestFacade.doDeleteForStatus( serviceURI, null);
+        return RequestFacade.doDeleteForStatus( serviceURI, null );
     }
 
     public static Status run( String taskId )
         throws IOException
     {
         String serviceURI = "service/local/schedule_run/" + taskId;
-        return RequestFacade.doGetForStatus(serviceURI);
+        return RequestFacade.doGetForStatus( serviceURI );
     }
 
     public static Status cancel( String taskId )
         throws IOException
     {
         String serviceURI = "service/local/schedule_run/" + taskId;
-        return RequestFacade.doDeleteForStatus( serviceURI, null);
+        return RequestFacade.doDeleteForStatus( serviceURI, null );
     }
 
     public static void runTask( String typeId, ScheduledServicePropertyResource... properties )

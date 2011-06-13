@@ -18,6 +18,8 @@
  */
 package util;
 
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -29,7 +31,6 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import com.sonatype.nexus.plugin.groovyconsole.rest.dto.GroovyScriptDTO;
 import com.sonatype.nexus.plugin.groovyconsole.rest.dto.GroovyScriptResponseDTO;
 import com.thoughtworks.xstream.XStream;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 
 public class GroovyConsoleMessageUtil
 {
@@ -45,7 +46,7 @@ public class GroovyConsoleMessageUtil
     public static List<GroovyScriptDTO> getScripts()
         throws IOException
     {
-        String responseText = RequestFacade.doGetForText("service/local/groovy_console", isSuccessful());
+        String responseText = RequestFacade.doGetForText( "service/local/groovy_console" );
 
         XStreamRepresentation representation = new XStreamRepresentation( xs, responseText, MediaType.APPLICATION_XML );
         GroovyScriptResponseDTO listRepsonse =

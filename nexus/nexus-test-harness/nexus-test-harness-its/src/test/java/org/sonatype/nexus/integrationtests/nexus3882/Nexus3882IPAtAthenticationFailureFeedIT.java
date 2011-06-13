@@ -18,7 +18,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3882;
 
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.StatusMatchers.*;
 
 import java.util.List;
 import java.util.regex.Matcher;
@@ -50,9 +51,7 @@ public class Nexus3882IPAtAthenticationFailureFeedIT
         TestContainer.getInstance().getTestContext().setUsername( "juka" );
         TestContainer.getInstance().getTestContext().setPassword( "juka" );
 
-        // user doesn't exists, nexus shall not allow me to login
-        Status status = UserCreationUtil.login();
-        assertTrue( status.isError(), "Juka shall not be able to login: " + status );
+        assertThat( UserCreationUtil.login(), isError() );
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 

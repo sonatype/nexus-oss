@@ -22,8 +22,6 @@ import java.util.List;
 
 import org.apache.maven.index.treeview.TreeNode;
 import org.restlet.data.MediaType;
-import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNode;
@@ -56,19 +54,8 @@ public class Nexus1961IndexContentIT
     {
         String serviceURI = "service/local/repositories/" + REPO_TEST_HARNESS_REPO + "/index_content/";
 
-        Response response = null;
-        String responseText;
-        try
-        {
-            response = RequestFacade.doGetRequest( serviceURI );
-            responseText = response.getEntity().getText();
-            Status status = response.getStatus();
-            Assert.assertTrue( status.isSuccess(), responseText + status );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        String responseText = RequestFacade.doGetForText( serviceURI );
+
         XStream xstream = XStreamFactory.getXmlXStream();
 
         xstream.processAnnotations( IndexBrowserTreeNode.class );

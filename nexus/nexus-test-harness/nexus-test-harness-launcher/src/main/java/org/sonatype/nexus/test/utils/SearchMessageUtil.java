@@ -77,7 +77,7 @@ public class SearchMessageUtil
 
     /**
      * Main entry point used by other exposed methods. Do NOT expose this method, never ever.
-     *
+     * 
      * @param queryArgs
      * @param repositoryId
      * @param asKeywords
@@ -122,7 +122,7 @@ public class SearchMessageUtil
         }
 
         log.info( "Search serviceURI " + serviceURI );
-        
+
         List<Matcher<? super Response>> list = new LinkedList<Matcher<? super Response>>();
         list.add( NexusRequestMatchers.isSuccessful() );
         list.addAll( Arrays.asList( matchers ) );
@@ -277,22 +277,18 @@ public class SearchMessageUtil
     {
         // GET /identify/sha1/8b1b85d04eea979c33109ea42808b7d3f6d355ab (is log4j:log4j:1.2.13)
 
-        Response response = null;
-        try {
-            response = RequestFacade.doGetRequest( "service/local/identify/sha1/" + sha1 );
-            if ( response.getStatus().isSuccess() )
-            {
-                XStreamRepresentation representation =
-                    new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
+        try
+        {
+            String responseText = RequestFacade.doGetForText( "service/local/identify/sha1/" + sha1 );
+            XStreamRepresentation representation =
+                new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
 
-                return (NexusArtifact) representation.getPayload( new NexusArtifact() );
-            }
-            else
-            {
-                return null;
-            }
-        } finally {
-            RequestFacade.releaseResponse(response);
+            return (NexusArtifact) representation.getPayload( new NexusArtifact() );
+        }
+        catch ( AssertionError e )
+        {
+            // unsuccesful GET
+            return null;
         }
 
     }
@@ -342,7 +338,7 @@ public class SearchMessageUtil
         throws IOException
     {
         String serviceURI = "service/local/repositories/" + repositoryName;
-        String entityText = RequestFacade.doGetForText(serviceURI, isSuccessful());
+        String entityText = RequestFacade.doGetForText( serviceURI );
         RepositoryResourceResponse repository = (RepositoryResourceResponse) xstream.fromXML( entityText );
         return (RepositoryResource) repository.getData();
     }
@@ -357,7 +353,7 @@ public class SearchMessageUtil
         repositoryResponse.setData( repository );
         representation.setPayload( repositoryResponse );
 
-        RequestFacade.doPutForStatus(serviceURI, representation, isSuccessful());
+        RequestFacade.doPutForStatus( serviceURI, representation, isSuccessful() );
 
     }
 
@@ -394,7 +390,7 @@ public class SearchMessageUtil
         {
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
             prop.setKey( UpdateIndexTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
-                prop.setValue(  repoId );
+            prop.setValue( repoId );
             scheduledTask.addProperty( prop );
         }
 
@@ -410,13 +406,17 @@ public class SearchMessageUtil
     {
         Response response = null;
         String entityText;
-        try {
-            response = RequestFacade.sendMessage( "content/repositories/" + repositoryId + "/" + itemPath + "?describe=info",
-                Method.GET, new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML ));
+        try
+        {
+            response =
+                RequestFacade.sendMessage( "content/repositories/" + repositoryId + "/" + itemPath + "?describe=info",
+                    Method.GET, new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML ) );
             entityText = response.getEntity().getText();
-            assertThat(response, isSuccessful());
-        } finally {
-            RequestFacade.releaseResponse(response);
+            assertThat( response, isSuccessful() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
         }
 
         XStreamRepresentation rep =
@@ -432,7 +432,7 @@ public class SearchMessageUtil
 
     /**
      * Main entry point used by other exposed methods. Do NOT expose this method, never ever.
-     *
+     * 
      * @param queryArgs
      * @param repositoryId
      * @param asKeywords
@@ -477,7 +477,7 @@ public class SearchMessageUtil
 
     /**
      * Uses XStream to unmarshall the DTOs.
-     *
+     * 
      * @param queryArgs
      * @param repositoryId
      * @param asKeywords
@@ -636,7 +636,7 @@ public class SearchMessageUtil
             serviceURI = serviceURI + "versionHint=" + versionIdHint + "&";
         }
 
-        String entityText = RequestFacade.doGetForText( serviceURI, isSuccessful() );
+        String entityText = RequestFacade.doGetForText( serviceURI );
 
         XStreamRepresentation re =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), entityText, MediaType.APPLICATION_XML );

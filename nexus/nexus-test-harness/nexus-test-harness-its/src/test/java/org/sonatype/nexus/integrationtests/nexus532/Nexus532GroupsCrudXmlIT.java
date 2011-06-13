@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus532;
 
+import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -80,9 +82,7 @@ public class Nexus532GroupsCrudXmlIT
     {
         String groupId = "nonexisted-group-from-mars";
 
-        Response response = RequestFacade.doGetRequest( GroupMessageUtil.SERVICE_PART + "/" + groupId );
-
-        Assert.assertEquals( 404, response.getStatus().getCode() );
+        RequestFacade.doGetForStatus( GroupMessageUtil.SERVICE_PART + "/" + groupId, isNotFound() );
     }
 
     @Test

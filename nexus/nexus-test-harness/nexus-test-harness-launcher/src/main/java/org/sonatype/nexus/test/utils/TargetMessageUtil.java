@@ -18,13 +18,14 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import java.io.IOException;
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-
 
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
@@ -42,9 +43,7 @@ import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+
 import com.thoughtworks.xstream.XStream;
 
 public class TargetMessageUtil
@@ -127,7 +126,7 @@ public class TargetMessageUtil
         throws IOException
     {
 
-        String responseText = RequestFacade.doGetForText("service/local/repo_targets", isSuccessful());
+        String responseText = RequestFacade.doGetForText( "service/local/repo_targets" );
         LOG.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation =

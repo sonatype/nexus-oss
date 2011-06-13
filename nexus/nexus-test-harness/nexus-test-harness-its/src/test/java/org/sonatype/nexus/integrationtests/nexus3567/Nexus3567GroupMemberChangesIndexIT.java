@@ -181,19 +181,8 @@ public class Nexus3567GroupMemberChangesIndexIT
     {
         String serviceURI = "service/local/repositories/" + repoId + "/index_content/";
 
-        Response response = null;
-        String responseText;
-        try
-        {
-            response = RequestFacade.doGetRequest( serviceURI );
-            responseText = response.getEntity().getText();
-            Status status = response.getStatus();
-            Assert.assertTrue( status.isSuccess(), responseText + status );
-        }
-        finally
-        {
-            RequestFacade.releaseResponse( response );
-        }
+        String responseText = RequestFacade.doGetForText( serviceURI );
+
         XStream xstream = XStreamFactory.getXmlXStream();
 
         xstream.processAnnotations( IndexBrowserTreeNode.class );

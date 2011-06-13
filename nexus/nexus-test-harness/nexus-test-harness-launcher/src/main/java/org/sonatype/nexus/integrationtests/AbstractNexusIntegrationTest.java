@@ -1061,13 +1061,12 @@ public abstract class AbstractNexusIntegrationTest
         Response response = null;
         try {
             response = RequestFacade.doGetRequest( serviceURI );
-            assertThat( response, allOf( isSuccessful(), respondsWithStatusCode( 301 ) ) );
 
-            Reference redirectRef = response.getLocationRef();
-            assertThat( "Snapshot download should redirect to a new file "
-                + response.getRequest().getResourceRef().toString(), redirectRef, notNullValue() );
+            assertThat(
+                response,
+                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
 
-            serviceURI = redirectRef.toString();
+            serviceURI = response.getLocationRef().toString();
         } finally {
             RequestFacade.releaseResponse(response);
         }

@@ -18,13 +18,14 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1563;
 
-import org.restlet.data.Status;
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
 import org.sonatype.security.rest.model.RoleResource;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -55,7 +56,6 @@ public class Nexus1563ExternalRealmsLoginIT
 
         testContext.setUsername( "admin-simple" );
         testContext.setPassword( "admin123" );
-        Status status = UserCreationUtil.login();
-        Assert.assertTrue( status.isSuccess(), "Unable to login " + status );
+        assertThat( UserCreationUtil.login(), isSuccess() );
     }
 }

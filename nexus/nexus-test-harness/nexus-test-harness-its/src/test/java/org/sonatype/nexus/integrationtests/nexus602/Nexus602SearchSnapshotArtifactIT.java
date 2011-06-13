@@ -18,15 +18,18 @@
  */
 package org.sonatype.nexus.integrationtests.nexus602;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+
 import java.net.URL;
 
 import org.apache.maven.index.artifact.Gav;
 import org.restlet.data.Method;
-import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -41,8 +44,7 @@ public class Nexus602SearchSnapshotArtifactIT
     public Nexus602SearchSnapshotArtifactIT()
         throws Exception
     {
-        gav =
-            new Gav( "nexus602", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, false, null, false, null );
+        gav = new Gav( "nexus602", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, false, null, false, null );
     }
 
     @Test
@@ -52,19 +54,25 @@ public class Nexus602SearchSnapshotArtifactIT
         String serviceURI =
             "service/local/artifact/maven/redirect?r=" + REPO_TEST_HARNESS_SNAPSHOT_REPO + "&g=" + gav.getGroupId()
                 + "&a=" + gav.getArtifactId() + "&v=" + gav.getVersion();
-        Response response = RequestFacade.doGetRequest( serviceURI );
-        Assert.assertEquals( response.getStatus().getCode(), 301, "Snapshot download should redirect to a new file "
-            + response.getRequest().getResourceRef().toString() );
+        Response response = null;
 
-        Reference redirectRef = response.getRedirectRef();
-        Assert.assertNotNull( redirectRef, "Snapshot download should redirect to a new file "
-            + response.getRequest().getResourceRef().toString() );
+        try
+        {
+            response = RequestFacade.doGetRequest( serviceURI );
+            assertThat(
+                response,
+                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
 
-        serviceURI = redirectRef.toString();
+            RequestFacade.releaseResponse( response );
 
-        response = RequestFacade.sendMessage( new URL( serviceURI ), Method.GET, null );
-
-        Assert.assertTrue( response.getStatus().isSuccess(), "Unable to fetch snapshot artifact" );
+            response =
+                RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
+                    isSuccessful() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 
     @Test
@@ -74,20 +82,26 @@ public class Nexus602SearchSnapshotArtifactIT
         String serviceURI =
             "service/local/artifact/maven/redirect?r=" + REPO_TEST_HARNESS_REPO + "&g=" + getTestId() + "&a="
                 + "artifact" + "&v=" + "1.0";
-        Response response = RequestFacade.doGetRequest( serviceURI );
 
-        Assert.assertEquals( response.getStatus().getCode(), 301, "Should redirect to a new file "
-            + response.getRequest().getResourceRef().toString() );
+        Response response = null;
+        try
+        {
+            response = RequestFacade.doGetRequest( serviceURI );
+            assertThat(
+                response,
+                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
 
-        Reference redirectRef = response.getRedirectRef();
-        Assert.assertNotNull( redirectRef, "Should redirect to a new file "
-            + response.getRequest().getResourceRef().toString() );
+            RequestFacade.releaseResponse( response );
 
-        serviceURI = redirectRef.toString();
-
-        response = RequestFacade.sendMessage( new URL( serviceURI ), Method.GET, null );
-
-        Assert.assertTrue( response.getStatus().isSuccess(), "fetch released artifact" );
+            // location is full url, so sendMessage directly
+            response =
+                RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
+                    isSuccessful() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 
     @Test
@@ -97,9 +111,8 @@ public class Nexus602SearchSnapshotArtifactIT
         String serviceURI =
             "service/local/artifact/maven/redirect?r=" + REPO_TEST_HARNESS_REPO + "&g=" + "invalidGroupId" + "&a="
                 + "invalidArtifact" + "&v=" + "32.64";
-        Response response = RequestFacade.doGetRequest( serviceURI );
 
-        Assert.assertEquals( response.getStatus().getCode(), 404, "Shouldn't find an invalid artifact" );
+        RequestFacade.doGetForStatus( serviceURI, isNotFound() );
     }
 
 }

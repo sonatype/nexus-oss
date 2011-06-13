@@ -18,6 +18,9 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -38,8 +41,7 @@ import org.sonatype.security.rest.model.RoleListResourceResponse;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.RoleResourceRequest;
 import org.testng.Assert;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
+
 import com.thoughtworks.xstream.XStream;
 
 public class RoleMessageUtil
@@ -207,7 +209,7 @@ public class RoleMessageUtil
         representation.setPayload( request );
 
         String serviceURI = "service/local/roles/" + role.getId();
-        return RequestFacade.doPutForStatus(serviceURI, representation, null);
+        return RequestFacade.doPutForStatus( serviceURI, representation, isSuccessful() );
     }
 
     /**

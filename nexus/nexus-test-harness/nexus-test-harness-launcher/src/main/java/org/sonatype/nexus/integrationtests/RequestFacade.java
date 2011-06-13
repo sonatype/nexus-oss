@@ -20,6 +20,8 @@ package org.sonatype.nexus.integrationtests;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
+import static org.sonatype.nexus.test.utils.StatusMatchers.*;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -61,6 +63,9 @@ import com.google.common.base.Preconditions;
 
 /**
  * HTTP Request helper (trying to hide any mention of the actual request implementation.)
+ * <p>
+ * <b>NOTE</b>: The do${HTTP_METHOD}* methods without a {@link Matcher} parameter will automatically assert that the
+ * received response is successful.
  * <p>
  * <b>IMPORTANT</b>: Any {@link Response} instances returned from methods here should have their
  * {@link Response#release()} method called in a finally block when you are done with it.
@@ -148,7 +153,7 @@ public class RequestFacade
     public static String doGetForText( final String serviceURIpart )
         throws IOException
     {
-        return doGetForText( serviceURIpart, ResponseMatchers.isSuccessful() );
+        return doGetForText( serviceURIpart, isSuccessful() );
     }
 
     public static String doGetForText( final String serviceURIpart, final org.hamcrest.Matcher<Response> responseMatcher )
@@ -191,12 +196,10 @@ public class RequestFacade
         }
     }
 
-    public static Status doGetForStatus( final String serviceURIpart, Matcher<Status> matcher )
+    public static Status doGetForStatus( final String serviceURIpart )
         throws IOException
     {
-        Status status = doGetForStatus( serviceURIpart );
-        assertThat( status, matcher );
-        return status;
+        return doGetForStatus( serviceURIpart, isSuccess() );
     }
 
     /**
@@ -206,7 +209,7 @@ public class RequestFacade
      * @return
      * @throws IOException
      */
-    public static Status doGetForStatus( final String serviceURIpart )
+    public static Status doGetForStatus( final String serviceURIpart, Matcher<Status> matcher )
         throws IOException
     {
         Preconditions.checkNotNull( serviceURIpart );
@@ -216,6 +219,12 @@ public class RequestFacade
             response = RequestFacade.sendMessage( serviceURIpart, Method.GET );
             Status status = response.getStatus();
             assertThat( status, notNullValue() );
+
+            if ( matcher != null )
+            {
+                assertThat( status, matcher );
+            }
+
             return status;
         }
         finally
@@ -302,6 +311,12 @@ public class RequestFacade
         }
     }
 
+    public static String doPutForText( final String serviceURIpart, final Representation representation )
+        throws IOException
+    {
+        return doPutForText( serviceURIpart, representation, isSuccessful() );
+    }
+
     public static String doPutForText( final String serviceURIpart, final Representation representation,
                                        Matcher<Response> responseMatcher )
         throws IOException
@@ -326,6 +341,12 @@ public class RequestFacade
         // return doPostForStatus(serviceURIpart,representation, null);
     }
 
+    public static String doPostForText( final String serviceURIpart, final Representation representation )
+        throws IOException
+    {
+        return doPostForText( serviceURIpart, representation, isSuccessful() );
+    }
+
     public static String doPostForText( final String serviceURIpart, final Representation representation,
                                         Matcher<Response> responseMatcher )
         throws IOException
@@ -345,7 +366,7 @@ public class RequestFacade
     public static Status doPostForStatus( final String serviceURIpart, final Representation representation )
         throws IOException
     {
-        return doPostForStatus( serviceURIpart, representation, null );
+        return doPostForStatus( serviceURIpart, representation, isSuccessful() );
     }
 
     public static Status doPostForStatus( final String serviceURIpart, final Representation representation,
@@ -364,6 +385,12 @@ public class RequestFacade
         {
             releaseResponse( response );
         }
+    }
+
+    public static void doDelete( final String serviceURIpart )
+        throws IOException
+    {
+        doDelete( serviceURIpart, isSuccessful() );
     }
 
     public static void doDelete( final String serviceURIpart, Matcher<Response> responseMatcher )

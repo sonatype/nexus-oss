@@ -18,8 +18,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus2862;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+
 import java.io.IOException;
 
+import org.hamcrest.collection.IsEmptyCollection;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -105,11 +110,11 @@ public class Nexus2862UrlRealmIT
     public void loginUrlRealm()
         throws IOException
     {
-        Assert.assertTrue( UserCreationUtil.login( "juka", "juk@" ).isSuccess() );
+        Status status = UserCreationUtil.login( "juka", "juk@" );
+        assertThat( status, isSuccess() );
+        assertThat( server.getAccessedUri(), not( IsEmptyCollection.<String> empty() ) );
 
-        Assert.assertFalse( server.getAccessedUri().isEmpty() );
-
-        Assert.assertTrue( UserCreationUtil.logout().isSuccess() );
+        UserCreationUtil.logout();
     }
 
     @Test
@@ -117,9 +122,9 @@ public class Nexus2862UrlRealmIT
         throws IOException
     {
         Status status = UserCreationUtil.login( "juka", "juka" );
-        Assert.assertFalse( status.isSuccess(), status + "" );
+        assertThat( status, not( isSuccess() ) );
 
-        Assert.assertTrue( UserCreationUtil.logout().isSuccess() );
+        UserCreationUtil.logout();
     }
 
     @Test
@@ -127,9 +132,9 @@ public class Nexus2862UrlRealmIT
         throws IOException
     {
         Status status = UserCreationUtil.login( "anuser", "juka" );
-        Assert.assertFalse( status.isSuccess(), status + "" );
+        assertThat( status, not( isSuccess() ) );
 
-        Assert.assertTrue( UserCreationUtil.logout().isSuccess() );
+        UserCreationUtil.logout();
     }
 
 }

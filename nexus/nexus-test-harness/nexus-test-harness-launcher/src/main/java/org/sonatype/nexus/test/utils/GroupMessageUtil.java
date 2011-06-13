@@ -18,6 +18,9 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,9 +39,7 @@ import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+
 import com.thoughtworks.xstream.XStream;
 
 public class GroupMessageUtil
@@ -148,7 +149,7 @@ public class GroupMessageUtil
         throws IOException
     {
 
-        String responseText = RequestFacade.doGetForText(SERVICE_PART + "/" + groupId, isSuccessful());
+        String responseText = RequestFacade.doGetForText( SERVICE_PART + "/" + groupId );
         LOG.debug( "responseText: \n" + responseText );
 
         // this should use call to: getResourceFromResponse

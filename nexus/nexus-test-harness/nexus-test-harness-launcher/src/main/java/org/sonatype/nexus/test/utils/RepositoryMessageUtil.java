@@ -18,6 +18,10 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -44,9 +48,6 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -162,6 +163,7 @@ public class RepositoryMessageUtil
     public RepositoryBaseResource getRepository( String repoId )
         throws IOException
     {
+        // accepted return codes: OK or redirect
         final String responseText = RequestFacade.doGetForText(SERVICE_PART + "/" + repoId, not(inError()));
         LOG.debug( "responseText: \n" + responseText );
 
@@ -493,7 +495,7 @@ public class RepositoryMessageUtil
     {
         String serviceURI = "service/local/repositories/" + repoId + "/index_content/";
 
-        String responseText = RequestFacade.doGetForText(serviceURI, isSuccessful());
+        String responseText = RequestFacade.doGetForText( serviceURI );
         
         XStreamRepresentation re =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );

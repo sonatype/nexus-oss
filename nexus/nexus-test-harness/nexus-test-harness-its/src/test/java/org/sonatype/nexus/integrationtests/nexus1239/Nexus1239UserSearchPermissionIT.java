@@ -18,14 +18,14 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1239;
 
-import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
+import static org.sonatype.nexus.integrationtests.ITGroups.*;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.restlet.data.MediaType;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -115,10 +115,7 @@ public class Nexus1239UserSearchPermissionIT
 
         String uriPart = RequestFacade.SERVICE_LOCAL + "user_search/default/a";
 
-        Response response = RequestFacade.doGetRequest( uriPart );
-
-        Assert.assertEquals( 403, response.getStatus().getCode() );
-
+        RequestFacade.doGet( uriPart, respondsWithStatusCode( 403 ) );
     }
 
 }
