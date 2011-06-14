@@ -11,13 +11,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
-import org.sonatype.nexus.plugins.p2.repository.its.P2ITException;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
@@ -43,11 +44,14 @@ public class NXCM2093CheckSumValidationIT
 
         try
         {
+            final Map<String, String> env = new HashMap<String, String>();
+            env.put( "eclipse.p2.MD5Check", "false" );
+
             installUsingP2( getNexusTestRepoUrl(), "com.sonatype.nexus.p2.its.feature.feature.group",
-                installDir.getCanonicalPath(), "-Declipse.p2.MD5Check=false" );
+                installDir.getCanonicalPath(), env );
             Assert.fail();
         }
-        catch ( final P2ITException e )
+        catch ( final Exception e )
         {
             assertThat(
                 FileUtils.fileRead( nexusLog ),
@@ -63,5 +67,4 @@ public class NXCM2093CheckSumValidationIT
         Assert.assertEquals( LocalStatus.IN_SERVICE.name(), repoStatusResource.getLocalStatus() );
 
     }
-
 }

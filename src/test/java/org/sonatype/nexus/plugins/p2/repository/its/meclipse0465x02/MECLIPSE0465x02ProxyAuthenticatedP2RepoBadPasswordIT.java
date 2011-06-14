@@ -12,7 +12,6 @@ import java.io.File;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2SecureIntegrationIT;
-import org.sonatype.nexus.plugins.p2.repository.its.P2ITException;
 
 public class MECLIPSE0465x02ProxyAuthenticatedP2RepoBadPasswordIT
     extends AbstractNexusProxyP2SecureIntegrationIT
@@ -34,12 +33,11 @@ public class MECLIPSE0465x02ProxyAuthenticatedP2RepoBadPasswordIT
         {
             installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
                 installDir.getCanonicalPath() );
-            Assert.fail( "Expected P2ITException" );
+            Assert.fail( "Expected P2 Exception containing text: [Unable to load repositories.]" );
         }
-        catch ( final P2ITException e )
+        catch ( final Exception e )
         {
-            if ( !e.getMessage().contains(
-                "No repository found at " + getBaseNexusUrl() + "content/repositories/meclipse0465x02/" ) )
+            if ( !e.getMessage().contains( "Unable to load repositories." ) )
             {
                 throw e;
             }

@@ -9,14 +9,15 @@ package org.sonatype.nexus.plugins.p2.repository.its;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.maven.it.Verifier;
+import org.apache.maven.it.util.ResourceExtractor;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.Commandline;
-import org.codehaus.plexus.util.cli.StreamConsumer;
 import org.junit.After;
 import org.junit.Before;
 import org.sonatype.jettytestsuite.ServletServer;
@@ -77,125 +78,37 @@ public abstract class AbstractNexusProxyP2IntegrationIT
         }
     }
 
-    private final int forkedProcessTimeoutInSeconds = 900;
-
-    private File getEquinoxLauncher( final String p2location )
-        throws Exception
-    {
-        final DirectoryScanner ds = new DirectoryScanner();
-        ds.setBasedir( p2location );
-        ds.setIncludes( new String[] { "plugins/org.eclipse.equinox.launcher_*.jar" } );
-        ds.scan();
-        final String[] includedFiles = ds.getIncludedFiles();
-        if ( includedFiles == null || includedFiles.length != 1 )
-        {
-            throw new Exception( "Can't locate org.eclipse.equinox.launcher bundle in " + p2location );
-        }
-        return new File( p2location, includedFiles[0] );
-    }
-
     protected void installUsingP2( final String repositoryURL, final String installIU, final String destination )
         throws Exception
     {
-        installUsingP2( repositoryURL, installIU, destination );
+        installUsingP2( repositoryURL, installIU, destination, null );
     }
 
     protected void installUsingP2( final String repositoryURL, final String installIU, final String destination,
-                                   final String... extraArgs )
+                                   final Map<String, String> extraEnv )
         throws Exception
     {
         FileUtils.deleteDirectory( destination );
 
-        final String p2location = getP2RuntimeLocation().getCanonicalPath();
-        cleanP2Runtime( p2location );
+        final File basedir = ResourceExtractor.simpleExtractResources( getClass(), "/run-p2" );
+        final Verifier verifier = new Verifier( basedir.getAbsolutePath() );
 
-        final Commandline cli = new Commandline();
+        final Map<String, String> env = new HashMap<String, String>();
+        env.put( "org.eclipse.ecf.provider.filetransfer.retrieve.readTimeout", "30000" );
+        env.put( "p2.installIU", installIU );
+        env.put( "p2.destination", destination );
+        env.put( "p2.metadataRepository", repositoryURL );
+        env.put( "p2.artifactRepository", repositoryURL );
+        env.put( "p2.profile", getTestId() );
 
-        cli.setWorkingDirectory( p2location );
-
-        String executable = System.getProperty( "java.home" ) + File.separator + "bin" + File.separator + "java";
-        if ( File.separatorChar == '\\' )
+        if ( extraEnv != null )
         {
-            executable = executable + ".exe";
-        }
-        cli.setExecutable( executable );
-
-        if ( extraArgs != null )
-        {
-            cli.addArguments( extraArgs );
+            env.putAll( extraEnv );
         }
 
-        cli.addArguments( new String[] { "-Declipse.p2.data.area=" + destination + "/p2" } );
-        cli.addArguments( new String[] { "-Dorg.eclipse.ecf.provider.filetransfer.retrieve.readTimeout=30000" } );
-
-        cli.addArguments( new String[] { "-jar", getEquinoxLauncher( p2location ).getAbsolutePath(), } );
-
-        cli.addArguments( new String[] { "-nosplash", "-application", "org.eclipse.equinox.p2.director",
-            "-metadataRepository", repositoryURL, "-artifactRepository", repositoryURL, "-installIU", installIU,
-            "-destination", destination, "-profile", getTestId(), "-profileProperties",
-            "org.eclipse.update.install.features=true", "-bundlepool", destination, "-roaming", "-debug",
-            "-consolelog", } );
-
-        log.info( "Command line:\n\t" + cli.toString() );
-
-        final StringBuffer buf = new StringBuffer();
-
-        final StreamConsumer out = new StreamConsumer()
-        {
-            @Override
-            public void consumeLine( final String line )
-            {
-                System.out.println( line );
-                buf.append( "[OUT] " ).append( line ).append( "\n" );
-            }
-        };
-
-        final StreamConsumer err = new StreamConsumer()
-        {
-            @Override
-            public void consumeLine( final String line )
-            {
-                System.err.println( line );
-                buf.append( "[ERR] " ).append( line ).append( "\n" );
-            }
-        };
-
-        final int result = CommandLineUtils.executeCommandLine( cli, out, err, forkedProcessTimeoutInSeconds );
-        if ( result != 0 )
-        {
-            throw new P2ITException( result, buf );
-        }
-    }
-
-    private void cleanP2Runtime( final String p2location )
-        throws IOException
-    {
-        FileUtils.deleteDirectory( p2location + "/p2" ); // clean p2 runtime cache
-        final DirectoryScanner scanner = new DirectoryScanner();
-        final File configuration = new File( p2location, "configuration" );
-        scanner.setBasedir( configuration );
-        scanner.scan();
-        for ( final String path : scanner.getIncludedFiles() )
-        {
-            if ( path != null && path.trim().length() > 0 && !"config.ini".equals( path ) )
-            {
-                new File( configuration, path ).delete();
-            }
-        }
-        for ( final String path : scanner.getIncludedDirectories() )
-        {
-            if ( path != null && path.trim().length() > 0 )
-            {
-                FileUtils.deleteDirectory( new File( configuration, path ) );
-            }
-        }
-    }
-
-    protected File getP2RuntimeLocation()
-        throws IOException
-    {
-        final File dst = getOverridableFile( "p2" );
-        return dst;
+        verifier.executeGoals( Arrays.asList( "verify" ), env );
+        verifier.verifyErrorFreeLog();
+        verifier.resetStreams();
     }
 
     @Override
