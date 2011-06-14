@@ -349,7 +349,7 @@ public class TaskStopTest
 
                 assertFalse( blockedCallable.isStarted() );
 
-                assertEquals( TaskState.WAITING, blockedTask.getTaskState() );
+                assertEquals( TaskState.SUBMITTED, blockedTask.getTaskState() );
                 assertEquals( 1, defaultScheduler.getAllTasks().size() );
                 assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
             }
@@ -365,7 +365,54 @@ public class TaskStopTest
         callable.blockForDone();
 
         assertEquals( 0, defaultScheduler.getAllTasks().size() );
+    }
 
+    public void testCancelManualRunStateIsSubmitted()
+        throws Exception
+    {
+        RunForeverTask callable = new RunForeverTask( 2000 );
+
+        assertFalse( callable.isAllDone() );
+        assertEquals( 0, defaultScheduler.getAllTasks().size() );
+
+        final ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", callable, new ManualRunSchedule() );
+
+        task.runNow();
+
+        callable.blockForStart();
+
+        final RunForeverTask blockedCallable = new RunForeverTask( 2000 );
+        final ScheduledTask<Integer> blockedTask =
+            defaultScheduler.schedule( "Blocked Task", blockedCallable, new ManualRunSchedule() );
+
+        blockedTask.runNow();
+
+        Thread.sleep( 600 );
+
+        assertFalse( blockedCallable.isStarted() );
+        assertEquals( TaskState.SLEEPING, blockedTask.getTaskState() );
+
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+        assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
+
+        blockedTask.cancelOnly();
+
+        assertFalse( blockedCallable.isStarted() );
+
+        assertEquals( TaskState.SUBMITTED, blockedTask.getTaskState() );
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+        assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
+
+        blockedTask.cancel();
+
+        task.cancelOnly();
+        callable.blockForDone();
+
+        assertEquals( TaskState.SUBMITTED, task.getTaskState() );
+
+        task.cancel();
+
+        assertEquals( 0, defaultScheduler.getAllTasks().size() );
     }
 
     public class RunForeverCallable

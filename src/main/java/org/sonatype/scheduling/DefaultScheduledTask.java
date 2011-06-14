@@ -230,10 +230,13 @@ public class DefaultScheduledTask<T>
             {
                 removeTask = true;
             }
-            else
+            else if ( !removeTask )
             {
+                // only reschedule/set new state if task is not to be removed
+                // (maintain correct state transitions, e.g. SUBMITTED -> CANCELLED not allowed)
                 reschedule();
-                setTaskState( TaskState.WAITING );
+                TaskState newState = isManualRunScheduled() ? TaskState.SUBMITTED : TaskState.WAITING;
+                setTaskState( newState );
             }
         }
 
