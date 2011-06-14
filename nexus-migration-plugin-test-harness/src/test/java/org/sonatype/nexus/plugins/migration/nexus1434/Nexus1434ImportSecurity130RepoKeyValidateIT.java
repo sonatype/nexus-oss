@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1434;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -20,6 +21,9 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
+import org.sonatype.nexus.rest.model.RepositoryListResource;
+import org.sonatype.nexus.security.NexusViewSecurityResource;
+import org.sonatype.nexus.security.RepositoryViewPrivilegeDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 
 public class Nexus1434ImportSecurity130RepoKeyValidateIT
@@ -45,13 +49,21 @@ public class Nexus1434ImportSecurity130RepoKeyValidateIT
 
         for ( PrivilegeStatusResource priv : privilegeList )
         {
-            String repoId =
-                getSecurityConfigUtil().getPrivilegeProperty( priv, TargetPrivilegeRepositoryPropertyDescriptor.ID );
+            String repoId = getSecurityConfigUtil().getPrivilegeProperty(
+                priv,
+                TargetPrivilegeRepositoryPropertyDescriptor.ID );
 
-            String groupId =
-                getSecurityConfigUtil().getPrivilegeProperty( priv, TargetPrivilegeGroupPropertyDescriptor.ID );
+            String groupId = getSecurityConfigUtil().getPrivilegeProperty(
+                priv,
+                TargetPrivilegeGroupPropertyDescriptor.ID );
 
-            if ( !StringUtils.isEmpty( repoId ) )
+            if ( priv.getType().equals( RepositoryViewPrivilegeDescriptor.TYPE ) )
+            {
+                // view permissions are created against a repository (because a group is a repository, anything that
+                // says otherwise is legacy code
+                assertRepoOrGroupIdExists( repoId );
+            }
+            else if ( !StringUtils.isEmpty( repoId ) )
             {
                 assertRepoIdExists( repoId );
             }
@@ -73,6 +85,27 @@ public class Nexus1434ImportSecurity130RepoKeyValidateIT
         throws Exception
     {
         Assert.assertNotNull( groupUtil.getGroup( id ) );
+    }
+
+    private void assertRepoOrGroupIdExists( String id )
+        throws Exception
+    {
+        boolean found = false;
+        List<String> repoIds = new ArrayList<String>();
+        for ( RepositoryListResource repositoryListResource : repoUtil.getAllList() )
+        {
+            repoIds.add( repositoryListResource.getId() );
+
+            if ( repositoryListResource.getId().equals( id ) )
+            {
+                found = true;
+            }
+        }
+
+        if ( !found )
+        {
+            Assert.fail( "Failed to find repository or groupId in list: " + repoIds );
+        }
     }
 
 }
