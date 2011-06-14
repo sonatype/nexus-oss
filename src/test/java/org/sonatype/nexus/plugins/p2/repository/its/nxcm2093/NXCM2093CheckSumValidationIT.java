@@ -39,12 +39,12 @@ public class NXCM2093CheckSumValidationIT
 
         // the must work one
         installUsingP2( getNexusTestRepoUrl( "nxcm2093-ok-checksum" ), "org.mortbay.jetty.util",
-            installDir.getCanonicalPath(), null, null, null );
+            installDir.getCanonicalPath() );
 
         try
         {
             installUsingP2( getNexusTestRepoUrl(), "com.sonatype.nexus.p2.its.feature.feature.group",
-                installDir.getCanonicalPath(), null, null, null, "-Declipse.p2.MD5Check=false" );
+                installDir.getCanonicalPath(), "-Declipse.p2.MD5Check=false" );
             Assert.fail();
         }
         catch ( final P2ITException e )

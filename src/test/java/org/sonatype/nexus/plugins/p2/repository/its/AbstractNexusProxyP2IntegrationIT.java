@@ -97,11 +97,11 @@ public abstract class AbstractNexusProxyP2IntegrationIT
     protected void installUsingP2( final String repositoryURL, final String installIU, final String destination )
         throws Exception
     {
-        installUsingP2( repositoryURL, installIU, destination, null, null, null );
+        installUsingP2( repositoryURL, installIU, destination );
     }
 
     protected void installUsingP2( final String repositoryURL, final String installIU, final String destination,
-                                   final String p2Os, final String p2Ws, final String p2Arch, final String... extraArgs )
+                                   final String... extraArgs )
         throws Exception
     {
         FileUtils.deleteDirectory( destination );
@@ -135,21 +135,6 @@ public abstract class AbstractNexusProxyP2IntegrationIT
             "-destination", destination, "-profile", getTestId(), "-profileProperties",
             "org.eclipse.update.install.features=true", "-bundlepool", destination, "-roaming", "-debug",
             "-consolelog", } );
-
-        if ( p2Os != null )
-        {
-            cli.addArguments( new String[] { "-p2.os", p2Os } );
-        }
-
-        if ( p2Ws != null )
-        {
-            cli.addArguments( new String[] { "-p2.ws", p2Ws } );
-        }
-
-        if ( p2Arch != null )
-        {
-            cli.addArguments( new String[] { "-p2.arch", p2Arch } );
-        }
 
         log.info( "Command line:\n\t" + cli.toString() );
 
