@@ -232,7 +232,7 @@ public class TaskStopTest
         cal.add( Calendar.WEEK_OF_YEAR, 1 );
         ScheduledTask<Integer> blockedTask =
             defaultScheduler.schedule( "Blocked Task", blockedCallable, new DailySchedule( new Date(), cal.getTime() ) );
-        
+
         blockedTask.runNow();
 
         // let scheduler catch up
@@ -273,7 +273,7 @@ public class TaskStopTest
         ScheduledTask<Integer> task = defaultScheduler.submit( "Test Task", callable );
 
         callable.blockForStart();
-        
+
         task.cancelOnly();
         assertEquals( TaskState.CANCELLING, task.getTaskState() );
 
@@ -303,6 +303,69 @@ public class TaskStopTest
         callable.blockForDone();
 
         assertEquals( 0, defaultScheduler.getAllTasks().size() );
+    }
+
+    public void testCancelBlockedTask()
+        throws Exception
+    {
+        RunForeverTask callable = new RunForeverTask();
+
+        assertFalse( callable.isAllDone() );
+        assertEquals( 0, defaultScheduler.getAllTasks().size() );
+
+        final ScheduledTask<Integer> task = defaultScheduler.submit( "Test Task", callable );
+
+        callable.blockForStart();
+
+        final RunForeverTask blockedCallable = new RunForeverTask();
+        final ScheduledTask<Integer> blockedTask =
+            defaultScheduler.schedule( "Blocked Task", blockedCallable, new ManualRunSchedule() );
+
+        Runnable runCancelBlockedTask = new Runnable()
+        {
+
+            public void run()
+            {
+
+                blockedTask.runNow();
+
+                // let scheduler catch up
+                try
+                {
+                    Thread.sleep( 600 );
+                }
+                catch ( InterruptedException e )
+                {
+                    throw new IllegalStateException( e );
+                }
+
+                assertFalse( blockedCallable.isStarted() );
+                assertEquals( TaskState.SLEEPING, blockedTask.getTaskState() );
+
+                assertEquals( 1, defaultScheduler.getAllTasks().size() );
+                assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
+
+                blockedTask.cancelOnly();
+
+                assertFalse( blockedCallable.isStarted() );
+
+                assertEquals( TaskState.WAITING, blockedTask.getTaskState() );
+                assertEquals( 1, defaultScheduler.getAllTasks().size() );
+                assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
+            }
+        };
+
+        runCancelBlockedTask.run();
+        runCancelBlockedTask.run();
+        runCancelBlockedTask.run();
+
+        task.cancel( true );
+        blockedTask.cancel( true );
+
+        callable.blockForDone();
+
+        assertEquals( 0, defaultScheduler.getAllTasks().size() );
+
     }
 
     public class RunForeverCallable
@@ -375,7 +438,7 @@ public class TaskStopTest
             }
         }
     }
-    
+
     public class RunForeverTask
         extends RunForeverCallable
         implements SchedulerTask<Integer>

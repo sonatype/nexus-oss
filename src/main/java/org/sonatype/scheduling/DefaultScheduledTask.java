@@ -222,6 +222,9 @@ public class DefaultScheduledTask<T>
 
         if ( originalState.equals( TaskState.SLEEPING ) )
         {
+            // manualRun would be reset on transition to RUNNING, so we need to do that here as well
+            manualRun = false;
+
             // remove one-shots
             if ( getScheduleIterator().isFinished() )
             {
