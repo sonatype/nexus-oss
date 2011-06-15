@@ -265,10 +265,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven.indexer</groupId>
-      <artifactId>indexer-artifact</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>com.sonatype.components</groupId>
@@ -366,14 +362,6 @@
           <groupId>org.codehaus.plexus</groupId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <version>${nexus.version}</version>
-      <type>nexus-plugin</type>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
