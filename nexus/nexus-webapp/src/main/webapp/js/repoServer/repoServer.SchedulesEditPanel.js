@@ -978,6 +978,10 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
       // Dump the currently stored data and requery for everything
       reloadAll : function() {
+        var gridSelectModel = this.schedulesGridPanel.getSelectionModel();
+        gridSelectModel.clearSelections();
+        this.formCards.getLayout().setActiveItem(0);
+        
         this.runButton.disable();
         this.stopButton.disable();
         this.deleteButton.disable();
@@ -995,7 +999,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               }
             }, this.formCards);
 
-        this.formCards.getLayout().setActiveItem(0);
         // //Enable add button on refresh
         // this.schedulesGridPanel.getTopToolbar().items.get('schedule-add-btn').enable();
       },
@@ -1559,6 +1562,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         }
 
         var readableStatus = rec.data.readableStatus;
+        
         if (rec.data.name.substring(0, 4) == 'New ')
         {
           this.runButton.disable();
