@@ -1021,6 +1021,34 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       },
 
       saveHandler : function(formInfoObj) {
+        // NEXUS-4365: after a save action, fields are enabled but empty. If you try to save again, validation fails -> disable all unused fields in dynamic cards
+        var disableItems = function(item) {
+          if (item && item.items && item.items.each)
+          {
+            item.items.each(function(subitem)
+            {
+              subitem.disabled = true;
+              disableItems(subitem.items);
+            });
+          }
+        };
+
+        var schedulePanel = this.findById(formInfoObj.formPanel.id + '_schedule-config-card-panel');
+        schedulePanel.items.each(function (item) {
+          if (schedulePanel.getLayout().activeItem != item )
+          {
+            disableItems(item);
+          }
+        });
+
+        var serviceTypePanel = this.findById(formInfoObj.formPanel.id + '_service-type-config-card-panel');
+        serviceTypePanel.items.each(function(item, i, len) {
+              if (serviceTypePanel.activeItem != item)
+              {
+                disableItems(item);
+              }
+            });
+        // END NEXUS-4365
 
         var allValid = false;
         allValid = formInfoObj.formPanel.form.isValid();
