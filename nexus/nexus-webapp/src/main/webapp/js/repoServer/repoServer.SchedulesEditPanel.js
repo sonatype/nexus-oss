@@ -1204,27 +1204,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               });
         }.defer(300, formPanel);
         
-        // NEXUS-4363 defer disabling the south panel because service-type-config-card values will not be set otherwise
-        var disableOnRunningState = function(formPanel, readableStatus)
-        {
-          if (!readableStatus || readableStatus == 'Waiting' || readableStatus == '')
-          {
-            //this.disableEditingHeader.setVisible(false);
-            // only layout again if change is needed
-            if ( formPanel.disabled )
-            {
-              formPanel.enable();
-              formPanel.doLayout();
-            }
-          }
-          else if (!formPanel.disabled)
-          {
-            //this.disableEditingHeader.setVisible(true);
-            formPanel.disable();
-            formPanel.doLayout();
-          }
-        }.defer(350, formPanel, [formPanel, formPanel.readableStatus]);
-
       },
 
       deleteHandler : function() {
@@ -1479,6 +1458,29 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             var sortState = this.schedulesDataStore.getSortState();
             this.schedulesDataStore.sort(sortState.field, sortState.direction);
           }
+
+	}
+	else if ( action.type == 'sonatypeLoad' )
+	{
+	    // NEXUS-4363 disable the south panel after service-type-config-card values are loaded
+	    var formPanel = action.options.fpanel;
+	    var readableStatus = formPanel.readableStatus;
+	    if (!readableStatus || readableStatus == 'Waiting' || readableStatus == '')
+	    {
+		//this.disableEditingHeader.setVisible(false);
+		// only layout if change is needed
+		if ( formPanel.disabled )
+		{
+		    formPanel.enable();
+		    formPanel.doLayout();
+		}
+	    }
+	    else if (!formPanel.disabled)
+	    {
+		//this.disableEditingHeader.setVisible(true);
+		formPanel.disable();
+		formPanel.doLayout();
+	    }
         }
       },
 
@@ -1544,6 +1546,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               dataModifiers : modFuncs,
               scope : this
             });
+        
       },
 
       rowSelect : function(selectionModel, index, rec) {
