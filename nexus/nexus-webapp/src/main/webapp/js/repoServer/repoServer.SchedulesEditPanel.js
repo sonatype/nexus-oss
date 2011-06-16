@@ -981,7 +981,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         var gridSelectModel = this.schedulesGridPanel.getSelectionModel();
         gridSelectModel.clearSelections();
         this.formCards.getLayout().setActiveItem(0);
-        
+
         this.runButton.disable();
         this.stopButton.disable();
         this.deleteButton.disable();
@@ -1203,7 +1203,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                     });
               });
         }.defer(300, formPanel);
-        
+
       },
 
       deleteHandler : function() {
@@ -1459,28 +1459,28 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             this.schedulesDataStore.sort(sortState.field, sortState.direction);
           }
 
-	}
-	else if ( action.type == 'sonatypeLoad' )
-	{
-	    // NEXUS-4363 disable the south panel after service-type-config-card values are loaded
-	    var formPanel = action.options.fpanel;
-	    var readableStatus = formPanel.readableStatus;
-	    if (!readableStatus || readableStatus == 'Waiting' || readableStatus == '')
-	    {
-		//this.disableEditingHeader.setVisible(false);
-		// only layout if change is needed
-		if ( formPanel.disabled )
-		{
-		    formPanel.enable();
-		    formPanel.doLayout();
-		}
-	    }
-	    else if (!formPanel.disabled)
-	    {
-		//this.disableEditingHeader.setVisible(true);
-		formPanel.disable();
-		formPanel.doLayout();
-	    }
+    }
+    else if ( action.type == 'sonatypeLoad' )
+    {
+        // NEXUS-4363 disable the south panel after service-type-config-card values are loaded
+        var formPanel = action.options.fpanel;
+        var readableStatus = formPanel.readableStatus;
+        if (!readableStatus || readableStatus == 'Waiting' || readableStatus == '')
+        {
+        //this.disableEditingHeader.setVisible(false);
+        // only layout if change is needed
+        if ( formPanel.disabled )
+        {
+            formPanel.enable();
+            formPanel.doLayout();
+        }
+        }
+        else if (!formPanel.disabled)
+        {
+        //this.disableEditingHeader.setVisible(true);
+        formPanel.disable();
+        formPanel.doLayout();
+        }
         }
       },
 
@@ -1522,7 +1522,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         {
           if (action.response.responseText.indexOf("There is no task with ID=") > -1 )
           {
-            Sonatype.MessageBox.alert('Selected task was removed', 'The selected task was removed in the backgrond.');
+            Sonatype.MessageBox.alert('Selected task was removed', 'The selected task was removed by another process and cannot be displayed.');
             this.reloadAll();
           }
           else
@@ -1546,7 +1546,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               dataModifiers : modFuncs,
               scope : this
             });
-        
+
       },
 
       rowSelect : function(selectionModel, index, rec) {
@@ -1565,7 +1565,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         }
 
         var readableStatus = rec.data.readableStatus;
-        
+
         if (rec.data.name.substring(0, 4) == 'New ')
         {
           this.runButton.disable();
