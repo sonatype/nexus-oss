@@ -373,9 +373,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 }
                 else
                 {
-                    res.setStatus( Status.REDIRECTION_NOT_MODIFIED, "The resource is not modified!" );
-
-                    return null;
+                    throw new ResourceException( Status.REDIRECTION_NOT_MODIFIED, "Resource is not modified." );
                 }
             }
             else if ( req.getConditions().getNoneMatch() != null && req.getConditions().getNoneMatch().size() > 0
@@ -766,7 +764,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
      * 
      * @param t
      */
-    protected void handleException( Request req, Response res, Exception t )
+    protected void handleException( final Request req, final Response res, final Exception t )
         throws ResourceException
     {
         // just set this flag to true in any if-else branch you want to see
@@ -835,6 +833,18 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
         finally
         {
+            if ( t instanceof ResourceException )
+            {
+                ResourceException re = (ResourceException) t;
+
+                if ( re.getStatus() != null && !re.getStatus().isError() )
+                {
+                    // do not spam the log with non-error responses, we need only errors to have logged in case when
+                    // exception to be handled is ResourceException
+                    return;
+                }
+            }
+
             String message =
                 "Got exception during processing request \"" + req.getMethod() + " " + req.getResourceRef().toString()
                     + "\": ";
@@ -887,7 +897,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
      * @param res
      * @param t
      */
-    public static void challengeIfNeeded( Request req, Response res, AccessDeniedException t )
+    public static void challengeIfNeeded( final Request req, final Response res, final AccessDeniedException t )
     {
         // TODO: a big fat problem here!
         // this makes restlet code tied to Servlet code, and we what is happening here is VERY dirty!
