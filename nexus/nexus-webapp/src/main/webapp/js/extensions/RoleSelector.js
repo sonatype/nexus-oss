@@ -157,7 +157,7 @@ Ext.extend(RoleManager, Ext.grid.GridPanel, {
                     height : 400,
                     width : 750,
                     usePrivileges : this.usePrivileges,
-                    hiddenRoleIds : this.getSelectedRoleIds(),
+                    hiddenRoleIds : this.getHiddenRoleIds(),
                     hiddenPrivilegeIds : this.getSelectedPrivilegeIds(),
                     title : 'Add Roles' + (this.usePrivileges ? ' and Privileges' : '')
                   }],
@@ -222,9 +222,7 @@ Ext.extend(RoleManager, Ext.grid.GridPanel, {
         }
         return null;
       },
-      setSelectedRoleIds : function(roleIds, reload) {
-        this.selectedRoleIds = [];
-
+      append : function (roleIds, to) {
         if (roleIds != null)
         {
           if (!Ext.isArray(roleIds))
@@ -237,10 +235,34 @@ Ext.extend(RoleManager, Ext.grid.GridPanel, {
             var roleId = this.getIdFromObject(roleIds[i]);
             if (roleId != null)
             {
-              this.selectedRoleIds.push(roleId);
+              to.push(roleId);
             }
           }
         }
+      },
+      setHiddenRoleIds : function(roleIds, reload) {
+        this.hiddenRoleIds = [];
+        
+        this.append(roleIds, this.hiddenRoleIds);
+        
+        this.validate();
+
+        if (reload)
+        {
+          this.reloadStore();
+        }
+      },
+      getHiddenRoleIds : function() {
+        // NEXUS-4371: merge selected and explicitly hidden roles
+        var hidden = [];
+        this.append(this.hiddenRoleIds, hidden);
+        this.append(this.getSelectedRoleIds(), hidden);
+        return hidden;
+      },
+      setSelectedRoleIds : function(roleIds, reload) {
+        this.selectedRoleIds = [];
+        
+        this.append(roleIds, this.selectedRoleIds);
 
         if (this.selectedRoleIds.length == 0)
         {
@@ -260,23 +282,8 @@ Ext.extend(RoleManager, Ext.grid.GridPanel, {
       },
       setSelectedPrivilegeIds : function(privilegeIds, reload) {
         this.selectedPrivilegeIds = [];
-
-        if (privilegeIds != null)
-        {
-          if (!Ext.isArray(privilegeIds))
-          {
-            privilegeIds = [privilegeIds];
-          }
-
-          for (var i = 0; i < privilegeIds.length; i++)
-          {
-            var privilegeId = this.getIdFromObject(privilegeIds[i]);
-            if (privilegeId != null)
-            {
-              this.selectedPrivilegeIds.push(privilegeId);
-            }
-          }
-        }
+        
+        this.append(privilegeIds, this.selectedPrivilegeIds);
 
         this.validate();
 
