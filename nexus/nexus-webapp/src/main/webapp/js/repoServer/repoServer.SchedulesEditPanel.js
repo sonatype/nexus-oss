@@ -1024,35 +1024,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       },
 
       saveHandler : function(formInfoObj) {
-        // NEXUS-4365: after a save action, fields are enabled but empty. If you try to save again, validation fails -> disable all unused fields in dynamic cards
-        var disableItems = function(item) {
-          if (item && item.items && item.items.each)
-          {
-            item.items.each(function(subitem)
-            {
-              subitem.disabled = true;
-              disableItems(subitem.items);
-            });
-          }
-        };
-
-        var schedulePanel = this.findById(formInfoObj.formPanel.id + '_schedule-config-card-panel');
-        schedulePanel.items.each(function (item) {
-          if (schedulePanel.getLayout().activeItem != item )
-          {
-            disableItems(item);
-          }
-        });
-
-        var serviceTypePanel = this.findById(formInfoObj.formPanel.id + '_service-type-config-card-panel');
-        serviceTypePanel.items.each(function(item, i, len) {
-              if (serviceTypePanel.activeItem != item)
-              {
-                disableItems(item);
-              }
-            });
-        // END NEXUS-4365
-
         var allValid = false;
         allValid = formInfoObj.formPanel.form.isValid();
 
@@ -1458,7 +1429,19 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             var sortState = this.schedulesDataStore.getSortState();
             this.schedulesDataStore.sort(sortState.field, sortState.direction);
           }
+          
+        // NEXUS-4365: after a save action, panel state is broken: fields are enabled but empty, combo box values are missing.
+        // -> rebuild panel after save action
+        var formLayout = this.formCards.getLayout();
+        var fp = action.options.fpanel;
+        this.formCards.remove(fp.id, true);
 
+        // switch to empty
+        formLayout.setActiveItem(0);
+        
+        var store = this.schedulesGridPanel.getStore();
+        this.schedulesGridPanel.getSelectionModel().selectRow(store.indexOfId(fp.id));
+        // END NEXUS-4365
     }
     else if ( action.type == 'sonatypeLoad' )
     {
