@@ -368,25 +368,30 @@ Ext.extend(RoleManager, Ext.grid.GridPanel, {
 
         return id;
       },
+      showErrorMarker: function(msg) {
+        var elp = this.getEl();
+        if (!this.errorEl) {
+            this.errorEl = elp.createChild({
+                cls: "x-form-invalid-msg"
+            });
+            this.errorEl.setWidth(elp.getWidth(true));
+            this.errorEl.setStyle("border: 0 solid #fff")
+        }
+        this.errorEl.update(msg);
+        elp.setStyle({
+            "background-color": "#fee",
+            border: "1px solid #dd7870"
+        });
+        Ext.form.Field.msgFx.normal.show(this.errorEl, this)
+      },
+      markInvalid: function(msg) {
+       this.showErrorMarker(msg);
+      },
       validate : function() {
         if (this.doValidation && !this.userId && this.selectedRoleIds.length == 0 && this.selectedPrivilegeIds.length == 0)
         {
-          var elp = this.getEl();
-
-          if (!this.errorEl)
-          {
-            this.errorEl = elp.createChild({
-                  cls : 'x-form-invalid-msg'
-                });
-            this.errorEl.setWidth(elp.getWidth(true));
-            this.errorEl.setStyle('border: 0 solid #fff');
-          }
-          this.errorEl.update('You must select at least 1 role' + (this.usePrivileges ? ' or privilege' : ''));
-          elp.setStyle({
-                'background-color' : '#fee',
-                border : '1px solid #dd7870'
-              });
-          Ext.form.Field.msgFx['normal'].show(this.errorEl, this);
+          var msg = "You must select at least 1 role" + (this.usePrivileges ? " or privilege" : "");
+          this.showErrorMarker(msg);
           return false;
         }
 

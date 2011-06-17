@@ -427,7 +427,20 @@ Sonatype.repoServer.DefaultRoleEditor = function(config) {
         allowBlank : true,
         width : this.COMBO_WIDTH
       }, {
+        name : 'configurationErrorPanel',
+        xtype : 'panel',
+        layout : 'table',
+        hidden : true,
+        style : 'font-size: 18px; padding: 5px 0px 5px 15px',
+        items : [{
+              html : '<div class="x-form-invalid-message">'
+            }, {html: "Replace this"}, {
+              html : '</div>'
+                }
+                ]
+      },{
         xtype : 'rolemanager',
+        id : 'roleManagerId',
         name : 'roleManager',
         height : 200,
         width : 490,
@@ -489,8 +502,7 @@ Ext.extend(Sonatype.repoServer.DefaultRoleEditor, Sonatype.ext.FormPanel, {
       submitHandler : function(form, action, receivedData) {
         receivedData.mapping = this.payload.data.mapping;
       },
-      // NEXUS-4371 show server validation errors via msgbox, markInvalid does not work properly here
-      validationModifiers : { 'roles' : "*" }
+      validationModifiers : { 'roles' : function(error,panel) { Ext.getCmp('roleManagerId').markInvalid(error.msg); } }
     });
 
 Sonatype.Events.addListener('roleViewInit', function(cardPanel, rec, gridPanel) {
