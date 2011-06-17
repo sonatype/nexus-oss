@@ -484,7 +484,9 @@ Ext.extend(Sonatype.repoServer.DefaultRoleEditor, Sonatype.ext.FormPanel, {
       },
       submitHandler : function(form, action, receivedData) {
         receivedData.mapping = this.payload.data.mapping;
-      }
+      },
+      // NEXUS-4371 show server validation errors via msgbox, markInvalid does not work properly here
+      validationModifiers : { 'roles' : "*" }
     });
 
 Sonatype.Events.addListener('roleViewInit', function(cardPanel, rec, gridPanel) {
