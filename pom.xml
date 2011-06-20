@@ -13,7 +13,7 @@
   <parent>
     <groupId>com.sonatype.nexus.plugin</groupId>
     <artifactId>nexus-enterprise-plugins</artifactId>
-    <version>1.9.2-RC2</version>
+    <version>1.9.2-RC3-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-unpack-plugin</artifactId>
