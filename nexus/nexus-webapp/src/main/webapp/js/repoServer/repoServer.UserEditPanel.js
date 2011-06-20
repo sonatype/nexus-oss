@@ -737,6 +737,7 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
   }
 
   items.push({
+        id : 'useredit-rolemanager',
         xtype : 'rolemanager',
         name : 'roleManager',
         height : 200,
@@ -801,6 +802,11 @@ Ext.extend(Sonatype.repoServer.DefaultUserEditor, Sonatype.ext.FormPanel, {
         rec.set('displayRoles', this.combineRoles(receivedData.roles));
         rec.commit();
         rec.endEdit();
+      },
+      validationModifiers : { 'roles' :
+        function(error,panel) {
+          Ext.getCmp('useredit-rolemanager').markInvalid(error.msg); 
+        }
       }
     });
 
@@ -927,6 +933,7 @@ Sonatype.repoServer.UserMappingEditor = function(config) {
                     allowBlank : false,
                     width : this.COMBO_WIDTH
                   }, {
+                    id : "usermapping-rolemanager",
                     xtype : 'rolemanager',
                     name : 'roleManager',
                     height : 200,
@@ -972,6 +979,7 @@ Ext.extend(Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
             fpanel : this,
             dataModifiers : this.dataModifiers.submit,
             serviceDataObj : this.referenceData,
+            validationModifiers : this.validationModifiers,
             isNew : this.isNew
               // extra option to send to callback, instead of conditioning on
               // method
@@ -1098,6 +1106,11 @@ Ext.extend(Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
         else
         {
           return Sonatype.repoServer.UserMappingEditor.superclass.actionFailedHandler.call(this, form, action);
+        }
+      },
+      validationModifiers : { 'roles' :
+        function(error,panel) {
+          Ext.getCmp('usermapping-rolemanager').markInvalid(error.msg); 
         }
       }
     });
