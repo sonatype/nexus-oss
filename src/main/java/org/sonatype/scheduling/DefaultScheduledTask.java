@@ -207,48 +207,51 @@ public class DefaultScheduledTask<T>
     {
         final ProgressListener progressListener = getProgressListener();
         TaskState originalState = getTaskState();
-        setTaskState( TaskState.CANCELLING );
 
-        if ( progressListener != null )
+        // only go into cancelling state if task is actually doing something
+        if ( originalState.isExecuting() || originalState.equals( TaskState.SLEEPING ) )
         {
-            getProgressListener().cancel();
-        }
+            setTaskState( TaskState.CANCELLING );
 
-        // to prevent starting it if not yet started
-        if ( getFuture() != null )
-        {
-            getFuture().cancel( interrupt );
-        }
-
-        if ( originalState.equals( TaskState.SLEEPING ) )
-        {
-            // manualRun would be reset on transition to RUNNING, so we need to do that here as well
-            manualRun = false;
-
-            // remove one-shots
-            if ( getScheduleIterator().isFinished() )
+            if ( progressListener != null )
             {
-                removeTask = true;
+                getProgressListener().cancel();
             }
-            else if ( !removeTask )
+
+            // to prevent starting it if not yet started
+            if ( getFuture() != null )
             {
-                // only reschedule/set new state if task is not to be removed
-                // (maintain correct state transitions, e.g. SUBMITTED -> CANCELLED not allowed)
-                reschedule();
-                TaskState newState = isManualRunScheduled() ? TaskState.SUBMITTED : TaskState.WAITING;
-                setTaskState( newState );
+                getFuture().cancel( interrupt );
             }
+
+            if ( originalState.equals( TaskState.SLEEPING ) )
+            {
+                // manualRun would be reset on transition to RUNNING, so we need to do that here as well
+                manualRun = false;
+
+                // remove one-shots
+                if ( getScheduleIterator().isFinished() )
+                {
+                    removeTask = true;
+                }
+                else if ( !removeTask )
+                {
+                    // only reschedule/set new state if task is not to be removed
+                    // (maintain correct state transitions, e.g. SUBMITTED -> CANCELLED not allowed)
+                    reschedule();
+                    TaskState newState = isManualRunScheduled() ? TaskState.SUBMITTED : TaskState.WAITING;
+                    setTaskState( newState );
+                }
+            }
+            setToBeRemoved( removeTask );
         }
 
-        setToBeRemoved( removeTask );
-
-        // if this task is not running, it can be immediately removed from task map
+        // if this task is not executing, it can be immediately removed from task map
         if ( removeTask && !originalState.isExecuting() )
         {
             setTaskState( TaskState.CANCELLED );
             getScheduler().removeFromTasksMap( this );
         }
-
     }
 
     public void reset()

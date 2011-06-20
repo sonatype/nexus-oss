@@ -367,6 +367,58 @@ public class TaskStopTest
         assertEquals( 0, defaultScheduler.getAllTasks().size() );
     }
 
+    public void testDoNotCancelWaitingState()
+        throws Exception
+    {
+        final RunForeverTask callable = new RunForeverTask( 2000 );
+
+        assertFalse( callable.isAllDone() );
+        assertEquals( 0, defaultScheduler.getAllTasks().size() );
+
+        Calendar cal = Calendar.getInstance();
+        cal.add( Calendar.DAY_OF_YEAR, 1 );
+        Date start = cal.getTime();
+        cal.add( Calendar.DAY_OF_YEAR, 7 );
+        Date end = cal.getTime();
+
+        final DefaultScheduledTask<Integer> task =
+            (DefaultScheduledTask<Integer>) defaultScheduler.schedule( "Blocked Task", callable, new DailySchedule(
+                start, end ) );
+
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+        assertEquals( TaskState.SUBMITTED, task.getTaskState() );
+
+        task.cancelOnly();
+
+        assertEquals( TaskState.SUBMITTED, task.getTaskState() );
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+
+        task.runNow();
+
+        callable.blockForStart();
+
+        task.cancelOnly();
+
+        callable.blockForDone();
+
+        assertEquals( TaskState.WAITING, task.getTaskState() );
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+
+        task.cancelOnly();
+
+        assertEquals( TaskState.WAITING, task.getTaskState() );
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+
+        task.setTaskState( TaskState.BROKEN );
+        assertEquals( TaskState.BROKEN, task.getTaskState() );
+
+        task.cancelOnly();
+
+        assertEquals( TaskState.BROKEN, task.getTaskState() );
+
+        task.cancel();
+    }
+
     public void testCancelManualRunStateIsSubmitted()
         throws Exception
     {
