@@ -426,18 +426,6 @@ Sonatype.repoServer.DefaultRoleEditor = function(config) {
         name : 'description',
         allowBlank : true,
         width : this.COMBO_WIDTH
-      }, {
-        name : 'configurationErrorPanel',
-        xtype : 'panel',
-        layout : 'table',
-        hidden : true,
-        style : 'font-size: 18px; padding: 5px 0px 5px 15px',
-        items : [{
-              html : '<div class="x-form-invalid-message">'
-            }, {html: "Replace this"}, {
-              html : '</div>'
-                }
-                ]
       },{
         xtype : 'rolemanager',
         id : 'roleManagerId',
