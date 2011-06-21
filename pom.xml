@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>nexus-migration-plugin</artifactId>
-  <version>1.9.2-SNAPSHOT</version>
+  <version>1.9.2-RC2</version>
   <packaging>pom</packaging>
 
   <name>Nexus Migration Plugin</name>
