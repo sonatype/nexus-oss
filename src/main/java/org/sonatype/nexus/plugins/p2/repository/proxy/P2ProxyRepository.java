@@ -63,7 +63,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.util.StringDigester;
 
-
 @Component( role = Repository.class, hint = P2ProxyRepository.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse P2 Proxy Repository" )
 public class P2ProxyRepository
     extends AbstractProxyRepository
@@ -93,6 +92,7 @@ public class P2ProxyRepository
         initArtifactMappingsAndMirrors();
     }
 
+    @Override
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
@@ -101,6 +101,7 @@ public class P2ProxyRepository
     /**
      * Override the "default" kind with Maven specifics.
      */
+    @Override
     public RepositoryKind getRepositoryKind()
     {
         if ( repositoryKind == null )
@@ -118,7 +119,8 @@ public class P2ProxyRepository
     {
         return new CRepositoryExternalConfigurationHolderFactory<P2ProxyRepositoryConfiguration>()
         {
-            public P2ProxyRepositoryConfiguration createExternalConfigurationHolder( CRepository config )
+            @Override
+            public P2ProxyRepositoryConfiguration createExternalConfigurationHolder( final CRepository config )
             {
                 return new P2ProxyRepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
             }
@@ -132,7 +134,7 @@ public class P2ProxyRepository
     }
 
     @Override
-    protected P2ProxyRepositoryConfiguration getExternalConfiguration( boolean forModification )
+    protected P2ProxyRepositoryConfiguration getExternalConfiguration( final boolean forModification )
     {
         return (P2ProxyRepositoryConfiguration) super.getExternalConfiguration( forModification );
     }
@@ -145,14 +147,14 @@ public class P2ProxyRepository
         // Try to get the mirrors from local storage
         try
         {
-            ResourceStoreRequest request = new ResourceStoreRequest( PRIVATE_MIRRORS_PATH );
+            final ResourceStoreRequest request = new ResourceStoreRequest( PRIVATE_MIRRORS_PATH );
             mirrorsItem = getLocalStorage().retrieveItem( this, request );
         }
-        catch ( StorageException e )
+        catch ( final StorageException e )
         {
             // fall through
         }
-        catch ( ItemNotFoundException e )
+        catch ( final ItemNotFoundException e )
         {
             // fall through
         }
@@ -164,7 +166,7 @@ public class P2ProxyRepository
 
         // exclusive locking begins here, since actual work needs to be done
         final RepositoryItemUidLock lock = uid.getLock();
-        
+
         lock.lock( Action.create );
 
         try
@@ -172,19 +174,19 @@ public class P2ProxyRepository
             // Try to get the mirrors from remote
             if ( mirrorsItem == null || isOld( mirrorsItem ) )
             {
-                this.mirrorsURLsByRepositoryURL = null;
+                mirrorsURLsByRepositoryURL = null;
 
                 getLogger().debug( "Repository " + getId() + ": configureMirrors: getting mirrors from remote" );
-                ResourceStoreRequest request = new ResourceStoreRequest( P2Constants.ARTIFACTS_XML );
+                final ResourceStoreRequest request = new ResourceStoreRequest( P2Constants.ARTIFACTS_XML );
                 request.getRequestContext().setParentContext( incomingRequest.getRequestContext() );
 
-                StorageItem artifacts = retrieveItem( request );
+                final StorageItem artifacts = retrieveItem( request );
 
                 // The P2ProxyMetadataSource.ATTR_MIRRORS_URL attribute of the artifacts StorageItem
                 // is set in the P2ProxyMetadataSource.doRetrieveArtifactsDom().
                 // The attribute is set only if the remote repository is a SimpleArtifactRepository (i.e. it is not set
                 // for CompositeArtifactRepositories)
-                String mirrorsURL = artifacts.getAttributes().get( P2ProxyMetadataSource.ATTR_MIRRORS_URL );
+                final String mirrorsURL = artifacts.getAttributes().get( P2ProxyMetadataSource.ATTR_MIRRORS_URL );
                 if ( mirrorsURL != null )
                 {
                     // The remote repository is a SimpleArtifactRepository with mirrors configured
@@ -205,14 +207,14 @@ public class P2ProxyRepository
                 }
             }
 
-            Xpp3Dom mirrorsDom = getMirrorsDom( (StorageFileItem) mirrorsItem );
-            Xpp3Dom[] repositoryDoms = mirrorsDom.getChildren( "repository" );
+            final Xpp3Dom mirrorsDom = getMirrorsDom( (StorageFileItem) mirrorsItem );
+            final Xpp3Dom[] repositoryDoms = mirrorsDom.getChildren( "repository" );
             if ( repositoryDoms != null && repositoryDoms.length > 0 )
             {
-                for ( Xpp3Dom repositoryDom : repositoryDoms )
+                for ( final Xpp3Dom repositoryDom : repositoryDoms )
                 {
-                    String repositoryUrl = repositoryDom.getAttribute( "uri" );
-                    Xpp3Dom[] mirrorsDoms = repositoryDom.getChildren( "mirror" );
+                    final String repositoryUrl = repositoryDom.getAttribute( "uri" );
+                    final Xpp3Dom[] mirrorsDoms = repositoryDom.getChildren( "mirror" );
                     addMirrors( repositoryUrl, mirrorsDoms );
                 }
             }
@@ -220,18 +222,17 @@ public class P2ProxyRepository
             {
                 getLogger().debug( "Repository " + getId() + ": configureMirrors: found flat list of mirrors" );
                 // There are no "repository" elements, so we only have a flat list of mirrors
-                List<Mirror> mirrors = new ArrayList<Mirror>();
+                final List<Mirror> mirrors = new ArrayList<Mirror>();
 
-                for ( Xpp3Dom mirrorDOM : mirrorsDom.getChildren( "mirror" ) )
+                for ( final Xpp3Dom mirrorDOM : mirrorsDom.getChildren( "mirror" ) )
                 {
-                    String mirrorUrl = mirrorDOM.getAttribute( "url" );
+                    final String mirrorUrl = mirrorDOM.getAttribute( "url" );
                     getLogger().debug( "Repository " + getId() + ": configureMirrors: found mirror URL=" + mirrorUrl );
                     if ( mirrorUrl != null )
                     {
                         // TODO: validate that this is valid way to generate id
                         // or if should be pulled from xml
-                        mirrors.add( new Mirror( StringDigester.getSha1Digest( mirrorUrl ), mirrorUrl,
-                            this.getRemoteUrl() ) );
+                        mirrors.add( new Mirror( StringDigester.getSha1Digest( mirrorUrl ), mirrorUrl, getRemoteUrl() ) );
                     }
                 }
 
@@ -241,7 +242,7 @@ public class P2ProxyRepository
 
             mirrorsConfigured = true;
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             getLogger().warn(
                 "Could not retrieve list of repository mirrors. All downloads will come from repository canonical URL",
@@ -253,30 +254,30 @@ public class P2ProxyRepository
         }
     }
 
-    private void addMirrors( String remoteRepositoryUrl, Xpp3Dom[] mirrorsDoms )
+    private void addMirrors( final String remoteRepositoryUrl, final Xpp3Dom[] mirrorsDoms )
     {
         if ( mirrorsDoms != null )
         {
-            for ( Xpp3Dom mirrorDOM : mirrorsDoms )
+            for ( final Xpp3Dom mirrorDOM : mirrorsDoms )
             {
-                String mirrorUrl = mirrorDOM.getAttribute( "url" );
+                final String mirrorUrl = mirrorDOM.getAttribute( "url" );
                 if ( mirrorUrl != null )
                 {
                     // TODO: validate that this is valid way to generate id
                     // or if should be pulled from xml
-                    this.getP2DownloadMirrors().addMirror(
+                    getP2DownloadMirrors().addMirror(
                         new Mirror( StringDigester.getSha1Digest( mirrorUrl ), mirrorUrl, remoteRepositoryUrl ) );
                 }
             }
         }
-        this.getP2DownloadMirrors().addMirror(
+        getP2DownloadMirrors().addMirror(
             new Mirror( StringDigester.getSha1Digest( remoteRepositoryUrl ), remoteRepositoryUrl, remoteRepositoryUrl ) );
     }
 
-    private Xpp3Dom getMirrorsDom( StorageFileItem mirrorsItem )
+    private Xpp3Dom getMirrorsDom( final StorageFileItem mirrorsItem )
         throws IOException, XmlPullParserException
     {
-        InputStream is = mirrorsItem.getInputStream();
+        final InputStream is = mirrorsItem.getInputStream();
 
         try
         {
@@ -291,51 +292,51 @@ public class P2ProxyRepository
     private AbstractStorageItem getMirrorsItemRemote()
         throws IllegalOperationException, ItemNotFoundException, IOException, XmlPullParserException
     {
-        Map<String, String> mirrorsURLsMap = getMirrorsURLsByRepositoryURL();
+        final Map<String, String> mirrorsURLsMap = getMirrorsURLsByRepositoryURL();
         if ( mirrorsURLsMap == null )
         {
             getLogger().debug( "getMirrorsItemRemote: mirrorsURLsMap is null" );
             return null;
         }
 
-        Xpp3Dom mirrorsByRepositoryDom = new Xpp3Dom( "mirrors" );
-        for ( String repositoryURL : mirrorsURLsMap.keySet() )
+        final Xpp3Dom mirrorsByRepositoryDom = new Xpp3Dom( "mirrors" );
+        for ( final String repositoryURL : mirrorsURLsMap.keySet() )
         {
             getLogger().debug( "getMirrorsItemRemote: repositoryURL=" + repositoryURL );
-            Xpp3Dom repositoryDom = new Xpp3Dom( "repository" );
+            final Xpp3Dom repositoryDom = new Xpp3Dom( "repository" );
             repositoryDom.setAttribute( "uri", repositoryURL );
             mirrorsByRepositoryDom.addChild( repositoryDom );
 
-            String mirrorsURL = mirrorsURLsMap.get( repositoryURL );
+            final String mirrorsURL = mirrorsURLsMap.get( repositoryURL );
             if ( mirrorsURL == null )
             {
                 continue;
             }
 
-            AbstractStorageItem mirrorsItem = getMirrorsItemRemote( mirrorsURL );
-            Xpp3Dom mirrorsDom = getMirrorsDom( (StorageFileItem) mirrorsItem );
-            for ( Xpp3Dom mirrorDOM : mirrorsDom.getChildren( "mirror" ) )
+            final AbstractStorageItem mirrorsItem = getMirrorsItemRemote( mirrorsURL );
+            final Xpp3Dom mirrorsDom = getMirrorsDom( (StorageFileItem) mirrorsItem );
+            for ( final Xpp3Dom mirrorDOM : mirrorsDom.getChildren( "mirror" ) )
             {
                 getLogger().debug( "getMirrorsItemRemote: mirrorURL=" + mirrorDOM.getAttribute( "url" ) );
                 repositoryDom.addChild( mirrorDOM );
             }
         }
 
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
-        MXSerializer mx = new MXSerializer();
+        final MXSerializer mx = new MXSerializer();
         mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-indentation", "  " );
         mx.setProperty( "http://xmlpull.org/v1/doc/properties.html#serializer-line-separator", "\n" );
-        String encoding = "UTF-8";
+        final String encoding = "UTF-8";
         mx.setOutput( buffer, encoding );
         mx.startDocument( encoding, null );
         mirrorsByRepositoryDom.writeToSerializer( null, mx );
         mx.flush();
 
-        byte[] bytes = buffer.toByteArray();
+        final byte[] bytes = buffer.toByteArray();
 
-        ContentLocator content = new ByteArrayContentLocator( bytes, "text/xml" );
-        DefaultStorageFileItem result =
+        final ContentLocator content = new ByteArrayContentLocator( bytes, "text/xml" );
+        final DefaultStorageFileItem result =
             new DefaultStorageFileItem( this, new ResourceStoreRequest( PRIVATE_MIRRORS_PATH ), true /* isReadable */,
                 false /* isWritable */, content );
         result.setLength( bytes.length );
@@ -343,22 +344,22 @@ public class P2ProxyRepository
         return result;
     }
 
-    private AbstractStorageItem getMirrorsItemRemote( String mirrorsURL )
-        throws MalformedURLException, RemoteAccessException, RemoteStorageException, ItemNotFoundException
+    private AbstractStorageItem getMirrorsItemRemote( final String mirrorsURL )
+        throws MalformedURLException, RemoteAccessException, StorageException, ItemNotFoundException
     {
-        URL url = new URL( mirrorsURL );
+        final URL url = new URL( mirrorsURL );
 
-        ResourceStoreRequest request = new ResourceStoreRequest( url.getFile() );
+        final ResourceStoreRequest request = new ResourceStoreRequest( url.getFile() );
 
-        String baseUrl = getBaseMirrorsURL( url );
-        AbstractStorageItem mirrorsItem = getRemoteStorage().retrieveItem( this, request, baseUrl );
+        final String baseUrl = getBaseMirrorsURL( url );
+        final AbstractStorageItem mirrorsItem = getRemoteStorage().retrieveItem( this, request, baseUrl );
 
         return mirrorsItem;
     }
 
-    private String getBaseMirrorsURL( URL mirrorsURL )
+    private String getBaseMirrorsURL( final URL mirrorsURL )
     {
-        StringBuilder baseUrl = new StringBuilder();
+        final StringBuilder baseUrl = new StringBuilder();
         baseUrl.append( mirrorsURL.getProtocol() ).append( "://" );
         if ( mirrorsURL.getUserInfo() != null )
         {
@@ -374,7 +375,7 @@ public class P2ProxyRepository
     }
 
     @Override
-    public StorageItem retrieveItem( boolean fromTask, ResourceStoreRequest request )
+    public StorageItem retrieveItem( final boolean fromTask, final ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
@@ -397,10 +398,10 @@ public class P2ProxyRepository
     }
 
     @Override
-    protected StorageItem doRetrieveItem( ResourceStoreRequest request )
+    protected StorageItem doRetrieveItem( final ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
-        String requestPath = request.getRequestPath();
+        final String requestPath = request.getRequestPath();
         getLogger().debug( "Repository " + getId() + ": doRetrieveItem:" + requestPath );
 
         if ( P2Constants.ARTIFACT_MAPPINGS_XML.equals( requestPath ) )
@@ -410,12 +411,12 @@ public class P2ProxyRepository
                 throw new ItemNotFoundException( request );
             }
 
-            StorageItem item = getLocalStorage().retrieveItem( this, request );
+            final StorageItem item = getLocalStorage().retrieveItem( this, request );
             item.getItemContext().putAll( request.getRequestContext() );
             return item;
         }
 
-        StorageItem item = metadataSource.doRetrieveItem( request, this );
+        final StorageItem item = metadataSource.doRetrieveItem( request, this );
         if ( item != null )
         {
             return item;
@@ -508,48 +509,48 @@ public class P2ProxyRepository
         throws StorageException, IllegalOperationException
     {
         StorageFileItem artifactMappingsItem;
-        ResourceStoreRequest req = new ResourceStoreRequest( P2Constants.ARTIFACT_MAPPINGS_XML );
+        final ResourceStoreRequest req = new ResourceStoreRequest( P2Constants.ARTIFACT_MAPPINGS_XML );
         req.setRequestLocalOnly( true );
         try
         {
             artifactMappingsItem = (StorageFileItem) retrieveItem( true, req );
         }
-        catch ( ItemNotFoundException e )
+        catch ( final ItemNotFoundException e )
         {
             hasArtifactMappings = false;
             return;
         }
 
-        Map<String, ArtifactMapping> tempRemoteArtifactMappings = new LinkedHashMap<String, ArtifactMapping>();
-        Map<String, String> tempMirrorsURLsByRepositoryURL = new LinkedHashMap<String, String>();
+        final Map<String, ArtifactMapping> tempRemoteArtifactMappings = new LinkedHashMap<String, ArtifactMapping>();
+        final Map<String, String> tempMirrorsURLsByRepositoryURL = new LinkedHashMap<String, String>();
         Xpp3Dom dom;
         try
         {
             dom = Xpp3DomBuilder.build( new XmlStreamReader( artifactMappingsItem.getInputStream() ) );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new StorageException( "Could not load artifact mappings", e );
         }
-        catch ( XmlPullParserException e )
+        catch ( final XmlPullParserException e )
         {
             throw new StorageException( "Could not load artifact mappings", e );
         }
-        Xpp3Dom[] artifactRepositories = dom.getChildren( "repository" );
-        for ( Xpp3Dom artifactRepositoryDom : artifactRepositories )
+        final Xpp3Dom[] artifactRepositories = dom.getChildren( "repository" );
+        for ( final Xpp3Dom artifactRepositoryDom : artifactRepositories )
         {
-            String repositoryUri = artifactRepositoryDom.getAttribute( "uri" );
+            final String repositoryUri = artifactRepositoryDom.getAttribute( "uri" );
 
-            Map<String, ArtifactPath> artifactPaths = new LinkedHashMap<String, ArtifactPath>();
-            ArtifactMapping artifactMapping = new ArtifactMapping( repositoryUri, artifactPaths );
-            for ( Xpp3Dom artifactDom : artifactRepositoryDom.getChildren( "artifact" ) )
+            final Map<String, ArtifactPath> artifactPaths = new LinkedHashMap<String, ArtifactPath>();
+            final ArtifactMapping artifactMapping = new ArtifactMapping( repositoryUri, artifactPaths );
+            for ( final Xpp3Dom artifactDom : artifactRepositoryDom.getChildren( "artifact" ) )
             {
                 artifactPaths.put( artifactDom.getAttribute( "remotePath" ),
                     new ArtifactPath( artifactDom.getAttribute( "remotePath" ), artifactDom.getAttribute( "md5" ) ) );
             }
             tempRemoteArtifactMappings.put( repositoryUri, artifactMapping );
 
-            String mirrorsURL = artifactRepositoryDom.getAttribute( P2Constants.PROP_MIRRORS_URL );
+            final String mirrorsURL = artifactRepositoryDom.getAttribute( P2Constants.PROP_MIRRORS_URL );
             tempMirrorsURLsByRepositoryURL.put( repositoryUri, mirrorsURL );
         }
 
@@ -560,7 +561,7 @@ public class P2ProxyRepository
     @Override
     public DownloadMirrors getDownloadMirrors()
     {
-        return this.getP2DownloadMirrors();
+        return getP2DownloadMirrors();
     }
 
     private P2ProxyDownloadMirrors getP2DownloadMirrors()
@@ -574,17 +575,17 @@ public class P2ProxyRepository
     }
 
     @Override
-    protected DownloadMirrorSelector openDownloadMirrorSelector( ResourceStoreRequest request )
+    protected DownloadMirrorSelector openDownloadMirrorSelector( final ResourceStoreRequest request )
     {
-        String remoteUrl = this.getRemoteUrl();
+        String remoteUrl = getRemoteUrl();
 
         // lookup child from the map here then udpate the remote URL
         try
         {
-            Map<String, ArtifactMapping> artifactMappings = getArtifactMappings();
+            final Map<String, ArtifactMapping> artifactMappings = getArtifactMappings();
             if ( artifactMappings != null )
             {
-                for ( String remoteRepositoryURI : artifactMappings.keySet() )
+                for ( final String remoteRepositoryURI : artifactMappings.keySet() )
                 {
                     if ( artifactMappings.get( remoteRepositoryURI ).getArtifactsPath().containsKey(
                         request.getRequestPath() ) )
@@ -595,26 +596,26 @@ public class P2ProxyRepository
                 }
             }
         }
-        catch ( StorageException e )
+        catch ( final StorageException e )
         {
-            this.getLogger().warn( "Could not find artifact-mapping.", e );
+            getLogger().warn( "Could not find artifact-mapping.", e );
         }
-        catch ( IllegalOperationException e )
+        catch ( final IllegalOperationException e )
         {
-            this.getLogger().warn( "Could not find artifact-mapping.", e );
+            getLogger().warn( "Could not find artifact-mapping.", e );
         }
 
         // now open the selector
-        return this.getDownloadMirrors().openSelector( remoteUrl );
+        return getDownloadMirrors().openSelector( remoteUrl );
     }
 
     @Override
-    protected boolean isRemoteStorageReachable( ResourceStoreRequest request )
+    protected boolean isRemoteStorageReachable( final ResourceStoreRequest request )
         throws StorageException, RemoteAuthenticationNeededException, RemoteAccessDeniedException
     {
         // For p2 repositories, the root URL may not be reachable,
         // so we test if we can reach one of the "standard" p2 repository metadata files.
-        for ( String metadataFilePath : P2Constants.METADATA_FILE_PATHS )
+        for ( final String metadataFilePath : P2Constants.METADATA_FILE_PATHS )
         {
             getLogger().debug(
                 "isRemoteStorageReachable: RepositoryId=" + getId() + ": Trying to access " + metadataFilePath );
@@ -630,7 +631,7 @@ public class P2ProxyRepository
                     return true;
                 }
             }
-            catch ( Exception e )
+            catch ( final Exception e )
             {
                 getLogger().debug(
                     "isRemoteStorageReachable: RepositoryId=" + getId() + ": Caught exception while trying to access "
@@ -646,7 +647,7 @@ public class P2ProxyRepository
         return getExternalConfiguration( false ).getArtifactMaxAge();
     }
 
-    public void setArtifactMaxAge( int maxAge )
+    public void setArtifactMaxAge( final int maxAge )
     {
         getExternalConfiguration( true ).setArtifactMaxAge( maxAge );
     }
@@ -656,13 +657,13 @@ public class P2ProxyRepository
         return getExternalConfiguration( false ).getMetadataMaxAge();
     }
 
-    public void setMetadataMaxAge( int metadataMaxAge )
+    public void setMetadataMaxAge( final int metadataMaxAge )
     {
         getExternalConfiguration( true ).setMetadataMaxAge( metadataMaxAge );
     }
 
     @Override
-    public boolean isOld( StorageItem item )
+    public boolean isOld( final StorageItem item )
     {
         if ( P2ProxyMetadataSource.isP2MetadataItem( item.getPath() ) )
         {
@@ -679,7 +680,7 @@ public class P2ProxyRepository
         return getExternalConfiguration( false ).getChecksumPolicy();
     }
 
-    public void setChecksumPolicy( ChecksumPolicy checksumPolicy )
+    public void setChecksumPolicy( final ChecksumPolicy checksumPolicy )
     {
         getExternalConfiguration( true ).setChecksumPolicy( checksumPolicy );
     }
