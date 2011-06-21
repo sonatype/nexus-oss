@@ -10,7 +10,6 @@ package org.sonatype.nexus.plugins.p2.repository.updatesite;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
@@ -23,24 +22,21 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.codehaus.tycho.model.Feature;
-import org.codehaus.tycho.model.IFeatureRef;
-import org.codehaus.tycho.model.PluginRef;
-import org.codehaus.tycho.model.UpdateSite;
-import org.codehaus.tycho.model.UpdateSite.FeatureRef;
+import org.eclipse.tycho.model.Feature;
+import org.eclipse.tycho.model.FeatureRef;
+import org.eclipse.tycho.model.PluginRef;
+import org.eclipse.tycho.model.UpdateSite;
+import org.eclipse.tycho.model.UpdateSite.SiteFeatureRef;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
 import org.sonatype.nexus.plugins.p2.repository.metadata.AbstractP2MetadataSource;
-import org.sonatype.nexus.plugins.p2.repository.util.P2Util;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
@@ -69,8 +65,7 @@ import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-
-import com.sonatype.nexus.p2.facade.P2Facade;
+import org.sonatype.p2.bridge.Publisher;
 
 @Component( role = Repository.class, hint = UpdateSiteRepository.ROLE_HINT, instantiationStrategy = "per-lookup", description = "Eclipse Update Site" )
 public class UpdateSiteRepository
@@ -89,24 +84,15 @@ public class UpdateSiteRepository
     @Requirement
     private NexusScheduler scheduler;
 
-    @Requirement
-    private P2Facade p2;
-
     @Requirement( role = UpdateSiteRepositoryConfigurator.class )
     private UpdateSiteRepositoryConfigurator updateSiteRepositoryConfigurator;
+
+    @Requirement
+    private Publisher publisher;
 
     private MutableProxyRepositoryKind repositoryKind;
 
     private String overwriteRemoteUrl;
-
-    @Override
-    public void initialize()
-        throws InitializationException
-    {
-        super.initialize();
-
-        p2.initializeP2( P2Util.getPluginCoordinates() );
-    }
 
     private static final WalkerFilter filter = new WalkerFilter()
     {
@@ -203,13 +189,13 @@ public class UpdateSiteRepository
             throw new StorageException( "Could not read site.xml", e );
         }
 
-        final List<FeatureRef> features = site.getFeatures();
+        final List<SiteFeatureRef> features = site.getFeatures();
 
         getLogger().info( "Mirroring " + features.size() + " features from update site " + getName() );
 
         final Set<String> mirrored = new HashSet<String>();
 
-        for ( final IFeatureRef feature : features )
+        for ( final FeatureRef feature : features )
         {
             mirrorFeature( site, feature, mirrored );
         }
@@ -254,7 +240,7 @@ public class UpdateSiteRepository
             getLogger().warn( "Unexpected IOException", e );
         }
 
-        p2.generateSiteMetadata( baseDir, metadataDir, getName() );
+        publisher.generateUpdateSite( baseDir, metadataDir.toURI() );
 
         try
         {
@@ -297,7 +283,7 @@ public class UpdateSiteRepository
      * @throws StorageException
      * @throws IllegalOperationException
      */
-    private void mirrorFeature( final UpdateSite site, final IFeatureRef featureRef, final Set<String> mirrored )
+    private void mirrorFeature( final UpdateSite site, final FeatureRef featureRef, final Set<String> mirrored )
         throws StorageException, IllegalOperationException
     {
         final ResourceStoreRequest request = createResourceStoreRequest( featureRef );
@@ -327,7 +313,7 @@ public class UpdateSiteRepository
         if ( feature != null )
         {
             final List<PluginRef> includedPlugins = feature.getPlugins();
-            final List<Feature.FeatureRef> includedFeatures = feature.getIncludedFeatures();
+            final List<FeatureRef> includedFeatures = feature.getIncludedFeatures();
 
             getLogger().debug(
                 featureRef + " includes " + includedFeatures.size() + " features and " + includedPlugins.size()
@@ -338,7 +324,7 @@ public class UpdateSiteRepository
                 mirrorPlugin( site, plugin, mirrored );
             }
 
-            for ( final IFeatureRef includedFeature : includedFeatures )
+            for ( final FeatureRef includedFeature : includedFeatures )
             {
                 mirrorFeature( site, includedFeature, mirrored );
             }
@@ -364,7 +350,7 @@ public class UpdateSiteRepository
      * @param mirrored
      * @return
      */
-    private Feature mirrorAbsoluteFeature( final String absoluteUrl, final IFeatureRef featureRef,
+    private Feature mirrorAbsoluteFeature( final String absoluteUrl, final FeatureRef featureRef,
                                            final ResourceStoreRequest request, final Set<String> mirrored )
     {
         try
@@ -387,19 +373,7 @@ public class UpdateSiteRepository
             getLogger().warn( "Could not download feature " + featureRef + " referenced by update site " + getName() );
             return null;
         }
-        catch ( final MalformedURLException e )
-        {
-            getLogger().warn( "Could not download feature " + featureRef + " referenced by update site " + getName(), e );
-        }
-        catch ( final IOException e )
-        {
-            getLogger().warn( "Could not download feature " + featureRef + " referenced by update site " + getName(), e );
-        }
-        catch ( final XmlPullParserException e )
-        {
-            getLogger().warn( "Could not download feature " + featureRef + " referenced by update site " + getName(), e );
-        }
-        catch ( final ItemNotFoundException e )
+        catch ( final Exception e )
         {
             getLogger().warn( "Could not download feature " + featureRef + " referenced by update site " + getName(), e );
         }
@@ -416,7 +390,7 @@ public class UpdateSiteRepository
      * @param mirrored
      * @return
      */
-    private Feature mirrorRelativeFeature( final IFeatureRef featureRef, final ResourceStoreRequest request,
+    private Feature mirrorRelativeFeature( final FeatureRef featureRef, final ResourceStoreRequest request,
                                            final Set<String> mirrored )
     {
         try
@@ -621,12 +595,12 @@ public class UpdateSiteRepository
         return new ResourceStoreRequest( sb.toString() );
     }
 
-    private ResourceStoreRequest createResourceStoreRequest( final IFeatureRef featureRef )
+    private ResourceStoreRequest createResourceStoreRequest( final FeatureRef featureRef )
     {
         String urlStr = null;
-        if ( featureRef instanceof UpdateSite.FeatureRef )
+        if ( featureRef instanceof SiteFeatureRef )
         {
-            urlStr = ( (UpdateSite.FeatureRef) featureRef ).getUrl();
+            urlStr = ( (SiteFeatureRef) featureRef ).getUrl();
         }
 
         if ( urlStr != null )
@@ -667,7 +641,7 @@ public class UpdateSiteRepository
         return null;
     }
 
-    private ResourceStoreRequest generateResourceStoreRequest( final IFeatureRef featureRef )
+    private ResourceStoreRequest generateResourceStoreRequest( final FeatureRef featureRef )
     {
         final StringBuilder sb = new StringBuilder();
         sb.append( DEFAULT_FEATURES_DIR );

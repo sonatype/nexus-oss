@@ -255,14 +255,12 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
         throws StorageException, ItemNotFoundException
     {
         final Throwable cause = e.getCause();
-        // hm, we don't have this class here?
-        if ( cause.getClass().getName().equals( "org.eclipse.equinox.internal.provisional.p2.core.ProvisionException" ) )
+        // TODO This must be possible to be done in some other way
+        if ( cause.getMessage().startsWith( "HTTP Server 'Service Unavailable'" )
+            || cause.getCause() instanceof ConnectException )
         {
-            if ( cause.getMessage().startsWith( "HTTP Server" ) || cause.getCause() instanceof ConnectException )
-            {
-                // P2.getRemoteRepositoryItem server error
-                return doRetrieveLocalItem( request, repository );
-            }
+            // P2.getRemoteRepositoryItem server error
+            return doRetrieveLocalItem( request, repository );
         }
         throw e;
     }

@@ -9,13 +9,14 @@ package org.sonatype.nexus.plugins.p2.repository.proxy;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -25,7 +26,6 @@ import org.sonatype.nexus.plugins.p2.repository.metadata.AbstractP2MetadataSourc
 import org.sonatype.nexus.plugins.p2.repository.metadata.Artifacts;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Content;
 import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataSource;
-import org.sonatype.nexus.plugins.p2.repository.util.P2Util;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -41,92 +41,95 @@ import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationS
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
-
-import com.sonatype.nexus.p2.facade.P2Facade;
+import org.sonatype.p2.bridge.ArtifactRepository;
+import org.sonatype.p2.bridge.MetadataRepository;
 
 @Component( role = P2MetadataSource.class, hint = "proxy" )
 public class P2ProxyMetadataSource
     extends AbstractP2MetadataSource<P2ProxyRepository>
-    implements Initializable
 {
 
     @Requirement
-    private P2Facade p2;
+    private ArtifactRepository artifactRepository;
+
+    @Requirement
+    private MetadataRepository metadataRepository;
 
     public static final String ATTR_MIRRORS_URL = P2Constants.PROP_MIRRORS_URL;
 
     public static final String CTX_MIRRORS_URL = P2Constants.PROP_MIRRORS_URL;
 
-    public void initialize()
-        throws InitializationException
-    {
-        p2.initializeP2( P2Util.getPluginCoordinates() );
-    }
-
     @Override
-    protected Xpp3Dom doRetrieveArtifactsDom( Map<String, Object> context, P2ProxyRepository repository )
+    protected Xpp3Dom doRetrieveArtifactsDom( final Map<String, Object> context, final P2ProxyRepository repository )
         throws StorageException, ItemNotFoundException
     {
         Xpp3Dom dom;
 
         try
         {
-            File file = File.createTempFile( "artifacts", ".xml" );
-            File artifactMappingsXmlFile = File.createTempFile( "p2proxy.artifact-mappings", ".xml" );
+            final File artifactRepositoryDir = File.createTempFile( "artifacts", "" );
+            artifactRepositoryDir.delete();
+            artifactRepositoryDir.mkdirs();
+
+            final File artifactMappingsXmlFile = File.createTempFile( "p2proxy.artifact-mappings", ".xml" );
             try
             {
                 String username = null;
                 String password = null;
-                RemoteAuthenticationSettings remoteAuthenticationSettings =
+                final RemoteAuthenticationSettings remoteAuthenticationSettings =
                     repository.getRemoteAuthenticationSettings();
                 if ( remoteAuthenticationSettings instanceof UsernamePasswordRemoteAuthenticationSettings )
                 {
-                    UsernamePasswordRemoteAuthenticationSettings upras =
+                    final UsernamePasswordRemoteAuthenticationSettings upras =
                         (UsernamePasswordRemoteAuthenticationSettings) remoteAuthenticationSettings;
                     username = upras.getUsername();
                     password = upras.getPassword();
                 }
 
-                p2.getRepositoryArtifacts( getRemoteUrl( repository ), username, password, file,
-                    artifactMappingsXmlFile );
+                artifactRepository.createProxyRepository( new URI( getRemoteUrl( repository ) ), username, password,
+                    artifactRepositoryDir.toURI(), artifactMappingsXmlFile );
 
-                dom = Xpp3DomBuilder.build( new XmlStreamReader( file ) );
+                dom = Xpp3DomBuilder.build( new XmlStreamReader( new File( artifactRepositoryDir, "artifacts.xml" ) ) );
                 storeItemFromFile( P2Constants.ARTIFACT_MAPPINGS_XML, artifactMappingsXmlFile, repository );
                 repository.initArtifactMappingsAndMirrors();
             }
+            catch ( final URISyntaxException e )
+            {
+                throw new StorageException( e );
+            }
             finally
             {
-                file.delete();
+                FileUtils.deleteDirectory( artifactRepositoryDir );
                 artifactMappingsXmlFile.delete();
             }
         }
-        catch ( XmlPullParserException e )
+        catch ( final XmlPullParserException e )
         {
             throw new StorageException( e );
         }
-        catch ( UnsupportedStorageOperationException e )
+        catch ( final UnsupportedStorageOperationException e )
         {
             throw new StorageException( e );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new StorageException( e );
         }
 
-        Artifacts artifacts = new Artifacts( dom );
+        final Artifacts artifacts = new Artifacts( dom );
 
         artifacts.setRepositoryAttributes( getName( repository ) );
 
-        LinkedHashMap<String, String> properties = artifacts.getProperties();
+        final LinkedHashMap<String, String> properties = artifacts.getProperties();
 
-        String mirrorsURL = properties.get( P2Constants.PROP_MIRRORS_URL );
+        final String mirrorsURL = properties.get( P2Constants.PROP_MIRRORS_URL );
         if ( mirrorsURL != null )
         {
             context.put( CTX_MIRRORS_URL, mirrorsURL );
         }
 
         properties.remove( P2Constants.PROP_MIRRORS_URL );
-        boolean compressed = P2Constants.ARTIFACTS_PATH.equals( P2Constants.ARTIFACTS_JAR );
+        final boolean compressed = P2Constants.ARTIFACTS_PATH.equals( P2Constants.ARTIFACTS_JAR );
         properties.put( P2Constants.PROP_COMPRESSED, Boolean.toString( compressed ) );
         // properties.put( P2Facade.PROP_REPOSITORY_ID, getId( repository ) );
         artifacts.setProperties( properties );
@@ -134,59 +137,67 @@ public class P2ProxyMetadataSource
         return artifacts.getDom();
     }
 
-    private String getRemoteUrl( P2ProxyRepository repository )
+    private String getRemoteUrl( final P2ProxyRepository repository )
     {
         return ( repository ).getRemoteUrl();
     }
 
     @Override
-    protected Xpp3Dom doRetrieveContentDom( Map<String, Object> context, P2ProxyRepository repository )
+    protected Xpp3Dom doRetrieveContentDom( final Map<String, Object> context, final P2ProxyRepository repository )
         throws StorageException, ItemNotFoundException
     {
         Xpp3Dom dom;
 
         try
         {
-            File file = File.createTempFile( "content", ".xml" );
+            final File metadataRepositoryDir = File.createTempFile( "content", "" );
+            metadataRepositoryDir.delete();
+            metadataRepositoryDir.mkdirs();
+
             try
             {
                 String username = null;
                 String password = null;
-                RemoteAuthenticationSettings remoteAuthenticationSettings =
+                final RemoteAuthenticationSettings remoteAuthenticationSettings =
                     repository.getRemoteAuthenticationSettings();
                 if ( remoteAuthenticationSettings instanceof UsernamePasswordRemoteAuthenticationSettings )
                 {
-                    UsernamePasswordRemoteAuthenticationSettings upras =
+                    final UsernamePasswordRemoteAuthenticationSettings upras =
                         (UsernamePasswordRemoteAuthenticationSettings) remoteAuthenticationSettings;
                     username = upras.getUsername();
                     password = upras.getPassword();
                 }
 
-                p2.getRepositoryContent( getRemoteUrl( repository ), username, password, file );
+                metadataRepository.createProxyRepository( new URI( getRemoteUrl( repository ) ), username, password,
+                    metadataRepositoryDir.toURI() );
 
-                dom = Xpp3DomBuilder.build( new XmlStreamReader( file ) );
+                dom = Xpp3DomBuilder.build( new XmlStreamReader( new File( metadataRepositoryDir, "content.xml" ) ) );
+            }
+            catch ( final URISyntaxException e )
+            {
+                throw new StorageException( e );
             }
             finally
             {
-                file.delete();
+                FileUtils.deleteDirectory( metadataRepositoryDir );
             }
         }
-        catch ( XmlPullParserException e )
+        catch ( final XmlPullParserException e )
         {
             throw new StorageException( e );
         }
-        catch ( IOException e )
+        catch ( final IOException e )
         {
             throw new StorageException( e );
         }
 
-        Content content = new Content( dom );
+        final Content content = new Content( dom );
 
         content.setRepositoryAttributes( getName( repository ) );
 
-        LinkedHashMap<String, String> properties = content.getProperties();
+        final LinkedHashMap<String, String> properties = content.getProperties();
         properties.remove( P2Constants.PROP_MIRRORS_URL );
-        boolean compressed = P2Constants.CONTENT_PATH.equals( P2Constants.CONTENT_JAR );
+        final boolean compressed = P2Constants.CONTENT_PATH.equals( P2Constants.CONTENT_JAR );
         properties.put( P2Constants.PROP_COMPRESSED, Boolean.toString( compressed ) );
         // properties.put( P2Facade.PROP_REPOSITORY_ID, getId( repository ) );
         content.setProperties( properties );
@@ -195,23 +206,25 @@ public class P2ProxyMetadataSource
     }
 
     @Override
-    protected StorageItem doRetrieveRemoteItem( Repository repository, String path, Map<String, Object> context )
+    protected StorageItem doRetrieveRemoteItem( final Repository repository, final String path,
+                                                final Map<String, Object> context )
         throws ItemNotFoundException, RemoteAccessException, StorageException
     {
-        P2ProxyRepository repo = (P2ProxyRepository) repository;
+        final P2ProxyRepository repo = (P2ProxyRepository) repository;
         // always return metadata from canonical url
         return getRemoteStorage( repo ).retrieveItem( repo, new ResourceStoreRequest( path ), getRemoteUrl( repo ) );
     }
 
-    public RemoteRepositoryStorage getRemoteStorage( P2ProxyRepository repo )
+    public RemoteRepositoryStorage getRemoteStorage( final P2ProxyRepository repo )
     {
         return ( repo ).getRemoteStorage();
     }
 
     @Override
-    protected void setItemAttributes( StorageFileItem item, Map<String, Object> context, P2ProxyRepository repository )
+    protected void setItemAttributes( final StorageFileItem item, final Map<String, Object> context,
+                                      final P2ProxyRepository repository )
     {
-        String mirrorsURL = (String) context.get( CTX_MIRRORS_URL );
+        final String mirrorsURL = (String) context.get( CTX_MIRRORS_URL );
         if ( mirrorsURL != null )
         {
             item.getAttributes().put( ATTR_MIRRORS_URL, mirrorsURL );
@@ -219,24 +232,24 @@ public class P2ProxyMetadataSource
     }
 
     @Override
-    protected boolean isArtifactsOld( AbstractStorageItem artifactsItem, P2ProxyRepository repository )
+    protected boolean isArtifactsOld( final AbstractStorageItem artifactsItem, final P2ProxyRepository repository )
         throws StorageException
     {
         return repository.isOld( artifactsItem );
     }
 
     @Override
-    protected boolean isContentOld( AbstractStorageItem contentItem, P2ProxyRepository repository )
+    protected boolean isContentOld( final AbstractStorageItem contentItem, final P2ProxyRepository repository )
         throws StorageException
     {
         return repository.isOld( contentItem );
     }
 
-    private void storeItemFromFile( String path, File file, P2ProxyRepository repository )
+    private void storeItemFromFile( final String path, final File file, final P2ProxyRepository repository )
         throws StorageException, UnsupportedStorageOperationException
     {
-        ContentLocator content = new FileContentLocator( file, "text/xml" );
-        DefaultStorageFileItem storageItem =
+        final ContentLocator content = new FileContentLocator( file, "text/xml" );
+        final DefaultStorageFileItem storageItem =
             new DefaultStorageFileItem( repository, new ResourceStoreRequest( path ), true /* isReadable */,
                 false /* isWritable */, content );
         getLocalStorage( repository ).storeItem( repository, storageItem );

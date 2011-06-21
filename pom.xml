@@ -32,7 +32,6 @@
     <tycho-artifacts.version>0.6.0</tycho-artifacts.version>
   </properties>
 
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -44,6 +43,98 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-proxy</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.tycho</groupId>
+      <artifactId>tycho-metadata-model</artifactId>
+      <version>0.12.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-p2-bridge-plugin</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <type>nexus-plugin</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.p2.bridge</groupId>
+      <artifactId>org.sonatype.p2.bridge.api</artifactId>
+      <version>1.0.8-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit-dep</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>1.3.RC2</version>
+      <scope>test</scope>
+    </dependency>
+      <!-- core To override any version from transitive dependencies. -->
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
+      <version>1.3.RC2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+      <version>${nexus.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-jetty-testsuite</artifactId>
+      <version>1.6</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>plexus-container-default</artifactId>
+          <groupId>org.codehaus.plexus</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-test-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <version>${nexus.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>plexus-container-default</artifactId>
+          <groupId>org.codehaus.plexus</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.maven.shared</groupId>
+      <artifactId>maven-verifier</artifactId>
+      <version>1.3-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
 
   <build>
     <plugins>
@@ -173,224 +264,19 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.2</version>
+        <version>1.4</version>
         <extensions>true</extensions>
-        <configuration>
-          <assemblyDescriptor>src/main/assemble/bundle.xml</assemblyDescriptor>
-        </configuration>
         <dependencies>
           <dependency>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.2</version>
+            <version>1.4</version>
           </dependency>
         </dependencies>
       </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.1</version>
-      </plugin>
-
     </plugins>
   </build>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-docs</artifactId>
-      <version>1.19</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-beanutils</groupId>
-          <artifactId>commons-beanutils</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core</artifactId>
-      <version>1.20</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>commons-logging</artifactId>
-          <groupId>commons-logging</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>commons-beanutils</artifactId>
-          <groupId>commons-beanutils</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>tools</artifactId>
-          <groupId>com.sun</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-proxy</artifactId>
-      <version>${nexus.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-app</artifactId>
-      <version>${nexus.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-rest-api</artifactId>
-      <version>${nexus.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sonatype.components</groupId>
-      <artifactId>nexus-p2-facade</artifactId>
-      <version>1.5.0</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>org.sonatype.tycho.p2.maven.repository</artifactId>
-          <groupId>org.sonatype.tycho</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.tycho</groupId>
-      <artifactId>tycho-osgi-components</artifactId>
-      <version>${tycho-artifacts.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>maven-core</artifactId>
-          <groupId>org.apache.maven</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>maven-plugin-api</artifactId>
-          <groupId>org.apache.maven</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>plexus-archiver</artifactId>
-          <groupId>org.codehaus.plexus</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.tycho</groupId>
-      <artifactId>tycho-p2-facade</artifactId>
-      <version>${tycho-artifacts.version}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>maven-compat</artifactId>
-          <groupId>org.apache.maven</groupId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.sonatype.components</groupId>
-      <artifactId>nexus-p2-runtime</artifactId>
-      <version>1.5.0</version>
-      <type>zip</type>
-    </dependency>
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <version>4.8.2</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-      <version>1.3.RC2</version>
-      <scope>test</scope>
-    </dependency>
-      <!-- core To override any version from transitive dependencies. -->
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <version>1.3.RC2</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
-      <version>${nexus.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty-testsuite</artifactId>
-      <version>1.6</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>plexus-container-default</artifactId>
-          <groupId>org.codehaus.plexus</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-test-api</artifactId>
-      <version>${nexus.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-harness-launcher</artifactId>
-      <version>${nexus.version}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>plexus-container-default</artifactId>
-          <groupId>org.codehaus.plexus</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.maven.shared</groupId>
-      <artifactId>maven-verifier</artifactId>
-      <version>1.3-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-    
-  </dependencies>
 
   <profiles>
     <profile>

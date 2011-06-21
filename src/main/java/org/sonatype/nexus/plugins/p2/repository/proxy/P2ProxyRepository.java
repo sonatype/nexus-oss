@@ -344,7 +344,7 @@ public class P2ProxyRepository
     }
 
     private AbstractStorageItem getMirrorsItemRemote( String mirrorsURL )
-        throws MalformedURLException, RemoteAccessException, StorageException, ItemNotFoundException
+        throws MalformedURLException, RemoteAccessException, RemoteStorageException, ItemNotFoundException
     {
         URL url = new URL( mirrorsURL );
 
