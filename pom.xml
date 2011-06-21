@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>10</version>
+  </parent>
+
+  <groupId>org.sonatype.nexus.plugins</groupId>
+  <artifactId>nexus-p2-bridge-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>nexus-plugin</packaging>
+
+  <name>Nexus :: Plugin :: P2 Bridge</name>
+
+  <scm>
+    <connection>scm:git:git@github.com/sonatype/nexus-p2-bridge-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-p2-bridge-plugin.git</developerConnection>
+    <url>http://github.com/sonatype/nexus-p2-bridge-plugin</url>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <nexus.version>1.9.2-INSIGHT-SNAPSHOT</nexus.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-bean</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.1</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.p2.bridge</groupId>
+      <artifactId>eclipse-bridge</artifactId>
+      <version>1.0.8-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.p2.bridge</groupId>
+      <artifactId>org.sonatype.p2.bridge.api</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-api</artifactId>
+      <version>${nexus.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-manager</artifactId>
+      <version>${nexus.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+  </dependencies>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-runtime-platform</artifactId>
+        <version>${nexus.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>2.0.5</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.p2.bridge</groupId>
+        <artifactId>org.sonatype.p2.bridge.api</artifactId>
+        <version>1.0.8-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.p2.bridge</groupId>
+        <artifactId>org.sonatype.p2.bridge.model</artifactId>
+        <version>1.0.8-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.p2.bridge</groupId>
+        <artifactId>org.sonatype.p2.bridge.impl</artifactId>
+        <version>1.0.8-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.p2.bridge</groupId>
+        <artifactId>p2-runtime</artifactId>
+        <version>1.0.8-SNAPSHOT</version>
+        <type>zip</type>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.sonatype.p2.bridge</groupId>
+                  <artifactId>org.sonatype.p2.bridge.api</artifactId>
+                  <outputDirectory>${project.build.directory}/dependency/org.sonatype.p2.bridge.api</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.p2.bridge</groupId>
+                  <artifactId>org.sonatype.p2.bridge.model</artifactId>
+                  <outputDirectory>${project.build.directory}/dependency/org.sonatype.p2.bridge.model</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.p2.bridge</groupId>
+                  <artifactId>p2-runtime</artifactId>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.directory}/dependency/p2-runtime</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy</id>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.sonatype.p2.bridge</groupId>
+                  <artifactId>org.sonatype.p2.bridge.impl</artifactId>
+                  <outputDirectory>${project.build.directory}/dependency/bundles</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <include>org.sonatype.p2.bridge:org.sonatype.p2.bridge.api</include>
+                  <include>org.sonatype.p2.bridge:org.sonatype.p2.bridge.model</include>
+                </includes>
+              </artifactSet>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <resource>META-INF/sisu/javax.inject.Named</resource>
+                </transformer>
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <version>1.4</version>
+        <extensions>true</extensions>
+        <configuration>
+          <assemblyDescriptor>src/main/assemble/bundle.xml</assemblyDescriptor>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>app-lifecycle-nexus</artifactId>
+            <version>1.4</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
