@@ -64,12 +64,12 @@ public class P2MetadataEventsInspector
 
     private void onItemAdded( final RepositoryItemEvent event )
     {
-        p2RepositoryGenerator.updateP2Artifacts( event.getItem() );
+        p2RepositoryGenerator.updateP2Metadata( event.getItem() );
     }
 
     private void onItemRemoved( final RepositoryItemEvent event )
     {
-        p2RepositoryGenerator.removeP2Artifacts( event.getItem() );
+        p2RepositoryGenerator.removeP2Metadata( event.getItem() );
     }
 
     private static boolean isP2ContentXML( final StorageItem item )
