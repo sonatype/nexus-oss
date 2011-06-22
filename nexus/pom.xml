@@ -599,8 +599,8 @@
       <!-- Various commonly used deps -->
       <dependency>
         <groupId>com.google.guava</groupId>
-        <artifactId>guava-collections</artifactId>
-        <version>r03</version>
+        <artifactId>guava</artifactId>
+        <version>r09</version>
         <scope>compile</scope>
         <type>jar</type>
       </dependency>
