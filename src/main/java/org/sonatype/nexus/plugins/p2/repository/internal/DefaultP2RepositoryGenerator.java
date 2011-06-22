@@ -73,4 +73,26 @@ public class DefaultP2RepositoryGenerator
         logger.debug( "Updating P2 repository artifacts (remove) for [{}:{}]", item.getRepositoryId(), item.getPath() );
     }
 
+    @Override
+    public void updateP2Metadata( final StorageItem item )
+    {
+        final P2RepositoryGeneratorConfiguration configuration = getConfiguration( item.getRepositoryId() );
+        if ( configuration == null )
+        {
+            return;
+        }
+        logger.debug( "Updating P2 repository metadata (update) for [{}:{}]", item.getRepositoryId(), item.getPath() );
+    }
+
+    @Override
+    public void removeP2Metadata( final StorageItem item )
+    {
+        final P2RepositoryGeneratorConfiguration configuration = getConfiguration( item.getRepositoryId() );
+        if ( configuration == null )
+        {
+            return;
+        }
+        logger.debug( "Updating P2 repository metadata (remove) for [{}:{}]", item.getRepositoryId(), item.getPath() );
+    }
+
 }

@@ -15,14 +15,14 @@ import org.sonatype.plexus.appevents.Event;
 
 @Named
 @Singleton
-public class P2ArtifactsEventsInspector
+public class P2MetadataEventsInspector
     implements EventInspector
 {
 
     private final P2RepositoryGenerator p2RepositoryGenerator;
 
     @Inject
-    public P2ArtifactsEventsInspector( final P2RepositoryGenerator p2RepositoryGenerator )
+    public P2MetadataEventsInspector( final P2RepositoryGenerator p2RepositoryGenerator )
     {
         this.p2RepositoryGenerator = p2RepositoryGenerator;
     }
@@ -39,7 +39,7 @@ public class P2ArtifactsEventsInspector
 
         final RepositoryItemEvent event = (RepositoryItemEvent) evt;
 
-        return isP2ArtifactsXML( event.getItem() );
+        return isP2ContentXML( event.getItem() );
     }
 
     @Override
@@ -72,7 +72,7 @@ public class P2ArtifactsEventsInspector
         p2RepositoryGenerator.removeP2Artifacts( event.getItem() );
     }
 
-    private static boolean isP2ArtifactsXML( final StorageItem item )
+    private static boolean isP2ContentXML( final StorageItem item )
     {
         if ( item == null )
         {
@@ -83,7 +83,7 @@ public class P2ArtifactsEventsInspector
         {
             return false;
         }
-        return path.endsWith( "p2Artifacts.xml" );
+        return path.endsWith( "p2Content.xml" );
     }
 
 }

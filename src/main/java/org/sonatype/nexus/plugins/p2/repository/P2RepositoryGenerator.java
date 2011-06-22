@@ -15,4 +15,8 @@ public interface P2RepositoryGenerator
 
     void removeP2Artifacts( StorageItem item );
 
+    void updateP2Metadata( StorageItem item );
+
+    void removeP2Metadata( StorageItem item );
+
 }
