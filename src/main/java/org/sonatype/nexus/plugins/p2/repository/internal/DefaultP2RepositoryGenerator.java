@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGeneratorConfiguration;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 @Named
@@ -48,6 +49,28 @@ public class DefaultP2RepositoryGenerator
     public void removeConfiguration( final P2RepositoryGeneratorConfiguration configuration )
     {
         configurations.remove( configuration.repositoryId() );
+    }
+
+    @Override
+    public void updateP2Artifacts( final StorageItem item )
+    {
+        final P2RepositoryGeneratorConfiguration configuration = getConfiguration( item.getRepositoryId() );
+        if ( configuration == null )
+        {
+            return;
+        }
+        logger.debug( "Updating P2 repository artifacts (update) for [{}:{}]", item.getRepositoryId(), item.getPath() );
+    }
+
+    @Override
+    public void removeP2Artifacts( final StorageItem item )
+    {
+        final P2RepositoryGeneratorConfiguration configuration = getConfiguration( item.getRepositoryId() );
+        if ( configuration == null )
+        {
+            return;
+        }
+        logger.debug( "Updating P2 repository artifacts (remove) for [{}:{}]", item.getRepositoryId(), item.getPath() );
     }
 
 }

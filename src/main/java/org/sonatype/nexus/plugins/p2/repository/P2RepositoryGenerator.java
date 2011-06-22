@@ -1,5 +1,7 @@
 package org.sonatype.nexus.plugins.p2.repository;
 
+import org.sonatype.nexus.proxy.item.StorageItem;
+
 public interface P2RepositoryGenerator
 {
 
@@ -8,5 +10,9 @@ public interface P2RepositoryGenerator
     void removeConfiguration( final P2RepositoryGeneratorConfiguration configuration );
 
     P2RepositoryGeneratorConfiguration getConfiguration( final String repositoryId );
+
+    void updateP2Artifacts( StorageItem item );
+
+    void removeP2Artifacts( StorageItem item );
 
 }
