@@ -259,8 +259,6 @@
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
         </configuration>
       </plugin>
-
-
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
@@ -280,7 +278,7 @@
 
   <profiles>
     <profile>
-      <id>skip-test-harness-tests</id>
+      <id>skipITs</id>
       <build>
         <plugins>
           <plugin>
@@ -309,6 +307,42 @@
             <configuration>
               <testSkip>false</testSkip>
             </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>assembly</id>
+      <activation>
+        <property>
+          <name>!skipAssembly</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.maven.plugins</groupId>
+            <artifactId>maven-sisu-assembler-plugin</artifactId>
+            <version>1.0.7</version>
+            <executions>
+              <execution>
+                <!-- TODO fix this: the phase is set in order to execute the plugin after app-lifecycle-maven-plugin (bundle zip is generated)-->
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>generate</goal>
+                </goals>
+                <configuration>
+                  <alternativeArtifact>
+                    <classifier>bundle</classifier>
+                    <type>zip</type>
+                  </alternativeArtifact>
+                  <useTransitiveDependencies>false</useTransitiveDependencies>
+                  <includeScopes>
+                    <includeScope>provided</includeScope>
+                  </includeScopes>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>

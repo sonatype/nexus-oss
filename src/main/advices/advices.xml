@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<assembly>
+  <advices>
+
+    <advice>
+      <generateAsItIs />
+      <unit>
+        <provides>
+          <provided namespace='org.apache.maven.artifact.type' name='nexus-plugin' version='1.0.0' />
+        </provides>
+      </unit>
+    </advice>
+
+  </advices>
+</assembly>  
