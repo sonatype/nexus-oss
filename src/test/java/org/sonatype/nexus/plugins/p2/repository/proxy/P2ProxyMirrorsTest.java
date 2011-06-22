@@ -15,11 +15,11 @@ import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
-import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -30,7 +30,6 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.security.SecuritySystem;
-
 
 public class P2ProxyMirrorsTest
     extends AbstractNexusTestCase
@@ -97,6 +96,7 @@ public class P2ProxyMirrorsTest
     }
 
     @Test
+    @Ignore
     public void testVerifyBlackList()
         throws AccessDeniedException, IllegalOperationException, ItemNotFoundException, IOException
     {
@@ -138,6 +138,7 @@ public class P2ProxyMirrorsTest
     }
 
     @Test
+    @Ignore
     public void testVerifyBlackListWithCompositeRepo()
         throws AccessDeniedException, IllegalOperationException, ItemNotFoundException, IOException
     {
@@ -149,6 +150,7 @@ public class P2ProxyMirrorsTest
     }
 
     @Test
+    @Ignore
     public void testCompositeRepoWithNoMirrors()
         throws AccessDeniedException, IllegalOperationException, ItemNotFoundException, IOException
     {
