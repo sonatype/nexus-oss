@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 @Named
@@ -48,6 +49,28 @@ public class DefaultP2MetadataGenerator
     public void removeConfiguration( final P2MetadataGeneratorConfiguration configuration )
     {
         configurations.remove( configuration.repositoryId() );
+    }
+
+    @Override
+    public void generateP2Metadata( final StorageItem item )
+    {
+        final P2MetadataGeneratorConfiguration configuration = getConfiguration( item.getRepositoryId() );
+        if ( configuration == null )
+        {
+            return;
+        }
+        logger.debug( "Generate P2 metadata for [{}:{}]", item.getRepositoryId(), item.getPath() );
+    }
+
+    @Override
+    public void removeP2Metadata( final StorageItem item )
+    {
+        final P2MetadataGeneratorConfiguration configuration = getConfiguration( item.getRepositoryId() );
+        if ( configuration == null )
+        {
+            return;
+        }
+        logger.debug( "Removing P2 metadata for [{}:{}]", item.getRepositoryId(), item.getPath() );
     }
 
 }
