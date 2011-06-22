@@ -29,7 +29,11 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
 import org.sonatype.p2.bridge.ArtifactRepository;
+import org.sonatype.p2.bridge.MetadataRepository;
+import org.sonatype.p2.bridge.Publisher;
 import org.sonatype.p2.bridge.model.InstallableArtifact;
+import org.sonatype.p2.bridge.model.InstallableUnit;
+import org.sonatype.p2.bridge.model.InstallableUnitArtifact;
 
 @Named
 @Singleton
@@ -46,12 +50,19 @@ public class DefaultP2MetadataGenerator
 
     private final ArtifactRepository artifactRepository;
 
+    private final MetadataRepository metadataRepository;
+
+    private final Publisher publisher;
+
     @Inject
     public DefaultP2MetadataGenerator( final RepositoryRegistry repositories,
-                                       final ArtifactRepository artifactRepository )
+                                       final ArtifactRepository artifactRepository,
+                                       final MetadataRepository metadataRepository, final Publisher publisher )
     {
         this.repositories = repositories;
         this.artifactRepository = artifactRepository;
+        this.metadataRepository = metadataRepository;
+        this.publisher = publisher;
         configurations = new HashMap<String, P2MetadataGeneratorConfiguration>();
     }
 
@@ -114,6 +125,20 @@ public class DefaultP2MetadataGenerator
             final Collection<InstallableArtifact> artifacts = new ArrayList<InstallableArtifact>();
             artifacts.add( artifact );
 
+            final Collection<InstallableUnit> ius =
+                publisher.generateIUs( true /* generateCapabilities */, true /* generateRequirements */,
+                    true /* generateManifest */, bundle );
+
+            for ( final InstallableUnit iu : ius )
+            {
+                final InstallableUnitArtifact iuArtifact = new InstallableUnitArtifact();
+                iuArtifact.setId( artifact.getId() );
+                iuArtifact.setClassifier( artifact.getClassifier() );
+                iuArtifact.setVersion( artifact.getVersion() );
+
+                iu.addArtifact( iuArtifact );
+            }
+
             File tempP2Repository = null;
             try
             {
@@ -130,6 +155,13 @@ public class DefaultP2MetadataGenerator
                         + "-p2Artifacts.xml";
 
                 storeItemFromFile( p2ArtifactsPath, new File( tempP2Repository, "artifacts.xml" ), repository );
+
+                metadataRepository.write( tempP2Repository.toURI(), ius, bsn, null );
+
+                final String p2ContentPath =
+                    item.getPath().substring( 0, item.getPath().length() - extension.length() - 1 ) + "-p2Content.xml";
+
+                storeItemFromFile( p2ContentPath, new File( tempP2Repository, "content.xml" ), repository );
             }
             finally
             {
