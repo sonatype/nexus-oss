@@ -126,6 +126,13 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-capabilities-plugin</artifactId>
+      <version>${nexus.version}</version>
+      <type>nexus-plugin</type>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
@@ -146,7 +153,6 @@
           <target>1.6</target>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
