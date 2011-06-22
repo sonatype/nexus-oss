@@ -36,10 +36,9 @@ public class MockHelper
 {
     private static final Object lock = new Object();
 
-    private static final HashBiMap<String, MockResponse> mockResponses = new HashBiMap<String, MockResponse>();
+    private static final HashBiMap<String, MockResponse> mockResponses = HashBiMap.create();
 
-    private static final HashBiMap<String, MockListener<Object>> mockListeneres =
-        new HashBiMap<String, MockListener<Object>>();;
+    private static final HashBiMap<String, MockListener<Object>> mockListeneres = HashBiMap.create();
 
     private static final ThreadLocal<List<MockResponse>> responses = new ThreadLocal<List<MockResponse>>();
 

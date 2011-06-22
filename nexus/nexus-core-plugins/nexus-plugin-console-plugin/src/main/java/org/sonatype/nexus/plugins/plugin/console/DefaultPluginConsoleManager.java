@@ -66,7 +66,7 @@ public class DefaultPluginConsoleManager
     public void initialize()
         throws InitializationException
     {
-        docBundles = new LinkedHashMultimap<String, NexusDocumentationBundle>();
+        docBundles = LinkedHashMultimap.create();
 
         for ( NexusResourceBundle rb : resourceBundles )
         {

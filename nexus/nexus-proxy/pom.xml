@@ -127,8 +127,8 @@
       <artifactId>commons-lang</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.code.google-collections</groupId>
-      <artifactId>google-collect</artifactId>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava-collections</artifactId>
     </dependency>
     <!-- Maven -->
     <dependency>

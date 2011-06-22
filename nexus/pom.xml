@@ -598,9 +598,11 @@
 
       <!-- Various commonly used deps -->
       <dependency>
-        <groupId>com.google.code.google-collections</groupId>
-        <artifactId>google-collect</artifactId>
-        <version>snapshot-20080530</version>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava-collections</artifactId>
+        <version>r03</version>
+        <scope>compile</scope>
+        <type>jar</type>
       </dependency>
       <dependency>
         <groupId>javax.servlet</groupId>
