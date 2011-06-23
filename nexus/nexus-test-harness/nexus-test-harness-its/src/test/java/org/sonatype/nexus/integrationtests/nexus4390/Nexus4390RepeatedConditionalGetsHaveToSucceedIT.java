@@ -51,21 +51,37 @@ public class Nexus4390RepeatedConditionalGetsHaveToSucceedIT
 
         // 1st, we do an unconditional GET to get it's timestamp. Unconditional GET is not affected by
         // this bug, it will succeed.
-        final Response response = RequestFacade.sendMessage( servicePath, Method.GET );
-        Assert.assertTrue( response.getStatus().isSuccess() );
-        final Date lastModified = response.getEntity().getModificationDate();
-        response.release();
+        Response response = null;
+        Date lastModified;
+        try
+        {
+            response = RequestFacade.sendMessage( servicePath, Method.GET );
+            Assert.assertTrue( response.getStatus().isSuccess() );
+            lastModified = response.getEntity().getModificationDate();
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
 
         // now, we construct and repeat conditional gets
         final String fullUrl = RequestFacade.toNexusURL( servicePath ).toString();
+        Request req = null;
+        Response res = null;
         for ( int i = 0; i < 10; i++ )
         {
-            final Request req = new Request( Method.GET, fullUrl );
-            req.getConditions().setModifiedSince( lastModified );
-            final Response res = RequestFacade.sendMessage( req, null );
-            // we are fine with 200 OK, 303 Not Modified or whatever, but not with any server side error or 404
-            Assert.assertTrue( res.getStatus().getCode() != 404 && !res.getStatus().isError() );
-            res.release();
+            try
+            {
+                req = new Request( Method.GET, fullUrl );
+                req.getConditions().setModifiedSince( lastModified );
+                res = RequestFacade.sendMessage( req, null );
+                // we are fine with 200 OK, 303 Not Modified or whatever, but not with any server side error or 404
+                Assert.assertTrue( res.getStatus().getCode() != 404 && !res.getStatus().isError() );
+            }
+            finally
+            {
+                RequestFacade.releaseResponse( res );
+            }
         }
 
         // good, we are here, we are fine
