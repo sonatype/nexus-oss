@@ -3,8 +3,11 @@ package org.sonatype.nexus.plugins.p2.repository.internal;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveFile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.Attributes;
@@ -16,18 +19,15 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
+import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
-import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.item.ContentLocator;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
 import org.sonatype.p2.bridge.ArtifactRepository;
 import org.sonatype.p2.bridge.MetadataRepository;
 import org.sonatype.p2.bridge.Publisher;
@@ -40,6 +40,7 @@ import org.sonatype.p2.bridge.model.InstallableUnitArtifact;
 public class DefaultP2MetadataGenerator
     implements P2MetadataGenerator
 {
+    private static final String GENERATED_AT_ATTRIBUTE = "p2Repository.generated.timestamp";
 
     @Inject
     private Logger logger;
@@ -54,12 +55,15 @@ public class DefaultP2MetadataGenerator
 
     private final Publisher publisher;
 
+    private final MimeUtil mimeUtil;
+
     @Inject
-    public DefaultP2MetadataGenerator( final RepositoryRegistry repositories,
+    public DefaultP2MetadataGenerator( final RepositoryRegistry repositories, final MimeUtil mimeUtil,
                                        final ArtifactRepository artifactRepository,
                                        final MetadataRepository metadataRepository, final Publisher publisher )
     {
         this.repositories = repositories;
+        this.mimeUtil = mimeUtil;
         this.artifactRepository = artifactRepository;
         this.metadataRepository = metadataRepository;
         this.publisher = publisher;
@@ -186,14 +190,24 @@ public class DefaultP2MetadataGenerator
         logger.debug( "Removing P2 metadata for [{}:{}]", item.getRepositoryId(), item.getPath() );
     }
 
-    private static void storeItemFromFile( final String path, final File file, final Repository repository )
-        throws LocalStorageException, UnsupportedStorageOperationException
+    private void storeItemFromFile( final String path, final File file, final Repository repository )
+        throws Exception
     {
-        final ContentLocator content = new FileContentLocator( file, "text/xml" );
-        final DefaultStorageFileItem storageItem =
-            new DefaultStorageFileItem( repository, new ResourceStoreRequest( path ), true /* isReadable */,
-                false /* isWritable */, content );
-        repository.getLocalStorage().storeItem( repository, storageItem );
+        InputStream in = null;
+        try
+        {
+            in = new FileInputStream( file );
+            final Map<String, String> attributes = new HashMap<String, String>();
+            attributes.put( GENERATED_AT_ATTRIBUTE, new Date().toString() );
+
+            final ResourceStoreRequest request = new ResourceStoreRequest( path );
+
+            NexusUtils.storeItem( repository, request, in, mimeUtil.getMimeType( request.getRequestPath() ), attributes );
+        }
+        finally
+        {
+            IOUtil.close( in );
+        }
     }
 
 }
