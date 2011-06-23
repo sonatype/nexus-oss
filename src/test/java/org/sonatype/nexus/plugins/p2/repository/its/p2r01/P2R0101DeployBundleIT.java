@@ -17,17 +17,19 @@ public class P2R0101DeployBundleIT
     public void test()
         throws Exception
     {
-        createCapability();
+        createP2MetadataGeneratorCapability();
 
         deployArtifacts( getTestResourceAsFile( "artifacts/jars" ) );
 
         final File p2Artifacts = downloadP2ArtifactsFor( "org.ops4j.base", "ops4j-base-lang", "1.2.3" );
         assertThat( "p2Artifacts has been downloaded", p2Artifacts, is( notNullValue() ) );
         assertThat( "p2Artifacts exists", p2Artifacts.exists(), is( true ) );
+        // TODO compare downloaded file with an expected one
 
         final File p2Content = downloadP2ContentFor( "org.ops4j.base", "ops4j-base-lang", "1.2.3" );
         assertThat( "p2Content has been downloaded", p2Content, is( notNullValue() ) );
         assertThat( "p2Content exists", p2Content.exists(), is( true ) );
+        // TODO compare downloaded file with an expected one
     }
 
 }

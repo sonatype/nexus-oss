@@ -23,7 +23,7 @@ public abstract class AbstractP2MetadataGeneratorIT
         super( repoId );
     }
 
-    protected void createCapability()
+    protected void createP2MetadataGeneratorCapability()
         throws Exception
     {
         final CapabilityResource capability = new CapabilityResource();
@@ -52,17 +52,36 @@ public abstract class AbstractP2MetadataGeneratorIT
         throws IOException
     {
         final File downloadDir = new File( "target/downloads/" + this.getClass().getSimpleName() );
-        final File recipe =
+        final File p2Artifacts =
             downloadArtifact( groupId, artifactId, version, "xml", "p2Artifacts", downloadDir.getPath() );
-        return recipe;
+        return p2Artifacts;
     }
 
     protected File downloadP2ContentFor( final String groupId, final String artifactId, final String version )
         throws IOException
     {
         final File downloadDir = new File( "target/downloads/" + this.getClass().getSimpleName() );
-        final File recipe = downloadArtifact( groupId, artifactId, version, "xml", "p2Content", downloadDir.getPath() );
-        return recipe;
+        final File p2Content =
+            downloadArtifact( groupId, artifactId, version, "xml", "p2Content", downloadDir.getPath() );
+        return p2Content;
+    }
+
+    protected File storageP2ArtifactsFor( final String groupId, final String artifactId, final String version )
+        throws IOException
+    {
+        final File p2Artifacts =
+            new File( new File( nexusWorkDir ), "storage/" + getTestRepositoryId() + "/" + groupId + "/" + artifactId
+                + "/" + version + "/" + artifactId + "-" + version + "-p2Artifacts.xml" );
+        return p2Artifacts;
+    }
+
+    protected File storageP2ContentFor( final String groupId, final String artifactId, final String version )
+        throws IOException
+    {
+        final File p2Artifacts =
+            new File( new File( nexusWorkDir ), "storage/" + getTestRepositoryId() + "/" + groupId + "/" + artifactId
+                + "/" + version + "/" + artifactId + "-" + version + "-p2Content.xml" );
+        return p2Artifacts;
     }
 
 }
