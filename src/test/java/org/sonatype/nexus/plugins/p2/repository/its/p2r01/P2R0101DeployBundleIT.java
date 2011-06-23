@@ -13,6 +13,9 @@ public class P2R0101DeployBundleIT
     extends AbstractP2MetadataGeneratorIT
 {
 
+    /**
+     * When an OSGi bundle is deployed pArtifacts && p2Content are created.
+     */
     @Test
     public void test()
         throws Exception
