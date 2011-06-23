@@ -116,11 +116,8 @@ public class DefaultP2MetadataGenerator
             artifact.setId( bsn );
             artifact.setClassifier( "osgi.bundle" );
             artifact.setVersion( version );
-
-            // TODO set properties as:
-            // <property name="artifact.size" value="3260428"/>
-            // <property name="download.size" value="3260428"/>
-            // <property name="download.md5" value="1023cb71600ee96e5d0ca225d23faa7b"/>
+            artifact.setPath( bundle.getAbsolutePath() );
+            artifact.setRepositoryPath( item.getPath() );
 
             final Collection<InstallableArtifact> artifacts = new ArrayList<InstallableArtifact>();
             artifacts.add( artifact );
@@ -148,7 +145,8 @@ public class DefaultP2MetadataGenerator
                 tempP2Repository.delete();
                 tempP2Repository.mkdirs();
 
-                artifactRepository.write( tempP2Repository.toURI(), artifacts, bsn, null );
+                artifactRepository.write( tempP2Repository.toURI(), artifacts, bsn, null, new String[][] { {
+                    "(classifier=osgi.bundle)", "${repoUrl}/" + item.getPath() + "}" } } );
 
                 final String p2ArtifactsPath =
                     item.getPath().substring( 0, item.getPath().length() - extension.length() - 1 )
@@ -170,8 +168,9 @@ public class DefaultP2MetadataGenerator
         }
         catch ( final Exception e )
         {
-            logger.warn( String.format( "Could not read manifest attributes of [%s:%s] due to %s. Bailing out.",
-                item.getRepositoryId(), item.getPath(), e.getMessage() ) );
+            logger.warn(
+                String.format( "Could not generate p2 metadata of [%s:%s] due to %s. Bailing out.",
+                    item.getRepositoryId(), item.getPath(), e.getMessage() ), e );
             return;
         }
     }
