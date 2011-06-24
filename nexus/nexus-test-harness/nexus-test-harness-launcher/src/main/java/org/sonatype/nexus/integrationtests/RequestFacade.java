@@ -480,6 +480,7 @@ public class RequestFacade
         Context ctx = new Context();
 
         Client client = new Client( ctx, Protocol.HTTP );
+        client.setConnectTimeout( 5000 );
 
         LOG.debug( "sendMessage: " + request.getMethod().getName() + " " + request.getResourceRef().toString() );
         Response response = client.handle( request );
@@ -565,6 +566,7 @@ public class RequestFacade
     {
         HttpClient client = new HttpClient();
         client.getHttpConnectionManager().getParams().setConnectionTimeout( 5000 );
+        client.getHttpConnectionManager().getParams().setSoTimeout( 5000 );
 
         if ( useTestContext )
         {
