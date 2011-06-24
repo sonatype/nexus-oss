@@ -16,10 +16,10 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 
 public class NXCM2812UseCachedMetadataWhenProxyIsUnavailableIT
-    extends AbstractNexusProxyP2IntegrationIT
+    extends AbstractNexusProxyP2IT
 {
 
     public NXCM2812UseCachedMetadataWhenProxyIsUnavailableIT()

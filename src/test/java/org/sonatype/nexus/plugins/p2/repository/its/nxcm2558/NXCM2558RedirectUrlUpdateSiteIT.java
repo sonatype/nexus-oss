@@ -13,14 +13,14 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteMirrorTask;
 import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteMirrorTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class NXCM2558RedirectUrlUpdateSiteIT
-    extends AbstractNexusProxyP2IntegrationIT
+    extends AbstractNexusProxyP2IT
 {
 
     public NXCM2558RedirectUrlUpdateSiteIT()

@@ -13,10 +13,10 @@ import java.net.URL;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 
 public class MECLIPSE1299P2CompositeRepoMergeRulesIT
-    extends AbstractNexusProxyP2IntegrationIT
+    extends AbstractNexusProxyP2IT
 {
     public MECLIPSE1299P2CompositeRepoMergeRulesIT()
     {

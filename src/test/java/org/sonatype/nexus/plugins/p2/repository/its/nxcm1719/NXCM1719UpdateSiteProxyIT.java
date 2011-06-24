@@ -14,14 +14,14 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 public class NXCM1719UpdateSiteProxyIT
-    extends AbstractNexusProxyP2IntegrationIT
+    extends AbstractNexusProxyP2IT
 {
 
     public NXCM1719UpdateSiteProxyIT()

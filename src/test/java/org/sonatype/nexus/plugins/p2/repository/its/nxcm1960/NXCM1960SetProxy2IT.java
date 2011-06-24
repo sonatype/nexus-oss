@@ -14,13 +14,13 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.restlet.data.Status;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
 public class NXCM1960SetProxy2IT
-    extends AbstractNexusProxyP2IntegrationIT
+    extends AbstractNexusProxyP2IT
 {
 
     public NXCM1960SetProxy2IT()

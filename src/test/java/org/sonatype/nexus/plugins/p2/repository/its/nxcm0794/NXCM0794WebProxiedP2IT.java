@@ -15,11 +15,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.jettytestsuite.ProxyServer;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 public class NXCM0794WebProxiedP2IT
-    extends AbstractNexusProxyP2IntegrationIT
+    extends AbstractNexusProxyP2IT
 {
 
     private static String baseProxyURL;

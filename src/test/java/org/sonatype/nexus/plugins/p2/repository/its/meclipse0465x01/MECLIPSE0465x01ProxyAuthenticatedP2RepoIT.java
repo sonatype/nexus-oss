@@ -11,10 +11,10 @@ import java.io.File;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2SecureIntegrationIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2SecureIT;
 
 public class MECLIPSE0465x01ProxyAuthenticatedP2RepoIT
-    extends AbstractNexusProxyP2SecureIntegrationIT
+    extends AbstractNexusProxyP2SecureIT
 {
     public MECLIPSE0465x01ProxyAuthenticatedP2RepoIT()
     {

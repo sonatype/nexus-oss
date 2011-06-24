@@ -12,11 +12,11 @@ import java.io.IOException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 public class MECLIPSE0393P2ProxyCompositeWithMirrorIT
-    extends AbstractNexusProxyP2IntegrationIT
+    extends AbstractNexusProxyP2IT
 {
     public MECLIPSE0393P2ProxyCompositeWithMirrorIT()
     {

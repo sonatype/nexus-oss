@@ -10,10 +10,10 @@ package org.sonatype.nexus.plugins.p2.repository.its.nexus0977;
 import java.net.URL;
 
 import org.junit.Test;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 
 public class NEXUS0977P2GroupOfGroupsIT
-    extends AbstractNexusProxyP2IntegrationIT
+    extends AbstractNexusProxyP2IT
 {
 
     public NEXUS0977P2GroupOfGroupsIT()

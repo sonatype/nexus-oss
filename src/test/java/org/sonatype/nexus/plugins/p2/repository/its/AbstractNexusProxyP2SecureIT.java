@@ -9,11 +9,11 @@ package org.sonatype.nexus.plugins.p2.repository.its;
 
 import org.sonatype.jettytestsuite.ServletServer;
 
-public abstract class AbstractNexusProxyP2SecureIntegrationIT
-    extends AbstractNexusProxyP2IntegrationIT
+public abstract class AbstractNexusProxyP2SecureIT
+    extends AbstractNexusProxyP2IT
 {
 
-    protected AbstractNexusProxyP2SecureIntegrationIT( final String testRepositoryId )
+    protected AbstractNexusProxyP2SecureIT( final String testRepositoryId )
     {
         super( testRepositoryId );
     }

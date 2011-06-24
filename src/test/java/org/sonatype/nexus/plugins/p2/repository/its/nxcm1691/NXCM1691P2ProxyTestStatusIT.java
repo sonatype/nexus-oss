@@ -11,13 +11,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
 public class NXCM1691P2ProxyTestStatusIT
-    extends AbstractNexusProxyP2IntegrationIT
+    extends AbstractNexusProxyP2IT
 {
     public NXCM1691P2ProxyTestStatusIT()
     {

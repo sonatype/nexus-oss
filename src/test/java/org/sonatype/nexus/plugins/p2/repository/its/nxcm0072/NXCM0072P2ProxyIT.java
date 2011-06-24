@@ -11,10 +11,10 @@ import java.io.File;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 
 public class NXCM0072P2ProxyIT
-    extends AbstractNexusProxyP2IntegrationIT
+    extends AbstractNexusProxyP2IT
 {
     public NXCM0072P2ProxyIT()
     {

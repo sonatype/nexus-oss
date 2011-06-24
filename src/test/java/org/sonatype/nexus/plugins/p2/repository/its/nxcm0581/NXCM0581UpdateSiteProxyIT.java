@@ -11,11 +11,11 @@ import java.io.File;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class NXCM0581UpdateSiteProxyIT
-    extends AbstractNexusProxyP2IntegrationIT
+    extends AbstractNexusProxyP2IT
 {
     public NXCM0581UpdateSiteProxyIT()
     {

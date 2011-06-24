@@ -25,7 +25,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.TestProperties;
 
-public abstract class AbstractNexusProxyP2IntegrationIT
+public abstract class AbstractNexusProxyP2IT
     extends AbstractNexusIntegrationTest
 {
     @Override
@@ -43,7 +43,7 @@ public abstract class AbstractNexusProxyP2IntegrationIT
         localStorageDir = TestProperties.getString( "proxy.repo.base.dir" );
     }
 
-    protected AbstractNexusProxyP2IntegrationIT( final String testRepositoryId )
+    protected AbstractNexusProxyP2IT( final String testRepositoryId )
     {
         super( testRepositoryId );
     }

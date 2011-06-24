@@ -6,10 +6,10 @@ import java.net.URL;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IntegrationIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 
 public class NXCM2838MergedMetadataP2GroupIT
-    extends AbstractNexusProxyP2IntegrationIT
+    extends AbstractNexusProxyP2IT
 {
     public NXCM2838MergedMetadataP2GroupIT()
     {
