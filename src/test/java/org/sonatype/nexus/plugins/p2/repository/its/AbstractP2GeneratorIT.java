@@ -1,24 +1,34 @@
 package org.sonatype.nexus.plugins.p2.repository.its;
 
+import static org.sonatype.nexus.plugins.p2.repository.P2Constants.ARTIFACTS_XML;
+import static org.sonatype.nexus.plugins.p2.repository.P2Constants.P2_REPOSITORY_ROOT_PATH;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
+import org.sonatype.nexus.plugins.p2.repository.P2Constants;
+import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
+import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGenerator;
+import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGeneratorConfiguration;
 import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2MetadataGeneratorCapability;
+import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryGeneratorCapability;
 import org.sonatype.nexus.test.utils.CapabilitiesMessageUtil;
 
-public abstract class AbstractP2MetadataGeneratorIT
+public abstract class AbstractP2GeneratorIT
     extends AbstractNexusIntegrationTest
 {
 
-    public AbstractP2MetadataGeneratorIT()
+    private String p2RepositoryGeneratorCapabilityId;
+
+    public AbstractP2GeneratorIT()
     {
     }
 
-    public AbstractP2MetadataGeneratorIT( final String repoId )
+    public AbstractP2GeneratorIT( final String repoId )
     {
         super( repoId );
     }
@@ -27,7 +37,7 @@ public abstract class AbstractP2MetadataGeneratorIT
         throws Exception
     {
         final CapabilityResource capability = new CapabilityResource();
-        capability.setName( AbstractP2MetadataGeneratorIT.class.getName() );
+        capability.setName( P2MetadataGenerator.class.getName() );
         capability.setTypeId( P2MetadataGeneratorCapability.ID );
 
         final CapabilityPropertyResource repoProp = new CapabilityPropertyResource();
@@ -37,6 +47,28 @@ public abstract class AbstractP2MetadataGeneratorIT
         capability.addProperty( repoProp );
 
         CapabilitiesMessageUtil.create( capability );
+    }
+
+    protected void createP2RepositoryGeneratorCapability()
+        throws Exception
+    {
+        final CapabilityResource capability = new CapabilityResource();
+        capability.setName( P2RepositoryGenerator.class.getName() );
+        capability.setTypeId( P2RepositoryGeneratorCapability.ID );
+
+        final CapabilityPropertyResource repoProp = new CapabilityPropertyResource();
+        repoProp.setKey( P2RepositoryGeneratorConfiguration.REPO_OR_GROUP_ID );
+        repoProp.setValue( getTestRepositoryId() );
+
+        capability.addProperty( repoProp );
+
+        p2RepositoryGeneratorCapabilityId = CapabilitiesMessageUtil.create( capability ).getId();
+    }
+
+    protected void removeP2RepositoryGeneratorCapability()
+        throws Exception
+    {
+        CapabilitiesMessageUtil.delete( p2RepositoryGeneratorCapabilityId );
     }
 
     protected void deployArtifact( final String repoId, final File fileToDeploy, final String path )
@@ -82,6 +114,24 @@ public abstract class AbstractP2MetadataGeneratorIT
             new File( new File( nexusWorkDir ), "storage/" + getTestRepositoryId() + "/" + groupId + "/" + artifactId
                 + "/" + version + "/" + artifactId + "-" + version + "-p2Content.xml" );
         return p2Artifacts;
+    }
+
+    protected File storageP2RepositoryArtifactsXML()
+        throws IOException
+    {
+        final File p2Artifacts =
+            new File( new File( nexusWorkDir ), "storage/" + getTestRepositoryId() + P2_REPOSITORY_ROOT_PATH
+                + ARTIFACTS_XML );
+        return p2Artifacts;
+    }
+
+    protected File storageP2RepositoryContentXML()
+        throws IOException
+    {
+        final File p2Content =
+            new File( new File( nexusWorkDir ), "storage/" + getTestRepositoryId() + P2_REPOSITORY_ROOT_PATH
+                + P2Constants.CONTENT_XML );
+        return p2Content;
     }
 
 }

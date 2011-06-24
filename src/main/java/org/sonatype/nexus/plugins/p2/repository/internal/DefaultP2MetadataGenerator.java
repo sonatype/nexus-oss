@@ -149,8 +149,8 @@ public class DefaultP2MetadataGenerator
                 tempP2Repository.delete();
                 tempP2Repository.mkdirs();
 
-                artifactRepository.write( tempP2Repository.toURI(), artifacts, bsn, null, new String[][] { {
-                    "(classifier=osgi.bundle)", "${repoUrl}/" + item.getPath() + "}" } } );
+                artifactRepository.write( tempP2Repository.toURI(), artifacts, bsn, null /** repository properties */
+                , new String[][] { { "(classifier=osgi.bundle)", "${repoUrl}/" + item.getPath() + "}" } } );
 
                 final String p2ArtifactsPath =
                     item.getPath().substring( 0, item.getPath().length() - extension.length() - 1 )
@@ -158,7 +158,8 @@ public class DefaultP2MetadataGenerator
 
                 storeItemFromFile( p2ArtifactsPath, new File( tempP2Repository, "artifacts.xml" ), repository );
 
-                metadataRepository.write( tempP2Repository.toURI(), ius, bsn, null );
+                metadataRepository.write( tempP2Repository.toURI(), ius, bsn, null /** repository properties */
+                );
 
                 final String p2ContentPath =
                     item.getPath().substring( 0, item.getPath().length() - extension.length() - 1 ) + "-p2Content.xml";

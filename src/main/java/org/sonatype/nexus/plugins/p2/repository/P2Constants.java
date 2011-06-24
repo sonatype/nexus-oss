@@ -41,6 +41,11 @@ public interface P2Constants
      */
     String PRIVATE_ROOT = "/.nexus/p2";
 
+    /**
+     * Generated P2 repository root path.
+     */
+    final String P2_REPOSITORY_ROOT_PATH = "/.p2";
+
     String ARTIFACT_MAPPINGS_XML = PRIVATE_ROOT + "/artifact-mappings.xml";
 
     String SITE_XML = "/site.xml";

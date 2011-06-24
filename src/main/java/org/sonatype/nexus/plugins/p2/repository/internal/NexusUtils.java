@@ -8,6 +8,7 @@ import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 
@@ -39,8 +40,28 @@ class NexusUtils
         }
     }
 
-    public static void storeItem( final Repository repository, final ResourceStoreRequest request,
-                                  final InputStream in, final String mimeType, final Map<String, String> userAttributes )
+    static StorageItem retrieveItem( final Repository repository, final String path )
+        throws Exception
+    {
+        final ResourceStoreRequest request = new ResourceStoreRequest( path );
+        final StorageItem item = repository.retrieveItem( request );
+        return item;
+    }
+
+    static StorageItem safeRetrieveItem( final Repository repository, final String path )
+    {
+        try
+        {
+            return retrieveItem( repository, path );
+        }
+        catch ( final Exception e )
+        {
+            return null;
+        }
+    }
+
+    static void storeItem( final Repository repository, final ResourceStoreRequest request, final InputStream in,
+                           final String mimeType, final Map<String, String> userAttributes )
         throws Exception
     {
         final DefaultStorageFileItem fItem =
