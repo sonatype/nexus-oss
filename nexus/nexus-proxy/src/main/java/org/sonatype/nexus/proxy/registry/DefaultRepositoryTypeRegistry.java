@@ -41,8 +41,8 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 
 @Component( role = RepositoryTypeRegistry.class )
 public class DefaultRepositoryTypeRegistry
@@ -74,7 +74,7 @@ public class DefaultRepositoryTypeRegistry
             if ( repositoryTypeDescriptorsMap == null )
             {
                 Multimap<Class<? extends Repository>, RepositoryTypeDescriptor> result =
-                    Multimaps.newArrayListMultimap();
+                    ArrayListMultimap.create();
 
                 // fill in the defaults
                 Class<? extends Repository> role = null;

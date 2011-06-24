@@ -29,7 +29,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExpiredCredentialsException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.codec.Base64;
-import org.apache.shiro.session.UnknownSessionException;
+import org.apache.shiro.session.SessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
@@ -307,7 +307,7 @@ public class NexusHttpAuthenticationFilter
             {
                 getSubject( request, response ).logout();
             }
-            catch ( UnknownSessionException e )
+            catch ( SessionException e )
             {
                 // we need to prevent log spam, just log this as trace
                 getLogger().trace( "Failed to find session for anonymous user.", e );

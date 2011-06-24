@@ -40,6 +40,7 @@ import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.scheduling.TaskUtil;
 
 /**
  * A default Wastebasket implementation.
@@ -247,6 +248,8 @@ public class DefaultFSWastebasket
     protected void removeForever( File file, long age )
         throws IOException
     {
+        TaskUtil.checkInterruption();
+
         if ( file.isFile() )
         {
             if ( isOlderThan( file, age ) )

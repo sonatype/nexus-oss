@@ -47,11 +47,21 @@ public class Nexus4268NewPluginContributedRepositoryTypeRoutingIT
     {
         // note the ending slash! We query the repo root, and slash is there to
         // avoid redirect
-        final String servicePath = "content/repositories/simple/";
+        Response response = null;
 
-        Response response = RequestFacade.sendMessage( servicePath, Method.GET );
+        try
+        {
+            final String servicePath = "content/repositories/simple/";
 
-        Assert.assertEquals( response.getStatus().getCode(), 200, "Repository should be accessible over " + servicePath );
+            response = RequestFacade.sendMessage( servicePath, Method.GET );
+
+            Assert.assertEquals( response.getStatus().getCode(), 200, "Repository should be accessible over "
+                + servicePath );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 
     @Test
@@ -60,10 +70,20 @@ public class Nexus4268NewPluginContributedRepositoryTypeRoutingIT
     {
         // note the ending slash! We query the repo root, and slash is there to
         // avoid redirect
-        final String servicePath = "content/simply/simple/";
+        Response response = null;
 
-        Response response = RequestFacade.sendMessage( servicePath, Method.GET );
+        try
+        {
+            final String servicePath = "content/simply/simple/";
 
-        Assert.assertEquals( response.getStatus().getCode(), 200, "Repository should be accessible over " + servicePath );
+            response = RequestFacade.sendMessage( servicePath, Method.GET );
+
+            Assert.assertEquals( response.getStatus().getCode(), 200, "Repository should be accessible over "
+                + servicePath );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
     }
 }

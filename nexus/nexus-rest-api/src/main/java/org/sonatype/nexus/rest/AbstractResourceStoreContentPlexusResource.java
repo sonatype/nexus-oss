@@ -373,9 +373,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 }
                 else
                 {
-                    res.setStatus( Status.REDIRECTION_NOT_MODIFIED, "The resource is not modified!" );
-
-                    return null;
+                    throw new ResourceException( Status.REDIRECTION_NOT_MODIFIED, "Resource is not modified." );
                 }
             }
             else if ( req.getConditions().getNoneMatch() != null && req.getConditions().getNoneMatch().size() > 0
@@ -766,7 +764,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
      * 
      * @param t
      */
-    protected void handleException( Request req, Response res, Exception t )
+    protected void handleException( final Request req, final Response res, final Exception t )
         throws ResourceException
     {
         // just set this flag to true in any if-else branch you want to see
@@ -835,45 +833,66 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
         finally
         {
-            String message =
-                "Got exception during processing request \"" + req.getMethod() + " " + req.getResourceRef().toString()
-                    + "\": ";
-
-            if ( getLogger().isDebugEnabled() )
+            if ( t instanceof ResourceException )
             {
-                // if DEBUG level, we log _all_ errors with stack traces, except the ItemNotFoundException
+                ResourceException re = (ResourceException) t;
 
-                if ( t instanceof ItemNotFoundException )
+                // See NEXUS-4380
+                // do not spam the log with non-error responses, we need only errors to have logged in case when
+                // exception to be handled is ResourceException
+                if ( re.getStatus() == null || re.getStatus().isError() )
                 {
-                    // we are "muting" item not found exception stack traces, it pollutes the DEBUG logs
-                    getLogger().error( message + t.getMessage() );
-                }
-                else
-                {
-                    // in debug mode, we log _with_ stack trace
-                    getLogger().error( message, t );
+                    handleErrorConstructLogMessage(req, res, t, shouldLogInfoStackTrace);
                 }
             }
             else
             {
-                // if not in DEBUG mode, we obey the flag to decide whether we need to log or not the stack trace
-                if ( ( t instanceof ItemNotFoundException || t instanceof IllegalRequestException )
-                    && !shouldLogInfoStackTrace )
+                handleErrorConstructLogMessage(req, res, t, shouldLogInfoStackTrace);
+            }
+        }
+    }
+
+    protected void handleErrorConstructLogMessage( final Request req, final Response res, final Exception t,
+                                                   final boolean shouldLogInfoStackTrace )
+    {
+        String message =
+            "Got exception during processing request \"" + req.getMethod() + " " + req.getResourceRef().toString()
+                + "\": ";
+
+        if ( getLogger().isDebugEnabled() )
+        {
+            // if DEBUG level, we log _all_ errors with stack traces, except the ItemNotFoundException
+
+            if ( t instanceof ItemNotFoundException )
+            {
+                // we are "muting" item not found exception stack traces, it pollutes the DEBUG logs
+                getLogger().error( message + t.getMessage() );
+            }
+            else
+            {
+                // in debug mode, we log _with_ stack trace
+                getLogger().error( message, t );
+            }
+        }
+        else
+        {
+            // if not in DEBUG mode, we obey the flag to decide whether we need to log or not the stack trace
+            if ( ( t instanceof ItemNotFoundException || t instanceof IllegalRequestException )
+                && !shouldLogInfoStackTrace )
+            {
+                // mute it
+            }
+            else
+            {
+                if ( shouldLogInfoStackTrace )
                 {
-                    // mute it
+                    // in INFO mode, we obey the shouldLogInfoStackTrace flag for serious errors (like internal is)
+                    getLogger().error( message, t );
                 }
                 else
                 {
-                    if ( shouldLogInfoStackTrace )
-                    {
-                        // in INFO mode, we obey the shouldLogInfoStackTrace flag for serious errors (like internal is)
-                        getLogger().error( message, t );
-                    }
-                    else
-                    {
-                        // in INFO mode, we want one liners usually
-                        getLogger().error( message + t.getMessage() );
-                    }
+                    // in INFO mode, we want one liners usually
+                    getLogger().error( message + t.getMessage() );
                 }
             }
         }
@@ -887,7 +906,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
      * @param res
      * @param t
      */
-    public static void challengeIfNeeded( Request req, Response res, AccessDeniedException t )
+    public static void challengeIfNeeded( final Request req, final Response res, final AccessDeniedException t )
     {
         // TODO: a big fat problem here!
         // this makes restlet code tied to Servlet code, and we what is happening here is VERY dirty!

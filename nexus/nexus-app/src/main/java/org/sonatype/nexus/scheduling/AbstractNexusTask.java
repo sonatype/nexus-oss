@@ -33,6 +33,7 @@ import org.sonatype.scheduling.AbstractSchedulerTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskState;
+import org.sonatype.scheduling.TaskUtil;
 
 public abstract class AbstractNexusTask<T>
     extends AbstractSchedulerTask<T>
@@ -45,7 +46,7 @@ public abstract class AbstractNexusTask<T>
 
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
-    
+
     @Requirement
     private FeedRecorder feedRecorder;
 
@@ -157,7 +158,14 @@ public abstract class AbstractNexusTask<T>
 
             result = doRun();
 
-            feedRecorder.systemProcessFinished( prc, getMessage() );
+            if ( TaskUtil.getCurrentProgressListener().isCanceled() )
+            {
+                feedRecorder.systemProcessCanceled( prc, getMessage() );
+            }
+            else
+            {
+                feedRecorder.systemProcessFinished( prc, getMessage() );
+            }
 
             afterRun();
 
@@ -165,6 +173,8 @@ public abstract class AbstractNexusTask<T>
         }
         catch ( Exception e )
         {
+            // this if below is to catch TaskInterrputedEx in tasks that does not handle it
+            // and let it propagate.
             if ( e instanceof TaskInterruptedException )
             {
                 // just return, nothing happened just task cancelled

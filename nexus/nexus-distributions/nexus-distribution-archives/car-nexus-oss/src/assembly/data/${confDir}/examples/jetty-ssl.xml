@@ -37,7 +37,6 @@
             <New class="org.mortbay.jetty.security.SslSelectChannelConnector">
                 <Set name="host">${application-host}</Set>
                 <Set name="port">${application-port}</Set>
-                <Set name="maxIdleTime">30000</Set>
                 <Set name="keystore">/etc/ssl/keystore</Set>
                 <Set name="truststore">/etc/ssl/keystore</Set>
                 <Set name="password">OBF:1v2j1uum1xtv1zej1zer1xtn1uvk1v1v</Set>

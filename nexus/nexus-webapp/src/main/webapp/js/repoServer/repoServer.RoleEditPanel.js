@@ -357,6 +357,10 @@ Sonatype.repoServer.DefaultRoleEditor = function(config) {
     referenceData : Sonatype.repoServer.referenceData.roles,
     dataModifiers : {
       load : {
+        id : function(value, srcObj, fpanel) {
+          fpanel.find('name', 'roleManager')[0].setHiddenRoleIds(value, true);
+          return value;
+        },
         roles : function(arr, srcObj, fpanel) {
           fpanel.find('name', 'roleManager')[0].setSelectedRoleIds(arr, true);
           return arr;
@@ -422,8 +426,9 @@ Sonatype.repoServer.DefaultRoleEditor = function(config) {
         name : 'description',
         allowBlank : true,
         width : this.COMBO_WIDTH
-      }, {
+      },{
         xtype : 'rolemanager',
+        id : 'roleManagerId',
         name : 'roleManager',
         height : 200,
         width : 490,
@@ -484,7 +489,8 @@ Ext.extend(Sonatype.repoServer.DefaultRoleEditor, Sonatype.ext.FormPanel, {
       },
       submitHandler : function(form, action, receivedData) {
         receivedData.mapping = this.payload.data.mapping;
-      }
+      },
+      validationModifiers : { 'roles' : function(error,panel) { Ext.getCmp('roleManagerId').markInvalid(error.msg); } }
     });
 
 Sonatype.Events.addListener('roleViewInit', function(cardPanel, rec, gridPanel) {

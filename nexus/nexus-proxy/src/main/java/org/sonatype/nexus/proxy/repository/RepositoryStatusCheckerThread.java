@@ -19,7 +19,7 @@
 package org.sonatype.nexus.proxy.repository;
 
 import org.apache.commons.lang.time.DurationFormatUtils;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 

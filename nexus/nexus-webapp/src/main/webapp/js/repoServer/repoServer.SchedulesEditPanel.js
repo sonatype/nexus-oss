@@ -978,6 +978,10 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
       // Dump the currently stored data and requery for everything
       reloadAll : function() {
+        var gridSelectModel = this.schedulesGridPanel.getSelectionModel();
+        gridSelectModel.clearSelections();
+        this.formCards.getLayout().setActiveItem(0);
+
         this.runButton.disable();
         this.stopButton.disable();
         this.deleteButton.disable();
@@ -995,7 +999,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               }
             }, this.formCards);
 
-        this.formCards.getLayout().setActiveItem(0);
         // //Enable add button on refresh
         // this.schedulesGridPanel.getTopToolbar().items.get('schedule-add-btn').enable();
       },
@@ -1021,7 +1024,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       },
 
       saveHandler : function(formInfoObj) {
-
         var allValid = false;
         allValid = formInfoObj.formPanel.form.isValid();
 
@@ -1427,6 +1429,41 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             var sortState = this.schedulesDataStore.getSortState();
             this.schedulesDataStore.sort(sortState.field, sortState.direction);
           }
+          
+        // NEXUS-4365: after a save action, panel state is broken: fields are enabled but empty, combo box values are missing.
+        // -> rebuild panel after save action
+        var formLayout = this.formCards.getLayout();
+        var fp = action.options.fpanel;
+        this.formCards.remove(fp.id, true);
+
+        // switch to empty
+        formLayout.setActiveItem(0);
+        
+        var store = this.schedulesGridPanel.getStore();
+        this.schedulesGridPanel.getSelectionModel().selectRow(store.indexOfId(fp.id));
+        // END NEXUS-4365
+    }
+    else if ( action.type == 'sonatypeLoad' )
+    {
+        // NEXUS-4363 disable the south panel after service-type-config-card values are loaded
+        var formPanel = action.options.fpanel;
+        var readableStatus = formPanel.readableStatus;
+        if (!readableStatus || readableStatus == 'Waiting' || readableStatus == '')
+        {
+        //this.disableEditingHeader.setVisible(false);
+        // only layout if change is needed
+        if ( formPanel.disabled )
+        {
+            formPanel.enable();
+            formPanel.doLayout();
+        }
+        }
+        else if (!formPanel.disabled)
+        {
+        //this.disableEditingHeader.setVisible(true);
+        formPanel.disable();
+        formPanel.doLayout();
+        }
         }
       },
 
@@ -1466,7 +1503,15 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         // }
         else if (action.failureType == Ext.form.Action.CONNECT_FAILURE)
         {
-          Sonatype.utils.connectionError(action.response, 'There is an error communicating with the server.')
+          if (action.response.responseText.indexOf("There is no task with ID=") > -1 )
+          {
+            Sonatype.MessageBox.alert('Selected task was removed', 'The selected task was removed by another process and cannot be displayed.');
+            this.reloadAll();
+          }
+          else
+          {
+            Sonatype.utils.connectionError(action.response, 'There is an error communicating with the server.');
+          }
         }
         else if (action.failureType == Ext.form.Action.LOAD_FAILURE)
         {
@@ -1484,6 +1529,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               dataModifiers : modFuncs,
               scope : this
             });
+
       },
 
       rowSelect : function(selectionModel, index, rec) {
@@ -1502,6 +1548,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         }
 
         var readableStatus = rec.data.readableStatus;
+
         if (rec.data.name.substring(0, 4) == 'New ')
         {
           this.runButton.disable();
@@ -1637,17 +1684,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
 
           this.formCards.add(formPanel);
         }
-
-        if (!readableStatus || readableStatus == 'Waiting' || readableStatus == '')
-        {
-          this.disableEditingHeader.setVisible(false);
-          formPanel.enable();
-        }
-        else
-        {
-          this.disableEditingHeader.setVisible(true);
-          formPanel.disable();
-        }
+        // save readable status
+        formPanel.readableStatus = readableStatus;
 
         // always set active
         this.formCards.getLayout().setActiveItem(formPanel);

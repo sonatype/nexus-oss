@@ -268,7 +268,9 @@ public class DefaultMetadataManager
 
         Snapshot current = gavMd.getVersioning().getSnapshot();
 
-        if ( current != null )
+        // NEXUS-4284: we have non null current, with no timestamp field in the wild out there
+        // so current != null is not enough
+        if ( current != null && !StringUtils.isBlank( current.getTimestamp() ) && ( current.getBuildNumber() > 0 ) )
         {
             latest = gav.getBaseVersion();
 

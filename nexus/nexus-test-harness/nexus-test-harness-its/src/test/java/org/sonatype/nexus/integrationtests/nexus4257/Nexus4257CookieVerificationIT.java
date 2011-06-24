@@ -19,15 +19,12 @@
 package org.sonatype.nexus.integrationtests.nexus4257;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -76,6 +73,7 @@ public class Nexus4257CookieVerificationIT
 
         GetMethod getMethod = new GetMethod( url );
         Assert.assertEquals( httpClient.executeMethod( getMethod ), 200 );
+        getMethod.releaseConnection();
 
         Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
         Assert.assertNotNull( sessionCookie, "Session Cookie not set" );
@@ -85,11 +83,13 @@ public class Nexus4257CookieVerificationIT
         // do not set the cookie, expect failure
         GetMethod failedGetMethod = new GetMethod( url );
         Assert.assertEquals( httpClient.executeMethod( failedGetMethod ), 401 );
+        failedGetMethod.releaseConnection();
 
         // set the cookie expect greatness
         httpClient.getState().addCookie( sessionCookie );
         getMethod = new GetMethod( url );
         Assert.assertEquals( httpClient.executeMethod( getMethod ), 200 );
+        getMethod.releaseConnection();
     }
     
     @Test
@@ -114,20 +114,6 @@ public class Nexus4257CookieVerificationIT
 
         Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
         Assert.assertNull( sessionCookie, "Session Cookie is set" );
-//        Assert.assertNotNull( sessionCookie, "Session Cookie not set" );
-//        
-//        httpClient.getState().clear(); // remove cookies, credentials, etc
-//        
-//        // do not set the cookie, expect failure
-//        GetMethod failedGetMethod = new GetMethod( url );
-//        failedGetMethod.addRequestHeader( header );
-//        Assert.assertEquals( httpClient.executeMethod( failedGetMethod ), 401 );
-//
-//        // set the cookie expect failure, the cookie is not valid on the server
-//        httpClient.getState().addCookie( sessionCookie );
-//        getMethod = new GetMethod( url );
-//        getMethod.addRequestHeader( header );
-//        Assert.assertEquals( httpClient.executeMethod( getMethod ), 401 );
     }
 
     private Cookie getSessionCookie( Cookie[] cookies )

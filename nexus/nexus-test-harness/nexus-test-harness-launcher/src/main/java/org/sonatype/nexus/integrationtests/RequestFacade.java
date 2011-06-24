@@ -219,7 +219,6 @@ public class RequestFacade
             response = RequestFacade.sendMessage( serviceURIpart, Method.GET );
             Status status = response.getStatus();
             assertThat( status, notNullValue() );
-
             if ( matcher != null )
             {
                 assertThat( status, matcher );
@@ -510,6 +509,14 @@ public class RequestFacade
             }
         }
 
+        return sendMessage( request, matchers );
+    }
+
+    public static Response sendMessage( final Request request, final org.hamcrest.Matcher<Response> matchers )
+        throws IOException
+    {
+        Preconditions.checkNotNull( request );
+
         // check the text context to see if this is a secure test
         TestContext context = TestContainer.getInstance().getTestContext();
         if ( context.isSecureTest() )
@@ -524,7 +531,9 @@ public class RequestFacade
 
         Client client = new Client( ctx, Protocol.HTTP );
 
-        LOG.debug( "sendMessage: " + method.getName() + " " + url );
+        client.setConnectTimeout( 5000 );
+
+        LOG.debug( "sendMessage: " + request.getMethod().getName() + " " + request.getResourceRef() );
         Response response = client.handle( request );
         if ( matchers != null )
         {
@@ -616,6 +625,7 @@ public class RequestFacade
     {
         HttpClient client = new HttpClient();
         client.getHttpConnectionManager().getParams().setConnectionTimeout( 5000 );
+        client.getHttpConnectionManager().getParams().setSoTimeout( 5000 );
 
         if ( useTestContext )
         {

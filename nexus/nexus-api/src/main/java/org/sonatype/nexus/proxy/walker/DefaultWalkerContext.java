@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
 
 public class DefaultWalkerContext
@@ -123,7 +124,19 @@ public class DefaultWalkerContext
 
     public boolean isStopped()
     {
-        TaskUtil.checkInterruption();
+        try
+        {
+            TaskUtil.checkInterruption();
+        }
+        catch ( TaskInterruptedException e )
+        {
+            if ( stopCause == null )
+            {
+                stopCause = e;
+            }
+
+            running = false;
+        }
 
         return !running;
     }
