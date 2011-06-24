@@ -164,7 +164,7 @@ public class TaskScheduleUtil
             uri += "&taskType=" + taskType;
         }
 
-        Status status = RequestFacade.doGetForStatus( uri );
+        final Status status = RequestFacade.doGetForStatus( uri );
 
         if ( !status.isSuccess() )
         {
@@ -175,7 +175,7 @@ public class TaskScheduleUtil
 
     /**
      * Blocks while waiting for a task to finish.
-     * 
+     *
      * @param name
      * @return
      * @throws Exception
@@ -196,7 +196,7 @@ public class TaskScheduleUtil
             uri += "&name=" + name;
         }
 
-        Status status = RequestFacade.doGetForStatus( uri );
+        final Status status = RequestFacade.doGetForStatus( uri );
 
         if ( !status.isSuccess() )
         {

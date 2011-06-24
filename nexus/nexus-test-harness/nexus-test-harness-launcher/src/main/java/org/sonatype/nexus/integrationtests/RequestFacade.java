@@ -93,7 +93,7 @@ public class RequestFacade
 
     /**
      * Extract text from response
-     * 
+     *
      * @param response
      * @return
      * @throws IOException
@@ -109,7 +109,7 @@ public class RequestFacade
 
     /**
      * Extract status from response
-     * 
+     *
      * @param response
      * @return
      * @throws IOException
@@ -124,7 +124,7 @@ public class RequestFacade
 
     /**
      * Null safe method to release a Response ( its streams and sockets )
-     * 
+     *
      * @param response release the response if not null
      */
     public static void releaseResponse( final Response response )
@@ -137,7 +137,7 @@ public class RequestFacade
 
     /**
      * Convert a serviceURIPart to a URL
-     * 
+     *
      * @param serviceURIPart
      * @return
      * @throws IOException
@@ -159,7 +159,7 @@ public class RequestFacade
      * ensures proper cleanup of any sockets, streams, etc., by releasing the response.
      * <p>
      * Of course the entire response text is buffered in memory so use this wisely.
-     * 
+     *
      * @param serviceURIpart the non-null part of the uri to fetch that is appended to the Nexus base URI.
      * @return the complete response body text
      * @throws NullPointerException if serviceURIpart is null
@@ -179,7 +179,7 @@ public class RequestFacade
     /**
      * Gets the response text, asserting that the entity is not null, and also applying any specified assertions on the
      * response instance.
-     * 
+     *
      * @param serviceURIpart
      * @param responseMatcher
      * @return
@@ -210,18 +210,27 @@ public class RequestFacade
         }
     }
 
+    /**
+     * Make a request to the service uri specified and return the Status
+     * @param serviceURIpart
+     * @return a non-null Status with no other assertions made on it.
+     * @throws IOException
+     */
     public static Status doGetForStatus( final String serviceURIpart )
         throws IOException
     {
-        return doGetForStatus( serviceURIpart, isSuccess() );
+        return doGetForStatus( serviceURIpart, null);
     }
 
     /**
      * GET the status of a request at the specified uri part, asserting that the returned status is not null.
-     * 
-     * @param serviceURIpart
-     * @return
+     * <p>
+     * If matcher is non-null, the matcher is applied to the status before returning and this may throw an {@link AssertionError}.
+     *
+     * @param serviceURIpart url part to be appended to Nexus root url
+     * @return a non-null Status with no other assertions made on it.
      * @throws IOException
+     * @throws AssertionError if the matcher is non-null and it fails
      */
     public static Status doGetForStatus( final String serviceURIpart, Matcher<Status> matcher )
         throws IOException
@@ -274,7 +283,7 @@ public class RequestFacade
      * FIXME this is used everywhere Send a message to a resource as a GET request and return the response.
      * <p>
      * Ensure you explicity clean up the response entity returned by this method by calling {@link Response#release()}
-     * 
+     *
      * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
      * @return the response of the request
      * @throws IOException if there is a problem communicating the response
@@ -302,7 +311,7 @@ public class RequestFacade
 
     /**
      * PUT a representation to the specified URI
-     * 
+     *
      * @param serviceURIpart
      * @param representation
      * @return
@@ -441,7 +450,7 @@ public class RequestFacade
      * Send a message to a resource and return the response.
      * <p>
      * Ensure you explicity clean up the response entity returned by this method by calling {@link Response#release()}
-     * 
+     *
      * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
      * @param method the method type of the request
      * @return the response of the request
@@ -457,7 +466,7 @@ public class RequestFacade
      * Send a message to a resource and return the response.
      * <p>
      * Ensure you explicity clean up the response entity returned by this method by calling {@link Response#release()}
-     * 
+     *
      * @param serviceURIpart the part of the uri to fetch that is appended to the Nexus base URI.
      * @param method the method type of the request
      * @param representation the representation to map the response to, may be null
@@ -488,7 +497,7 @@ public class RequestFacade
      * Send a message to a resource and return the response.
      * <p>
      * Ensure you explicity clean up the response entity returned by this method by calling {@link Response#release()}
-     * 
+     *
      * @param url the absolute url of the resource to request
      * @param method the method type of the request
      * @param representation the representation to map the response to, may be null
@@ -561,7 +570,7 @@ public class RequestFacade
 
     /**
      * Download a file at a url and save it to the target file location specified by targetFile.
-     * 
+     *
      * @param url the url to fetch the file from
      * @param targetFile the location where to save the download
      * @return a File instance for the saved file
@@ -621,7 +630,7 @@ public class RequestFacade
      * <p>
      * NOTE: Before being returned, {@link HttpMethod#releaseConnection()} is called on the {@link HttpMethod} instance,
      * therefore subsequent calls to get response body as string may return nulls.
-     * 
+     *
      * @param method the method to execute
      * @param useTestContext if true, execute this request in the context of a Test, false means ignore the testContext
      *            settings

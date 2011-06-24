@@ -1181,7 +1181,7 @@ public abstract class AbstractNexusIntegrationTest
         Status status = RequestFacade.doGetForStatus(serviceURI);
         if ( status.equals( Status.CLIENT_ERROR_NOT_FOUND ) )
         {
-            log.debug( "It was not deleted because it didn't exist " + serviceURI );
+            log.debug( "Not deleted because it didn't exist: " + serviceURI );
             return true;
         }
 
@@ -1265,16 +1265,16 @@ public abstract class AbstractNexusIntegrationTest
 
     protected boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz, String... tests )
     {
-        StringBuffer error =
-            new StringBuffer( "*********************************************************************************" );
+        StringBuilder error =
+            new StringBuilder( "*********************************************************************************" );
         error.append( "\n* This test is being skipped because its known to fail," );
         error.append( "\n* It is a very minor error, and is only a problem if you start sending in " );
         error.append( "\n* raw REST request to Nexus. (it is not a security problem)" );
         error.append( "*\n*\n" );
-        error.append( "*\n* TestClass: " + clazz );
+        error.append( "*\n* TestClass: ").append(clazz);
         for ( String test : tests )
         {
-            error.append( "*\n* Test: " + test );
+            error.append( "*\n* Test: ").append(test);
         }
         error.append( "\n**********************************************************************************" );
 
