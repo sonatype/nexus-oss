@@ -79,15 +79,10 @@ public class RequestFacade
 
     private static final Logger LOG = Logger.getLogger( RequestFacade.class );
 
-    private static final XStream XML_XSTREAM;
-    
     private static final Client client;
 
-    // FIXME - why doesn't XStreamFactory keep a static reference to its own goop
     static
     {
-        XML_XSTREAM = XStreamFactory.getXmlXStream();
-        
         // Restlet client
         Context ctx = new Context();
         // this is HttpClientHelper parameter
