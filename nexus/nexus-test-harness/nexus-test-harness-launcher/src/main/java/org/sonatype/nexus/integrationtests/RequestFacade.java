@@ -35,8 +35,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.SimpleHttpConnectionManager;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
@@ -76,6 +78,23 @@ public class RequestFacade
     public static final String SERVICE_LOCAL = "service/local/";
 
     private static final Logger LOG = Logger.getLogger( RequestFacade.class );
+
+    private static final XStream XML_XSTREAM;
+    
+    private static final Client client;
+
+    // FIXME - why doesn't XStreamFactory keep a static reference to its own goop
+    static
+    {
+        XML_XSTREAM = XStreamFactory.getXmlXStream();
+        
+        // Restlet client
+        Context ctx = new Context();
+        // this is HttpClientHelper parameter
+        ctx.getParameters().add( "readTimeout", "5000" );
+        ctx.getParameters().add( "maxConnectionsPerHost", "20");
+        client = new Client( ctx, Protocol.HTTP );
+    }
 
     /**
      * Extract text from response
@@ -527,13 +546,7 @@ public class RequestFacade
             request.setChallengeResponse( authentication );
         }
 
-        Context ctx = new Context();
-
-        Client client = new Client( ctx, Protocol.HTTP );
-
-        client.setConnectTimeout( 5000 );
-
-        LOG.debug( "sendMessage: " + request.getMethod().getName() + " " + request.getResourceRef() );
+        LOG.debug( "sendMessage: " + request.getMethod().getName() + " " + request.getResourceRef().toString() );
         Response response = client.handle( request );
         if ( matchers != null )
         {
@@ -547,6 +560,7 @@ public class RequestFacade
                 throw e;
             }
         }
+
         return response;
     }
 
@@ -652,6 +666,15 @@ public class RequestFacade
         finally
         {
             method.releaseConnection();
+
+            // force socket cleanup
+            HttpConnectionManager mgr = client.getHttpConnectionManager();
+
+            if ( mgr instanceof SimpleHttpConnectionManager )
+            {
+                ( (SimpleHttpConnectionManager) mgr ).shutdown();
+
+            }
         }
     }
 
