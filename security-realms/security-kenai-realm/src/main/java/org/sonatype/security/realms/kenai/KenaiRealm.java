@@ -12,15 +12,6 @@
  */
 package org.sonatype.security.realms.kenai;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.enterprise.inject.Typed;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -37,7 +28,6 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,9 +44,17 @@ import org.slf4j.Logger;
 import org.sonatype.inject.Description;
 import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * A Realm that connects to a java.net kenai API.
- * 
+ *
  * @author Brian Demers
  */
 @Singleton
@@ -66,9 +64,6 @@ import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
 public class KenaiRealm
     extends AuthorizingRealm
 {
-    @Named( value = "default-authentication-cache" )
-    private String authenticationCacheName;
-
     @Inject
     private Logger logger;
 
@@ -76,12 +71,6 @@ public class KenaiRealm
     private KenaiRealmConfiguration kenaiRealmConfiguration;
 
     private static final int PAGE_SIZE = 200;
-
-    private Cache<Object, Object> authenticatingCache = null;
-
-    private String DEFAULT_AUTHENTICATION_CACHE_POSTFIX = "-authentication";
-
-    private static int INSTANCE_COUNT = 0;
 
     @Override
     public String getName()
@@ -97,63 +86,21 @@ public class KenaiRealm
         UsernamePasswordToken upToken = (UsernamePasswordToken) token;
 
         // check cache
-        AuthenticationInfo authInfo = this.getAuthInfoFromCache( upToken );
+        AuthenticationInfo authInfo = null;
+        String username = upToken.getUsername();
+        String pass = String.valueOf( upToken.getPassword() );
 
-        // to normal authentication
-        if ( authInfo == null )
+        // if the user can authenticate we are good to go
+        if ( this.authenticateViaUrl( username, pass ) )
         {
-            String username = upToken.getUsername();
-            String pass = String.valueOf( upToken.getPassword() );
-
-            // if the user can authenticate we are good to go
-            if ( this.authenticateViaUrl( username, pass ) )
-            {
-                authInfo = buildAuthenticationInfo( username, null );
-                this.putUserInCache( token );
-            }
-            else
-            {
-                throw new AccountException( "User '" + username + "' cannot be authenticated." );
-            }
-        }
-
-        return authInfo;
-    }
-
-    private void putUserInCache( AuthenticationToken token )
-    {
-        // get cache
-        Cache authCache = this.getAuthenticationCache();
-
-        // check if null
-        if ( authCache != null )
-        {
-            authCache.put( this.getAuthenticationCacheKey( token ), Boolean.TRUE );
-            this.logger.debug( "Added user: '" + token.getPrincipal() + "' to cache." );
+            authInfo = buildAuthenticationInfo( username, null );
         }
         else
         {
-            this.logger.debug( "Authentication Cache is disabled." );
-        }
-    }
-
-    private AuthenticationInfo getAuthInfoFromCache( AuthenticationToken token )
-    {
-        // get cache
-        Cache authCache = this.getAuthenticationCache();
-
-        // check if null
-        if ( authCache != null )
-        {
-            Object cacheKey = this.getAuthenticationCacheKey( token );
-            if ( authCache.get( cacheKey ) != null )
-            {
-                // return an AuthenticationInfo if we found the username in the cache
-                return this.buildAuthenticationInfo( token.getPrincipal(), token.getCredentials() );
-            }
+            throw new AccountException( "User '" + username + "' cannot be authenticated." );
         }
 
-        return null;
+        return authInfo;
     }
 
     protected Object getAuthenticationCacheKey( PrincipalCollection principals )
@@ -164,48 +111,6 @@ public class KenaiRealm
     protected Object getAuthenticationCacheKey( AuthenticationToken token )
     {
         return token != null ? token.getPrincipal() : null;
-    }
-
-    private Cache<Object, Object> getAuthenticationCache()
-    {
-
-        if ( this.authenticatingCache == null )
-        {
-            this.logger.debug( "No cache implementation set.  Checking cacheManager..." );
-
-            CacheManager cacheManager = getCacheManager();
-
-            if ( cacheManager != null )
-            {
-                String cacheName = this.getAuthenticationCacheName();
-                if ( cacheName == null )
-                {
-                    // Simple default in case they didn't provide one:
-                    cacheName = getClass().getName() + "-" + INSTANCE_COUNT++ + DEFAULT_AUTHENTICATION_CACHE_POSTFIX;
-                    setAuthenticationCacheName( cacheName );
-                }
-                this.logger.debug( "CacheManager [" + cacheManager + "] has been configured.  Building "
-                    + "authentication cache named [" + cacheName + "]" );
-                this.authenticatingCache = cacheManager.getCache( cacheName );
-            }
-            else
-            {
-
-                this.logger.info( "No cache or cacheManager properties have been set.  Authorization caching is "
-                    + "disabled." );
-            }
-        }
-        return this.authenticatingCache;
-    }
-
-    private String getAuthenticationCacheName()
-    {
-        return authenticationCacheName;
-    }
-
-    private void setAuthenticationCacheName( String authenticationCacheName )
-    {
-        this.authenticationCacheName = authenticationCacheName;
     }
 
     protected AuthenticationInfo buildAuthenticationInfo( Object principal, Object credentials )
@@ -229,12 +134,11 @@ public class KenaiRealm
             {
                 if ( this.isAuthorizationCachingEnabled() )
                 {
-                    AuthorizationInfo authorizationInfo = this.buildAuthorizationInfo( username, password, response
-                        .getEntity().getText() );
+                    AuthorizationInfo authorizationInfo =
+                        this.buildAuthorizationInfo( username, password, response.getEntity().getText() );
 
-                    Object authorizationCacheKey = this.getAuthorizationCacheKey( new SimplePrincipalCollection(
-                        username,
-                        this.getName() ) );
+                    Object authorizationCacheKey =
+                        this.getAuthorizationCacheKey( new SimplePrincipalCollection( username, this.getName() ) );
                     this.getAvailableAuthorizationCache().put( authorizationCacheKey, authorizationInfo );
 
                 }
@@ -258,16 +162,13 @@ public class KenaiRealm
             }
         }
 
-        this.logger.debug( "Failed to authenticate user: {} for url: {} status: {}", new Object[] {
-            username,
-            response.getRequest().getResourceRef(),
-            response.getStatus() } );
+        this.logger.debug( "Failed to authenticate user: {} for url: {} status: {}",
+                           new Object[]{ username, response.getRequest().getResourceRef(), response.getStatus() } );
         return false;
     }
 
     private AuthorizationInfo buildAuthorizationInfo( String username, String password, String responseText )
-        throws JSONException,
-            IOException
+        throws JSONException, IOException
     {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
         // add the default role
@@ -306,8 +207,7 @@ public class KenaiRealm
     }
 
     private JSONObject buildJsonObject( Response response )
-        throws JSONException,
-            IOException
+        throws JSONException, IOException
     {
         if ( response.getStatus().isSuccess() )
         {
@@ -320,8 +220,7 @@ public class KenaiRealm
     }
 
     private JSONObject buildJsonObject( String responseText )
-        throws JSONException,
-            IOException
+        throws JSONException, IOException
     {
         return new JSONObject( responseText );
     }
@@ -424,51 +323,21 @@ public class KenaiRealm
             if ( cacheManager != null )
             {
                 String cacheName = getAuthorizationCacheName();
-                this.logger.debug(
-                    "CacheManager [{}] has been configured.  Building authorization cache named [{}]",
-                    cacheManager,
-                    cacheName );
+                this.logger.debug( "CacheManager [{}] has been configured.  Building authorization cache named [{}]",
+                                   cacheManager, cacheName );
 
                 Cache<Object, AuthorizationInfo> value = cacheManager.getCache( cacheName );
                 this.setAuthorizationCache( value );
             }
             else
             {
-                this.logger
-                    .info( "No cache or cacheManager properties have been set.  Authorization cache cannot be obtained." );
+                this.logger.info(
+                    "No cache or cacheManager properties have been set.  Authorization cache cannot be obtained." );
 
             }
         }
 
         return this.getAuthorizationCache();
-    }
-
-    @Override
-    public void onLogout( PrincipalCollection principals )
-    {
-        this.clearCachedAuthorizationInfo( principals );
-    }
-
-    @Override
-    protected void clearCachedAuthorizationInfo( PrincipalCollection principals )
-    {
-        super.clearCachedAuthorizationInfo( principals );
-        // a lot of this code will go away with shiro 1.2
-        this.clearCachedAuthenticationInfo( principals );
-    }
-
-    protected void clearCachedAuthenticationInfo( PrincipalCollection principals )
-    {
-        if ( !CollectionUtils.isEmpty( principals ) )
-        {
-            Cache<Object, Object> cache = getAuthenticationCache();
-            // cache instance will be non-null if caching is enabled:
-            if ( cache != null )
-            {
-                Object key = getAuthenticationCacheKey( principals );
-                cache.remove( key );
-            }
-        }
     }
 
     @Override

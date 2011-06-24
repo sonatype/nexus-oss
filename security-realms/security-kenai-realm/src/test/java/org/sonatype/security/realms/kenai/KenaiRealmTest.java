@@ -12,45 +12,43 @@
  */
 package org.sonatype.security.realms.kenai;
 
-import java.net.ServerSocket;
-import java.util.Arrays;
-import java.util.Properties;
-
+import com.sonatype.security.realms.kenai.config.model.Configuration;
 import junit.framework.Assert;
-
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.Subject;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.jettytestsuite.ServletInfo;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.jettytestsuite.WebappContext;
+import org.sonatype.plexus.appevents.EventMulticaster;
 import org.sonatype.security.AbstractSecurityTestCase;
+import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.events.SecurityConfigurationChangedEvent;
 import org.sonatype.security.realms.kenai.config.KenaiRealmConfiguration;
 
-import com.sonatype.security.realms.kenai.config.model.Configuration;
+import java.io.File;
+import java.io.FileFilter;
+import java.net.ServerSocket;
+import java.net.URL;
+import java.security.Security;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Properties;
 
 public class KenaiRealmTest
-    extends AbstractSecurityTestCase
+    extends AbstractKenaiRealmTest
 {
 
-    private String username = "test-user";
-
-    private String password = "password123";
-
-    private ServletServer server;
-
-    private final static String DEFAULT_ROLE = "default-url-role";
-
-    private static final String AUTH_APP_NAME = "auth_app";
-    
     protected int getTotalNumberOfProjects()
     {
         return 302;
     }
-    
+
     private Realm getRealm()
         throws Exception
     {
@@ -85,7 +83,7 @@ public class KenaiRealmTest
 
         AuthenticationInfo info = kenaiRealm.getAuthenticationInfo( new UsernamePasswordToken( username, password ) );
         Assert.assertNotNull( info );
-        
+
         // check all roles
         for ( int ii = 0; ii < getTotalNumberOfProjects(); ii++ )
         {
@@ -117,8 +115,8 @@ public class KenaiRealmTest
 
         try
         {
-            Assert.assertNotNull( kenaiRealm.getAuthenticationInfo( new UsernamePasswordToken( "unknown-user-foo-bar",
-                                                                                               "invalid" ) ) );
+            Assert.assertNotNull(
+                kenaiRealm.getAuthenticationInfo( new UsernamePasswordToken( "unknown-user-foo-bar", "invalid" ) ) );
             Assert.fail( "Expected: AccountException to be thrown" );
         }
         catch ( AccountException e )
@@ -148,69 +146,4 @@ public class KenaiRealmTest
             // expected
         }
     }
-
-    protected ServletServer getServletServer()
-        throws Exception
-    {
-        ServletServer server = new ServletServer();
-
-        ServerSocket socket = new ServerSocket( 0 );
-        int freePort = socket.getLocalPort();
-        socket.close();
-
-        server.setPort( freePort );
-
-        WebappContext webapp = new WebappContext();
-        server.setWebappContexts( Arrays.asList( webapp ) );
-
-        webapp.setName( "auth_app" );
-        org.sonatype.jettytestsuite.AuthenticationInfo authInfo = new org.sonatype.jettytestsuite.AuthenticationInfo();
-        webapp.setAuthenticationInfo( authInfo );
-
-        authInfo.setAuthMethod( "BASIC" );
-        authInfo.setCredentialsFilePath( getBasedir() + "/target/test-classes/credentials.properties" );
-
-        ServletInfo servletInfo = new ServletInfo();
-        webapp.setServletInfos( Arrays.asList( servletInfo ) );
-
-        servletInfo.setMapping( "/*" );
-        servletInfo.setServletClass( KenaiMockServlet.class.getName() );
-
-        Properties params = new Properties();
-        params.setProperty( KenaiMockServlet.TOTAL_PROJECTS_KEY, Integer.toString( getTotalNumberOfProjects() ) );
-        servletInfo.setParameters( params );
-
-        params.put( "resourceBase", getBasedir() + "/target/test-classes/data/" );
-
-        server.initialize();
-
-        return server;
-    }
-
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        server = this.getServletServer();
-        // start the server
-        server.start();
-
-        KenaiRealmConfiguration kenaiRealmConfiguration = this.lookup( KenaiRealmConfiguration.class );
-        Configuration configuration = kenaiRealmConfiguration.getConfiguration();
-        configuration.setDefaultRole( DEFAULT_ROLE );
-        configuration.setEmailDomain( "sonateyp.org" );
-        configuration.setBaseUrl( server.getUrl( AUTH_APP_NAME ) + "/" ); // add the '/' to the end
-        // kenaiRealmConfiguration.updateConfiguration( configuration );
-    }
-    
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        server.stop();
-        super.tearDown();
-    }
-
 }
