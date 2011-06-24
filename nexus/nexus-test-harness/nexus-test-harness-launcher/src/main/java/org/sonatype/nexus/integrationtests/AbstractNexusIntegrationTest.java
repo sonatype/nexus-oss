@@ -82,6 +82,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
+import com.google.common.io.Closeables;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -667,8 +668,15 @@ public abstract class AbstractNexusIntegrationTest
 
                 MavenXpp3Reader reader = new MavenXpp3Reader();
                 FileInputStream fis = new FileInputStream( pom );
-                Model model = reader.read( new FileReader( pom ) );
-                fis.close();
+                Model model = null;
+                try
+                {
+                    model = reader.read( fis );
+                }
+                finally
+                {
+                    Closeables.closeQuietly( fis );
+                }
 
                 // a helpful note so you don't need to dig into the code to much.
                 if ( model.getDistributionManagement() == null

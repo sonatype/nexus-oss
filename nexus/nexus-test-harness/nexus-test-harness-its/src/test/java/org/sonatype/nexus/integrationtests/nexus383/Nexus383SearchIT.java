@@ -19,7 +19,7 @@
 package org.sonatype.nexus.integrationtests.nexus383;
 
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +36,8 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
+
+import com.google.common.io.Closeables;
 
 /**
  * Test Search operations.
@@ -236,7 +238,16 @@ public class Nexus383SearchIT
         File pomFile = this.getTestFile( "crossArtifact.pom" );
 
         MavenXpp3Reader reader = new MavenXpp3Reader();
-        Model model = reader.read( new FileReader( pomFile ) );
+        FileInputStream fis = new FileInputStream( pomFile );
+        Model model = null;
+        try
+        {
+            model = reader.read( fis, true );
+        }
+        finally
+        {
+            Closeables.closeQuietly( fis );
+        }
 
         String deployUrl = model.getDistributionManagement().getRepository().getUrl();
 
