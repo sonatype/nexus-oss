@@ -6,7 +6,6 @@ import static org.sonatype.nexus.plugins.p2.repository.P2Constants.P2_REPOSITORY
 import java.io.File;
 import java.io.IOException;
 
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
@@ -18,17 +17,13 @@ import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2Metadata
 import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryGeneratorCapability;
 import org.sonatype.nexus.test.utils.CapabilitiesMessageUtil;
 
-public abstract class AbstractP2GeneratorIT
-    extends AbstractNexusIntegrationTest
+public abstract class AbstractNexusP2GeneratorIT
+    extends AbstractNexusP2IT
 {
 
     private String p2RepositoryGeneratorCapabilityId;
 
-    public AbstractP2GeneratorIT()
-    {
-    }
-
-    public AbstractP2GeneratorIT( final String repoId )
+    public AbstractNexusP2GeneratorIT( final String repoId )
     {
         super( repoId );
     }
@@ -85,7 +80,7 @@ public abstract class AbstractP2GeneratorIT
     {
         final File downloadDir = new File( "target/downloads/" + this.getClass().getSimpleName() );
         final File p2Artifacts =
-            downloadArtifact( groupId, artifactId, version, "xml", "p2Artifacts", downloadDir.getPath() );
+            downloadArtifact( groupId, artifactId, version, "xml", "p2Artifacts", downloadDir.getCanonicalPath() );
         return p2Artifacts;
     }
 
@@ -94,7 +89,7 @@ public abstract class AbstractP2GeneratorIT
     {
         final File downloadDir = new File( "target/downloads/" + this.getClass().getSimpleName() );
         final File p2Content =
-            downloadArtifact( groupId, artifactId, version, "xml", "p2Content", downloadDir.getPath() );
+            downloadArtifact( groupId, artifactId, version, "xml", "p2Content", downloadDir.getCanonicalPath() );
         return p2Content;
     }
 

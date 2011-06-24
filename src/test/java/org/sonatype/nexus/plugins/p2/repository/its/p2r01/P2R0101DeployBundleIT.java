@@ -7,11 +7,16 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 
 import org.junit.Test;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractP2GeneratorIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusP2GeneratorIT;
 
 public class P2R0101DeployBundleIT
-    extends AbstractP2GeneratorIT
+    extends AbstractNexusP2GeneratorIT
 {
+
+    public P2R0101DeployBundleIT()
+    {
+        super( "p2r01" );
+    }
 
     /**
      * When an OSGi bundle is deployed pArtifacts && p2Content are created.

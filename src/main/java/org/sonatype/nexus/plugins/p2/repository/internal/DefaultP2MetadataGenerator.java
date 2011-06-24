@@ -35,6 +35,7 @@ import org.sonatype.p2.bridge.Publisher;
 import org.sonatype.p2.bridge.model.InstallableArtifact;
 import org.sonatype.p2.bridge.model.InstallableUnit;
 import org.sonatype.p2.bridge.model.InstallableUnitArtifact;
+import org.sonatype.p2.bridge.model.TouchpointType;
 
 @Named
 @Singleton
@@ -139,6 +140,12 @@ public class DefaultP2MetadataGenerator
                 iuArtifact.setVersion( artifact.getVersion() );
 
                 iu.addArtifact( iuArtifact );
+
+                final TouchpointType touchpointType = new TouchpointType();
+                touchpointType.setId( "org.eclipse.equinox.p2.osgi" );
+                touchpointType.setVersion( "1.0.0" );
+
+                iu.setTouchpointType( touchpointType );
             }
 
             File tempP2Repository = null;

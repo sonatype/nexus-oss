@@ -2,6 +2,8 @@ package org.sonatype.nexus.plugins.p2.repository.internal;
 
 import static org.codehaus.plexus.util.FileUtils.deleteDirectory;
 import static org.sonatype.nexus.plugins.p2.repository.P2Constants.P2_REPOSITORY_ROOT_PATH;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.createLink;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.safeRetrieveItem;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.storeItem;
 
@@ -174,8 +176,8 @@ public class DefaultP2RepositoryGenerator
 
                 // copy artifacts to a temp location
                 sourceP2Repository = createTemporaryP2Repository();
-                FileUtils.copyFile( NexusUtils.retrieveFile( repository, item.getPath() ), new File(
-                    sourceP2Repository, "artifacts.xml" ) );
+                FileUtils.copyFile( retrieveFile( repository, item.getPath() ), new File( sourceP2Repository,
+                    "artifacts.xml" ) );
 
                 destinationP2Repository = createTemporaryP2Repository();
                 final File artifacts = getP2Artifacts( configuration, repository );
@@ -192,7 +194,12 @@ public class DefaultP2RepositoryGenerator
                     final String linkPath =
                         P2_REPOSITORY_ROOT_PATH + "/plugins/" + installableArtifact.getId() + "_"
                             + installableArtifact.getVersion() + ".jar";
-                    NexusUtils.createLink( repository, item, linkPath );
+                    if ( installableArtifact.getRepositoryPath() != null )
+                    {
+                        final StorageItem bundle =
+                            NexusUtils.retrieveItem( repository, installableArtifact.getRepositoryPath() );
+                        createLink( repository, bundle, linkPath );
+                    }
                 }
 
                 // copy artifacts back to exposed location
@@ -234,8 +241,8 @@ public class DefaultP2RepositoryGenerator
 
                 // copy artifacts to a temp location
                 sourceP2Repository = createTemporaryP2Repository();
-                FileUtils.copyFile( NexusUtils.retrieveFile( repository, item.getPath() ), new File(
-                    sourceP2Repository, "artifacts.xml" ) );
+                FileUtils.copyFile( retrieveFile( repository, item.getPath() ), new File( sourceP2Repository,
+                    "artifacts.xml" ) );
 
                 destinationP2Repository = createTemporaryP2Repository();
                 final File artifacts = getP2Artifacts( configuration, repository );
@@ -283,8 +290,8 @@ public class DefaultP2RepositoryGenerator
 
                 // copy artifacts to a temp location
                 sourceP2Repository = createTemporaryP2Repository();
-                FileUtils.copyFile( NexusUtils.retrieveFile( repository, item.getPath() ), new File(
-                    sourceP2Repository, "content.xml" ) );
+                FileUtils.copyFile( retrieveFile( repository, item.getPath() ), new File( sourceP2Repository,
+                    "content.xml" ) );
 
                 destinationP2Repository = createTemporaryP2Repository();
                 final File content = getP2Content( configuration, repository );
@@ -332,8 +339,8 @@ public class DefaultP2RepositoryGenerator
 
                 // copy artifacts to a temp location
                 sourceP2Repository = createTemporaryP2Repository();
-                FileUtils.copyFile( NexusUtils.retrieveFile( repository, item.getPath() ), new File(
-                    sourceP2Repository, "content.xml" ) );
+                FileUtils.copyFile( retrieveFile( repository, item.getPath() ), new File( sourceP2Repository,
+                    "content.xml" ) );
 
                 destinationP2Repository = createTemporaryP2Repository();
                 final File content = getP2Content( configuration, repository );
@@ -383,7 +390,7 @@ public class DefaultP2RepositoryGenerator
         throws LocalStorageException
     {
         // TODO handle compressed repository
-        final File file = NexusUtils.retrieveFile( repository, P2_REPOSITORY_ROOT_PATH + P2Constants.ARTIFACTS_XML );
+        final File file = retrieveFile( repository, P2_REPOSITORY_ROOT_PATH + P2Constants.ARTIFACTS_XML );
         return file;
     }
 
@@ -392,7 +399,7 @@ public class DefaultP2RepositoryGenerator
         throws LocalStorageException
     {
         // TODO handle compressed repository
-        final File file = NexusUtils.retrieveFile( repository, P2_REPOSITORY_ROOT_PATH + P2Constants.CONTENT_XML );
+        final File file = retrieveFile( repository, P2_REPOSITORY_ROOT_PATH + P2Constants.CONTENT_XML );
         return file;
     }
 

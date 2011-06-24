@@ -6,11 +6,16 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 
 import org.junit.Test;
-import org.sonatype.nexus.plugins.p2.repository.its.AbstractP2GeneratorIT;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusP2GeneratorIT;
 
 public class P2R0201DeployLegacyJarIT
-    extends AbstractP2GeneratorIT
+    extends AbstractNexusP2GeneratorIT
 {
+
+    public P2R0201DeployLegacyJarIT()
+    {
+        super( "p2r02" );
+    }
 
     /**
      * When deploying a legacy jar (non OSGi bundle), p2Artifacts & p2Content are not created.
