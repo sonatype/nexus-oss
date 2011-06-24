@@ -7,6 +7,7 @@ import java.util.Map;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -73,6 +74,19 @@ class NexusUtils
         }
 
         repository.storeItem( false, fItem );
+    }
+
+    static void createLink( final Repository repository, final StorageItem item, final String path )
+        throws Exception
+    {
+        final ResourceStoreRequest req = new ResourceStoreRequest( path );
+
+        req.getRequestContext().putAll( item.getItemContext() );
+
+        final DefaultStorageLinkItem link =
+            new DefaultStorageLinkItem( repository, req, true, true, item.getRepositoryItemUid() );
+
+        repository.storeItem( false, link );
     }
 
 }

@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -182,6 +183,17 @@ public class DefaultP2RepositoryGenerator
                 FileUtils.copyFile( artifacts, tempArtifacts );
 
                 artifactRepository.merge( sourceP2Repository.toURI(), destinationP2Repository.toURI() );
+
+                // create a link in /plugins directory back to original jar
+                final Collection<InstallableArtifact> installableArtifacts =
+                    artifactRepository.getInstallableArtifacts( sourceP2Repository.toURI() );
+                for ( final InstallableArtifact installableArtifact : installableArtifacts )
+                {
+                    final String linkPath =
+                        P2_REPOSITORY_ROOT_PATH + "/plugins/" + installableArtifact.getId() + "_"
+                            + installableArtifact.getVersion() + ".jar";
+                    NexusUtils.createLink( repository, item, linkPath );
+                }
 
                 // copy artifacts back to exposed location
                 FileUtils.copyFile( tempArtifacts, artifacts );
