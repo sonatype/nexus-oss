@@ -18,12 +18,14 @@
  */
 package org.sonatype.nexus.integrationtests.nxcm2124;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -50,7 +52,17 @@ public class NXCM2124CheckConsoleDocumentationIT
         Assert.assertFalse( pluginConsolePlugin.getDocumentation().isEmpty() );
 
         String url = pluginConsolePlugin.getDocumentation().get( 0 ).getUrl();
-        Response r = RequestFacade.sendMessage( new URL( url ), Method.GET, null );
-        Assert.assertEquals( r.getStatus().getCode(), Status.SUCCESS_OK.getCode(), "Should be able to get the DOCOs" );
+        Response r = null;
+
+        try
+        {
+            r = RequestFacade.sendMessage( new URL( url ), Method.GET, null );
+            Status status = r.getStatus();
+            assertThat( status, isSuccess() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( r );
+        }
     }
 }

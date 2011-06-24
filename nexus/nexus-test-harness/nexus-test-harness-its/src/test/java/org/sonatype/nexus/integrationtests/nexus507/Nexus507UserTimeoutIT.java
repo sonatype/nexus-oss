@@ -18,10 +18,6 @@
  */
 package org.sonatype.nexus.integrationtests.nexus507;
 
-import java.net.URL;
-
-import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -48,7 +44,7 @@ public class Nexus507UserTimeoutIT
     public void checkHtmlRequest()
         throws Exception
     {
-        String loginURI = nexusBaseUrl + "service/local/authentication/login";
+        String loginURI = "service/local/authentication/login";
 
         // accessUrl( serviceURI );
 
@@ -57,14 +53,10 @@ public class Nexus507UserTimeoutIT
         context.setUsername( "test-admin" );
         context.setPassword( "admin123" );
         
-        Response response;
-        
-        response = RequestFacade.sendMessage( new URL( loginURI ), Method.GET, null  );
-        Assert.assertEquals( response.getStatus().getCode(), 200, "Unable to login " + response.getStatus() );
+        RequestFacade.doGet( loginURI );
 
-        String userURI = nexusBaseUrl + "service/local/users/admin";
-        response = RequestFacade.sendMessage( new URL( userURI ), Method.GET, null  );
-        Assert.assertEquals( response.getStatus().getCode(), 200, "Unable to access users " + response.getStatus() );
+        String userURI = "service/local/users/admin";
+        RequestFacade.doGet( userURI );
 
 
 /*        WebConversation wc = new WebConversation();
