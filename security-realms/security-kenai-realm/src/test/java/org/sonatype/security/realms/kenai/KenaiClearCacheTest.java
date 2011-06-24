@@ -1,6 +1,7 @@
 package org.sonatype.security.realms.kenai;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
@@ -28,11 +29,14 @@ public class KenaiClearCacheTest
         // check authz
         subject1.checkRole( "project-1" );
 
-        securitySystem.setRealms( Collections.singletonList( "kenai" ) );
-        this.lookup( ApplicationEventMulticaster.class ).notifyEventListeners(
-            new SecurityConfigurationChangedEvent( "From a test" ) );
-        // now this nomally would clear the authz cache
-        // which means an authz request would hit the remote directory
+        // clear the cache
+        KenaiRealm realm = (KenaiRealm) this.lookup( Realm.class, "kenai" );
+        realm.getAuthorizationCache().clear();
+
+        // user should still have the role
+        subject1.checkRole( "project-1" );
+
+        // the user should be able to login again as well
         Subject subject2 = securitySystem.login( new UsernamePasswordToken( username, password ) );
         subject2.checkRole( "project-1" );
     }

@@ -23,7 +23,7 @@ import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.cache.Cache;
-import org.apache.shiro.cache.CacheManager;
+import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -49,6 +49,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -139,7 +140,7 @@ public class KenaiRealm
 
                     Object authorizationCacheKey =
                         this.getAuthorizationCacheKey( new SimplePrincipalCollection( username, this.getName() ) );
-                    this.getAvailableAuthorizationCache().put( authorizationCacheKey, authorizationInfo );
+                    this.getAuthorizationCache().put( authorizationCacheKey, authorizationInfo );
 
                 }
 
@@ -296,54 +297,93 @@ public class KenaiRealm
         return principals.getPrimaryPrincipal().toString();
     }
 
-    /*
-     * Start hacking around private caches, this is dirty, we either need a better way to get a users roles, or a
-     * cleaner Shiro api to do this.
-     */
-
-    private Cache<Object, AuthorizationInfo> getAvailableAuthorizationCache()
+    public Cache<Object, AuthorizationInfo> getAuthorizationCache()
     {
-        Cache<Object, AuthorizationInfo> cache = getAuthorizationCache();
-        if ( cache == null && isAuthorizationCachingEnabled() )
+
+        Cache<Object, AuthorizationInfo> cache = super.getAuthorizationCache();
+        if ( cache == null ) // no cache
         {
-            cache = getAuthorizationCacheLazy();
+            return null;
         }
-        return cache;
+        else if ( WrappedNonClearableCache.class.isInstance( cache ) )  // already wrapped cache
+        {
+            return cache;
+        }
+        else // cache not wrapped yet
+        {
+            Cache<Object, AuthorizationInfo> wrappedCache = new WrappedNonClearableCache( cache );
+            super.setAuthorizationCache( wrappedCache );
+            return super.getAuthorizationCache();
+        }
     }
 
-    private Cache<Object, AuthorizationInfo> getAuthorizationCacheLazy()
-    {
-        if ( this.getAuthorizationCache() == null )
-        {
-
-            this.logger.debug( "No authorizationCache instance set.  Checking for a cacheManager..." );
-
-            CacheManager cacheManager = getCacheManager();
-
-            if ( cacheManager != null )
-            {
-                String cacheName = getAuthorizationCacheName();
-                this.logger.debug( "CacheManager [{}] has been configured.  Building authorization cache named [{}]",
-                                   cacheManager, cacheName );
-
-                Cache<Object, AuthorizationInfo> value = cacheManager.getCache( cacheName );
-                this.setAuthorizationCache( value );
-            }
-            else
-            {
-                this.logger.info(
-                    "No cache or cacheManager properties have been set.  Authorization cache cannot be obtained." );
-
-            }
-        }
-
-        return this.getAuthorizationCache();
-    }
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
     {
         // FIXME, always return null, we are setting the cache directly, yes, this is dirty
         return null;
+    }
+
+    /**
+     * Stops the cache from being cleared, individual cached items will still be cleared when a user's session times out or they logout.
+     */
+    static class WrappedNonClearableCache
+        implements Cache<Object, AuthorizationInfo>
+    {
+        private Cache<Object, AuthorizationInfo> cache;
+
+        WrappedNonClearableCache( Cache cache )
+        {
+            this.cache = cache;
+        }
+
+        @Override
+        public AuthorizationInfo get( Object key )
+            throws CacheException
+        {
+            return cache.get( key );
+        }
+
+        @Override
+        public AuthorizationInfo put( Object key, AuthorizationInfo value )
+            throws CacheException
+        {
+            return cache.put( key, value );
+        }
+
+        @Override
+        public AuthorizationInfo remove( Object key )
+            throws CacheException
+        {
+            return cache.remove( key );
+        }
+
+        @Override
+        public void clear()
+            throws CacheException
+        {
+
+            // NOTE: this clear is NOT implemented, authz cache will only be removed when the session expires or user logs out.
+//            cache.clear();
+        }
+
+        @Override
+        public int size()
+        {
+            return cache.size();
+        }
+
+        @Override
+        public Set<Object> keys()
+        {
+            return cache.keys();
+        }
+
+        @Override
+        public Collection<AuthorizationInfo> values()
+        {
+            return cache.values();
+        }
     }
 }
