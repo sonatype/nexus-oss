@@ -1,5 +1,6 @@
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
+import static org.sonatype.nexus.plugins.p2.repository.internal.DefaultP2RepositoryGenerator.createTemporaryP2Repository;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveFile;
 
 import java.io.File;
@@ -145,9 +146,7 @@ public class DefaultP2MetadataGenerator
             {
                 final String extension = FileUtils.getExtension( bundle.getPath() );
 
-                tempP2Repository = File.createTempFile( "nexus-p2-repository-plugin", "" );
-                tempP2Repository.delete();
-                tempP2Repository.mkdirs();
+                tempP2Repository = createTemporaryP2Repository();
 
                 artifactRepository.write( tempP2Repository.toURI(), artifacts, bsn, null /** repository properties */
                 , new String[][] { { "(classifier=osgi.bundle)", "${repoUrl}/" + item.getPath() + "}" } } );
