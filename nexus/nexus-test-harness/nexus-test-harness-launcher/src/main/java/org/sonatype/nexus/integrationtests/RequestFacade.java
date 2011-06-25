@@ -535,7 +535,7 @@ public class RequestFacade
         return sendMessage( request, matchers );
     }
 
-    public static Response sendMessage( final Request request, final org.hamcrest.Matcher<Response> matchers )
+    public synchronized static Response sendMessage( final Request request, final org.hamcrest.Matcher<Response> matchers )
         throws IOException
     {
         Preconditions.checkNotNull( request );
