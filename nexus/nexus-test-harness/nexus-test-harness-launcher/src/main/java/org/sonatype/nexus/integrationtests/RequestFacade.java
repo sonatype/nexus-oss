@@ -18,10 +18,9 @@
  */
 package org.sonatype.nexus.integrationtests;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
-import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
-import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.isSuccessful;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -86,7 +85,9 @@ public class RequestFacade
         // Restlet client
         Context ctx = new Context();
         // this is HttpClientHelper parameter
-        ctx.getParameters().add( "readTimeout", "5000" );
+        // This below borks IT util like TaskSchedleUtil, that expects to be able to
+        // "hang" on a request for a long time...
+        // ctx.getParameters().add( "readTimeout", "5000" );
         ctx.getParameters().add( "maxConnectionsPerHost", "20");
         client = new Client( ctx, Protocol.HTTP );
     }
