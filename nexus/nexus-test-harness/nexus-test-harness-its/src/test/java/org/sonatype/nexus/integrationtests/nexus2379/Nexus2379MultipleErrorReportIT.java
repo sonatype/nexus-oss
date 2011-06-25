@@ -21,6 +21,7 @@ package org.sonatype.nexus.integrationtests.nexus2379;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.ErrorReportUtil;
+import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -33,19 +34,19 @@ public class Nexus2379MultipleErrorReportIT
     {
         ErrorReportUtil.cleanErrorBundleDir( nexusWorkDir );
     }
-    
+
     @Test
     public void validateMultipleErrors()
         throws Exception
-    {        
-        RequestFacade.doGet( "service/local/exception?status=500", null );
-        
+    {
+        RequestFacade.doGet( "service/local/exception?status=500", ResponseMatchers.inError() );
+
         ErrorReportUtil.validateZipContents( nexusWorkDir );
-        
+
         ErrorReportUtil.cleanErrorBundleDir( nexusWorkDir );
-        
+
         ErrorReportUtil.validateNoZip( nexusWorkDir );
-        
+
         for ( int i = 0; i < 10; i++ )
         {
             RequestFacade.doGet( "service/local/exception?status=500", null );
@@ -53,7 +54,7 @@ public class Nexus2379MultipleErrorReportIT
         }
 
         RequestFacade.doGet( "service/local/exception?status=501", null );
-        
+
         ErrorReportUtil.validateZipContents( nexusWorkDir );
     }
 }
