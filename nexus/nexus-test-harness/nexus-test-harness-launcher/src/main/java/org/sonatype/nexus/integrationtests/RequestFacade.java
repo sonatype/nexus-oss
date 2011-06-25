@@ -389,7 +389,7 @@ public class RequestFacade
     public static Status doPostForStatus( final String serviceURIpart, final Representation representation )
         throws IOException
     {
-        return doPostForStatus( serviceURIpart, representation, isSuccessful() );
+        return doPostForStatus( serviceURIpart, representation, null );
     }
 
     public static Status doPostForStatus( final String serviceURIpart, final Representation representation,
