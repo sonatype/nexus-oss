@@ -49,11 +49,11 @@ public class Nexus2379MultipleErrorReportIT
 
         for ( int i = 0; i < 10; i++ )
         {
-            RequestFacade.doGet( "service/local/exception?status=500", null );
+            RequestFacade.doGet( "service/local/exception?status=500", ResponseMatchers.inError() );
             ErrorReportUtil.validateNoZip( nexusWorkDir );
         }
 
-        RequestFacade.doGet( "service/local/exception?status=501", null );
+        RequestFacade.doGet( "service/local/exception?status=501", ResponseMatchers.inError() );
 
         ErrorReportUtil.validateZipContents( nexusWorkDir );
     }
