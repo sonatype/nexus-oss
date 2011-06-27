@@ -78,7 +78,11 @@ public class P2MetadataEventsInspector
         {
             return false;
         }
-        final String path = item.getPath();
+        return isP2ContentXML( item.getPath() );
+    }
+
+    static boolean isP2ContentXML( final String path )
+    {
         if ( path == null )
         {
             return false;

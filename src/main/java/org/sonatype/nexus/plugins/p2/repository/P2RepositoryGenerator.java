@@ -19,4 +19,8 @@ public interface P2RepositoryGenerator
 
     void removeP2Metadata( StorageItem item );
 
+    void scanAndRebuild( String repositoryId );
+
+    void scanAndRebuild();
+
 }

@@ -3,9 +3,13 @@ package org.sonatype.nexus.plugins.p2.repository.internal;
 import static org.codehaus.plexus.util.FileUtils.deleteDirectory;
 import static org.sonatype.nexus.plugins.p2.repository.P2Constants.P2_REPOSITORY_ROOT_PATH;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.createLink;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.localStorageOfRepositoryAsFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveFile;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveItem;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.safeRetrieveItem;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.storeItem;
+import static org.sonatype.nexus.plugins.p2.repository.internal.P2ArtifactsEventsInspector.isP2ArtifactsXML;
+import static org.sonatype.nexus.plugins.p2.repository.internal.P2MetadataEventsInspector.isP2ContentXML;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,6 +43,8 @@ import org.sonatype.p2.bridge.ArtifactRepository;
 import org.sonatype.p2.bridge.MetadataRepository;
 import org.sonatype.p2.bridge.model.InstallableArtifact;
 import org.sonatype.p2.bridge.model.InstallableUnit;
+import org.sonatype.sisu.resource.scanner.helper.ListenerSupport;
+import org.sonatype.sisu.resource.scanner.scanners.SerialScanner;
 
 @Named
 @Singleton
@@ -168,47 +174,25 @@ public class DefaultP2RepositoryGenerator
         {
             final Repository repository = repositories.getRepository( configuration.repositoryId() );
             final RepositoryItemUid p2RepoUid = repository.createUid( P2_REPOSITORY_ROOT_PATH );
-            File sourceP2Repository = null;
             File destinationP2Repository = null;
             try
             {
                 p2RepoUid.getLock().lock( Action.update );
 
-                // copy artifacts to a temp location
-                sourceP2Repository = createTemporaryP2Repository();
-                FileUtils.copyFile( retrieveFile( repository, item.getPath() ), new File( sourceP2Repository,
-                    "artifacts.xml" ) );
-
+                // copy repository artifacts to a temporary location
                 destinationP2Repository = createTemporaryP2Repository();
                 final File artifacts = getP2Artifacts( configuration, repository );
                 final File tempArtifacts = new File( destinationP2Repository, artifacts.getName() );
                 FileUtils.copyFile( artifacts, tempArtifacts );
 
-                artifactRepository.merge( sourceP2Repository.toURI(), destinationP2Repository.toURI() );
+                updateP2Artifacts( repository, retrieveFile( repository, item.getPath() ), destinationP2Repository );
 
-                // create a link in /plugins directory back to original jar
-                final Collection<InstallableArtifact> installableArtifacts =
-                    artifactRepository.getInstallableArtifacts( sourceP2Repository.toURI() );
-                for ( final InstallableArtifact installableArtifact : installableArtifacts )
-                {
-                    final String linkPath =
-                        P2_REPOSITORY_ROOT_PATH + "/plugins/" + installableArtifact.getId() + "_"
-                            + installableArtifact.getVersion() + ".jar";
-                    if ( installableArtifact.getRepositoryPath() != null )
-                    {
-                        final StorageItem bundle =
-                            NexusUtils.retrieveItem( repository, installableArtifact.getRepositoryPath() );
-                        createLink( repository, bundle, linkPath );
-                    }
-                }
-
-                // copy artifacts back to exposed location
+                // copy repository artifacts back to exposed location
                 FileUtils.copyFile( tempArtifacts, artifacts );
             }
             finally
             {
                 p2RepoUid.getLock().unlock();
-                deleteDirectory( sourceP2Repository );
                 deleteDirectory( destinationP2Repository );
             }
         }
@@ -239,19 +223,20 @@ public class DefaultP2RepositoryGenerator
             {
                 p2RepoUid.getLock().lock( Action.update );
 
-                // copy artifacts to a temp location
-                sourceP2Repository = createTemporaryP2Repository();
-                FileUtils.copyFile( retrieveFile( repository, item.getPath() ), new File( sourceP2Repository,
-                    "artifacts.xml" ) );
-
+                // copy repository artifacts to a temporary location
                 destinationP2Repository = createTemporaryP2Repository();
                 final File artifacts = getP2Artifacts( configuration, repository );
                 final File tempArtifacts = new File( destinationP2Repository, artifacts.getName() );
                 FileUtils.copyFile( artifacts, tempArtifacts );
 
+                // copy item artifacts to a temp location
+                sourceP2Repository = createTemporaryP2Repository();
+                FileUtils.copyFile( retrieveFile( repository, item.getPath() ), new File( sourceP2Repository,
+                    "artifacts.xml" ) );
+
                 artifactRepository.remove( sourceP2Repository.toURI(), destinationP2Repository.toURI() );
 
-                // copy artifacts back to exposed location
+                // copy repository artifacts back to exposed location
                 FileUtils.copyFile( tempArtifacts, artifacts );
             }
             finally
@@ -282,31 +267,25 @@ public class DefaultP2RepositoryGenerator
         {
             final Repository repository = repositories.getRepository( configuration.repositoryId() );
             final RepositoryItemUid p2RepoUid = repository.createUid( P2_REPOSITORY_ROOT_PATH );
-            File sourceP2Repository = null;
             File destinationP2Repository = null;
             try
             {
                 p2RepoUid.getLock().lock( Action.update );
 
-                // copy artifacts to a temp location
-                sourceP2Repository = createTemporaryP2Repository();
-                FileUtils.copyFile( retrieveFile( repository, item.getPath() ), new File( sourceP2Repository,
-                    "content.xml" ) );
-
+                // copy repository content to a temporary location
                 destinationP2Repository = createTemporaryP2Repository();
                 final File content = getP2Content( configuration, repository );
                 final File tempContent = new File( destinationP2Repository, content.getName() );
                 FileUtils.copyFile( content, tempContent );
 
-                metadataRepository.merge( sourceP2Repository.toURI(), destinationP2Repository.toURI() );
+                updateP2Metadata( repository, retrieveFile( repository, item.getPath() ), destinationP2Repository );
 
-                // copy artifacts back to exposed location
+                // copy repository content back to exposed location
                 FileUtils.copyFile( tempContent, content );
             }
             finally
             {
                 p2RepoUid.getLock().unlock();
-                deleteDirectory( sourceP2Repository );
                 deleteDirectory( destinationP2Repository );
             }
         }
@@ -337,19 +316,20 @@ public class DefaultP2RepositoryGenerator
             {
                 p2RepoUid.getLock().lock( Action.update );
 
-                // copy artifacts to a temp location
-                sourceP2Repository = createTemporaryP2Repository();
-                FileUtils.copyFile( retrieveFile( repository, item.getPath() ), new File( sourceP2Repository,
-                    "content.xml" ) );
-
+                // copy repository content to a temporary location
                 destinationP2Repository = createTemporaryP2Repository();
                 final File content = getP2Content( configuration, repository );
                 final File tempContent = new File( destinationP2Repository, content.getName() );
                 FileUtils.copyFile( content, tempContent );
 
+                // copy item content to a temp location
+                sourceP2Repository = createTemporaryP2Repository();
+                FileUtils.copyFile( retrieveFile( repository, item.getPath() ), new File( sourceP2Repository,
+                    "content.xml" ) );
+
                 metadataRepository.remove( sourceP2Repository.toURI(), destinationP2Repository.toURI() );
 
-                // copy artifacts back to exposed location
+                // copy repository content back to exposed location
                 FileUtils.copyFile( tempContent, content );
             }
             finally
@@ -364,6 +344,145 @@ public class DefaultP2RepositoryGenerator
             logger.warn(
                 String.format( "Could not update P2 repository [%s:%s] with [%s] due to [%s]",
                     configuration.repositoryId(), P2_REPOSITORY_ROOT_PATH, item.getPath(), e.getMessage() ), e );
+        }
+    }
+
+    @Override
+    public void scanAndRebuild( final String repositoryId )
+    {
+        logger.debug( "Rebuilding P2 repository for repository [{}]", repositoryId );
+
+        final P2RepositoryGeneratorConfiguration configuration = getConfiguration( repositoryId );
+        if ( configuration == null )
+        {
+            logger.warn(
+                "Rebuilding P2 repository for [{}] not executed as P2 Repository Generator capability is not enabled for this repository",
+                repositoryId );
+            return;
+        }
+
+        try
+        {
+            final Repository repository = repositories.getRepository( repositoryId );
+            final File scanPath = localStorageOfRepositoryAsFile( repository );
+            final RepositoryItemUid p2RepoUid = repository.createUid( P2_REPOSITORY_ROOT_PATH );
+            final File destinationP2Repository = createTemporaryP2Repository();
+            try
+            {
+                p2RepoUid.getLock().lock( Action.update );
+
+                // copy repository artifacts to a temporary location
+                final File artifacts = getP2Artifacts( configuration, repository );
+                final File tempArtifacts = new File( destinationP2Repository, artifacts.getName() );
+                FileUtils.copyFile( artifacts, tempArtifacts );
+
+                // copy repository content to a temporary location
+                final File content = getP2Content( configuration, repository );
+                final File tempContent = new File( destinationP2Repository, content.getName() );
+                FileUtils.copyFile( content, tempContent );
+
+                new SerialScanner().scan( scanPath, new ListenerSupport()
+                {
+
+                    @Override
+                    public void onFile( final File file )
+                    {
+                        try
+                        {
+                            if ( isP2ArtifactsXML( file.getPath() ) )
+                            {
+                                updateP2Artifacts( repository, file, destinationP2Repository );
+                            }
+                            else if ( isP2ContentXML( file.getPath() ) )
+                            {
+                                updateP2Metadata( repository, file, destinationP2Repository );
+                            }
+                        }
+                        catch ( final Exception e )
+                        {
+                            throw new RuntimeException( e );
+                        }
+                    }
+
+                } );
+
+                // copy artifacts back to exposed location
+                FileUtils.copyFile( tempArtifacts, artifacts );
+                // copy content back to exposed location
+                FileUtils.copyFile( tempContent, content );
+            }
+            finally
+            {
+                p2RepoUid.getLock().unlock();
+
+                deleteDirectory( destinationP2Repository );
+            }
+        }
+        catch ( final Exception e )
+        {
+            logger.warn( String.format(
+                "Rebuilding P2 repository not executed as repository [%s] could not be scanned due to [%s]",
+                repositoryId, e.getMessage() ), e );
+        }
+    }
+
+    @Override
+    public void scanAndRebuild()
+    {
+        for ( final Repository repository : repositories.getRepositories() )
+        {
+            scanAndRebuild( repository.getId() );
+        }
+    }
+
+    private void updateP2Artifacts( final Repository repository, final File sourceArtifacts,
+                                    final File destinationP2Repository )
+        throws Exception
+    {
+        final File sourceP2Repository = createTemporaryP2Repository();
+        try
+        {
+            // copy artifacts to a temp location
+            FileUtils.copyFile( sourceArtifacts, new File( sourceP2Repository, "artifacts.xml" ) );
+
+            artifactRepository.merge( sourceP2Repository.toURI(), destinationP2Repository.toURI() );
+
+            // create a link in /plugins directory back to original jar
+            final Collection<InstallableArtifact> installableArtifacts =
+                artifactRepository.getInstallableArtifacts( sourceP2Repository.toURI() );
+            for ( final InstallableArtifact installableArtifact : installableArtifacts )
+            {
+                final String linkPath =
+                    P2_REPOSITORY_ROOT_PATH + "/plugins/" + installableArtifact.getId() + "_"
+                        + installableArtifact.getVersion() + ".jar";
+                if ( installableArtifact.getRepositoryPath() != null )
+                {
+                    final StorageItem bundle = retrieveItem( repository, installableArtifact.getRepositoryPath() );
+                    createLink( repository, bundle, linkPath );
+                }
+            }
+        }
+        finally
+        {
+            deleteDirectory( sourceP2Repository );
+        }
+    }
+
+    private void updateP2Metadata( final Repository repository, final File sourceContent,
+                                   final File destinationP2Repository )
+        throws Exception
+    {
+        final File sourceP2Repository = createTemporaryP2Repository();
+        try
+        {
+            // copy content to a temp location
+            FileUtils.copyFile( sourceContent, new File( sourceP2Repository, "content.xml" ) );
+
+            metadataRepository.merge( sourceP2Repository.toURI(), destinationP2Repository.toURI() );
+        }
+        finally
+        {
+            deleteDirectory( sourceP2Repository );
         }
     }
 

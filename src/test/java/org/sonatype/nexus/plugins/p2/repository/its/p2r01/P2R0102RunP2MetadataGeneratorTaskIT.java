@@ -12,11 +12,11 @@ import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusP2GeneratorIT;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-public class P2R0102RunTaskIT
+public class P2R0102RunP2MetadataGeneratorTaskIT
     extends AbstractNexusP2GeneratorIT
 {
 
-    public P2R0102RunTaskIT()
+    public P2R0102RunP2MetadataGeneratorTaskIT()
     {
         super( "p2r01" );
     }

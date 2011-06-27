@@ -78,7 +78,11 @@ public class P2ArtifactsEventsInspector
         {
             return false;
         }
-        final String path = item.getPath();
+        return isP2ArtifactsXML( item.getPath() );
+    }
+
+    static boolean isP2ArtifactsXML( final String path )
+    {
         if ( path == null )
         {
             return false;
