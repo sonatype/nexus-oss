@@ -93,6 +93,22 @@ public class JarsEventsInspector
         try
         {
             final File file = retrieveFile( repositories.getRepository( item.getRepositoryId() ), item.getPath() );
+            return isABundle( file );
+        }
+        catch ( final Exception e )
+        {
+            return false;
+        }
+    }
+
+    static boolean isABundle( final File file )
+    {
+        if ( file == null )
+        {
+            return false;
+        }
+        try
+        {
             final JarFile jarFile = new JarFile( file );
             final Manifest manifest = jarFile.getManifest();
             final Attributes mainAttributes = manifest.getMainAttributes();
@@ -103,4 +119,5 @@ public class JarsEventsInspector
             return false;
         }
     }
+
 }

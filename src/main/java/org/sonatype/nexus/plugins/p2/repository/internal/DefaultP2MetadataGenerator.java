@@ -1,7 +1,11 @@
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
 import static org.sonatype.nexus.plugins.p2.repository.internal.DefaultP2RepositoryGenerator.createTemporaryP2Repository;
+import static org.sonatype.nexus.plugins.p2.repository.internal.JarsEventsInspector.isABundle;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.getRelativePath;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.localStorageOfRepositoryAsFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveFile;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveItem;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -36,6 +40,8 @@ import org.sonatype.p2.bridge.model.InstallableArtifact;
 import org.sonatype.p2.bridge.model.InstallableUnit;
 import org.sonatype.p2.bridge.model.InstallableUnitArtifact;
 import org.sonatype.p2.bridge.model.TouchpointType;
+import org.sonatype.sisu.resource.scanner.helper.ListenerSupport;
+import org.sonatype.sisu.resource.scanner.scanners.SerialScanner;
 
 @Named
 @Singleton
@@ -195,6 +201,73 @@ public class DefaultP2MetadataGenerator
             return;
         }
         logger.debug( "Removing P2 metadata for [{}:{}]", item.getRepositoryId(), item.getPath() );
+        // TODO implement
+    }
+
+    @Override
+    public void scanAndRebuild( final String repositoryId, final String resourceStorePath )
+    {
+        logger.debug( "Rebuilding P2 metadata for repository [{}], path [{}]", repositoryId, resourceStorePath );
+
+        final P2MetadataGeneratorConfiguration configuration = getConfiguration( repositoryId );
+        if ( configuration == null )
+        {
+            logger.warn(
+                "Rebuilding P2 metadata for [{}] not executed as P2 Metadata Generator capability is not enabled for this repository",
+                repositoryId );
+            return;
+        }
+
+        try
+        {
+            final Repository repository = repositories.getRepository( repositoryId );
+            final File localStorage = localStorageOfRepositoryAsFile( repository );
+            File scanPath = localStorage;
+            if ( resourceStorePath != null )
+            {
+                scanPath = new File( scanPath, resourceStorePath );
+            }
+
+            new SerialScanner().scan( scanPath, new ListenerSupport()
+            {
+
+                @Override
+                public void onFile( final File file )
+                {
+                    if ( isABundle( file ) )
+                    {
+                        final String path = getRelativePath( localStorage, file );
+                        try
+                        {
+                            final StorageItem bundle = retrieveItem( repository, path );
+                            generateP2Metadata( bundle );
+                        }
+                        catch ( final Exception e )
+                        {
+                            logger.warn(
+                                String.format( "P2 metadata for bundle [%s] not created due to [%s]", path,
+                                    e.getMessage() ), e );
+                        }
+                    }
+                }
+
+            } );
+        }
+        catch ( final Exception e )
+        {
+            logger.warn( String.format(
+                "Rebuilding P2 metadata not executed as repository [%s] could not be scanned due to [%s]",
+                repositoryId, e.getMessage() ), e );
+        }
+    }
+
+    @Override
+    public void scanAndRebuild( final String resourceStorePath )
+    {
+        for ( final Repository repository : repositories.getRepositories() )
+        {
+            scanAndRebuild( repository.getId(), resourceStorePath );
+        }
     }
 
     private void storeItemFromFile( final String path, final File file, final Repository repository )
