@@ -3,7 +3,7 @@
   <parent>
     <artifactId>nexus-migration-plugin</artifactId>
     <groupId>org.sonatype.nexus.plugins</groupId>
-    <version>1.9.2</version>
+    <version>1.9.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-migration-plugin-packaging</artifactId>
