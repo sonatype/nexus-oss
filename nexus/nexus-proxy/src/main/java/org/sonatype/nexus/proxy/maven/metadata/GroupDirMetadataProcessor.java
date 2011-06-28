@@ -18,7 +18,7 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata;
 
-import static org.sonatype.nexus.proxy.maven.metadata.operations.MetadataUtil.isPluginEquals;
+import static org.sonatype.nexus.proxy.maven.metadata.operations.MetadataUtil.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -81,8 +81,6 @@ public class GroupDirMetadataProcessor
             }
 
             MetadataBuilder.changeMetadata( md, ops );
-
-            ModelVersionUtility.setModelVersion( md, ModelVersionUtility.LATEST_MODEL_VERSION );
 
             return md;
         }
