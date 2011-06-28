@@ -19,6 +19,7 @@
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Versioning;
 
 /**
  * Handling model version of Maven repository metadata, with some rudimentary "version detection".
@@ -54,7 +55,11 @@ public class ModelVersionUtility
         {
             case V100:
                 metadata.setModelVersion( null );
-                metadata.getVersioning().setSnapshotVersions( null );
+                Versioning versioning = metadata.getVersioning();
+                if ( versioning != null )
+                {
+                    versioning.setSnapshotVersions( null );
+                }
                 break;
 
             case V110:
