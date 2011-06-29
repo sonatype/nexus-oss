@@ -9,7 +9,7 @@
   <artifactId>nexus-migration-plugin-packaging</artifactId>
   <packaging>war</packaging>
 
-  <name>Nexus Migration Plugin - Packaging</name>
+  <name>Nexus : Core Pluings : Migration Plugin : Packaging</name>
 
   <build>
     <plugins>

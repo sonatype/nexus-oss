@@ -8,7 +8,7 @@
 
   <artifactId>nexus-migration-plugin-artifactory-bridge</artifactId>
 
-  <name>Nexus Migration Plugin - Artifactory Bridge</name>
+  <name>Nexus : Core Plugins : Migration Plugin : Artifactory Bridge</name>
 
   <build>
     <plugins>

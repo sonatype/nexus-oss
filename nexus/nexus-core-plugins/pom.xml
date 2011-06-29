@@ -43,6 +43,7 @@
     <module>nexus-capabilities-plugin</module>
     <module>nexus-archetype-plugin</module>
     <module>nexus-maven-bridge-plugin</module>
+    <module>nexus-migration-plugin</module>
   </modules>
 
   <build>

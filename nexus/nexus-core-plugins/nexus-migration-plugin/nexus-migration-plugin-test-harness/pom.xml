@@ -9,7 +9,7 @@
 
   <artifactId>nexus-migration-plugin-test-harness</artifactId>
 
-  <name>Nexus Migration Plugin - Test harness</name>
+  <name>Nexus : Core Plugins : Migration Plugin : Test harness</name>
 
   <build>
 
@@ -18,8 +18,28 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.6</version>
+        <version>${nexus.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>setup-nexus-plugin-environment</goal>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
+          <nexusBundleArtifact>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-oss-webapp</artifactId>
+            <version>${nexus.version}</version>
+            <type>zip</type>
+            <classifier>bundle</classifier>
+          </nexusBundleArtifact>
+
+          <nexusBundleName>nexus-oss-webapp-${nexus.version}</nexusBundleName>
+
+          <nexusVersion>${nexus.version}</nexusVersion>
+
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>

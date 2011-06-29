@@ -9,7 +9,7 @@
 
   <artifactId>nexus-migration-plugin-configuration</artifactId>
 
-  <name>Nexus Migration Plugin - Configuration</name>
+  <name>Nexus : Core Plugins : Migration Plugin : Configuration</name>
 
   <build>
     <plugins>

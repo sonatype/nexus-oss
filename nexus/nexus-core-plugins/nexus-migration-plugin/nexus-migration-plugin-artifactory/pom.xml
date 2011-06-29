@@ -9,7 +9,7 @@
   <artifactId>nexus-migration-plugin-artifactory</artifactId>
   <packaging>nexus-plugin</packaging>
 
-  <name>Nexus Migration Plugin - Artifactory</name>
+  <name>Nexus : Core Plugins : Migration Plugin : Artifactory</name>
 
   <build>
     <testResources>
@@ -50,6 +50,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
+      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>
@@ -86,6 +87,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
+      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>
