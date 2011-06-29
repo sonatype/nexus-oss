@@ -29,6 +29,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.ArtifactInfoFilter;
@@ -381,6 +382,20 @@ public class SearchNGIndexPlexusResource
                 }
 
                 result.setData( null );
+            }
+            catch ( IllegalArgumentException e )
+            {
+                if ( e.getCause() instanceof ParseException )
+                {
+                    // NEXUS-4372: illegal query -> 400 response
+                    throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
+                        "The query was not understood by the server:\n" + e.getCause().getMessage(),
+                        e.getCause() );
+                }
+                else
+                {
+                    throw e;
+                }
             }
         }
 
