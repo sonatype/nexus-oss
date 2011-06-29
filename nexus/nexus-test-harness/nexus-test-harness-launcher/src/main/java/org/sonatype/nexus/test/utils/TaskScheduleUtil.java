@@ -108,7 +108,7 @@ public class TaskScheduleUtil
         catch ( AssertionError e )
         {
             // unsuccessful GET
-            LOG.error( e );
+            LOG.error( e.getMessage() , e );
             return Collections.emptyList();
         }
 
