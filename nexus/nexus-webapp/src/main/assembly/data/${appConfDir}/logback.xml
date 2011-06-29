@@ -17,13 +17,13 @@
     <!--See http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
     <!--and http://logback.qos.ch/manual/appenders.html#TimeBasedRollingPolicy-->
     <!--for further documentation-->
-    <File>${plexus.nexus-work}/logs/nexus.log</File>
+    <File>${basedir}/logs/nexus.log</File>
     <Append>true</Append>
     <encoder>
       <pattern>%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${plexus.nexus-work}/logs/nexus.log.%d{'.'yyyy-MM-dd}</fileNamePattern>
+      <fileNamePattern>${basedir}/logs/nexus.log.%d{yyyy-MM-dd}</fileNamePattern>
     </rollingPolicy>
   </appender>
   <logger name="org.jsecurity" level="WARN"/>
