@@ -20,12 +20,14 @@ package org.sonatype.nexus.log;
 
 import java.io.File;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 
 /**
  * @author juven
  */
+@Ignore
 public class LogManagerTest
     extends AbstractNexusTestCase
 {
