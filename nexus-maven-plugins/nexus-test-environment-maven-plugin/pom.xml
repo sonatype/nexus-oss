@@ -3,14 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.plugins</groupId>
-    <artifactId>plugins-parent</artifactId>
-    <version>5</version>
-    <relativePath>../plugins-parent/pom.xml</relativePath>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-maven-plugins-parent</artifactId>
+    <version>1.9.3-SNAPSHOT</version>
   </parent>
 
+  <groupId>org.sonatype.plugins</groupId>
   <artifactId>nexus-test-environment-maven-plugin</artifactId>
-  <version>1.7-SNAPSHOT</version>
 
   <packaging>maven-plugin</packaging>
 
