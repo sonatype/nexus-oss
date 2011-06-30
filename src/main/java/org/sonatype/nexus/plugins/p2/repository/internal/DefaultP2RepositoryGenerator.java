@@ -6,6 +6,7 @@ import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.creat
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.localStorageOfRepositoryAsFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveItem;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.safeRetrieveFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.safeRetrieveItem;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.storeItem;
 import static org.sonatype.nexus.plugins.p2.repository.internal.P2ArtifactsEventsInspector.isP2ArtifactsXML;
@@ -31,7 +32,6 @@ import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGeneratorConfiguration;
-import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
@@ -95,33 +95,15 @@ public class DefaultP2RepositoryGenerator
             if ( p2Dir == null )
             {
                 final RepositoryItemUid p2RepoUid = repository.createUid( P2_REPOSITORY_ROOT_PATH );
-                File tempP2Repository = null;
                 try
                 {
                     p2RepoUid.getLock().lock( Action.create );
 
-                    tempP2Repository = createTemporaryP2Repository();
-
-                    artifactRepository.write( tempP2Repository.toURI(), Collections.<InstallableArtifact> emptyList(),
-                        repository.getId(), null /** repository properties */
-                        , null /* mappings */);
-
-                    final String p2ArtifactsPath = P2_REPOSITORY_ROOT_PATH + P2Constants.ARTIFACTS_XML;
-
-                    storeItemFromFile( p2ArtifactsPath, new File( tempP2Repository, "artifacts.xml" ), repository );
-
-                    metadataRepository.write( tempP2Repository.toURI(), Collections.<InstallableUnit> emptyList(),
-                        repository.getId(), null /** repository properties */
-                    );
-
-                    final String p2ContentPath = P2_REPOSITORY_ROOT_PATH + "/" + P2Constants.CONTENT_XML;
-
-                    storeItemFromFile( p2ContentPath, new File( tempP2Repository, "content.xml" ), repository );
+                    createP2Repository( repository );
                 }
                 finally
                 {
                     p2RepoUid.getLock().unlock();
-                    FileUtils.deleteDirectory( tempP2Repository );
                 }
             }
         }
@@ -504,22 +486,62 @@ public class DefaultP2RepositoryGenerator
         }
     }
 
-    private static File getP2Artifacts( final P2RepositoryGeneratorConfiguration configuration,
-                                        final Repository repository )
-        throws LocalStorageException
+    private File getP2Artifacts( final P2RepositoryGeneratorConfiguration configuration, final Repository repository )
+        throws Exception
     {
         // TODO handle compressed repository
-        final File file = retrieveFile( repository, P2_REPOSITORY_ROOT_PATH + P2Constants.ARTIFACTS_XML );
+        final String path = P2_REPOSITORY_ROOT_PATH + P2Constants.ARTIFACTS_XML;
+        File file = safeRetrieveFile( repository, path );
+        if ( !file.exists() )
+        {
+            createP2Repository( repository );
+            file = retrieveFile( repository, path );
+        }
         return file;
     }
 
-    private static File getP2Content( final P2RepositoryGeneratorConfiguration configuration,
-                                      final Repository repository )
-        throws LocalStorageException
+    private File getP2Content( final P2RepositoryGeneratorConfiguration configuration, final Repository repository )
+        throws Exception
     {
         // TODO handle compressed repository
-        final File file = retrieveFile( repository, P2_REPOSITORY_ROOT_PATH + P2Constants.CONTENT_XML );
+        final String path = P2_REPOSITORY_ROOT_PATH + P2Constants.CONTENT_XML;
+        File file = safeRetrieveFile( repository, path );
+        if ( !file.exists() )
+        {
+            createP2Repository( repository );
+            file = retrieveFile( repository, path );
+        }
         return file;
+    }
+
+    private void createP2Repository( final Repository repository )
+        throws Exception
+    {
+        File tempP2Repository = null;
+        try
+        {
+            tempP2Repository = createTemporaryP2Repository();
+
+            artifactRepository.write( tempP2Repository.toURI(), Collections.<InstallableArtifact> emptyList(),
+                repository.getId(), null /** repository properties */
+                , null /* mappings */);
+
+            final String p2ArtifactsPath = P2_REPOSITORY_ROOT_PATH + P2Constants.ARTIFACTS_XML;
+
+            storeItemFromFile( p2ArtifactsPath, new File( tempP2Repository, "artifacts.xml" ), repository );
+
+            metadataRepository.write( tempP2Repository.toURI(), Collections.<InstallableUnit> emptyList(),
+                repository.getId(), null /** repository properties */
+            );
+
+            final String p2ContentPath = P2_REPOSITORY_ROOT_PATH + "/" + P2Constants.CONTENT_XML;
+
+            storeItemFromFile( p2ContentPath, new File( tempP2Repository, "content.xml" ), repository );
+        }
+        finally
+        {
+            FileUtils.deleteDirectory( tempP2Repository );
+        }
     }
 
     static File createTemporaryP2Repository()

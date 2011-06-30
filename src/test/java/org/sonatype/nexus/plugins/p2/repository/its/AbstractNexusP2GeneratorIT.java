@@ -111,22 +111,25 @@ public abstract class AbstractNexusP2GeneratorIT
         return p2Artifacts;
     }
 
+    protected File storageP2Repository()
+        throws IOException
+    {
+        final File p2Repository =
+            new File( new File( nexusWorkDir ), "storage/" + getTestRepositoryId() + P2_REPOSITORY_ROOT_PATH );
+        return p2Repository;
+    }
+
     protected File storageP2RepositoryArtifactsXML()
         throws IOException
     {
-        final File p2Artifacts =
-            new File( new File( nexusWorkDir ), "storage/" + getTestRepositoryId() + P2_REPOSITORY_ROOT_PATH
-                + ARTIFACTS_XML );
+        final File p2Artifacts = new File( storageP2Repository(), ARTIFACTS_XML );
         return p2Artifacts;
     }
 
     protected File storageP2RepositoryContentXML()
         throws IOException
     {
-        final File p2Content =
-            new File( new File( nexusWorkDir ), "storage/" + getTestRepositoryId() + P2_REPOSITORY_ROOT_PATH
-                + P2Constants.CONTENT_XML );
+        final File p2Content = new File( storageP2Repository(), P2Constants.CONTENT_XML );
         return p2Content;
     }
-
 }
