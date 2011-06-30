@@ -2,16 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.sonatype.plugins</groupId>
-    <artifactId>plugins-parent</artifactId>
-    <version>6</version>
-    <relativePath>../plugins-parent/pom.xml</relativePath>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-maven-plugins-parent</artifactId>
+    <version>1.9.3-SNAPSHOT</version>
   </parent>
+
   <groupId>org.sonatype.plugins</groupId>
   <artifactId>nexus-maven-plugin</artifactId>
-  <version>1.8-RC4-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <name>Nexus : Maven Plugin</name>
+
+  <description>Maven plugin used to interact with Nexus and Nexus Professional instances.</description>
+
   <licenses>
     <license>
       <name>GPL</name>
@@ -19,23 +21,20 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
   <distributionManagement>
     <site>
       <id>sonatype.org-sites</id>
       <url>${pluginsSiteBaseUrl}/${project.artifactId}</url>
     </site>
   </distributionManagement>
-  <description>Maven plugin used to interact with Nexus and Nexus Professional instances.</description>
+
   <properties>
     <forgeSiteUrl>dav:https://sites.sonatype.com/plugins/nexus-maven-plugin</forgeSiteUrl>
-    <restlight.version>1.9.2-RC3</restlight.version>
+    <restlight.version>${project.version}</restlight.version>
     <mavenVersion>2.2.1</mavenVersion>
   </properties>
-  <scm>
-    <connection>scm:svn:git://github.com/sonatype/nexus-maven-plugin.git</connection>
-    <url>https://github.com/sonatype/nexus-maven-plugin</url>
-    <developerConnection>scm:git:git@github.com:sonatype/nexus-maven-plugin.git</developerConnection>
-  </scm>
+
   <mailingLists>
     <mailingList>
       <name>Nexus Users</name>
@@ -74,6 +73,7 @@
       <unsubscribe>nexus-ci-unsubscribe@sonatype.org</unsubscribe>
     </mailingList>
   </mailingLists>
+
   <developers>
     <developer>
       <id>jdcasey</id>
@@ -174,7 +174,6 @@
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-component-annotations</artifactId>
-      <version>1.2.1.3</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -473,7 +472,7 @@
   </reporting>
   <ciManagement>
     <system>Hudson</system>
-    <url>https://grid.sonatype.org/ci/job/nexus-maven-plugin-trunk/</url>
+    <url>https://builds.sonatype.org/job/nexus-maven-plugin/</url>
   </ciManagement>
   <issueManagement>
     <system>JIRA</system>
