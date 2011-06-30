@@ -1,0 +1,52 @@
+  ---
+  Nexus Plugin for Maven
+  ---
+  John Casey
+  ---
+  April 1, 2009
+  ---
+  
+Introduction
+
+  The Nexus Plugin for Maven provides a set of mojos that allow Maven users to interact with a Nexus or Nexus Professional instance.
+  
+  For now, this plugin focuses on the interactions a user may have with Nexus during the course of setting up a new developer's workstation, or releasing a project. To support
+  standardization of settings across a team of developers, Nexus Professional provides plugin that stores a set of Maven <<<settings.xml>>> template files for different types of developers.
+  Once these templates are created, developers can use this Maven plugin to reference them by URL and save them in one of several locations for use on the local workstation.
+  
+  To support the release process, Nexus Professional provides a {{{http://www.sonatype.com/products/nexus/overview/features/staging}Staging Suite}} that manages on-demand, isolated 
+  repositories that can be used to deploy your artifacts. Once your release has been staged into one of these temporary repositories, you can seal - or "close" - the repository so that 
+  others may access it and determine whether it passes all the various acceptance tests employed by your organization. If these tests pass, you can promote this closed repository so that 
+  its artifacts are injected into a permanent repository managed by the Nexus instance. Alternatively, if the staged release fails to pass acceptance tests, you can drop the temporary 
+  repository that houses those artifacts and try again. This plugin  supports the staging workflow by allowing users to list open staging repositories, and to close the repository for a 
+  given project (using its groupId, artifactId, and version) after a release has been staged.
+  
+* Setup
+
+  By default, Maven 2 will only search the groupIds <<<org.apache.maven.plugins>>> and <<<org.codehaus.mojo>>> when you attempt to invoke a mojo directly from the command line 
+  using plugin prefixes like <<<install>>>, <<<surefire>>>, or <<<assembly>>>. To enable the use of plugin prefixes for Sonatype plugins, you'll need to add the following to your 
+  <<<settings.xml>>> file:
+  
++---+
+<pluginGroups>
+  <pluginGroup>org.sonatype.plugins</pluginGroup>
+</pluginGroups>
++---+
+
+  Once you have added this to your <<<~/.m2/settings.xml>>> file, you should be able to invoke mojos in the Nexus Plugin for Maven using the prefix <<<nexus>>>. For example, to list your
+  open staging repositories, the mojo you would access is <<<nexus:staging-list>>>. For more information on what you can do with the Nexus Plugin for Maven, and how, read on!
+  
+* More Information
+
+  * {{{plugin-info.html}Goals}}
+  
+  * Usage:
+  
+    * {{{usage-settings.html}Working with Nexus Professional's Maven Settings Templates}}
+    
+    * {{{usage-staging.html}Working with Nexus Professional's Staging Suite}}
+  
+    []
+    
+  []
+

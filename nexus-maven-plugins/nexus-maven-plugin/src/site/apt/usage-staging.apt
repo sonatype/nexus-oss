@@ -1,0 +1,274 @@
+  ---
+  Nexus Plugin for Maven: Working with the Staging Suite
+  ---
+  John Casey
+  ---
+  April 2, 2009
+  ---
+
+Plugin Usage: Working with the Nexus Professional Staging Suite
+
+  Nexus Professional provides a feature called the {{{http://www.sonatype.com/products/nexus/overview/features/staging}Staging Suite}}, which allows developers to deploy sets of
+  artifacts to unique, isolated repositories for testing. When all artifacts for a prospective release have been deployed, the repository can be sealed, providing a convenient
+  single location that houses the complete set of artifacts for the proposed release. Once the artifacts are tested, the repository as a whole can be promoted into a permanent 
+  repository to finalize the release for general consumption, or dropped to make room for another attempt.
+  
+  The Nexus Plugin for Maven gives you access to this feature from the Maven command line.
+  
+* Before You Start: Authentication and Required Information
+
+  All of the mojos below have two important attributes:
+  
+  * If critical information is missing, the mojo will prompt you for it.
+  
+  * If you supply the <<<serverAuthId>>> parameter, it will attempt to read the Nexus URL, username, and password from your <<<settings.xml>>>
+    file using that ID. For the Nexus URL, the mojo will attempt to find a <<<mirror>>> definition with that server ID; for username and password,
+    the <<<server>>> entry with that ID is used directly.
+    
+    If you don't use <<<serverAuthId>>>, or the corresponding entries in your <<<settings.xml>>> cannot be located, you will be prompted
+    for all login information <<except>> username. In this case, the System property <<<$\{user.name\}>>> will be used unless you specify the
+    <<<username>>> parameter.
+
+** TIP: Using your existing <<<settings.xml>>> configuration to authenticate against Nexus
+
+  If you've already configured Maven to authenticate your access to Nexus in order to resolve artifacts, you can reuse this configuration when interacting with Nexus' other functions.
+  Simply reference the <<<server>>> entry id from your <<<settings.xml>>> file, like this:
+  
++---+
+mvn nexus:staging-list -DserverAuthId=my.nexus
++---+
+
+  If you watch the console output, you should see the following:
+  
++---+
+[...]
+[INFO] Using authentication information for server: 'my.nexus'.
+[...]
++---+
+
+  On the other hand, if the specified <<<server>>> entry doesn't exist, you'll see the following instead:
+  
++---+
+[...]
+[WARN] Server authentication entry not found for: 'my.nexus'.
+[...]
++---+
+
+** TIP: Required Information
+
+  In order to access the staging suite in your Nexus instance, the plugin must be told where Nexus is. Additionally, in most cases a valid user login will be required to access your 
+  relevant staging information. By default, if you don't specify the <<<nexusURL>>> and <<<password>>> parameters, the plugin will prompt you for them. If you don't specify the
+  <<<username>>> parameter, the Java System property <<<$\{user.name\}>>> will be used.
+  
+  For example:
+  
++---+
+[...]
+Nexus URL: http://localhost:8082/nexus
+Password: ********
+Description: This is a test repository
+[...]
++---+
+
+* Listing Your Open Staging Repositories
+
+  Once you've deployed one or more sets of artifacts as release candidate to Nexus, you'll have one or more open staging repositories. There are a variety of actions you can take with
+  these repositories, but maybe one of the most basic is to list them. This gives you a pretty good view into the status of your release(s).
+
+  The basic command is:
+  
++---+
+mvn nexus:staging-list
++---+
+
+  and the console output will look something like this:
+  
++---+
+[...]
+[INFO] Logging into Nexus: http://localhost:8082/nexus
+[INFO] User: testuser
+[INFO] 
+
+
+[INFO] The following OPEN staging repositories were found: 
+
+-  staging-003 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-003
+
+
+[INFO] The following CLOSED staging repositories were found: 
+
+-  staging-001 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-001
+   Description: This is a test repository
+   
+-  staging-002 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-002
+   Description: This is another test repository
++---+
+
+  You can find more information about this mojo {{{staging-list-mojo.html}here}}. 
+  
+* Finishing an Open Staging Repository for Your Project
+
+  Before your team can run any tests against the set of artifacts that constitute your release, you need to mark the open staging repository as <<closed>>. This means that no additional
+  artifacts can be added to that specific staging repository, making the set of artifacts it contains an immutable snapshot. When it is closed, the repository will become available for
+  artifact resolution.
+
+  The basic command is:
+
++---+
+mvn nexus:staging-close
++---+
+
+  If you have one or more open staging repositories that match the current project coordinate, you'll see something like the following in the console output:
+  
++---+
+[INFO] 
+
+
+Available Staging Repositories:
+
+
+1: staging-002 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-002
+
+
+
+Select a repository to close (1) 1: : 1
+
+Repository Description: This is a test repository
+[INFO] Finishing staging repository for: 'com.myco:my-project:1':
+
+-  staging-002 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-002
+
+
+[INFO] The following CLOSED staging repositories were found for: 'com.myco:my-project:1':
+
+-  staging-001 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-001
+   Description: This is a test repository
+   
+-  staging-002 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-002
+   Description: This is another test repository
++---+
+
+  The output above shows that the <<<staging-close>>> mojo found an open staging repository - <<<staging-001>>> - for the current project, then told Nexus to close it. Afterward, 
+  it displayed the list of closed staging repositories, which included the one we just closed. 
+  
+  If you don't have an open staging repository, you'll see something like this instead:
+  
++---+
+No open staging repositories found. Nothing to do!
+
+
+[INFO] The following CLOSED staging repositories were found for: 'com.myco:my-project:1':
+
+-  staging-001 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-001
+   Description: This is a test repository
+   
+-  staging-002 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-002
+   Description: This is another test repository
++---+
+
+  You can find more information about this mojo {{{staging-close-mojo.html}here}}. 
+  
+* Dropping a Closed Staging Repository
+
+  In the unfortunate event that your project artifacts fail during testing, you may need to drop the staging repository that houses them, in order to avoid confusing them with newer 
+  candidate releases. 
+
+  The basic command is:
+
++---+
+mvn nexus:staging-drop
++---+
+
+  If you have one or more closed staging repositories, you'll see something like the following output:
+
++---+
+[INFO] 
+
+
+Available Staging Repositories:
+
+
+1: staging-006 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-006
+   Description: This is a test repository
+
+
+
+Select a repository to drop (1) 1: : 1
+[INFO] Dropping staged repository: 
+
+-  staging-006 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-006
+   Description: This is a test repository
++---+
+  
+  The mojo will present you with a list of closed staging repositories, with the first in the list selected as the default response. If you simply hit the Enter key, the default will 
+  be used; otherwise, the repository corresponding to the number you select will be used.
+
+  If you have no closed staging repositories, you'll see something like this instead: 
+
++---+
+[INFO] 
+
+No closed staging repositories found. Nothing to do!
++---+
+
+  You can find more information about this mojo {{{staging-drop-mojo.html}here}}. 
+  
+* Promoting a Closed Staging Repository
+
+  On the other hand, if your project artifacts pass all tests, you will find that you need to promote the staging repository that houses them, in order to finalize the release and 
+  make the artifacts available for public consumption.
+
+  The basic command is:
+
++---+
+mvn nexus:staging-promote
++---+
+
+  If you have one or more closed staging repositories, you'll see something like the following output:
+
++---+
+[INFO] 
+
+
+Available Staging Repositories:
+
+
+1: staging-006 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-006
+   Description: This is a test repository
+
+
+
+Select a repository to promote (1) 1: : 1
+Target Repository ID: releases
+[INFO] Promoting staging repository to: releases:
+
+-  staging-006 (profile: Example Profile)
+   URL: http://localhost:8082/nexus/content/repositories/staging-006
+   Description: This is a test repository
++---+
+  
+  The mojo will present you with a list of closed staging repositories, with the first in the list selected as the default response. If you simply hit the Enter key, the default will 
+  be used; otherwise, the repository corresponding to the number you select will be used.
+
+  If you have no closed staging repositories, you'll see something like this instead: 
+
++---+
+[INFO] 
+
+No closed staging repositories found. Nothing to do!
++---+
+
+  You can find more information about this mojo {{{staging-promote-mojo.html}here}}. 
+    

@@ -1,0 +1,88 @@
+  ---
+  Nexus Plugin for Maven: Working with the Staging Suite
+  ---
+  John Casey
+  ---
+  April 2, 2009
+  ---
+
+Plugin Usage: Working with Nexus Professional's Maven Settings Templates
+
+  Starting with version 1.3.2, Nexus Professional includes a feature called {{{http://www.sonatype.com/products/nexus/overview/features/m2-settings}Maven Settings Templates}}, which allows
+  users the appropriate permissions to define a template <<<settings.xml>>> file that contains the proper <<<server>>> entries for logging into that Nexus instance, among other things.
+  Once defined, users can login and download a <<<settings.xml>>> file which is customized to fit each user, but still retains the consistency that development teams need when writing an
+  application and using common infrastructure.
+  
+  The Nexus Plugin for Maven gives users access to this feature from the Maven command line.
+
+* Before You Start: Authentication and Required Information
+
+  All of the mojos below have two important attributes:
+  
+  * If critical information is missing, the mojo will prompt you for it.
+  
+  * If you supply the <<<serverAuthId>>> parameter, it will attempt to read the Nexus URL, username, and password from your <<<settings.xml>>>
+    file using that ID. For the Nexus URL, the mojo will attempt to find a <<<mirror>>> definition with that server ID; for username and password,
+    the <<<server>>> entry with that ID is used directly.
+    
+    If you don't use <<<serverAuthId>>>, or the corresponding entries in your <<<settings.xml>>> cannot be located, you will be prompted
+    for all login information <<except>> username. In this case, the System property <<<$\{user.name\}>>> will be used unless you specify the
+    <<<username>>> parameter.
+
+** TIP: Using your existing <<<settings.xml>>> configuration to authenticate against Nexus
+
+  If you've already configured Maven to authenticate your access to Nexus in order to resolve artifacts, you can reuse this configuration when interacting with Nexus' other functions.
+  Simply reference the <<<server>>> entry id from your <<<settings.xml>>> file, like this:
+  
++---+
+mvn nexus:staging-list -DserverAuthId=my.nexus
++---+
+
+  If you watch the console output, you should see the following:
+  
++---+
+[...]
+[INFO] Using authentication information for server: 'my.nexus'.
+[...]
++---+
+
+  On the other hand, if the specified <<<server>>> entry doesn't exist, you'll see the following instead:
+  
++---+
+[...]
+[WARN] Server authentication entry not found for: 'my.nexus'.
+[...]
++---+
+
+** TIP: Required Information
+
+  In order to access the staging suite in your Nexus instance, the plugin must be told where Nexus is. Additionally, in most cases a valid user login will be required to access your 
+  relevant staging information. By default, if you don't specify the <<<nexusURL>>> and <<<password>>> parameters, the plugin will prompt you for them. If you don't specify the
+  <<<username>>> parameter, the Java System property <<<$\{user.name\}>>> will be used.
+  
+  For example:
+  
++---+
+[...]
+Settings Template URL: http://localhost:8082/nexus/service/local/templates/settings/myTeam/content
+Password: ********
+[...]
++---+
+
+* Using an Absolute URL
+
+  The basic command is:
+  
++---+
+mvn nexus:settings-download
++---+
+
+  and the console output will resemble the following:
+  
++---+
+[INFO] Existing settings backed up to: /Users/jdcasey/.m2/settings.xml.20090402_204422
+[INFO] Settings saved to: /Users/jdcasey/.m2/settings.xml
++---+
+
+  You can find more information about this mojo {{{settings-download-mojo.html}here}}. 
+
