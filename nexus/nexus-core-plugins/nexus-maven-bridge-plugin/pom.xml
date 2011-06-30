@@ -6,26 +6,18 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.forge</groupId>
-    <artifactId>forge-parent</artifactId>
-    <version>10</version>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>nexus-core-plugins</artifactId>
+    <version>1.9.3-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-maven-bridge-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>nexus-plugin</packaging>
 
-  <name>Nexus :: Plugin :: Maven Bridge</name>
-
-  <scm>
-    <connection>scm:git:git@github.com/sonatype/nexus-maven-bridge-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-maven-bridge-plugin.git</developerConnection>
-    <url>http://github.com/sonatype/nexus-maven-bridge-plugin</url>
-  </scm>
+  <name>Nexus : Core Plugins : Maven Bridge</name>
 
   <properties>
-    <nexus.version>1.9.2-SNAPSHOT</nexus.version>
+    <nexus.version>${project.version}</nexus.version>
   </properties>
 
   <dependencies>
@@ -202,7 +194,7 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-runtime-platform</artifactId>
-        <version>2-INSIGHT-SNAPSHOT</version>
+        <version>${nexus.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -222,7 +214,6 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.4-SNAPSHOT</version>
         <extensions>true</extensions>
         <dependencies>
           <dependency>
