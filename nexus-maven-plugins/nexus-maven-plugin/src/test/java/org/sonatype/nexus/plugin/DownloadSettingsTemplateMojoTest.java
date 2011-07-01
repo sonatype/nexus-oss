@@ -18,8 +18,14 @@
  */
 package org.sonatype.nexus.plugin;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Server;
@@ -36,13 +42,6 @@ import org.sonatype.nexus.plugin.discovery.fixture.DefaultDiscoveryFixture;
 import org.sonatype.nexus.restlight.m2settings.M2SettingsClient;
 import org.sonatype.nexus.restlight.testharness.GETFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 import com.ibm.icu.text.SimpleDateFormat;
 
@@ -82,11 +81,7 @@ public class DownloadSettingsTemplateMojoTest
         Settings settings = new Settings();
         mojo.setSettings( settings );
 
-        File confDir = File.createTempFile( "download-settings-template.maven-conf", ".test.dir" );
-        confDir.delete();
-        confDir.mkdirs();
-
-        toDelete.add( confDir );
+        File confDir = createTempDir( "download-settings-template.maven-conf", ".test.dir" );
 
         mojo.setMavenUserConf( confDir );
 
@@ -137,7 +132,7 @@ public class DownloadSettingsTemplateMojoTest
         Settings settings = new Settings();
         mojo.setSettings( settings );
 
-        File target = File.createTempFile( "download-settings-template.", ".test.xml" );
+        File target = createTempFile( "download-settings-template.", ".test.xml" );
         mojo.setTarget( target );
 
         toDelete.add( target );
@@ -166,7 +161,7 @@ public class DownloadSettingsTemplateMojoTest
         Settings settings = new Settings();
         mojo.setSettings( settings );
 
-        File target = File.createTempFile( "download-settings-template.", ".test.xml" );
+        File target = createTempFile( "download-settings-template.", ".test.xml" );
         mojo.setTarget( target );
 
         toDelete.add( target );
@@ -202,7 +197,7 @@ public class DownloadSettingsTemplateMojoTest
         
         mojo.setSettings( settings );
 
-        File target = File.createTempFile( "download-settings-template.", ".test.xml" );
+        File target = createTempFile( "download-settings-template.", ".test.xml" );
         mojo.setTarget( target );
 
         toDelete.add( target );
@@ -226,7 +221,7 @@ public class DownloadSettingsTemplateMojoTest
         Settings settings = new Settings();
         mojo.setSettings( settings );
 
-        File target = File.createTempFile( "download-settings-template.", ".test.xml" );
+        File target = createTempFile( "download-settings-template.", ".test.xml" );
         mojo.setTarget( target );
 
         toDelete.add( target );
@@ -251,10 +246,11 @@ public class DownloadSettingsTemplateMojoTest
 
         Settings settings = new Settings();
         mojo.setSettings( settings );
+        File confDir1 = createTempFile( "download-settings-template.maven-conf", ".test.dir" );
+        confDir1.delete();
+        confDir1.mkdirs();
 
-        File confDir = File.createTempFile( "download-settings-template.maven-conf", ".test.dir" );
-        confDir.delete();
-        confDir.mkdirs();
+        File confDir = confDir1;
 
         toDelete.add( confDir );
 
@@ -282,10 +278,11 @@ public class DownloadSettingsTemplateMojoTest
 
         Settings settings = new Settings();
         mojo.setSettings( settings );
+        File confDir1 = createTempFile( "download-settings-template.maven-conf", ".test.dir" );
+        confDir1.delete();
+        confDir1.mkdirs();
 
-        File confDir = File.createTempFile( "download-settings-template.maven-conf", ".test.dir" );
-        confDir.delete();
-        confDir.mkdirs();
+        File confDir = confDir1;
 
         toDelete.add( confDir );
 
@@ -311,10 +308,11 @@ public class DownloadSettingsTemplateMojoTest
 
         Settings settings = new Settings();
         mojo.setSettings( settings );
+        File confDir1 = createTempFile( "download-settings-template.maven-conf", ".test.dir" );
+        confDir1.delete();
+        confDir1.mkdirs();
 
-        File confDir = File.createTempFile( "download-settings-template.maven-conf", ".test.dir" );
-        confDir.delete();
-        confDir.mkdirs();
+        File confDir = confDir1;
 
         toDelete.add( confDir );
 

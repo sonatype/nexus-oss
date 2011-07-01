@@ -18,19 +18,19 @@
  */
 package org.sonatype.nexus.plugin;
 
-import static junit.framework.Assert.fail;
-
-import org.codehaus.plexus.components.interactivity.Prompter;
-import org.codehaus.plexus.components.interactivity.PrompterException;
-import org.codehaus.plexus.util.StringUtils;
+import static junit.framework.Assert.*;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
+
+import org.codehaus.plexus.components.interactivity.Prompter;
+import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.codehaus.plexus.util.StringUtils;
 
 public class ExpectPrompter
     implements Prompter
@@ -92,7 +92,7 @@ public class ExpectPrompter
         return result;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "rawtypes" )
     public String prompt( final String prompt, final List values )
         throws PrompterException
     {
@@ -100,7 +100,7 @@ public class ExpectPrompter
         return expectationFor( wholePrompt );
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( { "rawtypes" } )
     public String prompt( final String prompt, final List values, final String defVal )
         throws PrompterException
     {

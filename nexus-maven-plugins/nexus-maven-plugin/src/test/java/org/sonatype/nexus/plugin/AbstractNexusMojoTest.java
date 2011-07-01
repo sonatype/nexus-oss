@@ -1,5 +1,12 @@
 package org.sonatype.nexus.plugin;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Set;
+
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -17,11 +24,6 @@ import org.sonatype.nexus.restlight.testharness.ConversationalFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
-
 public class AbstractNexusMojoTest
     extends AbstractRESTTest
 {
@@ -29,7 +31,7 @@ public class AbstractNexusMojoTest
     protected final ConversationalFixture fixture =
         new ConversationalFixture( getExpectedUser(), getExpectedPassword() );
 
-    protected final Set<File> toDelete = new HashSet<File>();
+    protected static final Set<File> toDelete = new HashSet<File>();
 
     protected Log log;
 
@@ -40,6 +42,8 @@ public class AbstractNexusMojoTest
     protected PlexusContainer container;
 
     protected ExpectPrompter prompter;
+
+    private static Random random = new Random();
 
     @Before
     public void beforeEach()
@@ -72,8 +76,10 @@ public class AbstractNexusMojoTest
     {
         if ( toDelete != null )
         {
-            for ( File f : toDelete )
+            for ( Iterator<File> it = toDelete.iterator(); it.hasNext(); )
             {
+                File f = it.next();
+
                 try
                 {
                     FileUtils.forceDelete( f );
@@ -82,6 +88,11 @@ public class AbstractNexusMojoTest
                 {
                     System.out.println( "Failed to delete test file/dir: " + f + ". Reason: " + e.getMessage() );
                 }
+                finally
+                {
+                    it.remove();
+                }
+
             }
         }
 
@@ -103,6 +114,44 @@ public class AbstractNexusMojoTest
         System.out.println( "\n\nRunning: '"
             + ( getClass().getName().substring( getClass().getPackage().getName().length() + 1 ) ) + "#"
             + e.getMethodName() + "'\n\n" );
+    }
+
+    protected static File createTempDir( String prefix, String suffix )
+        throws IOException
+    {
+        return createTmp( prefix, suffix, true );
+    }
+
+    protected static File createTempFile( String prefix, String suffix )
+        throws IOException
+    {
+        return createTmp( prefix, suffix, false );
+    }
+
+    private static File createTmp( String prefix, String suffix, boolean isDir )
+        throws IOException
+    {
+        File tmp = getTempFile( prefix, suffix );
+        if ( isDir )
+        {
+            tmp.mkdirs();
+        }
+        else
+        {
+            tmp.createNewFile();
+        }
+
+        toDelete.add( tmp );
+
+        return tmp;
+    }
+
+    protected static File getTempFile( String prefix, String suffix )
+    {
+        File tmp =
+            new File( System.getProperty( "java.io.tmpDir", "target" ), prefix + random.nextInt( Integer.MAX_VALUE )
+                + suffix );
+        return tmp;
     }
 
 }

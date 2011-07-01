@@ -69,7 +69,10 @@ public class CloseStageRepositoryMojoTest
         SettingsSecurity sec = new SettingsSecurity();
         sec.setMaster( master );
 
-        secFile = File.createTempFile( "settings-security.", ".xml" );
+        secFile = getTempFile( "settings-security.", ".xml" );
+        secFile.getParentFile().mkdirs();
+        secFile.createNewFile();
+
         FileWriter writer = null;
         try
         {
