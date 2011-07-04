@@ -63,8 +63,8 @@
 			<userId>deployment</userId>
 			<source>default</source>
 			<roles>
-				<role>deployment</role>
-                <role>repository-any-full</role>
+				<role>nx-deployment</role>
+				<role>repository-any-full</role>
 			</roles>
 		</userRoleMapping>
 		<userRoleMapping>
@@ -72,7 +72,7 @@
 			<source>default</source>
 			<roles>
 				<role>anonymous</role>
-                <role>repository-any-read</role>
+				<role>repository-any-read</role>
 			</roles>
 		</userRoleMapping>
 	</userRoleMappings>
