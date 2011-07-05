@@ -5,9 +5,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>nexus-plugins-parent</artifactId>
-    <version>8</version>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>10</version>
   </parent>
 
   <artifactId>nexus-p2-repository-plugin</artifactId>
@@ -27,16 +27,14 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <nexus.version>1.9.2-INSIGHT-SNAPSHOT</nexus.version>
-
-    <test-harness-launcher-resource>${project.build.directory}/test-harness-launcher</test-harness-launcher-resource>
-    <tycho-artifacts.version>0.6.0</tycho-artifacts.version>
+    <sisu.assembler.tags>nexus,nexus-plugins</sisu.assembler.tags>
   </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-webapp-dependencies</artifactId>
+        <artifactId>nexus-runtime-platform</artifactId>
         <version>${nexus.version}</version>
         <type>pom</type>
         <scope>import</scope>
@@ -46,13 +44,33 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-bean</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.6.1</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-proxy</artifactId>
+      <artifactId>nexus-app</artifactId>
+      <version>${nexus.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.tycho</groupId>
       <artifactId>tycho-metadata-model</artifactId>
       <version>0.12.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-utils</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -118,6 +136,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
+      <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -235,7 +254,6 @@
         <configuration>
           <junitArtifactName>junit:junit-dep</junitArtifactName>
           <forkMode>always</forkMode>
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <properties>
             <property>
               <name>listener</name>
@@ -268,7 +286,6 @@
               <value>${project.build.directory}/user_home</value>
             </property>
           </systemProperties>
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
         </configuration>
       </plugin>
       <plugin>
