@@ -44,12 +44,13 @@
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-it-helper-plugin</artifactId>
+              <version>${project.version}</version>
               <classifier>cp</classifier>
-              <type>jar</type>
             </plugin>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-it-helper-plugin</artifactId>
+              <version>${project.version}</version>
               <classifier>bundle</classifier>
               <type>zip</type>
             </plugin>
