@@ -1,14 +1,12 @@
 package org.sonatype.nexus.plugins.p2bridge.internal;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
-import javax.inject.Singleton;
 
 import org.sonatype.p2.bridge.Publisher;
 
-@Named
-@Singleton
+//@Named
+//@Singleton
 public class PublisherProvider
     implements Provider<Publisher>
 {
