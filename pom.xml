@@ -27,7 +27,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <nexus.version>1.9.2-INSIGHT-SNAPSHOT</nexus.version>
+    <nexus.version>1.9.2</nexus.version>
+    <sisu.assembler.tags>nexus,nexus-plugins</sisu.assembler.tags>
   </properties>
 
   <dependencies>
@@ -208,7 +209,7 @@
       </plugin>
     </plugins>
   </build>
-  
+
   <profiles>
     <profile>
       <id>assembly</id>
