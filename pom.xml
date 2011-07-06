@@ -37,7 +37,7 @@
   <description>Adds a repository type for OBR repositories.</description>
 
   <properties>
-    <nexus.version>1.9.2-SNAPSHOT</nexus.version>
+    <nexus.version>1.9.2</nexus.version>
     <felix.home>${project.build.directory}/felix</felix.home>
   </properties>
 
