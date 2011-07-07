@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://artifactory.jfrog.org/xsd/1.1.0"
+        xsi:schemaLocation="http://artifactory.jfrog.org/xsd/1.1.0
+        http://www.jfrog.org/xsd/artifactory-v1_1_0.xsd">
+    <!--
+    enable/disable anonymous downloads
+    -->
+    <!--<anonDownloadsAllowed>false</anonDownloadsAllowed>-->
+    <backup>
+        <!--
+        alternative backup dir
+        -->
+        <!--<dir></dir>-->
+        <!--
+        backup every 12 hours
+        -->
+        <cronExp>0 0 /12 * * ?</cronExp>
+        <!--
+        keep backups for a week
+        -->
+        <retentionPeriodHours>168</retentionPeriodHours>
+        <!--
+        exclude certain repositories from being backed up
+        -->
+        <excludedRepositories>
+            <repositoryRef>repo1</repositoryRef>
+            <repositoryRef>codehaus-snapshots</repositoryRef>
+            <repositoryRef>java.net</repositoryRef>
+        </excludedRepositories>
+    </backup>
+    <localRepositories>
+        <localRepository>
+            <key>libs-releases</key>
+            <description>Local repository for in-house libraries</description>
+            <handleReleases>true</handleReleases>
+            <handleSnapshots>false</handleSnapshots>
+        </localRepository>
+        <localRepository>
+            <key>libs-snapshots</key>
+            <description>Local repository for in-house snapshots</description>
+            <handleReleases>false</handleReleases>
+            <handleSnapshots>true</handleSnapshots>
+        </localRepository>
+        <localRepository>
+            <key>plugins-releases</key>
+            <description>Local repository for plugins</description>
+            <handleReleases>true</handleReleases>
+            <handleSnapshots>false</handleSnapshots>
+        </localRepository>
+        <localRepository>
+            <key>plugins-snapshots</key>
+            <description>Local repository for plugins snapshots</description>
+            <handleReleases>false</handleReleases>
+            <handleSnapshots>true</handleSnapshots>
+        </localRepository>
+        <localRepository>
+            <key>ext-releases</key>
+            <description>Local repository for third party libraries</description>
+            <handleReleases>true</handleReleases>
+            <handleSnapshots>false</handleSnapshots>
+        </localRepository>
+        <localRepository>
+            <key>ext-snapshots</key>
+            <description>Local repository for third party snapshots</description>
+            <handleReleases>false</handleReleases>
+            <handleSnapshots>true</handleSnapshots>
+        </localRepository>
+
+        <!--
+        A sample local repository with all possible settings
+        -->
+        <!--<localRepository>-->
+        <!--<key>local-sample</key>-->
+        <!--<description>Sample local repository</description>-->
+        <!--<blackedOut>false</blackedOut>-->
+        <!--<handleReleases>true</handleReleases>-->
+        <!--<handleSnapshots>true</handleSnapshots>-->
+        <!--
+        maximum number of unique stnapshot to keep
+        -->
+        <!--<maxUniqueSnapshots>3</maxUniqueSnapshots>-->
+        <!--<includesPattern>*/**</includesPattern>-->
+        <!--<excludesPattern>com/mycompany/**</excludesPattern>-->
+        <!--
+        centrally control unique snapshots behavior (nonunique|unique|deployer)
+        -->
+        <!--<snapshotVersionBehavior>nonunique</snapshotVersionBehavior>-->
+        <!--</localRepository>-->
+    </localRepositories>
+
+    <remoteRepositories>
+        <remoteRepository>
+            <key>repo1</key>
+            <handleReleases>true</handleReleases>
+            <handleSnapshots>false</handleSnapshots>
+            <excludesPattern>org/artifactory/**,org/jfrog/**</excludesPattern>
+            <url>http://repo1.maven.org/maven2</url>
+        </remoteRepository>
+        <remoteRepository>
+            <key>codehaus-snapshots</key>
+            <blackedOut>true</blackedOut>
+            <handleReleases>false</handleReleases>
+            <handleSnapshots>true</handleSnapshots>
+            <excludesPattern>org/artifactory/**,org/jfrog/**</excludesPattern>
+            <url>http://snapshots.repository.codehaus.org</url>
+        </remoteRepository>
+        <remoteRepository>
+            <key>java.net</key>
+            <description>java.net</description>
+            <handleReleases>true</handleReleases>
+            <handleSnapshots>true</handleSnapshots>
+            <excludesPattern>org/artifactory/**,org/jfrog/**</excludesPattern>
+            <url>http://download.java.net/maven/2</url>
+        </remoteRepository>
+        <!--<remoteRepository>
+            <key>codehaus</key>
+            <handleReleases>true</handleReleases>
+            <handleSnapshots>false</handleSnapshots>
+            <excludesPattern>org/artifactory/**,org/jfrog/**</excludesPattern>
+            <url>http://dist.codehaus.org</url>
+        </remoteRepository>-->
+        <!--<remoteRepository>
+            <key>ibiblio</key>
+            <excludesPattern>org/artifactory/**</excludesPattern>
+            <url>http://www.ibiblio.org/maven2</url>
+        </remoteRepository>-->
+        <!--<remoteRepository>
+            <key>apache-m2-snapshots</key>
+            <handleReleases>false</handleReleases>
+            <handleSnapshots>true</handleSnapshots>
+            <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+            <proxyRef>unused-proxy</proxyRef>
+        </remoteRepository>-->
+
+        <!-- A sample remote repository with all possible tunings -->
+        <!--<remoteRepository>-->
+        <!--<key>remote-sample</key>-->
+        <!--<description>Sample remote repository</description>-->
+        <!--
+        blok the usgae of this repository
+        -->
+        <!--<blackedOut>false</blackedOut>-->
+        <!--
+        maximum number of unique stnapshot to keep
+        -->
+        <!--<maxUniqueSnapshots>3</maxUniqueSnapshots>-->
+        <!--<includesPattern>*/**</includesPattern>-->
+        <!--<excludesPattern>com/mycompany/**</excludesPattern>-->
+        <!--<url>http://maven.repo/repository</url>-->
+        <!--
+        put offline to use only the cache and not send remote requests
+        -->
+        <!--<offline>false</offline>-->
+        <!--<hardFail>true</hardFail>-->
+        <!--
+        cache remotely retrieved artifacts (you'd want 'true')
+        -->
+        <!--<storeArtifactsLocally>true</storeArtifactsLocally>-->
+        <!--
+        number of seconds to cache artifact lookup results
+        -->
+        <!--<retrievalCachePeriodSecs>43200</retrievalCachePeriodSecs>-->
+        <!--
+        number of seconds to cache artifact retrieval failures (normally communication errors)
+        -->
+        <!--<failedRetrievalCachePeriodSecs>30</failedRetrievalCachePeriodSecs>-->
+        <!--
+        number of seconds to remember artifact retrieval misses (artifact not found)
+        -->
+        <!--<missedRetrievalCachePeriodSecs>43200</missedRetrievalCachePeriodSecs>-->
+        <!--
+        ttp authentication details
+        -->
+        <!--<username>un</username>-->
+        <!--<password>pw</password>-->
+        <!--
+        network timeout for both connection establishment failures and unanswered requests
+        -->
+        <!--<socketTimeoutMillis>2000</socketTimeoutMillis>-->
+        <!--
+        proxy reference
+        -->
+        <!--<proxyRef>unused-proxy</proxyRef>-->
+        <!--</remoteRepository>-->
+    </remoteRepositories>
+
+    <virtualRepositories>
+        <!-- This repositoy will be available at the url:
+        http://<host>:<port>/artifactory/snapshots-only/
+        (note the trailing slash!)
+        -->
+        <virtualRepository>
+            <key>snapshots-only</key>
+            <repositories>
+                <repositoryRef>libs-snapshots</repositoryRef>
+                <repositoryRef>plugins-snapshots</repositoryRef>
+                <repositoryRef>ext-snapshots</repositoryRef>
+                <repositoryRef>codehaus-snapshots</repositoryRef>
+            </repositories>
+        </virtualRepository>
+    </virtualRepositories>
+
+    <proxies>
+        <proxy>
+            <key>unused-proxy</key>
+            <host>host</host>
+            <port>8080</port>
+            <username>un</username>
+            <password>pw</password>
+            <domain>mydomain</domain>
+        </proxy>
+    </proxies>
+
+</config>

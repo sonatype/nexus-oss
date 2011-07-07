@@ -1,0 +1,45 @@
+<assembly>
+  <id>webapp</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <fileSets>
+    <fileSet>
+      <directory>${basedir}/src/main/webapp</directory>
+      <outputDirectory>runtime/apps/artifactory-bridge/webapp</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${basedir}/src/main/conf</directory>
+      <outputDirectory>conf</outputDirectory>
+    </fileSet>
+  </fileSets>
+
+  <dependencySets>
+    <dependencySet>
+      <unpack>true</unpack>
+      <outputDirectory>runtime/apps/nexus/plugin-repository</outputDirectory>
+      <scope>provided</scope>
+      <includes>
+        <include>org.sonatype.nexus.plugins:nexus-migration-plugin-artifactory</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <unpack>false</unpack>
+      <outputDirectory>runtime/apps/nexus/lib</outputDirectory>
+      <includes>
+        <include>org.sonatype.nexus.plugins:nexus-migration-plugin-configuration</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <unpack>false</unpack>
+      <outputDirectory>runtime/apps/nexus/lib</outputDirectory>
+      <includes>
+        <include>org.sonatype.nexus.plugins:nexus-migration-plugin-artifactory-bridge</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+
+</assembly>

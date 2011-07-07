@@ -1,0 +1,34 @@
+<mappingConfiguration>
+  <mapping>
+    <artifactoryRepositoryId>repo1</artifactoryRepositoryId>
+    <nexusRepositoryId>central</nexusRepositoryId>
+  </mapping>
+  <mapping>
+    <artifactoryRepositoryId>libs-local</artifactoryRepositoryId>
+    <nexusGroupId>libs-local</nexusGroupId>
+  </mapping>
+  <mapping>
+    <artifactoryRepositoryId>repo1</artifactoryRepositoryId>
+    <nexusRepositoryId>central</nexusRepositoryId>
+  </mapping>
+  <mapping>
+    <artifactoryRepositoryId>libs-local</artifactoryRepositoryId>
+    <nexusGroupId>libs-local</nexusGroupId>
+  </mapping>
+  <mapping>
+    <artifactoryRepositoryId>repo1</artifactoryRepositoryId>
+    <nexusRepositoryId>central</nexusRepositoryId>
+  </mapping>
+  <mapping>
+    <artifactoryRepositoryId>libs-local</artifactoryRepositoryId>
+    <nexusGroupId>libs-local</nexusGroupId>
+  </mapping>
+  <mapping>
+    <artifactoryRepositoryId>repo1</artifactoryRepositoryId>
+    <nexusRepositoryId>central</nexusRepositoryId>
+  </mapping>
+  <mapping>
+    <artifactoryRepositoryId>libs-local</artifactoryRepositoryId>
+    <nexusGroupId>libs-local</nexusGroupId>
+  </mapping>
+</mappingConfiguration>

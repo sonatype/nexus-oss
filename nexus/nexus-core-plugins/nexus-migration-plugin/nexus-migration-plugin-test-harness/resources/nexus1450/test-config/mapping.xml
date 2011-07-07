@@ -1,0 +1,7 @@
+<mappingConfiguration>
+  <nexusContext>/nexus</nexusContext>
+  <mapping>
+    <artifactoryRepositoryId>artifactory-repo</artifactoryRepositoryId>
+    <nexusRepositoryId>nexus-test-harness-repo</nexusRepositoryId>
+  </mapping>
+</mappingConfiguration>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/settings/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/setrings/1.0.0
+          http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <localRepository>${project.build.directory}/maven_repo</localRepository>
+
+  <mirrors>
+    <mirror>
+      <!--This sends everything else to /public -->
+      <id>nexus</id>
+      <mirrorOf>central</mirrorOf>
+      <url>${nexus-base-url}content/repositories/fake-central</url>
+    </mirror>
+  </mirrors>
+
+  <profiles>
+    <profile>
+      <id>development</id>
+      <!--Central is included by default and we must either turn it off, or fix it for our purposes. Lets fix it by turning on snapshots so that internal snaps will be found. Do
+     this for repo and pluginRepo -->
+      <repositories>
+        <repository>
+          <id>central</id>
+          <url>http://central</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>artifactory</id>
+          <url>http://localhost:${nexus-application-port}/artifactory/main-local</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>central</id>
+          <url>http://central</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>development</activeProfile>
+  </activeProfiles>
+</settings>
+

@@ -1,0 +1,122 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>nexus-plugins-parent</artifactId>
+    <version>8</version>
+    <relativePath>../nexus-plugins-parent/pom.xml</relativePath>
+  </parent>
+
+  <artifactId>nexus-migration-plugin</artifactId>
+  <version>1.9.3-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Nexus Migration Plugin</name>
+
+  <modules>
+    <module>nexus-migration-plugin-configuration</module>
+    <module>nexus-migration-plugin-artifactory</module>
+    <module>nexus-migration-plugin-artifactory-bridge</module>
+    <module>nexus-migration-plugin-packaging</module>
+    <module>nexus-migration-plugin-test-harness</module>
+  </modules>
+
+  <properties>
+    <plexus.version>1.2.1</plexus.version>
+    <nexus.version>1.9.2</nexus.version>
+    <spice-inject.version>1.3.3</spice-inject.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-webapp-dependencies</artifactId>
+        <version>${nexus.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-archiver</artifactId>
+        <version>1.0-alpha-12</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.spice</groupId>
+        <artifactId>spice-inject-plexus</artifactId>
+        <version>${spice-inject.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.0-alpha-4</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <id>enforce</id>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.codehaus.plexus:plexus-container-default:*</exclude>
+                  </excludes>
+                  <message>The Plexus Container is banned, use org.sonatype.spice:spice-inject-plexus. 
+                  </message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>*:jsecurity</exclude>
+                  </excludes>
+                  <message>Nexus has being updated to use apache shiro instead, please remove jsecurity dependency</message>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+        <version>${plexus.version}</version>
+        <executions>
+          <execution>
+            <id>process-classes</id>
+            <goals>
+              <goal>generate-metadata</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>process-test-classes</id>
+            <goals>
+              <goal>generate-test-metadata</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <scm>
+    <connection>scm:git:git://github.com/sonatype/nexus-migration-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:sonatype/nexus-migration-plugin.git</developerConnection>
+    <url>https://github.com/sonatype/nexus-migration-plugin</url>
+  </scm>
+  
+</project>
