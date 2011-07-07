@@ -27,13 +27,13 @@
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-webapp-dependencies</artifactId>
-        <version>${nexus.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
+      <!--<dependency>-->
+        <!--<groupId>org.sonatype.nexus</groupId>-->
+        <!--<artifactId>nexus-webapp-dependencies</artifactId>-->
+        <!--<version>${nexus.version}</version>-->
+        <!--<type>pom</type>-->
+        <!--<scope>import</scope>-->
+      <!--</dependency>-->
 
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
