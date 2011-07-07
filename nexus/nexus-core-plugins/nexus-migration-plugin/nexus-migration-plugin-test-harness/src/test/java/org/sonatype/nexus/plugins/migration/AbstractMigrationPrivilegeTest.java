@@ -31,7 +31,7 @@ public abstract class AbstractMigrationPrivilegeTest
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
     
-    protected final String ARTIFACTORY_MIGRATOR = "artifactory-migrator";
+    protected final String ARTIFACTORY_MIGRATOR = "artifactory-migrate";
 
     abstract protected File getBackupFile();
 
