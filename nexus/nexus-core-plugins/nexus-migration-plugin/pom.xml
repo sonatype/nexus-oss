@@ -16,7 +16,6 @@
     <module>nexus-migration-plugin-artifactory</module>
     <module>nexus-migration-plugin-artifactory-bridge</module>
     <module>nexus-migration-plugin-packaging</module>
-    <module>nexus-migration-plugin-test-harness</module>
   </modules>
 
   <properties>
@@ -120,5 +119,14 @@
     <developerConnection>scm:git:git@github.com:sonatype/nexus-migration-plugin.git</developerConnection>
     <url>https://github.com/sonatype/nexus-migration-plugin</url>
   </scm>
+
+  <profiles>
+    <profile>
+      <id>run-its</id>
+      <modules>
+        <module>nexus-migration-plugin-test-harness</module>
+      </modules>
+    </profile>
+  </profiles>
   
 </project>
