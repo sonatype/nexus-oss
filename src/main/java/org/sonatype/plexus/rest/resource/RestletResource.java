@@ -243,7 +243,18 @@ public class RestletResource
     public Representation represent( Variant variant )
         throws ResourceException
     {
-        Object result = delegate.get( getContext(), getRequest(), getResponse(), variant );
+        Object result;
+        try
+        {
+            result = delegate.get( getContext(), getRequest(), getResponse(), variant );
+        }
+        catch ( PlexusResourceException e )
+        {
+            // set the status
+            getResponse().setStatus( e.getStatus() );
+            // try to get the responseObject
+            result = e.getResultObject();
+        }
 
         return ( result != null ) ? doRepresent( result, variant ) : null;
     }
