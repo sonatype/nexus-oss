@@ -72,6 +72,7 @@ import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 @Component( role = PlexusResource.class, hint = "SearchNGIndexPlexusResource" )
 @Path( SearchNGIndexPlexusResource.RESOURCE_URI )
@@ -388,9 +389,7 @@ public class SearchNGIndexPlexusResource
                 if ( e.getCause() instanceof ParseException )
                 {
                     // NEXUS-4372: illegal query -> 400 response
-                    throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
-                        "The query was not understood by the server:\n" + e.getCause().getMessage(),
-                        e.getCause() );
+                    throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getCause(), getNexusErrorResponse( "search", e.getCause().getMessage() ) );
                 }
                 else
                 {

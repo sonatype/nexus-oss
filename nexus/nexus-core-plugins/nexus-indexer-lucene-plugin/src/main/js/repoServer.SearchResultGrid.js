@@ -29,7 +29,8 @@ Sonatype.SearchStore = function(config) {
   Sonatype.SearchStore.superclass.constructor.call(this, {
         proxy : new Ext.data.HttpProxy({
               url : this.searchUrl,
-              method : 'GET'
+              method : 'GET',
+              suppressStatus : 400
             }),
         reader : new Ext.data.JsonReader({
               root : 'data',
@@ -84,6 +85,21 @@ Sonatype.SearchStore = function(config) {
             fn : function(store, records, options) {
               this.grid.updateRowTotals(this.grid);
             },
+            scope : this
+          },
+          'loadexception' : {
+        	fn : function (obj, options, response, error) {
+        	  try {
+	        	  var errorResponse = Ext.decode(response.responseText);
+	        	  if ( errorResponse.errors && errorResponse.errors[0] && errorResponse.errors[0].id == "search" ) {
+		              this.grid.setWarningLabel(errorResponse.errors[0].msg);
+	        	  } else {
+		              this.grid.setWarningLabel(response.responseText);
+	        	  }
+        	  } catch (e) {
+        		  Sonatype.MessageBox.alert('Problem parsing error response:\n' + response.responseText);
+        	  }
+	        },
             scope : this
           }
         }
