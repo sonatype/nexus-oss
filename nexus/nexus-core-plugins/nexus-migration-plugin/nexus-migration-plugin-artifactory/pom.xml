@@ -196,7 +196,7 @@
     <!-- TEST -->
     <dependency>
       <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <artifactId>junit-dep</artifactId>
       <version>4.4</version>
       <scope>test</scope>
     </dependency>
