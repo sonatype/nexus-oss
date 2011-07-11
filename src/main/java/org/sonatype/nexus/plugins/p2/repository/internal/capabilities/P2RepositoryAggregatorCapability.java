@@ -3,20 +3,20 @@ package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 import java.util.Map;
 
 import org.sonatype.nexus.plugins.capabilities.api.AbstractCapability;
-import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGenerator;
-import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGeneratorConfiguration;
+import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
+import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
 
-public class P2RepositoryGeneratorCapability
+public class P2RepositoryAggregatorCapability
     extends AbstractCapability
 {
 
-    public static final String ID = "p2RepositoryCapability";
+    public static final String ID = "p2RepositoryAggregatorCapability";
 
-    private final P2RepositoryGenerator service;
+    private final P2RepositoryAggregator service;
 
-    private P2RepositoryGeneratorConfiguration configuration;
+    private P2RepositoryAggregatorConfiguration configuration;
 
-    public P2RepositoryGeneratorCapability( final String id, final P2RepositoryGenerator service )
+    public P2RepositoryAggregatorCapability( final String id, final P2RepositoryAggregator service )
     {
         super( id );
         this.service = service;
@@ -25,7 +25,7 @@ public class P2RepositoryGeneratorCapability
     @Override
     public void create( final Map<String, String> properties )
     {
-        configuration = new P2RepositoryGeneratorConfiguration( properties );
+        configuration = new P2RepositoryAggregatorConfiguration( properties );
         service.addConfiguration( configuration );
 
         super.create( properties );
@@ -34,7 +34,7 @@ public class P2RepositoryGeneratorCapability
     @Override
     public void load( final Map<String, String> properties )
     {
-        configuration = new P2RepositoryGeneratorConfiguration( properties );
+        configuration = new P2RepositoryAggregatorConfiguration( properties );
         service.addConfiguration( configuration );
 
         super.load( properties );
@@ -43,7 +43,7 @@ public class P2RepositoryGeneratorCapability
     @Override
     public void update( final Map<String, String> properties )
     {
-        final P2RepositoryGeneratorConfiguration newConfiguration = new P2RepositoryGeneratorConfiguration( properties );
+        final P2RepositoryAggregatorConfiguration newConfiguration = new P2RepositoryAggregatorConfiguration( properties );
         if ( !configuration.equals( newConfiguration ) )
         {
             remove();

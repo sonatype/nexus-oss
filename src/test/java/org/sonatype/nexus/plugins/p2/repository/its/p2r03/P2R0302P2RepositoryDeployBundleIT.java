@@ -25,7 +25,7 @@ public class P2R0302P2RepositoryDeployBundleIT
         throws Exception
     {
         createP2MetadataGeneratorCapability();
-        createP2RepositoryGeneratorCapability();
+        createP2RepositoryAggregatorCapability();
 
         deployArtifacts( getTestResourceAsFile( "artifacts/jars" ) );
 

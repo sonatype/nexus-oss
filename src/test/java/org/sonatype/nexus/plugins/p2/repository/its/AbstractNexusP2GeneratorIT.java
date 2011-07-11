@@ -11,17 +11,17 @@ import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResou
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
-import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGenerator;
-import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGeneratorConfiguration;
+import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
+import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
 import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2MetadataGeneratorCapability;
-import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryGeneratorCapability;
+import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapability;
 import org.sonatype.nexus.test.utils.CapabilitiesMessageUtil;
 
 public abstract class AbstractNexusP2GeneratorIT
     extends AbstractNexusP2IT
 {
 
-    private String p2RepositoryGeneratorCapabilityId;
+    private String p2RepositoryAggregatorCapabilityId;
 
     public AbstractNexusP2GeneratorIT( final String repoId )
     {
@@ -44,26 +44,26 @@ public abstract class AbstractNexusP2GeneratorIT
         CapabilitiesMessageUtil.create( capability );
     }
 
-    protected void createP2RepositoryGeneratorCapability()
+    protected void createP2RepositoryAggregatorCapability()
         throws Exception
     {
         final CapabilityResource capability = new CapabilityResource();
-        capability.setName( P2RepositoryGenerator.class.getName() );
-        capability.setTypeId( P2RepositoryGeneratorCapability.ID );
+        capability.setName( P2RepositoryAggregator.class.getName() );
+        capability.setTypeId( P2RepositoryAggregatorCapability.ID );
 
         final CapabilityPropertyResource repoProp = new CapabilityPropertyResource();
-        repoProp.setKey( P2RepositoryGeneratorConfiguration.REPO_OR_GROUP_ID );
+        repoProp.setKey( P2RepositoryAggregatorConfiguration.REPO_OR_GROUP_ID );
         repoProp.setValue( getTestRepositoryId() );
 
         capability.addProperty( repoProp );
 
-        p2RepositoryGeneratorCapabilityId = CapabilitiesMessageUtil.create( capability ).getId();
+        p2RepositoryAggregatorCapabilityId = CapabilitiesMessageUtil.create( capability ).getId();
     }
 
-    protected void removeP2RepositoryGeneratorCapability()
+    protected void removeP2RepositoryAggregatorCapability()
         throws Exception
     {
-        CapabilitiesMessageUtil.delete( p2RepositoryGeneratorCapabilityId );
+        CapabilitiesMessageUtil.delete( p2RepositoryAggregatorCapabilityId );
     }
 
     protected void deployArtifact( final String repoId, final File fileToDeploy, final String path )

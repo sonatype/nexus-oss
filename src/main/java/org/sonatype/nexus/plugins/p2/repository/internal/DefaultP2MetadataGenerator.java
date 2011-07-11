@@ -1,6 +1,6 @@
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
-import static org.sonatype.nexus.plugins.p2.repository.internal.DefaultP2RepositoryGenerator.createTemporaryP2Repository;
+import static org.sonatype.nexus.plugins.p2.repository.internal.DefaultP2RepositoryAggregator.createTemporaryP2Repository;
 import static org.sonatype.nexus.plugins.p2.repository.internal.JarsEventsInspector.isABundle;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.getRelativePath;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.localStorageOfRepositoryAsFile;

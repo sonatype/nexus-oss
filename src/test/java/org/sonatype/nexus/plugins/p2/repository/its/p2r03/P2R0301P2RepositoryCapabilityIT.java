@@ -28,12 +28,12 @@ public class P2R0301P2RepositoryCapabilityIT
         final File artifactsXML = storageP2RepositoryArtifactsXML();
         final File contentXML = storageP2RepositoryContentXML();
 
-        createP2RepositoryGeneratorCapability();
+        createP2RepositoryAggregatorCapability();
 
         assertThat( "P2 artifacts.xml does exist", artifactsXML.exists(), is( true ) );
         assertThat( "P2 content.xml does exist", contentXML.exists(), is( true ) );
 
-        removeP2RepositoryGeneratorCapability();
+        removeP2RepositoryAggregatorCapability();
 
         assertThat( "P2 artifacts.xml does not exist", artifactsXML.exists(), is( false ) );
         assertThat( "P2 content.xml does not exist", contentXML.exists(), is( false ) );

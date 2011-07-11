@@ -30,8 +30,8 @@ import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
-import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGenerator;
-import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGeneratorConfiguration;
+import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
+import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
@@ -48,14 +48,14 @@ import org.sonatype.sisu.resource.scanner.scanners.SerialScanner;
 
 @Named
 @Singleton
-public class DefaultP2RepositoryGenerator
-    implements P2RepositoryGenerator
+public class DefaultP2RepositoryAggregator
+    implements P2RepositoryAggregator
 {
 
     @Inject
     private Logger logger;
 
-    private final Map<String, P2RepositoryGeneratorConfiguration> configurations;
+    private final Map<String, P2RepositoryAggregatorConfiguration> configurations;
 
     private final RepositoryRegistry repositories;
 
@@ -66,7 +66,7 @@ public class DefaultP2RepositoryGenerator
     private final MetadataRepository metadataRepository;
 
     @Inject
-    public DefaultP2RepositoryGenerator( final RepositoryRegistry repositories, final MimeUtil mimeUtil,
+    public DefaultP2RepositoryAggregator( final RepositoryRegistry repositories, final MimeUtil mimeUtil,
                                          final ArtifactRepository artifactRepository,
                                          final MetadataRepository metadataRepository )
     {
@@ -74,17 +74,17 @@ public class DefaultP2RepositoryGenerator
         this.mimeUtil = mimeUtil;
         this.artifactRepository = artifactRepository;
         this.metadataRepository = metadataRepository;
-        configurations = new HashMap<String, P2RepositoryGeneratorConfiguration>();
+        configurations = new HashMap<String, P2RepositoryAggregatorConfiguration>();
     }
 
     @Override
-    public P2RepositoryGeneratorConfiguration getConfiguration( final String repositoryId )
+    public P2RepositoryAggregatorConfiguration getConfiguration( final String repositoryId )
     {
         return configurations.get( repositoryId );
     }
 
     @Override
-    public void addConfiguration( final P2RepositoryGeneratorConfiguration configuration )
+    public void addConfiguration( final P2RepositoryAggregatorConfiguration configuration )
     {
         configurations.put( configuration.repositoryId(), configuration );
         try
@@ -118,7 +118,7 @@ public class DefaultP2RepositoryGenerator
     }
 
     @Override
-    public void removeConfiguration( final P2RepositoryGeneratorConfiguration configuration )
+    public void removeConfiguration( final P2RepositoryAggregatorConfiguration configuration )
     {
         configurations.remove( configuration.repositoryId() );
         try
@@ -146,7 +146,7 @@ public class DefaultP2RepositoryGenerator
     @Override
     public void updateP2Artifacts( final StorageItem item )
     {
-        final P2RepositoryGeneratorConfiguration configuration = getConfiguration( item.getRepositoryId() );
+        final P2RepositoryAggregatorConfiguration configuration = getConfiguration( item.getRepositoryId() );
         if ( configuration == null )
         {
             return;
@@ -189,7 +189,7 @@ public class DefaultP2RepositoryGenerator
     @Override
     public void removeP2Artifacts( final StorageItem item )
     {
-        final P2RepositoryGeneratorConfiguration configuration = getConfiguration( item.getRepositoryId() );
+        final P2RepositoryAggregatorConfiguration configuration = getConfiguration( item.getRepositoryId() );
         if ( configuration == null )
         {
             return;
@@ -239,7 +239,7 @@ public class DefaultP2RepositoryGenerator
     @Override
     public void updateP2Metadata( final StorageItem item )
     {
-        final P2RepositoryGeneratorConfiguration configuration = getConfiguration( item.getRepositoryId() );
+        final P2RepositoryAggregatorConfiguration configuration = getConfiguration( item.getRepositoryId() );
         if ( configuration == null )
         {
             return;
@@ -282,7 +282,7 @@ public class DefaultP2RepositoryGenerator
     @Override
     public void removeP2Metadata( final StorageItem item )
     {
-        final P2RepositoryGeneratorConfiguration configuration = getConfiguration( item.getRepositoryId() );
+        final P2RepositoryAggregatorConfiguration configuration = getConfiguration( item.getRepositoryId() );
         if ( configuration == null )
         {
             return;
@@ -334,7 +334,7 @@ public class DefaultP2RepositoryGenerator
     {
         logger.debug( "Rebuilding P2 repository for repository [{}]", repositoryId );
 
-        final P2RepositoryGeneratorConfiguration configuration = getConfiguration( repositoryId );
+        final P2RepositoryAggregatorConfiguration configuration = getConfiguration( repositoryId );
         if ( configuration == null )
         {
             logger.warn(
@@ -486,7 +486,7 @@ public class DefaultP2RepositoryGenerator
         }
     }
 
-    private File getP2Artifacts( final P2RepositoryGeneratorConfiguration configuration, final Repository repository )
+    private File getP2Artifacts( final P2RepositoryAggregatorConfiguration configuration, final Repository repository )
         throws Exception
     {
         // TODO handle compressed repository
@@ -500,7 +500,7 @@ public class DefaultP2RepositoryGenerator
         return file;
     }
 
-    private File getP2Content( final P2RepositoryGeneratorConfiguration configuration, final Repository repository )
+    private File getP2Content( final P2RepositoryAggregatorConfiguration configuration, final Repository repository )
         throws Exception
     {
         // TODO handle compressed repository

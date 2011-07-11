@@ -4,7 +4,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGenerator;
+import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
@@ -19,12 +19,12 @@ public class P2ArtifactsEventsInspector
     implements EventInspector
 {
 
-    private final P2RepositoryGenerator p2RepositoryGenerator;
+    private final P2RepositoryAggregator p2RepositoryAggregator;
 
     @Inject
-    public P2ArtifactsEventsInspector( final P2RepositoryGenerator p2RepositoryGenerator )
+    public P2ArtifactsEventsInspector( final P2RepositoryAggregator p2RepositoryAggregator )
     {
-        this.p2RepositoryGenerator = p2RepositoryGenerator;
+        this.p2RepositoryAggregator = p2RepositoryAggregator;
     }
 
     @Override
@@ -64,12 +64,12 @@ public class P2ArtifactsEventsInspector
 
     private void onItemAdded( final RepositoryItemEvent event )
     {
-        p2RepositoryGenerator.updateP2Artifacts( event.getItem() );
+        p2RepositoryAggregator.updateP2Artifacts( event.getItem() );
     }
 
     private void onItemRemoved( final RepositoryItemEvent event )
     {
-        p2RepositoryGenerator.removeP2Artifacts( event.getItem() );
+        p2RepositoryAggregator.removeP2Artifacts( event.getItem() );
     }
 
     private static boolean isP2ArtifactsXML( final StorageItem item )

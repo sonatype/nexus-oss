@@ -3,28 +3,28 @@ package org.sonatype.nexus.plugins.p2.repository.internal.tasks;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGenerator;
+import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.scheduling.SchedulerTask;
 
-@Named( P2RepositoryGeneratorTaskDescriptor.ID )
-public class P2RepositoryGeneratorTask
+@Named( P2RepositoryAggregatorTaskDescriptor.ID )
+public class P2RepositoryAggregatorTask
     extends AbstractNexusRepositoriesTask<Object>
     implements SchedulerTask<Object>
 {
 
-    private final P2RepositoryGenerator p2RepositoryGenerator;
+    private final P2RepositoryAggregator p2RepositoryAggregator;
 
     @Inject
-    P2RepositoryGeneratorTask( final P2RepositoryGenerator p2RepositoryGenerator )
+    P2RepositoryAggregatorTask( final P2RepositoryAggregator p2RepositoryAggregator )
     {
-        this.p2RepositoryGenerator = p2RepositoryGenerator;
+        this.p2RepositoryAggregator = p2RepositoryAggregator;
     }
 
     @Override
     protected String getRepositoryFieldId()
     {
-        return P2RepositoryGeneratorTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+        return P2RepositoryAggregatorTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
     }
 
     @Override
@@ -54,11 +54,11 @@ public class P2RepositoryGeneratorTask
         final String repositoryId = getRepositoryId();
         if ( repositoryId != null )
         {
-            p2RepositoryGenerator.scanAndRebuild( repositoryId );
+            p2RepositoryAggregator.scanAndRebuild( repositoryId );
         }
         else
         {
-            p2RepositoryGenerator.scanAndRebuild();
+            p2RepositoryAggregator.scanAndRebuild();
         }
 
         return null;

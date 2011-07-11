@@ -12,12 +12,12 @@ import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
 @Named
-public class P2RepositoryGeneratorTaskDescriptor
+public class P2RepositoryAggregatorTaskDescriptor
     extends AbstractScheduledTaskDescriptor
     implements ScheduledTaskDescriptor
 {
 
-    public static final String ID = "P2RepositoryGeneratorTask";
+    public static final String ID = "P2RepositoryAggregatorTask";
 
     public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 

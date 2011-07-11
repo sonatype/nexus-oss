@@ -27,7 +27,7 @@ public class P2R0304P2RepositoryRecreateIT
         throws Exception
     {
         createP2MetadataGeneratorCapability();
-        createP2RepositoryGeneratorCapability();
+        createP2RepositoryAggregatorCapability();
 
         // delete p2 repository dir from storage
         final File p2Repository = storageP2Repository();

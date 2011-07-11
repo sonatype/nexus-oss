@@ -9,22 +9,22 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
-import org.sonatype.nexus.plugins.p2.repository.P2RepositoryGeneratorConfiguration;
+import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
 
 @Singleton
-@Named( P2RepositoryGeneratorCapability.ID )
-public class P2RepositoryGeneratorCapabilityDescriptor
+@Named( P2RepositoryAggregatorCapability.ID )
+public class P2RepositoryAggregatorCapabilityDescriptor
     implements CapabilityDescriptor
 {
 
-    public static final String ID = P2RepositoryGeneratorCapability.ID;
+    public static final String ID = P2RepositoryAggregatorCapability.ID;
 
     private final FormField repoOrGroup;
 
-    public P2RepositoryGeneratorCapabilityDescriptor()
+    public P2RepositoryAggregatorCapabilityDescriptor()
     {
         repoOrGroup =
-            new RepoOrGroupComboFormField( P2RepositoryGeneratorConfiguration.REPO_OR_GROUP_ID, FormField.MANDATORY );
+            new RepoOrGroupComboFormField( P2RepositoryAggregatorConfiguration.REPO_OR_GROUP_ID, FormField.MANDATORY );
     }
 
     @Override
@@ -36,7 +36,7 @@ public class P2RepositoryGeneratorCapabilityDescriptor
     @Override
     public String name()
     {
-        return "P2 Repository Generator capability";
+        return "P2 Repository Aggregator capability";
     }
 
     @Override

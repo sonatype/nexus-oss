@@ -6,16 +6,16 @@ import java.io.File;
 import java.net.URL;
 
 import org.junit.Test;
-import org.sonatype.nexus.plugins.p2.repository.internal.tasks.P2RepositoryGeneratorTaskDescriptor;
+import org.sonatype.nexus.plugins.p2.repository.internal.tasks.P2RepositoryAggregatorTaskDescriptor;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusP2GeneratorIT;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
-public class P2R0303RunP2RepositoryGeneratorTaskIT
+public class P2R0303RunP2RepositoryAggregatorTaskIT
     extends AbstractNexusP2GeneratorIT
 {
 
-    public P2R0303RunP2RepositoryGeneratorTaskIT()
+    public P2R0303RunP2RepositoryAggregatorTaskIT()
     {
         super( "p2r03" );
     }
@@ -31,12 +31,12 @@ public class P2R0303RunP2RepositoryGeneratorTaskIT
 
         deployArtifacts( getTestResourceAsFile( "artifacts/jars" ) );
 
-        createP2RepositoryGeneratorCapability();
+        createP2RepositoryAggregatorCapability();
 
         final ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( P2RepositoryGeneratorTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
+        repo.setKey( P2RepositoryAggregatorTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
         repo.setValue( getTestRepositoryId() );
-        TaskScheduleUtil.runTask( P2RepositoryGeneratorTaskDescriptor.ID, repo );
+        TaskScheduleUtil.runTask( P2RepositoryAggregatorTaskDescriptor.ID, repo );
         TaskScheduleUtil.waitForAllTasksToStop();
 
         // ensure link created

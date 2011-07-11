@@ -2,14 +2,14 @@ package org.sonatype.nexus.plugins.p2.repository;
 
 import java.util.Map;
 
-public class P2RepositoryGeneratorConfiguration
+public class P2RepositoryAggregatorConfiguration
 {
 
     public static final String REPO_OR_GROUP_ID = "repoOrGroup";
 
     private final String repositoryId;
 
-    public P2RepositoryGeneratorConfiguration( final Map<String, String> properties )
+    public P2RepositoryAggregatorConfiguration( final Map<String, String> properties )
     {
         repositoryId = repository( properties );
     }
@@ -43,7 +43,7 @@ public class P2RepositoryGeneratorConfiguration
         {
             return false;
         }
-        final P2RepositoryGeneratorConfiguration other = (P2RepositoryGeneratorConfiguration) obj;
+        final P2RepositoryAggregatorConfiguration other = (P2RepositoryAggregatorConfiguration) obj;
         if ( repositoryId == null )
         {
             if ( other.repositoryId != null )
@@ -62,7 +62,7 @@ public class P2RepositoryGeneratorConfiguration
     public String toString()
     {
         final StringBuilder builder = new StringBuilder();
-        builder.append( "P2RepositoryGeneratorConfiguration [" );
+        builder.append( "P2RepositoryAggregatorConfiguration [" );
         if ( repositoryId != null )
         {
             builder.append( "repositoryId=" );
