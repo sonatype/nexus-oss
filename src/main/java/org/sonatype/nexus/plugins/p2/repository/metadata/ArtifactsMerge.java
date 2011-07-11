@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.plugins.p2.repository.metadata;
 
@@ -19,7 +30,6 @@ import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Artifacts.Artifact;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Content.Unit;
 
-
 public class ArtifactsMerge
 {
 
@@ -27,10 +37,10 @@ public class ArtifactsMerge
      * Merges artifacts from the other repository. Current implementation requires both repositories to have identical
      * mapping and properties.
      */
-    public Artifacts mergeArtifactsMetadata( String name, List<Artifacts> repos )
+    public Artifacts mergeArtifactsMetadata( final String name, final List<Artifacts> repos )
         throws P2MetadataMergeException
     {
-        Artifacts result = new Artifacts( name );
+        final Artifacts result = new Artifacts( name );
 
         if ( repos == null || repos.size() <= 0 )
         {
@@ -42,19 +52,19 @@ public class ArtifactsMerge
             // TODO do we need/want to handle this specially?
         }
 
-        List<Artifacts.Artifact> mergedArtifacts = new ArrayList<Artifacts.Artifact>();
+        final List<Artifacts.Artifact> mergedArtifacts = new ArrayList<Artifacts.Artifact>();
 
-        LinkedHashMap<String, String> mergedProperties = new LinkedHashMap<String, String>();
+        final LinkedHashMap<String, String> mergedProperties = new LinkedHashMap<String, String>();
 
         LinkedHashMap<String, String> mergedMappingsMap = new LinkedHashMap<String, String>();
-        Set<String> keys = new HashSet<String>();
-        for ( Artifacts repo : repos )
+        final Set<String> keys = new HashSet<String>();
+        for ( final Artifacts repo : repos )
         {
             // mergedProperties = mergeProperties( mergedProperties, repo );
 
             mergeMappings( mergedMappingsMap, repo );
 
-            for ( Artifacts.Artifact artifact : repo.getArtifacts() )
+            for ( final Artifacts.Artifact artifact : repo.getArtifacts() )
             {
                 if ( keys.add( getArtifactKey( artifact ) ) )
                 {
@@ -67,12 +77,12 @@ public class ArtifactsMerge
         // handle rule ordering (this potentially creates new map instance, but only if needed)
         mergedMappingsMap = orderMappings( mergedMappingsMap );
 
-        Xpp3Dom mergedMappings = createMappingsDom( mergedMappingsMap );
+        final Xpp3Dom mergedMappings = createMappingsDom( mergedMappingsMap );
 
         mergedProperties.put( P2Constants.PROP_TIMESTAMP, Long.toString( System.currentTimeMillis() ) );
         mergedProperties.put( "publishPackFilesAsSiblings", "true" );
 
-        boolean compressed = P2Constants.ARTIFACTS_PATH.equals( P2Constants.ARTIFACTS_JAR );
+        final boolean compressed = P2Constants.ARTIFACTS_PATH.equals( P2Constants.ARTIFACTS_JAR );
         mergedProperties.put( P2Constants.PROP_COMPRESSED, Boolean.toString( compressed ) );
 
         result.setArtifacts( mergedArtifacts );
@@ -82,14 +92,14 @@ public class ArtifactsMerge
         return result;
     }
 
-    private Xpp3Dom createMappingsDom( Map<String, String> mappingsMap )
+    private Xpp3Dom createMappingsDom( final Map<String, String> mappingsMap )
     {
-        Xpp3Dom mappingsDom = new Xpp3Dom( "mappings" );
+        final Xpp3Dom mappingsDom = new Xpp3Dom( "mappings" );
         mappingsDom.setAttribute( "size", Integer.toString( mappingsMap.size() ) );
 
-        for ( String filter : mappingsMap.keySet() )
+        for ( final String filter : mappingsMap.keySet() )
         {
-            Xpp3Dom ruleDom = new Xpp3Dom( "rule" );
+            final Xpp3Dom ruleDom = new Xpp3Dom( "rule" );
             ruleDom.setAttribute( "filter", filter );
             ruleDom.setAttribute( "output", mappingsMap.get( filter ) );
             mappingsDom.addChild( ruleDom );
@@ -100,7 +110,7 @@ public class ArtifactsMerge
 
     private Xpp3Dom createMappingsDom()
     {
-        Xpp3Dom mappingsDom = new Xpp3Dom( "mappings" );
+        final Xpp3Dom mappingsDom = new Xpp3Dom( "mappings" );
         Xpp3Dom ruleDom;
 
         // <rule filter='(&amp; (classifier=osgi.bundle) (format=packed))'
@@ -130,7 +140,7 @@ public class ArtifactsMerge
         return mappingsDom;
     }
 
-    private LinkedHashMap<String, String> orderMappings( LinkedHashMap<String, String> mergedMappingsMap )
+    private LinkedHashMap<String, String> orderMappings( final LinkedHashMap<String, String> mergedMappingsMap )
         throws P2MetadataMergeException
     {
         // detect the presence of format=packed rules having filter attributes as:
@@ -142,7 +152,7 @@ public class ArtifactsMerge
         final String packedFilter = "(format=packed)";
         boolean hasPackedRule = false;
 
-        for ( String filter : mergedMappingsMap.keySet() )
+        for ( final String filter : mergedMappingsMap.keySet() )
         {
             if ( filter.contains( packedFilter ) )
             {
@@ -158,7 +168,7 @@ public class ArtifactsMerge
 
         final LinkedHashMap<String, String> ordered = new LinkedHashMap<String, String>( mergedMappingsMap.size() );
 
-        for ( Map.Entry<String, String> entry : mergedMappingsMap.entrySet() )
+        for ( final Map.Entry<String, String> entry : mergedMappingsMap.entrySet() )
         {
             // add all with "(format=packed)" first (bundles, features, etc)
             if ( entry.getKey().contains( packedFilter ) )
@@ -166,7 +176,7 @@ public class ArtifactsMerge
                 ordered.put( entry.getKey(), entry.getValue() );
             }
         }
-        for ( Map.Entry<String, String> entry : mergedMappingsMap.entrySet() )
+        for ( final Map.Entry<String, String> entry : mergedMappingsMap.entrySet() )
         {
             // add all the rest, without "(format=packed)" after
             if ( !entry.getKey().contains( packedFilter ) )
@@ -179,21 +189,21 @@ public class ArtifactsMerge
         return ordered;
     }
 
-    private void mergeMappings( LinkedHashMap<String, String> mergedMappingsMap, Artifacts repo )
+    private void mergeMappings( final LinkedHashMap<String, String> mergedMappingsMap, final Artifacts repo )
         throws P2MetadataMergeException
     {
-        Xpp3Dom repoMappingsDom = repo.getDom().getChild( "mappings" );
+        final Xpp3Dom repoMappingsDom = repo.getDom().getChild( "mappings" );
         if ( repoMappingsDom == null )
         {
             // Nothing to merge
             return;
         }
 
-        Xpp3Dom[] repoMappingRules = repoMappingsDom.getChildren( "rule" );
-        for ( Xpp3Dom repoMappingRule : repoMappingRules )
+        final Xpp3Dom[] repoMappingRules = repoMappingsDom.getChildren( "rule" );
+        for ( final Xpp3Dom repoMappingRule : repoMappingRules )
         {
-            String filter = repoMappingRule.getAttribute( "filter" );
-            String output = repoMappingRule.getAttribute( "output" );
+            final String filter = repoMappingRule.getAttribute( "filter" );
+            final String output = repoMappingRule.getAttribute( "output" );
 
             if ( mergedMappingsMap.containsKey( filter ) )
             {
@@ -215,11 +225,11 @@ public class ArtifactsMerge
     }
 
     private LinkedHashMap<String, String> mergeProperties( LinkedHashMap<String, String> mergedProperties,
-                                                           AbstractMetadata repo )
+                                                           final AbstractMetadata repo )
         throws P2MetadataMergeException
     {
         // make sure properties are the same
-        LinkedHashMap<String, String> properties = getProperties( repo );
+        final LinkedHashMap<String, String> properties = getProperties( repo );
         if ( mergedProperties == null )
         {
             mergedProperties = properties;
@@ -234,20 +244,20 @@ public class ArtifactsMerge
         return mergedProperties;
     }
 
-    private void setMappings( Xpp3Dom dom, Xpp3Dom mergedMappings )
+    private void setMappings( final Xpp3Dom dom, final Xpp3Dom mergedMappings )
     {
         AbstractMetadata.removeChild( dom, "mappings" );
         dom.addChild( mergedMappings );
     }
 
-    private LinkedHashMap<String, String> getProperties( AbstractMetadata repo )
+    private LinkedHashMap<String, String> getProperties( final AbstractMetadata repo )
     {
-        LinkedHashMap<String, String> properties = repo.getProperties();
+        final LinkedHashMap<String, String> properties = repo.getProperties();
         properties.remove( P2Constants.PROP_TIMESTAMP );
         return properties;
     }
 
-    private String getArtifactKey( Artifact artifact )
+    private String getArtifactKey( final Artifact artifact )
     {
         final String format = artifact.getFormat();
 
@@ -261,10 +271,10 @@ public class ArtifactsMerge
         }
     }
 
-    public Content mergeContentMetadata( String name, ArrayList<Content> repos )
+    public Content mergeContentMetadata( final String name, final ArrayList<Content> repos )
         throws P2MetadataMergeException
     {
-        Content result = new Content( name );
+        final Content result = new Content( name );
 
         if ( repos == null || repos.size() <= 0 )
         {
@@ -276,16 +286,16 @@ public class ArtifactsMerge
             // TODO do we need/want to handle this specially?
         }
 
-        List<Content.Unit> mergedUnits = new ArrayList<Content.Unit>();
+        final List<Content.Unit> mergedUnits = new ArrayList<Content.Unit>();
 
-        LinkedHashMap<String, String> mergedProperties = new LinkedHashMap<String, String>();
+        final LinkedHashMap<String, String> mergedProperties = new LinkedHashMap<String, String>();
 
-        Set<String> keys = new HashSet<String>();
-        for ( Content repo : repos )
+        final Set<String> keys = new HashSet<String>();
+        for ( final Content repo : repos )
         {
             // mergedProperties = mergeProperties( mergedProperties, repo );
 
-            for ( Content.Unit unit : repo.getUnits() )
+            for ( final Content.Unit unit : repo.getUnits() )
             {
                 if ( keys.add( getUnitKey( unit ) ) )
                 {
@@ -297,7 +307,7 @@ public class ArtifactsMerge
 
         mergedProperties.put( P2Constants.PROP_TIMESTAMP, Long.toString( System.currentTimeMillis() ) );
 
-        boolean compressed = P2Constants.ARTIFACTS_PATH.equals( P2Constants.ARTIFACTS_JAR );
+        final boolean compressed = P2Constants.ARTIFACTS_PATH.equals( P2Constants.ARTIFACTS_JAR );
         mergedProperties.put( P2Constants.PROP_COMPRESSED, Boolean.toString( compressed ) );
 
         result.setUnits( mergedUnits );
@@ -306,7 +316,7 @@ public class ArtifactsMerge
         return result;
     }
 
-    private String getUnitKey( Unit unit )
+    private String getUnitKey( final Unit unit )
     {
         return unit.getId() + ":" + unit.getVersion();
     }

@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.plugins.p2.repository.metadata;
 
@@ -15,18 +26,18 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 public class Content
     extends AbstractMetadata
 {
-    public Content( Xpp3Dom dom )
+    public Content( final Xpp3Dom dom )
     {
         super( dom );
     }
 
-    public Content( String name )
+    public Content( final String name )
     {
         super( new Xpp3Dom( "repository" ) );
         setRepositoryAttributes( name );
     }
 
-    public void setRepositoryAttributes( String name )
+    public void setRepositoryAttributes( final String name )
     {
         getDom().setAttribute( "name", name );
         getDom().setAttribute( "type", "org.eclipse.equinox.internal.p2.metadata.repository.LocalMetadataRepository" );
@@ -37,12 +48,12 @@ public class Content
         extends AbstractMetadata
     {
 
-        protected Unit( Xpp3Dom dom )
+        protected Unit( final Xpp3Dom dom )
         {
             super( dom );
         }
 
-        public Unit( Unit other )
+        public Unit( final Unit other )
         {
             super( other );
         }
@@ -60,7 +71,7 @@ public class Content
 
     public void removeReferences()
     {
-        Xpp3Dom[] children = dom.getChildren();
+        final Xpp3Dom[] children = dom.getChildren();
 
         for ( int i = 0; i < children.length; i++ )
         {
@@ -73,18 +84,18 @@ public class Content
 
     public List<Unit> getUnits()
     {
-        Xpp3Dom unitsDom = dom.getChild( "units" );
+        final Xpp3Dom unitsDom = dom.getChild( "units" );
 
         return getUnits( unitsDom );
     }
 
-    public static List<Unit> getUnits( Xpp3Dom unitsDom )
+    public static List<Unit> getUnits( final Xpp3Dom unitsDom )
     {
-        List<Unit> result = new ArrayList<Unit>();
+        final List<Unit> result = new ArrayList<Unit>();
 
         if ( unitsDom != null )
         {
-            for ( Xpp3Dom unitDom : unitsDom.getChildren( "unit" ) )
+            for ( final Xpp3Dom unitDom : unitsDom.getChildren( "unit" ) )
             {
                 result.add( new Unit( unitDom ) );
             }
@@ -93,12 +104,12 @@ public class Content
         return result;
     }
 
-    public void setUnits( List<Unit> units )
+    public void setUnits( final List<Unit> units )
     {
         removeChild( dom, "units" );
-        Xpp3Dom unitsDom = new Xpp3Dom( "units" );
+        final Xpp3Dom unitsDom = new Xpp3Dom( "units" );
 
-        for ( Unit unit : units )
+        for ( final Unit unit : units )
         {
             unitsDom.addChild( unit.getDom() );
         }

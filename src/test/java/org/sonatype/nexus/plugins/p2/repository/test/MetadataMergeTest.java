@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.plugins.p2.repository.test;
 
@@ -24,24 +35,22 @@ import org.sonatype.nexus.plugins.p2.repository.metadata.ArtifactsMerge;
 import org.sonatype.nexus.plugins.p2.repository.metadata.Content;
 import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataMergeException;
 
-
 public class MetadataMergeTest
 {
     @Test
     public void mergeArtifactsMetadata()
         throws Exception
     {
-        ArrayList<Artifacts> repos = loadArtifactsMetadata( new String[] {
-            "metadata/merge/artifact1.xml",
-            "metadata/merge/artifact2.xml" } );
+        final ArrayList<Artifacts> repos =
+            loadArtifactsMetadata( new String[] { "metadata/merge/artifact1.xml", "metadata/merge/artifact2.xml" } );
 
         // sanity check
         Assert.assertEquals( 2, repos.get( 0 ).getArtifacts().size() );
         Assert.assertEquals( 1, repos.get( 1 ).getArtifacts().size() );
 
-        ArtifactsMerge m = new ArtifactsMerge();
+        final ArtifactsMerge m = new ArtifactsMerge();
 
-        Artifacts merged = m.mergeArtifactsMetadata( "test", repos );
+        final Artifacts merged = m.mergeArtifactsMetadata( "test", repos );
 
         Assert.assertEquals( 3, merged.getArtifacts().size() );
         Assert.assertEquals( 5, merged.getMappings().size() );
@@ -51,18 +60,17 @@ public class MetadataMergeTest
     public void incompatibleRepositoryProperties()
         throws Exception
     {
-        ArrayList<Artifacts> repos = loadArtifactsMetadata( new String[] {
-            "metadata/merge/artifact1.xml",
-            "metadata/merge/artifact2props.xml" } );
+        final ArrayList<Artifacts> repos =
+            loadArtifactsMetadata( new String[] { "metadata/merge/artifact1.xml", "metadata/merge/artifact2props.xml" } );
 
-        ArtifactsMerge m = new ArtifactsMerge();
+        final ArtifactsMerge m = new ArtifactsMerge();
 
         try
         {
             m.mergeArtifactsMetadata( "test", repos );
             Assert.fail( "RepositoryMetadataMergeException expected" );
         }
-        catch ( P2MetadataMergeException e )
+        catch ( final P2MetadataMergeException e )
         {
             // expected
         }
@@ -72,18 +80,17 @@ public class MetadataMergeTest
     public void incompatibleMappingsRules()
         throws Exception
     {
-        ArrayList<Artifacts> repos = loadArtifactsMetadata( new String[] {
-            "metadata/merge/artifact1.xml",
-            "metadata/merge/artifact2mappins.xml" } );
+        final ArrayList<Artifacts> repos =
+            loadArtifactsMetadata( new String[] { "metadata/merge/artifact1.xml", "metadata/merge/artifact2mappins.xml" } );
 
-        ArtifactsMerge m = new ArtifactsMerge();
+        final ArtifactsMerge m = new ArtifactsMerge();
 
         try
         {
             m.mergeArtifactsMetadata( "test", repos );
             Assert.fail( "P2MetadataMergeException expected" );
         }
-        catch ( P2MetadataMergeException e )
+        catch ( final P2MetadataMergeException e )
         {
             if ( !e.getMessage().startsWith( "Incompatible artifact repository mapping rules: filter=" ) )
             {
@@ -96,48 +103,44 @@ public class MetadataMergeTest
     public void mergeContentMetadata()
         throws Exception
     {
-        ArrayList<Content> repos = loadContentMetadata( new String[] {
-            "metadata/merge/content1.xml",
-            "metadata/merge/content2.xml" } );
+        final ArrayList<Content> repos =
+            loadContentMetadata( new String[] { "metadata/merge/content1.xml", "metadata/merge/content2.xml" } );
 
-        ArtifactsMerge m = new ArtifactsMerge();
+        final ArtifactsMerge m = new ArtifactsMerge();
 
-        Content merged = m.mergeContentMetadata( "test", repos );
+        final Content merged = m.mergeContentMetadata( "test", repos );
 
         // repo1: bundle, featureJar, featureGroup, jre, jreConfig
         // repo2: feature2Jar, feature2Group (jre and jreConfig ignored)
         Assert.assertEquals( 7, merged.getUnits().size() );
     }
 
-    private ArrayList<Artifacts> loadArtifactsMetadata( String[] files )
-        throws IOException,
-            XmlPullParserException
+    private ArrayList<Artifacts> loadArtifactsMetadata( final String[] files )
+        throws IOException, XmlPullParserException
     {
-        ArrayList<Artifacts> repos = new ArrayList<Artifacts>();
-        for ( String file : files )
+        final ArrayList<Artifacts> repos = new ArrayList<Artifacts>();
+        for ( final String file : files )
         {
             repos.add( new Artifacts( loadXpp3Dom( file ) ) );
         }
         return repos;
     }
 
-    private ArrayList<Content> loadContentMetadata( String[] files )
-        throws IOException,
-            XmlPullParserException
+    private ArrayList<Content> loadContentMetadata( final String[] files )
+        throws IOException, XmlPullParserException
     {
-        ArrayList<Content> repos = new ArrayList<Content>();
-        for ( String file : files )
+        final ArrayList<Content> repos = new ArrayList<Content>();
+        for ( final String file : files )
         {
             repos.add( new Content( loadXpp3Dom( file ) ) );
         }
         return repos;
     }
 
-    private Xpp3Dom loadXpp3Dom( String filepath )
-        throws IOException,
-            XmlPullParserException
+    private Xpp3Dom loadXpp3Dom( final String filepath )
+        throws IOException, XmlPullParserException
     {
-        FileInputStream is = new FileInputStream( new File( "src/test/resources", filepath ) );
+        final FileInputStream is = new FileInputStream( new File( "src/test/resources", filepath ) );
         try
         {
             return Xpp3DomBuilder.build( new XmlStreamReader( is ) );

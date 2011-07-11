@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.plugins.p2.repository.metadata;
 
@@ -16,14 +27,14 @@ public abstract class AbstractMetadata
 {
     protected final Xpp3Dom dom;
 
-    protected AbstractMetadata( Xpp3Dom dom )
+    protected AbstractMetadata( final Xpp3Dom dom )
     {
         this.dom = dom;
     }
 
-    protected AbstractMetadata( AbstractMetadata other )
+    protected AbstractMetadata( final AbstractMetadata other )
     {
-        this.dom = new Xpp3Dom( other.dom );
+        dom = new Xpp3Dom( other.dom );
     }
 
     public Xpp3Dom getDom()
@@ -31,7 +42,7 @@ public abstract class AbstractMetadata
         return dom;
     }
 
-    public static void removeChild( Xpp3Dom dom, String name )
+    public static void removeChild( final Xpp3Dom dom, final String name )
     {
         Xpp3Dom[] children = dom.getChildren();
         for ( int i = 0; i < children.length; )
@@ -48,13 +59,13 @@ public abstract class AbstractMetadata
         }
     }
 
-    public void removeProperty( String name )
+    public void removeProperty( final String name )
     {
-        Xpp3Dom properties = dom.getChild( "properties" );
+        final Xpp3Dom properties = dom.getChild( "properties" );
 
         if ( properties != null )
         {
-            Xpp3Dom[] property = properties.getChildren( "property" );
+            final Xpp3Dom[] property = properties.getChildren( "property" );
 
             for ( int i = 0; i < property.length; i++ )
             {
@@ -68,13 +79,13 @@ public abstract class AbstractMetadata
 
     public LinkedHashMap<String, String> getProperties()
     {
-        LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
-        
-        Xpp3Dom propertiesDom = dom.getChild( "properties" );
-        
+        final LinkedHashMap<String, String> result = new LinkedHashMap<String, String>();
+
+        final Xpp3Dom propertiesDom = dom.getChild( "properties" );
+
         if ( propertiesDom != null )
         {
-            for ( Xpp3Dom propertyDom : propertiesDom.getChildren( "property" ) )
+            for ( final Xpp3Dom propertyDom : propertiesDom.getChildren( "property" ) )
             {
                 result.put( propertyDom.getAttribute( "name" ), propertyDom.getAttribute( "value" ) );
             }
@@ -83,15 +94,15 @@ public abstract class AbstractMetadata
         return result;
     }
 
-    public void setProperties( LinkedHashMap<String, String> properties )
+    public void setProperties( final LinkedHashMap<String, String> properties )
     {
         removeChild( dom, "properties" );
-        
-        Xpp3Dom propertiesDom = new Xpp3Dom( "properties" );
-        
-        for ( Map.Entry<String, String> property : properties.entrySet() )
+
+        final Xpp3Dom propertiesDom = new Xpp3Dom( "properties" );
+
+        for ( final Map.Entry<String, String> property : properties.entrySet() )
         {
-            Xpp3Dom propertyDom = new Xpp3Dom( "property" );
+            final Xpp3Dom propertyDom = new Xpp3Dom( "property" );
             propertyDom.setAttribute( "name", property.getKey() );
             propertyDom.setAttribute( "value", property.getValue() );
             propertiesDom.addChild( propertyDom );

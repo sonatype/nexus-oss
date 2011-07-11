@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.plugins.p2.repository.metadata;
 
@@ -14,7 +25,6 @@ import java.util.Map;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
-
 
 public class Artifacts
     extends AbstractMetadata
@@ -31,18 +41,18 @@ public class Artifacts
         { "(& (classifier=binary))", "${repoUrl}/binary/${id}_${version}" }, //$NON-NLS-1$ //$NON-NLS-2$
         { "(& (classifier=org.eclipse.update.feature))", "${repoUrl}/features/${id}_${version}.jar" } }; //$NON-NLS-1$//$NON-NLS-2$
 
-    public Artifacts( Xpp3Dom dom )
+    public Artifacts( final Xpp3Dom dom )
     {
         super( dom );
     }
 
-    public Artifacts( String name )
+    public Artifacts( final String name )
     {
         super( new Xpp3Dom( "repository" ) );
         setRepositoryAttributes( name );
     }
 
-    public void setRepositoryAttributes( String name )
+    public void setRepositoryAttributes( final String name )
     {
         getDom().setAttribute( "name", name );
         getDom().setAttribute( "type", "org.eclipse.equinox.p2.artifact.repository.simpleRepository" );
@@ -53,12 +63,12 @@ public class Artifacts
         extends AbstractMetadata
     {
 
-        protected Artifact( Xpp3Dom dom )
+        protected Artifact( final Xpp3Dom dom )
         {
             super( dom );
         }
 
-        public Artifact( Artifact artifact )
+        public Artifact( final Artifact artifact )
         {
             super( artifact );
         }
@@ -86,18 +96,18 @@ public class Artifacts
 
     public List<Artifact> getArtifacts()
     {
-        Xpp3Dom artifactsDom = dom.getChild( "artifacts" );
+        final Xpp3Dom artifactsDom = dom.getChild( "artifacts" );
 
         return getArtifacts( artifactsDom );
     }
 
-    public static List<Artifact> getArtifacts( Xpp3Dom artifactsDom )
+    public static List<Artifact> getArtifacts( final Xpp3Dom artifactsDom )
     {
-        List<Artifact> result = new ArrayList<Artifact>();
+        final List<Artifact> result = new ArrayList<Artifact>();
 
         if ( artifactsDom != null )
         {
-            for ( Xpp3Dom artifactDom : artifactsDom.getChildren( "artifact" ) )
+            for ( final Xpp3Dom artifactDom : artifactsDom.getChildren( "artifact" ) )
             {
                 result.add( new Artifact( artifactDom ) );
             }
@@ -106,12 +116,12 @@ public class Artifacts
         return result;
     }
 
-    public void setArtifacts( List<Artifact> artifacts )
+    public void setArtifacts( final List<Artifact> artifacts )
     {
         removeChild( dom, "artifacts" );
-        Xpp3Dom artifactsDom = new Xpp3Dom( "artifacts" );
+        final Xpp3Dom artifactsDom = new Xpp3Dom( "artifacts" );
 
-        for ( Artifact artifact : artifacts )
+        for ( final Artifact artifact : artifacts )
         {
             artifactsDom.addChild( artifact.getDom() );
         }
@@ -120,14 +130,14 @@ public class Artifacts
         dom.addChild( artifactsDom );
     }
 
-    public void setMapping( String[][] mappings )
+    public void setMapping( final String[][] mappings )
     {
         removeChild( dom, "mappings" );
-        Xpp3Dom mappingsDom = new Xpp3Dom( "mappings" );
+        final Xpp3Dom mappingsDom = new Xpp3Dom( "mappings" );
 
-        for ( String[] rule : mappings )
+        for ( final String[] rule : mappings )
         {
-            Xpp3Dom ruleDom = new Xpp3Dom( "rule" );
+            final Xpp3Dom ruleDom = new Xpp3Dom( "rule" );
             ruleDom.setAttribute( "filter", rule[0] );
             ruleDom.setAttribute( "output", rule[1] );
 
@@ -140,13 +150,13 @@ public class Artifacts
 
     public Map<String, String> getMappings()
     {
-        Map<String, String> result = new LinkedHashMap<String, String>();
+        final Map<String, String> result = new LinkedHashMap<String, String>();
 
-        Xpp3Dom mappingsDom = dom.getChild( "mappings" );
+        final Xpp3Dom mappingsDom = dom.getChild( "mappings" );
 
         if ( mappingsDom != null )
         {
-            for ( Xpp3Dom ruleDom : mappingsDom.getChildren( "rule" ) )
+            for ( final Xpp3Dom ruleDom : mappingsDom.getChildren( "rule" ) )
             {
                 result.put( ruleDom.getAttribute( "filter" ), ruleDom.getAttribute( "output" ) );
             }

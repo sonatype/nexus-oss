@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.plugins.p2.repository.proxy.validator;
 
@@ -27,7 +38,6 @@ import org.sonatype.nexus.proxy.maven.RemoteHashResponse;
 import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
-
 /**
  * P2 checksum content validator.
  * 
@@ -40,7 +50,7 @@ public class P2ChecksumContentValidator
 {
 
     @Override
-    protected ChecksumPolicy getChecksumPolicy( ProxyRepository proxy, AbstractStorageItem item )
+    protected ChecksumPolicy getChecksumPolicy( final ProxyRepository proxy, final AbstractStorageItem item )
         throws StorageException
     {
         if ( P2ProxyMetadataSource.isP2MetadataItem( item.getRepositoryItemUid().getPath() ) )
@@ -54,9 +64,9 @@ public class P2ChecksumContentValidator
             return ChecksumPolicy.IGNORE;
         }
 
-        P2ProxyRepository p2repo = proxy.adaptToFacet( P2ProxyRepository.class );
+        final P2ProxyRepository p2repo = proxy.adaptToFacet( P2ProxyRepository.class );
 
-        ChecksumPolicy checksumPolicy = p2repo.getChecksumPolicy();
+        final ChecksumPolicy checksumPolicy = p2repo.getChecksumPolicy();
 
         if ( checksumPolicy == null || !checksumPolicy.shouldCheckChecksum()
             || !( item instanceof DefaultStorageFileItem ) )
@@ -65,13 +75,13 @@ public class P2ChecksumContentValidator
             return ChecksumPolicy.IGNORE;
         }
 
-        ResourceStoreRequest req = new ResourceStoreRequest( P2Constants.ARTIFACT_MAPPINGS_XML );
+        final ResourceStoreRequest req = new ResourceStoreRequest( P2Constants.ARTIFACT_MAPPINGS_XML );
         req.setRequestLocalOnly( true );
         try
         {
             p2repo.retrieveItem( true, req );
         }
-        catch ( Exception e )
+        catch ( final Exception e )
         {
             // no way to calculate
             getLogger().debug( "Unable to find artifact-mapping.xml", e );
@@ -82,17 +92,18 @@ public class P2ChecksumContentValidator
     }
 
     @Override
-    protected void cleanup( ProxyRepository proxy, RemoteHashResponse remoteHash, boolean contentValid )
+    protected void cleanup( final ProxyRepository proxy, final RemoteHashResponse remoteHash, final boolean contentValid )
         throws StorageException
     {
         // no know cleanup for p2 repos
     }
 
     @Override
-    protected RemoteHashResponse retrieveRemoteHash( AbstractStorageItem item, ProxyRepository proxy, String baseUrl )
+    protected RemoteHashResponse retrieveRemoteHash( final AbstractStorageItem item, final ProxyRepository proxy,
+                                                     final String baseUrl )
         throws StorageException
     {
-        P2ProxyRepository p2repo = proxy.adaptToFacet( P2ProxyRepository.class );
+        final P2ProxyRepository p2repo = proxy.adaptToFacet( P2ProxyRepository.class );
 
         Map<String, ArtifactPath> paths;
         try
@@ -105,12 +116,12 @@ public class P2ChecksumContentValidator
             }
             paths = artifactMapping.getArtifactsPath();
         }
-        catch ( IllegalOperationException e )
+        catch ( final IllegalOperationException e )
         {
             getLogger().error( "Unable to open artifactsMapping.xml", e );
             return null;
         }
-        String md5 = paths.get( item.getPath() ).getMd5();
+        final String md5 = paths.get( item.getPath() ).getMd5();
         if ( md5 == null )
         {
             return null;

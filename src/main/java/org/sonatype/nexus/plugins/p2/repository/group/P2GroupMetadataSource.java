@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.plugins.p2.repository.group;
 
@@ -34,45 +45,44 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-
 @Component( role = P2MetadataSource.class, hint = "group" )
 public class P2GroupMetadataSource
     extends AbstractP2MetadataSource<P2GroupRepository>
 {
     private static final String ATTR_HASH_PREFIX = "original";
 
-    protected List<Repository> getMemberRepositories( P2GroupRepository repository )
+    protected List<Repository> getMemberRepositories( final P2GroupRepository repository )
         throws StorageException
     {
         return repository.getMemberRepositories();
     }
 
     @Override
-    protected Xpp3Dom doRetrieveArtifactsDom( Map<String, Object> context, P2GroupRepository repository )
+    protected Xpp3Dom doRetrieveArtifactsDom( final Map<String, Object> context, final P2GroupRepository repository )
         throws StorageException, ItemNotFoundException
     {
-        ArrayList<Xpp3Dom> doms =
+        final ArrayList<Xpp3Dom> doms =
             parseItemContent( P2Constants.ARTIFACTS_XML, P2Constants.ARTIFACTS_JAR, context, repository );
 
-        ArrayList<Artifacts> artifacts = new ArrayList<Artifacts>();
-        for ( Xpp3Dom dom : doms )
+        final ArrayList<Artifacts> artifacts = new ArrayList<Artifacts>();
+        for ( final Xpp3Dom dom : doms )
         {
             artifacts.add( new Artifacts( dom ) );
         }
 
-        ArtifactsMerge m = new ArtifactsMerge();
+        final ArtifactsMerge m = new ArtifactsMerge();
 
         try
         {
-            Artifacts metadata = m.mergeArtifactsMetadata( getName( repository ), artifacts );
+            final Artifacts metadata = m.mergeArtifactsMetadata( getName( repository ), artifacts );
 
-            LinkedHashMap<String, String> properties = metadata.getProperties();
-//            properties.put( P2Facade.PROP_REPOSITORY_ID, repository.getId() );
+            final LinkedHashMap<String, String> properties = metadata.getProperties();
+            // properties.put( P2Facade.PROP_REPOSITORY_ID, repository.getId() );
             metadata.setProperties( properties );
 
             return metadata.getDom();
         }
-        catch ( P2MetadataMergeException e )
+        catch ( final P2MetadataMergeException e )
         {
             throw new StorageException( e );
         }
@@ -80,43 +90,43 @@ public class P2GroupMetadataSource
     }
 
     @Override
-    protected Xpp3Dom doRetrieveContentDom( Map<String, Object> context, P2GroupRepository repository )
+    protected Xpp3Dom doRetrieveContentDom( final Map<String, Object> context, final P2GroupRepository repository )
         throws StorageException, ItemNotFoundException
     {
-        ArrayList<Xpp3Dom> doms =
+        final ArrayList<Xpp3Dom> doms =
             parseItemContent( P2Constants.CONTENT_XML, P2Constants.CONTENT_JAR, context, repository );
 
-        ArrayList<Content> artifacts = new ArrayList<Content>();
-        for ( Xpp3Dom dom : doms )
+        final ArrayList<Content> artifacts = new ArrayList<Content>();
+        for ( final Xpp3Dom dom : doms )
         {
             artifacts.add( new Content( dom ) );
         }
 
-        ArtifactsMerge m = new ArtifactsMerge();
+        final ArtifactsMerge m = new ArtifactsMerge();
 
         try
         {
-            Content metadata = m.mergeContentMetadata( getName( repository ), artifacts );
+            final Content metadata = m.mergeContentMetadata( getName( repository ), artifacts );
 
-            LinkedHashMap<String, String> properties = metadata.getProperties();
-//            properties.put( P2Facade.PROP_REPOSITORY_ID, repository.getId() );
+            final LinkedHashMap<String, String> properties = metadata.getProperties();
+            // properties.put( P2Facade.PROP_REPOSITORY_ID, repository.getId() );
             metadata.setProperties( properties );
 
             return metadata.getDom();
         }
-        catch ( P2MetadataMergeException e )
+        catch ( final P2MetadataMergeException e )
         {
             throw new StorageException( e );
         }
     }
 
-    private ArrayList<Xpp3Dom> parseItemContent( String xmlName, String jarName, Map<String, Object> context,
-                                                 P2GroupRepository repository )
+    private ArrayList<Xpp3Dom> parseItemContent( final String xmlName, final String jarName,
+                                                 final Map<String, Object> context, final P2GroupRepository repository )
         throws StorageException, ItemNotFoundException
     {
-        ArrayList<Xpp3Dom> doms = new ArrayList<Xpp3Dom>();
+        final ArrayList<Xpp3Dom> doms = new ArrayList<Xpp3Dom>();
 
-        for ( Repository repo : getMemberRepositories( repository ) )
+        for ( final Repository repo : getMemberRepositories( repository ) )
         {
             doms.add( parseItem( repo, jarName, xmlName, context ) );
         }
@@ -125,72 +135,72 @@ public class P2GroupMetadataSource
     }
 
     @Override
-    protected StorageItem doRetrieveRemoteItem( Repository repo, String path, Map<String, Object> context )
+    protected StorageItem doRetrieveRemoteItem( final Repository repo, final String path,
+                                                final Map<String, Object> context )
         throws ItemNotFoundException, StorageException
     {
-        ResourceStoreRequest req = new ResourceStoreRequest( path );
+        final ResourceStoreRequest req = new ResourceStoreRequest( path );
         req.getRequestContext().putAll( context );
 
         try
         {
             return repo.retrieveItem( req );
         }
-        catch ( IllegalOperationException e )
+        catch ( final IllegalOperationException e )
         {
             throw new StorageException( e );
         }
-        catch ( AccessDeniedException e )
+        catch ( final AccessDeniedException e )
         {
             throw new ItemNotFoundException( req, repo );
         }
     }
 
     @Override
-    protected boolean isArtifactsOld( AbstractStorageItem artifactsItem, P2GroupRepository repository )
+    protected boolean isArtifactsOld( final AbstractStorageItem artifactsItem, final P2GroupRepository repository )
         throws StorageException
     {
-        Map<String, Object> context = new HashMap<String, Object>();
+        final Map<String, Object> context = new HashMap<String, Object>();
 
         return isOld( artifactsItem, P2Constants.ARTIFACTS_JAR, P2Constants.ARTIFACTS_XML, context, repository );
     }
 
     @Override
-    protected boolean isContentOld( AbstractStorageItem contentItem, P2GroupRepository repository )
+    protected boolean isContentOld( final AbstractStorageItem contentItem, final P2GroupRepository repository )
         throws StorageException
     {
-        Map<String, Object> context = new HashMap<String, Object>();
+        final Map<String, Object> context = new HashMap<String, Object>();
 
         return isOld( contentItem, P2Constants.CONTENT_JAR, P2Constants.CONTENT_XML, context, repository );
     }
 
     @Override
-    protected void setItemAttributes( StorageFileItem item, Map<String, Object> context, P2GroupRepository repository )
+    protected void setItemAttributes( final StorageFileItem item, final Map<String, Object> context,
+                                      final P2GroupRepository repository )
         throws StorageException
     {
         if ( P2Constants.ARTIFACTS_JAR.equals( item.getPath() ) || P2Constants.ARTIFACTS_XML.equals( item.getPath() ) )
         {
             item.getAttributes().putAll(
-                                         getMemberHash( P2Constants.ARTIFACTS_JAR, P2Constants.ARTIFACTS_XML, context,
-                                                        repository ) );
+                getMemberHash( P2Constants.ARTIFACTS_JAR, P2Constants.ARTIFACTS_XML, context, repository ) );
         }
         else if ( P2Constants.CONTENT_JAR.equals( item.getPath() ) || P2Constants.CONTENT_XML.equals( item.getPath() ) )
         {
             item.getAttributes().putAll(
-                                         getMemberHash( P2Constants.CONTENT_JAR, P2Constants.CONTENT_XML, context,
-                                                        repository ) );
+                getMemberHash( P2Constants.CONTENT_JAR, P2Constants.CONTENT_XML, context, repository ) );
         }
     }
 
-    private boolean isOld( AbstractStorageItem artifactsItem, String jar, String xml, Map<String, Object> context,
-                           P2GroupRepository repository )
+    private boolean isOld( final AbstractStorageItem artifactsItem, final String jar, final String xml,
+                           final Map<String, Object> context, final P2GroupRepository repository )
         throws StorageException
     {
-        TreeMap<String, String> memberHash = getMemberHash( jar, xml, context, repository );
+        final TreeMap<String, String> memberHash = getMemberHash( jar, xml, context, repository );
 
-        LinkedHashMap<String, String> hash = new LinkedHashMap<String, String>();
+        final LinkedHashMap<String, String> hash = new LinkedHashMap<String, String>();
 
-        Map<String, String> attributes = artifactsItem.getAttributes();
-        for ( Map.Entry<String, String> entry : attributes.entrySet() )
+        final Map<String, String> attributes = artifactsItem.getAttributes();
+        for ( final Map.Entry<String, String> entry : attributes.entrySet() )
         {
             if ( entry.getKey().startsWith( ATTR_HASH_PREFIX ) )
             {
@@ -201,18 +211,18 @@ public class P2GroupMetadataSource
         return !hash.equals( memberHash );
     }
 
-    private TreeMap<String, String> getMemberHash( String jar, String xml, Map<String, Object> context,
-                                                   P2GroupRepository repository )
+    private TreeMap<String, String> getMemberHash( final String jar, final String xml,
+                                                   final Map<String, Object> context, final P2GroupRepository repository )
     {
-        TreeMap<String, String> memberHash = new TreeMap<String, String>();
+        final TreeMap<String, String> memberHash = new TreeMap<String, String>();
 
         int count = 0;
 
         try
         {
-            for ( StorageItem original : retrieveItems( jar, xml, context, repository ) )
+            for ( final StorageItem original : retrieveItems( jar, xml, context, repository ) )
             {
-                String hash = original.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+                final String hash = original.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
                 if ( hash == null )
                 {
                     // assume it has changed
@@ -224,7 +234,7 @@ public class P2GroupMetadataSource
                 count++;
             }
         }
-        catch ( StorageException e )
+        catch ( final StorageException e )
         {
             // assume it has changed
             return null;
@@ -233,24 +243,24 @@ public class P2GroupMetadataSource
         return memberHash;
     }
 
-    private List<StorageItem> retrieveItems( String jar, String xml, Map<String, Object> context,
-                                             P2GroupRepository repository )
+    private List<StorageItem> retrieveItems( final String jar, final String xml, final Map<String, Object> context,
+                                             final P2GroupRepository repository )
         throws StorageException
     {
-        ArrayList<StorageItem> items = new ArrayList<StorageItem>();
-        for ( Repository repo : getMemberRepositories( repository ) )
+        final ArrayList<StorageItem> items = new ArrayList<StorageItem>();
+        for ( final Repository repo : getMemberRepositories( repository ) )
         {
             try
             {
                 items.add( doRetrieveRemoteItem( repo, jar, context ) );
             }
-            catch ( ItemNotFoundException e )
+            catch ( final ItemNotFoundException e )
             {
                 try
                 {
                     items.add( doRetrieveRemoteItem( repo, xml, context ) );
                 }
-                catch ( ItemNotFoundException e1 )
+                catch ( final ItemNotFoundException e1 )
                 {
                     throw new StorageException( "Could not retrieve neither " + jar + " nor " + xml + " from "
                         + repo.getId() );

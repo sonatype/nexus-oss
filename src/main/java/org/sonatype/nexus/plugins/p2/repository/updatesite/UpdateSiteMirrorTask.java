@@ -1,9 +1,20 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- *
  * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
- * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
- * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
 package org.sonatype.nexus.plugins.p2.repository.updatesite;
 
@@ -35,12 +46,12 @@ public class UpdateSiteMirrorTask
     protected Object doRun()
         throws Exception
     {
-        String repositoryId = getRepositoryId();
-        String groupId = getRepositoryGroupId();
+        final String repositoryId = getRepositoryId();
+        final String groupId = getRepositoryGroupId();
 
         if ( repositoryId != null )
         {
-            UpdateSiteRepository repository = getRepository( repositoryId );
+            final UpdateSiteRepository repository = getRepository( repositoryId );
 
             if ( repository == null )
             {
@@ -51,16 +62,16 @@ public class UpdateSiteMirrorTask
         }
         else if ( groupId != null )
         {
-            GroupRepository group = registry.getRepository( groupId ).adaptToFacet( GroupRepository.class );
+            final GroupRepository group = registry.getRepository( groupId ).adaptToFacet( GroupRepository.class );
 
             if ( group == null )
             {
                 throw new IllegalStateException( "groupId is not a GroupRepository!" );
             }
 
-            for ( Repository repository : group.getMemberRepositories() )
+            for ( final Repository repository : group.getMemberRepositories() )
             {
-                UpdateSiteRepository updateSite = getRepository( repository );
+                final UpdateSiteRepository updateSite = getRepository( repository );
 
                 if ( updateSite != null )
                 {
@@ -70,9 +81,9 @@ public class UpdateSiteMirrorTask
         }
         else
         {
-            for ( Repository repository : registry.getRepositories() )
+            for ( final Repository repository : registry.getRepositories() )
             {
-                UpdateSiteRepository updateSite = getRepository( repository );
+                final UpdateSiteRepository updateSite = getRepository( repository );
 
                 if ( updateSite != null )
                 {
@@ -84,7 +95,7 @@ public class UpdateSiteMirrorTask
         return null;
     }
 
-    private UpdateSiteRepository getRepository( String repositoryId )
+    private UpdateSiteRepository getRepository( final String repositoryId )
     {
         // bad id, no repo
         if ( repositoryId == null )
@@ -97,13 +108,13 @@ public class UpdateSiteMirrorTask
             return getRepository( registry.getRepository( repositoryId ) );
         }
         // no repo
-        catch ( NoSuchRepositoryException e )
+        catch ( final NoSuchRepositoryException e )
         {
             return null;
         }
     }
 
-    private UpdateSiteRepository getRepository( Repository repository )
+    private UpdateSiteRepository getRepository( final Repository repository )
     {
         // no object, no repo
         if ( repository == null )
@@ -141,13 +152,14 @@ public class UpdateSiteMirrorTask
         return "Mirroring content of Eclipse Update Site ID='" + repo + "'.";
     }
 
-    public void setRepositoryId( String repositoryId )
+    @Override
+    public void setRepositoryId( final String repositoryId )
     {
         try
         {
             registry.getRepository( repositoryId );
         }
-        catch ( NoSuchRepositoryException e )
+        catch ( final NoSuchRepositoryException e )
         {
             throw new IllegalStateException( e );
         }
@@ -155,7 +167,7 @@ public class UpdateSiteMirrorTask
         super.setRepositoryId( repositoryId );
     }
 
-    public void setForce( boolean force )
+    public void setForce( final boolean force )
     {
         addParameter( UpdateSiteMirrorTaskDescriptor.FORCE_MIRROR_FIELD_ID, Boolean.toString( force ) );
     }
