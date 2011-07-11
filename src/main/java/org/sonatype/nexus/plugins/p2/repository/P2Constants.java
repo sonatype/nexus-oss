@@ -44,7 +44,7 @@ public interface P2Constants
     /**
      * Generated P2 repository root path.
      */
-    final String P2_REPOSITORY_ROOT_PATH = "/.p2";
+    final String P2_REPOSITORY_ROOT_PATH = "/.meta/p2";
 
     String ARTIFACT_MAPPINGS_XML = PRIVATE_ROOT + "/artifact-mappings.xml";
 

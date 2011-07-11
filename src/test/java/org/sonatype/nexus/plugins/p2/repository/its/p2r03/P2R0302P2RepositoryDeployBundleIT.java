@@ -32,14 +32,14 @@ public class P2R0302P2RepositoryDeployBundleIT
         // ensure link created
         final File file =
             downloadFile(
-                new URL( getNexusTestRepoUrl() + "/.p2/plugins/org.ops4j.base.lang_1.2.3.jar" ),
+                new URL( getNexusTestRepoUrl() + "/.meta/p2/plugins/org.ops4j.base.lang_1.2.3.jar" ),
                 new File( "target/downloads/" + this.getClass().getSimpleName() + "/org.ops4j.base.lang_1.2.3.jar" ).getCanonicalPath() );
         assertTrue( file.canRead() );
 
         // ensure repositories are valid
         final File installDir = new File( "target/eclipse/p2r0302" );
 
-        installUsingP2( getNexusTestRepoUrl() + "/.p2", "org.ops4j.base.lang", installDir.getCanonicalPath() );
+        installUsingP2( getNexusTestRepoUrl() + "/.meta/p2", "org.ops4j.base.lang", installDir.getCanonicalPath() );
 
         final File bundle = new File( installDir, "plugins/org.ops4j.base.lang_1.2.3.jar" );
         assertTrue( bundle.canRead() );
