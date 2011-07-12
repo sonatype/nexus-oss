@@ -1,0 +1,6 @@
+<com.sonatype.nexus.staging.api.dto.StagingPromoteRequestDTO>
+  <data>
+    <stagedRepositoryId>tp1-001</stagedRepositoryId>
+    <description>this is a description</description>
+  </data>
+</com.sonatype.nexus.staging.api.dto.StagingPromoteRequestDTO>

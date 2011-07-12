@@ -1,0 +1,6 @@
+<promoteRequest>
+  <data>
+    <stagedRepositoryId>tp1-001</stagedRepositoryId>
+    <description>this is a description</description>
+  </data>
+</promoteRequest>

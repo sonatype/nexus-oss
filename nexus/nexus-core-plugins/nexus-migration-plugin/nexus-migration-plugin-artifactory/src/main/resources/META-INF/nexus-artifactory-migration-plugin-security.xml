@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<security>
+	<version>2.0.1</version>
+	<roles>
+		<role>
+			<id>artifactory-migrator-role</id>
+			<name>Artifactory: Migrator</name>
+			<description>Give right to migrate artifactory to nexus.
+			</description>
+			<sessionTimeout>60</sessionTimeout>
+			<privileges>
+				<privilege>artifactory-file-location
+				</privilege>
+				<privilege>artifactory-migrate</privilege>
+			</privileges>
+		</role>
+	</roles>
+	<privileges>
+		<privilege>
+			<id>artifactory-file-location</id>
+			<type>method</type>
+			<name>Artifactory: File Location(read, create)</name>
+			<description>Set the location of artifactory file
+			</description>
+			<properties>
+				<property>
+					<key>method</key>
+					<value>read,create</value>
+				</property>
+				<property>
+					<key>permission</key>
+					<value>nexus:artifactoryfilelocation</value>
+				</property>
+			</properties>
+		</privilege>
+		<privilege>
+			<id>artifactory-migrate</id>
+			<type>method</type>
+			<name>Artifactory: Submit Migration(read, create)</name>
+			<description>Give permission to submit a artifactory migration.
+			</description>
+			<properties>
+				<property>
+					<key>method</key>
+					<value>read,create</value>
+				</property>
+				<property>
+					<key>permission</key>
+					<value>nexus:artifactorymigrate</value>
+				</property>
+			</properties>
+		</privilege>
+	</privileges>
+</security>
