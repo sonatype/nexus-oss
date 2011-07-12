@@ -859,7 +859,12 @@ public abstract class AbstractResourceStoreContentPlexusResource
             "Got exception during processing request \"" + req.getMethod() + " " + req.getResourceRef().toString()
                 + "\": ";
 
-        if ( getLogger().isDebugEnabled() )
+        // NEXUS-4417: logging of 'repository not found' should be debug level
+        if ( t instanceof NoSuchRepositoryException )
+        {
+            getLogger().debug( message, t );
+        }
+        else if ( getLogger().isDebugEnabled() )
         {
             // if DEBUG level, we log _all_ errors with stack traces, except the ItemNotFoundException
 
