@@ -43,7 +43,7 @@
       <id>its</id>
       <activation>
         <property>
-          <name>!maven.test.skip</name>
+          <name>!quick</name>
         </property>
       </activation>
       <modules>

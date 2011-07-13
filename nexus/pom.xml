@@ -1146,6 +1146,7 @@
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
+            <id>attach-test-jar</id>
             <goals>
               <goal>test-jar</goal>
             </goals>
@@ -1416,6 +1417,28 @@
             <configuration>
               <configFile>enunciate.xml</configFile>
             </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>no-attach-tests</id>
+      <activation>
+        <property>
+          <name>quick</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-test-jar</id>
+                <phase>none</phase>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
