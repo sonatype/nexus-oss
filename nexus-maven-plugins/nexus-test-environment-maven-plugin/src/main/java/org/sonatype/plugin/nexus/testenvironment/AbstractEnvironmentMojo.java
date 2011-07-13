@@ -205,7 +205,12 @@ public class AbstractEnvironmentMojo
     /**
      * @parameter expression="${maven.test.skip}"
      */
-    private boolean testSkip;
+    protected boolean testSkip;
+
+    /**
+     * @parameter expression="${test-env.skip}"
+     */
+    protected boolean pluginSkip;
 
     /**
      * @parameter default-value="false"
@@ -266,7 +271,7 @@ public class AbstractEnvironmentMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-        if ( testSkip )
+        if ( testSkip || pluginSkip )
         {
             return;
         }

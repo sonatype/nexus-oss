@@ -63,10 +63,25 @@ public class PackageTestsMojo
      */
     private File destinationFile;
 
+    /**
+     * @parameter expression="${maven.test.skip}"
+     */
+    private boolean testSkip;
+
+    /**
+     * @parameter expression="${test-env.skip}"
+     */
+    protected boolean pluginSkip;
+
     @SuppressWarnings( "unchecked" )
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
+        if ( testSkip || pluginSkip )
+        {
+            return;
+        }
+
         Archiver archiver;
         try
         {
