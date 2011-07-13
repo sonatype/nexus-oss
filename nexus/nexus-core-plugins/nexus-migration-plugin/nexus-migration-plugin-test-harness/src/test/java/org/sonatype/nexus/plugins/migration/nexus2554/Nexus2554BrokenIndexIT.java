@@ -39,7 +39,7 @@ public class Nexus2554BrokenIndexIT
         checkGroup( "plugins-snapshots" );
         checkGroup( "vvv" );
 
-        String logs = FileUtils.fileRead( nexusLog );
+        String logs = FileUtils.fileRead( getNexusLogFile() );
         Assert.assertFalse(
                             logs,
                             logs.contains( "Error message is: java.lang.NullPointerException Strack trace: java.lang.NullPointerException" ) );
