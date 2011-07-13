@@ -46,11 +46,15 @@ import ch.qos.logback.core.util.StatusPrinter;
 public class LogConfigListener
     implements ServletContextListener
 {
-    private static final String KEY_LOG_CONFIG_FILE = "plexus.log4j-prop-file";
+    private static final String KEY_LOG_CONFIG_DIR = "plexus.log-config-dir";
 
     private static final String KEY_NEXUS_WORK_DIR = "plexus.nexus-work";
 
-    private static final String RELATIVE_PATH_LOG_CONF = "conf/logback.xml";
+    private static final String LOG_CONF_RELATIVE_DIR = "conf";
+
+    private static final String LOG_CONF = "logback.xml";
+
+    private static final String LOG_CONF_PROPS = "logback.properties";
 
     private Handler[] originalHandlers;
 
@@ -58,11 +62,11 @@ public class LogConfigListener
     {
         setUpJULHandlerSLF4J();
 
-        String location = getLogConfigLocation();
+        String logConfigDir = getLogConfigDir();
 
-        ensureLogConfigLocation( location );
+        ensureLogConfigLocation( logConfigDir );
 
-        initializeLogConfig( location );
+        initializeLogConfig( logConfigDir );
     }
 
     public void contextDestroyed( ServletContextEvent sce )
@@ -99,45 +103,57 @@ public class LogConfigListener
         }
     }
 
-    private String getLogConfigLocation()
+    private String getLogConfigDir()
     {
-        String location = System.getProperty( KEY_LOG_CONFIG_FILE );
+        String logConfigDir = System.getProperty( KEY_LOG_CONFIG_DIR );
 
-        if ( StringUtils.isEmpty( location ) )
+        if ( StringUtils.isEmpty( logConfigDir ) )
         {
-            String workDir = System.getProperty( KEY_NEXUS_WORK_DIR );
+            logConfigDir = new File( System.getProperty( KEY_NEXUS_WORK_DIR ), LOG_CONF_RELATIVE_DIR ).getAbsolutePath();
 
-            location = new File( workDir, RELATIVE_PATH_LOG_CONF ).getAbsolutePath();
-
-            System.getProperties().put( KEY_LOG_CONFIG_FILE, location );
+            System.getProperties().put( KEY_LOG_CONFIG_DIR, logConfigDir );
         }
 
-        return location;
+        return logConfigDir;
     }
 
-    private void ensureLogConfigLocation( String location )
+    private void ensureLogConfigLocation( String logConfigDir )
     {
-        File logConfigFile = new File( location );
+        File logConfigFile = new File( logConfigDir, LOG_CONF );
+        File logConfigPropsFile = new File( logConfigDir, LOG_CONF_PROPS );
 
-        if ( logConfigFile.exists() )
+        if ( !logConfigFile.exists() )
         {
-            return;
+            try
+            {
+                URL configUrl = this.getClass().getResource( "/META-INF/log/" + LOG_CONF );
+
+                FileUtils.copyURLToFile( configUrl, logConfigFile );
+            }
+            catch ( IOException e )
+            {
+                throw new IllegalStateException( "Could not create default logback.xml into "
+                    + logConfigFile.getAbsolutePath(), e );
+            }
+        }
+        if ( !logConfigPropsFile.exists() )
+        {
+            try
+            {
+                URL configUrl = this.getClass().getResource( "/META-INF/log/" + LOG_CONF_PROPS );
+
+                FileUtils.copyURLToFile( configUrl, logConfigPropsFile );
+            }
+            catch ( IOException e )
+            {
+                throw new IllegalStateException( "Could not create default logback.properties into "
+                    + logConfigFile.getAbsolutePath(), e );
+            }
         }
 
-        try
-        {
-            URL configUrl = this.getClass().getResource( "/META-INF/log/logback.xml" );
-
-            FileUtils.copyURLToFile( configUrl, logConfigFile );
-        }
-        catch ( IOException e )
-        {
-            throw new IllegalStateException( "Could not create default logback.xml into "
-                + logConfigFile.getAbsolutePath(), e );
-        }
     }
 
-    private void initializeLogConfig( String location )
+    private void initializeLogConfig( String logConfigDir )
     {
         // PropertyConfigurator.configure( location );
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -147,7 +163,7 @@ public class LogConfigListener
             JoranConfigurator configurator = new JoranConfigurator();
             configurator.setContext( lc );
             lc.reset();
-            configurator.doConfigure( location );
+            configurator.doConfigure( new File( logConfigDir, LOG_CONF ) );
         }
         catch ( JoranException je )
         {
