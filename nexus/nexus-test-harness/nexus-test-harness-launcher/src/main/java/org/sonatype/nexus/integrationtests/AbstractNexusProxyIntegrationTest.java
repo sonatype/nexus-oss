@@ -162,7 +162,7 @@ public abstract class AbstractNexusProxyIntegrationTest
             return;
         }
 
-        FileTestingUtils.interpolationDirectoryCopy( source, new File( localStorageDir ), TestProperties.getAll() );
+        FileTestingUtils.interpolationDirectoryCopy( source, new File( localStorageDir ), getTestProperties() );
 
     }
 }

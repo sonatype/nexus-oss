@@ -15,14 +15,14 @@
   </appender>
   <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
-    <File>${project.build.directory}/logs/nexus.log</File>
+    <File>${project.build.directory}/logs/${test-id}/nexus.log</File>
     <Append>true</Append>
     <encoder>
       <pattern>%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <maxIndex>30</maxIndex>
-      <FileNamePattern>${project.build.directory}/logs/nexus.log.%i</FileNamePattern>
+      <FileNamePattern>${project.build.directory}/logs/${test-id}/nexus.log.%i</FileNamePattern>
     </rollingPolicy>
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
       <MaxFileSize>10MB</MaxFileSize>

@@ -35,7 +35,13 @@ import javax.servlet.ServletContextListener;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.util.StatusPrinter;
 
 public class LogConfigListener
     implements ServletContextListener
@@ -134,6 +140,20 @@ public class LogConfigListener
     private void initializeLogConfig( String location )
     {
         // PropertyConfigurator.configure( location );
+        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+        try
+        {
+            JoranConfigurator configurator = new JoranConfigurator();
+            configurator.setContext( lc );
+            lc.reset();
+            configurator.doConfigure( location );
+        }
+        catch ( JoranException je )
+        {
+            je.printStackTrace();
+        }
+        StatusPrinter.printInCaseOfErrorsOrWarnings( lc );
     }
 
 }
