@@ -17,26 +17,25 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserResource;
 
 public class PlexusUserMessageUtil
 {
-    private static final Logger LOG = Logger.getLogger( UserMessageUtil.class );
+    protected Logger log = LoggerFactory.getLogger( getClass() );
 
-    @SuppressWarnings( "unchecked" )
     public List<PlexusUserResource> getList()
         throws IOException
     {
         Response response = RequestFacade.doGetRequest( "service/local/plexus_users/allConfigured" );
         String responseText = response.getEntity().getText();
-        LOG.debug( "responseText: \n" + responseText );
+        log.debug( "responseText: \n" + responseText );
 
         XStreamRepresentation representation = new XStreamRepresentation(
             XStreamFactory.getXmlXStream(),
