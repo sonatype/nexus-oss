@@ -503,7 +503,7 @@ public abstract class AbstractNexusIntegrationTest
 
     protected File getNexusLogFile()
     {
-        return new File( "target/logs/nexus.log" );
+        return new File( "target/logs/"+ getTestId() + "/nexus.log" );
     }
 
     protected void beforeStartClean()
