@@ -46,6 +46,10 @@ public class UnpackTestsMojo
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
+        if ( testSkip || pluginSkip )
+        {
+            return;
+        }
 
         testOutputDirectory.mkdirs();
         resourcesSourceLocation.mkdirs();
