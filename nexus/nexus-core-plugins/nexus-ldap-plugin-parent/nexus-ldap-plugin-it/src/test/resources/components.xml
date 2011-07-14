@@ -32,7 +32,6 @@
           <plexus.webapp>${nexus-base-dir}/runtime/apps/nexus/webapp</plexus.webapp>
           <plexus.webapp-context-path>/nexus</plexus.webapp-context-path>
           <plexus.application-conf>${nexus-work-dir}/conf</plexus.application-conf>
-          <plexus.log4j-prop-file>${default-configs}/log4j.properties</plexus.log4j-prop-file>
           <plexus.jetty.xml>${nexus-base-dir}/conf/jetty.xml</plexus.jetty.xml>
         </systemProperties>
       </configuration>
@@ -58,7 +57,6 @@
           <plexus.nexus-work>${nexus-work-dir}</plexus.nexus-work>
           <plexus.webapp>${nexus-base-dir}/runtime/apps/nexus/webapp</plexus.webapp>
           <plexus.webapp-context-path>/nexus</plexus.webapp-context-path>
-          <plexus.log4j-prop-file>${default-configs}/log4j.properties</plexus.log4j-prop-file>
         </systemProperties>
       </configuration>
     </component>

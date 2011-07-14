@@ -40,8 +40,6 @@ public class ContainerUtil
 
         // for EHCache component
         System.setProperty( "nexus.home", new File( "target/nexus-work" ).getAbsolutePath() );
-        System.setProperty( "plexus.log4j-prop-file",
-                            new File( "target/test-classes/log4j.properties" ).getAbsolutePath() );
 
         return containerContext;
     }
