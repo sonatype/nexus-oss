@@ -17,12 +17,7 @@
     </triggeringPolicy>
   </appender>
 
-  <logger name="httpclient" level="WARN" />
-  <logger name="org.apache.http" level="WARN" />
-  <logger name="org.sonatype.nexus" level="INFO" />
-  <logger name="org.apache.commons" level="WARN" />
-
-  <root level="DEBUG">
+  <root level="${it.test.log.level:-INFO}">
     <appender-ref ref="logfile" />
   </root>
   
