@@ -255,24 +255,6 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <id>with-tests</id>
-      <activation>
-        <property>
-          <name>!quick</name>
-        </property>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>org.sonatype.nexus.plugins.ldap</groupId>
-          <artifactId>nexus-ldap-realm-plugin</artifactId>
-          <version>${project.version}</version>
-          <classifier>tests</classifier>
-          <type>jar</type>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
   </profiles>
 
 </project>
