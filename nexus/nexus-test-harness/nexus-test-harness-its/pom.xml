@@ -23,7 +23,7 @@
   PURPOSE. See the GNU Affero General Public License Version 3 for more details. You should have received a copy of the GNU Affero General Public License Version 3 along with this program. If not, see http://www.gnu.org/licenses. Sonatype Nexus (TM) Open Source
   Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective
   owners. -->
-  <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -48,14 +48,6 @@
   </properties>
 
   <build>
-
-    <testResources>
-      <testResource>
-        <targetPath>${project.build.testOutputDirectory}</targetPath>
-        <filtering>true</filtering>
-        <directory>${basedir}/src/test/resources</directory>
-      </testResource>
-    </testResources>
 
     <plugins>
       <plugin>
