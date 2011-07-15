@@ -35,8 +35,9 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.log.DefaultLogConfiguration;
+import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogManager;
-import org.sonatype.nexus.log.SimpleLog4jConfig;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.LogConfigResource;
 import org.sonatype.nexus.rest.model.LogConfigResourceResponse;
@@ -45,6 +46,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * @author juven
+ * @author adreghiciu@gmail.com
  */
 @Component( role = PlexusResource.class, hint = "logConfig" )
 @Path( LogConfigPlexusResource.RESOURCE_URI )
@@ -97,17 +99,17 @@ public class LogConfigPlexusResource
 
         try
         {
-            SimpleLog4jConfig logConfig = (SimpleLog4jConfig) logManager.getLogConfig();
+            LogConfiguration configuration = logManager.getConfiguration();
 
             LogConfigResource data = new LogConfigResource();
 
-            data.setRootLoggerLevel( parseRootLoggerLevel( logConfig ) );
+            data.setRootLoggerLevel( configuration.getRootLoggerLevel() );
 
-            data.setRootLoggerAppenders( parseRootLoggerAppenders( logConfig ) );
+            data.setRootLoggerAppenders( configuration.getRootLoggerAppenders() );
 
-            data.setFileAppenderLocation( logConfig.getFileAppenderLocation() );
+            data.setFileAppenderLocation( configuration.getFileAppenderLocation() );
 
-            data.setFileAppenderPattern( logConfig.getFileAppenderPattern() );
+            data.setFileAppenderPattern( configuration.getFileAppenderPattern() );
 
             result.setData( data );
 
@@ -140,13 +142,18 @@ public class LogConfigPlexusResource
         try
         {
             LogConfigResource data = requestResource.getData();
+            
+            DefaultLogConfiguration configuration = new DefaultLogConfiguration();
+            
+            configuration.setRootLoggerLevel( data.getRootLoggerLevel() );
 
-            String rootLogger = data.getRootLoggerLevel() + ", " + data.getRootLoggerAppenders();
+            configuration.setRootLoggerAppenders( data.getRootLoggerAppenders() );
 
-            SimpleLog4jConfig logConfig =
-                new SimpleLog4jConfig( rootLogger, data.getFileAppenderLocation(), data.getFileAppenderPattern() );
+            configuration.setFileAppenderLocation( data.getFileAppenderLocation() );
 
-            logManager.setLogConfig( logConfig );
+            configuration.setFileAppenderPattern( data.getFileAppenderPattern() );
+
+            logManager.setConfiguration( configuration );
 
             LogConfigResourceResponse responseResource = new LogConfigResourceResponse();
 
@@ -161,22 +168,5 @@ public class LogConfigPlexusResource
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL );
         }
     }
-
-    private String parseRootLoggerLevel( SimpleLog4jConfig config )
-    {
-        String rootLogger = config.getRootLogger();
-
-        int splitIndex = rootLogger.indexOf( "," );
-
-        return rootLogger.substring( 0, splitIndex ).trim();
-    }
-
-    private String parseRootLoggerAppenders( SimpleLog4jConfig config )
-    {
-        String rootLogger = config.getRootLogger();
-
-        int splitIndex = rootLogger.indexOf( "," );
-
-        return rootLogger.substring( splitIndex + 1 ).trim();
-    }
+    
 }

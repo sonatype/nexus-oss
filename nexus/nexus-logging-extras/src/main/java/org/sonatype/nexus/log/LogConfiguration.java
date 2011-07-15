@@ -18,32 +18,19 @@
  */
 package org.sonatype.nexus.log;
 
-import java.io.IOException;
 
 /**
- * @author juven
+ * @author adreghiciu@gmail.com
  */
-public interface LogConfiguration<T>
+public interface LogConfiguration
 {
-    /**
-     * Persist current log configuration
-     */
-    void save()
-        throws IOException;
-
-    /**
-     * load log configuration
-     */
-    void load()
-        throws IOException;
-
-    /**
-     * Apply current log configuration to current system
-     */
-    void apply();
-
-    T getConfig();
     
+    public String getRootLoggerLevel();
 
-    void setConfig( T config );
+    public String getRootLoggerAppenders();
+
+    public String getFileAppenderPattern();
+
+    public String getFileAppenderLocation();
+
 }

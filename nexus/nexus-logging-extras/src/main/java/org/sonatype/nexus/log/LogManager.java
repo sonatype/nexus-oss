@@ -38,16 +38,16 @@ public interface LogManager
 
     File getLogFile( String filename );
 
-    LogConfig getLogConfig()
-        throws IOException;
-
-    void setLogConfig( LogConfig logConfig )
-        throws IOException;
-
     Collection<NexusStreamResponse> getApplicationLogFiles()
         throws IOException;
 
     NexusStreamResponse getApplicationLogAsStream( String logFile, long fromByte, long bytesCount )
+        throws IOException;
+
+    LogConfiguration getConfiguration()
+        throws IOException;
+
+    void setConfiguration( LogConfiguration configuration )
         throws IOException;
 
     void configure();

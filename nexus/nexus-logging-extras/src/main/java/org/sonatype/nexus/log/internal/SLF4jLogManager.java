@@ -16,20 +16,24 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.log;
+package org.sonatype.nexus.log.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -42,7 +46,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.LimitedInputStream;
 import org.sonatype.nexus.NexusStreamResponse;
-import org.sonatype.nexus.util.EnhancedProperties;
+import org.sonatype.nexus.log.DefaultLogConfiguration;
+import org.sonatype.nexus.log.LogConfiguration;
+import org.sonatype.nexus.log.LogConfigurationParticipant;
+import org.sonatype.nexus.log.LogManager;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -53,6 +60,7 @@ import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.util.StatusPrinter;
 
+//TODO configuration operations should be locking
 /**
  * Log4J log manager.
  * 
@@ -60,10 +68,16 @@ import ch.qos.logback.core.util.StatusPrinter;
  * @author juven
  * @author adreghiciu@gmail.com
  */
-@Component( role = LogManager.class )
+@Component( role = LogManager.class ) 
 public class SLF4jLogManager
     implements LogManager
 {
+
+    private static final String KEY_APPENDER_FILE = "appender.file";
+
+    private static final String KEY_APPENDER_PATTERN = "appender.pattern";
+
+    private static final String KEY_ROOT_LEVEL = "root.level";
 
     private static final String KEY_LOG_CONFIG_DIR = "plexus.log-config-dir";
 
@@ -77,9 +91,6 @@ public class SLF4jLogManager
 
     @Requirement
     private Logger logger;
-
-    @Requirement
-    private LogConfiguration<EnhancedProperties> logConfiguration;
 
     @Requirement( role = LogConfigurationParticipant.class )
     private List<LogConfigurationParticipant> logConfigurationParticipants;
@@ -115,7 +126,7 @@ public class SLF4jLogManager
 
         return files;
     }
-    
+
     public File getLogFile( String filename )
     {
         Set<File> logFiles = getLogFiles();
@@ -131,25 +142,32 @@ public class SLF4jLogManager
         return null;
     }
 
-
-    public LogConfig getLogConfig()
+    public LogConfiguration getConfiguration()
         throws IOException
     {
-        logConfiguration.load();
+        Properties logProperties = loadConfigurationProperties();
+        DefaultLogConfiguration configuration = new DefaultLogConfiguration();
 
-        return new SimpleLog4jConfig( logConfiguration.getConfig() );
+        configuration.setRootLoggerLevel( logProperties.getProperty( KEY_ROOT_LEVEL ) );
+        // TODO
+        configuration.setRootLoggerAppenders( "console,file" );
+        configuration.setFileAppenderPattern( logProperties.getProperty( KEY_APPENDER_PATTERN ) );
+        configuration.setFileAppenderLocation( logProperties.getProperty( KEY_APPENDER_FILE ) );
+
+        return configuration;
     }
 
-    public void setLogConfig( LogConfig logConfig )
+    public void setConfiguration( LogConfiguration configuration )
         throws IOException
     {
-        Map<String, String> config = logConfiguration.getConfig();
+        Properties logProperties = loadConfigurationProperties();
 
-        config.putAll( logConfig );
+        logProperties.setProperty( KEY_ROOT_LEVEL, configuration.getRootLoggerLevel() );
+        logProperties.setProperty( KEY_APPENDER_PATTERN, configuration.getFileAppenderPattern() );
 
-        logConfiguration.apply();
-
-        logConfiguration.save();
+        saveConfigurationProperties( logProperties );
+        // TODO this will do a reconfiguration but would be just enough to "touch" logback.xml"
+        reconfigure();
     }
 
     public Collection<NexusStreamResponse> getApplicationLogFiles()
@@ -234,6 +252,45 @@ public class SLF4jLogManager
         // TODO maybe do some optimization that if participants does not change, do not reconfigure
         prepareConfigurationFiles();
         reconfigure();
+    }
+
+    private Properties loadConfigurationProperties()
+        throws IOException
+    {
+
+        String logConfigDir = getLogConfigDir();
+        File logConfigPropsFile = new File( logConfigDir, LOG_CONF_PROPS );
+        InputStream in = null;
+        try
+        {
+            in = new FileInputStream( logConfigPropsFile );
+
+            Properties properties = new Properties();
+            properties.load( in );
+
+            return properties;
+        }
+        finally
+        {
+            IOUtil.close( in );
+        }
+    }
+
+    private void saveConfigurationProperties( Properties properties )
+        throws FileNotFoundException, IOException
+    {
+        String logConfigDir = getLogConfigDir();
+        File logConfigPropsFile = new File( logConfigDir, LOG_CONF_PROPS );
+        OutputStream out = null;
+        try
+        {
+            out = new FileOutputStream( logConfigPropsFile );
+            properties.store( out, "Saved by Nexus" );
+        }
+        finally
+        {
+            IOUtil.close( out );
+        }
     }
 
     private String getLogConfigDir()

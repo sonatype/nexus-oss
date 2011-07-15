@@ -18,29 +18,59 @@
  */
 package org.sonatype.nexus.log;
 
-import java.io.File;
-
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
-
 /**
- * @author juven
+ * @author adreghiciu@gmail.com
  */
-@Component( role = LogConfigurationSource.class )
-public class Log4jLogConfigurationSource
-    implements LogConfigurationSource<File>
+public class DefaultLogConfiguration
+    implements LogConfiguration
 {
-    private static final String KEY = "plexus.log4j-prop-file";
 
-    public File getSource()
+    private String rootLoggerLevel;
+
+    private String rootLoggerAppenders;
+
+    private String fileAppenderPattern;
+
+    private String fileAppenderLocation;
+
+    public String getRootLoggerLevel()
     {
-        String logConfigFilePath = System.getProperty( KEY );
-
-        if ( StringUtils.isEmpty( logConfigFilePath ) )
-        {
-            return null;
-        }
-
-        return new File( logConfigFilePath );
+        return rootLoggerLevel;
     }
+
+    public void setRootLoggerLevel( String rootLoggerLevel )
+    {
+        this.rootLoggerLevel = rootLoggerLevel;
+    }
+
+    public String getRootLoggerAppenders()
+    {
+        return rootLoggerAppenders;
+    }
+
+    public void setRootLoggerAppenders( String rootLoggerAppenders )
+    {
+        this.rootLoggerAppenders = rootLoggerAppenders;
+    }
+
+    public String getFileAppenderPattern()
+    {
+        return fileAppenderPattern;
+    }
+
+    public void setFileAppenderPattern( String fileAppenderPattern )
+    {
+        this.fileAppenderPattern = fileAppenderPattern;
+    }
+
+    public String getFileAppenderLocation()
+    {
+        return fileAppenderLocation;
+    }
+
+    public void setFileAppenderLocation( String fileAppenderLocation )
+    {
+        this.fileAppenderLocation = fileAppenderLocation;
+    }
+
 }
