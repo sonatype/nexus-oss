@@ -203,7 +203,7 @@ public class NexusStatusUtil
     }
 
     /**
-     * This is a hack because due to magic log4j property reloading we lose normal log output sent to logger
+     * This is a hack because due to magic logging reloading we lose normal log output sent to logger
      * @param msg the msg to log at debug level
      */
     private void debug(final String msg) {

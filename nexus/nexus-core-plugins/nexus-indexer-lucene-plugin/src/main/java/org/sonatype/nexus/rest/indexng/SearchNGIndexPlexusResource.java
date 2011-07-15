@@ -146,14 +146,6 @@ public class SearchNGIndexPlexusResource
 
     public static final String RESOURCE_URI = "/lucene/search";
 
-    /**
-     * Separate logger for "diagnostic" messages regarding searchNG. Just add following line to log4j.properties of
-     * Nexus (in sonatype-work/nexus/conf directory) to get diagnostic loglines about search:
-     * 
-     * <pre>
-     * log4j.logger.search.ng.diagnostic = DEBUG
-     * </pre>
-     */
     private Logger searchDiagnosticLogger = LoggerFactory.getLogger( "search.ng.diagnostic" );
 
     @Requirement( role = Searcher.class )

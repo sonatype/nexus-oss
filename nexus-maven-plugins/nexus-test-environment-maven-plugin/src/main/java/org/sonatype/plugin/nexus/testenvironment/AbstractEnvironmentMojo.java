@@ -419,8 +419,6 @@ public class AbstractEnvironmentMojo
         copyUrl( "/default-config/security-configuration.xml", new File( defaultConfig, "security-configuration.xml" ) );
         copyUrl( "/default-config/settings.xml", new File( defaultConfig, "settings.xml" ) );
         copyUrl( "/default-config/logback-default.xml", new File( defaultConfig, "logback-default.xml" ) );
-        copyUrl( "/default-config/log4j.properties", new File( defaultConfig, "log4j.properties" ) );
-        copyUrl( "/default-config/log4j.properties", new File( nexusWorkDir, "conf/log4j.properties" ) );
 
         File sourceDefaultConfig = new File( resourcesSourceLocation, "default-config" );
         if ( sourceDefaultConfig.isDirectory() )

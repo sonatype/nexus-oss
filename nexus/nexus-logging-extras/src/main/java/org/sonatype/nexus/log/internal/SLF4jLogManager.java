@@ -62,8 +62,6 @@ import ch.qos.logback.core.util.StatusPrinter;
 
 //TODO configuration operations should be locking
 /**
- * Log4J log manager.
- * 
  * @author cstamas
  * @author juven
  * @author adreghiciu@gmail.com

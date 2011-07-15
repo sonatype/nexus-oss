@@ -19,9 +19,10 @@
 package org.sonatype.nexus.web;
 
 /**
- * Initialize logging system on start-up. Using this class assumes you are using Log4j!
+ * Initialize logging system on start-up.
  * 
  * @author juven
+ * @author adreghiciu@gmail.com
  */
 import java.util.logging.Handler;
 import java.util.logging.LogManager;

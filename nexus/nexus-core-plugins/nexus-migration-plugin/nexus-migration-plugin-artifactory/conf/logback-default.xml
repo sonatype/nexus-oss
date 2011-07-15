@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<included>
+
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${appender.pattern}</pattern>
+    </encoder>
+  </appender>
+  <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>${appender.file}</File>
+    <Append>true</Append>
+    <encoder>
+      <pattern>${appender.pattern}</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${appender.file}.%d{yyyy-MM-dd}</fileNamePattern>
+    </rollingPolicy>
+  </appender>
+  
+  <logger name="org.jsecurity" level="WARN" />
+  <logger name="httpclient" level="INFO" />
+  <logger name="org.sonatype.nexus.rest.NexusApplication" level="ERROR" />
+  <logger name="org.jsecurity.subject.AbstractRememberMeManager" level="ERROR" />
+  <logger name="org.apache.http" level="INFO" />
+  <logger name="org.restlet" level="WARN" />
+  <logger name="org.apache.commons" level="WARN" />
+  
+  <root level="${root.level}">
+    <appender-ref ref="console" />
+    <appender-ref ref="logfile" />
+  </root>
+  
+</included>

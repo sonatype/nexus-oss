@@ -253,28 +253,6 @@ public abstract class AbstractNexusIntegrationTest
         this.testRepositoryId = testRepositoryId;
         // this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
 
-        // // This is leftover code, here to serve as warning as something that needs ligration from log4j
-        // InputStream is = null;
-        // Properties props = new Properties();
-        // try
-        // {
-        // is = getClass().getResourceAsStream( "/log4j.properties" );
-        // if ( is != null )
-        // {
-        // log.error("/log4j.properties detected that used to be loaded as part of ITs, now it is being ignored."
-        // + " You may want to tweak the IT in question with suitable logging configuration.");
-        // //props.load( is );
-        // //PropertyConfigurator.configure( props );
-        // }
-        // }
-        // finally
-        // {
-        // IOUtil.close( is );
-        // }
-        //
-        // // configure the logging
-        // SLF4JBridgeHandler.install();
-
         // redirect filePrefs
         FilePreferencesFactory.setPreferencesFile( ITAppBooterCustomizer.getFilePrefsFile(
             new File( getNexusBaseDir() ), getTestId() ) );
@@ -321,19 +299,12 @@ public abstract class AbstractNexusIntegrationTest
                 // tell the console what we are doing, now that there is no output its
                 log.info( "Running Test: " + getClass().getSimpleName() );
 
-                // NOT DOING ANYMORE
-                // setupLog4j();
-
                 // clean common work dir
                 beforeStartClean();
 
                 copyTestResources();
 
                 this.copyConfigFiles();
-
-                // At this point we have the final log4j config for the IT, switch log4j to use it.
-                // FIXME: Investigate how to do this with logback instead if reqired
-                // PropertyConfigurator.configure( WORK_CONF_DIR + "/log4j.properties" );
 
                 // TODO: Below, Nexus configuration upgrade happens! But this is insane, since it is the IT that
                 // upgrades
@@ -409,97 +380,6 @@ public abstract class AbstractNexusIntegrationTest
     {
         // must override to happen something
     }
-
-    // == below methods are NOT participating in @Before/@After stuff
-
-    // /**
-    // *
-    // * @throws IOException
-    // */
-    // private void setupLog4j()
-    // throws IOException
-    // {
-    // File defaultLog4j = new File( TestProperties.getFile( "default-configs" ), "log4j.properties" );
-    // // File confLog4j = new File( nexusWorkDir, "conf/log4j.properties" );
-    //
-    // updateLog4j( defaultLog4j );
-    // // updateLog4j( confLog4j );
-    // }
-    //
-    // private void updateLog4j( File log4jFile )
-    // throws IOException
-    // {
-    // EnhancedProperties properties = new EnhancedProperties();
-    // if ( log4jFile.exists() )
-    // {
-    // FileInputStream input = new FileInputStream( log4jFile );
-    // properties.load( input );
-    // IOUtil.close( input );
-    // }
-    //
-    // attachPropertiesToLog( properties );
-    //
-    // String newFileName = this.getTestId() + "/test-config/log4j.properties";
-    // File newLog4JFile = new File( TestProperties.getString( "test.resources.folder" ), newFileName );
-    // newLog4JFile.getParentFile().mkdirs();
-    // FileOutputStream output = new FileOutputStream( newLog4JFile );
-    // try
-    // {
-    // properties.store( output );
-    // }
-    // finally
-    // {
-    // IOUtil.close( output );
-    // }
-    // }
-    //
-    // protected void attachPropertiesToLog( EnhancedProperties properties )
-    // throws IOException
-    // {
-    // nexusLog = new File( nexusLogDir, getTestId() + "/nexus.log" );
-    // nexusLog.getParentFile().mkdirs();
-    // if ( !nexusLog.exists() )
-    // {
-    // nexusLog.createNewFile();
-    // }
-    //
-    // properties.putIfNew( "log4j.rootLogger", "DEBUG, logfile" );
-    //
-    // properties.remove( "log4j.logger.org.apache.commons" );
-    // properties.remove( "log4j.logger.httpclient" );
-    // properties.remove( "log4j.logger.org.apache.http" );
-    // properties.remove( "log4j.logger.org.sonatype.nexus" );
-    // properties.remove( "log4j.logger.org.sonatype.nexus.rest.NexusApplication" );
-    // properties.remove( "log4j.logger.org.restlet" );
-    //
-    // properties.putIfNew( "log4j.appender.logfile", "org.apache.log4j.RollingFileAppender" );
-    // properties.putIfNew( "log4j.appender.logfile.File", nexusLog.getAbsolutePath().replace( '\\', '/' ) );
-    // properties.putIfNew( "log4j.appender.logfile.Append", "true" );
-    // properties.putIfNew( "log4j.appender.logfile.MaxBackupIndex", "30" );
-    // properties.putIfNew( "log4j.appender.logfile.MaxFileSize", "10MB" );
-    // properties.putIfNew( "log4j.appender.logfile.layout", "org.apache.log4j.PatternLayout" );
-    // properties.putIfNew( "log4j.appender.logfile.layout.ConversionPattern",
-    // "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
-    //
-    // File testMigrationLog = new File( nexusLogDir, getTestId() + "/migration.log" );
-    // testMigrationLog.getParentFile().mkdirs();
-    // if ( !testMigrationLog.exists() )
-    // {
-    // testMigrationLog.createNewFile();
-    // }
-    //
-    // properties.putIfNew( "log4j.logger.org.sonatype.nexus.plugin.migration", "DEBUG, migrationlogfile" );
-    //
-    // properties.putIfNew( "log4j.appender.migrationlogfile", "org.apache.log4j.DailyRollingFileAppender" );
-    // properties.putIfNew( "log4j.appender.migrationlogfile.File",
-    // testMigrationLog.getAbsolutePath().replace( '\\', '/' ) );
-    // properties.putIfNew( "log4j.appender.migrationlogfile.Append", "true" );
-    // properties.putIfNew( "log4j.appender.migrationlogfile.DatePattern", "'.'yyyy-MM-dd" );
-    // properties.putIfNew( "log4j.appender.migrationlogfile.layout", "org.apache.log4j.PatternLayout" );
-    // properties.putIfNew( "log4j.appender.migrationlogfile.layout.ConversionPattern",
-    // "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
-    //
-    // }
 
     protected File getNexusLogFile()
     {
