@@ -54,11 +54,9 @@ public class Nexus1375LogConfigIT
     {
         LogConfigResource resource = messageUtil.getLogConfig();
 
-        Assert.assertEquals( "DEBUG", resource.getRootLoggerLevel() );
+        Assert.assertEquals( resource.getRootLoggerLevel(), "DEBUG" );
 
-        Assert.assertEquals( "logfile, record", resource.getRootLoggerAppenders() );
-
-        Assert.assertEquals( "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n", resource.getFileAppenderPattern() );
+        Assert.assertEquals( resource.getFileAppenderPattern(), "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
 
         // exposing actual OS file location over REST is very bad idea...
         // File actualLoggerLocation = new File( resource.getFileAppenderLocation() ).getCanonicalFile();
@@ -71,19 +69,18 @@ public class Nexus1375LogConfigIT
     {
         LogConfigResource resource = messageUtil.getLogConfig();
 
-        Assert.assertEquals( "DEBUG", resource.getRootLoggerLevel() );
-        Assert.assertEquals( "logfile, record", resource.getRootLoggerAppenders() );
+        Assert.assertEquals( resource.getRootLoggerLevel(), "DEBUG" );
 
         resource.setRootLoggerLevel( "ERROR" );
 
         messageUtil.updateLogConfig( resource );
 
-        Assert.assertEquals( "ERROR", resource.getRootLoggerLevel() );
+        Assert.assertEquals(resource.getRootLoggerLevel(),  "ERROR" );
 
         resource.setRootLoggerLevel( "DEBUG" );
 
         messageUtil.updateLogConfig( resource );
 
-        Assert.assertEquals( "DEBUG", resource.getRootLoggerLevel() );
+        Assert.assertEquals( resource.getRootLoggerLevel(), "DEBUG" );
     }
 }
