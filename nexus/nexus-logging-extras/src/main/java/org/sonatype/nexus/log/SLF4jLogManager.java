@@ -37,6 +37,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.LimitedInputStream;
 import org.sonatype.nexus.NexusStreamResponse;
@@ -70,7 +71,7 @@ public class SLF4jLogManager
     private static final String LOG_CONF_PROPS = "logback.properties";
 
     @Requirement
-    private org.slf4j.Logger logger;
+    private Logger logger;
 
     @Requirement
     private LogConfiguration<EnhancedProperties> logConfiguration;
@@ -186,10 +187,6 @@ public class SLF4jLogManager
         }
     }
 
-    public boolean isUserEdited()
-    {
-        return logConfiguration.isUserEdited();
-    }
 
     public LogConfig getLogConfig()
         throws IOException

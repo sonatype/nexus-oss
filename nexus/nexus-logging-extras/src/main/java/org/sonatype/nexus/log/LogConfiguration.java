@@ -44,7 +44,6 @@ public interface LogConfiguration<T>
 
     T getConfig();
     
-    boolean isUserEdited();
 
     void setConfig( T config );
 }

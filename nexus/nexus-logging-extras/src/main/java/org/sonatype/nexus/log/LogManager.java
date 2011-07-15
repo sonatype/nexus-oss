@@ -43,8 +43,6 @@ public interface LogManager
     LogConfig getLogConfig()
         throws IOException;
 
-    boolean isUserEdited();
-
     void setLogConfig( LogConfig logConfig )
         throws IOException;
 

@@ -70,20 +70,6 @@ public class Log4jLogConfiguration
         return config;
     }
 
-    public boolean isUserEdited()
-    {
-        try
-        {
-            String configFile = FileUtils.fileRead( logConfigurationSource.getSource() );
-
-            return !configFile.contains( NEXUS_REMARK );
-        }
-        catch ( IOException e )
-        {
-            return true;
-        }
-    }
-
     public void setConfig( EnhancedProperties config )
     {
         this.config = config;
