@@ -503,7 +503,7 @@ public abstract class AbstractNexusIntegrationTest
 
     protected File getNexusLogFile()
     {
-        return new File( "target/logs/"+ getTestId() + "/nexus.log" );
+        return new File( "target/logs/" + getTestId() + "/nexus.log" );
     }
 
     protected void beforeStartClean()
@@ -550,8 +550,8 @@ public abstract class AbstractNexusIntegrationTest
         this.copyConfigFile( "security.xml", testProperties, WORK_CONF_DIR );
         this.copyConfigFile( "security-configuration.xml", testProperties, WORK_CONF_DIR );
 
+        this.copyConfigFile( "logback.properties", testProperties, WORK_CONF_DIR );
         this.copyConfigFile( "logback-default.xml", testProperties, WORK_CONF_DIR );
-        this.copyConfigFile( "log4j.properties", testProperties, WORK_CONF_DIR );
     }
 
     protected void findReplaceInFile( File file, String findString, String replaceString )
@@ -874,6 +874,11 @@ public abstract class AbstractNexusIntegrationTest
     {
         // the test can override the test config.
         File testConfigFile = this.getOverridableFile( configFile );
+
+        if ( testConfigFile == null )
+        {
+            return;
+        }
 
         File parent = new File( path );
         if ( !parent.isAbsolute() )
