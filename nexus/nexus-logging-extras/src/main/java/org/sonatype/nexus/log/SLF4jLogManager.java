@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +46,11 @@ import org.sonatype.nexus.util.EnhancedProperties;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.util.StatusPrinter;
 
 /**
@@ -79,16 +84,38 @@ public class SLF4jLogManager
     @Requirement( role = LogConfigurationParticipant.class )
     private List<LogConfigurationParticipant> logConfigurationParticipants;
 
-    protected org.slf4j.Logger getLogger()
-    {
-        return logger;
-    }
-
     public SLF4jLogManager()
     {
         createLogDirectory();
     }
 
+    public Set<File> getLogFiles()
+    {
+        HashSet<File> files = new HashSet<File>();
+
+        LoggerContext ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+        for ( Logger l : ctx.getLoggerList() )
+        {
+            ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger) l;
+            Iterator<Appender<ILoggingEvent>> it = log.iteratorForAppenders();
+
+            while ( it.hasNext() )
+            {
+                Appender<ILoggingEvent> ap = it.next();
+
+                if ( ap instanceof FileAppender<?> || ap instanceof RollingFileAppender<?> )
+                {
+                    FileAppender<?> fileAppender = (FileAppender<?>) ap;
+                    String path = fileAppender.getFile();
+                    files.add( new File( path ) );
+                }
+            }
+        }
+
+        return files;
+    }
+    
     public File getLogFile( String filename )
     {
         Set<File> logFiles = getLogFiles();
@@ -102,89 +129,6 @@ public class SLF4jLogManager
         }
 
         return null;
-    }
-
-    public Set<File> getLogFiles()
-    {
-        HashSet<File> files = new HashSet<File>();
-
-        // for ( Logger logger : getLoggers() )
-        // {
-        // files.addAll( getLogFiles( logger ) );
-        // }
-
-        return files;
-    }
-
-    @SuppressWarnings( { "deprecation", "unchecked" } )
-    // private List<Logger> getLoggers()
-    // {
-    // List<Logger> result = new ArrayList<Logger>();
-    // result.add( Logger.getRootLogger() );
-    //
-    // Enumeration<Category> categories = Category.getCurrentCategories();
-    //
-    // while ( categories.hasMoreElements() )
-    // {
-    // Category category = categories.nextElement();
-    //
-    // if ( category instanceof Logger )
-    // {
-    // result.add( (Logger) category );
-    // }
-    // }
-    //
-    // return result;
-    // }
-    // @SuppressWarnings( "unchecked" )
-    // private List<FileAppender> getFileAppenders( Category logger )
-    // {
-    // List<FileAppender> result = new ArrayList<FileAppender>();
-    //
-    // Enumeration<Appender> appenders = logger.getAllAppenders();
-    //
-    // while ( appenders.hasMoreElements() )
-    // {
-    // Appender appender = appenders.nextElement();
-    //
-    // if ( appender instanceof FileAppender )
-    // {
-    // result.add( (FileAppender) appender );
-    // }
-    // }
-    //
-    // return result;
-    // }
-    //
-    // protected Set<File> getLogFiles( Category logger )
-    // {
-    // HashSet<File> files = new HashSet<File>();
-    //
-    // for ( FileAppender appender : getFileAppenders( logger ) )
-    // {
-    // String file = appender.getFile();
-    //
-    // if ( file == null )
-    // {
-    // continue;
-    // }
-    //
-    // files.add( new File( file ) );
-    // }
-    //
-    // return files;
-    // }
-    public void createLogDirectory()
-    {
-        for ( File file : getLogFiles() )
-        {
-            File parent = file.getParentFile();
-
-            if ( parent != null && !parent.exists() )
-            {
-                parent.mkdirs();
-            }
-        }
     }
 
 
@@ -287,7 +231,7 @@ public class SLF4jLogManager
     @Override
     public void configure()
     {
-        // TODO maybe do some optimization that if participants does not change, do not reconfigure 
+        // TODO maybe do some optimization that if participants does not change, do not reconfigure
         prepareConfigurationFiles();
         reconfigure();
     }
@@ -396,6 +340,24 @@ public class SLF4jLogManager
             je.printStackTrace();
         }
         StatusPrinter.printInCaseOfErrorsOrWarnings( lc );
+    }
+
+    private void createLogDirectory()
+    {
+        for ( File file : getLogFiles() )
+        {
+            File parent = file.getParentFile();
+
+            if ( parent != null && !parent.exists() )
+            {
+                parent.mkdirs();
+            }
+        }
+    }
+
+    private Logger getLogger()
+    {
+        return logger;
     }
 
 }

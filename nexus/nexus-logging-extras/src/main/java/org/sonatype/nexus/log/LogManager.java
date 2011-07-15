@@ -38,8 +38,6 @@ public interface LogManager
 
     File getLogFile( String filename );
 
-    void createLogDirectory();
-
     LogConfig getLogConfig()
         throws IOException;
 
