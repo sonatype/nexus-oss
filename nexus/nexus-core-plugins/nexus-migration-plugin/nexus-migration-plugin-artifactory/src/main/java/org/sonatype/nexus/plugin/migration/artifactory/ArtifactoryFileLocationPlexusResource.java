@@ -35,6 +35,7 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryRepository;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryVirtualRepository;
@@ -72,7 +73,7 @@ public class ArtifactoryFileLocationPlexusResource
     private RepositoryRegistry repositoryRegistry;
 
     @Requirement
-    private MigrationLogInitializer logInitializer;
+    private LogManager logManager;
 
     public ArtifactoryFileLocationPlexusResource()
     {
@@ -366,7 +367,7 @@ public class ArtifactoryFileLocationPlexusResource
     public void initialize()
         throws InitializationException
     {
-        logInitializer.initialize();
+        logManager.configure();
     }
 
 }

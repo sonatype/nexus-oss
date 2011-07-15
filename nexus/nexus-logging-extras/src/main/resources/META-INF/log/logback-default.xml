@@ -1,15 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- For assistance related to logback-translator or configuration  -->
-<!-- files in general, please contact the logback user mailing list -->
-<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
-<!--                                                                -->
-<!-- For professional support please see                            -->
-<!--    http://www.qos.ch/shop/products/professionalSupport         -->
-<!--                                                                -->
-<configuration scan="true">
-
-  <property file="${plexus.log-config-dir}/logback.properties" />
+<included>
 
   <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
@@ -17,9 +8,6 @@
     </encoder>
   </appender>
   <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <!--See http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
-    <!--and http://logback.qos.ch/manual/appenders.html#TimeBasedRollingPolicy-->
-    <!--for further documentation-->
     <File>${appender.file}</File>
     <Append>true</Append>
     <encoder>
@@ -29,6 +17,7 @@
       <fileNamePattern>${appender.file}.%d{yyyy-MM-dd}</fileNamePattern>
     </rollingPolicy>
   </appender>
+  
   <logger name="org.jsecurity" level="WARN" />
   <logger name="httpclient" level="INFO" />
   <logger name="org.sonatype.nexus.rest.NexusApplication" level="ERROR" />
@@ -36,8 +25,10 @@
   <logger name="org.apache.http" level="INFO" />
   <logger name="org.restlet" level="WARN" />
   <logger name="org.apache.commons" level="WARN" />
+  
   <root level="${root.level}">
     <appender-ref ref="console" />
     <appender-ref ref="logfile" />
   </root>
-</configuration>
+  
+</included>

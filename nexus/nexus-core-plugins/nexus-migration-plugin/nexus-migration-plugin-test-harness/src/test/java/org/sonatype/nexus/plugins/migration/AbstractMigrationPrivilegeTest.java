@@ -13,6 +13,7 @@
 package org.sonatype.nexus.plugins.migration;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.junit.BeforeClass;
 import org.restlet.data.Status;
@@ -41,6 +42,14 @@ public abstract class AbstractMigrationPrivilegeTest
         MigrationSummaryDTO migrationSummary = ImportMessageUtil.importBackup( getBackupFile() );
 
         return ImportMessageUtil.commitImport( migrationSummary ).getStatus();
+    }
+    
+    @Override
+    protected void copyConfigFiles()
+        throws IOException
+    {
+        super.copyConfigFiles();
+        copyConfigFile( "logback-migration.xml", getTestProperties(), WORK_CONF_DIR );
     }
 
 }

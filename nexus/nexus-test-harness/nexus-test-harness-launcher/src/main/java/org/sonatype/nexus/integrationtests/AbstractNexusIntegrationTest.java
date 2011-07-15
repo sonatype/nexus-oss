@@ -550,7 +550,7 @@ public abstract class AbstractNexusIntegrationTest
         this.copyConfigFile( "security.xml", testProperties, WORK_CONF_DIR );
         this.copyConfigFile( "security-configuration.xml", testProperties, WORK_CONF_DIR );
 
-        this.copyConfigFile( "logback.xml", testProperties, WORK_CONF_DIR );
+        this.copyConfigFile( "logback-default.xml", testProperties, WORK_CONF_DIR );
         this.copyConfigFile( "log4j.properties", testProperties, WORK_CONF_DIR );
     }
 

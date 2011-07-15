@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<configuration>
+<included>
+
   <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <pattern>%d %p [%c] - %m%n</pattern>
     </encoder>
   </appender>
+
   <appender name="logfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
     <File>${project.build.directory}/logs/${test-id}/nexus.log</File>
@@ -14,13 +16,14 @@
       <pattern>%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-      <maxIndex>30</maxIndex>
+      <maxIndex>12</maxIndex>
       <FileNamePattern>${project.build.directory}/logs/${test-id}/nexus.log.%i</FileNamePattern>
     </rollingPolicy>
     <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
       <MaxFileSize>10MB</MaxFileSize>
     </triggeringPolicy>
   </appender>
+
   <logger name="httpclient" level="WARN"/>
   <logger name="org.sonatype.nexus.rest.NexusApplication" level="WARN">
     <appender-ref ref="console"/>
@@ -31,7 +34,9 @@
     <appender-ref ref="console"/>
   </logger>
   <logger name="org.apache.commons" level="WARN"/>
+
   <root level="DEBUG">
     <appender-ref ref="logfile"/>
   </root>
-</configuration>
+  
+</included>

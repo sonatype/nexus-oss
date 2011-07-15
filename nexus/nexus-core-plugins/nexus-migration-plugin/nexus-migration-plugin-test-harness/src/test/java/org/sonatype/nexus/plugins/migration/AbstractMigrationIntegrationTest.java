@@ -20,7 +20,6 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.artifact.Gav;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -31,7 +30,6 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.task.ArtifactoryMigrationTaskDescriptor;
 import org.sonatype.nexus.plugins.migration.util.ImportMessageUtil;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
@@ -259,5 +257,15 @@ public abstract class AbstractMigrationIntegrationTest
         new EventInspectorsUtil( this ).waitForCalmPeriod();
         TaskScheduleUtil.waitForAllTasksToStop();
     }
+
+    @Override
+    protected void copyConfigFiles()
+        throws IOException
+    {
+        super.copyConfigFiles();
+        copyConfigFile( "logback-migration.xml", getTestProperties(), WORK_CONF_DIR );
+    }
+    
+    
     
 }

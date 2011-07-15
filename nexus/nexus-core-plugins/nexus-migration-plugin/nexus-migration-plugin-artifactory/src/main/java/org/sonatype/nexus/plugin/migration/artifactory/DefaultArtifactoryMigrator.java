@@ -34,6 +34,7 @@ import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
+import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryProxy;
@@ -108,7 +109,7 @@ public class DefaultArtifactoryMigrator
     private Nexus nexus;
 
     @Requirement
-    private MigrationLogInitializer logInitializer;
+    private LogManager logManager;
 
     @Requirement
     private RepositoryRegistry repositoryRegistry;
@@ -1028,7 +1029,7 @@ public class DefaultArtifactoryMigrator
     public void initialize()
         throws InitializationException
     {
-        logInitializer.initialize();
+        logManager.configure();
     }
 
 }

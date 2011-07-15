@@ -30,6 +30,7 @@ import org.sonatype.nexus.NexusStreamResponse;
  * 
  * @author cstamas
  * @author juven
+ * @author adreghiciu@gmail.com
  */
 public interface LogManager
 {
@@ -52,4 +53,6 @@ public interface LogManager
 
     NexusStreamResponse getApplicationLogAsStream( String logFile, long fromByte, long bytesCount )
         throws IOException;
+
+    void configure();
 }

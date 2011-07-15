@@ -23,38 +23,22 @@ package org.sonatype.nexus.web;
  * 
  * @author juven
  */
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.LoggerFactory;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.spi.JoranException;
-import ch.qos.logback.core.util.StatusPrinter;
 
 public class LogConfigListener
     implements ServletContextListener
 {
-    private static final String KEY_LOG_CONFIG_DIR = "plexus.log-config-dir";
-
-    private static final String KEY_NEXUS_WORK_DIR = "plexus.nexus-work";
-
-    private static final String LOG_CONF_RELATIVE_DIR = "conf";
-
-    private static final String LOG_CONF = "logback.xml";
-
-    private static final String LOG_CONF_PROPS = "logback.properties";
 
     private Handler[] originalHandlers;
 
@@ -62,11 +46,7 @@ public class LogConfigListener
     {
         setUpJULHandlerSLF4J();
 
-        String logConfigDir = getLogConfigDir();
-
-        ensureLogConfigLocation( logConfigDir );
-
-        initializeLogConfig( logConfigDir );
+        configureLogManager( sce.getServletContext() );
     }
 
     public void contextDestroyed( ServletContextEvent sce )
@@ -103,73 +83,26 @@ public class LogConfigListener
         }
     }
 
-    private String getLogConfigDir()
+    private void configureLogManager( ServletContext sc )
     {
-        String logConfigDir = System.getProperty( KEY_LOG_CONFIG_DIR );
-
-        if ( StringUtils.isEmpty( logConfigDir ) )
-        {
-            logConfigDir = new File( System.getProperty( KEY_NEXUS_WORK_DIR ), LOG_CONF_RELATIVE_DIR ).getAbsolutePath();
-
-            System.getProperties().put( KEY_LOG_CONFIG_DIR, logConfigDir );
-        }
-
-        return logConfigDir;
-    }
-
-    private void ensureLogConfigLocation( String logConfigDir )
-    {
-        File logConfigFile = new File( logConfigDir, LOG_CONF );
-        File logConfigPropsFile = new File( logConfigDir, LOG_CONF_PROPS );
-
-        if ( !logConfigFile.exists() )
-        {
-            try
-            {
-                URL configUrl = this.getClass().getResource( "/META-INF/log/" + LOG_CONF );
-
-                FileUtils.copyURLToFile( configUrl, logConfigFile );
-            }
-            catch ( IOException e )
-            {
-                throw new IllegalStateException( "Could not create default logback.xml into "
-                    + logConfigFile.getAbsolutePath(), e );
-            }
-        }
-        if ( !logConfigPropsFile.exists() )
-        {
-            try
-            {
-                URL configUrl = this.getClass().getResource( "/META-INF/log/" + LOG_CONF_PROPS );
-
-                FileUtils.copyURLToFile( configUrl, logConfigPropsFile );
-            }
-            catch ( IOException e )
-            {
-                throw new IllegalStateException( "Could not create default logback.properties into "
-                    + logConfigFile.getAbsolutePath(), e );
-            }
-        }
-
-    }
-
-    private void initializeLogConfig( String logConfigDir )
-    {
-        // PropertyConfigurator.configure( location );
-        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-
         try
         {
-            JoranConfigurator configurator = new JoranConfigurator();
-            configurator.setContext( lc );
-            lc.reset();
-            configurator.doConfigure( new File( logConfigDir, LOG_CONF ) );
+            PlexusContainer plexusContainer = (PlexusContainer) sc.getAttribute( PlexusConstants.PLEXUS_KEY );
+            if ( plexusContainer == null )
+            {
+                throw new IllegalStateException( "Could not find Plexus container in servlet context" );
+            }
+
+            org.sonatype.nexus.log.LogManager logManager =
+                plexusContainer.lookup( org.sonatype.nexus.log.LogManager.class );
+
+            logManager.configure();
         }
-        catch ( JoranException je )
+        catch ( ComponentLookupException e )
         {
-            je.printStackTrace();
+            throw new IllegalStateException( "Could not lookup LogConfigurationParticipants" );
         }
-        StatusPrinter.printInCaseOfErrorsOrWarnings( lc );
+
     }
 
 }
