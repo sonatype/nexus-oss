@@ -33,6 +33,26 @@ public class ITAppBooterCustomizer
     @Override
     public void customizeContext( final PlexusAppBooter appBooter, final AppContext ctx )
     {
+        customizeMavenIndexerBlockingCommits( appBooter, ctx );
+        
+        customizeJavaPrefs( appBooter, ctx );
+    }
+    
+    protected void customizeMavenIndexerBlockingCommits(final PlexusAppBooter appBooter, final AppContext ctx)
+    {
+        // Note: in ITs we want to make Indexer perform blocking commits.
+        // Since MavenIndexer 4.0, it performs async commits by default, meaning that no "helper" from Nexus
+        // is able to tell and potentially block (see EventInspectorsUtil#waitForCalmPeriod() as example) execution
+        // up to the moment when readers are refreshed (indexing operation IS done, but readers will not "see" the
+        // change without reopening those).
+        // By having this switch, we are switching Maven Indexer back into "blocking" mode as it was before 4.0.
+        // The proper fix is to make all Indexer related ITs behave "properly" (with some heuristics?), and have some
+        // sort of "try-wait-try-failAfterSomeRetries" the search operation itself.
+        System.setProperty( "mavenIndexerBlockingCommits", Boolean.TRUE.toString() );
+    }
+    
+    protected void customizeJavaPrefs(final PlexusAppBooter appBooter, final AppContext ctx)
+    {
         String testId = getTestIdFromCmdLine( appBooter.getCommandLineArguments() );
 
         FilePreferencesFactory.setPreferencesFile( getFilePrefsFile( ctx.getBasedir(), testId ) );

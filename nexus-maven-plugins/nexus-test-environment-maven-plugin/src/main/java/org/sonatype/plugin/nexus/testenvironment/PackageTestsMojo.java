@@ -68,16 +68,11 @@ public class PackageTestsMojo
      */
     private boolean testSkip;
 
-    /**
-     * @parameter expression="${test-env.skip}"
-     */
-    protected boolean pluginSkip;
-
     @SuppressWarnings( "unchecked" )
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
-        if ( testSkip || pluginSkip )
+        if ( testSkip )
         {
             return;
         }
