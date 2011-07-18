@@ -1,6 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<configuration scan='true'>
-  <property file='${plexus.log-config-dir}/logback.properties'/>
-  <include file='${plexus.log-config-dir}/logback-migration.xml'/>
-  <include file='${plexus.log-config-dir}/logback-default.xml'/>
-</configuration>
