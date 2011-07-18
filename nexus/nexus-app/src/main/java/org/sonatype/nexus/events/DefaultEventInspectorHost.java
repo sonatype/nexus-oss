@@ -18,7 +18,9 @@
  */
 package org.sonatype.nexus.events;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -26,11 +28,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.slf4j.Logger;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.threads.NexusThreadFactory;
@@ -45,13 +46,25 @@ import org.sonatype.plexus.appevents.Event;
  */
 @Component( role = EventInspectorHost.class )
 public class DefaultEventInspectorHost
-    extends AbstractLogEnabled
     implements EventInspectorHost, Startable
 {
+    @Requirement
+    private Logger logger;
+
     @Requirement( role = EventInspector.class )
     private Map<String, EventInspector> eventInspectors;
 
     private ExecutorService executor;
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
+
+    protected Set<EventInspector> getEventInspectors()
+    {
+        return new HashSet<EventInspector>( eventInspectors.values() );
+    }
 
     // == Startable iface, to manage ExecutorService lifecycle
 
@@ -86,45 +99,38 @@ public class DefaultEventInspectorHost
 
     // ==
 
-    public void processEvent( Event<?> evt )
+    public void processEvent( final Event<?> evt )
     {
-        for ( Map.Entry<String, EventInspector> entry : eventInspectors.entrySet() )
-        {
-            EventInspector ei = entry.getValue();
+        final Set<EventInspector> inspectors = getEventInspectors();
 
+        for ( EventInspector ei : inspectors )
+        {
             EventInspectorHandler handler = new EventInspectorHandler( getLogger(), ei, evt );
 
-            // NEXUS-3800: async execution
-            // For now, turned off. Our core is happy and snappy with it, but some of our ITs are still unprepared for
-            // this
-            // since they do deploy-askIndexer and usually fail, since now indexer maintenance is async!
-            // Commenting this out all puts back into "old state". Later, we should review ITs and reenable this.
-            // ==
-
-            // handler.run();
-
-            // ==
-            if ( ei instanceof AsynchronousEventInspector && executor != null && !executor.isShutdown() )
+            if ( handler.accepts() )
             {
-                try
+                if ( ei instanceof AsynchronousEventInspector && executor != null && !executor.isShutdown() )
                 {
-                    executor.execute( handler );
+                    try
+                    {
+                        executor.execute( handler );
+                    }
+                    catch ( RejectedExecutionException e )
+                    {
+                        // execute it in sync mode, executor is either full or shutdown (?)
+                        // in case executor is full, this "slowdown" will make it able consume and build up
+                        handler.run();
+                    }
                 }
-                catch ( RejectedExecutionException e )
+                else
                 {
-                    // execute it in sync mode, executor is either full or shutdown (?)
-                    // in case executor is full, this "slowdown" will make it able consume and build up
                     handler.run();
                 }
-            }
-            else
-            {
-                handler.run();
             }
         }
     }
 
-    public void onEvent( Event<?> evt )
+    public void onEvent( final Event<?> evt )
     {
         processEvent( evt );
     }
@@ -140,19 +146,37 @@ public class DefaultEventInspectorHost
 
         private final Event<?> evt;
 
-        public EventInspectorHandler( Logger logger, EventInspector ei, Event<?> evt )
+        private boolean accepts;
+
+        public EventInspectorHandler( final Logger logger, final EventInspector ei, final Event<?> evt )
         {
-            super();
             this.logger = logger;
             this.ei = ei;
             this.evt = evt;
+
+            try
+            {
+                this.accepts = this.ei.accepts( this.evt );
+            }
+            catch ( Exception e )
+            {
+                logger.warn( "EventInspector implementation='" + ei.getClass().getName()
+                    + "' had problem accepting an event='" + evt.getClass() + "'", e );
+
+                this.accepts = false;
+            }
+        }
+
+        public boolean accepts()
+        {
+            return accepts;
         }
 
         public void run()
         {
             try
             {
-                if ( ei.accepts( evt ) )
+                if ( accepts() )
                 {
                     ei.inspect( evt );
                 }
@@ -163,6 +187,5 @@ public class DefaultEventInspectorHost
                     + "' had problem inspecting an event='" + evt.getClass() + "'", e );
             }
         }
-
     }
 }
