@@ -26,7 +26,8 @@ import java.net.UnknownHostException;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -39,7 +40,7 @@ import org.testng.Assert;
  */
 public class NexusStatusUtil {
 
-    protected static Logger log = Logger.getLogger(NexusStatusUtil.class);
+    protected static Logger log = LoggerFactory.getLogger(NexusStatusUtil.class);
     private ThreadedPlexusAppBooterService APP_BOOTER_SERVICE = null;
 
     public boolean isNexusRESTStarted()
@@ -117,12 +118,15 @@ public class NexusStatusUtil {
         int totalWaitCycles = 200 * 5; // 200 sec
         int retryStartCycles = 50 * 5; // 50 sec
         int pollingFreq = 200; // 200 ms
+        
+        final ThreadedPlexusAppBooterService appBooter = 
+                        getAppBooterService( testId );
 
         log.info("wait for Nexus start");
         for (int i = 0; i < totalWaitCycles; i++) {
 
             if (i % retryStartCycles == 0) {
-                getAppBooterService(testId).start();
+                appBooter.start();
             }
 
             if (isNexusRunning()) {
@@ -138,9 +142,11 @@ public class NexusStatusUtil {
         }
 
         try {
-            getAppBooterService(testId).shutdown();
+            appBooter.shutdown();
         } catch (Throwable t) {
             t.printStackTrace();
+        } finally {
+            appBooter.clean();
         }
         throw new NexusIllegalStateException("Unable to doHardStart(), nexus still stopped, took 200s");
 
@@ -167,7 +173,7 @@ public class NexusStatusUtil {
 
             if (!waitForStop()) {
                 // just start over if we can't stop normally
-                System.out.println("Forcing Stop of appbooter");
+                log.warn("Forcing Stop of appbooter");
                 appBooterService.forceStop();
                 APP_BOOTER_SERVICE = null;
             }
@@ -206,7 +212,7 @@ public class NexusStatusUtil {
      */
     private void debug(final String msg) {
         if (log.isDebugEnabled()) {
-            System.out.println("NexusStatusUtil.debug() " + msg);
+            log.debug( "NexusStatusUtil.debug() " + msg);
         }
     }
 

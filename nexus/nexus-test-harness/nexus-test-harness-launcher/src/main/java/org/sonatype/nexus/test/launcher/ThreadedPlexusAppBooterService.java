@@ -21,8 +21,9 @@ package org.sonatype.nexus.test.launcher;
 import java.io.File;
 import java.io.FileInputStream;
 
-import org.apache.log4j.Logger;
 import org.codehaus.plexus.classworlds.launcher.Launcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.appbooter.ctl.Service;
 import org.sonatype.nexus.rt.boot.ITAppBooterCustomizer;
@@ -30,7 +31,7 @@ import org.sonatype.nexus.rt.boot.ITAppBooterCustomizer;
 public class ThreadedPlexusAppBooterService
     implements Service
 {
-    private static Logger LOG = Logger.getLogger( ThreadedPlexusAppBooterService.class );
+    private static Logger LOG = LoggerFactory.getLogger( ThreadedPlexusAppBooterService.class );
 
     private LauncherThread launcherThread;
 
@@ -103,7 +104,7 @@ public class ThreadedPlexusAppBooterService
                 }
                 catch ( InterruptedException e )
                 {
-                    System.err.println( "Error waiting for launcher Thread to finish: " + e.getMessage() );
+                    LOG.warn( "Error waiting for launcher Thread to finish: " + e.getMessage() );
                     // pass it on.
                     Thread.currentThread().interrupt();
                 }
@@ -188,8 +189,8 @@ public class ThreadedPlexusAppBooterService
             }
             catch ( Exception e )
             {
+                LOG.warn( "Exception during launch of Nexus!", e );
                 exception = e;
-                e.printStackTrace();
             }
         }
 
@@ -201,6 +202,7 @@ public class ThreadedPlexusAppBooterService
 
     public void clean()
     {
+        LOG.info( "Cleaning lancher thread..." );
         this.launcherThread = null;
 
         // TODO: this causes severe problems
