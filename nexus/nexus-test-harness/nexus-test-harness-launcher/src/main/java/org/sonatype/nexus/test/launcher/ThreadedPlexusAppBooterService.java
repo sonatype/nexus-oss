@@ -54,6 +54,9 @@ public class ThreadedPlexusAppBooterService
         System.setProperty( "plexus.appbooter.customizers", ITAppBooterCustomizer.class.getName()
             + ",org.sonatype.nexus.NexusBooterCustomizer" );
 
+        // Jetty's shutdown hook disabled
+        System.setProperty( "JETTY_NO_SHUTDOWN_HOOK", Boolean.TRUE.toString() );
+
         ClassLoader systemClassLoader = this.launcher.getSystemClassLoader();
 
         this.launcher.setSystemClassLoader( null );
