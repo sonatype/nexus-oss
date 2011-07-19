@@ -183,6 +183,7 @@
     <micromailer.version>1.1.0</micromailer.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
+    <plexus-jetty7.version>1.0-SNAPSHOT</plexus-jetty7.version>
     <plexus-task-scheduler.version>1.4.2</plexus-task-scheduler.version>
     <plexus-digest.version>1.1</plexus-digest.version>
     <plexus-cli.version>1.2</plexus-cli.version>
@@ -305,6 +306,11 @@
             <artifactId>plexus-container-default</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.plexus</groupId>
+        <artifactId>plexus-jetty7</artifactId>
+        <version>${plexus-jetty7.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.plexus</groupId>

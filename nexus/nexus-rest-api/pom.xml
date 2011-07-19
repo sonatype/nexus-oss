@@ -62,11 +62,29 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty6</artifactId>
+      <artifactId>plexus-jetty7</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-restlet-bridge</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sonatype.plexus</groupId>
+          <artifactId>plexus-jetty6</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>jetty</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>jetty-util</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>jetty-sslengine</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.velocity</groupId>

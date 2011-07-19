@@ -55,7 +55,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- failsafe plugin picks this up among others -->
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <jetty.version>6.1.19</jetty.version>
     <nexus.version>${project.version}</nexus.version>
     <debug-js>false</debug-js>
   </properties>
@@ -87,27 +86,6 @@
         <version>1.0.3</version>
       </dependency>
 
-      <!-- Jetty -->
-      <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-client</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-sslengine</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-util</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
