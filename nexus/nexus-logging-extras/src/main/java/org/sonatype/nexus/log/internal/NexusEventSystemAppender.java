@@ -18,45 +18,35 @@
  */
 package org.sonatype.nexus.log.internal;
 
-import java.io.IOException;
-import java.io.InputStream;
+import javax.inject.Inject;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.log.LogConfigurationParticipant;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.UnsynchronizedAppenderBase;
 
 /**
- * Contributes "logback-default" to logback configuration.
+ * Logback appender that will multicast the logging event.
  * 
  * @author adreghiciu@gmail.com
  */
-
-@Component( role = LogConfigurationParticipant.class, hint = "logback-default" )
-public class LogbackDefaultLogConfigurationParticipant
-    implements LogConfigurationParticipant
+public class NexusEventSystemAppender
+    extends UnsynchronizedAppenderBase<ILoggingEvent>
 {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getName()
-    {
-        return "logback-default.xml";
-    }
+    @Inject
+    private ApplicationEventMulticaster eventMulticaster;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public InputStream getConfiguration()
+    protected void append( ILoggingEvent eventObject )
     {
-        try
+        if ( eventMulticaster != null )
         {
-            return this.getClass().getResource( "/META-INF/log/logback-default.xml" ).openStream();
-        }
-        catch ( IOException e )
-        {
-            throw new IllegalStateException( "Could not access logback-default.xml", e );
+            LogbackLoggingEvent logEvent = new LogbackLoggingEvent( eventObject );
+            eventMulticaster.notifyEventListeners( logEvent );
         }
     }
 

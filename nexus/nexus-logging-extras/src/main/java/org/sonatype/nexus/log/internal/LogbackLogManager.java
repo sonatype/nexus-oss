@@ -29,7 +29,6 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +50,8 @@ import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
 
+import com.google.inject.Injector;
+
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -67,7 +68,7 @@ import ch.qos.logback.core.util.StatusPrinter;
  * @author adreghiciu@gmail.com
  */
 @Component( role = LogManager.class ) 
-public class SLF4jLogManager
+public class LogbackLogManager
     implements LogManager
 {
 
@@ -92,8 +93,11 @@ public class SLF4jLogManager
 
     @Requirement( role = LogConfigurationParticipant.class )
     private List<LogConfigurationParticipant> logConfigurationParticipants;
+    
+    @Requirement
+    private Injector injector;
 
-    public SLF4jLogManager()
+    public LogbackLogManager()
     {
         createLogDirectory();
     }
@@ -395,6 +399,24 @@ public class SLF4jLogManager
             je.printStackTrace();
         }
         StatusPrinter.printInCaseOfErrorsOrWarnings( lc );
+        injectAppenders();
+    }
+
+    private void injectAppenders()
+    {
+        LoggerContext ctx = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+        for ( Logger l : ctx.getLoggerList() )
+        {
+            ch.qos.logback.classic.Logger log = (ch.qos.logback.classic.Logger) l;
+            Iterator<Appender<ILoggingEvent>> it = log.iteratorForAppenders();
+
+            while ( it.hasNext() )
+            {
+                Appender<ILoggingEvent> ap = it.next();
+                injector.injectMembers( ap );
+            }
+        }
     }
 
     private void createLogDirectory()

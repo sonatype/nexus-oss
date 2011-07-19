@@ -16,48 +16,42 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.log.internal;
+package org.sonatype.nexus.logging;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.log.LogConfigurationParticipant;
+import org.sonatype.plexus.appevents.Event;
 
 /**
- * Contributes "logback-default" to logback configuration.
+ * This {@link Event} is triggered when an message is logged. Usually only error and warnings will trigger it but this
+ * behavior (threshold) can be changed in logging system configuration files.
  * 
  * @author adreghiciu@gmail.com
  */
-
-@Component( role = LogConfigurationParticipant.class, hint = "logback-default" )
-public class LogbackDefaultLogConfigurationParticipant
-    implements LogConfigurationParticipant
+public interface LoggingEvent
+    extends Event<String>
 {
+    /**
+     * @return logging level.
+     */
+    public Level getLevel();
 
     /**
-     * {@inheritDoc}
+     * @return logged message
      */
-    @Override
-    public String getName()
-    {
-        return "logback-default.xml";
-    }
+    public String getMessage();
 
     /**
-     * {@inheritDoc}
+     * @return throwable if logged, null otherwise
      */
-    @Override
-    public InputStream getConfiguration()
+    public Throwable getThrowable();
+
+    /**
+     * Logging level.
+     * 
+     * @author adreghiciu@gmail.com
+     */
+    public static enum Level
     {
-        try
-        {
-            return this.getClass().getResource( "/META-INF/log/logback-default.xml" ).openStream();
-        }
-        catch ( IOException e )
-        {
-            throw new IllegalStateException( "Could not access logback-default.xml", e );
-        }
+        TRACE, DEBUG, INFO, WARN, ERROR
     }
 
 }

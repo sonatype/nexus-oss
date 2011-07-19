@@ -21,27 +21,28 @@ package org.sonatype.nexus.log.internal;
 import java.io.IOException;
 import java.io.InputStream;
 
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 
 /**
- * Contributes "logback-default" to logback configuration.
+ * Contributes "logback-events" to logback configuration.
  * 
  * @author adreghiciu@gmail.com
  */
-
-@Component( role = LogConfigurationParticipant.class, hint = "logback-default" )
-public class LogbackDefaultLogConfigurationParticipant
+@Component( role = LogConfigurationParticipant.class, hint="logback-events" )
+public class LogbackNexusEventSystemLogConfigurationParticipant
     implements LogConfigurationParticipant
 {
-
+    
+    
     /**
      * {@inheritDoc}
      */
     @Override
     public String getName()
     {
-        return "logback-default.xml";
+        return "logback-events.xml";
     }
 
     /**
@@ -52,11 +53,11 @@ public class LogbackDefaultLogConfigurationParticipant
     {
         try
         {
-            return this.getClass().getResource( "/META-INF/log/logback-default.xml" ).openStream();
+            return this.getClass().getResource( "/META-INF/log/logback-events.xml" ).openStream();
         }
         catch ( IOException e )
         {
-            throw new IllegalStateException( "Could not access logback-default.xml", e );
+            throw new IllegalStateException( "Could not access logback-events.xml", e );
         }
     }
 
