@@ -31,10 +31,10 @@
 <!--   https://docs.sonatype.com/display/NX/Jetty+Configuration   -->
 <!--                                                              -->
 <!-- ============================================================ -->
-<Configure id="Server" class="org.mortbay.jetty.Server">
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
     <Call name="addConnector">
         <Arg>
-            <New class="org.mortbay.jetty.nio.SelectChannelConnector">
+            <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
               <Set name="host">${application-host}</Set>
               <Set name="port">${application-port}</Set>
               
@@ -47,7 +47,7 @@
     </Call>
     
     <Set name="handler">
-      <New id="Contexts" class="org.mortbay.jetty.handler.ContextHandlerCollection">
+      <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
           <!-- The following configuration is REQUIRED, and MUST BE FIRST. 
                It makes the Plexus container available for use in the Nexus webapp. -->
           <Call name="addLifeCycleListener">
@@ -66,7 +66,7 @@
       </New>
     </Set>
     
-    <New id="NexusWebAppContext" class="org.mortbay.jetty.webapp.WebAppContext">
+    <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
       <Arg><Ref id="Contexts"/></Arg>
       <Arg>${webapp}</Arg>
       <Arg>${webapp-context-path}</Arg>

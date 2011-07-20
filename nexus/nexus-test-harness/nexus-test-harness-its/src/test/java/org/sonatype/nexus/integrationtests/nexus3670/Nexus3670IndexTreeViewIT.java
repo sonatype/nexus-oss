@@ -49,7 +49,7 @@ public class Nexus3670IndexTreeViewIT
         // just making sure all tasks are finished
         TaskScheduleUtil.waitForAllTasksToStop();
         
-        new EventInspectorsUtil( this ).waitForCalmPeriod();
+        getEventInspectorsUtil().waitForCalmPeriod();
 
         // this is just a "preflight", that all is there what we want, not a real test
 

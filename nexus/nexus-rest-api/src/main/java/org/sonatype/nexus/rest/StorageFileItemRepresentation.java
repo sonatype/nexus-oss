@@ -25,7 +25,6 @@ import java.net.SocketException;
 import java.util.Date;
 
 import org.codehaus.plexus.util.IOUtil;
-import org.mortbay.jetty.EofException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Tag;
 import org.restlet.resource.OutputRepresentation;
@@ -88,13 +87,21 @@ public class StorageFileItemRepresentation
 
             IOUtil.copy( is, outputStream );
         }
-        catch ( EofException e )
+        catch ( IOException e )
         {
-            // https://issues.sonatype.org/browse/NEXUS-217
-        }
-        catch ( SocketException e )
-        {
-            // https://issues.sonatype.org/browse/NEXUS-217
+            if ( "EofException".equals( e.getClass().getSimpleName() ) )
+            {
+                // This is for Jetty's org.eclipse.jetty.io.EofException
+                // https://issues.sonatype.org/browse/NEXUS-217
+            }
+            else if ( e instanceof SocketException )
+            {
+                // https://issues.sonatype.org/browse/NEXUS-217
+            }
+            else
+            {
+                throw e;
+            }
         }
         finally
         {

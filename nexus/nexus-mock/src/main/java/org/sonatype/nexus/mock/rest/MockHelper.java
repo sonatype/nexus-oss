@@ -21,7 +21,7 @@ package org.sonatype.nexus.mock.rest;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mortbay.log.Log;
+import org.eclipse.jetty.util.log.Log;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.MockResponse;
 

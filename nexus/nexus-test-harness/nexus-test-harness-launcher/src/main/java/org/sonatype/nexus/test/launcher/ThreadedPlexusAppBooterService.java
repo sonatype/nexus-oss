@@ -55,6 +55,9 @@ public class ThreadedPlexusAppBooterService
         System.setProperty( "plexus.appbooter.customizers", ITAppBooterCustomizer.class.getName()
             + ",org.sonatype.nexus.NexusBooterCustomizer" );
 
+        // Jetty's shutdown hook disabled
+        System.setProperty( "JETTY_NO_SHUTDOWN_HOOK", Boolean.TRUE.toString() );
+
         ClassLoader systemClassLoader = this.launcher.getSystemClassLoader();
 
         this.launcher.setSystemClassLoader( null );
@@ -101,7 +104,7 @@ public class ThreadedPlexusAppBooterService
                 }
                 catch ( InterruptedException e )
                 {
-                    System.err.println( "Error waiting for launcher Thread to finish: " + e.getMessage() );
+                    LOG.warn( "Error waiting for launcher Thread to finish: " + e.getMessage() );
                     // pass it on.
                     Thread.currentThread().interrupt();
                 }
@@ -186,8 +189,8 @@ public class ThreadedPlexusAppBooterService
             }
             catch ( Exception e )
             {
+                LOG.warn( "Exception during launch of Nexus!", e );
                 exception = e;
-                e.printStackTrace();
             }
         }
 
@@ -199,6 +202,7 @@ public class ThreadedPlexusAppBooterService
 
     public void clean()
     {
+        LOG.info( "Cleaning lancher thread..." );
         this.launcherThread = null;
 
         // TODO: this causes severe problems

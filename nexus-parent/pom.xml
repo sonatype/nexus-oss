@@ -18,7 +18,8 @@
     All other trademarks are the property of their respective owners.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -55,7 +56,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <!-- failsafe plugin picks this up among others -->
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <jetty.version>6.1.19</jetty.version>
     <nexus.version>${project.version}</nexus.version>
     <debug-js>false</debug-js>
   </properties>
@@ -87,27 +87,6 @@
         <version>1.0.3</version>
       </dependency>
 
-      <!-- Jetty -->
-      <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-client</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-sslengine</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-util</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -115,13 +94,70 @@
     <profile>
       <id>m2e</id>
       <activation>
-        <property>
-          <name>m2e.version</name>
-        </property>
+        <!-- Does not stir anything, hence is always active -->
+        <!-- Note: before, it was activated by presence of "m2e.version" property that is not set anymore -->
+        <activeByDefault>true</activeByDefault>
       </activation>
       <build>
+        <pluginManagement>
+          <plugins>
+            <!-- "new" M2E like 1.0 "IndIgor" -->
+            <plugin>
+              <groupId>org.eclipse.m2e</groupId>
+              <artifactId>lifecycle-mapping</artifactId>
+              <version>1.0.0</version>
+              <configuration>
+                <lifecycleMappingMetadata>
+                  <pluginExecutions>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.codehaus.plexus</groupId>
+                        <artifactId>plexus-component-metadata</artifactId>
+                        <versionRange>[1.5.5,)</versionRange>
+                        <goals>
+                          <goal>merge-metadata</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <execute/>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>modello-plugin-upgrade</artifactId>
+                        <versionRange>[1.0,)</versionRange>
+                        <goals>
+                          <goal>upgrade</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <execute/>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <versionRange>[2.0,)</versionRange>
+                        <goals>
+                          <goal>unpack</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore/>
+                      </action>
+                    </pluginExecution>
+                  </pluginExecutions>
+                </lifecycleMappingMetadata>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+
         <plugins>
           <plugin>
+            <!-- "oldie" M2E like 0.12.x -->
             <groupId>org.maven.ide.eclipse</groupId>
             <artifactId>lifecycle-mapping</artifactId>
             <version>0.9.9</version>
@@ -142,6 +178,7 @@
         </plugins>
       </build>
     </profile>
+
     <profile>
       <id>coverage</id>
       <build>
@@ -242,7 +279,7 @@
       </build>
     </profile>
 
-    <!-- 
+   <!-- 
          Nexus quick build profiles:
 
          effects of -Pquick: tests will be compiled but not run, n-t-e-p will assemble the test environments
@@ -338,21 +375,21 @@
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>0.0.1</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>aggregate</goal>
-                </goals>
-                <configuration>
-                  <nosuffix>true</nosuffix>
-                  <nomunge>true</nomunge>
-                  <nominify>${debug-js}</nominify>
-                  <jswarn>false</jswarn>
-                  <insertNewLine>true</insertNewLine>
-                  <disableOptimizations>true</disableOptimizations>
-                </configuration>
-              </execution>
-            </executions>
+          <executions>
+            <execution>
+              <goals>
+                <goal>aggregate</goal>
+              </goals>
+              <configuration>
+                <nosuffix>true</nosuffix>
+                <nomunge>true</nomunge>
+                <nominify>${debug-js}</nominify>
+                <jswarn>false</jswarn>
+                <insertNewLine>true</insertNewLine>
+                <disableOptimizations>true</disableOptimizations>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
@@ -397,7 +434,7 @@
             <!-- this is important for muti-module project -->
             <!-- <aggregate>true</aggregate> -->
           </configuration>
-      </plugin>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
