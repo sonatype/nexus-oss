@@ -67,7 +67,7 @@ import ch.qos.logback.core.util.StatusPrinter;
  * @author juven
  * @author adreghiciu@gmail.com
  */
-@Component( role = LogManager.class ) 
+@Component( role = LogManager.class )
 public class LogbackLogManager
     implements LogManager
 {
@@ -80,7 +80,7 @@ public class LogbackLogManager
 
     private static final String KEY_LOG_CONFIG_DIR = "plexus.log-config-dir";
 
-    private static final String KEY_NEXUS_WORK_DIR = "plexus.nexus-work";
+    static final String KEY_NEXUS_WORK_DIR = "plexus.nexus-work";
 
     private static final String LOG_CONF_RELATIVE_DIR = "conf";
 
@@ -93,14 +93,9 @@ public class LogbackLogManager
 
     @Requirement( role = LogConfigurationParticipant.class )
     private List<LogConfigurationParticipant> logConfigurationParticipants;
-    
+
     @Requirement
     private Injector injector;
-
-    public LogbackLogManager()
-    {
-        createLogDirectory();
-    }
 
     public Set<File> getLogFiles()
     {
@@ -175,7 +170,7 @@ public class LogbackLogManager
     public Collection<NexusStreamResponse> getApplicationLogFiles()
         throws IOException
     {
-        getLogger().debug( "List log files." );
+        logger.debug( "List log files." );
 
         Set<File> files = getLogFiles();
 
@@ -210,14 +205,14 @@ public class LogbackLogManager
     public NexusStreamResponse getApplicationLogAsStream( String logFile, long from, long count )
         throws IOException
     {
-        if ( getLogger().isDebugEnabled() )
+        if ( logger.isDebugEnabled() )
         {
-            getLogger().debug( "Retrieving " + logFile + " log file." );
+            logger.debug( "Retrieving " + logFile + " log file." );
         }
 
         if ( logFile.contains( File.pathSeparator ) )
         {
-            getLogger().warn( "Nexus refuses to retrive log files with path separators in its name." );
+            logger.warn( "Nexus refuses to retrive log files with path separators in its name." );
 
             return null;
         }
@@ -226,7 +221,7 @@ public class LogbackLogManager
 
         if ( log == null || !log.exists() )
         {
-            getLogger().warn( "Log file does not exist: [" + logFile + "]" );
+            logger.warn( "Log file does not exist: [" + logFile + "]" );
 
             return null;
         }
@@ -259,7 +254,7 @@ public class LogbackLogManager
     private Properties loadConfigurationProperties()
         throws IOException
     {
-
+        prepareConfigurationFiles();
         String logConfigDir = getLogConfigDir();
         File logConfigPropsFile = new File( logConfigDir, LOG_CONF_PROPS );
         InputStream in = null;
@@ -330,31 +325,33 @@ public class LogbackLogManager
             }
         }
 
-        for ( LogConfigurationParticipant participant : logConfigurationParticipants )
+        if ( logConfigurationParticipants != null )
         {
-            String name = participant.getName();
-            File logConfigFile = new File( logConfigDir, name );
-            if ( !logConfigFile.exists() )
+            for ( LogConfigurationParticipant participant : logConfigurationParticipants )
             {
-                InputStream in = null;
-                try
+                String name = participant.getName();
+                File logConfigFile = new File( logConfigDir, name );
+                if ( !logConfigFile.exists() )
                 {
-                    in = participant.getConfiguration();
+                    InputStream in = null;
+                    try
+                    {
+                        in = participant.getConfiguration();
 
-                    FileUtils.copyStreamToFile( new RawInputStreamFacade( in ), logConfigFile );
-                }
-                catch ( IOException e )
-                {
-                    throw new IllegalStateException( String.format( "Could not create %s as %s", name,
-                        logConfigFile.getAbsolutePath() ), e );
-                }
-                finally
-                {
-                    IOUtil.close( in );
+                        FileUtils.copyStreamToFile( new RawInputStreamFacade( in ), logConfigFile );
+                    }
+                    catch ( IOException e )
+                    {
+                        throw new IllegalStateException( String.format( "Could not create %s as %s", name,
+                            logConfigFile.getAbsolutePath() ), e );
+                    }
+                    finally
+                    {
+                        IOUtil.close( in );
+                    }
                 }
             }
         }
-
         File logConfigFile = new File( logConfigDir, LOG_CONF );
         PrintWriter out = null;
         try
@@ -364,9 +361,13 @@ public class LogbackLogManager
             out.println( "<?xml version='1.0' encoding='UTF-8'?>" );
             out.println( "<configuration scan='true'>" );
             out.println( "  <property file='${plexus.log-config-dir}/logback.properties'/>" );
-            for ( LogConfigurationParticipant participant : logConfigurationParticipants )
+            if ( logConfigurationParticipants != null )
             {
-                out.println( String.format( "  <include file='${plexus.log-config-dir}/%s'/>", participant.getName() ) );
+                for ( LogConfigurationParticipant participant : logConfigurationParticipants )
+                {
+                    out.println( String.format( "  <include file='${plexus.log-config-dir}/%s'/>",
+                        participant.getName() ) );
+                }
             }
             out.write( "</configuration>" );
         }
@@ -417,24 +418,6 @@ public class LogbackLogManager
                 injector.injectMembers( ap );
             }
         }
-    }
-
-    private void createLogDirectory()
-    {
-        for ( File file : getLogFiles() )
-        {
-            File parent = file.getParentFile();
-
-            if ( parent != null && !parent.exists() )
-            {
-                parent.mkdirs();
-            }
-        }
-    }
-
-    private Logger getLogger()
-    {
-        return logger;
     }
 
 }

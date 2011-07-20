@@ -96,6 +96,11 @@
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-slf4j-logging</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

@@ -33,6 +33,22 @@ public class DefaultLogConfiguration
 
     private String fileAppenderLocation;
 
+    public DefaultLogConfiguration()
+    {
+        this( null );
+    }
+
+    public DefaultLogConfiguration( LogConfiguration config )
+    {
+        if ( config != null )
+        {
+            rootLoggerLevel = config.getRootLoggerLevel();
+            rootLoggerAppenders = config.getRootLoggerAppenders();
+            fileAppenderPattern = config.getFileAppenderPattern();
+            fileAppenderLocation = config.getFileAppenderLocation();
+        }
+    }
+
     public String getRootLoggerLevel()
     {
         return rootLoggerLevel;
