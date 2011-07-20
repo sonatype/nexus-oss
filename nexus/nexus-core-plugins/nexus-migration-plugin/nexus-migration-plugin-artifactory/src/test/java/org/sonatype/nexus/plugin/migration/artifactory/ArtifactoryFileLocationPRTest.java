@@ -2,6 +2,8 @@ package org.sonatype.nexus.plugin.migration.artifactory;
 
 import java.io.File;
 
+import org.codehaus.plexus.context.Context;
+import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.FileLocationRequestDTO;
@@ -14,6 +16,21 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class ArtifactoryFileLocationPRTest
     extends AbstractNexusTestCase
 {
+
+    @Override
+    protected void customizeContext( Context ctx )
+    {
+        super.customizeContext( ctx );
+
+        try
+        {
+            System.setProperty( "plexus." + WORK_CONFIGURATION_KEY, (String) ctx.get( WORK_CONFIGURATION_KEY ) );
+        }
+        catch ( Exception e )
+        {
+            throw new RuntimeException( e );
+        }
+    }
 
     @Test
     public void testPost()
@@ -33,12 +50,12 @@ public class ArtifactoryFileLocationPRTest
         MigrationSummaryResponseDTO result = (MigrationSummaryResponseDTO) resource.post( null, null, null, dto );
         MigrationSummaryDTO resultDto = result.getData();
 
-        assertEquals( backupFile, new File( resultDto.getBackupLocation() ) );
+        Assert.assertEquals( backupFile, new File( resultDto.getBackupLocation() ) );
 
         // Nexus 1832
         GroupResolutionDTO repo = resultDto.getGroupResolution( "repo" );
-        assertNotNull( repo );
-        assertEquals( "repo", repo.getGroupId() );
+        Assert.assertNotNull( repo );
+        Assert.assertEquals( "repo", repo.getGroupId() );
     }
 
 }
