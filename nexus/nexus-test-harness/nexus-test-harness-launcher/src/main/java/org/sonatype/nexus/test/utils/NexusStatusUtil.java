@@ -38,57 +38,72 @@ import org.testng.Assert;
 /**
  * Simple util class
  */
-public class NexusStatusUtil {
+public class NexusStatusUtil
+{
 
-    protected static Logger log = LoggerFactory.getLogger(NexusStatusUtil.class);
+    protected static Logger log = LoggerFactory.getLogger( NexusStatusUtil.class );
 
     private ThreadedPlexusAppBooterService APP_BOOTER_SERVICE = null;
 
     public boolean isNexusRESTStarted()
-        throws NexusIllegalStateException {
+        throws NexusIllegalStateException
+    {
         final String statusURI = AbstractNexusIntegrationTest.nexusBaseUrl + RequestFacade.SERVICE_LOCAL + "status";
         // by not using test context we are only checking anonymously - this may not be a good idea, not sure
         org.apache.commons.httpclient.HttpMethod method = null;
-        try{
-            try {
-                method = RequestFacade.executeHTTPClientMethod(new GetMethod(statusURI), false);
-            } catch (HttpException ex) {
-                throw new NexusIllegalStateException("Problem executing status request: ", ex);
-            } catch (IOException ex) {
-                throw new NexusIllegalStateException("Problem executing status request: ", ex);
+        try
+        {
+            try
+            {
+                method = RequestFacade.executeHTTPClientMethod( new GetMethod( statusURI ), false );
+            }
+            catch ( HttpException ex )
+            {
+                throw new NexusIllegalStateException( "Problem executing status request: ", ex );
+            }
+            catch ( IOException ex )
+            {
+                throw new NexusIllegalStateException( "Problem executing status request: ", ex );
             }
 
             final int statusCode = method.getStatusCode();
             // 200 if anonymous access is enabled
             // 401 if nexus is running but anonymous access is disabled
-            if( statusCode == 401 )
+            if ( statusCode == 401 )
             {
                 return true;
             }
             else if ( statusCode != 200 )
             {
-                debug("Status check returned status " + statusCode);
+                debug( "Status check returned status " + statusCode );
                 return false;
             }
 
-
             String entityText;
-            try {
+            try
+            {
                 entityText = method.getResponseBodyAsString();
-            } catch (IOException e) {
-                throw new NexusIllegalStateException("Unable to retrieve nexus status body", e);
+            }
+            catch ( IOException e )
+            {
+                throw new NexusIllegalStateException( "Unable to retrieve nexus status body", e );
             }
 
-            StatusResourceResponse status = (StatusResourceResponse) XStreamFactory.getXmlXStream().fromXML(entityText);
-            if (!SystemState.STARTED.toString().equals(status.getData().getState())) {
-                debug("Status check returned system state " + status.getData().getState());
+            StatusResourceResponse status =
+                (StatusResourceResponse) XStreamFactory.getXmlXStream().fromXML( entityText );
+            if ( !SystemState.STARTED.toString().equals( status.getData().getState() ) )
+            {
+                debug( "Status check returned system state " + status.getData().getState() );
                 return false;
             }
 
             return true;
-        } finally {
-            if(method != null){
-                method.releaseConnection(); //request facade does this but just making sure
+        }
+        finally
+        {
+            if ( method != null )
+            {
+                method.releaseConnection(); // request facade does this but just making sure
             }
         }
 
@@ -96,153 +111,208 @@ public class NexusStatusUtil {
 
     /**
      * Get Nexus Status, failing if the request response is not successfully returned.
+     * 
      * @return the status resource
      * @throws NexusIllegalStateException
      */
     public StatusResourceResponse getNexusStatus()
-        throws NexusIllegalStateException {
-        try {
+        throws NexusIllegalStateException
+    {
+        try
+        {
             String entityText = RequestFacade.doGetForText( "service/local/status" );
-            StatusResourceResponse status = (StatusResourceResponse) XStreamFactory.getXmlXStream().fromXML(entityText);
+            StatusResourceResponse status =
+                (StatusResourceResponse) XStreamFactory.getXmlXStream().fromXML( entityText );
             return status;
-        } catch (IOException ex) {
-            throw new NexusIllegalStateException("Could not get nexus status", ex);
+        }
+        catch ( IOException ex )
+        {
+            throw new NexusIllegalStateException( "Could not get nexus status", ex );
         }
     }
 
-    public void start(String testId)
-        throws Exception {
-        if (isNexusApplicationPortOpen()) {
-            throw new NexusIllegalStateException("Ports in use!!!");
+    public void start( String testId )
+        throws Exception
+    {
+        if ( isNexusApplicationPortOpen() )
+        {
+            throw new NexusIllegalStateException( "Ports in use!!!" );
         }
 
         int totalWaitCycles = 200 * 5; // 200 sec
         int retryStartCycles = 50 * 5; // 50 sec
         int pollingFreq = 200; // 200 ms
-        
-        final ThreadedPlexusAppBooterService appBooter = 
-                        getAppBooterService( testId );
 
-        log.info("wait for Nexus start");
-        for (int i = 0; i < totalWaitCycles; i++) {
+        final ThreadedPlexusAppBooterService appBooter = getAppBooterService( testId );
 
-            if (i % retryStartCycles == 0) {
+        log.info( "wait for Nexus start" );
+        for ( int i = 0; i < totalWaitCycles; i++ )
+        {
+
+            if ( i % retryStartCycles == 0 )
+            {
                 appBooter.start();
             }
 
-            if (isNexusRunning()) {
+            if ( isNexusRunning() )
+            {
                 // nexus started
                 return;
             }
 
-            try {
-                Thread.sleep(pollingFreq);
-            } catch (InterruptedException e) {
+            try
+            {
+                Thread.sleep( pollingFreq );
+            }
+            catch ( InterruptedException e )
+            {
                 // no problem
             }
         }
 
-        try {
+        try
+        {
             appBooter.shutdown();
-        } catch (Throwable t) {
+        }
+        catch ( Throwable t )
+        {
             t.printStackTrace();
-        } finally {
+        }
+        finally
+        {
             appBooter.clean();
         }
-        throw new NexusIllegalStateException("Unable to doHardStart(), nexus still stopped, took 200s");
+        throw new NexusIllegalStateException( "Unable to doHardStart(), nexus still stopped, took 200s" );
 
     }
 
     public void stop()
-        throws Exception {
-        if (APP_BOOTER_SERVICE == null) {
+        throws Exception
+    {
+        if ( APP_BOOTER_SERVICE == null )
+        {
             // app booter wasn't started, won't do it on stop
             return;
         }
 
         final ThreadedPlexusAppBooterService appBooterService = APP_BOOTER_SERVICE;
 
-        try {
-            try {
+        try
+        {
+            try
+            {
                 appBooterService.stop();
-            } catch (Exception e) {
-                System.err.println("Failed to stop Nexus. The thread will most likely die with an error: "
-                    + e.getMessage());
-                Assert.fail(e.getMessage());
-            } finally {
+            }
+            catch ( Exception e )
+            {
+                System.err.println( "Failed to stop Nexus. The thread will most likely die with an error: "
+                    + e.getMessage() );
+                Assert.fail( e.getMessage() );
+            }
+            finally
+            {
             }
 
-            if (!waitForStop()) {
+            if ( !waitForStop() )
+            {
                 // just start over if we can't stop normally
-                log.warn("Forcing Stop of appbooter");
+                log.warn( "Forcing Stop of appbooter" );
                 appBooterService.forceStop();
                 APP_BOOTER_SERVICE = null;
             }
-        } finally {
+        }
+        finally
+        {
             appBooterService.clean();
         }
     }
 
-    public boolean isNexusRunning() {
-        if (!isNexusApplicationPortOpen()) {
+    public boolean isNexusRunning()
+    {
+        if ( !isNexusApplicationPortOpen() )
+        {
             return false;
         }
 
-        try {
+        try
+        {
             return isNexusRESTStarted();
-            //log.debug("nexus is running.");
-            //return true;
-        } catch (NexusIllegalStateException e) {
-            log.debug("Problem accessing nexus", e);
+            // log.debug("nexus is running.");
+            // return true;
+        }
+        catch ( NexusIllegalStateException e )
+        {
+            log.debug( "Problem accessing nexus", e );
         }
         return false;
 
     }
 
-    private boolean isNexusApplicationPortOpen() {
-        return isPortOpen(AbstractNexusIntegrationTest.nexusApplicationPort, "AbstractNexusIntegrationTest.nexusApplicationPort");
+    private boolean isNexusApplicationPortOpen()
+    {
+        return isPortOpen( AbstractNexusIntegrationTest.nexusApplicationPort,
+            "AbstractNexusIntegrationTest.nexusApplicationPort" );
     }
 
-    private boolean isNexusControlPortOpen() {
-        return isPortOpen(AbstractNexusIntegrationTest.nexusControlPort, "AbstractNexusIntegrationTest.nexusControlPort");
+    private boolean isNexusControlPortOpen()
+    {
+        return isPortOpen( AbstractNexusIntegrationTest.nexusControlPort,
+            "AbstractNexusIntegrationTest.nexusControlPort" );
     }
 
     /**
      * This is a hack because due to magic logging reloading we lose normal log output sent to logger
+     * 
      * @param msg the msg to log at debug level
      */
-    private void debug(final String msg) {
-        if (log.isDebugEnabled()) {
-            log.debug( "NexusStatusUtil.debug() " + msg);
+    private void debug( final String msg )
+    {
+        if ( log.isDebugEnabled() )
+        {
+            log.debug( "NexusStatusUtil.debug() " + msg );
         }
     }
 
     /**
-     *
      * @param port the port to check for being open
      * @param portName the name of the port we are checking
      * @return true if port is open, false if not
      */
-    private boolean isPortOpen(final int port, final String portName) {
+    private boolean isPortOpen( final int port, final String portName )
+    {
         Socket sock = null;
-        try {
-            sock = new Socket("localhost", AbstractNexusIntegrationTest.nexusApplicationPort);
+        try
+        {
+            sock = new Socket( "localhost", AbstractNexusIntegrationTest.nexusApplicationPort );
             return true;
-        } catch (UnknownHostException e1) {
-            if (log.isDebugEnabled()) {
-                debug(portName + "(" + port + ") is not open: " + e1.getMessage());
+        }
+        catch ( UnknownHostException e1 )
+        {
+            if ( log.isDebugEnabled() )
+            {
+                debug( portName + "(" + port + ") is not open: " + e1.getMessage() );
             }
-        } catch (IOException e1) {
-            if (log.isDebugEnabled()) {
-                debug(portName + "(" + port + ") is not open: " + e1.getMessage());
+        }
+        catch ( IOException e1 )
+        {
+            if ( log.isDebugEnabled() )
+            {
+                debug( portName + "(" + port + ") is not open: " + e1.getMessage() );
             }
-        } finally {
-            if (sock != null) {
-                try {
+        }
+        finally
+        {
+            if ( sock != null )
+            {
+                try
+                {
                     sock.close();
-                } catch (IOException e) {
-                    if (log.isDebugEnabled()) {
-                        debug("Problem closing socket to " + portName + "(" + port + ") : " + e.getMessage());
+                }
+                catch ( IOException e )
+                {
+                    if ( log.isDebugEnabled() )
+                    {
+                        debug( "Problem closing socket to " + portName + "(" + port + ") : " + e.getMessage() );
                     }
                 }
             }
@@ -251,27 +321,34 @@ public class NexusStatusUtil {
     }
 
     public boolean isNexusStopped()
-        throws NexusIllegalStateException {
+        throws NexusIllegalStateException
+    {
         return !isNexusRunning();
     }
 
     public boolean waitForStop()
-        throws NexusIllegalStateException {
-        log.info("wait for Nexus stop");
+        throws NexusIllegalStateException
+    {
+        log.info( "wait for Nexus stop" );
 
         int totalWaitTime = 40 * 1000; // 20 sec
         int pollingFreq = 200; // 200 ms
 
-        for (int i = 0; i < totalWaitTime / pollingFreq; i++) {
-            log.debug("wait for Nexus stop, attempt: " + i);
-            if (!isNexusRunning()) {
+        for ( int i = 0; i < totalWaitTime / pollingFreq; i++ )
+        {
+            log.debug( "wait for Nexus stop, attempt: " + i );
+            if ( !isNexusRunning() )
+            {
                 // nexus stopped!
                 return true;
             }
 
-            try {
-                Thread.sleep(pollingFreq);
-            } catch (InterruptedException e) {
+            try
+            {
+                Thread.sleep( pollingFreq );
+            }
+            catch ( InterruptedException e )
+            {
                 // no problem
             }
         }
@@ -280,29 +357,33 @@ public class NexusStatusUtil {
         return false;
     }
 
-    private ThreadedPlexusAppBooterService getAppBooterService(String testId)
-        throws Exception {
-        if (APP_BOOTER_SERVICE == null) {
-            final File f = new File("target/plexus-home");
+    private ThreadedPlexusAppBooterService getAppBooterService( String testId )
+        throws Exception
+    {
+        if ( APP_BOOTER_SERVICE == null )
+        {
+            final File f = new File( "target/plexus-home" );
 
-            if (!f.isDirectory()) {
+            if ( !f.isDirectory() )
+            {
                 f.mkdirs();
             }
 
-            File bundleRoot = new File(TestProperties.getAll().get("nexus.base.dir"));
-            System.setProperty("basedir", bundleRoot.getAbsolutePath());
+            File bundleRoot = new File( TestProperties.getAll().get( "nexus.base.dir" ) );
+            System.setProperty( "basedir", bundleRoot.getAbsolutePath() );
 
             // System.setProperty( "plexus.appbooter.customizers", "org.sonatype.nexus.NexusBooterCustomizer,"
             // + ITAppBooterCustomizer.class.getName() );
 
-            File classworldsConf = new File(bundleRoot, "conf/classworlds.conf");
+            File classworldsConf = new File( bundleRoot, "conf/classworlds.conf" );
 
-            if (!classworldsConf.isFile()) {
-                throw new IllegalStateException("The bundle classworlds.conf file is not found (\""
-                    + classworldsConf.getAbsolutePath() + "\")!");
+            if ( !classworldsConf.isFile() )
+            {
+                throw new IllegalStateException( "The bundle classworlds.conf file is not found (\""
+                    + classworldsConf.getAbsolutePath() + "\")!" );
             }
 
-            System.setProperty("classworlds.conf", classworldsConf.getAbsolutePath());
+            System.setProperty( "classworlds.conf", classworldsConf.getAbsolutePath() );
 
             // this is non trivial here, since we are running Nexus in _same_ JVM as tests
             // and the PlexusAppBooterJSWListener (actually theused WrapperManager in it) enforces then Nexus may be
@@ -311,11 +392,11 @@ public class NexusStatusUtil {
             // since we dont need all the bells-and-whistles in Service and JSW
             // but we are still _reusing_ the whole bundle environment by tricking Classworlds Launcher
 
-            ServerSocket socket = new ServerSocket(0);
+            ServerSocket socket = new ServerSocket( 0 );
             int controlPort = socket.getLocalPort();
             socket.close();
 
-            APP_BOOTER_SERVICE = new ThreadedPlexusAppBooterService(classworldsConf, controlPort, testId);
+            APP_BOOTER_SERVICE = new ThreadedPlexusAppBooterService( classworldsConf, controlPort, testId );
         }
 
         return APP_BOOTER_SERVICE;
