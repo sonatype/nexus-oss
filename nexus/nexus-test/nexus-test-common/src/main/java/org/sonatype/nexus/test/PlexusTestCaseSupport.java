@@ -20,6 +20,8 @@ package org.sonatype.nexus.test;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Properties;
+
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -35,25 +37,29 @@ import org.junit.Assert;
 import org.junit.Before;
 
 /**
- * A Support PlexusTestCase clone that does not extend JUnit TestCase, thereby allowing us to extend
- * this class like we did with JUnit 3x and use JUnit 4x annotations instead to design our tests.
+ * A Support PlexusTestCase clone that does not extend JUnit TestCase, thereby allowing us to extend this class like we
+ * did with JUnit 3x and use JUnit 4x annotations instead to design our tests.
  * <p>
  * This source is meant to be a near copy of the original {@link org.codehaus.plexus.PlexusTestCase}, sisu-2.1.1
  * <p>
- * The supporting asserts derived from JUnit's Assert class are deprecated here to encourage use of
- * the more modern alternative Hamcrest libraries.
+ * The supporting asserts derived from JUnit's Assert class are deprecated here to encourage use of the more modern
+ * alternative Hamcrest libraries.
  * <p>
  * TODO: integrate this directly with sisu-inject-plexus
  */
-public abstract class PlexusTestCaseSupport {
+public abstract class PlexusTestCaseSupport
+{
     private PlexusContainer container;
 
     private static String basedir;
+
+    private Properties sysPropsBackup;
 
     protected void setUp()
         throws Exception
     {
         basedir = getBasedir();
+        sysPropsBackup = System.getProperties();
     }
 
     protected void setupContainer()
@@ -117,7 +123,7 @@ public abstract class PlexusTestCaseSupport {
 
     /**
      * Allow custom test case implementations do augment the default container configuration before executing tests.
-     *
+     * 
      * @param containerConfiguration
      */
     protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
@@ -142,6 +148,7 @@ public abstract class PlexusTestCaseSupport {
 
             container = null;
         }
+        System.setProperties( sysPropsBackup );
     }
 
     protected PlexusContainer getContainer()
@@ -175,7 +182,7 @@ public abstract class PlexusTestCaseSupport {
      * Allow the retrieval of a container configuration that is based on the name of the test class being run. So if you
      * have a test class called org.foo.FunTest, then this will produce a resource name of org/foo/FunTest.xml which
      * would be used to configure the Plexus container before running your test.
-     *
+     * 
      * @param subname
      * @return
      */
@@ -291,120 +298,126 @@ public abstract class PlexusTestCaseSupport {
     // ========================= CUSTOM NEXUS =====================
     /**
      * Helper to call old JUnit 3x style {@link #setUp()}
+     * 
      * @throws Exception
      */
     @Before
-    final public void setUpJunit() throws Exception {
+    final public void setUpJunit()
+        throws Exception
+    {
         setUp();
     }
 
     /**
      * Helper to call old JUnit 3x style {@link #tearDown()}
+     * 
      * @throws Exception
      */
     @After
-    final public void tearDownJunit() throws Exception {
+    final public void tearDownJunit()
+        throws Exception
+    {
         tearDown();
     }
 
     /**
-     *
      * @deprecated Use {@link org.hamcrest.Assert#fail()} directly instead.
      */
     @Deprecated
-    protected void fail() {
+    protected void fail()
+    {
         Assert.fail();
     }
 
     /**
-     *
      * @deprecated Use {@link org.hamcrest.Assert#fail(java.lang.String)} directly instead.
      */
     @Deprecated
-    protected void fail(String message) {
-        Assert.fail(message);
+    protected void fail( String message )
+    {
+        Assert.fail( message );
     }
 
     /**
-     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
-    protected void assertTrue(boolean condition) {
-        Assert.assertTrue(condition);
+    protected void assertTrue( boolean condition )
+    {
+        Assert.assertTrue( condition );
     }
 
     /**
-     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
-    protected void assertTrue(String message, boolean condition) {
-        Assert.assertTrue(message, condition);
+    protected void assertTrue( String message, boolean condition )
+    {
+        Assert.assertTrue( message, condition );
     }
 
     /**
-     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
-    protected void assertFalse(boolean condition) {
-        Assert.assertFalse(condition);
+    protected void assertFalse( boolean condition )
+    {
+        Assert.assertFalse( condition );
     }
 
     /**
-     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
-    protected void assertFalse(String message, boolean condition) {
-        Assert.assertFalse(message, condition);
+    protected void assertFalse( String message, boolean condition )
+    {
+        Assert.assertFalse( message, condition );
     }
 
     /**
-     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
-    protected void assertNotNull(Object obj) {
+    protected void assertNotNull( Object obj )
+    {
         Assert.assertNotNull( obj );
     }
 
     /**
-     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
-    protected void assertNotNull(String message, Object obj) {
-        Assert.assertNotNull(message, obj);
+    protected void assertNotNull( String message, Object obj )
+    {
+        Assert.assertNotNull( message, obj );
     }
 
     /**
-     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
-    protected void assertNull(Object obj) {
+    protected void assertNull( Object obj )
+    {
         Assert.assertNull( obj );
     }
 
     /**
-     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
-    protected void assertNull(String message, Object obj) {
-        Assert.assertNull(message, obj );
+    protected void assertNull( String message, Object obj )
+    {
+        Assert.assertNull( message, obj );
     }
 
     /**
-     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
-    protected void assertEquals(String message, Object expected, Object actual) {
+    protected void assertEquals( String message, Object expected, Object actual )
+    {
         // don't use junit framework Assert due to autoboxing bug
-        MatcherAssert.assertThat(message, actual, Matchers.equalTo( expected ));
+        MatcherAssert.assertThat( message, actual, Matchers.equalTo( expected ) );
 
     }
 
     /**
-     *
      * @deprecated Use {@link org.hamcrest.MatcherAssert} directly instead.
      */
-    protected void assertEquals(Object expected, Object actual) {
+    protected void assertEquals( Object expected, Object actual )
+    {
         // don't use junit framework Assert
-        MatcherAssert.assertThat( actual, Matchers.equalTo( expected ));
+        MatcherAssert.assertThat( actual, Matchers.equalTo( expected ) );
     }
 }
