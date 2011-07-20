@@ -13,23 +13,11 @@
 
   <packaging>maven-plugin</packaging>
 
-  <name>Nexus : Test Environment Maven Plugin</name>
+  <name>Nexus : Maven Plugins : Test Environment</name>
 
   <prerequisites>
     <maven>2.0.9</maven>
   </prerequisites>
-
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
   <dependencies>
     <dependency>
