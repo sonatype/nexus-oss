@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
+import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.VersionUtils;
@@ -32,6 +33,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 
 /**
  * Component responsible for metadata maintenance.
@@ -260,6 +262,19 @@ public class DefaultMetadataManager
             gavMd.setVersioning( new Versioning() );
         }
 
+        if ( ModelVersionUtility.Version.V110.compareTo( ModelVersionUtility.getModelVersion( gavMd ) ) <= 0 )
+        {
+            return resolveSnapshotFromM3Metadata( gavRequest, gav, gavMd );
+        }
+        else
+        {
+            return resolveSnapshotFromM2Metadata( gavRequest, gav, gavMd );
+        }
+    }
+
+    public Gav resolveSnapshotFromM2Metadata( final ArtifactStoreRequest gavRequest, final Gav gav, final Metadata gavMd )
+        throws IOException
+    {
         String latest = null;
 
         Long buildTs = null;
@@ -301,6 +316,30 @@ public class DefaultMetadataManager
         }
     }
 
+    public Gav resolveSnapshotFromM3Metadata( final ArtifactStoreRequest gavRequest, final Gav gav, final Metadata gavMd )
+        throws IOException
+    {
+        for ( SnapshotVersion sv : gavMd.getVersioning().getSnapshotVersions() )
+        {
+            if ( StringUtils.equals( sv.getExtension(), gav.getExtension() )
+                && StringUtils.equals( StringUtils.defaultString( sv.getClassifier(), "" ),
+                    StringUtils.defaultString( gav.getClassifier(), "" ) ) )
+            {
+                Long buildTs = getTimestampForMdMaven3UpdatedString( sv.getUpdated() );
+
+                Integer buildNo = getBuildNoForMdMaven3ValueString( sv.getVersion() );
+
+                return new Gav( gav.getGroupId(), gav.getArtifactId(), sv.getVersion(), gav.getClassifier(),
+                    gav.getExtension(), buildNo, buildTs, gav.getName(), gav.isHash(), gav.getHashType(),
+                    gav.isSignature(), gav.getSignatureType() );
+
+            }
+        }
+
+        // even if model version is 1.1.0, we have no snapshots versions?
+        return resolveSnapshotFromM2Metadata( gavRequest, gav, gavMd );
+    }
+
     public static Long getTimestampForMdTsString( final String tsString )
     {
         try
@@ -309,6 +348,40 @@ public class DefaultMetadataManager
             return Long.valueOf( df.parse( tsString ).getTime() );
         }
         catch ( ParseException e )
+        {
+            return null;
+        }
+    }
+
+    public static Long getTimestampForMdMaven3UpdatedString( final String tsString )
+    {
+        try
+        {
+            SimpleDateFormat df = new SimpleDateFormat( "yyyyMMddHHmmss" );
+            return Long.valueOf( df.parse( tsString ).getTime() );
+        }
+        catch ( ParseException e )
+        {
+            return null;
+        }
+    }
+
+    public static Integer getBuildNoForMdMaven3ValueString( final String valueString )
+    {
+        try
+        {
+            final int lastIdx = valueString.lastIndexOf( '-' );
+
+            if ( lastIdx > -1 )
+            {
+                return Integer.valueOf( valueString.substring( lastIdx + 1 ) );
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        catch ( NumberFormatException e )
         {
             return null;
         }
