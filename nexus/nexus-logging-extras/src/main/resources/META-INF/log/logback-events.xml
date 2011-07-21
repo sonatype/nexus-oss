@@ -4,7 +4,7 @@
 
   <appender name="events" class="org.sonatype.nexus.log.internal.NexusEventSystemAppender">
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>ERROR</level>
+      <level>WARN</level>
     </filter>
   </appender>
 

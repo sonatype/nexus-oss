@@ -134,7 +134,7 @@ public class LogHelperPlexusResource
                 logger.debug( message, exception );
             }
         }
-        else if ( level.equalsIgnoreCase( "warning" ) )
+        else if ( level.equalsIgnoreCase( "warn" ) )
         {
             if ( exception == null )
             {

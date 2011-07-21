@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.events;
 
+import java.io.EOFException;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.ErrorWarningEvent;
@@ -31,9 +33,8 @@ import org.sonatype.plexus.appevents.Event;
 import org.sonatype.timeline.TimelineException;
 
 /**
- * Listens to {@link LoggingEvent}s of ERROR/WARN level and creates corresponding {@link FeedRecorder} entries.
- * 
- * It is an asynchronous listener so Nexus is not blocked during feed entry registration.
+ * Listens to {@link LoggingEvent}s of ERROR/WARN level and creates corresponding {@link FeedRecorder} entries. It is an
+ * asynchronous listener so Nexus is not blocked during feed entry registration.
  * 
  * @author adreghiciu@gmail.com
  */
@@ -42,7 +43,7 @@ public class LoggingToFeedEventInspector
     extends AbstractEventInspector
     implements AsynchronousEventInspector
 {
-    
+
     @Requirement
     private FeedRecorder feedRecorder;
 
@@ -56,9 +57,9 @@ public class LoggingToFeedEventInspector
         LoggingEvent event = (LoggingEvent) evt;
 
         Throwable throwable = event.getThrowable();
+        String message = event.getMessage();
 
-        // hack to prevent infinite loop
-        if ( throwable != null && throwable instanceof TimelineException )
+        if ( shouldIgnore( message, throwable ) )
         {
             return;
         }
@@ -78,18 +79,13 @@ public class LoggingToFeedEventInspector
             return;
         }
 
-        String message = event.getMessage();
-
-        if ( !shouldIgnore( message, throwable ) )
+        if ( throwable != null )
         {
-            if ( throwable != null )
-            {
-                feedRecorder.addErrorWarningEvent( action, message, throwable );
-            }
-            else
-            {
-                feedRecorder.addErrorWarningEvent( action, message );
-            }
+            feedRecorder.addErrorWarningEvent( action, message, throwable );
+        }
+        else
+        {
+            feedRecorder.addErrorWarningEvent( action, message );
         }
 
     }
@@ -98,7 +94,8 @@ public class LoggingToFeedEventInspector
     {
         if ( throwable != null )
         {
-            if ( "org.mortbay.jetty.EofException".equals( throwable.getClass().getName() ) )
+            if ( EOFException.class.getName().equals( throwable.getClass().getName() )
+                || TimelineException.class.getName().equals( throwable.getClass().getName() ) )
             {
                 return true;
             }

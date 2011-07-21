@@ -5,20 +5,11 @@ import java.io.IOException;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 
-import com.thoughtworks.xstream.XStream;
-
 public class ITHelperLogUtils
 {
 
     private static final String BASE_URI = "service/local/loghelper";
     
-    private static XStream xstream;
-
-    static
-    {
-        xstream = XStreamFactory.getXmlXStream();
-    }
-
     public static void debug( String message )
         throws Exception
     {
