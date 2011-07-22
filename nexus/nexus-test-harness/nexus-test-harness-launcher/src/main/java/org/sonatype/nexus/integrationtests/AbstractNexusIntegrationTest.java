@@ -18,10 +18,13 @@
  */
 package org.sonatype.nexus.integrationtests;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
-import static org.testng.Assert.*;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.isRedirecting;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.redirectLocation;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
+import static org.testng.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -61,7 +64,6 @@ import org.restlet.data.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.sonatype.nexus.rt.boot.ITAppBooterCustomizer;
 import org.sonatype.nexus.rt.prefs.FilePreferencesFactory;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.EventInspectorsUtil;
@@ -175,10 +177,11 @@ public abstract class AbstractNexusIntegrationTest
     private static NexusStatusUtil nexusStatusUtil;
 
     public static NexusStatusUtil getNexusStatusUtil()
+        throws Exception
     {
         if ( nexusStatusUtil == null )
         {
-            nexusStatusUtil = new NexusStatusUtil();
+            nexusStatusUtil = new NexusStatusUtil( nexusApplicationPort );
         }
 
         return nexusStatusUtil;
@@ -258,8 +261,19 @@ public abstract class AbstractNexusIntegrationTest
         // this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
 
         // redirect filePrefs
-        FilePreferencesFactory.setPreferencesFile( ITAppBooterCustomizer.getFilePrefsFile(
-            new File( getNexusBaseDir() ), getTestId() ) );
+        FilePreferencesFactory.setPreferencesFile( getFilePrefsFile( new File( getNexusBaseDir() ), getTestId() ) );
+    }
+
+    // ==
+
+    public static File getFilePrefsFile( File dir, String testId )
+    {
+        return new File( dir, getFilePrefsFileName( testId ) );
+    }
+
+    public static String getFilePrefsFileName( String testId )
+    {
+        return testId + "-filePrefs";
     }
 
     // == Test "lifecycle" (@Before/@After...)

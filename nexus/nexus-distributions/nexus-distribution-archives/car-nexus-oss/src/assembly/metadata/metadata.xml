@@ -51,8 +51,15 @@
     <property>
       <name>jvmParameters</name>
       <values>
-        <value>-Dbasedir=${runtimeDir}</value>
+        <value>-DbundleBasedir=${runtimeDir}</value>
         <value>-Djava.io.tmpdir=${runtimeDir}/runtime/tmp</value>
+      </values>
+      <mergePolicy>append</mergePolicy>
+    </property>
+    <property>
+      <name>appParameters</name>
+      <values>
+        <value>./conf/jetty.xml</value>
       </values>
       <mergePolicy>append</mergePolicy>
     </property>

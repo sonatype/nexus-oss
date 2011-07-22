@@ -49,6 +49,7 @@ import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.plugin.nexus2810.PluginConsoleMessageUtil;
@@ -186,7 +187,9 @@ public abstract class AbstractCargoIT
     public void checkStatus()
         throws Exception
     {
-        assertEquals( new NexusStatusUtil().getNexusStatus().getData().getState(), "STARTED" );
+        assertEquals(
+            new NexusStatusUtil( AbstractNexusIntegrationTest.nexusApplicationPort ).getNexusStatus().getData().getState(),
+            "STARTED" );
     }
 
     protected PluginConsoleMessageUtil pluginConsoleMsgUtil = new PluginConsoleMessageUtil();

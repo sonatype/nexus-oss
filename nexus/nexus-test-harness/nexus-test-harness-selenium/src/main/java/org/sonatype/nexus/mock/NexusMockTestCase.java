@@ -42,7 +42,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.appbooter.PlexusAppBooter;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
 import org.sonatype.nexus.test.utils.EventInspectorsUtil;
@@ -99,7 +98,8 @@ public abstract class NexusMockTestCase
             Context context = container.getContext();
             Assert.assertNotNull(context);
 
-            env = new MockNexusEnvironment( (PlexusAppBooter) context.get( "plexus.app.booter" ) );
+            // TODO: add bundleBasedir here!!!
+            env = new MockNexusEnvironment( FOO );
             // Don't do this env.start();
 
             Runtime.getRuntime().addShutdownHook( new Thread( new Runnable()

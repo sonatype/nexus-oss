@@ -21,41 +21,81 @@ package org.sonatype.nexus.mock;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.sonatype.appbooter.PlexusAppBooter;
+import org.sonatype.plexus.jetty.Jetty7;
+import org.sonatype.plexus.jetty.mangler.ContextAttributeGetterMangler;
 
 public class MockNexusEnvironment
 {
-    private PlexusAppBooter plexusAppBooter;
+    private Jetty7 jetty7;
 
-    public MockNexusEnvironment( PlexusAppBooter appBooter )
+    private File bundleBasedir;
+
+    private PlexusContainer plexusContainer;
+
+    @SuppressWarnings( "unchecked" )
+    public MockNexusEnvironment( final File bundleBasedir )
         throws Exception
     {
-        this.plexusAppBooter = appBooter;
+        this( bundleBasedir, getDefaultContext( bundleBasedir ) );
+    }
+
+    public MockNexusEnvironment( final File bundleBasedir, final Map<String, String>... contexts )
+        throws Exception
+    {
+        init( bundleBasedir, contexts );
+    }
+
+    public static Map<String, String> getDefaultContext( final File bundleBasedir )
+    {
+        Map<String, String> ctx = new HashMap<String, String>();
+
+        ctx.put( "bundleBasedir", bundleBasedir.getAbsolutePath() );
+
+        return ctx;
+    }
+
+    private void init( final File bundleBasedir, final Map<String, String>... contexts )
+        throws Exception
+    {
+        this.jetty7 = new Jetty7( new File( bundleBasedir, "conf/jetty.xml" ), contexts );
+
+        this.bundleBasedir = bundleBasedir;
     }
 
     public void start()
         throws Exception
     {
-        plexusAppBooter.startContainer();
+        jetty7.startJetty();
     }
 
     public void stop()
         throws Exception
     {
-        getPlexusAppBooter().stopContainer();
+        jetty7.stopJetty();
     }
 
     public PlexusContainer getPlexusContainer()
     {
-        return getPlexusAppBooter().getContainer();
+        if ( plexusContainer == null )
+        {
+            final ContextAttributeGetterMangler plexusGetter =
+                new ContextAttributeGetterMangler( "/nexus", PlexusConstants.PLEXUS_KEY );
+
+            plexusContainer = (PlexusContainer) jetty7.mangleServer( plexusGetter );
+        }
+
+        return plexusContainer;
     }
 
-    public PlexusAppBooter getPlexusAppBooter()
+    public File getBundleBasedir()
     {
-        return plexusAppBooter;
+        return bundleBasedir;
     }
 
     // ==
@@ -65,7 +105,7 @@ public class MockNexusEnvironment
     {
         return new File( unpackDir, getTestNexusBundleBase() + "-" + getTestNexusVersion() );
     }
-    
+
     public static String getTestNexusBundleBase()
         throws IOException
     {
@@ -77,7 +117,7 @@ public class MockNexusEnvironment
     {
         return getNexusInfoProperty( "nexus.version" );
     }
-    
+
     public static String getNexusInfoProperty( String key )
         throws IOException
     {
@@ -90,6 +130,6 @@ public class MockNexusEnvironment
             props.load( is );
         }
 
-        return props.getProperty( key );        
+        return props.getProperty( key );
     }
 }

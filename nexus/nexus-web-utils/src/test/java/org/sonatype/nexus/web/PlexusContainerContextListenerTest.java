@@ -32,6 +32,12 @@ import com.meterware.servletunit.InvocationContext;
 import com.meterware.servletunit.ServletRunner;
 import com.meterware.servletunit.ServletUnitClient;
 
+/**
+ * Big fat not: this is semi-finished: maven sets the basedir, hence it was esites to move plexus files to /conf/ folder
+ * in root of this module.
+ * 
+ * @author cstamas
+ */
 public class PlexusContainerContextListenerTest
 {
     protected File webXml;

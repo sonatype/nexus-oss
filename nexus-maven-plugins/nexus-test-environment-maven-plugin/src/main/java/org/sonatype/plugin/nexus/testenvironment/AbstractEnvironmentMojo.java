@@ -319,7 +319,8 @@ public class AbstractEnvironmentMojo
         // conf dir
         project.getProperties().put( "application-conf", getPath( new File( destination, "nexus-work-dir/conf" ) ) );
 
-        final File plexusProps = new File( nexusBaseDir, "conf/plexus.properties" );
+        // final File plexusProps = new File( nexusBaseDir, "conf/plexus.properties" );
+        final File plexusProps = new File( nexusBaseDir, "runtime/apps/nexus/webapp/WEB-INF/plexus.properties" );
         copyUrl( "/default-config/plexus.properties", plexusProps );
 
         File extraPlexusProps = new File( testResourcesDirectory, "plexus.properties" );

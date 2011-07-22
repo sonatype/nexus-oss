@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.StatusResource;
-import org.sonatype.nexus.test.utils.NexusIllegalStateException;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.security.rest.model.ClientPermission;
 import org.testng.Assert;
@@ -39,10 +38,10 @@ public class Nexus3936DisableSecurityStatusIT
 
     @Test
     public void testSecurityDisabledStatus()
-        throws NexusIllegalStateException
+        throws Exception
     {
 
-        NexusStatusUtil statusUtil = new NexusStatusUtil();
+        NexusStatusUtil statusUtil = getNexusStatusUtil();
         StatusResource statusResource = statusUtil.getNexusStatus().getData();
 
         List<ClientPermission> permisisons = statusResource.getClientPermissions().getPermissions();

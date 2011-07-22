@@ -78,9 +78,12 @@ public class LogConfigListener
 
         Logger julLogger = LogManager.getLogManager().getLogger( "" );
 
-        for ( Handler handler : originalHandlers )
+        if ( originalHandlers != null )
         {
-            julLogger.addHandler( handler );
+            for ( Handler handler : originalHandlers )
+            {
+                julLogger.addHandler( handler );
+            }
         }
     }
 

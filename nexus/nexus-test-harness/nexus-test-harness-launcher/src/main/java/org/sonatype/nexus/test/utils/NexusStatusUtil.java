@@ -19,31 +19,74 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
-import org.sonatype.nexus.test.launcher.ThreadedPlexusAppBooterService;
-import org.testng.Assert;
+import org.sonatype.plexus.jetty.Jetty7;
 
 /**
  * Simple util class
  */
 public class NexusStatusUtil
 {
-
     protected static Logger log = LoggerFactory.getLogger( NexusStatusUtil.class );
 
-    private ThreadedPlexusAppBooterService APP_BOOTER_SERVICE = null;
+    private final File bundleBasedir;
+
+    private final Jetty7 jetty7;
+
+    public NexusStatusUtil( final int port )
+        throws Exception
+    {
+        this.bundleBasedir = new File( TestProperties.getAll().get( "nexus.base.dir" ) ).getAbsoluteFile();
+
+        tamperJettyProperties( bundleBasedir, port );
+
+        Map<String, String> ctx = new HashMap<String, String>();
+        ctx.put( "bundleBasedir", bundleBasedir.getAbsolutePath() );
+
+        this.jetty7 = new Jetty7( new File( bundleBasedir, "conf/jetty.xml" ), ctx );
+    }
+
+    private void tamperJettyProperties( final File basedir, final int port )
+        throws Exception
+    {
+        File jettyProperties = new File( basedir, "conf/jetty.properties" );
+
+        if ( !jettyProperties.isFile() )
+        {
+            throw new FileNotFoundException( "Jetty properties not found at " + jettyProperties.getAbsolutePath() );
+        }
+
+        Properties p = new Properties();
+        InputStream in = new FileInputStream( jettyProperties );
+        p.load( in );
+        IOUtil.close( in );
+
+        p.setProperty( "application-port", String.valueOf( port ) );
+
+        OutputStream out = new FileOutputStream( jettyProperties );
+        p.store( out, "NexusStatusUtil" );
+        IOUtil.close( out );
+    }
 
     public boolean isNexusRESTStarted()
         throws NexusIllegalStateException
@@ -106,7 +149,6 @@ public class NexusStatusUtil
                 method.releaseConnection(); // request facade does this but just making sure
             }
         }
-
     }
 
     /**
@@ -139,92 +181,13 @@ public class NexusStatusUtil
             throw new NexusIllegalStateException( "Ports in use!!!" );
         }
 
-        int totalWaitCycles = 200 * 5; // 200 sec
-        int retryStartCycles = 50 * 5; // 50 sec
-        int pollingFreq = 200; // 200 ms
-
-        final ThreadedPlexusAppBooterService appBooter = getAppBooterService( testId );
-
-        log.info( "Wait for Nexus start" );
-        for ( int i = 0; i < totalWaitCycles; i++ )
-        {
-
-            if ( i % retryStartCycles == 0 )
-            {
-                appBooter.start();
-            }
-
-            if ( isNexusRunning() )
-            {
-                // nexus started
-                return;
-            }
-
-            try
-            {
-                Thread.sleep( pollingFreq );
-            }
-            catch ( InterruptedException e )
-            {
-                // no problem
-            }
-        }
-
-        try
-        {
-            appBooter.shutdown();
-        }
-        catch ( Throwable t )
-        {
-            t.printStackTrace();
-        }
-        finally
-        {
-            appBooter.clean();
-        }
-        throw new NexusIllegalStateException( "Unable to doHardStart(), nexus still stopped, took 200s" );
-
+        jetty7.startJetty();
     }
 
     public void stop()
         throws Exception
     {
-        if ( APP_BOOTER_SERVICE == null )
-        {
-            // app booter wasn't started, won't do it on stop
-            return;
-        }
-
-        final ThreadedPlexusAppBooterService appBooterService = APP_BOOTER_SERVICE;
-
-        try
-        {
-            try
-            {
-                appBooterService.stop();
-            }
-            catch ( Exception e )
-            {
-                System.err.println( "Failed to stop Nexus. The thread will most likely die with an error: "
-                    + e.getMessage() );
-                Assert.fail( e.getMessage() );
-            }
-            finally
-            {
-            }
-
-            if ( !waitForStop() )
-            {
-                // just start over if we can't stop normally
-                log.warn( "Forcing Stop of appbooter" );
-                appBooterService.forceStop();
-                APP_BOOTER_SERVICE = null;
-            }
-        }
-        finally
-        {
-            appBooterService.clean();
-        }
+        jetty7.stopJetty();
     }
 
     public boolean isNexusRunning()
@@ -237,8 +200,6 @@ public class NexusStatusUtil
         try
         {
             return isNexusRESTStarted();
-            // log.debug("nexus is running.");
-            // return true;
         }
         catch ( NexusIllegalStateException e )
         {
@@ -254,14 +215,8 @@ public class NexusStatusUtil
             "AbstractNexusIntegrationTest.nexusApplicationPort" );
     }
 
-    private boolean isNexusControlPortOpen()
-    {
-        return isPortOpen( AbstractNexusIntegrationTest.nexusControlPort,
-            "AbstractNexusIntegrationTest.nexusControlPort" );
-    }
-
     /**
-     * This is a hack because due to magic logging reloading we lose normal log output sent to logger
+     * This is a hack because due to magic log4j property reloading we lose normal log output sent to logger
      * 
      * @param msg the msg to log at debug level
      */
@@ -324,81 +279,5 @@ public class NexusStatusUtil
         throws NexusIllegalStateException
     {
         return !isNexusRunning();
-    }
-
-    public boolean waitForStop()
-        throws NexusIllegalStateException
-    {
-        log.info( "Wait for Nexus stop" );
-
-        int totalWaitTime = 40 * 1000; // 20 sec
-        int pollingFreq = 200; // 200 ms
-
-        for ( int i = 0; i < totalWaitTime / pollingFreq; i++ )
-        {
-            log.debug( "wait for Nexus stop, attempt: " + i );
-            if ( !isNexusRunning() )
-            {
-                // nexus stopped!
-                return true;
-            }
-
-            try
-            {
-                Thread.sleep( pollingFreq );
-            }
-            catch ( InterruptedException e )
-            {
-                // no problem
-            }
-        }
-
-        // didn't stopped!
-        return false;
-    }
-
-    private ThreadedPlexusAppBooterService getAppBooterService( String testId )
-        throws Exception
-    {
-        if ( APP_BOOTER_SERVICE == null )
-        {
-            final File f = new File( "target/plexus-home" );
-
-            if ( !f.isDirectory() )
-            {
-                f.mkdirs();
-            }
-
-            File bundleRoot = new File( TestProperties.getAll().get( "nexus.base.dir" ) );
-            System.setProperty( "basedir", bundleRoot.getAbsolutePath() );
-
-            // System.setProperty( "plexus.appbooter.customizers", "org.sonatype.nexus.NexusBooterCustomizer,"
-            // + ITAppBooterCustomizer.class.getName() );
-
-            File classworldsConf = new File( bundleRoot, "conf/classworlds.conf" );
-
-            if ( !classworldsConf.isFile() )
-            {
-                throw new IllegalStateException( "The bundle classworlds.conf file is not found (\""
-                    + classworldsConf.getAbsolutePath() + "\")!" );
-            }
-
-            System.setProperty( "classworlds.conf", classworldsConf.getAbsolutePath() );
-
-            // this is non trivial here, since we are running Nexus in _same_ JVM as tests
-            // and the PlexusAppBooterJSWListener (actually theused WrapperManager in it) enforces then Nexus may be
-            // started only once in same JVM!
-            // So, we are _overrriding_ the in-bundle plexus app booter with the simplest one
-            // since we dont need all the bells-and-whistles in Service and JSW
-            // but we are still _reusing_ the whole bundle environment by tricking Classworlds Launcher
-
-            ServerSocket socket = new ServerSocket( 0 );
-            int controlPort = socket.getLocalPort();
-            socket.close();
-
-            APP_BOOTER_SERVICE = new ThreadedPlexusAppBooterService( classworldsConf, controlPort, testId );
-        }
-
-        return APP_BOOTER_SERVICE;
     }
 }

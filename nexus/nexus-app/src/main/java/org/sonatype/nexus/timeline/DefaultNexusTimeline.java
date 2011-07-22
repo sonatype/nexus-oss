@@ -79,6 +79,8 @@ public class DefaultNexusTimeline
     {
         try
         {
+            getLogger().info( "Starting Nexus Timeline..." );
+            
             updateConfiguration();
         }
         catch ( TimelineException e )
@@ -89,6 +91,8 @@ public class DefaultNexusTimeline
 
     public void stop()
     {
+        getLogger().info( "Stopping Nexus Timeline..." );
+
         timeline.stop();
     }
 
