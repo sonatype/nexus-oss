@@ -60,12 +60,6 @@ public class Nexus639PurgeTaskIT
         feed = FeedUtil.getFeed( "recentlyDeployedArtifacts" );
         entries = feed.getEntries();
 
-        // for ( SyndEntry syndEntry : entries )
-        // {
-        // ! should use logger
-        // System.out.println( "entry: "+ syndEntry.getTitle() );
-        // }
-        //
         Assert.assertTrue( entries.size() == 0, "Expected ZERO artifacts in the recentlyDeployed feed." );
     }
 

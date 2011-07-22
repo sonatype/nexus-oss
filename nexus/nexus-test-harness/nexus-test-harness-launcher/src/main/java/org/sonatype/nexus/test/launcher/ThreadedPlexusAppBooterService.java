@@ -202,7 +202,7 @@ public class ThreadedPlexusAppBooterService
 
     public void clean()
     {
-        LOG.info( "Cleaning lancher thread..." );
+        LOG.info( "Cleaning LauncherThread (" + launcher + ", " + controlPort + ")" );
         this.launcherThread = null;
 
         // TODO: this causes severe problems

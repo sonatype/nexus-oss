@@ -118,6 +118,10 @@ public abstract class AbstractNexusIntegrationTest
 
     public static final String nexusBaseUrl;
 
+    public static final String LIx1 = "  ";
+
+    public static final String LIx2 = "    ";
+
     /**
      * @deprecated Use nexusBaseUrl instead!
      */
@@ -267,8 +271,6 @@ public abstract class AbstractNexusIntegrationTest
     {
         startProfiler();
 
-        staticLog.debug( "staticOncePerClassSetUp" );
-
         // hacky state machine
         NEEDS_INIT = true;
     }
@@ -290,14 +292,16 @@ public abstract class AbstractNexusIntegrationTest
     {
         synchronized ( AbstractNexusIntegrationTest.class )
         {
-            log.debug( "oncePerClassSetUp is init: " + NEEDS_INIT );
             if ( NEEDS_INIT )
             {
                 // this will trigger PlexusContainer creation when test is instantiated, but only if needed
                 getITPlexusContainer( getClass() );
 
                 // tell the console what we are doing, now that there is no output its
-                log.info( "Running Test: " + getClass().getSimpleName() );
+                String logMessage = "Running Test: " + getTestId() + " - Class: " + this.getClass().getSimpleName();
+                staticLog.info( String.format( "%1$-" + logMessage.length() + "s", " " ).replaceAll(" ", "*") );
+                staticLog.info( logMessage );
+                staticLog.info( String.format( "%1$-" + logMessage.length() + "s", " " ).replaceAll(" ", "*") );
 
                 // clean common work dir
                 beforeStartClean();
@@ -698,8 +702,7 @@ public abstract class AbstractNexusIntegrationTest
     protected void startNexus()
         throws Exception
     {
-        System.out.println( "######## Running Test: " + getTestId() + " - Class: " + this.getClass() );
-        log.info( "starting nexus" );
+        log.info( "Starting Nexus" );
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
@@ -718,7 +721,7 @@ public abstract class AbstractNexusIntegrationTest
     protected static void stopNexus()
         throws Exception
     {
-        staticLog.info( "stopping Nexus" );
+        staticLog.info( "Stopping Nexus" );
 
         getNexusStatusUtil().stop();
     }
@@ -767,7 +770,7 @@ public abstract class AbstractNexusIntegrationTest
         }
 
         File destFile = new File( parent, destShortName );
-        log.debug( "copying " + configFile + " to:  " + destFile );
+        log.debug( LIx2 + "copying " + configFile + " to:  " + destFile );
 
         FileTestingUtils.interpolationFileCopy( testConfigFile, destFile, variables );
 
@@ -821,7 +824,7 @@ public abstract class AbstractNexusIntegrationTest
 
     public static File getResource( String resource )
     {
-        staticLog.debug( "Looking for resource: " + resource );
+        staticLog.debug( LIx1 + "Looking for resource: " + resource );
         // URL classURL = Thread.currentThread().getContextClassLoader().getResource( resource );
 
         File rootDir = new File( TestProperties.getString( "test.resources.folder" ) );
@@ -832,7 +835,7 @@ public abstract class AbstractNexusIntegrationTest
             return null;
         }
 
-        staticLog.debug( "found: " + file );
+        staticLog.debug( LIx2 + "found: " + file );
 
         return file;
     }

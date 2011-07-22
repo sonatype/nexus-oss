@@ -145,7 +145,7 @@ public class NexusStatusUtil
 
         final ThreadedPlexusAppBooterService appBooter = getAppBooterService( testId );
 
-        log.info( "wait for Nexus start" );
+        log.info( "Wait for Nexus start" );
         for ( int i = 0; i < totalWaitCycles; i++ )
         {
 
@@ -329,7 +329,7 @@ public class NexusStatusUtil
     public boolean waitForStop()
         throws NexusIllegalStateException
     {
-        log.info( "wait for Nexus stop" );
+        log.info( "Wait for Nexus stop" );
 
         int totalWaitTime = 40 * 1000; // 20 sec
         int pollingFreq = 200; // 200 ms

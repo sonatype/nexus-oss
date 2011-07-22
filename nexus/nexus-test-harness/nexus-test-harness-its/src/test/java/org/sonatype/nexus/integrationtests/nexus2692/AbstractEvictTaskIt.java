@@ -241,7 +241,7 @@ public class AbstractEvictTaskIt
             String repoId = path.substring( 0, path.indexOf( "/" ) );
             if ( otherNotChangedRepoids.contains( repoId ) )
             {
-                System.out.println( "found it:" + path );
+                log.debug( "found it:" + path );
                 expectedFiles.add( path );
             }
         }
