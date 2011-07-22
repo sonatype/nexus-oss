@@ -100,6 +100,19 @@ public class NexusRequestMatchers
         protected void describeMismatchSafely( Response item, Description mismatchDescription )
         {
             mismatchDescription.appendText( item.getStatus().toString() );
+            
+            // provide some more info if it's validation error
+            if ( item.getStatus().getCode() == 400 )
+            {
+                try
+                {
+                    mismatchDescription.appendText( item.getEntity().getText() );
+                }
+                catch ( IOException e )
+                {
+                    mismatchDescription.appendText( "response entity could not be converted to text: " + e.getMessage() );
+                }
+            }
         }
     }
 
@@ -123,7 +136,7 @@ public class NexusRequestMatchers
         @Override
         public void describeTo( Description description )
         {
-            description.appendText( "response successful" );
+            description.appendText( "Status code " + expectedStatusCode );
         }
     }
 
