@@ -1,0 +1,172 @@
+<!--
+
+    Copyright (c) 2008-2011 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
+
+    This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+    Public License Version 3 as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+    for more details.
+
+    You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+    http://www.gnu.org/licenses.
+
+    Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+    Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+    All other trademarks are the property of their respective owners.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- Parent POM -->
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus</artifactId>
+    <version>1.9.3-SNAPSHOT</version>
+  </parent>
+
+  <!-- the version of maven's project object model -->
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- a unique name for this project -->
+  <artifactId>nexus-configuration-model</artifactId>
+
+  <!-- POM packaging -->
+  <packaging>jar</packaging>
+
+  <!-- a short but descriptive name for the project -->
+  <name>Nexus : Configuration Model</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-api</artifactId>
+    </dependency>
+
+
+    <!-- Testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit-dep</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.modello</groupId>
+        <artifactId>modello-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>nexus.xml</id>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+            </goals>
+            <configuration>
+              <useJava5>true</useJava5>
+              <version>1.4.6</version>
+              <packagedVersions>
+                <packagedVersion>1.4.0</packagedVersion>
+                <packagedVersion>1.4.1</packagedVersion>
+                <packagedVersion>1.4.2</packagedVersion>
+                <packagedVersion>1.4.3</packagedVersion>
+                <packagedVersion>1.4.4</packagedVersion>
+                <packagedVersion>1.4.5</packagedVersion>
+              </packagedVersions>
+              <models>
+                <model>src/main/mdo/nexus.xml</model>
+              </models>
+            </configuration>
+          </execution>
+          <execution>
+            <id>nexus-old.xml</id>
+            <goals>
+              <goal>java</goal>
+              <goal>xpp3-reader</goal>
+              <goal>xpp3-writer</goal>
+            </goals>
+            <configuration>
+              <packageWithVersion>true</packageWithVersion>
+              <version>1.0.8</version>
+              <packagedVersions>
+                <packagedVersion>1.0.0</packagedVersion>
+                <packagedVersion>1.0.1</packagedVersion>
+                <packagedVersion>1.0.2</packagedVersion>
+                <packagedVersion>1.0.3</packagedVersion>
+                <packagedVersion>1.0.4</packagedVersion>
+                <packagedVersion>1.0.5</packagedVersion>
+                <packagedVersion>1.0.6</packagedVersion>
+                <packagedVersion>1.0.7</packagedVersion>
+              </packagedVersions>
+              <models>
+                <model>src/main/mdo/nexus-old.xml</model>
+              </models>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <packageWithVersion>false</packageWithVersion>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <!-- TODO remove when upgrade generator is merged into modello -->
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>modello-plugin-upgrade</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>upgrade</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <version>1.4.6</version>
+              <packagedVersions>
+                <packagedVersion>1.4.0</packagedVersion>
+                <packagedVersion>1.4.1</packagedVersion>
+                <packagedVersion>1.4.2</packagedVersion>
+                <packagedVersion>1.4.3</packagedVersion>
+                <packagedVersion>1.4.4</packagedVersion>
+                <packagedVersion>1.4.5</packagedVersion>
+              </packagedVersions>
+              <models>
+                <model>src/main/mdo/nexus.xml</model>
+              </models>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <packageWithVersion>false</packageWithVersion>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>3.2</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
