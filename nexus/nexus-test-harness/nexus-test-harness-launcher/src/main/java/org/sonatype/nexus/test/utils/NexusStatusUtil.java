@@ -19,28 +19,19 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
-import org.sonatype.plexus.jetty.Jetty7;
+import org.sonatype.nexus.test.booter.NexusBooter;
 
 /**
  * Simple util class
@@ -49,43 +40,13 @@ public class NexusStatusUtil
 {
     protected static Logger log = LoggerFactory.getLogger( NexusStatusUtil.class );
 
-    private final File bundleBasedir;
-
-    private final Jetty7 jetty7;
+    private final NexusBooter nexusBooter;
 
     public NexusStatusUtil( final int port )
         throws Exception
     {
-        this.bundleBasedir = new File( TestProperties.getAll().get( "nexus.base.dir" ) ).getAbsoluteFile();
-
-        tamperJettyProperties( bundleBasedir, port );
-
-        Map<String, String> ctx = new HashMap<String, String>();
-        ctx.put( "bundleBasedir", bundleBasedir.getAbsolutePath() );
-
-        this.jetty7 = new Jetty7( new File( bundleBasedir, "conf/jetty.xml" ), ctx );
-    }
-
-    private void tamperJettyProperties( final File basedir, final int port )
-        throws Exception
-    {
-        File jettyProperties = new File( basedir, "conf/jetty.properties" );
-
-        if ( !jettyProperties.isFile() )
-        {
-            throw new FileNotFoundException( "Jetty properties not found at " + jettyProperties.getAbsolutePath() );
-        }
-
-        Properties p = new Properties();
-        InputStream in = new FileInputStream( jettyProperties );
-        p.load( in );
-        IOUtil.close( in );
-
-        p.setProperty( "application-port", String.valueOf( port ) );
-
-        OutputStream out = new FileOutputStream( jettyProperties );
-        p.store( out, "NexusStatusUtil" );
-        IOUtil.close( out );
+        this.nexusBooter =
+            new NexusBooter( new File( TestProperties.getAll().get( "nexus.base.dir" ) ).getAbsoluteFile(), port );
     }
 
     public boolean isNexusRESTStarted()
@@ -181,13 +142,13 @@ public class NexusStatusUtil
             throw new NexusIllegalStateException( "Ports in use!!!" );
         }
 
-        jetty7.startJetty();
+        nexusBooter.startNexus();
     }
 
     public void stop()
         throws Exception
     {
-        jetty7.stopJetty();
+        nexusBooter.stopNexus();
     }
 
     public boolean isNexusRunning()

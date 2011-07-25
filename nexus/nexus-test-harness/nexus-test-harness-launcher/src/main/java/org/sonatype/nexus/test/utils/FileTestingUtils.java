@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.FilenameUtils;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -273,7 +272,7 @@ public class FileTestingUtils
         String[] files = scan.getIncludedFiles();
         for ( String fileName : files )
         {
-            String extension = FilenameUtils.getExtension( fileName );
+            String extension = FileUtils.getExtension( fileName );
             File sourceFile = new File( from, fileName );
             File destFile = new File( dest, fileName );
             destFile.getParentFile().mkdirs();

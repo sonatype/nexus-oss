@@ -18,21 +18,7 @@
  */
 package org.sonatype.nexus.integrationtests.nexus412;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
-import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.repository.RemoteStatus;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class Nexus412RemoteLeakIT
@@ -40,8 +26,16 @@ public class Nexus412RemoteLeakIT
 {
     // TODO: This IT is not an IT and will newer work as such. This is actually an UT but was moved from there to ITs.
     // As long as Nexus and IT runs in separate container, this IT will NEVER work. This is UT!
+    
+    @Test
+    public void testDummy()
+    {
+        
+    }
 
     // DISABLED: move to IT, it takes too long (no route to host + java)
+    /* COMMENTED OUT SINCE THIS IS THE ONLY ONE CLASS DEPENDING ON NEXUS CORE INTERNAL CLASSES
+     * AND IS EVEN NOT AN IT!!! JUST TO PREVENT COMPILATION ERRORs
     @Test
     public void nonTestSimplerAvailabilityCheckRemoteLeak()
         throws Exception
@@ -114,5 +108,5 @@ public class Nexus412RemoteLeakIT
 
         return repo;
     }
-
+*/
 }

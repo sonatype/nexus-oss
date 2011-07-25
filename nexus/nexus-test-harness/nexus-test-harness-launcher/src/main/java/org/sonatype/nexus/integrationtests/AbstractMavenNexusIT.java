@@ -19,14 +19,13 @@
 package org.sonatype.nexus.integrationtests;
 
 import java.io.File;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
+import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.Assert;
 
@@ -131,7 +130,7 @@ public class AbstractMavenNexusIT
         throws IOException
     {
         File logFile = new File( verifier.getBasedir(), verifier.getLogFileName() );
-        String log = FileUtils.readFileToString( logFile );
+        String log = FileUtils.fileRead( logFile );
         Assert.fail( log );
     }
 }

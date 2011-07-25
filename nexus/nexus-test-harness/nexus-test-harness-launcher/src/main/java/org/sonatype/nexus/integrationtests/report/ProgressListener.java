@@ -20,10 +20,11 @@ package org.sonatype.nexus.integrationtests.report;
 
 import java.io.PrintStream;
 
-import org.apache.commons.io.output.NullOutputStream;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
+
+import com.google.common.io.NullOutputStream;
 
 public class ProgressListener
     extends TestListenerAdapter
