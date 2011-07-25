@@ -73,7 +73,7 @@ public class PlexusContainerContextListener
                 ContainerConfiguration plexusConfiguration =
                     new DefaultContainerConfiguration().setName( context.getServletContextName() ).setContainerConfigurationURL(
                         plexusXmlFile.toURI().toURL() ).setContext( plexusContext ).setAutoWiring( true ).setClassPathScanning(
-                        PlexusConstants.SCANNING_ON ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
+                        PlexusConstants.SCANNING_CACHE ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
 
                 plexusContainer = new DefaultPlexusContainer( plexusConfiguration );
 

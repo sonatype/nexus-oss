@@ -45,6 +45,7 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.velocity.runtime.parser.node.GetExecutor;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -1266,7 +1267,7 @@ public abstract class AbstractNexusIntegrationTest
                 baseClass.getName().replace( '.', '/' ) + ".xml" );
 
         containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_ON );
+        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
 
         customizeContainerConfiguration( containerConfiguration );
 

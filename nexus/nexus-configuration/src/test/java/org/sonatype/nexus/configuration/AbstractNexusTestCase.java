@@ -74,7 +74,7 @@ public abstract class AbstractNexusTestCase
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
         configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
     }
 
     @Override

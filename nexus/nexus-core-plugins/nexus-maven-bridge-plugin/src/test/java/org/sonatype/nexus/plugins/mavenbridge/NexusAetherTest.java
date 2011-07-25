@@ -47,7 +47,7 @@ public class NexusAetherTest
         super.customizeContainerConfiguration( containerConfiguration );
 
         containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_ON );
+        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
     }
 
     @Test
