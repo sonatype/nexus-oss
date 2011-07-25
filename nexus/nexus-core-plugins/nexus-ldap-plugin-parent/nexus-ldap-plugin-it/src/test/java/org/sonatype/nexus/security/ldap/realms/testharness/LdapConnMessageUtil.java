@@ -31,7 +31,6 @@ import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.testng.Assert;
 
@@ -65,18 +64,26 @@ public class LdapConnMessageUtil
     public LdapConnectionInfoDTO updateConnectionInfo( LdapConnectionInfoDTO connInfo )
         throws Exception
     {
-        Response response = this.sendMessage( Method.PUT, connInfo );
-
-        if ( !response.getStatus().isSuccess() )
+        Response response = null;
+        try
         {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not create Repository: " + response.getStatus() + ":\n" + responseText );
+            response = this.sendMessage( Method.PUT, connInfo );
+
+            if ( !response.getStatus().isSuccess() )
+            {
+                String responseText = response.getEntity().getText();
+                Assert.fail( "Could not update LDAP connection info: " + response.getStatus() + ":\n" + responseText );
+            }
+            LdapConnectionInfoDTO responseResource = this.getResourceFromResponse( response );
+            this.validateResourceResponse( connInfo, responseResource );
+
+            return responseResource;
         }
-        LdapConnectionInfoDTO responseResource = this.getResourceFromResponse( response );
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
 
-        this.validateResourceResponse( connInfo, responseResource );
-
-        return responseResource;
     }
 
     public Response sendMessage( Method method, LdapConnectionInfoDTO resource )
@@ -124,8 +131,8 @@ public class LdapConnMessageUtil
         LOG.debug( " getResourceFromResponse: " + responseString );
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
-        LdapConnectionInfoResponse resourceResponse = (LdapConnectionInfoResponse) representation
-            .getPayload( new LdapConnectionInfoResponse() );
+        LdapConnectionInfoResponse resourceResponse =
+            (LdapConnectionInfoResponse) representation.getPayload( new LdapConnectionInfoResponse() );
 
         return resourceResponse.getData();
     }
