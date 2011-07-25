@@ -8,25 +8,35 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
+import java.lang.reflect.Method;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.plexus.jetty.Jetty7;
 
 public class NexusBooter
 {
     protected static Logger log = LoggerFactory.getLogger( NexusBooter.class );
 
-    private final Jetty7 jetty7;
+    private final ClassLoader jetty7ClassLoader;
+
+    private final Class<?> jetty7Class;
+
+    private final Object jetty7;
+
+    private final Method startJetty;
+
+    private final Method stopJetty;
+
+    // private final Jetty7 jetty7;
 
     public NexusBooter( final File bundleBasedir, final int port )
         throws Exception
@@ -34,12 +44,27 @@ public class NexusBooter
         // modify the properties
         tamperJettyProperties( bundleBasedir, port );
 
-        final ClassLoader classloader = buildNexusClassLoader( bundleBasedir );
+        jetty7ClassLoader = buildNexusClassLoader( bundleBasedir );
+
+        final ClassLoader original = Thread.currentThread().getContextClassLoader();
+
+        Thread.currentThread().setContextClassLoader( jetty7ClassLoader );
+
+        jetty7Class = jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.Jetty7" );
+        jetty7 =
+            jetty7Class.getConstructor( File.class, ClassLoader.class, Map[].class ).newInstance(
+                new File( bundleBasedir, "conf/jetty.xml" ), jetty7ClassLoader,
+                new Map[] { defaultContext( bundleBasedir ) } );
+
+        startJetty = jetty7Class.getMethod( "startJetty" );
+        stopJetty = jetty7Class.getMethod( "stopJetty" );
+
+        Thread.currentThread().setContextClassLoader( original );
 
         // calculate the classpath that classworlds would use
 
-        this.jetty7 =
-            new Jetty7( new File( bundleBasedir, "conf/jetty.xml" ), classloader, defaultContext( bundleBasedir ) );
+        // this.jetty7 =
+        // new Jetty7( new File( bundleBasedir, "conf/jetty.xml" ), classloader, defaultContext( bundleBasedir ) );
     }
 
     protected Map<String, String> defaultContext( final File bundleBasedir )
@@ -50,7 +75,7 @@ public class NexusBooter
     }
 
     protected ClassLoader buildNexusClassLoader( final File bundleBasedir )
-        throws MalformedURLException
+        throws Exception
     {
         List<URL> urls = new ArrayList<URL>();
 
@@ -72,10 +97,21 @@ public class NexusBooter
             urls.add( jar.toURI().toURL() );
         }
 
-        ClassLoader classloader =
-            new URLClassLoader( urls.toArray( new URL[0] ), ClassLoader.getSystemClassLoader().getParent() );
+        ClassWorld world = new ClassWorld();
 
-        return classloader;
+        ClassRealm realm = world.newRealm( "it-core", null );
+
+        for ( URL url : urls )
+        {
+            realm.addURL( url );
+        }
+
+        return realm;
+
+        // ClassLoader classloader =
+        // new URLClassLoader( urls.toArray( new URL[0] ), ClassLoader.getSystemClassLoader().getParent() );
+        //
+        // return classloader;
     }
 
     protected void tamperJettyProperties( final File basedir, final int port )
@@ -103,12 +139,18 @@ public class NexusBooter
     public void startNexus()
         throws Exception
     {
-        jetty7.startJetty();
+        final ClassLoader original = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader( jetty7ClassLoader );
+        startJetty.invoke( jetty7 );
+        Thread.currentThread().setContextClassLoader( original );
     }
 
     public void stopNexus()
         throws Exception
     {
-        jetty7.stopJetty();
+        final ClassLoader original = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader( jetty7ClassLoader );
+        stopJetty.invoke( jetty7 );
+        Thread.currentThread().setContextClassLoader( original );
     }
 }
