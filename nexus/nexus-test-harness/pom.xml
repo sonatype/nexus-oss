@@ -32,6 +32,10 @@
   <packaging>pom</packaging>
   <name>Nexus : Test Harness</name>
 
+  <modules>
+    <module>nexus-it-helper-plugin</module>
+  </modules>
+
   <profiles>
     <profile>
       <id>selenium-tests</id>
@@ -47,7 +51,6 @@
         </property>
       </activation>
       <modules>
-        <module>nexus-it-helper-plugin</module>
         <module>nexus-test-harness-launcher</module>
         <module>nexus-test-harness-its</module>
       </modules>
