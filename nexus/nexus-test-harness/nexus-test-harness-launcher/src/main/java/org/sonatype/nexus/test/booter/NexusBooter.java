@@ -43,6 +43,9 @@ public class NexusBooter
     public NexusBooter( final File bundleBasedir, final int port )
         throws Exception
     {
+        // set system property
+        System.setProperty( "bundleBasedir", bundleBasedir.getAbsolutePath() );
+        
         // modify the properties
         tamperJettyProperties( bundleBasedir, port );
 
