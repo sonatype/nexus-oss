@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.security.ldap.realms.api;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserListResponse;
@@ -27,6 +28,7 @@ import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConf
 import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.basic.StringConverter;
 
 public class XStreamInitalizer
 {
@@ -39,6 +41,17 @@ public class XStreamInitalizer
         xstream.processAnnotations( LdapUserListResponse.class );
         xstream.processAnnotations( LdapAuthenticationTestRequest.class );
         xstream.processAnnotations( LdapUserAndGroupConfigTestRequest.class );
+
+        // NXCM-2974 unescape html entities like "o=org&amp;org", they get escaped by nexus-rest-api json->DTO
+        // conversion
+        xstream.registerConverter( new StringConverter()
+        {
+            @Override
+            public Object fromString( String str )
+            {
+                return StringEscapeUtils.unescapeHtml( str );
+            }
+        } );
 
       xstream.registerLocalConverter( LdapUserListResponse.class, "data", new AliasingListConverter(
           LdapUserResponseDTO.class, "user" ) );
