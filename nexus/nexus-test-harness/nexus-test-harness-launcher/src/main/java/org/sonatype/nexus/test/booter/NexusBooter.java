@@ -26,6 +26,8 @@ public class NexusBooter
 {
     protected static Logger log = LoggerFactory.getLogger( NexusBooter.class );
 
+    private static ClassLoader _jetty7ClassLoader;
+
     private final ClassLoader jetty7ClassLoader;
 
     private final Class<?> jetty7Class;
@@ -44,7 +46,15 @@ public class NexusBooter
         // modify the properties
         tamperJettyProperties( bundleBasedir, port );
 
-        jetty7ClassLoader = buildNexusClassLoader( bundleBasedir );
+        if ( _jetty7ClassLoader == null )
+        {
+            jetty7ClassLoader = buildNexusClassLoader( bundleBasedir );
+            _jetty7ClassLoader = jetty7ClassLoader;
+        }
+        else
+        {
+            jetty7ClassLoader = _jetty7ClassLoader;
+        }
 
         final ClassLoader original = Thread.currentThread().getContextClassLoader();
 
