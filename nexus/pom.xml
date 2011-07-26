@@ -1597,6 +1597,7 @@
     <module>nexus-migration-tool</module>
     <module>nexus-core-plugins</module>
     <module>nexus-webapp</module>
+    <module>nexus-launcher</module>
     <module>nexus-clients</module>
     <module>nexus-oss-webapp</module>
     <module>nexus-oss-webapp-tattletale</module>
