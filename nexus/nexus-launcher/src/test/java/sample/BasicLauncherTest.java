@@ -2,23 +2,14 @@ package sample;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundleLauncher;
 import javax.inject.Inject;
-import javax.inject.Named;
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
-import static org.mockito.Mockito.*;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.sonatype.nexus.bundle.NexusBundleConfiguration;
-import org.sonatype.nexus.bundle.launcher.ManagedNexusBundle;
-import org.sonatype.test.ConfigurableInjectedTest;
+import org.sonatype.nexus.test.ConfigurableInjectedTest;
 
 /**
  *
