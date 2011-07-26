@@ -36,7 +36,6 @@ import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.rest.RemoteIPFinder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
-import org.sonatype.nexus.web.NexusBooterListener;
 
 /**
  * A filter that maps the action from the HTTP Verb.
@@ -143,7 +142,7 @@ public class FailureLoggingHttpMethodPermissionFilter
 
         if ( nexus == null )
         {
-            nexus = NexusBooterListener.getNexus();
+            nexus = (Nexus) getServletContext().getAttribute( Nexus.class.getName() );
         }
 
         return nexus;
