@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -26,21 +28,25 @@ public class NexusBooter
 {
     protected static Logger log = LoggerFactory.getLogger( NexusBooter.class );
 
+    private final File bundleBasedir;
+
     private final ClassLoader jetty7ClassLoader;
 
     private final Class<?> jetty7Class;
 
-    private final Object jetty7;
+    private Object jetty7;
 
-    private final Method startJetty;
+    private Method startJetty;
 
-    private final Method stopJetty;
+    private Method stopJetty;
 
     // private final Jetty7 jetty7;
 
     public NexusBooter( final File bundleBasedir, final int port )
         throws Exception
     {
+        this.bundleBasedir = bundleBasedir;
+
         // modify the properties
         tamperJettyProperties( bundleBasedir, port );
 
@@ -50,29 +56,32 @@ public class NexusBooter
         // create classloader
         jetty7ClassLoader = buildNexusClassLoader( bundleBasedir );
 
+        jetty7Class = doInIsolation( new Callable<Class<?>>()
+        {
+            @Override
+            public Class<?> call()
+                throws Exception
+            {
+                return jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.Jetty7" );
+            }
+        } );
+    }
+
+    protected <T> T doInIsolation( final Callable<T> callable )
+        throws Exception
+    {
         final ClassLoader original = Thread.currentThread().getContextClassLoader();
 
-        Thread.currentThread().setContextClassLoader( jetty7ClassLoader );
+        try
+        {
+            Thread.currentThread().setContextClassLoader( jetty7ClassLoader );
 
-        jetty7Class = jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.Jetty7" );
-        jetty7 =
-            jetty7Class.getConstructor( File.class, ClassLoader.class, Map[].class ).newInstance(
-                new File( bundleBasedir, "conf/jetty.xml" ), jetty7ClassLoader,
-                new Map[] { defaultContext( bundleBasedir ) } );
-
-        // invoke: jetty7.mangleServer(new DisableShutdownHookMangler());
-        final Object disableShutdownHookMangler =
-            jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.mangler.DisableShutdownHookMangler" ).getConstructor().newInstance();
-
-        final Method mangleJetty =
-            jetty7Class.getMethod( "mangleServer",
-                jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.mangler.ServerMangler" ) );
-        mangleJetty.invoke( jetty7, disableShutdownHookMangler );
-
-        startJetty = jetty7Class.getMethod( "startJetty" );
-        stopJetty = jetty7Class.getMethod( "stopJetty" );
-
-        Thread.currentThread().setContextClassLoader( original );
+            return callable.call();
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( original );
+        }
     }
 
     protected Map<String, String> defaultContext( final File bundleBasedir )
@@ -147,12 +156,68 @@ public class NexusBooter
     public void startNexus()
         throws Exception
     {
+        final ClassLoader original = Thread.currentThread().getContextClassLoader();
+
+        try
+        {
+            Thread.currentThread().setContextClassLoader( jetty7ClassLoader );
+
+            jetty7 =
+                jetty7Class.getConstructor( File.class, ClassLoader.class, Map[].class ).newInstance(
+                    new File( bundleBasedir, "conf/jetty.xml" ), jetty7ClassLoader,
+                    new Map[] { defaultContext( bundleBasedir ) } );
+
+            // invoke: jetty7.mangleServer(new DisableShutdownHookMangler());
+            final Object disableShutdownHookMangler =
+                jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.mangler.DisableShutdownHookMangler" ).getConstructor().newInstance();
+
+            final Method mangleJetty =
+                jetty7Class.getMethod( "mangleServer",
+                    jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.mangler.ServerMangler" ) );
+            mangleJetty.invoke( jetty7, disableShutdownHookMangler );
+
+            startJetty = jetty7Class.getMethod( "startJetty" );
+            stopJetty = jetty7Class.getMethod( "stopJetty" );
+        }
+        finally
+        {
+            Thread.currentThread().setContextClassLoader( original );
+        }
+
         startJetty.invoke( jetty7 );
     }
 
     public void stopNexus()
         throws Exception
     {
-        stopJetty.invoke( jetty7 );
+        try
+        {
+            if ( stopJetty != null )
+            {
+                stopJetty.invoke( jetty7 );
+            }
+        }
+        catch ( InvocationTargetException e )
+        {
+            if ( e.getCause() instanceof IllegalStateException )
+            {
+                // swallow it
+            }
+            else
+            {
+                throw (Exception) e.getCause();
+            }
+        }
+        finally
+        {
+            clean();
+        }
+    }
+
+    protected void clean()
+    {
+        this.jetty7 = null;
+        this.startJetty = null;
+        this.stopJetty = null;
     }
 }
