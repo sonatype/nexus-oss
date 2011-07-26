@@ -29,6 +29,7 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.sonatype.plexus.jetty.Jetty7;
 import org.sonatype.plexus.jetty.mangler.ContextAttributeGetterMangler;
+import org.sonatype.plexus.jetty.mangler.DisableShutdownHookMangler;
 
 public class MockNexusEnvironment
 {
@@ -63,7 +64,15 @@ public class MockNexusEnvironment
     private void init( final File bundleBasedir, final Map<String, String>... contexts )
         throws Exception
     {
+        // on CI the tmpdir is redirected, but Jetty7 craps out if the actual directory does not exists,
+        // so "preemptively" make sure it exists
+        final File tmpDir = new File( System.getProperty( "java.io.tmpdir" ) );
+        tmpDir.mkdirs();
+
         this.jetty7 = new Jetty7( new File( bundleBasedir, "conf/jetty.xml" ), contexts );
+
+        // override stop at shutdown
+        this.jetty7.mangleServer( new DisableShutdownHookMangler() );
 
         this.bundleBasedir = bundleBasedir;
     }

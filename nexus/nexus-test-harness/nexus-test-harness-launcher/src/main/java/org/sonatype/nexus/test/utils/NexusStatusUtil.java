@@ -40,14 +40,13 @@ public class NexusStatusUtil
 {
     protected static Logger log = LoggerFactory.getLogger( NexusStatusUtil.class );
 
-    private final int port;
-
-    private NexusBooter nexusBooter;
+    private final NexusBooter nexusBooter;
 
     public NexusStatusUtil( final int port )
         throws Exception
     {
-        this.port = port;
+        nexusBooter =
+            new NexusBooter( new File( TestProperties.getAll().get( "nexus.base.dir" ) ).getAbsoluteFile(), port );
     }
 
     public boolean isNexusRESTStarted()
@@ -142,9 +141,6 @@ public class NexusStatusUtil
         {
             throw new NexusIllegalStateException( "Ports in use!!!" );
         }
-
-        nexusBooter =
-            new NexusBooter( new File( TestProperties.getAll().get( "nexus.base.dir" ) ).getAbsoluteFile(), port );
 
         nexusBooter.startNexus();
     }
