@@ -26,8 +26,6 @@ public class NexusBooter
 {
     protected static Logger log = LoggerFactory.getLogger( NexusBooter.class );
 
-    private static ClassLoader _jetty7ClassLoader;
-
     private final ClassLoader jetty7ClassLoader;
 
     private final Class<?> jetty7Class;
@@ -43,21 +41,14 @@ public class NexusBooter
     public NexusBooter( final File bundleBasedir, final int port )
         throws Exception
     {
-        // set system property
-        System.setProperty( "bundleBasedir", bundleBasedir.getAbsolutePath() );
-        
         // modify the properties
         tamperJettyProperties( bundleBasedir, port );
 
-        if ( _jetty7ClassLoader == null )
-        {
-            jetty7ClassLoader = buildNexusClassLoader( bundleBasedir );
-            _jetty7ClassLoader = jetty7ClassLoader;
-        }
-        else
-        {
-            jetty7ClassLoader = _jetty7ClassLoader;
-        }
+        // set system property
+        System.setProperty( "bundleBasedir", bundleBasedir.getAbsolutePath() );
+
+        // create classloader
+        jetty7ClassLoader = buildNexusClassLoader( bundleBasedir );
 
         final ClassLoader original = Thread.currentThread().getContextClassLoader();
 
@@ -69,15 +60,19 @@ public class NexusBooter
                 new File( bundleBasedir, "conf/jetty.xml" ), jetty7ClassLoader,
                 new Map[] { defaultContext( bundleBasedir ) } );
 
+        // invoke: jetty7.mangleServer(new DisableShutdownHookMangler());
+        final Object disableShutdownHookMangler =
+            jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.mangler.DisableShutdownHookMangler" ).getConstructor().newInstance();
+
+        final Method mangleJetty =
+            jetty7Class.getMethod( "mangleServer",
+                jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.mangler.ServerMangler" ) );
+        mangleJetty.invoke( jetty7, disableShutdownHookMangler );
+
         startJetty = jetty7Class.getMethod( "startJetty" );
         stopJetty = jetty7Class.getMethod( "stopJetty" );
 
         Thread.currentThread().setContextClassLoader( original );
-
-        // calculate the classpath that classworlds would use
-
-        // this.jetty7 =
-        // new Jetty7( new File( bundleBasedir, "conf/jetty.xml" ), classloader, defaultContext( bundleBasedir ) );
     }
 
     protected Map<String, String> defaultContext( final File bundleBasedir )
@@ -152,18 +147,12 @@ public class NexusBooter
     public void startNexus()
         throws Exception
     {
-        final ClassLoader original = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader( jetty7ClassLoader );
         startJetty.invoke( jetty7 );
-        Thread.currentThread().setContextClassLoader( original );
     }
 
     public void stopNexus()
         throws Exception
     {
-        final ClassLoader original = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader( jetty7ClassLoader );
         stopJetty.invoke( jetty7 );
-        Thread.currentThread().setContextClassLoader( original );
     }
 }
