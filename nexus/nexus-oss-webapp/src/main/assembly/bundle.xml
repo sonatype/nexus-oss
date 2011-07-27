@@ -41,12 +41,11 @@
         <exclude>**/wrapper.exe</exclude>
       </excludes>
       <outputDirectory>${project.build.finalName}</outputDirectory>
-      <fileMode>0644</fileMode>
     </fileSet>
+    
     <fileSet>
       <directory>src/main/assembly/content</directory>
       <includes>
-        <include>**/.placeholder</include>
         <include>**/nexus</include>
         <include>**/*.bat</include>
         <include>**/wrapper</include>
@@ -55,13 +54,13 @@
       <outputDirectory>${project.build.finalName}</outputDirectory>
       <fileMode>0755</fileMode>
     </fileSet>
+    
     <fileSet>
       <directory>src/main/assembly/sonatype-work</directory>
       <excludes>
         <exclude>**/.placeholder</exclude>
       </excludes>
       <outputDirectory>sonatype-work</outputDirectory>
-      <fileMode>0644</fileMode>
     </fileSet>
   </fileSets>
   
@@ -83,8 +82,8 @@
       </unpackOptions>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <outputDirectory>${project.build.finalName}/runtime/apps/nexus/webapp</outputDirectory>
-      <fileMode>0644</fileMode>
     </dependencySet>
+    
     <dependencySet>
       <includes>
         <include>*:nexus-webapp:zip</include>
@@ -94,6 +93,7 @@
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <outputDirectory>${project.build.finalName}/runtime/apps/nexus/lib</outputDirectory>
     </dependencySet>
+    
     <dependencySet>
       <includes>
         <include>*:nexus-archetype-plugin</include>
@@ -107,7 +107,6 @@
       <unpack>true</unpack>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <outputDirectory>${project.build.finalName}/runtime/apps/nexus/plugin-repository</outputDirectory>
-      <fileMode>0644</fileMode>
     </dependencySet>
 
     <dependencySet>
@@ -119,7 +118,6 @@
       <unpack>true</unpack>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <outputDirectory>${project.build.finalName}/runtime/apps/nexus/optional-plugins</outputDirectory>
-      <fileMode>0644</fileMode>
     </dependencySet>
   </dependencySets>
 
