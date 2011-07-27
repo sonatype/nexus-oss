@@ -1259,7 +1259,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.2-beta-2</version>
+          <version>2.2.1</version>
           <dependencies>
             <dependency>
               <groupId>org.sonatype.spice</groupId>
@@ -1267,6 +1267,9 @@
               <version>1.0</version>
             </dependency>
           </dependencies>
+          <configuration>
+            <tarLongFileMode>gnu</tarLongFileMode>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -1395,7 +1398,7 @@
     <module>nexus-core-plugins</module>
     <module>nexus-webapp</module>
     <module>nexus-clients</module>
-    <module>nexus-distributions</module>
+    <module>nexus-oss-webapp</module>
     <module>nexus-stories</module>
     <module>nexus-test</module>
     <module>nexus-test-harness</module>

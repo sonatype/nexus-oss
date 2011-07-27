@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2008-2011 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
+
+    This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+    Public License Version 3 as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+    for more details.
+
+    You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+    http://www.gnu.org/licenses.
+
+    Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+    Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+    All other trademarks are the property of their respective owners.
+
+-->
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+  <id>bundle</id>
+
+  <formats>
+    <format>tar.gz</format>
+    <format>zip</format>
+  </formats>
+  
+  <includeBaseDirectory>false</includeBaseDirectory>
+  
+  <fileSets>
+    <fileSet>
+      <directory>src/main/assembly/content</directory>
+      <excludes>
+        <exclude>**/.placeholder</exclude>
+        <exclude>**/nexus</exclude>
+        <exclude>**/*.bat</exclude>
+        <exclude>**/wrapper</exclude>
+        <exclude>**/wrapper.exe</exclude>
+      </excludes>
+      <outputDirectory>${project.build.finalName}</outputDirectory>
+      <fileMode>0644</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/assembly/content</directory>
+      <includes>
+        <include>**/.placeholder</include>
+        <include>**/nexus</include>
+        <include>**/*.bat</include>
+        <include>**/wrapper</include>
+        <include>**/wrapper.exe</include>
+      </includes>
+      <outputDirectory>${project.build.finalName}</outputDirectory>
+      <fileMode>0755</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>src/main/assembly/sonatype-work</directory>
+      <excludes>
+        <exclude>**/.placeholder</exclude>
+      </excludes>
+      <outputDirectory>sonatype-work</outputDirectory>
+      <fileMode>0644</fileMode>
+    </fileSet>
+  </fileSets>
+  
+  <dependencySets>
+    <dependencySet>
+      <includes>
+        <include>*:nexus-webapp:war</include>
+      </includes>
+      <useProjectArtifact>false</useProjectArtifact>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <excludes>
+          <exclude>WEB-INF/classes/**</exclude>
+          <exclude>WEB-INF/lib/**</exclude>
+          <exclude>WEB-INF/logback.xml</exclude>
+          <exclude>WEB-INF/runtime/**</exclude>
+          <exclude>META-INF/**</exclude>
+        </excludes>
+      </unpackOptions>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <outputDirectory>${project.build.finalName}/runtime/apps/nexus/webapp</outputDirectory>
+      <fileMode>0644</fileMode>
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>*:nexus-webapp:zip</include>
+      </includes>
+      <useProjectArtifact>false</useProjectArtifact>
+      <unpack>true</unpack>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <outputDirectory>${project.build.finalName}/runtime/apps/nexus/lib</outputDirectory>
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>*:nexus-archetype-plugin</include>
+        <include>*:nexus-core-documentation-plugin</include>
+        <include>*:nexus-indexer-lucene-plugin</include>
+        <include>*:nexus-ldap-realm-plugin</include>
+        <include>*:nexus-plugin-console-plugin</include>
+        <include>*:nexus-rrb-plugin</include>
+      </includes>
+      <useProjectArtifact>false</useProjectArtifact>
+      <unpack>true</unpack>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <outputDirectory>${project.build.finalName}/runtime/apps/nexus/plugin-repository</outputDirectory>
+      <fileMode>0644</fileMode>
+    </dependencySet>
+
+    <dependencySet>
+      <includes>
+        <include>*:nexus-capabilities-plugin</include>
+        <include>*:nexus-groovy-console-plugin</include>
+      </includes>
+      <useProjectArtifact>false</useProjectArtifact>
+      <unpack>true</unpack>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <outputDirectory>${project.build.finalName}/runtime/apps/nexus/optional-plugins</outputDirectory>
+      <fileMode>0644</fileMode>
+    </dependencySet>
+  </dependencySets>
+
+</assembly>
