@@ -18,7 +18,6 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>${nexus.version}</version>
         <executions>
           <execution>
             <goals>
@@ -31,7 +30,6 @@
           <nexusBundleArtifact>
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-oss-webapp</artifactId>
-            <version>${nexus.version}</version>
             <type>zip</type>
             <classifier>bundle</classifier>
           </nexusBundleArtifact>
@@ -44,13 +42,11 @@
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-it-helper-plugin</artifactId>
-              <version>${project.version}</version>
               <classifier>cp</classifier>
             </plugin>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-it-helper-plugin</artifactId>
-              <version>${project.version}</version>
               <classifier>bundle</classifier>
               <type>zip</type>
             </plugin>
