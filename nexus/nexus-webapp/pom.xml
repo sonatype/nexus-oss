@@ -410,6 +410,7 @@
         <configuration>
           <warSourceIncludes>
             *,
+            ext-2.3/ext-all-debug.js,
             ext-2.3/ext-all.js,
             ext-2.3/adapter/ext/ext-base.js,
             ext-2.3/resources/css/ext-all.css,
@@ -419,6 +420,7 @@
             js/*,
             js/extensions/*,
             js/filetree/js/Ext.ux.form.BrowseButton.js,
+            js/groupcombo/*,
             js/repoServer/*,
             style/Sonatype.css,
             style/Sonatype-content.css,
