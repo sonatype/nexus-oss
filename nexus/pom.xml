@@ -1367,12 +1367,6 @@
     </plugins>
   </reporting>
 
-  <scm>
-    <connection>scm:git:git://github.com/sonatype/app-lifecycle.git</connection>
-    <developerConnection>scm:git:git@github.com:sonatype/app-lifecycle.git</developerConnection>
-    <url>https://github.com/sonatype/app-lifecycle</url>
-  </scm>
-
   <distributionManagement>
     <site>
       <id>forge-sites</id>
