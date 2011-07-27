@@ -111,8 +111,6 @@ public class AbstractNexusDiscoveryTest
         throws ComponentLookupException, PlexusContainerException
     {
         container = new DefaultPlexusContainer();
-        container.initialize();
-        container.start();
 
         testClientManager = new ClientManagerFixture();
 

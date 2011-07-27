@@ -22,6 +22,7 @@ import java.util.zip.ZipFile;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
 import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.execution.MavenSession;
@@ -83,7 +84,7 @@ public class AbstractEnvironmentMojo
     protected org.apache.maven.artifact.repository.ArtifactRepository localRepository;
 
     /** @parameter expression="${project.remoteArtifactRepositories}" */
-    protected java.util.List<?> remoteRepositories;
+    protected java.util.List<ArtifactRepository> remoteRepositories;
 
     /** @component */
     private MavenFileFilter mavenFileFilter;
