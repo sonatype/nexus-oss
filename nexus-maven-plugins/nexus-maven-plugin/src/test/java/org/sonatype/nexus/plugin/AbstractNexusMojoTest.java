@@ -64,8 +64,6 @@ public class AbstractNexusMojoTest
 
         logger = new ConsoleLogger( Logger.LEVEL_INFO, "test" );
         container = new DefaultPlexusContainer();
-        container.initialize();
-        container.start();
 
         secDispatcher = (SecDispatcher) container.lookup( SecDispatcher.class.getName(), "maven" );
     }

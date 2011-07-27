@@ -25,9 +25,9 @@
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus-parent</artifactId>
+    <artifactId>nexus</artifactId>
     <version>1.9.3-SNAPSHOT</version>
-    <relativePath>../nexus-parent</relativePath>
+    <relativePath>../nexus</relativePath>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
@@ -36,6 +36,11 @@
   <packaging>pom</packaging>
   <name>Nexus : Maven Plugins : Parent</name>
   <description>Sonatype Nexus Maven Plugins Parent</description>
+
+  <properties>
+    <!-- override maven version managed by nexus - we want to build against 2.2.1 -->
+    <maven.version>2.2.1</maven.version>
+  </properties>
 
   <!-- pluginManagement and reporting taken from org.sonatype.plugins:plugins-parent:6 -->
   <build>
