@@ -20,10 +20,9 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.cache.Cache;
-import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -49,7 +48,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -80,6 +78,23 @@ public class KenaiRealm
     }
 
     @Override
+    public boolean supports( AuthenticationToken token )
+    {
+        return UsernamePasswordToken.class.isAssignableFrom( token.getClass() );
+    }
+
+    /*
+    * (non-Javadoc)
+    * @see org.jsecurity.realm.AuthenticatingRealm#getCredentialsMatcher()
+    */
+    @Override
+    public CredentialsMatcher getCredentialsMatcher()
+    {
+        // we are managing the authentication ourselfs
+        return new AllowAllCredentialsMatcher();
+    }
+
+    @Override
     protected AuthenticationInfo doGetAuthenticationInfo( AuthenticationToken token )
         throws AuthenticationException
     {
@@ -104,56 +119,93 @@ public class KenaiRealm
         return authInfo;
     }
 
-    protected Object getAuthenticationCacheKey( PrincipalCollection principals )
-    {
-        return getAvailablePrincipal( principals );
-    }
-
-    protected Object getAuthenticationCacheKey( AuthenticationToken token )
-    {
-        return token != null ? token.getPrincipal() : null;
-    }
-
     protected AuthenticationInfo buildAuthenticationInfo( Object principal, Object credentials )
     {
         return new SimpleAuthenticationInfo( principal, credentials, getName() );
     }
 
-    @Override
-    public boolean supports( AuthenticationToken token )
-    {
-        return UsernamePasswordToken.class.isAssignableFrom( token.getClass() );
-    }
 
     private boolean authenticateViaUrl( String username, String password )
     {
-        Response response = this.makeRemoteRequest( username, password );
+        StringBuffer buffer = new StringBuffer( this.kenaiRealmConfiguration.getConfiguration().getBaseUrl() ).append(
+            "api/login/authenticate.json" );
+        Response response = this.makeRemoteAuthcRequest( username, password, buffer.toString() );
 
         try
         {
-            if ( response.getStatus().isSuccess() )
+            boolean success = response.getStatus().isSuccess();
+            if ( !success )
             {
-                if ( this.isAuthorizationCachingEnabled() )
-                {
-                    AuthorizationInfo authorizationInfo =
-                        this.buildAuthorizationInfo( username, password, response.getEntity().getText() );
-
-                    Object authorizationCacheKey =
-                        this.getAuthorizationCacheKey( new SimplePrincipalCollection( username, this.getName() ) );
-                    this.getAuthorizationCache().put( authorizationCacheKey, authorizationInfo );
-
-                }
-
-                return true;
+                this.logger.debug( "Failed to authenticate user: {} for url: {} status: {}",
+                                   new Object[]{ username, response.getRequest().getResourceRef(),
+                                       response.getStatus() } );
             }
+            return success;
+        }
+        finally
+        {
+            if ( response != null )
+            {
+                response.release();
+            }
+        }
+    }
+
+    private Response makeRemoteAuthcRequest( String username, String password, String url )
+    {
+        Client restClient = new Client( new Context(), Protocol.HTTP );
+
+        ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
+        ChallengeResponse authentication = new ChallengeResponse( scheme, username, password );
+
+        Request request = new Request();
+
+        // FIXME: waiting for response from kenai team on how to get a non-paginated response
+        // If that is not possible we will need to add support for paged results.
+        request.setResourceRef( url );
+        request.setMethod( Method.GET );
+        request.setChallengeResponse( authentication );
+
+        Response response = restClient.handle( request );
+        this.logger.debug( "User: " + username + " url validation status: " + response.getStatus() );
+
+        return response;
+    }
+
+    //------------ AUTHORIZATION ------------
+
+    @Override
+    protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
+    {
+        try
+        {
+            return this.authorizeViaUrl( principals.getPrimaryPrincipal().toString() );
         }
         catch ( IOException e )
         {
-            this.logger.error( "Failed to read response", e );
+            throw new AuthorizationException( "Failed to Authorize user " + principals.getPrimaryPrincipal(), e );
         }
         catch ( JSONException e )
         {
-            this.logger.error( "Failed to read response", e );
+            throw new AuthorizationException( "Failed to Authorize user " + principals.getPrimaryPrincipal(), e );
+        }
+    }
+
+    private AuthorizationInfo authorizeViaUrl( String username )
+        throws IOException, JSONException
+    {
+        Response response = null;
+
+        try
+        {
+            response = this.makeRemoteAuthzRequest( username );
+            if ( response.getStatus().isSuccess() )
+            {
+                AuthorizationInfo authorizationInfo =
+                    this.buildAuthorizationInfo( username, response.getEntity().getText() );
+
+                return authorizationInfo;
+            }
         }
         finally
         {
@@ -163,12 +215,13 @@ public class KenaiRealm
             }
         }
 
-        this.logger.debug( "Failed to authenticate user: {} for url: {} status: {}",
-                           new Object[]{ username, response.getRequest().getResourceRef(), response.getStatus() } );
-        return false;
+        throw new AuthorizationException(
+            "Failed to authorize user: " + username + " for url: " + response.getRequest().getResourceRef() + " status:"
+                + response.getStatus() );
+
     }
 
-    private AuthorizationInfo buildAuthorizationInfo( String username, String password, String responseText )
+    private AuthorizationInfo buildAuthorizationInfo( String username, String responseText )
         throws JSONException, IOException
     {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
@@ -191,7 +244,7 @@ public class KenaiRealm
             Response response = null;
             try
             {
-                response = this.makeRemoteRequest( username, password, pagedURL );
+                response = this.makeRemoteAuthzRequest( username, pagedURL );
                 jsonObject = buildJsonObject( response );
                 authorizationInfo.addRoles( this.buildRoleSetFromJsonObject( jsonObject ) );
             }
@@ -205,6 +258,28 @@ public class KenaiRealm
         }
 
         return authorizationInfo;
+    }
+
+    private Response makeRemoteAuthzRequest( String username )
+    {
+        StringBuffer buffer = new StringBuffer( this.kenaiRealmConfiguration.getConfiguration().getBaseUrl() );
+        buffer.append( "api/projects?size=" ).append( PAGE_SIZE );
+        buffer.append( "&username=" ).append( username );
+        buffer.append( "&roles=" ).append( "admin%2Cdeveloper" ); // we want just the admin,developer projects
+
+        return makeRemoteAuthzRequest( username, buffer.toString() );
+    }
+
+    private Response makeRemoteAuthzRequest( String username, String url )
+    {
+        Client restClient = new Client( new Context(), Protocol.HTTP );
+        Request request = new Request();
+        request.setResourceRef( url );
+        request.setMethod( Method.GET );
+        Response response = restClient.handle( request );
+        this.logger.debug( "User: " + username + " url validation status: " + response.getStatus() );
+
+        return response;
     }
 
     private JSONObject buildJsonObject( Response response )
@@ -251,139 +326,5 @@ public class KenaiRealm
         }
 
         return roles;
-    }
-
-    private Response makeRemoteRequest( String username, String password )
-    {
-        return makeRemoteRequest( username, password, this.kenaiRealmConfiguration.getConfiguration().getBaseUrl()
-            + "api/projects/mine.json?size=" + PAGE_SIZE );
-    }
-
-    private Response makeRemoteRequest( String username, String password, String url )
-    {
-        Client restClient = new Client( new Context(), Protocol.HTTP );
-
-        ChallengeScheme scheme = ChallengeScheme.HTTP_BASIC;
-        ChallengeResponse authentication = new ChallengeResponse( scheme, username, password );
-
-        Request request = new Request();
-
-        // FIXME: waiting for response from kenai team on how to get a non-paginated response
-        // If that is not possible we will need to add support for paged results.
-        request.setResourceRef( url );
-        request.setMethod( Method.GET );
-        request.setChallengeResponse( authentication );
-
-        Response response = restClient.handle( request );
-        this.logger.debug( "User: " + username + " url validation status: " + response.getStatus() );
-
-        return response;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.jsecurity.realm.AuthenticatingRealm#getCredentialsMatcher()
-     */
-    @Override
-    public CredentialsMatcher getCredentialsMatcher()
-    {
-        // we are managing the authentication ourselfs
-        return new AllowAllCredentialsMatcher();
-    }
-
-    @Override
-    protected Object getAuthorizationCacheKey( PrincipalCollection principals )
-    {
-        return principals.getPrimaryPrincipal().toString();
-    }
-
-    public Cache<Object, AuthorizationInfo> getAuthorizationCache()
-    {
-
-        Cache<Object, AuthorizationInfo> cache = super.getAuthorizationCache();
-        if ( cache == null ) // no cache
-        {
-            return null;
-        }
-        else if ( WrappedNonClearableCache.class.isInstance( cache ) )  // already wrapped cache
-        {
-            return cache;
-        }
-        else // cache not wrapped yet
-        {
-            Cache<Object, AuthorizationInfo> wrappedCache = new WrappedNonClearableCache( cache );
-            super.setAuthorizationCache( wrappedCache );
-            return super.getAuthorizationCache();
-        }
-    }
-
-
-    @Override
-    protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
-    {
-        // FIXME, always return null, we are setting the cache directly, yes, this is dirty
-        return null;
-    }
-
-    /**
-     * Stops the cache from being cleared, individual cached items will still be cleared when a user's session times out or they logout.
-     */
-    static class WrappedNonClearableCache
-        implements Cache<Object, AuthorizationInfo>
-    {
-        private Cache<Object, AuthorizationInfo> cache;
-
-        WrappedNonClearableCache( Cache cache )
-        {
-            this.cache = cache;
-        }
-
-        @Override
-        public AuthorizationInfo get( Object key )
-            throws CacheException
-        {
-            return cache.get( key );
-        }
-
-        @Override
-        public AuthorizationInfo put( Object key, AuthorizationInfo value )
-            throws CacheException
-        {
-            return cache.put( key, value );
-        }
-
-        @Override
-        public AuthorizationInfo remove( Object key )
-            throws CacheException
-        {
-            return cache.remove( key );
-        }
-
-        @Override
-        public void clear()
-            throws CacheException
-        {
-
-            // NOTE: this clear is NOT implemented, authz cache will only be removed when the session expires or user logs out.
-//            cache.clear();
-        }
-
-        @Override
-        public int size()
-        {
-            return cache.size();
-        }
-
-        @Override
-        public Set<Object> keys()
-        {
-            return cache.keys();
-        }
-
-        @Override
-        public Collection<AuthorizationInfo> values()
-        {
-            return cache.values();
-        }
     }
 }

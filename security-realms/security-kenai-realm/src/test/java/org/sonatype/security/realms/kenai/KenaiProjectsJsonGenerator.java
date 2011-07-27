@@ -4,7 +4,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class KenaiProjectJsonGenerator
+import java.util.Arrays;
+import java.util.Iterator;
+
+public class KenaiProjectsJsonGenerator
 {
 
     private int pageSize = 10;
@@ -15,7 +18,7 @@ public class KenaiProjectJsonGenerator
 
     private String baseUrl = "https://java.net";
 
-    public KenaiProjectJsonGenerator( int pageSize, int totalProjects, String baseUrl )
+    public KenaiProjectsJsonGenerator( int pageSize, int totalProjects, String baseUrl )
     {
         super();
         this.pageSize = pageSize;
@@ -38,16 +41,34 @@ public class KenaiProjectJsonGenerator
         }
     }
 
-    public String generate( int startPage )
+    public String generate( int startPage, String userId, String... roles )
         throws JSONException
     {
 
+        StringBuffer urlPart = new StringBuffer();
+        if ( roles != null && roles.length > 0 )
+        {
+            urlPart.append( "roles=" );
+
+            for ( Iterator<String> iter = Arrays.asList( roles ).iterator(); iter.hasNext(); )
+            {
+                urlPart.append( iter.next() );
+                if( iter.hasNext())
+                {
+                    urlPart.append( "%2C" );
+                }
+            }
+        }
+        urlPart.append( "&size=" ).append( pageSize );
+        urlPart.append( "&theme=java.net" );
+        urlPart.append( "&username=" ).append( userId );
+
         JSONObject root = new JSONObject();
-        root.put( "href", this.baseUrl + "/api/projects/mine.json?theme=java.net" );
+        root.put( "href", this.baseUrl + "/api/projects?" + urlPart.toString() );
 
         if ( startPage > 1 )
         {
-            root.put( "prev", this.baseUrl + "/api/projects/mine.json?page=" + ( startPage - 1 ) );
+            root.put( "prev", this.baseUrl + "/api/projects?page=" + ( startPage - 1 ) + "&" + urlPart );
         }
         else
         {
@@ -56,7 +77,7 @@ public class KenaiProjectJsonGenerator
 
         if ( startPage < totalPages )
         {
-            root.put( "next", this.baseUrl + "/api/projects/mine.json?page=" + ( startPage + 1 ) );
+            root.put( "next", this.baseUrl + "/api/projects?page=" + ( startPage + 1 ) + "&" + urlPart );
         }
         else
         {

@@ -70,20 +70,6 @@ public class KenaiRealmTest
     {
         Realm kenaiRealm = this.getRealm();
 
-        // this will fail unless the user auth is cached from a login
-        try
-        {
-            kenaiRealm.checkRole( new SimplePrincipalCollection( username, kenaiRealm.getName() ), "project-252" );
-            Assert.fail( "Expected AuthorizationException" );
-        }
-        catch ( AuthorizationException e )
-        {
-            // expected
-        }
-
-        AuthenticationInfo info = kenaiRealm.getAuthenticationInfo( new UsernamePasswordToken( username, password ) );
-        Assert.assertNotNull( info );
-
         // check all roles
         for ( int ii = 0; ii < getTotalNumberOfProjects(); ii++ )
         {

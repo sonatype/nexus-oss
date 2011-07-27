@@ -53,18 +53,24 @@ public abstract class AbstractKenaiRealmTest
 
         authInfo.setAuthMethod( "BASIC" );
         authInfo.setCredentialsFilePath( getSmarterBasedir() + "/target/test-classes/credentials.properties" );
+        authInfo.setAuthPathSpec( "/api/login/*" );
 
-        ServletInfo servletInfo = new ServletInfo();
-        webapp.setServletInfos( Arrays.asList( servletInfo ) );
+        ServletInfo servletInfoAuthc = new ServletInfo();
+        servletInfoAuthc.setName( "authc" );
+        servletInfoAuthc.setMapping( "/api/login/*" );
+        servletInfoAuthc.setServletClass( KenaiMockAuthcServlet.class.getName() );
+        servletInfoAuthc.setParameters( new Properties() );
 
-        servletInfo.setMapping( "/*" );
-        servletInfo.setServletClass( KenaiMockServlet.class.getName() );
-
+        ServletInfo servletInfoAuthz = new ServletInfo();
+        servletInfoAuthz.setName( "authz" );
+        servletInfoAuthz.setMapping( "/api/projects" );
+        servletInfoAuthz.setServletClass( KenaiMockAuthzServlet.class.getName() );
         Properties params = new Properties();
-        params.setProperty( KenaiMockServlet.TOTAL_PROJECTS_KEY, Integer.toString( getTotalNumberOfProjects() ) );
-        servletInfo.setParameters( params );
-
+        params.setProperty( KenaiMockAuthzServlet.TOTAL_PROJECTS_KEY, Integer.toString( getTotalNumberOfProjects() ) );
+        servletInfoAuthz.setParameters( params );
         params.put( "resourceBase", getSmarterBasedir() + "/target/test-classes/data/" );
+
+        webapp.setServletInfos( Arrays.asList( servletInfoAuthc, servletInfoAuthz ) );
 
         server.initialize();
 

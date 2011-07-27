@@ -1,6 +1,7 @@
 package org.sonatype.security.realms.kenai;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -10,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 
-public class KenaiMockServlet
+public class KenaiMockAuthzServlet
     extends HttpServlet
 {
     
@@ -44,13 +45,23 @@ public class KenaiMockServlet
         
         int pageSize = 200;
         int pageIndex = 1;
+
+        String username = req.getParameter( "username" );
+        if( username == null )
+        {
+            resp.setStatus( 400 );
+            return;
+        }
+        String[] roles = URLDecoder.decode( req.getParameter( "roles" ), "UTF8").split( "," );
+
+
         
         String sizeParam = req.getParameter( "size" );
         if( sizeParam != null )
         {
             pageSize = Integer.parseInt( sizeParam );
         }
-        
+
         String pageIndexParam = req.getParameter( "page" );
         if( pageIndexParam != null )
         {
@@ -62,7 +73,7 @@ public class KenaiMockServlet
         
         try
         {
-            String output = new KenaiProjectJsonGenerator( pageSize, totalProjectSize, reqUrl ).generate( pageIndex );
+            String output = new KenaiProjectsJsonGenerator( pageSize, totalProjectSize, reqUrl ).generate( pageIndex, username, roles );
             resp.getOutputStream().write( output.getBytes() );
         }
         catch ( JSONException e )
