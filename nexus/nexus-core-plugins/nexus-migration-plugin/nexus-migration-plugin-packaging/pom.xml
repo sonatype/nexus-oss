@@ -37,7 +37,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-migration-plugin-artifactory</artifactId>
-      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>provided</scope>
@@ -45,7 +44,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-migration-plugin-artifactory-bridge</artifactId>
-      <version>${project.version}</version>
     </dependency>
   </dependencies>
 

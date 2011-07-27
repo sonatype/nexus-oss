@@ -94,7 +94,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.tools</groupId>
       <artifactId>nexus-repository-conversion-tool</artifactId>
-      <version>${nexus.version}</version>
     </dependency>
 
     <dependency>
@@ -206,7 +205,6 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
       <scope>test</scope>
-      <version>${nexus.version}</version>
     </dependency>
 
 
@@ -232,7 +230,6 @@
           <artifactId>nexus-configuration</artifactId>
           <classifier>tests</classifier>
           <scope>test</scope>
-          <version>${nexus.version}</version>
         </dependency>
         <dependency>
           <groupId>org.sonatype.nexus</groupId>
@@ -255,14 +252,12 @@
           <artifactId>nexus-app</artifactId>
           <classifier>tests</classifier>
           <scope>test</scope>
-          <version>${nexus.version}</version>
         </dependency>
         <dependency>
           <groupId>org.sonatype.nexus</groupId>
           <artifactId>nexus-proxy</artifactId>
           <classifier>tests</classifier>
           <scope>test</scope>
-          <version>${nexus.version}</version>
         </dependency>
       </dependencies>
     </profile>
