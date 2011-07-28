@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.httpclient.CustomMultiThreadedHttpConnectionManager;
 import org.apache.maven.index.artifact.ArtifactPackagingMapper;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -685,6 +686,9 @@ public class DefaultNexus
         cacheWrapper.stop();
 
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPED );
+        
+        // Now a cleanup, to kill dangling thread of HttpClients
+        CustomMultiThreadedHttpConnectionManager.shutdownAll();
 
         getLogger().info( "Stopped Nexus (version " + getSystemStatus().getVersion() + " "
                               + getSystemStatus().getEditionShort() + ")" );
