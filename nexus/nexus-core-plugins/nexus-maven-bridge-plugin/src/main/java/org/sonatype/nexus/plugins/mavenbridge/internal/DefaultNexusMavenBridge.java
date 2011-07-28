@@ -9,12 +9,13 @@ import javax.inject.Singleton;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.building.ModelBuildingException;
 import org.apache.maven.model.building.ModelSource;
-import org.sonatype.aether.AbstractRepositoryListener;
+import org.sonatype.aether.RepositoryListener;
 import org.sonatype.aether.RepositorySystemSession;
 import org.sonatype.aether.collection.DependencyCollectionException;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.graph.DependencyNode;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
+import org.sonatype.aether.util.listener.ChainedRepositoryListener;
 import org.sonatype.nexus.plugins.mavenbridge.NexusAether;
 import org.sonatype.nexus.plugins.mavenbridge.NexusMavenBridge;
 import org.sonatype.nexus.plugins.mavenbridge.workspace.NexusWorkspace;
@@ -39,21 +40,25 @@ public class DefaultNexusMavenBridge
     }
 
     @Override
-    public Model buildModel( ModelSource pom, List<MavenRepository> repositories )
+    public Model buildModel( ModelSource pom, List<MavenRepository> repositories, RepositoryListener... listeners )
         throws ModelBuildingException
     {
-        return mavenBridge.buildModel( createSession( repositories ), pom );
+        RepositorySystemSession session = createSession( repositories );
+        return mavenBridge.buildModel( session, pom );
     }
 
     @Override
-    public DependencyNode collectDependencies( Dependency node, List<MavenRepository> repositories )
+    public DependencyNode collectDependencies( Dependency node, List<MavenRepository> repositories,
+                                               RepositoryListener... listeners )
         throws DependencyCollectionException, ArtifactResolutionException
     {
-        return mavenBridge.buildDependencyTree( createSession( repositories ), node );
+        RepositorySystemSession session = createSession( repositories );
+        return mavenBridge.buildDependencyTree( session, node );
     }
 
     @Override
-    public DependencyNode resolveDependencies( Dependency node, List<MavenRepository> repositories )
+    public DependencyNode resolveDependencies( Dependency node, List<MavenRepository> repositories,
+                                               RepositoryListener... listeners )
         throws DependencyCollectionException, ArtifactResolutionException
     {
         RepositorySystemSession session = createSession( repositories );
@@ -66,14 +71,17 @@ public class DefaultNexusMavenBridge
     }
 
     @Override
-    public DependencyNode collectDependencies( Model model, List<MavenRepository> repositories )
+    public DependencyNode collectDependencies( Model model, List<MavenRepository> repositories,
+                                               RepositoryListener... listeners )
         throws DependencyCollectionException, ArtifactResolutionException
     {
-        return mavenBridge.buildDependencyTree( createSession( repositories ), model );
+        RepositorySystemSession session = createSession( repositories );
+        return mavenBridge.buildDependencyTree( session, model );
     }
 
     @Override
-    public DependencyNode resolveDependencies( Model model, List<MavenRepository> repositories )
+    public DependencyNode resolveDependencies( Model model, List<MavenRepository> repositories,
+                                               RepositoryListener... listeners )
         throws DependencyCollectionException, ArtifactResolutionException
     {
         RepositorySystemSession session = createSession( repositories );
@@ -87,14 +95,14 @@ public class DefaultNexusMavenBridge
 
     // ==
 
-    protected RepositorySystemSession createSession( List<MavenRepository> repositories )
+    protected RepositorySystemSession createSession( List<MavenRepository> repositories,
+                                                     RepositoryListener... listeners )
     {
         final NexusWorkspace nexusWorkspace = nexusAether.createWorkspace( repositories );
 
         final RepositorySystemSession session =
-            nexusAether.getNexusEnabledRepositorySystemSession( nexusWorkspace, new AbstractRepositoryListener()
-            {
-            } );
+            nexusAether.getNexusEnabledRepositorySystemSession( nexusWorkspace, new ChainedRepositoryListener(
+                listeners ) );
 
         return session;
     }
