@@ -12,14 +12,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.Callable;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,11 +32,25 @@ public class NexusBooter
 {
     protected static Logger log = LoggerFactory.getLogger( NexusBooter.class );
 
+    // ==
+
+    private static final String SHARED_REALM_ID = "it-shared";
+
+    private static final String IT_REALM_ID = "it-realm";
+
+    // ==
+
     private final File bundleBasedir;
 
-    private final ClassLoader jetty7ClassLoader;
+    private final ClassWorld world;
 
-    private final Class<?> jetty7Class;
+    private final ClassRealm sharedClassloader;
+
+    // ==
+
+    private ClassRealm jetty7ClassLoader;
+
+    private Class<?> jetty7Class;
 
     private Object jetty7;
 
@@ -50,38 +68,20 @@ public class NexusBooter
         // modify the properties
         tamperJettyProperties( bundleBasedir, port );
 
-        // set system property
+        // shuffle bundle files
+        tamperJarsForSharedClasspath( bundleBasedir );
+
+        // set system property for bundleBasedir
         System.setProperty( "bundleBasedir", bundleBasedir.getAbsolutePath() );
 
-        // create classloader
-        jetty7ClassLoader = buildNexusClassLoader( bundleBasedir );
+        // guice finalizer
+        System.setProperty( "guice.executor.class", "" );
 
-        jetty7Class = doInIsolation( new Callable<Class<?>>()
-        {
-            @Override
-            public Class<?> call()
-                throws Exception
-            {
-                return jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.Jetty7" );
-            }
-        } );
-    }
+        // create ClassWorld
+        world = new ClassWorld();
 
-    protected <T> T doInIsolation( final Callable<T> callable )
-        throws Exception
-    {
-        final ClassLoader original = Thread.currentThread().getContextClassLoader();
-
-        try
-        {
-            Thread.currentThread().setContextClassLoader( jetty7ClassLoader );
-
-            return callable.call();
-        }
-        finally
-        {
-            Thread.currentThread().setContextClassLoader( original );
-        }
+        // create shared loader
+        sharedClassloader = buildSharedClassLoader( bundleBasedir );
     }
 
     protected Map<String, String> defaultContext( final File bundleBasedir )
@@ -91,7 +91,35 @@ public class NexusBooter
         return ctx;
     }
 
-    protected ClassLoader buildNexusClassLoader( final File bundleBasedir )
+    protected ClassRealm buildSharedClassLoader( final File bundleBasedir )
+        throws Exception
+    {
+        final File sharedLib = new File( bundleBasedir, "shared" );
+
+        // Circumvention of reloaded/recreated classloader. The Lucene NativeFSLockFactory is coded with expectation
+        // that it might exist
+        // only one class instance of it within one JVM. This is a limitation of JVM FileChannels + Lucene. Hence,
+        // we "raise" the lucene classes level up.
+        List<URL> urls = new ArrayList<URL>();
+
+        final File[] jars = sharedLib.listFiles();
+
+        for ( File jar : jars )
+        {
+            urls.add( jar.toURI().toURL() );
+        }
+
+        ClassRealm realm = world.newRealm( SHARED_REALM_ID, null );
+
+        for ( URL url : urls )
+        {
+            realm.addURL( url );
+        }
+
+        return realm;
+    }
+
+    protected ClassRealm buildNexusClassLoader( final File bundleBasedir )
         throws Exception
     {
         List<URL> urls = new ArrayList<URL>();
@@ -114,9 +142,7 @@ public class NexusBooter
             urls.add( jar.toURI().toURL() );
         }
 
-        ClassWorld world = new ClassWorld();
-
-        ClassRealm realm = world.newRealm( "it-core", null );
+        ClassRealm realm = world.newRealm( IT_REALM_ID, sharedClassloader );
 
         for ( URL url : urls )
         {
@@ -124,11 +150,6 @@ public class NexusBooter
         }
 
         return realm;
-
-        // ClassLoader classloader =
-        // new URLClassLoader( urls.toArray( new URL[0] ), ClassLoader.getSystemClassLoader().getParent() );
-        //
-        // return classloader;
     }
 
     protected void tamperJettyProperties( final File basedir, final int port )
@@ -153,14 +174,39 @@ public class NexusBooter
         IOUtil.close( out );
     }
 
+    protected void tamperJarsForSharedClasspath( final File basedir )
+        throws IOException
+    {
+        @SuppressWarnings( "unchecked" )
+        Collection<File> files =
+            (Collection<File>) FileUtils.listFiles( basedir, new WildcardFileFilter( "lucene-*.jar" ),
+                TrueFileFilter.TRUE );
+
+        final File sharedLib = new File( basedir, "shared" );
+
+        for ( File file : files )
+        {
+            // copy lucene jars to /shared
+            FileUtils.copyFile( file, new File( sharedLib, file.getName() ) );
+
+            // replace lucene jars with dummies (to make nexus plugin manager happy)
+            FileUtils.writeStringToFile( file, "" );
+        }
+    }
+
     public void startNexus()
         throws Exception
     {
+        // create classloader
+        jetty7ClassLoader = buildNexusClassLoader( bundleBasedir );
+
         final ClassLoader original = Thread.currentThread().getContextClassLoader();
 
         try
         {
             Thread.currentThread().setContextClassLoader( jetty7ClassLoader );
+
+            jetty7Class = jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.Jetty7" );
 
             jetty7 =
                 jetty7Class.getConstructor( File.class, ClassLoader.class, Map[].class ).newInstance(
@@ -216,8 +262,18 @@ public class NexusBooter
 
     protected void clean()
     {
-        this.jetty7 = null;
         this.startJetty = null;
         this.stopJetty = null;
+        this.jetty7 = null;
+        this.jetty7Class = null;
+        this.jetty7ClassLoader = null;
+        try
+        {
+            world.disposeRealm( IT_REALM_ID );
+        }
+        catch ( NoSuchRealmException e )
+        {
+            // huh?
+        }
     }
 }
