@@ -510,7 +510,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <argLine>-agentpath:"${yourkit.agent}"</argLine>
+              <argLine>-Xmx512M -agentpath:"${yourkit.agent}"</argLine>
             </configuration>
           </plugin>
         </plugins>
