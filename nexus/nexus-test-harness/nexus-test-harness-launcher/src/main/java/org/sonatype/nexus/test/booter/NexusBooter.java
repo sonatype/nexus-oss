@@ -75,7 +75,7 @@ public class NexusBooter
         System.setProperty( "bundleBasedir", bundleBasedir.getAbsolutePath() );
 
         // guice finalizer
-        System.setProperty( "guice.executor.class", "" );
+        System.setProperty( "guice.executor.class", "NONE" );
 
         // create ClassWorld
         world = new ClassWorld();
