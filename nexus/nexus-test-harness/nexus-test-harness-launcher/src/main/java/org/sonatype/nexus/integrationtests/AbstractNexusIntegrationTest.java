@@ -147,10 +147,13 @@ public abstract class AbstractNexusIntegrationTest
 
     protected static Logger staticLog = LoggerFactory.getLogger( AbstractNexusIntegrationTest.class );
 
-    // Install the file preferences, to have them used from IT but also from embedded Nexus too.
     static
     {
+        // Install the file preferences, to have them used from IT but also from embedded Nexus too.
         System.setProperty( "java.util.prefs.PreferencesFactory", FilePreferencesFactory.class.getName() );
+
+        // guice finalizer turned OFF
+        System.setProperty( "guice.executor.class", "" );
     }
 
     /**
@@ -314,9 +317,9 @@ public abstract class AbstractNexusIntegrationTest
 
                 // tell the console what we are doing, now that there is no output its
                 String logMessage = "Running Test: " + getTestId() + " - Class: " + this.getClass().getSimpleName();
-                staticLog.info( String.format( "%1$-" + logMessage.length() + "s", " " ).replaceAll(" ", "*") );
+                staticLog.info( String.format( "%1$-" + logMessage.length() + "s", " " ).replaceAll( " ", "*" ) );
                 staticLog.info( logMessage );
-                staticLog.info( String.format( "%1$-" + logMessage.length() + "s", " " ).replaceAll(" ", "*") );
+                staticLog.info( String.format( "%1$-" + logMessage.length() + "s", " " ).replaceAll( " ", "*" ) );
 
                 // clean common work dir
                 beforeStartClean();
