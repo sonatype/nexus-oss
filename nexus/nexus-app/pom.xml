@@ -92,8 +92,8 @@
       <artifactId>shiro-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.micromailer</groupId>
-      <artifactId>micromailer</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-mailer</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sonatype.spice</groupId>

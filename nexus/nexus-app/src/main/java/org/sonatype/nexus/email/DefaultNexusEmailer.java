@@ -20,6 +20,7 @@ package org.sonatype.nexus.email;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
@@ -39,7 +40,7 @@ import org.sonatype.nexus.configuration.model.CSmtpConfigurationCoreConfiguratio
 @Component( role = NexusEmailer.class )
 public class DefaultNexusEmailer
     extends AbstractConfigurable
-    implements NexusEmailer
+    implements NexusEmailer, Startable
 {
     /**
      * The "name" of Nexus instance, as displayed on sent mails.
@@ -60,6 +61,18 @@ public class DefaultNexusEmailer
     @Requirement
     private EMailer eMailer;
 
+    // ==
+    
+    public void start()
+    {
+        // nop
+    }
+    
+    public void stop()
+    {
+        getEMailer().shutdown();
+    }
+    
     // ==
 
     public EMailer getEMailer()
