@@ -153,7 +153,7 @@ public abstract class AbstractNexusIntegrationTest
         System.setProperty( "java.util.prefs.PreferencesFactory", FilePreferencesFactory.class.getName() );
 
         // guice finalizer turned OFF
-        System.setProperty( "guice.executor.class", "" );
+        System.setProperty( "guice.executor.class", "NONE" );
     }
 
     /**
