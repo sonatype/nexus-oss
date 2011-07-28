@@ -19,7 +19,6 @@ target/
 
 # Other
 .svn/
-bin/
 .benchmarks.*.db
 
 /nexus/nexus-test-harness/nexus-test-harness-its/velocity.log*
