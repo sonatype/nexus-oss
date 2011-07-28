@@ -19,6 +19,11 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.AndFileFilter;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.NameFileFilter;
+import org.apache.commons.io.filefilter.NotFileFilter;
+import org.apache.commons.io.filefilter.SizeFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -177,20 +182,30 @@ public class NexusBooter
     protected void tamperJarsForSharedClasspath( final File basedir )
         throws IOException
     {
+        final File sharedLib = new File( basedir, "shared" );
+
+        // Explanation, we filter for lucene-*.jar files that are bigger than one byte, in all directories below
+        // bundleBasedir, since we
+        // have to move them into /shared newly created folder to set up IT shared classpath.
+        // But, we have to make it carefully, since we might be re-created during multi-forked ITs but the test-env
+        // plugin unzips the nexus bundle only once
+        // at the start of the build. So, we have to check and do it only once.
         @SuppressWarnings( "unchecked" )
         Collection<File> files =
-            (Collection<File>) FileUtils.listFiles( basedir, new WildcardFileFilter( "lucene-*.jar" ),
-                TrueFileFilter.TRUE );
-
-        final File sharedLib = new File( basedir, "shared" );
+            (Collection<File>) FileUtils.listFiles( basedir, new AndFileFilter(
+                new WildcardFileFilter( "lucene-*.jar" ), new SizeFileFilter( 1L ) ), TrueFileFilter.TRUE );
 
         for ( File file : files )
         {
-            // copy lucene jars to /shared
-            FileUtils.copyFile( file, new File( sharedLib, file.getName() ) );
+            // only if not in /shared folder (the size filter already filtered out processed jars)
+            if ( !file.getParentFile().equals( sharedLib ) )
+            {
+                // copy lucene jars to /shared
+                FileUtils.copyFile( file, new File( sharedLib, file.getName() ) );
 
-            // replace lucene jars with dummies (to make nexus plugin manager happy)
-            FileUtils.writeStringToFile( file, "" );
+                // replace lucene jars with dummies (to make nexus plugin manager happy)
+                FileUtils.writeStringToFile( file, "" );
+            }
         }
     }
 
