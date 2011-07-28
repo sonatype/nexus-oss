@@ -1502,9 +1502,9 @@
         </plugin>
 
          <plugin>
-          <groupId>org.sonatype.plugins</groupId>
+          <groupId>org.sonatype.nexus.plugins</groupId>
           <artifactId>nexus-test-environment-maven-plugin</artifactId>
-          <version>1.6</version>
+          <version>${project.version}</version>
         </plugin>
 
         <plugin>
@@ -1790,7 +1790,7 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.sonatype.plugins</groupId>
+            <groupId>org.sonatype.nexus.plugins</groupId>
             <artifactId>nexus-test-environment-maven-plugin</artifactId>
             <configuration>
               <testSkip>true</testSkip>
