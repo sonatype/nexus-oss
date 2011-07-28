@@ -184,7 +184,7 @@
     <nexus.repository.metadata.version>1.1</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
     <plexus.restlet.bridge.version>1.18-SNAPSHOT</plexus.restlet.bridge.version>
-    <micromailer.version>1.1.0</micromailer.version>
+    <micromailer.version>1.1.1-SNAPSHOT</micromailer.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
     <plexus-jetty7.version>1.0-SNAPSHOT</plexus-jetty7.version>
@@ -400,14 +400,10 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.micromailer</groupId>
-        <artifactId>micromailer</artifactId>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-mailer</artifactId>
         <version>${micromailer.version}</version>
         <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
           <exclusion>
             <groupId>javax.activation</groupId>
             <artifactId>activation</artifactId>
