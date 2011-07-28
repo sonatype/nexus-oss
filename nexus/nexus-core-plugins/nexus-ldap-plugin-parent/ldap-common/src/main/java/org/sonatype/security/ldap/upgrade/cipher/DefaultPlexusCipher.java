@@ -52,6 +52,7 @@ import org.bouncycastle.util.encoders.Base64Encoder;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
@@ -62,7 +63,7 @@ import org.codehaus.plexus.util.StringUtils;
 @Component( role = PlexusCipher.class )
 public class DefaultPlexusCipher
     extends AbstractLogEnabled
-    implements PlexusCipher, Initializable
+    implements PlexusCipher, Initializable, Disposable
 {
     private static final String SECURITY_PROVIDER = "BC";
 
@@ -92,13 +93,24 @@ public class DefaultPlexusCipher
     // protected String salt = "maven.rules.in.this";
     // protected byte [] saltData = new byte[8];
     // ---------------------------------------------------------------
+    
+    private boolean bouncyCastleInstalled;
+    
     public void initialize()
         throws InitializationException
     {
-        Security.addProvider( new BouncyCastleProvider() );
+        bouncyCastleInstalled = -1 != Security.addProvider( new BouncyCastleProvider() );
 
         // if( StringUtils.isEmpty(salt) && salt.length() > 7 )
         // System.arraycopy( salt.getBytes(), 0, saltData, 0, 8 );
+    }
+    
+    public void dispose()
+    {
+        if ( bouncyCastleInstalled ) 
+        {
+          Security.removeProvider( BouncyCastleProvider.PROVIDER_NAME );
+        }
     }
 
     // ---------------------------------------------------------------
