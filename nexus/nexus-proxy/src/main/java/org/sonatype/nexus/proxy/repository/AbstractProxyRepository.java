@@ -29,6 +29,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
@@ -93,8 +94,8 @@ public abstract class AbstractProxyRepository
      */
     private static final long AUTO_BLOCK_STATUS_MAX_RETAIN_TIME = 60L * 60L * 1000L;
 
-    private static final ExecutorService remoteStatusUpdateExecutorService =
-        Executors.newCachedThreadPool( new NexusThreadFactory( "nxproxy", "Remote Status Update" ) );
+    @Requirement
+    private ProxyRepositoryStatusExecutor proxyRepositoryStatusExecutor;
 
     /** if remote url changed, need special handling after save */
     private boolean remoteUrlChanged = false;
@@ -657,7 +658,7 @@ public abstract class AbstractProxyRepository
             // check for thread and go check it
             _remoteStatusChecking = true;
 
-            remoteStatusUpdateExecutorService.submit( new RemoteStatusUpdateCallable( request ) );
+            proxyRepositoryStatusExecutor.submit( new RemoteStatusUpdateCallable( request ) );
         }
 
         return remoteStatus;
@@ -810,7 +811,7 @@ public abstract class AbstractProxyRepository
             }
 
             final RepositoryItemUidLock itemLock = item.getRepositoryItemUid().getLock();
-            
+
             itemLock.lock( Action.create );
 
             try
@@ -877,7 +878,7 @@ public abstract class AbstractProxyRepository
         // serving up partial downloads...
 
         final RepositoryItemUid itemUid = createUid( request.getRequestPath() );
-        
+
         final RepositoryItemUidLock itemUidLock = itemUid.getLock();
 
         itemUidLock.lock( Action.read );
