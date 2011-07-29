@@ -37,8 +37,7 @@
         <exclude>**/.placeholder</exclude>
         <exclude>**/nexus</exclude>
         <exclude>**/*.bat</exclude>
-        <exclude>**/wrapper</exclude>
-        <exclude>**/wrapper.exe</exclude>
+        <exclude>**/wrapper-*</exclude>
       </excludes>
       <outputDirectory>${project.build.finalName}</outputDirectory>
     </fileSet>
@@ -48,8 +47,7 @@
       <includes>
         <include>**/nexus</include>
         <include>**/*.bat</include>
-        <include>**/wrapper</include>
-        <include>**/wrapper.exe</include>
+        <include>**/wrapper-*</include>
       </includes>
       <outputDirectory>${project.build.finalName}</outputDirectory>
       <fileMode>0755</fileMode>

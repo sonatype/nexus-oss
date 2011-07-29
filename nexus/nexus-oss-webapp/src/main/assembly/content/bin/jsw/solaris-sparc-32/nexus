@@ -15,7 +15,7 @@ APP_NAME="nexus"
 APP_LONG_NAME="Nexus OSS"
 
 # Wrapper
-WRAPPER_CMD="./wrapper"
+WRAPPER_CMD="../exec/wrapper-solaris-sparc-32"
 WRAPPER_CONF="../conf/wrapper.conf"
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
