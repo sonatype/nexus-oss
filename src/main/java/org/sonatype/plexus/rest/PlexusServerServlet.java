@@ -19,6 +19,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Application;
 import org.restlet.Context;
+import org.restlet.service.TaskService;
 
 import com.noelios.restlet.ext.servlet.ServerServlet;
 import com.noelios.restlet.ext.servlet.ServletContextAdapter;
@@ -31,6 +32,43 @@ public class PlexusServerServlet
     public PlexusContainer getPlexusContainer()
     {
         return (PlexusContainer) getServletContext().getAttribute( PlexusConstants.PLEXUS_KEY );
+    }
+
+    @Override
+    public void destroy()
+    {
+        // Note: to me, by inspecting this class' parent class ServerServlet, and by looking at
+        // servlet "lifecycle" methods init() and destroy(), it's clear case of a bug: init starts the application only
+        // while destroy() stops the component only. Maybe it's not even kicking in, since component is never started
+        // actually. So, just to make sure, I am stopping application here, just a copy+paste from parent's method
+        // with proper changes (component changed to application):
+        if ( ( getApplication() != null ) && ( getApplication().isStarted() ) )
+        {
+            try
+            {
+                try
+                {
+                    // here, we _ensure_ it is shut down properly, since the allowed shutdown seems never invoked?
+                    final TaskService taskService = getApplication().getTaskService();
+
+                    if ( taskService != null )
+                    {
+                        taskService.setShutdownAllowed( true );
+                        taskService.shutdownNow();
+                    }
+                }
+                finally
+                {
+                    getApplication().stop();
+                }
+            }
+            catch ( Exception e )
+            {
+                log( "Error during the stopping of the Restlet Application", e );
+            }
+        }
+
+        super.destroy();
     }
 
     public Application createApplication( Context context )

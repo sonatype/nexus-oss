@@ -59,7 +59,7 @@ public class WholeWorldClassloader
     {
         for ( ClassRealm realm : (Collection<ClassRealm>) getClassWorld().getRealms() )
         {
-            URL result = realm.getRealmResource( name );
+            URL result = realm.getResource( name );
 
             if ( result != null )
             {
@@ -76,7 +76,7 @@ public class WholeWorldClassloader
     {
         for ( ClassRealm realm : (Collection<ClassRealm>) getClassWorld().getRealms() )
         {
-            InputStream result = realm.getRealmResourceAsStream( name );
+            InputStream result = realm.getResourceAsStream( name );
 
             if ( result != null )
             {
@@ -96,7 +96,7 @@ public class WholeWorldClassloader
 
         for ( ClassRealm realm : (Collection<ClassRealm>) getClassWorld().getRealms() )
         {
-            Enumeration<URL> realmResources = realm.findRealmResources( name );
+            Enumeration<URL> realmResources = realm.findResources( name );
 
             for ( ; realmResources.hasMoreElements(); )
             {

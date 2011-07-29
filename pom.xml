@@ -1,34 +1,42 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.sonatype.spice</groupId>
     <artifactId>spice-parent</artifactId>
-    <version>15</version>
+    <version>17</version>
   </parent>
+
   <groupId>org.sonatype.plexus</groupId>
   <artifactId>plexus-restlet-bridge</artifactId>
   <version>1.18-SNAPSHOT</version>
+
   <name>Plexus Restlet.org Bridge Component</name>
 
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/spice/trunk/plexus-restlet-bridge</connection>
-    <url>http://svn.sonatype.org/spice/trunk/plexus-restlet-bridge</url>
-    <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/plexus-restlet-bridge</developerConnection>
+    <url>https://github.com/sonatype/sisu-restlet-bridge</url>
+    <connection>scm:git:git://github.com/sonatype/sisu-restlet-bridge.git</connection>
+    <developerConnection>scm:git:git@github.com:sonatype/sisu-restlet-bridge.git</developerConnection>
   </scm>
 
   <properties>
-    <restlet.version>1.1.6-SONATYPE-5348</restlet.version>
+    <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
   </properties>
 
   <dependencies>
 
+    <!-- SISU/Plexus -->
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-component-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
     </dependency>
 
     <!-- restlet.org -->
@@ -65,13 +73,6 @@
           <artifactId>jaxb-api</artifactId>
       	</exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.restlet</groupId>
-      <artifactId>org.restlet.ext.wadl</artifactId>
-      <version>${restlet.version}</version>
-      <type>jar</type>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.noelios.restlet</groupId>
@@ -113,6 +114,11 @@
       <version>2.5</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-interpolation</artifactId>
+      <version>1.14</version>
+    </dependency>
 
     <!-- For our XStream Representation impl -->
     <dependency>
@@ -127,9 +133,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.5.6</version>
-      <type>jar</type>
-      <scope>compile</scope>
     </dependency>
 
     <dependency>
@@ -141,11 +144,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-    	<groupId>org.codehaus.plexus</groupId>
-    	<artifactId>plexus-interpolation</artifactId>
-    	<version>1.14</version>
     </dependency>
   </dependencies>
 

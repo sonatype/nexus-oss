@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.apache.commons.collections.functors.TruePredicate;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -30,7 +29,6 @@ import org.restlet.Restlet;
 import org.restlet.Route;
 import org.restlet.Router;
 import org.restlet.data.MediaType;
-import org.restlet.ext.wadl.WadlApplication;
 import org.restlet.util.Template;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
@@ -50,7 +48,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamDriver;
  */
 @Component( role = Application.class )
 public class PlexusRestletApplicationBridge
-    extends WadlApplication
+    extends Application
 {
     /** Key to store JSON driver driven XStream */
     public static final String JSON_XSTREAM = "plexus.xstream.json";
@@ -89,9 +87,9 @@ public class PlexusRestletApplicationBridge
      */
     public PlexusRestletApplicationBridge()
     {
+        super();
+        
         this.createdOn = new Date();
-
-        setAutoDescribed( true );
     }
 
     /**
@@ -104,8 +102,6 @@ public class PlexusRestletApplicationBridge
         super( context );
 
         this.createdOn = new Date();
-
-        setAutoDescribed( true );
     }
 
     /**
