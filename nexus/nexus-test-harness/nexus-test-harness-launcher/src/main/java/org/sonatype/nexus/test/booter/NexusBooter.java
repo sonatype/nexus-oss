@@ -20,9 +20,6 @@ import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.AndFileFilter;
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.NameFileFilter;
-import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.SizeFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -55,8 +52,6 @@ public class NexusBooter
 
     private ClassRealm jetty7ClassLoader;
 
-    private Class<?> jetty7Class;
-
     private Object jetty7;
 
     private Method startJetty;
@@ -71,7 +66,7 @@ public class NexusBooter
         this.bundleBasedir = bundleBasedir;
 
         // modify the properties
-        tamperJettyProperties( bundleBasedir, port );
+        tamperJettyConfiguration( bundleBasedir, port );
 
         // shuffle bundle files
         tamperJarsForSharedClasspath( bundleBasedir );
@@ -157,26 +152,47 @@ public class NexusBooter
         return realm;
     }
 
-    protected void tamperJettyProperties( final File basedir, final int port )
+    protected void tamperJettyConfiguration( final File basedir, final int port )
         throws IOException
     {
-        File jettyProperties = new File( basedir, "conf/jetty.properties" );
-
-        if ( !jettyProperties.isFile() )
+        // ==
+        // Set the port to the one expected by IT
         {
-            throw new FileNotFoundException( "Jetty properties not found at " + jettyProperties.getAbsolutePath() );
+            final File jettyProperties = new File( basedir, "conf/jetty.properties" );
+
+            if ( !jettyProperties.isFile() )
+            {
+                throw new FileNotFoundException( "Jetty properties not found at " + jettyProperties.getAbsolutePath() );
+            }
+
+            Properties p = new Properties();
+            InputStream in = new FileInputStream( jettyProperties );
+            p.load( in );
+            IOUtil.close( in );
+
+            p.setProperty( "application-port", String.valueOf( port ) );
+
+            OutputStream out = new FileOutputStream( jettyProperties );
+            p.store( out, "NexusStatusUtil" );
+            IOUtil.close( out );
         }
 
-        Properties p = new Properties();
-        InputStream in = new FileInputStream( jettyProperties );
-        p.load( in );
-        IOUtil.close( in );
+        // ==
+        // Disable the shutdown hook, since it disturbs the embedded work
+        {
+            final File jettyXml = new File( basedir, "conf/jetty.xml" );
 
-        p.setProperty( "application-port", String.valueOf( port ) );
+            if ( !jettyXml.isFile() )
+            {
+                throw new FileNotFoundException( "Jetty properties not found at " + jettyXml.getAbsolutePath() );
+            }
 
-        OutputStream out = new FileOutputStream( jettyProperties );
-        p.store( out, "NexusStatusUtil" );
-        IOUtil.close( out );
+            String jettyXmlString = FileUtils.readFileToString( jettyXml, "UTF-8" );
+            
+            jettyXmlString = jettyXmlString.replace( "Set name=\"stopAtShutdown\">true", "Set name=\"stopAtShutdown\">false" );
+
+            FileUtils.writeStringToFile( jettyXml, jettyXmlString, "UTF-8" );
+        }
     }
 
     protected void tamperJarsForSharedClasspath( final File basedir )
@@ -221,21 +237,12 @@ public class NexusBooter
         {
             Thread.currentThread().setContextClassLoader( jetty7ClassLoader );
 
-            jetty7Class = jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.Jetty7" );
+            final Class<?> jetty7Class = jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.Jetty7" );
 
             jetty7 =
                 jetty7Class.getConstructor( File.class, ClassLoader.class, Map[].class ).newInstance(
                     new File( bundleBasedir, "conf/jetty.xml" ), jetty7ClassLoader,
                     new Map[] { defaultContext( bundleBasedir ) } );
-
-            // invoke: jetty7.mangleServer(new DisableShutdownHookMangler());
-            final Object disableShutdownHookMangler =
-                jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.mangler.DisableShutdownHookMangler" ).getConstructor().newInstance();
-
-            final Method mangleJetty =
-                jetty7Class.getMethod( "mangleServer",
-                    jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.mangler.ServerMangler" ) );
-            mangleJetty.invoke( jetty7, disableShutdownHookMangler );
 
             startJetty = jetty7Class.getMethod( "startJetty" );
             stopJetty = jetty7Class.getMethod( "stopJetty" );
@@ -280,7 +287,6 @@ public class NexusBooter
         this.startJetty = null;
         this.stopJetty = null;
         this.jetty7 = null;
-        this.jetty7Class = null;
         this.jetty7ClassLoader = null;
         try
         {
