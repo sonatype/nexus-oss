@@ -108,14 +108,14 @@
                   <goal>tattletale</goal>
                 </goals>
                 <configuration>
-
                   <source>${tattletale-source}</source>
                   <destination>${tattletale-destination-directory}</destination>
                   <profiles>
-                    <profile>java5</profile>
+                    <profile>java6</profile>
                   </profiles>
                   <reports>
                     <report>multiplejars</report>
+                    <report>eliminatejars</report>
                   </reports>
                   <failOnError>true</failOnError>
                   <failOnWarn>true</failOnWarn>
