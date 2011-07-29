@@ -185,15 +185,4 @@
       </build>
     </profile>
   </profiles>
-  <distributionManagement>
-    <repository>
-      <id>localhost</id>
-      <name>dumping to target</name>
-      <url>file://${basedir}/target/repo/</url>
-    </repository>
-     <site>
-      <id>forge-sites</id>
-      <url>dav:${nexus-site-base-url}/</url>
-    </site>
-  </distributionManagement>
 </project>
