@@ -136,35 +136,6 @@
     </contributor>
   </contributors>
 
-  <repositories>
-    <repository>
-      <id>sonatype-forge</id>
-      <url>http://repository.sonatype.org/content/groups/forge</url>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>sonatype-forge</id>
-      <url>http://repository.sonatype.org/content/groups/forge</url>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
-      </releases>
-    </pluginRepository>
-  </pluginRepositories>
-
   <properties>
     <debug-js>false</debug-js>
     <nexus-site-base-url>https://repository.sonatype.org/content/sites/maven-sites/nexus-oss</nexus-site-base-url>
