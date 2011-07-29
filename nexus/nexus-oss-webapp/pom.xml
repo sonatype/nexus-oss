@@ -119,7 +119,6 @@
 
   </dependencies>
 
-
   <build>
     <plugins>
       <plugin>
@@ -141,75 +140,5 @@
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>tattletale</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <tattletale-source>${project.build.directory}/runtime-bundle/target/${project.artifactId}-${project.version}/runtime/apps/nexus</tattletale-source>
-        <tattletale-destination-directory>${project.build.directory}/tattletale</tattletale-destination-directory>
-      </properties>
-
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <version>2.4.2</version>
-            <executions>
-              <execution>
-                <id>copy-rt-jar</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${tattletale-source}</outputDirectory>
-                  <resources>
-                    <resource>
-                      <directory>${java.home}/lib</directory>
-                      <filtering>false</filtering>
-                      <includes>
-                        <include>rt.jar</include>
-                      </includes>
-                    </resource>
-                  </resources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-
-          <!-- do it! -->
-          <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>tattletale-maven-plugin</artifactId>
-            <version>1.0</version>
-            <executions>
-              <execution>
-                <goals>
-                  <goal>tattletale</goal>
-                </goals>
-                <configuration>
-                  <source>${tattletale-source}</source>
-                  <destination>${tattletale-destination-directory}</destination>
-                  <profiles>
-                    <profile>java5</profile>
-                  </profiles>
-                  <reports>
-                    <report>multiplejars</report>
-                  </reports>
-                  <failOnError>true</failOnError>
-                  <failOnWarn>true</failOnWarn>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 
 </project>
