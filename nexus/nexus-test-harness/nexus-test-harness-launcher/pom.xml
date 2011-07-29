@@ -33,7 +33,7 @@
   <dependencies>
 
     <!-- All of Nexus needed on classpath -->
-    <dependency>
+     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
       <exclusions>
@@ -42,6 +42,27 @@
           <artifactId>plexus-jetty7</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+
+     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-configuration-model</artifactId>
+    </dependency>
+     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rest-api-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-repository-metadata</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
     </dependency>
 
     <dependency>
@@ -297,6 +318,14 @@
 
     <!-- Deps needed by some *Util classes (they use classes from these below) -->
 
+    <!-- The IT Helper Plugin for Simple realm -->
+<!-- 
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-it-helper-plugin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+-->
     <!-- To redirect j.u.Preferences -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
