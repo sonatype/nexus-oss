@@ -52,12 +52,15 @@ public abstract class AbstractEmailServerNexusIT
         server.start();
     }
 
-    @AfterClass
+    @AfterClass( alwaysRun = true )
     @org.junit.AfterClass
     public static void stopEmailServer()
     {
-        LOG.debug( "Stoping e-mail server" );
-        server.stop();
+        if ( server != null )
+        {
+            LOG.debug( "Stoping e-mail server" );
+            server.stop();
+        }
     }
 
     protected boolean waitForMail( int count )

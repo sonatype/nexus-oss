@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.AndFileFilter;
-import org.apache.commons.io.filefilter.SizeFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -44,6 +42,8 @@ public class NexusBooter
 
     private final File bundleBasedir;
 
+    private final File sharedLibs;
+
     private final ClassWorld world;
 
     private final ClassRealm sharedClassloader;
@@ -65,6 +65,8 @@ public class NexusBooter
     {
         this.bundleBasedir = bundleBasedir;
 
+        this.sharedLibs = bundleBasedir.getParentFile();
+
         // modify the properties
         tamperJettyConfiguration( bundleBasedir, port );
 
@@ -81,7 +83,7 @@ public class NexusBooter
         world = new ClassWorld();
 
         // create shared loader
-        sharedClassloader = buildSharedClassLoader( bundleBasedir );
+        sharedClassloader = buildSharedClassLoader();
     }
 
     protected Map<String, String> defaultContext( final File bundleBasedir )
@@ -91,18 +93,16 @@ public class NexusBooter
         return ctx;
     }
 
-    protected ClassRealm buildSharedClassLoader( final File bundleBasedir )
+    protected ClassRealm buildSharedClassLoader()
         throws Exception
     {
-        final File sharedLib = new File( bundleBasedir, "shared" );
-
         // Circumvention of reloaded/recreated classloader. The Lucene NativeFSLockFactory is coded with expectation
         // that it might exist
         // only one class instance of it within one JVM. This is a limitation of JVM FileChannels + Lucene. Hence,
         // we "raise" the lucene classes level up.
         List<URL> urls = new ArrayList<URL>();
 
-        final File[] jars = sharedLib.listFiles();
+        final File[] jars = sharedLibs.listFiles();
 
         for ( File jar : jars )
         {
@@ -188,8 +188,9 @@ public class NexusBooter
             }
 
             String jettyXmlString = FileUtils.readFileToString( jettyXml, "UTF-8" );
-            
-            jettyXmlString = jettyXmlString.replace( "Set name=\"stopAtShutdown\">true", "Set name=\"stopAtShutdown\">false" );
+
+            jettyXmlString =
+                jettyXmlString.replace( "Set name=\"stopAtShutdown\">true", "Set name=\"stopAtShutdown\">false" );
 
             FileUtils.writeStringToFile( jettyXml, jettyXmlString, "UTF-8" );
         }
@@ -198,28 +199,35 @@ public class NexusBooter
     protected void tamperJarsForSharedClasspath( final File basedir )
         throws IOException
     {
-        final File sharedLib = new File( basedir, "shared" );
-
         // Explanation, we filter for lucene-*.jar files that are bigger than one byte, in all directories below
         // bundleBasedir, since we
         // have to move them into /shared newly created folder to set up IT shared classpath.
         // But, we have to make it carefully, since we might be re-created during multi-forked ITs but the test-env
         // plugin unzips the nexus bundle only once
         // at the start of the build. So, we have to check and do it only once.
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "lucene-*.jar" );
+        // LDAP does not unregister it? Like SISU container does not invoke Disposable.dispose() to make patch for Provider
+        // unregistration happen?
+        // tamperJarsForSharedClasspath( basedir, sharedLibs, "bcprov-*.jar" );
+    }
+
+    protected void tamperJarsForSharedClasspath( final File basedir, final File sharedLibs, final String wildcard )
+        throws IOException
+    {
         @SuppressWarnings( "unchecked" )
         Collection<File> files =
-            (Collection<File>) FileUtils.listFiles( basedir, new AndFileFilter(
-                new WildcardFileFilter( "lucene-*.jar" ), new SizeFileFilter( 1L ) ), TrueFileFilter.TRUE );
+            (Collection<File>) FileUtils.listFiles( basedir, new WildcardFileFilter( wildcard ), TrueFileFilter.TRUE );
 
         for ( File file : files )
         {
-            // only if not in /shared folder (the size filter already filtered out processed jars)
-            if ( !file.getParentFile().equals( sharedLib ) )
+            // only if not in /shared folder and not zeroed
+            if ( !file.getParentFile().equals( sharedLibs ) && file.length() > 0 )
             {
                 // copy lucene jars to /shared
-                FileUtils.copyFile( file, new File( sharedLib, file.getName() ) );
+                FileUtils.copyFile( file, new File( sharedLibs, file.getName() ) );
 
-                // replace lucene jars with dummies (to make nexus plugin manager happy)
+                // replace lucene jars with dummies (to make nexus plugin manager happy) and prevent it's classes to be
+                // loaded from non-shared classloader
                 FileUtils.writeStringToFile( file, "" );
             }
         }
@@ -228,6 +236,12 @@ public class NexusBooter
     public void startNexus()
         throws Exception
     {
+        if ( startJetty != null )
+        {
+            // 2nd invocation? Stop first or puke?
+            throw new IllegalStateException( "Nexus already started!" );
+        }
+
         // create classloader
         jetty7ClassLoader = buildNexusClassLoader( bundleBasedir );
 
