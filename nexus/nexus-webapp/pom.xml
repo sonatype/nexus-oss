@@ -503,9 +503,17 @@
         <version>1.5-SNAPSHOT</version>
         <executions>
           <execution>
+            <id>generate-dependency-poms</id>
             <phase>process-resources</phase>
             <goals>
               <goal>generate</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>attach-signatures</id>
+            <phase>verify</phase> 
+            <goals>
+              <goal>attach-signatures</goal>
             </goals>
           </execution>
         </executions>
