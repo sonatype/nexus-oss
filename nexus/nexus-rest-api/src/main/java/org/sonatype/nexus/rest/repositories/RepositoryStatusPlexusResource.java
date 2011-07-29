@@ -172,7 +172,7 @@ public class RepositoryStatusPlexusResource
                 }
 
                 LocalStatus localStatus = EnumUtil.valueOf( resource.getLocalStatus(), LocalStatus.class );
-                if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
+                if ( RepositoryBaseResourceConverter.REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
                 {
                     ShadowRepository shadow =
                         getRepositoryRegistry().getRepositoryWithFacet( repoId, ShadowRepository.class );

@@ -99,6 +99,56 @@ public class NexusConfigUtil
         getTest().getITPlexusContainer().lookup( SecuritySystem.class ).setSecurityEnabled( enabled );
     }
 
+    public CRepository getRepo( String repoId )
+        throws IOException
+    {
+        List<CRepository> repos = getNexusConfig().getRepositories();
+
+        for ( Iterator<CRepository> iter = repos.iterator(); iter.hasNext(); )
+        {
+            CRepository cRepo = iter.next();
+
+            // check id
+            if ( cRepo.getId().equals( repoId ) )
+            {
+                return cRepo;
+            }
+        }
+        return null;
+    }
+
+    public Xpp3Dom getRepoExternalConfiguration( String repoId )
+        throws IOException
+    {
+        List<CRepository> repos = getNexusConfig().getRepositories();
+
+        for ( Iterator<CRepository> iter = repos.iterator(); iter.hasNext(); )
+        {
+            CRepository cRepo = iter.next();
+
+            // check id
+            if ( cRepo.getId().equals( repoId ) )
+            {
+                return (Xpp3Dom) cRepo.getExternalConfiguration();
+            }
+        }
+        return null;
+    }
+
+    public void validateConfig()
+        throws Exception
+    {
+        ApplicationConfigurationValidator validator =
+            getTest().getITPlexusContainer().lookup( ApplicationConfigurationValidator.class );
+        ValidationResponse vResponse = validator.validateModel( new ValidationRequest( getNexusConfig() ) );
+
+        if ( !vResponse.isValid() )
+        {
+            throw new InvalidConfigurationException( vResponse );
+        }
+
+    }
+
     public M2LayoutedM1ShadowRepositoryConfiguration getRepoShadow( String repoId )
         throws IOException
     {
@@ -119,38 +169,6 @@ public class NexusConfigUtil
         }
 
         return null;
-    }
-
-    public CRepository getRepo( String repoId )
-        throws IOException
-    {
-        List<CRepository> repos = getNexusConfig().getRepositories();
-
-        for ( Iterator<CRepository> iter = repos.iterator(); iter.hasNext(); )
-        {
-            CRepository cRepo = iter.next();
-
-            // check id
-            if ( cRepo.getId().equals( repoId ) )
-            {
-                return cRepo;
-            }
-        }
-        return null;
-    }
-
-    public void validateConfig()
-        throws Exception
-    {
-        ApplicationConfigurationValidator validator =
-            getTest().getITPlexusContainer().lookup( ApplicationConfigurationValidator.class );
-        ValidationResponse vResponse = validator.validateModel( new ValidationRequest( getNexusConfig() ) );
-
-        if ( !vResponse.isValid() )
-        {
-            throw new InvalidConfigurationException( vResponse );
-        }
-
     }
 
     public M2GroupRepositoryConfiguration getGroup( String groupId )

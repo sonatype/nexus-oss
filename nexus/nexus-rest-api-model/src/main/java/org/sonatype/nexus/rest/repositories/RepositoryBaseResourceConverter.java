@@ -40,6 +40,17 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class RepositoryBaseResourceConverter
     extends AbstractReflectionConverter
 {
+    /** Repo type hosted. */
+    public static final String REPO_TYPE_HOSTED = "hosted";
+
+    /** Repo type proxied. */
+    public static final String REPO_TYPE_PROXIED = "proxy";
+
+    /** Repo type virtual (shadow in nexus). */
+    public static final String REPO_TYPE_VIRTUAL = "virtual";
+
+    /** Repo type group. */
+    public static final String REPO_TYPE_GROUP = "group";
 
     public RepositoryBaseResourceConverter( Mapper mapper, ReflectionProvider reflectionProvider )
     {
@@ -67,19 +78,19 @@ public class RepositoryBaseResourceConverter
                 repoType = ( (LookAheadStreamReader) reader.underlyingReader() ).getFieldValue( "repoType" );
             }
 
-            if ( AbstractRepositoryPlexusResource.REPO_TYPE_VIRTUAL.equals( repoType ) )
+            if ( REPO_TYPE_VIRTUAL.equals( repoType ) )
             {
                 return new RepositoryShadowResource();
             }
-            else if ( AbstractRepositoryPlexusResource.REPO_TYPE_PROXIED.equals( repoType ) )
+            else if ( REPO_TYPE_PROXIED.equals( repoType ) )
             {
                 return new RepositoryProxyResource();
             }
-            else if ( AbstractRepositoryPlexusResource.REPO_TYPE_HOSTED.equals( repoType ) )
+            else if ( REPO_TYPE_HOSTED.equals( repoType ) )
             {
                 return new RepositoryResource();
             }
-            else if ( AbstractRepositoryPlexusResource.REPO_TYPE_GROUP.equals( repoType ) )
+            else if ( REPO_TYPE_GROUP.equals( repoType ) )
             {
                 return new RepositoryGroupResource();
             }

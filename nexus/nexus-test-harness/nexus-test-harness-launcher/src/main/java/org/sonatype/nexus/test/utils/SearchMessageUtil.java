@@ -18,8 +18,8 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -54,8 +54,6 @@ import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
-import org.sonatype.nexus.tasks.descriptors.RepairIndexTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
 
@@ -378,18 +376,20 @@ public class SearchMessageUtil
         scheduledTask.setName( taskName );
         if ( force )
         {
-            scheduledTask.setTypeId( RepairIndexTaskDescriptor.ID );
+            // TODO: these are constants, but it's expensive to reference whole nexus core just to get these
+            scheduledTask.setTypeId( "RepairIndexTask" );
         }
         else
         {
-            scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
+            // TODO: these are constants, but it's expensive to reference whole nexus core just to get these
+            scheduledTask.setTypeId( "UpdateIndexTask" );
         }
         scheduledTask.setSchedule( "manual" );
 
         if ( repoId != null )
         {
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-            prop.setKey( UpdateIndexTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
+            prop.setKey( "repositoryId" );
             prop.setValue( repoId );
             scheduledTask.addProperty( prop );
         }

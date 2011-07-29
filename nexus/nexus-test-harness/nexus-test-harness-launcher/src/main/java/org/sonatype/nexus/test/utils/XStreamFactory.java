@@ -18,7 +18,6 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import org.sonatype.nexus.rest.NexusApplication;
 import org.sonatype.nexus.rest.XStreamInitializer;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
@@ -29,37 +28,38 @@ import com.thoughtworks.xstream.converters.basic.StringConverter;
 
 /**
  * XStream factory for Nexus Core. It gives away a preconfigured XStream to communicate with Core REST Resources.
- *
+ * 
  * @author cstamas
  */
-public class XStreamFactory {
+public class XStreamFactory
+{
 
-    public static XStream getXmlXStream() {
-        XStream xmlXStream = new XStream(new LookAheadXppDriver());
-        initXStream(xmlXStream);
+    public static XStream getXmlXStream()
+    {
+        XStream xmlXStream = new XStream( new LookAheadXppDriver() );
+        initXStream( xmlXStream );
 
         return xmlXStream;
     }
 
-    public static XStream getJsonXStream() {
-        XStream jsonXStream = new XStream(new JsonOrgHierarchicalStreamDriver());
+    public static XStream getJsonXStream()
+    {
+        XStream jsonXStream = new XStream( new JsonOrgHierarchicalStreamDriver() );
 
         // for JSON, we use a custom converter for Maps
-        jsonXStream.registerConverter(new PrimitiveKeyedMapConverter(jsonXStream.getMapper()));
+        jsonXStream.registerConverter( new PrimitiveKeyedMapConverter( jsonXStream.getMapper() ) );
 
-        initXStream(jsonXStream);
+        initXStream( jsonXStream );
         return jsonXStream;
     }
 
-    private static void initXStream(XStream xstream) {
+    private static void initXStream( XStream xstream )
+    {
+        org.sonatype.nexus.rest.model.XStreamConfigurator.configureXStream( xstream );
 
-        NexusApplication napp = new NexusApplication();
-
-        napp.doConfigureXstream(xstream);
-
-        XStreamInitializer.init(xstream);
+        XStreamInitializer.init( xstream );
 
         // Nexus replaces the String converter with one that escape HTML, we do NOT want that on the IT client.
-        xstream.registerConverter(new StringConverter());
+        xstream.registerConverter( new StringConverter() );
     }
 }

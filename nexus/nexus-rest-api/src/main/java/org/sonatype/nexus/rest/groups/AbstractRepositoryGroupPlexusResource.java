@@ -39,7 +39,7 @@ import org.sonatype.nexus.rest.NexusCompat;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
-import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
+import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
@@ -78,7 +78,7 @@ public abstract class AbstractRepositoryGroupPlexusResource
 
         resource.setProvider( NexusCompat.getRepositoryProviderHint( group ) );
 
-        resource.setRepoType( AbstractRepositoryPlexusResource.REPO_TYPE_GROUP );
+        resource.setRepoType( RepositoryBaseResourceConverter.REPO_TYPE_GROUP );
 
         resource.setFormat( group.getRepositoryContentClass().getId() );
         

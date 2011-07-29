@@ -51,4 +51,8 @@ public interface RevertableConfiguration
      * Rollbacks the changes. Resets the state of config "back to normal" (saved).
      */
     void rollbackChanges();
+    
+    // ==
+    
+    Object getConfiguration( boolean forWrite );
 }
