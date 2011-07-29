@@ -207,7 +207,7 @@ public class RepositoryListPlexusResource
 
         appModel.setProviderRole( resource.getProviderRole() );
 
-        if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
+        if ( RepositoryBaseResourceConverter.REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
         {
             appModel.setExternalConfiguration( ex );
 
@@ -223,7 +223,7 @@ public class RepositoryListPlexusResource
             exConf.setSynchronizeAtStartup( repoResource.isSyncAtStartup() );
 
         }
-        else if ( !REPO_TYPE_GROUP.equals( resource.getRepoType() ) )
+        else if ( !RepositoryBaseResourceConverter.REPO_TYPE_GROUP.equals( resource.getRepoType() ) )
         {
             RepositoryResource repoResource = (RepositoryResource) resource;
 

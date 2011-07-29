@@ -27,7 +27,6 @@ import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 
 public abstract class AbstractShadowRepositoryConfiguration
     extends AbstractRepositoryConfiguration
@@ -80,15 +79,15 @@ public abstract class AbstractShadowRepositoryConfiguration
 
         if ( !masterFound )
         {
-            String id = ( (CRepositoryCoreConfiguration) owner ).getConfiguration( false ).getId();
+            String id = ( (CRepository) owner.getConfiguration( false ) ).getId();
             ValidationMessage message =
                 new ValidationMessage( "shadowOf", "Master repository id=\"" + getMasterRepositoryId()
                     + "\" not found for ShadowRepository with id=\"" + id + "\"!",
-                                       "The source nexus repository is not existing." );
+                    "The source nexus repository is not existing." );
 
             response.addValidationError( message );
         }
-        
+
         return response;
     }
 }

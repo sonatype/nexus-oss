@@ -41,6 +41,7 @@ import com.icegreen.greenmail.util.ServerSetup;
 import org.restlet.data.Status;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import static org.hamcrest.MatcherAssert.*;
+
 public class Nexus1806ValidateSmtpConfigurationIT
     extends AbstractNexusIntegrationTest
 {
@@ -91,8 +92,8 @@ public class Nexus1806ValidateSmtpConfigurationIT
         smtpSettings.setPassword( EmailUtil.USER_PASSWORD );
         smtpSettings.setSystemEmailAddress( EmailUtil.USER_EMAIL );
         smtpSettings.setTestEmail( "test_user@sonatype.org" );
-        Status status = SettingsMessageUtil.save(smtpSettings);
-        assertThat(status, hasStatusCode(400));
+        Status status = SettingsMessageUtil.save( smtpSettings );
+        assertThat( status, hasStatusCode( 400 ) );
     }
 
     @Test
@@ -117,8 +118,8 @@ public class Nexus1806ValidateSmtpConfigurationIT
         smtpSettings.setPassword( USER_PASSWORD );
         smtpSettings.setSystemEmailAddress( email );
         smtpSettings.setTestEmail( "test_user@sonatype.org" );
-        Status status = SettingsMessageUtil.save(smtpSettings);
-        assertThat(status, hasStatusCode(400));
+        Status status = SettingsMessageUtil.save( smtpSettings );
+        assertThat( status, hasStatusCode( 400 ) );
     }
 
     private void run( int port, GreenMail server )
@@ -132,8 +133,8 @@ public class Nexus1806ValidateSmtpConfigurationIT
         smtpSettings.setSystemEmailAddress( EmailUtil.USER_EMAIL );
         smtpSettings.setTestEmail( "test_user@sonatype.org" );
 
-        Status status = SettingsMessageUtil.save(smtpSettings);
-        assertThat(status, isSuccess());
+        Status status = SettingsMessageUtil.save( smtpSettings );
+        assertThat( status, isSuccess() );
 
         server.waitForIncomingEmail( 5000, 1 );
 
@@ -147,10 +148,16 @@ public class Nexus1806ValidateSmtpConfigurationIT
         Assert.assertFalse( body.trim().length() == 0, "Got empty message" );
     }
 
-    @AfterClass
+    @AfterClass( alwaysRun = true )
     public static void stop()
     {
-        EmailUtil.stopEmailServer();
-        changedServer.stop();
+        if ( originalServer != null )
+        {
+            originalServer.stop();
+        }
+        if ( changedServer != null )
+        {
+            changedServer.stop();
+        }
     }
 }

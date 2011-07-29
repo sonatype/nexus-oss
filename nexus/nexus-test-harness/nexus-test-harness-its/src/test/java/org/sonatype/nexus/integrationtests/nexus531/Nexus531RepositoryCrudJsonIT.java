@@ -34,7 +34,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfigu
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
+import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -276,7 +276,7 @@ public class Nexus531RepositoryCrudJsonIT
                 Assert.assertEquals( cRepo.getId(), listRepo.getId() );
                 Assert.assertEquals( cRepo.getName(), listRepo.getName() );
                 // Assert.assertEquals( cShadow.getType(), this.formatToType( listRepo.getFormat() ) );
-                Assert.assertEquals( AbstractRepositoryPlexusResource.REPO_TYPE_VIRTUAL, listRepo.getRepoType() );
+                Assert.assertEquals( RepositoryBaseResourceConverter.REPO_TYPE_VIRTUAL, listRepo.getRepoType() );
             }
 
         }

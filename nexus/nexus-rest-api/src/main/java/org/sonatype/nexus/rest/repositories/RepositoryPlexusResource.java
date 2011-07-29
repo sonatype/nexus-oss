@@ -138,7 +138,7 @@ public class RepositoryPlexusResource
             {
                 RepositoryBaseResource resource = repoRequest.getData();
 
-                if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
+                if ( RepositoryBaseResourceConverter.REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
                 {
                     RepositoryShadowResource model = (RepositoryShadowResource) resource;
 

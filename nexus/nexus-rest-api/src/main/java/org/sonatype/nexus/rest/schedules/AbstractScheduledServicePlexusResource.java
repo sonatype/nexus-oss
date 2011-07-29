@@ -65,47 +65,6 @@ import org.sonatype.scheduling.schedules.WeeklySchedule;
 public abstract class AbstractScheduledServicePlexusResource
     extends AbstractFormFieldResource
 {
-
-    /**
-     * Schedule Type Off.
-     */
-    public static final String SCHEDULE_TYPE_MANUAL = "manual";
-
-    /**
-     * Schedule type run now
-     */
-    public static final String SCHEDULE_TYPE_RUN_NOW = "internal";
-
-    /**
-     * Schedule Type Once.
-     */
-    public static final String SCHEDULE_TYPE_ONCE = "once";
-
-    /**
-     * Schedule type Hourly
-     */
-    public static final String SCHEDULE_TYPE_HOURLY = "hourly";
-
-    /**
-     * Schedule Type Daily.
-     */
-    public static final String SCHEDULE_TYPE_DAILY = "daily";
-
-    /**
-     * Schedule Type Weekly.
-     */
-    public static final String SCHEDULE_TYPE_WEEKLY = "weekly";
-
-    /**
-     * Schedule Type Monthly.
-     */
-    public static final String SCHEDULE_TYPE_MONTHLY = "monthly";
-
-    /**
-     * Schedule Type Advanced.
-     */
-    public static final String SCHEDULE_TYPE_ADVANCED = "advanced";
-
     @Requirement
     private NexusScheduler nexusScheduler;
 
@@ -122,35 +81,35 @@ public abstract class AbstractScheduledServicePlexusResource
     {
         if ( ManualRunSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-            return SCHEDULE_TYPE_MANUAL;
+            return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_MANUAL;
         }
         else if ( RunNowSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-            return SCHEDULE_TYPE_RUN_NOW;
+            return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_RUN_NOW;
         }
         else if ( OnceSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-            return SCHEDULE_TYPE_ONCE;
+            return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_ONCE;
         }
         else if ( HourlySchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-            return SCHEDULE_TYPE_HOURLY;
+            return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_HOURLY;
         }
         else if ( DailySchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-            return SCHEDULE_TYPE_DAILY;
+            return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_DAILY;
         }
         else if ( WeeklySchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-            return SCHEDULE_TYPE_WEEKLY;
+            return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_WEEKLY;
         }
         else if ( MonthlySchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-            return SCHEDULE_TYPE_MONTHLY;
+            return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_MONTHLY;
         }
         else if ( CronSchedule.class.isAssignableFrom( schedule.getClass() ) )
         {
-            return SCHEDULE_TYPE_ADVANCED;
+            return ScheduledServiceBaseResourceConverter.SCHEDULE_TYPE_ADVANCED;
         }
         else
         {

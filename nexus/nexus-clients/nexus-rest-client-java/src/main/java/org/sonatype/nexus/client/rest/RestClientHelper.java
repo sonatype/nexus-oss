@@ -43,7 +43,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
-import org.sonatype.nexus.rest.NexusApplication;
 import org.sonatype.nexus.rest.XStreamInitializer;
 import org.sonatype.nexus.rest.model.NexusResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
@@ -78,8 +77,7 @@ public class RestClientHelper
         this.restContext = new Context();
         this.restClient = new Client( restContext, Protocol.HTTP );
 
-        NexusApplication napp = new NexusApplication();
-        xstream = napp.doConfigureXstream( new XStream( new LookAheadXppDriver() ) );
+        xstream = org.sonatype.nexus.rest.model.XStreamConfigurator.configureXStream( new XStream( new LookAheadXppDriver() ) );
 
         XStreamInitializer.init( xstream );
     }
