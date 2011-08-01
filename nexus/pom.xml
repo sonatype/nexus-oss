@@ -188,7 +188,7 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-runtime-platform</artifactId>
-        <version>1.9.3-SNAPSHOT</version>
+        <version>${project.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
