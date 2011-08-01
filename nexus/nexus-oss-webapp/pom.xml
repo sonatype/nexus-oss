@@ -110,6 +110,13 @@
       <classifier>bundle</classifier>
       <type>zip</type>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-maven-bridge-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+    </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
