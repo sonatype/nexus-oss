@@ -178,7 +178,7 @@
     <slf4j.version>1.6.1</slf4j.version>
     <spice-timeline.version>2.0</spice-timeline.version>
     <spice-utils.version>1.0.0</spice-utils.version>
-    <surefire.version>2.8.1</surefire.version>
+    <surefire.version>2.9</surefire.version>
   </properties>
 
   <dependencyManagement>
