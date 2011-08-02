@@ -25,7 +25,7 @@
     <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>7</version>
+    <version>10</version>
     <relativePath />
   </parent>
 
@@ -1324,7 +1324,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.1.1</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -1442,7 +1441,7 @@
           </executions>
         </plugin>
 
-                <plugin>
+        <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
           <version>1.4.1</version>
@@ -1858,6 +1857,20 @@
                         <versionRange>[2.0,)</versionRange>
                         <goals>
                           <goal>unpack</goal>
+                        </goals>
+                      </pluginExecutionFilter>
+                      <action>
+                        <ignore/>
+                      </action>
+                    </pluginExecution>
+                    <pluginExecution>
+                      <pluginExecutionFilter>
+                        <groupId>org.sonatype.nexus.plugins</groupId>
+                        <artifactId>nexus-test-environment-maven-plugin</artifactId>
+                        <versionRange>[0,)</versionRange> <!-- says "all", disregard version -->
+                        <goals>
+                          <goal>setup-environment</goal>
+                          <goal>package</goal>
                         </goals>
                       </pluginExecutionFilter>
                       <action>
