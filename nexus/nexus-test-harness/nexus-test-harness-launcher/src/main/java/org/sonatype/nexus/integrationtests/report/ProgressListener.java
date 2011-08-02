@@ -67,7 +67,7 @@ public class ProgressListener
     {
         super.onTestFailure( tr );
 
-        showResult( tr, "failed", err );
+        showResult( tr, "FAILED", err );
     }
 
     @Override
@@ -83,7 +83,7 @@ public class ProgressListener
     {
         super.onTestSuccess( tr );
 
-        showResult( tr, "success", out );
+        showResult( tr, "SUCCESS", out );
     }
 
     private void showResult( ITestResult result, String status, PrintStream printer )
