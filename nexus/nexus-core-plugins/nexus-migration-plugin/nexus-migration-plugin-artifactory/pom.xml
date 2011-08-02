@@ -10,6 +10,7 @@
   <packaging>nexus-plugin</packaging>
 
   <name>Nexus : Core Plugins : Migration Plugin : Artifactory</name>
+  <description>Allows import of an Artifactory configuration.</description>
 
   <build>
     <testResources>

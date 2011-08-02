@@ -36,6 +36,7 @@
 
   <!-- a short but descriptive name for the project -->
   <name>Nexus : Core Plugins : Capabilities</name>
+  <description>Allows Nexus to define and set repository capabilities.</description>
 
   <dependencies>
     <dependency>

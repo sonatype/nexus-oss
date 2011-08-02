@@ -29,7 +29,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>nexus-ldap-realm-plugin</artifactId>
   <name>Nexus : Core Plugins : OSS LDAP : LDAP Plugin</name>
-  <description>Nexus OSS LDAP Realm Plugin</description>
+  <description>Adds a LDAP security realm to Nexus.</description>
   <packaging>nexus-plugin</packaging>
 
   <properties>
