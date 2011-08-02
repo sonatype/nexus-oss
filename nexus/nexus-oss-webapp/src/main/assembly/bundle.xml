@@ -32,7 +32,7 @@
   
   <fileSets>
     <fileSet>
-      <directory>src/main/assembly/content</directory>
+      <directory>src/main/resource/content</directory>
       <excludes>
         <exclude>**/.placeholder</exclude>
         <exclude>**/nexus</exclude>
@@ -43,7 +43,7 @@
     </fileSet>
     
     <fileSet>
-      <directory>src/main/assembly/content</directory>
+      <directory>src/main/resource/content</directory>
       <includes>
         <include>**/nexus</include>
         <include>**/*.bat</include>
@@ -54,7 +54,7 @@
     </fileSet>
     
     <fileSet>
-      <directory>src/main/assembly/sonatype-work</directory>
+      <directory>src/main/resource/sonatype-work</directory>
       <excludes>
         <exclude>**/.placeholder</exclude>
       </excludes>

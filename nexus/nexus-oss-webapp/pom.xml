@@ -129,10 +129,32 @@
   <build>
     <plugins>
       <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
+        <executions>
+          <execution>
+            <id>filter-assembly-descriptor</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target/assembly</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/assembly</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <descriptors>
-            <descriptor>src/main/assembly/bundle.xml</descriptor>
+            <descriptor>target/assembly/bundle.xml</descriptor>
           </descriptors>
         </configuration>
         <executions>
