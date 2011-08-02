@@ -179,12 +179,15 @@
           <argLine>-Xmx720M -XX:+HeapDumpOnOutOfMemoryError</argLine>
           <excludes>
             <exclude>**Suite*</exclude>
-            <!-- START This are start/stop tests, shouldn't be runned -->
+            <!-- START These are start/stop tests, shouldn't be runned -->
             <exclude>**/Nexus758ServiceStability.*</exclude>
             <exclude>**/Nexus758StatusService.*</exclude>
             <exclude>**/Nexus748MultipleStart.*</exclude>
             <exclude>**/Nexus3860*</exclude>
-            <!-- END This are start/stop tests, shouldn't be runned -->
+            <!-- END These are start/stop tests, shouldn't be runned -->
+            <!-- START These are ITs that are "invalid" here, and should be moved out anyway -->
+            <exclude>**/Nexus2862*</exclude>
+            <!-- END These are ITs that are "invalid" here, and should be moved out anyway -->
             <!-- inner classes -->
             <exclude>**/*$*.*</exclude>
           </excludes>

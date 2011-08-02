@@ -45,7 +45,6 @@ import org.testng.annotations.Test;
  * @author cstamas
  *
  */
-@Test(enabled=false)
 public class Nexus2862UrlRealmIT
     extends AbstractNexusIntegrationTest
 {
