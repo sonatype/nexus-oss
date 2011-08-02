@@ -9,7 +9,8 @@
   <artifactId>nexus-migration-plugin-packaging</artifactId>
   <packaging>war</packaging>
 
-  <name>Nexus : Core Pluings : Migration Plugin : Packaging</name>
+  <name>Nexus : Core Plugins : Migration Plugin : Packaging</name>
+  <description>Allows import of an Artifactory configuration.</description>
 
   <build>
     <plugins>

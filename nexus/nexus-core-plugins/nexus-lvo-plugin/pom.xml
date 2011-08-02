@@ -34,7 +34,7 @@
 
   <artifactId>nexus-lvo-plugin</artifactId>
   <name>Nexus : Core Plugins : LVO Plugin</name>
-  <description>Nexus LVO Plugin (Extension).</description>
+  <description>Reminds about newer Nexus versions.</description>
 
   <dependencies>
     <dependency>

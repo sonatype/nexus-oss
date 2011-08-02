@@ -18,9 +18,14 @@
  */
 package org.sonatype.security.ldap.dao;
 
+import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -114,10 +119,6 @@ public class LdapAuthConfiguration
 
     /** If not, don't parse it as a labelUri. */
     private boolean isWebsiteAttributeLabelUri = true;
-
-    // calculated from the above.
-    /** The user attributes. */
-    private transient String[] userAttributes;
 
     private boolean ldapGroupsAsRoles;
     
@@ -408,12 +409,19 @@ public class LdapAuthConfiguration
      */
     public synchronized String[] getUserAttributes()
     {
-        if ( userAttributes == null )
+        List<String> result = new ArrayList<String>();
+        String[] allAttributes =
+            new String[]{ userIdAttribute, passwordAttribute, userRealNameAttribute, emailAddressAttribute,
+                websiteAttribute, userMemberOfAttribute };
+        for ( String attribute : allAttributes )
         {
-            userAttributes = new String[] { userIdAttribute, passwordAttribute, userRealNameAttribute, emailAddressAttribute, websiteAttribute, userMemberOfAttribute };
+            if ( StringUtils.isNotEmpty( attribute ) )
+            {
+                result.add( attribute );
+            }
         }
 
-        return userAttributes;
+        return result.toArray( new String[result.size()] );
     }
 
     /**

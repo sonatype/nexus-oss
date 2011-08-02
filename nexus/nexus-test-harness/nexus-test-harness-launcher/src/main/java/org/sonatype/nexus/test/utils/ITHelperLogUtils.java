@@ -9,7 +9,7 @@ public class ITHelperLogUtils
 {
 
     private static final String BASE_URI = "service/local/loghelper";
-    
+
     public static void debug( String message )
         throws Exception
     {
@@ -46,6 +46,12 @@ public class ITHelperLogUtils
         log( null, "ERROR", message, exception );
     }
 
+    public static void error( String message, String exceptionType, String exceptionMessage )
+        throws Exception
+    {
+        log( null, "ERROR", message, exceptionType, exceptionMessage );
+    }
+
     public static void warn( String message )
         throws Exception
     {
@@ -62,6 +68,12 @@ public class ITHelperLogUtils
         throws Exception
     {
         log( null, "WARN", message, exception );
+    }
+
+    public static void warn( String message, String exceptionType, String exceptionMessage )
+        throws Exception
+    {
+        log( null, "WARN", message, exceptionType, exceptionMessage );
     }
 
     public static void log( String loggerName, String level, String message, Exception exception )

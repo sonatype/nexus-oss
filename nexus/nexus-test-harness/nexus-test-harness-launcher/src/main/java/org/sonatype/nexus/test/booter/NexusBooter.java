@@ -65,7 +65,7 @@ public class NexusBooter
     {
         this.bundleBasedir = bundleBasedir;
 
-        this.sharedLibs = bundleBasedir.getParentFile();
+        this.sharedLibs = new File( bundleBasedir.getParentFile(), "shared" );
 
         // modify the properties
         tamperJettyConfiguration( bundleBasedir, port );
@@ -209,6 +209,8 @@ public class NexusBooter
         // LDAP does not unregister it? Like SISU container does not invoke Disposable.dispose() to make patch for Provider
         // unregistration happen?
         // tamperJarsForSharedClasspath( basedir, sharedLibs, "bcprov-*.jar" );
+        // logback
+        // tamperJarsForSharedClasspath( basedir, sharedLibs, "logback-*.jar" );
     }
 
     protected void tamperJarsForSharedClasspath( final File basedir, final File sharedLibs, final String wildcard )

@@ -499,12 +499,20 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>provided-dependencies-maven-plugin</artifactId>
-        <version>1.4</version>
+        <version>1.5-SNAPSHOT</version>
         <executions>
           <execution>
+            <id>generate-dependency-poms</id>
             <phase>process-resources</phase>
             <goals>
               <goal>generate</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>attach-signatures</id>
+            <phase>verify</phase> 
+            <goals>
+              <goal>attach-signatures</goal>
             </goals>
           </execution>
         </executions>

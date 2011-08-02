@@ -31,6 +31,7 @@
   <artifactId>nexus-indexer-lucene-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Indexer Lucene</name>
+  <description>Adds search capablities for repository content.</description>
 
   <properties>
     <truezip.version>7.0-rc1</truezip.version>

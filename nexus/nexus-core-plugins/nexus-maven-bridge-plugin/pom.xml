@@ -33,6 +33,7 @@
 
   <artifactId>nexus-maven-bridge-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
+  <description>Adds an API to access maven dependency resolution for Nexus plugins.</description>
 
   <name>Nexus : Core Plugins : Maven Bridge</name>
 
@@ -45,7 +46,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.6.1</version>
       <scope>provided</scope>
     </dependency>
 
@@ -155,7 +155,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit-dep</artifactId>
-      <version>4.8.2</version>
       <scope>test</scope>
     </dependency>
 
@@ -167,7 +166,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <version>1.6.1</version>
       <scope>test</scope>
     </dependency>
 

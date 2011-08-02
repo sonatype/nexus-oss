@@ -31,7 +31,7 @@
   <artifactId>nexus-plugin-console-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Plugin Console</name>
-  <description>Nexus Core Plugin :: Plugin Console</description>
+  <description>Adds a UI to view installed plugins.</description>
 
   <dependencies>
 
