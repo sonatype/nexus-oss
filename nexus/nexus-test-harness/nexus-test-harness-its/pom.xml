@@ -175,7 +175,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
-          <forkMode>always</forkMode> <!-- "always" for the latest resort -->
+          <forkMode>once</forkMode> <!-- "always" for the latest resort, "once" is actually what we want -->
           <argLine>-Xmx512M -XX:+HeapDumpOnOutOfMemoryError</argLine>
           <excludes>
             <exclude>**Suite*</exclude>
