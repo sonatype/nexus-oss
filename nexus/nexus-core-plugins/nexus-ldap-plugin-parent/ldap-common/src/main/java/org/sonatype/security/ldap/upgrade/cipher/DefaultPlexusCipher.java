@@ -38,7 +38,6 @@ import java.io.ByteArrayOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
-import java.security.Security;
 import java.security.spec.KeySpec;
 
 import javax.crypto.Cipher;
@@ -52,9 +51,6 @@ import org.bouncycastle.util.encoders.Base64Encoder;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -63,10 +59,8 @@ import org.codehaus.plexus.util.StringUtils;
 @Component( role = PlexusCipher.class )
 public class DefaultPlexusCipher
     extends AbstractLogEnabled
-    implements PlexusCipher, Initializable, Disposable
+    implements PlexusCipher
 {
-    private static final String SECURITY_PROVIDER = "BC";
-
     private static final int SALT_SIZE = 8;
 
     private static final String STRING_ENCODING = "UTF8";
@@ -74,16 +68,23 @@ public class DefaultPlexusCipher
     /**
      * Encryption algorithm to use by this instance. Needs protected scope for tests
      */
-    @Configuration(value="PBEWithSHAAnd128BitRC4")
+    @Configuration( value = "PBEWithSHAAnd128BitRC4" )
     protected String algorithm = "PBEWithSHAAnd128BitRC4";
 
     /**
      * Number of iterations when generationg the key
-     *
+     * 
      * @plexus.configuration default-value="23"
      */
-    @Configuration(value="23")
+    @Configuration( value = "23" )
     protected int iterationCount = 23;
+
+    private final BouncyCastleProvider bouncyCastleProvider;
+
+    public DefaultPlexusCipher()
+    {
+        this.bouncyCastleProvider = new BouncyCastleProvider();
+    }
 
     // /**
     // * Salt to init this cypher
@@ -93,25 +94,6 @@ public class DefaultPlexusCipher
     // protected String salt = "maven.rules.in.this";
     // protected byte [] saltData = new byte[8];
     // ---------------------------------------------------------------
-    
-    private boolean bouncyCastleInstalled;
-    
-    public void initialize()
-        throws InitializationException
-    {
-        bouncyCastleInstalled = -1 != Security.addProvider( new BouncyCastleProvider() );
-
-        // if( StringUtils.isEmpty(salt) && salt.length() > 7 )
-        // System.arraycopy( salt.getBytes(), 0, saltData, 0, 8 );
-    }
-    
-    public void dispose()
-    {
-        if ( bouncyCastleInstalled ) 
-        {
-          Security.removeProvider( BouncyCastleProvider.PROVIDER_NAME );
-        }
-    }
 
     // ---------------------------------------------------------------
     private Cipher init( String passPhrase, byte[] salt, boolean encrypt )
@@ -121,8 +103,8 @@ public class DefaultPlexusCipher
         try
         {
             KeySpec keySpec = new PBEKeySpec( passPhrase.toCharArray() );
-            SecretKey key = SecretKeyFactory.getInstance( algorithm, SECURITY_PROVIDER ).generateSecret( keySpec );
-            Cipher cipher = Cipher.getInstance( algorithm );
+            SecretKey key = SecretKeyFactory.getInstance( algorithm, bouncyCastleProvider ).generateSecret( keySpec );
+            Cipher cipher = Cipher.getInstance( algorithm, bouncyCastleProvider );
 
             PBEParameterSpec paramSpec = new PBEParameterSpec( salt, iterationCount );
 
