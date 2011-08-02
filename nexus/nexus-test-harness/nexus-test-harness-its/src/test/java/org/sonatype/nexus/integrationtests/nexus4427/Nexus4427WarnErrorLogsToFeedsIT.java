@@ -106,22 +106,24 @@ public class Nexus4427WarnErrorLogsToFeedsIT
     }
 
     /**
-     * When an ERROR/WARN org.mortbay.jetty.EofException there should be no corresponding entry feed.
+     * When an ERROR/WARN org.eclipse.jetty.io.EofException there should be no corresponding entry feed.
+     * 
+     * !!!! We use a fake EofException as the classloader of Nexus does not see anymore jetty classes.
      */
     @Test
     public void eofException()
         throws Exception
     {
-        String message = generateMessage( "org.mortbay.jetty.EofException" );
-        ITHelperLogUtils.warn( message, new org.mortbay.jetty.EofException( "warn" ) );
-        ITHelperLogUtils.error( message, new org.mortbay.jetty.EofException( "error" ) );
+        String message = generateMessage( "org.eclipse.jetty.io.EofException" );
+        ITHelperLogUtils.warn( message, "org.sonatype.nexus.plugins.ithelper.jetty.EofException", "warn" ) ;
+        ITHelperLogUtils.error( message, "org.sonatype.nexus.plugins.ithelper.jetty.EofException",  "error" ) ;
 
         // logging is asynchronous so give it a bit of time
         getEventInspectorsUtil().waitForCalmPeriod();
 
         assertFeedDoesNotContainEntryFor( message );
     }
-    
+
     /**
      * When an ERROR/WARN logs with specific messages there should be no corresponding entry feed.
      */
@@ -155,7 +157,7 @@ public class Nexus4427WarnErrorLogsToFeedsIT
         for ( SyndEntry entry : entries )
         {
             SyndContent description = entry.getDescription();
-            if ( description != null && description.getValue().equals( message ) )
+            if ( description != null && description.getValue().startsWith( message ) )
             {
                 return;
             }
@@ -172,7 +174,7 @@ public class Nexus4427WarnErrorLogsToFeedsIT
         for ( SyndEntry entry : entries )
         {
             SyndContent description = entry.getDescription();
-            if ( description != null && description.getValue().equals( message ) )
+            if ( description != null && description.getValue().startsWith( message ) )
             {
                 Assert.fail( "Feed contains entry for " + message );
             }

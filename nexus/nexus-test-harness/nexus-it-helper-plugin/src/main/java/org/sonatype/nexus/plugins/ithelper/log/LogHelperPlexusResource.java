@@ -87,12 +87,11 @@ public class LogHelperPlexusResource
                 try
                 {
                     exception =
-                        (Throwable) Class.forName( exceptionType ).getConstructor( String.class ).newInstance(
-                            exceptionMessage );
+                        (Throwable) this.getClass().getClassLoader().loadClass( exceptionType ).getConstructor(
+                            String.class ).newInstance( exceptionMessage );
                 }
                 catch ( Exception e )
                 {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }

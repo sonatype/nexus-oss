@@ -18,8 +18,6 @@
  */
 package org.sonatype.nexus.events;
 
-import java.io.EOFException;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.ErrorWarningEvent;
@@ -94,8 +92,9 @@ public class LoggingToFeedEventInspector
     {
         if ( throwable != null )
         {
-            if ( EOFException.class.getName().equals( throwable.getClass().getName() )
-                || TimelineException.class.getName().equals( throwable.getClass().getName() ) )
+            String exClassName = throwable.getClass().getName();
+            if ( TimelineException.class.getName().equals( exClassName )
+                || ( exClassName.endsWith( "EofException" ) && exClassName.contains( "jetty" ) ) )
             {
                 return true;
             }
