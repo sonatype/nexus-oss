@@ -55,16 +55,6 @@
       <artifactId>indexer-artifact</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-      <artifactId>plexus-app-booter</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
     </dependency>
