@@ -784,7 +784,7 @@ public class DefaultErrorReportingManager
     {
         if ( throwable != null )
         {
-            if ( "org.mortbay.jetty.EofException".equals( throwable.getClass().getName() ) )
+            if ( "org.mortbay.jetty.EofException".equals( throwable.getClass().getName() ) || "org.eclipse.jetty.io.EofException".equals( throwable.getClass().getName() ) )
             {
                 return true;
             }
