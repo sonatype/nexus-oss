@@ -176,7 +176,7 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <forkMode>once</forkMode> <!-- "always" for the latest resort, "once" is actually what we want -->
-          <argLine>-Xmx512M -XX:+HeapDumpOnOutOfMemoryError</argLine>
+          <!-- argLine moved into profiles, it varies depending on OS this build runs! See below... -->
           <excludes>
             <exclude>**Suite*</exclude>
             <!-- START This are start/stop tests, shouldn't be runned -->
@@ -329,6 +329,65 @@
   </dependencies>
 
   <profiles>
+
+    <profile>
+      <id>runs-on-unix</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <argLine>-d32 -Xmx512M -XX:+HeapDumpOnOutOfMemoryError</argLine>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>runs-on-mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <argLine>-d32 -Xmx512M -XX:+HeapDumpOnOutOfMemoryError</argLine>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>runs-on-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <argLine>-Xmx512M -XX:+HeapDumpOnOutOfMemoryError</argLine>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <profile>
       <id>ahc-provider</id>
       <build>
