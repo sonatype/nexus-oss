@@ -34,8 +34,6 @@ public class NexusBooter
 
     // ==
 
-    private static final String SHARED_REALM_ID = "it-shared";
-
     private static final String IT_REALM_ID = "it-realm";
 
     // ==
@@ -109,7 +107,7 @@ public class NexusBooter
             urls.add( jar.toURI().toURL() );
         }
 
-        ClassRealm realm = world.newRealm( SHARED_REALM_ID, null );
+        ClassRealm realm = world.newRealm( "it-shared", null );
 
         for ( URL url : urls )
         {
@@ -119,7 +117,7 @@ public class NexusBooter
         return realm;
     }
 
-    protected ClassRealm buildNexusClassLoader( final File bundleBasedir )
+    protected ClassRealm buildNexusClassLoader( final File bundleBasedir, final String testId )
         throws Exception
     {
         List<URL> urls = new ArrayList<URL>();
@@ -142,7 +140,7 @@ public class NexusBooter
             urls.add( jar.toURI().toURL() );
         }
 
-        ClassRealm realm = world.newRealm( IT_REALM_ID, sharedClassloader );
+        ClassRealm realm = world.newRealm( IT_REALM_ID + "-" + testId, sharedClassloader );
 
         for ( URL url : urls )
         {
@@ -206,9 +204,15 @@ public class NexusBooter
         // plugin unzips the nexus bundle only once
         // at the start of the build. So, we have to check and do it only once.
         tamperJarsForSharedClasspath( basedir, sharedLibs, "lucene-*.jar" );
-        // LDAP does not unregister it? Like SISU container does not invoke Disposable.dispose() to make patch for Provider
-        // unregistration happen?
+
+        // LDAP does not unregister it? Like SISU container does not invoke Disposable.dispose() to make patch for
+        // Provider unregistration happen? NO: the cause is if someone creates HTTPS connection while BC is registered,
+        // JCEs SSLSocketFactory will get a grab on it. So, SISU is not faulty here, unregistration does happen, but
+        // the URLConnection instance may still exists. So, we are lifting the provider into "shareds", and registering
+        // it manually. LDAP's DefaultPlexusCipher obeys the registration rules, so will happily live with BC registered.
+        // WE ARE NOT REGISTERING IT ANYMORE, but is left here at "hand"
         // tamperJarsForSharedClasspath( basedir, sharedLibs, "bcprov-*.jar" );
+        
         // logback
         // tamperJarsForSharedClasspath( basedir, sharedLibs, "logback-*.jar" );
     }
@@ -235,7 +239,7 @@ public class NexusBooter
         }
     }
 
-    public void startNexus()
+    public void startNexus( final String testId )
         throws Exception
     {
         if ( startJetty != null )
@@ -245,7 +249,7 @@ public class NexusBooter
         }
 
         // create classloader
-        jetty7ClassLoader = buildNexusClassLoader( bundleBasedir );
+        jetty7ClassLoader = buildNexusClassLoader( bundleBasedir, testId );
 
         final ClassLoader original = Thread.currentThread().getContextClassLoader();
 
@@ -300,17 +304,21 @@ public class NexusBooter
 
     protected void clean()
     {
-        this.startJetty = null;
-        this.stopJetty = null;
-        this.jetty7 = null;
-        this.jetty7ClassLoader = null;
         try
         {
-            world.disposeRealm( IT_REALM_ID );
+            world.disposeRealm( jetty7ClassLoader.getId() );
         }
         catch ( NoSuchRealmException e )
         {
             // huh?
         }
+        this.startJetty = null;
+        this.stopJetty = null;
+        this.jetty7 = null;
+        this.jetty7ClassLoader = null;
+        
+        // force cleaning?
+        
+        System.gc();
     }
 }
