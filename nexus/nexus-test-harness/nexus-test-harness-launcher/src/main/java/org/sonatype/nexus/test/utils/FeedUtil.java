@@ -55,6 +55,22 @@ public class FeedUtil
         return feed;
     }
 
+    public static SyndFeed getFeed( String feedId, int from, int count )
+        throws IllegalArgumentException, MalformedURLException, FeedException, IOException
+    {
+        SyndFeedInput input = new SyndFeedInput();
+
+        Response response =
+            RequestFacade.sendMessage( FEED_URL_PART + feedId + "?_dc=" + System.currentTimeMillis() + "&from=" + from
+                + "&count=" + count, Method.GET );
+
+        String text = response.getEntity().getText();
+        Assert.assertTrue( response.getStatus().isSuccess(), "Unexpected content: " + text );
+
+        SyndFeed feed = input.build( new XmlReader( new ByteArrayInputStream( text.getBytes() ) ) );
+        return feed;
+    }
+
     @SuppressWarnings( "unchecked" )
     public static void sortSyndEntryOrderByPublishedDate( SyndFeed feed )
     {
