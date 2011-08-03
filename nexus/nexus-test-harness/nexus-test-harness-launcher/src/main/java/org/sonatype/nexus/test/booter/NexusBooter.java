@@ -209,10 +209,11 @@ public class NexusBooter
         // Provider unregistration happen? NO: the cause is if someone creates HTTPS connection while BC is registered,
         // JCEs SSLSocketFactory will get a grab on it. So, SISU is not faulty here, unregistration does happen, but
         // the URLConnection instance may still exists. So, we are lifting the provider into "shareds", and registering
-        // it manually. LDAP's DefaultPlexusCipher obeys the registration rules, so will happily live with BC registered.
+        // it manually. LDAP's DefaultPlexusCipher obeys the registration rules, so will happily live with BC
+        // registered.
         // WE ARE NOT REGISTERING IT ANYMORE, but is left here at "hand"
         // tamperJarsForSharedClasspath( basedir, sharedLibs, "bcprov-*.jar" );
-        
+
         // logback
         // tamperJarsForSharedClasspath( basedir, sharedLibs, "logback-*.jar" );
     }
@@ -282,7 +283,14 @@ public class NexusBooter
         {
             if ( stopJetty != null )
             {
-                stopJetty.invoke( jetty7 );
+                try
+                {
+                    stopJetty.invoke( jetty7 );
+                }
+                finally
+                {
+                    clean();
+                }
             }
         }
         catch ( InvocationTargetException e )
@@ -296,29 +304,29 @@ public class NexusBooter
                 throw (Exception) e.getCause();
             }
         }
-        finally
-        {
-            clean();
-        }
     }
 
     protected void clean()
     {
-        try
+        if ( jetty7ClassLoader != null )
         {
-            world.disposeRealm( jetty7ClassLoader.getId() );
+            try
+            {
+                world.disposeRealm( jetty7ClassLoader.getId() );
+            }
+            catch ( NoSuchRealmException e )
+            {
+                // huh?
+            }
         }
-        catch ( NoSuchRealmException e )
-        {
-            // huh?
-        }
+
+        // drop references
         this.startJetty = null;
         this.stopJetty = null;
         this.jetty7 = null;
         this.jetty7ClassLoader = null;
-        
-        // force cleaning?
-        
+
+        // force GC, may help
         System.gc();
     }
 }
