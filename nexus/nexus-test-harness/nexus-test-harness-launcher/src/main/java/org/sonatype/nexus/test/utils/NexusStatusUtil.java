@@ -31,6 +31,7 @@ import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
+import org.sonatype.nexus.test.booter.Jetty7NexusBooter;
 import org.sonatype.nexus.test.booter.NexusBooter;
 
 /**
@@ -46,7 +47,7 @@ public class NexusStatusUtil
         throws Exception
     {
         nexusBooter =
-            new NexusBooter( new File( TestProperties.getAll().get( "nexus.base.dir" ) ).getAbsoluteFile(), port );
+            new Jetty7NexusBooter( new File( TestProperties.getAll().get( "nexus.base.dir" ) ).getAbsoluteFile(), port );
     }
 
     public boolean isNexusRESTStarted()
