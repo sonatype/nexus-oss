@@ -60,7 +60,7 @@ public class Nexus2810PluginConsoleIT
             this.getPluginInfoByName( pluginInfos, "Nexus : Core Plugins : Plugin Console" );
         assertPropertyValid( "Name", pluginConsolePlugin.getName(), "Nexus : Core Plugins : Plugin Console" );
         assertPropertyValid( "Version", pluginConsolePlugin.getVersion() );
-        assertPropertyValid( "Description", pluginConsolePlugin.getDescription(), "Nexus Core Plugin :: Plugin Console" );
+        assertPropertyValid( "Description", pluginConsolePlugin.getDescription(), "Adds a UI to view installed plugins." );
         assertPropertyValid( "Status", pluginConsolePlugin.getStatus(), "ACTIVATED" );
         if ( new File( "./.svn" ).exists() )
         {
