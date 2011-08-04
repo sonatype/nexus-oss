@@ -157,7 +157,7 @@
     <maven.indexer.version>4.1.1</maven.indexer.version>
     <maven.version>3.0.1</maven.version>
     <micromailer.version>1.1.1-SNAPSHOT</micromailer.version>
-    <nexus.repository.metadata.version>1.1</nexus.repository.metadata.version>
+    <nexus.repository.metadata.version>1.2-SNAPSHOT</nexus.repository.metadata.version>
     <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
     <plexus-app-events.version>1.0.0</plexus-app-events.version>
     <plexus-cli.version>1.2</plexus-cli.version>
