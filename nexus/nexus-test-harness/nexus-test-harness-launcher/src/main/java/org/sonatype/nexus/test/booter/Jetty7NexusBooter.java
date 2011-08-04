@@ -267,9 +267,7 @@ public class Jetty7NexusBooter
     {
         List<URL> urls = new ArrayList<URL>();
 
-        urls.add( new File( bundleBasedir, "runtime/apps/nexus/conf/" ).toURI().toURL() );
-
-        final File libDir = new File( bundleBasedir, "runtime/apps/nexus/lib/" );
+        final File libDir = new File( bundleBasedir, "lib" );
 
         final File[] jars = libDir.listFiles( new FileFilter()
         {

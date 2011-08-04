@@ -339,7 +339,7 @@ public class AbstractEnvironmentMojo
         project.getProperties().put( "application-conf", getPath( new File( destination, "nexus-work-dir/conf" ) ) );
 
         // final File plexusProps = new File( nexusBaseDir, "conf/plexus.properties" );
-        final File plexusProps = new File( nexusBaseDir, "runtime/apps/nexus/webapp/WEB-INF/plexus.properties" );
+        final File plexusProps = new File( nexusBaseDir, "nexus/WEB-INF/plexus.properties" );
         copyUrl( "/default-config/plexus.properties", plexusProps );
 
         File extraPlexusProps = new File( testResourcesDirectory, "plexus.properties" );
@@ -349,14 +349,14 @@ public class AbstractEnvironmentMojo
         }
         project.getProperties().put( "nexus-plexus-config-file", getPath( new File( nexusBaseDir, "conf/plexus.xml" ) ) );
 
-        File libFolder = new File( nexusBaseDir, "runtime/apps/nexus/lib" );
+        File libFolder = new File( nexusBaseDir, "nexus/WEB-INF/lib" );
         if ( setupEmma )
         {
             copyEmma( libFolder );
         }
 
         // if any plugin artifacts were specified, install them into runtime
-        File pluginFolder = new File( nexusBaseDir, "runtime/apps/nexus/plugin-repository" );
+        File pluginFolder = new File( nexusBaseDir, "nexus/WEB-INF/plugin-repository" );
         project.getProperties().put( "plugin-repository", getPath( pluginFolder ) );
 
         Collection<MavenArtifact> npas = getNexusPluginsArtifacts();
@@ -368,7 +368,7 @@ public class AbstractEnvironmentMojo
         // promote any plugins included in the bundle to the runtime install
         if ( promoteOptionalPlugin )
         {
-            File optionalPluginFolder = new File( nexusBaseDir, "runtime/apps/nexus/optional-plugins" );
+            File optionalPluginFolder = new File( nexusBaseDir, "nexus/WEB-INF//optional-plugins" );
             try
             {
                 if ( optionalPluginFolder.exists() )
