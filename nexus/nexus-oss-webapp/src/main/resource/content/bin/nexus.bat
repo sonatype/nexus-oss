@@ -31,7 +31,8 @@ pause
 goto end
 
 :pickconfig
-set WRAPPER_CONF=%DIRNAME%\jsw\conf\wrapper.confif exist "%WRAPPER_CONF%" goto execute
+set WRAPPER_CONF=%DIRNAME%\jsw\conf\wrapper.conf
+if exist "%WRAPPER_CONF%" goto execute
 echo Missing wrapper config: %WRAPPER_CONF%
 pause
 goto end
