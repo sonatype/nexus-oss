@@ -38,10 +38,10 @@ pause
 goto end
 
 :execute
-for /F %%v in ('echo %1^|findstr "^console$ ^start$ ^pause$ ^resume$ ^stop$ ^restart$ ^install$ ^remove"') do call :exec set COMMAND=%%v
+for /F %%v in ('echo %1^|findstr "^console$ ^start$ ^stop$ ^restart$ ^install$ ^remove"') do call :exec set COMMAND=%%v
 
 if "%COMMAND%" == "" (
-    echo Usage: %0 { console : start : pause : resume : stop : restart : install : remove }
+    echo Usage: %0 { console : start : stop : restart : install : remove }
     pause
     goto end
 ) else (
@@ -58,14 +58,6 @@ goto :eof
 
 :start
 "%WRAPPER_EXE%" -t "%WRAPPER_CONF%"
-goto :eof
-
-:pause
-"%WRAPPER_EXE%" -a "%WRAPPER_CONF%"
-goto :eof
-
-:resume
-"%WRAPPER_EXE%" -e "%WRAPPER_CONF%"
 goto :eof
 
 :stop
