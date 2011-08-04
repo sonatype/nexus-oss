@@ -46,19 +46,13 @@
     <nexus-tools-input>target/nexus-tools</nexus-tools-input>
     <compressed-dir>${project.build.directory}/ui-compressed</compressed-dir>
 
-    <plugin-repository.directory>${project.build.finalName}/WEB-INF/runtime/apps/nexus/plugin-repository</plugin-repository.directory>
-    <optional-plugins.directory>${project.build.finalName}/WEB-INF/runtime/apps/nexus/optional-plugins</optional-plugins.directory>
+    <plugin-repository.directory>${project.build.finalName}/WEB-INF/plugin-repository</plugin-repository.directory>
+    <optional-plugins.directory>${project.build.finalName}/WEB-INF/optional-plugins</optional-plugins.directory>
     <plugin-api.version>1.0.3</plugin-api.version>
     <jetty.version>7.4.4.v20110707</jetty.version>
   </properties>
 
   <dependencies>
-
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
@@ -188,26 +182,6 @@
       <scope>test</scope>
     </dependency>
 
-    <!-- jetty libs explicitly -->
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-webapp</artifactId>
-      <version>${jetty.version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-deploy</artifactId>
-      <version>${jetty.version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-rewrite</artifactId>
-      <version>${jetty.version}</version>
-      <scope>compile</scope>
-    </dependency>
-
   </dependencies>
   <build>
     <plugins>
@@ -281,6 +255,14 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-capabilities-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                  <outputDirectory>target/${optional-plugins.directory}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-maven-bridge-plugin</artifactId>
                   <version>${project.version}</version>
                   <classifier>bundle</classifier>
                   <type>zip</type>
@@ -453,23 +435,6 @@
         </configuration>
       </plugin>
 
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>src/main/assembly/dependencies.xml</descriptor>
-              </descriptors>
-              <tarLongFileMode>gnu</tarLongFileMode>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.mortbay.jetty</groupId>
         <artifactId>maven-jetty-plugin</artifactId>

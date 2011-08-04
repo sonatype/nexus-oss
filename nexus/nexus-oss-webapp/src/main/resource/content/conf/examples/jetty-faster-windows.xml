@@ -68,8 +68,8 @@
     
     <New id="NexusWebAppContext" class="org.eclipse.jetty.webapp.WebAppContext">
       <Arg><Ref id="Contexts"/></Arg>
-      <Arg>${webapp}</Arg>
-      <Arg>${webapp-context-path}</Arg>
+      <Arg>${nexus-webapp}</Arg>
+      <Arg>${nexus-webapp-context-path}</Arg>
       <Set name="extractWAR">false</Set>
     </New>
     

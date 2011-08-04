@@ -71,53 +71,25 @@
       <unpack>true</unpack>
       <unpackOptions>
         <excludes>
-          <exclude>WEB-INF/classes/**</exclude>
-          <exclude>WEB-INF/lib/**</exclude>
-          <exclude>WEB-INF/logback.xml</exclude>
-          <exclude>WEB-INF/runtime/**</exclude>
-          <exclude>WEB-INF/plexus.properties</exclude>
           <exclude>META-INF/**</exclude>
+          <exclude>WEB-INF/plexus.properties</exclude>
         </excludes>
       </unpackOptions>
       <useTransitiveDependencies>false</useTransitiveDependencies>
-      <outputDirectory>${project.build.finalName}/runtime/apps/nexus/webapp</outputDirectory>
+      <outputDirectory>${project.build.finalName}/nexus</outputDirectory>
     </dependencySet>
     
     <dependencySet>
       <includes>
-        <include>*:nexus-webapp:zip</include>
+        <include>javax.servlet:*</include>
+        <include>org.eclipse.jetty:*</include>
+        <include>org.codehaus.plexus:*</include>
+        <include>org.sonatype.plexus:*</include>
       </includes>
       <useProjectArtifact>false</useProjectArtifact>
-      <unpack>true</unpack>
+      <unpack>false</unpack>
       <useTransitiveDependencies>false</useTransitiveDependencies>
-      <outputDirectory>${project.build.finalName}/runtime/apps/nexus/lib</outputDirectory>
-    </dependencySet>
-    
-    <dependencySet>
-      <includes>
-        <include>*:nexus-archetype-plugin</include>
-        <include>*:nexus-core-documentation-plugin</include>
-        <include>*:nexus-indexer-lucene-plugin</include>
-        <include>*:nexus-ldap-realm-plugin</include>
-        <include>*:nexus-plugin-console-plugin</include>
-        <include>*:nexus-rrb-plugin</include>
-      </includes>
-      <useProjectArtifact>false</useProjectArtifact>
-      <unpack>true</unpack>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
-      <outputDirectory>${project.build.finalName}/runtime/apps/nexus/plugin-repository</outputDirectory>
-    </dependencySet>
-
-    <dependencySet>
-      <includes>
-        <include>*:nexus-capabilities-plugin</include>
-        <include>*:nexus-groovy-console-plugin</include>
-        <include>*:nexus-maven-bridge-plugin</include>
-      </includes>
-      <useProjectArtifact>false</useProjectArtifact>
-      <unpack>true</unpack>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
-      <outputDirectory>${project.build.finalName}/runtime/apps/nexus/optional-plugins</outputDirectory>
+      <outputDirectory>${project.build.finalName}/lib</outputDirectory>
     </dependencySet>
   </dependencySets>
 

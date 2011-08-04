@@ -66,10 +66,6 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty7</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-restlet-bridge</artifactId>
       <exclusions>
         <exclusion>
