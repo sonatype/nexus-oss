@@ -42,6 +42,8 @@ import org.sonatype.appcontext.MapSourcedContextFiller;
 import org.sonatype.appcontext.PropertiesFileContextFiller;
 import org.sonatype.appcontext.SimpleBasedirDiscoverer;
 
+import com.google.inject.Module;
+
 /**
  * This ServeletContextListener boots up Plexus in a webapp environment, if needed. It is safe to have it multiple times
  * executed, since it will create only once, or reuse the found container.
@@ -51,6 +53,8 @@ import org.sonatype.appcontext.SimpleBasedirDiscoverer;
 public class PlexusContainerContextListener
     implements ServletContextListener
 {
+    public static final String CUSTOM_MODULES = "customModules";
+
     private AppContextFactory appContextFactory = new AppContextFactory();
 
     private PlexusContainer plexusContainer;
@@ -75,7 +79,16 @@ public class PlexusContainerContextListener
                         plexusXmlFile.toURI().toURL() ).setContext( plexusContext ).setAutoWiring( true ).setClassPathScanning(
                         PlexusConstants.SCANNING_ON ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
 
-                plexusContainer = new DefaultPlexusContainer( plexusConfiguration );
+                final Module[] customModules = (Module[]) context.getAttribute( CUSTOM_MODULES );
+
+                if ( customModules != null )
+                {
+                    plexusContainer = new DefaultPlexusContainer( plexusConfiguration, customModules );
+                }
+                else
+                {
+                    plexusContainer = new DefaultPlexusContainer( plexusConfiguration );
+                }
 
                 context.setAttribute( PlexusConstants.PLEXUS_KEY, plexusContainer );
 
