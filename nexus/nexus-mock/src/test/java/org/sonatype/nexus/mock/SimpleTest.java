@@ -19,19 +19,9 @@
 package org.sonatype.nexus.mock;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ServerSocket;
-import java.util.Collection;
-import java.util.Properties;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.NameFileFilter;
-import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,6 +40,12 @@ import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * This test is simply wrong, so disabled for now.
+ * 
+ * @author cstamas
+ *
+ */
 public class SimpleTest
 {
     protected MockNexusEnvironment mockNexusEnvironment;
@@ -79,35 +75,11 @@ public class SimpleTest
     {
         bundleRoot = MockNexusEnvironment.getBundleRoot( new File( "target/nexus-ui" ) );
 
-        tamperPlexusPropertiesAndReturnRealBasedir( bundleRoot );
-
         MockHelper.clearMocks();
 
-        mockNexusEnvironment = new MockNexusEnvironment( bundleRoot.getAbsoluteFile() );
+        mockNexusEnvironment = new MockNexusEnvironment( bundleRoot.getAbsoluteFile(), port );
 
         mockNexusEnvironment.start();
-    }
-
-    private void tamperPlexusPropertiesAndReturnRealBasedir( File basedir )
-        throws Exception
-    {
-        Collection<File> files =
-            FileUtils.listFiles( basedir, new NameFileFilter( "jetty.properties" ), TrueFileFilter.TRUE );
-        Assert.assertEquals( 1, files.size() );
-
-        File pp = files.iterator().next();
-        Assert.assertTrue( pp.exists() );
-
-        Properties p = new Properties();
-        InputStream in = new FileInputStream( pp );
-        p.load( in );
-        IOUtil.close( in );
-
-        p.setProperty( "application-port", String.valueOf( port ) );
-
-        OutputStream out = new FileOutputStream( pp );
-        p.store( out, "" );
-        IOUtil.close( out );
     }
 
     @After
@@ -115,6 +87,12 @@ public class SimpleTest
         throws Exception
     {
         mockNexusEnvironment.stop();
+        
+        mockNexusEnvironment = null;
+        
+        Thread.yield();
+        
+        System.gc();
     }
 
     /**
@@ -202,7 +180,6 @@ public class SimpleTest
     public void testListenStatusFine()
         throws Exception
     {
-
         MockHelper.listen( "/status", new MockListener() );
 
         Client client = new Client( Protocol.HTTP );
