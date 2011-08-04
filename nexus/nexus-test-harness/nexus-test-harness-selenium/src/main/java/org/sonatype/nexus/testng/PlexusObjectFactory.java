@@ -33,6 +33,7 @@ import org.testng.IObjectFactory;
 public class PlexusObjectFactory
     implements IObjectFactory
 {
+    private PlexusContainer plexusContainer;
 
     private static final PlexusContainer container;
 
@@ -66,7 +67,9 @@ public class PlexusObjectFactory
 
         File bundleRoot = new File( TestProperties.getAll().get( "nexus.base.dir" ) );
         System.setProperty( "basedir", bundleRoot.getAbsolutePath() );
-
+        System.setProperty( "bundleBasedir", bundleRoot.getAbsolutePath() );
+        System.setProperty( "plexus.configuration", new File(bundleRoot, "nexus/WEB-INF/plexus.xml").getAbsolutePath() );
+        
         System.setProperty( "plexus.appbooter.customizers", "org.sonatype.nexus.NexusBooterCustomizer,"
             + SeleniumAppBooterCustomizer.class.getName() );
 
@@ -114,7 +117,6 @@ public class PlexusObjectFactory
 
     private static final long serialVersionUID = -45456541236971L;
 
-    @SuppressWarnings( "unchecked" )
     @Override
     public Object newInstance( Constructor constructor, Object... params )
     {

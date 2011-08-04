@@ -89,18 +89,18 @@ public abstract class NexusMockTestCase
                 webappRoot = new File( "../nexus-webapp/src/main/webapp" );
                 if ( !webappRoot.exists() )
                 {
-                    webappRoot = new File( root, "runtime/apps/nexus/webapp" );
+                    webappRoot = new File( root, "nexus" );
                 }
             }
 
             nexusBaseURL = TestProperties.getString( "nexus.base.url" );
 
             Context context = container.getContext();
-            Assert.assertNotNull(context);
+            Assert.assertNotNull( context );
 
-            // TODO: add bundleBasedir here!!!
-            env = new MockNexusEnvironment( FOO );
-            // Don't do this env.start();
+            env =
+                new MockNexusEnvironment( new File( TestProperties.getString( "nexus.base.dir" ) ),
+                    TestProperties.getInteger( "nexus.application.port" ) );
 
             Runtime.getRuntime().addShutdownHook( new Thread( new Runnable()
             {
@@ -162,7 +162,7 @@ public abstract class NexusMockTestCase
                 public boolean accept( File pathname )
                 {
                     return ( !pathname.getName().endsWith( ".svn" ) && pathname.isDirectory() && new File( pathname,
-                                                                                                           "pom.xml" ).exists() );
+                        "pom.xml" ).exists() );
                 }
             } );
 
@@ -194,7 +194,7 @@ public abstract class NexusMockTestCase
 
                 Gav gav =
                     new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(),
-                             0, new Date().getTime(), model.getName(), false, null, false, null );
+                        0, new Date().getTime(), model.getName(), false, null, false, null );
 
                 // the Restlet Client does not support multipart forms:
                 // http://restlet.tigris.org/issues/show_bug.cgi?id=71
@@ -219,17 +219,17 @@ public abstract class NexusMockTestCase
                     if ( artifactSha1.exists() )
                     {
                         deployWithWagon( container, "http", deployUrl, artifactSha1,
-                                         GavUtil.getRelitiveArtifactPath( gav ) + ".sha1" );
+                            GavUtil.getRelitiveArtifactPath( gav ) + ".sha1" );
                     }
                     if ( artifactMd5.exists() )
                     {
                         deployWithWagon( container, "http", deployUrl, artifactMd5,
-                                         GavUtil.getRelitiveArtifactPath( gav ) + ".md5" );
+                            GavUtil.getRelitiveArtifactPath( gav ) + ".md5" );
                     }
                     if ( artifactAsc.exists() )
                     {
                         deployWithWagon( container, "http", deployUrl, artifactAsc,
-                                         GavUtil.getRelitiveArtifactPath( gav ) + ".asc" );
+                            GavUtil.getRelitiveArtifactPath( gav ) + ".asc" );
                     }
 
                     deployWithWagon( container, "http", deployUrl, artifactFile, GavUtil.getRelitiveArtifactPath( gav ) );

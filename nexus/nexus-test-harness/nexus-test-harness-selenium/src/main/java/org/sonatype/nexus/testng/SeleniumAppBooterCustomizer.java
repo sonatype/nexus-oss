@@ -21,13 +21,13 @@ package org.sonatype.nexus.testng;
 import java.util.Map.Entry;
 
 import org.codehaus.plexus.ContainerConfiguration;
+import org.sonatype.appbooter.AbstractPlexusAppBooterCustomizer;
 import org.sonatype.appbooter.PlexusAppBooter;
 import org.sonatype.appcontext.AppContext;
-import org.sonatype.nexus.mock.MockAppBooterCustomizer;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 public class SeleniumAppBooterCustomizer
-    extends MockAppBooterCustomizer
+    extends AbstractPlexusAppBooterCustomizer
 {
 
     @Override
