@@ -18,16 +18,15 @@
  */
 package org.sonatype.security.ldap.dao;
 
-import org.apache.commons.lang.StringUtils;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.codehaus.plexus.util.StringUtils;
 
 public class LdapAuthConfiguration
 {
@@ -415,7 +414,7 @@ public class LdapAuthConfiguration
                 websiteAttribute, userMemberOfAttribute };
         for ( String attribute : allAttributes )
         {
-            if ( StringUtils.isNotEmpty( attribute ) )
+            if ( StringUtils.isNotBlank( attribute ) )
             {
                 result.add( attribute );
             }
