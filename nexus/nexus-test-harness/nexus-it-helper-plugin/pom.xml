@@ -62,16 +62,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-      <artifactId>plexus-app-booter</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-      <artifactId>plexus-forked-app-booter</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-system</artifactId>
       <version>${plexus-security.version}</version>

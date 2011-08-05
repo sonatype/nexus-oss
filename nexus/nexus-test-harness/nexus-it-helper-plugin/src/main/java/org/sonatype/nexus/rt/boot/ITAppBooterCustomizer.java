@@ -18,18 +18,12 @@
  */
 package org.sonatype.nexus.rt.boot;
 
-import java.io.File;
-
-import org.sonatype.appbooter.AbstractPlexusAppBooterCustomizer;
-import org.sonatype.appbooter.PlexusAppBooter;
-import org.sonatype.appcontext.AppContext;
-import org.sonatype.nexus.rt.prefs.FilePreferencesFactory;
 
 public class ITAppBooterCustomizer
-    extends AbstractPlexusAppBooterCustomizer
+   // extends AbstractPlexusAppBooterCustomizer
 {
     public static final String TEST_ID_PREFIX = "testId=";
-
+/* JUST LEFT HERE FOR FUTURE REFERENCE
     @Override
     public void customizeContext( final PlexusAppBooter appBooter, final AppContext ctx )
     {
@@ -83,5 +77,5 @@ public class ITAppBooterCustomizer
     {
         return testId + "-filePrefs";
     }
-
+*/
 }
