@@ -56,11 +56,25 @@ public class AppContextImpl
 
     public Map<String, Object> flatten()
     {
-        final HashMap<String, Object> result = new HashMap<String, Object>();
+        final Map<String, AppContextEntry> flattenEntries = flattenAppContextEntries();
+
+        final HashMap<String, Object> result = new HashMap<String, Object>( flattenEntries.size() );
+
+        for ( AppContextEntry entry : flattenEntries.values() )
+        {
+            result.put( entry.getKey(), entry.getValue() );
+        }
+
+        return Collections.unmodifiableMap( result );
+    }
+
+    public Map<String, AppContextEntry> flattenAppContextEntries()
+    {
+        final HashMap<String, AppContextEntry> result = new HashMap<String, AppContextEntry>();
 
         result.putAll( entries.flatten() );
 
-        return result;
+        return Collections.unmodifiableMap( result );
     }
 
     public Interpolator getInterpolator()

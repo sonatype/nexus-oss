@@ -43,6 +43,15 @@ public interface AppContext
     Map<String, Object> flatten();
 
     /**
+     * Flattens this AppContext (calculates "visible" entries from this and it's parent and returns a plain Map but with
+     * AppContextEntries as values. This map is not connected to AppContext anymore, and not modifiable! It is just a
+     * "snapshot".
+     * 
+     * @return
+     */
+    Map<String, AppContextEntry> flattenAppContextEntries();
+
+    /**
      * Returns an interpolator using this app context as source.
      * 
      * @return
