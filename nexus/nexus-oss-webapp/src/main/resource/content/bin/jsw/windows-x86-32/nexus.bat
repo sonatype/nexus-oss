@@ -1,55 +1,88 @@
-@echo off
-setlocal
+@rem .
+@rem Copyright (c) 2009-2010 Sonatype, Inc. All rights reserved.
+@rem .
 
-rem Copyright (c) 1999, 2006 Tanuki Software Inc.
-rem
-rem Java Service Wrapper general startup script
-rem
+@if "%WRAPPER_DEBUG%" == "" @echo off
 
-rem
-rem Resolve the real path of the wrapper.exe
-rem  For non NT systems, the _REALPATH and _WRAPPER_CONF values
-rem  can be hard-coded below and the following test removed.
-rem
-if "%OS%"=="Windows_NT" goto nt
-echo This script only works with NT-based versions of Windows.
-goto :eof
-
-:nt
-rem
-rem Find the application home.
-rem
-rem %~dp0 is location of current script under NT
-set _REALPATH=%~dp0
-
-rem Decide on the wrapper binary.
-set _WRAPPER_BASE=..\exec\wrapper
-set _WRAPPER_EXE=%_REALPATH%%_WRAPPER_BASE%-windows-x86-32.exe
-if exist "%_WRAPPER_EXE%" goto conf
-set _WRAPPER_EXE=%_REALPATH%%_WRAPPER_BASE%-windows-x86-64.exe
-if exist "%_WRAPPER_EXE%" goto conf
-set _WRAPPER_EXE=%_REALPATH%%_WRAPPER_BASE%.exe
-if exist "%_WRAPPER_EXE%" goto conf
-echo Unable to locate a Wrapper executable using any of the following names:
-echo %_REALPATH%%_WRAPPER_BASE%-windows-x86-32.exe
-echo %_REALPATH%%_WRAPPER_BASE%-windows-x86-64.exe
-echo %_REALPATH%%_WRAPPER_BASE%.exe
+if "%OS%"=="Windows_NT" goto begin
+echo Unsupported Windows version: %OS%
 pause
 goto :eof
 
-rem
-rem Find the wrapper.conf
-rem
-:conf
-set _WRAPPER_CONF="%~f1"
-if not %_WRAPPER_CONF%=="" goto startup
-set _WRAPPER_CONF="%_REALPATH%..\conf\wrapper.conf"
+:begin
+setlocal enableextensions
 
-rem
-rem Start the Wrapper
-rem
-:startup
-"%_WRAPPER_EXE%" -c %_WRAPPER_CONF%
-if not errorlevel 1 goto :eof
+set DIRNAME=%~dp0
+if "%DIRNAME%" == "" set DIRNAME=.\
+
+set DIST_BITS=32
+if "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto amd64
+if not "%ProgramW6432%" == "" set DIST_BITS=64
+goto pickwrapper
+
+:amd64
+set DIST_BITS=64
+
+:pickwrapper
+set WRAPPER_EXE=%DIRNAME%..\..\jsw\exec\wrapper-windows-x86-%DIST_BITS%.exe
+if exist "%WRAPPER_EXE%" goto pickconfig
+echo Missing wrapper executable: %WRAPPER_EXE%
 pause
+goto end
 
+:pickconfig
+set WRAPPER_CONF=%DIRNAME%..\..\jsw\conf\wrapper.conf
+if exist "%WRAPPER_CONF%" goto execute
+echo Missing wrapper config: %WRAPPER_CONF%
+pause
+goto end
+
+:execute
+for /F %%v in ('echo %1^|findstr "^console$ ^start$ ^stop$ ^restart$ ^install$ ^remove"') do call :exec set COMMAND=%%v
+
+if "%COMMAND%" == "" (
+    echo Usage: %0 { console : start : stop : restart : install : remove }
+    pause
+    goto end
+) else (
+    shift
+)
+
+call :%COMMAND%
+if errorlevel 1 pause
+goto end
+
+:console
+"%WRAPPER_EXE%" -c "%WRAPPER_CONF%"
+goto :eof
+
+:start
+"%WRAPPER_EXE%" -t "%WRAPPER_CONF%"
+goto :eof
+
+:stop
+"%WRAPPER_EXE%" -p "%WRAPPER_CONF%"
+goto :eof
+
+:install
+"%WRAPPER_EXE%" -i "%WRAPPER_CONF%"
+goto :eof
+
+:remove
+"%WRAPPER_EXE%" -r "%WRAPPER_CONF%"
+goto :eof
+
+:restart
+call :stop
+call :start
+goto :eof
+
+:exec
+%*
+goto :eof
+
+:end
+endlocal
+
+:finish
+cmd /C exit /B %ERRORLEVEL%
