@@ -29,7 +29,7 @@ public class SystemEnvironmentEntrySource
         for ( Map.Entry<String, String> entry : envMap.entrySet() )
         {
             // MAVEN_OPTS => maven.opts
-            final String key = entry.getKey().toLowerCase().replace( '_', '-' );
+            final String key = entry.getKey().toLowerCase().replace( '_', '.' );
 
             result.put( key, entry.getValue() );
         }
