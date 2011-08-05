@@ -15,16 +15,8 @@ setlocal enableextensions
 set DIRNAME=%~dp0
 if "%DIRNAME%" == "" set DIRNAME=.\
 
-set DIST_BITS=32
-if "%PROCESSOR_ARCHITECTURE%" == "AMD64" goto amd64
-if not "%ProgramW6432%" == "" set DIST_BITS=64
-goto pickwrapper
-
-:amd64
-set DIST_BITS=64
-
 :pickwrapper
-set WRAPPER_EXE=%DIRNAME%..\..\jsw\exec\wrapper-windows-x86-%DIST_BITS%.exe
+set WRAPPER_EXE=%DIRNAME%..\..\jsw\exec\wrapper-windows-x86-64.exe
 if exist "%WRAPPER_EXE%" goto pickconfig
 echo Missing wrapper executable: %WRAPPER_EXE%
 pause
