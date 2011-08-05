@@ -14,7 +14,7 @@ import org.sonatype.appcontext.AppContextEntry;
 import org.sonatype.appcontext.AppContextException;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.publisher.EntryPublisher;
-import org.sonatype.appcontext.publisher.Slf4jLoggerEntryPublisher;
+import org.sonatype.appcontext.publisher.PrintStreamEntryPublisher;
 import org.sonatype.appcontext.source.EntrySource;
 import org.sonatype.appcontext.source.EntrySourceMarker;
 import org.sonatype.appcontext.source.FilteredEntrySource;
@@ -53,7 +53,7 @@ public class InternalFactory
             Arrays.asList( new EntrySource[] {
                 new FilteredEntrySource( new SystemEnvironmentEntrySource(), new KeyPrefixEntryFilter( id + "." ) ),
                 new FilteredEntrySource( new SystemPropertiesEntrySource(), new KeyPrefixEntryFilter( id + "." ) ) } );
-        List<EntryPublisher> publishers = Arrays.asList( new EntryPublisher[] { new Slf4jLoggerEntryPublisher() } );
+        List<EntryPublisher> publishers = Arrays.asList( new EntryPublisher[] { new PrintStreamEntryPublisher() } );
 
         return new AppContextRequest( id, parent, sources, publishers );
     }

@@ -10,16 +10,24 @@ import org.sonatype.appcontext.internal.Preconditions;
 public class MapEntrySource
     implements EntrySource, EntrySourceMarker
 {
+    private final String name;
+
     private final Map<?, ?> source;
 
     public MapEntrySource( final Map<?, ?> source )
     {
+        this( "map", source );
+    }
+
+    public MapEntrySource( final String name, final Map<?, ?> source )
+    {
+        this.name = Preconditions.checkNotNull( name );
         this.source = Preconditions.checkNotNull( source );
     }
 
     public String getDescription()
     {
-        return "map: " + source.toString();
+        return String.format( "map: %s (size:%s)", name, source.size() );
     }
 
     public EntrySourceMarker getEntrySourceMarker()
