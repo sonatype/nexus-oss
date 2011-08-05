@@ -1,52 +1,54 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.spice</groupId>
     <artifactId>spice-parent</artifactId>
-    <version>15</version>
-    <relativePath>../spice-parent</relativePath>
+    <version>17</version>
   </parent>
 
   <groupId>org.sonatype.appcontext</groupId>
   <artifactId>appcontext</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>2.0-SNAPSHOT</version>
 
   <name>Sonatype AppContext</name>
+  <description>A small utility useful in various use cases, like "booting" an application. All it does is simply creates a plain Map, with it's values sourced from different places and applies different strategies (override order).</description>
 
-  <url>http://maven.apache.org</url>
+  <url>https://github.com/sonatype/appcontext</url>
+
+  <scm>
+    <url>https://github.com/sonatype/appcontext</url>
+    <connection>scm:git:git://github.com/sonatype/appcontext.git</connection>
+    <developerConnection>scm:git:git@github.com:sonatype/appcontext.git</developerConnection>
+  </scm>
 
   <dependencies>
 
+    <!-- interpolation -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-interpolation</artifactId>
-      <version>1.2</version>
-      <scope>compile</scope>
+      <version>1.14</version>
     </dependency>
-    
+
+    <!-- logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.5.8</version>
-      <scope>compile</scope>
     </dependency>
 
+    <!-- Test -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
-      <version>1.5.8</version>
-      <scope>test</scope>
     </dependency>
-
   </dependencies>
+
 </project>

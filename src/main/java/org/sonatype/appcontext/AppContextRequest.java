@@ -1,22 +1,53 @@
 package org.sonatype.appcontext;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public interface AppContextRequest
+import org.sonatype.appcontext.internal.Preconditions;
+import org.sonatype.appcontext.publisher.EntryPublisher;
+import org.sonatype.appcontext.source.EntrySource;
+
+public class AppContextRequest
 {
-    String getName();
+    private final String id;
 
-    void setName( String name );
+    private final AppContext parent;
 
-    BasedirDiscoverer getBasedirDiscoverer();
+    private final List<EntrySource> sources;
 
-    void setBasedirDiscoverer( BasedirDiscoverer discoverer );
+    private final List<EntryPublisher> publishers;
 
-    List<ContextFiller> getContextFillers();
+    public AppContextRequest( final String id, final List<EntrySource> sources, final List<EntryPublisher> publishers )
+    {
+        this( id, null, sources, publishers );
+    }
 
-    void setContextFillers( List<ContextFiller> fillers );
+    public AppContextRequest( final String id, final AppContext parent, final List<EntrySource> sources,
+                              final List<EntryPublisher> publishers )
+    {
+        this.id = Preconditions.checkNotNull( id );
+        this.parent = parent;
+        this.sources = new ArrayList<EntrySource>( Preconditions.checkNotNull( sources ) );
+        this.publishers = new ArrayList<EntryPublisher>( Preconditions.checkNotNull( publishers ) );
+    }
 
-    List<ContextPublisher> getContextPublishers();
+    public String getId()
+    {
+        return id;
+    }
 
-    void setContextPublishers( List<ContextPublisher> publishers );
+    public AppContext getParent()
+    {
+        return parent;
+    }
+
+    public List<EntrySource> getSources()
+    {
+        return sources;
+    }
+
+    public List<EntryPublisher> getPublishers()
+    {
+        return publishers;
+    }
 }

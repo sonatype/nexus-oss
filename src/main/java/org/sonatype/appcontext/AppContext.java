@@ -1,6 +1,5 @@
 package org.sonatype.appcontext;
 
-import java.io.File;
 import java.util.Map;
 
 import org.codehaus.plexus.interpolation.Interpolator;
@@ -11,35 +10,37 @@ import org.codehaus.plexus.interpolation.Interpolator;
  * @author cstamas
  */
 public interface AppContext
-    extends Map<Object, Object>
+    extends Map<String, Object>
 {
     /**
-     * Returns the factory that created this context.
+     * Returns the id of this context.
      * 
      * @return
      */
-    AppContextFactory getFactory();
+    String getId();
 
     /**
-     * Returns the name of this context.
+     * Returns the parent app context if any, or {@code null} if this context is root context.
      * 
      * @return
      */
-    String getName();
+    AppContext getParent();
 
     /**
-     * Returns the basedir of this context.
+     * Returns the entry value, used in creation of this context. Gives access to source marker and raw (uninterpolated)
+     * values.
      * 
      * @return
      */
-    File getBasedir();
+    AppContextEntry getAppContextEntry( String key );
 
     /**
-     * Returns the uninterpolated values, used in creation of this context.
+     * Flattens this AppContext (calculates "visible" entries from this and it's parent and returns a plain Map. This
+     * map is not connected to AppContext anymore, and not modifiable! It is just a "snapshot".
      * 
      * @return
      */
-    Map<Object, Object> getRawContext();
+    Map<String, Object> flatten();
 
     /**
      * Returns an interpolator using this app context as source.
@@ -47,4 +48,9 @@ public interface AppContext
      * @return
      */
     Interpolator getInterpolator();
+
+    /**
+     * Dumps the complete AppContext (with hierarchy, sources).
+     */
+    void dump();
 }
