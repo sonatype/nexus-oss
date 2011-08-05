@@ -30,10 +30,10 @@ pause
 goto end
 
 :execute
-for /F %%v in ('echo %1^|findstr "^console$ ^start$ ^stop$ ^restart$ ^install$ ^remove"') do call :exec set COMMAND=%%v
+for /F %%v in ('echo %1^|findstr "^console$ ^start$ ^stop$ ^restart$ ^install$ ^uninstall"') do call :exec set COMMAND=%%v
 
 if "%COMMAND%" == "" (
-    echo Usage: %0 { console : start : stop : restart : install : remove }
+    echo Usage: %0 { console : start : stop : restart : install : uninstall }
     pause
     goto end
 ) else (
@@ -60,7 +60,7 @@ goto :eof
 "%WRAPPER_EXE%" -i "%WRAPPER_CONF%"
 goto :eof
 
-:remove
+:uninstall
 "%WRAPPER_EXE%" -r "%WRAPPER_CONF%"
 goto :eof
 
