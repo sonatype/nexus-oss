@@ -411,6 +411,7 @@ public class Jetty7NexusBooter
         tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-utils-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-interpolation-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-classworlds-*.jar" );
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "appcontext-*.jar" );
     }
 
     /**
