@@ -298,7 +298,7 @@ public class LogbackLogManager
         {
             logConfigDir = applicationConfiguration.getConfigurationDirectory().getAbsolutePath();
 
-            System.getProperties().put( KEY_LOG_CONFIG_DIR, logConfigDir );
+            System.setProperty( KEY_LOG_CONFIG_DIR, logConfigDir );
         }
 
         return logConfigDir;
@@ -359,7 +359,7 @@ public class LogbackLogManager
 
             out.println( "<?xml version='1.0' encoding='UTF-8'?>" );
             out.println( "<configuration scan='true'>" );
-            out.println( "  <property file='${plexus.log-config-dir}/logback.properties'/>" );
+            out.println( "  <property file='${nexus.log-config-dir}/logback.properties'/>" );
             if ( logConfigurationParticipants != null )
             {
                 for ( LogConfigurationParticipant participant : logConfigurationParticipants )
