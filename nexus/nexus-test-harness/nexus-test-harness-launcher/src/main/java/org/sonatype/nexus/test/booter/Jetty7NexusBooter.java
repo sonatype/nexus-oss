@@ -117,11 +117,26 @@ public class Jetty7NexusBooter
         // shuffle bundle files
         tamperJarsForSharedClasspath( bundleBasedir );
 
+        // --------------
+        // Setting system props, even if it might be redundant, just to be 100% positive
+        // --------------
         // set system property for bundleBasedir
         System.setProperty( "bundleBasedir", bundleBasedir.getAbsolutePath() );
 
         // guice finalizer
         System.setProperty( "guice.executor.class", "NONE" );
+        
+        // Note: in ITs we want to make Indexer perform blocking commits.
+        // Since MavenIndexer 4.0, it performs async commits by default, meaning that no "helper" from Nexus
+        // is able to tell and potentially block (see EventInspectorsUtil#waitForCalmPeriod() as example) execution
+        // up to the moment when readers are refreshed (indexing operation IS done, but readers will not "see" the
+        // change without reopening those).
+        // By having this switch, we are switching Maven Indexer back into "blocking" mode as it was before 4.0.
+        // The proper fix is to make all Indexer related ITs behave "properly" (with some heuristics?), and have some
+        // sort of "try-wait-try-failAfterSomeRetries" the search operation itself.
+        System.setProperty( "mavenIndexerBlockingCommits", Boolean.TRUE.toString() );
+
+        // ---------------
 
         // create ClassWorld
         world = new ClassWorld();
