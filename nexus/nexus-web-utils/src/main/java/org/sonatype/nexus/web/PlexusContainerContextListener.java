@@ -20,7 +20,6 @@ package org.sonatype.nexus.web;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -36,11 +35,11 @@ import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextException;
-import org.sonatype.appcontext.AppContextFactory;
 import org.sonatype.appcontext.AppContextRequest;
-import org.sonatype.appcontext.MapSourcedContextFiller;
-import org.sonatype.appcontext.PropertiesFileContextFiller;
-import org.sonatype.appcontext.SimpleBasedirDiscoverer;
+import org.sonatype.appcontext.Factory;
+import org.sonatype.appcontext.source.MapEntrySource;
+import org.sonatype.appcontext.source.PropertiesFileEntrySource;
+import org.sonatype.appcontext.source.StaticEntrySource;
 
 import com.google.inject.Module;
 
@@ -55,28 +54,39 @@ public class PlexusContainerContextListener
 {
     public static final String CUSTOM_MODULES = "customModules";
 
-    private AppContextFactory appContextFactory = new AppContextFactory();
-
     private PlexusContainer plexusContainer;
 
-    private File plexusPropertiesFile;
+    /**
+     * The one in bundle/conf/nexus.properties when ran as bundle, in WAR it does not exists.
+     */
+    private File nexusPropertiesFile;
 
+    /**
+     * The one in nexus/WEB-INF/nexus.properties, always exists
+     */
+    private File nexusDefaultPropertiesFile;
+
+    /**
+     * The plexus.xml file in nexus/WEB-INF/plexus.xml, always exists
+     */
     private File plexusXmlFile;
 
-    public void contextInitialized( ServletContextEvent sce )
+    public void contextInitialized( final ServletContextEvent sce )
     {
-        ServletContext context = sce.getServletContext();
+        final ServletContext context = sce.getServletContext();
 
         // create a container if there is none yet
         if ( context.getAttribute( PlexusConstants.PLEXUS_KEY ) == null )
         {
             try
             {
-                AppContext plexusContext = createContainerContext( context );
+                AppContext plexusContext =
+                    createContainerContext( context,
+                        (Map<String, Object>) context.getAttribute( AppContext.class.getName() ) );
 
                 ContainerConfiguration plexusConfiguration =
                     new DefaultContainerConfiguration().setName( context.getServletContextName() ).setContainerConfigurationURL(
-                        plexusXmlFile.toURI().toURL() ).setContext( plexusContext ).setAutoWiring( true ).setClassPathScanning(
+                        plexusXmlFile.toURI().toURL() ).setContext( (Map) plexusContext ).setAutoWiring( true ).setClassPathScanning(
                         PlexusConstants.SCANNING_ON ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
 
                 final Module[] customModules = (Module[]) context.getAttribute( CUSTOM_MODULES );
@@ -109,7 +119,7 @@ public class PlexusContainerContextListener
         }
     }
 
-    public void contextDestroyed( ServletContextEvent sce )
+    public void contextDestroyed( final ServletContextEvent sce )
     {
         if ( plexusContainer != null )
         {
@@ -119,9 +129,18 @@ public class PlexusContainerContextListener
 
     // ==
 
-    protected AppContext createContainerContext( ServletContext context )
-        throws IllegalStateException
+    protected AppContext createContainerContext( final ServletContext context, final Map<String, Object> parent )
+        throws AppContextException
     {
+        if ( parent == null )
+        {
+            context.log( "Configuring Nexus in vanilla WAR..." );
+        }
+        else
+        {
+            context.log( "Configuring Nexus in bundle..." );
+        }
+
         File basedirFile = null;
         File warWebInfFile = null;
 
@@ -158,32 +177,35 @@ public class PlexusContainerContextListener
         }
 
         // plexus files are always here
-        plexusPropertiesFile = new File( warWebInfFile, "plexus.properties" );
+        nexusDefaultPropertiesFile = new File( warWebInfFile, "plexus.properties" );
         plexusXmlFile = new File( warWebInfFile, "plexus.xml" );
 
-        AppContextRequest request = appContextFactory.getDefaultAppContextRequest();
+        // no "real" parenting for now
+        AppContextRequest request = Factory.getDefaultRequest( "nexus", null );
 
-        // just pass over the already found basedir
-        request.setBasedirDiscoverer( new SimpleBasedirDiscoverer( basedirFile ) );
+        // set basedir
+        request.getSources().add( new StaticEntrySource( "bundleBasedir", basedirFile.getAbsolutePath() ) );
 
-        // add it to fillers as very 1st resource, and leaving others in
-        request.getContextFillers().add( 0, new PropertiesFileContextFiller( plexusPropertiesFile, true ) );
-
-        // add bundleBasedir (since "basedir") is automatically supported, but this one is not
-        Map<Object, Object> ctx = new HashMap<Object, Object>();
-        ctx.put( "bundleBasedir", basedirFile.getAbsolutePath() );
-        request.getContextFillers().add( new MapSourcedContextFiller( ctx ) );
-
-        try
+        // add parent if found
+        if ( parent != null )
         {
-            AppContext response = appContextFactory.getAppContext( request );
+            // for now, once we resolve classloading issues....
+            request.getSources().add( new MapEntrySource( "quasiParent", parent ) );
+        }
 
-            // wrap it in, to make Plexus friendly
-            return response;
-        }
-        catch ( AppContextException e )
+        // add the "defaults" properties files, must be present
+        request.getSources().add( new PropertiesFileEntrySource( nexusDefaultPropertiesFile, true ) );
+
+        // if in bundle only
+        if ( parent != null )
         {
-            throw new IllegalStateException( e );
+            nexusPropertiesFile =
+                new File( new File( (String) parent.get( "bundleBasedir" ) ), "conf/nexus.properties" );
+
+            // add the user overridable properties file, but it might not be present
+            request.getSources().add( new PropertiesFileEntrySource( nexusPropertiesFile, false ) );
         }
+
+        return Factory.create( request );
     }
 }
