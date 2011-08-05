@@ -4,8 +4,11 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+import org.sonatype.appcontext.source.FilteredEntrySource;
+import org.sonatype.appcontext.source.KeyEqualityEntryFilter;
 import org.sonatype.appcontext.source.LegacyBasedirEntrySource;
 import org.sonatype.appcontext.source.PropertiesFileEntrySource;
+import org.sonatype.appcontext.source.SystemEnvironmentEntrySource;
 
 public class SimpleTest
     extends TestCase
@@ -21,10 +24,11 @@ public class SimpleTest
         request.getSources().add( new LegacyBasedirEntrySource( "c01.basedir", true ) );
         request.getSources().add(
             new PropertiesFileEntrySource( new File( "src/test/resources/c01/plexus.properties" ) ) );
+        request.getSources().add(
+            new FilteredEntrySource( new SystemEnvironmentEntrySource(), new KeyEqualityEntryFilter( "home" ) ) );
 
         AppContext appContext = Factory.create( request );
 
-        assertEquals( 5, appContext.size() );
+        assertEquals( 6, appContext.size() );
     }
-
 }

@@ -54,9 +54,7 @@ public class InternalFactory
             Arrays.asList( new EntrySource[] {
                 new FilteredEntrySource( new SystemEnvironmentEntrySource(), new KeyPrefixEntryFilter( id + "." ) ),
                 new FilteredEntrySource( new SystemPropertiesEntrySource(), new KeyPrefixEntryFilter( id + "." ) ) } );
-        List<EntryPublisher> publishers =
-            Arrays.asList( new EntryPublisher[] { new SystemPropertiesEntryPublisher( id + "." ),
-                new Slf4jLoggerEntryPublisher() } );
+        List<EntryPublisher> publishers = Arrays.asList( new EntryPublisher[] { new Slf4jLoggerEntryPublisher() } );
 
         return new AppContextRequest( id, parent, sources, publishers );
     }
@@ -98,7 +96,7 @@ public class InternalFactory
             interpolator.addValueSource( new RawAppContextValueSource( request.getParent() ) );
             interpolator.addValueSource( new MapBasedValueSource( request.getParent() ) );
         }
-        
+
         interpolator.addValueSource( new MapBasedValueSource( rawContext ) );
 
         Map<String, AppContextEntry> context = new HashMap<String, AppContextEntry>();

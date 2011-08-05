@@ -1,8 +1,7 @@
 package org.sonatype.appcontext.internal;
 
-import java.util.Map.Entry;
-
 import org.sonatype.appcontext.AppContext;
+import org.sonatype.appcontext.AppContextEntry;
 
 public class ContextStringDumper
 {
@@ -12,10 +11,16 @@ public class ContextStringDumper
 
         sb.append( "Application context \"" + context.getId() + "\" dump:\n" );
 
-        for ( Entry<String, Object> entry : context.entrySet() )
+        if ( context.getParent() != null )
         {
-            sb.append( String.format( "\"%s\"=\"%s\"\n", String.valueOf( entry.getKey() ),
-                String.valueOf( entry.getValue() ) ) );
+            sb.append( "Parent context is \"" + context.getParent().getId() + "\"\n" );
+        }
+
+        for ( String key : context.keySet() )
+        {
+            final AppContextEntry entry = context.getAppContextEntry( key );
+
+            sb.append( entry.toString() ).append( "\n" );
         }
 
         sb.append( String.format( "Total of %s entries.\n", context.size() ) );

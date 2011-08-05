@@ -29,7 +29,7 @@ public class LegacyBasedirEntrySource
 
     public String getDescription()
     {
-        return "legacyBasedir key: " + basedirKey;
+        return "legacyBasedir(key:\"" + basedirKey + "\")";
     }
 
     public EntrySourceMarker getEntrySourceMarker()

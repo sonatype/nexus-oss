@@ -33,7 +33,7 @@ public class KeyEqualityEntryFilter
             @Override
             protected String getDescription( EntrySourceMarker wrapped )
             {
-                return String.format( "keyEq(%s, %s)", keys, wrapped.getDescription() );
+                return String.format( "filter(keyIsIn:%s, %s)", keys, wrapped.getDescription() );
             }
         };
     }

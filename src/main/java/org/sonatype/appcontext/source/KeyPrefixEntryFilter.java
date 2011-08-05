@@ -44,7 +44,7 @@ public class KeyPrefixEntryFilter
             @Override
             protected String getDescription( EntrySourceMarker wrapped )
             {
-                return String.format( "keyPrefix(%s, %s)", prefixes, wrapped.getDescription() );
+                return String.format( "filter(keyStartsWith:%s, %s)", prefixes, wrapped.getDescription() );
             }
         };
     }
