@@ -1,0 +1,22 @@
+# Ignores for Sonatype Spice
+# Language is Java
+# Build tool is Apache Maven3
+# IDE used is Eclipse M2E
+# so, we have to ignore all the specifics of these above
+
+# Eclipse related (and M2e)
+.classpath
+.project
+.settings/
+
+# Maven related (and some plugins)
+target/
+*.ser
+*.ec
+
+# Intellij
+*.ipr
+
+# Other
+.svn/
+bin/
