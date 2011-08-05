@@ -62,6 +62,12 @@ public class SimpleHierarchyTest
         final AppContext grandchild =
             create( "grandchild", new File( "src/test/resources/c02/grandchild.properties" ), child );
 
+        grandchild.put( "wowThisIsAnObject", new Object() );
+
+        System.out.println( " *** " );
+        System.out.println( grandchild.get( "basedir" ) );
+        System.out.println( " *** " );
+
         grandchild.dump();
     }
 

@@ -33,7 +33,7 @@ public class PropertiesFileEntrySource
 
     public String getDescription()
     {
-        return "file: " + propertiesFile.getAbsolutePath();
+        return "file:" + propertiesFile.getAbsolutePath();
     }
 
     public EntrySourceMarker getEntrySourceMarker()
