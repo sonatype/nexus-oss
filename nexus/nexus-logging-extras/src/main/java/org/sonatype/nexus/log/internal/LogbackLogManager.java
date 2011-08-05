@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.LimitedInputStream;
 import org.sonatype.nexus.NexusStreamResponse;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.log.DefaultLogConfiguration;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
@@ -78,11 +79,7 @@ public class LogbackLogManager
 
     private static final String KEY_ROOT_LEVEL = "root.level";
 
-    private static final String KEY_LOG_CONFIG_DIR = "plexus.log-config-dir";
-
-    static final String KEY_NEXUS_WORK_DIR = "plexus.nexus-work";
-
-    private static final String LOG_CONF_RELATIVE_DIR = "conf";
+    private static final String KEY_LOG_CONFIG_DIR = "nexus.log-config-dir";
 
     private static final String LOG_CONF = "logback.xml";
 
@@ -96,6 +93,9 @@ public class LogbackLogManager
 
     @Requirement
     private Injector injector;
+
+    @Requirement
+    private ApplicationConfiguration applicationConfiguration;
 
     public Set<File> getLogFiles()
     {
@@ -296,8 +296,7 @@ public class LogbackLogManager
 
         if ( StringUtils.isEmpty( logConfigDir ) )
         {
-            logConfigDir =
-                new File( System.getProperty( KEY_NEXUS_WORK_DIR ), LOG_CONF_RELATIVE_DIR ).getAbsolutePath();
+            logConfigDir = applicationConfiguration.getConfigurationDirectory().getAbsolutePath();
 
             System.getProperties().put( KEY_LOG_CONFIG_DIR, logConfigDir );
         }
@@ -365,8 +364,7 @@ public class LogbackLogManager
             {
                 for ( LogConfigurationParticipant participant : logConfigurationParticipants )
                 {
-                    out.println( String.format( "  <include file='${plexus.log-config-dir}/%s'/>",
-                        participant.getName() ) );
+                    out.println( String.format( "  <include file='${nexus.log-config-dir}/%s'/>", participant.getName() ) );
                 }
             }
             out.write( "</configuration>" );
