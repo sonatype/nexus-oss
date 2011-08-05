@@ -7,7 +7,7 @@ package org.sonatype.appcontext;
  * @author cstamas
  */
 public class AppContextException
-    extends Exception
+    extends RuntimeException
 {
     private static final long serialVersionUID = 3396476391595403414L;
 

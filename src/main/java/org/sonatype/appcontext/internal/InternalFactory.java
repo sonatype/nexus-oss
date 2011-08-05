@@ -15,7 +15,6 @@ import org.sonatype.appcontext.AppContextException;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.publisher.EntryPublisher;
 import org.sonatype.appcontext.publisher.Slf4jLoggerEntryPublisher;
-import org.sonatype.appcontext.publisher.SystemPropertiesEntryPublisher;
 import org.sonatype.appcontext.source.EntrySource;
 import org.sonatype.appcontext.source.EntrySourceMarker;
 import org.sonatype.appcontext.source.FilteredEntrySource;
