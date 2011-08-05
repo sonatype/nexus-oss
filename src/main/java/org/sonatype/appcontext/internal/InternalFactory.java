@@ -17,10 +17,9 @@ import org.sonatype.appcontext.publisher.EntryPublisher;
 import org.sonatype.appcontext.publisher.PrintStreamEntryPublisher;
 import org.sonatype.appcontext.source.EntrySource;
 import org.sonatype.appcontext.source.EntrySourceMarker;
-import org.sonatype.appcontext.source.FilteredEntrySource;
-import org.sonatype.appcontext.source.KeyPrefixEntryFilter;
 import org.sonatype.appcontext.source.SystemEnvironmentEntrySource;
 import org.sonatype.appcontext.source.SystemPropertiesEntrySource;
+import org.sonatype.appcontext.source.TargetedEntrySource;
 
 public class InternalFactory
 {
@@ -50,9 +49,8 @@ public class InternalFactory
         Preconditions.checkNotNull( id );
 
         List<EntrySource> sources =
-            Arrays.asList( new EntrySource[] {
-                new FilteredEntrySource( new SystemEnvironmentEntrySource(), new KeyPrefixEntryFilter( id + "." ) ),
-                new FilteredEntrySource( new SystemPropertiesEntrySource(), new KeyPrefixEntryFilter( id + "." ) ) } );
+            Arrays.asList( new EntrySource[] { new TargetedEntrySource( new SystemEnvironmentEntrySource(), id + "." ),
+                new TargetedEntrySource( new SystemPropertiesEntrySource(), id + "." ) } );
         List<EntryPublisher> publishers = Arrays.asList( new EntryPublisher[] { new PrintStreamEntryPublisher() } );
 
         return new AppContextRequest( id, parent, sources, publishers );
@@ -61,20 +59,6 @@ public class InternalFactory
     public static AppContext create( final AppContextRequest request )
         throws AppContextException
     {
-        // environment is a map of properties that comes from "environment": env vars and JVM system properties.
-        // Keys found in this map are collected in this order, and the latter added will always replace any pre-existing
-        // key:
-        //
-        // - basedir is put initially
-        // - env vars
-        // - system properties (will "stomp" env vars)
-        //
-        // As next step, the plexus.properties file is searched. If found, it will be loaded and filtered out for any
-        // key that exists in environment map, and finally interpolation will be made against the "union" of those two.
-        // The interpolation sources used in interpolation are: plexusProperties, environment and
-        // System.getProperties().
-        // The final interpolated values are put into containerContext map and returned.
-
         final Map<String, Object> rawContext = new HashMap<String, Object>();
         final Map<String, EntrySourceMarker> rawContextSourceMarkers = new HashMap<String, EntrySourceMarker>();
 

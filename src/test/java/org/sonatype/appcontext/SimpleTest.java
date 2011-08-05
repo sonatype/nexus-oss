@@ -29,6 +29,6 @@ public class SimpleTest
 
         AppContext appContext = Factory.create( request );
 
-        assertEquals( 6, appContext.size() );
+        assertEquals( 7, appContext.size() );
     }
 }
