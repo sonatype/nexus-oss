@@ -42,7 +42,7 @@ public class Nexus2810PluginConsoleIT
 
         File source = this.getTestFile( "broken-plugin" );
 
-        File desti = new File( this.getNexusBaseDir(), "runtime/apps/nexus/plugin-repository" );
+        File desti = new File( this.getNexusBaseDir(), RELATIVE_PLUGIN_REPOSITORY_DIR );
 
         FileUtils.copyDirectoryStructure( source, desti );
     }

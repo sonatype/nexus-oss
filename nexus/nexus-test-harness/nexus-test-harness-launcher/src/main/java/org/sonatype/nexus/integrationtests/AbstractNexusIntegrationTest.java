@@ -112,6 +112,11 @@ public abstract class AbstractNexusIntegrationTest
     protected static boolean NEEDS_INIT = false;
 
     public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
+    
+    /**
+     * relative path from {@link #nexusBaseDir} to plugin-repository
+     */
+    public static final String RELATIVE_PLUGIN_REPOSITORY_DIR = "nexus/WEB-INF/plugin-repository";
 
     public static final String GROUP_REPOSITORY_RELATIVE_URL = "content/groups/";
 
