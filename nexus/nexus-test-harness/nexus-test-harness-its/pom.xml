@@ -176,7 +176,7 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <forkMode>once</forkMode> <!-- "always" for the latest resort, "once" is actually what we want -->
-          <argLine>-Xmx720M -XX:+HeapDumpOnOutOfMemoryError</argLine>
+          <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx720M -XX:+HeapDumpOnOutOfMemoryError</argLine>
           <excludes>
             <exclude>**Suite*</exclude>
             <!-- START These are start/stop tests, shouldn't be runned -->
@@ -514,7 +514,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
-              <argLine>-Xmx512M -XX:+HeapDumpOnOutOfMemoryError -agentpath:"${yourkit.agent}"</argLine>
+              <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx720M -XX:+HeapDumpOnOutOfMemoryError -agentpath:"${yourkit.agent}"</argLine>
             </configuration>
           </plugin>
         </plugins>
