@@ -22,23 +22,10 @@ WRAPPER_CONF="../conf/wrapper.conf"
 #  nice is only used if a priority is specified.
 PRIORITY=
 
-# Location of the pid file.
-PIDDIR="."
-
 # If uncommented, causes the Wrapper to be shutdown using an anchor file.
 #  When launched with the 'start' command, it will also ignore all INT and
 #  TERM signals.
 #IGNORE_SIGNALS=true
-
-# If specified, the Wrapper will be run as the specified user.
-# IMPORTANT - Make sure that the user has the required privileges to write
-#  the PID file and wrapper.log files.  Failure to be able to write the log
-#  file will cause the Wrapper to exit without any way to write out an error
-#  message.
-# NOTE - This will set the user which is used to run the Wrapper as well as
-#  the JVM and is not useful in situations where a privileged resource or
-#  port needs to be allocated prior to the user being changed.
-#RUN_AS_USER=
 
 # The following two lines are used by the chkconfig command. Change as is
 #  appropriate for your application.  They should remain commented.
@@ -47,35 +34,6 @@ PIDDIR="."
 
 # Do not modify anything beyond this point
 #-----------------------------------------------------------------------------
-
-# Resolve the location of the 'id' command
-if [ ! -x "$IDEXE" ]
-then
-    IDEXE="/usr/xpg4/bin/id"
-    if [ ! -x "$IDEXE" ]
-    then
-        IDEXE="/usr/bin/id"
-        if [ ! -x "$IDEXE" ]
-        then
-            echo "Unable to locate 'id'."
-            echo "Please report this message along with the location of the command on your system."
-            exit 1
-        fi
-    fi
-fi
-# Check that script is not run as root
-LUID=$($IDEXE -u)
-if [[ $LUID -eq 0 ]]; 
-then
-    echo "****************************************"
-    echo "WARNING - NOT RECOMMENDED TO RUN AS ROOT"
-    echo "****************************************"
-    if [ ! "`$IDEXE -u -n`" = "$RUN_AS_USER" ]
-    then
-        echo "If you insist running as root, then set the environment variable RUN_AS_USER=root before running this script."
-        exit 1
-    fi
-fi
 
 # Get the fully qualified path to the script
 case $0 in
@@ -126,6 +84,45 @@ done
 # Change the current directory to the location of the script
 cd "`dirname "$REALPATH"`"
 REALDIR=`pwd`
+
+# Source nexus.rc allowing user to override/set env variables without changing this script  
+. ${REALDIR}/../../../conf/nexus.rc
+
+# Resolve the location of the 'id' command
+if [ ! -x "$IDEXE" ]
+then
+    IDEXE="/usr/xpg4/bin/id"
+    if [ ! -x "$IDEXE" ]
+    then
+        IDEXE="/usr/bin/id"
+        if [ ! -x "$IDEXE" ]
+        then
+            echo "Unable to locate 'id'."
+            echo "Please report this message along with the location of the command on your system."
+            exit 1
+        fi
+    fi
+fi
+
+# Check that script is not run as root
+LUID=$($IDEXE -u)
+if [[ $LUID -eq 0 ]]; 
+then
+    echo "****************************************"
+    echo "WARNING - NOT RECOMMENDED TO RUN AS ROOT"
+    echo "****************************************"
+    if [ ! "`$IDEXE -u -n`" = "$RUN_AS_USER" ]
+    then
+        echo "If you insist running as root, then set the environment variable RUN_AS_USER=root before running this script."
+        exit 1
+    fi
+fi
+
+# Default PIDDIR to current directory
+if [ "X$PIDDIR" = "X" ]
+then
+    PIDDIR="."
+fi
 
 # If the PIDDIR is relative, set its value relative to the full REALPATH to avoid problems if
 #  the working directory is later changed.
