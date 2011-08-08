@@ -32,7 +32,7 @@
 
   <fileSets>
     <fileSet>
-      <directory>src/main/resource/content</directory>
+      <directory>src/main/resources/content</directory>
       <excludes>
         <exclude>**/.placeholder</exclude>
         <exclude>**/nexus</exclude>
@@ -43,7 +43,7 @@
     </fileSet>
 
     <fileSet>
-      <directory>src/main/resource/content</directory>
+      <directory>src/main/resources/content</directory>
       <includes>
         <include>**/wrapper-*</include>
       </includes>
@@ -52,7 +52,7 @@
     </fileSet>
 
     <fileSet>
-      <directory>src/main/resource/content</directory>
+      <directory>src/main/resources/content</directory>
       <includes>
         <include>**/nexus</include>
       </includes>
@@ -62,7 +62,7 @@
     </fileSet>
 
     <fileSet>
-      <directory>src/main/resource/content</directory>
+      <directory>src/main/resources/content</directory>
       <includes>
         <include>**/*.bat</include>
       </includes>
@@ -72,7 +72,7 @@
     </fileSet>
 
     <fileSet>
-      <directory>src/main/resource/sonatype-work</directory>
+      <directory>src/main/resources/sonatype-work</directory>
       <excludes>
         <exclude>**/.placeholder</exclude>
       </excludes>
