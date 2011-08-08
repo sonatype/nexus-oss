@@ -23,13 +23,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.junit.Assert;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.security.ldap.realms.api.XStreamInitalizer;
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;

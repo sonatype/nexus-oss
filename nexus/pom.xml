@@ -1576,7 +1576,7 @@
               </property>
               <property>
                 <name>reporter</name>
-                <value>org.sonatype.nexus.integrationtests.report.SonatypeHTMLReporter</value>
+                <value>org.testng.reporters.JUnitXMLReporter</value>
               </property>
               <property>
                 <name>listener</name>

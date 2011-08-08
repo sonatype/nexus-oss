@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.junit.Test;
 
 import com.thoughtworks.qdox.JavaDocBuilder;
 import com.thoughtworks.qdox.model.Annotation;
@@ -35,7 +34,6 @@ import com.thoughtworks.qdox.model.JavaMethod;
 
 public class ReportWriter
 {
-
     private File sourceDir;
 
     public ReportWriter( File sourceDir )
@@ -133,7 +131,7 @@ public class ReportWriter
             {
                 Annotation annotation = iter.next();
 
-                if ( annotation.getType().getValue().equals( Test.class.getName() ) )
+                if ( annotation.getType().getValue().equals( "org.junit.Test" ) )
                 {
                     return true;
                 }

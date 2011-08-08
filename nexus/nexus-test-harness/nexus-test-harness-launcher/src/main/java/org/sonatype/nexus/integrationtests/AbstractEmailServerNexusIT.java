@@ -33,13 +33,12 @@ public abstract class AbstractEmailServerNexusIT
 
     private static final Logger LOG = LoggerFactory.getLogger( AbstractEmailServerNexusIT.class );
 
-    private static int emailServerPort;
+    private int emailServerPort;
 
-    protected static GreenMail server;
+    protected GreenMail server;
 
     @BeforeClass
-    @org.junit.BeforeClass
-    public static void startEmailServer()
+    public void startEmailServer()
     {
         String port = TestProperties.getString( "email.server.port" );
         emailServerPort = new Integer( port );
@@ -53,13 +52,14 @@ public abstract class AbstractEmailServerNexusIT
     }
 
     @AfterClass( alwaysRun = true )
-    @org.junit.AfterClass
-    public static void stopEmailServer()
+    public void stopEmailServer()
     {
         if ( server != null )
         {
             LOG.debug( "Stoping e-mail server" );
             server.stop();
+
+            server = null;
         }
     }
 

@@ -22,8 +22,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.index.artifact.Gav;
-import org.junit.After;
-import org.junit.Before;
 import org.restlet.data.Response;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -64,7 +62,6 @@ public abstract class AbstractNexusProxyIntegrationTest
     }
 
     @BeforeMethod(alwaysRun = true)
-    @Before
     public void startProxy()
         throws Exception
     {
@@ -73,7 +70,6 @@ public abstract class AbstractNexusProxyIntegrationTest
     }
 
     @AfterMethod(alwaysRun = true)
-    @After
     public void stopProxy()
         throws Exception
     {

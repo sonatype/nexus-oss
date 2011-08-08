@@ -18,17 +18,22 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1806;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.EmailUtil.USER_EMAIL;
+import static org.sonatype.nexus.test.utils.EmailUtil.USER_PASSWORD;
+import static org.sonatype.nexus.test.utils.EmailUtil.USER_USERNAME;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.hasStatusCode;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccess;
+
 import java.io.IOException;
 
 import javax.mail.internet.MimeMessage;
 
+import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.nexus.test.utils.EmailUtil;
-import static org.sonatype.nexus.test.utils.EmailUtil.USER_EMAIL;
-import static org.sonatype.nexus.test.utils.EmailUtil.USER_PASSWORD;
-import static org.sonatype.nexus.test.utils.EmailUtil.USER_USERNAME;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -38,22 +43,19 @@ import org.testng.annotations.Test;
 import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
-import org.restlet.data.Status;
-import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import static org.hamcrest.MatcherAssert.*;
 
 public class Nexus1806ValidateSmtpConfigurationIT
     extends AbstractNexusIntegrationTest
 {
 
-    private static GreenMail changedServer;
+    private GreenMail changedServer;
 
-    private static int port;
+    private int port;
 
-    private static GreenMail originalServer;
+    private GreenMail originalServer;
 
     @BeforeClass
-    public static void init()
+    public void init()
     {
         port = TestProperties.getInteger( "webproxy-server-port" );
         // it is necessary to change port to make sure it worked
@@ -61,7 +63,7 @@ public class Nexus1806ValidateSmtpConfigurationIT
 
         changedServer = new GreenMail( smtp );
         changedServer.setUser( USER_EMAIL, USER_USERNAME, USER_PASSWORD );
-        staticLog.debug( "Starting e-mail server" );
+        log.debug( "Starting e-mail server" );
         changedServer.start();
 
         originalServer = EmailUtil.startEmailServer();
@@ -149,15 +151,19 @@ public class Nexus1806ValidateSmtpConfigurationIT
     }
 
     @AfterClass( alwaysRun = true )
-    public static void stop()
+    public void stop()
     {
         if ( originalServer != null )
         {
             originalServer.stop();
+            
+            originalServer = null;
         }
         if ( changedServer != null )
         {
             changedServer.stop();
+            
+            changedServer = null;
         }
     }
 }
