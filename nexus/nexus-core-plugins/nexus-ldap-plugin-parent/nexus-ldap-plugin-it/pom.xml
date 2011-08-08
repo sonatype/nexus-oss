@@ -135,7 +135,7 @@
     <!-- funny, but plexus-ldap-testsuite requires JUNIT??? -->
     <dependency>
       <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <artifactId>junit-dep</artifactId>
       <version>4.8.2</version>
       <scope>runtime</scope>
     </dependency>
