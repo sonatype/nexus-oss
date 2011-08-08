@@ -48,6 +48,35 @@ PIDDIR="."
 # Do not modify anything beyond this point
 #-----------------------------------------------------------------------------
 
+# Resolve the location of the 'id' command
+if [ ! -x "$IDEXE" ]
+then
+    IDEXE="/usr/xpg4/bin/id"
+    if [ ! -x "$IDEXE" ]
+    then
+        IDEXE="/usr/bin/id"
+        if [ ! -x "$IDEXE" ]
+        then
+            echo "Unable to locate 'id'."
+            echo "Please report this message along with the location of the command on your system."
+            exit 1
+        fi
+    fi
+fi
+# Check that script is not run as root
+LUID=$($IDEXE -u)
+if [[ $LUID -eq 0 ]]; 
+then
+    echo "****************************************"
+    echo "WARNING - NOT RECOMMENDED TO RUN AS ROOT"
+    echo "****************************************"
+    if [ ! "`$IDEXE -u -n`" = "$RUN_AS_USER" ]
+    then
+        echo "If you insist running as root, then set the environment variable RUN_AS_USER=root before running this script."
+        exit 1
+    fi
+fi
+
 # Get the fully qualified path to the script
 case $0 in
     /*)
@@ -285,19 +314,6 @@ checkUser() {
     # Check the configured user.  If necessary rerun this script as the desired user.
     if [ "X$RUN_AS_USER" != "X" ]
     then
-        # Resolve the location of the 'id' command
-        IDEXE="/usr/xpg4/bin/id"
-        if [ ! -x "$IDEXE" ]
-        then
-            IDEXE="/usr/bin/id"
-            if [ ! -x "$IDEXE" ]
-            then
-                echo "Unable to locate 'id'."
-                echo "Please report this message along with the location of the command on your system."
-                exit 1
-            fi
-        fi
-    
         if [ "`$IDEXE -u -n`" = "$RUN_AS_USER" ]
         then
             # Already running as the configured user.  Avoid password prompts by not calling su.
