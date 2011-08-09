@@ -177,7 +177,7 @@ public class FileTestingUtils
         return false;
     }
 
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings( "rawtypes" )
     public static File getTestFile( Class clazz, String filename )
     {
         String resource = clazz.getName().replace( '.', '/' ) + "Resources/" + filename;
