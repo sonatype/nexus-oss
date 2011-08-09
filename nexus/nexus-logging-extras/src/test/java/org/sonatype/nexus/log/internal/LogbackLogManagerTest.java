@@ -27,7 +27,6 @@ import java.io.File;
 import java.util.Set;
 
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
