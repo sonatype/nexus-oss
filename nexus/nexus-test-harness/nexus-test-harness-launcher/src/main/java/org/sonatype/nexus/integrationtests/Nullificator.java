@@ -3,16 +3,48 @@ package org.sonatype.nexus.integrationtests;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Nullificator
 {
+    private static Logger logger = LoggerFactory.getLogger( Nullificator.class );
+
+    /**
+     * Searches and nullifies passed in instance's member fields, using reflection. Will "eat" all exceptions, but also
+     * log them.
+     * 
+     * @param instance
+     */
     public static void nullifyMembers( final Object instance )
     {
-        nullifyMembers( instance.getClass(), instance );
+        if ( instance == null )
+        {
+            return;
+        }
+
+        try
+        {
+            nullifyMembers( instance.getClass(), instance );
+        }
+        catch ( Exception e )
+        {
+            // catch all to not make test "skipped"
+            logger.warn( String.format( "Could not nullify instance %s of class %s", instance.toString(),
+                instance.getClass().getName() ), e );
+        }
     }
 
     // ==
 
-    protected static void nullifyMembers( final Class<?> clazz, final Object instance )
+    /**
+     * Searches and nullifies passed in instance and corresponding class. This method might throw some exception, and
+     * should not accept {@code null} as any of it's parameters.
+     * 
+     * @param clazz
+     * @param instance
+     */
+    public static void nullifyMembers( final Class<?> clazz, final Object instance )
     {
         Field[] fields = clazz.getDeclaredFields();
 
