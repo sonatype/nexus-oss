@@ -24,34 +24,19 @@ import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 
-import com.google.common.io.NullOutputStream;
-
 public class ProgressListener
     extends TestListenerAdapter
 {
-
-    private PrintStream out;
-
-    private PrintStream err;
-
     @Override
     public void onStart( ITestContext testContext )
     {
         super.onStart( testContext );
-
-        out = System.out;
-        err = System.err;
-        System.setOut( new PrintStream( new NullOutputStream() ) );
-        System.setErr( new PrintStream( new NullOutputStream() ) );
     }
 
     @Override
     public void onFinish( ITestContext testContext )
     {
         super.onFinish( testContext );
-
-        System.setOut( out );
-        System.setErr( err );
     }
 
     @Override
@@ -59,7 +44,7 @@ public class ProgressListener
     {
         super.onTestFailedButWithinSuccessPercentage( tr );
 
-        showResult( tr, "partial success", err );
+        showResult( tr, "partial success", System.out );
     }
 
     @Override
@@ -67,7 +52,7 @@ public class ProgressListener
     {
         super.onTestFailure( tr );
 
-        showResult( tr, "FAILED", err );
+        showResult( tr, "FAILED",  System.out );
     }
 
     @Override
@@ -75,7 +60,7 @@ public class ProgressListener
     {
         super.onTestSkipped( tr );
 
-        showResult( tr, "skipped", err );
+        showResult( tr, "skipped",  System.out );
     }
 
     @Override
@@ -83,7 +68,7 @@ public class ProgressListener
     {
         super.onTestSuccess( tr );
 
-        showResult( tr, "SUCCESS", out );
+        showResult( tr, "SUCCESS",  System.out );
     }
 
     private void showResult( ITestResult result, String status, PrintStream printer )
