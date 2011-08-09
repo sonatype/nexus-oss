@@ -212,7 +212,7 @@ public class LogbackLogManager
 
         if ( logFile.contains( File.pathSeparator ) )
         {
-            logger.warn( "Nexus refuses to retrive log files with path separators in its name." );
+            logger.warn( "Nexus refuses to retrieve log files with path separators in its name." );
 
             return null;
         }
