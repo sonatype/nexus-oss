@@ -176,7 +176,7 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <forkMode>once</forkMode> <!-- "always" for the latest resort, "once" is actually what we want -->
-          <argLine>-Xmx512M -XX:+HeapDumpOnOutOfMemoryError</argLine>
+          <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError</argLine>
           <excludes>
             <exclude>**Suite*</exclude>
             <!-- START These are start/stop tests, shouldn't be runned -->
@@ -251,7 +251,6 @@
     <dependency>
       <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-url-realm</artifactId>
-      <version>${plexus-security.version}</version>
     </dependency>
 
     <!-- NEXUS-2490 -->
@@ -515,7 +514,7 @@
             <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
 	          <!-- for Yourkit session, we left more memory intentionally -->
-              <argLine>-Xmx720M -XX:+HeapDumpOnOutOfMemoryError -agentpath:"${yourkit.agent}"</argLine>
+              <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError -agentpath:"${yourkit.agent}"</argLine>
             </configuration>
           </plugin>
         </plugins>
