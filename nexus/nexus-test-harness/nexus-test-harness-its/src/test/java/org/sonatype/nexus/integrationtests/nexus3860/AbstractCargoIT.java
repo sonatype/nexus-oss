@@ -27,6 +27,7 @@ import static org.testng.Assert.assertNotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -38,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.io.IOUtils;
 import org.codehaus.cargo.container.ContainerType;
 import org.codehaus.cargo.container.InstalledLocalContainer;
 import org.codehaus.cargo.container.configuration.ConfigurationType;
@@ -47,8 +49,12 @@ import org.codehaus.cargo.container.property.ServletPropertySet;
 import org.codehaus.cargo.generic.DefaultContainerFactory;
 import org.codehaus.cargo.generic.configuration.ConfigurationFactory;
 import org.codehaus.cargo.generic.configuration.DefaultConfigurationFactory;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -57,15 +63,20 @@ import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
+import org.sonatype.nexus.test.utils.NexusWebappLayout;
+import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import static org.hamcrest.Matchers.*;
 
 public abstract class AbstractCargoIT
 {
+
+    protected Logger log = LoggerFactory.getLogger( getClass() );
 
     private InstalledLocalContainer container;
 
@@ -88,7 +99,7 @@ public abstract class AbstractCargoIT
         throws Exception
     {
         fixPlexusProperties();
-        fixLog4jProperties();
+        changeStartupLoggingToDebug();
 
         WAR war = new WAR( getWarFile().getAbsolutePath() );
         war.setContext( "nexus" );
@@ -99,7 +110,6 @@ public abstract class AbstractCargoIT
                 ConfigurationType.STANDALONE );
         configuration.addDeployable( war );
         configuration.setProperty( ServletPropertySet.PORT, TestProperties.getString( "nexus.application.port" ) );
-
         container =
             (InstalledLocalContainer) new DefaultContainerFactory().createContainer( getContainer(),
                 ContainerType.INSTALLED, configuration );
@@ -112,10 +122,69 @@ public abstract class AbstractCargoIT
         TestContainer.getInstance().getTestContext().useAdminForRequests();
     }
 
-    private void fixLog4jProperties()
-        throws IOException
+    /**
+     * To be sure we get as much logging as possible to scan for errors loading plugins or other hidden goop, set
+     * startup logging to DEBUG level
+     */
+    private void changeStartupLoggingToDebug()
+        throws Exception
     {
-        File plexusProps = new File( getWarFile(), "WEB-INF/log4j.properties" );
+        // get the default logback.properties that will be deployed on 1st startup
+        File startupLogbackPropsFile = new File( getITNexusWorkDirPath() + "/conf/logback.properties" );
+        try
+        {
+            URL configUrl = this.getClass().getResource( "/META-INF/log/logback.properties" );
+            FileUtils.copyURLToFile( configUrl, startupLogbackPropsFile );
+        }
+        catch ( IOException e )
+        {
+            throw new IllegalStateException( "Could not create logback.properties as "
+                + startupLogbackPropsFile.getAbsolutePath() );
+        }
+
+        // now load the prop file and change the root.level to DEBUG
+        Properties p = new Properties();
+        FileReader r = new FileReader( startupLogbackPropsFile );
+        try
+        {
+            p.load( r );
+        }
+        finally
+        {
+            r.close();
+        }
+        assertThat( (String) p.get( "root.level" ), is( "INFO" ) ); // sanity
+
+        // reset it
+        p.setProperty( "root.level", "DEBUG" );
+
+        Writer w = new FileWriter( startupLogbackPropsFile );
+        try
+        {
+            p.store( w, "Startup properties that override the default root.level to DEBUG - created by "
+                + getClass().getName() );
+        }
+        catch ( IOException e )
+        {
+            throw new IllegalStateException( "Could not load logback.properties from "
+                + startupLogbackPropsFile.getAbsolutePath() );
+        }
+        finally
+        {
+
+            w.close();
+        }
+    }
+
+    /**
+     * Customize the work dir per IT by mucking with the nexus-work-dir property
+     * 
+     * @throws Exception
+     */
+    private void fixPlexusProperties()
+        throws Exception
+    {
+        File plexusProps = new File( getWarFile(), NexusWebappLayout.PATH_PLEXUS_PROPERTIES );
         Properties p = new Properties();
         FileReader r = new FileReader( plexusProps );
         try
@@ -126,10 +195,7 @@ public abstract class AbstractCargoIT
         {
             r.close();
         }
-
-        p.clear();
-        p.setProperty( "log4j.rootLogger", "DEBUG, logfile" );
-
+        p.setProperty( "nexus-work", getITNexusWorkDirPath() );
         Writer w = new FileWriter( plexusProps );
         try
         {
@@ -141,30 +207,9 @@ public abstract class AbstractCargoIT
         }
     }
 
-    private void fixPlexusProperties()
-        throws Exception
+    protected String getITNexusWorkDirPath()
     {
-        File plexusProps = new File( getWarFile(), "WEB-INF/plexus.properties" );
-        Properties p = new Properties();
-        FileReader r = new FileReader( plexusProps );
-        try
-        {
-            p.load( r );
-        }
-        finally
-        {
-            r.close();
-        }
-        p.setProperty( "nexus-work", TestProperties.getString( "nexus-work-dir" ) + "-" + getClass().getSimpleName() );
-        Writer w = new FileWriter( plexusProps );
-        try
-        {
-            p.store( w, null );
-        }
-        finally
-        {
-            w.close();
-        }
+        return TestProperties.getString( "nexus-work-dir" ) + "-" + getClass().getSimpleName();
     }
 
     @AfterClass( alwaysRun = true )
@@ -233,33 +278,51 @@ public abstract class AbstractCargoIT
         }
     }
 
+    /**
+     * Verify the logging output does not contain any nasty errors and such
+     */
     private void downloadAndConfirmLog( String logURI, String name )
         throws Exception
     {
-        Response response = RequestFacade.sendMessage( new URL( logURI ), Method.GET, null );
-        Assert.assertEquals( response.getStatus().getCode(), 200, "Request URI: " + logURI + " Status: " );
-        InputStream stream = response.getEntity().getStream();
-        if ( stream == null )
+        Response response = null;
+        InputStreamReader reader = null;
+        BufferedReader bReader = null;
+        try
         {
-            Assert.fail( "Stream was null: " + response.getEntity().getText() );
+            response = RequestFacade.sendMessage( new URL( logURI ), Method.GET, null );
+            assertThat( response, ResponseMatchers.isSuccessful() );
+            InputStream stream = response.getEntity().getStream();
+            if ( stream == null )
+            {
+                Assert.fail( "Stream was null: " + response.getEntity().getText() );
+            }
+
+            // get the first 10000 chars from the downloaded log
+            reader = new InputStreamReader( stream );
+            bReader = new BufferedReader( reader );
+
+            StringBuffer downloadedLog = new StringBuffer();
+
+            int lineCount = 10000;
+            while ( bReader.ready() && lineCount-- > 0 )
+            {
+                downloadedLog.append( (char) bReader.read() );
+            }
+
+            String downloadedLogStr = downloadedLog.toString();
+
+            assertThat( "Should have been DEBUG level logging so there should have been DEBUG in log",
+                downloadedLogStr, containsString( "DEBUG" ) );
+            assertThat( downloadedLogStr, not( containsString( "error" ) ) );
+            assertThat( downloadedLogStr, not( containsString( "exception" ) ) );
+
         }
-
-        // get the first 10000 chars from the downloaded log
-        InputStreamReader reader = new InputStreamReader( stream );
-        BufferedReader bReader = new BufferedReader( reader );
-
-        StringBuffer downloadedLog = new StringBuffer();
-
-        int lineCount = 10000;
-        while ( bReader.ready() && lineCount-- > 0 )
+        finally
         {
-            downloadedLog.append( (char) bReader.read() );
+            RequestFacade.releaseResponse( response );
+            IOUtils.closeQuietly( reader );
+            IOUtils.closeQuietly( bReader );
         }
-
-        String log = downloadedLog.toString();
-
-        assertThat( log, not( containsString( "error" ) ) );
-        assertThat( log, not( containsString( "exception" ) ) );
     }
 
 }
