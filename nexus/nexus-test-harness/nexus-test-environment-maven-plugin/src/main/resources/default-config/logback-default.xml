@@ -55,7 +55,7 @@
   </logger>
   <logger name="org.apache.commons" level="WARN"/>
 
-  <root level="INFO">
+  <root level="${it.nexus.log.level:-INFO}">
     <appender-ref ref="logfile"/>
   </root>
   
