@@ -1814,9 +1814,9 @@
     <profile>
       <id>m2e</id>
       <activation>
-        <!-- Does not stir anything, hence is always active -->
-        <!-- Note: before, it was activated by presence of "m2e.version" property that is not set anymore -->
-        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>m2e.version</name>
+        </property>
       </activation>
       <build>
         <pluginManagement>
