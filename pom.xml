@@ -63,6 +63,7 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
     </dependency>
+
   </dependencies>
 
   <build>
@@ -73,21 +74,18 @@
         <artifactId>app-lifecycle-maven-plugin</artifactId>
       </plugin>
       <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+      <plugin>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
       </plugin>
-
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
       </plugin>
-
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
       </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
