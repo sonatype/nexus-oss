@@ -22,78 +22,39 @@
   <name>Nexus Enterprise Plugin :: Unpack</name>
   <description>A plugin that will automatically unpack deployed bundles</description>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-webapp-dependencies</artifactId>
-        <version>${nexus.oss.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>app-lifecycle-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-test-environment-maven-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-invoker-plugin</artifactId>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-failsafe-plugin</artifactId>
-      </plugin>
-
-    </plugins>
-  </build>
-
   <dependencies>
+
+    <!-- Because we enforce license -->
+    <dependency>
+      <groupId>com.sonatype.nexus.edition</groupId>
+      <artifactId>nexus-professional-edition</artifactId>
+    </dependency>
+
+    <!-- This is a plugin -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
     </dependency>
 
+    <!-- This is a plugin that contributes REST API -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
     </dependency>
 
-    <!-- Testing -->
+    <!-- AllInOne for UTs -->
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-library</artifactId>
-    </dependency>
-      <!-- core To override any version from transitive dependencies. -->
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-test-api</artifactId>
     </dependency>
 
-
+    <!-- AllInOne for ITs -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>com.sonatype.nexus.extension</groupId>
-      <artifactId>nexus-licensing-extension</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
+    <!-- Is perverted, but it uses maven 3.0-alpha-4!!! -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>apache-maven</artifactId>
@@ -109,43 +70,25 @@
       </exclusions>
     </dependency>
 
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <version>5.11</version>
-      <classifier>jdk15</classifier>
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-      </exclusions>
-      <scope>test</scope>
-    </dependency>
-
-
   </dependencies>
 
-  <profiles>
-    <profile>
-      <id>skip-test-harness-tests</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.sonatype.nexus.plugins</groupId>
-            <artifactId>nexus-test-environment-maven-plugin</artifactId>
-            <configuration>
-              <testSkip>true</testSkip>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-test-environment-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-invoker-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
