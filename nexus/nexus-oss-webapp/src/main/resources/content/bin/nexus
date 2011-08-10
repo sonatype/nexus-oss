@@ -88,39 +88,6 @@ REALDIR=`pwd`
 # Source nexus.rc allowing user to override/set env variables without changing this script  
 . ${REALDIR}/../conf/nexus.rc
 
-# Default PIDDIR to current directory
-if [ "X$PIDDIR" = "X" ]
-then
-    PIDDIR="."
-fi
-
-# If the PIDDIR is relative, set its value relative to the full REALPATH to avoid problems if
-#  the working directory is later changed.
-FIRST_CHAR=`echo $PIDDIR | cut -c1,1`
-if [ "$FIRST_CHAR" != "/" ]
-then
-    PIDDIR=$REALDIR/$PIDDIR
-fi
-# Same test for WRAPPER_CMD
-FIRST_CHAR=`echo $WRAPPER_CMD | cut -c1,1`
-if [ "$FIRST_CHAR" != "/" ]
-then
-    WRAPPER_CMD=$REALDIR/$WRAPPER_CMD
-fi
-# Same test for WRAPPER_CONF
-FIRST_CHAR=`echo $WRAPPER_CONF | cut -c1,1`
-if [ "$FIRST_CHAR" != "/" ]
-then
-    WRAPPER_CONF=$REALDIR/$WRAPPER_CONF
-fi
-
-# Process ID
-ANCHORFILE="$PIDDIR/$APP_NAME.anchor"
-PIDFILE="$PIDDIR/$APP_NAME.pid"
-LOCKDIR="/var/lock/subsys"
-LOCKFILE="$LOCKDIR/$APP_NAME"
-pid=""
-
 # Resolve the location of the 'ps' command
 PSEXE="/usr/bin/ps"
 if [ ! -x "$PSEXE" ]
@@ -266,6 +233,39 @@ ignoreThisStuffForNow() {
         fi
     fi
 }
+
+# Default PIDDIR to os/arch/bits directory
+if [ "X$PIDDIR" = "X" ]
+then
+    PIDDIR="jsw/$DIST_OS-$DIST_ARCH-$DIST_BITS"
+fi
+
+# If the PIDDIR is relative, set its value relative to the full REALPATH to avoid problems if
+#  the working directory is later changed.
+FIRST_CHAR=`echo $PIDDIR | cut -c1,1`
+if [ "$FIRST_CHAR" != "/" ]
+then
+    PIDDIR=$REALDIR/$PIDDIR
+fi
+# Same test for WRAPPER_CMD
+FIRST_CHAR=`echo $WRAPPER_CMD | cut -c1,1`
+if [ "$FIRST_CHAR" != "/" ]
+then
+    WRAPPER_CMD=$REALDIR/$WRAPPER_CMD
+fi
+# Same test for WRAPPER_CONF
+FIRST_CHAR=`echo $WRAPPER_CONF | cut -c1,1`
+if [ "$FIRST_CHAR" != "/" ]
+then
+    WRAPPER_CONF=$REALDIR/$WRAPPER_CONF
+fi
+
+# Process ID
+ANCHORFILE="$PIDDIR/$APP_NAME.anchor"
+PIDFILE="$PIDDIR/$APP_NAME.pid"
+LOCKDIR="/var/lock/subsys"
+LOCKFILE="$LOCKDIR/$APP_NAME"
+pid=""
 
 TEST_WRAPPER_CMD="$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-$DIST_BITS"
 if [ -x "$TEST_WRAPPER_CMD" ]; then
