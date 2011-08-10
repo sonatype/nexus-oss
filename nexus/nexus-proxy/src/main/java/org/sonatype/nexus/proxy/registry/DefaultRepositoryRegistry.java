@@ -67,15 +67,12 @@ public class DefaultRepositoryRegistry
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
-    /** The repository register */
-    private final Map<String, Repository> repositories = new HashMap<String, Repository>();
-
     protected Logger getLogger()
     {
         return logger;
     }
 
-    public synchronized void addRepository( final Repository repository )
+    public void addRepository( final Repository repository )
     {
         final RepositoryTypeDescriptor rtd =
             repositoryTypeRegistry.getRepositoryTypeDescriptor( repository.getProviderRole(),
@@ -89,13 +86,13 @@ public class DefaultRepositoryRegistry
                 + repository.getRepositoryKind().getMainFacet().getName() + "')" );
     }
 
-    public synchronized void removeRepository( final String repoId )
+    public void removeRepository( final String repoId )
         throws NoSuchRepositoryException
     {
         doRemoveRepository( repoId, false );
     }
 
-    public synchronized void removeRepositorySilently( final String repoId )
+    public void removeRepositorySilently( final String repoId )
         throws NoSuchRepositoryException
     {
         doRemoveRepository( repoId, true );
@@ -219,6 +216,9 @@ public class DefaultRepositoryRegistry
     // priv
     //
 
+    /** The repository registry map */
+    private final Map<String, Repository> _repositories = new HashMap<String, Repository>();
+
     /**
      * Returns a copy of map with repositories. Is synchronized method, to allow consistent-read access. Methods
      * modifying this map are all also synchronized (see API Interface and above), while all the "reading" methods from
@@ -226,7 +226,17 @@ public class DefaultRepositoryRegistry
      */
     protected synchronized Map<String, Repository> getRepositoriesMap()
     {
-        return Collections.unmodifiableMap( new HashMap<String, Repository>( repositories ) );
+        return Collections.unmodifiableMap( new HashMap<String, Repository>( _repositories ) );
+    }
+
+    protected synchronized void repositoriesMapPut( final Repository repository )
+    {
+        _repositories.put( repository.getId(), repository );
+    }
+
+    protected synchronized void repositoriesMapRemove( final String repositoryId )
+    {
+        _repositories.remove( repositoryId );
     }
 
     protected void doRemoveRepository( final String repoId, final boolean silently )
@@ -251,27 +261,30 @@ public class DefaultRepositoryRegistry
 
     private void insertRepository( final RepositoryTypeDescriptor rtd, final Repository repository )
     {
-        repositories.put( repository.getId(), repository );
-
-        rtd.instanceRegistered( this );
-
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        synchronized ( this )
         {
-            ProxyRepository proxy = repository.adaptToFacet( ProxyRepository.class );
+            repositoriesMapPut( repository );
 
-            killMonitorThread( proxy );
+            rtd.instanceRegistered( this );
 
-            RepositoryStatusCheckerThread thread =
-                new RepositoryStatusCheckerThread( LoggerFactory.getLogger( getClass().getName() + "-"
-                    + repository.getId() ), (ProxyRepository) repository );
+            if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+            {
+                ProxyRepository proxy = repository.adaptToFacet( ProxyRepository.class );
 
-            proxy.setRepositoryStatusCheckerThread( thread );
+                killMonitorThread( proxy );
 
-            thread.setRunning( true );
+                RepositoryStatusCheckerThread thread =
+                    new RepositoryStatusCheckerThread( LoggerFactory.getLogger( getClass().getName() + "-"
+                        + repository.getId() ), (ProxyRepository) repository );
 
-            thread.setDaemon( true );
+                proxy.setRepositoryStatusCheckerThread( thread );
 
-            thread.start();
+                thread.setRunning( true );
+
+                thread.setDaemon( true );
+
+                thread.start();
+            }
         }
 
         applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventAdd( this, repository ) );
@@ -291,11 +304,14 @@ public class DefaultRepositoryRegistry
             applicationEventMulticaster.removeEventListener( (EventListener) repository );
         }
 
-        rtd.instanceUnregistered( this );
+        synchronized ( this )
+        {
+            rtd.instanceUnregistered( this );
 
-        repositories.remove( repository.getId() );
+            repositoriesMapRemove( repository.getId() );
 
-        killMonitorThread( repository.adaptToFacet( ProxyRepository.class ) );
+            killMonitorThread( repository.adaptToFacet( ProxyRepository.class ) );
+        }
 
         if ( !silently )
         {
