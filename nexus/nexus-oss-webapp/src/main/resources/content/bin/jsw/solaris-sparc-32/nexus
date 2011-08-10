@@ -339,7 +339,7 @@ checkUser() {
 
     # Check that script is not run as root
     LUID=`$IDEXE -u`
-    if [[ $LUID -eq 0 ]]; 
+    if [ $LUID -eq 0 ]
     then
         echo "****************************************"
         echo "WARNING - NOT RECOMMENDED TO RUN AS ROOT"
