@@ -88,36 +88,6 @@ REALDIR=`pwd`
 # Source nexus.rc allowing user to override/set env variables without changing this script  
 . ${REALDIR}/../conf/nexus.rc
 
-# Resolve the location of the 'id' command
-if [ ! -x "$IDEXE" ]
-then
-    IDEXE="/usr/xpg4/bin/id"
-    if [ ! -x "$IDEXE" ]
-    then
-        IDEXE="/usr/bin/id"
-        if [ ! -x "$IDEXE" ]
-        then
-            echo "Unable to locate 'id'."
-            echo "Please report this message along with the location of the command on your system."
-            exit 1
-        fi
-    fi
-fi
-
-# Check that script is not run as root
-LUID=$($IDEXE -u)
-if [[ $LUID -eq 0 ]]; 
-then
-    echo "****************************************"
-    echo "WARNING - NOT RECOMMENDED TO RUN AS ROOT"
-    echo "****************************************"
-    if [ ! "`$IDEXE -u -n`" = "$RUN_AS_USER" ]
-    then
-        echo "If you insist running as root, then set the environment variable RUN_AS_USER=root before running this script."
-        exit 1
-    fi
-fi
-
 # Default PIDDIR to current directory
 if [ "X$PIDDIR" = "X" ]
 then
@@ -337,55 +307,77 @@ checkUser() {
     # $1 touchLock flag
     # $2 command
 
+    # Resolve the location of the 'id' command
+    IDEXE="/usr/xpg4/bin/id"
+    if [ ! -x "$IDEXE" ]
+    then
+        IDEXE="/usr/bin/id"
+        if [ ! -x "$IDEXE" ]
+        then
+            echo "Unable to locate 'id'."
+            echo "Please report this message along with the location of the command on your system."
+            exit 1
+        fi
+    fi
+
     # Check the configured user.  If necessary rerun this script as the desired user.
     if [ "X$RUN_AS_USER" != "X" ]
     then
-        if [ "`$IDEXE -u -n`" = "$RUN_AS_USER" ]
+        if [ "`$IDEXE -u -n`" != "$RUN_AS_USER" ]
         then
-            # Already running as the configured user.  Avoid password prompts by not calling su.
-            RUN_AS_USER=""
+            # If LOCKPROP and $RUN_AS_USER are defined then the new user will most likely not be
+            # able to create the lock file.  The Wrapper will be able to update this file once it
+            # is created but will not be able to delete it on shutdown.  If $2 is defined then
+            # the lock file should be created for the current command
+            if [ "X$LOCKPROP" != "X" ]
+            then
+                if [ "X$1" != "X" ]
+                then
+                    # Resolve the primary group 
+                    RUN_AS_GROUP=`groups $RUN_AS_USER | awk '{print $3}' | tail -1`
+                    if [ "X$RUN_AS_GROUP" = "X" ]
+                    then
+                        RUN_AS_GROUP=$RUN_AS_USER
+                    fi
+                    touch $LOCKFILE
+                    chown $RUN_AS_USER:$RUN_AS_GROUP $LOCKFILE
+                fi
+            fi
+    
+            # Still want to change users, recurse.  This means that the user will only be
+            #  prompted for a password once. Variables shifted by 1
+            su -m $RUN_AS_USER -c "\"$REALPATH\" $2"
+    
+            # Now that we are the original user again, we may need to clean up the lock file.
+            if [ "X$LOCKPROP" != "X" ]
+            then
+                getpid
+                if [ "X$pid" = "X" ]
+                then
+                    # Wrapper is not running so make sure the lock file is deleted.
+                    if [ -f "$LOCKFILE" ]
+                    then
+                        rm "$LOCKFILE"
+                    fi
+                fi
+            fi
+    
+            exit 0
         fi
     fi
-    if [ "X$RUN_AS_USER" != "X" ]
+
+    # Check that script is not run as root
+    LUID=$($IDEXE -u)
+    if [[ $LUID -eq 0 ]]; 
     then
-        # If LOCKPROP and $RUN_AS_USER are defined then the new user will most likely not be
-        # able to create the lock file.  The Wrapper will be able to update this file once it
-        # is created but will not be able to delete it on shutdown.  If $2 is defined then
-        # the lock file should be created for the current command
-        if [ "X$LOCKPROP" != "X" ]
+        echo "****************************************"
+        echo "WARNING - NOT RECOMMENDED TO RUN AS ROOT"
+        echo "****************************************"
+        if [ ! "`$IDEXE -u -n`" = "$RUN_AS_USER" ]
         then
-            if [ "X$1" != "X" ]
-            then
-                # Resolve the primary group 
-                RUN_AS_GROUP=`groups $RUN_AS_USER | awk '{print $3}' | tail -1`
-                if [ "X$RUN_AS_GROUP" = "X" ]
-                then
-                    RUN_AS_GROUP=$RUN_AS_USER
-                fi
-                touch $LOCKFILE
-                chown $RUN_AS_USER:$RUN_AS_GROUP $LOCKFILE
-            fi
+            echo "If you insist running as root, then set the environment variable RUN_AS_USER=root before running this script."
+            exit 1
         fi
-
-        # Still want to change users, recurse.  This means that the user will only be
-        #  prompted for a password once. Variables shifted by 1
-        su -m $RUN_AS_USER -c "\"$REALPATH\" $2"
-
-        # Now that we are the original user again, we may need to clean up the lock file.
-        if [ "X$LOCKPROP" != "X" ]
-        then
-            getpid
-            if [ "X$pid" = "X" ]
-            then
-                # Wrapper is not running so make sure the lock file is deleted.
-                if [ -f "$LOCKFILE" ]
-                then
-                    rm "$LOCKFILE"
-                fi
-            fi
-        fi
-
-        exit 0
     fi
 }
 
