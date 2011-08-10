@@ -338,7 +338,7 @@ checkUser() {
     fi
 
     # Check that script is not run as root
-    LUID=$($IDEXE -u)
+    LUID=`$IDEXE -u`
     if [[ $LUID -eq 0 ]]; 
     then
         echo "****************************************"
