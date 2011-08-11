@@ -18,11 +18,16 @@
  */
 package org.sonatype.nexus.integrationtests.nexus602;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
-import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.isRedirecting;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.isSuccessful;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.redirectLocation;
+import static org.sonatype.nexus.test.utils.ResponseMatchers.respondsWithStatusCode;
+import static org.sonatype.nexus.test.utils.StatusMatchers.isNotFound;
 
+import java.io.File;
 import java.net.URL;
 
 import org.apache.maven.index.artifact.Gav;
@@ -38,13 +43,36 @@ import org.testng.annotations.Test;
 public class Nexus602SearchSnapshotArtifactIT
     extends AbstractNexusIntegrationTest
 {
+    /**
+     * Which contains both, the release and snap repo where this test has artifacts deployed, see resources/nexus602 and
+     * it's test-config
+     */
+    private static final String NEXUS_602_GROUP = "nexus-602-nexus-test-harness-group";
 
-    private Gav gav;
+    private final Gav gav;
 
     public Nexus602SearchSnapshotArtifactIT()
         throws Exception
     {
         gav = new Gav( "nexus602", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, false, null, false, null );
+    }
+
+    @Override
+    protected void runOnce()
+        throws Exception
+    {
+        // we must add GA level repository metadata, something not done by IT when it "deploys"
+        // GA level metadata is needed by two searchWildcardLatestOverAGroup() and searchWildcardReleaseOverAGroup()
+        // to perform proper maven-like resolution
+        final File gamdRelease = getTestFile( "gamd-release.xml" );
+        getDeployUtils().deployWithWagon( "http",
+            RequestFacade.toNexusURL( "content/repositories/nexus-test-harness-repo" ).toString(), gamdRelease,
+            gav.getGroupId() + "/" + gav.getArtifactId() + "/maven-metadata.xml" );
+
+        final File gamdSnapshot = getTestFile( "gamd-snapshot.xml" );
+        getDeployUtils().deployWithWagon( "http",
+            RequestFacade.toNexusURL( "content/repositories/nexus-test-harness-snapshot-repo" ).toString(),
+            gamdSnapshot, gav.getGroupId() + "/" + gav.getArtifactId() + "/maven-metadata.xml" );
     }
 
     @Test
@@ -80,7 +108,7 @@ public class Nexus602SearchSnapshotArtifactIT
         throws Exception
     {
         String serviceURI =
-            "service/local/artifact/maven/redirect?r=" + REPO_TEST_HARNESS_REPO + "&g=" + getTestId() + "&a="
+            "service/local/artifact/maven/redirect?r=" + REPO_TEST_HARNESS_REPO + "&g=" + gav.getGroupId() + "&a="
                 + "artifact" + "&v=" + "1.0";
 
         Response response = null;
@@ -94,6 +122,119 @@ public class Nexus602SearchSnapshotArtifactIT
             RequestFacade.releaseResponse( response );
 
             // location is full url, so sendMessage directly
+            response =
+                RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
+                    isSuccessful() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
+    }
+
+    @Test
+    public void searchSnapshotOverAGroup()
+        throws Exception
+    {
+        String serviceURI =
+            "service/local/artifact/maven/redirect?r=" + NEXUS_602_GROUP + "&g=" + gav.getGroupId() + "&a="
+                + gav.getArtifactId() + "&v=" + gav.getVersion();
+        Response response = null;
+
+        try
+        {
+            response = RequestFacade.doGetRequest( serviceURI );
+            assertThat(
+                response,
+                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
+
+            RequestFacade.releaseResponse( response );
+
+            response =
+                RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
+                    isSuccessful() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
+    }
+
+    @Test
+    public void searchReleaseOverAGroup()
+        throws Exception
+    {
+        String serviceURI =
+            "service/local/artifact/maven/redirect?r=" + NEXUS_602_GROUP + "&g=" + gav.getGroupId() + "&a="
+                + "artifact" + "&v=" + "1.0";
+
+        Response response = null;
+        try
+        {
+            response = RequestFacade.doGetRequest( serviceURI );
+            assertThat(
+                response,
+                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
+
+            RequestFacade.releaseResponse( response );
+
+            // location is full url, so sendMessage directly
+            response =
+                RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
+                    isSuccessful() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
+    }
+
+    @Test
+    public void searchWildcardLatestOverAGroup()
+        throws Exception
+    {
+        String serviceURI =
+            "service/local/artifact/maven/redirect?r=" + NEXUS_602_GROUP + "&g=" + gav.getGroupId() + "&a="
+                + gav.getArtifactId() + "&v=LATEST";
+        Response response = null;
+
+        try
+        {
+            response = RequestFacade.doGetRequest( serviceURI );
+            assertThat(
+                response,
+                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
+
+            RequestFacade.releaseResponse( response );
+
+            response =
+                RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
+                    isSuccessful() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
+    }
+
+    @Test
+    public void searchWildcardReleaseOverAGroup()
+        throws Exception
+    {
+        String serviceURI =
+            "service/local/artifact/maven/redirect?r=" + NEXUS_602_GROUP + "&g=" + gav.getGroupId() + "&a="
+                + gav.getArtifactId() + "&v=RELEASE";
+        Response response = null;
+
+        try
+        {
+            response = RequestFacade.doGetRequest( serviceURI );
+            assertThat(
+                response,
+                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
+
+            RequestFacade.releaseResponse( response );
+
             response =
                 RequestFacade.sendMessage( new URL( response.getLocationRef().toString() ), Method.GET, null,
                     isSuccessful() );
