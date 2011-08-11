@@ -20,6 +20,8 @@ package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 import static org.sonatype.nexus.proxy.maven.metadata.operations.MetadataUtil.isPluginEquals;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -102,10 +104,51 @@ public class AddPluginOperation
 
         // not found, add it
         plugins.add( plugin );
-
         Collections.sort( plugins, pluginComparator );
-
         return true;
+/*
+        // We have a large hack happening here
+        // Originally, the code was:
+
+        // plugins.add( plugin );
+        // Collections.sort( plugins, pluginComparator );
+        // return true;
+
+        // This above resulted with "batch" operations (like Nexus metadata merge when group serves up Maven metadata)
+        // high CPU usage and high response times. What was happening that Collections.sort() was invoked over and over
+        // for every insertion of one new plugin.
+
+        // Solution: we sort the list once, probably 1st time we got here -- and we "mark" that fact by using a
+        // ArrayList2 class. Then, we _keep_ that sorted list _stable_, by using binarySearch on it for insertions.
+        // Thus, we kept the semantics of previous solution but at
+        // much less CPU and computational expense.
+
+        if ( !( plugins instanceof ArrayList2 ) )
+        {
+            Collections.sort( plugins, pluginComparator );
+
+            metadata.setPlugins( new ArrayList2( plugins ) );
+
+            plugins = metadata.getPlugins();
+        }
+
+        final int index = Collections.binarySearch( plugins, plugin, pluginComparator );
+
+        // um, this checks seems unnecessary, since we already checked for contains() above,
+        // so if we are here, we _know_ the version to be added is NOT in the list
+        if ( index < 0 )
+        {
+            // vs.addVersion( version );
+            plugins.add( -index - 1, plugin );
+
+            return true;
+        }
+        else
+        {
+            // we should never arrive here, se above if()
+            return false;
+        }
+        */
     }
 
     class PluginComparator
@@ -127,4 +170,14 @@ public class AddPluginOperation
         }
     }
 
+    // == A HACK
+
+    public static class ArrayList2
+        extends ArrayList<Plugin>
+    {
+        public ArrayList2( Collection<? extends Plugin> c )
+        {
+            super( c );
+        }
+    }
 }

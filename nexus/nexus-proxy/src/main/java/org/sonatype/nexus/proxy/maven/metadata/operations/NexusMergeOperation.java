@@ -166,17 +166,17 @@ public class NexusMergeOperation
 
                 if ( sourceSnapshot.getTimestamp() != null )
                 {
-                    long sourceTimestamp = -1;
+//                    long sourceTimestamp = -1;
+//
+//                    try
+//                    {
+//                      sourceTimestamp = Long.parseLong( sourceSnapshot.getTimestamp().replace( ".", "" ) );
+//                  }
+//                  catch ( NumberFormatException e )
+//                  {
+//                  }
 
-                    try
-                    {
-                        sourceTimestamp = Long.parseLong( sourceSnapshot.getTimestamp().replace( ".", "" ) );
-                    }
-                    catch ( NumberFormatException e )
-                    {
-                    }
-
-                    if ( sourceTimestamp > timestamp )
+//                  if ( sourceTimestamp > timestamp )
                     {
                         ops.add( new SetSnapshotOperation( new SnapshotOperand( sourceModelVersion,
                             sourceSnapshot.getTimestamp().replace( ".", "" ), sourceSnapshot,
