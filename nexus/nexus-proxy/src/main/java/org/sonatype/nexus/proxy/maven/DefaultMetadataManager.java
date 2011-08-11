@@ -125,25 +125,34 @@ public class DefaultMetadataManager
     {
         MavenRepository repository = gavRequest.getMavenRepository();
 
-        if ( RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )
+        Metadata gaMd =
+            metadataLocator.retrieveGAMetadata( new ArtifactStoreRequest( gavRequest.getMavenRepository(), gav,
+                gavRequest.isRequestLocalOnly(), gavRequest.isRequestRemoteOnly() ) );
+
+        if ( gaMd.getVersioning() == null )
         {
-            Metadata gaMd =
-                metadataLocator.retrieveGAMetadata( new ArtifactStoreRequest( gavRequest.getMavenRepository(), gav,
-                    gavRequest.isRequestLocalOnly(), gavRequest.isRequestRemoteOnly() ) );
+            gaMd.setVersioning( new Versioning() );
+        }
 
-            if ( gaMd.getVersioning() == null )
+        String latest = gaMd.getVersioning().getLatest();
+
+        if ( StringUtils.isEmpty( latest ) && gaMd.getVersioning().getVersions() != null )
+        {
+            List<String> versions = gaMd.getVersioning().getVersions();
+
+            // iterate over versions for the end, and grab the first snap found
+            for ( int i = versions.size() - 1; i >= 0; i-- )
             {
-                gaMd.setVersioning( new Versioning() );
-            }
+                if ( RepositoryPolicy.RELEASE.equals( repository.getRepositoryPolicy() ) )
+                {
+                    if ( !VersionUtils.isSnapshot( versions.get( i ) ) )
+                    {
+                        latest = versions.get( i );
 
-            String latest = gaMd.getVersioning().getLatest();
-
-            if ( StringUtils.isEmpty( latest ) && gaMd.getVersioning().getVersions() != null )
-            {
-                List<String> versions = gaMd.getVersioning().getVersions();
-
-                // iterate over versions for the end, and grab the first snap found
-                for ( int i = versions.size() - 1; i >= 0; i-- )
+                        break;
+                    }
+                }
+                else if ( RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )
                 {
                     if ( VersionUtils.isSnapshot( versions.get( i ) ) )
                     {
@@ -152,20 +161,22 @@ public class DefaultMetadataManager
                         break;
                     }
                 }
-            }
+                else
+                {
+                    latest = versions.get( i );
 
-            if ( !StringUtils.isEmpty( latest ) )
-            {
-                return latest;
+                    break;
+                }
             }
-            else
-            {
-                return gavRequest.getVersion();
-            }
+        }
+
+        if ( !StringUtils.isEmpty( latest ) )
+        {
+            return latest;
         }
         else
         {
-            return resolveRelease( gavRequest, gav );
+            return gavRequest.getVersion();
         }
     }
 
