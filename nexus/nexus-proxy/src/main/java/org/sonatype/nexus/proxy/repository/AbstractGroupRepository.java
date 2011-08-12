@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
@@ -46,7 +47,13 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsGroupLocalOnlyAttribute;
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.charger.AllArrivedChargeStrategy;
+import org.sonatype.nexus.proxy.repository.charger.Charger;
+import org.sonatype.nexus.proxy.repository.charger.FirstArrivedChargeStrategy;
+import org.sonatype.nexus.proxy.repository.charger.GroupItemRetrieveCallable;
+import org.sonatype.nexus.proxy.repository.charger.ItemRetrieveCallable;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -58,11 +65,18 @@ public abstract class AbstractGroupRepository
     extends AbstractRepository
     implements GroupRepository
 {
+    /** Secret switch ;) */
+    private static final boolean USE_CHARGER_FOR_GROUP_REQUESTS = SystemPropertiesHelper.getBoolean(
+        "nexus.useChargerForGroupRequests", false );
+
     @Requirement
     private RepositoryRegistry repoRegistry;
 
     @Requirement
     private RequestRepositoryMapper requestRepositoryMapper;
+
+    @Requirement( hint = "shiro" )
+    private Charger charger;
 
     @Override
     protected AbstractGroupRepositoryConfiguration getExternalConfiguration( boolean forWrite )
@@ -238,48 +252,92 @@ public abstract class AbstractGroupRepository
 
             if ( !isRequestGroupLocalOnly )
             {
-                for ( Repository repo : getRequestRepositories( request ) )
+                if ( USE_CHARGER_FOR_GROUP_REQUESTS )
                 {
-                    if ( !request.getProcessedRepositories().contains( repo.getId() ) )
+                    List<Callable<StorageItem>> callables = new ArrayList<Callable<StorageItem>>();
+
+                    for ( Repository repository : getRequestRepositories( request ) )
                     {
-                        try
+                        if ( !request.getProcessedRepositories().contains( repository.getId() ) )
                         {
-                            StorageItem item = repo.retrieveItem( request );
-
-                            if ( item instanceof StorageCollectionItem )
+                            callables.add( new GroupItemRetrieveCallable( getLogger(), repository, request, this ) );
+                        }
+                        else
+                        {
+                            if ( getLogger().isDebugEnabled() )
                             {
-                                item = new DefaultStorageCollectionItem( this, request, true, false );
+                                getLogger().debug(
+                                    "Repository ID='"
+                                        + repository.getId()
+                                        + "' in group ID='"
+                                        + this.getId()
+                                        + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                        + request.toString() );
                             }
-
-                            return item;
-                        }
-                        catch ( IllegalOperationException e )
-                        {
-                            // ignored
-                        }
-                        catch ( ItemNotFoundException e )
-                        {
-                            // ignored
-                        }
-                        catch ( StorageException e )
-                        {
-                            // ignored
-                        }
-                        catch ( AccessDeniedException e )
-                        {
-                            // cannot happen, since we add/check for AccessManager.REQUEST_AUTHORIZED flag
                         }
                     }
-                    else
-                    {
-                        getLogger().info(
-                            "Repository ID='"
-                                + repo.getId()
-                                + "' in group ID='"
-                                + this.getId()
-                                + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                + request.toString() );
 
+                    try
+                    {
+                        List<StorageItem> items =
+                            charger.submit( callables, new FirstArrivedChargeStrategy<StorageItem>() ).getResult();
+
+                        if ( items.size() > 0 )
+                        {
+                            return items.get( 0 );
+                        }
+                    }
+                    catch ( Exception e )
+                    {
+                        // will not happen, see GroupItemRetrieveCallable class' javadoc, it supresses all of them
+                        // to make compiler happy
+                        throw new LocalStorageException( "Ouch!", e );
+                    }
+                }
+                else
+                {
+                    for ( Repository repo : getRequestRepositories( request ) )
+                    {
+                        if ( !request.getProcessedRepositories().contains( repo.getId() ) )
+                        {
+                            try
+                            {
+                                StorageItem item = repo.retrieveItem( request );
+
+                                if ( item instanceof StorageCollectionItem )
+                                {
+                                    item = new DefaultStorageCollectionItem( this, request, true, false );
+                                }
+
+                                return item;
+                            }
+                            catch ( IllegalOperationException e )
+                            {
+                                // ignored
+                            }
+                            catch ( ItemNotFoundException e )
+                            {
+                                // ignored
+                            }
+                            catch ( StorageException e )
+                            {
+                                // ignored
+                            }
+                            catch ( AccessDeniedException e )
+                            {
+                                // cannot happen, since we add/check for AccessManager.REQUEST_AUTHORIZED flag
+                            }
+                        }
+                        else
+                        {
+                            getLogger().info(
+                                "Repository ID='"
+                                    + repo.getId()
+                                    + "' in group ID='"
+                                    + this.getId()
+                                    + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                    + request.toString() );
+                        }
                     }
                 }
             }
@@ -416,47 +474,90 @@ public abstract class AbstractGroupRepository
 
         if ( !isRequestGroupLocalOnly )
         {
-            for ( Repository repository : getRequestRepositories( request ) )
+            if ( USE_CHARGER_FOR_GROUP_REQUESTS )
             {
-                if ( !request.getProcessedRepositories().contains( repository.getId() ) )
-                {
-                    try
-                    {
-                        StorageItem item = repository.retrieveItem( false, request );
+                List<Callable<StorageItem>> callables = new ArrayList<Callable<StorageItem>>();
 
-                        items.add( item );
-                    }
-                    catch ( ItemNotFoundException e )
+                for ( Repository repository : getRequestRepositories( request ) )
+                {
+                    if ( !request.getProcessedRepositories().contains( repository.getId() ) )
                     {
-                        // that's okay
+                        callables.add( new ItemRetrieveCallable( getLogger(), repository, request ) );
                     }
-                    catch ( RepositoryNotAvailableException e )
+                    else
                     {
-                        getLogger().debug(
-                            RepositoryStringUtils.getFormattedMessage(
-                                "Member repository %s is not available, request failed.", e.getRepository() ) );
-                    }
-                    catch ( StorageException e )
-                    {
-                        throw e;
-                    }
-                    catch ( IllegalOperationException e )
-                    {
-                        getLogger().warn( "Member repository request failed", e );
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            getLogger().debug(
+                                "Repository ID='"
+                                    + repository.getId()
+                                    + "' in group ID='"
+                                    + this.getId()
+                                    + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                    + request.toString() );
+                        }
                     }
                 }
-                else
-                {
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().debug(
-                            "Repository ID='"
-                                + repository.getId()
-                                + "' in group ID='"
-                                + this.getId()
-                                + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                + request.toString() );
 
+                try
+                {
+                    return charger.submit( callables, new AllArrivedChargeStrategy<StorageItem>() ).getResult();
+                }
+                catch ( StorageException e )
+                {
+                    throw e;
+                }
+                catch ( Exception e )
+                {
+                    // will not happen, ItemRetrieveCallable supresses all except StorageException!
+                    // just to make compiler happy
+                    throw new LocalStorageException( "Ouch!", e );
+                }
+            }
+            else
+            {
+                for ( Repository repository : getRequestRepositories( request ) )
+                {
+                    if ( !request.getProcessedRepositories().contains( repository.getId() ) )
+                    {
+                        try
+                        {
+                            StorageItem item = repository.retrieveItem( false, request );
+
+                            items.add( item );
+                        }
+                        catch ( ItemNotFoundException e )
+                        {
+                            // that's okay
+                        }
+                        catch ( RepositoryNotAvailableException e )
+                        {
+                            getLogger().debug(
+                                RepositoryStringUtils.getFormattedMessage(
+                                    "Member repository %s is not available, request failed.", e.getRepository() ) );
+                        }
+                        catch ( StorageException e )
+                        {
+                            throw e;
+                        }
+                        catch ( IllegalOperationException e )
+                        {
+                            getLogger().warn( "Member repository request failed", e );
+                        }
+                    }
+                    else
+                    {
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            getLogger().debug(
+                                "Repository ID='"
+                                    + repository.getId()
+                                    + "' in group ID='"
+                                    + this.getId()
+                                    + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                    + request.toString() );
+
+                        }
                     }
                 }
             }
