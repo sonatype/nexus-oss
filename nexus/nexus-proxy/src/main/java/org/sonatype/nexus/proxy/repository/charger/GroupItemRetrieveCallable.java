@@ -15,6 +15,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.sisu.charger.ExceptionHandler;
 
 import com.google.common.base.Preconditions;
 

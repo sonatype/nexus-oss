@@ -492,6 +492,13 @@
         </exclusions>
       </dependency>
 
+      <!-- Sisu -->
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-charger</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </dependency>
+      
       <!-- shiro -->
       <dependency>
         <groupId>org.sonatype.security</groupId>

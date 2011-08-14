@@ -47,14 +47,14 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsGroupLocalOnlyAttribute;
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.charger.AllArrivedChargeStrategy;
-import org.sonatype.nexus.proxy.repository.charger.Charger;
-import org.sonatype.nexus.proxy.repository.charger.FirstArrivedChargeStrategy;
 import org.sonatype.nexus.proxy.repository.charger.GroupItemRetrieveCallable;
 import org.sonatype.nexus.proxy.repository.charger.ItemRetrieveCallable;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.charger.Charger;
+import org.sonatype.sisu.charger.internal.AllArrivedChargeStrategy;
+import org.sonatype.sisu.charger.internal.FirstArrivedChargeStrategy;
 
 /**
  * An abstract group repository. The specific behaviour (ie. metadata merge) should be implemented in subclases.
