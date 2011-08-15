@@ -44,12 +44,12 @@ public class Nexus977GroupOfGroupsPublishIndexesTaskIT
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryId" );
-        repo.setValue( "repository_r4" );
+        repo.setValue( "r4" );
         TaskScheduleUtil.runTask( "r4", DownloadIndexesTaskDescriptor.ID, repo );
         
         repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryId" );
-        repo.setValue( "repository_r5" );
+        repo.setValue( "r5" );
         TaskScheduleUtil.runTask( "r5", DownloadIndexesTaskDescriptor.ID, repo );
     }
 

@@ -38,7 +38,6 @@ public class Nexus977GroupOfGroupsRebuildMavenMetadataTaskIT
     extends AbstractNexusProxyIntegrationTest
 {
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void checkMetadata()
         throws Exception
