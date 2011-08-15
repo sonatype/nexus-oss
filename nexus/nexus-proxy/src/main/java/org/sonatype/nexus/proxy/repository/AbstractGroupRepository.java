@@ -65,9 +65,9 @@ public abstract class AbstractGroupRepository
     extends AbstractRepository
     implements GroupRepository
 {
-    /** Secret switch ;) */
+    /** Secret switch that allows disabling use of Charger if needed */
     private static final boolean USE_CHARGER_FOR_GROUP_REQUESTS = SystemPropertiesHelper.getBoolean(
-        "nexus.useChargerForGroupRequests", false );
+        "nexus.useParallelGroupRequests", true );
 
     @Requirement
     private RepositoryRegistry repoRegistry;
