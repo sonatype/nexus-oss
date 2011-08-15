@@ -47,12 +47,12 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsGroupLocalOnlyAttribute;
 import org.sonatype.nexus.proxy.mapping.RequestRepositoryMapper;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.charger.ChargerHolder;
 import org.sonatype.nexus.proxy.repository.charger.GroupItemRetrieveCallable;
 import org.sonatype.nexus.proxy.repository.charger.ItemRetrieveCallable;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
-import org.sonatype.sisu.charger.Charger;
 import org.sonatype.sisu.charger.internal.AllArrivedChargeStrategy;
 import org.sonatype.sisu.charger.internal.FirstArrivedChargeStrategy;
 
@@ -75,8 +75,8 @@ public abstract class AbstractGroupRepository
     @Requirement
     private RequestRepositoryMapper requestRepositoryMapper;
 
-    @Requirement( hint = "shiro" )
-    private Charger charger;
+    @Requirement
+    private ChargerHolder chargerHolder;
 
     @Override
     protected AbstractGroupRepositoryConfiguration getExternalConfiguration( boolean forWrite )
@@ -280,7 +280,7 @@ public abstract class AbstractGroupRepository
                     try
                     {
                         List<StorageItem> items =
-                            charger.submit( callables, new FirstArrivedChargeStrategy<StorageItem>() ).getResult();
+                            chargerHolder.getCharger().submit( callables, new FirstArrivedChargeStrategy<StorageItem>() ).getResult();
 
                         if ( items.size() > 0 )
                         {
@@ -501,7 +501,7 @@ public abstract class AbstractGroupRepository
 
                 try
                 {
-                    return charger.submit( callables, new AllArrivedChargeStrategy<StorageItem>() ).getResult();
+                    return chargerHolder.getCharger().submit( callables, new AllArrivedChargeStrategy<StorageItem>() ).getResult();
                 }
                 catch ( StorageException e )
                 {
