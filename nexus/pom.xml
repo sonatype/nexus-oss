@@ -158,7 +158,6 @@
     <enunciate.version>1.20</enunciate.version>
     <jetty.version>6.1.19</jetty.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
-    <log4j.version>1.2.14</log4j.version>
     <logback.version>0.9.29</logback.version>
     <maven.indexer.version>4.1.1</maven.indexer.version>
     <maven.version>3.0.1</maven.version>
@@ -602,13 +601,6 @@
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>${slf4j.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4j.version}</version>
         <type>jar</type>
@@ -625,13 +617,6 @@
         <groupId>org.slf4j</groupId>
         <artifactId>log4j-over-slf4j</artifactId>
         <version>${slf4j.version}</version>
-        <type>jar</type>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <version>${log4j.version}</version>
         <type>jar</type>
         <scope>runtime</scope>
       </dependency>
@@ -1325,7 +1310,7 @@
                     <exclude>log4j:log4j:*:jar:test</exclude>
                   </excludes>
                   <includes>
-                    <include>log4j:log4j:${log4j.version}:jar:provided</include>
+                    <include>log4j:*</include>
                   </includes>
                   
                   <message>Do not use log4j api directly in tests. Use slf4j api instead.</message>
