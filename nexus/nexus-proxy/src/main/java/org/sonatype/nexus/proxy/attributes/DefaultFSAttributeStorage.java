@@ -27,6 +27,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
@@ -57,7 +58,7 @@ import com.thoughtworks.xstream.XStreamException;
  */
 @Component( role = AttributeStorage.class )
 public class DefaultFSAttributeStorage
-    implements AttributeStorage, EventListener, Initializable
+    implements AttributeStorage, EventListener, Initializable, Disposable
 {
     @Requirement
     private Logger logger;
@@ -97,19 +98,21 @@ public class DefaultFSAttributeStorage
     public void initialize()
     {
         applicationEventMulticaster.addEventListener( this );
+
+        initializeWorkingDirectory();
+    }
+
+    public void dispose()
+    {
+        applicationEventMulticaster.removeEventListener( this );
     }
 
     public void onEvent( final Event<?> evt )
     {
         if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {
-            nullifyWorkingDirectory();
+            initializeWorkingDirectory();
         }
-    }
-
-    protected synchronized void nullifyWorkingDirectory()
-    {
-        this.workingDirectory = null;
     }
 
     /**
@@ -117,8 +120,13 @@ public class DefaultFSAttributeStorage
      * 
      * @return the base dir
      */
-    public synchronized File getWorkingDirectory()
+    public File getWorkingDirectory()
         throws IOException
+    {
+        return workingDirectory;
+    }
+
+    public synchronized File initializeWorkingDirectory()
     {
         if ( workingDirectory == null )
         {
