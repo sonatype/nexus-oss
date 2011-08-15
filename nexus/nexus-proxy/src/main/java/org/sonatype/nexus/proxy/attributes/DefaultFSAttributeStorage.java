@@ -68,13 +68,13 @@ public class DefaultFSAttributeStorage
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
+    /** The xstream. */
+    private final XStream xstream;
+
     /**
      * The base dir.
      */
-    private File workingDirectory;
-
-    /** The xstream. */
-    private XStream xstream;
+    private volatile File workingDirectory;
 
     /**
      * Instantiates a new FSX stream attribute storage.
@@ -103,8 +103,13 @@ public class DefaultFSAttributeStorage
     {
         if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {
-            this.workingDirectory = null;
+            nullifyWorkingDirectory();
         }
+    }
+
+    protected synchronized void nullifyWorkingDirectory()
+    {
+        this.workingDirectory = null;
     }
 
     /**
@@ -112,7 +117,7 @@ public class DefaultFSAttributeStorage
      * 
      * @return the base dir
      */
-    public File getWorkingDirectory()
+    public synchronized File getWorkingDirectory()
         throws IOException
     {
         if ( workingDirectory == null )
@@ -121,7 +126,7 @@ public class DefaultFSAttributeStorage
 
             if ( workingDirectory.exists() )
             {
-                if ( workingDirectory.isFile() )
+                if ( !workingDirectory.isDirectory() )
                 {
                     throw new IllegalArgumentException( "The attribute storage exists and is not a directory: "
                         + workingDirectory.getAbsolutePath() );
@@ -133,8 +138,11 @@ public class DefaultFSAttributeStorage
 
                 if ( !workingDirectory.mkdirs() )
                 {
-                    throw new IllegalArgumentException( "Could not create the attribute storage directory on path "
-                        + workingDirectory.getAbsolutePath() );
+                    if ( !workingDirectory.isDirectory() )
+                    {
+                        throw new IllegalArgumentException( "Could not create the attribute storage directory on path "
+                            + workingDirectory.getAbsolutePath() );
+                    }
                 }
             }
         }
@@ -142,7 +150,7 @@ public class DefaultFSAttributeStorage
         return workingDirectory;
     }
 
-    public void setWorkingDirectory( final File baseDir )
+    public synchronized void setWorkingDirectory( final File baseDir )
     {
         this.workingDirectory = baseDir;
     }
