@@ -57,8 +57,7 @@ public class Nexus2302DeployEncodedFileIT
     public void plusSign()
         throws Exception
     {
-        Gav gav =
-            new Gav( "nexus2302", "artifact", "1.0", "c++", "jar", null, null, null, false, null, false, null );
+        Gav gav = new Gav( "nexus2302", "artifact", "1.0", "c++", "jar", null, null, null, false, null, false, null );
         testIt( gav );
     }
 
@@ -66,8 +65,7 @@ public class Nexus2302DeployEncodedFileIT
     public void version()
         throws Exception
     {
-        Gav gav =
-            new Gav( "nexus2302", "artifact", "1++0", null, "jar", null, null, null, false, null, false, null );
+        Gav gav = new Gav( "nexus2302", "artifact", "1++0", null, "jar", null, null, null, false, null, false, null );
         testIt( gav );
     }
 
@@ -76,8 +74,7 @@ public class Nexus2302DeployEncodedFileIT
         throws Exception
     {
         Gav gav =
-            new Gav( "nexus2302", "artifact", "$dolar", "void", "jar", null, null, null, false, null, false,
-                null );
+            new Gav( "nexus2302", "artifact", "$dolar", "void", "jar", null, null, null, false, null, false, null );
         testIt( gav );
     }
 
@@ -232,22 +229,25 @@ public class Nexus2302DeployEncodedFileIT
         List<NexusArtifact> result =
             getSearchMessageUtil().searchForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
                 REPO_TEST_HARNESS_REPO );
-        assertResult( gav, result );
+        assertResult( gav, result, false );
 
         result =
             getSearchMessageUtil().searchForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
                 gav.getExtension(), gav.getClassifier(), REPO_TEST_HARNESS_REPO );
-        assertResult( gav, result );
+        assertResult( gav, result, true );
     }
 
-    private void assertResult( Gav gav, List<NexusArtifact> result )
+    private void assertResult( Gav gav, List<NexusArtifact> result, boolean assertClassifier )
     {
         assertFalse( result.isEmpty() );
 
         assertThat( result.get( 0 ).getGroupId(), equalTo( gav.getGroupId() ) );
         assertThat( result.get( 0 ).getArtifactId(), equalTo( gav.getArtifactId() ) );
         assertThat( result.get( 0 ).getVersion(), equalTo( gav.getVersion() ) );
-        assertThat( result.get( 0 ).getClassifier(), equalTo( gav.getClassifier() ) );
+        if ( assertClassifier )
+        {
+            assertThat( result.get( 0 ).getClassifier(), equalTo( gav.getClassifier() ) );
+        }
     }
 
     private void checkFileSystem( Gav gav )
