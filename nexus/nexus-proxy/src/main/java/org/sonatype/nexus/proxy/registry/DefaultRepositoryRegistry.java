@@ -269,7 +269,7 @@ public class DefaultRepositoryRegistry
 
             if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
             {
-                ProxyRepository proxy = repository.adaptToFacet( ProxyRepository.class );
+                final ProxyRepository proxy = repository.adaptToFacet( ProxyRepository.class );
 
                 killMonitorThread( proxy );
 

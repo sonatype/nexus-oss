@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
@@ -50,9 +51,11 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.charger.ChargerHolder;
 import org.sonatype.nexus.proxy.repository.charger.GroupItemRetrieveCallable;
 import org.sonatype.nexus.proxy.repository.charger.ItemRetrieveCallable;
+import org.sonatype.nexus.proxy.repository.threads.PoolManager;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.charger.CallableExecutor;
 import org.sonatype.sisu.charger.internal.AllArrivedChargeStrategy;
 import org.sonatype.sisu.charger.internal.FirstArrivedChargeStrategy;
 
@@ -63,11 +66,11 @@ import org.sonatype.sisu.charger.internal.FirstArrivedChargeStrategy;
  */
 public abstract class AbstractGroupRepository
     extends AbstractRepository
-    implements GroupRepository
+    implements GroupRepository, CallableExecutor
 {
     /** Secret switch that allows disabling use of Charger if needed */
     private static final boolean USE_CHARGER_FOR_GROUP_REQUESTS = SystemPropertiesHelper.getBoolean(
-        "nexus.useParallelGroupRequests", true );
+        "nexus.useParallelGroupRequests", false );
 
     @Requirement
     private RepositoryRegistry repoRegistry;
@@ -77,6 +80,9 @@ public abstract class AbstractGroupRepository
 
     @Requirement
     private ChargerHolder chargerHolder;
+
+    @Requirement
+    private PoolManager poolManager;
 
     @Override
     protected AbstractGroupRepositoryConfiguration getExternalConfiguration( boolean forWrite )
@@ -111,6 +117,12 @@ public abstract class AbstractGroupRepository
             // fire another event
             getApplicationEventMulticaster().notifyEventListeners( new RepositoryGroupMembersChangedEvent( this ) );
         }
+    }
+
+    @Override
+    public <T> Future<T> submit( Callable<T> task )
+    {
+        return poolManager.getExecutorService( this ).submit( task );
     }
 
     @Override
@@ -280,7 +292,8 @@ public abstract class AbstractGroupRepository
                     try
                     {
                         List<StorageItem> items =
-                            chargerHolder.getCharger().submit( callables, new FirstArrivedChargeStrategy<StorageItem>() ).getResult();
+                            chargerHolder.getCharger().submit( callables,
+                                new FirstArrivedChargeStrategy<StorageItem>(), this ).getResult();
 
                         if ( items.size() > 0 )
                         {
@@ -501,7 +514,8 @@ public abstract class AbstractGroupRepository
 
                 try
                 {
-                    return chargerHolder.getCharger().submit( callables, new AllArrivedChargeStrategy<StorageItem>() ).getResult();
+                    return chargerHolder.getCharger().submit( callables, new AllArrivedChargeStrategy<StorageItem>(),
+                        this ).getResult();
                 }
                 catch ( StorageException e )
                 {

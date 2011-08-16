@@ -26,8 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.ExceptionUtils;
@@ -60,6 +58,7 @@ import org.sonatype.nexus.proxy.mirror.DefaultDownloadMirrors;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrorSelector;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.repository.EvictUnusedItemsWalkerProcessor.EvictUnusedItemsWalkerFilter;
+import org.sonatype.nexus.proxy.repository.threads.PoolManager;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -68,7 +67,6 @@ import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClie
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
-import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.ConstantNumberSequence;
 import org.sonatype.nexus.util.FibonacciNumberSequence;
 import org.sonatype.nexus.util.NumberSequence;
@@ -95,7 +93,12 @@ public abstract class AbstractProxyRepository
     private static final long AUTO_BLOCK_STATUS_MAX_RETAIN_TIME = 60L * 60L * 1000L;
 
     @Requirement
-    private ProxyRepositoryStatusExecutor proxyRepositoryStatusExecutor;
+    private PoolManager poolManager;
+
+    /**
+     * The remote status checker thread, used in Proxies. Not to go into Pool above, is handled separately.
+     */
+    private Thread repositoryStatusCheckerThread;
 
     /** if remote url changed, need special handling after save */
     private boolean remoteUrlChanged = false;
@@ -109,8 +112,6 @@ public abstract class AbstractProxyRepository
     /** How much should be the last known remote status be retained. */
     private volatile NumberSequence remoteStatusRetainTimeSequence = new ConstantNumberSequence(
         REMOTE_STATUS_RETAIN_TIME );
-
-    private Thread repositoryStatusCheckerThread;
 
     /** The remote storage. */
     private RemoteRepositoryStorage remoteStorage;
@@ -658,7 +659,7 @@ public abstract class AbstractProxyRepository
             // check for thread and go check it
             _remoteStatusChecking = true;
 
-            proxyRepositoryStatusExecutor.submit( new RemoteStatusUpdateCallable( request ) );
+            poolManager.getExecutorService( this ).submit( new RemoteStatusUpdateCallable( request ) );
         }
 
         return remoteStatus;
