@@ -50,6 +50,8 @@ public abstract class AbstractArtifactInfoIT
         getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_REPO, jar, pom, null, null );
         getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_REPO2, jar, pom, null, null );
         getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_RELEASE_REPO, jar, pom, null, null );
+        
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
     protected Iterable<String> getRepositoryId( List<RepositoryUrlResource> repositories )
