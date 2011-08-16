@@ -57,7 +57,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.sisu.charger.CallableExecutor;
 import org.sonatype.sisu.charger.internal.AllArrivedChargeStrategy;
-import org.sonatype.sisu.charger.internal.FirstArrivedChargeStrategy;
+import org.sonatype.sisu.charger.internal.FirstArrivedInOrderChargeStrategy;
 
 /**
  * An abstract group repository. The specific behaviour (ie. metadata merge) should be implemented in subclases.
@@ -293,7 +293,7 @@ public abstract class AbstractGroupRepository
                     {
                         List<StorageItem> items =
                             chargerHolder.getCharger().submit( callables,
-                                new FirstArrivedChargeStrategy<StorageItem>(), this ).getResult();
+                                new FirstArrivedInOrderChargeStrategy<StorageItem>(), this ).getResult();
 
                         if ( items.size() > 0 )
                         {
