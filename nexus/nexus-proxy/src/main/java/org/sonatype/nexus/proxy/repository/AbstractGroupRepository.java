@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
@@ -51,7 +52,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.charger.ChargerHolder;
 import org.sonatype.nexus.proxy.repository.charger.GroupItemRetrieveCallable;
 import org.sonatype.nexus.proxy.repository.charger.ItemRetrieveCallable;
-import org.sonatype.nexus.proxy.repository.threads.PoolManager;
+import org.sonatype.nexus.proxy.repository.threads.ThreadPoolManager;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
@@ -82,7 +83,7 @@ public abstract class AbstractGroupRepository
     private ChargerHolder chargerHolder;
 
     @Requirement
-    private PoolManager poolManager;
+    private ThreadPoolManager poolManager;
 
     @Override
     protected AbstractGroupRepositoryConfiguration getExternalConfiguration( boolean forWrite )
@@ -122,7 +123,7 @@ public abstract class AbstractGroupRepository
     @Override
     public <T> Future<T> submit( Callable<T> task )
     {
-        return poolManager.getExecutorService( this ).submit( task );
+        return poolManager.getRepositoryThreadPool( this ).submit( task );
     }
 
     @Override
@@ -264,7 +265,9 @@ public abstract class AbstractGroupRepository
 
             if ( !isRequestGroupLocalOnly )
             {
-                if ( USE_CHARGER_FOR_GROUP_REQUESTS )
+                boolean useChargerForGroupRequests = USE_CHARGER_FOR_GROUP_REQUESTS;
+
+                if ( useChargerForGroupRequests )
                 {
                     List<Callable<StorageItem>> callables = new ArrayList<Callable<StorageItem>>();
 
@@ -300,6 +303,13 @@ public abstract class AbstractGroupRepository
                             return items.get( 0 );
                         }
                     }
+                    catch ( RejectedExecutionException e )
+                    {
+                        getLogger().warn(
+                            "Group processing thread pool is depleted, falling back to sequential group processing! Consider increasing the size of Group Repository ThreadPool!" );
+
+                        useChargerForGroupRequests = false;
+                    }
                     catch ( Exception e )
                     {
                         // will not happen, see GroupItemRetrieveCallable class' javadoc, it supresses all of them
@@ -307,7 +317,8 @@ public abstract class AbstractGroupRepository
                         throw new LocalStorageException( "Ouch!", e );
                     }
                 }
-                else
+
+                if ( !useChargerForGroupRequests )
                 {
                     for ( Repository repo : getRequestRepositories( request ) )
                     {
@@ -487,7 +498,9 @@ public abstract class AbstractGroupRepository
 
         if ( !isRequestGroupLocalOnly )
         {
-            if ( USE_CHARGER_FOR_GROUP_REQUESTS )
+            boolean useChargerForGroupRequests = USE_CHARGER_FOR_GROUP_REQUESTS;
+            
+            if ( useChargerForGroupRequests )
             {
                 List<Callable<StorageItem>> callables = new ArrayList<Callable<StorageItem>>();
 
@@ -517,6 +530,13 @@ public abstract class AbstractGroupRepository
                     return chargerHolder.getCharger().submit( callables, new AllArrivedChargeStrategy<StorageItem>(),
                         this ).getResult();
                 }
+                catch ( RejectedExecutionException e )
+                {
+                    getLogger().warn(
+                        "Group processing thread pool is depleted, falling back to sequential group processing! Consider increasing the size of GroupRepositoryThreadPool!" );
+
+                    useChargerForGroupRequests = false;
+                }
                 catch ( StorageException e )
                 {
                     throw e;
@@ -528,7 +548,8 @@ public abstract class AbstractGroupRepository
                     throw new LocalStorageException( "Ouch!", e );
                 }
             }
-            else
+
+            if ( !useChargerForGroupRequests )
             {
                 for ( Repository repository : getRequestRepositories( request ) )
                 {

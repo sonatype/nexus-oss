@@ -4,9 +4,9 @@ import java.util.concurrent.ExecutorService;
 
 import org.sonatype.nexus.proxy.repository.Repository;
 
-public interface PoolManager
+public interface ThreadPoolManager
 {
-    ExecutorService getExecutorService( Repository repository );
+    ExecutorService getRepositoryThreadPool( Repository repository );
 
     void createPool( Repository repository );
 

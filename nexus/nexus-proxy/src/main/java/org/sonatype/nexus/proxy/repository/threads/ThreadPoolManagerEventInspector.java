@@ -9,12 +9,12 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.plexus.appevents.Event;
 
-@Component( role = EventInspector.class, hint = "PoolManagerEventInspector" )
-public class PoolManagerEventInspector
+@Component( role = EventInspector.class, hint = "ThreadPoolManagerEventInspector" )
+public class ThreadPoolManagerEventInspector
     extends AbstractEventInspector
 {
     @Requirement
-    private PoolManager poolManager;
+    private ThreadPoolManager poolManager;
 
     @Override
     public boolean accepts( Event<?> evt )

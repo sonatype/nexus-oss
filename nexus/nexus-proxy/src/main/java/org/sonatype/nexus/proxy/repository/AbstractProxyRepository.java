@@ -58,7 +58,7 @@ import org.sonatype.nexus.proxy.mirror.DefaultDownloadMirrors;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrorSelector;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.repository.EvictUnusedItemsWalkerProcessor.EvictUnusedItemsWalkerFilter;
-import org.sonatype.nexus.proxy.repository.threads.PoolManager;
+import org.sonatype.nexus.proxy.repository.threads.ThreadPoolManager;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -93,10 +93,11 @@ public abstract class AbstractProxyRepository
     private static final long AUTO_BLOCK_STATUS_MAX_RETAIN_TIME = 60L * 60L * 1000L;
 
     @Requirement
-    private PoolManager poolManager;
+    private ThreadPoolManager poolManager;
 
     /**
-     * The remote status checker thread, used in Proxies. Not to go into Pool above, is handled separately.
+     * The remote status checker thread, used in Proxies for handling autoBlocking. Not to go into Pool above, is
+     * handled separately.
      */
     private Thread repositoryStatusCheckerThread;
 
@@ -659,7 +660,7 @@ public abstract class AbstractProxyRepository
             // check for thread and go check it
             _remoteStatusChecking = true;
 
-            poolManager.getExecutorService( this ).submit( new RemoteStatusUpdateCallable( request ) );
+            poolManager.getRepositoryThreadPool( this ).submit( new RemoteStatusUpdateCallable( request ) );
         }
 
         return remoteStatus;
