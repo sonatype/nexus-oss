@@ -1,8 +1,10 @@
 package org.sonatype.nexus.proxy.repository.threads;
 
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 import java.util.concurrent.TimeUnit;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -29,25 +31,30 @@ public class DefaultThreadPoolManager
 
     public DefaultThreadPoolManager()
     {
+        // TODO: i don't like different pool behaviours here
+        // direct hand-off used, RejectedExecutionException will be thrown and should be handled
         this.groupRepositoryThreadPool =
             new ThreadPoolExecutor( 0, GROUP_REPOSITORY_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS,
                 new SynchronousQueue<Runnable>(), new NexusThreadFactory( "group", "Group TPool" ) );
 
+        // bounded queue! Proxy pool will use caller thread to execute the task when full!
         this.proxyRepositoryThreadPool =
             new ThreadPoolExecutor( 0, PROXY_REPOSITORY_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS,
-                new SynchronousQueue<Runnable>(), new NexusThreadFactory( "proxy", "Proxy TPool" ) );
+                new ArrayBlockingQueue<Runnable>( 5 ), new NexusThreadFactory( "proxy", "Proxy TPool" ),
+                new CallerRunsPolicy() );
+
     }
 
     @Override
     public ExecutorService getRepositoryThreadPool( Repository repository )
     {
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            return proxyRepositoryThreadPool;
-        }
-        else if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
         {
             return groupRepositoryThreadPool;
+        }
+        else if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        {
+            return proxyRepositoryThreadPool;
         }
         else
         {
