@@ -87,7 +87,7 @@ public class PlexusContainerContextListener
                 ContainerConfiguration plexusConfiguration =
                     new DefaultContainerConfiguration().setName( context.getServletContextName() ).setContainerConfigurationURL(
                         plexusXmlFile.toURI().toURL() ).setContext( (Map) plexusContext ).setAutoWiring( true ).setClassPathScanning(
-                        PlexusConstants.SCANNING_ON ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
+                        PlexusConstants.SCANNING_INDEX ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
 
                 final Module[] customModules = (Module[]) context.getAttribute( CUSTOM_MODULES );
 
