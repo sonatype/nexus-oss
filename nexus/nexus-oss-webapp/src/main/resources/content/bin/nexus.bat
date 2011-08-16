@@ -24,7 +24,7 @@ goto pickwrapper
 set DIST_BITS=64
 
 :pickwrapper
-set WRAPPER_EXE=%DIRNAME%jsw\exec\wrapper-windows-x86-%DIST_BITS%.exe
+set WRAPPER_EXE=%DIRNAME%jsw\windows-x86-%DIST_BITS%\wrapper.exe
 if exist "%WRAPPER_EXE%" goto pickconfig
 echo Missing wrapper executable: %WRAPPER_EXE%
 pause

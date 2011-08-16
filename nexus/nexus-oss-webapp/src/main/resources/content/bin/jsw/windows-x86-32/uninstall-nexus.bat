@@ -16,7 +16,7 @@ set DIRNAME=%~dp0
 if "%DIRNAME%" == "" set DIRNAME=.\
 
 :pickwrapper
-set WRAPPER_EXE=%DIRNAME%..\..\jsw\exec\wrapper-windows-x86-32.exe
+set WRAPPER_EXE=%DIRNAME%wrapper.exe
 if exist "%WRAPPER_EXE%" goto pickconfig
 echo Missing wrapper executable: %WRAPPER_EXE%
 pause

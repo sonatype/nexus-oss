@@ -10,17 +10,29 @@
 #-----------------------------------------------------------------------------
 # These settings can be modified to fit the needs of your application
 
+# If specified, the Wrapper will be run as the specified user.
+
+# IMPORTANT - Make sure that the user has the required privileges to write into the Nexus installation directory.
+
+# NOTE - This will set the user which is used to run the Wrapper as well as
+#  the JVM and is not useful in situations where a privileged resource or
+#  port needs to be allocated prior to the user being changed.
+#RUN_AS_USER=
+
 # Application
 APP_NAME="nexus"
 APP_LONG_NAME="Nexus OSS"
 
 # Wrapper
-WRAPPER_CMD="../exec/wrapper-macosx-universal-64"
+WRAPPER_CMD="./wrapper"
 WRAPPER_CONF="../conf/wrapper.conf"
 
 # Priority at which to run the wrapper.  See "man nice" for valid priorities.
 #  nice is only used if a priority is specified.
 PRIORITY=
+
+# Location of the pid file.
+#PIDDIR="."
 
 # If uncommented, causes the Wrapper to be shutdown using an anchor file.
 #  When launched with the 'start' command, it will also ignore all INT and
@@ -84,9 +96,6 @@ done
 # Change the current directory to the location of the script
 cd "`dirname "$REALPATH"`"
 REALDIR=`pwd`
-
-# Source nexus.rc allowing user to override/set env variables without changing this script  
-. ${REALDIR}/../../../conf/nexus.rc
 
 # Resolve the location of the 'ps' command
 PSEXE="/usr/bin/ps"
@@ -187,62 +196,9 @@ LOCKDIR="/var/lock/subsys"
 LOCKFILE="$LOCKDIR/$APP_NAME"
 pid=""
 
-# Decide on the wrapper binary to use.
-# If a 32-bit wrapper binary exists then it will work on 32 or 64 bit
-#  platforms, if the 64-bit binary exists then the distribution most
-#  likely wants to use long names.  Otherwise, look for the default.
-# For macosx, we also want to look for universal binaries.
-WRAPPER_TEST_CMD="$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-32"
-if [ -x "$WRAPPER_TEST_CMD" ]
-then
-    WRAPPER_CMD="$WRAPPER_TEST_CMD"
-else
-    if [ "$DIST_OS" = "macosx" ]
-    then
-        WRAPPER_TEST_CMD="$WRAPPER_CMD-$DIST_OS-universal-32"
-        if [ -x "$WRAPPER_TEST_CMD" ]
-        then
-            WRAPPER_CMD="$WRAPPER_TEST_CMD"
-        else
-            WRAPPER_TEST_CMD="$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-64"
-            if [ -x "$WRAPPER_TEST_CMD" ]
-            then
-                WRAPPER_CMD="$WRAPPER_TEST_CMD"
-            else
-                WRAPPER_TEST_CMD="$WRAPPER_CMD-$DIST_OS-universal-64"
-                if [ -x "$WRAPPER_TEST_CMD" ]
-                then
-                    WRAPPER_CMD="$WRAPPER_TEST_CMD"
-                else
-                    if [ ! -x "$WRAPPER_CMD" ]
-                    then
-                        echo "Unable to locate any of the following binaries:"
-                        outputFile "$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-32"
-                        outputFile "$WRAPPER_CMD-$DIST_OS-universal-32"
-                        outputFile "$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-64"
-                        outputFile "$WRAPPER_CMD-$DIST_OS-universal-64"
-                        outputFile "$WRAPPER_CMD"
-                        exit 1
-                    fi
-                fi
-            fi
-        fi
-    else
-        WRAPPER_TEST_CMD="$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-64"
-        if [ -x "$WRAPPER_TEST_CMD" ]
-        then
-            WRAPPER_CMD="$WRAPPER_TEST_CMD"
-        else
-            if [ ! -x "$WRAPPER_CMD" ]
-            then
-                echo "Unable to locate any of the following binaries:"
-                outputFile "$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-32"
-                outputFile "$WRAPPER_CMD-$DIST_OS-$DIST_ARCH-64"
-                outputFile "$WRAPPER_CMD"
-                exit 1
-            fi
-        fi
-    fi
+if [ ! -x "$WRAPPER_CMD" ]; then
+    echo "Missing platform binary: $WRAPPER_CMD"
+    exit 1
 fi
 
 # Build the nice clause

@@ -37,7 +37,7 @@
         <exclude>**/.placeholder</exclude>
         <exclude>**/nexus</exclude>
         <exclude>**/*.bat</exclude>
-        <exclude>**/wrapper-*</exclude>
+        <exclude>**/wrapper</exclude>
       </excludes>
       <outputDirectory>${project.build.finalName}</outputDirectory>
     </fileSet>
@@ -45,7 +45,7 @@
     <fileSet>
       <directory>src/main/resources/content</directory>
       <includes>
-        <include>**/wrapper-*</include>
+        <include>**/wrapper</include>
       </includes>
       <outputDirectory>${project.build.finalName}</outputDirectory>
       <fileMode>0755</fileMode>
