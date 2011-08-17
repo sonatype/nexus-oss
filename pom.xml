@@ -81,6 +81,8 @@
               <exclude>**/nexus-repository-metadata/**</exclude>
               <exclude>**/gwt/ext/ui/**/*.js</exclude>
               <exclude>**/gwt/ext/ui/**/*.css</exclude>
+              <!-- already has a lgpl license -->
+              <exclude>**/Ext.ux.form.LovCombo.css</exclude>
               <!-- Apache licensed -->
               <exclude>**/nexus-migration-plugin/**</exclude>
             </excludes>
