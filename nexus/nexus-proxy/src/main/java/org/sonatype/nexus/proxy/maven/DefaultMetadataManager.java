@@ -39,6 +39,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
  * Component responsible for metadata maintenance.
  * 
  * @author cstamas
+ * @todo add some unit tests
  */
 @Component( role = MetadataManager.class )
 public class DefaultMetadataManager
@@ -296,13 +297,13 @@ public class DefaultMetadataManager
 
         // NEXUS-4284: we have non null current, with no timestamp field in the wild out there
         // so current != null is not enough
-        if ( current != null && !StringUtils.isBlank( current.getTimestamp() ) && ( current.getBuildNumber() > 0 ) )
+        if ( current != null && StringUtils.isNotBlank( current.getTimestamp() ) && ( current.getBuildNumber() > 0 ) )
         {
             latest = gav.getBaseVersion();
 
             latest = latest.replace( SNAPSHOT_VERSION, current.getTimestamp() + "-" + current.getBuildNumber() );
 
-            buildTs = getTimestampForMdTsString( current.getTimestamp() );
+            buildTs = getTimeFromMetadataTimestampMaven2( current.getTimestamp() );
 
             buildNo = current.getBuildNumber();
         }
@@ -336,9 +337,9 @@ public class DefaultMetadataManager
                 && StringUtils.equals( StringUtils.defaultString( sv.getClassifier(), "" ),
                     StringUtils.defaultString( gav.getClassifier(), "" ) ) )
             {
-                Long buildTs = getTimestampForMdMaven3UpdatedString( sv.getUpdated() );
+                Long buildTs = getTimeFromMetadataTimestampMaven3Updated( sv.getUpdated() );
 
-                Integer buildNo = getBuildNoForMdMaven3ValueString( sv.getVersion() );
+                Integer buildNo = getBuildNumberForMetadataMaven3Value( sv.getVersion() );
 
                 return new Gav( gav.getGroupId(), gav.getArtifactId(), sv.getVersion(), gav.getClassifier(),
                     gav.getExtension(), buildNo, buildTs, gav.getName(), gav.isHash(), gav.getHashType(),
@@ -351,11 +352,24 @@ public class DefaultMetadataManager
         return resolveSnapshotFromM2Metadata( gavRequest, gav, gavMd );
     }
 
-    public static Long getTimestampForMdTsString( final String tsString )
+    private static final String METADATA_TIMESTAMP_FORMAT_MAVEN2 = "yyyyMMdd.HHmmss";
+
+    private static final String METADATA_TIMESTAMP_FORMAT_MAVEN3_UPDATED = "yyyyMMddHHmmss";
+
+    /**
+     * Convert a metadata timestamp in the specified format to its time since epoch millis equiv
+     * 
+     * @param the SimpleDateFormat format the parse the string with.
+     * @param tsString a metadata timestamp string
+     * @return the long millis
+     * @throws NullPointerException if arguments are null
+     * @throws IllegalArgumentException if dateFormat is invalid
+     */
+    private static Long getTimeFromMetadataTimestamp( final String dateFormat, final String tsString )
     {
         try
         {
-            SimpleDateFormat df = new SimpleDateFormat( "yyyyMMdd.HHmmss" );
+            SimpleDateFormat df = new SimpleDateFormat( dateFormat );
             return Long.valueOf( df.parse( tsString ).getTime() );
         }
         catch ( ParseException e )
@@ -364,20 +378,17 @@ public class DefaultMetadataManager
         }
     }
 
-    public static Long getTimestampForMdMaven3UpdatedString( final String tsString )
+    protected static Long getTimeFromMetadataTimestampMaven3Updated( final String tsString )
     {
-        try
-        {
-            SimpleDateFormat df = new SimpleDateFormat( "yyyyMMddHHmmss" );
-            return Long.valueOf( df.parse( tsString ).getTime() );
-        }
-        catch ( ParseException e )
-        {
-            return null;
-        }
+        return getTimeFromMetadataTimestamp( METADATA_TIMESTAMP_FORMAT_MAVEN3_UPDATED, tsString );
     }
 
-    public static Integer getBuildNoForMdMaven3ValueString( final String valueString )
+    protected static Long getTimeFromMetadataTimestampMaven2( final String tsString )
+    {
+        return getTimeFromMetadataTimestamp( METADATA_TIMESTAMP_FORMAT_MAVEN2, tsString );
+    }
+
+    protected static Integer getBuildNumberForMetadataMaven3Value( final String valueString )
     {
         try
         {
