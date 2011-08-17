@@ -32,7 +32,7 @@
   <artifactId>nexus-core-documentation-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Core Documentation</name>
-  <description>Plugin only used to expose nexus core documentation</description>
+  <description>Exposes Nexus core documentation.</description>
   <url>http://nexus.sonatype.org/</url>
 
   <dependencies>
