@@ -51,13 +51,22 @@
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.0-beta-3</version>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
         <!-- Manually run with: mvn clean com.mycila.maven-license-plugin:maven-license-plugin:1.9.0:format -->
         <plugin>
           <groupId>com.mycila.maven-license-plugin</groupId>
           <artifactId>maven-license-plugin</artifactId>
           <version>1.9.0</version>
           <configuration>
-            <header>nexus/header.txt</header>
+            <header>header-agplv3.txt</header>
+            <encoding>UTF-8</encoding>
             <strictCheck>true</strictCheck>
             <useDefaultExcludes>false</useDefaultExcludes>
             <includes>
@@ -83,7 +92,7 @@
               <exclude>**/gwt/ext/ui/**/*.css</exclude>
               <!-- already has a lgpl license -->
               <exclude>**/Ext.ux.form.LovCombo.css</exclude>
-              <!-- Apache licensed -->
+              <!-- Apache licensed, see profile -->
               <exclude>**/nexus-migration-plugin/**</exclude>
             </excludes>
             <mapping>
@@ -95,18 +104,10 @@
               <year>2011</year>
             </properties>
             <!-- this is important for muti-module project -->
-            <!-- <aggregate>true</aggregate> -->
+            <aggregate>true</aggregate>
           </configuration>
-      </plugin>
+        </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.0-beta-3</version>
-      </plugin>
-    </plugins>
-    <pluginManagement>
-      <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
@@ -130,15 +131,15 @@
       </plugins>
     </pluginManagement>
   </build>
-      <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.2</version>
-            </plugin>
-        </plugins>
-    </reporting>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.2</version>
+      </plugin>
+    </plugins>
+  </reporting>
 
   <profiles>
     <profile>
@@ -196,5 +197,37 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>license-alv2</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <!-- Manually run with: mvn clean com.mycila.maven-license-plugin:maven-license-plugin:1.9.0:format -Plicense-alv2 -->
+            <plugin>
+              <groupId>com.mycila.maven-license-plugin</groupId>
+              <artifactId>maven-license-plugin</artifactId>
+              <configuration>
+                <header>header-alv2.txt</header>
+                <includes>
+                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.java</include>
+                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.vm</include>
+                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.xml</include>
+                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.groovy</include>
+                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.aj</include>
+                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.css</include>
+                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.html</include>
+                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.js</include>
+                </includes>
+                <excludes>
+                  <exclude>**/target/**</exclude>
+                </excludes>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
   </profiles>
 </project>
