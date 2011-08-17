@@ -497,7 +497,7 @@
         <artifactId>sisu-charger</artifactId>
         <version>1.0-SNAPSHOT</version>
       </dependency>
-      
+
       <!-- shiro -->
       <dependency>
         <groupId>org.sonatype.security</groupId>
@@ -627,7 +627,7 @@
         <type>jar</type>
         <scope>runtime</scope>
       </dependency>
-      
+
 
       <!-- Maven -->
       <dependency>
@@ -1312,11 +1312,11 @@
                   <includes>
                     <include>log4j:*</include>
                   </includes>
-                  
+
                   <message>Do not use log4j api directly in tests. Use slf4j api instead.</message>
                 </bannedDependencies>
-                
-                
+
+
                 <!-- <requirePluginVersions> <banSnapshots>false</banSnapshots> </requirePluginVersions> -->
               </rules>
               <fail>true</fail>
@@ -1379,51 +1379,6 @@
 
     <pluginManagement>
       <plugins>
-
-      <!-- Manually run with: mvn clean com.mycila.maven-license-plugin:maven-license-plugin:1.9.0:format -->
-        <plugin>
-          <groupId>com.mycila.maven-license-plugin</groupId>
-          <artifactId>maven-license-plugin</artifactId>
-          <version>1.9.0</version>
-          <configuration>
-            <header>nexus/header.txt</header>
-            <strictCheck>true</strictCheck>
-            <useDefaultExcludes>false</useDefaultExcludes>
-            <includes>
-              <include>**/*.java</include>
-              <include>**/*.vm</include>
-              <include>**/*.xml</include>
-              <include>**/*.groovy</include>
-              <include>**/*.aj</include>
-              <include>**/*.css</include>
-              <include>**/*.html</include>
-              <include>**/*.js</include>
-            </includes>
-            <excludes>
-              <exclude>**/target/**</exclude>
-              <exclude>**/ext-2.3/**</exclude>
-              <exclude>**/js/filetree/**</exclude>
-              <exclude>**/editarea_0_8_2/**</exclude>
-              <!-- FIXME is this really a good idea excluding all test resources? -->
-              <exclude>**/src/test/resources/**</exclude>
-              <exclude>**/nexus-repository-metadata/**</exclude>
-              <exclude>**/gwt/ext/ui/**/*.js</exclude>
-              <exclude>**/gwt/ext/ui/**/*.css</exclude>
-              <exclude>**/nexus/nexus-test-harness/nexus-test-harness-its/resources/**</exclude>
-            </excludes>
-            <mapping>
-              <vm>XML_STYLE</vm>
-              <groovy>JAVADOC_STYLE</groovy>
-              <aj>JAVADOC_STYLE</aj>
-            </mapping>
-            <properties>
-              <year>2011</year>
-            </properties>
-            <!-- this is important for muti-module project -->
-            <!-- <aggregate>true</aggregate> -->
-          </configuration>
-      </plugin>
-
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
@@ -1740,7 +1695,7 @@
         </plugins>
       </build>
     </profile>
-   <!-- 
+   <!--
          Nexus quick build profiles:
 
          effects of -Pquick: tests will be compiled but not run, n-t-e-p will assemble the test environments
