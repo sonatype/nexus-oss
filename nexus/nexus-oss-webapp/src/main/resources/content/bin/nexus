@@ -182,25 +182,25 @@ outputFile() {
     fi
 }
 
-# Default PIDDIR to os/arch/bits directory
-if [ "X$PIDDIR" = "X" ]
-then
-    PIDDIR="jsw/$DIST_OS-$DIST_ARCH-$DIST_BITS"
-fi
-
-# If the PIDDIR is relative, set its value relative to the full REALPATH to avoid problems if
-#  the working directory is later changed.
-FIRST_CHAR=`echo $PIDDIR | cut -c1,1`
-if [ "$FIRST_CHAR" != "/" ]
-then
-    PIDDIR=$REALDIR/$PIDDIR
-fi
-
 # Test if NEXUS_HOME is relative (does not start with /). If relative it should be relative to this script location
 FIRST_CHAR=`echo $NEXUS_HOME | cut -c1,1`
 if [ "$FIRST_CHAR" != "/" ]
 then
     NEXUS_HOME=$REALDIR/$NEXUS_HOME
+fi
+
+# Default PIDDIR to os/arch/bits directory
+if [ "X$PIDDIR" = "X" ]
+then
+    PIDDIR="bin/jsw/$DIST_OS-$DIST_ARCH-$DIST_BITS"
+fi
+
+# If the PIDDIR is relative, set its value relative to the full NEXUS_HOME to avoid problems if
+#  the working directory is later changed.
+FIRST_CHAR=`echo $PIDDIR | cut -c1,1`
+if [ "$FIRST_CHAR" != "/" ]
+then
+    PIDDIR=$NEXUS_HOME/$PIDDIR
 fi
 
 # Process ID
