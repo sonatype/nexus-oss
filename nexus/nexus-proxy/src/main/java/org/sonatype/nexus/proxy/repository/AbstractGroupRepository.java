@@ -265,9 +265,7 @@ public abstract class AbstractGroupRepository
 
             if ( !isRequestGroupLocalOnly )
             {
-                boolean useChargerForGroupRequests = USE_CHARGER_FOR_GROUP_REQUESTS;
-
-                if ( useChargerForGroupRequests )
+                if ( USE_CHARGER_FOR_GROUP_REQUESTS )
                 {
                     List<Callable<StorageItem>> callables = new ArrayList<Callable<StorageItem>>();
 
@@ -305,10 +303,7 @@ public abstract class AbstractGroupRepository
                     }
                     catch ( RejectedExecutionException e )
                     {
-                        getLogger().warn(
-                            "Group processing thread pool is depleted, falling back to sequential group processing! Consider increasing the size of Group Repository ThreadPool!" );
-
-                        useChargerForGroupRequests = false;
+                        // this will not happen
                     }
                     catch ( Exception e )
                     {
@@ -317,8 +312,7 @@ public abstract class AbstractGroupRepository
                         throw new LocalStorageException( "Ouch!", e );
                     }
                 }
-
-                if ( !useChargerForGroupRequests )
+                else
                 {
                     for ( Repository repo : getRequestRepositories( request ) )
                     {
@@ -498,9 +492,7 @@ public abstract class AbstractGroupRepository
 
         if ( !isRequestGroupLocalOnly )
         {
-            boolean useChargerForGroupRequests = USE_CHARGER_FOR_GROUP_REQUESTS;
-            
-            if ( useChargerForGroupRequests )
+            if ( USE_CHARGER_FOR_GROUP_REQUESTS )
             {
                 List<Callable<StorageItem>> callables = new ArrayList<Callable<StorageItem>>();
 
@@ -532,10 +524,7 @@ public abstract class AbstractGroupRepository
                 }
                 catch ( RejectedExecutionException e )
                 {
-                    getLogger().warn(
-                        "Group processing thread pool is depleted, falling back to sequential group processing! Consider increasing the size of GroupRepositoryThreadPool!" );
-
-                    useChargerForGroupRequests = false;
+                    // this will not happen
                 }
                 catch ( StorageException e )
                 {
@@ -548,8 +537,7 @@ public abstract class AbstractGroupRepository
                     throw new LocalStorageException( "Ouch!", e );
                 }
             }
-
-            if ( !useChargerForGroupRequests )
+            else
             {
                 for ( Repository repository : getRequestRepositories( request ) )
                 {

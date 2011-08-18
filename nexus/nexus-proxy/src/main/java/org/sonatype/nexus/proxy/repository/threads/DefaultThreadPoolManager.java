@@ -1,6 +1,5 @@
 package org.sonatype.nexus.proxy.repository.threads;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -31,18 +30,17 @@ public class DefaultThreadPoolManager
 
     public DefaultThreadPoolManager()
     {
-        // TODO: i don't like different pool behaviours here
-        // direct hand-off used, RejectedExecutionException will be thrown and should be handled
+        // direct hand-off used! Proxy pool will use caller thread to execute the task when full!
         this.groupRepositoryThreadPool =
             new ThreadPoolExecutor( 0, GROUP_REPOSITORY_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS,
-                new SynchronousQueue<Runnable>(), new NexusThreadFactory( "group", "Group TPool" ) );
-
-        // bounded queue! Proxy pool will use caller thread to execute the task when full!
-        this.proxyRepositoryThreadPool =
-            new ThreadPoolExecutor( 0, PROXY_REPOSITORY_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<Runnable>( 5 ), new NexusThreadFactory( "proxy", "Proxy TPool" ),
+                new SynchronousQueue<Runnable>(), new NexusThreadFactory( "group", "Group TPool" ),
                 new CallerRunsPolicy() );
 
+        // direct hand-off used! Proxy pool will use caller thread to execute the task when full!
+        this.proxyRepositoryThreadPool =
+            new ThreadPoolExecutor( 0, PROXY_REPOSITORY_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS,
+                new SynchronousQueue<Runnable>(), new NexusThreadFactory( "proxy", "Proxy TPool" ),
+                new CallerRunsPolicy() );
     }
 
     @Override
