@@ -38,6 +38,7 @@ import org.restlet.Context;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
+import org.restlet.data.Method;
 import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -340,6 +341,11 @@ public abstract class AbstractResourceStoreContentPlexusResource
         throws IOException, AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
         ItemNotFoundException, StorageException, ResourceException
     {
+        if ( Method.HEAD.equals( req.getMethod() ) )
+        {
+            return renderHeadResponseItem( context, req, res, variant, store, item.getResourceStoreRequest(), item );
+        }
+
         if ( isDescribe( req ) )
         {
             return renderDescribeItem( context, req, res, variant, store, item.getResourceStoreRequest(), item );
@@ -548,6 +554,15 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
 
         return null;
+    }
+
+    protected Object renderHeadResponseItem( Context context, Request req, Response res, Variant variant,
+                                             ResourceStore store, ResourceStoreRequest request, StorageItem item )
+        throws IOException, AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
+        ItemNotFoundException, StorageException, ResourceException
+    {
+        // we are just returning anything, the connector will strip off content anyway.
+        return "";
     }
 
     protected Object renderDescribeItem( Context context, Request req, Response res, Variant variant,
@@ -842,12 +857,12 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 // exception to be handled is ResourceException
                 if ( re.getStatus() == null || re.getStatus().isError() )
                 {
-                    handleErrorConstructLogMessage(req, res, t, shouldLogInfoStackTrace);
+                    handleErrorConstructLogMessage( req, res, t, shouldLogInfoStackTrace );
                 }
             }
             else
             {
-                handleErrorConstructLogMessage(req, res, t, shouldLogInfoStackTrace);
+                handleErrorConstructLogMessage( req, res, t, shouldLogInfoStackTrace );
             }
         }
     }
