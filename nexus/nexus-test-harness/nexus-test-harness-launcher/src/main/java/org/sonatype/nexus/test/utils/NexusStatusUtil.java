@@ -80,7 +80,7 @@ public class NexusStatusUtil
             }
             else if ( statusCode != 200 )
             {
-                debug( "Status check returned status " + statusCode );
+                log.debug( "Status check returned status " + statusCode );
                 return false;
             }
 
@@ -98,7 +98,7 @@ public class NexusStatusUtil
                 (StatusResourceResponse) XStreamFactory.getXmlXStream().fromXML( entityText );
             if ( !SystemState.STARTED.toString().equals( status.getData().getState() ) )
             {
-                debug( "Status check returned system state " + status.getData().getState() );
+                log.debug( "Status check returned system state " + status.getData().getState() );
                 return false;
             }
 
@@ -115,7 +115,7 @@ public class NexusStatusUtil
 
     /**
      * Get Nexus Status, failing if the request response is not successfully returned.
-     * 
+     *
      * @return the status resource
      * @throws NexusIllegalStateException
      */
@@ -178,19 +178,6 @@ public class NexusStatusUtil
     }
 
     /**
-     * This is a hack because due to magic log4j property reloading we lose normal log output sent to logger
-     * 
-     * @param msg the msg to log at debug level
-     */
-    private void debug( final String msg )
-    {
-        if ( log.isDebugEnabled() )
-        {
-            log.debug( "NexusStatusUtil.debug() " + msg );
-        }
-    }
-
-    /**
      * @param port the port to check for being open
      * @param portName the name of the port we are checking
      * @return true if port is open, false if not
@@ -207,14 +194,14 @@ public class NexusStatusUtil
         {
             if ( log.isDebugEnabled() )
             {
-                debug( portName + "(" + port + ") is not open: " + e1.getMessage() );
+                log.debug( portName + "(" + port + ") is not open: " + e1.getMessage() );
             }
         }
         catch ( IOException e1 )
         {
             if ( log.isDebugEnabled() )
             {
-                debug( portName + "(" + port + ") is not open: " + e1.getMessage() );
+                log.debug( portName + "(" + port + ") is not open: " + e1.getMessage() );
             }
         }
         finally
@@ -229,7 +216,7 @@ public class NexusStatusUtil
                 {
                     if ( log.isDebugEnabled() )
                     {
-                        debug( "Problem closing socket to " + portName + "(" + port + ") : " + e.getMessage() );
+                        log.debug( "Problem closing socket to " + portName + "(" + port + ") : " + e.getMessage() );
                     }
                 }
             }
