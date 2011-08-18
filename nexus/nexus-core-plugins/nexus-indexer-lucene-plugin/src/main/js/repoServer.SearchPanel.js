@@ -251,7 +251,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       // set the warning in the toolbar
       setWarningLabel : function(s) {
         this.clearWarningLabel();
-        this.warningLabel = this.searchToolbar.addText('<span class="x-toolbar-warning">' + s + '</span>');
+        this.warningLabel = this.searchToolbar.addText('<span class="x-toolbar-warning">' + Ext.util.Format.htmlEncode(s) + '</span>');
       },
       // clear the warning in the toolbar
       clearWarningLabel : function() {
