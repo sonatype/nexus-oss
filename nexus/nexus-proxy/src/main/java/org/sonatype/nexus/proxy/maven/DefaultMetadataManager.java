@@ -19,10 +19,13 @@
 package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import java.util.Locale;
+import java.util.TimeZone;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
@@ -37,7 +40,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 
 /**
  * Component responsible for metadata maintenance.
- * 
+ *
  * @author cstamas
  * @todo add some unit tests
  */
@@ -357,8 +360,8 @@ public class DefaultMetadataManager
     private static final String METADATA_TIMESTAMP_FORMAT_MAVEN3_UPDATED = "yyyyMMddHHmmss";
 
     /**
-     * Convert a metadata timestamp in the specified format to its time since epoch millis equiv
-     * 
+     * Convert a metadata timestamp in the specified format to its time since epoch millis equiv in the UTC timezone
+     *
      * @param the SimpleDateFormat format the parse the string with.
      * @param tsString a metadata timestamp string
      * @return the long millis
@@ -369,7 +372,8 @@ public class DefaultMetadataManager
     {
         try
         {
-            SimpleDateFormat df = new SimpleDateFormat( dateFormat );
+            SimpleDateFormat df = new SimpleDateFormat( dateFormat, Locale.US );
+            df.setTimeZone(TimeZone.getTimeZone("GMT-00:00"));
             return Long.valueOf( df.parse( tsString ).getTime() );
         }
         catch ( ParseException e )
