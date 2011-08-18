@@ -20,8 +20,9 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.Map;
 
+import org.sonatype.nexus.proxy.LocalStorageException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -141,7 +142,7 @@ public interface ProxyRepository
      * @param url the new remote url
      */
     void setRemoteUrl( String url )
-        throws StorageException;
+        throws RemoteStorageException;
 
     /**
      * Gets the download mirrors.
@@ -256,6 +257,6 @@ public interface ProxyRepository
      * @throws StorageException
      */
     AbstractStorageItem doCacheItem( AbstractStorageItem item )
-        throws StorageException;
+        throws LocalStorageException;
 
 }

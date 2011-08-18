@@ -45,6 +45,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHo
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
@@ -175,7 +176,7 @@ public class M2Repository
 
     @Override
     public AbstractStorageItem doCacheItem( AbstractStorageItem item )
-        throws StorageException
+        throws LocalStorageException
     {
         // if the item is file, is M2 repository metadata and this repo is release-only or snapshot-only
         if ( isCleanseRepositoryMetadata() && StorageFileItem.class.isAssignableFrom( item.getClass() )

@@ -49,6 +49,8 @@ import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
@@ -978,7 +980,7 @@ public class MavenRepositoryReaderTest
         }
 
         public void setRemoteUrl( String url )
-            throws StorageException
+            throws RemoteStorageException
         {
 
         }
@@ -1070,7 +1072,7 @@ public class MavenRepositoryReaderTest
         }
 
         public AbstractStorageItem doCacheItem( AbstractStorageItem item )
-            throws StorageException
+            throws LocalStorageException
         {
 
             return null;

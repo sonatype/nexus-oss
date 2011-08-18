@@ -38,6 +38,7 @@ import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.InvalidItemContentException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
@@ -64,6 +65,7 @@ import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
@@ -550,7 +552,7 @@ public abstract class AbstractProxyRepository
         // log the event
         getLogger().info(
             "Remote peer of proxy repository \"" + getName() + "\" (id=" + getId()
-                + ") detected as healty, un-blocking the proxy repository (it was AutoBlocked by Nexus)." );
+                + ") detected as healthy, un-blocking the proxy repository (it was AutoBlocked by Nexus)." );
 
         setProxyMode( ProxyMode.ALLOW, true, null );
 
@@ -589,7 +591,7 @@ public abstract class AbstractProxyRepository
     }
 
     public void setRemoteUrl( String remoteUrl )
-        throws StorageException
+        throws RemoteStorageException
     {
         if ( getRemoteStorage() != null )
         {
@@ -787,7 +789,7 @@ public abstract class AbstractProxyRepository
     }
 
     public AbstractStorageItem doCacheItem( AbstractStorageItem item )
-        throws StorageException
+        throws LocalStorageException
     {
         boolean shouldCache = true;
 
@@ -1374,7 +1376,7 @@ public abstract class AbstractProxyRepository
 
                             continue all_urls; // retry with next url
                         }
-                        catch ( StorageException e )
+                        catch ( RemoteStorageException e )
                         {
                             lastException = e;
 
@@ -1395,9 +1397,48 @@ public abstract class AbstractProxyRepository
                                 }
 
                                 getLogger().error(
-                                    "Got Storage Exception while storing remote artifact, will attempt next mirror, cause: "
-                                        + t.getClass().getName() + ": " + t.getMessage() );
+                                    String.format(
+                                        "Got RemoteStorageException in proxy repository %s while retrieving remote artifact \"%s\" from URL %s, this is %s (re)try, cause: %s: %s",
+                                        RepositoryStringUtils.getHumanizedNameString( this ), request.toString(),
+                                        mirror.getUrl(), String.valueOf( i + 1 ), t.getClass().getName(),
+                                        t.getMessage() ) );
                             }
+
+                            // nope, do not switch Mirror yet, obey the retries
+                            // continue all_urls; // retry with next url
+                        }
+                        catch ( LocalStorageException e )
+                        {
+                            lastException = e;
+
+                            selector.feedbackFailure( mirror );
+                            // debug, print all
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                logFailedMirror( mirror, e );
+                            }
+                            // not debug, only print the message
+                            else
+                            {
+                                Throwable t = ExceptionUtils.getRootCause( e );
+
+                                if ( t == null )
+                                {
+                                    t = e;
+                                }
+
+                                getLogger().error(
+                                    String.format(
+                                        "Got LocalStorageException in proxy repository %s while caching retrieved artifact \"%s\" got from URL %s, will attempt next mirror, cause: %s: %s",
+                                        RepositoryStringUtils.getHumanizedNameString( this ), request.toString(),
+                                        mirror.getUrl(), t.getClass().getName(), t.getMessage() ) );
+                            }
+
+                            // This is actually fatal error? LocalStorageException means something like IOException
+                            // while writing data to disk, full disk, no perms, etc
+                            // currently, we preserve the old -- probably wrong -- behaviour: on IOException Nexus will log the error
+                            // but will respond with 404
+                            continue all_urls; // retry with next url
                         }
                         catch ( RuntimeException e )
                         {
