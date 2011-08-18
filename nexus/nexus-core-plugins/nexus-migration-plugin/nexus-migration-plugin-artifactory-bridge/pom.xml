@@ -68,7 +68,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit-dep</artifactId>
-      <version>4.4</version>
       <scope>test</scope>
     </dependency>
 

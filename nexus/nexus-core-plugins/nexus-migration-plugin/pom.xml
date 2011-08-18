@@ -90,7 +90,6 @@
       </plugin>
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.0-alpha-4</version>
         <executions>
           <execution>
             <goals>

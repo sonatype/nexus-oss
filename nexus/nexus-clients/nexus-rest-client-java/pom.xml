@@ -28,7 +28,6 @@
     <version>1.9.3-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-rest-client-java</artifactId>
   <name>Nexus : Clients : Java REST</name>
 

@@ -28,7 +28,6 @@
     <version>1.9.3-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.plugins.ldap</groupId>
   <artifactId>nexus-ldap-plugin-it</artifactId>
   <name>Nexus : Core Plugins : OSS LDAP : Plugin ITs</name>
   <description>Nexus LDAP Realm Plugin ITs</description>
@@ -136,7 +135,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit-dep</artifactId>
-      <version>4.8.2</version>
       <scope>runtime</scope>
     </dependency>
 

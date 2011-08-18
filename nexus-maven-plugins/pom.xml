@@ -30,9 +30,7 @@
     <relativePath>../nexus</relativePath>
   </parent>
 
-  <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-maven-plugins-parent</artifactId>
-
   <packaging>pom</packaging>
   <name>Nexus : Maven Plugins : Parent</name>
   <description>Sonatype Nexus Maven Plugins Parent</description>

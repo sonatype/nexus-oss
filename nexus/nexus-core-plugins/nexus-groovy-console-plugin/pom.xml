@@ -96,7 +96,6 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>yuicompressor-maven-plugin</artifactId>
-        <version>0.0.2</version>
         <executions>
           <execution>
             <goals>

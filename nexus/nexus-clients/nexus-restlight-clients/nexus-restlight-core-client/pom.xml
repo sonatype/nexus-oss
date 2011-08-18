@@ -23,12 +23,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>nexus-restlight-clients</artifactId>
     <groupId>org.sonatype.nexus.restlight</groupId>
+    <artifactId>nexus-restlight-clients</artifactId>
     <version>1.9.3-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.sonatype.nexus.restlight</groupId>
   <artifactId>nexus-restlight-core-client</artifactId>
   <name>Nexus : Clients : Lightweight REST : Core</name>
 
