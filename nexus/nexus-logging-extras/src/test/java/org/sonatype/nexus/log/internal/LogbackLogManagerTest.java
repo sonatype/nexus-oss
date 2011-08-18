@@ -18,16 +18,15 @@
  */
 package org.sonatype.nexus.log.internal;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
 import java.util.Set;
 
 import org.codehaus.plexus.context.Context;
-import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.log.DefaultLogConfiguration;
@@ -39,12 +38,12 @@ import org.sonatype.nexus.log.internal.LogbackLogManager;
  * @author juven
  * @author adreghiciu@gmail.com
  */
+@SuppressWarnings( "unused" )
 public class LogbackLogManagerTest
     extends AbstractNexusTestCase
 {
     private LogManager manager;
 
-    @SuppressWarnings( "unused" )
     private org.codehaus.plexus.logging.Logger logger;
 
     @Override
@@ -78,7 +77,7 @@ public class LogbackLogManagerTest
         throws Exception
     {
         LogConfiguration config1 = manager.getConfiguration();
-        Assert.assertEquals( "INFO", config1.getRootLoggerLevel() );
+        assertThat(config1.getRootLoggerLevel(), is("INFO"));
 
         DefaultLogConfiguration config2 = new DefaultLogConfiguration( config1 );
         config2.setRootLoggerLevel( "DEBUG" );
@@ -86,7 +85,7 @@ public class LogbackLogManagerTest
         manager.setConfiguration( config2 );
 
         LogConfiguration config3 = manager.getConfiguration();
-        Assert.assertEquals( "DEBUG", config3.getRootLoggerLevel() );
+        assertThat(config3.getRootLoggerLevel(), is("DEBUG"));
 
         // TODO check that is actually logging at debug level
     }
