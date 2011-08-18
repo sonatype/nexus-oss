@@ -54,7 +54,7 @@ public class DefaultMetadataManagerTest
     @Test(expected=NullPointerException.class)
     public void getTimeForMetadataTimestampMaven3UpdatedArg1Null()
     {
-        assertThat(DefaultMetadataManager.getTimeFromMetadataTimestampMaven3Updated( null ), is(1293207262000L));
+        DefaultMetadataManager.getTimeFromMetadataTimestampMaven3Updated( null );
     }
     
     //================
