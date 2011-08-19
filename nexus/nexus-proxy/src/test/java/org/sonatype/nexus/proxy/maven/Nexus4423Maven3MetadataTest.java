@@ -21,9 +21,14 @@ package org.sonatype.nexus.proxy.maven;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import java.util.Locale;
+import java.util.TimeZone;
+import javax.inject.Inject;
 import org.apache.maven.index.artifact.Gav;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
@@ -32,6 +37,8 @@ import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
 public class Nexus4423Maven3MetadataTest
     extends AbstractProxyTestEnvironment
 {
+
+    private Logger log = LoggerFactory.getLogger(Nexus4423Maven3MetadataTest.class);
 
     @Override
     protected EnvironmentBuilder getEnvironmentBuilder()
@@ -63,10 +70,15 @@ public class Nexus4423Maven3MetadataTest
             Assert.fail( "We should be able to resolve the gav " + gav.toString() );
         }
 
+        log.error("resolvedGav.getSnapshotTimeStamp()" + resolvedGav.getSnapshotTimeStamp());
         Assert.assertEquals( "The expected version does not match!", "1.2.1-20110719.134341-19",
             resolvedGav.getVersion() );
-        Assert.assertEquals( "The expected timestamp does not match!", "20110719.134341", new SimpleDateFormat(
-            "yyyyMMdd.HHmmss" ).format( new Date( resolvedGav.getSnapshotTimeStamp() ) ) );
+
+        // ensure GMT 00:00 sine that is what is supposed to be in metadata files
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd.HHmmss", Locale.US);
+        df.setTimeZone(TimeZone.getTimeZone("GMT-00:00"));
+
+        Assert.assertEquals( "The expected timestamp does not match!", "20110719.134341", df.format( new Date( resolvedGav.getSnapshotTimeStamp() ) ) );
         Assert.assertEquals( "The expected buildNumber does not match!", Integer.valueOf( 19 ),
             resolvedGav.getSnapshotBuildNumber() );
     }
@@ -95,8 +107,12 @@ public class Nexus4423Maven3MetadataTest
 
         Assert.assertEquals( "The expected version does not match!", "1.2.1-20110719.092007-17",
             resolvedGav.getVersion() );
-        Assert.assertEquals( "The expected timestamp does not match!", "20110719.092007", new SimpleDateFormat(
-            "yyyyMMdd.HHmmss" ).format( new Date( resolvedGav.getSnapshotTimeStamp() ) ) );
+
+        // ensure GMT 00:00 sine that is what is supposed to be in metadata files
+        SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd.HHmmss", Locale.US);
+        df.setTimeZone(TimeZone.getTimeZone("GMT-00:00"));
+
+        Assert.assertEquals( "The expected timestamp does not match!", "20110719.092007", df.format(new Date( resolvedGav.getSnapshotTimeStamp() ) ) );
         Assert.assertEquals( "The expected buildNumber does not match!", Integer.valueOf( 17 ),
             resolvedGav.getSnapshotBuildNumber() );
     }
