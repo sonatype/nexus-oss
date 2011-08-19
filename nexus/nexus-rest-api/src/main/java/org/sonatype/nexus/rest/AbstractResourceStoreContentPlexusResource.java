@@ -341,11 +341,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
         throws IOException, AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
         ItemNotFoundException, StorageException, ResourceException
     {
-        if ( Method.HEAD.equals( req.getMethod() ) )
-        {
-            return renderHeadResponseItem( context, req, res, variant, store, item.getResourceStoreRequest(), item );
-        }
-
         if ( isDescribe( req ) )
         {
             return renderDescribeItem( context, req, res, variant, store, item.getResourceStoreRequest(), item );
@@ -431,6 +426,11 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             // we have a collection
             StorageCollectionItem coll = (StorageCollectionItem) item;
+
+            if ( Method.HEAD.equals( req.getMethod() ) )
+            {
+                return renderHeadResponseItem( context, req, res, variant, store, item.getResourceStoreRequest(), coll );
+            }
 
             Collection<StorageItem> children = coll.list();
 
@@ -557,12 +557,13 @@ public abstract class AbstractResourceStoreContentPlexusResource
     }
 
     protected Object renderHeadResponseItem( Context context, Request req, Response res, Variant variant,
-                                             ResourceStore store, ResourceStoreRequest request, StorageItem item )
+                                             ResourceStore store, ResourceStoreRequest request,
+                                             StorageCollectionItem coll )
         throws IOException, AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
         ItemNotFoundException, StorageException, ResourceException
     {
         // we are just returning anything, the connector will strip off content anyway.
-        return "";
+        return new StorageItemRepresentation( variant.getMediaType(), coll );
     }
 
     protected Object renderDescribeItem( Context context, Request req, Response res, Variant variant,
