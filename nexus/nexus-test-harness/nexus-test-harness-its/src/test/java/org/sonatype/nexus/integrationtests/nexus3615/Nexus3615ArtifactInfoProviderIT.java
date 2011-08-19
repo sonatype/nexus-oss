@@ -18,8 +18,11 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3615;
 
-import org.hamcrest.MatcherAssert;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
+
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.sonatype.nexus.rest.model.ArtifactInfoResource;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -35,6 +38,8 @@ public class Nexus3615ArtifactInfoProviderIT
         ArtifactInfoResource info =
             getSearchMessageUtil().getInfo( REPO_TEST_HARNESS_REPO, "nexus3615/artifact/1.0/artifact-1.0.jar" );
 
+        Assert.assertEquals( REPO_TEST_HARNESS_REPO, info.getRepositoryId() );
+
         validate( info );
     }
 
@@ -45,12 +50,15 @@ public class Nexus3615ArtifactInfoProviderIT
         ArtifactInfoResource info =
             getSearchMessageUtil().getInfo( "public", "nexus3615/artifact/1.0/artifact-1.0.jar" );
 
+        // artifact is deployed to the 3 repos mentioned here. Depending on indexer order, any one of these may be the one for getRepositoryId()
+        assertThat( info.getRepositoryId(), Matchers.isOneOf( REPO_TEST_HARNESS_REPO, REPO_TEST_HARNESS_REPO2,
+                                                              REPO_TEST_HARNESS_RELEASE_REPO ) );
         validate( info );
+
     }
 
     private void validate( ArtifactInfoResource info )
     {
-        Assert.assertEquals( REPO_TEST_HARNESS_REPO, info.getRepositoryId() );
         Assert.assertEquals( "/nexus3615/artifact/1.0/artifact-1.0.jar", info.getRepositoryPath() );
         Assert.assertEquals( "b354a0022914a48daf90b5b203f90077f6852c68", info.getSha1Hash() );
         Assert.assertEquals( 3, info.getRepositories().size() );
