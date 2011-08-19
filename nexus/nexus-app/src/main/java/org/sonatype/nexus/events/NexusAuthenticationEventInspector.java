@@ -19,42 +19,33 @@
 package org.sonatype.nexus.events;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.auth.AuthenticationItem;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.proxy.events.AbstractEventInspector;
+import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
+import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
 
 @Component( role = EventInspector.class, hint = "NexusAuthenticationEventInspector" )
 public class NexusAuthenticationEventInspector
-    extends AbstractEventInspector
+    extends AbstractFeedRecorderEventInspector
+    implements AsynchronousEventInspector
 {
-    @Requirement
-    private FeedRecorder feedRecorder;
-
     private volatile NexusAuthenticationEvent lastNexusAuthenticationEvent;
 
     @Override
     public boolean accepts( Event<?> evt )
     {
-        // We accept only if it is NexusAuthenticationEvent but not alike previos one, see #isSimilar()
+        // We accept only if it is NexusAuthenticationEvent but not alike previous one, see #isSimilar()
         if ( evt instanceof NexusAuthenticationEvent )
         {
             final NexusAuthenticationEvent nae = (NexusAuthenticationEvent) evt;
 
-            if ( isSimilarEvent( nae ) )
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return !isSimilarEvent( nae );
         }
         else
         {
@@ -66,6 +57,14 @@ public class NexusAuthenticationEventInspector
     public void inspect( Event<?> evt )
     {
         final NexusAuthenticationEvent nae = (NexusAuthenticationEvent) evt;
+
+        if ( isSimilarEvent( nae ) )
+        {
+            // do nothing
+            return;
+        }
+
+        lastNexusAuthenticationEvent = nae;
 
         final AuthenticationItem ai = nae.getItem();
 
@@ -87,21 +86,17 @@ public class NexusAuthenticationEventInspector
             evt.getEventContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, ip );
         }
 
-        feedRecorder.addAuthcAuthzEvent( aae );
-
-        lastNexusAuthenticationEvent = nae;
+        getFeedRecorder().addAuthcAuthzEvent( aae );
     }
 
     // ==
 
     protected boolean isSimilarEvent( final NexusAuthenticationEvent nae )
     {
-        if ( lastNexusAuthenticationEvent == null )
-        {
-            return false;
-        }
-
-        if ( lastNexusAuthenticationEvent.getItem().equals( nae.getItem() )
+        // event is similar (to previously processed one) if there was previously processed at all, the carried
+        // AuthenticationItem equals to the one carried by previously processed one, and the events happened in range
+        // less than 2 seconds
+        if ( lastNexusAuthenticationEvent != null && lastNexusAuthenticationEvent.getItem().equals( nae.getItem() )
             && ( System.currentTimeMillis() - lastNexusAuthenticationEvent.getEventDate().getTime() < 2000L ) )
         {
             return true;
