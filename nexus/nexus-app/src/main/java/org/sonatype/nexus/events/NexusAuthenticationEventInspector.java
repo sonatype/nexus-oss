@@ -19,9 +19,11 @@
 package org.sonatype.nexus.events;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.auth.AuthenticationItem;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.access.AccessManager;
@@ -35,17 +37,18 @@ public class NexusAuthenticationEventInspector
     extends AbstractFeedRecorderEventInspector
     implements AsynchronousEventInspector
 {
+    @Requirement
+    private NexusConfiguration nexusConfiguration;
+
     private volatile NexusAuthenticationEvent lastNexusAuthenticationEvent;
 
     @Override
     public boolean accepts( Event<?> evt )
     {
-        // We accept only if it is NexusAuthenticationEvent but not alike previous one, see #isSimilar()
         if ( evt instanceof NexusAuthenticationEvent )
         {
-            final NexusAuthenticationEvent nae = (NexusAuthenticationEvent) evt;
-
-            return !isSimilarEvent( nae );
+            // We accept only some NexusAuthenticationEvent, see #isRecordedEvent()
+            return isRecordedEvent( (NexusAuthenticationEvent) evt );
         }
         else
         {
@@ -58,7 +61,7 @@ public class NexusAuthenticationEventInspector
     {
         final NexusAuthenticationEvent nae = (NexusAuthenticationEvent) evt;
 
-        if ( isSimilarEvent( nae ) )
+        if ( !isRecordedEvent( nae ) )
         {
             // do nothing
             return;
@@ -90,6 +93,18 @@ public class NexusAuthenticationEventInspector
     }
 
     // ==
+
+    protected boolean isRecordedEvent( final NexusAuthenticationEvent nae )
+    {
+        // we record everything except anonymous related ones
+        if ( StringUtils.equals( nexusConfiguration.getAnonymousUsername(), nae.getItem().getUserid() ) )
+        {
+            return false;
+        }
+
+        // if here, we record the event if not similar to previous one
+        return !isSimilarEvent( nae );
+    }
 
     protected boolean isSimilarEvent( final NexusAuthenticationEvent nae )
     {
