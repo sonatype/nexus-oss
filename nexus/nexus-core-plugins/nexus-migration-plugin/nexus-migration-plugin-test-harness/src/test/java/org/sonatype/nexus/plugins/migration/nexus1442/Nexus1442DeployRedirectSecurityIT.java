@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1442;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,21 +25,20 @@ import java.net.URL;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.shiro.codec.Base64;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class Nexus1442DeployRedirectSecurityIT
     extends AbstractMigrationIntegrationTest
 {
 
     @BeforeClass
-    public static void start()
+    public void start()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
@@ -49,22 +52,22 @@ public class Nexus1442DeployRedirectSecurityIT
     }
 
     @Test
-    public void deployWithPermition()
+    public void deployWithPermission()
         throws Exception
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         int returnCode = deploy();
-        Assert.assertTrue( "Unable to deploy artifact " + returnCode, Status.isSuccess( returnCode ) );
+        assertThat( "Unable to deploy artifact " + returnCode, Status.isSuccess( returnCode ) );
     }
 
     @Test
-    public void deployWithoutPermition()
+    public void deployWithoutPermission()
         throws Exception
     {
         TestContainer.getInstance().getTestContext().setUsername( "dummy" );
 
-        Assert.assertEquals( "Unable to deploy artifact ", 401, deploy() );
+        assertThat( "Unable to deploy artifact ", deploy(), is( equalTo( 401 ) ) );
     }
 
     private int deploy()

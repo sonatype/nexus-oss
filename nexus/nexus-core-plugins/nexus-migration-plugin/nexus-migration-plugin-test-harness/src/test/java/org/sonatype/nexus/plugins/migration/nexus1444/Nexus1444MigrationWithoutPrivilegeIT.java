@@ -12,12 +12,12 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1444;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.File;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationPrivilegeTest;
+import org.testng.annotations.Test;
 
 public class Nexus1444MigrationWithoutPrivilegeIT
     extends AbstractMigrationPrivilegeTest
@@ -35,8 +35,8 @@ public class Nexus1444MigrationWithoutPrivilegeIT
         }
         catch ( Exception e )
         {
-            Assert.assertTrue( "Exception message should contain 401 error:\n" + e.getStackTrace(), e
-                .getMessage().contains( "401" ) );
+            assertThat( "Exception message should contain 401 error:\n" + e.getStackTrace(),
+                e.getMessage().contains( "401" ) );
         }
     }
 

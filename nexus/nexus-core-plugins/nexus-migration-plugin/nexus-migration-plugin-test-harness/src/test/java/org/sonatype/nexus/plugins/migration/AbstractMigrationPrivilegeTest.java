@@ -15,22 +15,14 @@ package org.sonatype.nexus.plugins.migration;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.BeforeClass;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
-import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.util.ImportMessageUtil;
 
 public abstract class AbstractMigrationPrivilegeTest
     extends AbstractPrivilegeTest
 {
-
-    @BeforeClass
-    public static void enableSecurity()
-    {
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
     
     protected final String ARTIFACTORY_MIGRATOR = "artifactory-migrate";
 

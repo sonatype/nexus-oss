@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus3343;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
@@ -20,7 +22,6 @@ import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.shiro.codec.Base64;
-import org.junit.Assert;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
@@ -55,7 +56,7 @@ public class Nexus3343DeployBigFileIT
         input.close();
         out.close();
 
-        Assert.assertTrue( Status.isSuccess( conn.getResponseCode() ) );
+        assertThat( "Deploy is succesful", Status.isSuccess( conn.getResponseCode() ) );
 
         return new File( nexusWorkDir, "storage/main-local-releases/nexus3343/released/1.0/released-1.0.bin" );
     }
@@ -65,4 +66,5 @@ public class Nexus3343DeployBigFileIT
     {
         return new File( getTestFile( "." ), "sourceFile.bin" );
     }
+
 }

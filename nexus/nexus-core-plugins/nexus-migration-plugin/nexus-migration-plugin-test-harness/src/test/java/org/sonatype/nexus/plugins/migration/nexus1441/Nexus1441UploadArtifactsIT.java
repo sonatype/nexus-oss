@@ -13,7 +13,7 @@
 package org.sonatype.nexus.plugins.migration.nexus1441;
 
 import org.apache.maven.index.artifact.Gav;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 public class Nexus1441UploadArtifactsIT
     extends AbstractDeployBridgeIT

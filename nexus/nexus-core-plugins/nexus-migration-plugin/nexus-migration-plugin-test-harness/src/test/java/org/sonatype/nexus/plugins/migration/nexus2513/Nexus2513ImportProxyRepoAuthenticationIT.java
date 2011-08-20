@@ -12,12 +12,16 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus2513;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.testng.annotations.Test;
 
 public class Nexus2513ImportProxyRepoAuthenticationIT
     extends AbstractMigrationIntegrationTest
@@ -39,12 +43,13 @@ public class Nexus2513ImportProxyRepoAuthenticationIT
 
     private void validateAuthentication( RepositoryResource sss )
     {
-        Assert.assertNotNull( sss.getRemoteStorage() );
+        assertThat( sss.getRemoteStorage(), is( notNullValue() ) );
         AuthenticationSettings auth = sss.getRemoteStorage().getAuthentication();
-        Assert.assertNotNull( auth );
+        assertThat( auth, is( notNullValue() ) );
 
-        Assert.assertEquals( "rseddon", auth.getUsername() );
+        assertThat( auth.getUsername(), is( equalTo( "rseddon" ) ) );
         // TODO is it possible to validate the PW? "12Hola.."
-        Assert.assertEquals( "|$|N|E|X|U|S|$|", auth.getPassword() );
+        assertThat( auth.getPassword(), is( equalTo( "|$|N|E|X|U|S|$|" ) ) );
     }
+    
 }

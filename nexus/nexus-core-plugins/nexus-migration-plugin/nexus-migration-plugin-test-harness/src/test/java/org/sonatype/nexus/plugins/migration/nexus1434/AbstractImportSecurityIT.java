@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
@@ -31,6 +30,7 @@ import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.RoleResource;
+import org.testng.annotations.Test;
 
 public abstract class AbstractImportSecurityIT
     extends AbstractMigrationIntegrationTest

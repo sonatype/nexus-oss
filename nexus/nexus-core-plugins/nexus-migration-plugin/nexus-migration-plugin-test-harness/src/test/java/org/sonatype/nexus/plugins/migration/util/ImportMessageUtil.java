@@ -15,7 +15,6 @@ package org.sonatype.nexus.plugins.migration.util;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.Assert;
 import org.mortbay.log.Log;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -27,6 +26,7 @@ import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryRequestDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryResponseDTO;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 

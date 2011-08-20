@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1435;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -21,12 +23,12 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1435MapRepositoriesIT
     extends AbstractMigrationIntegrationTest
@@ -60,7 +62,7 @@ public class Nexus1435MapRepositoriesIT
             throw e; // never happen
         }
 
-        Assert.assertTrue( "Downloaded artifact was not right, checksum comparation fail " + url,
+        assertThat( "Downloaded artifact was not right, checksum comparation fail " + url,
                            FileTestingUtils.compareFileSHA1s( artifact, downloaded ) );
 
     }
@@ -85,7 +87,7 @@ public class Nexus1435MapRepositoriesIT
             throw e; // never happen
         }
 
-        Assert.assertTrue( "Downloaded artifact was not right, checksum comparation fail " + url,
+        assertThat( "Downloaded artifact was not right, checksum comparation fail " + url,
                            FileTestingUtils.compareFileSHA1s( artifact, downloaded ) );
 
     }

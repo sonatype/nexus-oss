@@ -12,10 +12,13 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1441;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+
 import java.io.File;
 
 import org.apache.maven.index.artifact.Gav;
-import org.junit.Assert;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
@@ -54,14 +57,14 @@ public abstract class AbstractDeployBridgeIT
         File deployedFile = new File( nexusWorkDir, "/storage/" + targetRepository + "/" + path );
         if ( numberOfFiles == -1 )
         {
-            Assert.assertTrue( "Artifact was not deployed", deployedFile.exists() );
-            Assert.assertTrue( "Deployed artifact was not right, checksum comparation fail " + deployUrl,
-                               FileTestingUtils.compareFileSHA1s( artifact, deployedFile ) );
+            assertThat( "Artifact was not deployed", deployedFile.exists() );
+            assertThat( "Deployed artifact was not right, checksum comparation fail " + deployUrl,
+                FileTestingUtils.compareFileSHA1s( artifact, deployedFile ) );
         }
         else
         {
-            Assert.assertEquals( "Artifact was not deployed ", numberOfFiles,
-                                 deployedFile.getParentFile().list().length );
+            assertThat( "Artifact was not deployed ", deployedFile.getParentFile().list().length,
+                is( equalTo( numberOfFiles ) ) );
         }
     }
 

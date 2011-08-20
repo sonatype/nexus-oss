@@ -12,16 +12,21 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1447;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
+import org.testng.annotations.Test;
 
 public class Nexus1447ImportWebProxyIT
     extends AbstractMigrationIntegrationTest
 {
+    
     @Override
     protected void runOnce()
         throws Exception
@@ -37,12 +42,13 @@ public class Nexus1447ImportWebProxyIT
         RepositoryProxyResource repo = (RepositoryProxyResource) this.repositoryUtil.getRepository( "nexus1447-repo" );
         RemoteHttpProxySettings proxy = repo.getRemoteStorage().getHttpProxySettings();
 
-        Assert.assertNotNull( "Proxy repository not defined", proxy );
-        Assert.assertEquals( "Proxy configuration do no match", "10.10.10.10", proxy.getProxyHostname() );
-        Assert.assertEquals( "Proxy configuration do no match", 8080, proxy.getProxyPort() );
-        Assert.assertNotNull( "Proxy configuration do no match", proxy.getAuthentication() );
-        Assert.assertEquals( "Proxy configuration do no match", "un", proxy.getAuthentication().getUsername() );
-        Assert.assertEquals( "Proxy configuration do no match", "|$|N|E|X|U|S|$|", proxy.getAuthentication().getPassword() );
+        assertThat( "Proxy repository not defined", proxy, is( notNullValue() ) );
+        assertThat( "Proxy configuration do no match", proxy.getProxyHostname(), is( equalTo( "10.10.10.10" ) ) );
+        assertThat( "Proxy configuration do no match", proxy.getProxyPort(), is( equalTo( 8080 ) ) );
+        assertThat( "Proxy configuration do no match", proxy.getAuthentication(), is( notNullValue() ) );
+        assertThat( "Proxy configuration do no match", proxy.getAuthentication().getUsername(), is( equalTo( "un" ) ) );
+        assertThat( "Proxy configuration do no match", proxy.getAuthentication().getPassword(),
+            is( equalTo( "|$|N|E|X|U|S|$|" ) ) );
     }
 
 }

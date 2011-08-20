@@ -12,27 +12,22 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1438;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
 import java.util.ArrayList;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.restlet.data.MediaType;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
-import org.sonatype.nexus.test.utils.GroupMessageUtil;
+import org.testng.annotations.Test;
 
 public class Nexus1438UnwindVirtualRepositoriesIT
     extends AbstractMigrationIntegrationTest
 {
-
-    private GroupMessageUtil groupUtil;
-
-    public Nexus1438UnwindVirtualRepositoriesIT()
-    {
-        this.groupUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
-    }
 
     @Test
     public void importWindVirtualRepos()
@@ -42,12 +37,12 @@ public class Nexus1438UnwindVirtualRepositoriesIT
         commitMigration( migrationSummary );
 
         RepositoryGroupResource group = this.groupUtil.getGroup( "libs-snapshots" );
-        Assert.assertNotNull( group );
-        Assert.assertEquals( "libs-snapshots", group.getId() );
+        assertThat( group, is( notNullValue() ) );
+        assertThat( group.getId(), is( equalTo( "libs-snapshots" ) ) );
 
         ArrayList<RepositoryGroupMemberRepository> repositories =
             (ArrayList<RepositoryGroupMemberRepository>) group.getRepositories();
-        Assert.assertEquals( 4, repositories.size() );
+        assertThat( repositories.size(), is( equalTo( 4 ) ) );
 
         ArrayList<String> reposIds = new ArrayList<String>();
         for ( RepositoryGroupMemberRepository repo : repositories )

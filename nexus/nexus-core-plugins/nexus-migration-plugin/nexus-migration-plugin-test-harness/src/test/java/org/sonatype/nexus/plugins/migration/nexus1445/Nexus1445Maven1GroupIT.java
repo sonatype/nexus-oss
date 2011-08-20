@@ -12,14 +12,17 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1445;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
 import org.sonatype.nexus.plugin.migration.artifactory.dto.ERepositoryTypeResolution;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.GroupResolutionDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
+import org.testng.annotations.Test;
 
 public class Nexus1445Maven1GroupIT
     extends AbstractMigrationIntegrationTest
@@ -32,21 +35,21 @@ public class Nexus1445Maven1GroupIT
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactoryBackup.zip" ) );
 
         RepositoryResolutionDTO repo = migrationSummary.getRepositoryResolution( "repo1" );
-        Assert.assertNotNull( "Central repository not found", repo );
-        Assert.assertNotNull( "Central repository not marked to merge", repo.getSimilarRepositoryId() );
+        assertThat( "Central repository not found", repo, is( notNullValue() ) );
+        assertThat( "Central repository not marked to merge", repo.getSimilarRepositoryId(), is( notNullValue() ) );
         repo.setMergeSimilarRepository( true );
 
         GroupResolutionDTO group = migrationSummary.getGroupResolution( "remote-repos" );
-        Assert.assertNotNull( "Group not found", group );
-        Assert.assertTrue( "Group should contains maven 1 and 2 repositories", group.isMixed() );
+        assertThat( "Group not found", group, is( notNullValue() ) );
+        assertThat( "Group should contains maven 1 and 2 repositories", group.isMixed() );
         group.setRepositoryTypeResolution( ERepositoryTypeResolution.VIRTUAL_BOTH );
 
         commitMigration( migrationSummary );
 
         RepositoryBaseResource virtualRepo = repositoryUtil.getRepository( "java.net.m1-releases-virtual" );
-        Assert.assertNotNull( "Virtual release repository was not created", virtualRepo );
+        assertThat( "Virtual release repository was not created", virtualRepo, is( notNullValue() ) );
         virtualRepo = repositoryUtil.getRepository( "java.net.m1-snapshots-virtual" );
-        Assert.assertNotNull( "Virtual snapshot repository was not created", virtualRepo );
+        assertThat( "Virtual snapshot repository was not created", virtualRepo, is( notNullValue() ) );
     }
 
 }

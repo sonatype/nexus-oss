@@ -13,7 +13,7 @@
 package org.sonatype.nexus.plugins.migration.nexus1441;
 
 import org.apache.maven.index.artifact.Gav;
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 public class Nexus1441DeployToMixedRepositoryIT
     extends AbstractDeployBridgeIT
@@ -25,7 +25,7 @@ public class Nexus1441DeployToMixedRepositoryIT
     {
         Gav gav =
             new Gav( "nxcm280.maven", "maven-mixed-released", "1.0", null, "jar", null, null, null, false, false, null,
-                     false, null );
+                false, null );
         deploy( gav, "main-local", true, "main-local-releases" );
     }
 
@@ -35,7 +35,7 @@ public class Nexus1441DeployToMixedRepositoryIT
     {
         Gav gav =
             new Gav( "nxcm280.maven", "maven-mixed-snapshot", "1.0-SNAPSHOT", null, "jar", null, null, null, true,
-                     false, null, false, null );
+                false, null, false, null );
         deploy( gav, "main-local", true, 9, "main-local-snapshots" );
     }
 

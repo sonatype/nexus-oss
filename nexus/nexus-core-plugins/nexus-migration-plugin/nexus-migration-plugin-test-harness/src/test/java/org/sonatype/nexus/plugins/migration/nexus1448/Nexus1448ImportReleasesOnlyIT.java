@@ -12,14 +12,14 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1448;
 
-import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.EMixResolution;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.RepositoryResolutionDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
+import org.testng.annotations.Test;
 
 public class Nexus1448ImportReleasesOnlyIT
-extends AbstractMigrationIntegrationTest
+    extends AbstractMigrationIntegrationTest
 {
     @Test
     public void importReleasesOnly()

@@ -12,10 +12,12 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1434;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.UserResolutionDTO;
@@ -52,7 +54,7 @@ public class Nexus1434ImportSecurity125RemoveUserIT
     protected void verifySecurity()
         throws Exception
     {
-        Assert.assertEquals( 2, getImportedUserList().size() );
+        assertThat( getImportedUserList().size(), is( equalTo( 2 ) ) );
     }
 
 }

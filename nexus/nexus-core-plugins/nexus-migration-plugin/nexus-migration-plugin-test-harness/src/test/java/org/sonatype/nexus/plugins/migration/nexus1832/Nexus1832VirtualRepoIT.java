@@ -12,11 +12,11 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1832;
 
-import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.tasks.RepairIndexTask;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.annotations.Test;
 
 public class Nexus1832VirtualRepoIT
     extends AbstractMigrationIntegrationTest

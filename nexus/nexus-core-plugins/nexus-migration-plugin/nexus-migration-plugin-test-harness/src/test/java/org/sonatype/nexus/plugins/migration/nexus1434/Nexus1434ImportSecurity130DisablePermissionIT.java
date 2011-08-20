@@ -12,10 +12,15 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1434;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
 import java.util.List;
 
-import junit.framework.Assert;
-
+import org.hamcrest.Matchers;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
@@ -25,7 +30,6 @@ import org.sonatype.security.rest.model.RoleResource;
 public class Nexus1434ImportSecurity130DisablePermissionIT
     extends AbstractImportSecurityIT
 {
-
 
     @Override
     protected void importSecurity()
@@ -38,7 +42,6 @@ public class Nexus1434ImportSecurity130DisablePermissionIT
         commitMigration( migrationSummary );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Override
     protected void verifySecurity()
         throws Exception
@@ -48,39 +51,39 @@ public class Nexus1434ImportSecurity130DisablePermissionIT
         List<PrivilegeStatusResource> privilegeList = getImportedTargetPrivilegesList();
         List<RoleResource> roleList = getImportedRoleList();
 
-        Assert.assertEquals( 4, userList.size() );
-        Assert.assertTrue( targetList.isEmpty() );
-        Assert.assertTrue( privilegeList.isEmpty() );
+        assertThat( "4 users imported", userList.size(), is( equalTo( 4 ) ) );
+        assertThat( targetList, is( Matchers.<RepositoryTargetListResource> empty() ) );
+        assertThat( privilegeList, is( Matchers.<PrivilegeStatusResource> empty() ) );
         // the group is coverted to a role now
-        Assert.assertEquals( 1, roleList.size() );
+        assertThat( roleList.size(), is( equalTo( 1 ) ) );
 
         // these users are imported
-        Assert.assertTrue( containUser( userList, "anonymous-artifactory" ) );
-        Assert.assertTrue( containUser( userList, "admin-artifactory" ) );
-        Assert.assertTrue( containUser( userList, "user" ) );
-        Assert.assertTrue( containUser( userList, "user1" ) );
+        assertThat( "User list contains 'anonymous-artifactory'", containUser( userList, "anonymous-artifactory" ) );
+        assertThat( "User list contains 'admin-artifactory'", containUser( userList, "admin-artifactory" ) );
+        assertThat( "User list contains 'user'", containUser( userList, "user" ) );
+        assertThat( "User list contains 'user1'", containUser( userList, "user1" ) );
 
         // verify user-role mapping
         PlexusUserResource anonymous = getUserById( userList, "anonymous-artifactory" );
-        Assert.assertEquals( 1, anonymous.getRoles().size() );
+        assertThat( anonymous.getRoles().size(), is( equalTo( 1 ) ) );
         containPlexusRole( anonymous.getRoles(), "anonymous" );
 
         PlexusUserResource admin = getUserById( userList, "admin-artifactory" );
-        Assert.assertEquals( 1, admin.getRoles().size() );
+        assertThat( admin.getRoles().size(), is( equalTo( 1 ) ) );
         containPlexusRole( admin.getRoles(), "admin" );
 
         PlexusUserResource user = getUserById( userList, "user" );
-        Assert.assertEquals( 1, user.getRoles().size() );
+        assertThat( user.getRoles().size(), is( equalTo( 1 ) ) );
         containPlexusRole( user.getRoles(), "group" );
 
         PlexusUserResource user1 = getUserById( userList, "user1" );
-        Assert.assertEquals( 1, user1.getRoles().size() );
+        assertThat( user1.getRoles().size(), is( equalTo( 1 ) ) );
         containPlexusRole( user1.getRoles(), "anonymous" );
 
         // verify the group role
         RoleResource groupRole = getRoleById( roleList, "group" );
-        Assert.assertNotNull( groupRole );
-        Assert.assertTrue( groupRole.getRoles().contains( "anonymous" ) );
+        assertThat( groupRole, is( notNullValue() ) );
+        assertThat( groupRole.getRoles(), hasItem( "anonymous" ) );
     }
 
 }

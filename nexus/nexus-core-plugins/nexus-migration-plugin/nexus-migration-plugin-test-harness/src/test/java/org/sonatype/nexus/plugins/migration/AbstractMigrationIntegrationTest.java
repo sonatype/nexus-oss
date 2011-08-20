@@ -12,6 +12,14 @@
  */
 package org.sonatype.nexus.plugins.migration;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -20,9 +28,6 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.artifact.Gav;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -43,6 +48,9 @@ import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 
 public abstract class AbstractMigrationIntegrationTest
     extends AbstractNexusIntegrationTest
@@ -62,8 +70,7 @@ public abstract class AbstractMigrationIntegrationTest
 
     public AbstractMigrationIntegrationTest()
     {
-        this.repositoryUtil =
-            new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
+        this.repositoryUtil = new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
         this.groupUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
         this.searchUtil = new SearchMessageUtil( this );
         this.userUtil = new UserMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
@@ -84,12 +91,13 @@ public abstract class AbstractMigrationIntegrationTest
         cleanWorkDir();
     }
 
+    @SuppressWarnings( "unchecked" )
     protected <E> void assertContains( ArrayList<E> collection, E item )
     {
-        Assert.assertTrue( item + " not found.\n" + collection, collection.contains( item ) );
+        assertThat( item + " not found.\n" + collection, collection, hasItem( item ) );
     }
 
-    @After
+    @AfterMethod
     public void waitEnd()
         throws Exception
     {
@@ -100,8 +108,8 @@ public abstract class AbstractMigrationIntegrationTest
         Thread.sleep( 2000 );
 
         String log = FileUtils.readFileToString( migrationLogFile );
-        Assert.assertFalse( log, log.toLowerCase().contains( "Exception".toLowerCase() ) );
-        Assert.assertFalse( log, log.toLowerCase().contains( "Error".toLowerCase() ) );
+        assertThat( log, log.toLowerCase(), not( containsString( "Exception".toLowerCase() ) ) );
+        assertThat( log, log.toLowerCase(), not( containsString( "Error".toLowerCase() ) ) );
 
         TaskScheduleUtil.waitForAllTasksToStop();
     }
@@ -137,7 +145,7 @@ public abstract class AbstractMigrationIntegrationTest
             throw e; // never happen
         }
 
-        Assert.assertTrue( "Downloaded artifact was not right, checksum comparation fail " + artifactId,
+        assertThat( "Downloaded artifact was not right, checksum comparation fail " + artifactId,
             FileTestingUtils.compareFileSHA1s( artifact, downloaded ) );
     }
 
@@ -167,8 +175,8 @@ public abstract class AbstractMigrationIntegrationTest
         throws Exception
     {
         List<NexusArtifact> artifacts = searchUtil.searchForGav( groupId, artifactId, version, repoId );
-        Assert.assertEquals( "Expected to found only one artifact (" + artifactId + ") instead of " + artifacts.size()
-            + "\n" + this.getXMLXStream().toXML( artifacts ), 1, artifacts.size() );
+        assertThat( "Expected to found only one artifact (" + artifactId + ") instead of " + artifacts.size() + "\n"
+            + this.getXMLXStream().toXML( artifacts ), artifacts.size(), is( equalTo( 1 ) ) );
     }
 
     protected void checkGroup( String groupId )
@@ -220,7 +228,7 @@ public abstract class AbstractMigrationIntegrationTest
         throws IOException
     {
         MigrationSummaryDTO migrationSummary = ImportMessageUtil.importBackup( artifactoryBackup );
-        Assert.assertNotNull( "Unexpected result from server: " + migrationSummary, migrationSummary );
+        assertThat( "Unexpected result from server: " + migrationSummary, migrationSummary, is( notNullValue() ) );
         return migrationSummary;
     }
 
@@ -228,7 +236,7 @@ public abstract class AbstractMigrationIntegrationTest
         throws Exception
     {
         Status status = ImportMessageUtil.commitImport( migrationSummary ).getStatus();
-        Assert.assertTrue( "Unable to commit import " + status, status.isSuccess() );
+        assertThat( "Unable to commit import " + status, status.isSuccess() );
 
         waitForCompletion();
     }
@@ -264,8 +272,8 @@ public abstract class AbstractMigrationIntegrationTest
     {
         super.copyConfigFiles();
         copyConfigFile( "logback-migration.xml", getTestProperties(), WORK_CONF_DIR );
+        copyConfigFile( "artifactory-bridge/WEB-INF/classes/logback.xml", getTestProperties(), nexusBaseDir );
+        copyConfigFile( "artifactory-bridge/WEB-INF/plexus.properties", getTestProperties(), nexusBaseDir );
     }
-    
-    
-    
+
 }

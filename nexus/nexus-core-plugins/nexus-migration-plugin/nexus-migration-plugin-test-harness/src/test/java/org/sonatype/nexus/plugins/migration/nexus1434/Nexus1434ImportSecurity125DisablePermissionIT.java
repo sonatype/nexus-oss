@@ -12,10 +12,13 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1434;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+
 import java.util.List;
 
-import junit.framework.Assert;
-
+import org.hamcrest.Matchers;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
@@ -43,7 +46,6 @@ public class Nexus1434ImportSecurity125DisablePermissionIT
         commitMigration( migrationSummary );
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void verifySecurity()
         throws Exception
@@ -53,32 +55,32 @@ public class Nexus1434ImportSecurity125DisablePermissionIT
         List<PrivilegeStatusResource> privilegeList = getImportedTargetPrivilegesList();
         List<RoleResource> roleList = getImportedRoleList();
 
-        Assert.assertEquals( 4, userList.size() );
-        Assert.assertTrue( targetList.isEmpty() );
-        Assert.assertTrue( privilegeList.isEmpty() );
-        Assert.assertTrue( roleList.isEmpty() );
+        assertThat( userList.size(), is( equalTo( 4 ) ) );
+        assertThat( targetList, is( Matchers.<RepositoryTargetListResource> empty() ) );
+        assertThat( privilegeList, is( Matchers.<PrivilegeStatusResource> empty() ) );
+        assertThat( roleList, is( Matchers.<RoleResource> empty() ) );
 
         // these users are imported
-        Assert.assertTrue( containUser( userList, "admin-artifactory" ) );
-        Assert.assertTrue( containUser( userList, "admin1" ) );
-        Assert.assertTrue( containUser( userList, "user" ) );
-        Assert.assertTrue( containUser( userList, "user1" ) );
+        assertThat( "User list contains 'admin-artifactory'", containUser( userList, "admin-artifactory" ) );
+        assertThat( "User list contains 'admin1'", containUser( userList, "admin1" ) );
+        assertThat( "User list contains 'user'", containUser( userList, "user" ) );
+        assertThat( "User list contains 'user1'", containUser( userList, "user1" ) );
 
         // verify user-role mapping
         PlexusUserResource admin = getUserById( userList, "admin-artifactory" );
-        Assert.assertEquals( 1, admin.getRoles().size() );
+        assertThat( admin.getRoles().size(), is( equalTo( 1 ) ) );
         containPlexusRole( admin.getRoles(), "admin" );
 
         PlexusUserResource admin1 = getUserById( userList, "admin1" );
-        Assert.assertEquals( 1, admin1.getRoles().size() );
+        assertThat( admin1.getRoles().size(), is( equalTo( 1 ) ) );
         containPlexusRole( admin1.getRoles(), "admin" );
 
         PlexusUserResource user = getUserById( userList, "user" );
-        Assert.assertEquals( 1, user.getRoles().size() );
+        assertThat( user.getRoles().size(), is( equalTo( 1 ) ) );
         containPlexusRole( user.getRoles(), "anonymous" );
 
         PlexusUserResource user1 = getUserById( userList, "user1" );
-        Assert.assertEquals( 1, user1.getRoles().size() );
+        assertThat( user1.getRoles().size(), is( equalTo( 1 ) ) );
         containPlexusRole( user1.getRoles(), "anonymous" );
     }
 

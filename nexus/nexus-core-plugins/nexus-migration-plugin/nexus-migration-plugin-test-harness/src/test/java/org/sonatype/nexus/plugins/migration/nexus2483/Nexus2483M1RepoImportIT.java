@@ -12,12 +12,12 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus2483;
 
-import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
+import org.testng.annotations.Test;
 
 public class Nexus2483M1RepoImportIT
-extends AbstractMigrationIntegrationTest
+    extends AbstractMigrationIntegrationTest
 {
 
     @Test

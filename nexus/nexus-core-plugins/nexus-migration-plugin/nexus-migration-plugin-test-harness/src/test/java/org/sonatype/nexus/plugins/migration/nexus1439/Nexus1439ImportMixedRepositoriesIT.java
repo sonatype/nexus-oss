@@ -12,17 +12,20 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1439;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.tasks.RepairIndexTask;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.annotations.Test;
 
 public class Nexus1439ImportMixedRepositoriesIT
     extends AbstractMigrationIntegrationTest
@@ -62,7 +65,7 @@ public class Nexus1439ImportMixedRepositoriesIT
         RepositoryGroupResource group = this.groupUtil.getGroup( "main-local" );
         ArrayList<RepositoryGroupMemberRepository> repositories =
             (ArrayList<RepositoryGroupMemberRepository>) group.getRepositories();
-        Assert.assertEquals( 2, repositories.size() );
+        assertThat( repositories.size(), is( equalTo( 2 ) ) );
 
         ArrayList<String> reposIds = new ArrayList<String>();
         for ( RepositoryGroupMemberRepository repo : repositories )

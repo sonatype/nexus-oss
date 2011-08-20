@@ -13,8 +13,11 @@
 
 -->
 <assembly>
+
   <id>webapp</id>
+
   <formats>
+    <format>tar.gz</format>
     <format>zip</format>
   </formats>
 
@@ -23,7 +26,7 @@
   <fileSets>
     <fileSet>
       <directory>${basedir}/src/main/webapp</directory>
-      <outputDirectory>runtime/apps/artifactory-bridge/webapp</outputDirectory>
+      <outputDirectory>artifactory-bridge</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>${basedir}/src/main/conf</directory>
@@ -34,25 +37,15 @@
   <dependencySets>
     <dependencySet>
       <unpack>true</unpack>
-      <outputDirectory>runtime/apps/nexus/plugin-repository</outputDirectory>
+      <outputDirectory>nexus/WEB-INF/plugin-repository</outputDirectory>
       <scope>provided</scope>
       <includes>
         <include>org.sonatype.nexus.plugins:nexus-migration-plugin-artifactory</include>
       </includes>
     </dependencySet>
     <dependencySet>
-      <unpack>false</unpack>
-      <outputDirectory>runtime/apps/nexus/lib</outputDirectory>
-      <includes>
-        <include>org.sonatype.nexus.plugins:nexus-migration-plugin-configuration</include>
-      </includes>
-    </dependencySet>
-    <dependencySet>
-      <unpack>false</unpack>
-      <outputDirectory>runtime/apps/nexus/lib</outputDirectory>
-      <includes>
-        <include>org.sonatype.nexus.plugins:nexus-migration-plugin-artifactory-bridge</include>
-      </includes>
+      <outputDirectory>artifactory-bridge/WEB-INF/lib</outputDirectory>
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
   </dependencySets>
 

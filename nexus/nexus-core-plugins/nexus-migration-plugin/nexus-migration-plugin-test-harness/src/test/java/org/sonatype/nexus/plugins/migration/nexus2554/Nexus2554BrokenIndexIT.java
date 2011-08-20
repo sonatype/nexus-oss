@@ -12,11 +12,12 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus2554;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
+import org.testng.annotations.Test;
 
 public class Nexus2554BrokenIndexIT
     extends AbstractMigrationIntegrationTest
@@ -52,11 +53,11 @@ public class Nexus2554BrokenIndexIT
         checkGroup( "vvv" );
 
         String logs = FileUtils.fileRead( getNexusLogFile() );
-        Assert.assertFalse(
-                            logs,
-                            logs.contains( "Error message is: java.lang.NullPointerException Strack trace: java.lang.NullPointerException" ) );
-        Assert.assertFalse( logs, logs.contains( "RepositoryNotAvailableException" ) );
-        Assert.assertFalse( logs, logs.contains( "java.lang.NullPointerException" ) );
+        assertThat(
+            logs,
+            !logs.contains( "Error message is: java.lang.NullPointerException Strack trace: java.lang.NullPointerException" ) );
+        assertThat( logs, !logs.contains( "RepositoryNotAvailableException" ) );
+        assertThat( logs, !logs.contains( "java.lang.NullPointerException" ) );
     }
 
 }

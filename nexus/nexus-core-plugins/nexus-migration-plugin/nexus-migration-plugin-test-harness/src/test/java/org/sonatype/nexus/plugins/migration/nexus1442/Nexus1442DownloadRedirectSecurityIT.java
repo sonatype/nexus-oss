@@ -12,24 +12,27 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1442;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+
 import java.net.URL;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class Nexus1442DownloadRedirectSecurityIT
     extends AbstractMigrationIntegrationTest
 {
 
     @BeforeClass
-    public static void start()
+    public void start()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
@@ -43,21 +46,21 @@ public class Nexus1442DownloadRedirectSecurityIT
     }
 
     @Test
-    public void downloadWithPermition()
+    public void downloadWithPermission()
         throws Exception
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        Assert.assertTrue( "Unable to download artifact", Status.isSuccess( download() ) );
+        assertThat( "Unable to download artifact", Status.isSuccess( download() ) );
     }
 
     @Test
-    public void downloadWithoutPermition()
+    public void downloadWithoutPermission()
         throws Exception
     {
         TestContainer.getInstance().getTestContext().setUsername( "dummy" );
 
-        Assert.assertEquals( "Unable to download artifact", 401, download() );
+        assertThat( "Unable to download artifact", download(), is( equalTo( 401 ) ) );
 
     }
 

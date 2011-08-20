@@ -12,9 +12,13 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1434;
 
-import java.util.List;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
-import junit.framework.Assert;
+import java.util.List;
 
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
@@ -38,7 +42,6 @@ public class Nexus1434ImportSecurity130IT
 
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void verifySecurity()
         throws Exception
@@ -48,62 +51,73 @@ public class Nexus1434ImportSecurity130IT
         List<PrivilegeStatusResource> privilegeList = getImportedTargetPrivilegesList();
         List<RoleResource> roleList = getImportedRoleList();
 
-        Assert.assertEquals( "4 users imported", 4, userList.size() );
-        Assert.assertEquals( "3 repo targets imported", 3, targetList.size() );
-        Assert.assertEquals( "4 privileges for each repo target", targetList.size() * 4, privilegeList.size() );
-        Assert.assertEquals( "4 roles for each repo target, plus a group", targetList.size() * 4 + 1, roleList.size() );
+        assertThat( "4 users imported", userList.size(), is( equalTo( 4 ) ) );
+        assertThat( "3 repo targets imported", targetList.size(), is( equalTo( 3 ) ) );
+        assertThat( "4 privileges for each repo target", privilegeList.size(), is( equalTo( targetList.size() * 4 ) ) );
+        assertThat( "4 roles for each repo target, plus a group", roleList.size(),
+            is( equalTo( targetList.size() * 4 + 1 ) ) );
 
         // these users are imported
-        Assert.assertTrue( containUser( userList, "anonymous-artifactory" ) );
-        Assert.assertTrue( containUser( userList, "admin-artifactory" ) );
-        Assert.assertTrue( containUser( userList, "user" ) );
-        Assert.assertTrue( containUser( userList, "user1" ) );
+        assertThat( "User list contains 'anonymous-artifactory'", containUser( userList, "anonymous-artifactory" ) );
+        assertThat( "User list contains 'admin-artifactory'", containUser( userList, "admin-artifactory" ) );
+        assertThat( "User list contains 'user'", containUser( userList, "user" ) );
+        assertThat( "User list contains 'user1'", containUser( userList, "user1" ) );
 
+        assertThat( "Contains privilege Anything-ANY-create",
+            containPrivilegeName( privilegeList, "Anything-ANY-create" ) );
+        assertThat( "Contains privilege Anything-ANY-read", containPrivilegeName( privilegeList, "Anything-ANY-read" ) );
+        assertThat( "Contains privilege Anything-ANY-update",
+            containPrivilegeName( privilegeList, "Anything-ANY-update" ) );
+        assertThat( "Contains privilege Anything-ANY-delete",
+            containPrivilegeName( privilegeList, "Anything-ANY-delete" ) );
 
-        Assert.assertTrue( containPrivilegeName( privilegeList, "Anything-ANY-create" ) );
-        Assert.assertTrue( containPrivilegeName( privilegeList, "Anything-ANY-read" ) );
-        Assert.assertTrue( containPrivilegeName( privilegeList, "Anything-ANY-update" ) );
-        Assert.assertTrue( containPrivilegeName( privilegeList, "Anything-ANY-delete" ) );
+        assertThat( "Contains role Anything-ANY-reader", containRole( roleList, "Anything-ANY-reader" ) );
+        assertThat( "Contains role Anything-ANY-deployer", containRole( roleList, "Anything-ANY-deployer" ) );
+        assertThat( "Contains role Anything-ANY-delete", containRole( roleList, "Anything-ANY-delete" ) );
+        assertThat( "Contains role Anything-ANY-admin", containRole( roleList, "Anything-ANY-admin" ) );
 
-        Assert.assertTrue( containRole( roleList, "Anything-ANY-reader" ) );
-        Assert.assertTrue( containRole( roleList, "Anything-ANY-deployer" ) );
-        Assert.assertTrue( containRole( roleList, "Anything-ANY-delete" ) );
-        Assert.assertTrue( containRole( roleList, "Anything-ANY-admin" ) );
+        assertThat( "Contains privilege permTarget-repo1-cache-create",
+            containPrivilegeName( privilegeList, "permTarget-repo1-cache-create" ) );
+        assertThat( "Contains privilege permTarget-repo1-cache-read",
+            containPrivilegeName( privilegeList, "permTarget-repo1-cache-read" ) );
+        assertThat( "Contains privilege permTarget-repo1-cache-update",
+            containPrivilegeName( privilegeList, "permTarget-repo1-cache-update" ) );
+        assertThat( "Contains privilege permTarget-repo1-cache-delete",
+            containPrivilegeName( privilegeList, "permTarget-repo1-cache-delete" ) );
 
-        Assert.assertTrue( containPrivilegeName( privilegeList, "permTarget-repo1-cache-create" ) );
-        Assert.assertTrue( containPrivilegeName( privilegeList, "permTarget-repo1-cache-read" ) );
-        Assert.assertTrue( containPrivilegeName( privilegeList, "permTarget-repo1-cache-update" ) );
-        Assert.assertTrue( containPrivilegeName( privilegeList, "permTarget-repo1-cache-delete" ) );
-
-        Assert.assertTrue( containRole( roleList, "permTarget-repo1-cache-reader" ) );
-        Assert.assertTrue( containRole( roleList, "permTarget-repo1-cache-deployer" ) );
-        Assert.assertTrue( containRole( roleList, "permTarget-repo1-cache-delete" ) );
-        Assert.assertTrue( containRole( roleList, "permTarget-repo1-cache-admin" ) );
+        assertThat( "Contains role permTarget-repo1-cache-reader",
+            containRole( roleList, "permTarget-repo1-cache-reader" ) );
+        assertThat( "Contains role permTarget-repo1-cache-deployer",
+            containRole( roleList, "permTarget-repo1-cache-deployer" ) );
+        assertThat( "Contains role permTarget-repo1-cache-delete",
+            containRole( roleList, "permTarget-repo1-cache-delete" ) );
+        assertThat( "Contains role permTarget-repo1-cache-admin",
+            containRole( roleList, "permTarget-repo1-cache-admin" ) );
 
         // verify user-role mapping
         PlexusUserResource anonymous = getUserById( userList, "anonymous-artifactory" );
-        Assert.assertEquals( 1, anonymous.getRoles().size() );
+        assertThat( anonymous.getRoles().size(), is( equalTo( 1 ) ) );
         containPlexusRole( anonymous.getRoles(), "Anything-reader" );
 
         PlexusUserResource admin = getUserById( userList, "admin-artifactory" );
-        Assert.assertEquals( 1, admin.getRoles().size() );
+        assertThat( admin.getRoles().size(), is( equalTo( 1 ) ) );
         containPlexusRole( admin.getRoles(), "admin" );
 
         PlexusUserResource user = getUserById( userList, "user" );
-        Assert.assertEquals( 1, user.getRoles().size() );
+        assertThat( user.getRoles().size(), is( equalTo( 1 ) ) );
         containPlexusRole( user.getRoles(), "group" );
 
         PlexusUserResource user1 = getUserById( userList, "user1" );
-        Assert.assertEquals( 1, user1.getRoles().size() );
+        assertThat( user1.getRoles().size(), is( equalTo( 1 ) ) );
         containPlexusRole( user1.getRoles(), "permTarget1-delete" );
 
         // verify the group role
-        RoleResource groupRole = getRoleById(roleList, "group");
-        Assert.assertNotNull ( groupRole);
-        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-repo1-cache-reader" ) );
-        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-repo1-cache-deployer" ) );
-        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-repo1-cache-delete" ) );
-        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-repo1-cache-admin" ) );
+        RoleResource groupRole = getRoleById( roleList, "group" );
+        assertThat( groupRole, is( notNullValue() ) );
+        assertThat( groupRole.getRoles(), hasItem( "permTarget-repo1-cache-reader" ) );
+        assertThat( groupRole.getRoles(), hasItem( "permTarget-repo1-cache-deployer" ) );
+        assertThat( groupRole.getRoles(), hasItem( "permTarget-repo1-cache-delete" ) );
+        assertThat( groupRole.getRoles(), hasItem( "permTarget-repo1-cache-admin" ) );
     }
 
 }

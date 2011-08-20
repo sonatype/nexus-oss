@@ -12,17 +12,21 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1455;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
 import java.io.FileReader;
 
 import org.codehaus.plexus.util.IOUtil;
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
+import org.testng.annotations.Test;
 
 public class Nexus1455ImportTwiceIT
     extends AbstractMigrationIntegrationTest
 {
+
     @Test
     public void importTwice()
         throws Exception
@@ -34,16 +38,15 @@ public class Nexus1455ImportTwiceIT
         }
 
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactoryBackup.zip" ) );
-        Assert.assertNotNull( migrationSummary.getId() );
+        assertThat( migrationSummary.getId(), is( notNullValue() ) );
         commitMigration( migrationSummary );
         commitMigration( migrationSummary );
 
-        Assert.assertTrue( "Migration log file not found", migrationLogFile.isFile() );
+        assertThat( "Migration log file not found", migrationLogFile.isFile() );
 
         String log = IOUtil.toString( new FileReader( migrationLogFile ) );
-        Assert.assertTrue( "Didn't skip second migration " + log,
-                           log.contains( "Trying to import the same package twice" ) );
-        Assert.assertFalse( "Error during migration", log.toLowerCase().contains( "error" ) );
+        assertThat( "Didn't skip second migration " + log, log.contains( "Trying to import the same package twice" ) );
+        assertThat( "No error during migration", !log.toLowerCase().contains( "error" ) );
     }
 
 }

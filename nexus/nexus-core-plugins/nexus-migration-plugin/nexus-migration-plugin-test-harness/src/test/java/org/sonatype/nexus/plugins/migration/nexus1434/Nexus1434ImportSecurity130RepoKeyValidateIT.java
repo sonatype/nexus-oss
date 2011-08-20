@@ -12,19 +12,21 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1434;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
-import org.sonatype.nexus.security.NexusViewSecurityResource;
 import org.sonatype.nexus.security.RepositoryViewPrivilegeDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
+import org.testng.Assert;
 
 public class Nexus1434ImportSecurity130RepoKeyValidateIT
     extends AbstractImportSecurityIT
@@ -49,13 +51,11 @@ public class Nexus1434ImportSecurity130RepoKeyValidateIT
 
         for ( PrivilegeStatusResource priv : privilegeList )
         {
-            String repoId = getSecurityConfigUtil().getPrivilegeProperty(
-                priv,
-                TargetPrivilegeRepositoryPropertyDescriptor.ID );
+            String repoId =
+                getSecurityConfigUtil().getPrivilegeProperty( priv, TargetPrivilegeRepositoryPropertyDescriptor.ID );
 
-            String groupId = getSecurityConfigUtil().getPrivilegeProperty(
-                priv,
-                TargetPrivilegeGroupPropertyDescriptor.ID );
+            String groupId =
+                getSecurityConfigUtil().getPrivilegeProperty( priv, TargetPrivilegeGroupPropertyDescriptor.ID );
 
             if ( priv.getType().equals( RepositoryViewPrivilegeDescriptor.TYPE ) )
             {
@@ -78,13 +78,13 @@ public class Nexus1434ImportSecurity130RepoKeyValidateIT
     private void assertRepoIdExists( String id )
         throws Exception
     {
-        Assert.assertNotNull( repoUtil.getRepository( id ) );
+        assertThat( repoUtil.getRepository( id ), is( notNullValue() ) );
     }
 
     private void assertRepoGroupIdExists( String id )
         throws Exception
     {
-        Assert.assertNotNull( groupUtil.getGroup( id ) );
+        assertThat( groupUtil.getGroup( id ), is( notNullValue() ) );
     }
 
     private void assertRepoOrGroupIdExists( String id )

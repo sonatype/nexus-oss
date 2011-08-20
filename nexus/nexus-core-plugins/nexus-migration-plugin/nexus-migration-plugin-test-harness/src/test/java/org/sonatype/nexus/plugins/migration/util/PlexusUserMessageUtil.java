@@ -12,10 +12,10 @@
  */
 package org.sonatype.nexus.plugins.migration.util;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.IOException;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
@@ -43,7 +43,7 @@ public class PlexusUserMessageUtil
             MediaType.APPLICATION_XML );
 
         // make sure we have a success
-        Assert.assertTrue( "Status: " + response.getStatus() + "\n" + responseText, response.getStatus().isSuccess() );
+        assertThat( "Status: " + response.getStatus() + "\n" + responseText, response.getStatus().isSuccess() );
 
         PlexusUserListResourceResponse resourceResponse = (PlexusUserListResourceResponse) representation
             .getPayload( new PlexusUserListResourceResponse() );

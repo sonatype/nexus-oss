@@ -12,17 +12,18 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1444;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.File;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationPrivilegeTest;
+import org.testng.annotations.Test;
 
 public class Nexus1444MigrationWithPrivilegeIT
     extends AbstractMigrationPrivilegeTest
 {
+
     @Test
     public void doMigrationWithPermission()
         throws Exception
@@ -31,7 +32,7 @@ public class Nexus1444MigrationWithPrivilegeIT
 
         Status status = doMigration();
 
-        Assert.assertTrue( status.isSuccess() );
+        assertThat( "Migration is succesful", status.isSuccess() );
     }
 
     @Override
@@ -39,4 +40,5 @@ public class Nexus1444MigrationWithPrivilegeIT
     {
         return getTestFile( "artifactory125.zip" );
     }
+
 }

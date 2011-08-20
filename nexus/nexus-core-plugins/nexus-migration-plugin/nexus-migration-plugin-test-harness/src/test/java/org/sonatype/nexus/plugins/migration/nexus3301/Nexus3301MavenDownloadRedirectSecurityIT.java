@@ -12,26 +12,27 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus3301;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationPrivilegeTest;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class Nexus3301MavenDownloadRedirectSecurityIT
     extends AbstractMigrationPrivilegeTest
 {
 
     @BeforeClass
-    public static void start()
+    public void start()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
@@ -40,10 +41,10 @@ public class Nexus3301MavenDownloadRedirectSecurityIT
     protected void runOnce()
         throws Exception
     {
-        Assert.assertTrue( doMigration().isSuccess() );
+        assertThat( "Migration is succesful", doMigration().isSuccess() );
     }
 
-    @Before
+    @BeforeMethod
     public void cleanRepo()
         throws IOException
     {
@@ -63,7 +64,7 @@ public class Nexus3301MavenDownloadRedirectSecurityIT
         download();
     }
 
-    @Test( expected = VerificationException.class )
+    @Test( expectedExceptions = VerificationException.class )
     public void downloadWithoutPermition()
         throws Exception
     {
@@ -76,7 +77,7 @@ public class Nexus3301MavenDownloadRedirectSecurityIT
 
         Verifier v =
             AbstractMavenNexusIT.createMavenVerifier( getTestFile( "project" ), getOverridableFile( "settings.xml" ),
-                                                      getTestId() );
+                getTestId() );
 
         v.executeGoal( "install" );
     }

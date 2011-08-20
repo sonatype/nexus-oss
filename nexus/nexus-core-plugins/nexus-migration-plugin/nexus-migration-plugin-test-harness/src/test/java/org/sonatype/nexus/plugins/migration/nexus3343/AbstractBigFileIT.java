@@ -12,16 +12,17 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus3343;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.File;
 
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
+import org.testng.annotations.Test;
 
 public abstract class AbstractBigFileIT
     extends AbstractMigrationIntegrationTest
@@ -55,7 +56,7 @@ public abstract class AbstractBigFileIT
         FileTestingUtils.populate( getSourceFile(), 5 );
         File result = doTest();
 
-        Assert.assertTrue( "File don't match", FileTestingUtils.compareFileSHA1s( result, getSourceFile() ) );
+        assertThat( "File don't match", FileTestingUtils.compareFileSHA1s( result, getSourceFile() ) );
     }
 
     public abstract File getSourceFile();

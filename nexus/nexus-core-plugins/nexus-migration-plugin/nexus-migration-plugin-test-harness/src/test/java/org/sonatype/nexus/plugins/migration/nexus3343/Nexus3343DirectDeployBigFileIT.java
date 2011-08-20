@@ -12,9 +12,10 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus3343;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.File;
 
-import org.junit.Assert;
 import org.restlet.data.Status;
 
 public class Nexus3343DirectDeployBigFileIT
@@ -27,7 +28,7 @@ public class Nexus3343DirectDeployBigFileIT
     {
 
         int m = getDeployUtils().deployUsingGavWithRest( "main-local-releases", GAV, getSourceFile() );
-        Assert.assertTrue( Status.isSuccess( m ) );
+        assertThat( "Deploy is succesful", Status.isSuccess( m ) );
 
         return new File( nexusWorkDir, "storage/main-local-releases/nexus3343/released/1.0/released-1.0.bin" );
     }
@@ -37,4 +38,5 @@ public class Nexus3343DirectDeployBigFileIT
     {
         return new File( getTestFile( "." ), "sourceFile.bin" );
     }
+    
 }

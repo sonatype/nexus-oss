@@ -12,11 +12,15 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus2501;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.security.rest.model.UserResource;
+import org.testng.annotations.Test;
 
 public class Nexus2501UseRolesAssignIT
     extends AbstractMigrationIntegrationTest
@@ -29,14 +33,14 @@ public class Nexus2501UseRolesAssignIT
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "20090818.120005.zip" ) );
         commitMigration( migrationSummary );
 
-        Assert.assertNotNull( roleUtil.getRole( "exclusive-group" ) );
-        Assert.assertNotNull( roleUtil.getRole( "inclusive-group" ) );
+        assertThat( roleUtil.getRole( "exclusive-group" ), is( notNullValue() ) );
+        assertThat( roleUtil.getRole( "inclusive-group" ), is( notNullValue() ) );
 
         UserResource foobar = userUtil.getUser( "foobar" );
-        Assert.assertTrue( foobar.getRoles().contains( "exclusive-group" ) );
+        assertThat( foobar.getRoles(), hasItem( "exclusive-group" ) );
 
         UserResource barfoo = userUtil.getUser( "barfoo" );
-        Assert.assertTrue( barfoo.getRoles().contains( "inclusive-group" ) );
-
+        assertThat( barfoo.getRoles(), hasItem( "inclusive-group" ) );
     }
+
 }

@@ -12,16 +12,13 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus3301;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.Assert;
-
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.it.VerificationException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationPrivilegeTest;
@@ -29,13 +26,16 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class Nexus3301MavenDeployRedirectSecurityIT
     extends AbstractMigrationPrivilegeTest
 {
 
     @BeforeClass
-    public static void start()
+    public void start()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
@@ -44,12 +44,12 @@ public class Nexus3301MavenDeployRedirectSecurityIT
     protected void runOnce()
         throws Exception
     {
-        Assert.assertTrue( doMigration().isSuccess() );
+        assertThat( "Migration is succesful", doMigration().isSuccess() );
 
         TaskScheduleUtil.waitForAllTasksToStop();
     }
 
-    @Before
+    @BeforeMethod
     public void cleanRepo()
         throws IOException
     {
@@ -67,7 +67,7 @@ public class Nexus3301MavenDeployRedirectSecurityIT
         deploy();
     }
 
-    @Test( expected = VerificationException.class )
+    @Test( expectedExceptions = VerificationException.class )
     public void deployWithoutPermition()
         throws Exception
     {

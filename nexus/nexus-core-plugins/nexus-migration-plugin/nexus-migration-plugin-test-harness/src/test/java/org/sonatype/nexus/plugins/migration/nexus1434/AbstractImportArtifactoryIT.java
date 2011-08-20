@@ -12,12 +12,15 @@
  */
 package org.sonatype.nexus.plugins.migration.nexus1434;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -25,6 +28,7 @@ import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.testng.annotations.Test;
 
 public abstract class AbstractImportArtifactoryIT
     extends AbstractMigrationIntegrationTest
@@ -80,12 +84,12 @@ public abstract class AbstractImportArtifactoryIT
         throws IOException
     {
         RepositoryGroupResource group = this.groupUtil.getGroup( "snapshots-only" );
-        Assert.assertNotNull( group );
-        Assert.assertEquals( "snapshots-only", group.getId() );
+        assertThat( group, is( notNullValue() ) );
+        assertThat( group.getId(), is( equalTo( "snapshots-only" ) ) );
 
         ArrayList<RepositoryGroupMemberRepository> repositories =
             (ArrayList<RepositoryGroupMemberRepository>) group.getRepositories();
-        Assert.assertEquals( 4, repositories.size() );
+        assertThat( repositories.size(), is( equalTo( 4 ) ) );
 
         ArrayList<String> reposIds = new ArrayList<String>();
         for ( RepositoryGroupMemberRepository repo : repositories )
@@ -102,20 +106,20 @@ public abstract class AbstractImportArtifactoryIT
         throws IOException
     {
         RepositoryProxyResource repo1 = (RepositoryProxyResource) this.repositoryUtil.getRepository( "repo1" );
-        Assert.assertNotNull( repo1 );
-        Assert.assertEquals( "proxy", repo1.getRepoType() );
-        Assert.assertEquals( RepositoryPolicy.RELEASE.name(), repo1.getRepoPolicy() );
-        Assert.assertEquals( "http://repo1.maven.org/maven2/", repo1.getRemoteStorage().getRemoteStorageUrl() );
+        assertThat( repo1, is( notNullValue() ) );
+        assertThat( repo1.getRepoType(), is( equalTo( "proxy" ) ) );
+        assertThat( repo1.getRepoPolicy(), is( equalTo( RepositoryPolicy.RELEASE.name() ) ) );
+        assertThat( repo1.getRemoteStorage().getRemoteStorageUrl(), is( equalTo( "http://repo1.maven.org/maven2/" ) ) );
     }
 
     private void checkLocalRepo()
         throws IOException
     {
         RepositoryResource libsReleases = (RepositoryResource) this.repositoryUtil.getRepository( "libs-releases" );
-        Assert.assertNotNull( libsReleases );
-        Assert.assertEquals( "hosted", libsReleases.getRepoType() );
-        Assert.assertEquals( RepositoryPolicy.RELEASE.name(), libsReleases.getRepoPolicy() );
-        Assert.assertEquals( "Local repository for in-house libraries", libsReleases.getName() );
+        assertThat( libsReleases, is( notNullValue() ) );
+        assertThat( libsReleases.getRepoType(), is( equalTo( "hosted" ) ) );
+        assertThat( libsReleases.getRepoPolicy(), is( equalTo( RepositoryPolicy.RELEASE.name() ) ) );
+        assertThat( libsReleases.getName(), is( equalTo( "Local repository for in-house libraries" ) ) );
     }
 
     private void checkCreation()
