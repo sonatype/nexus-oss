@@ -37,7 +37,7 @@ public class Nexus1581RemoteMetadataIT
 
     public Nexus1581RemoteMetadataIT()
     {
-        super( "with-mirror-proxy-repo" );
+        super( "with-mirror-proxy-repo1581" );
     }
     
     @Test

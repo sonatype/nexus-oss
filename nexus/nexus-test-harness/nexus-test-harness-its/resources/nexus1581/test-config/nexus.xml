@@ -88,7 +88,7 @@
       <repositoryPolicy>snapshot</repositoryPolicy>
     </repository>
     <repository>
-      <id>with-mirror-proxy-repo</id>
+      <id>with-mirror-proxy-repo1581</id>
       <name>Mirror Metadata test repo</name>
       <remoteStorage>
         <url>${proxy-repo-base-url}with-mirror-repo</url>
