@@ -18,6 +18,9 @@
  */
 package org.sonatype.nexus.restlight.stage;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 /**
  * Simple container for details of a staging repository. This minimal model is used in queries for staging-repository
  * information, and for feeding back into finish/drop/promote actions within the {@link StageClient}.
@@ -42,6 +45,13 @@ public class StageRepository
     private String ipAddress;
 
     private String userAgent;
+
+    private String createdDate;
+
+    private String closedDate;
+
+    //Nexus sends a string like: 'Fri Jul 29 12:41:40 CEST 2011' or 'n/a'
+    private static final SimpleDateFormat FORMAT = new SimpleDateFormat( "EEE MMM dd HH:mm:ss z yyyy", Locale.US );
 
     public StageRepository( final String profileId, final String repositoryId, final boolean isOpen )
     {
@@ -69,7 +79,7 @@ public class StageRepository
     public String toString()
     {
         return ( url == null ? "(No URI)" : url ) + "\n[profile: '" + profileId + "', repository: '" + repositoryId
-            + "', open? " + isOpen + "]";
+            + "', open? " + isOpen + ", created: " + ( createdDate == null ? "n/a" : createdDate ) + "]";
     }
 
     /**
@@ -146,4 +156,28 @@ public class StageRepository
         return this;
     }
 
+    public String getCreatedDate()
+    {
+        return createdDate;
+    }
+
+    public void setCreatedDate( final String createdDate )
+    {
+        this.createdDate = createdDate;
+    }
+
+    public String getClosedDate()
+    {
+        return closedDate;
+    }
+
+    public static SimpleDateFormat getDateFormat()
+    {
+        return FORMAT;
+    }
+
+    public void setClosedDate( final String closedDate )
+    {
+        this.closedDate = closedDate;
+    }
 }

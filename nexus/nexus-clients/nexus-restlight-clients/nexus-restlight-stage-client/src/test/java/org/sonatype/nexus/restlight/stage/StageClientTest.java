@@ -18,17 +18,15 @@
  */
 package org.sonatype.nexus.restlight.stage;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.jdom.JDOMException;
+import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.testharness.AbstractRESTTest;
@@ -37,11 +35,21 @@ import org.sonatype.nexus.restlight.testharness.GETFixture;
 import org.sonatype.nexus.restlight.testharness.POSTFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 
+import junit.framework.Assert;
+
 public class StageClientTest
     extends AbstractRESTTest
 {
 
     private final ConversationalFixture fixture = new ConversationalFixture( getExpectedUser(), getExpectedPassword() );
+
+    private long before;
+
+    @Before
+    public void before()
+    {
+        this.before = System.currentTimeMillis();
+    }
 
     @Test
     public void queryAllOpenRepositories()
@@ -53,12 +61,7 @@ public class StageClientTest
 
         List<StageRepository> repositories = client.getOpenStageRepositories();
 
-        List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
-        if ( unused != null && !unused.isEmpty() )
-        {
-            System.out.println( unused );
-            fail( "Conversation was not finished. Didn't traverse:\n" + unused );
-        }
+        failOnUnfinishedConversation();
 
         assertNotNull( repositories );
 
@@ -84,12 +87,7 @@ public class StageClientTest
 
         List<StageRepository> repositories = client.getOpenStageRepositoriesForUser();
 
-        List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
-        if ( unused != null && !unused.isEmpty() )
-        {
-            System.out.println( unused );
-            fail( "Conversation was not finished. Didn't traverse:\n" + unused );
-        }
+        failOnUnfinishedConversation();
 
         assertNotNull( repositories );
 
@@ -112,17 +110,22 @@ public class StageClientTest
 
         StageRepository repo = client.getOpenStageRepositoryForUser( "group", "artifact", "version" );
 
+        failOnUnfinishedConversation();
+
+        assertNotNull( repo );
+
+        assertEquals( "tp1-002", repo.getRepositoryId() );
+        assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-002", repo.getUrl() );
+    }
+
+    private void failOnUnfinishedConversation()
+    {
         List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
         if ( unused != null && !unused.isEmpty() )
         {
             System.out.println( unused );
             fail( "Conversation was not finished. Didn't traverse:\n" + unused );
         }
-
-        assertNotNull( repo );
-
-        assertEquals( "tp1-002", repo.getRepositoryId() );
-        assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-002", repo.getUrl() );
     }
 
     @Test
@@ -159,12 +162,7 @@ public class StageClientTest
 
         client.finishRepository( repo, "this is a description" );
 
-        List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
-        if ( unused != null && !unused.isEmpty() )
-        {
-            System.out.println( unused );
-            fail( "Conversation was not finished. Didn't traverse:\n" + unused );
-        }
+        failOnUnfinishedConversation();
     }
 
     @Test
@@ -193,12 +191,7 @@ public class StageClientTest
             repoIds.add( "repoId2" );
             client.promoteRepositories( "groupProfile", "The description", repoIds );
 
-            List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
-            if ( unused != null && !unused.isEmpty() )
-            {
-                System.out.println( unused );
-                fail( "Conversation was not finished. Didn't traverse:\n" + unused );
-            }
+            failOnUnfinishedConversation();
         }
         finally
         {
@@ -213,10 +206,7 @@ public class StageClientTest
     {
         initConversation();
 
-        GETFixture repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
-        repoListGet.setExactURI( StageClient.PROFILES_PATH );
-        repoListGet.setResponseDocument( readTestDocumentResource( "profile-list-bp.xml" ) );
-        fixture.getConversation().add( repoListGet );
+        addGet( StageClient.PROFILES_PATH, "profile-list-bp.xml" );
 
         StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
         List<StageProfile> profiles = client.getBuildPromotionProfiles();
@@ -240,12 +230,7 @@ public class StageClientTest
 
         List<StageRepository> repos = client.getClosedStageRepositoriesForUser( "group", "artifact", "version" );
 
-        List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
-        if ( unused != null && !unused.isEmpty() )
-        {
-            System.out.println( unused );
-            fail( "Conversation was not finished. Didn't traverse:\n" + unused );
-        }
+        failOnUnfinishedConversation();
 
         assertNotNull( repos );
         assertEquals( 2, repos.size() );
@@ -267,12 +252,7 @@ public class StageClientTest
 
         List<StageRepository> repos = client.getClosedStageRepositories();
 
-        List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
-        if ( unused != null && !unused.isEmpty() )
-        {
-            System.out.println( unused );
-            fail( "Conversation was not finished. Didn't traverse:\n" + unused );
-        }
+        failOnUnfinishedConversation();
 
         assertNotNull( repos );
         assertEquals( 3, repos.size() );
@@ -297,12 +277,7 @@ public class StageClientTest
 
         List<StageRepository> repos = client.getClosedStageRepositoriesForUser();
 
-        List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
-        if ( unused != null && !unused.isEmpty() )
-        {
-            System.out.println( unused );
-            fail( "Conversation was not finished. Didn't traverse:\n" + unused );
-        }
+        failOnUnfinishedConversation();
 
         assertNotNull( repos );
         assertEquals( 2, repos.size() );
@@ -312,6 +287,43 @@ public class StageClientTest
 
         assertEquals( "tp1-003", repos.get( 1 ).getRepositoryId() );
         assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-003", repos.get( 1 ).getUrl() );
+    }
+
+    @Test
+    public void queryAllRepositoriesWithDates()
+        throws Exception
+    {
+        setupAllReposWithDatesConversation();
+
+        StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
+
+        List<StageRepository> repositories = client.getOpenStageRepositories();
+
+        failOnUnfinishedConversation();
+
+        assertNotNull( repositories );
+
+        assertThat( repositories, hasSize(4) );
+
+        assertEquals( "tp1-001", repositories.get( 0 ).getRepositoryId() );
+        assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-001", repositories.get( 0 ).getUrl() );
+        assertThat( repositories.get( 0 ), hasProperty( "createdDate", is("n/a") ) );
+        assertThat( repositories.get( 0 ), hasProperty( "closedDate", is("n/a") ) );
+
+        assertEquals( "tp1-002", repositories.get( 1 ).getRepositoryId() );
+        assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-002", repositories.get( 1 ).getUrl() );
+        assertThat( repositories.get( 1 ), hasProperty( "createdDate", is("n/a") ) );
+        assertThat( repositories.get( 1 ), hasProperty( "closedDate", is("n/a") ) );
+
+        assertEquals( "tp1-003", repositories.get( 2 ).getRepositoryId() );
+        assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-003", repositories.get( 2 ).getUrl() );
+        assertThat( repositories.get( 2 ), hasProperty( "createdDate", is( "arbitraryDateString" ) ) );
+        assertThat( repositories.get( 2 ), hasProperty( "closedDate", is("n/a") ) );
+
+        assertEquals( "tp1-004", repositories.get( 3 ).getRepositoryId() );
+        assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-003", repositories.get( 2 ).getUrl() );
+        assertThat( repositories.get( 3 ), hasProperty( "createdDate", is( "arbitraryDateString" ) ) );
+        assertThat( repositories.get( 3 ), hasProperty( "closedDate", is( "arbitraryDateString" ) ) );
     }
 
     private void initConversation()
@@ -329,11 +341,7 @@ public class StageClientTest
     {
         initConversation();
 
-        GETFixture repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
-        repoListGet.setExactURI( StageClient.PROFILES_PATH );
-        repoListGet.setResponseDocument( readTestDocumentResource( "profile-list.xml" ) );
-
-        fixture.getConversation().add( repoListGet );
+        addGet( StageClient.PROFILES_PATH, "profile-list.xml" );
 
         // GETFixture repoEvalListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         // repoEvalListGet.setExactURI( StageClient.PROFILES_EVALUATE_PATH );
@@ -341,11 +349,26 @@ public class StageClientTest
         //
         // fixture.getConversation().add( repoEvalListGet );
 
-        GETFixture reposGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
-        reposGet.setExactURI( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1" );
-        reposGet.setResponseDocument( readTestDocumentResource( "profile-repo-list.xml" ) );
+        addGet( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1", "profile-repo-list.xml" );
+    }
 
-        fixture.getConversation().add( reposGet );
+    private void setupAllReposWithDatesConversation()
+        throws Exception
+    {
+        initConversation();
+
+        addGet( StageClient.PROFILES_PATH, "dates-profile-list.xml" );
+        addGet( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1", "creation-closed-dates.xml" );
+    }
+
+    private void addGet( String servicePath, String resourcePath )
+        throws JDOMException, IOException
+    {
+        GETFixture repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
+        repoListGet.setExactURI( servicePath );
+        repoListGet.setResponseDocument( readTestDocumentResource( resourcePath ) );
+
+        fixture.getConversation().add( repoListGet );
     }
 
     private void setupEvaluateOpenReposConversation()
@@ -353,11 +376,7 @@ public class StageClientTest
     {
         initConversation();
 
-        GETFixture repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
-        repoListGet.setExactURI( StageClient.PROFILES_EVALUATE_PATH );
-        repoListGet.setResponseDocument( readTestDocumentResource( "profile-list.xml" ) );
-
-        fixture.getConversation().add( repoListGet );
+        addGet( StageClient.PROFILES_EVALUATE_PATH, "profile-list.xml" );
 
         // GETFixture repoEvalListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         // repoEvalListGet.setExactURI( StageClient.PROFILES_EVALUATE_PATH );
@@ -365,11 +384,7 @@ public class StageClientTest
         //
         // fixture.getConversation().add( repoEvalListGet );
 
-        GETFixture reposGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
-        reposGet.setExactURI( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1" );
-        reposGet.setResponseDocument( readTestDocumentResource( "profile-repo-list.xml" ) );
-
-        fixture.getConversation().add( reposGet );
+        addGet( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1", "profile-repo-list.xml" );
     }
 
     private void setupEvaluateClosedReposConversation()
