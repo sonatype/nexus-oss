@@ -91,6 +91,7 @@
           </execution>
         </executions>
         <configuration>
+          <setupEmma>true</setupEmma>
           <nexusBundleArtifact>
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-oss-webapp</artifactId>
