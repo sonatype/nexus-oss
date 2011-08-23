@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.sonatype.nexus.restlight.common.ProxyConfig;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageProfile;
@@ -35,7 +36,7 @@ public abstract class AbstractStagingMojo
 
     /**
      * If provided, and this repository is available for selection, use it.
-     * 
+     *
      * @parameter expression="${nexus.repositoryId}"
      */
     private String repositoryId;
@@ -51,12 +52,18 @@ public abstract class AbstractStagingMojo
     protected synchronized StageClient connect()
         throws RESTLightClientException
     {
-        String url = formatUrl( getNexusUrl() );
+        final String url = formatUrl( getNexusUrl() );
 
+        setAndValidateProxy();
         getLog().info( "Logging into Nexus: " + url );
         getLog().info( "User: " + getUsername() );
 
-        client = new StageClient( url, getUsername(), getPassword() );
+        ProxyConfig proxyConfig = null;
+        if(getProxyHost() != null){
+            proxyConfig = new ProxyConfig(getProxyHost(), getProxyPort(), getProxyUsername(), getProxyPassword());
+        }
+
+        client = new StageClient( url, getUsername(), getPassword(), proxyConfig);
         return client;
     }
 

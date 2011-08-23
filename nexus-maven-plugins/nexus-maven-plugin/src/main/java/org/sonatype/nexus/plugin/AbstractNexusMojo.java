@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.plugin;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
@@ -25,6 +27,7 @@ import org.apache.log4j.SimpleLayout;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.components.interactivity.Prompter;
@@ -42,7 +45,7 @@ public abstract class AbstractNexusMojo
 
     /**
      * NOT REQUIRED IN ALL CASES. If this is available, the current project will be used in the Nexus discovery process.
-     * 
+     *
      * @parameter default-value="${project}"
      * @readonly
      */
@@ -52,7 +55,7 @@ public abstract class AbstractNexusMojo
      * If false, the Nexus discovery process will prompt the user to accept any Nexus connection information it finds
      * before using it. <br/>
      * <b>NOTE:</b> Batch-mode executions will override this parameter with an effective value of 'true'.
-     * 
+     *
      * @parameter expression="${nexus.automaticDiscovery}" default-value="false"
      */
     private boolean automatic;
@@ -60,7 +63,7 @@ public abstract class AbstractNexusMojo
     /**
      * The base URL for a Nexus Professional instance that includes the nexus-staging-plugin. If missing, the mojo will
      * prompt for this value.
-     * 
+     *
      * @parameter expression="${nexus.url}"
      */
     private String nexusUrl;
@@ -72,21 +75,21 @@ public abstract class AbstractNexusMojo
 
     /**
      * The username that should be used to log into Nexus.
-     * 
+     *
      * @parameter expression="${nexus.username}" default-value="${user.name}"
      */
     private String username;
 
     /**
      * If provided, lookup username/password from this server entry in the current Maven settings.
-     * 
+     *
      * @parameter expression="${nexus.serverAuthId}"
      */
     private String serverAuthId;
 
     /**
      * The password that should be used to log into Nexus. If missing, the mojo will prompt for this value.
-     * 
+     *
      * @parameter expression="${nexus.password}"
      */
     private String password;
@@ -97,6 +100,12 @@ public abstract class AbstractNexusMojo
      */
     private Settings settings;
 
+    // proxy settings derived only from active Maven settings proxy
+    private String proxyHost;
+    private int proxyPort = -1;
+    private String proxyUsername;
+    private String proxyPassword;
+
     /**
      * <p>
      * If set to true, enable the debug log-level inside commons-httpclient (used to interact with Nexus).
@@ -105,7 +114,7 @@ public abstract class AbstractNexusMojo
      * <b>NOTE:</b> This parameter will ONLY work when used with the -X Maven switch (which enables debug logging for
      * the build).
      * </p>
-     * 
+     *
      * @parameter expression="${nexus.verboseDebug}" default-value="false"
      */
     private boolean verboseDebug;
@@ -189,6 +198,40 @@ public abstract class AbstractNexusMojo
         this.verboseDebug = verboseDebug;
     }
 
+    protected void setProxyHost(String proxyHost) {
+        this.proxyHost = proxyHost;
+    }
+
+    protected void setProxyPort(int proxyPort) {
+        this.proxyPort = proxyPort;
+    }
+
+    public String getProxyHost() {
+        return proxyHost;
+    }
+
+    public int getProxyPort() {
+        return proxyPort;
+    }
+
+    public String getProxyPassword() {
+        return proxyPassword;
+    }
+
+    protected void setProxyPassword(String proxyPassword) {
+        this.proxyPassword = proxyPassword;
+    }
+
+    public String getProxyUsername() {
+        return proxyUsername;
+    }
+
+    protected void setProxyUsername(String proxyUsername) {
+        this.proxyUsername = proxyUsername;
+    }
+
+
+
     protected abstract AbstractRESTLightClient connect()
         throws RESTLightClientException, MojoExecutionException;
 
@@ -241,9 +284,9 @@ public abstract class AbstractNexusMojo
             {
                 Server server = getSettings() == null ? null : getSettings().getServer( getServerAuthId() );
                 if ( server != null )
-                {   
+                {
                     getLog().info( "Using authentication information for server: '" + getServerAuthId() + "'." );
-                    
+
                     try
                     {
                         setUsername( server.getUsername() );
@@ -277,6 +320,7 @@ public abstract class AbstractNexusMojo
 
                     setUsername( info.getUser() );
                     setPassword( discoverer.getSecDispatcher().decrypt( info.getPassword() ) );
+
                 }
                 catch ( NexusDiscoveryException e )
                 {
@@ -300,7 +344,6 @@ public abstract class AbstractNexusMojo
                 {
                     throw new MojoExecutionException( "Nexus instance discovery failed." );
                 }
-
                 setNexusUrl( info.getNexusUrl() );
                 setUsername( info.getUser() );
                 setPassword( discoverer.getSecDispatcher().decrypt( info.getPassword() ) );
@@ -314,7 +357,79 @@ public abstract class AbstractNexusMojo
                 throw new MojoExecutionException( "Failed to decrypt Nexus password: " + e.getMessage(), e );
             }
         }
+
+
     }
+
+
+    /**
+     *
+     * @param url the url to parse the host from
+     * @return the host in the given url, or null if the url is malformed
+     */
+    protected String getHostFromUrl(final String url){
+        try {
+            URL u = new URL(url);
+            return u.getHost();
+        } catch (MalformedURLException ex) {
+            // returning null instead
+        }
+        return null;
+    }
+
+    /**
+     * Configures the proxy information based on the configured settings and Nexus URL.
+     *
+     * @since 1.9.2
+     */
+    protected void setAndValidateProxy(){
+        // proxy only coming from maven
+        if(settings != null)
+        {
+            Proxy proxy = settings.getActiveProxy();
+            if(proxy != null)
+            {
+                // HttpClient only supports http
+                if("http".equals(proxy.getProtocol()))
+                {
+                    // verify that the nexus host is not configured as a non proxiable
+                    final String nexusUrl = getNexusUrl();
+                    final String nexusHost = getHostFromUrl(nexusUrl);
+                    if(nexusHost != null)
+                    {
+                        final String nonProxyHosts = proxy.getNonProxyHosts();
+                        if(nonProxyHosts != null)
+                        {
+                            final String[] nphs = nonProxyHosts.split("[\\;\\|]");
+                            for (String nph : nphs)
+                            {
+                                if(nph != null && nph.endsWith("*." + nexusHost) || nph.equals(nexusHost))
+                                {
+                                    // proxy config excludes proxying nexus host, ignore
+                                    getLog().info("Not proxying the Nexus connection because the active Maven proxy lists it as a nonProxyHost.");
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                    getLog().info("Proxying the Nexus client connection because an applicable active Maven proxy is configured.");
+                    // ok looks like it applies
+                    setProxyHost(proxy.getHost());
+                    setProxyPort(proxy.getPort());
+                    setProxyUsername(proxy.getUsername());
+                    setProxyPassword(proxy.getPassword());
+
+                }
+                else
+                {
+                    // FIXME hardcoded plugin artifactId
+                    getLog().info("Not proxying the Nexus connection because the nexus-maven-plugin plugin only supports 'http' proxy protocol.");
+                }
+            }
+
+        }
+    }
+
 
     public MavenProject getProject()
     {
@@ -362,5 +477,5 @@ public abstract class AbstractNexusMojo
     {
         this.discoverer.setSecDispatcher( dispatcher );
     }
-    
+
 }
