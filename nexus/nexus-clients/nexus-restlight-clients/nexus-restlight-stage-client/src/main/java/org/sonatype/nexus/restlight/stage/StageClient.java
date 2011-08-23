@@ -32,6 +32,7 @@ import org.jdom.JDOMException;
 import org.jdom.Text;
 import org.jdom.xpath.XPath;
 import org.sonatype.nexus.restlight.common.AbstractRESTLightClient;
+import org.sonatype.nexus.restlight.common.ProxyConfig;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 
 /**
@@ -93,11 +94,18 @@ public class StageClient
 
     private static final String BUILD_PROMOTION_PROFILES_XPATH = "//stagingProfile[mode=\"GROUP\"]";
 
+    private static final String STAGE_VOCAB_BASE_PATH = "stage/";
+    
     public StageClient( final String baseUrl, final String user, final String password )
         throws RESTLightClientException
     {
-        super( baseUrl, user, password, "stage/" );
+        super( baseUrl, user, password, STAGE_VOCAB_BASE_PATH  );
     }
+
+    public StageClient(final String baseUrl, final String user, final String password, final ProxyConfig proxyConfig) throws RESTLightClientException {
+        super(baseUrl, user, password, STAGE_VOCAB_BASE_PATH , proxyConfig);
+    }
+    
 
     /**
      * Retrieve the list of all open staging repositories (not finished) in all available profiles that are opened for

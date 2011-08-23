@@ -20,6 +20,7 @@ package org.sonatype.nexus.restlight.m2settings;
 
 import org.jdom.Document;
 import org.sonatype.nexus.restlight.common.AbstractRESTLightClient;
+import org.sonatype.nexus.restlight.common.ProxyConfig;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 
 /**
@@ -39,6 +40,8 @@ public class M2SettingsClient
 extends AbstractRESTLightClient
 {
 
+    private static final String M2SETTINGS_VOCAB_BASE_PATH = "m2settings";
+    
     /**
      * Base URL used to construct URLs for retrieving a settings template based on a template ID.
      */
@@ -52,9 +55,15 @@ extends AbstractRESTLightClient
     public M2SettingsClient( final String baseUrl, final String user, final String password )
     throws RESTLightClientException
     {
-        super( baseUrl, user, password, "m2settings" );
+        super( baseUrl, user, password, M2SETTINGS_VOCAB_BASE_PATH );
     }
 
+    public M2SettingsClient( final String baseUrl, final String user, final String password, final ProxyConfig proxyConfig)
+    throws RESTLightClientException
+    {
+        super( baseUrl, user, password, M2SETTINGS_VOCAB_BASE_PATH, proxyConfig );
+    }
+    
     /**
      * Retrieve a Maven 2.x settings.xml template using an absolute URL referencing a running Nexus Professional instance.
      * 

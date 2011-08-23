@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
+import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -139,13 +140,29 @@ public abstract class AbstractRESTLightClient
     private Properties vocabulary;
 
     private final String vocabBasepath;
+    
+    private final ProxyConfig proxyConfig;
+    
+
+    /**
+     * @see AbstractRESTLightClient#AbstractRESTLightClient(java.lang.String, java.lang.String, java.lang.String, java.lang.String, org.sonatype.nexus.restlight.common.ProxyConfig) 
+     */
+    protected AbstractRESTLightClient( final String baseUrl, final String user, final String password,
+                                       final String vocabBasepath )
+        throws RESTLightClientException
+    {
+        this(baseUrl, user, password, vocabBasepath, null);
+    }
 
     /**
      * Instantiate and connect new REST client. For now, connecting simply means retrieving the Nexus server's
      * apiVersion, so we can load the appropriate vocabulary items.
+     * <p>
+     * ProxyConfig is optional.
+     * 
      */
     protected AbstractRESTLightClient( final String baseUrl, final String user, final String password,
-                                       final String vocabBasepath )
+                                       final String vocabBasepath, final ProxyConfig proxyConfig)
         throws RESTLightClientException
     {
         this.baseUrl = baseUrl;
@@ -165,9 +182,16 @@ public abstract class AbstractRESTLightClient
             this.vocabBasepath = vocabBasepath;
         }
 
+        this.proxyConfig = proxyConfig;
+        
         connect();
     }
 
+    public ProxyConfig getProxyConfig() {
+        return proxyConfig;
+    }
+   
+    
     /**
      * Retrieve the base URL used to connect to Nexus. This URL contains everything <b>up to, but not including</b> the
      * {@link AbstractRESTLightClient#SVC_BASE} base-path.
@@ -203,6 +227,16 @@ public abstract class AbstractRESTLightClient
 
         client.getState().setCredentials( AuthScope.ANY, creds );
 
+        ProxyConfig proxy = getProxyConfig();
+        if(proxy != null){
+            client.getHostConfiguration().setProxy(proxy.getHost(), proxy.getPort());
+            if(proxy.getUsername() != null){
+                Credentials credentials = new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword());
+                AuthScope authScope = new AuthScope(proxy.getHost(), proxy.getPort());
+                client.getState().setProxyCredentials(authScope, credentials);
+            }
+        }
+        
         loadVocabulary();
     }
 

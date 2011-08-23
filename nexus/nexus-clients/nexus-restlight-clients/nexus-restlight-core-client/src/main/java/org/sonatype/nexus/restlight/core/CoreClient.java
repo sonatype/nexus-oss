@@ -27,6 +27,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.xpath.XPath;
 import org.sonatype.nexus.restlight.common.AbstractRESTLightClient;
+import org.sonatype.nexus.restlight.common.ProxyConfig;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 
 public class CoreClient
@@ -132,10 +133,18 @@ public class CoreClient
 
     private static final String USER_TO_ROLE_XPATH = "//data";
 
+    private static final String CORE_VOCAB_BASE_PATH = "core/";
+    
     public CoreClient( final String baseUrl, final String username, final String password )
         throws RESTLightClientException
     {
-        super( baseUrl, username, password, "core/" );
+        super( baseUrl, username, password, CORE_VOCAB_BASE_PATH );
+    }
+    
+    public CoreClient( final String baseUrl, final String username, final String password, final ProxyConfig proxyConfig )
+        throws RESTLightClientException
+    {
+        super( baseUrl, username, password, CORE_VOCAB_BASE_PATH, proxyConfig );
     }
 
     public List<User> listUser()
