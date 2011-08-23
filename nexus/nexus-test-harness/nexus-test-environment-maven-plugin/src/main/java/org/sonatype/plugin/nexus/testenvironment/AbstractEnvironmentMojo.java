@@ -352,7 +352,7 @@ public class AbstractEnvironmentMojo
         File libFolder = new File( nexusBaseDir, "nexus/WEB-INF/lib" );
         if ( setupEmma )
         {
-            copyEmma( libFolder );
+            copyEmma( new File( nexusBaseDir, "lib" ) );
         }
 
         // if any plugin artifacts were specified, install them into runtime
