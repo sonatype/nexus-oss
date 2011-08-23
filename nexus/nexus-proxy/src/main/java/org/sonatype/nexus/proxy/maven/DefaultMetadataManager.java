@@ -39,7 +39,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 
 /**
  * Component responsible for metadata maintenance.
- *
+ * 
  * @author cstamas
  * @todo add some unit tests
  */
@@ -360,7 +360,7 @@ public class DefaultMetadataManager
 
     /**
      * Convert a metadata timestamp in the specified format to its time since epoch millis equiv in the UTC timezone
-     *
+     * 
      * @param the SimpleDateFormat format the parse the string with.
      * @param tsString a metadata timestamp string
      * @return the long millis
@@ -372,7 +372,7 @@ public class DefaultMetadataManager
         try
         {
             SimpleDateFormat df = new SimpleDateFormat( dateFormat, Locale.US );
-            df.setTimeZone(TimeZone.getTimeZone("GMT-00:00"));
+            df.setTimeZone( TimeZone.getTimeZone( "GMT-00:00" ) );
             return Long.valueOf( df.parse( tsString ).getTime() );
         }
         catch ( ParseException e )
