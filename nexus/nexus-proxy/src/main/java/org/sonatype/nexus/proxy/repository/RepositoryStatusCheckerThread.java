@@ -115,7 +115,7 @@ public class RepositoryStatusCheckerThread
                     getLogger().info(
                         "Next attempt to auto-unblock the \"" + getRepository().getName() + "\" (id="
                             + getRepository().getId()
-                            + ") repository by checking it's remote peer health will occur in "
+                            + ") repository by checking its remote peer health will occur in "
                             + DurationFormatUtils.formatDurationWords( sleepTime, true, true ) + "." );
                 }
 
