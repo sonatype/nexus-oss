@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.NameValuePair;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -510,7 +511,7 @@ public abstract class AbstractRESTLightClient
 
         if ( status != 200 )
         {
-            throw new RESTLightClientException( "GET request failed; HTTP status: " + status + ": " + statusText );
+            throw validationError( method );
         }
 
         try
@@ -529,6 +530,21 @@ public abstract class AbstractRESTLightClient
         {
             method.releaseConnection();
         }
+    }
+
+    protected RESTLightClientException validationError( HttpMethod method )
+    {
+        String errorBody = null;
+        try
+        {
+            errorBody = method.getResponseBodyAsString();
+        }
+        catch ( IOException e )
+        {
+            errorBody = "Could not retrieve error body, message lost";
+        }
+
+        return new RESTLightClientException( method.getName() + " request failed; HTTP status: " + method.getStatusCode() + ", " + method.getStatusText() + "\nHTTP body: " + errorBody );
     }
 
     private String formatUrl( final String baseUrl, final String path )
@@ -634,7 +650,7 @@ public abstract class AbstractRESTLightClient
 
         if ( status < 200 || status > 299 )
         {
-            throw new RESTLightClientException( "POST request failed; HTTP status: " + status + ": " + statusText );
+            throw validationError( method );
         }
 
         if ( expectResponseBody )
@@ -879,7 +895,7 @@ public abstract class AbstractRESTLightClient
 
         if ( status != 200 )
         {
-            throw new RESTLightClientException( "DELETE request failed; HTTP status: " + status + ": " + statusText );
+            throw validationError( method );
         }
 
         if ( expectResponseBody )
