@@ -24,7 +24,7 @@ public class Tag {
 	Vector					content		= new Vector();
 
 	static SimpleDateFormat	format		= new SimpleDateFormat(
-												"yyyyMMddhhmmss.SSS");
+												"yyyyMMddHHmmss.SSS");
 
 	/**
 	 * Construct a new Tag with a name.
