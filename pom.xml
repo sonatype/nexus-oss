@@ -29,6 +29,7 @@
     <version>1.9.2.2</version>
   </parent>
 
+  <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-obr-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
   <version>1.9.3-SNAPSHOT</version>
