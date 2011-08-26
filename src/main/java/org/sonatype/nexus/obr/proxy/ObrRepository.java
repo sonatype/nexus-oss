@@ -39,6 +39,7 @@ import org.sonatype.nexus.obr.util.ObrUtils;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -123,7 +124,7 @@ public class ObrRepository
 
     @Override
     public void setRemoteUrl( final String remoteUrl )
-        throws StorageException
+        throws RemoteStorageException
     {
         final String[] siteAndPath = ObrUtils.splitObrSiteAndPath( remoteUrl, false );
 
@@ -134,8 +135,8 @@ public class ObrRepository
             if ( !getExternalConfiguration( false ).isObrPathSet() )
             {
                 // it is not set, this is an error
-                throw new StorageException(
-                                            "Cannot set OBR URL! The OBR metadata path is not set, please specify a full URL including the OBR metadata file!" );
+                throw new RemoteStorageException(
+                                                  "Cannot set OBR URL! The OBR metadata path is not set, please specify a full URL including the OBR metadata file!" );
             }
         }
         else
