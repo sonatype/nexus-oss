@@ -32,7 +32,7 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public abstract class AbstractObrDownloadIT
     extends AbstractOBRIntegrationTest
 {
-    protected static final File FELIX_HOME = new File( "target/felix/org.apache.felix.main.distribution-2.0.5" );
+    protected static final File FELIX_HOME = new File( "target/felix/org.apache.felix.main.distribution-3.2.2" );
 
     protected static final File FELIX_REPO = new File( "target/felix-repo" );
 
@@ -88,13 +88,16 @@ public abstract class AbstractObrDownloadIT
         {
             final InputStream input = p.getInputStream();
             final OutputStream output = p.getOutputStream();
-            waitFor( input, "->" );
-            output.write( ( "obr add-url " + getRepositoryUrl( repoId ) + ".meta/obr.xml\r\n" ).getBytes() );
+            waitFor( input, "g!" );
+            output.write( ( "obr:repos remove http://felix.apache.org/obr/releases.xml\r\n" ).getBytes() );
             output.flush();
-            waitFor( input, "->" );
-            output.write( "obr start 'Apache Felix Web Management Console'\r\n".getBytes() );
+            waitFor( input, "g!" );
+            output.write( ( "obr:repos add " + getRepositoryUrl( repoId ) + ".meta/obr.xml\r\n" ).getBytes() );
             output.flush();
-            waitFor( input, "Deploying...done." );
+            waitFor( input, "g!" );
+            output.write( "obr:deploy -s org.apache.felix.webconsole\r\n".getBytes() );
+            output.flush();
+            waitFor( input, "done." );
             p.destroy();
 
             lock.notifyAll();

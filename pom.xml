@@ -93,7 +93,7 @@
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.main.distribution</artifactId>
-      <version>2.0.5</version>
+      <version>3.2.2</version>
       <classifier>project</classifier>
       <type>tar.gz</type>
       <scope>test</scope>
@@ -119,6 +119,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.9</version>
           <configuration>
             <junitArtifactName>junit:junit-dep</junitArtifactName>
             <testNGArtifactName>none:none</testNGArtifactName>
@@ -132,6 +133,7 @@
         </plugin>
         <plugin>
           <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.9</version>
           <configuration>
             <forkMode>always</forkMode> <!-- "always" for the latest resort, "once" is actually what we want -->
             <junitArtifactName>none:none</junitArtifactName>
@@ -237,7 +239,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.2</version>
+        <version>2.5.1</version>
         <configuration>
           <instrumentation>
             <includes>
