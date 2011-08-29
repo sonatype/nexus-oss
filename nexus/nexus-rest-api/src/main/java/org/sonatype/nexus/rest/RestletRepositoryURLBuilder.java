@@ -11,6 +11,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 @Component( role = RepositoryURLBuilder.class, hint = "RestletRepositoryUrlBuilder" )
 public class RestletRepositoryURLBuilder
@@ -28,6 +29,29 @@ public class RestletRepositoryURLBuilder
     @Requirement
     private GlobalRestApiSettings globalRestApiSettings;
 
+    public RestletRepositoryURLBuilder()
+    {
+        // nothing
+    }
+
+    /**
+     * This constructor is used for testing only.
+     * 
+     * @param logger
+     * @param repositoryRegistry
+     * @param repositoryTypeRegistry
+     * @param globalRestApiSettings
+     */
+    protected RestletRepositoryURLBuilder( final Logger logger, final RepositoryRegistry repositoryRegistry,
+                                           final RepositoryTypeRegistry repositoryTypeRegistry,
+                                           final GlobalRestApiSettings globalRestApiSettings )
+    {
+        this.logger = logger;
+        this.repositoryRegistry = repositoryRegistry;
+        this.repositoryTypeRegistry = repositoryTypeRegistry;
+        this.globalRestApiSettings = globalRestApiSettings;
+    }
+
     @Override
     public String getRepositoryContentUrl( String repositoryId )
         throws NoSuchRepositoryException
@@ -38,11 +62,6 @@ public class RestletRepositoryURLBuilder
     @Override
     public String getRepositoryContentUrl( Repository repository )
     {
-        if ( !repository.isExposed() )
-        {
-            return null;
-        }
-
         final boolean forceBaseURL =
             globalRestApiSettings.isEnabled() && globalRestApiSettings.isForceBaseUrl()
                 && StringUtils.isNotBlank( globalRestApiSettings.getBaseUrl() );
@@ -68,11 +87,14 @@ public class RestletRepositoryURLBuilder
         // if all else fails?
         if ( StringUtils.isBlank( baseURL ) )
         {
+            logger.info( "Not able to build content URL of the repository {}, baseUrl not set!",
+                RepositoryStringUtils.getHumanizedNameString( repository ) );
+
             return null;
         }
 
         StringBuffer url = new StringBuffer( baseURL );
-        
+
         if ( !baseURL.endsWith( "/" ) )
         {
             url.append( "/" );
@@ -87,4 +109,16 @@ public class RestletRepositoryURLBuilder
         return url.toString();
     }
 
+    @Override
+    public String getExposedRepositoryContentUrl( Repository repository )
+    {
+        if ( !repository.isExposed() )
+        {
+            return null;
+        }
+        else
+        {
+            return getRepositoryContentUrl( repository );
+        }
+    }
 }

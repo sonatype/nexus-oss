@@ -79,7 +79,7 @@ public abstract class AbstractRepositoryGroupPlexusResource
     {
         RepositoryGroupResource resource = new RepositoryGroupResource();
         
-        resource.setContentResourceURI( getRepositoryURLBuilder().getRepositoryContentUrl( group) );
+        resource.setContentResourceURI( getRepositoryURLBuilder().getExposedRepositoryContentUrl( group) );
         
         resource.setId( group.getId() );
 

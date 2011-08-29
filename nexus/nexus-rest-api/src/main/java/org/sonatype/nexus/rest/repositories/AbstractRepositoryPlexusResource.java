@@ -191,7 +191,7 @@ public abstract class AbstractRepositoryPlexusResource
 
                 repoRes.setResourceURI( createRepositoryReference( request, repository.getId() ).toString() );
 
-                repoRes.setContentResourceURI( repositoryURLBuilder.getRepositoryContentUrl( repository) );
+                repoRes.setContentResourceURI( repositoryURLBuilder.getExposedRepositoryContentUrl( repository) );
 
                 repoRes.setRepoType( getRestRepoType( repository ) );
 
@@ -286,7 +286,7 @@ public abstract class AbstractRepositoryPlexusResource
             resource = new RepositoryResource();
         }
 
-        resource.setContentResourceURI( repositoryURLBuilder.getRepositoryContentUrl( repository) );
+        resource.setContentResourceURI( repositoryURLBuilder.getExposedRepositoryContentUrl( repository) );
 
         resource.setProvider( NexusCompat.getRepositoryProviderHint( repository ) );
 
@@ -425,7 +425,7 @@ public abstract class AbstractRepositoryPlexusResource
 
         resource.setName( shadow.getName() );
 
-        resource.setContentResourceURI( repositoryURLBuilder.getRepositoryContentUrl( shadow) );
+        resource.setContentResourceURI( repositoryURLBuilder.getExposedRepositoryContentUrl( shadow) );
 
         resource.setProvider( NexusCompat.getRepositoryProviderHint( shadow ) );
 

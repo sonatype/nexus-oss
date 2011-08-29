@@ -102,7 +102,7 @@ public class RepositoryGroupListPlexusResource
             {
                 RepositoryGroupListResource resource = new RepositoryGroupListResource();
                 
-                resource.setContentResourceURI( getRepositoryURLBuilder().getRepositoryContentUrl( group) );
+                resource.setContentResourceURI( getRepositoryURLBuilder().getExposedRepositoryContentUrl( group) );
 
                 resource.setResourceURI( createRepositoryGroupReference( request, group.getId() ).toString() );
 
