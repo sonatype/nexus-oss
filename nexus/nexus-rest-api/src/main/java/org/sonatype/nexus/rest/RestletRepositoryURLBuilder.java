@@ -1,8 +1,5 @@
 package org.sonatype.nexus.rest;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -41,12 +38,15 @@ public class RestletRepositoryURLBuilder
     @Override
     public String getRepositoryContentUrl( Repository repository )
     {
-        // TODO: what about repositories not being exposed at all?
-        // repository.isExposed()
-        
-        boolean forceBaseURL =
+        if ( !repository.isExposed() )
+        {
+            return null;
+        }
+
+        final boolean forceBaseURL =
             globalRestApiSettings.isEnabled() && globalRestApiSettings.isForceBaseUrl()
-                && StringUtils.isNotEmpty( globalRestApiSettings.getBaseUrl() );
+                && StringUtils.isNotBlank( globalRestApiSettings.getBaseUrl() );
+
         String baseURL = null;
 
         // if force, always use force
@@ -54,67 +54,35 @@ public class RestletRepositoryURLBuilder
         {
             baseURL = globalRestApiSettings.getBaseUrl();
         }
-        // next check if this thread has a request
+        // next check if this thread has a restlet request
         else if ( Request.getCurrent() != null )
         {
             baseURL = Request.getCurrent().getRootRef().toString();
         }
-        // try to use the baseURL
+        // as last resort, try to use the baseURL if set
         else
         {
             baseURL = globalRestApiSettings.getBaseUrl();
         }
 
-        // if still null try to figure out the URL from the system properties (only works for the bundle)
-        // TODO: this could be problematic, consider removing this
-        if ( StringUtils.isEmpty( baseURL ) )
-        {
-            logger.info( "Base URL not set, this can be set in Administration -> Server -> Application Server Settings" );
-            try
-            {
-                InetAddress local = InetAddress.getLocalHost();
-                String hostname = local.getHostName();
-
-                Integer port = Integer.getInteger( "plexus.application-port" );
-                String contextPath = System.getProperty( "plexus.webapp-context-path" );
-
-                // assume http?
-                if ( port != null && contextPath != null )
-                {
-                    baseURL =
-                        new StringBuffer( "http://" ).append( hostname ).append( ":" ).append( port ).append(
-                            contextPath ).toString();
-                }
-            }
-            catch ( UnknownHostException e )
-            {
-                logger.debug( "Failed to find name", e );
-            }
-        }
-
         // if all else fails?
-        if ( StringUtils.isEmpty( baseURL ) )
+        if ( StringUtils.isBlank( baseURL ) )
         {
-            baseURL = "http://base-url-not-set/"; // TODO: what should we do here ?
+            return null;
         }
 
         StringBuffer url = new StringBuffer( baseURL );
+        
         if ( !baseURL.endsWith( "/" ) )
         {
             url.append( "/" );
         }
 
-        String descriptiveURLPart = "repositories";
-        for ( RepositoryTypeDescriptor desc : repositoryTypeRegistry.getRegisteredRepositoryTypeDescriptors() )
-        {
-            if ( repository.getProviderRole().equals( desc.getRole().getName() ) )
-            {
-                descriptiveURLPart = desc.getPrefix();
-                break;
-            }
-        }
+        final RepositoryTypeDescriptor rtd =
+            repositoryTypeRegistry.getRepositoryTypeDescriptor( repository.getProviderRole(),
+                repository.getProviderHint() );
 
-        url.append( "content/" ).append( descriptiveURLPart ).append( "/" ).append( repository.getId() );
+        url.append( "content/" ).append( rtd.getPrefix() ).append( "/" ).append( repository.getPathPrefix() );
 
         return url.toString();
     }
