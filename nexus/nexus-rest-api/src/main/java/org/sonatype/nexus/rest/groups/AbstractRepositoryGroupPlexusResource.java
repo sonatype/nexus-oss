@@ -37,6 +37,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.NexusCompat;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
+import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
@@ -51,6 +52,14 @@ public abstract class AbstractRepositoryGroupPlexusResource
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
     
+    @Requirement(hint="RestletRepositoryUrlBuilder")
+    private RepositoryURLBuilder repositoryURLBuilder;
+    
+    protected RepositoryURLBuilder getRepositoryURLBuilder()
+    {
+        return repositoryURLBuilder;
+    }
+
     protected RepositoryGroupResource buildGroupResource( Request request, String groupId ) 
         throws NoSuchRepositoryException,
             ResourceException
@@ -70,7 +79,7 @@ public abstract class AbstractRepositoryGroupPlexusResource
     {
         RepositoryGroupResource resource = new RepositoryGroupResource();
         
-        resource.setContentResourceURI( createRepositoryContentReference( request, group.getId() ).toString() );
+        resource.setContentResourceURI( getRepositoryURLBuilder().getRepositoryContentUrl( group) );
         
         resource.setId( group.getId() );
 

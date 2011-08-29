@@ -178,6 +178,15 @@ public abstract class AbstractNexusPlexusResource
         return ref.getTargetRef();
     }
 
+    /**
+     * Builds a reference to Repository's content root.
+     * 
+     * @param request
+     * @param repoId
+     * @return
+     * @deprecated Use RepositoryURLBuilder component instead.
+     */
+    @Deprecated
     protected Reference createRepositoryContentReference( Request request, String repoId )
     {
         try

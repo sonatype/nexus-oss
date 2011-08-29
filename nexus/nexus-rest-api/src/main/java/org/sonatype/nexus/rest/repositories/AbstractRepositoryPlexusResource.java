@@ -43,7 +43,6 @@ import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -53,6 +52,7 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.NexusCompat;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
+import org.sonatype.nexus.rest.RepositoryURLBuilder;
 import org.sonatype.nexus.rest.global.AbstractGlobalConfigurationPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
@@ -72,9 +72,6 @@ public abstract class AbstractRepositoryPlexusResource
     /** Key to store Repo with which we work against. */
     public static final String REPOSITORY_ID_KEY = "repositoryId";
 
-     @Requirement
-    private RepositoryTypeRegistry repositoryTypeRegistry;
-
     @Requirement
     private AuthenticationInfoConverter authenticationInfoConverter;
 
@@ -86,6 +83,9 @@ public abstract class AbstractRepositoryPlexusResource
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
+    
+    @Requirement(hint="RestletRepositoryUrlBuilder")
+    private RepositoryURLBuilder repositoryURLBuilder;
 
     protected AuthenticationInfoConverter getAuthenticationInfoConverter()
     {
@@ -191,8 +191,7 @@ public abstract class AbstractRepositoryPlexusResource
 
                 repoRes.setResourceURI( createRepositoryReference( request, repository.getId() ).toString() );
 
-                repoRes.setContentResourceURI( createRepositoryContentReference( request, repository.getId() )
-                    .toString() );
+                repoRes.setContentResourceURI( repositoryURLBuilder.getRepositoryContentUrl( repository) );
 
                 repoRes.setRepoType( getRestRepoType( repository ) );
 
@@ -287,7 +286,7 @@ public abstract class AbstractRepositoryPlexusResource
             resource = new RepositoryResource();
         }
 
-        resource.setContentResourceURI( createRepositoryContentReference( request, repository.getId() ).toString() );
+        resource.setContentResourceURI( repositoryURLBuilder.getRepositoryContentUrl( repository) );
 
         resource.setProvider( NexusCompat.getRepositoryProviderHint( repository ) );
 
@@ -426,7 +425,7 @@ public abstract class AbstractRepositoryPlexusResource
 
         resource.setName( shadow.getName() );
 
-        resource.setContentResourceURI( createRepositoryContentReference( request, shadow.getId() ).toString() );
+        resource.setContentResourceURI( repositoryURLBuilder.getRepositoryContentUrl( shadow) );
 
         resource.setProvider( NexusCompat.getRepositoryProviderHint( shadow ) );
 
