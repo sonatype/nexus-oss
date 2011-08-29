@@ -2,7 +2,6 @@ package org.sonatype.nexus.bundle.launcher.internal;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Provider;
-import com.sun.istack.internal.Nullable;
 import java.io.File;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -49,12 +48,13 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
     private final File overlaysSourceDirectory;
 
     @Inject
-    public DefaultNexusBundleLauncher(final ArtifactResolver artifactResolver, final PortReservationService portReservationService, final Provider<ZipUnArchiver> zipUnArchiverProvider, final Provider<GZipUnArchiver> gzipUnArchiverProvider, @Named("${NexusBundleServce.serviceWorkDirectory:-target/nbs}") final File serviceWorkDirectory, @Named("${NexusBundleServce.overlaySourceDirectory:-target/overlays}") @Nullable final File overlaysSourceDirectory) {
+    public DefaultNexusBundleLauncher(final ArtifactResolver artifactResolver, final PortReservationService portReservationService, final Provider<ZipUnArchiver> zipUnArchiverProvider, final Provider<GZipUnArchiver> gzipUnArchiverProvider, @Named("${NexusBundleServce.serviceWorkDirectory:-target/nbs}") final File serviceWorkDirectory, @Named("${NexusBundleServce.overlaySourceDirectory:-target/overlays}") final File overlaysSourceDirectory) {
         Preconditions.checkNotNull(artifactResolver);
         Preconditions.checkNotNull(portReservationService);
         Preconditions.checkNotNull(serviceWorkDirectory);
         Preconditions.checkNotNull(zipUnArchiverProvider);
         Preconditions.checkNotNull(gzipUnArchiverProvider);
+        Preconditions.checkNotNull(overlaysSourceDirectory);
 
         // required
         this.artifactResolver = artifactResolver;
@@ -62,8 +62,6 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
         this.serviceWorkDirectory = serviceWorkDirectory;
         this.zipUnArchiverProvider = zipUnArchiverProvider;
         this.gzipUnArchiverProvider = gzipUnArchiverProvider;
-
-        // optional
         this.overlaysSourceDirectory = overlaysSourceDirectory;
 
         logger.debug(serviceWorkDirectory.getAbsolutePath());
