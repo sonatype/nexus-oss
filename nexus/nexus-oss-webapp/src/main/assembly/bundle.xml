@@ -90,7 +90,7 @@
       <unpackOptions>
         <excludes>
           <exclude>META-INF/**</exclude>
-          <exclude>WEB-INF/plexus.properties</exclude>
+          <exclude>WEB-INF/lib/appcontext*.jar</exclude>
         </excludes>
       </unpackOptions>
       <useTransitiveDependencies>false</useTransitiveDependencies>

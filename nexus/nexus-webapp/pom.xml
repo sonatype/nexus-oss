@@ -428,11 +428,8 @@
             WEB-INF/*,
             js/sonatype-all.js,
             style/sonatype-all.css
-                    </warSourceIncludes>
+          </warSourceIncludes>
           <webResources>
-            <webResource>
-              <directory>${basedir}/src/main/webapp-war-extras</directory>
-            </webResource>
             <webResource>
               <directory>${compressed-dir}</directory>
               <includes>

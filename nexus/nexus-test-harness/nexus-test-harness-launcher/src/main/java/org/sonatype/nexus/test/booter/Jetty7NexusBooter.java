@@ -342,7 +342,7 @@ public class Jetty7NexusBooter
         // ==
         // Set the port to the one expected by IT
         {
-            final File jettyProperties = new File( basedir, "conf/jetty.properties" );
+            final File jettyProperties = new File( basedir, "conf/nexus.properties" );
 
             if ( !jettyProperties.isFile() )
             {
