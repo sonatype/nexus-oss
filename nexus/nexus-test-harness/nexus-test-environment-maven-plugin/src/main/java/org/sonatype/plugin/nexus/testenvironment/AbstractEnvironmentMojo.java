@@ -339,8 +339,8 @@ public class AbstractEnvironmentMojo
         project.getProperties().put( "application-conf", getPath( new File( destination, "nexus-work-dir/conf" ) ) );
 
         // final File plexusProps = new File( nexusBaseDir, "conf/plexus.properties" );
-        final File plexusProps = new File( nexusBaseDir, "nexus/WEB-INF/plexus.properties" );
-        copyUrl( "/default-config/plexus.properties", plexusProps );
+        final File plexusProps = new File( nexusBaseDir, "conf/nexus.properties" );
+        copyUrl( "/default-config/nexus.properties", plexusProps );
 
         File extraPlexusProps = new File( testResourcesDirectory, "plexus.properties" );
         if ( extraPlexusProps.exists() )
