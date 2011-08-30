@@ -32,15 +32,7 @@ public class InternalFactory
         {
             interpolator.addValueSource( new MapBasedValueSource( context ) );
         }
-        // interpolator.addValueSource( new MapBasedValueSource( System.getProperties() ) );
 
-        return interpolator;
-    }
-
-    public static Interpolator getInterpolator( final AppContext ctx )
-    {
-        Interpolator interpolator = new RegexBasedInterpolator();
-        interpolator.addValueSource( new MapBasedValueSource( ctx ) );
         return interpolator;
     }
 
@@ -53,7 +45,7 @@ public class InternalFactory
                 new TargetedEntrySource( new SystemPropertiesEntrySource(), id + "." ) } );
         List<EntryPublisher> publishers = Arrays.asList( new EntryPublisher[] { new PrintStreamEntryPublisher() } );
 
-        return new AppContextRequest( id, parent, sources, publishers );
+        return new AppContextRequest( id, parent, sources, publishers, true );
     }
 
     public static AppContext create( final AppContextRequest request )
@@ -81,6 +73,12 @@ public class InternalFactory
         }
 
         interpolator.addValueSource( new MapBasedValueSource( rawContext ) );
+
+        if ( request.isUseSystemPropertiesFallback() )
+        {
+            // make Java System properties participate in interpolation but as last resort, kinda "fallback"
+            interpolator.addValueSource( new MapBasedValueSource( System.getProperties() ) );
+        }
 
         Map<String, AppContextEntry> context = new HashMap<String, AppContextEntry>();
 
