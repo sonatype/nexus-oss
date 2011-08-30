@@ -140,6 +140,8 @@ public class Jetty7NexusBooter
         // --------------
         // set system property for bundleBasedir
         System.setProperty( "bundleBasedir", bundleBasedir.getAbsolutePath() );
+        // needed since NEXUS-4515
+        System.setProperty( "jettyContext", "nexus.properties" );
 
         // guice finalizer
         System.setProperty( "guice.executor.class", "NONE" );

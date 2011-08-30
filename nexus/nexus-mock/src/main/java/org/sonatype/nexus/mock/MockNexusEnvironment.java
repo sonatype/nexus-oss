@@ -39,6 +39,7 @@ import org.sonatype.plexus.jetty.Jetty7;
 import org.sonatype.plexus.jetty.mangler.ContextAttributeGetterMangler;
 import org.sonatype.plexus.jetty.mangler.ContextGetterMangler;
 import org.sonatype.plexus.jetty.mangler.DisableShutdownHookMangler;
+import org.sonatype.plexus.util.JettyUtils;
 
 import com.google.inject.Module;
 
@@ -76,6 +77,8 @@ public class MockNexusEnvironment
     public static Map<String, String> getDefaultContext( final File bundleBasedir )
     {
         System.setProperty( "bundleBasedir", bundleBasedir.getAbsolutePath() );
+        // needed since NEXUS-4515
+        System.setProperty( JettyUtils.JETTY_CONTEXT_FILE_KEY, "nexus.properties" );
 
         Map<String, String> ctx = new HashMap<String, String>();
 
