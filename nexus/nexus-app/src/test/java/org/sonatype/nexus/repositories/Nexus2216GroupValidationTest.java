@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
@@ -68,15 +71,19 @@ public class Nexus2216GroupValidationTest
             List<String> memberIds = new ArrayList<String>();
             for ( Repository repo : publicGroup.getMemberRepositories() )
             {
-                memberIds.add(  repo.getId() );
+                memberIds.add( repo.getId() );
             }
-            assertEquals( "Repo object list returned a different set of repos", publicGroup.getMemberRepositoryIds(), memberIds );
 
-            assertEquals( "The config should be correct, ids found are: "+ publicGroup.getMemberRepositoryIds(), 7, publicGroup.getMemberRepositories().size() );
+            MatcherAssert.assertThat( "Repo object list returned a different set of repos", memberIds,
+                Matchers.equalTo( publicGroup.getMemberRepositoryIds() ) );
+
+            MatcherAssert.assertThat(
+                "The config should be 5 reposes, but ids found are: " + publicGroup.getMemberRepositoryIds(),
+                publicGroup.getMemberRepositories().size(), Matchers.equalTo( 5 ) );
         }
         catch ( Exception e )
         {
-            fail( "Should succeed!" );
+            Assert.fail( "Should succeed!" );
         }
     }
 
@@ -114,7 +121,7 @@ public class Nexus2216GroupValidationTest
 
         if ( publicGroup == null )
         {
-            fail( "Public group not found in default configuration?" );
+            Assert.fail( "Public group not found in default configuration?" );
         }
 
         config.getRepositories().remove( publicGroup );
