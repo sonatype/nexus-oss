@@ -60,7 +60,7 @@ public class NexusAuthenticationEventInspectorTest
             naei.inspect( naeFailed );
         }
         // we sleep a bit over two seconds
-        Thread.sleep( 2001L );
+        Thread.sleep( 2100L );
         // and we send again the second event, but this one should be recorded, since the gap between last sent and this
         // is more than 2 seconds
         naei.inspect( naeFailed );
