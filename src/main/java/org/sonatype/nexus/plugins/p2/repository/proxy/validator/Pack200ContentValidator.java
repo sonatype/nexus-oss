@@ -88,7 +88,9 @@ public class Pack200ContentValidator
             lock.unlock();
         }
 
-        return Arrays.equals( magicBytes, new byte[] { 31, -117, 8, 0 } );
+        return Arrays.equals( magicBytes, new byte[] { 31, -117, 8, 0 } ) // real pack.gz
+            || Arrays.equals( magicBytes, new byte[] { 80, 75, 3, 4 } ) // plain jar works too
+        ;
     }
 
 }
