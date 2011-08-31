@@ -1,6 +1,7 @@
 package org.sonatype.nexus.bundle.launcher;
 
 import java.io.File;
+import org.sonatype.nexus.bundle.launcher.util.ResolvedArtifact;
 
 /**
  * A Nexus bundle that is being managed by a {@link NexusBundleService}
@@ -17,9 +18,9 @@ public interface ManagedNexusBundle {
     String getId();
 
     /**
-     * @return The Artifact coordinates used to resolve the original bundle file.
+     * @return the resolved artifact for the original bundle file.
      */
-    String getArtifactCordinates();
+    ResolvedArtifact getArtifact();
 
     /**
      *

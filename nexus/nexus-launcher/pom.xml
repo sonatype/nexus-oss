@@ -154,5 +154,9 @@
       <artifactId>ant</artifactId>
       <version>1.8.2</version>
     </dependency>
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+    </dependency>
   </dependencies>
 </project>

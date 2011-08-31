@@ -44,9 +44,11 @@ public class ConfigurableInjectedTest
     public void configure( final Properties properties )
     {
         loadAll( properties, "injected-test.properties" );
+        // per test class properties
         load( properties, this.getClass().getSimpleName() + "/injected-test.properties" );
         super.configure( properties );
     }
+
 
     private void loadAll( final Properties properties, final String name )
     {

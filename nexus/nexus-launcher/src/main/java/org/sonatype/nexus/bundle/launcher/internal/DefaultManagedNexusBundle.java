@@ -6,6 +6,7 @@ import java.util.EnumMap;
 import javax.inject.Inject;
 import org.sonatype.nexus.bundle.launcher.ManagedNexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusPort;
+import org.sonatype.nexus.bundle.launcher.util.ResolvedArtifact;
 
 /**
  * Default implementation of {@link ManagedNexusBundle}
@@ -17,20 +18,20 @@ public class DefaultManagedNexusBundle implements ManagedNexusBundle {
     private final File nexusRuntimeDirectory;
     private final String host;
     private final String contextPath;
-    private final String artifactCoordinates;
+    private final ResolvedArtifact artifact;
     private EnumMap<NexusPort, Integer> portMap;
 
     @Inject
-    DefaultManagedNexusBundle(final String id, final String artifactCoordinates, final String host, EnumMap<NexusPort, Integer> portMap, final String contextPath, File nexusWorkDirectory, File nexusRuntimeDirectory) {
+    DefaultManagedNexusBundle(final String id, final ResolvedArtifact artifact, final String host, EnumMap<NexusPort, Integer> portMap, final String contextPath, File nexusWorkDirectory, File nexusRuntimeDirectory) {
         Preconditions.checkNotNull(id);
-        Preconditions.checkNotNull(artifactCoordinates);
+        Preconditions.checkNotNull(artifact);
         Preconditions.checkNotNull(host);
         Preconditions.checkNotNull(portMap);
         Preconditions.checkNotNull(contextPath);
         Preconditions.checkNotNull(nexusWorkDirectory);
         Preconditions.checkNotNull(nexusRuntimeDirectory);
         this.id = id;
-        this.artifactCoordinates = artifactCoordinates;
+        this.artifact = artifact;
         this.host = host;
         if(!portMap.containsKey(NexusPort.HTTP)){
             throw new IllegalArgumentException("missing http port");
@@ -55,8 +56,8 @@ public class DefaultManagedNexusBundle implements ManagedNexusBundle {
     }
 
     @Override
-    public String getArtifactCordinates() {
-        return artifactCoordinates;
+    public ResolvedArtifact getArtifact() {
+        return artifact;
     }
 
     @Override

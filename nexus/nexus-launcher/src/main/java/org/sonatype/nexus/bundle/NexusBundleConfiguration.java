@@ -1,13 +1,9 @@
 package org.sonatype.nexus.bundle;
 
 import com.google.common.base.Preconditions;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.Properties;
-import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -16,53 +12,59 @@ import javax.inject.Named;
  */
 public class NexusBundleConfiguration {
 
-    public String getBundleArtifactCoordinates() {
-        return bundleArtifactCoordinates;
-    }
-
+    /**
+     * Unique ID to identify the bundle.
+     */
     public String getBundleId() {
         return bundleId;
+    }
+
+    /**
+     * Artifact coordinates of the Nexus bundle to install
+     */
+    public String getBundleArtifactCoordinates() {
+        return bundleArtifactCoordinates;
     }
 
     public boolean isLicensed() {
         return licensed;
     }
 
+    /**
+     * Patterns to exclude from the default bundle
+     */
     public List<String> getNexusBundleExcludes() {
-        return new ArrayList<String>(nexusBundleExcludes);
+        return this.nexusBundleExcludes;
     }
 
+    /**
+     * Plugin artifact coordinates to include in the Nexus bundle
+     */
     public List<String> getPluginCoordinates() {
-        return new ArrayList<String>(pluginCoordinates);
+        return this.pluginCoordinates;
     }
 
     public boolean isConfigureOptionalPlugins() {
-        return configuraOptionalPlugins;
+        return configureOptionalPlugins;
     }
 
     public boolean isConfigurePluginWebapps() {
         return configurePluginWebapps;
     }
 
-    /**
-     * Unique ID to identify the bundle.
-     */
+
     private String bundleId;
 
-    /**
-     * Artifact coordinates of the Nexus bundle to install
-     */
+
     private String bundleArtifactCoordinates;
 
-    /**
-     * Plugin artifact coordinates to include in the Nexus bundle
-     */
+
     private List<String> pluginCoordinates;
 
     /**
      * Promote the optional plugins included in the bundle
      */
-    private boolean configuraOptionalPlugins;
+    private boolean configureOptionalPlugins;
 
     /**
      * If there is one or more *-webapp.zip files in runtime/apps/nexus/plugin-repository, then unpack that zip to nexus
@@ -70,9 +72,7 @@ public class NexusBundleConfiguration {
      */
     private boolean configurePluginWebapps;
 
-    /**
-     * Patterns to exclude from the default bundle
-     */
+
     private List<String> nexusBundleExcludes;
 
     /**
@@ -80,14 +80,15 @@ public class NexusBundleConfiguration {
      */
     private boolean licensed;
 
-    private NexusBundleConfiguration(Builder builder) {
+    private NexusBundleConfiguration(final Builder builder) {
         // required
         this.bundleId = builder.bundleId;
         this.bundleArtifactCoordinates = builder.bundleArtifactCoordinates;
+        // optional
         this.licensed = builder.licensed;
         this.nexusBundleExcludes = builder.nexusBundleExcludes;
         this.pluginCoordinates = builder.pluginCoordinates;
-        this.configuraOptionalPlugins = builder.configureOptionalPlugins;
+        this.configureOptionalPlugins = builder.configureOptionalPlugins;
         this.configurePluginWebapps = builder.configurePluginWebapps;
     }
 
@@ -117,6 +118,16 @@ public class NexusBundleConfiguration {
             this.pluginCoordinates = new ArrayList<String>(builder.pluginCoordinates);
             this.configureOptionalPlugins = builder.configureOptionalPlugins;
             this.configurePluginWebapps = builder.configurePluginWebapps;
+        }
+
+        /**
+         * Constructor useful for inject a builder with default artifact coordinates into tests.
+         * @param artifactCoordinates
+         */
+        @Inject
+        public Builder(@Named("${nexus.artifact}") final String artifactCoordinates) {
+            Preconditions.checkNotNull(artifactCoordinates);
+            this.bundleArtifactCoordinates = artifactCoordinates;
         }
 
         /**
@@ -176,7 +187,17 @@ public class NexusBundleConfiguration {
             return this;
         }
 
+        public Builder setBundleId(final String bundleId) {
+            Preconditions.checkNotNull(bundleId);
+            this.bundleId = bundleId;
+            return this;
+        }
+
         public NexusBundleConfiguration build() {
+            // handle injected constructor missing bundle id
+            if(this.bundleId == null){
+                throw new IllegalStateException("bundleId must be set to a non-null value");
+            }
             return new NexusBundleConfiguration(this);
         }
     }

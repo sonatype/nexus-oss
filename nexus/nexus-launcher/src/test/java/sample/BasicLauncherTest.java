@@ -13,7 +13,6 @@ import org.sonatype.nexus.test.ConfigurableInjectedTest;
 
 /**
  *
- * @author plynch
  */
 public class BasicLauncherTest extends ConfigurableInjectedTest{
 
@@ -22,6 +21,9 @@ public class BasicLauncherTest extends ConfigurableInjectedTest{
 
     @Inject
     private NexusBundleLauncher nexusBundleLauncher;
+
+    @Inject
+    private NexusBundleConfiguration.Builder nexusBuilder;
 
     @Before
     public void before() {
@@ -36,10 +38,13 @@ public class BasicLauncherTest extends ConfigurableInjectedTest{
 
     @Test
     public void testBundleService(){
-        String nexusOSSArtifactCoords = "org.sonatype.nexus:nexus-oss-webapp:tar.gz:bundle:1.9.2";
+        String nexusOSSArtifactCoords = "org.sonatype.nexus:nexus-oss-webapp:tar.gz:bundle:1.9.3-SNAPSHOT";
         NexusBundleConfiguration config = new NexusBundleConfiguration.Builder(nexusOSSArtifactCoords, "mybundle").build();
+        config = nexusBuilder.setBundleId("nexus1").build();
+        config = nexusBuilder.setBundleId("nexus2").build();
+        assertThat(config.getBundleArtifactCoordinates(), is("org.sonatype.nexus:nexus-oss-webapp:tar.gz:bundle:1.9.3-SNAPSHOT"));
         //ManagedNexusBundle bundle = nexusBundleLauncher.start(config);
         //nexusBundleLauncher.stop(bundle);
-
     }
+
 }

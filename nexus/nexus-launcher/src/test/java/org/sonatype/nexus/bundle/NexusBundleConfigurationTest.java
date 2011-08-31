@@ -51,7 +51,12 @@ public class NexusBundleConfigurationTest {
         assertThat(config.isLicensed(), is(false));
         assertThat(config.isConfigureOptionalPlugins(), is(false));
         assertThat(config.isConfigurePluginWebapps(), is(false));
-
     }
-    
+
+    @Test(expected=IllegalStateException.class)
+    public void validateMissingBundleId(){
+        NexusBundleConfiguration config = new Builder("coordinate").build();
+    }
+
+
 }

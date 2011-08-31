@@ -14,6 +14,7 @@ import org.sonatype.aether.repository.LocalRepository;
 import org.sonatype.aether.repository.RemoteRepository;
 import org.sonatype.aether.resolution.ArtifactRequest;
 import org.sonatype.aether.resolution.ArtifactResolutionException;
+import org.sonatype.aether.resolution.ArtifactResult;
 import org.sonatype.aether.spi.connector.RepositoryConnectorFactory;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
 
@@ -65,9 +66,11 @@ public class AetherArtifactResolver
         }
     }
 
-    public File resolve( final String coordinates )
+
+    public ResolvedArtifact resolveArtifact( final String coordinates )
     {
         DefaultServiceLocator locator = new DefaultServiceLocator();
+
         locator.addService( RepositoryConnectorFactory.class, AsyncRepositoryConnectorFactory.class );
 
         RepositorySystem repoSystem = locator.getService( RepositorySystem.class );
@@ -85,12 +88,15 @@ public class AetherArtifactResolver
         request.addRepository( remoteRepo );
         try
         {
-            return repoSystem.resolveArtifact( repoSession, request ).getArtifact().getFile();
+            ArtifactResult result = repoSystem.resolveArtifact( repoSession, request );
+            return new DefaultResolvedArtifact(result.getArtifact());
         }
         catch ( ArtifactResolutionException e )
         {
             throw new IllegalArgumentException( e );
         }
     }
+
+
 
 }
