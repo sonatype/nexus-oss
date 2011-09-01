@@ -72,12 +72,12 @@ public class JSWExecSupport {
 
     /**
      *
-     * @return true if started, false if could not detect it as started
+     * @return true if started, false if could not detect Nexus as started
      */
-    public boolean startAndWaitUntilReady() {
+    public boolean startAndWaitUntilReady(final String nexusBaseURL) {
         //need console since on windows we would first need a service installed if start cmd was used
         executeJSWScript("console");
-        return RequestUtils.waitForNexusToStart("http://localhost:8081/nexus");
+        return RequestUtils.waitForNexusToStart(nexusBaseURL);
     }
 
     /**

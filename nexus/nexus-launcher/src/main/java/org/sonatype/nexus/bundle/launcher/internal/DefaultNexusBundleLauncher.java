@@ -2,10 +2,19 @@ package org.sonatype.nexus.bundle.launcher.internal;
 
 import com.google.common.base.Preconditions;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.util.EnumMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Level;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -13,6 +22,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Expand;
 import org.apache.tools.ant.taskdefs.Untar;
 import org.apache.tools.ant.types.EnumeratedAttribute;
+import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bundle.NexusBundleConfiguration;
@@ -33,6 +43,9 @@ import org.sonatype.nexus.bundle.launcher.util.ResolvedArtifact;
 @Named("default")
 @Singleton
 public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBundleService {
+
+    private static final String NEXUS_CONTEXT = "/nexus";
+
 
     private Logger logger = LoggerFactory.getLogger(DefaultNexusBundleLauncher.class);
     /**
@@ -93,12 +106,13 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
         final ResolvedArtifact artifact = resolveArtifact(bundleConfiguration.getBundleArtifactCoordinates());
         final File bundleFile = resolveArtifactFile(artifact);
         final File extractionDir = computeExtractionDir(bundleConfiguration.getBundleId());
+        final File appDir = computeNexusAppDir(extractionDir, artifact);
 
         extractBundle(bundleFile, extractionDir, bundleConfiguration.getNexusBundleExcludes());
         configureExtractedBundlePermissions(extractionDir);
 
         // if ( bundleConfiguration.isConfigureOptionalPlugins())
-        // {
+        //
         //     configureOptionalPlugins(extractionDir)
         // }
 
@@ -107,21 +121,26 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
         // final File bundleOverlaysSourceDirectory = computeBundleOverlaysSourceDirectory(bundleConfiguration);
         // installOverlays(extractionDir, bundleOverlaysSourceDirectory )
-        // computeNexusWorkDir(extractionDir);
 
         final File binDir = computeNexusBinDir(extractionDir, artifact);
 
-        startBundle(binDir);
+        EnumMap<NexusPort,Integer> portMap = new EnumMap<NexusPort,Integer>(NexusPort.class);
+        portMap.put(NexusPort.HTTP, this.portReservationService.reservePort());
+        try {
+            modifyJettyConfiguration(appDir, portMap.get(NexusPort.HTTP));
+        } catch (IOException ex) {
+            throw new NexusBundleLauncherException("Problem modifying jetty config", ex);
+        }
+
+        startBundle(binDir, "http://127.0.0.1:" + portMap.get(NexusPort.HTTP) + NEXUS_CONTEXT);
 
         // register
-        EnumMap<NexusPort,Integer> portMap = new EnumMap<NexusPort,Integer>(NexusPort.class);
-        portMap.put(NexusPort.HTTP, 8081);
         File workDir = buildFilePath(extractionDir, "sonatype-work", "nexus");
-        File appDir = computeNexusAppDir(extractionDir, artifact);
-        DefaultManagedNexusBundle managedBundle = new DefaultManagedNexusBundle(bundleConfiguration.getBundleId(),artifact, "127.0.0.1", portMap, "/nexus", workDir, appDir);
+        DefaultManagedNexusBundle managedBundle = new DefaultManagedNexusBundle(bundleConfiguration.getBundleId(),artifact, "127.0.0.1", portMap, NEXUS_CONTEXT, workDir, appDir);
         managedBundles.put(bundleConfiguration.getBundleId(), managedBundle);
         return managedBundle;
     }
+
 
     @Override
     public ManagedNexusBundle start(NexusBundleConfiguration config, String groupName) {
@@ -139,6 +158,7 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
         final File extractionDir = computeExtractionDir(managedBundle.getId());
         final File binDir = computeNexusBinDir(extractionDir, managedBundle.getArtifact());
         stopBundle(binDir);
+        this.portReservationService.cancelPort(managedBundle.getHttpPort());
 
     }
 
@@ -206,6 +226,30 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
         }
     }
 
+    protected void modifyJettyConfiguration( final File nexusAppDir, final int httpPort )
+        throws IOException
+    {
+
+        final File jettyProperties = new File( nexusAppDir, "conf/nexus.properties" );
+
+        if ( !jettyProperties.isFile() )
+        {
+            throw new FileNotFoundException( "Jetty properties not found at " + jettyProperties.getAbsolutePath() );
+        }
+
+        Properties p = new Properties();
+        InputStream in = new FileInputStream( jettyProperties );
+        p.load( in );
+        IOUtil.close( in );
+
+        p.setProperty( "application-port", String.valueOf( httpPort ) );
+
+        OutputStream out = new FileOutputStream( jettyProperties );
+        p.store( out, "NexusStatusUtil" );
+        IOUtil.close( out );
+
+    }
+
     /**
      * Extract the specified bundle file to a directory, excluding any provided patterns.
      * @param bundleFile the bundle file to extractUsingPlexus
@@ -252,9 +296,9 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
     }
 
-    protected void startBundle(final File binDir) {
+    protected void startBundle(final File binDir, final String nexusBaseURL) {
         final JSWExecSupport jswExec = new JSWExecSupport(binDir, "nexus", ant);
-        if(!jswExec.startAndWaitUntilReady()){
+        if(!jswExec.startAndWaitUntilReady(nexusBaseURL)){
             throw new NexusBundleLauncherException("Bundle start detection failed, see logs.");
         }
     }

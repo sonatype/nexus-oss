@@ -643,9 +643,9 @@ public class RequestFacade
     public static HttpMethod executeHTTPClientMethod( final HttpMethod method, final boolean useTestContext )
         throws HttpException, IOException
     {
-        HttpClient client = new HttpClient();
-        client.getHttpConnectionManager().getParams().setConnectionTimeout( 5000 );
-        client.getHttpConnectionManager().getParams().setSoTimeout( 5000 );
+        HttpClient httpClient = new HttpClient();
+        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout( 5000 );
+        httpClient.getHttpConnectionManager().getParams().setSoTimeout( 5000 );
 
         if ( useTestContext )
         {
@@ -653,19 +653,19 @@ public class RequestFacade
             TestContext context = TestContainer.getInstance().getTestContext();
             if ( context.isSecureTest() )
             {
-                client.getState().setCredentials( AuthScope.ANY,
+                httpClient.getState().setCredentials( AuthScope.ANY,
                     new UsernamePasswordCredentials( context.getUsername(), context.getPassword() ) );
 
                 List<String> authPrefs = new ArrayList<String>( 1 );
                 authPrefs.add( AuthPolicy.BASIC );
-                client.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
-                client.getParams().setAuthenticationPreemptive( true );
+                httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
+                httpClient.getParams().setAuthenticationPreemptive( true );
             }
         }
 
         try
         {
-            client.executeMethod( method );
+            httpClient.executeMethod( method );
             method.getResponseBodyAsString(); // forced consumption of response I guess
             return method;
         }
@@ -674,7 +674,7 @@ public class RequestFacade
             method.releaseConnection();
 
             // force socket cleanup
-            HttpConnectionManager mgr = client.getHttpConnectionManager();
+            HttpConnectionManager mgr = httpClient.getHttpConnectionManager();
 
             if ( mgr instanceof SimpleHttpConnectionManager )
             {
