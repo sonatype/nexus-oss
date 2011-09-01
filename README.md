@@ -15,7 +15,7 @@ To build this project you will need to add the Sonatype Forge repository to your
 
 https://repository.sonatype.org/content/groups/forge
 
-If you are adding proxy's for this in a Nexus instance be sure to add both release and snapshot proxy repositories.
+If you are adding proxies for this in a Nexus instance be sure to add both release and snapshot proxy repositories for the above URL.
 
 Have fun,  
 Sonatype Team
