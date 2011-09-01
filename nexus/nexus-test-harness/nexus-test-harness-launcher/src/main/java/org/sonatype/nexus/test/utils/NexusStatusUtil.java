@@ -187,7 +187,7 @@ public class NexusStatusUtil
         Socket sock = null;
         try
         {
-            sock = new Socket( "localhost", AbstractNexusIntegrationTest.nexusApplicationPort );
+            sock = new Socket( "localhost", port );
             return true;
         }
         catch ( UnknownHostException e1 )
