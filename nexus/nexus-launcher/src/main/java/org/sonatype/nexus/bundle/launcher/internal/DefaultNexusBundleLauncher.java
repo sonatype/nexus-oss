@@ -54,7 +54,7 @@ import org.sonatype.nexus.bundle.launcher.NexusBundleService;
 import org.sonatype.nexus.bundle.launcher.NexusPort;
 import org.sonatype.nexus.bundle.launcher.util.ArtifactResolver;
 import org.sonatype.nexus.bundle.launcher.jsw.JSWExecSupport;
-import org.sonatype.nexus.bundle.launcher.util.NexusLauncherUtils;
+import org.sonatype.nexus.bundle.launcher.util.NexusBundleUtils;
 import org.sonatype.nexus.bundle.launcher.util.PortReservationService;
 import org.sonatype.nexus.bundle.launcher.util.ResolvedArtifact;
 
@@ -82,7 +82,7 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
     /**
      * Helper for common tasks
      */
-    private final NexusLauncherUtils bundleUtils;
+    private final NexusBundleUtils bundleUtils;
 
     /**
      * service for reserving free ports used by bundles
@@ -100,7 +100,7 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
     private final Map<String,ManagedNexusBundle> managedBundles = new ConcurrentHashMap<String, ManagedNexusBundle>();
 
     @Inject
-    public DefaultNexusBundleLauncher(final ArtifactResolver artifactResolver, final PortReservationService portReservationService, final AntHelper ant, final NexusLauncherUtils bundleUtils, @Named("${NexusBundleService.serviceWorkDirectory:-target/nbs}") final File serviceWorkDirectory, @Named("${NexusBundleService.overlaySourceDirectory:-target/overlays}") final File overlaysSourceDirectory) {
+    public DefaultNexusBundleLauncher(final ArtifactResolver artifactResolver, final PortReservationService portReservationService, final AntHelper ant, final NexusBundleUtils bundleUtils, @Named("${NexusBundleService.serviceWorkDirectory:-target/nbs}") final File serviceWorkDirectory, @Named("${NexusBundleService.overlaySourceDirectory:-target/overlays}") final File overlaysSourceDirectory) {
         Preconditions.checkNotNull(artifactResolver);
         Preconditions.checkNotNull(portReservationService);
         Preconditions.checkNotNull(serviceWorkDirectory);

@@ -27,16 +27,15 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Expand;
 import org.apache.tools.ant.taskdefs.Untar;
 import org.apache.tools.ant.types.EnumeratedAttribute;
-import org.sonatype.nexus.bundle.launcher.NexusBundleLauncherException;
 import org.sonatype.nexus.bundle.launcher.internal.AntHelper;
 
 
-public class NexusLauncherUtils {
+public class NexusBundleUtils {
 
     private final AntHelper ant;
 
     @Inject
-    NexusLauncherUtils(final AntHelper ant) {
+    NexusBundleUtils(final AntHelper ant) {
         Preconditions.checkNotNull(ant);
         this.ant = ant;
     }

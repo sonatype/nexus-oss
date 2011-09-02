@@ -27,7 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sonatype.nexus.bundle.launcher.util.ArtifactResolver;
-import org.sonatype.nexus.bundle.launcher.util.NexusLauncherUtils;
+import org.sonatype.nexus.bundle.launcher.util.NexusBundleUtils;
 import org.sonatype.nexus.bundle.launcher.util.PortReservationService;
 
 /**
@@ -46,7 +46,7 @@ public class DefaultNexusBundleLauncherTest {
     private AntHelper ant;
 
     @Mock
-    private NexusLauncherUtils bundleUtils;
+    private NexusBundleUtils bundleUtils;
 
     @Mock
     private File serviceWorkDir;
@@ -67,7 +67,7 @@ public class DefaultNexusBundleLauncherTest {
 
     @Test
     public void nothing(){
-        
+
     }
 
 }
