@@ -20,6 +20,7 @@ package org.sonatype.nexus.web;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -181,7 +182,8 @@ public class PlexusContainerContextListener
         plexusXmlFile = new File( warWebInfFile, "plexus.xml" );
 
         // no "real" parenting for now
-        AppContextRequest request = Factory.getDefaultRequest( "nexus", null );
+        // for historical reasons, honor the "plexus" prefix too
+        AppContextRequest request = Factory.getDefaultRequest( "nexus", null, Arrays.asList( "plexus" ) );
 
         // set basedir
         request.getSources().add( new StaticEntrySource( "bundleBasedir", basedirFile.getAbsolutePath() ) );
@@ -197,10 +199,10 @@ public class PlexusContainerContextListener
         request.getSources().add( new PropertiesFileEntrySource( nexusDefaultPropertiesFile, true ) );
 
         // if in bundle only
-        if ( parent != null )
+        if ( parent != null && basedirFile != null )
         {
             nexusPropertiesFile =
-                new File( new File( (String) parent.get( "bundleBasedir" ) ), "conf/nexus.properties" );
+                new File( basedirFile, "conf/nexus.properties" );
 
             // add the user overridable properties file, but it might not be present
             request.getSources().add( new PropertiesFileEntrySource( nexusPropertiesFile, false ) );
