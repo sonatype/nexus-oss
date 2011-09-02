@@ -7,12 +7,17 @@ import java.util.Properties;
 import org.sonatype.appcontext.AppContextException;
 import org.sonatype.appcontext.AppContextRequest;
 
+/**
+ * EntrySource that sources itself from System.getProperties().
+ * 
+ * @author cstamas
+ */
 public class SystemPropertiesEntrySource
     implements EntrySource, EntrySourceMarker
 {
     public String getDescription()
     {
-        return "system:properties";
+        return "system(properties)";
     }
 
     public EntrySourceMarker getEntrySourceMarker()

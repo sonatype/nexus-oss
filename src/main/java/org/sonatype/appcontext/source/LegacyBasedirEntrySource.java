@@ -8,6 +8,13 @@ import org.sonatype.appcontext.AppContextException;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.internal.Preconditions;
 
+/**
+ * This is a "legacy" baseDir EntrySource that should not be used anymore. It was used mostly in Plexus applications,
+ * that usually do depend on "baseDir".
+ * 
+ * @author cstamas
+ * @deprecated Do not rely on system properties for stuff like these, use AppContext better.
+ */
 public class LegacyBasedirEntrySource
     implements EntrySource, EntrySourceMarker
 {
@@ -15,11 +22,21 @@ public class LegacyBasedirEntrySource
 
     private final boolean failIfNotFound;
 
+    /**
+     * Constructs the instance using "standard" key used in Plexus Applications. The constructed instance will fail if
+     * key is not found!
+     */
     public LegacyBasedirEntrySource()
     {
         this( "basedir", true );
     }
 
+    /**
+     * Constructs an instance with custom key.
+     * 
+     * @param basedirKey
+     * @param failIfNotFound
+     */
     public LegacyBasedirEntrySource( final String basedirKey, final boolean failIfNotFound )
     {
         this.basedirKey = Preconditions.checkNotNull( basedirKey );
@@ -58,6 +75,13 @@ public class LegacyBasedirEntrySource
 
     // ==
 
+    /**
+     * The essence how old Plexus application was expecting to have "basedir" discovered. Usually using system property
+     * that contained a file path, or fall back to current working directory.
+     * 
+     * @param basedirKey
+     * @return
+     */
     public File discoverBasedir( final String basedirKey )
     {
         String basedirPath = System.getProperty( basedirKey );

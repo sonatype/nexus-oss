@@ -15,7 +15,7 @@ public class AppContextImpl
     implements AppContext
 {
     private final String id;
-
+    
     private final AppContext parent;
 
     private final HierarchicalMap<String, AppContextEntry> entries;
@@ -24,7 +24,7 @@ public class AppContextImpl
                            final Map<String, AppContextEntry> sourcedEntries )
     {
         this.id = Preconditions.checkNotNull( id );
-
+        
         this.parent = parent;
 
         if ( parent != null )

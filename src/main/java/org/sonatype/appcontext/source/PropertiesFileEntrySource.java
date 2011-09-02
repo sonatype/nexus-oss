@@ -9,15 +9,22 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.sonatype.appcontext.AppContextException;
-import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.internal.Preconditions;
 
+/**
+ * EntrySource that sources itself from a {@code java.util.Properties} file. It might be set to fail but also to keep
+ * silent the fact that file to load is not found.
+ * 
+ * @author cstamas
+ */
 public class PropertiesFileEntrySource
-    implements EntrySource, EntrySourceMarker
+    extends AbstractMapEntrySource
 {
     private final File propertiesFile;
 
     private final boolean failIfNotFound;
+
+    private Map<String, Object> source;
 
     public PropertiesFileEntrySource( final File propertiesFile )
     {
@@ -26,77 +33,74 @@ public class PropertiesFileEntrySource
 
     public PropertiesFileEntrySource( final File propertiesFile, final boolean failIfNotFound )
     {
+        super( Preconditions.checkNotNull( propertiesFile ).getAbsolutePath(), "propsFile" );
+
         this.propertiesFile = Preconditions.checkNotNull( propertiesFile ).getAbsoluteFile();
 
         this.failIfNotFound = failIfNotFound;
     }
 
-    public String getDescription()
-    {
-        return "file:" + propertiesFile.getAbsolutePath();
-    }
-
-    public EntrySourceMarker getEntrySourceMarker()
-    {
-        return this;
-    }
-
-    public Map<String, Object> getEntries( AppContextRequest request )
+    public synchronized Map<String, Object> getSource()
         throws AppContextException
     {
-        try
+        if ( source == null )
         {
-            FileInputStream fis;
-
-            if ( propertiesFile.isFile() )
+            try
             {
-                Properties properties = new Properties();
+                FileInputStream fis;
 
-                fis = new FileInputStream( propertiesFile );
-
-                try
+                if ( propertiesFile.isFile() )
                 {
-                    if ( propertiesFile.getName().endsWith( ".xml" ) )
+                    Properties properties = new Properties();
+
+                    fis = new FileInputStream( propertiesFile );
+
+                    try
                     {
-                        // assume it's new XML properties file
-                        properties.loadFromXML( fis );
+                        if ( propertiesFile.getName().endsWith( ".xml" ) )
+                        {
+                            // assume it's new XML properties file
+                            properties.loadFromXML( fis );
+                        }
+                        else
+                        {
+                            // assume it's "plain old" properties file
+                            properties.load( fis );
+                        }
                     }
-                    else
+                    finally
                     {
-                        // assume it's "plain old" properties file
-                        properties.load( fis );
+                        fis.close();
                     }
+
+                    final Map<String, Object> result = new HashMap<String, Object>();
+
+                    for ( Map.Entry<Object, Object> entry : properties.entrySet() )
+                    {
+                        final String key = String.valueOf( entry.getKey() );
+
+                        result.put( key, entry.getValue() );
+                    }
+
+                    source = result;
                 }
-                finally
+                else if ( failIfNotFound )
                 {
-                    fis.close();
+                    throw new AppContextException( "Cannot load up properties file from \""
+                        + propertiesFile.getAbsolutePath() + "\", it does not exists!" );
                 }
-
-                final Map<String, Object> result = new HashMap<String, Object>();
-
-                for ( Map.Entry<Object, Object> entry : properties.entrySet() )
+                else
                 {
-                    final String key = String.valueOf( entry.getKey() );
-
-                    result.put( key, entry.getValue() );
+                    source = Collections.emptyMap();
                 }
-
-                return result;
             }
-            else if ( failIfNotFound )
+            catch ( IOException e )
             {
-                throw new AppContextException( "Cannot load up plexus properties file from \""
-                    + propertiesFile.getAbsolutePath() + "\", it does not exists!" );
-            }
-            else
-            {
-                return Collections.emptyMap();
+                throw new AppContextException( "Cannot load up properties file from \""
+                    + propertiesFile.getAbsolutePath() + "\"!", e );
             }
         }
-        catch ( IOException e )
-        {
-            throw new AppContextException( "Cannot load up plexus properties file from \""
-                + propertiesFile.getAbsolutePath() + "\"!", e );
-        }
+
+        return source;
     }
 }

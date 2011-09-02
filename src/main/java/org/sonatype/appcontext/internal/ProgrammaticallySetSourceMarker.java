@@ -7,6 +7,6 @@ public class ProgrammaticallySetSourceMarker
 {
     public String getDescription()
     {
-        return "programmatically-set";
+        return "set(programmatically)";
     }
 }

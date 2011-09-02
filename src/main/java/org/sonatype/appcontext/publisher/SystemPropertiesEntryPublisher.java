@@ -3,6 +3,7 @@ package org.sonatype.appcontext.publisher;
 import java.util.Map.Entry;
 
 import org.sonatype.appcontext.AppContext;
+import org.sonatype.appcontext.internal.Preconditions;
 
 /**
  * A publisher that publishes Application Context back to to System properties, probably prefixed with keyPrefix, to
@@ -13,16 +14,40 @@ import org.sonatype.appcontext.AppContext;
 public class SystemPropertiesEntryPublisher
     implements EntryPublisher
 {
+    /**
+     * The prefix to be used to prefix keys ("prefix.XXX"), if set.
+     */
     private final String keyPrefix;
 
-    public SystemPropertiesEntryPublisher()
+    /**
+     * Flag to force publishing. Otherwise, the system property will be set only if does not exists.
+     */
+    private final boolean override;
+
+    /**
+     * Constructs a publisher without prefix, will publish {@code key=values} with keys as is in context.
+     * 
+     * @param override
+     */
+    public SystemPropertiesEntryPublisher( final boolean override )
     {
-        this( null );
+        this.keyPrefix = null;
+
+        this.override = override;
     }
 
-    public SystemPropertiesEntryPublisher( final String keyPrefix )
+    /**
+     * Constructs a publisher with prefix, will publish context with {@code prefix.key=value}.
+     * 
+     * @param keyPrefix
+     * @param override
+     * @throws NullPointerException if {@code keyPrefix} is null
+     */
+    public SystemPropertiesEntryPublisher( final String keyPrefix, final boolean override )
     {
-        this.keyPrefix = keyPrefix;
+        this.keyPrefix = Preconditions.checkNotNull( keyPrefix );
+
+        this.override = override;
     }
 
     public void publishEntries( AppContext context )
@@ -36,7 +61,7 @@ public class SystemPropertiesEntryPublisher
             // adjust the key name and put it back to System properties
             String sysPropKey = keyPrefix == null ? key : keyPrefix + key;
 
-            if ( System.getProperty( sysPropKey ) == null )
+            if ( override || System.getProperty( sysPropKey ) == null )
             {
                 System.setProperty( sysPropKey, (String) value );
             }

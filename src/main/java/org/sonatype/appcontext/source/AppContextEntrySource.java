@@ -8,11 +8,22 @@ import org.sonatype.appcontext.AppContextException;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.internal.Preconditions;
 
+/**
+ * Entry source that sources from supplied AppContext. This is not the same as setting AppContext parent!
+ * 
+ * @author cstamas
+ */
 public class AppContextEntrySource
     implements EntrySource, EntrySourceMarker
 {
     private final AppContext context;
 
+    /**
+     * Constructs the AppContextEntrySource with supplied AppContext.
+     * 
+     * @param context
+     * @throws NullPointerException when supplied context is null,
+     */
     public AppContextEntrySource( final AppContext context )
     {
         this.context = Preconditions.checkNotNull( context );
@@ -20,7 +31,7 @@ public class AppContextEntrySource
 
     public String getDescription()
     {
-        return "appcontext: " + context.getId();
+        return "appcontext(" + context.getId() + ")";
     }
 
     public EntrySourceMarker getEntrySourceMarker()

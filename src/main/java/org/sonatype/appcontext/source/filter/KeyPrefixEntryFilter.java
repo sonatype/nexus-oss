@@ -1,11 +1,19 @@
-package org.sonatype.appcontext.source;
+package org.sonatype.appcontext.source.filter;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.sonatype.appcontext.internal.Preconditions;
+import org.sonatype.appcontext.source.EntrySourceMarker;
+import org.sonatype.appcontext.source.WrappingEntrySourceMarker;
 
+/**
+ * EntryFilter that filters on key-prefix (keys are Strings) using key.startsWith() method, hence, this is case
+ * sensitive! You can supply a list of key prefixes to accept.
+ * 
+ * @author cstamas
+ */
 public class KeyPrefixEntryFilter
     implements EntryFilter
 {
@@ -37,12 +45,12 @@ public class KeyPrefixEntryFilter
         return false;
     }
 
-    public EntrySourceMarker getEntrySourceMarker( EntrySourceMarker source )
+    public EntrySourceMarker getFilteredEntrySourceMarker( final EntrySourceMarker source )
     {
         return new WrappingEntrySourceMarker( source )
         {
             @Override
-            protected String getDescription( EntrySourceMarker wrapped )
+            protected String getDescription( final EntrySourceMarker wrapped )
             {
                 return String.format( "filter(keyStartsWith:%s, %s)", prefixes, wrapped.getDescription() );
             }

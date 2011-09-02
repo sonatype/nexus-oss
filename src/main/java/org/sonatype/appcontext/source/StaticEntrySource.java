@@ -7,6 +7,12 @@ import org.sonatype.appcontext.AppContextException;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.internal.Preconditions;
 
+/**
+ * A static EntrySource that holds the key and value to make it into AppContext. Useful in testing, or when you need to
+ * add one key=value into context, and you need to calculate those somehow before constructing AppContext.
+ * 
+ * @author cstamas
+ */
 public class StaticEntrySource
     implements EntrySource, EntrySourceMarker
 {
@@ -22,7 +28,14 @@ public class StaticEntrySource
 
     public String getDescription()
     {
-        return String.format( "static: \"%s\"=\"%s\"", key, value );
+        if ( value != null )
+        {
+            return String.format( "static(\"%s\"=\"%s\")", key, String.valueOf( value ) );
+        }
+        else
+        {
+            return String.format( "static(\"%s\"=null)", key );
+        }
     }
 
     public EntrySourceMarker getEntrySourceMarker()

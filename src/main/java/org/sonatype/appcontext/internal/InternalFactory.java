@@ -17,9 +17,7 @@ import org.sonatype.appcontext.publisher.EntryPublisher;
 import org.sonatype.appcontext.publisher.PrintStreamEntryPublisher;
 import org.sonatype.appcontext.source.EntrySource;
 import org.sonatype.appcontext.source.EntrySourceMarker;
-import org.sonatype.appcontext.source.SystemEnvironmentEntrySource;
-import org.sonatype.appcontext.source.SystemPropertiesEntrySource;
-import org.sonatype.appcontext.source.TargetedEntrySource;
+import org.sonatype.appcontext.source.Sources;
 
 public class InternalFactory
 {
@@ -36,13 +34,13 @@ public class InternalFactory
         return interpolator;
     }
 
-    public static AppContextRequest getDefaultAppContextRequest( final String id, final AppContext parent )
+    public static AppContextRequest getDefaultAppContextRequest( final String id, final AppContext parent,
+                                                                 final List<String> aliases )
     {
         Preconditions.checkNotNull( id );
+        Preconditions.checkNotNull( aliases );
 
-        List<EntrySource> sources =
-            Arrays.asList( new EntrySource[] { new TargetedEntrySource( new SystemEnvironmentEntrySource(), id + "." ),
-                new TargetedEntrySource( new SystemPropertiesEntrySource(), id + "." ) } );
+        List<EntrySource> sources = Sources.getDefaultSources( id, aliases );
         List<EntryPublisher> publishers = Arrays.asList( new EntryPublisher[] { new PrintStreamEntryPublisher() } );
 
         return new AppContextRequest( id, parent, sources, publishers, true );

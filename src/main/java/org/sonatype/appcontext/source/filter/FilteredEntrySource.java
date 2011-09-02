@@ -1,4 +1,4 @@
-package org.sonatype.appcontext.source;
+package org.sonatype.appcontext.source.filter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,14 @@ import java.util.Map;
 import org.sonatype.appcontext.AppContextException;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.internal.Preconditions;
+import org.sonatype.appcontext.source.EntrySource;
+import org.sonatype.appcontext.source.EntrySourceMarker;
 
+/**
+ * EntrySource that wraps another EntrySource and applies EntryFilter to it.
+ * 
+ * @author cstamas
+ */
 public class FilteredEntrySource
     implements EntrySource
 {
@@ -22,7 +29,7 @@ public class FilteredEntrySource
 
         this.filter = Preconditions.checkNotNull( filter );
 
-        this.sourceMarker = filter.getEntrySourceMarker( source.getEntrySourceMarker() );
+        this.sourceMarker = filter.getFilteredEntrySourceMarker( source.getEntrySourceMarker() );
     }
 
     public EntrySourceMarker getEntrySourceMarker()
@@ -45,5 +52,4 @@ public class FilteredEntrySource
 
         return result;
     }
-
 }

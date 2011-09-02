@@ -7,7 +7,8 @@ import org.sonatype.appcontext.internal.ContextStringDumper;
 import org.sonatype.appcontext.internal.Preconditions;
 
 /**
- * A publisher that publishes Application Context to SLF4J Log on INFO level.
+ * A publisher that publishes Application Context to SLF4J Log on first enabled level (will try DEBUG, INFO, WARN in
+ * this order). If none of those are enabled, will do nothing.
  * 
  * @author cstamas
  */
@@ -34,6 +35,17 @@ public class Slf4jLoggerEntryPublisher
         sb.append( ContextStringDumper.dumpToString( context ) );
         sb.append( "===================================\n" );
 
-        logger.info( sb.toString() );
+        if ( logger.isDebugEnabled() )
+        {
+            logger.debug( sb.toString() );
+        }
+        else if ( logger.isInfoEnabled() )
+        {
+            logger.info( sb.toString() );
+        }
+        else if ( logger.isWarnEnabled() )
+        {
+            logger.warn( sb.toString() );
+        }
     }
 }
