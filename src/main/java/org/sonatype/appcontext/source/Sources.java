@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.sonatype.appcontext.source.filter.FilteredEntrySource;
 import org.sonatype.appcontext.source.filter.KeyPrefixEntryFilter;
-import org.sonatype.appcontext.source.keys.DefaultSystemEnvironmentKeyTransformer;
+import org.sonatype.appcontext.source.keys.ConfigurableSystemEnvironmentKeyTransformer;
 import org.sonatype.appcontext.source.keys.KeyTransformer;
 import org.sonatype.appcontext.source.keys.KeyTransformingEntrySource;
 import org.sonatype.appcontext.source.keys.NoopKeyTransformer;
@@ -37,11 +37,11 @@ public final class Sources
         for ( String alias : aliases )
         {
             result.add( getTargetedEntrySource( new SystemEnvironmentEntrySource(),
-                new DefaultSystemEnvironmentKeyTransformer(), alias + "." ) );
+                new ConfigurableSystemEnvironmentKeyTransformer( '-' ), alias + "-" ) );
         }
 
         result.add( getTargetedEntrySource( new SystemEnvironmentEntrySource(),
-            new DefaultSystemEnvironmentKeyTransformer(), id + "." ) );
+            new ConfigurableSystemEnvironmentKeyTransformer( '-' ), id + "-" ) );
 
         for ( String alias : aliases )
         {
