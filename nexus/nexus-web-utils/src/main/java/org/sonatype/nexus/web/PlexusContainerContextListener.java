@@ -185,28 +185,27 @@ public class PlexusContainerContextListener
         // for historical reasons, honor the "plexus" prefix too
         AppContextRequest request = Factory.getDefaultRequest( "nexus", null, Arrays.asList( "plexus" ) );
 
-        // set basedir
-        request.getSources().add( new StaticEntrySource( "bundleBasedir", basedirFile.getAbsolutePath() ) );
+        // if in bundle only
+        if ( parent != null && basedirFile != null )
+        {
+            nexusPropertiesFile = new File( basedirFile, "conf/nexus.properties" );
+
+            // add the user overridable properties file, but it might not be present
+            request.getSources().add( 0, new PropertiesFileEntrySource( nexusPropertiesFile, false ) );
+        }
+
+        // add the "defaults" properties files, must be present
+        request.getSources().add( 0, new PropertiesFileEntrySource( nexusDefaultPropertiesFile, true ) );
 
         // add parent if found
         if ( parent != null )
         {
             // for now, once we resolve classloading issues....
-            request.getSources().add( new MapEntrySource( "quasiParent", parent ) );
+            request.getSources().add( 0, new MapEntrySource( "quasiParent", parent ) );
         }
 
-        // add the "defaults" properties files, must be present
-        request.getSources().add( new PropertiesFileEntrySource( nexusDefaultPropertiesFile, true ) );
-
-        // if in bundle only
-        if ( parent != null && basedirFile != null )
-        {
-            nexusPropertiesFile =
-                new File( basedirFile, "conf/nexus.properties" );
-
-            // add the user overridable properties file, but it might not be present
-            request.getSources().add( new PropertiesFileEntrySource( nexusPropertiesFile, false ) );
-        }
+        // set basedir as LAST, no overrides for it
+        request.getSources().add( new StaticEntrySource( "bundleBasedir", basedirFile.getAbsolutePath() ) );
 
         return Factory.create( request );
     }
