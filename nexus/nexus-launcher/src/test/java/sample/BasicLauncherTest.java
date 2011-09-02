@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.sonatype.nexus.bundle.NexusBundleConfiguration;
+import org.sonatype.nexus.bundle.launcher.ManagedNexusBundle;
 import org.sonatype.nexus.test.ConfigurableInjectedTest;
 
 /**
@@ -41,8 +42,9 @@ public class BasicLauncherTest extends ConfigurableInjectedTest{
         String nexusOSSArtifactCoords = "org.sonatype.nexus:nexus-oss-webapp:tar.gz:bundle:1.9.3-SNAPSHOT";
         NexusBundleConfiguration config = new NexusBundleConfiguration.Builder(nexusOSSArtifactCoords, "mybundle").build();
         config = nexusBuilder.setBundleId("nexus1").build();
-        config = nexusBuilder.setBundleId("nexus2").build();
         assertThat(config.getBundleArtifactCoordinates(), is("org.sonatype.nexus:nexus-oss-webapp:tar.gz:bundle:1.9.3-SNAPSHOT"));
+        nexusBuilder.addPluginCoordinates("org.sonatype.nexus.plugins:nexus-groovy-console-plugin:zip:bundle:1.9.3-SNAPSHOT");
+        config = nexusBuilder.setBundleId("nexus2").build();
         //ManagedNexusBundle bundle = nexusBundleLauncher.start(config);
         //nexusBundleLauncher.stop(bundle);
     }

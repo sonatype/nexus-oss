@@ -1,6 +1,11 @@
 package org.sonatype.nexus.bundle.launcher.util;
 
+import com.google.common.base.Preconditions;
 import java.io.File;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -67,8 +72,17 @@ public class AetherArtifactResolver
     }
 
 
+    @Override
     public ResolvedArtifact resolveArtifact( final String coordinates )
     {
+        Preconditions.checkNotNull(coordinates);
+        List<String> coords = new ArrayList<String>();
+        coords.add(coordinates);
+        return resolveArtifacts(coords).iterator().next();
+    }
+
+    @Override
+    public List<ResolvedArtifact> resolveArtifacts(Collection<String> coordinates) {
         DefaultServiceLocator locator = new DefaultServiceLocator();
 
         locator.addService( RepositoryConnectorFactory.class, AsyncRepositoryConnectorFactory.class );
@@ -83,18 +97,24 @@ public class AetherArtifactResolver
 
         RemoteRepository remoteRepo = new RemoteRepository( repoId, repoType, repoUrl );
 
-        ArtifactRequest request = new ArtifactRequest();
-        request.setArtifact( new DefaultArtifact( coordinates ) );
-        request.addRepository( remoteRepo );
-        try
-        {
-            ArtifactResult result = repoSystem.resolveArtifact( repoSession, request );
-            return new DefaultResolvedArtifact(result.getArtifact());
+        List<ResolvedArtifact> artifacts = new ArrayList<ResolvedArtifact>();
+        for (String coordinate : coordinates) {
+
+            ArtifactRequest request = new ArtifactRequest();
+            request.setArtifact( new DefaultArtifact( coordinate ) );
+            request.addRepository( remoteRepo );
+            try
+            {
+                ArtifactResult result = repoSystem.resolveArtifact( repoSession, request );
+                artifacts.add(new DefaultResolvedArtifact(result.getArtifact()));
+            }
+            catch ( ArtifactResolutionException e )
+            {
+                throw new IllegalArgumentException( e );
+            }
         }
-        catch ( ArtifactResolutionException e )
-        {
-            throw new IllegalArgumentException( e );
-        }
+        return artifacts;
+
     }
 
 

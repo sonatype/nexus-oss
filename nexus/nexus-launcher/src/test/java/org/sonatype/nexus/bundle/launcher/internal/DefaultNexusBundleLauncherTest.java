@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sonatype.nexus.bundle.launcher.util.ArtifactResolver;
+import org.sonatype.nexus.bundle.launcher.util.NexusLauncherUtils;
 import org.sonatype.nexus.bundle.launcher.util.PortReservationService;
 
 /**
@@ -27,6 +28,9 @@ public class DefaultNexusBundleLauncherTest {
     private AntHelper ant;
 
     @Mock
+    private NexusLauncherUtils bundleUtils;
+
+    @Mock
     private File serviceWorkDir;
 
     @Mock
@@ -40,29 +44,12 @@ public class DefaultNexusBundleLauncherTest {
 
 
     private DefaultNexusBundleLauncher getLauncher(){
-        return new DefaultNexusBundleLauncher(artifactResolver, portService, ant, serviceWorkDir, overlaysSourceDir);
+        return new DefaultNexusBundleLauncher(artifactResolver, portService, ant, bundleUtils, serviceWorkDir, overlaysSourceDir);
     }
 
-    @Test(expected=NullPointerException.class)
-    public void extractBundleArg1Null() {
-        assertThat(serviceWorkDir, notNullValue());
-        assertThat(bundleExcludes, notNullValue());
-        getLauncher().extractBundle(null, serviceWorkDir, bundleExcludes);
+    @Test
+    public void nothing(){
+        
     }
-
-    @Test(expected=NullPointerException.class)
-    public void extractBundleArg2Null() {
-        assertThat(fakeBundle, notNullValue());
-        assertThat(bundleExcludes, notNullValue());
-        getLauncher().extractBundle(fakeBundle, null, bundleExcludes);
-    }
-
-    @Test(expected=NullPointerException.class)
-    public void extractBundleArg3Null() {
-        assertThat(fakeBundle, notNullValue());
-        assertThat(serviceWorkDir, notNullValue());
-        getLauncher().extractBundle(fakeBundle, serviceWorkDir, null);
-    }
-
 
 }

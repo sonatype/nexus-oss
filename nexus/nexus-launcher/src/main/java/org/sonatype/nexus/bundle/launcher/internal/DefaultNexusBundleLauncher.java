@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
@@ -22,6 +23,8 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.Expand;
 import org.apache.tools.ant.taskdefs.Untar;
 import org.apache.tools.ant.types.EnumeratedAttribute;
+import org.apache.tools.ant.types.FileSet;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +36,7 @@ import org.sonatype.nexus.bundle.launcher.NexusBundleService;
 import org.sonatype.nexus.bundle.launcher.NexusPort;
 import org.sonatype.nexus.bundle.launcher.util.ArtifactResolver;
 import org.sonatype.nexus.bundle.launcher.jsw.JSWExecSupport;
+import org.sonatype.nexus.bundle.launcher.util.NexusLauncherUtils;
 import org.sonatype.nexus.bundle.launcher.util.PortReservationService;
 import org.sonatype.nexus.bundle.launcher.util.ResolvedArtifact;
 
@@ -58,6 +62,11 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
     private final AntHelper ant;
 
     /**
+     * Helper for common tasks
+     */
+    private final NexusLauncherUtils bundleUtils;
+
+    /**
      * service for reserving free ports used by bundles
      */
     private final PortReservationService portReservationService;
@@ -73,17 +82,20 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
     private final Map<String,ManagedNexusBundle> managedBundles = new ConcurrentHashMap<String, ManagedNexusBundle>();
 
     @Inject
-    public DefaultNexusBundleLauncher(final ArtifactResolver artifactResolver, final PortReservationService portReservationService, final AntHelper ant, @Named("${NexusBundleService.serviceWorkDirectory:-target/nbs}") final File serviceWorkDirectory, @Named("${NexusBundleService.overlaySourceDirectory:-target/overlays}") final File overlaysSourceDirectory) {
+    public DefaultNexusBundleLauncher(final ArtifactResolver artifactResolver, final PortReservationService portReservationService, final AntHelper ant, final NexusLauncherUtils bundleUtils, @Named("${NexusBundleService.serviceWorkDirectory:-target/nbs}") final File serviceWorkDirectory, @Named("${NexusBundleService.overlaySourceDirectory:-target/overlays}") final File overlaysSourceDirectory) {
         Preconditions.checkNotNull(artifactResolver);
         Preconditions.checkNotNull(portReservationService);
         Preconditions.checkNotNull(serviceWorkDirectory);
         Preconditions.checkNotNull(ant);
+        Preconditions.checkNotNull(bundleUtils);
+
         Preconditions.checkNotNull(overlaysSourceDirectory);
         // required
         this.artifactResolver = artifactResolver;
         this.portReservationService = portReservationService;
         this.serviceWorkDirectory = serviceWorkDirectory;
         this.ant = ant;
+        this.bundleUtils = bundleUtils;
         this.overlaysSourceDirectory = overlaysSourceDirectory;
 
         logger.debug(serviceWorkDirectory.getAbsolutePath());
@@ -102,43 +114,47 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
     // ================== NexusBundleLauncher =========================
     public synchronized ManagedNexusBundle start(final NexusBundleConfiguration bundleConfiguration) {
-
-        final ResolvedArtifact artifact = resolveArtifact(bundleConfiguration.getBundleArtifactCoordinates());
-        final File bundleFile = resolveArtifactFile(artifact);
-        final File extractionDir = computeExtractionDir(bundleConfiguration.getBundleId());
-        final File appDir = computeNexusAppDir(extractionDir, artifact);
-
-        extractBundle(bundleFile, extractionDir, bundleConfiguration.getNexusBundleExcludes());
-        configureExtractedBundlePermissions(extractionDir);
-
-        // if ( bundleConfiguration.isConfigureOptionalPlugins())
-        //
-        //     configureOptionalPlugins(extractionDir)
-        // }
-
-        // final List<File> pluginFiles = resolveAdditionalPlugins(bundleConfiguration.getAdditionalPluginCoordinates())
-        // configureAdditionalPlugins(pluginFiles);
-
-        // final File bundleOverlaysSourceDirectory = computeBundleOverlaysSourceDirectory(bundleConfiguration);
-        // installOverlays(extractionDir, bundleOverlaysSourceDirectory )
-
-        final File binDir = computeNexusBinDir(extractionDir, artifact);
-
-        EnumMap<NexusPort,Integer> portMap = new EnumMap<NexusPort,Integer>(NexusPort.class);
-        portMap.put(NexusPort.HTTP, this.portReservationService.reservePort());
         try {
-            modifyJettyConfiguration(appDir, portMap.get(NexusPort.HTTP));
+            final ResolvedArtifact artifact = resolveArtifact(bundleConfiguration.getBundleArtifactCoordinates());
+            final File bundleFile = resolveArtifactFile(artifact);
+            final File extractionDir = computeExtractionDir(bundleConfiguration.getBundleId());
+            final File appDir = computeNexusAppDir(extractionDir, artifact);
+
+            this.bundleUtils.extractNexusBundle(bundleFile, extractionDir, bundleConfiguration.getNexusBundleExcludes());
+
+            // if ( bundleConfiguration.isConfigureOptionalPlugins())
+            //
+            //     configureOptionalPlugins(extractionDir)
+            // }
+
+            final List<ResolvedArtifact> pluginArtifacts = artifactResolver.resolveArtifacts(bundleConfiguration.getPluginCoordinates());;
+            installPlugins(appDir, pluginArtifacts);
+
+            // final File bundleOverlaysSourceDirectory = computeBundleOverlaysSourceDirectory(bundleConfiguration);
+            // installOverlays(extractionDir, bundleOverlaysSourceDirectory )
+
+            configureExtractedBundlePermissions(extractionDir);
+
+            final File binDir = computeNexusBinDir(extractionDir, artifact);
+
+            EnumMap<NexusPort,Integer> portMap = new EnumMap<NexusPort,Integer>(NexusPort.class);
+            portMap.put(NexusPort.HTTP, this.portReservationService.reservePort());
+            try {
+                modifyJettyConfiguration(appDir, portMap.get(NexusPort.HTTP));
+            } catch (IOException ex) {
+                throw new NexusBundleLauncherException("Problem modifying jetty config", ex);
+            }
+
+            startBundle(binDir, "http://127.0.0.1:" + portMap.get(NexusPort.HTTP) + NEXUS_CONTEXT);
+
+            // register
+            File workDir = buildFilePath(extractionDir, "sonatype-work", "nexus");
+            DefaultManagedNexusBundle managedBundle = new DefaultManagedNexusBundle(bundleConfiguration.getBundleId(),artifact, "127.0.0.1", portMap, NEXUS_CONTEXT, workDir, appDir);
+            managedBundles.put(bundleConfiguration.getBundleId(), managedBundle);
+            return managedBundle;
         } catch (IOException ex) {
-            throw new NexusBundleLauncherException("Problem modifying jetty config", ex);
+            throw new NexusBundleLauncherException("Problem starting bundle", ex);
         }
-
-        startBundle(binDir, "http://127.0.0.1:" + portMap.get(NexusPort.HTTP) + NEXUS_CONTEXT);
-
-        // register
-        File workDir = buildFilePath(extractionDir, "sonatype-work", "nexus");
-        DefaultManagedNexusBundle managedBundle = new DefaultManagedNexusBundle(bundleConfiguration.getBundleId(),artifact, "127.0.0.1", portMap, NEXUS_CONTEXT, workDir, appDir);
-        managedBundles.put(bundleConfiguration.getBundleId(), managedBundle);
-        return managedBundle;
     }
 
 
@@ -183,13 +199,20 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
         return artifactResolver.resolveArtifact(artifactCoordinates);
     }
 
+    /**
+     * Get an artifact file from a Resolved Artifact, performing some sanity checks in the process.
+     * @param artifact the artifact to get the file for
+     * @return the File, never null
+     * @throws NexusBundleLauncherException if a valid file could not be located.
+     */
     protected File resolveArtifactFile(final ResolvedArtifact artifact) {
+        Preconditions.checkNotNull(artifact);
         File file  = artifact.getFile();
         if (file == null) {
-            throw new IllegalStateException("Artifact " + artifact + " is not resolved to a file.");
+            throw new NexusBundleLauncherException("Artifact " + artifact + " is not resolved to a file.");
         }
         if (!file.isFile()) {
-            throw new IllegalStateException("Artifact " + artifact + " is not a file. (" + file.getAbsolutePath() + ")");
+            throw new NexusBundleLauncherException("Artifact " + artifact + " is not a file. (" + file.getAbsolutePath() + ")");
         }
         return file;
     }
@@ -219,6 +242,7 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
      * This is in case the java extraction of the bundle loses permissions somehow.
      */
     protected void configureExtractedBundlePermissions(final File extractedBundleDir){
+        Preconditions.checkNotNull(extractedBundleDir);
         try {
             ant.chmod(extractedBundleDir, "nexus-*/bin/**", "u+x");
         } catch (BuildException e) {
@@ -226,6 +250,12 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
         }
     }
 
+    /**
+     * Configure Jetty in the bundle via its properties, prior to managing the bundle
+     * @param nexusAppDir
+     * @param httpPort the http port jetty will listen on
+     * @throws IOException
+     */
     protected void modifyJettyConfiguration( final File nexusAppDir, final int httpPort )
         throws IOException
     {
@@ -250,51 +280,6 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
     }
 
-    /**
-     * Extract the specified bundle file to a directory, excluding any provided patterns.
-     * @param bundleFile the bundle file to extractUsingPlexus
-     * @param extractionDir the directory to extractUsingPlexus to
-     * @param nexusBundleExcludes the exclusion patterns to be applied during extraction
-     */
-    protected void extractBundle(final File sourceFile, final File toDir, final List<String> excludes) {
-        Preconditions.checkNotNull(sourceFile);
-        Preconditions.checkNotNull(toDir);
-        Preconditions.checkNotNull(excludes);
-
-        String fileName = sourceFile.getName();
-        ant.mkdir(toDir);
-
-        if (fileName.endsWith(".zip")) {
-            //unArchiver = zipUnArchiverProvider.get();
-            try {
-
-                final Expand unzip = ant.createTask(Expand.class);
-                unzip.setDest(toDir);
-                unzip.setSrc(sourceFile);
-                unzip.execute();
-
-            } catch (BuildException e) {
-                throw new NexusBundleLauncherException("Unable to unarchive " + sourceFile + " to " + toDir, e);
-            }
-
-        } else if (fileName.endsWith(".tar.gz")) {
-            //throw new NexusBundleLauncherException("Archive type not supported yet " + fileName);
-            try {
-                final Untar untar = ant.createTask(Untar.class);
-                untar.setDest(toDir);
-                untar.setSrc(sourceFile);
-                untar.setCompression(((Untar.UntarCompressionMethod)EnumeratedAttribute.getInstance(Untar.UntarCompressionMethod.class, "gzip")));
-                untar.execute();
-
-            } catch (BuildException e) {
-                throw new NexusBundleLauncherException("Unable to unarchive " + sourceFile + " to " + toDir, e);
-            }
-
-        } else {
-            throw new NexusBundleLauncherException("Archive type could not be determined from name: " + fileName);
-        }
-
-    }
 
     protected void startBundle(final File binDir, final String nexusBaseURL) {
         final JSWExecSupport jswExec = new JSWExecSupport(binDir, "nexus", ant);
@@ -323,6 +308,23 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
             path.append(pathComponent).append(File.separatorChar);
         }
         return new File(parent, path.toString());
+    }
+
+    protected List<ResolvedArtifact> resolveArtifacts(List<String> artifactCoordinates) {
+        List<ResolvedArtifact> pluginFiles = new ArrayList<ResolvedArtifact>();
+        for (String coord : artifactCoordinates) {
+            pluginFiles.add(resolveArtifact(coord));
+        }
+        return pluginFiles;
+    }
+
+    protected void installPlugins(final File nexusAppDir, final List<ResolvedArtifact> pluginArtifacts) throws IOException{
+        File pluginRepo = new File( nexusAppDir, "nexus/WEB-INF/plugin-repository" );
+        for (ResolvedArtifact pluginArtifact : pluginArtifacts) {
+            final File pluginFile = resolveArtifactFile(pluginArtifact);
+            // standard nexus plugin bundle is a bundle.zip
+            this.bundleUtils.extractNexusPlugin( pluginFile, pluginRepo );
+        }
     }
 
 
