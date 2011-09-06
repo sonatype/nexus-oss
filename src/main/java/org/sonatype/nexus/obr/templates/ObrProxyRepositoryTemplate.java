@@ -19,18 +19,10 @@
 package org.sonatype.nexus.obr.templates;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.configuration.model.CRemoteStorage;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
-import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
-import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.obr.ObrContentClass;
 import org.sonatype.nexus.obr.proxy.ObrProxyRepository;
 import org.sonatype.nexus.obr.proxy.ObrRepository;
 import org.sonatype.nexus.obr.proxy.ObrRepositoryConfiguration;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
-import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 
 public class ObrProxyRepositoryTemplate
     extends AbstractRepositoryTemplate
@@ -43,7 +35,8 @@ public class ObrProxyRepositoryTemplate
 
     public ObrRepositoryConfiguration getExternalConfiguration( final boolean forWrite )
     {
-        return (ObrRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration().getConfiguration( forWrite );
+        return (ObrRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration().getConfiguration(
+            forWrite );
     }
 
     @Override
@@ -58,8 +51,9 @@ public class ObrProxyRepositoryTemplate
         repo.setProviderHint( ObrRepository.ROLE_HINT );
 
         repo.setRemoteStorage( new CRemoteStorage() );
-        repo.getRemoteStorage().setProvider( getTemplateProvider().getRemoteProviderHintFactory().getDefaultHttpRoleHint() );
-        repo.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root" );
+        repo.getRemoteStorage().setProvider(
+            getTemplateProvider().getRemoteProviderHintFactory().getDefaultHttpRoleHint() );
+        repo.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root/obr.xml" );
 
         final Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
         repo.setExternalConfiguration( ex );
@@ -72,17 +66,14 @@ public class ObrProxyRepositoryTemplate
         repo.setNotFoundCacheTTL( 1440 );
 
         final CRepositoryCoreConfiguration result =
-            new CRepositoryCoreConfiguration(
-                                              getTemplateProvider().getApplicationConfiguration(),
-                                              repo,
-                                              new CRepositoryExternalConfigurationHolderFactory<ObrRepositoryConfiguration>()
-                                              {
-                                                  public ObrRepositoryConfiguration createExternalConfigurationHolder( final CRepository config )
-                                                  {
-                                                      return new ObrRepositoryConfiguration(
-                                                                                             (Xpp3Dom) config.getExternalConfiguration() );
-                                                  }
-                                              } );
+            new CRepositoryCoreConfiguration( getTemplateProvider().getApplicationConfiguration(), repo,
+                new CRepositoryExternalConfigurationHolderFactory<ObrRepositoryConfiguration>()
+                {
+                    public ObrRepositoryConfiguration createExternalConfigurationHolder( final CRepository config )
+                    {
+                        return new ObrRepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
+                    }
+                } );
 
         return result;
     }
