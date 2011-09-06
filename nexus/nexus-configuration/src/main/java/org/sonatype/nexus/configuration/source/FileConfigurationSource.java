@@ -77,13 +77,13 @@ public class FileConfigurationSource
 
     @Requirement
     private ApplicationEventMulticaster eventMulticaster;
-    
+
     @Requirement
     private ConfigurationHelper configHelper;
 
     /** Flag to mark defaulted config */
     private boolean configurationDefaulted;
-    
+
     /**
      * Gets the configuration validator.
      * 
@@ -131,8 +131,7 @@ public class FileConfigurationSource
     }
 
     public Configuration loadConfiguration()
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         // propagate call and fill in defaults too
         nexusDefaults.loadConfiguration();
@@ -161,7 +160,7 @@ public class FileConfigurationSource
 
         try
         {
-        loadConfiguration( getConfigurationFile() );
+            loadConfiguration( getConfigurationFile() );
         }
         catch ( ConfigurationException e )
         {
@@ -170,17 +169,18 @@ public class FileConfigurationSource
             upgradeConfiguration( getConfigurationFile() );
 
             loadConfiguration( getConfigurationFile() );
-            
+
             // if the configuration is upgraded we need to reload the security.
             // it would be great if this was put somewhere else, but I am out of ideas.
             // the problem is the default security was already loaded with the security-system component was loaded
             // so it has the defaults, the upgrade from 1.0.8 -> 1.4 moves security out of the nexus.xml
-            // and we cannot use the 'correct' way of updating the info, because that would cause an infinit loop loading the nexus.xml
+            // and we cannot use the 'correct' way of updating the info, because that would cause an infinit loop
+            // loading the nexus.xml
             this.eventMulticaster.notifyEventListeners( new SecurityConfigurationChangedEvent( null ) );
         }
 
-        ValidationResponse vResponse = getConfigurationValidator().validateModel(
-            new ValidationRequest( getConfiguration() ) );
+        ValidationResponse vResponse =
+            getConfigurationValidator().validateModel( new ValidationRequest( getConfiguration() ) );
 
         setValidationResponse( vResponse );
 
@@ -220,8 +220,7 @@ public class FileConfigurationSource
     }
 
     protected void upgradeConfiguration( File file )
-        throws IOException,
-            ConfigurationException
+        throws IOException, ConfigurationException
     {
         getLogger().info( "Trying to upgrade the configuration file " + file.getAbsolutePath() );
 
@@ -252,8 +251,7 @@ public class FileConfigurationSource
      * @throws IOException Signals that an I/O exception has occurred.
      */
     private void loadConfiguration( File file )
-        throws IOException,
-            ConfigurationException
+        throws IOException, ConfigurationException
     {
         getLogger().info( "Loading Nexus configuration from " + file.getAbsolutePath() );
 
@@ -263,12 +261,12 @@ public class FileConfigurationSource
             fis = new FileInputStream( file );
 
             loadConfiguration( fis );
-            
+
             // seems a bit dirty, but the config might need to be upgraded.
-            if( this.getConfiguration() != null )
+            if ( this.getConfiguration() != null )
             {
                 // decrypt the passwords
-                configHelper.encryptDecryptPasswords( this.getConfiguration(), false );
+                setConfiguration( configHelper.encryptDecryptPasswords( getConfiguration(), false ) );
             }
         }
         finally
@@ -299,12 +297,13 @@ public class FileConfigurationSource
             // bad bad bad
             if ( !file.getParentFile().exists() && !file.getParentFile().mkdirs() )
             {
-                String message = "\r\n******************************************************************************\r\n"
-                    + "* Could not create configuration file [ "
-                    + file.toString()
-                    + "]!!!! *\r\n"
-                    + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
-                    + "******************************************************************************";
+                String message =
+                    "\r\n******************************************************************************\r\n"
+                        + "* Could not create configuration file [ "
+                        + file.toString()
+                        + "]!!!! *\r\n"
+                        + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
+                        + "******************************************************************************";
 
                 getLogger().fatalError( message );
             }
@@ -316,10 +315,7 @@ public class FileConfigurationSource
             }
 
             // Clone the conf so we can encrypt the passwords
-            Configuration copyOfConfig = configHelper.clone( this.getConfiguration() );
-
-            // encrypt the passwords
-            configHelper.encryptDecryptPasswords( copyOfConfig, true );
+            Configuration copyOfConfig = configHelper.encryptDecryptPasswords( getConfiguration(), true );
 
             fos = new FileOutputStream( file );
 

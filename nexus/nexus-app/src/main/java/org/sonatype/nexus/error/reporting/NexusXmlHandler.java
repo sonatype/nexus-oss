@@ -33,15 +33,13 @@ public class NexusXmlHandler
     public File getFile( ConfigurationHelper configHelper, NexusConfiguration nexusConfig )
         throws IOException
     {
-        Configuration configuration = configHelper.clone( nexusConfig.getConfigurationModel() );
+        final Configuration configuration = configHelper.maskPasswords( nexusConfig.getConfigurationModel() );
         
         // No config ?
         if ( configuration == null )
         {
             return null;
         }
-        
-        configHelper.maskPasswords( configuration );
         
         NexusConfigurationXpp3Writer writer = new NexusConfigurationXpp3Writer();
         FileWriter fWriter = null;

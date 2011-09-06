@@ -20,7 +20,22 @@ package org.sonatype.nexus.configuration.model;
 
 public interface ConfigurationHelper
 {
-    Configuration clone( Configuration config );
-    void encryptDecryptPasswords( Configuration config, boolean encrypt );
-    void maskPasswords( Configuration config );
+    /**
+     * Returns a copy of passed in configuration that has password fields encrypted/decrypted. If {@code null} is passed
+     * in, the return value is {@code null} also.
+     * 
+     * @param config
+     * @param encrypt
+     * @return
+     */
+    Configuration encryptDecryptPasswords( Configuration config, boolean encrypt );
+
+    /**
+     * Returns a copy of passed in configuration with removed/sanitized sensitive information. If {@code null} is passed
+     * in, the return value is {@code null} also.
+     * 
+     * @param config
+     * @return
+     */
+    Configuration maskPasswords( Configuration config );
 }
