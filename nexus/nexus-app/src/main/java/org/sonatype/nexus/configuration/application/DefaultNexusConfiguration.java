@@ -168,7 +168,7 @@ public class DefaultNexusConfiguration
         loadConfiguration( false );
     }
 
-    public void loadConfiguration( boolean force )
+    public synchronized void loadConfiguration( boolean force )
         throws ConfigurationException, IOException
     {
         if ( force || configurationSource.getConfiguration() == null )
@@ -226,7 +226,7 @@ public class DefaultNexusConfiguration
         }
     }
 
-    public boolean applyConfiguration()
+    public synchronized boolean applyConfiguration()
     {
         getLogger().info( "Applying Nexus Configuration..." );
 
@@ -705,7 +705,7 @@ public class DefaultNexusConfiguration
         }
     }
 
-    public Repository createRepository( CRepository settings )
+    public synchronized Repository createRepository( CRepository settings )
         throws ConfigurationException, IOException
     {
         validateRepository( settings, true );
@@ -722,7 +722,7 @@ public class DefaultNexusConfiguration
         return repository;
     }
 
-    public void deleteRepository( String id )
+    public synchronized void deleteRepository( String id )
         throws NoSuchRepositoryException, IOException, ConfigurationException
     {
         Repository repository = repositoryRegistry.getRepository( id );
