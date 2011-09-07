@@ -19,10 +19,18 @@
 package org.sonatype.nexus.obr.templates;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.configuration.model.CRemoteStorage;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
+import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.obr.ObrContentClass;
 import org.sonatype.nexus.obr.proxy.ObrProxyRepository;
 import org.sonatype.nexus.obr.proxy.ObrRepository;
 import org.sonatype.nexus.obr.proxy.ObrRepositoryConfiguration;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
+import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 
 public class ObrProxyRepositoryTemplate
     extends AbstractRepositoryTemplate
