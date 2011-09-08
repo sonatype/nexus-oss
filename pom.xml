@@ -98,6 +98,8 @@
               <exclude>**/Ext.ux.form.LovCombo.css</exclude>
               <!-- Apache licensed, see profile -->
               <exclude>**/nexus-migration-plugin/**</exclude>
+              <!-- grid makes this directory -->
+              <exclude>.maven/**</exclude>
             </excludes>
             <mapping>
               <vm>XML_STYLE</vm>
