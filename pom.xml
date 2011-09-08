@@ -100,6 +100,8 @@
               <exclude>**/nexus-migration-plugin/**</exclude>
               <!-- grid makes this directory -->
               <exclude>.maven/**</exclude>
+              <!-- temp file created by maven-shade-plugin in basedir, deleted on maven jvm exit but possibly still around during license check -->
+              <exclude>**/dependency-reduced-pom.xml</exclude>
             </excludes>
             <mapping>
               <vm>XML_STYLE</vm>
