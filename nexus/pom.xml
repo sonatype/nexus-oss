@@ -1711,6 +1711,45 @@
       </build>
     </profile>
 
+    <!-- grid quick deploy 20 to 25 mins avoiding ITs -->
+    <profile>
+      <id>grid-deploy</id>
+      <properties>
+        <it.test>void</it.test>
+        <invoker.skip>true</invoker.skip>
+        <test-env.skip>true</test-env.skip>
+      </properties>
+    </profile>
+
+     <!-- pre code push profile to be run by a developer before push to scm, eventually the default profile without a profile -->
+    <profile>
+      <id>prepush</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <!-- FIXME only run a select group of unit tests possibly to speeed the build -->
+        <it.test>void</it.test>
+        <failIfNoTests>false</failIfNoTests>
+        <invoker.skip>true</invoker.skip>
+        <!-- <source.skip>true</source.skip>
+        <enunciate.skip>true</enunciate.skip> -->
+        <test-env.skip>true</test-env.skip>
+      </properties>
+    </profile>
+
+    <!-- dummy profile for activating integration tests -->
+    <profile>
+      <id>it</id>
+      <activation>
+        <property>
+          <name>it</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <!-- FIXME, make running cargo ITs part of this profile? -->
+    </profile>
+
     <!-- Nexus quick build profiles: effects of -Pquick: tests will be compiled but not run, n-t-e-p will assemble the test environments effects of -Dquick: tests will not be compiled,
       n-t-e-p and other test-related plugins will be skipped entirely -->
     <profile>
@@ -1730,6 +1769,7 @@
         <tattletale.skip>true</tattletale.skip>
         <test-env.skip>true</test-env.skip>
         <license.skip>true</license.skip>
+        <!-- FIXME there are still some dependency unpacking going on that could be removed somehow -->
       </properties>
       <build>
         <plugins>
@@ -1742,24 +1782,6 @@
           </plugin>
         </plugins>
       </build>
-    </profile>
-    <!-- sanity profile to be run by a developer before push to scm, eventually the default profile -->
-    <profile>
-      <id>prepush</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <!-- <test>void</test> -->
-        <it.test>void</it.test>
-        <failIfNoTests>false</failIfNoTests>
-        <invoker.skip>true</invoker.skip>
-        <source.skip>true</source.skip>
-        <enunciate.skip>true</enunciate.skip>
-        <!-- <tattletale.skip>true</tattletale.skip> -->
-        <test-env.skip>true</test-env.skip>
-        <!-- <license.skip>true</license.skip> -->
-      </properties>
     </profile>
 
     <profile>
@@ -1795,6 +1817,7 @@
         </pluginManagement>
       </build>
     </profile>
+
     <profile>
       <id>m2e</id>
       <activation>
