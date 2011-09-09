@@ -41,6 +41,11 @@ public enum ProxyMode
         return ALLOW.equals( this ) || BLOCKED_AUTO.equals( this );
     }
 
+    public boolean shouldAutoBlock()
+    {
+        return ALLOW.equals( this );
+    }
+
     public boolean shouldAutoUnblock()
     {
         return BLOCKED_AUTO.equals( this );

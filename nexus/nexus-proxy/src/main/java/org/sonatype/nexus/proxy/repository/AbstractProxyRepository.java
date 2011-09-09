@@ -387,12 +387,17 @@ public abstract class AbstractProxyRepository
             // and was !shouldProxy() and the new is shouldProxy()
             if ( proxyMode != null && proxyMode.shouldProxy() && !oldProxyMode.shouldProxy() )
             {
-                if ( getLogger().isDebugEnabled() )
+                // NEXUS-4410: do this only when we are going BLOCKED_MANUAL -> ALLOW transition
+                // In case of Auto unblocking, do not perform purge!
+                if ( !oldProxyMode.shouldAutoUnblock() )
                 {
-                    getLogger().debug( "We have a !shouldProxy() -> shouldProxy() transition, purging NFC" );
-                }
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug( "We have a BLOCKED_MANUAL -> ALLOW transition, purging NFC" );
+                    }
 
-                getNotFoundCache().purge();
+                    getNotFoundCache().purge();
+                }
 
                 resetRemoteStatus();
             }
@@ -427,28 +432,43 @@ public abstract class AbstractProxyRepository
      */
     protected void autoBlockProxying( Throwable cause )
     {
-        RemoteRepositoryStorage remoteStorage = getRemoteStorage();
+        // depend of proxy mode
+        ProxyMode oldProxyMode = getProxyMode();
 
-        /**
-         * Special case here to handle Amazon S3 storage. Problem is that if we do a request against a folder, a 403
-         * will always be returned, as S3 doesn't support that. So we simple check if its s3 and if so, we ignore the
-         * fact that 403 was returned (only in regards to auto-blocking, rest of system will still handle 403 response
-         * as expected)
-         */
-        try
+        if ( !oldProxyMode.shouldAutoBlock() )
         {
-            if ( remoteStorage instanceof CommonsHttpClientRemoteStorage
-                && ( (CommonsHttpClientRemoteStorage) remoteStorage ).isRemotePeerAmazonS3Storage( this )
-                && cause instanceof RemoteAccessDeniedException )
-            {
-                getLogger().debug( "Not autoblocking repository id " + getId() + "since this is Amazon S3 proxy repo" );
-                return;
-            }
+            // NEXUS-4537: Auto block only if proxy mode is ALLOW (otherwise you would override status like Manually
+            // Blocked)
+            return;
         }
-        catch ( StorageException e )
+
+        // Detect do we deal with S3 remote peer, those are not managed/autoblocked, since we have no
+        // proper means using HTTP only to detect the issue.
         {
-            // This shouldn't occur, since we are just checking the context
-            getLogger().debug( "Unable to validate if proxy repository id " + getId() + "is Amazon S3", e );
+            RemoteRepositoryStorage remoteStorage = getRemoteStorage();
+
+            /**
+             * Special case here to handle Amazon S3 storage. Problem is that if we do a request against a folder, a 403
+             * will always be returned, as S3 doesn't support that. So we simple check if its s3 and if so, we ignore
+             * the fact that 403 was returned (only in regards to auto-blocking, rest of system will still handle 403
+             * response as expected)
+             */
+            try
+            {
+                if ( remoteStorage instanceof CommonsHttpClientRemoteStorage
+                    && ( (CommonsHttpClientRemoteStorage) remoteStorage ).isRemotePeerAmazonS3Storage( this )
+                    && cause instanceof RemoteAccessDeniedException )
+                {
+                    getLogger().debug(
+                        "Not autoblocking repository id " + getId() + "since this is Amazon S3 proxy repo" );
+                    return;
+                }
+            }
+            catch ( StorageException e )
+            {
+                // This shouldn't occur, since we are just checking the context
+                getLogger().debug( "Unable to validate if proxy repository id " + getId() + "is Amazon S3", e );
+            }
         }
 
         // invalidate remote status
@@ -456,9 +476,6 @@ public abstract class AbstractProxyRepository
 
         // do we need to do anything at all?
         boolean autoBlockActive = isAutoBlockActive();
-
-        // if yes, then do it
-        ProxyMode oldProxyMode = getProxyMode();
 
         // nag only here
         if ( !ProxyMode.BLOCKED_AUTO.equals( oldProxyMode ) )
@@ -544,17 +561,15 @@ public abstract class AbstractProxyRepository
 
         ProxyMode oldProxyMode = getProxyMode();
 
-        if ( !ProxyMode.BLOCKED_AUTO.equals( oldProxyMode ) )
+        if ( oldProxyMode.shouldAutoUnblock() )
         {
-            return;
+            // log the event
+            getLogger().info(
+                "Remote peer of proxy repository \"" + getName() + "\" (id=" + getId()
+                    + ") detected as healthy, un-blocking the proxy repository (it was AutoBlocked by Nexus)." );
+
+            setProxyMode( ProxyMode.ALLOW, true, null );
         }
-
-        // log the event
-        getLogger().info(
-            "Remote peer of proxy repository \"" + getName() + "\" (id=" + getId()
-                + ") detected as healthy, un-blocking the proxy repository (it was AutoBlocked by Nexus)." );
-
-        setProxyMode( ProxyMode.ALLOW, true, null );
 
         // NEXUS-3552: Do NOT save configuration, just make it applied (see setProxyMode() how it is done)
         // try
@@ -1436,7 +1451,8 @@ public abstract class AbstractProxyRepository
 
                             // This is actually fatal error? LocalStorageException means something like IOException
                             // while writing data to disk, full disk, no perms, etc
-                            // currently, we preserve the old -- probably wrong -- behaviour: on IOException Nexus will log the error
+                            // currently, we preserve the old -- probably wrong -- behaviour: on IOException Nexus will
+                            // log the error
                             // but will respond with 404
                             continue all_urls; // retry with next url
                         }
