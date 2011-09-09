@@ -106,7 +106,7 @@ public class DefaultLSAttributeStorage
             return false;
         }
 
-        final RepositoryItemUidLock uidLock = uid.getLock();
+        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
         
         uidLock.lock( Action.delete );
 
@@ -157,7 +157,7 @@ public class DefaultLSAttributeStorage
             return null;
         }
 
-        final RepositoryItemUidLock uidLock = uid.getLock();
+        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.read );
 
@@ -198,7 +198,7 @@ public class DefaultLSAttributeStorage
 
         RepositoryItemUid origUid = item.getRepositoryItemUid();
 
-        final RepositoryItemUidLock uidLock = origUid.getLock();
+        final RepositoryItemUidLock uidLock = origUid.getAttributeLock();
 
         uidLock.lock( Action.create );
 

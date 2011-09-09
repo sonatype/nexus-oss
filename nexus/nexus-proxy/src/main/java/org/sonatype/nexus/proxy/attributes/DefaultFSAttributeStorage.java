@@ -186,7 +186,7 @@ public class DefaultFSAttributeStorage
             return false;
         }
 
-        final RepositoryItemUidLock uidLock = uid.getLock();
+        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.delete );
 
@@ -226,7 +226,7 @@ public class DefaultFSAttributeStorage
             return null;
         }
 
-        final RepositoryItemUidLock uidLock = uid.getLock();
+        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.read );
 
@@ -267,7 +267,7 @@ public class DefaultFSAttributeStorage
 
         final RepositoryItemUid origUid = item.getRepositoryItemUid();
 
-        final RepositoryItemUidLock uidLock = origUid.getLock();
+        final RepositoryItemUidLock uidLock = origUid.getAttributeLock();
 
         uidLock.lock( Action.create );
 

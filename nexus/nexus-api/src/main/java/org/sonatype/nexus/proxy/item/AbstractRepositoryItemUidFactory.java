@@ -62,10 +62,25 @@ public abstract class AbstractRepositoryItemUidFactory
         new WeakHashMap<DefaultRepositoryItemUidLock, WeakReference<DefaultRepositoryItemUidLock>>();
 
     @Override
-    public synchronized DefaultRepositoryItemUidLock createUidLock( final RepositoryItemUid uid )
+    public DefaultRepositoryItemUidLock createUidLock( final RepositoryItemUid uid )
     {
         final String key = new String( uid.getKey() );
 
+        return doCreateUidLockForKey( key );
+    }
+
+    @Override
+    public DefaultRepositoryItemUidLock createUidAttributeLock( final RepositoryItemUid uid )
+    {
+        final String key = new String( "attribute:" + uid.getKey() );
+
+        return doCreateUidLockForKey( key );
+    }
+
+    // ==
+
+    protected synchronized DefaultRepositoryItemUidLock doCreateUidLockForKey( final String key )
+    {
         final DefaultRepositoryItemUidLock newLock = new DefaultRepositoryItemUidLock( key, new SimpleLockResource() );
 
         final WeakReference<DefaultRepositoryItemUidLock> oldLockRef = locks.get( newLock );
