@@ -100,6 +100,8 @@
               <exclude>**/nexus-migration-plugin/**</exclude>
               <!-- grid makes this directory -->
               <exclude>.maven/**</exclude>
+              <!-- eclipse makes this directory -->
+              <exclude>**/.settings/**</exclude>
               <!-- temp file created by maven-shade-plugin in basedir, deleted on maven jvm exit but possibly still around during license check -->
               <exclude>**/dependency-reduced-pom.xml</exclude>
             </excludes>
@@ -111,7 +113,7 @@
             <properties>
               <year>2011</year>
             </properties>
-            <!-- this is important for muti-module project -->
+            <!-- this is important for multi-module project -->
             <aggregate>true</aggregate>
           </configuration>
           <executions>
@@ -142,6 +144,8 @@
                 </includes>
                 <excludes>
                   <exclude>**/target/**</exclude>
+	              <!-- eclipse makes this directory -->
+	              <exclude>**/.settings/**</exclude>
                 </excludes>
               </configuration>
             </execution>
