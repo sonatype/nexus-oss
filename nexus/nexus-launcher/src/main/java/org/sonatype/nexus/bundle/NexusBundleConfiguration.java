@@ -19,6 +19,10 @@
 package org.sonatype.nexus.bundle;
 
 import com.google.common.base.Preconditions;
+import org.sonatype.sisu.overlay.Overlay;
+import org.sonatype.sisu.overlay.OverlayBuilder;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -70,6 +74,10 @@ public class NexusBundleConfiguration {
         return configurePluginWebapps;
     }
 
+    public List<Overlay> getOverlays() {
+        return this.overlays;
+    }
+
 
     private String bundleId;
 
@@ -93,6 +101,8 @@ public class NexusBundleConfiguration {
 
     private List<String> nexusBundleExcludes;
 
+    private List<Overlay> overlays;
+
     /**
      * Should the bits required to license the bundle be configured?
      */
@@ -108,6 +118,7 @@ public class NexusBundleConfiguration {
         this.pluginCoordinates = builder.pluginCoordinates;
         this.configureOptionalPlugins = builder.configureOptionalPlugins;
         this.configurePluginWebapps = builder.configurePluginWebapps;
+        this.overlays = builder.overlays;
     }
 
     /**
@@ -124,6 +135,7 @@ public class NexusBundleConfiguration {
         private List<String> nexusBundleExcludes = new ArrayList<String>();
         private boolean configureOptionalPlugins = false;
         private boolean configurePluginWebapps = false;
+        private List<Overlay> overlays = new ArrayList<Overlay>();
 
         /**
          * Copy constructor using the provided builder as the provider of default values.
@@ -136,6 +148,7 @@ public class NexusBundleConfiguration {
             this.pluginCoordinates = new ArrayList<String>(builder.pluginCoordinates);
             this.configureOptionalPlugins = builder.configureOptionalPlugins;
             this.configurePluginWebapps = builder.configurePluginWebapps;
+            this.overlays = builder.overlays;
         }
 
         /**
@@ -168,7 +181,6 @@ public class NexusBundleConfiguration {
 
         /**
          * Add to the list of plugins to configure for the bundle.
-         * @param coords
          * @return The coordinates for the plugin to bundle.
          */
         public Builder addPluginCoordinates(final String... pluginCoordinate) {
@@ -208,6 +220,12 @@ public class NexusBundleConfiguration {
         public Builder setBundleId(final String bundleId) {
             Preconditions.checkNotNull(bundleId);
             this.bundleId = bundleId;
+            return this;
+        }
+
+        public Builder addOverlay(final Overlay... overlays) {
+            Preconditions.checkNotNull(overlays);
+            this.overlays.addAll(Arrays.asList(overlays));
             return this;
         }
 

@@ -52,9 +52,6 @@ public class DefaultNexusBundleLauncherTest {
     private File serviceWorkDir;
 
     @Mock
-    private File overlaysSourceDir;
-
-    @Mock
     private File fakeBundle;
 
     @Mock
@@ -62,7 +59,7 @@ public class DefaultNexusBundleLauncherTest {
 
 
     private DefaultNexusBundleLauncher getLauncher(){
-        return new DefaultNexusBundleLauncher(artifactResolver, portService, ant, bundleUtils, serviceWorkDir, overlaysSourceDir);
+        return new DefaultNexusBundleLauncher(artifactResolver, portService, ant, bundleUtils, serviceWorkDir);
     }
 
     @Test

@@ -57,6 +57,7 @@ import org.sonatype.nexus.bundle.launcher.jsw.JSWExecSupport;
 import org.sonatype.nexus.bundle.launcher.util.NexusBundleUtils;
 import org.sonatype.nexus.bundle.launcher.util.PortReservationService;
 import org.sonatype.nexus.bundle.launcher.util.ResolvedArtifact;
+import org.sonatype.sisu.overlay.Overlay;
 
 /**
  *
@@ -92,32 +93,25 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
      * Directory where the service performs it's work
      */
     private final File serviceWorkDirectory;
-    /**
-     * Root Directory where bundle overlays are looked up
-     */
-    private final File overlaysSourceDirectory;
 
     private final Map<String,ManagedNexusBundle> managedBundles = new ConcurrentHashMap<String, ManagedNexusBundle>();
 
     @Inject
-    public DefaultNexusBundleLauncher(final ArtifactResolver artifactResolver, final PortReservationService portReservationService, final AntHelper ant, final NexusBundleUtils bundleUtils, @Named("${NexusBundleService.serviceWorkDirectory:-target/nbs}") final File serviceWorkDirectory, @Named("${NexusBundleService.overlaySourceDirectory:-target/overlays}") final File overlaysSourceDirectory) {
+    public DefaultNexusBundleLauncher(final ArtifactResolver artifactResolver, final PortReservationService portReservationService, final AntHelper ant, final NexusBundleUtils bundleUtils, @Named("${NexusBundleService.serviceWorkDirectory:-target/nbs}") final File serviceWorkDirectory) {
         Preconditions.checkNotNull(artifactResolver);
         Preconditions.checkNotNull(portReservationService);
         Preconditions.checkNotNull(serviceWorkDirectory);
         Preconditions.checkNotNull(ant);
         Preconditions.checkNotNull(bundleUtils);
 
-        Preconditions.checkNotNull(overlaysSourceDirectory);
         // required
         this.artifactResolver = artifactResolver;
         this.portReservationService = portReservationService;
         this.serviceWorkDirectory = serviceWorkDirectory;
         this.ant = ant;
         this.bundleUtils = bundleUtils;
-        this.overlaysSourceDirectory = overlaysSourceDirectory;
 
         logger.debug(serviceWorkDirectory.getAbsolutePath());
-        logger.debug(overlaysSourceDirectory.getAbsolutePath());
 
         makeServiceDirectories();
 
@@ -148,9 +142,6 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
             final List<ResolvedArtifact> pluginArtifacts = artifactResolver.resolveArtifacts(bundleConfiguration.getPluginCoordinates());;
             installPlugins(appDir, pluginArtifacts);
 
-            // final File bundleOverlaysSourceDirectory = computeBundleOverlaysSourceDirectory(bundleConfiguration);
-            // installOverlays(extractionDir, bundleOverlaysSourceDirectory )
-
             configureExtractedBundlePermissions(extractionDir);
 
             final File binDir = computeNexusBinDir(extractionDir, artifact);
@@ -163,6 +154,8 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
                 throw new NexusBundleLauncherException("Problem modifying jetty config", ex);
             }
 
+            applyOverlays(bundleConfiguration, extractionDir);
+
             startBundle(binDir, "http://127.0.0.1:" + portMap.get(NexusPort.HTTP) + NEXUS_CONTEXT);
 
             // register
@@ -174,7 +167,6 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
             throw new NexusBundleLauncherException("Problem starting bundle", ex);
         }
     }
-
 
     @Override
     public ManagedNexusBundle start(NexusBundleConfiguration config, String groupName) {
@@ -345,5 +337,14 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
         }
     }
 
+    private void applyOverlays(NexusBundleConfiguration bundleConfiguration, File extractionDir) {
+        List<Overlay> overlays = bundleConfiguration.getOverlays();
+        if(overlays!=null&&overlays.size()>0)
+        {
+            for (Overlay overlay : overlays) {
+                overlay.applyTo(extractionDir);
+            }
+        }
+    }
 
 }
