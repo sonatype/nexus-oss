@@ -334,85 +334,90 @@ public abstract class AbstractProxyRepository
         {
             ProxyMode oldProxyMode = getProxyMode();
 
-            // change configuration only if we have a transition
-            if ( !oldProxyMode.equals( proxyMode ) )
+            // NEXUS-4537: apply transition constraints: BLOCKED_MANUALLY cannot be transitioned into BLOCKED_AUTO
+            if ( !( ProxyMode.BLOCKED_AUTO.equals( proxyMode ) && ProxyMode.BLOCKED_MANUAL.equals( oldProxyMode ) ) )
             {
-                // NEXUS-3552: Tricking the config framework, we are making this applied _without_ making configuration
-                // dirty
-                if ( ProxyMode.BLOCKED_AUTO.equals( proxyMode ) || ProxyMode.BLOCKED_AUTO.equals( oldProxyMode ) )
+                // change configuration only if we have a transition
+                if ( !oldProxyMode.equals( proxyMode ) )
                 {
-                    getExternalConfiguration( false ).setProxyMode( proxyMode );
-
-                    if ( isDirty() )
+                    // NEXUS-3552: Tricking the config framework, we are making this applied _without_ making
+                    // configuration
+                    // dirty
+                    if ( ProxyMode.BLOCKED_AUTO.equals( proxyMode ) || ProxyMode.BLOCKED_AUTO.equals( oldProxyMode ) )
                     {
-                        // we are dirty, then just set same value in the "changed" one too
+                        getExternalConfiguration( false ).setProxyMode( proxyMode );
+
+                        if ( isDirty() )
+                        {
+                            // we are dirty, then just set same value in the "changed" one too
+                            getExternalConfiguration( true ).setProxyMode( proxyMode );
+                        }
+                    }
+                    else
+                    {
+                        // this makes it dirty if it was not dirty yet, but this is the intention too
                         getExternalConfiguration( true ).setProxyMode( proxyMode );
+                    }
+                }
+
+                // setting the time to retain remote status, depending on proxy mode
+                // if not blocked_auto, just use default as it was the case before AutoBlock
+                if ( ProxyMode.BLOCKED_AUTO.equals( proxyMode ) )
+                {
+                    if ( !( this.remoteStatusRetainTimeSequence instanceof FibonacciNumberSequence ) )
+                    {
+                        // take the timeout * 2 as initial step
+                        long initialStep = getRemoteConnectionSettings().getConnectionTimeout() * 2L;
+
+                        // make it a fibonacci one
+                        this.remoteStatusRetainTimeSequence = new FibonacciNumberSequence( initialStep );
+
+                        // make it step one
+                        this.remoteStatusRetainTimeSequence.next();
+
+                        // ping the monitor thread
+                        if ( this.repositoryStatusCheckerThread != null )
+                        {
+                            this.repositoryStatusCheckerThread.interrupt();
+                        }
                     }
                 }
                 else
                 {
-                    // this makes it dirty if it was not dirty yet, but this is the intention too
-                    getExternalConfiguration( true ).setProxyMode( proxyMode );
+                    this.remoteStatusRetainTimeSequence = new ConstantNumberSequence( REMOTE_STATUS_RETAIN_TIME );
                 }
-            }
 
-            // setting the time to retain remote status, depending on proxy mode
-            // if not blocked_auto, just use default as it was the case before AutoBlock
-            if ( ProxyMode.BLOCKED_AUTO.equals( proxyMode ) )
-            {
-                if ( !( this.remoteStatusRetainTimeSequence instanceof FibonacciNumberSequence ) )
+                // if this is proxy
+                // and was !shouldProxy() and the new is shouldProxy()
+                if ( proxyMode != null && proxyMode.shouldProxy() && !oldProxyMode.shouldProxy() )
                 {
-                    // take the timeout * 2 as initial step
-                    long initialStep = getRemoteConnectionSettings().getConnectionTimeout() * 2L;
-
-                    // make it a fibonacci one
-                    this.remoteStatusRetainTimeSequence = new FibonacciNumberSequence( initialStep );
-
-                    // make it step one
-                    this.remoteStatusRetainTimeSequence.next();
-
-                    // ping the monitor thread
-                    if ( this.repositoryStatusCheckerThread != null )
+                    // NEXUS-4410: do this only when we are going BLOCKED_MANUAL -> ALLOW transition
+                    // In case of Auto unblocking, do not perform purge!
+                    if ( !oldProxyMode.shouldAutoUnblock() )
                     {
-                        this.repositoryStatusCheckerThread.interrupt();
-                    }
-                }
-            }
-            else
-            {
-                this.remoteStatusRetainTimeSequence = new ConstantNumberSequence( REMOTE_STATUS_RETAIN_TIME );
-            }
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            getLogger().debug( "We have a BLOCKED_MANUAL -> ALLOW transition, purging NFC" );
+                        }
 
-            // if this is proxy
-            // and was !shouldProxy() and the new is shouldProxy()
-            if ( proxyMode != null && proxyMode.shouldProxy() && !oldProxyMode.shouldProxy() )
-            {
-                // NEXUS-4410: do this only when we are going BLOCKED_MANUAL -> ALLOW transition
-                // In case of Auto unblocking, do not perform purge!
-                if ( !oldProxyMode.shouldAutoUnblock() )
-                {
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().debug( "We have a BLOCKED_MANUAL -> ALLOW transition, purging NFC" );
+                        getNotFoundCache().purge();
                     }
 
-                    getNotFoundCache().purge();
+                    resetRemoteStatus();
                 }
 
-                resetRemoteStatus();
-            }
-
-            if ( sendNotification )
-            {
-                // this one should be fired _always_
-                getApplicationEventMulticaster().notifyEventListeners(
-                    new RepositoryEventProxyModeSet( this, oldProxyMode, proxyMode, cause ) );
-
-                if ( !proxyMode.equals( oldProxyMode ) )
+                if ( sendNotification )
                 {
-                    // this one should be fired on _transition_ only
+                    // this one should be fired _always_
                     getApplicationEventMulticaster().notifyEventListeners(
-                        new RepositoryEventProxyModeChanged( this, oldProxyMode, proxyMode, cause ) );
+                        new RepositoryEventProxyModeSet( this, oldProxyMode, proxyMode, cause ) );
+
+                    if ( !proxyMode.equals( oldProxyMode ) )
+                    {
+                        // this one should be fired on _transition_ only
+                        getApplicationEventMulticaster().notifyEventListeners(
+                            new RepositoryEventProxyModeChanged( this, oldProxyMode, proxyMode, cause ) );
+                    }
                 }
             }
         }
@@ -434,13 +439,6 @@ public abstract class AbstractProxyRepository
     {
         // depend of proxy mode
         ProxyMode oldProxyMode = getProxyMode();
-
-        if ( !oldProxyMode.shouldAutoBlock() )
-        {
-            // NEXUS-4537: Auto block only if proxy mode is ALLOW (otherwise you would override status like Manually
-            // Blocked)
-            return;
-        }
 
         // Detect do we deal with S3 remote peer, those are not managed/autoblocked, since we have no
         // proper means using HTTP only to detect the issue.
