@@ -39,7 +39,6 @@ public class DefaultManagedNexusBundle implements ManagedNexusBundle {
     private final ResolvedArtifact artifact;
     private EnumMap<NexusPort, Integer> portMap;
 
-    @Inject
     DefaultManagedNexusBundle(final String id, final ResolvedArtifact artifact, final String host, EnumMap<NexusPort, Integer> portMap, final String contextPath, File nexusWorkDirectory, File nexusRuntimeDirectory) {
         Preconditions.checkNotNull(id);
         Preconditions.checkNotNull(artifact);
