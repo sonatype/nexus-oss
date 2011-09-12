@@ -19,31 +19,7 @@
 package org.sonatype.nexus.bundle.launcher.internal;
 
 import com.google.common.base.Preconditions;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.logging.Level;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.taskdefs.Expand;
-import org.apache.tools.ant.taskdefs.Untar;
-import org.apache.tools.ant.types.EnumeratedAttribute;
-import org.apache.tools.ant.types.FileSet;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bundle.NexusBundleConfiguration;
@@ -52,12 +28,24 @@ import org.sonatype.nexus.bundle.launcher.NexusBundleLauncher;
 import org.sonatype.nexus.bundle.launcher.NexusBundleLauncherException;
 import org.sonatype.nexus.bundle.launcher.NexusBundleService;
 import org.sonatype.nexus.bundle.launcher.NexusPort;
-import org.sonatype.nexus.bundle.launcher.util.ArtifactResolver;
 import org.sonatype.nexus.bundle.launcher.jsw.JSWExecSupport;
+import org.sonatype.nexus.bundle.launcher.util.ArtifactResolver;
 import org.sonatype.nexus.bundle.launcher.util.NexusBundleUtils;
 import org.sonatype.nexus.bundle.launcher.util.PortReservationService;
 import org.sonatype.nexus.bundle.launcher.util.ResolvedArtifact;
 import org.sonatype.sisu.overlay.Overlay;
+import org.sonatype.sisu.overlay.OverlayBuilder;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -96,8 +84,16 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
     private final Map<String,ManagedNexusBundle> managedBundles = new ConcurrentHashMap<String, ManagedNexusBundle>();
 
+    private OverlayBuilder overlayBuilder;
+
     @Inject
-    public DefaultNexusBundleLauncher(final ArtifactResolver artifactResolver, final PortReservationService portReservationService, final AntHelper ant, final NexusBundleUtils bundleUtils, @Named("${NexusBundleService.serviceWorkDirectory:-target/nbs}") final File serviceWorkDirectory) {
+    public DefaultNexusBundleLauncher(final ArtifactResolver artifactResolver,
+                                      final PortReservationService portReservationService,
+                                      final AntHelper ant,
+                                      final NexusBundleUtils bundleUtils,
+                                      @Named("${NexusBundleService.serviceWorkDirectory:-target/nbs}") final File serviceWorkDirectory,
+                                      final OverlayBuilder overlayBuilder) {
+
         Preconditions.checkNotNull(artifactResolver);
         Preconditions.checkNotNull(portReservationService);
         Preconditions.checkNotNull(serviceWorkDirectory);
@@ -110,6 +106,7 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
         this.serviceWorkDirectory = serviceWorkDirectory;
         this.ant = ant;
         this.bundleUtils = bundleUtils;
+        this.overlayBuilder = Preconditions.checkNotNull(overlayBuilder);
 
         logger.debug(serviceWorkDirectory.getAbsolutePath());
 
@@ -148,11 +145,8 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
             EnumMap<NexusPort,Integer> portMap = new EnumMap<NexusPort,Integer>(NexusPort.class);
             portMap.put(NexusPort.HTTP, this.portReservationService.reservePort());
-            try {
-                modifyJettyConfiguration(appDir, portMap.get(NexusPort.HTTP));
-            } catch (IOException ex) {
-                throw new NexusBundleLauncherException("Problem modifying jetty config", ex);
-            }
+
+            setApplicationPort(appDir, portMap.get(NexusPort.HTTP));
 
             applyOverlays(bundleConfiguration, extractionDir);
 
@@ -229,7 +223,6 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
     /**
      * Compute the extraction directory for a given bundleConfiguration
-     * @param bundleConfiguration the configuration for the bundle for which we are computing extraction dir
      * @return the computed extraction dir
      */
     protected File computeExtractionDir(final String bundleId){
@@ -266,28 +259,13 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
      * @param httpPort the http port jetty will listen on
      * @throws IOException
      */
-    protected void modifyJettyConfiguration( final File nexusAppDir, final int httpPort )
+    protected void setApplicationPort(final File nexusAppDir, final int httpPort)
         throws IOException
     {
-
-        final File jettyProperties = new File( nexusAppDir, "conf/nexus.properties" );
-
-        if ( !jettyProperties.isFile() )
-        {
-            throw new FileNotFoundException( "Jetty properties not found at " + jettyProperties.getAbsolutePath() );
-        }
-
-        Properties p = new Properties();
-        InputStream in = new FileInputStream( jettyProperties );
-        p.load( in );
-        IOUtil.close( in );
-
-        p.setProperty( "application-port", String.valueOf( httpPort ) );
-
-        OutputStream out = new FileOutputStream( jettyProperties );
-        p.store( out, "NexusStatusUtil" );
-        IOUtil.close( out );
-
+        overlayBuilder.overlayProperties()
+                .property("application-port", String.valueOf( httpPort ))
+                .overPath("conf/nexus.properties")
+                .applyTo(nexusAppDir);
     }
 
 

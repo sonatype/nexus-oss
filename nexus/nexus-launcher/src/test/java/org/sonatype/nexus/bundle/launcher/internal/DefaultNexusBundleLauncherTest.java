@@ -18,10 +18,6 @@
  */
 package org.sonatype.nexus.bundle.launcher.internal;
 
-import java.io.File;
-import java.util.List;
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -29,6 +25,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.sonatype.nexus.bundle.launcher.util.ArtifactResolver;
 import org.sonatype.nexus.bundle.launcher.util.NexusBundleUtils;
 import org.sonatype.nexus.bundle.launcher.util.PortReservationService;
+import org.sonatype.sisu.overlay.OverlayBuilder;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * This is just a dummy test for now
@@ -57,13 +57,16 @@ public class DefaultNexusBundleLauncherTest {
     @Mock
     private List<String> bundleExcludes;
 
+    @Mock
+    private OverlayBuilder overlayBuilder;
 
-    private DefaultNexusBundleLauncher getLauncher(){
-        return new DefaultNexusBundleLauncher(artifactResolver, portService, ant, bundleUtils, serviceWorkDir);
+
+    private DefaultNexusBundleLauncher getLauncher() {
+        return new DefaultNexusBundleLauncher(artifactResolver, portService, ant, bundleUtils, serviceWorkDir, overlayBuilder);
     }
 
     @Test
-    public void nothing(){
+    public void nothing() {
 
     }
 
