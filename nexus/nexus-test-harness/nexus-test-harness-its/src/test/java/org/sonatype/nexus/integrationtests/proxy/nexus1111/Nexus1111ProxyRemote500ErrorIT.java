@@ -124,9 +124,14 @@ public class Nexus1111ProxyRemote500ErrorIT
         server.start();
 
         // unblock it manually
+        // NEXUS-4410: since this issue is implemented, the lines below are not enough,
+        // since NFC will still contain the artifact do be downloaded, so we need to make it manually blocked and then allow proxy
+        // those steps DOES clean NFC
+        status.setProxyMode( ProxyMode.BLOCKED_MANUAL.name() );
+        util.updateStatus( status );
         status.setProxyMode( ProxyMode.ALLOW.name() );
         util.updateStatus( status );
-
+        
         // and now, all should go well
         downloadArtifact( "nexus1111", "artifact", "1.1", "jar", null, "target/downloads" );
     }
