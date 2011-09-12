@@ -63,16 +63,16 @@ public class BasicLauncherTest extends ConfigurableInjectedTest{
         assertThat(config.getBundleArtifactCoordinates(), is("org.sonatype.nexus:nexus-oss-webapp:tar.gz:bundle:1.9.3-SNAPSHOT"));
         nexusBuilder.addPluginCoordinates("org.sonatype.nexus.plugins:nexus-groovy-console-plugin:zip:bundle:1.9.3-SNAPSHOT");
         config = nexusBuilder.setBundleId("nexus2").build();
-        ManagedNexusBundle bundle = null;
-        try
-        {
-            bundle = nexusBundleLauncher.start(config);
-        }
-        finally {
-            if (bundle!=null) {
-                nexusBundleLauncher.stop(bundle);
-            }
-        }
+//        ManagedNexusBundle bundle = null;
+//        try
+//        {
+//            bundle = nexusBundleLauncher.start(config);
+//        }
+//        finally {
+//            if (bundle!=null) {
+//                nexusBundleLauncher.stop(bundle);
+//            }
+//        }
     }
 
 }
