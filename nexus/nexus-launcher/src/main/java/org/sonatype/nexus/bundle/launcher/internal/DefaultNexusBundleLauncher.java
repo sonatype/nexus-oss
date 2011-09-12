@@ -129,9 +129,9 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
             final File extractionDir = computeExtractionDir(bundleConfiguration.getBundleId());
             final File appDir = computeNexusAppDir(extractionDir, artifact);
 
-            this.bundleUtils.extractNexusBundle(bundleFile, extractionDir, bundleConfiguration.getNexusBundleExcludes());
+            this.bundleUtils.extractNexusBundle(bundleFile, extractionDir, bundleConfiguration.getExcludes());
 
-            // if ( bundleConfiguration.isConfigureOptionalPlugins())
+            // if ( bundleConfiguration.isPromoteOptionalPlugins())
             //
             //     configureOptionalPlugins(extractionDir)
             // }

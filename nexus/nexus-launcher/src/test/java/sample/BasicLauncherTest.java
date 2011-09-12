@@ -18,22 +18,28 @@
  */
 package sample;
 
-import org.sonatype.nexus.bundle.launcher.NexusBundleLauncher;
-import javax.inject.Inject;
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.sonatype.nexus.bundle.NexusBundleConfiguration;
+import org.sonatype.nexus.bundle.NexusBundleConfigurationBuilder;
 import org.sonatype.nexus.bundle.launcher.ManagedNexusBundle;
+import org.sonatype.nexus.bundle.launcher.NexusBundleLauncher;
 import org.sonatype.nexus.test.ConfigurableInjectedTest;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
  *
  */
-public class BasicLauncherTest extends ConfigurableInjectedTest{
+public class BasicLauncherTest extends ConfigurableInjectedTest {
 
     @Inject
     private Logger logger;
@@ -42,34 +48,64 @@ public class BasicLauncherTest extends ConfigurableInjectedTest{
     private NexusBundleLauncher nexusBundleLauncher;
 
     @Inject
-    private NexusBundleConfiguration.Builder nexusBuilder;
+    private NexusBundleConfigurationBuilder nexusBuilder;
+
+    @Inject
+    @Named("${nexus.artifact}")
+    private String bundleArtifactCoordinates;
 
     @Before
     public void before() {
         assertThat(logger, notNullValue());
-        logger.debug(testName.getMethodName());
         assertThat(nexusBundleLauncher, notNullValue());
-    }
-
-    @After
-    public void after() {
+        assertThat(nexusBuilder, notNullValue());
+        assertThat(bundleArtifactCoordinates, notNullValue());
     }
 
     @Test
-    public void testBundleService(){
-        String nexusOSSArtifactCoords = "org.sonatype.nexus:nexus-oss-webapp:tar.gz:bundle:1.9.3-SNAPSHOT";
-        NexusBundleConfiguration config = new NexusBundleConfiguration.Builder(nexusOSSArtifactCoords, "mybundle").build();
-        config = nexusBuilder.setBundleId("nexus1").build();
-        assertThat(config.getBundleArtifactCoordinates(), is("org.sonatype.nexus:nexus-oss-webapp:tar.gz:bundle:1.9.3-SNAPSHOT"));
-        nexusBuilder.addPluginCoordinates("org.sonatype.nexus.plugins:nexus-groovy-console-plugin:zip:bundle:1.9.3-SNAPSHOT");
-        config = nexusBuilder.setBundleId("nexus2").build();
+    public void injectedBundleArtifact() {
+        NexusBundleConfiguration config = nexusBuilder
+                .bundleId(testName.getMethodName())
+                .build();
+
+        assertThat(config.getBundleArtifactCoordinates(), is(equalTo(bundleArtifactCoordinates)));
+        assertThat(config.getBundleId(), is(equalTo(testName.getMethodName())));
+
+        startAndStop(config);
+    }
+
+    @Test
+    public void manual() {
+        NexusBundleConfiguration config = new NexusBundleConfigurationBuilder()
+                .artifactCoordinates(bundleArtifactCoordinates)
+                .bundleId(testName.getMethodName())
+                .build();
+
+        assertThat(config.getBundleArtifactCoordinates(), is(equalTo(bundleArtifactCoordinates)));
+        assertThat(config.getBundleId(), is(equalTo(testName.getMethodName())));
+
+        startAndStop(config);
+    }
+
+    @Test
+    public void methods() {
+        NexusBundleConfiguration config = nexusBuilder
+                .bundleId(testName.getMethodName())
+                .pluginCoordinates("org.sonatype.nexus.plugins:nexus-groovy-console-plugin:zip:bundle:1.9.3-SNAPSHOT")
+                .build();
+
+        assertThat(config.getBundleArtifactCoordinates(), is(equalTo(bundleArtifactCoordinates)));
+        assertThat(config.getBundleId(), is(equalTo(testName.getMethodName())));
+
+        startAndStop(config);
+    }
+
+    private void startAndStop(NexusBundleConfiguration config) {
 //        ManagedNexusBundle bundle = null;
-//        try
-//        {
+//        try {
 //            bundle = nexusBundleLauncher.start(config);
-//        }
-//        finally {
-//            if (bundle!=null) {
+//        } finally {
+//            if (bundle != null) {
 //                nexusBundleLauncher.stop(bundle);
 //            }
 //        }
