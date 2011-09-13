@@ -15,7 +15,7 @@
   <properties>
     <!-- Set the Nexus version here, against which you build the plugin -->
     <nexus-version>${nexusVersion}</nexus-version>
-    <app-lifecycle.version>1.4-SNAPSHOT</app-lifecycle.version>
+    <app-lifecycle.version>1.4</app-lifecycle.version>
   </properties>
 
   <dependencies>
