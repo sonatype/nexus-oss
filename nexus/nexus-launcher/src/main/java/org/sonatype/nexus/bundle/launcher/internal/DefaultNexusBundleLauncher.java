@@ -169,6 +169,9 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
     @Override
     public synchronized void stop(ManagedNexusBundle managedNexusBundle) {
+        if(managedNexusBundle == null){
+            return;
+        }
         ManagedNexusBundle managedBundle = managedBundles.remove(managedNexusBundle.getId());
         if(managedBundle == null){
             // is it a good thing?
