@@ -20,6 +20,7 @@ package org.sonatype.nexus.bundle.launcher.internal;
 
 import com.google.common.base.Preconditions;
 import org.apache.tools.ant.BuildException;
+import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bundle.NexusBundleConfiguration;
@@ -48,7 +49,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
  * @author plynch
  */
 @Named("default")
@@ -82,7 +82,7 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
      */
     private final File serviceWorkDirectory;
 
-    private final Map<String,ManagedNexusBundle> managedBundles = new ConcurrentHashMap<String, ManagedNexusBundle>();
+    private final Map<String, ManagedNexusBundle> managedBundles = new ConcurrentHashMap<String, ManagedNexusBundle>();
 
     private OverlayBuilder overlayBuilder;
 
@@ -127,6 +127,12 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
             final ResolvedArtifact artifact = resolveArtifact(bundleConfiguration.getBundleArtifactCoordinates());
             final File bundleFile = resolveArtifactFile(artifact);
             final File extractionDir = computeExtractionDir(bundleConfiguration.getBundleId());
+            if (extractionDir.exists()) {
+                FileUtils.deleteDirectory(extractionDir);
+                if (extractionDir.exists()) {
+                    throw new NexusBundleLauncherException("Could not remove bundle directory " + extractionDir.getAbsolutePath());
+                }
+            }
             final File appDir = computeNexusAppDir(extractionDir, artifact);
 
             this.bundleUtils.extractNexusBundle(bundleFile, extractionDir, bundleConfiguration.getExcludes());
@@ -136,14 +142,14 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
             //     configureOptionalPlugins(extractionDir)
             // }
 
-            final List<ResolvedArtifact> pluginArtifacts = artifactResolver.resolveArtifacts(bundleConfiguration.getPluginCoordinates());;
+            final List<ResolvedArtifact> pluginArtifacts = artifactResolver.resolveArtifacts(bundleConfiguration.getPluginCoordinates());
             installPlugins(appDir, pluginArtifacts);
 
             configureExtractedBundlePermissions(extractionDir);
 
             final File binDir = computeNexusBinDir(extractionDir, artifact);
 
-            EnumMap<NexusPort,Integer> portMap = new EnumMap<NexusPort,Integer>(NexusPort.class);
+            EnumMap<NexusPort, Integer> portMap = new EnumMap<NexusPort, Integer>(NexusPort.class);
             portMap.put(NexusPort.HTTP, this.portReservationService.reservePort());
 
             setApplicationPort(appDir, portMap.get(NexusPort.HTTP));
@@ -154,7 +160,7 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
             // register
             File workDir = buildFilePath(extractionDir, "sonatype-work", "nexus");
-            DefaultManagedNexusBundle managedBundle = new DefaultManagedNexusBundle(bundleConfiguration.getBundleId(),artifact, "127.0.0.1", portMap, NEXUS_CONTEXT, workDir, appDir);
+            DefaultManagedNexusBundle managedBundle = new DefaultManagedNexusBundle(bundleConfiguration.getBundleId(), artifact, "127.0.0.1", portMap, NEXUS_CONTEXT, workDir, appDir);
             managedBundles.put(bundleConfiguration.getBundleId(), managedBundle);
             return managedBundle;
         } catch (IOException ex) {
@@ -169,11 +175,11 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
     @Override
     public synchronized void stop(ManagedNexusBundle managedNexusBundle) {
-        if(managedNexusBundle == null){
+        if (managedNexusBundle == null) {
             return;
         }
         ManagedNexusBundle managedBundle = managedBundles.remove(managedNexusBundle.getId());
-        if(managedBundle == null){
+        if (managedBundle == null) {
             // is it a good thing?
             throw new NexusBundleLauncherException("Managed bundle is not managed by this service.");
         }
@@ -199,6 +205,7 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
     /**
      * Resolve a file by its given artifact Coordinates.
+     *
      * @param artifactCoordinates the coordinates to locate the artifact with
      * @return the file of the resolved artifact
      */
@@ -208,13 +215,14 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
     /**
      * Get an artifact file from a Resolved Artifact, performing some sanity checks in the process.
+     *
      * @param artifact the artifact to get the file for
      * @return the File, never null
      * @throws NexusBundleLauncherException if a valid file could not be located.
      */
     protected File resolveArtifactFile(final ResolvedArtifact artifact) {
         Preconditions.checkNotNull(artifact);
-        File file  = artifact.getFile();
+        File file = artifact.getFile();
         if (file == null) {
             throw new NexusBundleLauncherException("Artifact " + artifact + " is not resolved to a file.");
         }
@@ -226,28 +234,28 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
     /**
      * Compute the extraction directory for a given bundleConfiguration
+     *
      * @return the computed extraction dir
      */
-    protected File computeExtractionDir(final String bundleId){
+    protected File computeExtractionDir(final String bundleId) {
         return new File(this.serviceWorkDirectory, bundleId);
     }
 
-    protected File computeNexusAppDir(final File extractionDir, ResolvedArtifact artifact){
+    protected File computeNexusAppDir(final File extractionDir, ResolvedArtifact artifact) {
         return new File(extractionDir, artifact.getArtifactId() + "-" + artifact.getBaseVersion());
     }
 
-    protected File computeNexusBinDir(final File extractionDir, ResolvedArtifact artifact){
+    protected File computeNexusBinDir(final File extractionDir, ResolvedArtifact artifact) {
         return new File(computeNexusAppDir(extractionDir, artifact), "bin");
     }
 
 
-
     /**
      * Set any required permissions on the extracted bundle dir.
-     * <p>
+     * <p/>
      * This is in case the java extraction of the bundle loses permissions somehow.
      */
-    protected void configureExtractedBundlePermissions(final File extractedBundleDir){
+    protected void configureExtractedBundlePermissions(final File extractedBundleDir) {
         Preconditions.checkNotNull(extractedBundleDir);
         try {
             ant.chmod(extractedBundleDir, "nexus-*/bin/**", "u+x");
@@ -258,15 +266,15 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
     /**
      * Configure Jetty in the bundle via its properties, prior to managing the bundle
+     *
      * @param nexusAppDir
-     * @param httpPort the http port jetty will listen on
+     * @param httpPort    the http port jetty will listen on
      * @throws IOException
      */
     protected void setApplicationPort(final File nexusAppDir, final int httpPort)
-        throws IOException
-    {
+            throws IOException {
         overlayBuilder.overlayProperties()
-                .property("application-port", String.valueOf( httpPort ))
+                .property("application-port", String.valueOf(httpPort))
                 .overPath("conf/nexus.properties")
                 .applyTo(nexusAppDir);
     }
@@ -274,12 +282,12 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
     protected void startBundle(final File binDir, final String nexusBaseURL) {
         final JSWExecSupport jswExec = new JSWExecSupport(binDir, "nexus", ant);
-        if(!jswExec.startAndWaitUntilReady(nexusBaseURL)){
+        if (!jswExec.startAndWaitUntilReady(nexusBaseURL)) {
             throw new NexusBundleLauncherException("Bundle start detection failed, see logs.");
         }
     }
 
-    protected void stopBundle(final File binDir){
+    protected void stopBundle(final File binDir) {
         final JSWExecSupport jswExec = new JSWExecSupport(binDir, "nexus", ant);
         jswExec.stop();
     }
@@ -288,10 +296,10 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
     /**
      * Build a file from the specified path components.
      *
-     * @param parent the parent directory to start building the path from
+     * @param parent         the parent directory to start building the path from
      * @param pathComponents path parts to append to the parent
      * @return the final file path with all the parts
-     * FIXME move to utils
+     *         FIXME move to utils
      */
     public static File buildFilePath(final File parent, final String... pathComponents) {
         StringBuilder path = new StringBuilder();
@@ -309,19 +317,18 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
         return pluginFiles;
     }
 
-    protected void installPlugins(final File nexusAppDir, final List<ResolvedArtifact> pluginArtifacts) throws IOException{
-        File pluginRepo = new File( nexusAppDir, "nexus/WEB-INF/plugin-repository" );
+    protected void installPlugins(final File nexusAppDir, final List<ResolvedArtifact> pluginArtifacts) throws IOException {
+        File pluginRepo = new File(nexusAppDir, "nexus/WEB-INF/plugin-repository");
         for (ResolvedArtifact pluginArtifact : pluginArtifacts) {
             final File pluginFile = resolveArtifactFile(pluginArtifact);
             // standard nexus plugin bundle is a bundle.zip
-            this.bundleUtils.extractNexusPlugin( pluginFile, pluginRepo );
+            this.bundleUtils.extractNexusPlugin(pluginFile, pluginRepo);
         }
     }
 
     private void applyOverlays(NexusBundleConfiguration bundleConfiguration, File extractionDir) {
         List<Overlay> overlays = bundleConfiguration.getOverlays();
-        if(overlays!=null&&overlays.size()>0)
-        {
+        if (overlays != null && overlays.size() > 0) {
             for (Overlay overlay : overlays) {
                 overlay.applyTo(extractionDir);
             }
