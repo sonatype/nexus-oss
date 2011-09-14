@@ -19,15 +19,15 @@
 package org.sonatype.nexus.bundle.launcher.jsw;
 
 import com.google.common.base.Preconditions;
-import java.io.File;
-import java.io.IOException;
 import org.apache.tools.ant.taskdefs.ExecTask;
 import org.apache.tools.ant.types.Commandline;
 import org.codehaus.plexus.util.Os;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bundle.launcher.internal.AntHelper;
-import org.sonatype.nexus.bundle.launcher.util.RequestUtils;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * Helper to perform operations on JSW bundle scripts.
@@ -43,10 +43,9 @@ public class JSWExecSupport {
     private final AntHelper ant;
 
     /**
-     *
-     * @param binDir the bin directory where the jsw control scripts are located
+     * @param binDir  the bin directory where the jsw control scripts are located
      * @param appName the app name managed by JSW
-     * @throws NullPointerException if params are null
+     * @throws NullPointerException     if params are null
      * @throws IllegalArgumentException if the JSW exec script cannot be found for this platform
      */
     public JSWExecSupport(final File binDir, final String appName, final AntHelper ant) {
@@ -56,13 +55,13 @@ public class JSWExecSupport {
 
         this.ant = ant;
 
-        if(!binDir.isDirectory()){
+        if (!binDir.isDirectory()) {
             throw new IllegalArgumentException("binDir is not a directory:" + binDir.getAbsolutePath());
         }
 
         this.binDir = binDir;
 
-        if(appName.trim().equals("")){
+        if (appName.trim().equals("")) {
             throw new IllegalArgumentException("appName must contain at least one character");
         }
 
@@ -72,7 +71,9 @@ public class JSWExecSupport {
         final String extension = windows ? ".bat" : "";
         this.controlScript = new File(binDir, appName + extension);
 
-        if(!this.controlScript.isFile() || !this.controlScript.canExecute()){
+        ant.chmod(binDir, "**/*", "u+x");
+
+        if (!this.controlScript.isFile() || !this.controlScript.canExecute()) {
             throw new IllegalArgumentException("jsw script is not an executable file: " + this.controlScript.getAbsolutePath());
         }
 
@@ -84,23 +85,21 @@ public class JSWExecSupport {
 
     }
 
-    protected File getControlScript(){
+    protected File getControlScript() {
         return this.controlScript;
     }
 
     /**
-     *
-     * @return true if started, false if could not detect Nexus as started
+     * Starts the server using cmd line scripts.
      */
-    public boolean startAndWaitUntilReady(final String nexusBaseURL) {
+    public void start() {
         //need console since on windows we would first need a service installed if start cmd was used
         executeJSWScript("console");
-        return RequestUtils.waitForNexusToStart(nexusBaseURL);
     }
 
     /**
      * Stop the server using cmd line script.
-     * <p>
+     * <p/>
      * This method is more reliable when you need the server completely stopped
      * before continuing.
      */
@@ -113,9 +112,9 @@ public class JSWExecSupport {
     }
 
 
-
     protected void executeJSWScript(final String command, final boolean spawn) {
         File script = getControlScript();
+
         ExecTask exec = ant.createTask(ExecTask.class);
         exec.setExecutable(this.controlScriptCanonicalPath);
 

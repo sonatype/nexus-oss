@@ -48,6 +48,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.sonatype.nexus.bundle.launcher.util.RequestUtils.waitForNexusToStart;
+
 /**
  * @author plynch
  */
@@ -282,7 +284,8 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
     protected void startBundle(final File binDir, final String nexusBaseURL) {
         final JSWExecSupport jswExec = new JSWExecSupport(binDir, "nexus", ant);
-        if (!jswExec.startAndWaitUntilReady(nexusBaseURL)) {
+        jswExec.start();
+        if (!waitForNexusToStart(nexusBaseURL)) {
             throw new NexusBundleLauncherException("Bundle start detection failed, see logs.");
         }
     }
