@@ -275,7 +275,7 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
             throws IOException {
         overlayBuilder.overlayProperties()
                 .property("application-port", String.valueOf(httpPort))
-                .overPath("conf/nexus.properties")
+                .over().path("conf/nexus.properties")
                 .applyTo(nexusAppDir);
     }
 
