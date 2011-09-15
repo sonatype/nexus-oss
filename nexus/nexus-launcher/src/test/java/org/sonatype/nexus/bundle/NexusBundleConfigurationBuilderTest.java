@@ -20,6 +20,8 @@ package org.sonatype.nexus.bundle;
 
 import org.hamcrest.Matcher;
 import org.junit.Test;
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfigurationBuilder;
 
 import java.util.Collection;
 

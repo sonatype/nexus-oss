@@ -18,17 +18,19 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
+import org.sonatype.nexus.bundle.launcher.internal.PortType;
+import org.sonatype.nexus.bundle.launcher.support.resolver.ResolvedArtifact;
+
 import java.io.File;
-import org.sonatype.nexus.bundle.launcher.util.ResolvedArtifact;
 
 /**
- * A Nexus bundle that is being managed by a {@link NexusBundleService}
- * <p>
+ * A Nexus bundle that is being managed by a {@link NexusBundleLauncher}
+ * <p/>
  * We only try to expose the minimum details needed to interact with a bundle as a client.
  *
  * @author plynch
  */
-public interface ManagedNexusBundle {
+public interface NexusBundle {
 
     /**
      * @return The unique id among all managed Nexus bundles.
@@ -41,40 +43,36 @@ public interface ManagedNexusBundle {
     ResolvedArtifact getArtifact();
 
     /**
-     *
      * @param portType the portType to get
      * @return the port value for the specified port type. -1 if not port value assigned for the type.
      */
-    int getPort(NexusPort portType);
+    int getPort(PortType portType);
 
     /**
-     *
      * @return the http port assigned to this bundle
      */
     int getHttpPort();
 
     /**
-     *
      * @return The host this bundle is configured to run on, usually 'localhost'.
      */
     String getHost();
 
     /**
      * The context path at which the bundle is configured.
-     * <p>
+     * <p/>
      * In keeping with {@link javax.servlet.ServletContext#getContextPath()}, if the bundle is configured at the root context, then this value will be "".
+     *
      * @return The context path at which the bundle is configured - usually /nexus. It is guaranteed to not be null and either equal to "" or a string starting with forward slash {@code /}
      */
     String getContextPath();
 
     /**
-     *
      * @return the work directory configured for this bundle
      */
     File getNexusWorkDirectory();
 
     /**
-     *
      * @return the runtime directory configured for this bundle
      */
     File getNexusRuntimeDirectory();

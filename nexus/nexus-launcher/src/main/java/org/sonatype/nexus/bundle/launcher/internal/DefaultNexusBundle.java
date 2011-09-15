@@ -19,27 +19,27 @@
 package org.sonatype.nexus.bundle.launcher.internal;
 
 import com.google.common.base.Preconditions;
+import org.sonatype.nexus.bundle.launcher.NexusBundle;
+import org.sonatype.nexus.bundle.launcher.support.resolver.ResolvedArtifact;
+
 import java.io.File;
 import java.util.EnumMap;
-import javax.inject.Inject;
-import org.sonatype.nexus.bundle.launcher.ManagedNexusBundle;
-import org.sonatype.nexus.bundle.launcher.NexusPort;
-import org.sonatype.nexus.bundle.launcher.util.ResolvedArtifact;
 
 /**
- * Default implementation of {@link ManagedNexusBundle}
+ * Default implementation of {@link org.sonatype.nexus.bundle.launcher.NexusBundle}
+ *
  * @author plynch
  */
-public class DefaultManagedNexusBundle implements ManagedNexusBundle {
+public class DefaultNexusBundle implements NexusBundle {
     private final String id;
     private final File nexusWorkDirectory;
     private final File nexusRuntimeDirectory;
     private final String host;
     private final String contextPath;
     private final ResolvedArtifact artifact;
-    private EnumMap<NexusPort, Integer> portMap;
+    private EnumMap<PortType, Integer> portMap;
 
-    DefaultManagedNexusBundle(final String id, final ResolvedArtifact artifact, final String host, EnumMap<NexusPort, Integer> portMap, final String contextPath, File nexusWorkDirectory, File nexusRuntimeDirectory) {
+    DefaultNexusBundle(final String id, final ResolvedArtifact artifact, final String host, EnumMap<PortType, Integer> portMap, final String contextPath, File nexusWorkDirectory, File nexusRuntimeDirectory) {
         Preconditions.checkNotNull(id);
         Preconditions.checkNotNull(artifact);
         Preconditions.checkNotNull(host);
@@ -50,21 +50,21 @@ public class DefaultManagedNexusBundle implements ManagedNexusBundle {
         this.id = id;
         this.artifact = artifact;
         this.host = host;
-        if(!portMap.containsKey(NexusPort.HTTP)){
+        if (!portMap.containsKey(PortType.HTTP)) {
             throw new IllegalArgumentException("missing http port");
         }
-        if(!"".equals(contextPath) && !contextPath.startsWith("/")){
+        if (!"".equals(contextPath) && !contextPath.startsWith("/")) {
             throw new IllegalArgumentException("Context path should be empty string or begin with a forward slash");
         }
         this.contextPath = contextPath;
-        this.portMap = new EnumMap<NexusPort,Integer>(portMap);
+        this.portMap = new EnumMap<PortType, Integer>(portMap);
         this.nexusWorkDirectory = nexusWorkDirectory;
         this.nexusRuntimeDirectory = nexusRuntimeDirectory;
     }
 
     @Override
     public int getHttpPort() {
-        return portMap.get(NexusPort.HTTP);
+        return portMap.get(PortType.HTTP);
     }
 
     @Override
@@ -78,9 +78,9 @@ public class DefaultManagedNexusBundle implements ManagedNexusBundle {
     }
 
     @Override
-    public int getPort(final NexusPort portType) {
+    public int getPort(final PortType portType) {
         Integer port = portMap.get(portType);
-        if(port == null){
+        if (port == null) {
             return -1;
         }
         return port;

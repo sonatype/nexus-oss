@@ -18,13 +18,11 @@
  */
 package sample;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
-import org.sonatype.nexus.bundle.NexusBundleConfiguration;
-import org.sonatype.nexus.bundle.NexusBundleConfigurationBuilder;
-import org.sonatype.nexus.bundle.launcher.ManagedNexusBundle;
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfigurationBuilder;
 import org.sonatype.nexus.bundle.launcher.NexusBundleLauncher;
 import org.sonatype.nexus.test.ConfigurableInjectedTest;
 
@@ -101,7 +99,7 @@ public class BasicLauncherTest extends ConfigurableInjectedTest {
     }
 
     private void startAndStop(NexusBundleConfiguration config) {
-//        ManagedNexusBundle bundle = null;
+//        NexusBundle bundle = null;
 //        try {
 //            bundle = nexusBundleLauncher.start(config);
 //        } finally {

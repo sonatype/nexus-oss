@@ -16,7 +16,7 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher.jsw;
+package org.sonatype.nexus.bundle.launcher.support.jsw;
 
 import com.google.common.base.Preconditions;
 import org.apache.tools.ant.taskdefs.ExecTask;
@@ -24,7 +24,7 @@ import org.apache.tools.ant.types.Commandline;
 import org.codehaus.plexus.util.Os;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.bundle.launcher.internal.AntHelper;
+import org.sonatype.nexus.bundle.launcher.support.ant.AntHelper;
 
 import java.io.File;
 import java.io.IOException;

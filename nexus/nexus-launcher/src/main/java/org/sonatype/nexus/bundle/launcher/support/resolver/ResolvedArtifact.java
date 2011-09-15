@@ -16,26 +16,33 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher.util;
+package org.sonatype.nexus.bundle.launcher.support.resolver;
+
+import java.io.File;
+import java.util.Map;
 
 /**
- * Service that reserves free system ports.
- * <p>
- * Ports are only guaranteed freely available at port reservation time.
+ * @author plynch
  */
-public interface PortReservationService {
+public interface ResolvedArtifact {
 
-    /**
-     * Reserve a port for use
-     * @return a free port at time of method call.
-     */
-    Integer reservePort();
+    public String getGroupId();
 
-    /**
-     * Cancel the reservation of the specified port, indicating the service shall make it available for future reservations.
-     * @param port the port to unreserve
-     * @throws IllegalArgumentException if the specified port has not been reserved
-     */
-    void cancelPort(Integer port);
+    public String getArtifactId();
 
+    public String getVersion();
+
+    public String getBaseVersion();
+
+    public boolean isSnapshot();
+
+    public String getClassifier();
+
+    public String getExtension();
+
+    public File getFile();
+
+    public String getProperty(String key, String defaultValue);
+
+    public Map<String, String> getProperties();
 }

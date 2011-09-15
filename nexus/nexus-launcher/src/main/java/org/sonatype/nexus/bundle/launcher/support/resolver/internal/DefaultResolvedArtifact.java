@@ -16,21 +16,24 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher.util;
+package org.sonatype.nexus.bundle.launcher.support.resolver.internal;
 
 import com.google.common.base.Preconditions;
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.nexus.bundle.launcher.support.resolver.ResolvedArtifact;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.Map;
-import org.sonatype.aether.artifact.Artifact;
 
 /**
  * Immutable resolved artifact.
+ *
  * @since 1.9.3
  */
-public class DefaultResolvedArtifact implements ResolvedArtifact{
+public class DefaultResolvedArtifact implements ResolvedArtifact {
 
-    DefaultResolvedArtifact(final Artifact artifact){
+    DefaultResolvedArtifact(final Artifact artifact) {
         Preconditions.checkNotNull(artifact);
         this.artifact = artifact;
     }

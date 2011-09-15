@@ -22,9 +22,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.sonatype.nexus.bundle.launcher.util.ArtifactResolver;
-import org.sonatype.nexus.bundle.launcher.util.NexusBundleUtils;
-import org.sonatype.nexus.bundle.launcher.util.PortReservationService;
+import org.sonatype.nexus.bundle.launcher.support.ant.AntHelper;
+import org.sonatype.nexus.bundle.launcher.support.port.PortReservationService;
+import org.sonatype.nexus.bundle.launcher.support.resolver.ArtifactResolver;
 import org.sonatype.sisu.overlay.OverlayBuilder;
 
 import java.io.File;

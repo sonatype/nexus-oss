@@ -16,18 +16,20 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher.util;
+package org.sonatype.nexus.bundle.launcher.support.port;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Set;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * Act as a registry of ports available to use in the JVM.
+ *
  * @author plynch
  */
 @Singleton
@@ -68,6 +70,7 @@ public class DefaultPortReservationService implements PortReservationService {
 
     /**
      * Find a random free system port.
+     *
      * @param portNumber
      * @return a free system port at the time this method was called.
      */

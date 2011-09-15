@@ -23,17 +23,15 @@ import org.apache.tools.ant.BuildException;
 import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.bundle.NexusBundleConfiguration;
-import org.sonatype.nexus.bundle.launcher.ManagedNexusBundle;
+import org.sonatype.nexus.bundle.launcher.NexusBundle;
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.bundle.launcher.NexusBundleLauncher;
 import org.sonatype.nexus.bundle.launcher.NexusBundleLauncherException;
-import org.sonatype.nexus.bundle.launcher.NexusBundleService;
-import org.sonatype.nexus.bundle.launcher.NexusPort;
-import org.sonatype.nexus.bundle.launcher.jsw.JSWExecSupport;
-import org.sonatype.nexus.bundle.launcher.util.ArtifactResolver;
-import org.sonatype.nexus.bundle.launcher.util.NexusBundleUtils;
-import org.sonatype.nexus.bundle.launcher.util.PortReservationService;
-import org.sonatype.nexus.bundle.launcher.util.ResolvedArtifact;
+import org.sonatype.nexus.bundle.launcher.support.ant.AntHelper;
+import org.sonatype.nexus.bundle.launcher.support.jsw.JSWExecSupport;
+import org.sonatype.nexus.bundle.launcher.support.port.PortReservationService;
+import org.sonatype.nexus.bundle.launcher.support.resolver.ArtifactResolver;
+import org.sonatype.nexus.bundle.launcher.support.resolver.ResolvedArtifact;
 import org.sonatype.sisu.overlay.Overlay;
 import org.sonatype.sisu.overlay.OverlayBuilder;
 
@@ -48,14 +46,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.sonatype.nexus.bundle.launcher.util.RequestUtils.waitForNexusToStart;
+import static org.sonatype.nexus.bundle.launcher.internal.RequestUtils.waitForNexusToStart;
 
 /**
  * @author plynch
  */
 @Named("default")
 @Singleton
-public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBundleService {
+public class DefaultNexusBundleLauncher implements NexusBundleLauncher {
 
     private static final String NEXUS_CONTEXT = "/nexus";
 
@@ -84,7 +82,7 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
      */
     private final File serviceWorkDirectory;
 
-    private final Map<String, ManagedNexusBundle> managedBundles = new ConcurrentHashMap<String, ManagedNexusBundle>();
+    private final Map<String, NexusBundle> managedBundles = new ConcurrentHashMap<String, NexusBundle>();
 
     private OverlayBuilder overlayBuilder;
 
@@ -124,7 +122,7 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
     }
 
     // ================== NexusBundleLauncher =========================
-    public synchronized ManagedNexusBundle start(final NexusBundleConfiguration bundleConfiguration) {
+    public synchronized NexusBundle start(final NexusBundleConfiguration bundleConfiguration) {
         try {
             final ResolvedArtifact artifact = resolveArtifact(bundleConfiguration.getBundleArtifactCoordinates());
             final File bundleFile = resolveArtifactFile(artifact);
@@ -151,18 +149,18 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
 
             final File binDir = computeNexusBinDir(extractionDir, artifact);
 
-            EnumMap<NexusPort, Integer> portMap = new EnumMap<NexusPort, Integer>(NexusPort.class);
-            portMap.put(NexusPort.HTTP, this.portReservationService.reservePort());
+            EnumMap<PortType, Integer> portMap = new EnumMap<PortType, Integer>(PortType.class);
+            portMap.put(PortType.HTTP, this.portReservationService.reservePort());
 
-            setApplicationPort(appDir, portMap.get(NexusPort.HTTP));
+            setApplicationPort(appDir, portMap.get(PortType.HTTP));
 
             applyOverlays(bundleConfiguration, extractionDir);
 
-            startBundle(binDir, "http://127.0.0.1:" + portMap.get(NexusPort.HTTP) + NEXUS_CONTEXT);
+            startBundle(binDir, "http://127.0.0.1:" + portMap.get(PortType.HTTP) + NEXUS_CONTEXT);
 
             // register
             File workDir = buildFilePath(extractionDir, "sonatype-work", "nexus");
-            DefaultManagedNexusBundle managedBundle = new DefaultManagedNexusBundle(bundleConfiguration.getBundleId(), artifact, "127.0.0.1", portMap, NEXUS_CONTEXT, workDir, appDir);
+            DefaultNexusBundle managedBundle = new DefaultNexusBundle(bundleConfiguration.getBundleId(), artifact, "127.0.0.1", portMap, NEXUS_CONTEXT, workDir, appDir);
             managedBundles.put(bundleConfiguration.getBundleId(), managedBundle);
             return managedBundle;
         } catch (IOException ex) {
@@ -171,25 +169,25 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher, NexusBun
     }
 
     @Override
-    public ManagedNexusBundle start(NexusBundleConfiguration config, String groupName) {
+    public NexusBundle start(NexusBundleConfiguration config, String groupName) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public synchronized void stop(ManagedNexusBundle managedNexusBundle) {
-        if (managedNexusBundle == null) {
+    public synchronized void stop(NexusBundle nexusBundle) {
+        if (nexusBundle == null) {
             return;
         }
-        ManagedNexusBundle managedBundle = managedBundles.remove(managedNexusBundle.getId());
-        if (managedBundle == null) {
+        NexusBundle bundle = managedBundles.remove(nexusBundle.getId());
+        if (bundle == null) {
             // is it a good thing?
             throw new NexusBundleLauncherException("Managed bundle is not managed by this service.");
         }
 
-        final File extractionDir = computeExtractionDir(managedBundle.getId());
-        final File binDir = computeNexusBinDir(extractionDir, managedBundle.getArtifact());
+        final File extractionDir = computeExtractionDir(bundle.getId());
+        final File binDir = computeNexusBinDir(extractionDir, bundle.getArtifact());
         stopBundle(binDir);
-        this.portReservationService.cancelPort(managedBundle.getHttpPort());
+        this.portReservationService.cancelPort(bundle.getHttpPort());
 
     }
 

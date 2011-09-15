@@ -16,27 +16,28 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher.internal;
+package org.sonatype.nexus.bundle.launcher.support.ant;
 
 import com.google.common.base.Preconditions;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Chmod;
 import org.apache.tools.ant.taskdefs.Mkdir;
 import org.apache.tools.ant.taskdefs.Property;
-
-import java.io.File;
-import java.io.PrintStream;
-import javax.inject.Inject;
-import javax.inject.Named;
-import org.apache.tools.ant.DefaultLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import java.io.File;
+import java.io.PrintStream;
+
 /**
  * Wrapper for invoking Ant tasks.
+ *
  * @since 1.9.3
  */
 public class AntHelper {
@@ -67,8 +68,7 @@ public class AntHelper {
 
         if (logger.isDebugEnabled()) {
             antLogger.setMessageOutputLevel(Project.MSG_VERBOSE);
-        }
-        else {
+        } else {
             antLogger.setMessageOutputLevel(Project.MSG_INFO);
         }
 
@@ -125,7 +125,7 @@ public class AntHelper {
      * Adapts Ant logging to Slf4j Logging.
      */
     private static class Slf4jAntLoggerAdapter
-        extends DefaultLogger {
+            extends DefaultLogger {
 
         protected Logger logger;
 
@@ -134,7 +134,7 @@ public class AntHelper {
         }
 
         public Slf4jAntLoggerAdapter(final Logger logger) {
-            if(logger == null){
+            if (logger == null) {
                 this.logger = LoggerFactory.getLogger(Slf4jAntLoggerAdapter.class);
             } else {
                 this.logger = logger;
