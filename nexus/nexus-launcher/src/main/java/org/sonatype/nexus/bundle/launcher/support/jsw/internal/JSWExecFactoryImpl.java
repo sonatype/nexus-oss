@@ -16,62 +16,51 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher.internal;
+package org.sonatype.nexus.bundle.launcher.support.jsw.internal;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.sonatype.nexus.bundle.launcher.support.ant.AntHelper;
+import org.sonatype.nexus.bundle.launcher.support.jsw.JSWExec;
 import org.sonatype.nexus.bundle.launcher.support.jsw.JSWExecFactory;
-import org.sonatype.nexus.bundle.launcher.support.port.PortReservationService;
-import org.sonatype.nexus.bundle.launcher.support.resolver.ArtifactResolver;
-import org.sonatype.sisu.overlay.OverlayBuilder;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.File;
-import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * This is just a dummy test for now
+ * {@link JSWExecFactory} implementation.
+ *
+ * @since 1.9.3
  */
-@RunWith(MockitoJUnitRunner.class)
-public class DefaultNexusBundleLauncherTest {
+@Named
+class JSWExecFactoryImpl
+        implements JSWExecFactory {
 
-    @Mock
-    private ArtifactResolver artifactResolver;
+    /**
+     * ANT helper used by {@link JSWExecImpl}.
+     */
+    private AntHelper antHelper;
 
-    @Mock
-    private PortReservationService portService;
-
-    @Mock
-    private AntHelper ant;
-
-    @Mock
-    private NexusBundleUtils bundleUtils;
-
-    @Mock
-    private File serviceWorkDir;
-
-    @Mock
-    private File fakeBundle;
-
-    @Mock
-    private List<String> bundleExcludes;
-
-    @Mock
-    private OverlayBuilder overlayBuilder;
-
-    @Mock
-    private JSWExecFactory jswExecFactory;
-
-
-    private DefaultNexusBundleLauncher getLauncher() {
-        return new DefaultNexusBundleLauncher(artifactResolver, portService, ant, bundleUtils, serviceWorkDir, overlayBuilder, jswExecFactory);
+    /**
+     * Constructor.
+     *
+     * @param antHelper ANT helper used by {@link JSWExecImpl}
+     * @since 1.9.3
+     */
+    @Inject
+    public JSWExecFactoryImpl(final AntHelper antHelper) {
+        this.antHelper = checkNotNull(antHelper);
     }
 
-    @Test
-    public void nothing() {
-
+    /**
+     * {@inheritDoc}
+     *
+     * @since 1.9.3
+     */
+    @Override
+    public JSWExec create(final File binDir, final String appName) {
+        return new JSWExecImpl(binDir, appName, antHelper);
     }
 
 }

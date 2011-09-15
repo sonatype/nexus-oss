@@ -18,7 +18,6 @@
  */
 package org.sonatype.nexus.bundle.launcher.internal;
 
-import com.google.common.base.Preconditions;
 import org.apache.tools.ant.BuildException;
 import org.codehaus.plexus.util.FileUtils;
 import org.slf4j.Logger;
@@ -28,7 +27,7 @@ import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.nexus.bundle.launcher.NexusBundleLauncher;
 import org.sonatype.nexus.bundle.launcher.NexusBundleLauncherException;
 import org.sonatype.nexus.bundle.launcher.support.ant.AntHelper;
-import org.sonatype.nexus.bundle.launcher.support.jsw.JSWExecSupport;
+import org.sonatype.nexus.bundle.launcher.support.jsw.JSWExecFactory;
 import org.sonatype.nexus.bundle.launcher.support.port.PortReservationService;
 import org.sonatype.nexus.bundle.launcher.support.resolver.ArtifactResolver;
 import org.sonatype.nexus.bundle.launcher.support.resolver.ResolvedArtifact;
@@ -46,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.bundle.launcher.internal.RequestUtils.waitForNexusToStart;
 
 /**
@@ -86,32 +86,31 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher {
 
     private OverlayBuilder overlayBuilder;
 
+    /**
+     * JSW executable helper factory.
+     */
+    private JSWExecFactory jswExecFactory;
+
     @Inject
     public DefaultNexusBundleLauncher(final ArtifactResolver artifactResolver,
                                       final PortReservationService portReservationService,
                                       final AntHelper ant,
                                       final NexusBundleUtils bundleUtils,
                                       @Named("${NexusBundleService.serviceWorkDirectory:-target/nbs}") final File serviceWorkDirectory,
-                                      final OverlayBuilder overlayBuilder) {
+                                      final OverlayBuilder overlayBuilder,
+                                      final JSWExecFactory jswExecFactory) {
 
-        Preconditions.checkNotNull(artifactResolver);
-        Preconditions.checkNotNull(portReservationService);
-        Preconditions.checkNotNull(serviceWorkDirectory);
-        Preconditions.checkNotNull(ant);
-        Preconditions.checkNotNull(bundleUtils);
-
-        // required
-        this.artifactResolver = artifactResolver;
-        this.portReservationService = portReservationService;
-        this.serviceWorkDirectory = serviceWorkDirectory;
-        this.ant = ant;
-        this.bundleUtils = bundleUtils;
-        this.overlayBuilder = Preconditions.checkNotNull(overlayBuilder);
+        this.artifactResolver = checkNotNull(artifactResolver);
+        this.portReservationService = checkNotNull(portReservationService);
+        this.serviceWorkDirectory = checkNotNull(serviceWorkDirectory);
+        this.ant = checkNotNull(ant);
+        this.bundleUtils = checkNotNull(bundleUtils);
+        this.overlayBuilder = checkNotNull(overlayBuilder);
+        this.jswExecFactory = checkNotNull(jswExecFactory);
 
         logger.debug(serviceWorkDirectory.getAbsolutePath());
 
         makeServiceDirectories();
-
     }
 
     /**
@@ -186,7 +185,9 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher {
 
         final File extractionDir = computeExtractionDir(bundle.getId());
         final File binDir = computeNexusBinDir(extractionDir, bundle.getArtifact());
+
         stopBundle(binDir);
+
         this.portReservationService.cancelPort(bundle.getHttpPort());
 
     }
@@ -221,7 +222,7 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher {
      * @throws NexusBundleLauncherException if a valid file could not be located.
      */
     protected File resolveArtifactFile(final ResolvedArtifact artifact) {
-        Preconditions.checkNotNull(artifact);
+        checkNotNull(artifact);
         File file = artifact.getFile();
         if (file == null) {
             throw new NexusBundleLauncherException("Artifact " + artifact + " is not resolved to a file.");
@@ -256,7 +257,7 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher {
      * This is in case the java extraction of the bundle loses permissions somehow.
      */
     protected void configureExtractedBundlePermissions(final File extractedBundleDir) {
-        Preconditions.checkNotNull(extractedBundleDir);
+        checkNotNull(extractedBundleDir);
         try {
             ant.chmod(extractedBundleDir, "nexus-*/bin/**", "u+x");
         } catch (BuildException e) {
@@ -281,16 +282,14 @@ public class DefaultNexusBundleLauncher implements NexusBundleLauncher {
 
 
     protected void startBundle(final File binDir, final String nexusBaseURL) {
-        final JSWExecSupport jswExec = new JSWExecSupport(binDir, "nexus", ant);
-        jswExec.start();
+        jswExecFactory.create(binDir, "nexus").start();
         if (!waitForNexusToStart(nexusBaseURL)) {
             throw new NexusBundleLauncherException("Bundle start detection failed, see logs.");
         }
     }
 
     protected void stopBundle(final File binDir) {
-        final JSWExecSupport jswExec = new JSWExecSupport(binDir, "nexus", ant);
-        jswExec.stop();
+        jswExecFactory.create(binDir, "nexus").stop();
     }
 
 

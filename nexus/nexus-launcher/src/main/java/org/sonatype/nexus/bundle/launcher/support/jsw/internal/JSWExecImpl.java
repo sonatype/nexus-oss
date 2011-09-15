@@ -16,7 +16,7 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.bundle.launcher.support.jsw;
+package org.sonatype.nexus.bundle.launcher.support.jsw.internal;
 
 import com.google.common.base.Preconditions;
 import org.apache.tools.ant.taskdefs.ExecTask;
@@ -25,30 +25,36 @@ import org.codehaus.plexus.util.Os;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.bundle.launcher.support.ant.AntHelper;
+import org.sonatype.nexus.bundle.launcher.support.jsw.JSWExec;
 
 import java.io.File;
 import java.io.IOException;
 
 /**
- * Helper to perform operations on JSW bundle scripts.
+ * Default {@link JSWExec} implementation.
+ *
+ * @since 1.9.3
  */
-public class JSWExecSupport {
+class JSWExecImpl
+        implements JSWExec {
 
-    private Logger logger = LoggerFactory.getLogger(JSWExecSupport.class);
+    private Logger logger = LoggerFactory.getLogger(JSWExecImpl.class);
 
-    private final File binDir;
     private final String appName;
     private final File controlScript;
     private final String controlScriptCanonicalPath;
     private final AntHelper ant;
 
     /**
+     * Constructor.
+     *
      * @param binDir  the bin directory where the jsw control scripts are located
      * @param appName the app name managed by JSW
      * @throws NullPointerException     if params are null
      * @throws IllegalArgumentException if the JSW exec script cannot be found for this platform
+     * @since 1.9.3
      */
-    public JSWExecSupport(final File binDir, final String appName, final AntHelper ant) {
+    public JSWExecImpl(final File binDir, final String appName, final AntHelper ant) {
         Preconditions.checkNotNull(binDir);
         Preconditions.checkNotNull(appName);
         Preconditions.checkNotNull(ant);
@@ -58,8 +64,6 @@ public class JSWExecSupport {
         if (!binDir.isDirectory()) {
             throw new IllegalArgumentException("binDir is not a directory:" + binDir.getAbsolutePath());
         }
-
-        this.binDir = binDir;
 
         if (appName.trim().equals("")) {
             throw new IllegalArgumentException("appName must contain at least one character");
@@ -85,34 +89,36 @@ public class JSWExecSupport {
 
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @since 1.9.3
+     */
+    public JSWExecImpl start() {
+        //need console since on windows we would first need a service installed if start cmd was used
+        executeJSWScript("console");
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 1.9.3
+     */
+    public JSWExecImpl stop() {
+        executeJSWScript("stop", false);
+        return this;
+    }
+
     protected File getControlScript() {
         return this.controlScript;
     }
 
-    /**
-     * Starts the server using cmd line scripts.
-     */
-    public void start() {
-        //need console since on windows we would first need a service installed if start cmd was used
-        executeJSWScript("console");
-    }
-
-    /**
-     * Stop the server using cmd line script.
-     * <p/>
-     * This method is more reliable when you need the server completely stopped
-     * before continuing.
-     */
-    public void stop() {
-        executeJSWScript("stop", false);
-    }
-
-    protected void executeJSWScript(final String command) {
+    private void executeJSWScript(final String command) {
         executeJSWScript(command, true);
     }
 
-
-    protected void executeJSWScript(final String command, final boolean spawn) {
+    private void executeJSWScript(final String command, final boolean spawn) {
         File script = getControlScript();
 
         ExecTask exec = ant.createTask(ExecTask.class);
