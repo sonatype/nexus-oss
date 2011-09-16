@@ -96,7 +96,7 @@ class JSWExecImpl
      */
     public JSWExecImpl start() {
         //need console since on windows we would first need a service installed if start cmd was used
-        executeJSWScript("console");
+        executeJSWScript("start");
         return this;
     }
 
