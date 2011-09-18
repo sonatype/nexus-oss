@@ -1,0 +1,208 @@
+/**
+ * Copyright (c) 2008-2011 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
+ *
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
+ *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
+ */
+package org.sonatype.nexus.bundle.launcher;
+
+import com.google.inject.Binder;
+import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
+import org.sonatype.sisu.bl.support.resolver.ArtifactResolver;
+import org.sonatype.sisu.bl.support.resolver.ResolvedArtifact;
+import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
+import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
+
+import javax.inject.Inject;
+import java.io.File;
+
+/**
+ * Base class for Nexus Integration Tests.
+ *
+ * @since 1.9.3
+ */
+public abstract class NexusITSupport
+        extends InjectedTestSupport {
+
+    /**
+     * Path in project where IT resources will be searched.
+     */
+    private static final String SRC_TEST_IT_RESOURCES = "src/test/it-resources";
+
+    /**
+     * Artifact resolver used to resolve artifacts by Maven coordinates.
+     */
+    @Inject
+    private ArtifactResolver artifactResolver;
+
+    /**
+     * Binds a {@link TargetDirectoryResolver} to an implementation that will set the bundle target directory to a
+     * directory specific to test method.
+     * <p/>
+     * Format: {@code <project>/target/its/<test class package>/<test class name>/<test method name>/<path>}
+     * <p/>
+     * {@inheritDoc}
+     */
+    @Override
+    public void configure(final Binder binder) {
+        TargetDirectoryResolver targetDirectoryResolver = new TargetDirectoryResolver() {
+
+            @Override
+            public File resolve() {
+                return methodSpecificDirectory("bundle");
+            }
+
+        };
+        binder.bind(TargetDirectoryResolver.class).annotatedWith(NexusSpecific.class).toInstance(targetDirectoryResolver);
+    }
+
+    /**
+     * Resolves a test file by looking up the specified path into test resources.
+     * <p/>
+     * It searches the following path locations:<br/>
+     * {@code <project>/src/test/it-resources/<test class package>/<test class name>/<test method name>/<path>}<br/>
+     * {@code <project>/src/test/it-resources/<test class package>/<test class name>/<path>}<br/>
+     * {@code <project>/src/test/it-resources/<path>}<br/>
+     *
+     * @param path path to look up
+     * @return found file
+     * @throws RuntimeException if path cannot be found in any of above locations
+     * @since 1.9.3
+     */
+    public File resolveTestFile(final String path) throws RuntimeException {
+        File level1 = testMethodSourceDirectory(path);
+        if (level1.exists()) {
+            return level1;
+        }
+        File level2 = testClassSourceDirectory(path);
+        if (level2.exists()) {
+            return level2;
+        }
+        File level3 = testSourceDirectory(path);
+        if (level3.exists()) {
+            return level3;
+        }
+        throw new RuntimeException("Path " + path + " not found in any of: " + level1 + ", " + level2 + ", " + level3);
+    }
+
+    /**
+     * Resolves an artifact given its Maven coordinates.
+     *
+     * @param coordinates Maven artifact coordinates
+     * @return resolved artifact file
+     */
+    protected File resolveArtifact(final String coordinates) throws RuntimeException {
+        ResolvedArtifact artifact = artifactResolver.resolveArtifact(coordinates);
+        if (artifact == null || artifact.getFile() == null || !artifact.getFile().exists()) {
+            throw new RuntimeException(String.format("Artifact %s could not be resolved", coordinates));
+        }
+        return artifact.getFile();
+    }
+
+    /**
+     * Returns a test source directory specific to running test.
+     * <p/>
+     * Format: {@code <project>/src/test/it-resources/<path>}
+     *
+     * @param path path to be appended
+     * @return test source directory specific to running test + provided path
+     * @since 1.9.3
+     */
+    private File testSourceDirectory(String path) {
+        return
+                new File(
+                        new File(
+                                util.getBaseDir(),
+                                SRC_TEST_IT_RESOURCES
+                        ),
+                        path
+                );
+    }
+
+    /**
+     * Returns a test source directory specific to running test class.
+     * <p/>
+     * Format: {@code <project>/src/test/it-resources/<test class package>/<test class name>/<path>}
+     *
+     * @param path path to be appended
+     * @return test source directory specific to running test class + provided path
+     * @since 1.9.3
+     */
+    private File testClassSourceDirectory(String path) {
+        return
+                new File(
+                        new File(
+                                new File(
+                                        util.getBaseDir(),
+                                        SRC_TEST_IT_RESOURCES
+                                ),
+                                getClass().getCanonicalName().replace(".", "/")
+                        ),
+                        path
+                );
+    }
+
+    /**
+     * Returns a test source directory specific to running test method.
+     * <p/>
+     * Format: {@code <project>/src/test/it-resources/<test class package>/<test class name>/<test method name>/<path>}
+     *
+     * @param path path to be appended
+     * @return test source directory specific to running test method + provided path
+     * @since 1.9.3
+     */
+    private File testMethodSourceDirectory(String path) {
+        return
+                new File(
+                        new File(
+                                new File(
+                                        new File(
+                                                util.getBaseDir(),
+                                                SRC_TEST_IT_RESOURCES
+                                        ),
+                                        getClass().getCanonicalName().replace(".", "/")
+                                ),
+                                testName.getMethodName()
+                        ),
+                        path
+                );
+    }
+
+    /**
+     * Returns a directory specific to running test method.
+     * <p/>
+     * Format: {@code <project>/target/its/<test class package>/<test class name>/<test method name>/<path>}
+     *
+     * @param path path to be appended to test method specific directory
+     * @return directory specific to running test method + provided path
+     */
+    private File methodSpecificDirectory(String path) {
+        return
+                new File(
+                        new File(
+                                new File(
+                                        new File(
+                                                util.getTargetDir(),
+                                                "its"
+                                        ),
+                                        getClass().getCanonicalName().replace(".", "/")
+                                ),
+                                testName.getMethodName()
+                        ),
+                        path
+                );
+    }
+
+}

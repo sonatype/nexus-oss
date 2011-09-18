@@ -18,112 +18,61 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
-import org.sonatype.sisu.overlay.Overlay;
+import org.sonatype.sisu.bl.BundleConfiguration;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.io.File;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.util.Collections.unmodifiableList;
-
 /**
- * Configuration for a nexus bundle.
+ * An Nexus bundle configuration.
  *
  * @since 1.9.3
  */
-public class NexusBundleConfiguration {
+public interface NexusBundleConfiguration
+        extends BundleConfiguration<NexusBundleConfiguration> {
 
     /**
-     * Extracted bundle id.
+     * Returns additional plugins to be installed in Nexus.
+     * <p/>
+     * Plugins can be zips/jars/tars to be unpacked or directories to be copied
+     *
+     * @return Nexus plugins to be installed
+     * @since 1.9.3
      */
-    private final String bundleId;
+    List<File> getPlugins();
 
     /**
-     * Bundle source artifact coordinates.
+     * Sets plugins to be installed in Nexus. Provided plugins will overwrite existing configured plugins.
+     * <p/>
+     * Plugins can be zips/jars/tars to be unpacked or directories to be copied
+     *
+     * @param plugins Nexus plugins to be installed. Can be null, case when an empty list will be used
+     * @return itself, for usage in fluent api
+     * @since 1.9.3
      */
-    private final String bundleArtifactCoordinates;
+    NexusBundleConfiguration setPlugins(List<File> plugins);
 
     /**
-     * List of additional plugins (beside ones already in the bundle)
+     * Sets plugins to be installed in Nexus. Provided plugins will overwrite existing configured plugins.
+     * <p/>
+     * Plugins can be zips/jars/tars to be unpacked or directories to be copied
+     *
+     * @param plugins Nexus plugins to be installed
+     * @return itself, for usage in fluent api
+     * @since 1.9.3
      */
-    private final List<String> pluginCoordinates;
+    NexusBundleConfiguration setPlugins(File... plugins);
 
     /**
-     * Promote the optional plugins included in the bundle
+     * Append plugins to existing set of plugins.
+     * <p/>
+     * Plugins can be zips/jars/tars to be unpacked or directories to be copied
+     *
+     * @param plugins Nexus plugins to be installed
+     * @return itself, for usage in fluent api
+     * @since 1.9.3
      */
-    private final boolean promoteOptionalPlugins;
+    NexusBundleConfiguration addPlugins(File... plugins);
 
-    /**
-     * If there is one or more *-webapp.zip files in runtime/apps/nexus/plugin-repository, then unpack that zip to nexus
-     * base dir and delete the original file
-     */
-    private final boolean configurePluginWebapps;
-
-    /**
-     * Paths to be excluded from extracted bundle.
-     */
-    private final List<String> excludes;
-
-    /**
-     * Overlays to be applied over unpacked bundle.
-     */
-    private final List<Overlay> overlays;
-
-    /**
-     * Should the bits required to license the bundle be configured?
-     */
-    private final boolean licensed;
-
-    public NexusBundleConfiguration(final String bundleId,
-                                    final String bundleArtifactCoordinates,
-                                    final List<String> pluginCoordinates,
-                                    final boolean promoteOptionalPlugins,
-                                    final List<String> excludes,
-                                    final boolean licensed,
-                                    final List<Overlay> overlays,
-                                    final boolean configurePluginWebapps) {
-
-        this.bundleId = checkNotNull(bundleId, "Bundle id must be set to a non null value");
-        this.bundleArtifactCoordinates = checkNotNull(bundleArtifactCoordinates, "Bundle artifact coordinates must be set to a non null value");
-        this.pluginCoordinates = unmodifiableList(new ArrayList<String>(pluginCoordinates == null ? Collections.<String>emptyList() : pluginCoordinates));
-        this.promoteOptionalPlugins = promoteOptionalPlugins;
-        this.excludes = unmodifiableList(new ArrayList<String>(excludes == null ? Collections.<String>emptyList() : excludes));
-        this.licensed = licensed;
-        this.overlays = unmodifiableList(new ArrayList<Overlay>(overlays == null ? Collections.<Overlay>emptyList() : overlays));
-        this.configurePluginWebapps = configurePluginWebapps;
-    }
-
-    public String getBundleId() {
-        return bundleId;
-    }
-
-    public String getBundleArtifactCoordinates() {
-        return bundleArtifactCoordinates;
-    }
-
-    public boolean isLicensed() {
-        return licensed;
-    }
-
-    public List<String> getExcludes() {
-        return this.excludes;
-    }
-
-    public List<String> getPluginCoordinates() {
-        return this.pluginCoordinates;
-    }
-
-    public boolean isPromoteOptionalPlugins() {
-        return promoteOptionalPlugins;
-    }
-
-    public boolean isConfigurePluginWebapps() {
-        return configurePluginWebapps;
-    }
-
-    public List<Overlay> getOverlays() {
-        return this.overlays;
-    }
 
 }
