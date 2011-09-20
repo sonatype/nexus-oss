@@ -1002,23 +1002,26 @@ public abstract class AbstractRepository
         // replace UID to own one
         item.setRepositoryItemUid( uid );
 
-        // NEXUS-4550: we are shared-locking the actual UID (to not prevent downloaders while
-        // we save to temporary location. But this depends on actual LS backend actually...)
-        // but we exclusive lock uploaders to serialize them!
-        // And the LS has to take care of whatever stricter locking it has to use or not
-        // Think: RDBMS LS or some trickier LS implementations for example
-        final RepositoryItemUidLock uidLock = uid.getLock();
+        // NEXUS-4550: This "fake" UID/lock here is introduced only to serialize uploaders
+        // This will catch immediately an uploader if an upload already happens
+        // and prevent deadlocks, since uploader still does not have
+        // shared lock
+        final RepositoryItemUid uploaderUid = createUid( item.getPath() + ".storeItem()" );
 
-        uidLock.lock( Action.read );
+        final RepositoryItemUidLock uidUploaderLock = uploaderUid.getLock();
+
+        uidUploaderLock.lock( Action.create );
 
         try
         {
-            // NEXUS-4550: This "fake" UID/lock here is introduced only to serialize uploaders
-            final RepositoryItemUid uploaderUid = createUid( item.getPath() + ".storeItem()" );
+            // NEXUS-4550: we are shared-locking the actual UID (to not prevent downloaders while
+            // we save to temporary location. But this depends on actual LS backend actually...)
+            // but we exclusive lock uploaders to serialize them!
+            // And the LS has to take care of whatever stricter locking it has to use or not
+            // Think: RDBMS LS or some trickier LS implementations for example
+            final RepositoryItemUidLock uidLock = uid.getLock();
 
-            final RepositoryItemUidLock uidUploaderLock = uploaderUid.getLock();
-
-            uidUploaderLock.lock( Action.create );
+            uidLock.lock( Action.read );
 
             try
             {
@@ -1027,12 +1030,12 @@ public abstract class AbstractRepository
             }
             finally
             {
-                uidUploaderLock.unlock();
+                uidLock.unlock();
             }
         }
         finally
         {
-            uidLock.unlock();
+            uidUploaderLock.unlock();
         }
 
         // remove the "request" item from n-cache if there
