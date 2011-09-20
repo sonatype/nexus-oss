@@ -236,6 +236,7 @@ public class DefaultFSAttributeStorage
             {
                 getLogger().debug( "Loading attributes on UID=" + uid.toString() );
             }
+            
             try
             {
                 AbstractStorageItem result = null;
@@ -273,15 +274,15 @@ public class DefaultFSAttributeStorage
 
         try
         {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "Storing attributes on UID=" + item.getRepositoryItemUid() );
-            }
-
             if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
             {
                 // not saving attributes for directories anymore
                 return;
+            }
+
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Storing attributes on UID=" + item.getRepositoryItemUid() );
             }
 
             try
