@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.apache.maven.index.artifact.ArtifactPackagingMapper;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.plugin.metadata.GAVCoordinate;
@@ -46,7 +48,7 @@ public abstract class AbstractFileNexusPluginRepository
     // Implementation fields
     // ----------------------------------------------------------------------
 
-    @Requirement
+    @Inject
     private ArtifactPackagingMapper packagingMapper;
 
     // ----------------------------------------------------------------------
