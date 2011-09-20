@@ -858,7 +858,7 @@ public abstract class AbstractRepository
         final RepositoryItemUid fromUid = createUid( from.getRequestPath() );
 
         final RepositoryItemUid toUid = createUid( to.getRequestPath() );
-        
+
         final RepositoryItemUidLock fromUidLock = fromUid.getLock();
 
         final RepositoryItemUidLock toUidLock = toUid.getLock();
@@ -933,7 +933,7 @@ public abstract class AbstractRepository
         maintainNotFoundCache( request );
 
         final RepositoryItemUid uid = createUid( request.getRequestPath() );
-        
+
         final RepositoryItemUidLock uidLock = uid.getLock();
 
         uidLock.lock( Action.delete );
@@ -998,18 +998,37 @@ public abstract class AbstractRepository
         }
 
         final RepositoryItemUid uid = createUid( item.getPath() );
-        
-        final RepositoryItemUidLock uidLock = uid.getLock();
 
         // replace UID to own one
         item.setRepositoryItemUid( uid );
 
-        uidLock.lock( Action.create );
+        // NEXUS-4550: we are shared-locking the actual UID (to not prevent downloaders while
+        // we save to temporary location. But this depends on actual LS backend actually...)
+        // but we exclusive lock uploaders to serialize them!
+        // And the LS has to take care of whatever stricter locking it has to use or not
+        // Think: RDBMS LS or some trickier LS implementations for example
+        final RepositoryItemUidLock uidLock = uid.getLock();
+
+        uidLock.lock( Action.read );
 
         try
         {
-            // store it
-            getLocalStorage().storeItem( this, item );
+            // NEXUS-4550: This "fake" UID/lock here is introduced only to serialize uploaders
+            final RepositoryItemUid uploaderUid = createUid( item.getPath() + ".storeItem()" );
+
+            final RepositoryItemUidLock uidUploaderLock = uploaderUid.getLock();
+
+            uidUploaderLock.lock( Action.create );
+
+            try
+            {
+                // store it
+                getLocalStorage().storeItem( this, item );
+            }
+            finally
+            {
+                uidUploaderLock.unlock();
+            }
         }
         finally
         {

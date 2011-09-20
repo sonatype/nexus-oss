@@ -70,6 +70,26 @@ public class RepositoryItemUidFactoryTest
     }
 
     @Test
+    public void testPathPeculiarites()
+        throws Exception
+    {
+        RepositoryItemUid uid1 = factory.createUid( repository, "/some/blammo/poth" );
+
+        RepositoryItemUid uid2 = factory.createUid( repository, "/some/blammo/poth.storeItem()" );
+
+        DefaultRepositoryItemUidLock uidLock1 = (DefaultRepositoryItemUidLock) uid1.getLock();
+
+        DefaultRepositoryItemUidLock uidLock2 = (DefaultRepositoryItemUidLock) uid2.getLock();
+
+        uidLock1.lock( Action.read );
+
+        // They dont share SAME lock
+        Assert.assertNotSame( "UIDLock instances should be different", uidLock1, uidLock2 );
+        Assert.assertNotSame( "UIDLock lock instances should be different", uidLock1.getContentLock(),
+            uidLock2.getContentLock() );
+    }
+
+    @Test
     public void testRelease()
         throws Exception
     {

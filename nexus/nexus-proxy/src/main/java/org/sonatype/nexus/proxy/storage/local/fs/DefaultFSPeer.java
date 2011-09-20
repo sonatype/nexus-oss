@@ -35,7 +35,9 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -85,25 +87,51 @@ public class DefaultFSPeer
             // we have _content_ (content or link), hence we store a file
             File hiddenTarget = getHiddenTarget( target );
 
+            // NEXUS-4550: Part One, saving to "hidden" (temp) file
+            // In case of error cleaning up only what needed
+            // No locking needed, AbstractRepository took care of that
+            FileOutputStream os = null;
+            InputStream is = null;
+
             try
             {
-                FileOutputStream os = new FileOutputStream( hiddenTarget );
+                os = new FileOutputStream( hiddenTarget );
 
-                InputStream is = cl.getContent();
+                is = cl.getContent();
 
-                try
+                IOUtil.copy( is, os, getCopyStreamBufferSize() );
+
+                os.flush();
+            }
+            catch ( IOException e )
+            {
+                if ( hiddenTarget != null )
                 {
-                    IOUtil.copy( is, os, getCopyStreamBufferSize() );
-
-                    os.flush();
-                }
-                finally
-                {
-                    IOUtil.close( is );
-
-                    IOUtil.close( os );
+                    hiddenTarget.delete();
                 }
 
+                throw new LocalStorageException( "Got exception during storing on path "
+                    + item.getRepositoryItemUid().toString() + " (while writing to hiddenTarget: "
+                    + hiddenTarget.getAbsolutePath() + ")", e );
+            }
+            finally
+            {
+                IOUtil.close( is );
+
+                IOUtil.close( os );
+            }
+
+            // NEXUS-4550: Part Two, moving the "hidden" (temp) file to final location
+            // In case of error cleaning up both files
+            // Locking is needed, AbstractRepository got shared lock only for destination
+
+            // NEXUS-4550: FSPeer is the one that handles the rename in case of FS LS,
+            // so we need here to claim exclusive lock on actual UID to perform the rename
+            final RepositoryItemUidLock uidLock = item.getRepositoryItemUid().getLock();
+            uidLock.lock( Action.create );
+
+            try
+            {
                 handleRenameOperation( hiddenTarget, target );
 
                 target.setLastModified( item.getModified() );
@@ -121,7 +149,11 @@ public class DefaultFSPeer
                 }
 
                 throw new LocalStorageException( "Got exception during storing on path "
-                    + item.getRepositoryItemUid().toString(), e );
+                    + item.getRepositoryItemUid().toString() + " (while moving to final destination)", e );
+            }
+            finally
+            {
+                uidLock.unlock();
             }
         }
         else
