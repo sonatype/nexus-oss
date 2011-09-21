@@ -941,7 +941,6 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
               items : [{
                     xtype : 'textfield',
                     fieldLabel : 'User Agent',
-                    itemCls : 'required-field',
                     helpText : ht.userAgentString,
                     name : 'remoteStorage.connectionSettings.userAgentString',
                     anchor : Sonatype.view.FIELD_OFFSET,
