@@ -45,10 +45,9 @@ public class StartAndStopNexusRunningIT
     @Test
     public void startAndStop() throws Exception {
         assertThat(nexus(), is(notNullValue()));
-        assertThat(nexus().getState(), is(notNullValue()));
-        assertThat(nexus().getState().isRunning(), is(true));
+        assertThat(nexus().isRunning(), is(true));
 
-        assertThat(nexus().getState().getUrl(), respondsWithStatus(200));
+        assertThat(nexus().getUrl(), respondsWithStatus(200));
     }
 
 }

@@ -18,7 +18,7 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
-import org.sonatype.sisu.bl.Bundle;
+import org.sonatype.sisu.bl.WebBundle;
 
 /**
  * An Nexus bundle that can be created, started, stopped based on a provided configuration.
@@ -26,6 +26,6 @@ import org.sonatype.sisu.bl.Bundle;
  * @since 1.9.3
  */
 public interface NexusBundle
-        extends Bundle<NexusBundle, NexusBundleConfiguration> {
+        extends WebBundle<NexusBundle, NexusBundleConfiguration> {
 
 }

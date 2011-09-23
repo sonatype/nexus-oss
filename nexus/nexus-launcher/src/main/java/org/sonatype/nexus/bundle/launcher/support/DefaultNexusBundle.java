@@ -20,7 +20,7 @@ package org.sonatype.nexus.bundle.launcher.support;
 
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
-import org.sonatype.sisu.bl.support.DefaultBundle;
+import org.sonatype.sisu.bl.support.DefaultWebBundle;
 import org.sonatype.sisu.bl.support.jsw.JSWExec;
 import org.sonatype.sisu.bl.support.jsw.JSWExecFactory;
 import org.sonatype.sisu.overlay.OverlayBuilder;
@@ -40,7 +40,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @Named
 public class DefaultNexusBundle
-        extends DefaultBundle<NexusBundle, NexusBundleConfiguration>
+        extends DefaultWebBundle<NexusBundle, NexusBundleConfiguration>
         implements NexusBundle {
 
     /**
@@ -122,7 +122,7 @@ public class DefaultNexusBundle
     @Override
     protected boolean applicationAlive() {
         try {
-            return RequestUtils.isNexusRESTStarted(getState().getUrl().toExternalForm());
+            return RequestUtils.isNexusRESTStarted(getUrl().toExternalForm());
         } catch (IOException ignore) {
             return false;
         }
@@ -164,7 +164,7 @@ public class DefaultNexusBundle
      */
     private void configureNexusPort() {
         overlayBuilder.overlayProperties()
-                .property("application-port", String.valueOf(getState().getPort()))
+                .property("application-port", String.valueOf(getPort()))
                 .over().path("nexus/conf/nexus.properties")
                 .applyTo(getConfiguration().getTargetDirectory());
     }

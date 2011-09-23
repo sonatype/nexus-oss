@@ -61,10 +61,9 @@ public class StartAndStopNexusIT
             nexus().start();
 
             assertThat(nexus(), is(notNullValue()));
-            assertThat(nexus().getState(), is(notNullValue()));
-            assertThat(nexus().getState().isRunning(), is(true));
+            assertThat(nexus().isRunning(), is(true));
 
-            assertThat(nexus().getState().getUrl(), respondsWithStatus(200));
+            assertThat(nexus().getUrl(), respondsWithStatus(200));
         } finally {
             nexus.stop();
         }

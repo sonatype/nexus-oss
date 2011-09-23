@@ -69,7 +69,7 @@ public abstract class NexusRunningITSupport
     @Override
     public void tearDown() {
 
-        if (nexus() != null && nexus().getState().isRunning()) {
+        if (nexus() != null && nexus().isRunning()) {
             try {
                 nexus().stop();
             } catch (Exception e) {
