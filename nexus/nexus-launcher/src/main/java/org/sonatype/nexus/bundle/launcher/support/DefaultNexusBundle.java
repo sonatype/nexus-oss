@@ -23,7 +23,7 @@ import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.sisu.bl.support.DefaultWebBundle;
 import org.sonatype.sisu.bl.support.jsw.JSWExec;
 import org.sonatype.sisu.bl.support.jsw.JSWExecFactory;
-import org.sonatype.sisu.overlay.OverlayBuilder;
+import org.sonatype.sisu.filetasks.FileTaskBuilder;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,6 +32,9 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
+import static org.sonatype.sisu.filetasks.builder.FileRef.file;
+import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 
 /**
  * Default Nexus bundle implementation.
@@ -56,10 +59,10 @@ public class DefaultNexusBundle
     private JSWExec jswExec;
 
     /**
-     * Overlay builder.
+     * File task builder.
      * Cannot be null.
      */
-    private OverlayBuilder overlayBuilder;
+    private FileTaskBuilder fileTaskBuilder;
 
     /**
      * Constructor.
@@ -69,9 +72,9 @@ public class DefaultNexusBundle
      */
     @Inject
     public DefaultNexusBundle(JSWExecFactory jswExecFactory,
-                              OverlayBuilder overlayBuilder) {
+                              FileTaskBuilder fileTaskBuilder) {
         super("nexus");
-        this.overlayBuilder = overlayBuilder;
+        this.fileTaskBuilder = fileTaskBuilder;
         this.jswExecFactory = checkNotNull(jswExecFactory);
     }
 
@@ -148,13 +151,16 @@ public class DefaultNexusBundle
         List<File> plugins = config.getPlugins();
         for (File plugin : plugins) {
             if (plugin.isDirectory()) {
-                overlayBuilder.overlayDirectory(plugin)
-                        .over().directory("sonatype-work/nexus/plugin-repository")
-                        .applyTo(config.getTargetDirectory());
+                onDirectory(config.getTargetDirectory()).apply(
+                        fileTaskBuilder.copy()
+                                .directory(file(plugin))
+                                .to().directory(path("sonatype-work/nexus/plugin-repository"))
+                );
             } else {
-                overlayBuilder.expand(plugin)
-                        .over().directory("sonatype-work/nexus/plugin-repository")
-                        .applyTo(config.getTargetDirectory());
+                onDirectory(config.getTargetDirectory()).apply(
+                        fileTaskBuilder.expand(file(plugin))
+                                .to().directory(path("sonatype-work/nexus/plugin-repository"))
+                );
             }
         }
     }
@@ -163,10 +169,10 @@ public class DefaultNexusBundle
      * Configures "application-port" nexus property.
      */
     private void configureNexusPort() {
-        overlayBuilder.overlayProperties()
-                .property("application-port", String.valueOf(getPort()))
-                .over().path("nexus/conf/nexus.properties")
-                .applyTo(getConfiguration().getTargetDirectory());
+        onDirectory(getConfiguration().getTargetDirectory()).apply(
+                fileTaskBuilder.properties(path("nexus/conf/nexus.properties"))
+                        .property("application-port", String.valueOf(getPort()))
+        );
     }
 
 }
