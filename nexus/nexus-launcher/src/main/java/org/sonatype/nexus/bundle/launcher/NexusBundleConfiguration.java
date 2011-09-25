@@ -29,7 +29,8 @@ import java.util.List;
  * @since 1.9.3
  */
 public interface NexusBundleConfiguration
-        extends BundleConfiguration<NexusBundleConfiguration> {
+    extends BundleConfiguration<NexusBundleConfiguration>
+{
 
     /**
      * Returns additional plugins to be installed in Nexus.
@@ -50,7 +51,7 @@ public interface NexusBundleConfiguration
      * @return itself, for usage in fluent api
      * @since 1.9.3
      */
-    NexusBundleConfiguration setPlugins(List<File> plugins);
+    NexusBundleConfiguration setPlugins( List<File> plugins );
 
     /**
      * Sets plugins to be installed in Nexus. Provided plugins will overwrite existing configured plugins.
@@ -61,7 +62,7 @@ public interface NexusBundleConfiguration
      * @return itself, for usage in fluent api
      * @since 1.9.3
      */
-    NexusBundleConfiguration setPlugins(File... plugins);
+    NexusBundleConfiguration setPlugins( File... plugins );
 
     /**
      * Append plugins to existing set of plugins.
@@ -72,7 +73,6 @@ public interface NexusBundleConfiguration
      * @return itself, for usage in fluent api
      * @since 1.9.3
      */
-    NexusBundleConfiguration addPlugins(File... plugins);
-
+    NexusBundleConfiguration addPlugins( File... plugins );
 
 }

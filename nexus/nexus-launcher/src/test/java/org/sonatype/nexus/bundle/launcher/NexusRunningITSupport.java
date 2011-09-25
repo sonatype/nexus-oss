@@ -27,7 +27,8 @@ import javax.inject.Provider;
  * @since 1.9.3
  */
 public abstract class NexusRunningITSupport
-        extends NexusITSupport {
+    extends NexusITSupport
+{
 
     /**
      * Provider used to create Nexus bundles on demand.
@@ -48,14 +49,18 @@ public abstract class NexusRunningITSupport
      * @since 1.9.3
      */
     @Override
-    public void setUp() {
+    public void setUp()
+    {
 
         super.setUp();
 
-        try {
+        try
+        {
             nexus().start();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        }
+        catch ( Exception e )
+        {
+            throw new RuntimeException( e );
         }
     }
 
@@ -67,13 +72,18 @@ public abstract class NexusRunningITSupport
      * @since 1.9.3
      */
     @Override
-    public void tearDown() {
+    public void tearDown()
+    {
 
-        if (nexus() != null && nexus().isRunning()) {
-            try {
+        if ( nexus() != null && nexus().isRunning() )
+        {
+            try
+            {
                 nexus().stop();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            }
+            catch ( Exception e )
+            {
+                throw new RuntimeException( e );
             }
         }
 
@@ -86,12 +96,15 @@ public abstract class NexusRunningITSupport
      * @return current Nexus
      * @since 1.9.3
      */
-    protected final NexusBundle nexus() {
-        if (nexus == null) {
+    protected final NexusBundle nexus()
+    {
+        if ( nexus == null )
+        {
             nexus = nexusProvider.get();
-            NexusBundleConfiguration config = configureNexus(nexus().getConfiguration());
-            if (config != null) {
-                nexus().setConfiguration(config);
+            NexusBundleConfiguration config = configureNexus( nexus().getConfiguration() );
+            if ( config != null )
+            {
+                nexus().setConfiguration( config );
             }
         }
         return nexus;
@@ -106,7 +119,8 @@ public abstract class NexusRunningITSupport
      *         be used
      * @since 1.9.3
      */
-    protected NexusBundleConfiguration configureNexus(NexusBundleConfiguration configuration) {
+    protected NexusBundleConfiguration configureNexus( NexusBundleConfiguration configuration )
+    {
         // template method
         return configuration;
     }

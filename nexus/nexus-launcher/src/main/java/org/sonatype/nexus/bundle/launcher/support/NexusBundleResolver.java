@@ -32,7 +32,8 @@ import javax.inject.Named;
 @Named
 @NexusSpecific
 public class NexusBundleResolver
-        extends ArtifactResolverBundleResolver {
+    extends ArtifactResolverBundleResolver
+{
 
     /**
      * Bundle coordinates configuration property key.
@@ -48,8 +49,9 @@ public class NexusBundleResolver
      * @since 1.9.3
      */
     @Inject
-    public NexusBundleResolver(@Named("${" + BUNDLE_COORDINATES + "}") String bundleCoordinates,
-                               ArtifactResolver artifactResolver) {
-        super(bundleCoordinates, artifactResolver);
+    public NexusBundleResolver( @Named( "${" + BUNDLE_COORDINATES + "}" ) String bundleCoordinates,
+                                ArtifactResolver artifactResolver )
+    {
+        super( bundleCoordinates, artifactResolver );
     }
 }

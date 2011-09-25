@@ -34,7 +34,8 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.responds
  * @since 1.9.3
  */
 public class StartAndStopNexusIT
-        extends NexusITSupport {
+    extends NexusITSupport
+{
 
     /**
      * Nexus bundle to be used during tests.
@@ -43,7 +44,7 @@ public class StartAndStopNexusIT
     private NexusBundle nexus;
 
     @Inject
-    @Named("${NexusITSupport.groovyPluginCoordinates}")
+    @Named( "${NexusITSupport.groovyPluginCoordinates}" )
     private String groovyPluginCoordinates;
 
     /**
@@ -56,15 +57,20 @@ public class StartAndStopNexusIT
      * @throws Exception re-thrown
      */
     @Test
-    public void startAndStop() throws Exception {
-        try {
+    public void startAndStop()
+        throws Exception
+    {
+        try
+        {
             nexus().start();
 
-            assertThat(nexus(), is(notNullValue()));
-            assertThat(nexus().isRunning(), is(true));
+            assertThat( nexus(), is( notNullValue() ) );
+            assertThat( nexus().isRunning(), is( true ) );
 
-            assertThat(nexus().getUrl(), respondsWithStatus(200));
-        } finally {
+            assertThat( nexus().getUrl(), respondsWithStatus( 200 ) );
+        }
+        finally
+        {
             nexus.stop();
         }
     }
@@ -75,11 +81,16 @@ public class StartAndStopNexusIT
      * @throws Exception re-thrown
      */
     @Test
-    public void installPlugins() throws Exception {
-        try {
-            nexus.getConfiguration().addPlugins(resolveArtifact(groovyPluginCoordinates));
+    public void installPlugins()
+        throws Exception
+    {
+        try
+        {
+            nexus.getConfiguration().addPlugins( resolveArtifact( groovyPluginCoordinates ) );
             nexus().start();
-        } finally {
+        }
+        finally
+        {
             nexus.stop();
         }
     }
@@ -90,7 +101,8 @@ public class StartAndStopNexusIT
      * @return nexus instance
      */
 
-    private NexusBundle nexus() {
+    private NexusBundle nexus()
+    {
         return nexus;
     }
 

@@ -37,9 +37,9 @@ import java.util.List;
  */
 @Named
 public class DefaultNexusBundleConfiguration
-        extends DefaultBundleConfiguration<NexusBundleConfiguration>
-        implements NexusBundleConfiguration {
-
+    extends DefaultBundleConfiguration<NexusBundleConfiguration>
+    implements NexusBundleConfiguration
+{
 
     /**
      * Start timeout configuration property key.
@@ -57,7 +57,8 @@ public class DefaultNexusBundleConfiguration
      * @since 1.9.3
      */
     @Inject
-    public DefaultNexusBundleConfiguration() {
+    public DefaultNexusBundleConfiguration()
+    {
         setPlugins();
     }
 
@@ -70,8 +71,10 @@ public class DefaultNexusBundleConfiguration
      * @since 1.9.3
      */
     @Inject
-    protected void configureStartTimeout(final @Named("${" + START_TIMEOUT + ":-" + START_TIMEOUT_DEFAULT + "}") Integer startTimeout) {
-        super.setStartTimeout(startTimeout);
+    protected void configureStartTimeout(
+        final @Named( "${" + START_TIMEOUT + ":-" + START_TIMEOUT_DEFAULT + "}" ) Integer startTimeout )
+    {
+        super.setStartTimeout( startTimeout );
     }
 
     /**
@@ -82,8 +85,9 @@ public class DefaultNexusBundleConfiguration
      * @since 1.9.3
      */
     @Inject
-    protected void setBundleResolver(final @NexusSpecific BundleResolver bundleResolver) {
-        super.setBundleResolver(bundleResolver);
+    protected void setBundleResolver( final @NexusSpecific BundleResolver bundleResolver )
+    {
+        super.setBundleResolver( bundleResolver );
     }
 
     /**
@@ -94,8 +98,9 @@ public class DefaultNexusBundleConfiguration
      * @since 1.9.3
      */
     @Inject
-    protected void setTargetDirectoryResolver(final @NexusSpecific TargetDirectoryResolver targetDirectoryResolver) {
-        super.setTargetDirectoryResolver(targetDirectoryResolver);
+    protected void setTargetDirectoryResolver( final @NexusSpecific TargetDirectoryResolver targetDirectoryResolver )
+    {
+        super.setTargetDirectoryResolver( targetDirectoryResolver );
     }
 
     /**
@@ -104,7 +109,8 @@ public class DefaultNexusBundleConfiguration
      * @since 1.9.3
      */
     @Override
-    public List<File> getPlugins() {
+    public List<File> getPlugins()
+    {
         return plugins;
     }
 
@@ -114,10 +120,12 @@ public class DefaultNexusBundleConfiguration
      * @since 1.9.3
      */
     @Override
-    public NexusBundleConfiguration setPlugins(final List<File> plugins) {
+    public NexusBundleConfiguration setPlugins( final List<File> plugins )
+    {
         this.plugins = new ArrayList<File>();
-        if (plugins != null) {
-            this.plugins.addAll(plugins);
+        if ( plugins != null )
+        {
+            this.plugins.addAll( plugins );
         }
         return this;
     }
@@ -128,8 +136,9 @@ public class DefaultNexusBundleConfiguration
      * @since 1.9.3
      */
     @Override
-    public NexusBundleConfiguration setPlugins(final File... plugins) {
-        return setPlugins(Arrays.asList(plugins));
+    public NexusBundleConfiguration setPlugins( final File... plugins )
+    {
+        return setPlugins( Arrays.asList( plugins ) );
     }
 
     /**
@@ -138,8 +147,9 @@ public class DefaultNexusBundleConfiguration
      * @since 1.9.3
      */
     @Override
-    public NexusBundleConfiguration addPlugins(final File... plugins) {
-        this.plugins.addAll(Arrays.asList(plugins));
+    public NexusBundleConfiguration addPlugins( final File... plugins )
+    {
+        this.plugins.addAll( Arrays.asList( plugins ) );
         return this;
     }
 

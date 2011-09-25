@@ -34,7 +34,8 @@ import java.io.File;
  * @since 1.9.3
  */
 public abstract class NexusITSupport
-        extends InjectedTestSupport {
+    extends InjectedTestSupport
+{
 
     /**
      * Path in project where IT resources will be searched.
@@ -56,16 +57,20 @@ public abstract class NexusITSupport
      * {@inheritDoc}
      */
     @Override
-    public void configure(final Binder binder) {
-        TargetDirectoryResolver targetDirectoryResolver = new TargetDirectoryResolver() {
+    public void configure( final Binder binder )
+    {
+        TargetDirectoryResolver targetDirectoryResolver = new TargetDirectoryResolver()
+        {
 
             @Override
-            public File resolve() {
-                return methodSpecificDirectory("bundle");
+            public File resolve()
+            {
+                return methodSpecificDirectory( "bundle" );
             }
 
         };
-        binder.bind(TargetDirectoryResolver.class).annotatedWith(NexusSpecific.class).toInstance(targetDirectoryResolver);
+        binder.bind( TargetDirectoryResolver.class ).annotatedWith( NexusSpecific.class ).toInstance(
+            targetDirectoryResolver );
     }
 
     /**
@@ -81,20 +86,26 @@ public abstract class NexusITSupport
      * @throws RuntimeException if path cannot be found in any of above locations
      * @since 1.9.3
      */
-    public File resolveTestFile(final String path) throws RuntimeException {
-        File level1 = testMethodSourceDirectory(path);
-        if (level1.exists()) {
+    public File resolveTestFile( final String path )
+        throws RuntimeException
+    {
+        File level1 = testMethodSourceDirectory( path );
+        if ( level1.exists() )
+        {
             return level1;
         }
-        File level2 = testClassSourceDirectory(path);
-        if (level2.exists()) {
+        File level2 = testClassSourceDirectory( path );
+        if ( level2.exists() )
+        {
             return level2;
         }
-        File level3 = testSourceDirectory(path);
-        if (level3.exists()) {
+        File level3 = testSourceDirectory( path );
+        if ( level3.exists() )
+        {
             return level3;
         }
-        throw new RuntimeException("Path " + path + " not found in any of: " + level1 + ", " + level2 + ", " + level3);
+        throw new RuntimeException(
+            "Path " + path + " not found in any of: " + level1 + ", " + level2 + ", " + level3 );
     }
 
     /**
@@ -103,10 +114,13 @@ public abstract class NexusITSupport
      * @param coordinates Maven artifact coordinates
      * @return resolved artifact file
      */
-    protected File resolveArtifact(final String coordinates) throws RuntimeException {
-        ResolvedArtifact artifact = artifactResolver.resolveArtifact(coordinates);
-        if (artifact == null || artifact.getFile() == null || !artifact.getFile().exists()) {
-            throw new RuntimeException(String.format("Artifact %s could not be resolved", coordinates));
+    protected File resolveArtifact( final String coordinates )
+        throws RuntimeException
+    {
+        ResolvedArtifact artifact = artifactResolver.resolveArtifact( coordinates );
+        if ( artifact == null || artifact.getFile() == null || !artifact.getFile().exists() )
+        {
+            throw new RuntimeException( String.format( "Artifact %s could not be resolved", coordinates ) );
         }
         return artifact.getFile();
     }
@@ -120,15 +134,16 @@ public abstract class NexusITSupport
      * @return test source directory specific to running test + provided path
      * @since 1.9.3
      */
-    private File testSourceDirectory(String path) {
+    private File testSourceDirectory( String path )
+    {
         return
+            new File(
                 new File(
-                        new File(
-                                util.getBaseDir(),
-                                SRC_TEST_IT_RESOURCES
-                        ),
-                        path
-                );
+                    util.getBaseDir(),
+                    SRC_TEST_IT_RESOURCES
+                ),
+                path
+            );
     }
 
     /**
@@ -140,18 +155,19 @@ public abstract class NexusITSupport
      * @return test source directory specific to running test class + provided path
      * @since 1.9.3
      */
-    private File testClassSourceDirectory(String path) {
+    private File testClassSourceDirectory( String path )
+    {
         return
+            new File(
                 new File(
-                        new File(
-                                new File(
-                                        util.getBaseDir(),
-                                        SRC_TEST_IT_RESOURCES
-                                ),
-                                getClass().getCanonicalName().replace(".", "/")
-                        ),
-                        path
-                );
+                    new File(
+                        util.getBaseDir(),
+                        SRC_TEST_IT_RESOURCES
+                    ),
+                    getClass().getCanonicalName().replace( ".", "/" )
+                ),
+                path
+            );
     }
 
     /**
@@ -163,21 +179,22 @@ public abstract class NexusITSupport
      * @return test source directory specific to running test method + provided path
      * @since 1.9.3
      */
-    private File testMethodSourceDirectory(String path) {
+    private File testMethodSourceDirectory( String path )
+    {
         return
+            new File(
                 new File(
+                    new File(
                         new File(
-                                new File(
-                                        new File(
-                                                util.getBaseDir(),
-                                                SRC_TEST_IT_RESOURCES
-                                        ),
-                                        getClass().getCanonicalName().replace(".", "/")
-                                ),
-                                testName.getMethodName()
+                            util.getBaseDir(),
+                            SRC_TEST_IT_RESOURCES
                         ),
-                        path
-                );
+                        getClass().getCanonicalName().replace( ".", "/" )
+                    ),
+                    testName.getMethodName()
+                ),
+                path
+            );
     }
 
     /**
@@ -188,21 +205,22 @@ public abstract class NexusITSupport
      * @param path path to be appended to test method specific directory
      * @return directory specific to running test method + provided path
      */
-    private File methodSpecificDirectory(String path) {
+    private File methodSpecificDirectory( String path )
+    {
         return
+            new File(
                 new File(
+                    new File(
                         new File(
-                                new File(
-                                        new File(
-                                                util.getTargetDir(),
-                                                "its"
-                                        ),
-                                        getClass().getCanonicalName().replace(".", "/")
-                                ),
-                                testName.getMethodName()
+                            util.getTargetDir(),
+                            "its"
                         ),
-                        path
-                );
+                        getClass().getCanonicalName().replace( ".", "/" )
+                    ),
+                    testName.getMethodName()
+                ),
+                path
+            );
     }
 
 }

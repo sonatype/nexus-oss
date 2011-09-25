@@ -43,8 +43,9 @@ import static org.sonatype.sisu.filetasks.builder.FileRef.path;
  */
 @Named
 public class DefaultNexusBundle
-        extends DefaultWebBundle<NexusBundle, NexusBundleConfiguration>
-        implements NexusBundle {
+    extends DefaultWebBundle<NexusBundle, NexusBundleConfiguration>
+    implements NexusBundle
+{
 
     /**
      * JSW utility factory.
@@ -71,11 +72,12 @@ public class DefaultNexusBundle
      * @since 1.9.3
      */
     @Inject
-    public DefaultNexusBundle(JSWExecFactory jswExecFactory,
-                              FileTaskBuilder fileTaskBuilder) {
-        super("nexus");
+    public DefaultNexusBundle( JSWExecFactory jswExecFactory,
+                               FileTaskBuilder fileTaskBuilder )
+    {
+        super( "nexus" );
         this.fileTaskBuilder = fileTaskBuilder;
-        this.jswExecFactory = checkNotNull(jswExecFactory);
+        this.jswExecFactory = checkNotNull( jswExecFactory );
     }
 
     /**
@@ -86,7 +88,8 @@ public class DefaultNexusBundle
      * @since 1.9.3
      */
     @Override
-    public void doPrepare() {
+    public void doPrepare()
+    {
         super.doPrepare();
         installPlugins();
         configureNexusPort();
@@ -100,7 +103,8 @@ public class DefaultNexusBundle
      * @since 1.9.3
      */
     @Override
-    protected void startApplication() {
+    protected void startApplication()
+    {
         jswExec().start();
     }
 
@@ -112,7 +116,8 @@ public class DefaultNexusBundle
      * @since 1.9.3
      */
     @Override
-    protected void stopApplication() {
+    protected void stopApplication()
+    {
         jswExec().stop();
     }
 
@@ -123,10 +128,14 @@ public class DefaultNexusBundle
      * @since 1.9.3
      */
     @Override
-    protected boolean applicationAlive() {
-        try {
-            return RequestUtils.isNexusRESTStarted(getUrl().toExternalForm());
-        } catch (IOException ignore) {
+    protected boolean applicationAlive()
+    {
+        try
+        {
+            return RequestUtils.isNexusRESTStarted( getUrl().toExternalForm() );
+        }
+        catch ( IOException ignore )
+        {
             return false;
         }
     }
@@ -136,9 +145,11 @@ public class DefaultNexusBundle
      *
      * @return JSW utility (never null)
      */
-    private JSWExec jswExec() {
-        if (jswExec == null) {
-            jswExec = jswExecFactory.create(getConfiguration().getTargetDirectory(), "nexus");
+    private JSWExec jswExec()
+    {
+        if ( jswExec == null )
+        {
+            jswExec = jswExecFactory.create( getConfiguration().getTargetDirectory(), "nexus" );
         }
         return jswExec;
     }
@@ -146,20 +157,25 @@ public class DefaultNexusBundle
     /**
      * Install Nexus plugins in {@code sonatype-work/nexus/plugin-repository}.
      */
-    private void installPlugins() {
+    private void installPlugins()
+    {
         NexusBundleConfiguration config = getConfiguration();
         List<File> plugins = config.getPlugins();
-        for (File plugin : plugins) {
-            if (plugin.isDirectory()) {
-                onDirectory(config.getTargetDirectory()).apply(
-                        fileTaskBuilder.copy()
-                                .directory(file(plugin))
-                                .to().directory(path("sonatype-work/nexus/plugin-repository"))
+        for ( File plugin : plugins )
+        {
+            if ( plugin.isDirectory() )
+            {
+                onDirectory( config.getTargetDirectory() ).apply(
+                    fileTaskBuilder.copy()
+                        .directory( file( plugin ) )
+                        .to().directory( path( "sonatype-work/nexus/plugin-repository" ) )
                 );
-            } else {
-                onDirectory(config.getTargetDirectory()).apply(
-                        fileTaskBuilder.expand(file(plugin))
-                                .to().directory(path("sonatype-work/nexus/plugin-repository"))
+            }
+            else
+            {
+                onDirectory( config.getTargetDirectory() ).apply(
+                    fileTaskBuilder.expand( file( plugin ) )
+                        .to().directory( path( "sonatype-work/nexus/plugin-repository" ) )
                 );
             }
         }
@@ -168,10 +184,11 @@ public class DefaultNexusBundle
     /**
      * Configures "application-port" nexus property.
      */
-    private void configureNexusPort() {
-        onDirectory(getConfiguration().getTargetDirectory()).apply(
-                fileTaskBuilder.properties(path("nexus/conf/nexus.properties"))
-                        .property("application-port", String.valueOf(getPort()))
+    private void configureNexusPort()
+    {
+        onDirectory( getConfiguration().getTargetDirectory() ).apply(
+            fileTaskBuilder.properties( path( "nexus/conf/nexus.properties" ) )
+                .property( "application-port", String.valueOf( getPort() ) )
         );
     }
 

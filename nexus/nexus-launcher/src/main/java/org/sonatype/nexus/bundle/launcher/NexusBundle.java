@@ -26,6 +26,7 @@ import org.sonatype.sisu.bl.WebBundle;
  * @since 1.9.3
  */
 public interface NexusBundle
-        extends WebBundle<NexusBundle, NexusBundleConfiguration> {
+    extends WebBundle<NexusBundle, NexusBundleConfiguration>
+{
 
 }

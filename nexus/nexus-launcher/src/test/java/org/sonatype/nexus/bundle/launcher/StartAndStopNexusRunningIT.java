@@ -31,7 +31,8 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.responds
  * @since 1.9.3
  */
 public class StartAndStopNexusRunningIT
-        extends NexusRunningITSupport {
+    extends NexusRunningITSupport
+{
 
     /**
      * Given a running/started nexus it checks that:<br/>
@@ -43,11 +44,13 @@ public class StartAndStopNexusRunningIT
      * @throws Exception re-thrown
      */
     @Test
-    public void startAndStop() throws Exception {
-        assertThat(nexus(), is(notNullValue()));
-        assertThat(nexus().isRunning(), is(true));
+    public void startAndStop()
+        throws Exception
+    {
+        assertThat( nexus(), is( notNullValue() ) );
+        assertThat( nexus().isRunning(), is( true ) );
 
-        assertThat(nexus().getUrl(), respondsWithStatus(200));
+        assertThat( nexus().getUrl(), respondsWithStatus( 200 ) );
     }
 
 }
