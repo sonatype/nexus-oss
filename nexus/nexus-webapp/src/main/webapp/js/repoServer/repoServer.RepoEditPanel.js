@@ -748,7 +748,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
                     allowBlank : false
                   }, {}, {
                     xtype : 'combo',
-                    fieldLabel : 'Auto blocking active',
+                    fieldLabel : 'Auto Blocking Enabled',
                     helpText : ht.autoBlockActive,
                     name : 'autoBlockActive',
                     itemCls : 'required-field',
@@ -764,7 +764,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
                     allowBlank : false
                   }, {
                     xtype : 'combo',
-                    fieldLabel : 'File content validation',
+                    fieldLabel : 'File Content Validation',
                     helpText : ht.fileTypeValidation,
                     name : 'fileTypeValidation',
                     itemCls : 'required-field',
