@@ -182,8 +182,6 @@
             <!-- END These are start/stop tests, shouldn't be runned -->
             <!-- START These are ITs that are "invalid" here, and should be moved out anyway -->
             <exclude>**/Nexus2862*</exclude>
-            <!-- see NEXUS-4455 -->
-            <exclude>**/Nexus393ResetPasswordPermissionIT*</exclude>
             <exclude>**/Nexus394ForgotPasswordPermissionIT*</exclude>
             <!-- END These are ITs that are "invalid" here, and should be moved out anyway -->
             <!-- inner classes -->
