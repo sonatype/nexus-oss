@@ -28,7 +28,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.apache.maven.index.artifact.ArtifactPackagingMapper;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.PluginMetadata;
 
