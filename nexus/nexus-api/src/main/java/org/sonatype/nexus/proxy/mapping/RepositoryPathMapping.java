@@ -89,7 +89,7 @@ public class RepositoryPathMapping
     {
         if ( isAllGroups()
             || ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) && groupId.equals( repository
-                .getId() ) ) )
+                .getIdentifier().toString() ) ) )
         {
             for ( Pattern pattern : patterns )
             {

@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.artifact;
 
+import org.sonatype.nexus.proxy.repository.RepositoryIdentifier;
+
 public class NexusItemInfo
 {
     private String path;
