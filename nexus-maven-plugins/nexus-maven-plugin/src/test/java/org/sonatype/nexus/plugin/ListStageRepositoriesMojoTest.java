@@ -24,6 +24,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.jdom.JDOMException;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasSize;
 import org.junit.Test;
 import org.sonatype.nexus.plugin.discovery.fixture.DefaultDiscoveryFixture;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
@@ -34,10 +39,11 @@ import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 
 
 public class ListStageRepositoriesMojoTest
-    extends AbstractNexusMojoTest
+    extends NexusMojoTestSupport
 {
 
     private ListStageRepositoriesMojo newMojo()
@@ -56,15 +62,52 @@ public class ListStageRepositoriesMojoTest
         throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
     {
         printTestName();
-        
+
         ListStageRepositoriesMojo mojo = newMojo();
-        
+
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
         mojo.setNexusUrl( getBaseUrl() );
 
         runMojo( mojo );
     }
+
+    @Test
+    public void mavenProxySupportWithAuth() throws StartingException, JDOMException, IOException, MojoExecutionException{
+        printTestName();
+        mavenProxySupportTest(true);
+    }
+
+    @Test
+    public void mavenProxySupportWithoutAuth() throws StartingException, JDOMException, IOException, MojoExecutionException{
+        printTestName();
+        mavenProxySupportTest(false);
+    }
+
+
+    private void mavenProxySupportTest(boolean useProxyAuth) throws StartingException, JDOMException, IOException, MojoExecutionException{
+
+        ListStageRepositoriesMojo mojo = newMojo();
+
+        Settings settings = new Settings();
+        startProxyServer(useProxyAuth);
+        settings.addProxy( getMavenSettingsProxy(useProxyAuth) );
+        mojo.setSettings( settings );
+
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
+        mojo.setNexusUrl( getBaseUrl() );
+
+        runMojo( mojo );
+
+        List<String> proxyUris = proxyServer.getAccessedUris();
+        assertThat(proxyUris, hasSize(10));
+        assertThat(proxyUris, allOf( hasItem(endsWith("service/local/staging/profiles")),
+            hasItem(endsWith("service/local/status")),
+            hasItem(endsWith("service/local/staging/profile_repositories/112cc490b91265a1"))));
+
+    }
+
 
     @Test
     public void baseUrlWithTrailingSlash()
@@ -112,16 +155,16 @@ public class ListStageRepositoriesMojoTest
         throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
     {
         printTestName();
-        
+
         ListStageRepositoriesMojo mojo = newMojo();
-        
+
         prompter.addExpectation( "Are you sure you want to use the Nexus URL", "" );
         prompter.addExpectation( "Enter Username [" + getExpectedUser() + "]", getExpectedUser() );
         prompter.addExpectation( "Enter Password", getExpectedPassword() );
-        
+
         mojo.setUsername( getExpectedUser() );
         mojo.setNexusUrl( getBaseUrl() );
-        
+
         runMojo( mojo );
     }
 
@@ -130,16 +173,16 @@ public class ListStageRepositoriesMojoTest
         throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
     {
         printTestName();
-        
+
         ListStageRepositoriesMojo mojo = newMojo();
-        
+
         prompter.addExpectation( "Nexus URL", getBaseUrl() );
         prompter.addExpectation( "Enter Username [" + getExpectedUser() + "]", getExpectedUser() );
         prompter.addExpectation( "Enter Password", getExpectedPassword() );
 
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
-        
+
         runMojo( mojo );
     }
 
@@ -148,24 +191,24 @@ public class ListStageRepositoriesMojoTest
         throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
     {
         printTestName();
-        
+
         ListStageRepositoriesMojo mojo = newMojo();
-        
+
         String serverId = "server";
-        
+
         Server server = new Server();
         server.setId( serverId );
         server.setUsername( getExpectedUser() );
         server.setPassword( getExpectedPassword() );
-        
+
         Settings settings = new Settings();
         settings.addServer( server );
-        
+
         mojo.setSettings( settings );
         mojo.setServerAuthId( serverId );
-        
+
         mojo.setNexusUrl( getBaseUrl() );
-        
+
         runMojo( mojo );
     }
 
@@ -173,7 +216,7 @@ public class ListStageRepositoriesMojoTest
         throws JDOMException, IOException, MojoExecutionException
     {
         mojo.setLog( log );
-        
+
         List<RESTTestFixture> conversation = new ArrayList<RESTTestFixture>();
 
         conversation.add( getVersionCheckFixture() );
@@ -203,8 +246,8 @@ public class ListStageRepositoriesMojoTest
         conversation.add( reposGet );
 
         fixture.setConversation( conversation );
-        
+
         mojo.execute();
     }
-    
+
 }

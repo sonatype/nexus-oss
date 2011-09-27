@@ -49,7 +49,7 @@ public abstract class AbstractStagingMojo
     }
 
     @Override
-    protected synchronized StageClient connect()
+    protected final synchronized StageClient connect()
         throws RESTLightClientException
     {
         final String url = formatUrl( getNexusUrl() );

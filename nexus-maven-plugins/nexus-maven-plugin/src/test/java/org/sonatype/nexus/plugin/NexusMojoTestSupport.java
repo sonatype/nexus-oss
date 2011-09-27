@@ -18,15 +18,18 @@
  */
 package org.sonatype.nexus.plugin;
 
+import com.sun.media.jai.opimage.AddCRIF;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
+import org.apache.maven.settings.Proxy;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
@@ -34,15 +37,24 @@ import org.codehaus.plexus.component.repository.exception.ComponentLifecycleExce
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.FileUtils;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.After;
 import org.junit.Before;
+import org.mortbay.jetty.Server;
+import org.sonatype.jettytestsuite.ProxyServer;
 import org.sonatype.nexus.restlight.testharness.AbstractRESTTest;
 import org.sonatype.nexus.restlight.testharness.ConversationalFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 
-public class AbstractNexusMojoTest
+public class NexusMojoTestSupport
     extends AbstractRESTTest
 {
 
@@ -63,9 +75,11 @@ public class AbstractNexusMojoTest
 
     private static Random random = new Random();
 
+    protected ProxyServer proxyServer;
+
     @Before
     public void beforeEach()
-        throws ComponentLookupException, PlexusContainerException
+        throws ComponentLookupException, PlexusContainerException, StartingException, InitializationException
     {
         log = new SystemStreamLog()
         {
@@ -82,13 +96,15 @@ public class AbstractNexusMojoTest
 
         logger = new ConsoleLogger( Logger.LEVEL_INFO, "test" );
         container = new DefaultPlexusContainer();
-
         secDispatcher = (SecDispatcher) container.lookup( SecDispatcher.class.getName(), "maven" );
+
+        proxyServer = new ProxyServer();
+        proxyServer.initialize();
     }
 
     @After
     public void afterEach()
-        throws ComponentLifecycleException
+        throws ComponentLifecycleException, StoppingException
     {
         if ( toDelete != null )
         {
@@ -113,6 +129,10 @@ public class AbstractNexusMojoTest
         }
 
         container.release( secDispatcher );
+
+        // stop proxy server if started
+        stopProxyServer();
+
         container.dispose();
 
         prompter.verifyPromptsUsed();
@@ -168,6 +188,56 @@ public class AbstractNexusMojoTest
             new File( System.getProperty( "java.io.tmpDir", "target" ), prefix + random.nextInt( Integer.MAX_VALUE )
                 + suffix );
         return tmp;
+    }
+
+    /**
+     * Stop the proxy server if started.
+     * @param proxyServer
+     */
+    protected final void stopProxyServer() throws StoppingException{
+        proxyServer.stop();
+    }
+
+    /**
+     * Starts a proxy server on a random port
+     * @return
+     */
+    protected final void startProxyServer(boolean includeAuth) throws StartingException{
+        if(includeAuth){
+            proxyServer.getProxyServlet().setUseAuthentication(true);
+            proxyServer.getProxyServlet().getAuthentications().put("proxyuser", "proxypass");
+        }
+        this.proxyServer.start();
+    }
+
+    /**
+     * Get the port the proxy server is listening on
+     * @return
+     */
+    protected final int getProxyServerPort(){
+        Server server = proxyServer.getServer();
+        return server.getConnectors()[0].getLocalPort();
+    }
+
+    /**
+     *
+     * @return a maven setting proxy optionally configured with the proxy authentication credentials
+     */
+    protected final Proxy getMavenSettingsProxy(boolean includeAuth){
+        Proxy proxy = new Proxy();
+        proxy.setActive(true);
+        proxy.setHost("localhost");
+        proxy.setPort(getProxyServerPort());
+        proxy.setNonProxyHosts("localhostdisabled");
+
+        if(includeAuth){
+            Map<String,String> auths = proxyServer.getProxyServlet().getAuthentications();
+            assertThat(auths.isEmpty(), not(true));
+            proxy.setPassword(auths.entrySet().iterator().next().getValue());
+            proxy.setUsername(auths.entrySet().iterator().next().getKey());
+        }
+
+        return proxy;
     }
 
 }

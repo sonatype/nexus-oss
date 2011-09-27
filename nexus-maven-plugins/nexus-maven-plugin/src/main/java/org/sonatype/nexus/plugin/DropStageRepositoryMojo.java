@@ -27,7 +27,7 @@ import org.sonatype.nexus.restlight.stage.StageRepository;
 
 /**
  * Drop a closed Nexus staging repository.
- * 
+ *
  * @goal staging-drop
  * @requiresProject false
  * @aggregator
@@ -41,7 +41,7 @@ public class DropStageRepositoryMojo
      * If set to <code>true</code>, allow auto-selection of the repository to drop in cases where no repositoryId has
      * been specified during execution, and only one staged repository is available. <br/>
      * <b>NOTE:</b> Use with care! This can be dangerous!
-     * 
+     *
      * @parameter expression="${nexus.drop.autoSelectOverride}" default-value="false"
      */
     private boolean dropAutoSelectOverride;
@@ -69,11 +69,11 @@ public class DropStageRepositoryMojo
         {
             throw new MojoExecutionException( "Failed to find closed staging repository: " + e.getMessage(), e );
         }
-        
+
         if ( repos != null && !repos.isEmpty() )
         {
             StageRepository repo = select( repos, "Select a repository to drop", isDropAutoSelectOverride() );
-            
+
             StringBuilder builder = new StringBuilder();
             builder.append( "Dropping staged repository: " );
 
@@ -109,6 +109,11 @@ public class DropStageRepositoryMojo
     public void setDropAutoSelectOverride( final boolean dropAutoSelectOverride )
     {
         this.dropAutoSelectOverride = dropAutoSelectOverride;
+    }
+
+    public void setDescription( final String desc )
+    {
+        this.description = desc;
     }
 
 }

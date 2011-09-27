@@ -1,0 +1,6 @@
+<promoteRequest>
+  <data>
+    <stagedRepositoryId>tp1-001</stagedRepositoryId>
+    <description>Reason for dropping repo cannot be null</description>
+  </data>
+</promoteRequest>

@@ -39,6 +39,7 @@ import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.sonatype.nexus.restlight.common.ProxyConfig;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.m2settings.M2SettingsClient;
 
@@ -55,7 +56,7 @@ import org.sonatype.nexus.restlight.m2settings.M2SettingsClient;
  * Additionally, by default any existing settings.xml file in the way will be backed up using a datestamp to ensure
  * previous backup files are not overwritten.
  * </p>
- * 
+ *
  * @goal settings-download
  * @requiresProject false
  * @aggregator
@@ -68,7 +69,7 @@ public class DownloadSettingsTemplateMojo
     /**
      * The ID of the template to download. For instance, a templateId of 'sonatype' will download from
      * '${nexusUrl}/service/local/templates/settings/sonatype/content'.
-     * 
+     *
      * @parameter expression="${settings.templateId}" default-value="default"
      */
     private String templateId;
@@ -76,7 +77,7 @@ public class DownloadSettingsTemplateMojo
     /**
      * The full URL of a settings template available from a particular Nexus Professional instance. If missing, the mojo
      * will prompt for this value.
-     * 
+     *
      * @parameter expression="${url}"
      */
     private String url;
@@ -84,7 +85,7 @@ public class DownloadSettingsTemplateMojo
     /**
      * The standard destination where the downloaded settings.xml template should be saved. The <a
      * href="#target">target</a> parameter will override this value.
-     * 
+     *
      * @parameter expression="${destination}" default-value="user"
      */
     private String destination;
@@ -93,7 +94,7 @@ public class DownloadSettingsTemplateMojo
      * If true and there is a pre-existing settings.xml file in the way of this download, backup the file to a
      * datestamped filename, where the specific format of the datestamp is given by the <a
      * href="#backupFormat">backupFormat</a> parameter.
-     * 
+     *
      * @parameter expression="${doBackup}" default-value="true"
      */
     private boolean doBackup;
@@ -104,7 +105,7 @@ public class DownloadSettingsTemplateMojo
      * copies of the settings.xml to avoid overwriting previously backed up settings files. This protects against the
      * case where the download mojo is used multiple times with incorrect settings, where using a single static
      * backup-file name would destroy the original, pre-existing settings.
-     * 
+     *
      * @parameter expression="${backupFormat}" default-value="yyyyMMdd_HHmmss"
      */
     private String backupFormat;
@@ -114,14 +115,14 @@ public class DownloadSettingsTemplateMojo
      * file location to save the settings template instead. If this file exists, it will be backed up using the same
      * logic as the standard locations (using the <a href="#doBackup">doBackup</a> and <a
      * href="#backupFormat">backupFormat</a> parameters).
-     * 
+     *
      * @parameter expression="${target}"
      */
     private File target;
 
     /**
      * Use this parameter to define a non-default encoding for the settings file.
-     * 
+     *
      * @parameter expression="${encoding}"
      */
     private String encoding;
@@ -275,12 +276,18 @@ public class DownloadSettingsTemplateMojo
     protected synchronized M2SettingsClient connect()
         throws RESTLightClientException, MojoExecutionException
     {
-        String url = formatUrl( getNexusUrl() );
+        final String nexusUrl = formatUrl( getNexusUrl() );
 
-        getLog().info( "Logging into Nexus: " + url );
+        setAndValidateProxy();
+        getLog().info( "Logging into Nexus: " + nexusUrl );
         getLog().info( "User: " + getUsername() );
 
-        client = new M2SettingsClient( url, getUsername(), getPassword() );
+        ProxyConfig proxyConfig = null;
+        if(getProxyHost() != null){
+            proxyConfig = new ProxyConfig(getProxyHost(), getProxyPort(), getProxyUsername(), getProxyPassword());
+        }
+
+        client = new M2SettingsClient( nexusUrl, getUsername(), getPassword(), proxyConfig );
         return client;
     }
 

@@ -24,6 +24,11 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.jdom.JDOMException;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasSize;
 import org.junit.Test;
 import org.sonatype.nexus.plugin.discovery.fixture.DefaultDiscoveryFixture;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
@@ -35,9 +40,10 @@ import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 
 public class PromoteToStageProfileMojoTest
-    extends AbstractNexusMojoTest
+    extends NexusMojoTestSupport
 {
 
     @Test
@@ -59,7 +65,52 @@ public class PromoteToStageProfileMojoTest
 
         runMojo( mojo );
     }
-    
+
+
+    @Test
+    public void mavenProxySupportWithAuth() throws StartingException, JDOMException, IOException, MojoExecutionException{
+        printTestName();
+        mavenProxySupportTest(true);
+    }
+
+    @Test
+    public void mavenProxySupportWithoutAuth() throws StartingException, JDOMException, IOException, MojoExecutionException{
+        printTestName();
+        mavenProxySupportTest(false);
+    }
+
+
+    private void mavenProxySupportTest(boolean useProxyAuth) throws StartingException, JDOMException, IOException, MojoExecutionException{
+
+        PromoteToStageProfileMojo mojo = newMojo();
+
+        Settings settings = new Settings();
+        startProxyServer(useProxyAuth);
+        settings.addProxy( getMavenSettingsProxy(useProxyAuth) );
+        mojo.setSettings( settings );
+
+        mojo.setStagingBuildPromotionProfileId( "profile3" );
+        mojo.getRepositoryIds().add( "repoId1" );
+        mojo.getRepositoryIds().add( "repoId2" );
+
+        mojo.setNexusUrl( getBaseUrl() );
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
+        mojo.setDescription( "The description" );
+
+        runMojo( mojo );
+
+        List<String> proxyUris = proxyServer.getAccessedUris();
+        assertThat(proxyUris, hasSize(12));
+        assertThat(proxyUris, allOf( hasItem(endsWith("service/local/staging/profiles")),
+            hasItem(endsWith("service/local/status")),
+            hasItem(endsWith("service/local/staging/profile_repositories/profile1")),
+            hasItem(endsWith("service/local/staging/bulk/promote"))));
+
+    }
+
+
+
     @Test
     public void promptForGroupProfile()
         throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
@@ -80,7 +131,7 @@ public class PromoteToStageProfileMojoTest
 
         runMojo( mojo );
     }
-    
+
     @Test
     public void promptForRepository()
         throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
@@ -94,7 +145,7 @@ public class PromoteToStageProfileMojoTest
         prompter.addExpectation( "Add another Repository?", "y" );
         prompter.addExpectation( "Repository:", "2" );
         prompter.addExpectation( "Add another Repository?", "n" );
-        
+
 //        prompter.addExpectation( "Repository", "0" );
         mojo.setStagingBuildPromotionProfileId( "profile3" );
 //        mojo.getRepositoryIds().add( "repoId1" );
@@ -107,8 +158,8 @@ public class PromoteToStageProfileMojoTest
 
         runMojo( mojo );
     }
-    
-    
+
+
     @Test
     public void promptForDescription()
         throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
@@ -129,7 +180,7 @@ public class PromoteToStageProfileMojoTest
 
         runMojo( mojo );
     }
-    
+
 
     @Test
     public void promptForPassword()
@@ -223,7 +274,7 @@ public class PromoteToStageProfileMojoTest
     {
         return "1.7.2";
     }
-    
+
     private void runMojo( final PromoteToStageProfileMojo mojo )
         throws JDOMException, IOException, MojoExecutionException
     {

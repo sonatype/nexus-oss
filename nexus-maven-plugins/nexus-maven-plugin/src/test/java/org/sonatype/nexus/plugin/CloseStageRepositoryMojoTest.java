@@ -28,8 +28,15 @@ import java.util.Properties;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasSize;
 import org.jdom.JDOMException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -47,17 +54,17 @@ import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 import org.sonatype.plexus.components.sec.dispatcher.model.io.xpp3.SecurityConfigurationXpp3Writer;
 
 public class CloseStageRepositoryMojoTest
-    extends AbstractNexusMojoTest
+    extends NexusMojoTestSupport
 {
-    
+
     protected static File secFile;
 
     protected static String encryptedPassword;
-    
+
     protected static String clearTextPassword = "password";
 
     protected static String oldSecLocation;
-    
+
     @BeforeClass
     public static void beforeAll()
         throws PlexusCipherException, IOException
@@ -112,7 +119,7 @@ public class CloseStageRepositoryMojoTest
         {
         }
     }
-    
+
 
     @Test
     public void simplestUseCase()
@@ -216,7 +223,53 @@ public class CloseStageRepositoryMojoTest
 
         runMojo( mojo );
     }
-    
+
+
+    @Test
+    public void mavenProxySupportWithAuth() throws StartingException, JDOMException, IOException, MojoExecutionException, RESTLightClientException, InitializationException{
+        printTestName();
+        mavenProxySupportTest(true);
+    }
+
+    @Test
+    public void mavenProxySupportWithoutAuth() throws StartingException, JDOMException, IOException, MojoExecutionException, RESTLightClientException, InitializationException{
+        printTestName();
+        mavenProxySupportTest(false);
+    }
+
+    public void mavenProxySupportTest(boolean useProxyAuth)
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException, StartingException, InitializationException
+    {
+
+        printTestName();
+
+        CloseStageRepositoryMojo mojo = newMojo();
+
+        prompter.addExpectation( "1", "" );
+
+        Settings settings = new Settings();
+        startProxyServer(useProxyAuth);
+        settings.addProxy( getMavenSettingsProxy(useProxyAuth) );
+        mojo.setSettings( settings );
+
+        mojo.setArtifactId( "artifactId" );
+        mojo.setGroupId( "group.id" );
+        mojo.setVersion( "1" );
+
+        mojo.setNexusUrl( getBaseUrl() );
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
+        mojo.setDescription( "this is a description" );
+
+        runMojo( mojo );
+
+        List<String> proxyUris = proxyServer.getAccessedUris();
+        assertThat(proxyUris, hasSize(12));
+        assertThat(proxyUris, allOf( hasItem(endsWith("service/local/staging/profile_evaluate?v=1&g=group.id&t=maven2&a=artifactId")),
+            hasItem(endsWith("/service/local/status"))));
+
+    }
+
     @Test
     public void authUsingSettingsEnctypedPasswordWithServerAuthId()
         throws JDOMException, IOException, RESTLightClientException, MojoExecutionException

@@ -36,6 +36,11 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasSize;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.sonatype.nexus.plugin.discovery.fixture.DefaultDiscoveryFixture;
@@ -44,9 +49,12 @@ import org.sonatype.nexus.restlight.testharness.GETFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 
 import com.ibm.icu.text.SimpleDateFormat;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.sonatype.nexus.restlight.common.RESTLightClientException;
 
 public class DownloadSettingsTemplateMojoTest
-    extends AbstractNexusMojoTest
+    extends NexusMojoTestSupport
 {
 
     private DownloadSettingsTemplateMojo newMojo()
@@ -58,6 +66,50 @@ public class DownloadSettingsTemplateMojoTest
         mojo.setDispatcher( secDispatcher );
 
         return mojo;
+    }
+
+    @Test
+    public void mavenProxySupportWithAuth() throws StartingException, JDOMException, IOException, MojoExecutionException, RESTLightClientException, InitializationException{
+        printTestName();
+        mavenProxySupportTest(true);
+    }
+
+    @Test
+    public void mavenProxySupportWithoutAuth() throws StartingException, JDOMException, IOException, MojoExecutionException, RESTLightClientException, InitializationException{
+        printTestName();
+        mavenProxySupportTest(false);
+    }
+
+
+    private void mavenProxySupportTest(boolean useProxyAuth)
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException, StartingException, InitializationException
+    {
+        String token = "testToken";
+
+        DownloadSettingsTemplateMojo mojo = newMojo();
+
+        mojo.setUrl( getTemplateURL( token ) );
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
+
+        Settings settings = new Settings();
+        startProxyServer(useProxyAuth);
+        settings.addProxy( getMavenSettingsProxy(useProxyAuth) );
+
+        mojo.setSettings( settings );
+
+        File target = createTempFile( "download-settings-template.", ".test.xml" );
+        mojo.setTarget( target );
+
+        toDelete.add( target );
+
+        runMojoTest( mojo, token, target );
+
+        List<String> proxyUris = proxyServer.getAccessedUris();
+        assertThat(proxyUris, hasSize(4));
+        assertThat(proxyUris, allOf( hasItem(endsWith("/service/local/templates/settings/testToken/content")),
+            hasItem(endsWith("/service/local/status"))));
+
     }
 
     @Test
@@ -113,9 +165,7 @@ public class DownloadSettingsTemplateMojoTest
     }
 
     @Test
-    @Ignore
-    // Disabled, since the main Nexus URL is discovered unless -Durl= is specified. Default templateId
-    // is used in this case, which is 'default'.
+    @Ignore("Disabled, since the main Nexus URL is discovered unless -Durl= is specified. Default templateId is used in this case, which is 'default'.")
     public void getSettingsTemplatePromptForMissingURL()
         throws JDOMException, IOException, MojoExecutionException
     {
@@ -181,20 +231,20 @@ public class DownloadSettingsTemplateMojoTest
         DownloadSettingsTemplateMojo mojo = newMojo();
 
         mojo.setUrl( getTemplateURL( token ) );
-        
+
         String serverId = "server";
         mojo.setServerAuthId( serverId );
 
         Settings settings = new Settings();
-        
+
         Server server = new Server();
-        
+
         server.setId( serverId );
         server.setUsername( getExpectedUser() );
         server.setPassword( getExpectedPassword() );
-        
+
         settings.addServer( server );
-        
+
         mojo.setSettings( settings );
 
         File target = createTempFile( "download-settings-template.", ".test.xml" );

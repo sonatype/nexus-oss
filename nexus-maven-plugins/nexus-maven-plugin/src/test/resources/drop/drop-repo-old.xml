@@ -1,0 +1,6 @@
+<com.sonatype.nexus.staging.api.dto.StagingPromoteRequestDTO>
+  <data>
+    <stagedRepositoryId>tp1-001</stagedRepositoryId>
+    <description>Reason for dropping repo cannot be null</description>
+  </data>
+</com.sonatype.nexus.staging.api.dto.StagingPromoteRequestDTO>
