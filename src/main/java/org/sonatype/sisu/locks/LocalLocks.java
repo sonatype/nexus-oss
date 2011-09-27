@@ -1,32 +1,19 @@
 package org.sonatype.sisu.locks;
 
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Semaphore;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.guice.bean.reflect.Weak;
-
 @Named( "local" )
 @Singleton
 public final class LocalLocks
-    implements Locks
+    extends AbstractLocks
 {
-    private final ConcurrentMap<String, Impl> sharedLocks = Weak.concurrentValues();
-
-    public SharedLock getSharedLock( final String name )
+    @Override
+    protected SharedLock create( String name )
     {
-        Impl sem = sharedLocks.get( name );
-        if ( null == sem )
-        {
-            final Impl oldSem = sharedLocks.putIfAbsent( name, sem = new Impl() );
-            if ( null != oldSem )
-            {
-                return oldSem;
-            }
-        }
-        return sem;
+        return new Impl();
     }
 
     public static final class Impl

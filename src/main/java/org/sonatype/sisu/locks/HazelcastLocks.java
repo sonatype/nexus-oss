@@ -1,10 +1,15 @@
 package org.sonatype.sisu.locks;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import com.hazelcast.config.InMemoryXmlConfig;
+import org.sonatype.inject.Nullable;
+
+import com.hazelcast.config.FileSystemXmlConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.ISemaphore;
 import com.hazelcast.core.InstanceDestroyedException;
@@ -12,15 +17,26 @@ import com.hazelcast.core.InstanceDestroyedException;
 @Named( "hazelcast" )
 @Singleton
 final class HazelcastLocks
-    implements Locks
+    extends AbstractLocks
 {
     @Inject
-    HazelcastLocks( @Named( "hazelcast.config.xml" ) final String xml )
+    HazelcastLocks( @Nullable @Named( "${hazelcast.config}" ) final File configFile )
     {
-        Hazelcast.init( new InMemoryXmlConfig( xml ) );
+        if ( null != configFile && configFile.isFile() )
+        {
+            try
+            {
+                Hazelcast.init( new FileSystemXmlConfig( configFile ) );
+            }
+            catch ( final FileNotFoundException e )
+            {
+                throw new IllegalArgumentException( e.getMessage() );
+            }
+        }
     }
 
-    public SharedLock getSharedLock( final String name )
+    @Override
+    protected SharedLock create( String name )
     {
         return new Impl( name );
     }
@@ -33,7 +49,7 @@ final class HazelcastLocks
         Impl( final String name )
         {
             sem = Hazelcast.getSemaphore( name );
-            sem.release( Integer.MAX_VALUE );
+            sem.release( Integer.MAX_VALUE - sem.availablePermits() );
         }
 
         @Override
