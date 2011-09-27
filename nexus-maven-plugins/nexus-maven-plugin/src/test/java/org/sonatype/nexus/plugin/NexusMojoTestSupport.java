@@ -190,49 +190,59 @@ public class NexusMojoTestSupport
 
     /**
      * Stop the proxy server if started.
+     * 
      * @param proxyServer
      */
-    protected final void stopProxyServer() throws StoppingException{
+    protected final void stopProxyServer()
+        throws StoppingException
+    {
         proxyServer.stop();
     }
 
     /**
      * Starts a proxy server on a random port
+     * 
      * @return
      */
-    protected final void startProxyServer(boolean includeAuth) throws StartingException{
-        if(includeAuth){
-            proxyServer.getProxyServlet().setUseAuthentication(true);
-            proxyServer.getProxyServlet().getAuthentications().put("proxyuser", "proxypass");
+    protected final void startProxyServer( boolean includeAuth )
+        throws StartingException
+    {
+        if ( includeAuth )
+        {
+            proxyServer.getProxyServlet().setUseAuthentication( true );
+            proxyServer.getProxyServlet().getAuthentications().put( "proxyuser", "proxypass" );
         }
         this.proxyServer.start();
     }
 
     /**
      * Get the port the proxy server is listening on
+     * 
      * @return
      */
-    protected final int getProxyServerPort(){
+    protected final int getProxyServerPort()
+    {
         Server server = proxyServer.getServer();
         return server.getConnectors()[0].getLocalPort();
     }
 
     /**
-     *
      * @return a maven setting proxy optionally configured with the proxy authentication credentials
      */
-    protected final Proxy getMavenSettingsProxy(boolean includeAuth){
+    protected final Proxy getMavenSettingsProxy( boolean includeAuth )
+    {
         Proxy proxy = new Proxy();
-        proxy.setActive(true);
-        proxy.setHost("localhost");
-        proxy.setPort(getProxyServerPort());
-        proxy.setNonProxyHosts("localhostdisabled");
+        proxy.setActive( true );
+        proxy.setHost( "localhost" );
+        proxy.setPort( getProxyServerPort() );
+        proxy.setNonProxyHosts( "localhostdisabled" );
 
-        if(includeAuth){
-            Map<String,String> auths = proxyServer.getProxyServlet().getAuthentications();
-            assertThat(auths.isEmpty(), not(true));
-            proxy.setPassword(auths.entrySet().iterator().next().getValue());
-            proxy.setUsername(auths.entrySet().iterator().next().getKey());
+        if ( includeAuth )
+        {
+            Map<String, String> auths = proxyServer.getProxyServlet().getAuthentications();
+            assertThat( auths.isEmpty(), not( true ) );
+            proxy.setPassword( auths.entrySet().iterator().next().getValue() );
+            proxy.setUsername( auths.entrySet().iterator().next().getKey() );
         }
 
         return proxy;

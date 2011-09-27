@@ -311,7 +311,7 @@ public class DefaultNexusDiscovery
         }
 
         sb.append( "\nwith username: " ).append( user ).append( "? [Y/n] " );
-        return PromptUtil.booleanPrompt( prompter,  sb, Boolean.TRUE );
+        return PromptUtil.booleanPrompt( prompter, sb, Boolean.TRUE );
     }
 
     private Server promptForUserAndPassword( final String defaultUser )
@@ -354,8 +354,6 @@ public class DefaultNexusDiscovery
         while ( u == null );
         return result;
     }
-
-    
 
     private String stringPrompt( final CharSequence prompt )
     {
@@ -697,13 +695,13 @@ public class DefaultNexusDiscovery
         }
     }
 
-	public SecDispatcher getSecDispatcher() 
-	{
-		return secDispatcher;
-	}
+    public SecDispatcher getSecDispatcher()
+    {
+        return secDispatcher;
+    }
 
-	public void setSecDispatcher( SecDispatcher secDispatcher )
-	{
-		this.secDispatcher = secDispatcher;
-	}
+    public void setSecDispatcher( SecDispatcher secDispatcher )
+    {
+        this.secDispatcher = secDispatcher;
+    }
 }

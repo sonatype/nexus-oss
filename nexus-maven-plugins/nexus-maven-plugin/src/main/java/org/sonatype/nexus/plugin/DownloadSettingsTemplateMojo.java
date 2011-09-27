@@ -283,8 +283,9 @@ public class DownloadSettingsTemplateMojo
         getLog().info( "User: " + getUsername() );
 
         ProxyConfig proxyConfig = null;
-        if(getProxyHost() != null){
-            proxyConfig = new ProxyConfig(getProxyHost(), getProxyPort(), getProxyUsername(), getProxyPassword());
+        if ( getProxyHost() != null )
+        {
+            proxyConfig = new ProxyConfig( getProxyHost(), getProxyPort(), getProxyUsername(), getProxyPassword() );
         }
 
         client = new M2SettingsClient( nexusUrl, getUsername(), getPassword(), proxyConfig );

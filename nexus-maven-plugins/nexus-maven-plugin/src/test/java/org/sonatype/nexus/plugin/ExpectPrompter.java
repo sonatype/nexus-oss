@@ -35,15 +35,15 @@ import org.codehaus.plexus.util.StringUtils;
 public class ExpectPrompter
     implements Prompter
 {
-    
+
     private final LinkedHashMap<String[], String> expectations = new LinkedHashMap<String[], String>();
-    
+
     private int expectationIndex = 0;
-    
+
     private boolean useOrder = false;
 
     private final Set<String[]> used = new HashSet<String[]>();
-    
+
     private boolean output = false;
 
     private boolean debug = false;
@@ -138,14 +138,15 @@ public class ExpectPrompter
         {
             System.out.print( prompt );
         }
-        
+
         String result = defaultValue == null ? "-NOT SUPPLIED-" : defaultValue;
         String original = result;
 
-        if( useOrder )
+        if ( useOrder )
         {
             // NOTE: A LinkedMap from Commons Collections might be great here, but they are not generic
-            List<Entry<String[], String>> orderedEntries = new ArrayList<Entry<String[], String>>( expectations.entrySet() );
+            List<Entry<String[], String>> orderedEntries =
+                new ArrayList<Entry<String[], String>>( expectations.entrySet() );
             Entry<String[], String> entry = orderedEntries.get( expectationIndex++ );
             // just return the value (in order)
             result = entry.getValue();
@@ -164,10 +165,10 @@ public class ExpectPrompter
                     {
                         continue promptMatching;
                     }
-                    
+
                     idx = nxtIdx + fragment.length();
                 }
-    
+
                 result = entry.getValue();
                 used.add( entry.getKey() );
                 break;
@@ -177,7 +178,7 @@ public class ExpectPrompter
         {
             System.out.println( result );
         }
-        
+
         if ( debug && original.equals( result ) )
         {
             System.out.println( "Debug mode enabled; suspending for prompt examination." );
@@ -200,21 +201,19 @@ public class ExpectPrompter
     {
         Map<String[], String> remaining = new LinkedHashMap<String[], String>( expectations );
         remaining.keySet().removeAll( used );
-        
+
         if ( !remaining.isEmpty() )
         {
             StringBuilder sb = new StringBuilder();
-            
+
             sb.append( "The following prompt/answer pairs were never used:\n" );
             for ( Map.Entry<String[], String> entry : remaining.entrySet() )
             {
-                sb.append( "\n-  " )
-                  .append( StringUtils.join( entry.getKey(), "*" ) )
-                  .append( " = " )
-                  .append( entry.getValue() );
+                sb.append( "\n-  " ).append( StringUtils.join( entry.getKey(), "*" ) ).append( " = " ).append(
+                    entry.getValue() );
             }
             sb.append( "\n\n" );
-            
+
             System.out.println( sb.toString() );
             fail( sb.toString() );
         }

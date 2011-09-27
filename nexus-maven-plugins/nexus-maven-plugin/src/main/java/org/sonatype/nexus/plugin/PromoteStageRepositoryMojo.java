@@ -24,10 +24,11 @@ package org.sonatype.nexus.plugin;
  * @goal staging-promote
  * @requiresProject false
  * @aggregator
- * @deprecated Replaced by: staging-release. 
+ * @deprecated Replaced by: staging-release.
  */
 @Deprecated
-public class PromoteStageRepositoryMojo extends ReleaseStageRepositoryMojo
+public class PromoteStageRepositoryMojo
+    extends ReleaseStageRepositoryMojo
 {
 
 }

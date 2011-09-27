@@ -66,27 +66,31 @@ public class PromoteToStageProfileMojoTest
         runMojo( mojo );
     }
 
-
     @Test
-    public void mavenProxySupportWithAuth() throws StartingException, JDOMException, IOException, MojoExecutionException{
+    public void mavenProxySupportWithAuth()
+        throws StartingException, JDOMException, IOException, MojoExecutionException
+    {
         printTestName();
-        mavenProxySupportTest(true);
+        mavenProxySupportTest( true );
     }
 
     @Test
-    public void mavenProxySupportWithoutAuth() throws StartingException, JDOMException, IOException, MojoExecutionException{
+    public void mavenProxySupportWithoutAuth()
+        throws StartingException, JDOMException, IOException, MojoExecutionException
+    {
         printTestName();
-        mavenProxySupportTest(false);
+        mavenProxySupportTest( false );
     }
 
-
-    private void mavenProxySupportTest(boolean useProxyAuth) throws StartingException, JDOMException, IOException, MojoExecutionException{
+    private void mavenProxySupportTest( boolean useProxyAuth )
+        throws StartingException, JDOMException, IOException, MojoExecutionException
+    {
 
         PromoteToStageProfileMojo mojo = newMojo();
 
         Settings settings = new Settings();
-        startProxyServer(useProxyAuth);
-        settings.addProxy( getMavenSettingsProxy(useProxyAuth) );
+        startProxyServer( useProxyAuth );
+        settings.addProxy( getMavenSettingsProxy( useProxyAuth ) );
         mojo.setSettings( settings );
 
         mojo.setStagingBuildPromotionProfileId( "profile3" );
@@ -101,15 +105,15 @@ public class PromoteToStageProfileMojoTest
         runMojo( mojo );
 
         List<String> proxyUris = proxyServer.getAccessedUris();
-        assertThat(proxyUris, hasSize(12));
-        assertThat(proxyUris, allOf( hasItem(endsWith("service/local/staging/profiles")),
-            hasItem(endsWith("service/local/status")),
-            hasItem(endsWith("service/local/staging/profile_repositories/profile1")),
-            hasItem(endsWith("service/local/staging/bulk/promote"))));
+        assertThat( proxyUris, hasSize( 12 ) );
+        assertThat(
+            proxyUris,
+            allOf( hasItem( endsWith( "service/local/staging/profiles" ) ),
+                hasItem( endsWith( "service/local/status" ) ),
+                hasItem( endsWith( "service/local/staging/profile_repositories/profile1" ) ),
+                hasItem( endsWith( "service/local/staging/bulk/promote" ) ) ) );
 
     }
-
-
 
     @Test
     public void promptForGroupProfile()
@@ -120,7 +124,7 @@ public class PromoteToStageProfileMojoTest
         PromoteToStageProfileMojo mojo = newMojo();
 
         prompter.addExpectation( "Build Promotion Profile", "1" );
-//        mojo.setStagingBuildPromotionProfileId( "profile3" );
+        // mojo.setStagingBuildPromotionProfileId( "profile3" );
         mojo.getRepositoryIds().add( "repoId1" );
         mojo.getRepositoryIds().add( "repoId2" );
 
@@ -146,10 +150,10 @@ public class PromoteToStageProfileMojoTest
         prompter.addExpectation( "Repository:", "2" );
         prompter.addExpectation( "Add another Repository?", "n" );
 
-//        prompter.addExpectation( "Repository", "0" );
+        // prompter.addExpectation( "Repository", "0" );
         mojo.setStagingBuildPromotionProfileId( "profile3" );
-//        mojo.getRepositoryIds().add( "repoId1" );
-//        mojo.getRepositoryIds().add( "repoId2" );
+        // mojo.getRepositoryIds().add( "repoId1" );
+        // mojo.getRepositoryIds().add( "repoId2" );
 
         mojo.setNexusUrl( getBaseUrl() );
         mojo.setUsername( getExpectedUser() );
@@ -158,7 +162,6 @@ public class PromoteToStageProfileMojoTest
 
         runMojo( mojo );
     }
-
 
     @Test
     public void promptForDescription()
@@ -176,11 +179,10 @@ public class PromoteToStageProfileMojoTest
         mojo.setNexusUrl( getBaseUrl() );
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
-//        mojo.setDescription( "The description" );
+        // mojo.setDescription( "The description" );
 
         runMojo( mojo );
     }
-
 
     @Test
     public void promptForPassword()

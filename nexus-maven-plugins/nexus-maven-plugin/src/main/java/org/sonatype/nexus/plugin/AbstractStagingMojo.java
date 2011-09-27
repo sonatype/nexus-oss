@@ -59,11 +59,12 @@ public abstract class AbstractStagingMojo
         getLog().info( "User: " + getUsername() );
 
         ProxyConfig proxyConfig = null;
-        if(getProxyHost() != null){
-            proxyConfig = new ProxyConfig(getProxyHost(), getProxyPort(), getProxyUsername(), getProxyPassword());
+        if ( getProxyHost() != null )
+        {
+            proxyConfig = new ProxyConfig( getProxyHost(), getProxyPort(), getProxyUsername(), getProxyPassword() );
         }
 
-        client = new StageClient( url, getUsername(), getPassword(), proxyConfig);
+        client = new StageClient( url, getUsername(), getPassword(), proxyConfig );
         return client;
     }
 

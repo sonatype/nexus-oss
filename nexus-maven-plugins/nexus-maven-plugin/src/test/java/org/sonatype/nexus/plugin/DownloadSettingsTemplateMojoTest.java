@@ -69,20 +69,26 @@ public class DownloadSettingsTemplateMojoTest
     }
 
     @Test
-    public void mavenProxySupportWithAuth() throws StartingException, JDOMException, IOException, MojoExecutionException, RESTLightClientException, InitializationException{
+    public void mavenProxySupportWithAuth()
+        throws StartingException, JDOMException, IOException, MojoExecutionException, RESTLightClientException,
+        InitializationException
+    {
         printTestName();
-        mavenProxySupportTest(true);
+        mavenProxySupportTest( true );
     }
 
     @Test
-    public void mavenProxySupportWithoutAuth() throws StartingException, JDOMException, IOException, MojoExecutionException, RESTLightClientException, InitializationException{
+    public void mavenProxySupportWithoutAuth()
+        throws StartingException, JDOMException, IOException, MojoExecutionException, RESTLightClientException,
+        InitializationException
+    {
         printTestName();
-        mavenProxySupportTest(false);
+        mavenProxySupportTest( false );
     }
 
-
-    private void mavenProxySupportTest(boolean useProxyAuth)
-        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException, StartingException, InitializationException
+    private void mavenProxySupportTest( boolean useProxyAuth )
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException, StartingException,
+        InitializationException
     {
         String token = "testToken";
 
@@ -93,8 +99,8 @@ public class DownloadSettingsTemplateMojoTest
         mojo.setPassword( getExpectedPassword() );
 
         Settings settings = new Settings();
-        startProxyServer(useProxyAuth);
-        settings.addProxy( getMavenSettingsProxy(useProxyAuth) );
+        startProxyServer( useProxyAuth );
+        settings.addProxy( getMavenSettingsProxy( useProxyAuth ) );
 
         mojo.setSettings( settings );
 
@@ -106,9 +112,11 @@ public class DownloadSettingsTemplateMojoTest
         runMojoTest( mojo, token, target );
 
         List<String> proxyUris = proxyServer.getAccessedUris();
-        assertThat(proxyUris, hasSize(4));
-        assertThat(proxyUris, allOf( hasItem(endsWith("/service/local/templates/settings/testToken/content")),
-            hasItem(endsWith("/service/local/status"))));
+        assertThat( proxyUris, hasSize( 4 ) );
+        assertThat(
+            proxyUris,
+            allOf( hasItem( endsWith( "/service/local/templates/settings/testToken/content" ) ),
+                hasItem( endsWith( "/service/local/status" ) ) ) );
 
     }
 
@@ -161,11 +169,11 @@ public class DownloadSettingsTemplateMojoTest
 
         XMLOutputter outputter = new XMLOutputter( Format.getCompactFormat() );
         assertEquals( outputter.outputString( emptySettings ),
-                      outputter.outputString( readTestDocumentFile( backupSettingsFile ) ) );
+            outputter.outputString( readTestDocumentFile( backupSettingsFile ) ) );
     }
 
     @Test
-    @Ignore("Disabled, since the main Nexus URL is discovered unless -Durl= is specified. Default templateId is used in this case, which is 'default'.")
+    @Ignore( "Disabled, since the main Nexus URL is discovered unless -Durl= is specified. Default templateId is used in this case, which is 'default'." )
     public void getSettingsTemplatePromptForMissingURL()
         throws JDOMException, IOException, MojoExecutionException
     {

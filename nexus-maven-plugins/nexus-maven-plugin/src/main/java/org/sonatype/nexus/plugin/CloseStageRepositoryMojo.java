@@ -115,7 +115,7 @@ public class CloseStageRepositoryMojo
             getLog().info( builder.toString() );
 
             promptForMissingDescription();
-            
+
             try
             {
                 client.finishRepository( repo, getDescription() );
@@ -172,7 +172,7 @@ public class CloseStageRepositoryMojo
     {
         this.description = description;
     }
-    
+
     private String promptForMissingDescription()
         throws MojoExecutionException
     {

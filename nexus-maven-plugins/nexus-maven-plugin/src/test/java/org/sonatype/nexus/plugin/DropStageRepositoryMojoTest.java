@@ -38,10 +38,11 @@ import org.sonatype.nexus.restlight.testharness.POSTFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 
 /**
- *
  * @author plynch
  */
-public class DropStageRepositoryMojoTest extends NexusMojoTestSupport{
+public class DropStageRepositoryMojoTest
+    extends NexusMojoTestSupport
+{
 
     private DropStageRepositoryMojo newMojo()
     {
@@ -54,22 +55,25 @@ public class DropStageRepositoryMojoTest extends NexusMojoTestSupport{
         return mojo;
     }
 
-
-
     @Test
-    public void mavenProxySupportWithAuth() throws StartingException, JDOMException, IOException, MojoExecutionException{
+    public void mavenProxySupportWithAuth()
+        throws StartingException, JDOMException, IOException, MojoExecutionException
+    {
         printTestName();
-        mavenProxySupportTest(true);
+        mavenProxySupportTest( true );
     }
 
     @Test
-    public void mavenProxySupportWithoutAuth() throws StartingException, JDOMException, IOException, MojoExecutionException{
+    public void mavenProxySupportWithoutAuth()
+        throws StartingException, JDOMException, IOException, MojoExecutionException
+    {
         printTestName();
-        mavenProxySupportTest(false);
+        mavenProxySupportTest( false );
     }
 
-
-    private void mavenProxySupportTest(boolean useProxyAuth) throws StartingException, JDOMException, IOException, MojoExecutionException{
+    private void mavenProxySupportTest( boolean useProxyAuth )
+        throws StartingException, JDOMException, IOException, MojoExecutionException
+    {
 
         DropStageRepositoryMojo mojo = newMojo();
 
@@ -80,22 +84,22 @@ public class DropStageRepositoryMojoTest extends NexusMojoTestSupport{
         mojo.setPassword( getExpectedPassword() );
 
         Settings settings = new Settings();
-        startProxyServer(useProxyAuth);
-        settings.addProxy( getMavenSettingsProxy(useProxyAuth) );
+        startProxyServer( useProxyAuth );
+        settings.addProxy( getMavenSettingsProxy( useProxyAuth ) );
         mojo.setSettings( settings );
-        mojo.setDescription("Reason for dropping repo cannot be null");
+        mojo.setDescription( "Reason for dropping repo cannot be null" );
 
         runMojo( mojo );
 
         List<String> proxyUris = proxyServer.getAccessedUris();
-        assertThat(proxyUris, hasSize(12));
-        assertThat(proxyUris, allOf( hasItem(endsWith("service/local/staging/profiles")),
-            hasItem(endsWith("service/local/staging/profiles/112cc490b91265a1/drop")),
-            hasItem(endsWith("service/local/staging/profile_repositories/112cc490b91265a1"))));
-
+        assertThat( proxyUris, hasSize( 12 ) );
+        assertThat(
+            proxyUris,
+            allOf( hasItem( endsWith( "service/local/staging/profiles" ) ),
+                hasItem( endsWith( "service/local/staging/profiles/112cc490b91265a1/drop" ) ),
+                hasItem( endsWith( "service/local/staging/profile_repositories/112cc490b91265a1" ) ) ) );
 
     }
-
 
     private void runMojo( final DropStageRepositoryMojo mojo )
         throws JDOMException, IOException, MojoExecutionException
@@ -135,7 +139,6 @@ public class DropStageRepositoryMojoTest extends NexusMojoTestSupport{
         dropPost.setResponseStatus( 201 );
 
         conversation.add( dropPost );
-
 
         repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         repoListGet.setExactURI( StageClient.PROFILES_PATH );

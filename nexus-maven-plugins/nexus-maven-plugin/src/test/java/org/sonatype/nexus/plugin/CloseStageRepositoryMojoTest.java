@@ -71,7 +71,8 @@ public class CloseStageRepositoryMojoTest
     {
         DefaultPlexusCipher cipher = new DefaultPlexusCipher();
 
-        String master = cipher.encryptAndDecorate( clearTextPassword, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
+        String master =
+            cipher.encryptAndDecorate( clearTextPassword, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
 
         SettingsSecurity sec = new SettingsSecurity();
         sec.setMaster( master );
@@ -119,7 +120,6 @@ public class CloseStageRepositoryMojoTest
         {
         }
     }
-
 
     @Test
     public void simplestUseCase()
@@ -224,21 +224,27 @@ public class CloseStageRepositoryMojoTest
         runMojo( mojo );
     }
 
-
     @Test
-    public void mavenProxySupportWithAuth() throws StartingException, JDOMException, IOException, MojoExecutionException, RESTLightClientException, InitializationException{
+    public void mavenProxySupportWithAuth()
+        throws StartingException, JDOMException, IOException, MojoExecutionException, RESTLightClientException,
+        InitializationException
+    {
         printTestName();
-        mavenProxySupportTest(true);
+        mavenProxySupportTest( true );
     }
 
     @Test
-    public void mavenProxySupportWithoutAuth() throws StartingException, JDOMException, IOException, MojoExecutionException, RESTLightClientException, InitializationException{
+    public void mavenProxySupportWithoutAuth()
+        throws StartingException, JDOMException, IOException, MojoExecutionException, RESTLightClientException,
+        InitializationException
+    {
         printTestName();
-        mavenProxySupportTest(false);
+        mavenProxySupportTest( false );
     }
 
-    public void mavenProxySupportTest(boolean useProxyAuth)
-        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException, StartingException, InitializationException
+    public void mavenProxySupportTest( boolean useProxyAuth )
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException, StartingException,
+        InitializationException
     {
 
         printTestName();
@@ -248,8 +254,8 @@ public class CloseStageRepositoryMojoTest
         prompter.addExpectation( "1", "" );
 
         Settings settings = new Settings();
-        startProxyServer(useProxyAuth);
-        settings.addProxy( getMavenSettingsProxy(useProxyAuth) );
+        startProxyServer( useProxyAuth );
+        settings.addProxy( getMavenSettingsProxy( useProxyAuth ) );
         mojo.setSettings( settings );
 
         mojo.setArtifactId( "artifactId" );
@@ -264,9 +270,12 @@ public class CloseStageRepositoryMojoTest
         runMojo( mojo );
 
         List<String> proxyUris = proxyServer.getAccessedUris();
-        assertThat(proxyUris, hasSize(12));
-        assertThat(proxyUris, allOf( hasItem(endsWith("service/local/staging/profile_evaluate?v=1&g=group.id&t=maven2&a=artifactId")),
-            hasItem(endsWith("/service/local/status"))));
+        assertThat( proxyUris, hasSize( 12 ) );
+        assertThat(
+            proxyUris,
+            allOf(
+                hasItem( endsWith( "service/local/staging/profile_evaluate?v=1&g=group.id&t=maven2&a=artifactId" ) ),
+                hasItem( endsWith( "/service/local/status" ) ) ) );
 
     }
 

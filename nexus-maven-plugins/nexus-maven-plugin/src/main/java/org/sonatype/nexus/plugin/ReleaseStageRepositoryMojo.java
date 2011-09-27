@@ -52,7 +52,6 @@ public class ReleaseStageRepositoryMojo
      */
     private String targetRepositoryId;
 
-
     /**
      * @parameter default-value="Staging Releasing ${project.build.finalName}" expression="${description}"
      */

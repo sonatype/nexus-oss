@@ -65,7 +65,7 @@ public class AbstractNexusDiscoveryTest
     protected static File secFile;
 
     protected static String encryptedPassword;
-    
+
     protected static String clearTextPassword = "password";
 
     protected static String oldSecLocation;
@@ -77,12 +77,13 @@ public class AbstractNexusDiscoveryTest
         throws PlexusCipherException, IOException
     {
         DefaultPlexusCipher cipher = new DefaultPlexusCipher();
-        
-        String master = cipher.encryptAndDecorate( clearTextPassword, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
-        
+
+        String master =
+            cipher.encryptAndDecorate( clearTextPassword, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
+
         SettingsSecurity sec = new SettingsSecurity();
         sec.setMaster( master );
-        
+
         secFile = new File( String.format( "target/settings-security.%s.xml", random.nextInt( Integer.MAX_VALUE ) ) );
         FileWriter writer = null;
         try
@@ -94,13 +95,13 @@ public class AbstractNexusDiscoveryTest
         {
             IOUtil.close( writer );
         }
-        
+
         encryptedPassword = cipher.encryptAndDecorate( "password", "password" );
-        
+
         Properties sysProps = System.getProperties();
         oldSecLocation = sysProps.getProperty( DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
         sysProps.setProperty( DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION, secFile.getAbsolutePath() );
-        
+
         System.setProperties( sysProps );
     }
 
