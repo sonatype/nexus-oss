@@ -45,5 +45,11 @@ public final class LocalLocks
         {
             sem.release( permits );
         }
+
+        @Override
+        protected int availablePermits()
+        {
+            return sem.availablePermits();
+        }
     }
 }

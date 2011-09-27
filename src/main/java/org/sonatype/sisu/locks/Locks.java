@@ -1,9 +1,9 @@
 package org.sonatype.sisu.locks;
 
-import java.util.Collection;
-
 public interface Locks
 {
+    SharedLock getSharedLock( String name );
+
     interface SharedLock
     {
         void lockShared();
@@ -14,12 +14,14 @@ public interface Locks
 
         void unlockShared();
 
+        boolean isExclusive();
+
+        int globalOwners();
+
+        Thread[] localOwners();
+
         int sharedLockCount( Thread thread );
 
         int exclusiveLockCount( Thread thread );
-
-        Collection<Thread> owners();
     }
-
-    SharedLock getSharedLock( String name );
 }

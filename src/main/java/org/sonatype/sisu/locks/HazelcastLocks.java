@@ -44,6 +44,7 @@ final class HazelcastLocks
                 try
                 {
                     sem.acquireAttach( permits );
+                    return;
                 }
                 catch ( final InterruptedException e )
                 {
@@ -60,6 +61,12 @@ final class HazelcastLocks
         protected void release( final int permits )
         {
             sem.releaseDetach( permits );
+        }
+
+        @Override
+        protected int availablePermits()
+        {
+            return sem.availablePermits();
         }
     }
 }

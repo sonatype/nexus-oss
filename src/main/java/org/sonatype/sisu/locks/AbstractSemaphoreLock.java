@@ -1,7 +1,5 @@
 package org.sonatype.sisu.locks;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -93,6 +91,22 @@ public abstract class AbstractSemaphoreLock
         }
     }
 
+    public boolean isExclusive()
+    {
+        return 0 == availablePermits();
+    }
+
+    public int globalOwners()
+    {
+        final int n = availablePermits();
+        return n > 0 ? Integer.MAX_VALUE - n : 1;
+    }
+
+    public Thread[] localOwners()
+    {
+        return threadCounters.keySet().toArray( new Thread[0] );
+    }
+
     public int sharedLockCount( final Thread thread )
     {
         final int[] counters = threadCounters.get( thread );
@@ -105,12 +119,9 @@ public abstract class AbstractSemaphoreLock
         return null != counters ? counters[1] : 0;
     }
 
-    public Collection<Thread> owners()
-    {
-        return new ArrayList<Thread>( threadCounters.keySet() );
-    }
-
     protected abstract void acquire( int permits );
 
     protected abstract void release( int permits );
+
+    protected abstract int availablePermits();
 }
