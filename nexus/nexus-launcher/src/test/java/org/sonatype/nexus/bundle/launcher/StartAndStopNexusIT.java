@@ -71,7 +71,7 @@ public class StartAndStopNexusIT
         }
         finally
         {
-            nexus.stop();
+            nexus().stop();
         }
     }
 
@@ -86,12 +86,12 @@ public class StartAndStopNexusIT
     {
         try
         {
-            nexus.getConfiguration().addPlugins( resolveArtifact( groovyPluginCoordinates ) );
+            nexus().getConfiguration().addPlugins( resolveArtifact( groovyPluginCoordinates ) );
             nexus().start();
         }
         finally
         {
-            nexus.stop();
+            nexus().stop();
         }
     }
 
