@@ -18,7 +18,9 @@
  */
 package org.sonatype.nexus.plugin;
 
-import com.sun.media.jai.opimage.AddCRIF;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
@@ -41,10 +43,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.FileUtils;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
 import org.junit.After;
 import org.junit.Before;
 import org.mortbay.jetty.Server;
