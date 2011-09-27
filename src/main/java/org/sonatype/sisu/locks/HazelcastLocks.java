@@ -11,22 +11,22 @@ import com.hazelcast.core.InstanceDestroyedException;
 
 @Named( "hazelcast" )
 @Singleton
-final class HazelcastSemaphores
-    implements Semaphores
+final class HazelcastLocks
+    implements Locks
 {
     @Inject
-    HazelcastSemaphores( @Named( "hazelcast.config.xml" ) final String xml )
+    HazelcastLocks( @Named( "hazelcast.config.xml" ) final String xml )
     {
         Hazelcast.init( new InMemoryXmlConfig( xml ) );
     }
 
-    public Sem get( final String name )
+    public SharedLock getSharedLock( final String name )
     {
         return new Impl( name );
     }
 
     private static final class Impl
-        extends AbstractSem
+        extends AbstractSemaphoreLock
     {
         private final ISemaphore sem;
 
@@ -37,7 +37,7 @@ final class HazelcastSemaphores
         }
 
         @Override
-        protected void acquire( int permits )
+        protected void acquire( final int permits )
         {
             while ( true )
             {
@@ -57,7 +57,7 @@ final class HazelcastSemaphores
         }
 
         @Override
-        protected void release( int permits )
+        protected void release( final int permits )
         {
             sem.releaseDetach( permits );
         }

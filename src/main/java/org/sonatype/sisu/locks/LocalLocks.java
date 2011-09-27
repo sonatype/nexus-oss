@@ -10,17 +10,17 @@ import org.sonatype.guice.bean.reflect.Weak;
 
 @Named( "local" )
 @Singleton
-public final class LocalSemaphores
-    implements Semaphores
+public final class LocalLocks
+    implements Locks
 {
-    private final ConcurrentMap<String, Impl> semaphores = Weak.concurrentValues();
+    private final ConcurrentMap<String, Impl> sharedLocks = Weak.concurrentValues();
 
-    public Sem get( final String name )
+    public SharedLock getSharedLock( final String name )
     {
-        Impl sem = semaphores.get( name );
+        Impl sem = sharedLocks.get( name );
         if ( null == sem )
         {
-            final Impl oldSem = semaphores.putIfAbsent( name, sem = new Impl() );
+            final Impl oldSem = sharedLocks.putIfAbsent( name, sem = new Impl() );
             if ( null != oldSem )
             {
                 return oldSem;
@@ -30,18 +30,18 @@ public final class LocalSemaphores
     }
 
     public static final class Impl
-        extends AbstractSem
+        extends AbstractSemaphoreLock
     {
         private final Semaphore sem = new Semaphore( Integer.MAX_VALUE );
 
         @Override
-        protected void acquire( int permits )
+        protected void acquire( final int permits )
         {
             sem.acquireUninterruptibly( permits );
         }
 
         @Override
-        protected void release( int permits )
+        protected void release( final int permits )
         {
             sem.release( permits );
         }

@@ -1,17 +1,19 @@
 package org.sonatype.sisu.locks;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.sonatype.sisu.locks.Semaphores.Sem;
+import org.sonatype.sisu.locks.Locks.SharedLock;
 
-public abstract class AbstractSem
-    implements Sem
+public abstract class AbstractSemaphoreLock
+    implements SharedLock
 {
     private final Map<Thread, int[]> threadCounters = Collections.synchronizedMap( new WeakHashMap<Thread, int[]>() );
 
-    public final void acquireShared()
+    public final void lockShared()
     {
         final Thread self = Thread.currentThread();
         final int[] counters = threadCounters.get( self );
@@ -26,7 +28,7 @@ public abstract class AbstractSem
         }
     }
 
-    public final void acquireExclusive()
+    public final void lockExclusive()
     {
         final Thread self = Thread.currentThread();
         final int[] counters = threadCounters.get( self );
@@ -35,8 +37,10 @@ public abstract class AbstractSem
             if ( counters[1] == 0 && counters[0] > 0 )
             {
                 release( 1 );
+                threadCounters.remove( self );
                 Thread.yield();
                 acquire( Integer.MAX_VALUE );
+                threadCounters.put( self, counters );
             }
             counters[1]++;
         }
@@ -47,7 +51,7 @@ public abstract class AbstractSem
         }
     }
 
-    public final void releaseExclusive()
+    public final void unlockExclusive()
     {
         final Thread self = Thread.currentThread();
         final int[] counters = threadCounters.get( self );
@@ -56,14 +60,12 @@ public abstract class AbstractSem
             if ( --counters[1] == 0 )
             {
                 release( Integer.MAX_VALUE );
+                threadCounters.remove( self );
                 if ( counters[0] > 0 )
                 {
                     Thread.yield();
                     acquire( 1 );
-                }
-                else
-                {
-                    threadCounters.remove( self );
+                    threadCounters.put( self, counters );
                 }
             }
         }
@@ -73,7 +75,7 @@ public abstract class AbstractSem
         }
     }
 
-    public final void releaseShared()
+    public final void unlockShared()
     {
         final Thread self = Thread.currentThread();
         final int[] counters = threadCounters.get( self );
@@ -91,21 +93,21 @@ public abstract class AbstractSem
         }
     }
 
-    public final int[] getHoldCounts()
+    public int sharedLockCount( final Thread thread )
     {
-        return threadCounters.get( Thread.currentThread() );
+        final int[] counters = threadCounters.get( thread );
+        return null != counters ? counters[0] : 0;
     }
 
-    @Override
-    public String toString()
+    public int exclusiveLockCount( final Thread thread )
     {
-        final Thread self = Thread.currentThread();
-        int[] counters = threadCounters.get( self );
-        if ( null == counters )
-        {
-            counters = new int[2];
-        }
-        return super.toString() + "[Write locks = " + counters[1] + ", Read locks = " + counters[0] + "]";
+        final int[] counters = threadCounters.get( thread );
+        return null != counters ? counters[1] : 0;
+    }
+
+    public Collection<Thread> owners()
+    {
+        return new ArrayList<Thread>( threadCounters.keySet() );
     }
 
     protected abstract void acquire( int permits );
