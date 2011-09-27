@@ -174,16 +174,8 @@
           <argLine>-XX:PermSize=220m -XX:MaxPermSize=220m -Xmx600M -XX:+HeapDumpOnOutOfMemoryError</argLine>
           <excludes>
             <exclude>**Suite*</exclude>
-            <!-- START These are start/stop tests, shouldn't be runned -->
-            <exclude>**/Nexus758ServiceStability.*</exclude>
-            <exclude>**/Nexus758StatusService.*</exclude>
-            <exclude>**/Nexus748MultipleStart.*</exclude>
+            <!-- cargo tests, run on a separated profile -->
             <exclude>**/Nexus3860*</exclude>
-            <!-- END These are start/stop tests, shouldn't be runned -->
-            <!-- START These are ITs that are "invalid" here, and should be moved out anyway -->
-            <exclude>**/Nexus2862*</exclude>
-            <exclude>**/Nexus394ForgotPasswordPermissionIT*</exclude>
-            <!-- END These are ITs that are "invalid" here, and should be moved out anyway -->
             <!-- inner classes -->
             <exclude>**/*$*.*</exclude>
           </excludes>
