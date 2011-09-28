@@ -2,14 +2,14 @@ package org.sonatype.sisu.locks;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.WeakHashMap;
 
+import org.sonatype.guice.bean.reflect.Weak;
 import org.sonatype.sisu.locks.Locks.SharedLock;
 
 public abstract class AbstractSemaphoreLock
     implements SharedLock
 {
-    private final Map<Thread, int[]> threadCounters = Collections.synchronizedMap( new WeakHashMap<Thread, int[]>() );
+    private final Map<Thread, int[]> threadCounters = Collections.synchronizedMap( Weak.<Thread, int[]> keys() );
 
     public final void lockShared()
     {
