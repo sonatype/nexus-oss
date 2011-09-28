@@ -15,6 +15,9 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.sonatype.guice.bean.reflect.Weak;
 
+/**
+ * Abstract {@link Locks} implementation; associates names with {@link ResourceLock}s.
+ */
 abstract class AbstractLocks
     implements Locks
 {
@@ -46,5 +49,8 @@ abstract class AbstractLocks
     // Implementation methods
     // ----------------------------------------------------------------------
 
+    /**
+     * @return Lock associated with the given resource name
+     */
     protected abstract ResourceLock create( final String name );
 }

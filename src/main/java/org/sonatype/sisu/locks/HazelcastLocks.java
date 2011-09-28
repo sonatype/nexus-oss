@@ -26,6 +26,9 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.ISemaphore;
 import com.hazelcast.core.InstanceDestroyedException;
 
+/**
+ * Distributed Hazelcast {@link Locks}.
+ */
 @Named( "hazelcast" )
 @Singleton
 final class HazelcastLocks
@@ -66,6 +69,9 @@ final class HazelcastLocks
     // Implementation types
     // ----------------------------------------------------------------------
 
+    /**
+     * {@link ResourceLock} implemented on top of a Hazelcast {@link ISemaphore}.
+     */
     private static final class ResourceLockImpl
         extends AbstractSemaphoreResourceLock
     {
@@ -85,7 +91,7 @@ final class HazelcastLocks
         }
 
         // ----------------------------------------------------------------------
-        // Implementation methods
+        // Semaphore methods
         // ----------------------------------------------------------------------
 
         @Override

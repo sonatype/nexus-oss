@@ -16,6 +16,9 @@ import java.util.concurrent.Semaphore;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+/**
+ * Local JDK {@link Locks}.
+ */
 @Named
 @Singleton
 public final class DefaultLocks
@@ -35,6 +38,9 @@ public final class DefaultLocks
     // Implementation types
     // ----------------------------------------------------------------------
 
+    /**
+     * {@link ResourceLock} implemented on top of a JDK {@link Semaphore}.
+     */
     public static final class ResourceLockImpl
         extends AbstractSemaphoreResourceLock
     {
@@ -45,7 +51,7 @@ public final class DefaultLocks
         private final Semaphore sem = new Semaphore( Integer.MAX_VALUE );
 
         // ----------------------------------------------------------------------
-        // Implementation methods
+        // Semaphore methods
         // ----------------------------------------------------------------------
 
         @Override

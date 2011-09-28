@@ -17,6 +17,9 @@ import java.util.Map;
 import org.sonatype.guice.bean.reflect.Weak;
 import org.sonatype.sisu.locks.Locks.ResourceLock;
 
+/**
+ * {@link ResourceLock} implemented on top of an abstract semaphore.
+ */
 public abstract class AbstractSemaphoreResourceLock
     implements ResourceLock
 {
@@ -61,6 +64,9 @@ public abstract class AbstractSemaphoreResourceLock
         {
             if ( counters[EXCLUSIVE] == 0 && counters[SHARED] > 0 )
             {
+                /*
+                 * Must drop shared lock before upgrading to exclusive lock
+                 */
                 release( 1 );
                 threadCounters.remove( self );
                 Thread.yield();
@@ -88,6 +94,9 @@ public abstract class AbstractSemaphoreResourceLock
                 threadCounters.remove( self );
                 if ( counters[SHARED] > 0 )
                 {
+                    /*
+                     * Downgrading from exclusive back to shared lock
+                     */
                     Thread.yield();
                     acquire( 1 );
                     threadCounters.put( self, counters );
@@ -147,12 +156,21 @@ public abstract class AbstractSemaphoreResourceLock
     }
 
     // ----------------------------------------------------------------------
-    // Implementation methods
+    // Semaphore methods
     // ----------------------------------------------------------------------
 
+    /**
+     * @param permits Number of permits to acquire
+     */
     protected abstract void acquire( int permits );
 
+    /**
+     * @param permits Number of permits to release
+     */
     protected abstract void release( int permits );
 
+    /**
+     * @return Number of available permits
+     */
     protected abstract int availablePermits();
 }
