@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 import org.sonatype.inject.Nullable;
 
 import com.hazelcast.config.FileSystemXmlConfig;
+import com.hazelcast.config.SemaphoreConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.ISemaphore;
 import com.hazelcast.core.InstanceDestroyedException;
@@ -33,6 +34,7 @@ final class HazelcastLocks
                 throw new IllegalArgumentException( e.getMessage() );
             }
         }
+        Hazelcast.getConfig().addSemaphoreConfig( new SemaphoreConfig( "default", Integer.MAX_VALUE ) );
     }
 
     @Override
@@ -49,7 +51,6 @@ final class HazelcastLocks
         Impl( final String name )
         {
             sem = Hazelcast.getSemaphore( name );
-            sem.release( Integer.MAX_VALUE - sem.availablePermits() );
         }
 
         @Override
