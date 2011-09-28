@@ -2,9 +2,9 @@ package org.sonatype.sisu.locks;
 
 public interface Locks
 {
-    SharedLock getSharedLock( String name );
+    ResourceLock getResourceLock( String name );
 
-    interface SharedLock
+    interface ResourceLock
     {
         void lockShared();
 
@@ -20,8 +20,8 @@ public interface Locks
 
         Thread[] localOwners();
 
-        int sharedLockCount( Thread thread );
+        int sharedCount( Thread thread );
 
-        int exclusiveLockCount( Thread thread );
+        int exclusiveCount( Thread thread );
     }
 }

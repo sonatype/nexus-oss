@@ -4,11 +4,15 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.sonatype.guice.bean.reflect.Weak;
-import org.sonatype.sisu.locks.Locks.SharedLock;
+import org.sonatype.sisu.locks.Locks.ResourceLock;
 
-public abstract class AbstractSemaphoreLock
-    implements SharedLock
+public abstract class AbstractSemaphoreResourceLock
+    implements ResourceLock
 {
+    private static final int SHARED = 0;
+
+    private static final int EXCLUSIVE = 1;
+
     private final Map<Thread, int[]> threadCounters = Collections.synchronizedMap( Weak.<Thread, int[]> keys() );
 
     public final void lockShared()
@@ -17,7 +21,7 @@ public abstract class AbstractSemaphoreLock
         final int[] counters = threadCounters.get( self );
         if ( null != counters )
         {
-            counters[0]++;
+            counters[SHARED]++;
         }
         else
         {
@@ -32,7 +36,7 @@ public abstract class AbstractSemaphoreLock
         final int[] counters = threadCounters.get( self );
         if ( null != counters )
         {
-            if ( counters[1] == 0 && counters[0] > 0 )
+            if ( counters[EXCLUSIVE] == 0 && counters[SHARED] > 0 )
             {
                 release( 1 );
                 threadCounters.remove( self );
@@ -40,7 +44,7 @@ public abstract class AbstractSemaphoreLock
                 acquire( Integer.MAX_VALUE );
                 threadCounters.put( self, counters );
             }
-            counters[1]++;
+            counters[EXCLUSIVE]++;
         }
         else
         {
@@ -53,13 +57,13 @@ public abstract class AbstractSemaphoreLock
     {
         final Thread self = Thread.currentThread();
         final int[] counters = threadCounters.get( self );
-        if ( null != counters && counters[1] > 0 )
+        if ( null != counters && counters[EXCLUSIVE] > 0 )
         {
-            if ( --counters[1] == 0 )
+            if ( --counters[EXCLUSIVE] == 0 )
             {
                 release( Integer.MAX_VALUE );
                 threadCounters.remove( self );
-                if ( counters[0] > 0 )
+                if ( counters[SHARED] > 0 )
                 {
                     Thread.yield();
                     acquire( 1 );
@@ -77,9 +81,9 @@ public abstract class AbstractSemaphoreLock
     {
         final Thread self = Thread.currentThread();
         final int[] counters = threadCounters.get( self );
-        if ( null != counters && counters[0] > 0 )
+        if ( null != counters && counters[SHARED] > 0 )
         {
-            if ( --counters[0] == 0 && counters[1] == 0 )
+            if ( --counters[SHARED] == 0 && counters[EXCLUSIVE] == 0 )
             {
                 release( 1 );
                 threadCounters.remove( self );
@@ -91,32 +95,32 @@ public abstract class AbstractSemaphoreLock
         }
     }
 
-    public boolean isExclusive()
+    public final boolean isExclusive()
     {
         return 0 == availablePermits();
     }
 
-    public int globalOwners()
+    public final int globalOwners()
     {
         final int n = availablePermits();
         return n > 0 ? Integer.MAX_VALUE - n : 1;
     }
 
-    public Thread[] localOwners()
+    public final Thread[] localOwners()
     {
         return threadCounters.keySet().toArray( new Thread[0] );
     }
 
-    public int sharedLockCount( final Thread thread )
+    public final int sharedCount( final Thread thread )
     {
         final int[] counters = threadCounters.get( thread );
-        return null != counters ? counters[0] : 0;
+        return null != counters ? counters[SHARED] : 0;
     }
 
-    public int exclusiveLockCount( final Thread thread )
+    public final int exclusiveCount( final Thread thread )
     {
         final int[] counters = threadCounters.get( thread );
-        return null != counters ? counters[1] : 0;
+        return null != counters ? counters[EXCLUSIVE] : 0;
     }
 
     protected abstract void acquire( int permits );

@@ -7,14 +7,14 @@ import org.sonatype.guice.bean.reflect.Weak;
 abstract class AbstractLocks
     implements Locks
 {
-    private final ConcurrentMap<String, SharedLock> sharedLocks = Weak.concurrentValues();
+    private final ConcurrentMap<String, ResourceLock> resourceLocks = Weak.concurrentValues();
 
-    public final SharedLock getSharedLock( final String name )
+    public final ResourceLock getResourceLock( final String name )
     {
-        SharedLock lock = sharedLocks.get( name );
+        ResourceLock lock = resourceLocks.get( name );
         if ( null == lock )
         {
-            final SharedLock oldLock = sharedLocks.putIfAbsent( name, lock = create( name ) );
+            final ResourceLock oldLock = resourceLocks.putIfAbsent( name, lock = create( name ) );
             if ( null != oldLock )
             {
                 return oldLock;
@@ -23,5 +23,5 @@ abstract class AbstractLocks
         return lock;
     }
 
-    protected abstract SharedLock create( final String name );
+    protected abstract ResourceLock create( final String name );
 }

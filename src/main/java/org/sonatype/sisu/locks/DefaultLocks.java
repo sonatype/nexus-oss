@@ -5,19 +5,19 @@ import java.util.concurrent.Semaphore;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-@Named( "local" )
+@Named
 @Singleton
-public final class LocalLocks
+public final class DefaultLocks
     extends AbstractLocks
 {
     @Override
-    protected SharedLock create( String name )
+    protected ResourceLock create( String name )
     {
-        return new Impl();
+        return new ResourceLockImpl();
     }
 
-    public static final class Impl
-        extends AbstractSemaphoreLock
+    public static final class ResourceLockImpl
+        extends AbstractSemaphoreResourceLock
     {
         private final Semaphore sem = new Semaphore( Integer.MAX_VALUE );
 

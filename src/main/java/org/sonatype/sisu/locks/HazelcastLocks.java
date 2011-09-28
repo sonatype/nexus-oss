@@ -38,17 +38,17 @@ final class HazelcastLocks
     }
 
     @Override
-    protected SharedLock create( String name )
+    protected ResourceLock create( String name )
     {
-        return new Impl( name );
+        return new ResourceLockImpl( name );
     }
 
-    private static final class Impl
-        extends AbstractSemaphoreLock
+    private static final class ResourceLockImpl
+        extends AbstractSemaphoreResourceLock
     {
         private final ISemaphore sem;
 
-        Impl( final String name )
+        ResourceLockImpl( final String name )
         {
             sem = Hazelcast.getSemaphore( name );
         }
