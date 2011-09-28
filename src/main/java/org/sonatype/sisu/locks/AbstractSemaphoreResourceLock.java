@@ -1,3 +1,14 @@
+/*******************************************************************************
+ * Copyright (c) 2011 Sonatype, Inc.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * and Apache License v2.0 which accompanies this distribution.
+ * The Eclipse Public License is available at
+ *   http://www.eclipse.org/legal/epl-v10.html
+ * The Apache License v2.0 is available at
+ *   http://www.apache.org/licenses/LICENSE-2.0.html
+ * You may elect to redistribute this code under either of these licenses.
+ *******************************************************************************/
 package org.sonatype.sisu.locks;
 
 import java.util.Collections;
@@ -9,11 +20,23 @@ import org.sonatype.sisu.locks.Locks.ResourceLock;
 public abstract class AbstractSemaphoreResourceLock
     implements ResourceLock
 {
+    // ----------------------------------------------------------------------
+    // Constants
+    // ----------------------------------------------------------------------
+
     private static final int SHARED = 0;
 
     private static final int EXCLUSIVE = 1;
 
+    // ----------------------------------------------------------------------
+    // Implementation fields
+    // ----------------------------------------------------------------------
+
     private final Map<Thread, int[]> threadCounters = Collections.synchronizedMap( Weak.<Thread, int[]> keys() );
+
+    // ----------------------------------------------------------------------
+    // Public methods
+    // ----------------------------------------------------------------------
 
     public final void lockShared()
     {
@@ -122,6 +145,10 @@ public abstract class AbstractSemaphoreResourceLock
         final int[] counters = threadCounters.get( thread );
         return null != counters ? counters[EXCLUSIVE] : 0;
     }
+
+    // ----------------------------------------------------------------------
+    // Implementation methods
+    // ----------------------------------------------------------------------
 
     protected abstract void acquire( int permits );
 
