@@ -24,7 +24,7 @@ import javax.inject.Provider;
 /**
  * Base class for Nexus Integration Tests that starts Nexus before each test and stops it afterwards.
  *
- * @since 1.9.3
+ * @since 1.10.0
  */
 public abstract class NexusRunningITSupport
     extends NexusITSupport
@@ -46,7 +46,7 @@ public abstract class NexusRunningITSupport
      * <p/>
      * {@inheritDoc}
      *
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Override
     public void setUp()
@@ -69,7 +69,7 @@ public abstract class NexusRunningITSupport
      * <p/>
      * {@inheritDoc}
      *
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Override
     public void tearDown()
@@ -94,7 +94,7 @@ public abstract class NexusRunningITSupport
      * Returns current Nexus. If Nexus was not yet instantiated, Nexus is created and configured.
      *
      * @return current Nexus
-     * @since 1.9.3
+     * @since 1.10.0
      */
     protected final NexusBundle nexus()
     {
@@ -117,7 +117,7 @@ public abstract class NexusRunningITSupport
      * @param configuration Nexus configuration
      * @return configuration that will replace current configuration. If null is returned passed in configuration will
      *         be used
-     * @since 1.9.3
+     * @since 1.10.0
      */
     protected NexusBundleConfiguration configureNexus( NexusBundleConfiguration configuration )
     {

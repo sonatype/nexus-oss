@@ -39,7 +39,7 @@ import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 /**
  * Default Nexus bundle implementation.
  *
- * @since 1.9.3
+ * @since 1.10.0
  */
 @Named
 public class DefaultNexusBundle
@@ -69,7 +69,7 @@ public class DefaultNexusBundle
      * Constructor.
      *
      * @param jswExecFactory JSW executor factory.
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Inject
     public DefaultNexusBundle( JSWExecFactory jswExecFactory,
@@ -85,7 +85,7 @@ public class DefaultNexusBundle
      * <p/>
      * {@inheritDoc}
      *
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Override
     public void doPrepare()
@@ -100,7 +100,7 @@ public class DefaultNexusBundle
      * <p/>
      * {@inheritDoc}
      *
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Override
     protected void startApplication()
@@ -113,7 +113,7 @@ public class DefaultNexusBundle
      * <p/>
      * {@inheritDoc}
      *
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Override
     protected void stopApplication()
@@ -125,7 +125,7 @@ public class DefaultNexusBundle
      * Checks if Nexus is alive by using REST status service.
      *
      * @return true if Nexus is alive
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Override
     protected boolean applicationAlive()

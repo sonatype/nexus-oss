@@ -23,7 +23,7 @@ import org.sonatype.sisu.bl.WebBundle;
 /**
  * An Nexus bundle that can be created, started, stopped based on a provided configuration.
  *
- * @since 1.9.3
+ * @since 1.10.0
  */
 public interface NexusBundle
     extends WebBundle<NexusBundle, NexusBundleConfiguration>

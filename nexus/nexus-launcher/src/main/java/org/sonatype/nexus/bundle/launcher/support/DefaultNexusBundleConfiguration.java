@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * Default Nexus bundle configuration.
  *
- * @since 1.9.3
+ * @since 1.10.0
  */
 @Named
 public class DefaultNexusBundleConfiguration
@@ -54,7 +54,7 @@ public class DefaultNexusBundleConfiguration
     /**
      * Constructor.
      *
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Inject
     public DefaultNexusBundleConfiguration()
@@ -68,7 +68,7 @@ public class DefaultNexusBundleConfiguration
      * <p/>
      * {@inheritDoc}
      *
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Inject
     protected void configureStartTimeout(
@@ -82,7 +82,7 @@ public class DefaultNexusBundleConfiguration
      * <p/>
      * {@inheritDoc}
      *
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Inject
     protected void setBundleResolver( final @NexusSpecific BundleResolver bundleResolver )
@@ -95,7 +95,7 @@ public class DefaultNexusBundleConfiguration
      * <p/>
      * {@inheritDoc}
      *
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Inject
     protected void setTargetDirectoryResolver( final @NexusSpecific TargetDirectoryResolver targetDirectoryResolver )
@@ -106,7 +106,7 @@ public class DefaultNexusBundleConfiguration
     /**
      * {@inheritDoc}
      *
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Override
     public List<File> getPlugins()
@@ -117,7 +117,7 @@ public class DefaultNexusBundleConfiguration
     /**
      * {@inheritDoc}
      *
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Override
     public NexusBundleConfiguration setPlugins( final List<File> plugins )
@@ -133,7 +133,7 @@ public class DefaultNexusBundleConfiguration
     /**
      * {@inheritDoc}
      *
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Override
     public NexusBundleConfiguration setPlugins( final File... plugins )
@@ -144,7 +144,7 @@ public class DefaultNexusBundleConfiguration
     /**
      * {@inheritDoc}
      *
-     * @since 1.9.3
+     * @since 1.10.0
      */
     @Override
     public NexusBundleConfiguration addPlugins( final File... plugins )

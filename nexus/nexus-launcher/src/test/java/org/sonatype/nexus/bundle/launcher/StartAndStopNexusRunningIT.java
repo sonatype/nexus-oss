@@ -28,7 +28,7 @@ import static org.sonatype.sisu.litmus.testsupport.hamcrest.URLMatchers.responds
 /**
  * Test starting and launching of Nexus.
  *
- * @since 1.9.3
+ * @since 1.10.0
  */
 public class StartAndStopNexusRunningIT
     extends NexusRunningITSupport

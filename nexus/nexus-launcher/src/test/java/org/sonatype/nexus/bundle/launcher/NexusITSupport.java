@@ -31,7 +31,7 @@ import java.io.File;
 /**
  * Base class for Nexus Integration Tests.
  *
- * @since 1.9.3
+ * @since 1.10.0
  */
 public abstract class NexusITSupport
     extends InjectedTestSupport
@@ -84,7 +84,7 @@ public abstract class NexusITSupport
      * @param path path to look up
      * @return found file
      * @throws RuntimeException if path cannot be found in any of above locations
-     * @since 1.9.3
+     * @since 1.10.0
      */
     public File resolveTestFile( final String path )
         throws RuntimeException
@@ -132,7 +132,7 @@ public abstract class NexusITSupport
      *
      * @param path path to be appended
      * @return test source directory specific to running test + provided path
-     * @since 1.9.3
+     * @since 1.10.0
      */
     private File testSourceDirectory( String path )
     {
@@ -153,7 +153,7 @@ public abstract class NexusITSupport
      *
      * @param path path to be appended
      * @return test source directory specific to running test class + provided path
-     * @since 1.9.3
+     * @since 1.10.0
      */
     private File testClassSourceDirectory( String path )
     {
@@ -177,7 +177,7 @@ public abstract class NexusITSupport
      *
      * @param path path to be appended
      * @return test source directory specific to running test method + provided path
-     * @since 1.9.3
+     * @since 1.10.0
      */
     private File testMethodSourceDirectory( String path )
     {

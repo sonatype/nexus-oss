@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * An Nexus bundle configuration.
  *
- * @since 1.9.3
+ * @since 1.10.0
  */
 public interface NexusBundleConfiguration
     extends BundleConfiguration<NexusBundleConfiguration>
@@ -38,7 +38,7 @@ public interface NexusBundleConfiguration
      * Plugins can be zips/jars/tars to be unpacked or directories to be copied
      *
      * @return Nexus plugins to be installed
-     * @since 1.9.3
+     * @since 1.10.0
      */
     List<File> getPlugins();
 
@@ -49,7 +49,7 @@ public interface NexusBundleConfiguration
      *
      * @param plugins Nexus plugins to be installed. Can be null, case when an empty list will be used
      * @return itself, for usage in fluent api
-     * @since 1.9.3
+     * @since 1.10.0
      */
     NexusBundleConfiguration setPlugins( List<File> plugins );
 
@@ -60,7 +60,7 @@ public interface NexusBundleConfiguration
      *
      * @param plugins Nexus plugins to be installed
      * @return itself, for usage in fluent api
-     * @since 1.9.3
+     * @since 1.10.0
      */
     NexusBundleConfiguration setPlugins( File... plugins );
 
@@ -71,7 +71,7 @@ public interface NexusBundleConfiguration
      *
      * @param plugins Nexus plugins to be installed
      * @return itself, for usage in fluent api
-     * @since 1.9.3
+     * @since 1.10.0
      */
     NexusBundleConfiguration addPlugins( File... plugins );
 
