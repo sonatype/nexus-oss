@@ -48,7 +48,7 @@ public final class DefaultLocks
         // Implementation fields
         // ----------------------------------------------------------------------
 
-        private final Semaphore sem = new Semaphore( Integer.MAX_VALUE );
+        private final Semaphore sem = new Semaphore( Integer.MAX_VALUE, true );
 
         // ----------------------------------------------------------------------
         // Semaphore methods

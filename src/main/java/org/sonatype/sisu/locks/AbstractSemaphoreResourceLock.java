@@ -69,7 +69,6 @@ public abstract class AbstractSemaphoreResourceLock
                  */
                 release( 1 );
                 threadCounters.remove( self );
-                Thread.yield();
                 acquire( Integer.MAX_VALUE );
                 threadCounters.put( self, counters );
             }
@@ -97,7 +96,6 @@ public abstract class AbstractSemaphoreResourceLock
                     /*
                      * Downgrading from exclusive back to shared lock
                      */
-                    Thread.yield();
                     acquire( 1 );
                     threadCounters.put( self, counters );
                 }
