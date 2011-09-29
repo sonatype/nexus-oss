@@ -13,7 +13,7 @@
   <parent>
     <groupId>com.sonatype.nexus.plugin</groupId>
     <artifactId>nexus-enterprise-plugins</artifactId>
-    <version>1.9.3-SNAPSHOT</version>
+    <version>1.10.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-maven-site-plugin</artifactId>
@@ -23,7 +23,7 @@
   <description>Adds a repository type for deploying maven sites.</description>
 
   <dependencies>
-  
+
     <!-- Because we enforce license -->
     <dependency>
       <groupId>com.sonatype.nexus.edition</groupId>
