@@ -60,7 +60,7 @@ final class HazelcastLocks
     // ----------------------------------------------------------------------
 
     @Override
-    protected ResourceLock create( String name )
+    protected ResourceLock create( final String name )
     {
         return new ResourceLockImpl( name );
     }

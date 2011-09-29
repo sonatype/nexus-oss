@@ -29,7 +29,7 @@ public final class DefaultLocks
     // ----------------------------------------------------------------------
 
     @Override
-    protected ResourceLock create( String name )
+    protected ResourceLock create( final String name )
     {
         return new ResourceLockImpl();
     }
