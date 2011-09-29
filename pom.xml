@@ -19,7 +19,7 @@
   <artifactId>nexus-maven-site-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
 
-  <name>Nexus Enterprise Plugin :: Maven Site Plugin</name>
+  <name>Nexus Professional Plugin :: Maven Site Plugin</name>
   <description>Adds a repository type for deploying maven sites.</description>
 
   <dependencies>
