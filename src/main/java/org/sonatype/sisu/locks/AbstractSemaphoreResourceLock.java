@@ -61,7 +61,7 @@ public abstract class AbstractSemaphoreResourceLock
         final int[] counters = threadCounters.get( self );
         if ( null != counters )
         {
-            if ( counters[EXCLUSIVE] == 0 && counters[SHARED] > 0 )
+            if ( counters[EXCLUSIVE] == 0 )
             {
                 /*
                  * Must drop shared lock before upgrading to exclusive lock

@@ -78,7 +78,7 @@ public class MultiThreadedLocksTest
             ts[i].start();
         }
 
-        Thread.sleep( 8000 );
+        Thread.sleep( 30000 );
 
         running = false;
 
@@ -110,22 +110,28 @@ public class MultiThreadedLocksTest
             while ( running )
             {
                 final double transition = Math.random();
-                if ( 0.0 <= transition && transition < 0.4 )
+                if ( 0.0 <= transition && transition < 0.2 )
                 {
-                    lk.lockShared();
-                    sharedDepth[index]++;
+                    if ( sharedDepth[index] < 8 )
+                    {
+                        lk.lockShared();
+                        sharedDepth[index]++;
+                    }
                 }
-                else if ( 0.4 <= transition && transition < 0.5 )
+                else if ( 0.2 <= transition && transition < 0.3 )
                 {
-                    lk.lockExclusive();
-                    exclusiveDepth[index]++;
+                    if ( exclusiveDepth[index] < 8 )
+                    {
+                        lk.lockExclusive();
+                        exclusiveDepth[index]++;
+                    }
                 }
-                else if ( 0.5 <= transition && transition < 0.6 )
+                else if ( 0.3 <= transition && transition < 0.6 )
                 {
                     if ( exclusiveDepth[index] > 0 )
                     {
-                        lk.unlockExclusive();
                         exclusiveDepth[index]--;
+                        lk.unlockExclusive();
                     }
                     else
                     {
@@ -144,8 +150,8 @@ public class MultiThreadedLocksTest
                 {
                     if ( sharedDepth[index] > 0 )
                     {
-                        lk.unlockShared();
                         sharedDepth[index]--;
+                        lk.unlockShared();
                     }
                     else
                     {
