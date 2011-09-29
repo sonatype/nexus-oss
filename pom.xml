@@ -19,7 +19,7 @@
   <artifactId>nexus-unpack-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
 
-  <name>Nexus Enterprise Plugin :: Unpack</name>
+  <name>Nexus Professional Plugin :: Unpack</name>
   <description>A plugin that will automatically unpack deployed bundles</description>
 
   <dependencies>
