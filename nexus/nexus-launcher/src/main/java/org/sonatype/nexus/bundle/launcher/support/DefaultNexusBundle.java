@@ -108,7 +108,7 @@ public class DefaultNexusBundle
      * @since 1.10.0
      */
     @Override
-    public void configure()
+    protected void configure()
     {
         super.configure();
 
