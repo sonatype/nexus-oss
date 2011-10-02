@@ -21,9 +21,12 @@ package org.sonatype.nexus.bundle.launcher.support;
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.sisu.bl.support.DefaultWebBundle;
-import org.sonatype.sisu.bl.support.jsw.JSWExec;
-import org.sonatype.sisu.bl.support.jsw.JSWExecFactory;
+import org.sonatype.sisu.bl.support.port.PortReservationService;
 import org.sonatype.sisu.filetasks.FileTaskBuilder;
+import org.sonatype.sisu.jsw.exec.JSWExec;
+import org.sonatype.sisu.jsw.exec.JSWExecFactory;
+import org.sonatype.sisu.jsw.monitor.CommandMonitorTalker;
+import org.sonatype.sisu.jsw.util.JSWConfig;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -51,7 +54,7 @@ public class DefaultNexusBundle
      * JSW utility factory.
      * Cannot be null.
      */
-    private JSWExecFactory jswExecFactory;
+    private final JSWExecFactory jswExecFactory;
 
     /**
      * JSW utility to star/stop Nexus.
@@ -63,7 +66,18 @@ public class DefaultNexusBundle
      * File task builder.
      * Cannot be null.
      */
-    private FileTaskBuilder fileTaskBuilder;
+    private final FileTaskBuilder fileTaskBuilder;
+
+    /**
+     * Used to reserve custom overlord ports.
+     * Cannot be null.
+     */
+    private final PortReservationService portService;
+
+    /**
+     * Port on which NEXUS JSW Monitor is running. 0 (zero) if application is not running.
+     */
+    private int jswMonitorPort;
 
     /**
      * Constructor.
@@ -72,27 +86,54 @@ public class DefaultNexusBundle
      * @since 1.10.0
      */
     @Inject
-    public DefaultNexusBundle( JSWExecFactory jswExecFactory,
-                               FileTaskBuilder fileTaskBuilder )
+    public DefaultNexusBundle( final JSWExecFactory jswExecFactory,
+                               final FileTaskBuilder fileTaskBuilder,
+                               final PortReservationService portService )
     {
         super( "nexus" );
         this.fileTaskBuilder = fileTaskBuilder;
         this.jswExecFactory = checkNotNull( jswExecFactory );
+        this.portService = checkNotNull( portService );
     }
 
     /**
-     * Aditionaly configures Nexus/Jetty port and installs plugins.
+     * Additionally <br/>
+     * - configures Nexus/Jetty port<br/>
+     * - installs JSW command monitor<br/>
+     * - configure remote debugging if requested<br/>
+     * - installs plugins.
      * <p/>
      * {@inheritDoc}
      *
      * @since 1.10.0
      */
     @Override
-    public void doPrepare()
+    public void configure()
     {
-        super.doPrepare();
+        super.configure();
+
+        jswMonitorPort = portService.reservePort();
+
+        configureJSW();
         installPlugins();
         configureNexusPort();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @since 1.0
+     */
+    @Override
+    protected void unconfigure()
+    {
+        super.unconfigure();
+
+        if ( jswMonitorPort > 0 )
+        {
+            portService.cancelPort( jswMonitorPort );
+            jswMonitorPort = 0;
+        }
     }
 
     /**
@@ -106,6 +147,7 @@ public class DefaultNexusBundle
     protected void startApplication()
     {
         jswExec().start();
+        CommandMonitorTalker.installStopShutdownHook( jswMonitorPort );
     }
 
     /**
@@ -190,6 +232,50 @@ public class DefaultNexusBundle
             fileTaskBuilder.properties( path( "nexus/conf/nexus.properties" ) )
                 .property( "application-port", String.valueOf( getPort() ) )
         );
+    }
+
+    /**
+     * Creates a JSW configuration file specifying:<br/>
+     * - debugging options if debugging is enabled<br/>
+     * - installs JSW command monitor
+     *
+     * @throws RuntimeException if a problem occurred during reading of JSW configuration or writing the additional JSW
+     *                          configuration file
+     */
+    private void configureJSW()
+        throws RuntimeException
+    {
+        try
+        {
+            NexusBundleConfiguration config = getConfiguration();
+
+            File jswConfigFile = new File( config.getTargetDirectory(), "nexus/bin/jsw/conf/wrapper.conf" );
+            File jswAddonConfigFile = new File( config.getTargetDirectory(), "nexus/conf/wrapper-override.conf" );
+
+            jswExec().installMonitor( jswMonitorPort, jswConfigFile, jswAddonConfigFile );
+
+            JSWConfig jswConfig = new JSWConfig( jswConfigFile, jswAddonConfigFile );
+            jswConfig.load();
+
+            // configure remote debug if requested
+            if ( config.getDebugPort() > 0 )
+            {
+                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xdebug" );
+                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Xnoagent" );
+                jswConfig.addIndexedProperty( "wrapper.java.additional", "-Djava.compiler=NONE" );
+                jswConfig.addIndexedProperty( "wrapper.java.additional",
+                                              "-Xrunjdwp:transport=dt_socket,server=y,suspend="
+                                                  + ( config.isSuspendOnStart() ? "y" : "n" )
+                                                  + ",address=" + config.getDebugPort() );
+            }
+
+            jswConfig.save();
+
+        }
+        catch ( IOException e )
+        {
+            throw new RuntimeException( e );
+        }
     }
 
 }
