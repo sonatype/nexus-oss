@@ -146,8 +146,8 @@ public class DefaultNexusBundle
     @Override
     protected void startApplication()
     {
-        jswExec().start();
         CommandMonitorTalker.installStopShutdownHook( jswMonitorPort );
+        jswExec().start();
     }
 
     /**
