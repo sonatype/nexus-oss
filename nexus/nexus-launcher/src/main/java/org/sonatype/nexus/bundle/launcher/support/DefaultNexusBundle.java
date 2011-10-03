@@ -26,6 +26,8 @@ import org.sonatype.sisu.filetasks.FileTaskBuilder;
 import org.sonatype.sisu.jsw.exec.JSWExec;
 import org.sonatype.sisu.jsw.exec.JSWExecFactory;
 import org.sonatype.sisu.jsw.monitor.CommandMonitorTalker;
+import org.sonatype.sisu.jsw.monitor.KeepAliveThread;
+import org.sonatype.sisu.jsw.monitor.internal.log.Slf4jLogProxy;
 import org.sonatype.sisu.jsw.util.JSWConfig;
 
 import javax.inject.Inject;
@@ -75,9 +77,19 @@ public class DefaultNexusBundle
     private final PortReservationService portService;
 
     /**
-     * Port on which NEXUS JSW Monitor is running. 0 (zero) if application is not running.
+     * Port on which Nexus JSW Monitor is running. 0 (zero) if application is not running.
      */
     private int jswMonitorPort;
+
+    /**
+     * Port on which Nexus JSW Keep Alive is running. 0 (zero) if application is not running.
+     */
+    private int jswKeepAlivePort;
+
+    /**
+     * JSW keep alive thread. Null if server is not started.
+     */
+    private KeepAliveThread keepAliveThread;
 
     /**
      * Constructor.
@@ -100,6 +112,7 @@ public class DefaultNexusBundle
      * Additionally <br/>
      * - configures Nexus/Jetty port<br/>
      * - installs JSW command monitor<br/>
+     * - installs JSW keep alive monitor<br/>
      * - configure remote debugging if requested<br/>
      * - installs plugins.
      * <p/>
@@ -113,6 +126,7 @@ public class DefaultNexusBundle
         super.configure();
 
         jswMonitorPort = portService.reservePort();
+        jswKeepAlivePort = portService.reservePort();
 
         configureJSW();
         installPlugins();
@@ -134,6 +148,11 @@ public class DefaultNexusBundle
             portService.cancelPort( jswMonitorPort );
             jswMonitorPort = 0;
         }
+        if ( jswKeepAlivePort > 0 )
+        {
+            portService.cancelPort( jswKeepAlivePort );
+            jswKeepAlivePort = 0;
+        }
     }
 
     /**
@@ -147,6 +166,15 @@ public class DefaultNexusBundle
     protected void startApplication()
     {
         CommandMonitorTalker.installStopShutdownHook( jswMonitorPort );
+        try
+        {
+            keepAliveThread = new KeepAliveThread( jswKeepAlivePort, new Slf4jLogProxy( log() ) );
+            keepAliveThread.start();
+        }
+        catch ( IOException e )
+        {
+            throw new RuntimeException( "Could not start JSW keep alive thread", e );
+        }
         jswExec().start();
     }
 
@@ -160,7 +188,17 @@ public class DefaultNexusBundle
     @Override
     protected void stopApplication()
     {
-        jswExec().stop();
+        try
+        {
+            jswExec().stop();
+        }
+        finally
+        {
+            if ( keepAliveThread != null )
+            {
+                    keepAliveThread.stopRunning();
+            }
+        }
     }
 
     /**
@@ -252,10 +290,11 @@ public class DefaultNexusBundle
             File jswConfigFile = new File( config.getTargetDirectory(), "nexus/bin/jsw/conf/wrapper.conf" );
             File jswAddonConfigFile = new File( config.getTargetDirectory(), "nexus/conf/wrapper-override.conf" );
 
-            jswExec().installMonitor( jswMonitorPort, jswConfigFile, jswAddonConfigFile );
-
             JSWConfig jswConfig = new JSWConfig( jswConfigFile, jswAddonConfigFile );
             jswConfig.load();
+
+            jswConfig.configureMonitor( jswMonitorPort );
+            jswConfig.configureKeepAlive( jswKeepAlivePort );
 
             // configure remote debug if requested
             if ( config.getDebugPort() > 0 )
