@@ -16,12 +16,6 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-/**
-// * Sonatype Nexus (TM) Professional Version.
- * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
- * Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions/.
- * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
- */
 package org.sonatype.nexus.security.ldap.realms;
 
 import java.net.MalformedURLException;
@@ -186,7 +180,7 @@ public class DefaultLdapManager
         defaultLdapContextFactory.setSystemPassword( connInfo.getSystemPassword() );
         defaultLdapContextFactory.setSearchBase( connInfo.getSearchBase() );
         defaultLdapContextFactory.setAuthentication( connInfo.getAuthScheme() );
-        
+
         Map<String, String> connectionProperties = new HashMap<String, String>();
         // set the realm
         if ( connInfo.getRealm() != null )
@@ -222,8 +216,8 @@ public class DefaultLdapManager
                 // auth by checking password,
                 this.ldapAuthenticator.authenticateUserWithPassword( ldapUser, password );
             }
-            
-            // everything was successful  
+
+            // everything was successful
             return ldapUser;
         }
         catch ( Exception e )
@@ -235,7 +229,7 @@ public class DefaultLdapManager
         }
         throw new AuthenticationException( "User: " + userId + " could not be authenticated." );
     }
-    
+
     public void onEvent( Event<?> evt )
     {
         if ( evt instanceof LdapClearCacheEvent )
