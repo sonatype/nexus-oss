@@ -22,7 +22,7 @@ import java.util.Date;
 
 /**
  * Nexus system state object. It gives small amount of important infos about Nexus Application.
- * 
+ *
  * @author cstamas
  * @author damian
  */
@@ -58,6 +58,10 @@ public class SystemStatus
      */
     private String editionShort = "OSS";
 
+    /**
+     * The Nexus attributions url
+     */
+    private String attributionsURL = "http://links.sonatype.com/products/nexus/oss/attributions";
     /**
      * The Nexus Application state.
      */
@@ -163,6 +167,16 @@ public class SystemStatus
         this.editionShort = editionUserAgent;
     }
 
+    public String getAttriutionsURL()
+    {
+        return attributionsURL;
+    }
+
+    public void setAttributionsURL( String attributionsURL )
+    {
+        this.attributionsURL = attributionsURL;
+    }
+    
     public SystemState getState()
     {
         return state;
@@ -252,7 +266,7 @@ public class SystemStatus
     {
         this.configurationUpgraded = configurationUpgraded;
     }
-    
+
     public boolean isNexusStarted()
     {
         return SystemState.STARTED.equals( getState() );

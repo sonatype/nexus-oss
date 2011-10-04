@@ -42,7 +42,11 @@ Ext.extend(Sonatype.repoServer.HelpAboutPanel, Ext.Panel, {
         + Sonatype.utils.edition
         + ' Version'
         + '<br/>Copyright &copy; 2008-2011 Sonatype, Inc.'
-		+ '<br/>All rights reserved. Includes the third-party code listed at <a href="http://www.sonatype.com/products/nexus/attributions" target="_new">http://www.sonatype.com/products/nexus/attributions</a>.' 
+		+ '<br/>All rights reserved. Includes the third-party code listed at <a href="'
+        + Sonatype.utils.attributionsURL
+        + '" target="_new">'
+        + Sonatype.utils.attributionsURL
+        + '</a>.'
 		+ '<br/>'
 		+ '<br/>This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General'
 		+ '<br/>Public License Version 3 as published by the Free Software Foundation.'

@@ -939,6 +939,7 @@ public class TestMarshalUnmarchal
         status.setBaseUrl( "baseurl" );
         status.setEditionLong( "long edition name" );
         status.setEditionShort( "short" );
+        status.setAttributionsURL("http://my.attributions.com/url");
         status.setFormattedAppName( "formatted" );
 
         StatusConfigurationValidationResponse validation = new StatusConfigurationValidationResponse();

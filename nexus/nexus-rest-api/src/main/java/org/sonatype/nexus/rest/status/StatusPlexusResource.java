@@ -50,11 +50,11 @@ public class StatusPlexusResource
     extends AbstractUIPermissionCalculatingPlexusResource
     implements ManagedPlexusResource
 {
-    public static final String RESOURCE_URI = "/status"; 
+    public static final String RESOURCE_URI = "/status";
 
     @Requirement
     private Nexus nexus;
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -97,6 +97,8 @@ public class StatusPlexusResource
         resource.setEditionLong( status.getEditionLong() );
 
         resource.setEditionShort( status.getEditionShort() );
+        
+        resource.setAttributionsURL( status.getAttriutionsURL() );
 
         resource.setState( status.getState().toString() );
 
@@ -150,18 +152,18 @@ public class StatusPlexusResource
     private NexusAuthenticationClientPermissions getClientPermissions(Request request) throws ResourceException
     {
         AuthenticationClientPermissions originalClientPermissions = getClientPermissionsForCurrentUser( request );
-        
+
         // TODO: this is a modello work around,
         // the SystemStatus could not include a field of type AuthenticationClientPermissions
         // because it is in a different model, but I can extend that class... and include it.
-        
+
         NexusAuthenticationClientPermissions clientPermissions = new NexusAuthenticationClientPermissions();
         clientPermissions.setLoggedIn( originalClientPermissions.isLoggedIn() );
         clientPermissions.setLoggedInUsername( originalClientPermissions.getLoggedInUsername() );
         clientPermissions.setLoggedInUserSource( originalClientPermissions.getLoggedInUserSource() );
         clientPermissions.setLoggedInUserSource( originalClientPermissions.getLoggedInUserSource() );
         clientPermissions.setPermissions( originalClientPermissions.getPermissions() );
-        
+
         return clientPermissions;
     }
 
