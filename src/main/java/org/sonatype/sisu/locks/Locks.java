@@ -24,6 +24,13 @@ public interface Locks
      */
     ResourceLock getResourceLock( String name );
 
+    /**
+     * Returns all resource names associated with active {@link ResourceLock}s.
+     * 
+     * @return Resource names
+     */
+    String[] getResourceNames();
+
     // ----------------------------------------------------------------------
     // Lock types
     // ----------------------------------------------------------------------
@@ -34,48 +41,43 @@ public interface Locks
     interface ResourceLock
     {
         /**
-         * Takes a shared lock for the associated resource.
+         * Takes a shared resource lock for the given thread.
          */
-        void lockShared();
+        void lockShared( Thread thread );
 
         /**
-         * Takes an exclusive lock for the associated resource.
+         * Takes an exclusive resource lock for the given thread.
          */
-        void lockExclusive();
+        void lockExclusive( Thread thread );
 
         /**
-         * Drops an exclusive lock for the associated resource.
+         * Drops an exclusive resource lock for the given thread.
          */
-        void unlockExclusive();
+        void unlockExclusive( Thread thread );
 
         /**
-         * Drops a shared lock for the associated resource.
+         * Drops a shared resource lock for the given thread.
          */
-        void unlockShared();
+        void unlockShared( Thread thread );
 
         /**
-         * @return {@code true} if the resource is exclusively locked; otherwise {@code false}
+         * @return Threads that currently hold locks on this resource
          */
-        boolean isExclusive();
+        Thread[] getOwners();
 
         /**
-         * @return Number of threads (local and remote) accessing the associated resource
+         * @return Threads that are waiting for locks on this resource
          */
-        int globalOwners();
-
-        /**
-         * @return Details of local threads currently accessing the associated resource
-         */
-        Thread[] localOwners();
+        Thread[] getWaiters();
 
         /**
          * @return Number of shared locks taken by the given thread
          */
-        int sharedCount( Thread thread );
+        int getSharedCount( Thread thread );
 
         /**
          * @return Number of exclusive locks taken by the given thread
          */
-        int exclusiveCount( Thread thread );
+        int getExclusiveCount( Thread thread );
     }
 }

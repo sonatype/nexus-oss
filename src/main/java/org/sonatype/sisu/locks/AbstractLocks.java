@@ -28,6 +28,22 @@ abstract class AbstractLocks
     private final ConcurrentMap<String, ResourceLock> resourceLocks = Weak.concurrentValues();
 
     // ----------------------------------------------------------------------
+    // Constructor
+    // ----------------------------------------------------------------------
+
+    AbstractLocks()
+    {
+        // try
+        // {
+        // final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        // }
+        // catch ( final Exception e )
+        // {
+        // e.printStackTrace();
+        // }
+    }
+
+    // ----------------------------------------------------------------------
     // Public methods
     // ----------------------------------------------------------------------
 
@@ -43,6 +59,11 @@ abstract class AbstractLocks
             }
         }
         return lock;
+    }
+
+    public final String[] getResourceNames()
+    {
+        return resourceLocks.keySet().toArray( new String[0] );
     }
 
     // ----------------------------------------------------------------------

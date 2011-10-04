@@ -52,6 +52,7 @@ final class HazelcastLocks
                 throw new IllegalArgumentException( e.getMessage() );
             }
         }
+
         Hazelcast.getConfig().addSemaphoreConfig( new SemaphoreConfig( "default", Integer.MAX_VALUE ) );
     }
 

@@ -33,6 +33,8 @@ public class MultiThreadedLocksTest
 
     static int[] exclusiveDepth;
 
+    static Throwable[] errors;
+
     @Provides
     @Parameters
     Properties systemProperties()
@@ -63,6 +65,7 @@ public class MultiThreadedLocksTest
 
         sharedDepth = new int[ts.length];
         exclusiveDepth = new int[ts.length];
+        errors = new Throwable[ts.length];
 
         for ( int i = 0; i < ts.length; i++ )
         {
@@ -73,19 +76,30 @@ public class MultiThreadedLocksTest
 
         running = true;
 
-        for ( int i = 0; i < ts.length; i++ )
+        for ( final Thread element : ts )
         {
-            ts[i].start();
+            element.start();
         }
 
         Thread.sleep( 30000 );
 
         running = false;
 
-        for ( int i = 0; i < ts.length; i++ )
+        for ( final Thread element : ts )
         {
-            ts[i].join();
+            element.join( 8000 );
         }
+
+        boolean failed = false;
+        for ( final Throwable e : errors )
+        {
+            if ( null != e )
+            {
+                e.printStackTrace();
+                failed = true;
+            }
+        }
+        assertFalse( failed );
     }
 
     @Named
@@ -98,86 +112,94 @@ public class MultiThreadedLocksTest
 
         private int index;
 
-        public void setIndex( int index )
+        public void setIndex( final int index )
         {
             this.index = index;
         }
 
         public void run()
         {
-            final ResourceLock lk = locks.getResourceLock( "TEST" );
-
-            while ( running )
+            try
             {
-                final double transition = Math.random();
-                if ( 0.0 <= transition && transition < 0.2 )
+                final ResourceLock lk = locks.getResourceLock( "TEST" );
+                final Thread self = Thread.currentThread();
+
+                while ( running )
                 {
-                    if ( sharedDepth[index] < 8 )
+                    final double transition = Math.random();
+                    if ( 0.0 <= transition && transition < 0.2 )
                     {
-                        lk.lockShared();
-                        sharedDepth[index]++;
+                        if ( sharedDepth[index] < 8 )
+                        {
+                            lk.lockShared( self );
+                            sharedDepth[index]++;
+                        }
                     }
-                }
-                else if ( 0.2 <= transition && transition < 0.3 )
-                {
-                    if ( exclusiveDepth[index] < 8 )
+                    else if ( 0.2 <= transition && transition < 0.3 )
                     {
-                        lk.lockExclusive();
-                        exclusiveDepth[index]++;
+                        if ( exclusiveDepth[index] < 8 )
+                        {
+                            lk.lockExclusive( self );
+                            exclusiveDepth[index]++;
+                        }
                     }
-                }
-                else if ( 0.3 <= transition && transition < 0.6 )
-                {
-                    if ( exclusiveDepth[index] > 0 )
+                    else if ( 0.3 <= transition && transition < 0.6 )
                     {
-                        exclusiveDepth[index]--;
-                        lk.unlockExclusive();
+                        if ( exclusiveDepth[index] > 0 )
+                        {
+                            exclusiveDepth[index]--;
+                            lk.unlockExclusive( self );
+                        }
+                        else
+                        {
+                            try
+                            {
+                                lk.unlockExclusive( self );
+                                fail( "Expected IllegalStateException" );
+                            }
+                            catch ( final IllegalStateException e )
+                            {
+                                // expected
+                            }
+                        }
                     }
                     else
                     {
-                        try
+                        if ( sharedDepth[index] > 0 )
                         {
-                            lk.unlockExclusive();
-                            fail( "Expected IllegalStateException" );
+                            sharedDepth[index]--;
+                            lk.unlockShared( self );
                         }
-                        catch ( final IllegalStateException e )
+                        else
                         {
-                            // expected
+                            try
+                            {
+                                lk.unlockShared( self );
+                                fail( "Expected IllegalStateException" );
+                            }
+                            catch ( final IllegalStateException e )
+                            {
+                                // expected
+                            }
                         }
                     }
                 }
-                else
+
+                while ( sharedDepth[index] > 0 )
                 {
-                    if ( sharedDepth[index] > 0 )
-                    {
-                        sharedDepth[index]--;
-                        lk.unlockShared();
-                    }
-                    else
-                    {
-                        try
-                        {
-                            lk.unlockShared();
-                            fail( "Expected IllegalStateException" );
-                        }
-                        catch ( final IllegalStateException e )
-                        {
-                            // expected
-                        }
-                    }
+                    lk.unlockShared( self );
+                    sharedDepth[index]--;
+                }
+
+                while ( exclusiveDepth[index] > 0 )
+                {
+                    lk.unlockExclusive( self );
+                    exclusiveDepth[index]--;
                 }
             }
-
-            while ( sharedDepth[index] > 0 )
+            catch ( final Throwable e )
             {
-                lk.unlockShared();
-                sharedDepth[index]--;
-            }
-
-            while ( exclusiveDepth[index] > 0 )
-            {
-                lk.unlockExclusive();
-                exclusiveDepth[index]--;
+                errors[index] = e;
             }
         }
     }

@@ -41,14 +41,23 @@ public final class DefaultLocks
     /**
      * {@link ResourceLock} implemented on top of a JDK {@link Semaphore}.
      */
-    public static final class ResourceLockImpl
+    private static final class ResourceLockImpl
         extends AbstractSemaphoreResourceLock
     {
         // ----------------------------------------------------------------------
         // Implementation fields
         // ----------------------------------------------------------------------
 
-        private final Semaphore sem = new Semaphore( Integer.MAX_VALUE, true );
+        private final Semaphore sem;
+
+        // ----------------------------------------------------------------------
+        // Constructors
+        // ----------------------------------------------------------------------
+
+        ResourceLockImpl()
+        {
+            sem = new Semaphore( Integer.MAX_VALUE, true );
+        }
 
         // ----------------------------------------------------------------------
         // Semaphore methods

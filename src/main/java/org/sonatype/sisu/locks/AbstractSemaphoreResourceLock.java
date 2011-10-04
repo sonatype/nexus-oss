@@ -11,9 +11,12 @@
  *******************************************************************************/
 package org.sonatype.sisu.locks;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.sonatype.guice.bean.reflect.Weak;
 import org.sonatype.sisu.locks.Locks.ResourceLock;
 
 /**
@@ -34,122 +37,140 @@ public abstract class AbstractSemaphoreResourceLock
     // Implementation fields
     // ----------------------------------------------------------------------
 
-    private final Map<Thread, int[]> threadCounters = Weak.concurrentKeys( 16, 1 );
+    private final Map<Thread, int[]> map = new ConcurrentHashMap<Thread, int[]>( 16, 0.75f, 1 );
 
     // ----------------------------------------------------------------------
     // Public methods
     // ----------------------------------------------------------------------
 
-    public final void lockShared()
+    public final void lockShared( final Thread thread )
     {
-        final Thread self = Thread.currentThread();
-        final int[] counters = threadCounters.get( self );
-        if ( null != counters )
+        int[] counters = map.get( thread );
+        if ( null == counters )
         {
-            counters[SHARED]++;
-        }
-        else
-        {
+            counters = new int[] { 0, 0 };
+            map.put( thread, counters );
             acquire( 1 );
-            threadCounters.put( self, new int[] { 1, 0 } );
         }
+        counters[SHARED]++;
     }
 
-    public final void lockExclusive()
+    public final void lockExclusive( final Thread thread )
     {
-        final Thread self = Thread.currentThread();
-        final int[] counters = threadCounters.get( self );
-        if ( null != counters )
+        int[] counters = map.get( thread );
+        if ( null == counters )
         {
-            if ( counters[EXCLUSIVE] == 0 )
-            {
-                /*
-                 * Must drop shared lock before upgrading to exclusive lock
-                 */
-                release( 1 );
-                threadCounters.remove( self );
-                acquire( Integer.MAX_VALUE );
-                threadCounters.put( self, counters );
-            }
-            counters[EXCLUSIVE]++;
-        }
-        else
-        {
+            counters = new int[] { 0, 0 };
+            map.put( thread, counters );
             acquire( Integer.MAX_VALUE );
-            threadCounters.put( self, new int[] { 0, 1 } );
         }
+        else if ( counters[EXCLUSIVE] == 0 )
+        {
+            final int shared = counters[SHARED];
+            /*
+             * Must drop shared lock before upgrading to exclusive lock
+             */
+            release( 1 );
+            counters[SHARED] = 0;
+            acquire( Integer.MAX_VALUE );
+            counters[SHARED] = shared;
+        }
+        counters[EXCLUSIVE]++;
     }
 
-    public final void unlockExclusive()
+    public final void unlockExclusive( final Thread thread )
     {
-        final Thread self = Thread.currentThread();
-        final int[] counters = threadCounters.get( self );
+        final int[] counters = map.get( thread );
         if ( null != counters && counters[EXCLUSIVE] > 0 )
         {
             if ( --counters[EXCLUSIVE] == 0 )
             {
                 release( Integer.MAX_VALUE );
-                threadCounters.remove( self );
-                if ( counters[SHARED] > 0 )
+                final int shared = counters[SHARED];
+                if ( shared > 0 )
                 {
                     /*
-                     * Downgrading from exclusive back to shared lock
+                     * Down-grading from exclusive back to shared lock
                      */
+                    counters[SHARED] = 0;
                     acquire( 1 );
-                    threadCounters.put( self, counters );
+                    counters[SHARED] = shared;
+                }
+                else
+                {
+                    map.remove( thread );
                 }
             }
         }
         else
         {
-            throw new IllegalStateException( self + " does not hold this resource" );
+            throw new IllegalStateException( thread + " does not hold this resource" );
         }
     }
 
-    public final void unlockShared()
+    public final void unlockShared( final Thread thread )
     {
-        final Thread self = Thread.currentThread();
-        final int[] counters = threadCounters.get( self );
+        final int[] counters = map.get( thread );
         if ( null != counters && counters[SHARED] > 0 )
         {
             if ( --counters[SHARED] == 0 && counters[EXCLUSIVE] == 0 )
             {
                 release( 1 );
-                threadCounters.remove( self );
+                map.remove( thread );
             }
         }
         else
         {
-            throw new IllegalStateException( self + " does not hold this resource" );
+            throw new IllegalStateException( thread + " does not hold this resource" );
         }
     }
 
-    public final boolean isExclusive()
+    public final Thread[] getOwners()
     {
-        return 0 == availablePermits();
+        final List<Thread> owners = new ArrayList<Thread>();
+        for ( final Entry<Thread, int[]> e : map.entrySet() )
+        {
+            final int[] counters = e.getValue();
+            if ( counters[SHARED] > 0 || counters[EXCLUSIVE] > 0 )
+            {
+                owners.add( e.getKey() );
+            }
+        }
+        return owners.toArray( new Thread[owners.size()] );
     }
 
-    public final int globalOwners()
+    public final Thread[] getWaiters()
     {
-        final int n = availablePermits();
-        return n > 0 ? Integer.MAX_VALUE - n : 1;
+        final List<Thread> waiters = new ArrayList<Thread>();
+        for ( final Entry<Thread, int[]> e : map.entrySet() )
+        {
+            final int[] counters = e.getValue();
+            if ( counters[SHARED] == 0 && counters[EXCLUSIVE] == 0 )
+            {
+                waiters.add( e.getKey() );
+            }
+        }
+        return waiters.toArray( new Thread[waiters.size()] );
     }
 
-    public final Thread[] localOwners()
+    public final int getSharedCount( final Thread thread )
     {
-        return threadCounters.keySet().toArray( new Thread[0] );
-    }
-
-    public final int sharedCount( final Thread thread )
-    {
-        final int[] counters = threadCounters.get( thread );
+        final int[] counters = map.get( thread );
         return null != counters ? counters[SHARED] : 0;
     }
 
-    public final int exclusiveCount( final Thread thread )
+    public final int getExclusiveCount( final Thread thread )
     {
-        final int[] counters = threadCounters.get( thread );
+        final int[] counters = map.get( thread );
         return null != counters ? counters[EXCLUSIVE] : 0;
+    }
+
+    @Override
+    public String toString()
+    {
+        final int permits = availablePermits();
+        final int owners = permits > 0 ? Integer.MAX_VALUE - permits : 1;
+        return "[Owners = " + owners + ", Exclusive = " + ( permits == 0 ) + "]";
     }
 
     // ----------------------------------------------------------------------
