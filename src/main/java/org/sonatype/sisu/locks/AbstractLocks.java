@@ -11,7 +11,12 @@
  *******************************************************************************/
 package org.sonatype.sisu.locks;
 
+import java.lang.management.ManagementFactory;
 import java.util.concurrent.ConcurrentMap;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
+import javax.management.StandardMBean;
 
 import org.sonatype.guice.bean.reflect.Weak;
 
@@ -33,14 +38,17 @@ abstract class AbstractLocks
 
     AbstractLocks()
     {
-        // try
-        // {
-        // final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-        // }
-        // catch ( final Exception e )
-        // {
-        // e.printStackTrace();
-        // }
+        try
+        {
+            final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+            final String tag = getClass().getSimpleName() + '@' + Integer.toHexString( System.identityHashCode( this ) );
+            final ObjectName name = ObjectName.getInstance( "org.sonatype.sisu:type=" + tag );
+            server.registerMBean( new StandardMBean( createLocksMBean(), LocksMBean.class ), name );
+        }
+        catch ( final Exception e )
+        {
+            e.printStackTrace();
+        }
     }
 
     // ----------------------------------------------------------------------
@@ -52,7 +60,7 @@ abstract class AbstractLocks
         ResourceLock lock = resourceLocks.get( name );
         if ( null == lock )
         {
-            final ResourceLock oldLock = resourceLocks.putIfAbsent( name, lock = create( name ) );
+            final ResourceLock oldLock = resourceLocks.putIfAbsent( name, lock = createResourceLock( name ) );
             if ( null != oldLock )
             {
                 return oldLock;
@@ -73,5 +81,10 @@ abstract class AbstractLocks
     /**
      * @return Lock associated with the given resource name
      */
-    protected abstract ResourceLock create( final String name );
+    protected abstract ResourceLock createResourceLock( final String name );
+
+    /**
+     * @return MBean suitable for managing this locks factory
+     */
+    protected abstract LocksMBean createLocksMBean();
 }

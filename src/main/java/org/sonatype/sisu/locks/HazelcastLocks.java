@@ -61,9 +61,15 @@ final class HazelcastLocks
     // ----------------------------------------------------------------------
 
     @Override
-    protected ResourceLock create( final String name )
+    protected ResourceLock createResourceLock( final String name )
     {
         return new ResourceLockImpl( name );
+    }
+
+    @Override
+    protected LocksMBean createLocksMBean()
+    {
+        throw new UnsupportedOperationException();
     }
 
     // ----------------------------------------------------------------------

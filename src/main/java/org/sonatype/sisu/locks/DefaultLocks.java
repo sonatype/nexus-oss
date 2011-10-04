@@ -11,6 +11,8 @@
  *******************************************************************************/
 package org.sonatype.sisu.locks;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import javax.inject.Named;
@@ -29,9 +31,15 @@ public final class DefaultLocks
     // ----------------------------------------------------------------------
 
     @Override
-    protected ResourceLock create( final String name )
+    protected ResourceLock createResourceLock( final String name )
     {
         return new ResourceLockImpl();
+    }
+
+    @Override
+    protected LocksMBean createLocksMBean()
+    {
+        return new LocksMBeanImpl( this );
     }
 
     // ----------------------------------------------------------------------
@@ -79,6 +87,92 @@ public final class DefaultLocks
         protected int availablePermits()
         {
             return sem.availablePermits();
+        }
+    }
+
+    private static final class LocksMBeanImpl
+        implements LocksMBean
+    {
+        private final Locks locks;
+
+        LocksMBeanImpl( final Locks locks )
+        {
+            this.locks = locks;
+        }
+
+        public String[] getResourceNames()
+        {
+            return locks.getResourceNames();
+        }
+
+        public long[] getResourceOwners( String name )
+        {
+            final Thread[] owners = locks.getResourceLock( name ).getOwners();
+            final long[] ownerIds = new long[owners.length];
+            for ( int i = 0; i < owners.length; i++ )
+            {
+                ownerIds[i] = owners[i].getId();
+            }
+            return ownerIds;
+        }
+
+        public long[] getResourceWaiters( String name )
+        {
+            final Thread[] waiters = locks.getResourceLock( name ).getWaiters();
+            final long[] waiterIds = new long[waiters.length];
+            for ( int i = 0; i < waiters.length; i++ )
+            {
+                waiterIds[i] = waiters[i].getId();
+            }
+            return waiterIds;
+        }
+
+        public String[] getOwnedResources( long tid )
+        {
+            final List<String> names = new ArrayList<String>();
+            for ( final String n : locks.getResourceNames() )
+            {
+                for ( final Thread t : locks.getResourceLock( n ).getOwners() )
+                {
+                    if ( t.getId() == tid )
+                    {
+                        names.add( n );
+                    }
+                }
+            }
+            return names.toArray( new String[names.size()] );
+        }
+
+        public String[] getWaitedResources( long tid )
+        {
+            final List<String> names = new ArrayList<String>();
+            for ( final String n : locks.getResourceNames() )
+            {
+                for ( final Thread t : locks.getResourceLock( n ).getWaiters() )
+                {
+                    if ( t.getId() == tid )
+                    {
+                        names.add( n );
+                    }
+                }
+            }
+            return names.toArray( new String[names.size()] );
+        }
+
+        public void releaseResource( String name )
+        {
+            final ResourceLock lock = locks.getResourceLock( name );
+            for ( final Thread t : lock.getOwners() )
+            {
+                for ( int i = lock.getSharedCount( t ); i > 0; i-- )
+                {
+                    lock.unlockShared( t );
+                }
+                for ( int i = lock.getExclusiveCount( t ); i > 0; i-- )
+                {
+                    lock.unlockExclusive( t );
+                }
+            }
         }
     }
 }
