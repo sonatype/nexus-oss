@@ -940,6 +940,9 @@ public class TestMarshalUnmarchal
         status.setEditionLong( "long edition name" );
         status.setEditionShort( "short" );
         status.setAttributionsURL("http://my.attributions.com/url");
+        status.setPurchaseURL("http://my.store.com/url");
+        status.setUserLicenseURL("http://my.userlicense.com/url");
+
         status.setFormattedAppName( "formatted" );
 
         StatusConfigurationValidationResponse validation = new StatusConfigurationValidationResponse();

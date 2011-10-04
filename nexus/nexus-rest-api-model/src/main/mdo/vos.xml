@@ -2921,6 +2921,20 @@
           <description>The attributions page URL.</description>
         </field>
         <field>
+          <name>purchaseURL</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The URL of where to buy the product.</description>
+        </field>
+        <field>
+          <name>userLicenseURL</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The URL of where the End User License Agreement can be found.</description>
+        </field>
+        <field>
           <name>state</name>
           <version>1.0.0+</version>
           <type>String</type>

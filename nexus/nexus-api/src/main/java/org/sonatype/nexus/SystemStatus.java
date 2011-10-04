@@ -62,6 +62,17 @@ public class SystemStatus
      * The Nexus attributions url
      */
     private String attributionsURL = "http://links.sonatype.com/products/nexus/oss/attributions";
+
+    /**
+     * The Nexus attributions url
+     */
+    private String purchaseURL = "http://links.sonatype.com/products/nexus/oss/store";
+
+    /**
+     * The Nexus attributions url
+     */
+    private String userLicenseURL = "http://links.sonatype.com/products/nexus/oss/EULA";
+
     /**
      * The Nexus Application state.
      */
@@ -167,7 +178,7 @@ public class SystemStatus
         this.editionShort = editionUserAgent;
     }
 
-    public String getAttriutionsURL()
+    public String getAttributionsURL()
     {
         return attributionsURL;
     }
@@ -176,7 +187,26 @@ public class SystemStatus
     {
         this.attributionsURL = attributionsURL;
     }
-    
+
+    public String getPurchaseURL() {
+        return purchaseURL;
+    }
+
+    public void setPurchaseURL(String purchaseURL)
+    {
+        this.purchaseURL = purchaseURL;
+    }
+
+    public String getUserLicenseURL()
+    {
+        return userLicenseURL;
+    }
+
+    public void setUserLicenseURL(String userLicenseURL)
+    {
+        this.userLicenseURL = userLicenseURL;
+    }
+
     public SystemState getState()
     {
         return state;

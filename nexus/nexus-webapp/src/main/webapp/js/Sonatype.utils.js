@@ -23,6 +23,8 @@
     edition : '',
     editionShort : '',
     attributionsURL : '',
+    purchaseURL : '',
+    userLicenseURL : '',
     authToken : '',
     lowercase : function(str) {
       if (Ext.isEmpty(str))
@@ -800,6 +802,9 @@
                 Sonatype.utils.edition = respObj.data.editionLong;
                 Sonatype.utils.editionShort = respObj.data.editionShort;
                 Sonatype.utils.attributionsURL = respObj.data.attributionsURL;
+                Sonatype.utils.purchaseURL = respObj.data.purchaseURL;
+                Sonatype.utils.userLicenseURL = respObj.data.userLicenseURL;
+
                 Sonatype.utils.formattedAppName = Sonatype.utils.parseFormattedAppName(respObj.data.formattedAppName);
 
                 Ext.get('logo').update('<span>' + Sonatype.utils.formattedAppName + '</span>');

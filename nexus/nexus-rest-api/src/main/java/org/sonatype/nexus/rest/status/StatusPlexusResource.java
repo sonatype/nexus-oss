@@ -97,8 +97,12 @@ public class StatusPlexusResource
         resource.setEditionLong( status.getEditionLong() );
 
         resource.setEditionShort( status.getEditionShort() );
-        
-        resource.setAttributionsURL( status.getAttriutionsURL() );
+
+        resource.setAttributionsURL( status.getAttributionsURL() );
+
+        resource.setPurchaseURL( status.getPurchaseURL() );
+
+        resource.setUserLicenseURL( status.getUserLicenseURL() );
 
         resource.setState( status.getState().toString() );
 
