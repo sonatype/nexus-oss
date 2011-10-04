@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2008-2011 Sonatype, Inc.
- * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/oss/attributions
+ * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions
  *
  * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
  * Public License Version 3 as published by the Free Software Foundation.
