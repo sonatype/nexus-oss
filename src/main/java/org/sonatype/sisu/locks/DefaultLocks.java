@@ -17,6 +17,9 @@ import java.util.concurrent.Semaphore;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.management.MBeanOperationInfo;
+import javax.management.MBeanParameterInfo;
+import javax.management.StandardMBean;
 
 /**
  * Local JDK {@link Locks}.
@@ -91,13 +94,21 @@ public final class DefaultLocks
     }
 
     private static final class LocksMBeanImpl
+        extends StandardMBean
         implements LocksMBean
     {
         private final Locks locks;
 
         LocksMBeanImpl( final Locks locks )
         {
+            super( LocksMBean.class, false );
             this.locks = locks;
+        }
+
+        @Override
+        protected String getParameterName( final MBeanOperationInfo op, final MBeanParameterInfo param, final int seq )
+        {
+            return op.getName().endsWith( "Resources" ) ? "thread id #" : "resource name";
         }
 
         public String[] getResourceNames()
@@ -105,36 +116,37 @@ public final class DefaultLocks
             return locks.getResourceNames();
         }
 
-        public long[] getResourceOwners( String name )
+        public String[] getOwningThreads( final String name )
         {
             final Thread[] owners = locks.getResourceLock( name ).getOwners();
-            final long[] ownerIds = new long[owners.length];
+            final String[] ownerTIDs = new String[owners.length];
             for ( int i = 0; i < owners.length; i++ )
             {
-                ownerIds[i] = owners[i].getId();
+                ownerTIDs[i] = Long.toString( owners[i].getId() );
             }
-            return ownerIds;
+            return ownerTIDs;
         }
 
-        public long[] getResourceWaiters( String name )
+        public String[] getWaitingThreads( final String name )
         {
             final Thread[] waiters = locks.getResourceLock( name ).getWaiters();
-            final long[] waiterIds = new long[waiters.length];
+            final String[] waiterTIDs = new String[waiters.length];
             for ( int i = 0; i < waiters.length; i++ )
             {
-                waiterIds[i] = waiters[i].getId();
+                waiterTIDs[i] = Long.toString( waiters[i].getId() );
             }
-            return waiterIds;
+            return waiterTIDs;
         }
 
-        public String[] getOwnedResources( long tid )
+        public String[] getOwnedResources( final String tid )
         {
+            final long ownerId = Integer.parseInt( tid );
             final List<String> names = new ArrayList<String>();
             for ( final String n : locks.getResourceNames() )
             {
                 for ( final Thread t : locks.getResourceLock( n ).getOwners() )
                 {
-                    if ( t.getId() == tid )
+                    if ( t.getId() == ownerId )
                     {
                         names.add( n );
                     }
@@ -143,14 +155,15 @@ public final class DefaultLocks
             return names.toArray( new String[names.size()] );
         }
 
-        public String[] getWaitedResources( long tid )
+        public String[] getWaitedResources( final String tid )
         {
+            final long waiterId = Integer.parseInt( tid );
             final List<String> names = new ArrayList<String>();
             for ( final String n : locks.getResourceNames() )
             {
                 for ( final Thread t : locks.getResourceLock( n ).getWaiters() )
                 {
-                    if ( t.getId() == tid )
+                    if ( t.getId() == waiterId )
                     {
                         names.add( n );
                     }
@@ -159,7 +172,7 @@ public final class DefaultLocks
             return names.toArray( new String[names.size()] );
         }
 
-        public void releaseResource( String name )
+        public void releaseResource( final String name )
         {
             final ResourceLock lock = locks.getResourceLock( name );
             for ( final Thread t : lock.getOwners() )

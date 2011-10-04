@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.management.StandardMBean;
 
 import org.sonatype.guice.bean.reflect.Weak;
 
@@ -43,7 +42,7 @@ abstract class AbstractLocks
             final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
             final String tag = getClass().getSimpleName() + '@' + Integer.toHexString( System.identityHashCode( this ) );
             final ObjectName name = ObjectName.getInstance( "org.sonatype.sisu:type=" + tag );
-            server.registerMBean( new StandardMBean( createLocksMBean(), LocksMBean.class ), name );
+            server.registerMBean( createLocksMBean(), name );
         }
         catch ( final Exception e )
         {

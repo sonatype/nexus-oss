@@ -15,13 +15,13 @@ public interface LocksMBean
 {
     String[] getResourceNames();
 
-    long[] getResourceOwners( String name );
+    String[] getOwningThreads( String name );
 
-    long[] getResourceWaiters( String name );
+    String[] getWaitingThreads( String name );
 
-    String[] getOwnedResources( long tid );
+    String[] getOwnedResources( String tid );
 
-    String[] getWaitedResources( long tid );
+    String[] getWaitedResources( String tid );
 
     void releaseResource( String name );
 }
