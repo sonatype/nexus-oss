@@ -26,13 +26,16 @@ final class RemoteLocksMBeanImpl
     // Implementation fields
     // ----------------------------------------------------------------------
 
+    private final String type;
+
     // ----------------------------------------------------------------------
     // Constructor
     // ----------------------------------------------------------------------
 
-    RemoteLocksMBeanImpl()
+    RemoteLocksMBeanImpl( final String type )
     {
         super( LocksMBean.class, false );
+        this.type = type;
     }
 
     // ----------------------------------------------------------------------

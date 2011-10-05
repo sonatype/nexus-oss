@@ -12,6 +12,7 @@
 package org.sonatype.sisu.locks;
 
 import java.lang.management.ManagementFactory;
+import java.util.Hashtable;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.management.MBeanServer;
@@ -25,6 +26,12 @@ import org.sonatype.guice.bean.reflect.Weak;
 abstract class AbstractLocks
     implements Locks
 {
+    // ----------------------------------------------------------------------
+    // Constants
+    // ----------------------------------------------------------------------
+
+    private static final String JMX_DOMAIN = "org.sonatype.sisu";
+
     // ----------------------------------------------------------------------
     // Implementation fields
     // ----------------------------------------------------------------------
@@ -40,9 +47,21 @@ abstract class AbstractLocks
         try
         {
             final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-            final Integer hash = new Integer( System.identityHashCode( this ) );
-            final String name = String.format( "org.sonatype.sisu:name=%s[0x%08X]", getClass().getSimpleName(), hash );
-            server.registerMBean( new LocalLocksMBeanImpl( this ), ObjectName.getInstance( name ) );
+
+            final String type = getClass().getSimpleName();
+            final ObjectName remoteName = ObjectName.getInstance( JMX_DOMAIN, "type", type );
+            if ( !server.isRegistered( remoteName ) )
+            {
+                server.registerMBean( new RemoteLocksMBeanImpl( type ), remoteName );
+            }
+
+            final String hash = String.format( "0x%08X", System.identityHashCode( this ) );
+            final Hashtable<String, String> properties = new Hashtable<String, String>();
+            properties.put( "type", type );
+            properties.put( "hash", hash );
+            final ObjectName localName = ObjectName.getInstance( JMX_DOMAIN, properties );
+
+            server.registerMBean( new LocalLocksMBeanImpl( this ), localName );
         }
         catch ( final Exception e )
         {
