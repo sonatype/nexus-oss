@@ -40,9 +40,9 @@ abstract class AbstractLocks
         try
         {
             final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-            final String tag = getClass().getSimpleName() + '@' + Integer.toHexString( System.identityHashCode( this ) );
-            final ObjectName name = ObjectName.getInstance( "org.sonatype.sisu:type=" + tag );
-            server.registerMBean( createLocksMBean(), name );
+            final Integer hash = new Integer( System.identityHashCode( this ) );
+            final String name = String.format( "org.sonatype.sisu:name=%s[0x%08X]", getClass().getSimpleName(), hash );
+            server.registerMBean( new LocalLocksMBeanImpl( this ), ObjectName.getInstance( name ) );
         }
         catch ( final Exception e )
         {
@@ -81,9 +81,4 @@ abstract class AbstractLocks
      * @return Lock associated with the given resource name
      */
     protected abstract ResourceLock createResourceLock( final String name );
-
-    /**
-     * @return MBean suitable for managing this locks factory
-     */
-    protected abstract LocksMBean createLocksMBean();
 }

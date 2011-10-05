@@ -66,12 +66,6 @@ final class HazelcastLocks
         return new ResourceLockImpl( name );
     }
 
-    @Override
-    protected LocksMBean createLocksMBean()
-    {
-        throw new UnsupportedOperationException();
-    }
-
     // ----------------------------------------------------------------------
     // Implementation types
     // ----------------------------------------------------------------------
