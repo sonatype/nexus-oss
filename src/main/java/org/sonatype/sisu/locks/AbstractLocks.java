@@ -30,7 +30,7 @@ abstract class AbstractLocks
     // Constants
     // ----------------------------------------------------------------------
 
-    private static final String JMX_DOMAIN = "org.sonatype.sisu";
+    protected static final String JMX_DOMAIN = "org.sonatype.sisu";
 
     // ----------------------------------------------------------------------
     // Implementation fields
@@ -49,19 +49,10 @@ abstract class AbstractLocks
             final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 
             final String type = getClass().getSimpleName();
-            final ObjectName remoteName = ObjectName.getInstance( JMX_DOMAIN, "type", type );
-            if ( !server.isRegistered( remoteName ) )
-            {
-                server.registerMBean( new RemoteLocksMBeanImpl( type ), remoteName );
-            }
+            final String hash = String.format( "0x%08X", new Integer( System.identityHashCode( this ) ) );
+            final ObjectName name = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type, "hash", hash ) );
 
-            final String hash = String.format( "0x%08X", System.identityHashCode( this ) );
-            final Hashtable<String, String> properties = new Hashtable<String, String>();
-            properties.put( "type", type );
-            properties.put( "hash", hash );
-            final ObjectName localName = ObjectName.getInstance( JMX_DOMAIN, properties );
-
-            server.registerMBean( new LocalLocksMBeanImpl( this ), localName );
+            server.registerMBean( new DefaultLocksMBean( this ), name );
         }
         catch ( final Exception e )
         {
@@ -100,4 +91,14 @@ abstract class AbstractLocks
      * @return Lock associated with the given resource name
      */
     protected abstract ResourceLock createResourceLock( final String name );
+
+    protected static final Hashtable<String, String> properties( final String... keyValues )
+    {
+        final Hashtable<String, String> properties = new Hashtable<String, String>();
+        for ( int i = 0; i < keyValues.length; )
+        {
+            properties.put( keyValues[i++], keyValues[i++] );
+        }
+        return properties;
+    }
 }

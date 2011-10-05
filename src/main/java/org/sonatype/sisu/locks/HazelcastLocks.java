@@ -13,10 +13,13 @@ package org.sonatype.sisu.locks;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.lang.management.ManagementFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.sonatype.inject.Nullable;
 
@@ -27,7 +30,7 @@ import com.hazelcast.core.ISemaphore;
 import com.hazelcast.core.InstanceDestroyedException;
 
 /**
- * Distributed Hazelcast {@link Locks}.
+ * Distributed Hazelcast {@link Locks} implementation.
  */
 @Named( "hazelcast" )
 @Singleton
@@ -54,6 +57,23 @@ final class HazelcastLocks
         }
 
         Hazelcast.getConfig().addSemaphoreConfig( new SemaphoreConfig( "default", Integer.MAX_VALUE ) );
+
+        try
+        {
+            final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+
+            final String type = getClass().getSimpleName();
+            final ObjectName controller = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type ) );
+            final ObjectName query = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type, "hash", "*" ) );
+            if ( !server.isRegistered( controller ) )
+            {
+                server.registerMBean( new HazelcastLocksMBean( query ), controller );
+            }
+        }
+        catch ( final Exception e )
+        {
+            e.printStackTrace();
+        }
     }
 
     // ----------------------------------------------------------------------

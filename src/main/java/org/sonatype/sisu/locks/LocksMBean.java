@@ -13,15 +13,15 @@ package org.sonatype.sisu.locks;
 
 public interface LocksMBean
 {
-    String[] getResourceNames();
+    String[] listResourceNames();
 
-    String[] getOwningThreads( String name );
+    String[] findOwningThreads( String name );
 
-    String[] getWaitingThreads( String name );
+    String[] findWaitingThreads( String name );
 
-    String[] getOwnedResources( String tid );
+    String[] findOwnedResources( String tid );
 
-    String[] getWaitedResources( String tid );
+    String[] findWaitedResources( String tid );
 
     void releaseResource( String name );
 }

@@ -17,7 +17,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
- * Local JDK {@link Locks}.
+ * Local {@link Locks} implementation.
  */
 @Named
 @Singleton

@@ -12,20 +12,16 @@
 package org.sonatype.sisu.locks;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
-import javax.management.MBeanOperationInfo;
-import javax.management.MBeanParameterInfo;
-import javax.management.StandardMBean;
 
 import org.sonatype.sisu.locks.Locks.ResourceLock;
 
 /**
  * Local {@link LocksMBean} implementation.
  */
-final class LocalLocksMBeanImpl
-    extends StandardMBean
-    implements LocksMBean
+final class DefaultLocksMBean
+    extends AbstractLocksMBean
 {
     // ----------------------------------------------------------------------
     // Implementation fields
@@ -37,9 +33,8 @@ final class LocalLocksMBeanImpl
     // Constructor
     // ----------------------------------------------------------------------
 
-    LocalLocksMBeanImpl( final Locks locks )
+    DefaultLocksMBean( final Locks locks )
     {
-        super( LocksMBean.class, false );
         this.locks = locks;
     }
 
@@ -47,13 +42,17 @@ final class LocalLocksMBeanImpl
     // Public methods
     // ----------------------------------------------------------------------
 
-    public String[] getResourceNames()
+    public String[] listResourceNames()
     {
         return locks.getResourceNames();
     }
 
-    public String[] getOwningThreads( final String name )
+    public String[] findOwningThreads( final String name )
     {
+        if ( !Arrays.asList( locks.getResourceNames() ).contains( name ) )
+        {
+            return new String[0];
+        }
         final Thread[] owners = locks.getResourceLock( name ).getOwners();
         final String[] ownerTIDs = new String[owners.length];
         for ( int i = 0; i < owners.length; i++ )
@@ -63,8 +62,12 @@ final class LocalLocksMBeanImpl
         return ownerTIDs;
     }
 
-    public String[] getWaitingThreads( final String name )
+    public String[] findWaitingThreads( final String name )
     {
+        if ( !Arrays.asList( locks.getResourceNames() ).contains( name ) )
+        {
+            return new String[0];
+        }
         final Thread[] waiters = locks.getResourceLock( name ).getWaiters();
         final String[] waiterTIDs = new String[waiters.length];
         for ( int i = 0; i < waiters.length; i++ )
@@ -74,9 +77,9 @@ final class LocalLocksMBeanImpl
         return waiterTIDs;
     }
 
-    public String[] getOwnedResources( final String tid )
+    public String[] findOwnedResources( final String tid )
     {
-        final long ownerId = Integer.parseInt( tid );
+        final long ownerId = Long.decode( tid ).longValue();
         final List<String> names = new ArrayList<String>();
         for ( final String n : locks.getResourceNames() )
         {
@@ -91,9 +94,9 @@ final class LocalLocksMBeanImpl
         return names.toArray( new String[names.size()] );
     }
 
-    public String[] getWaitedResources( final String tid )
+    public String[] findWaitedResources( final String tid )
     {
-        final long waiterId = Integer.parseInt( tid );
+        final long waiterId = Long.decode( tid ).longValue();
         final List<String> names = new ArrayList<String>();
         for ( final String n : locks.getResourceNames() )
         {
@@ -110,27 +113,20 @@ final class LocalLocksMBeanImpl
 
     public void releaseResource( final String name )
     {
-        final ResourceLock lock = locks.getResourceLock( name );
-        for ( final Thread t : lock.getOwners() )
+        if ( Arrays.asList( locks.getResourceNames() ).contains( name ) )
         {
-            for ( int i = lock.getSharedCount( t ); i > 0; i-- )
+            final ResourceLock lock = locks.getResourceLock( name );
+            for ( final Thread t : lock.getOwners() )
             {
-                lock.unlockShared( t );
-            }
-            for ( int i = lock.getExclusiveCount( t ); i > 0; i-- )
-            {
-                lock.unlockExclusive( t );
+                for ( int i = lock.getSharedCount( t ); i > 0; i-- )
+                {
+                    lock.unlockShared( t );
+                }
+                for ( int i = lock.getExclusiveCount( t ); i > 0; i-- )
+                {
+                    lock.unlockExclusive( t );
+                }
             }
         }
-    }
-
-    // ----------------------------------------------------------------------
-    // Implementation methods
-    // ----------------------------------------------------------------------
-
-    @Override
-    protected String getParameterName( final MBeanOperationInfo op, final MBeanParameterInfo param, final int seq )
-    {
-        return op.getName().endsWith( "Resources" ) ? "thread id #" : "resource name";
     }
 }

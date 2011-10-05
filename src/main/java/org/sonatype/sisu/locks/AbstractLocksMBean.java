@@ -16,60 +16,19 @@ import javax.management.MBeanParameterInfo;
 import javax.management.StandardMBean;
 
 /**
- * Remote {@link LocksMBean} implementation.
+ * Abstract {@link LocksMBean} implementation.
  */
-final class RemoteLocksMBeanImpl
+abstract class AbstractLocksMBean
     extends StandardMBean
     implements LocksMBean
 {
     // ----------------------------------------------------------------------
-    // Implementation fields
-    // ----------------------------------------------------------------------
-
-    private final String type;
-
-    // ----------------------------------------------------------------------
     // Constructor
     // ----------------------------------------------------------------------
 
-    RemoteLocksMBeanImpl( final String type )
+    AbstractLocksMBean()
     {
         super( LocksMBean.class, false );
-        this.type = type;
-    }
-
-    // ----------------------------------------------------------------------
-    // Public methods
-    // ----------------------------------------------------------------------
-
-    public String[] getResourceNames()
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public String[] getOwningThreads( final String name )
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public String[] getWaitingThreads( final String name )
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public String[] getOwnedResources( final String tid )
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public String[] getWaitedResources( final String tid )
-    {
-        throw new UnsupportedOperationException();
-    }
-
-    public void releaseResource( final String name )
-    {
-        throw new UnsupportedOperationException();
     }
 
     // ----------------------------------------------------------------------
@@ -77,7 +36,7 @@ final class RemoteLocksMBeanImpl
     // ----------------------------------------------------------------------
 
     @Override
-    protected String getParameterName( final MBeanOperationInfo op, final MBeanParameterInfo param, final int seq )
+    protected final String getParameterName( final MBeanOperationInfo op, final MBeanParameterInfo param, final int seq )
     {
         return op.getName().endsWith( "Resources" ) ? "thread id #" : "resource name";
     }
