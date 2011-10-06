@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.bundle.launcher.support;
 
+import org.sonatype.inject.Nullable;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.sisu.bl.support.DefaultBundleConfiguration;
 import org.sonatype.sisu.bl.support.resolver.BundleResolver;
@@ -85,7 +86,7 @@ public class DefaultNexusBundleConfiguration
      * @since 1.10.0
      */
     @Inject
-    protected void setBundleResolver( final @NexusSpecific BundleResolver bundleResolver )
+    protected void setBundleResolver( final @Nullable @NexusSpecific BundleResolver bundleResolver )
     {
         super.setBundleResolver( bundleResolver );
     }
@@ -98,7 +99,8 @@ public class DefaultNexusBundleConfiguration
      * @since 1.10.0
      */
     @Inject
-    protected void setTargetDirectoryResolver( final @NexusSpecific TargetDirectoryResolver targetDirectoryResolver )
+    protected void setTargetDirectoryResolver(
+        final @Nullable @NexusSpecific TargetDirectoryResolver targetDirectoryResolver )
     {
         super.setTargetDirectoryResolver( targetDirectoryResolver );
     }
