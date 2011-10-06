@@ -18,6 +18,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import org.sonatype.guice.bean.reflect.Logs;
 import org.sonatype.guice.bean.reflect.Weak;
 
 /**
@@ -42,21 +43,24 @@ abstract class AbstractLocks
     // Constructor
     // ----------------------------------------------------------------------
 
-    AbstractLocks()
+    AbstractLocks( final boolean jmxEnabled )
     {
-        try
+        if ( jmxEnabled )
         {
-            final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+            try
+            {
+                final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 
-            final String type = getClass().getSimpleName();
-            final String hash = String.format( "0x%08X", new Integer( System.identityHashCode( this ) ) );
-            final ObjectName name = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type, "hash", hash ) );
+                final String type = getClass().getSimpleName();
+                final String hash = String.format( "0x%08X", new Integer( System.identityHashCode( this ) ) );
+                final ObjectName name = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type, "hash", hash ) );
 
-            server.registerMBean( new DefaultLocksMBean( this ), name );
-        }
-        catch ( final Exception e )
-        {
-            e.printStackTrace();
+                server.registerMBean( new DefaultLocksMBean( this ), name );
+            }
+            catch ( final Exception e )
+            {
+                Logs.warn( "Problem registering LocksMBean for: <>", this, e );
+            }
         }
     }
 

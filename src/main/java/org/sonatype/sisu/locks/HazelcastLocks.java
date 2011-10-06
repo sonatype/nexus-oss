@@ -21,6 +21,7 @@ import javax.inject.Singleton;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import org.sonatype.guice.bean.reflect.Logs;
 import org.sonatype.inject.Nullable;
 
 import com.hazelcast.config.FileSystemXmlConfig;
@@ -44,6 +45,8 @@ final class HazelcastLocks
     @Inject
     HazelcastLocks( @Nullable @Named( "${hazelcast.config}" ) final File configFile )
     {
+        super( true );
+
         if ( null != configFile && configFile.isFile() )
         {
             try
@@ -63,16 +66,16 @@ final class HazelcastLocks
             final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 
             final String type = getClass().getSimpleName();
-            final ObjectName controller = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type ) );
+            final ObjectName master = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type ) );
             final ObjectName query = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type, "hash", "*" ) );
-            if ( !server.isRegistered( controller ) )
+            if ( !server.isRegistered( master ) )
             {
-                server.registerMBean( new HazelcastLocksMBean( query ), controller );
+                server.registerMBean( new HazelcastLocksMBean( query ), master );
             }
         }
         catch ( final Exception e )
         {
-            e.printStackTrace();
+            Logs.warn( "Problem registering master LocksMBean for: <>", this, e );
         }
     }
 

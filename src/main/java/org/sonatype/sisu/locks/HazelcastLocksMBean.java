@@ -26,6 +26,8 @@ import java.util.concurrent.Callable;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import org.sonatype.guice.bean.reflect.Logs;
+
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.Member;
 import com.hazelcast.core.MultiTask;
@@ -104,7 +106,7 @@ final class HazelcastLocksMBean
         }
         catch ( final Exception e )
         {
-            e.printStackTrace();
+            Logs.warn( "Problem executing cluster MultiTask for: \"{}\"", method, e );
         }
         return values.toArray( new String[values.size()] );
     }
@@ -146,7 +148,7 @@ final class HazelcastLocksMBean
         }
         catch ( final Exception e )
         {
-            e.printStackTrace();
+            Logs.warn( "Problem filtering cluster members for: \"{}\"", method, e );
         }
         if ( members.isEmpty() )
         {
@@ -210,7 +212,7 @@ final class HazelcastLocksMBean
                 }
                 catch ( final Exception e )
                 {
-                    e.printStackTrace();
+                    Logs.warn( "Problem invoking JMX method: \"{}\"", method, e );
                 }
             }
             return normalizeValues( method, values );

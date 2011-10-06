@@ -13,6 +13,7 @@ package org.sonatype.sisu.locks;
 
 import java.util.concurrent.Semaphore;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -24,6 +25,21 @@ import javax.inject.Singleton;
 public final class DefaultLocks
     extends AbstractLocks
 {
+    // ----------------------------------------------------------------------
+    // Constructors
+    // ----------------------------------------------------------------------
+
+    @Inject
+    public DefaultLocks()
+    {
+        this( true );
+    }
+
+    public DefaultLocks( final boolean jmxEnabled )
+    {
+        super( jmxEnabled );
+    }
+
     // ----------------------------------------------------------------------
     // Implementation methods
     // ----------------------------------------------------------------------
