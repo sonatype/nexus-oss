@@ -72,10 +72,13 @@ public class DefaultNexusBundleConfiguration
      * @since 1.10.0
      */
     @Inject
-    protected void configureStartTimeout(
-        final @Named( "${" + START_TIMEOUT + ":-" + START_TIMEOUT_DEFAULT + "}" ) Integer startTimeout )
+    protected void configureNexusStartTimeout(
+        final @Nullable @Named( "${" + START_TIMEOUT + "}" ) Integer startTimeout )
     {
-        super.setStartTimeout( startTimeout );
+        if ( startTimeout != null )
+        {
+            super.setStartTimeout( startTimeout );
+        }
     }
 
     /**
