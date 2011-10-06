@@ -164,8 +164,16 @@ public class ErrorReportingPlexusResource
         }
         catch ( IssueSubmissionException e )
         {
-            getLogger().debug( "Unable to submit jira ticket.", e );
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(), e );
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().error( "Unable to submit jira ticket.", e );
+            }
+            else
+            {
+                getLogger().error( "Unable to submit jira ticket: " + e.getMessage() );
+            }
+
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Unable to submit jira ticket:" + e.getMessage(), e );
         }
         catch ( IOException e )
         {
