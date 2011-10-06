@@ -106,6 +106,9 @@
               <exclude>**/.settings/**</exclude>
               <!-- temp file created by maven-shade-plugin in basedir, deleted on maven jvm exit but possibly still around during license check -->
               <exclude>**/dependency-reduced-pom.xml</exclude>
+              <!-- netbeans adds these -->
+              <exclude>**/nbactions*.xml</exclude>
+              <exclude>**/nb-configuration.xml</exclude>
             </excludes>
             <mapping>
               <vm>XML_STYLE</vm>
