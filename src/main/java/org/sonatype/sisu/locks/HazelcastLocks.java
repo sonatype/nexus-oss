@@ -24,9 +24,11 @@ import javax.management.ObjectName;
 import org.sonatype.guice.bean.reflect.Logs;
 import org.sonatype.inject.Nullable;
 
+import com.hazelcast.config.Config;
 import com.hazelcast.config.FileSystemXmlConfig;
-import com.hazelcast.config.SemaphoreConfig;
+import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ISemaphore;
 import com.hazelcast.core.InstanceDestroyedException;
 
@@ -39,6 +41,16 @@ final class HazelcastLocks
     extends AbstractLocks
 {
     // ----------------------------------------------------------------------
+    // Implementation fields
+    // ----------------------------------------------------------------------
+
+    private final HazelcastInstance instance;
+
+    private ObjectName jmxQuery;
+
+    private ObjectName jmxMaster;
+
+    // ----------------------------------------------------------------------
     // Constructors
     // ----------------------------------------------------------------------
 
@@ -47,35 +59,61 @@ final class HazelcastLocks
     {
         super( true );
 
-        if ( null != configFile && configFile.isFile() )
-        {
-            try
-            {
-                Hazelcast.init( new FileSystemXmlConfig( configFile ) );
-            }
-            catch ( final FileNotFoundException e )
-            {
-                throw new IllegalArgumentException( e.getMessage() );
-            }
-        }
-
-        Hazelcast.getConfig().addSemaphoreConfig( new SemaphoreConfig( "default", Integer.MAX_VALUE ) );
+        instance = Hazelcast.newHazelcastInstance( getHazelcastConfig( configFile ) );
 
         try
         {
             final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 
             final String type = getClass().getSimpleName();
-            final ObjectName master = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type ) );
-            final ObjectName query = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type, "hash", "*" ) );
-            if ( !server.isRegistered( master ) )
+            jmxQuery = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type, "hash", "*" ) );
+            jmxMaster = ObjectName.getInstance( JMX_DOMAIN, "type", type );
+            if ( !server.isRegistered( jmxMaster ) )
             {
-                server.registerMBean( new HazelcastLocksMBean( query ), master );
+                server.registerMBean( new HazelcastLocksMBean( instance, jmxQuery ), jmxMaster );
             }
         }
         catch ( final Exception e )
         {
             Logs.warn( "Problem registering master LocksMBean for: <>", this, e );
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    // Public methods
+    // ----------------------------------------------------------------------
+
+    @Override
+    public void shutdown()
+    {
+        boolean lastMember = false;
+        try
+        {
+            super.shutdown();
+            final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+            lastMember = server.queryNames( jmxQuery, null ).isEmpty();
+            if ( lastMember )
+            {
+                try
+                {
+                    server.unregisterMBean( jmxMaster );
+                }
+                catch ( final Exception e )
+                {
+                    Logs.warn( "Problem unregistering master LocksMBean for: <>", this, e );
+                }
+            }
+        }
+        finally
+        {
+            if ( lastMember )
+            {
+                Hazelcast.shutdownAll();
+            }
+            else
+            {
+                instance.getLifecycleService().shutdown();
+            }
         }
     }
 
@@ -86,7 +124,32 @@ final class HazelcastLocks
     @Override
     protected ResourceLock createResourceLock( final String name )
     {
-        return new ResourceLockImpl( name );
+        return new ResourceLockImpl( instance.getSemaphore( name ) );
+    }
+
+    private static Config getHazelcastConfig( final File configFile )
+    {
+        final Config config;
+        if ( null != configFile && configFile.isFile() )
+        {
+            try
+            {
+                config = new FileSystemXmlConfig( configFile );
+            }
+            catch ( final FileNotFoundException e )
+            {
+                throw new IllegalArgumentException( e.getMessage() );
+            }
+        }
+        else
+        {
+            config = new XmlConfigBuilder().build();
+        }
+
+        config.getSemaphoreConfig( "default" ).setInitialPermits( Integer.MAX_VALUE );
+        config.setClassLoader( Hazelcast.class.getClassLoader() );
+
+        return config;
     }
 
     // ----------------------------------------------------------------------
@@ -109,9 +172,9 @@ final class HazelcastLocks
         // Constructors
         // ----------------------------------------------------------------------
 
-        ResourceLockImpl( final String name )
+        ResourceLockImpl( final ISemaphore sem )
         {
-            sem = Hazelcast.getSemaphore( name );
+            this.sem = sem;
         }
 
         // ----------------------------------------------------------------------

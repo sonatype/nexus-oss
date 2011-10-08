@@ -31,6 +31,11 @@ public interface Locks
      */
     String[] getResourceNames();
 
+    /**
+     * Shuts down the lock factory and cleans up any allocated resources/threads.
+     */
+    void shutdown();
+
     // ----------------------------------------------------------------------
     // Lock types
     // ----------------------------------------------------------------------

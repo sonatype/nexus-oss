@@ -39,6 +39,8 @@ abstract class AbstractLocks
 
     private final ConcurrentMap<String, ResourceLock> resourceLocks = Weak.concurrentValues();
 
+    private ObjectName jmxName;
+    
     // ----------------------------------------------------------------------
     // Constructor
     // ----------------------------------------------------------------------
@@ -53,9 +55,9 @@ abstract class AbstractLocks
 
                 final String type = getClass().getSimpleName();
                 final String hash = String.format( "0x%08X", new Integer( System.identityHashCode( this ) ) );
-                final ObjectName name = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type, "hash", hash ) );
+                jmxName = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type, "hash", hash ) );
 
-                server.registerMBean( new DefaultLocksMBean( this ), name );
+                server.registerMBean( new DefaultLocksMBean( this ), jmxName );
             }
             catch ( final Exception e )
             {
@@ -85,6 +87,21 @@ abstract class AbstractLocks
     public final String[] getResourceNames()
     {
         return resourceLocks.keySet().toArray( new String[0] );
+    }
+
+    public void shutdown()
+    {
+        if ( null != jmxName )
+        {
+            try
+            {
+                ManagementFactory.getPlatformMBeanServer().unregisterMBean( jmxName );
+            }
+            catch ( final Exception e )
+            {
+                Logs.warn( "Problem unregistering LocksMBean for: <>", this, e );
+            }
+        }
     }
 
     // ----------------------------------------------------------------------

@@ -28,7 +28,8 @@ import javax.management.ObjectName;
 
 import org.sonatype.guice.bean.reflect.Logs;
 
-import com.hazelcast.core.Hazelcast;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.core.Member;
 import com.hazelcast.core.MultiTask;
 
@@ -42,15 +43,18 @@ final class HazelcastLocksMBean
     // Implementation fields
     // ----------------------------------------------------------------------
 
-    private final ObjectName query;
+    private final HazelcastInstance instance;
+
+    private final ObjectName jmxQuery;
 
     // ----------------------------------------------------------------------
     // Constructor
     // ----------------------------------------------------------------------
 
-    HazelcastLocksMBean( final ObjectName query )
+    HazelcastLocksMBean( final HazelcastInstance instance, final ObjectName jmxQuery )
     {
-        this.query = query;
+        this.instance = instance;
+        this.jmxQuery = jmxQuery;
     }
 
     // ----------------------------------------------------------------------
@@ -93,12 +97,12 @@ final class HazelcastLocksMBean
 
     public String[] invokeMethod( final String method, final String... args )
     {
-        final MBeansInvoker invoker = new MBeansInvoker( query, method, args );
+        final MBeansInvoker invoker = new MBeansInvoker( jmxQuery, method, args );
         final MultiTask<List<String>> task = new MultiTask<List<String>>( invoker, filterMembers( method, args ) );
         final Set<String> values = new HashSet<String>();
         try
         {
-            Hazelcast.getExecutorService().execute( task );
+            instance.getExecutorService().execute( task );
             for ( final List<String> result : task.get() )
             {
                 values.addAll( result );
@@ -111,7 +115,7 @@ final class HazelcastLocksMBean
         return values.toArray( new String[values.size()] );
     }
 
-    private static Set<Member> filterMembers( final String method, final String... args )
+    private Set<Member> filterMembers( final String method, final String... args )
     {
         final Set<Member> members = new HashSet<Member>();
         try
@@ -125,7 +129,7 @@ final class HazelcastLocksMBean
                 if ( tokens.length == 3 )
                 {
                     final InetSocketAddress addr = new InetSocketAddress( tokens[1], Integer.parseInt( tokens[2] ) );
-                    for ( final Member m : Hazelcast.getCluster().getMembers() )
+                    for ( final Member m : instance.getCluster().getMembers() )
                     {
                         if ( addr.equals( m.getInetSocketAddress() ) )
                         {
@@ -136,7 +140,7 @@ final class HazelcastLocksMBean
                 else if ( tokens.length == 2 )
                 {
                     final InetAddress addr = InetAddress.getByName( tokens[1] );
-                    for ( final Member m : Hazelcast.getCluster().getMembers() )
+                    for ( final Member m : instance.getCluster().getMembers() )
                     {
                         if ( addr.equals( m.getInetSocketAddress().getAddress() ) )
                         {
@@ -152,7 +156,7 @@ final class HazelcastLocksMBean
         }
         if ( members.isEmpty() )
         {
-            members.addAll( Hazelcast.getCluster().getMembers() );
+            members.addAll( instance.getCluster().getMembers() );
         }
         return members;
     }
@@ -163,13 +167,15 @@ final class HazelcastLocksMBean
 
     @SuppressWarnings( "serial" )
     private static final class MBeansInvoker
-        implements Callable<List<String>>, Serializable
+        implements HazelcastInstanceAware, Callable<List<String>>, Serializable
     {
         // ----------------------------------------------------------------------
         // Implementation fields
         // ----------------------------------------------------------------------
 
-        private final ObjectName query;
+        private HazelcastInstance instance;
+
+        private final ObjectName jmxQuery;
 
         private final String method;
 
@@ -179,9 +185,9 @@ final class HazelcastLocksMBean
         // Constructor
         // ----------------------------------------------------------------------
 
-        MBeansInvoker( final ObjectName query, final String method, final String... args )
+        MBeansInvoker( final ObjectName jmxQuery, final String method, final String... args )
         {
-            this.query = query;
+            this.jmxQuery = jmxQuery;
             this.method = method;
             this.args = args;
         }
@@ -189,6 +195,11 @@ final class HazelcastLocksMBean
         // ----------------------------------------------------------------------
         // Public methods
         // ----------------------------------------------------------------------
+
+        public void setHazelcastInstance( final HazelcastInstance instance )
+        {
+            this.instance = instance;
+        }
 
         @Override
         public List<String> call()
@@ -200,7 +211,7 @@ final class HazelcastLocksMBean
             Arrays.fill( sig, String.class.getName() );
 
             final List<String> values = new ArrayList<String>();
-            for ( final ObjectName mBean : server.queryNames( query, null ) )
+            for ( final ObjectName mBean : server.queryNames( jmxQuery, null ) )
             {
                 try
                 {
@@ -215,18 +226,18 @@ final class HazelcastLocksMBean
                     Logs.warn( "Problem invoking JMX method: \"{}\"", method, e );
                 }
             }
-            return normalizeValues( method, values );
+            return normalizeValues( values );
         }
 
         // ----------------------------------------------------------------------
         // Implementation methods
         // ----------------------------------------------------------------------
 
-        private static List<String> normalizeValues( final String method, final List<String> values )
+        private List<String> normalizeValues( final List<String> values )
         {
             if ( method.endsWith( "Threads" ) )
             {
-                final String addr = toString( Hazelcast.getCluster().getLocalMember().getInetSocketAddress() );
+                final String addr = toString( instance.getCluster().getLocalMember().getInetSocketAddress() );
                 for ( int i = 0; i < values.size(); i++ )
                 {
                     values.set( i, values.get( i ) + " @ " + addr );
