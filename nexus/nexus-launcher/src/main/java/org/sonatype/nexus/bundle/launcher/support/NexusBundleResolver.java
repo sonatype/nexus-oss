@@ -19,8 +19,8 @@
 package org.sonatype.nexus.bundle.launcher.support;
 
 import org.sonatype.inject.Nullable;
-import org.sonatype.sisu.bl.support.resolver.ArtifactResolver;
-import org.sonatype.sisu.bl.support.resolver.ArtifactResolverBundleResolver;
+import org.sonatype.sisu.bl.support.resolver.MavenBridgedBundleResolver;
+import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,7 +33,7 @@ import javax.inject.Named;
 @Named
 @NexusSpecific
 public class NexusBundleResolver
-    extends ArtifactResolverBundleResolver
+    extends MavenBridgedBundleResolver
 {
 
     /**
@@ -50,8 +50,8 @@ public class NexusBundleResolver
      * @since 1.10.0
      */
     @Inject
-    public NexusBundleResolver( @Nullable @Named( "${" + BUNDLE_COORDINATES + "}" ) String bundleCoordinates,
-                                ArtifactResolver artifactResolver )
+    public NexusBundleResolver( final @Nullable @Named( "${" + BUNDLE_COORDINATES + "}" ) String bundleCoordinates,
+                                final MavenArtifactResolver artifactResolver )
     {
         super( bundleCoordinates, artifactResolver );
     }

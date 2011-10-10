@@ -19,14 +19,17 @@
 package org.sonatype.nexus.bundle.launcher;
 
 import com.google.inject.Binder;
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.resolution.ArtifactResolutionException;
 import org.sonatype.nexus.bundle.launcher.support.NexusSpecific;
-import org.sonatype.sisu.bl.support.resolver.ArtifactResolver;
-import org.sonatype.sisu.bl.support.resolver.ResolvedArtifact;
 import org.sonatype.sisu.bl.support.resolver.TargetDirectoryResolver;
 import org.sonatype.sisu.litmus.testsupport.inject.InjectedTestSupport;
+import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
 
 import javax.inject.Inject;
 import java.io.File;
+
+import static org.sonatype.sisu.maven.bridge.support.ArtifactRequestBuilder.request;
 
 /**
  * Base class for Nexus Integration Tests.
@@ -46,7 +49,7 @@ public abstract class NexusITSupport
      * Artifact resolver used to resolve artifacts by Maven coordinates.
      */
     @Inject
-    private ArtifactResolver artifactResolver;
+    private MavenArtifactResolver artifactResolver;
 
     /**
      * Binds a {@link TargetDirectoryResolver} to an implementation that will set the bundle target directory to a
@@ -117,12 +120,21 @@ public abstract class NexusITSupport
     protected File resolveArtifact( final String coordinates )
         throws RuntimeException
     {
-        ResolvedArtifact artifact = artifactResolver.resolveArtifact( coordinates );
-        if ( artifact == null || artifact.getFile() == null || !artifact.getFile().exists() )
+        try
         {
-            throw new RuntimeException( String.format( "Artifact %s could not be resolved", coordinates ) );
+            Artifact artifact = artifactResolver.resolveArtifact(
+                request().artifact( coordinates )
+            );
+            if ( artifact == null || artifact.getFile() == null || !artifact.getFile().exists() )
+            {
+                throw new RuntimeException( String.format( "Artifact %s could not be resolved", coordinates ) );
+            }
+            return artifact.getFile();
         }
-        return artifact.getFile();
+        catch ( ArtifactResolutionException e )
+        {
+            throw new RuntimeException( e.getMessage(), e );
+        }
     }
 
     /**
