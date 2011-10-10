@@ -30,6 +30,7 @@
     <module>nexus-migration-plugin-artifactory</module>
     <module>nexus-migration-plugin-artifactory-bridge</module>
     <module>nexus-migration-plugin-packaging</module>
+    <module>nexus-migration-plugin-test-harness</module>
   </modules>
 
   <properties>
@@ -138,14 +139,5 @@
       </plugin>
     </plugins>
   </build>
-
-  <profiles>
-    <profile>
-      <id>run-its</id>
-      <modules>
-        <module>nexus-migration-plugin-test-harness</module>
-      </modules>
-    </profile>
-  </profiles>
 
 </project>
