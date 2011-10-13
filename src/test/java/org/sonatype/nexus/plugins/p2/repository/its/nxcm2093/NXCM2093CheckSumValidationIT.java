@@ -65,7 +65,7 @@ public class NXCM2093CheckSumValidationIT
         catch ( final Exception e )
         {
             assertThat(
-                FileUtils.fileRead( nexusLog ),
+                FileUtils.fileRead( getNexusLogFile() ),
                 containsString( "Validation failed due: The artifact /features/com.sonatype.nexus.p2.its.feature_1.0.0.jar and it's remote checksums does not match in repository nxcm2093-bad-checksum! The checksumPolicy of repository forbids downloading of it." ) );
         }
 

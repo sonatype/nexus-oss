@@ -46,7 +46,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <nexus.version>1.9.2.2</nexus.version>
+    <nexus.version>1.10.0-SNAPSHOT</nexus.version>
     <sisu.assembler.tags>nexus,nexus-plugins</sisu.assembler.tags>
   </properties>
 
@@ -74,7 +74,7 @@
       <version>1.6.1</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
@@ -106,7 +106,7 @@
       <version>1.0.8-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-resource-scanner</artifactId>
@@ -135,8 +135,16 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-common</artifactId>
+      <artifactId>nexus-proxy</artifactId>
       <version>${nexus.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-configuration</artifactId>
+      <version>${nexus.version}</version>
+      <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
 
@@ -199,9 +207,9 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
+        <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.6</version>
+        <version>${nexus.version}</version>
         <executions>
           <execution>
             <goals>
