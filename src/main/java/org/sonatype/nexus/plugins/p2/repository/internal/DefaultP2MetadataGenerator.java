@@ -134,7 +134,9 @@ public class DefaultP2MetadataGenerator
             final Manifest manifest = jarFile.getManifest();
             final Attributes mainAttributes = manifest.getMainAttributes();
 
-            final String bsn = mainAttributes.getValue( "Bundle-SymbolicName" );
+            // get part before first semicolon
+            // bug fix NEXUS-4552 & NEXUS-4567
+            final String bsn = mainAttributes.getValue( "Bundle-SymbolicName" ).split(";")[0].trim();
             if ( bsn == null )
             {
                 logger.debug( "[{}:{}] is not an OSGi bundle. Bailing out.", item.getRepositoryId(), item.getPath() );
