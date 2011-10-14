@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.proxy.walker;
 
+import junit.framework.Assert;
 import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
@@ -29,6 +30,9 @@ import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 public class WalkerTest
     extends AbstractProxyTestEnvironment
@@ -37,12 +41,15 @@ public class WalkerTest
 
     private Walker walker;
 
+    private RepositoryRegistry repositoryRegistry;
+
     public void setUp()
         throws Exception
     {
         super.setUp();
 
         walker = lookup( Walker.class );
+        repositoryRegistry = this.lookup( RepositoryRegistry.class );
     }
 
     @Override
@@ -90,11 +97,46 @@ public class WalkerTest
             fail( "Should be no exception!" );
         }
 
-        assertEquals( 10, wp.collEnters );
-        assertEquals( 10, wp.collExits );
-        assertEquals( 10, wp.colls );
-        assertEquals( 4, wp.files );
-        assertEquals( 0, wp.links );
+        Assert.assertEquals( 10, wp.collEnters );
+        Assert.assertEquals( 10, wp.collExits );
+        Assert.assertEquals( 10, wp.colls );
+        Assert.assertEquals( 4, wp.files );
+        Assert.assertEquals( 0, wp.links );
+    }
+
+    /**
+     * Tests walking an out of service repo.  The walker should NOT not fail, but also NOT find any items.</BR>
+     * Verifies fix for: NEXUS-4554 (which is more general then just fixing the Trash task)
+     * @throws Exception
+     */
+    @Test
+    public void testWalkOutOfServiceRepo() throws Exception
+    {
+        // put repo2 out of service
+        String repoId = "repo2";
+        Repository repo = repositoryRegistry.getRepository( repoId );
+        repo.setLocalStatus( LocalStatus.OUT_OF_SERVICE );
+        repo.commitChanges();
+
+        TestWalkerProcessor wp = null;
+        WalkerContext wc = null;
+
+        wp = new TestWalkerProcessor();
+
+        // this is a group
+        wc = new DefaultWalkerContext( getRepositoryRegistry().getRepository( repoId ), new ResourceStoreRequest(
+            RepositoryItemUid.PATH_ROOT,
+            true ) );
+
+        wc.getProcessors().add( wp );
+
+        walker.walk( wc );
+
+        Assert.assertEquals( 0, wp.collEnters );
+        Assert.assertEquals( 0, wp.collExits );
+        Assert.assertEquals( 0, wp.colls );
+        Assert.assertEquals( 0, wp.files );
+        Assert.assertEquals( 0, wp.links );
     }
 
     private class TestWalkerProcessor

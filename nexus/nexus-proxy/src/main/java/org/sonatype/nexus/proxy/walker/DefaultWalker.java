@@ -29,6 +29,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.scheduling.TaskInterruptedException;
 
@@ -49,6 +50,7 @@ public class DefaultWalker
     public void walk( WalkerContext context )
         throws WalkerException
     {
+
         String fromPath = context.getResourceStoreRequest().getRequestPath();
 
         if ( fromPath == null )
@@ -56,74 +58,81 @@ public class DefaultWalker
             fromPath = RepositoryItemUid.PATH_ROOT;
         }
 
-        context.getContext().put( WALKER_WALKED_FROM_PATH, fromPath );
-
-        if ( getLogger().isDebugEnabled() )
+        // cannot walk out of service repos
+        if( LocalStatus.OUT_OF_SERVICE == context.getRepository().getLocalStatus() )
         {
-            getLogger().debug(
-                "Start walking on ResourceStore " + context.getRepository().getId() + " from path '" + fromPath + "'." );
+            getLogger().info( "Cannot walk, repository: '"+ context.getRepository().getId() + "' is out of service." );
         }
-
-        try
+        else
         {
-            // user may call stop()
-            beforeWalk( context );
+            context.getContext().put( WALKER_WALKED_FROM_PATH, fromPath );
 
-            if ( context.isStopped() )
+            if ( getLogger().isDebugEnabled() )
             {
-                reportWalkEnd( context, fromPath );
-
-                return;
+                getLogger().debug(
+                    "Start walking on ResourceStore " + context.getRepository().getId() + " from path '" + fromPath + "'." );
             }
 
-            StorageItem item = null;
-
-            item = context.getRepository().retrieveItem( true, context.getResourceStoreRequest() );
-
-            int collCount = 0;
-
-            if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
+            try
             {
-                try
+                // user may call stop()
+                beforeWalk( context );
+
+                if ( context.isStopped() )
                 {
-                    WalkerFilter filter =
-                        context.getFilter() != null ? context.getFilter() : new DefaultStoreWalkerFilter();
-
-                    collCount = walkRecursive( 0, context, filter, (StorageCollectionItem) item );
-
-                    context.getContext().put( WALKER_WALKED_COLLECTION_COUNT, collCount );
-                }
-                catch ( Exception e )
-                {
-                    context.stop( e );
-
                     reportWalkEnd( context, fromPath );
 
                     return;
                 }
-            }
 
-            if ( !context.isStopped() )
+                StorageItem item = null;
+
+                item = context.getRepository().retrieveItem( true, context.getResourceStoreRequest() );
+
+                int collCount = 0;
+
+                if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
+                {
+                    try
+                    {
+                        WalkerFilter filter =
+                            context.getFilter() != null ? context.getFilter() : new DefaultStoreWalkerFilter();
+
+                        collCount = walkRecursive( 0, context, filter, (StorageCollectionItem) item );
+
+                        context.getContext().put( WALKER_WALKED_COLLECTION_COUNT, collCount );
+                    }
+                    catch ( Exception e )
+                    {
+                        context.stop( e );
+
+                        reportWalkEnd( context, fromPath );
+
+                        return;
+                    }
+                }
+
+                if ( !context.isStopped() )
+                {
+                    afterWalk( context );
+                }
+            }
+            catch ( ItemNotFoundException ex )
             {
-                afterWalk( context );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "ItemNotFound where walking should start, bailing out.", ex );
+                }
+
+                context.stop( ex );
             }
-        }
-        catch ( ItemNotFoundException ex )
-        {
-            if ( getLogger().isDebugEnabled() )
+            catch ( Exception ex )
             {
-                getLogger().debug( "ItemNotFound where walking should start, bailing out.", ex );
+                getLogger().warn( "Got exception while doing retrieve, bailing out.", ex );
+
+                context.stop( ex );
             }
-
-            context.stop( ex );
         }
-        catch ( Exception ex )
-        {
-            getLogger().warn( "Got exception while doing retrieve, bailing out.", ex );
-
-            context.stop( ex );
-        }
-
         reportWalkEnd( context, fromPath );
     }
 
