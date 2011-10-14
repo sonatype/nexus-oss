@@ -26,10 +26,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -39,6 +41,7 @@ import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
+import org.sonatype.nexus.proxy.item.LinkPersister;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -50,8 +53,11 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.AbstractLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
+import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.util.ItemPathUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
+
+import javax.inject.Inject;
 
 /**
  * The Class DefaultFSLocalRepositoryStorage.
@@ -73,8 +79,16 @@ public class DefaultFSLocalRepositoryStorage
     private static final boolean touchLastRequestedForProxyRepositories = SystemPropertiesHelper.getBoolean(
         "nexus.ls.file.touchLastRequested.proxy", touchLastRequested );
 
-    @Requirement
+
     private FSPeer fsPeer;
+
+    @Inject
+    public DefaultFSLocalRepositoryStorage( Wastebasket wastebasket, LinkPersister linkPersister, MimeUtil mimeUtil,
+                                            Map<String, Long> repositoryContexts, FSPeer fsPeer )
+    {
+        super( wastebasket, linkPersister, mimeUtil, repositoryContexts );
+        this.fsPeer = fsPeer;
+    }
 
     protected FSPeer getFSPeer()
     {
@@ -458,7 +472,14 @@ public class DefaultFSLocalRepositoryStorage
 
                 ResourceStoreRequest collMemberReq = new ResourceStoreRequest( request );
 
-                result.add( retrieveItemFromFile( repository, collMemberReq, file ) );
+                try
+                {
+                    result.add( retrieveItemFromFile( repository, collMemberReq, file ) );
+                }
+                catch( ItemNotFoundException e)
+                {
+                    getLogger().debug( "ItemNotFoundException while listing directory, for request: {}", collMemberReq.getRequestPath(), e );
+                }
 
                 request.popRequestPath();
             }

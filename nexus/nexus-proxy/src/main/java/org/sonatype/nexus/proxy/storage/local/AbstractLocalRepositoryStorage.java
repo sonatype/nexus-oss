@@ -27,8 +27,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -43,6 +43,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 
+import javax.inject.Inject;
+
 /**
  * Abstract Storage class. It have ID and defines logger. Predefines all write methods to be able to "decorate"
  * StorageItems with attributes if supported.
@@ -52,31 +54,37 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 public abstract class AbstractLocalRepositoryStorage
     implements LocalRepositoryStorage
 {
-    @Requirement
-    private Logger logger;
+    private Logger logger = LoggerFactory.getLogger( AbstractLocalRepositoryStorage.class );
 
     /**
      * The wastebasket.
      */
-    @Requirement
     private Wastebasket wastebasket;
 
     /**
      * The default Link persister.
      */
-    @Requirement
     private LinkPersister linkPersister;
 
     /**
      * The MIME util.
      */
-    @Requirement
     private MimeUtil mimeUtil;
 
     /**
      * Since storages are shared, we are tracking the last changes from each of them.
      */
     private Map<String, Long> repositoryContexts = new HashMap<String, Long>();
+
+
+    protected AbstractLocalRepositoryStorage( Wastebasket wastebasket, LinkPersister linkPersister, MimeUtil mimeUtil,
+                                              Map<String, Long> repositoryContexts )
+    {
+        this.wastebasket = wastebasket;
+        this.linkPersister = linkPersister;
+        this.mimeUtil = mimeUtil;
+        this.repositoryContexts = repositoryContexts;
+    }
 
     protected Logger getLogger()
     {
