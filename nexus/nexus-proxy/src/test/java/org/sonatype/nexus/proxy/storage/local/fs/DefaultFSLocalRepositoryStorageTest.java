@@ -21,8 +21,9 @@ package org.sonatype.nexus.proxy.storage.local.fs;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.FileBackedOutputStream;
-import junit.framework.Assert;
 import org.codehaus.plexus.util.FileUtils;
+import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
@@ -44,7 +45,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static  org.mockito.Mockito.*;
+import static org.mockito.Mockito.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 /**
  * Tests {@link DefaultFSLocalRepositoryStorage}
@@ -57,6 +60,7 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
      * Tests listing a directory, when a contained file does NOT exists.
      * @throws Exception
      */
+    @SuppressWarnings( { "unchecked" } )
     @Test
     public void testListFilesThrowsItemNotFoundException() throws Exception
     {
@@ -85,8 +89,8 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
 
         // Mock FSPeer to return the results created above
         FSPeer fsPeer = mock( FSPeer.class );
-        when( fsPeer.listItems( any( Repository.class ), any( ResourceStoreRequest.class ), eq( validDir ) ) ).thenReturn( validFileCollection );
-        when( fsPeer.listItems( any(Repository.class), any(ResourceStoreRequest.class), eq( new File( repoLocation, "invalid/") ) ) ).thenReturn( invalidFileCollection );
+        when( fsPeer.listItems( Mockito.any( Repository.class ), Mockito.any( ResourceStoreRequest.class ), eq( validDir ) ) ).thenReturn( validFileCollection );
+        when( fsPeer.listItems( Mockito.any( Repository.class ), Mockito.any( ResourceStoreRequest.class ), eq( new File( repoLocation, "invalid/" ) ) ) ).thenReturn( invalidFileCollection );
 
         // create Repository Mock
         Repository repository = mock( Repository.class );
@@ -101,14 +105,15 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
 
         // positive test, valid.txt should be found
         Collection<StorageItem> items = localRepositoryStorageUnderTest.listItems( repository, validRequest );
-        Assert.assertEquals( "items: "+ items, 1, items.size() );
-        Assert.assertEquals( "valid.txt", items.iterator().next().getName() );
+        assertThat( items.iterator().next().getName(), equalTo( "valid.txt" ) );
+        assertThat( items, hasSize( 1 ) );
+
 
         // missing.txt was listed in this directory, but it does NOT exist, only invalid.txt should be found
         ResourceStoreRequest invalidRequest = new ResourceStoreRequest( "invalid" );
         items = localRepositoryStorageUnderTest.listItems( repository, invalidRequest );
-        Assert.assertEquals( 1, items.size() );
-        Assert.assertEquals( "invalid.txt", items.iterator().next().getName() );
+        assertThat( items.iterator().next().getName(), equalTo( "invalid.txt" ) );
+        assertThat( items, hasSize( 1 ) );
 
     }
 }
