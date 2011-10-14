@@ -105,7 +105,8 @@ public class WalkerTest
     }
 
     /**
-     * Tests walking an out of service repo.  The walker should NOT not fail, but also NOT find any items.
+     * Tests walking an out of service repo.  The walker should NOT not fail, but also NOT find any items.</BR>
+     * Verifies fix for: NEXUS-4554 (which is more general then just fixing the Trash task)
      * @throws Exception
      */
     @Test
