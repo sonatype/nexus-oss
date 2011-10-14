@@ -31,5 +31,3 @@ target/
 /nexus/nexus-test-harness/nexus-test-harness-its/resources/nexus2120/files/basic/.index/
 nexus/nexus-test-harness/nexus-test-harness-its/test-output
 nexus/nexus-clients/nexus-rest-client-java/test-output/
-
-nexus/nexus-core-plugins/nexus-migration-plugin/nexus-migration-plugin-test-harness/plexus.nexus-work_IS_UNDEFINED/logs/migration.log
