@@ -45,6 +45,12 @@ public final class DefaultResourceLockFactory
     // ----------------------------------------------------------------------
 
     @Override
+    protected String category()
+    {
+        return "DefaultResourceLocks";
+    }
+
+    @Override
     protected ResourceLock createResourceLock( final String name )
     {
         return new DefaultResourceLock();

@@ -53,9 +53,8 @@ abstract class AbstractResourceLockFactory
             {
                 final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 
-                final String type = getClass().getSimpleName();
                 final String hash = String.format( "0x%08X", new Integer( System.identityHashCode( this ) ) );
-                jmxName = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type, "hash", hash ) );
+                jmxName = ObjectName.getInstance( JMX_DOMAIN, properties( "type", category(), "hash", hash ) );
 
                 server.registerMBean( new DefaultResourceLockMBean( this ), jmxName );
             }
@@ -107,6 +106,11 @@ abstract class AbstractResourceLockFactory
     // ----------------------------------------------------------------------
     // Implementation methods
     // ----------------------------------------------------------------------
+
+    /**
+     * @return JMX category for this {@link ResourceLockFactory}
+     */
+    protected abstract String category();
 
     /**
      * @return Lock associated with the given resource name

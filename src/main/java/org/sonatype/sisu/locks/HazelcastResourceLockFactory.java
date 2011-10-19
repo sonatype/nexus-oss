@@ -65,9 +65,8 @@ final class HazelcastResourceLockFactory
         {
             final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 
-            final String type = getClass().getSimpleName();
-            jmxQuery = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type, "hash", "*" ) );
-            jmxMaster = ObjectName.getInstance( JMX_DOMAIN, "type", type );
+            jmxMaster = ObjectName.getInstance( JMX_DOMAIN, "type", category() );
+            jmxQuery = ObjectName.getInstance( JMX_DOMAIN, properties( "type", category(), "hash", "*" ) );
             if ( !server.isRegistered( jmxMaster ) )
             {
                 server.registerMBean( new HazelcastResourceLockMBean( instance, jmxQuery ), jmxMaster );
@@ -120,6 +119,12 @@ final class HazelcastResourceLockFactory
     // ----------------------------------------------------------------------
     // Implementation methods
     // ----------------------------------------------------------------------
+
+    @Override
+    protected String category()
+    {
+        return "HazelcastResourceLocks";
+    }
 
     @Override
     protected ResourceLock createResourceLock( final String name )
