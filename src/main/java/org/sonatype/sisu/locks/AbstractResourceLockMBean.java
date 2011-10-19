@@ -16,19 +16,19 @@ import javax.management.MBeanParameterInfo;
 import javax.management.StandardMBean;
 
 /**
- * Abstract {@link LocksMBean} implementation.
+ * Abstract {@link ResourceLockMBean} implementation.
  */
-abstract class AbstractLocksMBean
+abstract class AbstractResourceLockMBean
     extends StandardMBean
-    implements LocksMBean
+    implements ResourceLockMBean
 {
     // ----------------------------------------------------------------------
     // Constructor
     // ----------------------------------------------------------------------
 
-    AbstractLocksMBean()
+    AbstractResourceLockMBean()
     {
-        super( LocksMBean.class, false );
+        super( ResourceLockMBean.class, false );
     }
 
     // ----------------------------------------------------------------------

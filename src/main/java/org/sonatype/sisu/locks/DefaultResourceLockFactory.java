@@ -18,24 +18,24 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
- * Local {@link Locks} implementation.
+ * Local {@link ResourceLockFactory} implementation.
  */
 @Named
 @Singleton
-public final class DefaultLocks
-    extends AbstractLocks
+public final class DefaultResourceLockFactory
+    extends AbstractResourceLockFactory
 {
     // ----------------------------------------------------------------------
     // Constructors
     // ----------------------------------------------------------------------
 
     @Inject
-    public DefaultLocks()
+    public DefaultResourceLockFactory()
     {
         this( true );
     }
 
-    public DefaultLocks( final boolean jmxEnabled )
+    public DefaultResourceLockFactory( final boolean jmxEnabled )
     {
         super( jmxEnabled );
     }
@@ -47,54 +47,50 @@ public final class DefaultLocks
     @Override
     protected ResourceLock createResourceLock( final String name )
     {
-        return new ResourceLockImpl();
+        return new DefaultResourceLock();
+    }
+}
+
+/**
+ * {@link ResourceLock} implemented on top of a JDK {@link Semaphore}.
+ */
+final class DefaultResourceLock
+    extends AbstractSemaphoreResourceLock
+{
+    // ----------------------------------------------------------------------
+    // Implementation fields
+    // ----------------------------------------------------------------------
+
+    private final Semaphore sem;
+
+    // ----------------------------------------------------------------------
+    // Constructors
+    // ----------------------------------------------------------------------
+
+    DefaultResourceLock()
+    {
+        sem = new Semaphore( Integer.MAX_VALUE, true );
     }
 
     // ----------------------------------------------------------------------
-    // Implementation types
+    // Semaphore methods
     // ----------------------------------------------------------------------
 
-    /**
-     * {@link ResourceLock} implemented on top of a JDK {@link Semaphore}.
-     */
-    private static final class ResourceLockImpl
-        extends AbstractSemaphoreResourceLock
+    @Override
+    protected void acquire( final int permits )
     {
-        // ----------------------------------------------------------------------
-        // Implementation fields
-        // ----------------------------------------------------------------------
+        sem.acquireUninterruptibly( permits );
+    }
 
-        private final Semaphore sem;
+    @Override
+    protected void release( final int permits )
+    {
+        sem.release( permits );
+    }
 
-        // ----------------------------------------------------------------------
-        // Constructors
-        // ----------------------------------------------------------------------
-
-        ResourceLockImpl()
-        {
-            sem = new Semaphore( Integer.MAX_VALUE, true );
-        }
-
-        // ----------------------------------------------------------------------
-        // Semaphore methods
-        // ----------------------------------------------------------------------
-
-        @Override
-        protected void acquire( final int permits )
-        {
-            sem.acquireUninterruptibly( permits );
-        }
-
-        @Override
-        protected void release( final int permits )
-        {
-            sem.release( permits );
-        }
-
-        @Override
-        protected int availablePermits()
-        {
-            return sem.availablePermits();
-        }
+    @Override
+    protected int availablePermits()
+    {
+        return sem.availablePermits();
     }
 }

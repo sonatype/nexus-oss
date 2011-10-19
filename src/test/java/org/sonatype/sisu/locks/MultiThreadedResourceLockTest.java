@@ -18,11 +18,10 @@ import javax.inject.Named;
 
 import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.inject.Parameters;
-import org.sonatype.sisu.locks.Locks.ResourceLock;
 
 import com.google.inject.Provides;
 
-public class MultiThreadedLocksTest
+public class MultiThreadedResourceLockTest
     extends InjectedTestCase
 {
     static volatile boolean running;
@@ -108,7 +107,7 @@ public class MultiThreadedLocksTest
     {
         @Inject
         @Named( "${locks}" )
-        private Locks locks;
+        private ResourceLockFactory locks;
 
         private int index;
 

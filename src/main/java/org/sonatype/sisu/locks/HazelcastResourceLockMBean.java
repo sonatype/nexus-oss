@@ -34,10 +34,10 @@ import com.hazelcast.core.Member;
 import com.hazelcast.core.MultiTask;
 
 /**
- * Distributed Hazelcast {@link LocksMBean} implementation.
+ * Distributed Hazelcast {@link ResourceLockMBean} implementation.
  */
-final class HazelcastLocksMBean
-    extends AbstractLocksMBean
+final class HazelcastResourceLockMBean
+    extends AbstractResourceLockMBean
 {
     // ----------------------------------------------------------------------
     // Implementation fields
@@ -51,7 +51,7 @@ final class HazelcastLocksMBean
     // Constructor
     // ----------------------------------------------------------------------
 
-    HazelcastLocksMBean( final HazelcastInstance instance, final ObjectName jmxQuery )
+    HazelcastResourceLockMBean( final HazelcastInstance instance, final ObjectName jmxQuery )
     {
         this.instance = instance;
         this.jmxQuery = jmxQuery;
@@ -97,7 +97,7 @@ final class HazelcastLocksMBean
 
     public String[] invokeMethod( final String method, final String... args )
     {
-        final MBeansInvoker invoker = new MBeansInvoker( jmxQuery, method, args );
+        final HazelcastMBeansInvoker invoker = new HazelcastMBeansInvoker( jmxQuery, method, args );
         final MultiTask<List<String>> task = new MultiTask<List<String>>( invoker, filterMembers( method, args ) );
         final Set<String> values = new HashSet<String>();
         try
@@ -160,109 +160,105 @@ final class HazelcastLocksMBean
         }
         return members;
     }
+}
+
+@SuppressWarnings( "serial" )
+final class HazelcastMBeansInvoker
+    implements HazelcastInstanceAware, Callable<List<String>>, Serializable
+{
+    // ----------------------------------------------------------------------
+    // Implementation fields
+    // ----------------------------------------------------------------------
+
+    private HazelcastInstance instance;
+
+    private final ObjectName jmxQuery;
+
+    private final String method;
+
+    private final String[] args;
 
     // ----------------------------------------------------------------------
-    // Implementation types
+    // Constructor
     // ----------------------------------------------------------------------
 
-    @SuppressWarnings( "serial" )
-    private static final class MBeansInvoker
-        implements HazelcastInstanceAware, Callable<List<String>>, Serializable
+    HazelcastMBeansInvoker( final ObjectName jmxQuery, final String method, final String... args )
     {
-        // ----------------------------------------------------------------------
-        // Implementation fields
-        // ----------------------------------------------------------------------
+        this.jmxQuery = jmxQuery;
+        this.method = method;
+        this.args = args;
+    }
 
-        private HazelcastInstance instance;
+    // ----------------------------------------------------------------------
+    // Public methods
+    // ----------------------------------------------------------------------
 
-        private final ObjectName jmxQuery;
+    public void setHazelcastInstance( final HazelcastInstance instance )
+    {
+        this.instance = instance;
+    }
 
-        private final String method;
+    @Override
+    public List<String> call()
+        throws Exception
+    {
+        final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 
-        private final String[] args;
+        final String[] sig = new String[args.length];
+        Arrays.fill( sig, String.class.getName() );
 
-        // ----------------------------------------------------------------------
-        // Constructor
-        // ----------------------------------------------------------------------
-
-        MBeansInvoker( final ObjectName jmxQuery, final String method, final String... args )
+        final List<String> values = new ArrayList<String>();
+        for ( final ObjectName mBean : server.queryNames( jmxQuery, null ) )
         {
-            this.jmxQuery = jmxQuery;
-            this.method = method;
-            this.args = args;
-        }
-
-        // ----------------------------------------------------------------------
-        // Public methods
-        // ----------------------------------------------------------------------
-
-        public void setHazelcastInstance( final HazelcastInstance instance )
-        {
-            this.instance = instance;
-        }
-
-        @Override
-        public List<String> call()
-            throws Exception
-        {
-            final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-
-            final String[] sig = new String[args.length];
-            Arrays.fill( sig, String.class.getName() );
-
-            final List<String> values = new ArrayList<String>();
-            for ( final ObjectName mBean : server.queryNames( jmxQuery, null ) )
+            try
             {
-                try
+                final Object result = server.invoke( mBean, method, args, sig );
+                if ( result instanceof String[] )
                 {
-                    final Object result = server.invoke( mBean, method, args, sig );
-                    if ( result instanceof String[] )
-                    {
-                        Collections.addAll( values, (String[]) result );
-                    }
-                }
-                catch ( final Exception e )
-                {
-                    Logs.warn( "Problem invoking JMX method: \"{}\"", method, e );
+                    Collections.addAll( values, (String[]) result );
                 }
             }
-            return normalizeValues( values );
-        }
-
-        // ----------------------------------------------------------------------
-        // Implementation methods
-        // ----------------------------------------------------------------------
-
-        private List<String> normalizeValues( final List<String> values )
-        {
-            if ( method.endsWith( "Threads" ) )
+            catch ( final Exception e )
             {
-                final String addr = toString( instance.getCluster().getLocalMember().getInetSocketAddress() );
-                for ( int i = 0; i < values.size(); i++ )
-                {
-                    values.set( i, values.get( i ) + " @ " + addr );
-                }
+                Logs.warn( "Problem invoking JMX method: \"{}\"", method, e );
             }
-            return values;
         }
+        return normalizeValues( values );
+    }
 
-        private static String toString( final InetSocketAddress address )
+    // ----------------------------------------------------------------------
+    // Implementation methods
+    // ----------------------------------------------------------------------
+
+    private List<String> normalizeValues( final List<String> values )
+    {
+        if ( method.endsWith( "Threads" ) )
         {
-            final StringBuilder buf = new StringBuilder();
-
-            final byte[] ip = address.getAddress().getAddress();
-
-            append( buf, ip[0], '.' );
-            append( buf, ip[1], '.' );
-            append( buf, ip[2], '.' );
-            append( buf, ip[3], ':' );
-
-            return buf.append( address.getPort() ).toString();
+            final String addr = toString( instance.getCluster().getLocalMember().getInetSocketAddress() );
+            for ( int i = 0; i < values.size(); i++ )
+            {
+                values.set( i, values.get( i ) + " @ " + addr );
+            }
         }
+        return values;
+    }
 
-        private static void append( final StringBuilder buf, final byte value, final char delim )
-        {
-            buf.append( value & 0xFF ).append( delim );
-        }
+    private static String toString( final InetSocketAddress address )
+    {
+        final StringBuilder buf = new StringBuilder();
+
+        final byte[] ip = address.getAddress().getAddress();
+
+        append( buf, ip[0], '.' );
+        append( buf, ip[1], '.' );
+        append( buf, ip[2], '.' );
+        append( buf, ip[3], ':' );
+
+        return buf.append( address.getPort() ).toString();
+    }
+
+    private static void append( final StringBuilder buf, final byte value, final char delim )
+    {
+        buf.append( value & 0xFF ).append( delim );
     }
 }

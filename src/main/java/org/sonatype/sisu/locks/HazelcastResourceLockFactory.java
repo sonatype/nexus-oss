@@ -33,12 +33,12 @@ import com.hazelcast.core.ISemaphore;
 import com.hazelcast.core.InstanceDestroyedException;
 
 /**
- * Distributed Hazelcast {@link Locks} implementation.
+ * Distributed Hazelcast {@link ResourceLockFactory} implementation.
  */
 @Named( "hazelcast" )
 @Singleton
-final class HazelcastLocks
-    extends AbstractLocks
+final class HazelcastResourceLockFactory
+    extends AbstractResourceLockFactory
 {
     // ----------------------------------------------------------------------
     // Implementation fields
@@ -55,7 +55,7 @@ final class HazelcastLocks
     // ----------------------------------------------------------------------
 
     @Inject
-    HazelcastLocks( @Nullable @Named( "${hazelcast.config}" ) final File configFile )
+    HazelcastResourceLockFactory( @Nullable @Named( "${hazelcast.config}" ) final File configFile )
     {
         super( true );
 
@@ -70,7 +70,7 @@ final class HazelcastLocks
             jmxMaster = ObjectName.getInstance( JMX_DOMAIN, "type", type );
             if ( !server.isRegistered( jmxMaster ) )
             {
-                server.registerMBean( new HazelcastLocksMBean( instance, jmxQuery ), jmxMaster );
+                server.registerMBean( new HazelcastResourceLockMBean( instance, jmxQuery ), jmxMaster );
             }
         }
         catch ( final Exception e )
@@ -124,7 +124,7 @@ final class HazelcastLocks
     @Override
     protected ResourceLock createResourceLock( final String name )
     {
-        return new ResourceLockImpl( instance.getSemaphore( name ) );
+        return new HazelcastResourceLock( instance.getSemaphore( name ) );
     }
 
     private static Config getHazelcastConfig( final File configFile )
@@ -151,67 +151,63 @@ final class HazelcastLocks
 
         return config;
     }
+}
+
+/**
+ * {@link ResourceLock} implemented on top of a Hazelcast {@link ISemaphore}.
+ */
+final class HazelcastResourceLock
+    extends AbstractSemaphoreResourceLock
+{
+    // ----------------------------------------------------------------------
+    // Implementation fields
+    // ----------------------------------------------------------------------
+
+    private final ISemaphore sem;
 
     // ----------------------------------------------------------------------
-    // Implementation types
+    // Constructors
     // ----------------------------------------------------------------------
 
-    /**
-     * {@link ResourceLock} implemented on top of a Hazelcast {@link ISemaphore}.
-     */
-    private static final class ResourceLockImpl
-        extends AbstractSemaphoreResourceLock
+    HazelcastResourceLock( final ISemaphore sem )
     {
-        // ----------------------------------------------------------------------
-        // Implementation fields
-        // ----------------------------------------------------------------------
+        this.sem = sem;
+    }
 
-        private final ISemaphore sem;
+    // ----------------------------------------------------------------------
+    // Semaphore methods
+    // ----------------------------------------------------------------------
 
-        // ----------------------------------------------------------------------
-        // Constructors
-        // ----------------------------------------------------------------------
-
-        ResourceLockImpl( final ISemaphore sem )
+    @Override
+    protected void acquire( final int permits )
+    {
+        while ( true )
         {
-            this.sem = sem;
-        }
-
-        // ----------------------------------------------------------------------
-        // Semaphore methods
-        // ----------------------------------------------------------------------
-
-        @Override
-        protected void acquire( final int permits )
-        {
-            while ( true )
+            try
             {
-                try
-                {
-                    sem.acquireAttach( permits );
-                    return;
-                }
-                catch ( final InterruptedException e )
-                {
-                    Thread.currentThread().interrupt();
-                }
-                catch ( final InstanceDestroyedException e )
-                {
-                    throw new IllegalStateException( e );
-                }
+                sem.acquireAttach( permits );
+                return;
+            }
+            catch ( final InterruptedException e )
+            {
+                Thread.currentThread().interrupt();
+            }
+            catch ( final InstanceDestroyedException e )
+            {
+                throw new IllegalStateException( e );
             }
         }
+    }
 
-        @Override
-        protected void release( final int permits )
-        {
-            sem.releaseDetach( permits );
-        }
+    @Override
+    protected void release( final int permits )
+    {
+        sem.releaseDetach( permits );
+    }
 
-        @Override
-        protected int availablePermits()
-        {
-            return sem.availablePermits();
-        }
+    @Override
+    protected int availablePermits()
+    {
+        return sem.availablePermits();
     }
 }

@@ -15,25 +15,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.sonatype.sisu.locks.Locks.ResourceLock;
-
 /**
- * Local {@link LocksMBean} implementation.
+ * Local {@link ResourceLockMBean} implementation.
  */
-final class DefaultLocksMBean
-    extends AbstractLocksMBean
+final class DefaultResourceLockMBean
+    extends AbstractResourceLockMBean
 {
     // ----------------------------------------------------------------------
     // Implementation fields
     // ----------------------------------------------------------------------
 
-    private final Locks locks;
+    private final ResourceLockFactory locks;
 
     // ----------------------------------------------------------------------
     // Constructor
     // ----------------------------------------------------------------------
 
-    DefaultLocksMBean( final Locks locks )
+    DefaultResourceLockMBean( final ResourceLockFactory locks )
     {
         this.locks = locks;
     }

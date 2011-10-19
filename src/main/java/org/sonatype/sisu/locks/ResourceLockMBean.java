@@ -11,7 +11,7 @@
  *******************************************************************************/
 package org.sonatype.sisu.locks;
 
-public interface LocksMBean
+public interface ResourceLockMBean
 {
     String[] listResourceNames();
 

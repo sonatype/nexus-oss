@@ -17,8 +17,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.sonatype.sisu.locks.Locks.ResourceLock;
-
 /**
  * {@link ResourceLock} implemented on top of an abstract semaphore.
  */

@@ -22,10 +22,10 @@ import org.sonatype.guice.bean.reflect.Logs;
 import org.sonatype.guice.bean.reflect.Weak;
 
 /**
- * Abstract {@link Locks} implementation; associates names with {@link ResourceLock}s.
+ * Abstract {@link ResourceLockFactory} implementation; associates names with {@link ResourceLock}s.
  */
-abstract class AbstractLocks
-    implements Locks
+abstract class AbstractResourceLockFactory
+    implements ResourceLockFactory
 {
     // ----------------------------------------------------------------------
     // Constants
@@ -40,12 +40,12 @@ abstract class AbstractLocks
     private final ConcurrentMap<String, ResourceLock> resourceLocks = Weak.concurrentValues();
 
     private ObjectName jmxName;
-    
+
     // ----------------------------------------------------------------------
     // Constructor
     // ----------------------------------------------------------------------
 
-    AbstractLocks( final boolean jmxEnabled )
+    AbstractResourceLockFactory( final boolean jmxEnabled )
     {
         if ( jmxEnabled )
         {
@@ -57,7 +57,7 @@ abstract class AbstractLocks
                 final String hash = String.format( "0x%08X", new Integer( System.identityHashCode( this ) ) );
                 jmxName = ObjectName.getInstance( JMX_DOMAIN, properties( "type", type, "hash", hash ) );
 
-                server.registerMBean( new DefaultLocksMBean( this ), jmxName );
+                server.registerMBean( new DefaultResourceLockMBean( this ), jmxName );
             }
             catch ( final Exception e )
             {
