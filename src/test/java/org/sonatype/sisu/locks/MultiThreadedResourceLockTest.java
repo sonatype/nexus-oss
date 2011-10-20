@@ -44,7 +44,7 @@ public class MultiThreadedResourceLockTest
     public void testDefaultLocks()
         throws InterruptedException
     {
-        System.setProperty( "locks", "default" );
+        System.setProperty( "resource-lock-hint", "default" );
 
         launchThreads();
     }
@@ -52,7 +52,7 @@ public class MultiThreadedResourceLockTest
     public void testHazelcastLocks()
         throws InterruptedException
     {
-        System.setProperty( "locks", "hazelcast" );
+        System.setProperty( "resource-lock-hint", "hazelcast" );
 
         launchThreads();
     }
@@ -106,7 +106,7 @@ public class MultiThreadedResourceLockTest
         implements Runnable
     {
         @Inject
-        @Named( "${locks}" )
+        @Named( "resource-lock-hint" )
         private ResourceLockFactory locks;
 
         private int index;

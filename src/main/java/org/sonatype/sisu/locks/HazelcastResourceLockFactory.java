@@ -55,7 +55,7 @@ final class HazelcastResourceLockFactory
     // ----------------------------------------------------------------------
 
     @Inject
-    HazelcastResourceLockFactory( @Nullable @Named( "${hazelcast.config}" ) final File configFile )
+    HazelcastResourceLockFactory( @Nullable @Named( "hazelcast.config" ) final File configFile )
     {
         super( true );
 

@@ -12,6 +12,7 @@
 package org.sonatype.sisu.locks;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
@@ -19,26 +20,47 @@ import java.net.URI;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.guice.bean.reflect.Logs;
 import org.xadisk.additional.XAFileInputStreamWrapper;
 import org.xadisk.additional.XAFileOutputStreamWrapper;
 import org.xadisk.bridge.proxies.interfaces.Session;
+import org.xadisk.bridge.proxies.interfaces.XAFileSystem;
+import org.xadisk.bridge.proxies.interfaces.XAFileSystemProxy;
+import org.xadisk.filesystem.standalone.StandaloneFileSystemConfiguration;
 
 @Named( "xadisk" )
 @Singleton
 final class XADiskResourceSessionFactory
     implements ResourceSessionFactory
 {
-    XADiskResourceSessionFactory()
+    private final XAFileSystem fs;
+
+    XADiskResourceSessionFactory( @Named( "xadisk.home" ) final String home, @Named( "xadisk.id" ) final String id )
     {
+        final StandaloneFileSystemConfiguration config = new StandaloneFileSystemConfiguration( home, id );
+        XAFileSystem fileSystem = XAFileSystemProxy.getNativeXAFileSystemReference( config.getInstanceId() );
+        if ( null == fileSystem )
+        {
+            fileSystem = XAFileSystemProxy.bootNativeXAFileSystem( config );
+        }
+        this.fs = fileSystem;
     }
 
     public ResourceSession newSession()
     {
-        return null;
+        return new XADiskResourceSession( fs.createSessionForLocalTransaction() );
     }
 
     public void shutdown()
     {
+        try
+        {
+            fs.shutdown();
+        }
+        catch ( IOException e )
+        {
+            Logs.warn( "Problem shutting down XADisk", null, e );
+        }
     }
 }
 
@@ -52,12 +74,11 @@ final class XADiskResourceSession
         this.session = session;
     }
 
-    public boolean isFile( final URI resource )
+    public boolean exists( final URI resource )
     {
-        final File f = new File( resource );
         try
         {
-            return session.fileExists( f ) && !session.fileExistsAndIsDirectory( f );
+            return session.fileExists( new File( resource ) );
         }
         catch ( final Exception e )
         {
