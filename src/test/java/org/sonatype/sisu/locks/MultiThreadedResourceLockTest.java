@@ -44,7 +44,7 @@ public class MultiThreadedResourceLockTest
     public void testDefaultLocks()
         throws InterruptedException
     {
-        System.setProperty( "resource-lock-hint", "default" );
+        System.setProperty( "resource-lock-hint", "semaphore" );
 
         launchThreads();
     }

@@ -16,9 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Local {@link ResourceLockMBean} implementation.
+ * Local semaphore-based {@link ResourceLockMBean} implementation.
  */
-final class DefaultResourceLockMBean
+final class SemaphoreResourceLockMBean
     extends AbstractResourceLockMBean
 {
     // ----------------------------------------------------------------------
@@ -31,7 +31,7 @@ final class DefaultResourceLockMBean
     // Constructor
     // ----------------------------------------------------------------------
 
-    DefaultResourceLockMBean( final ResourceLockFactory locks )
+    SemaphoreResourceLockMBean( final ResourceLockFactory locks )
     {
         this.locks = locks;
     }

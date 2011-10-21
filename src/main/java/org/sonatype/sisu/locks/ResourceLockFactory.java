@@ -11,12 +11,9 @@
  *******************************************************************************/
 package org.sonatype.sisu.locks;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * Factory API for managing various kinds of resource locks.
  */
-@ImplementedBy( DefaultResourceLockFactory.class )
 public interface ResourceLockFactory
 {
     /**

@@ -18,11 +18,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
- * Local {@link ResourceLockFactory} implementation.
+ * Local semaphore-based {@link ResourceLockFactory} implementation.
  */
-@Named
+@Named( "semaphore" )
 @Singleton
-public final class DefaultResourceLockFactory
+public final class SemaphoreResourceLockFactory
     extends AbstractResourceLockFactory
 {
     // ----------------------------------------------------------------------
@@ -30,12 +30,12 @@ public final class DefaultResourceLockFactory
     // ----------------------------------------------------------------------
 
     @Inject
-    public DefaultResourceLockFactory()
+    public SemaphoreResourceLockFactory()
     {
         this( true );
     }
 
-    public DefaultResourceLockFactory( final boolean jmxEnabled )
+    public SemaphoreResourceLockFactory( final boolean jmxEnabled )
     {
         super( jmxEnabled );
     }
