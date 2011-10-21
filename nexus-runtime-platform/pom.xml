@@ -37,8 +37,8 @@
   <name>Nexus : Runtime Platform</name>
 
   <properties>
-    <sisu-inject.version>2.2.3</sisu-inject.version>
-    <sisu-guice.version>3.0.3</sisu-guice.version>
+    <sisu-inject.version>2.3.0</sisu-inject.version>
+    <sisu-guice.version>3.1.0</sisu-guice.version>
   </properties>
 
   <dependencyManagement>
@@ -56,11 +56,29 @@
         <version>${sisu-guice.version}</version>
         <classifier>no_aop</classifier>
         <scope>compile</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-guava</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-guice</artifactId>
         <version>${sisu-guice.version}</version>
+        <scope>compile</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-guava</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>10.0.1</version>
         <scope>compile</scope>
       </dependency>
       <dependency>
@@ -102,6 +120,10 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
   </dependencies>
 
