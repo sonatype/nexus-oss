@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Local semaphore-based {@link ResourceLockMBean} implementation.
  */
-final class SemaphoreResourceLockMBean
+final class LocalResourceLockMBean
     extends AbstractResourceLockMBean
 {
     // ----------------------------------------------------------------------
@@ -31,7 +31,7 @@ final class SemaphoreResourceLockMBean
     // Constructor
     // ----------------------------------------------------------------------
 
-    SemaphoreResourceLockMBean( final ResourceLockFactory locks )
+    LocalResourceLockMBean( final ResourceLockFactory locks )
     {
         this.locks = locks;
     }

@@ -123,7 +123,7 @@ final class HazelcastResourceLockFactory
     @Override
     protected String category()
     {
-        return "HazelcastResourceLocks";
+        return HazelcastResourceLock.class.getSimpleName() + 's';
     }
 
     @Override

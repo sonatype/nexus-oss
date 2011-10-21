@@ -41,10 +41,10 @@ public class MultiThreadedResourceLockTest
         return System.getProperties();
     }
 
-    public void testDefaultLocks()
+    public void testLocalLocks()
         throws InterruptedException
     {
-        System.setProperty( "resource-lock-hint", "semaphore" );
+        System.setProperty( "resource-lock-hint", "local" );
 
         launchThreads();
     }

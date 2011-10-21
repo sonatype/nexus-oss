@@ -56,7 +56,7 @@ abstract class AbstractResourceLockFactory
                 final String hash = String.format( "0x%08X", new Integer( System.identityHashCode( this ) ) );
                 jmxName = ObjectName.getInstance( JMX_DOMAIN, properties( "type", category(), "hash", hash ) );
 
-                server.registerMBean( new SemaphoreResourceLockMBean( this ), jmxName );
+                server.registerMBean( new LocalResourceLockMBean( this ), jmxName );
             }
             catch ( final Exception e )
             {

@@ -20,9 +20,9 @@ import javax.inject.Singleton;
 /**
  * Local semaphore-based {@link ResourceLockFactory} implementation.
  */
-@Named( "semaphore" )
+@Named( "local" )
 @Singleton
-public final class SemaphoreResourceLockFactory
+public final class LocalResourceLockFactory
     extends AbstractResourceLockFactory
 {
     // ----------------------------------------------------------------------
@@ -30,12 +30,12 @@ public final class SemaphoreResourceLockFactory
     // ----------------------------------------------------------------------
 
     @Inject
-    public SemaphoreResourceLockFactory()
+    public LocalResourceLockFactory()
     {
         this( true );
     }
 
-    public SemaphoreResourceLockFactory( final boolean jmxEnabled )
+    public LocalResourceLockFactory( final boolean jmxEnabled )
     {
         super( jmxEnabled );
     }
@@ -47,20 +47,20 @@ public final class SemaphoreResourceLockFactory
     @Override
     protected String category()
     {
-        return "DefaultResourceLocks";
+        return LocalResourceLock.class.getSimpleName() + 's';
     }
 
     @Override
     protected ResourceLock createResourceLock( final String name )
     {
-        return new DefaultResourceLock();
+        return new LocalResourceLock();
     }
 }
 
 /**
  * {@link ResourceLock} implemented on top of a JDK {@link Semaphore}.
  */
-final class DefaultResourceLock
+final class LocalResourceLock
     extends AbstractSemaphoreResourceLock
 {
     // ----------------------------------------------------------------------
@@ -73,7 +73,7 @@ final class DefaultResourceLock
     // Constructors
     // ----------------------------------------------------------------------
 
-    DefaultResourceLock()
+    LocalResourceLock()
     {
         sem = new Semaphore( Integer.MAX_VALUE, true );
     }
