@@ -100,6 +100,9 @@ public class Nexus179RemoteRepoDownIT
         // unblock the proxy
         this.setBlockProxy( this.getBaseNexusUrl(), REPO_RELEASE_PROXY_REPO1, false );
 
+        // run async events
+        getEventInspectorsUtil().waitForCalmPeriod();
+
         File artifact = this.downloadArtifact( gav, "target/downloads" );
 
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( artifact, localFile ) );
