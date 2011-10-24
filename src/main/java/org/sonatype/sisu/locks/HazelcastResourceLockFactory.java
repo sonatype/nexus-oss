@@ -132,6 +132,9 @@ final class HazelcastResourceLockFactory
         return new HazelcastResourceLock( instance.getSemaphore( name ) );
     }
 
+    /**
+     * @return Hazelcast configuration; ensures semaphores start with {@link Integer#MAX_VALUE} permits by default
+     */
     private static Config getHazelcastConfig( final File configFile )
     {
         final Config config;

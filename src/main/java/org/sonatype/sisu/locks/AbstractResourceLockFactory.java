@@ -117,6 +117,9 @@ abstract class AbstractResourceLockFactory
      */
     protected abstract ResourceLock createResourceLock( final String name );
 
+    /**
+     * @return Hashtable from key,value,key,value,... sequence
+     */
     protected static final Hashtable<String, String> properties( final String... keyValues )
     {
         final Hashtable<String, String> properties = new Hashtable<String, String>();

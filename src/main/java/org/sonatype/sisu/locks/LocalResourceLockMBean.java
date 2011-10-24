@@ -49,7 +49,7 @@ final class LocalResourceLockMBean
     {
         if ( !Arrays.asList( locks.getResourceNames() ).contains( name ) )
         {
-            return new String[0];
+            return new String[0]; // avoid creating new resource lock
         }
         final Thread[] owners = locks.getResourceLock( name ).getOwners();
         final String[] ownerTIDs = new String[owners.length];
@@ -64,7 +64,7 @@ final class LocalResourceLockMBean
     {
         if ( !Arrays.asList( locks.getResourceNames() ).contains( name ) )
         {
-            return new String[0];
+            return new String[0]; // avoid creating new resource lock
         }
         final Thread[] waiters = locks.getResourceLock( name ).getWaiters();
         final String[] waiterTIDs = new String[waiters.length];
@@ -113,6 +113,7 @@ final class LocalResourceLockMBean
     {
         if ( Arrays.asList( locks.getResourceNames() ).contains( name ) )
         {
+            // forcibly unwind any current holds on this lock
             final ResourceLock lock = locks.getResourceLock( name );
             for ( final Thread t : lock.getOwners() )
             {

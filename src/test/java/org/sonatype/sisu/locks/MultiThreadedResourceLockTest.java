@@ -15,6 +15,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.sonatype.guice.bean.containers.InjectedTestCase;
 import org.sonatype.inject.Parameters;
@@ -24,16 +25,6 @@ import com.google.inject.Provides;
 public class MultiThreadedResourceLockTest
     extends InjectedTestCase
 {
-    static volatile boolean running;
-
-    static Thread[] ts;
-
-    static int[] sharedDepth;
-
-    static int[] exclusiveDepth;
-
-    static Throwable[] errors;
-
     @Provides
     @Parameters
     Properties systemProperties()
@@ -44,53 +35,70 @@ public class MultiThreadedResourceLockTest
     public void testLocalLocks()
         throws InterruptedException
     {
+        // test local JVM locks
         System.setProperty( "resource-lock-hint", "local" );
-
         launchThreads();
     }
 
     public void testHazelcastLocks()
         throws InterruptedException
     {
+        // test distributed locks
         System.setProperty( "resource-lock-hint", "hazelcast" );
-
         launchThreads();
     }
+
+    @Singleton
+    static class TestData
+    {
+        volatile boolean running;
+
+        Thread[] ts;
+
+        int[] sharedDepth;
+
+        int[] exclusiveDepth;
+
+        Throwable[] errors;
+    }
+
+    @Inject
+    private TestData data;
 
     private void launchThreads()
         throws InterruptedException
     {
-        ts = new Thread[128];
+        data.ts = new Thread[128];
 
-        sharedDepth = new int[ts.length];
-        exclusiveDepth = new int[ts.length];
-        errors = new Throwable[ts.length];
+        data.sharedDepth = new int[data.ts.length];
+        data.exclusiveDepth = new int[data.ts.length];
+        data.errors = new Throwable[data.ts.length];
 
-        for ( int i = 0; i < ts.length; i++ )
+        for ( int i = 0; i < data.ts.length; i++ )
         {
             final Locker locker = lookup( Locker.class );
-            ts[i] = new Thread( locker );
+            data.ts[i] = new Thread( locker );
             locker.setIndex( i );
         }
 
-        running = true;
+        data.running = true;
 
-        for ( final Thread element : ts )
+        for ( final Thread element : data.ts )
         {
             element.start();
         }
 
         Thread.sleep( 30000 );
 
-        running = false;
+        data.running = false;
 
-        for ( final Thread element : ts )
+        for ( final Thread element : data.ts )
         {
             element.join( 8000 );
         }
 
         boolean failed = false;
-        for ( final Throwable e : errors )
+        for ( final Throwable e : data.errors )
         {
             if ( null != e )
             {
@@ -102,12 +110,15 @@ public class MultiThreadedResourceLockTest
     }
 
     @Named
-    static class Locker
+    private static class Locker
         implements Runnable
     {
         @Inject
         @Named( "resource-lock-hint" )
         private ResourceLockFactory locks;
+
+        @Inject
+        private TestData data;
 
         private int index;
 
@@ -123,30 +134,30 @@ public class MultiThreadedResourceLockTest
                 final ResourceLock lk = locks.getResourceLock( "TEST" );
                 final Thread self = Thread.currentThread();
 
-                while ( running )
+                while ( data.running )
                 {
                     final double transition = Math.random();
                     if ( 0.0 <= transition && transition < 0.2 )
                     {
-                        if ( sharedDepth[index] < 8 )
+                        if ( data.sharedDepth[index] < 8 )
                         {
                             lk.lockShared( self );
-                            sharedDepth[index]++;
+                            data.sharedDepth[index]++;
                         }
                     }
                     else if ( 0.2 <= transition && transition < 0.3 )
                     {
-                        if ( exclusiveDepth[index] < 8 )
+                        if ( data.exclusiveDepth[index] < 8 )
                         {
                             lk.lockExclusive( self );
-                            exclusiveDepth[index]++;
+                            data.exclusiveDepth[index]++;
                         }
                     }
                     else if ( 0.3 <= transition && transition < 0.6 )
                     {
-                        if ( exclusiveDepth[index] > 0 )
+                        if ( data.exclusiveDepth[index] > 0 )
                         {
-                            exclusiveDepth[index]--;
+                            data.exclusiveDepth[index]--;
                             lk.unlockExclusive( self );
                         }
                         else
@@ -164,9 +175,9 @@ public class MultiThreadedResourceLockTest
                     }
                     else
                     {
-                        if ( sharedDepth[index] > 0 )
+                        if ( data.sharedDepth[index] > 0 )
                         {
-                            sharedDepth[index]--;
+                            data.sharedDepth[index]--;
                             lk.unlockShared( self );
                         }
                         else
@@ -184,21 +195,21 @@ public class MultiThreadedResourceLockTest
                     }
                 }
 
-                while ( sharedDepth[index] > 0 )
+                while ( data.sharedDepth[index] > 0 )
                 {
                     lk.unlockShared( self );
-                    sharedDepth[index]--;
+                    data.sharedDepth[index]--;
                 }
 
-                while ( exclusiveDepth[index] > 0 )
+                while ( data.exclusiveDepth[index] > 0 )
                 {
                     lk.unlockExclusive( self );
-                    exclusiveDepth[index]--;
+                    data.exclusiveDepth[index]--;
                 }
             }
             catch ( final Throwable e )
             {
-                errors[index] = e;
+                data.errors[index] = e;
             }
         }
     }

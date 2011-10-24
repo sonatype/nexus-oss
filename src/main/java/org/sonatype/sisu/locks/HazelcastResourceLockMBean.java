@@ -63,63 +63,80 @@ final class HazelcastResourceLockMBean
 
     public String[] listResourceNames()
     {
-        return invokeMethod( "listResourceNames" );
+        return multiInvoke( "listResourceNames" );
     }
 
     public String[] findOwningThreads( final String name )
     {
-        return invokeMethod( "findOwningThreads", name );
+        return multiInvoke( "findOwningThreads", name );
     }
 
     public String[] findWaitingThreads( final String name )
     {
-        return invokeMethod( "findWaitingThreads", name );
+        return multiInvoke( "findWaitingThreads", name );
     }
 
     public String[] findOwnedResources( final String tid )
     {
-        return invokeMethod( "findOwnedResources", tid );
+        return multiInvoke( "findOwnedResources", tid );
     }
 
     public String[] findWaitedResources( final String tid )
     {
-        return invokeMethod( "findWaitedResources", tid );
+        return multiInvoke( "findWaitedResources", tid );
     }
 
     public void releaseResource( final String name )
     {
-        invokeMethod( "releaseResource", name );
+        multiInvoke( "releaseResource", name );
     }
 
     // ----------------------------------------------------------------------
     // Implementation methods
     // ----------------------------------------------------------------------
 
-    public String[] invokeMethod( final String method, final String... args )
+    /**
+     * Distributes the given JMX invocation across the Hazelcast cluster.
+     * 
+     * @param method JMX method
+     * @param args JMX arguments
+     * @return Aggregated results
+     */
+    public String[] multiInvoke( final String method, final String... args )
     {
         final HazelcastMBeansInvoker invoker = new HazelcastMBeansInvoker( jmxQuery, method, args );
         final MultiTask<List<String>> task = new MultiTask<List<String>>( invoker, filterMembers( method, args ) );
-        final Set<String> values = new HashSet<String>();
+        final Set<String> results = new HashSet<String>();
         try
         {
             instance.getExecutorService().execute( task );
             for ( final List<String> result : task.get() )
             {
-                values.addAll( result );
+                results.addAll( result );
             }
         }
         catch ( final Exception e )
         {
             Logs.warn( "Problem executing cluster MultiTask for: \"{}\"", method, e );
         }
-        return values.toArray( new String[values.size()] );
+        return results.toArray( new String[results.size()] );
     }
 
+    /**
+     * Filters members of the Hazelcast cluster based on the given JMX invocation.
+     * 
+     * @param method JMX method
+     * @param args JMX arguments
+     * @return Filtered members
+     */
     private Set<Member> filterMembers( final String method, final String... args )
     {
         final Set<Member> members = new HashSet<Member>();
         try
         {
+            /*
+             * Filter members based on IP address (forms part of the distributed thread id)
+             */
             if ( method.endsWith( "Resources" ) && args[0].contains( "@" ) )
             {
                 final String[] tokens = args[0].split( "\\s*[@:]\\s*", 3 );
@@ -162,6 +179,9 @@ final class HazelcastResourceLockMBean
     }
 }
 
+/**
+ * JMX method invoker that can be distributed across a Hazelcast cluster.
+ */
 @SuppressWarnings( "serial" )
 final class HazelcastMBeansInvoker
     implements HazelcastInstanceAware, Callable<List<String>>, Serializable
@@ -204,18 +224,20 @@ final class HazelcastMBeansInvoker
     {
         final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
 
+        // assumes methods have string-only signatures
         final String[] sig = new String[args.length];
         Arrays.fill( sig, String.class.getName() );
 
-        final List<String> values = new ArrayList<String>();
+        final List<String> results = new ArrayList<String>();
         for ( final ObjectName mBean : server.queryNames( jmxQuery, null ) )
         {
             try
             {
+                // Invoke across all matching MBeans in this Hazelcast instance
                 final Object result = server.invoke( mBean, method, args, sig );
                 if ( result instanceof String[] )
                 {
-                    Collections.addAll( values, (String[]) result );
+                    Collections.addAll( results, (String[]) result );
                 }
             }
             catch ( final Exception e )
@@ -223,26 +245,35 @@ final class HazelcastMBeansInvoker
                 Logs.warn( "Problem invoking JMX method: \"{}\"", method, e );
             }
         }
-        return normalizeValues( values );
+        return qualifyResults( results );
     }
 
     // ----------------------------------------------------------------------
     // Implementation methods
     // ----------------------------------------------------------------------
 
-    private List<String> normalizeValues( final List<String> values )
+    /**
+     * Qualifies the given results by appending the IP address of the local Hazelcast instance.
+     * 
+     * @param results Local results
+     * @return Qualified results
+     */
+    private List<String> qualifyResults( final List<String> results )
     {
         if ( method.endsWith( "Threads" ) )
         {
             final String addr = toString( instance.getCluster().getLocalMember().getInetSocketAddress() );
-            for ( int i = 0; i < values.size(); i++ )
+            for ( int i = 0; i < results.size(); i++ )
             {
-                values.set( i, values.get( i ) + " @ " + addr );
+                results.set( i, results.get( i ) + " @ " + addr );
             }
         }
-        return values;
+        return results;
     }
 
+    /**
+     * @return IP address in "x.y.z:port" format
+     */
     private static String toString( final InetSocketAddress address )
     {
         final StringBuilder buf = new StringBuilder();
@@ -257,6 +288,9 @@ final class HazelcastMBeansInvoker
         return buf.append( address.getPort() ).toString();
     }
 
+    /**
+     * Appends unsigned value from 0 to 255 plus delimiter.
+     */
     private static void append( final StringBuilder buf, final byte value, final char delim )
     {
         buf.append( value & 0xFF ).append( delim );
