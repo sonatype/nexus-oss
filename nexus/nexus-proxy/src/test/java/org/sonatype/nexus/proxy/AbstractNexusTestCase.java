@@ -49,7 +49,7 @@ public abstract class AbstractNexusTestCase
         super.customizeContext( ctx );
 
         ctx.put( PROXY_SERVER_PORT, String.valueOf( allocatePort() ) );
-        ctx.put( SECURITY_XML_FILE, new File( getConfHomeDir(), "security.xml" ).getAbsolutePath() );
+        ctx.put( SECURITY_XML_FILE, getNexusSecurityConfiguration() );
     }
 
     @Override
@@ -58,18 +58,6 @@ public abstract class AbstractNexusTestCase
         super.customizeContainerConfiguration( configuration );
         configuration.setAutoWiring( true );
         configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
-    }
-
-    protected String getNexusSecurityConfiguration()
-    {
-        return getConfHomeDir().getAbsolutePath() + "/security.xml";
-    }
-
-    @Override
-    protected void copyDefaultSecurityConfigToPlace()
-        throws IOException
-    {
-        this.copyResource( "/META-INF/security/security.xml", getNexusSecurityConfiguration() );
     }
 
     private int allocatePort()
