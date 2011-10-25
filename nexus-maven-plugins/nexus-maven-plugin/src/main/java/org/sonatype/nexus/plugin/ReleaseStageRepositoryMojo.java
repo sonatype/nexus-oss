@@ -28,7 +28,7 @@ import org.sonatype.nexus.restlight.stage.StageRepository;
 
 /**
  * Release a finished Nexus staging repository into a permanent Nexus repository for general consumption.
- * 
+ *
  * @goal staging-release
  * @requiresProject false
  * @aggregator
@@ -42,7 +42,7 @@ public class ReleaseStageRepositoryMojo
      * If set to <code>true</code>, allow auto-selection of the repository to promote in cases where no repositoryId has
      * been specified during execution, and only one staged repository is available. <br/>
      * <b>NOTE:</b> Use with care! This can be dangerous!
-     * 
+     *
      * @parameter expression="${nexus.promote.autoSelectOverride}" default-value="false"
      */
     private boolean promoteAutoSelectOverride;
@@ -57,13 +57,9 @@ public class ReleaseStageRepositoryMojo
      */
     private String description;
 
-    public void execute()
+    protected void doExecute()
         throws MojoExecutionException
     {
-        fillMissing();
-
-        initLog4j();
-
         StageClient client = getClient();
 
         List<StageRepository> repos;
@@ -75,13 +71,13 @@ public class ReleaseStageRepositoryMojo
         {
             throw new MojoExecutionException( "Failed to find closed staging repository: " + e.getMessage(), e );
         }
-        
+
         if ( repos != null && !repos.isEmpty() )
         {
             StageRepository repo = select( repos, "Select a repository to promote", isPromoteAutoSelectOverride() );
-            
+
             promptForPromoteInfo();
-            
+
             StringBuilder builder = new StringBuilder();
             builder.append( "Promoting staging repository to: " ).append( getTargetRepositoryId() ).append( ":" );
 
@@ -91,7 +87,7 @@ public class ReleaseStageRepositoryMojo
             builder.append( "\n\n" );
 
             getLog().info( builder.toString() );
-            
+
             try
             {
                 client.promoteRepository( repo, getTargetRepositoryId(), description );
@@ -123,7 +119,7 @@ public class ReleaseStageRepositoryMojo
                 throw new MojoExecutionException( "Failed to read from CLI prompt: " + e.getMessage(), e );
             }
         }
-        
+
     }
 
     public String getTargetRepositoryId()
