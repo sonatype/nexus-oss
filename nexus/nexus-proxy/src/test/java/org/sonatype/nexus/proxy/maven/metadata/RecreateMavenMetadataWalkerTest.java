@@ -29,12 +29,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.codehaus.plexus.util.StringUtils;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
@@ -62,7 +61,7 @@ public class RecreateMavenMetadataWalkerTest
 
     private Repository inhouseSnapshot;
 
-    private File repoBase = new File( "./target/test-classes/mavenMetadataTestRepo" );
+    private File repoBase;
 
     private Walker walker;
 
@@ -152,6 +151,8 @@ public class RecreateMavenMetadataWalkerTest
 
         super.setUp();
 
+         repoBase = new File( getBasedir(), "target/test-classes/mavenMetadataTestRepo" );
+
         inhouseRelease = getRepositoryRegistry().getRepository( "inhouse" );
 
         // copy all release artifact fils hosted inhouse repo
@@ -226,7 +227,7 @@ public class RecreateMavenMetadataWalkerTest
             {
                 // we succeeded, the value must be true
                 assertFalse( "The entry '" + entry.getKey() + "' was not found in repository '" + repository.getId()
-                    + "' !", entry.getValue() );
+                                 + "' !", entry.getValue() );
             }
         }
     }
@@ -244,7 +245,7 @@ public class RecreateMavenMetadataWalkerTest
         }
 
         throw new FileNotFoundException( "File with path '" + path + "' in repository '" + repo.getId()
-            + "' does not exist!" );
+                                             + "' does not exist!" );
     }
 
     private Metadata readMavenMetadata( File mdFle )
@@ -279,7 +280,8 @@ public class RecreateMavenMetadataWalkerTest
     {
         rebuildMavenMetadata( inhouseRelease );
 
-        assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest( "/junit/junit/maven-metadata.xml", false ) ) );
+        assertNotNull(
+            inhouseRelease.retrieveItem( new ResourceStoreRequest( "/junit/junit/maven-metadata.xml", false ) ) );
 
     }
 
@@ -368,16 +370,16 @@ public class RecreateMavenMetadataWalkerTest
         rebuildMavenMetadata( inhouseRelease );
 
         assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest( "/junit/junit/3.8.1/junit-3.8.1.jar.md5",
-            false ) ) );
+                                                                              false ) ) );
 
         assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest(
             "/junit/junit/3.8.1/junit-3.8.1.jar.sha1", false ) ) );
 
         assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest( "/junit/junit/4.0/junit-4.0.pom.md5",
-            false ) ) );
+                                                                              false ) ) );
 
         assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest( "/junit/junit/maven-metadata.xml.md5",
-            false ) ) );
+                                                                              false ) ) );
 
         assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest(
             "/org/apache/maven/plugins/maven-metadata.xml.sha1", false ) ) );
