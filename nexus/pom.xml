@@ -505,6 +505,13 @@
         <version>1.0-SNAPSHOT</version>
       </dependency>
 
+      <!-- locks -->
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-locks</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+      </dependency>
+
       <!-- shiro -->
       <dependency>
         <groupId>org.sonatype.security</groupId>
