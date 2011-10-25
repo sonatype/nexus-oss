@@ -109,6 +109,8 @@
               <!-- netbeans adds these -->
               <exclude>**/nbactions*.xml</exclude>
               <exclude>**/nb-configuration.xml</exclude>
+              <!-- IntelliJ IDEA project directory-->
+              <exclude>**/.idea/**</exclude>
             </excludes>
             <mapping>
               <vm>XML_STYLE</vm>
