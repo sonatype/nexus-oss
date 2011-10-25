@@ -45,22 +45,24 @@ public class Nexus4588CancellationTest
     public void setUpProgressListener()
         throws Exception
     {
-        Method setCurrentMethod = TaskUtil.class.getDeclaredMethod( "setCurrent", ProgressListener.class );
-
-        setCurrentMethod.setAccessible( true );
-
-        setCurrentMethod.invoke( null, new CancellableProgressListenerWrapper( null ) );
+        new TaskUtil()
+        {
+            {
+                setCurrent( new CancellableProgressListenerWrapper( null ) );
+            }
+        };
     }
 
     @After
     public void removeProgressListener()
         throws Exception
     {
-        Method setCurrentMethod = TaskUtil.class.getDeclaredMethod( "setCurrent", ProgressListener.class );
-
-        setCurrentMethod.setAccessible( true );
-
-        setCurrentMethod.invoke( null, (ProgressListener) null );
+        new TaskUtil()
+        {
+            {
+                setCurrent( null );
+            }
+        };
     }
 
     @Test( expected = TaskInterruptedException.class )
