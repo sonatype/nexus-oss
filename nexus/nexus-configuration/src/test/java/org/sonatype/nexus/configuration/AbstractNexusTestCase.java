@@ -137,17 +137,17 @@ public abstract class AbstractNexusTestCase
 
     protected String getNexusConfiguration()
     {
-        return confHomeDir + "/nexus.xml";
+        return new File( confHomeDir, "nexus.xml" ).getAbsolutePath();
     }
 
     protected String getSecurityConfiguration()
     {
-        return confHomeDir + "/security-configuration.xml";
+        return new File( confHomeDir, "security-configuration.xml" ).getAbsolutePath();
     }
 
     protected String getNexusSecurityConfiguration()
     {
-        return confHomeDir + "/security.xml";
+        return new File( confHomeDir, "security.xml" ).getAbsolutePath();
     }
 
     protected void copyDefaultConfigToPlace()
