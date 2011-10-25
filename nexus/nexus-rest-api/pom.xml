@@ -137,6 +137,10 @@
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>servlet-api</artifactId>
+    </dependency>
     <!-- For testing -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

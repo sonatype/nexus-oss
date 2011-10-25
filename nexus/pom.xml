@@ -184,6 +184,8 @@
     <spice-timeline.version>2.1-SNAPSHOT</spice-timeline.version>
     <spice-utils.version>1.0.0</spice-utils.version>
     <surefire.version>2.9</surefire.version>
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
+    <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
   </properties>
 
   <dependencyManagement>
@@ -1027,7 +1029,7 @@
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-indexer-lucene-plugin</artifactId>
         <version>${project.version}</version>
-        <type>nexus-plugin</type>
+        <type>${nexus-plugin.type}</type>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -2056,6 +2058,13 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
+    <profile>
+        <id>idea</id>
+        <properties>
+            <nexus-plugin.type>jar</nexus-plugin.type>
+        </properties>
     </profile>
   </profiles>
 </project>
