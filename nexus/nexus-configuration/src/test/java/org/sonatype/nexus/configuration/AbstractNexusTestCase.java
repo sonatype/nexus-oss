@@ -142,6 +142,11 @@ public abstract class AbstractNexusTestCase
 
     protected String getSecurityConfiguration()
     {
+        return confHomeDir + "/security-configuration.xml";
+    }
+
+    protected String getNexusSecurityConfiguration()
+    {
         return confHomeDir + "/security.xml";
     }
 
