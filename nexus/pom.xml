@@ -1352,24 +1352,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-test-jar</id>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <configuration>
-              <excludes>
-                <exclude>logback-test.xml</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <artifactId>maven-site-plugin</artifactId>
         <executions>
           <execution>
