@@ -39,16 +39,19 @@ import org.junit.Before;
 /**
  * A Support PlexusTestCase clone that does not extend JUnit TestCase, thereby allowing us to extend this class like we
  * did with JUnit 3x and use JUnit 4x annotations instead to design our tests.
- * <p>
+ * <p/>
  * This source is meant to be a near copy of the original {@link org.codehaus.plexus.PlexusTestCase}, sisu-2.1.1
- * <p>
+ * <p/>
  * The supporting asserts derived from JUnit's Assert class are deprecated here to encourage use of the more modern
  * alternative Hamcrest libraries.
- * <p>
+ * <p/>
  * TODO: integrate this directly with sisu-inject-plexus
  */
 public abstract class PlexusTestCaseSupport
 {
+
+    public static final String BASE_DIR_KEY = "basedir";
+
     private PlexusContainer container;
 
     private static String basedir;
@@ -123,7 +126,7 @@ public abstract class PlexusTestCaseSupport
 
     /**
      * Allow custom test case implementations do augment the default container configuration before executing tests.
-     * 
+     *
      * @param containerConfiguration
      */
     protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
@@ -142,13 +145,19 @@ public abstract class PlexusTestCaseSupport
     protected void tearDown()
         throws Exception
     {
-        if ( container != null )
+        try
         {
-            container.dispose();
+            if ( container != null )
+            {
+                container.dispose();
 
-            container = null;
+                container = null;
+            }
         }
-        System.setProperties( sysPropsBackup );
+        finally
+        {
+            System.setProperties( sysPropsBackup );
+        }
     }
 
     protected PlexusContainer getContainer()
@@ -182,7 +191,7 @@ public abstract class PlexusTestCaseSupport
      * Allow the retrieval of a container configuration that is based on the name of the test class being run. So if you
      * have a test class called org.foo.FunTest, then this will produce a resource name of org/foo/FunTest.xml which
      * would be used to configure the Plexus container before running your test.
-     * 
+     *
      * @param subname
      * @return
      */
@@ -239,12 +248,12 @@ public abstract class PlexusTestCaseSupport
     // Helper methods for sub classes
     // ----------------------------------------------------------------------
 
-    public static File getTestFile( final String path )
+    public File getTestFile( final String path )
     {
         return new File( getBasedir(), path );
     }
 
-    public static File getTestFile( final String basedir, final String path )
+    public File getTestFile( final String basedir, final String path )
     {
         File basedirFile = new File( basedir );
 
@@ -256,28 +265,35 @@ public abstract class PlexusTestCaseSupport
         return new File( basedirFile, path );
     }
 
-    public static String getTestPath( final String path )
+    public String getTestPath( final String path )
     {
         return getTestFile( path ).getAbsolutePath();
     }
 
-    public static String getTestPath( final String basedir, final String path )
+    public String getTestPath( final String basedir, final String path )
     {
         return getTestFile( basedir, path ).getAbsolutePath();
     }
 
-    public static String getBasedir()
+    public String getBasedir()
     {
         if ( basedir != null )
         {
             return basedir;
         }
 
-        basedir = System.getProperty( "basedir" );
+        basedir = System.getProperty( BASE_DIR_KEY );
 
         if ( basedir == null )
         {
-            basedir = new File( "" ).getAbsolutePath();
+            // Find the directory which this class is defined in.
+            final String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+
+            // We expect the file to be in target/test-classes, so go up 2 dirs
+            final File baseDir = new File( path ).getParentFile().getParentFile();
+
+            // Set ${basedir}
+            System.setProperty( BASE_DIR_KEY, baseDir.getPath() );
         }
 
         return basedir;
@@ -296,9 +312,10 @@ public abstract class PlexusTestCaseSupport
     }
 
     // ========================= CUSTOM NEXUS =====================
+
     /**
      * Helper to call old JUnit 3x style {@link #setUp()}
-     * 
+     *
      * @throws Exception
      */
     @Before
@@ -310,7 +327,7 @@ public abstract class PlexusTestCaseSupport
 
     /**
      * Helper to call old JUnit 3x style {@link #tearDown()}
-     * 
+     *
      * @throws Exception
      */
     @After
