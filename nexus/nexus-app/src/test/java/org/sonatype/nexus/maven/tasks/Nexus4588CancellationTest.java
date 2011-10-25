@@ -53,7 +53,7 @@ public class Nexus4588CancellationTest
     }
 
     @After
-    public void removeUpProgressListener()
+    public void removeProgressListener()
         throws Exception
     {
         Method setCurrentMethod = TaskUtil.class.getDeclaredMethod( "setCurrent", ProgressListener.class );
