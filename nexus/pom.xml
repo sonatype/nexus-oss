@@ -1614,6 +1614,23 @@
   </modules>
 
   <profiles>
+      
+    <profile>
+      <id>debug</id>
+      <activation>
+        <property>
+            <name>debug</name>
+            <value>true</value>
+        </property>
+      </activation>
+      <properties>
+        <!-- configure test logging properties to debug levels -->
+        <test.log.level>DEBUG</test.log.level>
+        <it.test.log.level>DEBUG</it.test.log.level>
+        <it.nexus.log.level>DEBUG</it.nexus.log.level>
+      </properties>
+    </profile>
+
     <profile>
       <id>skipBenchmarks</id>
       <build>
