@@ -77,9 +77,8 @@ public class Nexus4257CookieVerificationIT
 
         Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
         Assert.assertNotNull( sessionCookie, "Session Cookie not set" );
-        
         httpClient.getState().clear(); // remove cookies, credentials, etc
-        
+
         // do not set the cookie, expect failure
         GetMethod failedGetMethod = new GetMethod( url );
         Assert.assertEquals( httpClient.executeMethod( failedGetMethod ), 401 );
@@ -107,6 +106,68 @@ public class Nexus4257CookieVerificationIT
         // default useragent is: Jakarta Commons-HttpClient/3.1[\r][\n]
         HttpClient httpClient = new HttpClient(); 
         httpClient.getState().setCredentials( AuthScope.ANY, new UsernamePasswordCredentials( username, password ) );
+
+        GetMethod getMethod = new GetMethod( url );
+        getMethod.addRequestHeader( header );
+        getMethod.releaseConnection();
+        Assert.assertEquals( httpClient.executeMethod( getMethod ), 200 );
+
+        Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
+        Assert.assertNull( sessionCookie, "Session Cookie is set" );
+    }
+
+
+    @Test
+    public void testCookieForStateFullClientForAnonUser()
+        throws HttpException, IOException
+    {
+
+        GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+        settings.setSecurityAnonymousAccessEnabled( true );
+        SettingsMessageUtil.save( settings );
+
+        TestContext context = TestContainer.getInstance().getTestContext();
+        String username = context.getAdminUsername();
+        String password = context.getPassword();
+        String url = this.getBaseNexusUrl() + "content/";
+
+        // default useragent is: Jakarta Commons-HttpClient/3.1[\r][\n]
+        HttpClient httpClient = new HttpClient(); // anonymous access
+
+        GetMethod getMethod = new GetMethod( url );
+        Assert.assertEquals( httpClient.executeMethod( getMethod ), 200 );
+        getMethod.releaseConnection();
+
+        Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
+        Assert.assertNotNull( sessionCookie, "Session Cookie not set" );
+
+        
+        httpClient.getState().clear(); // remove cookies, credentials, etc
+        // set the cookie expect greatness
+        httpClient.getState().addCookie( sessionCookie );
+        getMethod = new GetMethod( url );
+        Assert.assertEquals( httpClient.executeMethod( getMethod ), 200 );
+        getMethod.releaseConnection();
+    }
+
+
+    @Test
+    public void testCookieForStateLessClientForAnonUser()
+        throws HttpException, IOException
+    {
+        GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+        settings.setSecurityAnonymousAccessEnabled( true );
+        SettingsMessageUtil.save( settings );
+
+        TestContext context = TestContainer.getInstance().getTestContext();
+        String username = context.getAdminUsername();
+        String password = context.getPassword();
+        String url = this.getBaseNexusUrl() + "content/";
+
+        Header header = new Header("User-Agent", "Java/1.6" );
+
+        // default useragent is: Jakarta Commons-HttpClient/3.1[\r][\n]
+        HttpClient httpClient = new HttpClient(); // anonymous access
 
         GetMethod getMethod = new GetMethod( url );
         getMethod.addRequestHeader( header );
