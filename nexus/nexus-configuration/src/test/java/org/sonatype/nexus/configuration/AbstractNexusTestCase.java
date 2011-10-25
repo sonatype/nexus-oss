@@ -154,7 +154,7 @@ public abstract class AbstractNexusTestCase
     protected void copyDefaultSecurityConfigToPlace()
         throws IOException
     {
-        this.copyResource( "/META-INF/nexus/default-oss-security.xml", getSecurityConfiguration() );
+        this.copyResource( "/META-INF/security/security.xml", getSecurityConfiguration() );
     }
 
     protected void copyResource( String resource, String dest )
