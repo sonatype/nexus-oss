@@ -51,7 +51,7 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
       <scope>provided</scope>
-      <type>nexus-plugin</type>
+      <type>${nexus-plugin.type}</type>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
