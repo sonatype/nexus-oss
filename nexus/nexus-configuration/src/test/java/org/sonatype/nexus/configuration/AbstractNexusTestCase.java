@@ -26,11 +26,11 @@ import java.util.Random;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 /**
  * Abstract test case for nexus tests. It is customizing the context and helps with nexus configurations.
@@ -40,27 +40,29 @@ import org.codehaus.plexus.util.io.RawInputStreamFacade;
 public abstract class AbstractNexusTestCase
     extends PlexusTestCaseSupport
 {
+
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
 
     public static final String APPS_CONFIGURATION_KEY = "apps";
 
     public static final String CONF_DIR_KEY = "application-conf";
 
-    private static File plexusHomeDir = null;
+    private File plexusHomeDir = null;
 
-    private static File appsHomeDir = null;
+    private File appsHomeDir = null;
 
-    private static File workHomeDir = null;
+    private File workHomeDir = null;
 
-    private static File confHomeDir = null;
+    private File confHomeDir = null;
 
     @Override
     protected void customizeContext( Context ctx )
     {
         super.customizeContext( ctx );
 
-        plexusHomeDir =
-            new File( getBasedir(), "target/plexus-home-" + new Random( System.currentTimeMillis() ).nextLong() );
+        plexusHomeDir = new File(
+            getBasedir(), "target/plexus-home-" + new Random( System.currentTimeMillis() ).nextLong()
+        );
         appsHomeDir = new File( plexusHomeDir, "apps" );
         workHomeDir = new File( plexusHomeDir, "nexus-work" );
         confHomeDir = new File( workHomeDir, "conf" );
@@ -118,17 +120,17 @@ public abstract class AbstractNexusTestCase
         }
     }
 
-    public static File getPlexusHomeDir()
+    public File getPlexusHomeDir()
     {
         return plexusHomeDir;
     }
 
-    public static File getWorkHomeDir()
+    public File getWorkHomeDir()
     {
         return workHomeDir;
     }
 
-    public static File getConfHomeDir()
+    public File getConfHomeDir()
     {
         return confHomeDir;
     }
