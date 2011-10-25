@@ -65,35 +65,17 @@ public abstract class AbstractNexusLdapTestCase
         ctx.put( LDAP_CONFIGURATION_KEY, getConfHomeDir().getAbsolutePath() );
     }
 
-    @Override
-    protected String getSecurityConfiguration()
-    {
-        return getConfHomeDir() + "/security-configuration.xml";
-    }
-
-    protected String getNexusSecurityConfiguration()
-    {
-        return getConfHomeDir() + "/security.xml";
-    }
-
     protected String getNexusLdapConfiguration()
     {
         return getConfHomeDir() + "/ldap.xml";
     }
 
-    protected void copyDefaultConfigToPlace()
-        throws IOException
-    {
-        this.copyStream( getClass().getResourceAsStream( "/test-conf/security-configuration.xml" ),
-                         new FileOutputStream(
-                             getSecurityConfiguration() ) );
-    }
-
+    @Override
     protected void copyDefaultSecurityConfigToPlace()
         throws IOException
     {
-        this.copyStream( getClass().getResourceAsStream( "/test-conf/security.xml" ), new FileOutputStream(
-            getNexusSecurityConfiguration() ) );
+        copyResource( "/test-conf/security-configuration.xml", getSecurityConfiguration() ) ;
+        copyResource( "/test-conf/security.xml", getNexusSecurityConfiguration() ) ;
     }
 
     protected void copyDefaultLdapConfigToPlace()
@@ -116,29 +98,10 @@ public abstract class AbstractNexusLdapTestCase
         IOUtil.close( out );
     }
 
-    private void copyStream( InputStream is, OutputStream out )
-        throws IOException
-    {
-        try
-        {
-            IOUtil.copy( is, out );
-        }
-        finally
-        {
-            IOUtil.close( is );
-            IOUtil.close( out );
-        }
-    }
-
     protected int getLdapPort()
     {
         Assert.assertNotNull( "LDAP server is not initialized yet.", ldapServer );
         return ldapServer.getPort();
-    }
-
-    protected boolean loadConfigurationAtSetUp()
-    {
-        return true;
     }
 
     @Override
@@ -153,13 +116,8 @@ public abstract class AbstractNexusLdapTestCase
         // startup the LDAP server.
         ldapServer = (LdapServer) lookup( LdapServer.ROLE );
 
-        if ( loadConfigurationAtSetUp() )
-        {
-            this.copyDefaultConfigToPlace();
             this.copyDefaultSecurityConfigToPlace();
             this.copyDefaultLdapConfigToPlace();
-        }
-
     }
 
     protected String getErrorString( ErrorResponse errorResponse, int index )
