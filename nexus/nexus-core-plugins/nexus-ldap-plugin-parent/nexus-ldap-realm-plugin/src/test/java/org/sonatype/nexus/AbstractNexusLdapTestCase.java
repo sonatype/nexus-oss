@@ -27,10 +27,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.util.HashMap;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.junit.Assert;
@@ -38,73 +35,58 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.security.ldap.realms.api.LdapRealmPlexusResourceConst;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
 public abstract class AbstractNexusLdapTestCase
-    extends PlexusTestCaseSupport
+    extends org.sonatype.nexus.configuration.AbstractNexusTestCase
 {
-
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
-    }
 
     public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
 
-    public static final String WORK_CONFIGURATION_KEY = "nexus-work";
-
     public static final String LDAP_CONFIGURATION_KEY = "application-conf";
 
-    public static final String APPS_CONFIGURATION_KEY = "apps";
     public static final String SECURITY_CONFIG_KEY = "security-xml-file";
 
-    protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
-
-    protected static final File WORK_HOME = new File( PLEXUS_HOME, "nexus-work" );
-
-    protected static final File CONF_HOME = new File( WORK_HOME, "conf" );
-
-    /** The ldap server. */
+    /**
+     * The ldap server.
+     */
     private LdapServer ldapServer;
 
     @Override
     protected void customizeContext( Context ctx )
     {
-        ctx.put( APPS_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
+        super.customizeContext( ctx );
 
-        ctx.put( WORK_CONFIGURATION_KEY, WORK_HOME.getAbsolutePath() );
-
-        ctx.put( RUNTIME_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
+        ctx.put( RUNTIME_CONFIGURATION_KEY, getPlexusHomeDir().getAbsolutePath() );
 
         ctx.put( SECURITY_CONFIG_KEY, this.getNexusSecurityConfiguration() );
 
-        ctx.put( LDAP_CONFIGURATION_KEY, CONF_HOME.getAbsolutePath() );
+        ctx.put( LDAP_CONFIGURATION_KEY, getConfHomeDir().getAbsolutePath() );
     }
 
+    @Override
     protected String getSecurityConfiguration()
     {
-        return CONF_HOME + "/security-configuration.xml";
+        return getConfHomeDir() + "/security-configuration.xml";
     }
 
     protected String getNexusSecurityConfiguration()
     {
-        return CONF_HOME.getAbsolutePath() + "/security.xml";
+        return getConfHomeDir() + "/security.xml";
     }
 
     protected String getNexusLdapConfiguration()
     {
-        return CONF_HOME + "/ldap.xml";
+        return getConfHomeDir() + "/ldap.xml";
     }
 
     protected void copyDefaultConfigToPlace()
         throws IOException
     {
-        this.copyStream( getClass().getResourceAsStream( "/test-conf/security-configuration.xml" ), new FileOutputStream(
-            getSecurityConfiguration() ) );
+        this.copyStream( getClass().getResourceAsStream( "/test-conf/security-configuration.xml" ),
+                         new FileOutputStream(
+                             getSecurityConfiguration() ) );
     }
 
     protected void copyDefaultSecurityConfigToPlace()
@@ -115,13 +97,13 @@ public abstract class AbstractNexusLdapTestCase
     }
 
     protected void copyDefaultLdapConfigToPlace()
-    throws IOException
+        throws IOException
     {
         InputStream in = getClass().getResourceAsStream( "/test-conf/ldap.xml" );
         this.interpolateLdapXml( in, new File( getNexusLdapConfiguration() ) );
         IOUtil.close( in );
     }
-    
+
     protected void interpolateLdapXml( InputStream inputStream, File outputFile )
         throws IOException
     {
@@ -153,7 +135,7 @@ public abstract class AbstractNexusLdapTestCase
         Assert.assertNotNull( "LDAP server is not initialized yet.", ldapServer );
         return ldapServer.getPort();
     }
-    
+
     protected boolean loadConfigurationAtSetUp()
     {
         return true;
@@ -168,15 +150,9 @@ public abstract class AbstractNexusLdapTestCase
         // configure the logging
         SLF4JBridgeHandler.install();
 
-        FileUtils.deleteDirectory( PLEXUS_HOME );
-
-        PLEXUS_HOME.mkdirs();
-        WORK_HOME.mkdirs();
-        CONF_HOME.mkdirs();
-
         // startup the LDAP server.
         ldapServer = (LdapServer) lookup( LdapServer.ROLE );
-        
+
         if ( loadConfigurationAtSetUp() )
         {
             this.copyDefaultConfigToPlace();
@@ -205,7 +181,6 @@ public abstract class AbstractNexusLdapTestCase
         super.tearDown();
     }
 
-
     protected void validateConnectionDTO( LdapConnectionInfoDTO expected, LdapConnectionInfoDTO actual )
     {
         Assert.assertEquals( expected.getAuthScheme(), actual.getAuthScheme() );
@@ -218,7 +193,7 @@ public abstract class AbstractNexusLdapTestCase
 
         // if the expectedPassword == null then the actual should be null
         // if its anything else the actual password should be "--FAKE-PASSWORD--"
-        if(expected.getSystemPassword() == null)
+        if ( expected.getSystemPassword() == null )
         {
             Assert.assertNull( actual.getSystemPassword() );
         }

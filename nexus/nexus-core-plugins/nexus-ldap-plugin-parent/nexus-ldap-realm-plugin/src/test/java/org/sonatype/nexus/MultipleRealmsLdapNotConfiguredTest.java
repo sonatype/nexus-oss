@@ -118,7 +118,7 @@ public class MultipleRealmsLdapNotConfiguredTest
         throws IOException
     {
         IOUtil.copy( getClass().getResourceAsStream( "/test-conf/security-configuration-multipleRealms.xml" ),
-            new FileOutputStream( getSecurityConfiguration() ) );
+                     new FileOutputStream( getSecurityConfiguration() ) );
     }
 
     /*
@@ -130,7 +130,7 @@ public class MultipleRealmsLdapNotConfiguredTest
     {
         super.customizeContext( ctx );
 
-        ctx.put( LDAP_CONFIGURATION_KEY, CONF_HOME.getAbsolutePath() + "/not-configured/" );
+        ctx.put( LDAP_CONFIGURATION_KEY, getConfHomeDir().getAbsolutePath() + "/not-configured/" );
     }
 
 }

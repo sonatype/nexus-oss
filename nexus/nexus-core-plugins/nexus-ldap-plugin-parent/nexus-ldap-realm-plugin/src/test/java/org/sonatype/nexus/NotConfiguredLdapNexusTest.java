@@ -18,15 +18,13 @@
  */
 package org.sonatype.nexus;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-import org.codehaus.plexus.context.Context;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.codehaus.plexus.context.Context;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
-
 import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
 
 public class NotConfiguredLdapNexusTest
@@ -77,7 +75,7 @@ public class NotConfiguredLdapNexusTest
         SimplePrincipalCollection principals = new SimplePrincipalCollection();
         principals.add( "cstamas", AbstractLdapAuthenticatingRealm.class.getName() );
 
-     // if realm is not configured, the user should not be able to be authorized
+        // if realm is not configured, the user should not be able to be authorized
         Assert.assertFalse( security.isPermitted( principals, "nexus:usersforgotpw:create" ) );
     }
 
@@ -91,7 +89,7 @@ public class NotConfiguredLdapNexusTest
     {
         super.customizeContext( ctx );
 
-        ctx.put( LDAP_CONFIGURATION_KEY, CONF_HOME.getAbsolutePath() + "/not-configured/" );
+        ctx.put( LDAP_CONFIGURATION_KEY, getConfHomeDir().getAbsolutePath() + "/not-configured/" );
     }
 
 }
