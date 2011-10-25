@@ -117,6 +117,11 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-configuration-model</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <!-- Because this is a nexus-plugin -->
     <dependency>
