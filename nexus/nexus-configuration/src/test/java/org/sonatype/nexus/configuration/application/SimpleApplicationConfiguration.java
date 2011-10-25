@@ -23,6 +23,9 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.ConfigurationCommitEvent;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
@@ -35,18 +38,21 @@ import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
-@Component(role=ApplicationConfiguration.class)
+@Component( role = ApplicationConfiguration.class )
 public class SimpleApplicationConfiguration
-    implements ApplicationConfiguration
+    implements ApplicationConfiguration, Contextualizable
 {
+
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
-    
+
     private Configuration configuration;
 
     private LocalStorageContext localStorageContext = new SimpleLocalStorageContext();
-    
+
     private RemoteStorageContext remoteStorageContext = new SimpleRemoteStorageContext();
+
+    private File workingDirectory;
 
     public SimpleApplicationConfiguration()
     {
@@ -64,7 +70,7 @@ public class SimpleApplicationConfiguration
     {
         return localStorageContext;
     }
-    
+
     public RemoteStorageContext getGlobalRemoteStorageContext()
     {
         return remoteStorageContext;
@@ -77,7 +83,7 @@ public class SimpleApplicationConfiguration
 
     public File getWorkingDirectory()
     {
-        return AbstractNexusTestCase.getPlexusHomeDir();
+        return workingDirectory;
     }
 
     public File getWorkingDirectory( String key )
@@ -89,7 +95,7 @@ public class SimpleApplicationConfiguration
     {
         File dir = getWorkingDirectory( "tmp" );
         dir.mkdirs();
-        
+
         return dir;
     }
 
@@ -97,7 +103,7 @@ public class SimpleApplicationConfiguration
     {
         File dir = getWorkingDirectory( "trash" );
         dir.mkdirs();
-        
+
         return dir;
     }
 
@@ -105,7 +111,7 @@ public class SimpleApplicationConfiguration
     {
         File dir = new File( getWorkingDirectory(), "conf" );
         dir.mkdirs();
-        
+
         return dir;
     }
 
@@ -122,4 +128,21 @@ public class SimpleApplicationConfiguration
     {
         return false;
     }
+
+    @Override
+    public void contextualize( final Context context )
+        throws ContextException
+    {
+        try
+        {
+            workingDirectory = new File( (String) context.get( AbstractNexusTestCase.WORK_CONFIGURATION_KEY ) );
+        }
+        catch ( ContextException e )
+        {
+            throw new RuntimeException(
+                "Missing key from plexus context: " + AbstractNexusTestCase.WORK_CONFIGURATION_KEY, e
+            );
+        }
+    }
+
 }
