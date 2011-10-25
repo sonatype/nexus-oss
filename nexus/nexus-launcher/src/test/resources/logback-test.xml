@@ -19,7 +19,7 @@
   <logger name="com.sonatype.overlord" level="TRACE"/>
   <logger name="org.apache.commons.httpclient.HttpMethodDirector" level="ERROR"/>
 
-  <root level="INFO">
+  <root level="${test.log.level:-INFO}">
     <appender-ref ref="CONSOLE"/>
   </root>
 
