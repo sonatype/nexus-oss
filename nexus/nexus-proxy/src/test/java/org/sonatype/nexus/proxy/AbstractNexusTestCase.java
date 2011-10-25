@@ -52,14 +52,6 @@ public abstract class AbstractNexusTestCase
         ctx.put( SECURITY_XML_FILE, getNexusSecurityConfiguration() );
     }
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        super.customizeContainerConfiguration( configuration );
-        configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
-    }
-
     private int allocatePort()
     {
         ServerSocket ss;
