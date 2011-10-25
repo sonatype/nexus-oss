@@ -189,6 +189,7 @@ public class Nexus383SearchNGIT
 
         // Enabling default repo again
         getSearchMessageUtil().allowSearch( NEXUS_TEST_HARNESS_REPO, true );
+        getEventInspectorsUtil().waitForCalmPeriod();
 
         // All searchs should run ok
         searchFor();
