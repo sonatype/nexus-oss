@@ -149,6 +149,11 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <nexus.version>${project.version}</nexus.version>
 
+    <!-- logging configuration used in logback config files to control test logging -->
+    <test.log.level>INFO</test.log.level>
+    <it.test.log.level>INFO</it.test.log.level>
+    <it.nexus.log.level>INFO</it.nexus.log.level>
+
     <!-- version properties -->
     <aether.version>1.8.1</aether.version>
     <applifecycle.version>1.4</applifecycle.version>
@@ -1503,8 +1508,11 @@
               <jub.customkey>${os.name}</jub.customkey>
               <jub.charts.dir>${project.build.directory}/junit-benchmarks</jub.charts.dir>
               <!-- end junit benchmarks config -->
+              <!-- logging configuration properties, see logback*.xml files -->
+              <test.log.level>${test.log.level}</test.log.level>
+              <it.test.log.level>${it.test.log.level}</it.test.log.level>
+              <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
             </systemPropertyVariables>
-
           </configuration>
         </plugin>
         <plugin>
@@ -1538,6 +1546,12 @@
                 <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
               </property>
             </properties>
+            <systemPropertyVariables>
+              <!-- logging configuration properties, see logback*.xml files -->
+              <test.log.level>${test.log.level}</test.log.level>
+              <it.test.log.level>${it.test.log.level}</it.test.log.level>
+              <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
+            </systemPropertyVariables>
           </configuration>
         </plugin>
       </plugins>
@@ -1602,6 +1616,23 @@
   </modules>
 
   <profiles>
+      
+    <profile>
+      <id>debug</id>
+      <activation>
+        <property>
+            <name>debug</name>
+            <value>true</value>
+        </property>
+      </activation>
+      <properties>
+        <!-- configure test logging properties to debug levels -->
+        <test.log.level>DEBUG</test.log.level>
+        <it.test.log.level>DEBUG</it.test.log.level>
+        <it.nexus.log.level>DEBUG</it.nexus.log.level>
+      </properties>
+    </profile>
+
     <profile>
       <id>skipBenchmarks</id>
       <build>
@@ -1977,7 +2008,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.8.1</version>
             <configuration>
               <classesDirectory>${project.build.directory}/generated-classes/emma/classes</classesDirectory>
               <systemPropertyVariables>
