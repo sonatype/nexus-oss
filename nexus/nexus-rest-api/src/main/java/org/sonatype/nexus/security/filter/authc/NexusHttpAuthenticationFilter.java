@@ -332,16 +332,23 @@ public class NexusHttpAuthenticationFilter
             else
             {
 
-                Subject subject = getSubject( request, response );
-
-                String username = getNexusConfiguration().getAnonymousUsername();
-
-                if ( subject != null && subject.isAuthenticated() )
+                if ( getLogger().isDebugEnabled() )
                 {
-                    username = subject.getPrincipal().toString();
-                }
+                    final Subject subject = getSubject( request, response );
 
-                getLogger().info( "Request processing is rejected because user \"" + username + "\" lacks permissions." );
+                    String username;
+
+                    if ( subject != null && subject.isAuthenticated() )
+                    {
+                        username = subject.getPrincipal().toString();
+                    }
+                    else
+                    {
+                        username = getNexusConfiguration().getAnonymousUsername();
+                    }
+
+                    getLogger().debug( "Request processing is rejected because user \"" + username + "\" lacks permissions." );
+                }
 
                 sendForbidden( request, response );
             }
