@@ -144,6 +144,7 @@ public abstract class AbstractMavenRepoContentTests
         // wait for this tasks to run
         // waiting was introduced as a fix for NEXUS-4530 but will benefit all subclasses of this test as it will
         // avoid unexpected behavior
+        wairForAsyncEventsToCalmDown();
         waitForTasksToStop();
     }
 
