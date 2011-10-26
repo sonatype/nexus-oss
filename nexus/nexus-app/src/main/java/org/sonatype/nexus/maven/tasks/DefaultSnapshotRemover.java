@@ -232,6 +232,8 @@ public class DefaultSnapshotRemover
 
         for ( String path : request.getMetadataRebuildPaths() )
         {
+            TaskUtil.checkInterruption();
+
             DefaultWalkerContext ctxMd =
                 new DefaultWalkerContext( repository, new ResourceStoreRequest( path ), new DottedStoreWalkerFilter() );
 

@@ -104,6 +104,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.sonatype.security.realms</groupId>
+      <artifactId>security-xml-realm</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <scope>provided</scope>

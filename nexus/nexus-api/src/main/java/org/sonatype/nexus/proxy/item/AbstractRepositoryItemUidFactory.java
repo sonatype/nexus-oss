@@ -21,9 +21,15 @@ package org.sonatype.nexus.proxy.item;
 import java.lang.ref.WeakReference;
 import java.util.WeakHashMap;
 
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.locks.ResourceLockFactory;
 
 /**
  * Abstract factory for UIDs.
@@ -31,7 +37,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @author cstamas
  */
 public abstract class AbstractRepositoryItemUidFactory
-    implements RepositoryItemUidFactory
+    implements RepositoryItemUidFactory, Disposable
 {
     @Override
     public DefaultRepositoryItemUid createUid( final Repository repository, String path )
@@ -58,6 +64,11 @@ public abstract class AbstractRepositoryItemUidFactory
 
     // ==
 
+    @Inject
+    @Nullable
+    @Named( "${sisu-resource-locks:-disabled}" )
+    private ResourceLockFactory sisuLockFactory;
+
     private WeakHashMap<DefaultRepositoryItemUidLock, WeakReference<DefaultRepositoryItemUidLock>> locks =
         new WeakHashMap<DefaultRepositoryItemUidLock, WeakReference<DefaultRepositoryItemUidLock>>();
 
@@ -81,7 +92,17 @@ public abstract class AbstractRepositoryItemUidFactory
 
     protected synchronized DefaultRepositoryItemUidLock doCreateUidLockForKey( final String key )
     {
-        final DefaultRepositoryItemUidLock newLock = new DefaultRepositoryItemUidLock( key, new SimpleLockResource() );
+        final LockResource lockResource;
+        if ( sisuLockFactory != null )
+        {
+            lockResource = new SisuLockResource( sisuLockFactory.getResourceLock( key ) );
+        }
+        else
+        {
+            lockResource = new SimpleLockResource();
+        }
+
+        final DefaultRepositoryItemUidLock newLock = new DefaultRepositoryItemUidLock( key, lockResource );
 
         final WeakReference<DefaultRepositoryItemUidLock> oldLockRef = locks.get( newLock );
 
@@ -108,5 +129,14 @@ public abstract class AbstractRepositoryItemUidFactory
     protected int locksInMap()
     {
         return locks.size();
+    }
+
+    @Override
+    public void dispose()
+    {
+        if ( sisuLockFactory != null )
+        {
+            sisuLockFactory.shutdown();
+        }
     }
 }

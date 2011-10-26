@@ -89,7 +89,7 @@ public class FailureLoggingHttpMethodPermissionFilter
             return;
         }
 
-        getLogger().info( msg );
+        getLogger().debug( msg );
 
         AuthcAuthzEvent authzEvt = new AuthcAuthzEvent( new Date(), FeedRecorder.SYSTEM_AUTHZ, msg );
 
