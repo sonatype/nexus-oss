@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.logging.LoggerManager;
@@ -33,15 +31,14 @@ import org.codehaus.plexus.util.IOUtil;
 
 /**
  * Abstract test case for nexus tests. It is customizing the context and helps with nexus configurations.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractNexusTestCase
     extends org.sonatype.nexus.configuration.AbstractNexusTestCase
 {
-    public static final String PROXY_SERVER_PORT = "proxy.server.port";
 
-    public static final String SECURITY_XML_FILE = "security-xml-file";
+    public static final String PROXY_SERVER_PORT = "proxy.server.port";
 
     @Override
     protected void customizeContext( Context ctx )
@@ -49,7 +46,6 @@ public abstract class AbstractNexusTestCase
         super.customizeContext( ctx );
 
         ctx.put( PROXY_SERVER_PORT, String.valueOf( allocatePort() ) );
-        ctx.put( SECURITY_XML_FILE, getNexusSecurityConfiguration() );
     }
 
     private int allocatePort()

@@ -41,27 +41,8 @@ public abstract class AbstractNexusTestCase
 
     private EventInspectorHost eventInspectorHost;
 
-    public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
-
-    public static final String NEXUS_APP_CONFIGURATION_KEY = "nexus-app";
-
     protected NexusConfiguration nexusConfiguration;
 
-    private static File runtimeHomeDir = null;
-
-    private static File nexusappHomeDir = null;
-
-    @Override
-    protected void customizeContext( Context ctx )
-    {
-        super.customizeContext( ctx );
-
-        runtimeHomeDir = new File( getPlexusHomeDir(), "runtime" );
-        nexusappHomeDir = new File( getPlexusHomeDir(), "nexus-app" );
-
-        ctx.put( RUNTIME_CONFIGURATION_KEY, runtimeHomeDir.getAbsolutePath() );
-        ctx.put( NEXUS_APP_CONFIGURATION_KEY, nexusappHomeDir.getAbsolutePath() );
-    }
 
     protected boolean loadConfigurationAtSetUp()
     {
@@ -73,9 +54,6 @@ public abstract class AbstractNexusTestCase
         throws Exception
     {
         super.setUp();
-
-        runtimeHomeDir.mkdirs();
-        nexusappHomeDir.mkdirs();
 
         nexusScheduler = lookup( NexusScheduler.class );
         eventInspectorHost = lookup( EventInspectorHost.class );
@@ -93,9 +71,6 @@ public abstract class AbstractNexusTestCase
         waitForTasksToStop();
 
         super.tearDown();
-
-        cleanDir( runtimeHomeDir );
-        cleanDir( nexusappHomeDir );
     }
 
     protected void shutDownSecurity()

@@ -47,6 +47,12 @@ public abstract class AbstractNexusTestCase
 
     public static final String CONF_DIR_KEY = "application-conf";
 
+    public static final String SECURITY_XML_FILE = "security-xml-file";
+
+    public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
+
+    public static final String NEXUS_APP_CONFIGURATION_KEY = "nexus-app";
+
     private File plexusHomeDir = null;
 
     private File appsHomeDir = null;
@@ -54,6 +60,10 @@ public abstract class AbstractNexusTestCase
     private File workHomeDir = null;
 
     private File confHomeDir = null;
+
+    private File runtimeHomeDir = null;
+
+    private File nexusappHomeDir = null;
 
     @Override
     protected void customizeContext( Context ctx )
@@ -66,10 +76,15 @@ public abstract class AbstractNexusTestCase
         appsHomeDir = new File( plexusHomeDir, "apps" );
         workHomeDir = new File( plexusHomeDir, "nexus-work" );
         confHomeDir = new File( workHomeDir, "conf" );
+        runtimeHomeDir = new File( plexusHomeDir, "runtime" );
+        nexusappHomeDir = new File( plexusHomeDir, "nexus-app" );
 
         ctx.put( WORK_CONFIGURATION_KEY, workHomeDir.getAbsolutePath() );
         ctx.put( APPS_CONFIGURATION_KEY, appsHomeDir.getAbsolutePath() );
         ctx.put( CONF_DIR_KEY, confHomeDir.getAbsolutePath() );
+        ctx.put( SECURITY_XML_FILE, getNexusSecurityConfiguration() );
+        ctx.put( RUNTIME_CONFIGURATION_KEY, runtimeHomeDir.getAbsolutePath() );
+        ctx.put( NEXUS_APP_CONFIGURATION_KEY, nexusappHomeDir.getAbsolutePath() );
     }
 
     @Override
@@ -93,6 +108,8 @@ public abstract class AbstractNexusTestCase
         appsHomeDir.mkdirs();
         workHomeDir.mkdirs();
         confHomeDir.mkdirs();
+        runtimeHomeDir.mkdirs();
+        nexusappHomeDir.mkdirs();
     }
 
     @Override
