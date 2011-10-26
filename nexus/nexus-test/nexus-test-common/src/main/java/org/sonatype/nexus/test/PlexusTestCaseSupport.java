@@ -19,6 +19,8 @@
 package org.sonatype.nexus.test;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
@@ -27,9 +29,12 @@ import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.DefaultContext;
+import org.codehaus.plexus.logging.LoggerManager;
+import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -311,6 +316,12 @@ public abstract class PlexusTestCaseSupport
         return s.substring( 0, s.indexOf( "$" ) ) + ".xml";
     }
 
+    protected LoggerManager getLoggerManager()
+        throws ComponentLookupException
+    {
+        return getContainer().lookup( LoggerManager.class );
+    }
+
     // ========================= CUSTOM NEXUS =====================
 
     /**
@@ -436,5 +447,28 @@ public abstract class PlexusTestCaseSupport
     {
         // don't use junit framework Assert
         MatcherAssert.assertThat( actual, Matchers.equalTo( expected ) );
+    }
+
+    protected boolean contentEquals( File f1, File f2 )
+        throws IOException
+    {
+        return contentEquals( new FileInputStream( f1 ), new FileInputStream( f2 ) );
+    }
+
+    /**
+     * Both s1 and s2 will be closed.
+     */
+    protected boolean contentEquals( InputStream s1, InputStream s2 )
+        throws IOException
+    {
+        try
+        {
+            return IOUtil.contentEquals( s1, s2 );
+        }
+        finally
+        {
+            IOUtil.close( s1 );
+            IOUtil.close( s2 );
+        }
     }
 }

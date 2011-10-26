@@ -18,17 +18,9 @@
  */
 package org.sonatype.nexus;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.logging.LoggerManager;
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -37,12 +29,12 @@ import org.sonatype.scheduling.ScheduledTask;
 public abstract class AbstractNexusTestCase
     extends org.sonatype.nexus.proxy.AbstractNexusTestCase
 {
+
     private NexusScheduler nexusScheduler;
 
     private EventInspectorHost eventInspectorHost;
 
     protected NexusConfiguration nexusConfiguration;
-
 
     protected boolean loadConfigurationAtSetUp()
     {
@@ -151,37 +143,8 @@ public abstract class AbstractNexusTestCase
             for ( ScheduledTask<?> task : taskList )
             {
                 System.out.println( task.getName() + " with id " + task.getId() + " is in state "
-                    + task.getTaskState().toString() );
+                                        + task.getTaskState().toString() );
             }
-        }
-    }
-
-    protected LoggerManager getLoggerManager()
-        throws ComponentLookupException
-    {
-        return getContainer().lookup( LoggerManager.class );
-    }
-
-    protected boolean contentEquals( File f1, File f2 )
-        throws IOException
-    {
-        return contentEquals( new FileInputStream( f1 ), new FileInputStream( f2 ) );
-    }
-
-    /**
-     * Both s1 and s2 will be closed.
-     */
-    protected boolean contentEquals( InputStream s1, InputStream s2 )
-        throws IOException
-    {
-        try
-        {
-            return IOUtil.contentEquals( s1, s2 );
-        }
-        finally
-        {
-            IOUtil.close( s1 );
-            IOUtil.close( s2 );
         }
     }
 
