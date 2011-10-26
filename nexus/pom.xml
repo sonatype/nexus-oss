@@ -149,6 +149,11 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <nexus.version>${project.version}</nexus.version>
 
+    <!-- logging configuration used in logback config files to control test logging -->
+    <test.log.level>INFO</test.log.level>
+    <it.test.log.level>INFO</it.test.log.level>
+    <it.nexus.log.level>INFO</it.nexus.log.level>
+
     <!-- version properties -->
     <aether.version>1.8.1</aether.version>
     <applifecycle.version>1.4</applifecycle.version>
@@ -184,6 +189,8 @@
     <spice-timeline.version>2.1-SNAPSHOT</spice-timeline.version>
     <spice-utils.version>1.0.0</spice-utils.version>
     <surefire.version>2.9</surefire.version>
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
+    <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
   </properties>
 
   <dependencyManagement>
@@ -496,6 +503,13 @@
         <groupId>org.sonatype.sisu</groupId>
         <artifactId>sisu-charger</artifactId>
         <version>1.0-SNAPSHOT</version>
+      </dependency>
+
+      <!-- locks -->
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-locks</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
       </dependency>
 
       <!-- shiro -->
@@ -1027,7 +1041,7 @@
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-indexer-lucene-plugin</artifactId>
         <version>${project.version}</version>
-        <type>nexus-plugin</type>
+        <type>${nexus-plugin.type}</type>
         <scope>provided</scope>
       </dependency>
       <dependency>
@@ -1501,8 +1515,11 @@
               <jub.customkey>${os.name}</jub.customkey>
               <jub.charts.dir>${project.build.directory}/junit-benchmarks</jub.charts.dir>
               <!-- end junit benchmarks config -->
+              <!-- logging configuration properties, see logback*.xml files -->
+              <test.log.level>${test.log.level}</test.log.level>
+              <it.test.log.level>${it.test.log.level}</it.test.log.level>
+              <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
             </systemPropertyVariables>
-
           </configuration>
         </plugin>
         <plugin>
@@ -1536,6 +1553,12 @@
                 <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
               </property>
             </properties>
+            <systemPropertyVariables>
+              <!-- logging configuration properties, see logback*.xml files -->
+              <test.log.level>${test.log.level}</test.log.level>
+              <it.test.log.level>${it.test.log.level}</it.test.log.level>
+              <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
+            </systemPropertyVariables>
           </configuration>
         </plugin>
       </plugins>
@@ -1600,6 +1623,23 @@
   </modules>
 
   <profiles>
+      
+    <profile>
+      <id>debug</id>
+      <activation>
+        <property>
+            <name>debug</name>
+            <value>true</value>
+        </property>
+      </activation>
+      <properties>
+        <!-- configure test logging properties to debug levels -->
+        <test.log.level>DEBUG</test.log.level>
+        <it.test.log.level>DEBUG</it.test.log.level>
+        <it.nexus.log.level>DEBUG</it.nexus.log.level>
+      </properties>
+    </profile>
+
     <profile>
       <id>skipBenchmarks</id>
       <build>
@@ -1975,7 +2015,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.8.1</version>
             <configuration>
               <classesDirectory>${project.build.directory}/generated-classes/emma/classes</classesDirectory>
               <systemPropertyVariables>
@@ -2056,6 +2095,13 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
+    <profile>
+        <id>idea</id>
+        <properties>
+            <nexus-plugin.type>jar</nexus-plugin.type>
+        </properties>
     </profile>
   </profiles>
 </project>
