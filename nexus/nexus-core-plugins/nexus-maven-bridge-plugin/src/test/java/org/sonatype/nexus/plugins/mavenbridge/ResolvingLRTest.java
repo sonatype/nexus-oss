@@ -34,7 +34,8 @@ import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
-public class ResolvingTest
+// This is an IT just because it runs longer then 15 seconds
+public class ResolvingLRTest
     extends AbstractMavenRepoContentTests
 {
     protected NexusAether nexusAether;

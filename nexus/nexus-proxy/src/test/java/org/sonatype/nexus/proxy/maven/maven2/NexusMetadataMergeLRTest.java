@@ -38,7 +38,8 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperation;
 import org.sonatype.nexus.proxy.maven.metadata.operations.NexusMergeOperation;
 
-public class NexusMetadataMergeTest
+// This is an IT just because it runs longer then 15 seconds
+public class NexusMetadataMergeLRTest
 {
     private static final boolean DUMP = false;
 

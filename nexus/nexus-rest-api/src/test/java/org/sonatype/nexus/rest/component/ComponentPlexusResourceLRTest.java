@@ -30,7 +30,8 @@ import org.sonatype.nexus.rest.model.PlexusComponentListResource;
 import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-public class ComponentPlexusResourceTest
+// This is an IT just because it runs longer then 15 seconds
+public class ComponentPlexusResourceLRTest
     extends AbstractNexusTestCase
 {
     private AbstractComponentListPlexusResource getComponentPlexusResource()

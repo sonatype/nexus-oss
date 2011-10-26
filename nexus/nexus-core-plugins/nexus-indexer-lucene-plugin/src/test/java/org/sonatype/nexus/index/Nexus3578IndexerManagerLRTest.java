@@ -39,7 +39,8 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
 
-public class Nexus3578IndexerManagerTest
+// This is an IT just because it runs longer then 15 seconds
+public class Nexus3578IndexerManagerLRTest
     extends AbstractIndexerManagerTest
 {
     protected static File pomFile =
