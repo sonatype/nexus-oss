@@ -137,25 +137,12 @@ public class LdapConnNotConfiguredTest
         this.validateConnectionDTO( connectionInfo, result.getData() );
     }
 
-    /* (non-Javadoc)
-    * @see com.sonatype.nexus.AbstractNexusTestCase#customizeContext(org.codehaus.plexus.context.Context)
-    */
     @Override
     protected void customizeContext( Context ctx )
     {
         super.customizeContext( ctx );
 
-        ctx.put( LDAP_CONFIGURATION_KEY, getLdapXml().getParentFile().getAbsolutePath() );
-    }
-
-    @Override
-    public void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-
-        // delete the ldap.xml file
-        cleanDir( getLdapXml() );
+        ctx.put( CONF_DIR_KEY, getLdapXml().getParentFile().getAbsolutePath() );
     }
 
     private File getLdapXml()

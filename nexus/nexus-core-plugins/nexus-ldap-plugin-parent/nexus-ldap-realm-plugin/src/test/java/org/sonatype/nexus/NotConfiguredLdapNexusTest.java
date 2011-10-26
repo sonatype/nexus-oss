@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus;
 
+import java.io.File;
+
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.context.Context;
@@ -79,17 +81,17 @@ public class NotConfiguredLdapNexusTest
         Assert.assertFalse( security.isPermitted( principals, "nexus:usersforgotpw:create" ) );
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see com.sonatype.nexus.AbstractNexusTestCase#customizeContext(org.codehaus.plexus.context.Context)
-     */
     @Override
     protected void customizeContext( Context ctx )
     {
         super.customizeContext( ctx );
 
-        ctx.put( LDAP_CONFIGURATION_KEY, getConfHomeDir().getAbsolutePath() + "/not-configured/" );
+        ctx.put( CONF_DIR_KEY, getLdapXml().getParentFile().getAbsolutePath() );
+    }
+
+    private File getLdapXml()
+    {
+        return new File( getConfHomeDir(), "no-conf/ldap.xml" );
     }
 
 }

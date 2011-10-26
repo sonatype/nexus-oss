@@ -27,7 +27,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.util.HashMap;
 
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.junit.Assert;
@@ -42,28 +41,10 @@ public abstract class AbstractNexusLdapTestCase
     extends org.sonatype.nexus.configuration.AbstractNexusTestCase
 {
 
-    public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
-
-    public static final String LDAP_CONFIGURATION_KEY = "application-conf";
-
-    public static final String SECURITY_CONFIG_KEY = "security-xml-file";
-
     /**
      * The ldap server.
      */
     private LdapServer ldapServer;
-
-    @Override
-    protected void customizeContext( Context ctx )
-    {
-        super.customizeContext( ctx );
-
-        ctx.put( RUNTIME_CONFIGURATION_KEY, getPlexusHomeDir().getAbsolutePath() );
-
-        ctx.put( SECURITY_CONFIG_KEY, this.getNexusSecurityConfiguration() );
-
-        ctx.put( LDAP_CONFIGURATION_KEY, getConfHomeDir().getAbsolutePath() );
-    }
 
     protected String getNexusLdapConfiguration()
     {
@@ -74,8 +55,8 @@ public abstract class AbstractNexusLdapTestCase
     protected void copyDefaultSecurityConfigToPlace()
         throws IOException
     {
-        copyResource( "/test-conf/security-configuration.xml", getSecurityConfiguration() ) ;
-        copyResource( "/test-conf/security.xml", getNexusSecurityConfiguration() ) ;
+        copyResource( "/test-conf/security-configuration.xml", getSecurityConfiguration() );
+        copyResource( "/test-conf/security.xml", getNexusSecurityConfiguration() );
     }
 
     protected void copyDefaultLdapConfigToPlace()
@@ -116,8 +97,8 @@ public abstract class AbstractNexusLdapTestCase
         // startup the LDAP server.
         ldapServer = (LdapServer) lookup( LdapServer.ROLE );
 
-            this.copyDefaultSecurityConfigToPlace();
-            this.copyDefaultLdapConfigToPlace();
+        this.copyDefaultSecurityConfigToPlace();
+        this.copyDefaultLdapConfigToPlace();
     }
 
     protected String getErrorString( ErrorResponse errorResponse, int index )
