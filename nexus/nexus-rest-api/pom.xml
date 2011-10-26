@@ -192,7 +192,6 @@
               <includes>
                 <include>**/TestMarshalUnmarchal*</include>
                 <include>**/DeepEqualsBuilder*</include>
-                <include>ehcache.xml</include>
               </includes>
             </configuration>
           </execution>
