@@ -34,11 +34,12 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.security.ldap.realms.api.LdapRealmPlexusResourceConst;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
+import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 
 public abstract class AbstractNexusLdapTestCase
-    extends org.sonatype.nexus.configuration.AbstractNexusTestCase
+    extends NexusTestSupport
 {
 
     /**

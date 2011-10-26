@@ -36,6 +36,7 @@ import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 @Component( role = ApplicationConfiguration.class )
@@ -135,12 +136,12 @@ public class SimpleApplicationConfiguration
     {
         try
         {
-            workingDirectory = new File( (String) context.get( AbstractNexusTestCase.WORK_CONFIGURATION_KEY ) );
+            workingDirectory = new File( (String) context.get( NexusTestSupport.WORK_CONFIGURATION_KEY ) );
         }
         catch ( ContextException e )
         {
             throw new RuntimeException(
-                "Missing key from plexus context: " + AbstractNexusTestCase.WORK_CONFIGURATION_KEY, e
+                "Missing key from plexus context: " + NexusTestSupport.WORK_CONFIGURATION_KEY, e
             );
         }
     }
