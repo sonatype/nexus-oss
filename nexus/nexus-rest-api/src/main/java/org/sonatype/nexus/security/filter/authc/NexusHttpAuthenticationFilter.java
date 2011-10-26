@@ -338,7 +338,7 @@ public class NexusHttpAuthenticationFilter
 
                     String username;
 
-                    if ( subject != null && subject.isAuthenticated() )
+                    if ( subject != null && subject.isAuthenticated() && subject.getPrincipal() != null )
                     {
                         username = subject.getPrincipal().toString();
                     }
@@ -347,7 +347,9 @@ public class NexusHttpAuthenticationFilter
                         username = getNexusConfiguration().getAnonymousUsername();
                     }
 
-                    getLogger().debug( "Request processing is rejected because user \"" + username + "\" lacks permissions." );
+                    getLogger().debug(
+                        "Request processing is rejected because user \"" + username + "\" lacks permissions."
+                    );
                 }
 
                 sendForbidden( request, response );
@@ -357,7 +359,7 @@ public class NexusHttpAuthenticationFilter
 
     /**
      * set http 403 forbidden header for the response
-     * 
+     *
      * @param request
      * @param response
      */
