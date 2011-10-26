@@ -1341,4 +1341,13 @@ public abstract class AbstractNexusIntegrationTest
         return variables;
     }
 
+    public void downloadFromRepositoryToVoid( String repoId, Gav gav )
+        throws IOException
+    {
+        String baseUrl = AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + repoId + "/";
+        String path = getRelitiveArtifactPath( gav );
+        URL url = new URL( baseUrl + path );
+        RequestFacade.downloadToVoid( url );
+    }
+
 }

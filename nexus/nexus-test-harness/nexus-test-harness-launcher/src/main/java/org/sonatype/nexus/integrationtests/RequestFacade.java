@@ -41,6 +41,7 @@ import org.apache.commons.httpclient.SimpleHttpConnectionManager;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.io.output.NullOutputStream;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.Matcher;
@@ -57,6 +58,8 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.Representation;
 import org.sonatype.nexus.test.utils.ResponseMatchers;
+import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -696,5 +699,30 @@ public class RequestFacade
             authInfo.setPassword( context.getPassword() );
         }
         return authInfo;
+    }
+
+    public static void downloadToVoid( URL url )
+        throws IOException
+    {
+        InputStream in = null;
+        Response response = null;
+        try
+        {
+            response = sendMessage( url, Method.GET, null );
+
+            if ( !response.getStatus().isSuccess() )
+            {
+                throw new FileNotFoundException( response.getStatus() + " - " + url );
+            }
+
+            in = response.getEntity().getStream();
+
+            IOUtil.copy( in, NullOutputStream.NULL_OUTPUT_STREAM, 1024 );
+        }
+        finally
+        {
+            IOUtil.close( in );
+            releaseResponse( response );
+        }
     }
 }
