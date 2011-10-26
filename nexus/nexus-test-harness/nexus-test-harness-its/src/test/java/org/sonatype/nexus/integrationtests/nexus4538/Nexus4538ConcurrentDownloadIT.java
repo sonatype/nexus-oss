@@ -34,7 +34,7 @@ public class Nexus4538ConcurrentDownloadIT
     {
         gav = GavUtil.newGav( "nexus4538", "artifact", "1.0" );
         File f = new File( nexusWorkDir + "/storage/" + REPO_TEST_HARNESS_REPO, getRelitiveArtifactPath( gav ) );
-        populate( f, 500 );
+        populate( f, 100 );
     }
 
     @Test
@@ -47,7 +47,6 @@ public class Nexus4538ConcurrentDownloadIT
         // create
         for ( int i = 0; i < 100; i++ )
         {
-            final int j = i;
             Thread t = new Thread( new Runnable()
             {
 
@@ -104,7 +103,7 @@ public class Nexus4538ConcurrentDownloadIT
                 s.append( "\n" );
             }
 
-            Assert.fail( "Found some errors deploying:\n" + str.toString() );
+            Assert.fail( "Found some errors downloading:\n" + str.toString() );
         }
 
     }
