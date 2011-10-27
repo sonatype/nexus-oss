@@ -26,7 +26,7 @@
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
     <version>10</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <groupId>org.sonatype.nexus</groupId>
@@ -45,7 +45,7 @@
     <url>https://github.com/sonatype/nexus</url>
   </scm>
 
-  <mailingLists />
+  <mailingLists/>
   <licenses>
     <license>
       <name>GNU Affero General Public License</name>
@@ -283,7 +283,6 @@
         <!--make sure this doesn't get into any classpaths -->
         <scope>provided</scope>
       </dependency>
-
 
       <!-- Jetty -->
       <dependency>
@@ -597,7 +596,6 @@
         <version>${commons-beanutils.baseVersion}</version>
       </dependency>
 
-
       <!-- SLF4J Logging -->
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -641,7 +639,6 @@
         <type>jar</type>
         <scope>runtime</scope>
       </dependency>
-
 
       <!-- Maven -->
       <dependency>
@@ -1099,7 +1096,6 @@
         <version>${project.version}</version>
       </dependency>
 
-
       <!-- Plugins -->
 
       <dependency>
@@ -1192,7 +1188,8 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.0.1</version><!--$NO-MVN-MAN-VER$-->
+        <version>1.0.1</version>
+        <!--$NO-MVN-MAN-VER$-->
         <executions>
           <execution>
             <id>enforce-java</id>
@@ -1245,7 +1242,8 @@
                     <exclude>*:plexus-component-api</exclude>
                   </excludes>
                   <message>plexus-component-api conflicts with newer plexus-container-default. You probably added a dependency that is plexus component made with older plexus
-                    container.</message>
+                    container.
+                  </message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <excludes>
@@ -1330,7 +1328,6 @@
                   <message>Do not use log4j api directly in tests. Use slf4j api instead.</message>
                 </bannedDependencies>
 
-
                 <!-- <requirePluginVersions> <banSnapshots>false</banSnapshots> </requirePluginVersions> -->
               </rules>
               <fail>true</fail>
@@ -1351,24 +1348,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-test-jar</id>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <configuration>
-              <excludes>
-                <exclude>logback-test.xml</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
       <plugin>
         <artifactId>maven-site-plugin</artifactId>
         <executions>
@@ -1561,6 +1540,30 @@
             </systemPropertyVariables>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>attach-test-jar</id>
+              <goals>
+                <goal>test-jar</goal>
+              </goals>
+              <configuration>
+                <includes>
+                  <include>**/*.class</include>
+                </includes>
+                <excludes>
+                  <exclude>**/*Test.class</exclude>
+                  <exclude>**/*Test$*.class</exclude>
+                  <exclude>**/*IT.class</exclude>
+                  <exclude>**/*IT$*.class</exclude>
+                  <exclude>**/internal/*.class</exclude>
+                </excludes>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -1623,13 +1626,13 @@
   </modules>
 
   <profiles>
-      
+
     <profile>
       <id>debug</id>
       <activation>
         <property>
-            <name>debug</name>
-            <value>true</value>
+          <name>debug</name>
+          <value>true</value>
         </property>
       </activation>
       <properties>
@@ -1754,7 +1757,7 @@
       </properties>
     </profile>
 
-     <!-- pre code push profile to be run by a developer before push to scm, eventually the default profile without a profile -->
+    <!-- pre code push profile to be run by a developer before push to scm, eventually the default profile without a profile -->
     <profile>
       <id>prepush</id>
       <activation>
@@ -1894,7 +1897,7 @@
                         </goals>
                       </pluginExecutionFilter>
                       <action>
-                        <execute />
+                        <execute/>
                       </action>
                     </pluginExecution>
                     <pluginExecution>
@@ -1907,7 +1910,7 @@
                         </goals>
                       </pluginExecutionFilter>
                       <action>
-                        <execute />
+                        <execute/>
                       </action>
                     </pluginExecution>
                     <pluginExecution>
@@ -1920,21 +1923,22 @@
                         </goals>
                       </pluginExecutionFilter>
                       <action>
-                        <ignore />
+                        <ignore/>
                       </action>
                     </pluginExecution>
                     <pluginExecution>
                       <pluginExecutionFilter>
                         <groupId>org.sonatype.nexus.plugins</groupId>
                         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-                        <versionRange>[0,)</versionRange> <!-- says "all", disregard version -->
+                        <versionRange>[0,)</versionRange>
+                        <!-- says "all", disregard version -->
                         <goals>
                           <goal>setup-environment</goal>
                           <goal>package</goal>
                         </goals>
                       </pluginExecutionFilter>
                       <action>
-                        <ignore />
+                        <ignore/>
                       </action>
                     </pluginExecution>
                     <pluginExecution>
@@ -1947,7 +1951,7 @@
                         </goals>
                       </pluginExecutionFilter>
                       <action>
-                        <ignore />
+                        <ignore/>
                       </action>
                     </pluginExecution>
                     <pluginExecution>
@@ -1960,7 +1964,7 @@
                         </goals>
                       </pluginExecutionFilter>
                       <action>
-                        <ignore />
+                        <ignore/>
                       </action>
                     </pluginExecution>
                   </pluginExecutions>
@@ -1979,10 +1983,10 @@
             <configuration>
               <mappingId>customizable</mappingId>
               <configurators>
-                <configurator id="org.maven.ide.eclipse.jdt.javaConfigurator" />
-                <configurator id="org.maven.ide.eclipse.modello.modelloConfigurator" />
-                <configurator id="org.maven.ide.eclipse.plexus.annotations.plexusConfigurator" />
-                <configurator id="org.maven.ide.eclipse.mavenarchiver.pomProperties" />
+                <configurator id="org.maven.ide.eclipse.jdt.javaConfigurator"/>
+                <configurator id="org.maven.ide.eclipse.modello.modelloConfigurator"/>
+                <configurator id="org.maven.ide.eclipse.plexus.annotations.plexusConfigurator"/>
+                <configurator id="org.maven.ide.eclipse.mavenarchiver.pomProperties"/>
               </configurators>
               <mojoExecutions>
                 <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
@@ -2113,10 +2117,10 @@
     </profile>
     <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
     <profile>
-        <id>idea</id>
-        <properties>
-            <nexus-plugin.type>jar</nexus-plugin.type>
-        </properties>
+      <id>idea</id>
+      <properties>
+        <nexus-plugin.type>jar</nexus-plugin.type>
+      </properties>
     </profile>
   </profiles>
 </project>

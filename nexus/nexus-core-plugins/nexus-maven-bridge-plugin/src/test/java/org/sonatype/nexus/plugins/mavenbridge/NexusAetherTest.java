@@ -42,14 +42,6 @@ public class NexusAetherTest
         // repositoryRegistry = lookup( RepositoryRegistry.class );
     }
 
-    protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-
-        containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
-    }
-
     @Test
     public void testDependency()
     {

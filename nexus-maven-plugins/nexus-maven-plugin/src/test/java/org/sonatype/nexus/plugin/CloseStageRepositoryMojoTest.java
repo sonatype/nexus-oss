@@ -317,7 +317,7 @@ public class CloseStageRepositoryMojoTest
         CloseStageRepositoryMojo mojo = new CloseStageRepositoryMojo();
 
         mojo.setPrompter( prompter );
-        mojo.setDiscoverer( new DefaultDiscoveryFixture( secDispatcher, prompter, logger ) );
+        mojo.setDiscoverer( new DefaultDiscoveryFixture( secDispatcher, prompter ) );
         mojo.setDispatcher( secDispatcher );
 
         return mojo;

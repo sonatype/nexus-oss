@@ -62,7 +62,7 @@ public class DownloadSettingsTemplateMojoTest
         DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
 
         mojo.setPrompter( prompter );
-        mojo.setDiscoverer( new DefaultDiscoveryFixture( secDispatcher, prompter, logger ) );
+        mojo.setDiscoverer( new DefaultDiscoveryFixture( secDispatcher, prompter ) );
         mojo.setDispatcher( secDispatcher );
 
         return mojo;

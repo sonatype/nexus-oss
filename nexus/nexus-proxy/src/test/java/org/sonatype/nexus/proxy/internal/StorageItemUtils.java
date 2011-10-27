@@ -16,49 +16,47 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy;
+package org.sonatype.nexus.proxy.internal;
 
-import java.io.IOException;
-import java.util.HashMap;
+import java.io.PrintWriter;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.sonatype.nexus.proxy.item.StorageItem;
 
-import org.codehaus.plexus.util.IOUtil;
-
-
-public class ErrorServlet extends HttpServlet
+public class StorageItemUtils
 {
 
-    public static String CONTENT = "<html>some content</html>";
-    
-    private static Map<String, String> RESPONSE_HEADERS = new HashMap<String, String>();
-    
-    public static void clearHeaders()
+    public static void printStorageItemList( List<StorageItem> items )
     {
-        RESPONSE_HEADERS.clear();
-    }
-    
-    public static void addHeader( String key, String value )
-    {
-        RESPONSE_HEADERS.put( key, value );
-    }
-    
-    @Override
-    protected void doGet( HttpServletRequest req, HttpServletResponse resp )
-        throws ServletException, IOException
-    {
-        for ( Entry<String, String> headerEntry : RESPONSE_HEADERS.entrySet() )
+        PrintWriter pw = new PrintWriter( System.out );
+        pw.println( " *** List of StorageItems:" );
+        for ( StorageItem item : items )
         {
-            resp.addHeader( headerEntry.getKey(), headerEntry.getValue() );   
+            printStorageItem( pw, item );
         }
-        
-        IOUtil.copy( CONTENT, resp.getOutputStream() );
-        
+        pw.println( " *** List of StorageItems end" );
+        pw.flush();
+    }
+
+    public static void printStorageItem( StorageItem item )
+    {
+        printStorageItem( new PrintWriter( System.out ), item );
+    }
+
+    public static void printStorageItem( PrintWriter pw, StorageItem item )
+    {
+        pw.println( item.getClass().getName() );
+        Map<String, String> dataMap = item.getAttributes();
+        for ( String key : dataMap.keySet() )
+        {
+            pw.print( key );
+            pw.print( " = " );
+            pw.print( dataMap.get( key ) );
+            pw.println();
+        }
+        pw.println();
+        pw.flush();
     }
 
 }

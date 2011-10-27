@@ -26,6 +26,7 @@ import java.util.Arrays;
 
 import org.junit.Test;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -33,7 +34,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 public class DefaultTargetRegistryTest
-    extends PlexusTestCaseSupport
+    extends AbstractNexusTestCase
 {
     protected ApplicationConfiguration applicationConfiguration;
 
@@ -72,12 +73,6 @@ public class DefaultTargetRegistryTest
         targetRegistry.addRepositoryTarget( t3 );
 
         applicationConfiguration.saveConfiguration();
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
     }
 
     @Test
