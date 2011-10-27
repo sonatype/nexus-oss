@@ -45,7 +45,8 @@ import org.mortbay.jetty.handler.HandlerList;
 import org.mortbay.jetty.handler.ResourceHandler;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 
-public class DownloadRemoteIndexerManagerTest
+// This is an IT just because it runs longer then 15 seconds
+public class DownloadRemoteIndexerManagerLRTest
     extends AbstractIndexerManagerTest
 {
     private Server server;

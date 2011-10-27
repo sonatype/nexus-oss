@@ -28,7 +28,8 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
 
-public class DefaultIndexerManagerTest
+// This is an IT just because it runs longer then 15 seconds
+public class DefaultIndexerManagerLRTest
     extends AbstractIndexerManagerTest
 {
 
