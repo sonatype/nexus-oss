@@ -37,6 +37,11 @@ abstract class AbstractResourceLockFactory
     // Implementation fields
     // ----------------------------------------------------------------------
 
+    /*
+     * TODO: investigate combining this with the thread-counts map by using a MultiMap?
+     * 
+     * TODO: stop GC from reclaiming locks if they're still locked, but not referenced?
+     */
     private final ConcurrentMap<String, ResourceLock> resourceLocks = Weak.concurrentValues();
 
     private ObjectName jmxName;
