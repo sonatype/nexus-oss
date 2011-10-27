@@ -38,11 +38,14 @@ import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 
 public class StatelessAndStatefulWebSessionManager
     extends DefaultWebSessionManager
 {
     private static final Logger log = LoggerFactory.getLogger( DefaultWebSessionManager.class );
+
+    public static final String NO_SESSION_HEADER = "X-Nexus-Session";
 
     private SessionIdGenerator fakeSessionIdGenerator = new JavaUuidSessionIdGenerator();
 
@@ -177,6 +180,16 @@ public class StatelessAndStatefulWebSessionManager
 
     protected boolean isStatelessClient( final ServletRequest request )
     {
+        if( hasNoSessionHeader( request ) )
+        {
+            return true;
+        }
+
+        if( Boolean.TRUE.equals( request.getAttribute( NexusHttpAuthenticationFilter.ANONYMOUS_LOGIN ) ) )
+        {
+            return true;
+        }
+
         final String userAgent = getUserAgent( request );
 
         if ( userAgent != null && userAgent.trim().length() > 0 )
@@ -211,17 +224,74 @@ public class StatelessAndStatefulWebSessionManager
                 return true;
             }
 
+            // Nexus
+            if ( userAgent.startsWith( "Nexus/" ) )
+            {
+                return true;
+            }
+
+            // Artifactory
+            if ( userAgent.startsWith( "Artifactory/" ) )
+            {
+                return true;
+            }
+
+            // Apache Archiva
+            if ( userAgent.startsWith( "Apache Archiva/" ) )
+            {
+                return true;
+            }
+
+            // M2Eclipse
+            if ( userAgent.startsWith( "M2Eclipse/" ) )
+            {
+                return true;
+            }
+
+            // Aether
+            if ( userAgent.startsWith( "Aether/" ) )
+            {
+                return true;
+            }
         }
 
         // we can't decided for sure, let's return the safest
         return false;
     }
 
+    /**
+     * Checks for the no session header: "X-Nexus-Session: none".
+     * @param request
+     * @return true if header 'X-Nexus-Session' is 'none', false otherwise.
+     */
+    private boolean hasNoSessionHeader( final ServletRequest request )
+    {
+        //"X-Nexus-Session: none"
+        return "none".equals( getHeaderValue( NO_SESSION_HEADER, request ) );
+    }
+
+    /**
+     * Returns the User-Agent of the request, or null if not set.
+     * @param request
+     * @return
+     */
     private String getUserAgent( final ServletRequest request )
+    {
+        return getHeaderValue( "User-Agent", request );
+    }
+
+    /**
+     * Gets a header value from the request if the ServletRequest is a HttpServletRequest.
+     *
+     * @param headerName
+     * @param request
+     * @return null if request is not HttpServletRequest, or header is not found.
+     */
+    private String getHeaderValue( String headerName, final ServletRequest request )
     {
         if ( request instanceof HttpServletRequest )
         {
-            final String userAgent = ( (HttpServletRequest) request ).getHeader( "User-Agent" );
+            final String userAgent = ( (HttpServletRequest) request ).getHeader( headerName );
             return userAgent;
         }
         return null;
