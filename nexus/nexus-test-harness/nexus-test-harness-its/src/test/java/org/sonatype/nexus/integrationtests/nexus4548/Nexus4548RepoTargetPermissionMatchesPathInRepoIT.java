@@ -18,23 +18,15 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4548;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.maven.index.artifact.Gav;
-import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -42,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.respondsWithStatusCode;
 
 /**
  * IT testing the pattern matching of repository targets for security permissions.
@@ -60,7 +53,6 @@ public class Nexus4548RepoTargetPermissionMatchesPathInRepoIT
         super( "releases" );
     }
 
-    @BeforeClass( alwaysRun = true )
     @BeforeMethod( alwaysRun = true )
     public void setSecureTest()
         throws IOException
@@ -85,67 +77,24 @@ public class Nexus4548RepoTargetPermissionMatchesPathInRepoIT
     private void get( final String gavPath, final int code )
         throws IOException
     {
-        // could not make the test work with RequestFacade - it would always give access, looks like was using admin user although test context says otherwise?
-        // RequestFacade.doGet( AbstractNexusIntegrationTest.REPOSITORY_RELATIVE_URL + "releases/" + gavPath, respondsWithStatusCode( code ) );
-        HttpMethod httpMethod = null;
-        try
-        {
-            HttpClient client = new HttpClient();
-            client.getState().setCredentials( AuthScope.ANY, new UsernamePasswordCredentials( "test", "test" ) );
-            httpMethod = new GetMethod( getNexusTestRepoUrl() + gavPath );
-            assertThat( client.executeMethod( httpMethod ), Matchers.is( code ) );
-        }
-        finally
-        {
-            if ( httpMethod != null )
-            {
-                httpMethod.releaseConnection();
-            }
-        }
+        RequestFacade.doGet( AbstractNexusIntegrationTest.REPOSITORY_RELATIVE_URL + "releases/" + gavPath,
+                             respondsWithStatusCode( code ) );
     }
 
     private void put( final String gavPath, final int code )
         throws Exception
     {
-        PutMethod putMethod = null;
-        try
-        {
-            putMethod = new PutMethod( getNexusTestRepoUrl() + gavPath );
-            HttpClient client = new HttpClient();
-            client.getState().setCredentials( AuthScope.ANY, new UsernamePasswordCredentials( "test", "test" ) );
-            putMethod.setRequestEntity( new FileRequestEntity( getTestFile( "pom-a.pom" ), "text/xml" ) );
+        PutMethod putMethod = new PutMethod( getNexusTestRepoUrl() + gavPath );
+        putMethod.setRequestEntity( new FileRequestEntity( getTestFile( "pom-a.pom" ), "text/xml" ) );
 
-            assertThat( client.executeMethod( putMethod ), Matchers.is( code ) );
-        }
-        finally
-        {
-            if ( putMethod != null )
-            {
-                putMethod.releaseConnection();
-            }
-        }
-
+        assertThat( RequestFacade.executeHTTPClientMethod( putMethod ).getStatusCode(), Matchers.is( code ) );
     }
 
     private void putRest( final String artifactId, final int code )
         throws IOException
     {
-        HttpMethod httpMethod = null;
-        try
-        {
-            File testFile = getTestFile( String.format( "pom-%s.pom", artifactId ) );
-            httpMethod =
-                getDeployUtils().deployPomWithRest( "releases",
-                                                    testFile );
-            assertThat( httpMethod.getStatusCode(), Matchers.is( code ) );
-        }
-        finally
-        {
-            if ( httpMethod != null )
-            {
-                httpMethod.releaseConnection();
-            }
-        }
+        File testFile = getTestFile( String.format( "pom-%s.pom", artifactId ) );
+        assertThat( getDeployUtils().deployPomWithRest( "releases", testFile ).getStatusCode(), Matchers.is( code ) );
     }
 
     @Test
