@@ -5,10 +5,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.sonatype.nexus.test.utils.FileTestingUtils.populate;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -16,12 +16,8 @@ import java.lang.Thread.State;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.index.artifact.Gav;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.GavUtil;
@@ -53,7 +49,8 @@ public class Nexus4538ConcurrentDownloadIT
         String path = getRelitiveArtifactPath( gav );
         final URL url = new URL( baseUrl + path );
 
-        long op = ping( url );
+        final long op = ping( url );
+        final long p2 = ping( url );
 
         final Long[] time = new Long[1];
         final Throwable[] errors = new Throwable[1];
@@ -90,7 +87,9 @@ public class Nexus4538ConcurrentDownloadIT
         Thread.yield();
 
         // while download is happening let's check if nexus still responsive
-        long ping = ping( url );
+        final long ping = ping( url );
+        t.join();
+        fail( op + " - " + p2 + " - " + ping + " - " + time[0] );
         // check if ping was not blocked by download
         assertTrue( ping < ( op * 2 ), "Ping took " + ping + " original pind " + op );
 
@@ -124,6 +123,9 @@ public class Nexus4538ConcurrentDownloadIT
     {
         long t = System.currentTimeMillis();
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        InputStream in = conn.getInputStream();
+        in.read();
+        in.close();
         conn.disconnect();
 
         return System.currentTimeMillis() - t;
