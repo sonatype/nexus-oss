@@ -37,8 +37,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
@@ -62,8 +60,6 @@ public class NexusMojoTestSupport
     protected static final Set<File> toDelete = new HashSet<File>();
 
     protected Log log;
-
-    protected Logger logger;
 
     protected SecDispatcher secDispatcher;
 
@@ -92,7 +88,6 @@ public class NexusMojoTestSupport
 
         prompter.enableDebugging();
 
-        logger = new ConsoleLogger( Logger.LEVEL_INFO, "test" );
         container = new DefaultPlexusContainer();
         secDispatcher = (SecDispatcher) container.lookup( SecDispatcher.class.getName(), "maven" );
 
@@ -191,7 +186,6 @@ public class NexusMojoTestSupport
     /**
      * Stop the proxy server if started.
      * 
-     * @param proxyServer
      */
     protected final void stopProxyServer()
         throws StoppingException

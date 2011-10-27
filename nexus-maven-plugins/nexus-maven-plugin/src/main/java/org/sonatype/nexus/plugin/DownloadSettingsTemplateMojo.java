@@ -146,13 +146,9 @@ public class DownloadSettingsTemplateMojo
 
     private M2SettingsClient client;
 
-    public void execute()
+    protected void doExecute()
         throws MojoExecutionException
     {
-        fillMissing();
-
-        initLog4j();
-
         try
         {
             connect();
@@ -212,7 +208,7 @@ public class DownloadSettingsTemplateMojo
             if ( !f.renameTo( b ) )
             {
                 throw new MojoExecutionException( "Cannot rename existing settings to backup file.\nExisting file: "
-                    + f.getAbsolutePath() + "\nBackup file: " + b.getAbsolutePath() );
+                                                      + f.getAbsolutePath() + "\nBackup file: " + b.getAbsolutePath() );
             }
 
             getLog().info( "Existing settings backed up to: " + b.getAbsolutePath() );
@@ -239,12 +235,12 @@ public class DownloadSettingsTemplateMojo
         catch ( IOException e )
         {
             throw new MojoExecutionException( "Failed to load settings.defaults: " + settingsDefaults + ". Reason: "
-                + e.getMessage(), e );
+                                                  + e.getMessage(), e );
         }
 
         InterpolationFilterReader r =
             new InterpolationFilterReader( new InputStreamReader( new ByteArrayInputStream( bos.toByteArray() ) ),
-                new SettingsMap( p ), "$[", "]" );
+                                           new SettingsMap( p ), "$[", "]" );
 
         Writer w = null;
         try
@@ -323,7 +319,7 @@ public class DownloadSettingsTemplateMojo
             catch ( RESTLightClientException e )
             {
                 throw new MojoExecutionException( "Failed to retrieve Maven settings.xml from URL: " + getUrl()
-                    + "\n(Reason: " + e.getMessage() + ")", e );
+                                                      + "\n(Reason: " + e.getMessage() + ")", e );
             }
         }
         else
@@ -338,7 +334,7 @@ public class DownloadSettingsTemplateMojo
             catch ( RESTLightClientException e )
             {
                 throw new MojoExecutionException( "Failed to retrieve Maven settings.xml from template: " + templateId
-                    + "\n(Reason: " + e.getMessage() + ")", e );
+                                                      + "\n(Reason: " + e.getMessage() + ")", e );
             }
         }
     }

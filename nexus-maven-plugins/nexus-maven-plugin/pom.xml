@@ -20,7 +20,7 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.nexus</groupId>
@@ -99,6 +99,7 @@
       <timezone>-5</timezone>
     </developer>
   </developers>
+
   <dependencies>
     <!-- NOTE: These MUST BE at the top, or we get NoSuchFieldException in the Xerces bundled with the JDK during testing... -->
     <dependency>
@@ -114,15 +115,21 @@
       <scope>test</scope>
     </dependency>
     <!-- end of required ordering... -->
+
+    <!-- mojo-commons shall be used by this (and any other Sonatype) Maven plugin -->
+    <!-- Currently, mojo-commons is not yet fully usable for this case, but Stuart will make it usable -->
+    <!--dependency>
+      <groupId>org.sonatype.maven</groupId>
+      <artifactId>mojo-commons</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency-->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -277,19 +284,10 @@
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
-    <!-- While restlight does not forces you to specific slf4j backend, in case of Maven plugin it fixes itself to Log4j,
-      to be able to "tune" logging to the level Maven uses -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>${slf4j.version}</version>
-      <type>jar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4jVersion}</version>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
       <type>jar</type>
       <scope>compile</scope>
     </dependency>
@@ -319,7 +317,6 @@
       <artifactId>plexus-sec-dispatcher</artifactId>
       <version>1.4</version>
     </dependency>
-
 
     <dependency>
       <groupId>com.ibm.icu</groupId>

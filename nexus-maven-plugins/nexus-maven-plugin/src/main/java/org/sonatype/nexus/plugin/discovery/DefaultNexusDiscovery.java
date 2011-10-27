@@ -38,17 +38,18 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
-import org.codehaus.plexus.logging.LogEnabled;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugin.util.PromptUtil;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
 @Component( role = NexusInstanceDiscoverer.class )
 public class DefaultNexusDiscovery
-    implements NexusInstanceDiscoverer, LogEnabled
+    implements NexusInstanceDiscoverer
 {
-
+    private Logger logger = LoggerFactory.getLogger( getClass() );
+    
     private static final OptionGenerator<NexusConnectionInfo> URL_OPTION_GENERATOR =
         new OptionGenerator<NexusConnectionInfo>()
         {
@@ -95,19 +96,16 @@ public class DefaultNexusDiscovery
     @Requirement
     private Prompter prompter;
 
-    private Logger logger;
-
     public DefaultNexusDiscovery()
     {
     }
 
     public DefaultNexusDiscovery( final NexusTestClientManager clientManager, final SecDispatcher dispatcher,
-                                  final Prompter prompter, final Logger logger )
+                                  final Prompter prompter )
     {
         testClientManager = clientManager;
         secDispatcher = dispatcher;
         this.prompter = prompter;
-        enableLogging( logger );
     }
 
     public NexusConnectionInfo fillAuth( final String nexusUrl, final Settings settings, final MavenProject project,
@@ -288,6 +286,8 @@ public class DefaultNexusDiscovery
 
     private boolean promptForAcceptance( final String url, final String name )
     {
+        logger.debug( "Prompting for acceptance..." );
+
         StringBuilder sb = new StringBuilder();
 
         sb.append( "\n\nA valid Nexus connection was found at: " ).append( url );
@@ -614,11 +614,6 @@ public class DefaultNexusDiscovery
         }
     }
 
-    public void enableLogging( final Logger logger )
-    {
-        this.logger = logger;
-    }
-
     public NexusTestClientManager getTestClientManager()
     {
         return testClientManager;
@@ -627,16 +622,6 @@ public class DefaultNexusDiscovery
     public void setTestClientManager( final NexusTestClientManager testClientManager )
     {
         this.testClientManager = testClientManager;
-    }
-
-    public Logger getLogger()
-    {
-        return logger;
-    }
-
-    public void setLogger( final Logger logger )
-    {
-        enableLogging( logger );
     }
 
     public Prompter getPrompter()

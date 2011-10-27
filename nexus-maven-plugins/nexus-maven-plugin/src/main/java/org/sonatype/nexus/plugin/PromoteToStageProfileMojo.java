@@ -36,7 +36,7 @@ import org.sonatype.nexus.restlight.stage.StageRepository;
 
 /**
  * Promote a finished Nexus staging repository into a permanent Nexus repository for general consumption.
- * 
+ *
  * @goal staging-build-promotion
  * @requiresProject false
  * @aggregator
@@ -61,14 +61,9 @@ public class PromoteToStageProfileMojo
      */
     private String stagingBuildPromotionProfileId;
 
-    @SuppressWarnings( "unchecked" )
-    public void execute()
+    protected void doExecute()
         throws MojoExecutionException
     {
-        fillMissing();
-
-        initLog4j();
-
         StageClient client = getClient();
 
         List<StageProfile> profiles;
@@ -119,7 +114,8 @@ public class PromoteToStageProfileMojo
         promptForDescription();
 
         StringBuilder builder = new StringBuilder();
-        builder.append( "Promoting staging repository to: " ).append( getStagingBuildPromotionProfileId() ).append( ":" );
+        builder.append( "Promoting staging repository to: " ).append( getStagingBuildPromotionProfileId() ).append(
+            ":" );
 
         builder.append( "\n\n" );
         for ( String repoId : getRepositoryIds() )
