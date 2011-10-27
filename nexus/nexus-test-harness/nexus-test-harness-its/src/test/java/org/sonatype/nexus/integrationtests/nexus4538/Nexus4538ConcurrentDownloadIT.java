@@ -1,21 +1,29 @@
 package org.sonatype.nexus.integrationtests.nexus4538;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.sonatype.nexus.test.utils.FileTestingUtils.populate;
-import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.Thread.State;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.index.artifact.Gav;
+import org.restlet.data.Method;
+import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -27,72 +35,73 @@ public class Nexus4538ConcurrentDownloadIT
 
     private Gav gav;
 
-
     @BeforeMethod
     public void createFiles()
         throws Exception
     {
         gav = GavUtil.newGav( "nexus4538", "artifact", "1.0" );
         File f = new File( nexusWorkDir + "/storage/" + REPO_TEST_HARNESS_REPO, getRelitiveArtifactPath( gav ) );
-        populate( f, 100 );
+        populate( f, 750 );
     }
 
     @Test
-    public void doConcurrence()
+    public void lock()
         throws Exception
     {
-        List<Thread> threads = new ArrayList<Thread>();
-        final Set<Throwable> errors = new LinkedHashSet<Throwable>();
+        String baseUrl =
+            AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + REPO_TEST_HARNESS_REPO + "/";
+        String path = getRelitiveArtifactPath( gav );
+        final URL url = new URL( baseUrl + path );
 
-        // create
-        for ( int i = 0; i < 100; i++ )
+        long op = ping( url );
+
+        final Long[] time = new Long[1];
+        final Throwable[] errors = new Throwable[1];
+        Thread t = new Thread( new Runnable()
         {
-            Thread t = new Thread( new Runnable()
+
+            public void run()
             {
-
-                public void run()
+                // start as many threads as fastest as possible
+                try
                 {
-                    // start as many threads as fastest as possible
-                    Thread.yield();
-                    try
-                    {
-                        downloadFromRepositoryToVoid( REPO_TEST_HARNESS_REPO, gav );
-                    }
-                    catch ( Exception e )
-                    {
-                        errors.add( e );
-                    }
+                    long t = System.currentTimeMillis();
+                    RequestFacade.downloadToVoid( url );
+                    time[0] = System.currentTimeMillis() - t;
                 }
-            } );
-            t.setUncaughtExceptionHandler( new UncaughtExceptionHandler()
+                catch ( Exception e )
+                {
+                    errors[0] = e;
+                    time[0] = -1L;
+                }
+            }
+        } );
+        t.setUncaughtExceptionHandler( new UncaughtExceptionHandler()
+        {
+            public void uncaughtException( Thread t, Throwable e )
             {
-                public void uncaughtException( Thread t, Throwable e )
-                {
-                    errors.add( e );
-                }
-            } );
+                errors[0] = e;
+            }
+        } );
 
-            threads.add( t );
-        }
+        // let java kill it if VM wanna quit
+        t.setDaemon( true );
+        t.start();
+        Thread.yield();
 
-        // start
-        for ( Thread t : threads )
+        // while download is happening let's check if nexus still responsive
+        long ping = ping( url );
+        // check if ping was not blocked by download
+        assertTrue( ping < ( op * 2 ), "Ping took " + ping + " original pind " + op );
+
+        if ( time[0] != null )
         {
-            t.start();
+            assertTrue( ping < time[0], "Ping took " + ping + " dl time: " + time[0] );
         }
+        assertThat( t.getState(), not( equalTo( State.TERMINATED ) ) );
 
-        // w8 for downloads
-        for ( Thread thread : threads )
-        {
-            thread.join();
-        }
-
-        for ( Thread t : threads )
-        {
-            assertEquals( t.getState(), State.TERMINATED );
-        }
-
-        if ( !errors.isEmpty() )
+        // check if it is error free
+        if ( errors[0] != null )
         {
             ByteArrayOutputStream str = new ByteArrayOutputStream();
             PrintStream s = new PrintStream( str );
@@ -106,6 +115,18 @@ public class Nexus4538ConcurrentDownloadIT
             Assert.fail( "Found some errors downloading:\n" + str.toString() );
         }
 
+        // I know, I know, shouldn't be doing this
+        t.stop();
+    }
+
+    private long ping( URL url )
+        throws IOException
+    {
+        long t = System.currentTimeMillis();
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.disconnect();
+
+        return System.currentTimeMillis() - t;
     }
 
 }
