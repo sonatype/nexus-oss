@@ -19,6 +19,8 @@
 package org.sonatype.nexus.integrationtests.nexus4257;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
@@ -32,10 +34,13 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
+import org.sonatype.nexus.security.StatelessAndStatefulWebSessionManager;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 
 public class Nexus4257CookieVerificationIT
@@ -48,21 +53,11 @@ public class Nexus4257CookieVerificationIT
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Override
-    protected void runOnce()
-        throws Exception
-    {
-        // disable anonymous access
-        GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
-        settings.setSecurityAnonymousAccessEnabled( false );
-        SettingsMessageUtil.save( settings );
-
-    }
-
     @Test
     public void testCookieForStateFullClient()
-        throws HttpException, IOException
+        throws Exception
     {
+        setAnonymousAccess( false );
 
         TestContext context = TestContainer.getInstance().getTestContext();
         String username = context.getAdminUsername();
@@ -70,92 +65,114 @@ public class Nexus4257CookieVerificationIT
         String url = this.getBaseNexusUrl() + "content/";
 
         // default useragent is: Jakarta Commons-HttpClient/3.1[\r][\n]
-        HttpClient httpClient = new HttpClient(); 
+        HttpClient httpClient = new HttpClient();
         httpClient.getState().setCredentials( AuthScope.ANY, new UsernamePasswordCredentials( username, password ) );
 
         GetMethod getMethod = new GetMethod( url );
-        Assert.assertEquals( executeAndRelease( httpClient, getMethod ), 200 );
+        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
         Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
-        Assert.assertNotNull( sessionCookie, "Session Cookie not set" );
+        assertThat( "Session Cookie not set", sessionCookie, notNullValue() );
         httpClient.getState().clear(); // remove cookies, credentials, etc
 
         // do not set the cookie, expect failure
         GetMethod failedGetMethod = new GetMethod( url );
-        Assert.assertEquals( executeAndRelease( httpClient, failedGetMethod ), 401 );
+        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 401 ) );
 
         // set the cookie expect a 200, If a cookie is set, and cannot be found on the server, the response will fail with a 401
         httpClient.getState().addCookie( sessionCookie );
         getMethod = new GetMethod( url );
-        Assert.assertEquals( executeAndRelease( httpClient, getMethod ), 200 );
+        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
     }
-    
+
+    /**
+     * Tests that session cookies are not set for the list of known stateless clients.
+     * @throws Exception
+     */
     @Test
     public void testCookieForStateLessClient()
-        throws HttpException, IOException
+        throws Exception
     {
+        setAnonymousAccess( false );
 
+        String[] statelessUserAgents = {
+            "Java",
+            "Apache-Maven",
+            "Apache Ivy",
+            "curl",
+            "Wget",
+            "Nexus",
+            "Artifactory",
+            "Apache Archiva",
+            "M2Eclipse",
+            "Aether"
+        };
+
+        for( String userAgent : statelessUserAgents )
+        {
+            testCookieNotSetForKnownStateLessClients( userAgent );
+        }
+    }
+
+    /**
+     * Makes a request after setting the user agent and verifies that the session cookie is NOT set.
+     * @param userAgent
+     * @throws Exception
+     */
+    private void testCookieNotSetForKnownStateLessClients( String userAgent ) throws Exception
+    {
         TestContext context = TestContainer.getInstance().getTestContext();
         String username = context.getAdminUsername();
         String password = context.getPassword();
         String url = this.getBaseNexusUrl() + "content/";
 
-        Header header = new Header("User-Agent", "Java/1.6" );
-        
-        // default useragent is: Jakarta Commons-HttpClient/3.1[\r][\n]
-        HttpClient httpClient = new HttpClient(); 
+        Header header = new Header("User-Agent", userAgent + "/1.6" ); // user agent plus some version
+
+        HttpClient httpClient = new HttpClient();
         httpClient.getState().setCredentials( AuthScope.ANY, new UsernamePasswordCredentials( username, password ) );
 
         GetMethod getMethod = new GetMethod( url );
         getMethod.addRequestHeader( header );
-        Assert.assertEquals( executeAndRelease( httpClient, getMethod ), 200 );
+        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
 
         Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
-        Assert.assertNull( sessionCookie, "Session Cookie is set" );
+        assertThat( "Session Cookie should not be set for user agent: " + userAgent, sessionCookie, nullValue() );
     }
 
 
+    /**
+     * Tests that an anonymous user with a stateless client does NOT receive a session cookie.
+     * @throws HttpException
+     * @throws IOException
+     */
     @Test
     public void testCookieForStateFullClientForAnonUser()
-        throws HttpException, IOException
+        throws Exception
     {
+        setAnonymousAccess( true );
 
-        GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
-        settings.setSecurityAnonymousAccessEnabled( true );
-        SettingsMessageUtil.save( settings );
-
-        TestContext context = TestContainer.getInstance().getTestContext();
-        String username = context.getAdminUsername();
-        String password = context.getPassword();
         String url = this.getBaseNexusUrl() + "content/";
 
         // default useragent is: Jakarta Commons-HttpClient/3.1[\r][\n]
         HttpClient httpClient = new HttpClient(); // anonymous access
 
         GetMethod getMethod = new GetMethod( url );
-        Assert.assertEquals( executeAndRelease( httpClient, getMethod ), 200 );
+        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
 
         Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
-        Assert.assertNotNull( sessionCookie, "Session Cookie not set" );
-        
-        httpClient.getState().clear(); // remove cookies, credentials, etc
-        // set the cookie expect a 200, If a cookie is set, and cannot be found on the server, the response will fail with a 401
-        httpClient.getState().addCookie( sessionCookie );
-        getMethod = new GetMethod( url );
-        Assert.assertEquals( executeAndRelease( httpClient, getMethod ), 200 );
+        assertThat( "Session Cookie should not be set", sessionCookie, nullValue() );
     }
 
-
+    /**
+     * Tests that an anonymous user with a stateless client does NOT receive a session cookie.
+     * @throws HttpException
+     * @throws IOException
+     */
     @Test
     public void testCookieForStateLessClientForAnonUser()
-        throws HttpException, IOException
+        throws Exception
     {
-        GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
-        settings.setSecurityAnonymousAccessEnabled( true );
-        SettingsMessageUtil.save( settings );
+        setAnonymousAccess( true );
 
-        TestContext context = TestContainer.getInstance().getTestContext();
-        String username = context.getAdminUsername();
-        String password = context.getPassword();
         String url = this.getBaseNexusUrl() + "content/";
 
         Header header = new Header("User-Agent", "Java/1.6" );
@@ -165,10 +182,40 @@ public class Nexus4257CookieVerificationIT
 
         GetMethod getMethod = new GetMethod( url );
         getMethod.addRequestHeader( header );
-        Assert.assertEquals( executeAndRelease( httpClient, getMethod ), 200 );
+        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
 
         Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
-        Assert.assertNull( sessionCookie, "Session Cookie is set" );
+        assertThat( "Session Cookie should not be set", sessionCookie, nullValue() );
+    }
+
+    /**
+     * Verifies that requests with the header: X-Nexus-Session do not have session cookies set.
+     * @throws Exception
+     */
+    @Test
+    public void testNoSessionHeader() throws Exception
+    {
+        setAnonymousAccess( true );
+
+        String url = this.getBaseNexusUrl() + "content/";
+
+        // default useragent is: Jakarta Commons-HttpClient/3.1[\r][\n]
+        HttpClient httpClient = new HttpClient(); // anonymous access
+
+        Header header = new Header( StatelessAndStatefulWebSessionManager.NO_SESSION_HEADER, "none" );
+
+        GetMethod getMethod = new GetMethod( url );
+        assertThat( executeAndRelease( httpClient, getMethod ), equalTo( 200 ) );
+
+        Cookie sessionCookie = this.getSessionCookie( httpClient.getState().getCookies() );
+        assertThat( "Session Cookie should not be set", sessionCookie, nullValue() );
+    }
+    
+    private void setAnonymousAccess( boolean enabled ) throws Exception
+    {
+        GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+        settings.setSecurityAnonymousAccessEnabled( enabled );
+        SettingsMessageUtil.save( settings );
     }
 
     private Cookie getSessionCookie( Cookie[] cookies )
@@ -200,4 +247,5 @@ public class Nexus4257CookieVerificationIT
 
         return status;
     }
+
 }
