@@ -115,6 +115,9 @@
       <scope>test</scope>
     </dependency>
     <!-- end of required ordering... -->
+
+    <!-- mojo-commons shall be used by this (and any other Sonatype) Maven plugin -->
+    <!-- Currently, mojo-commons is not yet fully usable for this case, but Stuart will make it usable -->
     <!--dependency>
       <groupId>org.sonatype.maven</groupId>
       <artifactId>mojo-commons</artifactId>
