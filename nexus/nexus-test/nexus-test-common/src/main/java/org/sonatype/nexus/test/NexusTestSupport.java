@@ -175,7 +175,7 @@ public abstract class NexusTestSupport
     protected void copyDefaultSecurityConfigToPlace()
         throws IOException
     {
-        this.copyResource( "/META-INF/security/security.xml", getSecurityConfiguration() );
+        this.copyResource( "/META-INF/security/security.xml", getNexusSecurityConfiguration() );
     }
 
     protected void copyResource( String resource, String dest )

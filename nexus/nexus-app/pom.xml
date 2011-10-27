@@ -161,7 +161,7 @@
       </exclusions>
     </dependency>
 
-<!-- TEMPORARY: remove once AbstractPluginTestCase is fixed -->
+    <!-- TEMPORARY: remove once AbstractPluginTestCase is fixed -->
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-gleaner</artifactId>
@@ -188,16 +188,6 @@
         <executions>
           <execution>
             <id>attach-test-jar</id>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-            <configuration>
-              <includes>
-                <include>**/AbstractNexusTestCase*</include>
-                <include>**/AbstractPluginTestCase*</include>
-                <include>**/AbstractMavenRepoContentTests*</include>
-              </includes>
-            </configuration>
           </execution>
         </executions>
       </plugin>

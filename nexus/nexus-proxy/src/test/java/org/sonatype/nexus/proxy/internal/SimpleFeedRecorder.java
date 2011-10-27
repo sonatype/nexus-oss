@@ -16,7 +16,7 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.feeds;
+package org.sonatype.nexus.proxy.internal;
 
 import java.util.Collections;
 import java.util.Date;
@@ -26,6 +26,12 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.sonatype.nexus.feeds.AuthcAuthzEvent;
+import org.sonatype.nexus.feeds.ErrorWarningEvent;
+import org.sonatype.nexus.feeds.FeedRecorder;
+import org.sonatype.nexus.feeds.NexusArtifactEvent;
+import org.sonatype.nexus.feeds.SystemEvent;
+import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.timeline.TimelineFilter;
 import org.sonatype.timeline.TimelineResult;
 
@@ -133,7 +139,7 @@ public class SimpleFeedRecorder
     public void systemProcessCanceled( SystemProcess prc, String cancelMessage )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
 }
