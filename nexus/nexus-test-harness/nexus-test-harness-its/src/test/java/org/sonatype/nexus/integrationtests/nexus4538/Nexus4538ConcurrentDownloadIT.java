@@ -17,9 +17,10 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import org.apache.commons.io.output.NullOutputStream;
 import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.it.util.IOUtil;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -37,7 +38,7 @@ public class Nexus4538ConcurrentDownloadIT
     {
         gav = GavUtil.newGav( "nexus4538", "artifact", "1.0" );
         File f = new File( nexusWorkDir + "/storage/" + REPO_TEST_HARNESS_REPO, getRelitiveArtifactPath( gav ) );
-        populate( f, 750 );
+        populate( f, 1 );
     }
 
     @Test
@@ -50,7 +51,6 @@ public class Nexus4538ConcurrentDownloadIT
         final URL url = new URL( baseUrl + path );
 
         final long op = ping( url );
-        final long p2 = ping( url );
 
         final Long[] time = new Long[1];
         final Throwable[] errors = new Throwable[1];
@@ -63,7 +63,7 @@ public class Nexus4538ConcurrentDownloadIT
                 try
                 {
                     long t = System.currentTimeMillis();
-                    RequestFacade.downloadToVoid( url );
+                    read( url, -1, 1 );
                     time[0] = System.currentTimeMillis() - t;
                 }
                 catch ( Exception e )
@@ -88,8 +88,7 @@ public class Nexus4538ConcurrentDownloadIT
 
         // while download is happening let's check if nexus still responsive
         final long ping = ping( url );
-        t.join();
-        fail( op + " - " + p2 + " - " + ping + " - " + time[0] );
+        fail( op + " - " + ping + " - " + time[0] );
         // check if ping was not blocked by download
         assertTrue( ping < ( op * 2 ), "Ping took " + ping + " original pind " + op );
 
@@ -119,16 +118,53 @@ public class Nexus4538ConcurrentDownloadIT
     }
 
     private long ping( URL url )
-        throws IOException
+        throws Exception
     {
         long t = System.currentTimeMillis();
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        InputStream in = conn.getInputStream();
-        in.read();
-        in.close();
-        conn.disconnect();
+        read( url, 512 * 1024, -1 );
 
         return System.currentTimeMillis() - t;
+    }
+
+    private void read( URL url, int volume, int speedLimit )
+        throws IOException, Exception
+    {
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+        // getting headers like curl does...
+        conn.getContent();
+        conn.getContentEncoding();
+        conn.getContentLength();
+        conn.getContentType();
+        int i = 0;
+        while ( conn.getHeaderField( i ) != null )
+        {
+            System.out.println( i );
+        }
+
+        InputStream in = conn.getInputStream();
+        // half Mb
+        if ( volume != -1 )
+        {
+            in.read( new byte[volume] );
+        }
+        else
+        {
+            if ( speedLimit != -1 )
+            {
+                IOUtil.copy( in, NullOutputStream.NULL_OUTPUT_STREAM );
+            }
+            else
+            {
+                final byte[] buffer = new byte[speedLimit * 1024];
+                while ( -1 != in.read( buffer ) )
+                {
+                    Thread.sleep( 1000 );
+                }
+            }
+        }
+        in.close();
+        conn.disconnect();
     }
 
 }
