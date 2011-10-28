@@ -22,7 +22,9 @@
 <ehcache>
 
     <!-- All ${...} is replaced by plexus if know to it! -->
-    <diskStore path="${nexus-work}/tmp/ehcache"/>
+    <!-- NO MORE DISK CACHE !!! 
+    <diskStore path="${runtime-tmp}/ehcache"/>
+     -->
     
     <!-- all created caches shares these defaults 
 
@@ -32,12 +34,31 @@
 	      FIFO - first in first out
     -->
     <defaultCache
-            maxElementsInMemory="10000"
+            maxElementsInMemory="1000"
             eternal="false"
             timeToIdleSeconds="120"
             timeToLiveSeconds="120"
-            overflowToDisk="true"
-            maxElementsOnDisk="10000000"
+            overflowToDisk="false"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LFU"
+            />
+
+    <cache name="path-cache"
+            maxElementsInMemory="100000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="false"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LFU"
+            />
+
+    <cache name="shiro-activeSessionCache"
+            maxElementsInMemory="10000"
+            eternal="true"
+            overflowToDisk="false"
             diskPersistent="false"
             diskExpiryThreadIntervalSeconds="120"
             memoryStoreEvictionPolicy="LFU"

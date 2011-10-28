@@ -231,7 +231,7 @@
     repoTargets : {
       name : 'The name of the repository target.',
       contentClass : 'The content class of the repository target. It will be matched only against repositories with the same content class.',
-      pattern : 'Enter a pattern expression and click "Add" to add it to the list. Regular expressions are used to match the artifact path. The path is everything after /nexus/content/ so it will include the group or repository name. .* is used to specify all paths. \'.*/com/some/company/.*\' will match any artifact with \'com.some.company\' as the group id or artifact id.'
+      pattern : 'Enter a pattern expression and click "Add" to add it to the list. Regular expressions are used to match the artifact path. ".*" is used to specify all paths. ".*/com/some/company/.*" will match any artifact with "com.some.company" as the group id or artifact id. "^/com/some/company/.*" will match any artifact starting with com/some/company.'
     },
 
     log : {

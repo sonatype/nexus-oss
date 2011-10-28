@@ -39,20 +39,18 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
 
-public class Nexus3578IndexerManagerTest
+// This is an IT just because it runs longer then 15 seconds
+public class Nexus3578IndexerManagerLRTest
     extends AbstractIndexerManagerTest
 {
-    protected static File pomFile =
-        getTestFile( "src/test/resources/nexus-3578/maven-pmd-plugin-2.6-20100607.233625-29.pom" );
 
-    protected static String pomPath =
-        "/org/apache/maven/plugins/maven-pmd-plugin/2.6-SNAPSHOT/maven-pmd-plugin-2.6-20100607.233625-29.pom";
+    protected File pomFile;
 
-    protected static File jarFile =
-        getTestFile( "src/test/resources/nexus-3578/maven-pmd-plugin-2.6-20100607.233625-29.jar" );
+    protected String pomPath;
 
-    protected static String jarPath =
-        "/org/apache/maven/plugins/maven-pmd-plugin/2.6-SNAPSHOT/maven-pmd-plugin-2.6-20100607.233625-29.jar";
+    protected File jarFile;
+
+    protected String jarPath;
 
     protected MimeUtil mimeUtil;
 
@@ -62,9 +60,18 @@ public class Nexus3578IndexerManagerTest
     {
         super.setUp();
 
-        hackContext( (DefaultIndexingContext) ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext( snapshots.getId() ) );
+        hackContext( (DefaultIndexingContext) ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext(
+            snapshots.getId() ) );
 
         this.mimeUtil = lookup( MimeUtil.class );
+
+        pomFile = getTestFile( "src/test/resources/nexus-3578/maven-pmd-plugin-2.6-20100607.233625-29.pom" );
+
+        pomPath = "/org/apache/maven/plugins/maven-pmd-plugin/2.6-SNAPSHOT/maven-pmd-plugin-2.6-20100607.233625-29.pom";
+
+        jarFile = getTestFile( "src/test/resources/nexus-3578/maven-pmd-plugin-2.6-20100607.233625-29.jar" );
+
+        jarPath = "/org/apache/maven/plugins/maven-pmd-plugin/2.6-SNAPSHOT/maven-pmd-plugin-2.6-20100607.233625-29.jar";
     }
 
     // this one fails (see NEXUS-3578)
@@ -142,14 +149,15 @@ public class Nexus3578IndexerManagerTest
          */
         IteratorSearchResponse response =
             indexerManager.searchArtifactIterator( "org.apache.maven.plugins", "maven-pmd-plugin", "2.6-SNAPSHOT",
-                "maven-plugin", null, snapshots.getId(), null, null, null, false, SearchType.EXACT, null );
+                                                   "maven-plugin", null, snapshots.getId(), null, null, null, false,
+                                                   SearchType.EXACT, null );
 
         assertEquals( "There should be one hit!", 1, response.getTotalHits() );
 
         ArtifactInfo ai = response.getResults().next();
 
         assertEquals( "Coordinates should match too!",
-            "org.apache.maven.plugins:maven-pmd-plugin:2.6-SNAPSHOT:null:maven-plugin", ai.toString() );
+                      "org.apache.maven.plugins:maven-pmd-plugin:2.6-SNAPSHOT:null:maven-plugin", ai.toString() );
     }
 
     protected void hackContext( DefaultIndexingContext context )

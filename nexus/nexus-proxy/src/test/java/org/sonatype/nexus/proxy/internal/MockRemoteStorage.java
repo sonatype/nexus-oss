@@ -16,7 +16,7 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy;
+package org.sonatype.nexus.proxy.internal;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +26,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.RemoteAccessException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -42,7 +46,9 @@ public class MockRemoteStorage
 {
 
     private Map<String, String> validUrlContentMap = new HashMap<String, String>();
+
     private Map<String, Integer> valueUrlFailConfigMap = new HashMap<String, Integer>();
+
     private Map<String, Integer> valueUrlFailResultMap = new HashMap<String, Integer>();
 
     private Set<String> downUrls = new HashSet<String>();
@@ -63,7 +69,8 @@ public class MockRemoteStorage
     }
 
     public void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException, RemoteStorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException,
+        RemoteStorageException
     {
         throw new UnsupportedStorageOperationException( "This is a mock, no deleting!" );
     }
@@ -90,22 +97,22 @@ public class MockRemoteStorage
 
         String requestUrl = baseUrl.substring( 0, baseUrl.length() - 1 ) + request.getRequestPath();
 
-        if( this.valueUrlFailConfigMap.containsKey( requestUrl ) )
+        if ( this.valueUrlFailConfigMap.containsKey( requestUrl ) )
         {
             int expectedFailCount = this.valueUrlFailConfigMap.get( requestUrl );
             int actualFailCount = 0;
-            if( this.valueUrlFailResultMap.containsKey( requestUrl ) )
+            if ( this.valueUrlFailResultMap.containsKey( requestUrl ) )
             {
                 actualFailCount = this.valueUrlFailResultMap.get( requestUrl );
             }
-             
-            if( actualFailCount < expectedFailCount )
+
+            if ( actualFailCount < expectedFailCount )
             {
                 this.valueUrlFailResultMap.put( requestUrl, actualFailCount + 1 );
-                throw new RemoteStorageException( "Mock Remote Storage is pretending to be down.");
+                throw new RemoteStorageException( "Mock Remote Storage is pretending to be down." );
             }
         }
-        
+
         if ( this.downUrls.contains( baseUrl ) )
         {
             throw new RemoteStorageException( "Mock " + baseUrl + " is expected to be down." );
@@ -114,7 +121,9 @@ public class MockRemoteStorage
         if ( this.validUrlContentMap.containsKey( requestUrl ) )
         {
             return new DefaultStorageFileItem( repository, request, true, false,
-                                               new ByteArrayContentLocator( this.validUrlContentMap.get( requestUrl ).getBytes(), "plain/text" ) );
+                                               new ByteArrayContentLocator(
+                                                   this.validUrlContentMap.get( requestUrl ).getBytes(),
+                                                   "plain/text" ) );
         }
 
         // else
@@ -170,6 +179,7 @@ public class MockRemoteStorage
 
     public static class MockRequestRecord
     {
+
         ProxyRepository repository;
 
         ResourceStoreRequest request;
@@ -198,33 +208,51 @@ public class MockRemoteStorage
         public boolean equals( Object obj )
         {
             if ( this == obj )
+            {
                 return true;
+            }
             if ( obj == null )
+            {
                 return false;
+            }
             if ( getClass() != obj.getClass() )
+            {
                 return false;
+            }
             MockRequestRecord other = (MockRequestRecord) obj;
             if ( baseUrl == null )
             {
                 if ( other.baseUrl != null )
+                {
                     return false;
+                }
             }
             else if ( !baseUrl.equals( other.baseUrl ) )
+            {
                 return false;
+            }
             if ( repository == null )
             {
                 if ( other.repository != null )
+                {
                     return false;
+                }
             }
             else if ( !repository.equals( other.repository ) )
+            {
                 return false;
+            }
             if ( request == null )
             {
                 if ( other.request != null )
+                {
                     return false;
+                }
             }
             else if ( !request.getRequestPath().equals( other.request.getRequestPath() ) )
+            {
                 return false;
+            }
             return true;
         }
 

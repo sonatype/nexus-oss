@@ -18,17 +18,9 @@
  */
 package org.sonatype.nexus;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.logging.LoggerManager;
-import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -37,31 +29,12 @@ import org.sonatype.scheduling.ScheduledTask;
 public abstract class AbstractNexusTestCase
     extends org.sonatype.nexus.proxy.AbstractNexusTestCase
 {
+
     private NexusScheduler nexusScheduler;
 
     private EventInspectorHost eventInspectorHost;
 
-    public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
-
-    public static final String NEXUS_APP_CONFIGURATION_KEY = "nexus-app";
-
     protected NexusConfiguration nexusConfiguration;
-
-    private static File runtimeHomeDir = null;
-
-    private static File nexusappHomeDir = null;
-
-    @Override
-    protected void customizeContext( Context ctx )
-    {
-        super.customizeContext( ctx );
-
-        runtimeHomeDir = new File( getPlexusHomeDir(), "runtime" );
-        nexusappHomeDir = new File( getPlexusHomeDir(), "nexus-app" );
-
-        ctx.put( RUNTIME_CONFIGURATION_KEY, runtimeHomeDir.getAbsolutePath() );
-        ctx.put( NEXUS_APP_CONFIGURATION_KEY, nexusappHomeDir.getAbsolutePath() );
-    }
 
     protected boolean loadConfigurationAtSetUp()
     {
@@ -73,9 +46,6 @@ public abstract class AbstractNexusTestCase
         throws Exception
     {
         super.setUp();
-
-        runtimeHomeDir.mkdirs();
-        nexusappHomeDir.mkdirs();
 
         nexusScheduler = lookup( NexusScheduler.class );
         eventInspectorHost = lookup( EventInspectorHost.class );
@@ -93,9 +63,6 @@ public abstract class AbstractNexusTestCase
         waitForTasksToStop();
 
         super.tearDown();
-
-        cleanDir( runtimeHomeDir );
-        cleanDir( nexusappHomeDir );
     }
 
     protected void shutDownSecurity()
@@ -176,37 +143,8 @@ public abstract class AbstractNexusTestCase
             for ( ScheduledTask<?> task : taskList )
             {
                 System.out.println( task.getName() + " with id " + task.getId() + " is in state "
-                    + task.getTaskState().toString() );
+                                        + task.getTaskState().toString() );
             }
-        }
-    }
-
-    protected LoggerManager getLoggerManager()
-        throws ComponentLookupException
-    {
-        return getContainer().lookup( LoggerManager.class );
-    }
-
-    protected boolean contentEquals( File f1, File f2 )
-        throws IOException
-    {
-        return contentEquals( new FileInputStream( f1 ), new FileInputStream( f2 ) );
-    }
-
-    /**
-     * Both s1 and s2 will be closed.
-     */
-    protected boolean contentEquals( InputStream s1, InputStream s2 )
-        throws IOException
-    {
-        try
-        {
-            return IOUtil.contentEquals( s1, s2 );
-        }
-        finally
-        {
-            IOUtil.close( s1 );
-            IOUtil.close( s2 );
         }
     }
 

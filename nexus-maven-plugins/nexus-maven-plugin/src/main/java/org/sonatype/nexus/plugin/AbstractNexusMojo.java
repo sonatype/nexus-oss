@@ -20,17 +20,22 @@ package org.sonatype.nexus.plugin;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.SimpleLayout;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.components.interactivity.Prompter;
+import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.logging.LoggerManager;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugin.discovery.NexusConnectionInfo;
 import org.sonatype.nexus.plugin.discovery.NexusDiscoveryException;
 import org.sonatype.nexus.plugin.discovery.NexusInstanceDiscoverer;
@@ -38,9 +43,12 @@ import org.sonatype.nexus.restlight.common.AbstractRESTLightClient;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
 
 public abstract class AbstractNexusMojo
     extends AbstractMojo
+    implements Contextualizable
 {
 
     /**
@@ -109,27 +117,64 @@ public abstract class AbstractNexusMojo
 
     private String proxyPassword;
 
-    /**
-     * <p>
-     * If set to true, enable the debug log-level inside commons-httpclient (used to interact with Nexus).
-     * </p>
-     * <p>
-     * <b>NOTE:</b> This parameter will ONLY work when used with the -X Maven switch (which enables debug logging for
-     * the build).
-     * </p>
-     *
-     * @parameter expression="${nexus.verboseDebug}" default-value="false"
-     */
-    private boolean verboseDebug;
-
-    /**
-     * @component
-     */
     private NexusInstanceDiscoverer discoverer;
 
-    protected AbstractNexusMojo()
+    // ==
+
+    public final void execute()
+        throws MojoExecutionException
     {
+        fillMissing();
+
+        doExecute();
     }
+
+    protected abstract void doExecute()
+        throws MojoExecutionException;
+
+    // ==
+
+    @Override
+    public void contextualize( Context context )
+        throws ContextException
+    {
+        PlexusContainer container = (PlexusContainer) context.get( PlexusConstants.PLEXUS_KEY );
+
+        try
+        {
+            Object factory = LoggerFactory.getILoggerFactory();
+            ch.qos.logback.classic.Logger logger = null;
+            if ( factory instanceof LoggerContext )
+            {
+                logger =
+                    ( (LoggerContext) factory ).getLogger( ch.qos.logback.classic.Logger.ROOT_LOGGER_NAME );
+            }
+
+            if ( logger != null )
+            {
+                LoggerManager loggerManager = container.lookup( LoggerManager.class );
+
+                final int threshold = loggerManager.getThreshold();
+
+                if ( org.codehaus.plexus.logging.Logger.LEVEL_DEBUG == threshold )
+                {
+                    logger.setLevel( Level.DEBUG );
+                }
+                else
+                {
+                    logger.setLevel( Level.INFO );
+                }
+            }
+
+            discoverer = container.lookup( NexusInstanceDiscoverer.class );
+        }
+        catch ( ComponentLookupException e )
+        {
+            throw new ContextException( "Cannot lookup discoverer!", e );
+        }
+    }
+
+    // ==
 
     public String getNexusUrl()
     {
@@ -191,16 +236,6 @@ public abstract class AbstractNexusMojo
         this.settings = settings;
     }
 
-    public boolean isVerboseDebug()
-    {
-        return verboseDebug;
-    }
-
-    public void setVerboseDebug( final boolean verboseDebug )
-    {
-        this.verboseDebug = verboseDebug;
-    }
-
     protected void setProxyHost( String proxyHost )
     {
         this.proxyHost = proxyHost;
@@ -259,30 +294,6 @@ public abstract class AbstractNexusMojo
         return url.endsWith( "/" ) ? url.substring( 0, url.length() - 1 ) : url;
     }
 
-    protected void initLog4j()
-    {
-        if ( getLog().isDebugEnabled() )
-        {
-            if ( isVerboseDebug() )
-            {
-                LogManager.getRootLogger().setLevel( Level.DEBUG );
-            }
-            else
-            {
-                LogManager.getRootLogger().setLevel( Level.INFO );
-            }
-        }
-        else
-        {
-            LogManager.getRootLogger().setLevel( Level.WARN );
-        }
-
-        if ( !LogManager.getRootLogger().getAllAppenders().hasMoreElements() )
-        {
-            LogManager.getRootLogger().addAppender( new ConsoleAppender( new SimpleLayout() ) );
-        }
-    }
-
     protected void fillMissing()
         throws MojoExecutionException
     {
@@ -323,7 +334,7 @@ public abstract class AbstractNexusMojo
                     if ( info == null )
                     {
                         throw new MojoExecutionException( "Cannot determine login credentials for Nexus instance: "
-                            + getNexusUrl() );
+                                                              + getNexusUrl() );
                     }
 
                     setUsername( info.getUser() );
@@ -333,7 +344,7 @@ public abstract class AbstractNexusMojo
                 catch ( NexusDiscoveryException e )
                 {
                     throw new MojoExecutionException( "Failed to determine authentication information for Nexus at: "
-                        + getNexusUrl(), e );
+                                                          + getNexusUrl(), e );
                 }
                 catch ( SecDispatcherException e )
                 {
@@ -366,12 +377,9 @@ public abstract class AbstractNexusMojo
             }
         }
 
-
     }
 
-
     /**
-     *
      * @param url the url to parse the host from
      * @return the host in the given url, or null if the url is malformed
      */

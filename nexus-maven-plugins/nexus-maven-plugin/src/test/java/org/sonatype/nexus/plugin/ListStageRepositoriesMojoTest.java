@@ -50,7 +50,7 @@ public class ListStageRepositoriesMojoTest
         ListStageRepositoriesMojo mojo = new ListStageRepositoriesMojo();
 
         mojo.setPrompter( prompter );
-        mojo.setDiscoverer( new DefaultDiscoveryFixture( secDispatcher, prompter, logger ) );
+        mojo.setDiscoverer( new DefaultDiscoveryFixture( secDispatcher, prompter ) );
         mojo.setDispatcher( secDispatcher );
 
         return mojo;
@@ -126,7 +126,6 @@ public class ListStageRepositoriesMojoTest
         mojo.setPassword( getExpectedPassword() );
         mojo.setNexusUrl( getBaseUrl() + "/" );
 
-        mojo.setVerboseDebug( true );
         fixture.setDebugEnabled( true );
 
         runMojo( mojo );

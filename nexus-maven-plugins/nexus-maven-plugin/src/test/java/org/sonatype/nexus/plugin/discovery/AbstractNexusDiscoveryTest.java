@@ -30,8 +30,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.After;
@@ -133,14 +131,12 @@ public class AbstractNexusDiscoveryTest
 
         testClientManager = new ClientManagerFixture();
 
-        Logger logger = new ConsoleLogger( Logger.LEVEL_INFO, "test" );
-
         secDispatcher = (SecDispatcher) container.lookup( SecDispatcher.class.getName(), "maven" );
         factory = (ProjectArtifactFactory) container.lookup( ProjectArtifactFactory.class.getName() );
 
         prompter = new ExpectPrompter();
 
-        discovery = new DefaultNexusDiscovery( testClientManager, secDispatcher, prompter, logger );
+        discovery = new DefaultNexusDiscovery( testClientManager, secDispatcher, prompter );
     }
 
     @After

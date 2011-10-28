@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -117,20 +118,20 @@ public class MultipleRealmsLdapNotConfiguredTest
     protected void copyDefaultConfigToPlace()
         throws IOException
     {
-        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/security-configuration-multipleRealms.xml" ),
-            new FileOutputStream( getSecurityConfiguration() ) );
+        copyResource( "/test-conf/security-configuration-multipleRealms.xml", getSecurityConfiguration() );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.sonatype.nexus.AbstractNexusTestCase#customizeContext(org.codehaus.plexus.context.Context)
-     */
     @Override
     protected void customizeContext( Context ctx )
     {
         super.customizeContext( ctx );
 
-        ctx.put( LDAP_CONFIGURATION_KEY, CONF_HOME.getAbsolutePath() + "/not-configured/" );
+        ctx.put( CONF_DIR_KEY, getLdapXml().getParentFile().getAbsolutePath() );
+    }
+
+    private File getLdapXml()
+    {
+        return new File( getConfHomeDir(), "no-conf/ldap.xml" );
     }
 
 }

@@ -16,47 +16,29 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy;
+package org.sonatype.nexus.index;
 
-import java.io.PrintWriter;
-import java.util.List;
-import java.util.Map;
+import org.junit.Test;
 
-import org.sonatype.nexus.proxy.item.StorageItem;
-
-public class StorageItemUtils
+// This is an IT just because it runs longer then 15 seconds
+public class DisableIndexerManagerLRTest
+    extends AbstractIndexerManagerTest
 {
 
-    public static void printStorageItemList( List<StorageItem> items )
+    @Test
+    public void testDisableIndex()
+        throws Exception
     {
-        PrintWriter pw = new PrintWriter( System.out );
-        pw.println( " *** List of StorageItems:" );
-        for ( StorageItem item : items )
-        {
-            printStorageItem( pw, item );
-        }
-        pw.println( " *** List of StorageItems end" );
-        pw.flush();
-    }
+        fillInRepo();
 
-    public static void printStorageItem( StorageItem item )
-    {
-        printStorageItem( new PrintWriter( System.out ), item );
-    }
+        indexerManager.reindexRepository( "/", snapshots.getId(), false );
 
-    public static void printStorageItem( PrintWriter pw, StorageItem item )
-    {
-        pw.println( item.getClass().getName() );
-        Map<String, String> dataMap = item.getAttributes();
-        for ( String key : dataMap.keySet() )
-        {
-            pw.print( key );
-            pw.print( " = " );
-            pw.print( dataMap.get( key ) );
-            pw.println();
-        }
-        pw.println();
-        pw.flush();
-    }
+        searchFor( "org.sonatype.plexus", 1 );
 
+        snapshots.setSearchable( false );
+
+        nexusConfiguration.saveConfiguration();
+
+        searchFor( "org.sonatype.plexus", 0 );
+    }
 }

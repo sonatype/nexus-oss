@@ -25,16 +25,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.jetty.webapp.WebAppContext;
-import org.sonatype.nexus.web.PlexusContainerContextListener;
+import org.sonatype.guice.bean.binders.MergedModule;
+import org.sonatype.guice.bean.reflect.ClassSpace;
 import org.sonatype.plexus.jetty.Jetty7;
 import org.sonatype.plexus.jetty.mangler.ContextAttributeGetterMangler;
 import org.sonatype.plexus.jetty.mangler.ContextGetterMangler;
@@ -55,6 +57,9 @@ import com.google.inject.Module;
  */
 public class MockNexusEnvironment
 {
+    /** Copied from org.sonatype.nexus.web.PlexusContainerContextListener to not have direct dep */
+    public static final String CUSTOM_MODULES = "customModules";
+
     private Jetty7 jetty7;
 
     private File bundleBasedir;
@@ -106,7 +111,7 @@ public class MockNexusEnvironment
         // set system classpath priority (opposite of the "default" webapp classloading!)
         WebAppContext nexusContext = (WebAppContext) this.jetty7.mangleServer( new ContextGetterMangler( "/nexus" ) );
         nexusContext.setParentLoaderPriority( true );
-        nexusContext.setAttribute( PlexusContainerContextListener.CUSTOM_MODULES,
+        nexusContext.setAttribute( CUSTOM_MODULES,
             new Module[] { new PlexusResourceInterceptorModule() } );
 
         this.bundleBasedir = bundleBasedir;
@@ -149,7 +154,7 @@ public class MockNexusEnvironment
                 throw new FileNotFoundException( "Jetty properties not found at " + jettyXml.getAbsolutePath() );
             }
 
-            String jettyXmlString = FileUtils.readFileToString( jettyXml, "UTF-8" );
+            String jettyXmlString = FileUtils.fileRead( jettyXml, "UTF-8" );
 
             // was: we just set the value to "false", but the server.stopAtShutdown() invocation still happened,
             // triggering thread to be created in static member
@@ -162,7 +167,7 @@ public class MockNexusEnvironment
                 jettyXmlString.replace( "<Set name=\"stopAtShutdown\">true</Set>",
                     "<!-- NexusBooter: Set name=\"stopAtShutdown\">true</Set-->" );
 
-            FileUtils.writeStringToFile( jettyXml, jettyXmlString, "UTF-8" );
+            FileUtils.fileWrite( jettyXml, "UTF-8", jettyXmlString );
         }
     }
 

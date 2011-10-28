@@ -161,7 +161,7 @@
       </exclusions>
     </dependency>
 
-<!-- TEMPORARY: remove once AbstractPluginTestCase is fixed -->
+    <!-- TEMPORARY: remove once AbstractPluginTestCase is fixed -->
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-gleaner</artifactId>
@@ -181,6 +181,15 @@
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-test-jar</id>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

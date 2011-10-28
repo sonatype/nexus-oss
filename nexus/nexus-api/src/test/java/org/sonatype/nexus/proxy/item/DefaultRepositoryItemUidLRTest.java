@@ -26,7 +26,8 @@ import org.junit.Test;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-public class DefaultRepositoryItemUidTest
+// This is an IT just because it runs longer then 15 seconds
+public class DefaultRepositoryItemUidLRTest
 {
     private DummyRepositoryItemUidFactory factory;
 

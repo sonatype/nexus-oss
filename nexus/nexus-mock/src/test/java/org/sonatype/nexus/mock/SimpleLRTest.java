@@ -46,7 +46,8 @@ import com.thoughtworks.xstream.XStream;
  * @author cstamas
  *
  */
-public class SimpleTest
+// This is an IT just because it runs longer then 15 seconds
+public class SimpleLRTest
 {
     protected MockNexusEnvironment mockNexusEnvironment;
 

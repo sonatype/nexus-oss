@@ -20,20 +20,14 @@ package org.sonatype.nexus.security.ldap.realms.api;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusLdapTestCase;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-
 import org.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.Configuration;
 import org.sonatype.security.ldap.realms.persist.model.io.xpp3.LdapConfigurationXpp3Reader;
@@ -83,7 +77,8 @@ public class LdapUserGroupConfNotConfiguredTest
     private void validateConfigFile( LdapUserAndGroupConfigurationDTO dto )
         throws Exception
     {
-        String configFileName = CONF_HOME.getAbsolutePath() + "/no-conf" + "/ldap.xml";// this.getNexusLdapConfiguration();
+        // this.getNexusLdapConfiguration();
+        String configFileName = getLdapXml().getAbsolutePath();
 
         LdapConfigurationXpp3Reader reader = new LdapConfigurationXpp3Reader();
         FileInputStream fis = new FileInputStream( configFileName );
@@ -143,26 +138,17 @@ public class LdapUserGroupConfNotConfiguredTest
         this.validateConfigFile( userGroupConf );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see com.sonatype.nexus.AbstractNexusTestCase#customizeContext(org.codehaus.plexus.context.Context)
-     */
     @Override
     protected void customizeContext( Context ctx )
     {
         super.customizeContext( ctx );
 
-        ctx.put( LDAP_CONFIGURATION_KEY, CONF_HOME.getAbsolutePath() + "/no-conf/" );
+        ctx.put( CONF_DIR_KEY, getLdapXml().getParentFile().getAbsolutePath() );
     }
 
-    public void tearDown()
-        throws Exception
+    private File getLdapXml()
     {
-        super.tearDown();
-
-        // delete the ldap.xml file
-        File confFile = new File( CONF_HOME.getAbsolutePath() + "/no-conf/", "ldap.xml" );
-        confFile.delete();
+        return new File( getConfHomeDir(), "no-conf/ldap.xml" );
     }
 
 }

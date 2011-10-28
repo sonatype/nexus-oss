@@ -44,7 +44,8 @@ import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.scheduling.SchedulerTask;
 
-public class DefaultErrorReportingManagerTest
+// This is an IT just because it runs longer then 15 seconds
+public class DefaultErrorReportingManagerLRTest
     extends AbstractNexusTestCase
 {
     private DefaultErrorReportingManager manager;

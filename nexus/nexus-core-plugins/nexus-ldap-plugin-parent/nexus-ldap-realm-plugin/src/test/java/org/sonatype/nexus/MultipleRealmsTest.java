@@ -23,7 +23,6 @@ import java.io.IOException;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -107,19 +106,7 @@ public class MultipleRealmsTest
         throws IOException
     {
         IOUtil.copy( getClass().getResourceAsStream( "/test-conf/security-configuration-multipleRealms.xml" ),
-            new FileOutputStream( getSecurityConfiguration() ) );
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see com.sonatype.nexus.AbstractNexusTestCase#customizeContext(org.codehaus.plexus.context.Context)
-     */
-    @Override
-    protected void customizeContext( Context ctx )
-    {
-        super.customizeContext( ctx );
-
-        ctx.put( LDAP_CONFIGURATION_KEY, CONF_HOME.getAbsolutePath() );
+                     new FileOutputStream( getSecurityConfiguration() ) );
     }
 
 }

@@ -20,11 +20,11 @@ package org.sonatype.nexus.maven.tasks;
 
 import java.lang.reflect.Method;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
-import org.sonatype.plexus.appevents.Event;
 import org.sonatype.scheduling.CancellableProgressListenerWrapper;
 import org.sonatype.scheduling.ProgressListener;
 import org.sonatype.scheduling.TaskInterruptedException;
@@ -41,13 +41,35 @@ public class Nexus4588CancellationTest
     extends AbstractMavenRepoContentTests
 {
 
+    @Before
+    public void setUpProgressListener()
+        throws Exception
+    {
+        new TaskUtil()
+        {
+            {
+                setCurrent( new CancellableProgressListenerWrapper( null ) );
+            }
+        };
+    }
+
+    @After
+    public void removeProgressListener()
+        throws Exception
+    {
+        new TaskUtil()
+        {
+            {
+                setCurrent( null );
+            }
+        };
+    }
+
     @Test( expected = TaskInterruptedException.class )
     public void testNexus4588()
         throws Exception
     {
         fillInRepo();
-
-        setUpProgressListener();
 
         SnapshotRemovalRequest snapshotRemovalRequest =
             new SnapshotRemovalRequest( snapshots.getId(), 1, 10, true );
@@ -63,8 +85,6 @@ public class Nexus4588CancellationTest
     {
         fillInRepo();
 
-        setUpProgressListener();
-
         SnapshotRemovalRequest snapshotRemovalRequest =
             new SnapshotRemovalRequest( snapshots.getId(), 1, 10, true );
 
@@ -77,13 +97,4 @@ public class Nexus4588CancellationTest
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
     }
 
-    public static void setUpProgressListener()
-        throws Exception
-    {
-        Method setCurrentMethod = TaskUtil.class.getDeclaredMethod( "setCurrent", ProgressListener.class );
-
-        setCurrentMethod.setAccessible( true );
-
-        setCurrentMethod.invoke( null, new CancellableProgressListenerWrapper( null ) );
-    }
 }

@@ -18,30 +18,16 @@
  */
 package org.sonatype.nexus.proxy;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.ServerSocket;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.logging.LoggerManager;
-import org.codehaus.plexus.util.IOUtil;
 
-/**
- * Abstract test case for nexus tests. It is customizing the context and helps with nexus configurations.
- * 
- * @author cstamas
- */
 public abstract class AbstractNexusTestCase
     extends org.sonatype.nexus.configuration.AbstractNexusTestCase
 {
-    public static final String PROXY_SERVER_PORT = "proxy.server.port";
 
-    public static final String SECURITY_XML_FILE = "security-xml-file";
+    public static final String PROXY_SERVER_PORT = "proxy.server.port";
 
     @Override
     protected void customizeContext( Context ctx )
@@ -49,27 +35,6 @@ public abstract class AbstractNexusTestCase
         super.customizeContext( ctx );
 
         ctx.put( PROXY_SERVER_PORT, String.valueOf( allocatePort() ) );
-        ctx.put( SECURITY_XML_FILE, new File( getConfHomeDir(), "security.xml" ).getAbsolutePath() );
-    }
-
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        super.customizeContainerConfiguration( configuration );
-        configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
-    }
-
-    protected String getNexusSecurityConfiguration()
-    {
-        return getConfHomeDir().getAbsolutePath() + "/security.xml";
-    }
-
-    @Override
-    protected void copyDefaultSecurityConfigToPlace()
-        throws IOException
-    {
-        this.copyResource( "/META-INF/security/security.xml", getNexusSecurityConfiguration() );
     }
 
     private int allocatePort()
@@ -94,35 +59,6 @@ public abstract class AbstractNexusTestCase
             fail( "Error allocating port " + e.getMessage() );
         }
         return port;
-    }
-
-    protected LoggerManager getLoggerManager()
-        throws ComponentLookupException
-    {
-        return getContainer().lookup( LoggerManager.class );
-    }
-
-    protected boolean contentEquals( File f1, File f2 )
-        throws IOException
-    {
-        return contentEquals( new FileInputStream( f1 ), new FileInputStream( f2 ) );
-    }
-
-    /**
-     * Both s1 and s2 will be closed.
-     */
-    protected boolean contentEquals( InputStream s1, InputStream s2 )
-        throws IOException
-    {
-        try
-        {
-            return IOUtil.contentEquals( s1, s2 );
-        }
-        finally
-        {
-            IOUtil.close( s1 );
-            IOUtil.close( s2 );
-        }
     }
 
 }

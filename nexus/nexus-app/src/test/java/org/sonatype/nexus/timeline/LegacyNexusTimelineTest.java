@@ -33,7 +33,7 @@ public class LegacyNexusTimelineTest
     public void testMoveLegacyTimeline()
         throws Exception
     {
-        File legacyDataDir = new File( AbstractNexusTestCase.getBasedir(), "target/test-classes/timeline/legacy" );
+        File legacyDataDir = new File( getBasedir(), "target/test-classes/timeline/legacy" );
 
         File legacyTimelineDir = new File( getWorkHomeDir(), "timeline" );
 
@@ -50,9 +50,9 @@ public class LegacyNexusTimelineTest
     public void testDoNotMoveLegacyTimeline()
         throws Exception
     {
-        File legacyDataDir = new File( AbstractNexusTestCase.getBasedir(), "target/test-classes/timeline/legacy" );
+        File legacyDataDir = new File( getBasedir(), "target/test-classes/timeline/legacy" );
 
-        File newDataDir = new File( AbstractNexusTestCase.getBasedir(), "target/test-classes/timeline/new" );
+        File newDataDir = new File( getBasedir(), "target/test-classes/timeline/new" );
 
         File legacyTimelineDir = new File( getWorkHomeDir(), "timeline" );
 

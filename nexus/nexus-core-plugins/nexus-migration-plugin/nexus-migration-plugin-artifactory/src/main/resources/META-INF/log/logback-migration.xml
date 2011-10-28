@@ -17,13 +17,13 @@
 <included>
 
   <appender name="migrationlogfile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <File>${plexus.nexus-work}/logs/migration.log</File>
+    <File>${bundleBasedir}/logs/migration.log</File>
     <Append>true</Append>
     <encoder>
       <pattern>${appender.pattern}</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${plexus.nexus-work}/logs/migration.log.%d{yyyy-MM-dd}</fileNamePattern>
+      <fileNamePattern>${bundleBasedir}/logs/migration.log.%d{yyyy-MM-dd}</fileNamePattern>
     </rollingPolicy>
   </appender>
   

@@ -140,6 +140,12 @@ public abstract class AbstractMavenRepoContentTests
                 super.getContainer().getContext().get( PROXY_SERVER_PORT )+"/apache-snapshots/" );
         ( (MavenProxyRepository) apacheSnapshots ).setDownloadRemoteIndexes( false );
         nexusConfiguration.saveConfiguration();
+        // saving the configuration will trigger an re-indexing task for apache-snapshots
+        // wait for this tasks to run
+        // waiting was introduced as a fix for NEXUS-4530 but will benefit all subclasses of this test as it will
+        // avoid unexpected behavior
+        wairForAsyncEventsToCalmDown();
+        waitForTasksToStop();
     }
 
     protected File retrieveFile( MavenRepository repo, String path )

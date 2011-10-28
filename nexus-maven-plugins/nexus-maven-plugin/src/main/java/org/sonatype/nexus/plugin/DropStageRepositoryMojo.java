@@ -51,13 +51,9 @@ public class DropStageRepositoryMojo
      */
     private String description;
 
-    public void execute()
+    protected void doExecute()
         throws MojoExecutionException
     {
-        fillMissing();
-
-        initLog4j();
-
         StageClient client = getClient();
 
         List<StageRepository> repos;
