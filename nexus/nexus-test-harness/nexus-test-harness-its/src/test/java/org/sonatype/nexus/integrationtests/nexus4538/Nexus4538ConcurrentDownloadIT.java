@@ -4,24 +4,21 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 import static org.sonatype.nexus.test.utils.FileTestingUtils.populate;
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.Thread.State;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.maven.index.artifact.Gav;
-import org.codehaus.plexus.util.cli.StreamPumper;
+import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.GavUtil;
@@ -139,39 +136,30 @@ public class Nexus4538ConcurrentDownloadIT
     private void read( URL url, int speedLimit )
         throws IOException, Exception
     {
-        List<String> cmd = new ArrayList<String>();
-        cmd.add( "curl" );
-        cmd.add( "-v" );
-        cmd.add( "-f" );
-        cmd.add( "-o" );
-        File f = File.createTempFile( "nexus4538", ".curl" );
-        f.delete();
-        cmd.add( f.getAbsolutePath() );
+        HttpClient client = new HttpClient();
+        GetMethod get = new GetMethod( url.toString() );
+        int result = client.executeMethod( get );
+        assertTrue( Status.isSuccess( result ) );
+        InputStream in = get.getResponseBodyAsStream();
+        byte[] b;
         if ( speedLimit != -1 )
         {
-            cmd.add( "--limit-rate" );
-            cmd.add( String.valueOf( speedLimit ) + "K" );
+            b = new byte[speedLimit * 1024];
         }
-        cmd.add( url.toString() );
-
-        StringWriter sw = new StringWriter();
-        sw.write( cmd.toString() );
-
-        ProcessBuilder pb = new ProcessBuilder( cmd );
-        Process p = pb.start();
-
-        new StreamPumper( p.getInputStream(), new PrintWriter( sw ) ).start();
-        new StreamPumper( p.getErrorStream(), new PrintWriter( sw ) ).start();
-
-        assertEquals( p.waitFor(), 0, sw.getBuffer().toString() );
-
-        synchronized ( Nexus4538ConcurrentDownloadIT.class )
+        else
         {
-            System.out.println( sw.getBuffer() );
+            b = new byte[1024];
+        }
+        while ( in.read( b ) != -1 )
+        {
+            if ( speedLimit != -1 )
+            {
+                Thread.sleep( 1000 );
+            }
         }
 
-        f.delete();
-        f.deleteOnExit();
+        in.close();
+        get.releaseConnection();
     }
 
 }
