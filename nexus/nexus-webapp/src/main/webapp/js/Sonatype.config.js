@@ -27,7 +27,7 @@
 
   // Set default HTTP headers //@todo: move this to some other common init
   // section
-  Ext.lib.Ajax.defaultPostHeader = 'application/json';
+  Ext.lib.Ajax.defaultPostHeader = 'application/json; charset=utf-8';
 
   // set Sonatype defaults for Ext widgets
   Ext.form.Field.prototype.msgTarget = 'under';

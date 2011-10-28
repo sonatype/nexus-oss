@@ -195,6 +195,20 @@ Ext.override(Ext.data.Connection, {
             }
           }
 
+          if(o.xmlData)
+          {
+              if (!hs || !hs['Content-Type']){
+                  hs['Content-Type'] = 'text/xml; charset=utf-8';
+              }
+          }
+          else if(o.jsonData)
+          {
+              if (!hs || !hs['Content-Type']){
+                  hs['Content-Type'] = 'application/json; charset=utf-8';
+              }
+          }
+
+
           if (Sonatype.utils.authToken)
           {
             // Add auth header to each request
