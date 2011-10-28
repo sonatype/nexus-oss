@@ -21,6 +21,7 @@ package org.sonatype.nexus.proxy.storage.local.fs;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -324,6 +325,10 @@ public class DefaultFSLocalRepositoryStorage
                     repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(), repository,
                         request, file );
                 }
+            }
+            catch ( FileNotFoundException e )
+            {
+                throw new ItemNotFoundException( request, repository );
             }
             catch ( IOException e )
             {
