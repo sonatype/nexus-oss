@@ -701,28 +701,4 @@ public class RequestFacade
         return authInfo;
     }
 
-    public static void downloadToVoid( URL url )
-        throws IOException
-    {
-        InputStream in = null;
-        Response response = null;
-        try
-        {
-            response = sendMessage( url, Method.GET, null );
-
-            if ( !response.getStatus().isSuccess() )
-            {
-                throw new FileNotFoundException( response.getStatus() + " - " + url );
-            }
-
-            in = response.getEntity().getStream();
-
-            IOUtil.copy( in, NullOutputStream.NULL_OUTPUT_STREAM, 1024 );
-        }
-        finally
-        {
-            IOUtil.close( in );
-            releaseResponse( response );
-        }
-    }
 }
