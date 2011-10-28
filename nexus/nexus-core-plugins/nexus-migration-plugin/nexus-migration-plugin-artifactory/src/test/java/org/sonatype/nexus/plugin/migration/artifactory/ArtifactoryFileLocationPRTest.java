@@ -36,7 +36,7 @@ public class ArtifactoryFileLocationPRTest
 
         try
         {
-            System.setProperty( "plexus." + WORK_CONFIGURATION_KEY, (String) ctx.get( WORK_CONFIGURATION_KEY ) );
+            System.setProperty( "bundleBasedir", (String) ctx.get( WORK_CONFIGURATION_KEY ) );
         }
         catch ( Exception e )
         {
