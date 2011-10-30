@@ -138,7 +138,7 @@
       <version>${mavenVersion}</version>
       <exclusions>
         <exclusion>
-          <groupId>org.sonatype.plexus</groupId>
+          <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-container-default</artifactId>
         </exclusion>
       </exclusions>
