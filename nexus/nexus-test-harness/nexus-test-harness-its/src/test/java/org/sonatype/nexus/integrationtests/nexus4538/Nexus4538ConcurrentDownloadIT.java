@@ -2,13 +2,12 @@ package org.sonatype.nexus.integrationtests.nexus4538;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.not;
 import static org.sonatype.nexus.test.utils.FileTestingUtils.populate;
-import static org.testng.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.Thread.State;
@@ -18,12 +17,11 @@ import java.net.URL;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.maven.index.artifact.Gav;
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.GavUtil;
+import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -56,21 +54,17 @@ public class Nexus4538ConcurrentDownloadIT
         String path = getRelitiveArtifactPath( gav );
         final URL url = new URL( baseUrl + path );
 
-        final long op = ping( url );
+        final long op = read( url );
 
         final Long[] time = new Long[1];
         final Throwable[] errors = new Throwable[1];
         Thread t = new Thread( new Runnable()
         {
-
             public void run()
             {
-                // start as many threads as fastest as possible
                 try
                 {
-                    long t = System.currentTimeMillis();
-                    read( url, 100 );
-                    time[0] = System.currentTimeMillis() - t;
+                    time[0] = read( url, 100 );
                 }
                 catch ( Exception e )
                 {
@@ -97,14 +91,14 @@ public class Nexus4538ConcurrentDownloadIT
         }
 
         // while download is happening let's check if nexus still responsive
-        final long ping = ping( url );
+        final long ping = read( url );
 
         // check if ping was not blocked by download
-        assertTrue( ping < ( op * 2 ), "Ping took " + ping + " original pind " + op );
+        assertThat( "Ping took " + ping + " original pind " + op, ping, lessThan( op * 2 ) );
 
         if ( time[0] != null )
         {
-            assertTrue( ping < time[0], "Ping took " + ping + " dl time: " + time[0] );
+            assertThat( "Ping took " + ping + " dl time: " + time[0], ping, lessThan( time[0] ) );
         }
         assertThat( t.getState(), not( equalTo( State.TERMINATED ) ) );
 
@@ -120,29 +114,34 @@ public class Nexus4538ConcurrentDownloadIT
                 s.append( "\n" );
             }
 
-            Assert.fail( "Found some errors downloading:\n" + str.toString() );
+            assertThat( "Found some errors downloading:\n" + str.toString(), false );
         }
 
+        stop( t );
+    }
+
+    @SuppressWarnings( "deprecation" )
+    private void stop( Thread t )
+    {
         // I know, I know, shouldn't be doing this
         t.stop();
     }
 
-    private long ping( URL url )
+    private long read( URL url )
+        throws Exception
+    {
+        return read( url, -1 );
+    }
+
+    private long read( URL url, int speedLimit )
         throws Exception
     {
         long t = System.currentTimeMillis();
-        read( url, -1 );
 
-        return System.currentTimeMillis() - t;
-    }
-
-    private void read( URL url, int speedLimit )
-        throws IOException, Exception
-    {
         HttpClient client = new HttpClient();
         GetMethod get = new GetMethod( url.toString() );
         int result = client.executeMethod( get );
-        assertTrue( Status.isSuccess( result ) );
+        assertThat( result, ResponseMatchers.isSuccessfulCode() );
         InputStream in = get.getResponseBodyAsStream();
         byte[] b;
         if ( speedLimit != -1 )
@@ -163,6 +162,8 @@ public class Nexus4538ConcurrentDownloadIT
 
         in.close();
         get.releaseConnection();
+
+        return System.currentTimeMillis() - t;
     }
 
 }
