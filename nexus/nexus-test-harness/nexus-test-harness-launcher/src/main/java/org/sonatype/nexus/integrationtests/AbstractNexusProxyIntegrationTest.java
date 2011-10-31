@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.maven.index.artifact.Gav;
+import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -29,6 +30,7 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryStatusMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.Assert;
@@ -47,6 +49,8 @@ public abstract class AbstractNexusProxyIntegrationTest
     
     protected ServletServer proxyServer = null;
 
+    protected final RepositoryMessageUtil repositoryUtil;
+
     protected AbstractNexusProxyIntegrationTest()
     {
         this( "release-proxy-repo-1" );
@@ -59,6 +63,8 @@ public abstract class AbstractNexusProxyIntegrationTest
         this.baseProxyURL = TestProperties.getString( "proxy.repo.base.url" );
         this.localStorageDir = TestProperties.getString( "proxy.repo.base.dir" );
         this.proxyPort = TestProperties.getInteger( "proxy.server.port" );
+
+        this.repositoryUtil = new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @BeforeMethod(alwaysRun = true)
@@ -92,58 +98,6 @@ public abstract class AbstractNexusProxyIntegrationTest
                 + version + "/" + artifact + "-" + version + "." + type );
         log.debug( "Returning file: " + result );
         return result;
-    }
-
-    // TODO: Refactor this into the AbstractNexusIntegrationTest or some util class, to make more generic
-
-    public void setBlockProxy( String nexusBaseUrl, String repoId, boolean block )
-        throws IOException
-    {
-        RepositoryStatusResource status = new RepositoryStatusResource();
-        status.setId( repoId );
-        status.setRepoType( "proxy" );
-        status.setLocalStatus( LocalStatus.IN_SERVICE.name() );
-        if ( block )
-        {
-            status.setRemoteStatus( RemoteStatus.AVAILABLE.name() );
-            status.setProxyMode( ProxyMode.BLOCKED_MANUAL.name() );
-        }
-        else
-        {
-            status.setRemoteStatus( RemoteStatus.UNAVAILABLE.name() );
-            status.setProxyMode( ProxyMode.ALLOW.name() );
-        }
-        Response response = RepositoryStatusMessageUtil.changeStatus( status );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not unblock proxy: " + repoId + ", status: " + response.getStatus().getName() + " ("
-                + response.getStatus().getCode() + ") - " + response.getStatus().getDescription() );
-        }
-    }
-
-    public void setOutOfServiceProxy( String nexusBaseUrl, String repoId, boolean outOfService )
-        throws IOException
-    {
-
-        RepositoryStatusResource status = new RepositoryStatusResource();
-        status.setId( repoId );
-        status.setRepoType( "proxy" );
-        if ( outOfService )
-        {
-            status.setLocalStatus( LocalStatus.OUT_OF_SERVICE.name() );
-        }
-        else
-        {
-            status.setLocalStatus( LocalStatus.IN_SERVICE.name() );
-        }
-        Response response = RepositoryStatusMessageUtil.changeStatus( status );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not set proxy out of service status (Status: " + response.getStatus() + ": " + repoId
-                + "\n" + response.getEntity().getText() );
-        }
     }
 
     @Override

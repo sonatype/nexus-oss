@@ -66,7 +66,7 @@ public class Nexus177OutOfServiceIT
         File originalFile = this.downloadArtifact( gav, "target/downloads/original" );
 
         // put proxy out of service
-        this.setOutOfServiceProxy( this.getBaseNexusUrl(), TEST_RELEASE_REPO, true );
+        repositoryUtil.setOutOfServiceProxy( TEST_RELEASE_REPO, true );
 
         // redownload artifact
         try
@@ -80,7 +80,7 @@ public class Nexus177OutOfServiceIT
         }
 
         // put proxy back in service
-        this.setOutOfServiceProxy( this.getBaseNexusUrl(), TEST_RELEASE_REPO, false );
+        repositoryUtil.setOutOfServiceProxy( TEST_RELEASE_REPO, false );
 
         // redownload artifact
         File newFile = this.downloadArtifact( gav, "target/downloads/original" );

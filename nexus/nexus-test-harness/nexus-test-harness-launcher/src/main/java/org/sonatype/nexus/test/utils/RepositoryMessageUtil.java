@@ -36,6 +36,9 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
+import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
@@ -505,4 +508,81 @@ public class RepositoryMessageUtil
 
         return resourceResponse;
     }
+
+    /**
+     * Change block proxy state.<BR>
+     * this method only return after all Tasks and Asynchronous events to finish
+     * 
+     * @param repoId
+     * @param block
+     * @throws Exception
+     */
+    public void setBlockProxy( String repoId, boolean block )
+        throws Exception
+    {
+        RepositoryStatusResource status = new RepositoryStatusResource();
+        status.setId( repoId );
+        status.setRepoType( "proxy" );
+        status.setLocalStatus( LocalStatus.IN_SERVICE.name() );
+        if ( block )
+        {
+            status.setRemoteStatus( RemoteStatus.AVAILABLE.name() );
+            status.setProxyMode( ProxyMode.BLOCKED_MANUAL.name() );
+        }
+        else
+        {
+            status.setRemoteStatus( RemoteStatus.UNAVAILABLE.name() );
+            status.setProxyMode( ProxyMode.ALLOW.name() );
+        }
+        Response response = RepositoryStatusMessageUtil.changeStatus( status );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Could not unblock proxy: " + repoId + ", status: " + response.getStatus().getName() + " ("
+                + response.getStatus().getCode() + ") - " + response.getStatus().getDescription() );
+        }
+
+        // wait for this action to be complete, since make no sense test if repo got block before blocking was really
+        // enforced
+        TaskScheduleUtil.waitForAllTasksToStop();
+        getTest().getEventInspectorsUtil().waitForCalmPeriod();
+    }
+
+    /**
+     * Change block out of service state.<BR>
+     * this method only return after all Tasks and Asynchronous events to finish
+     * 
+     * @param repoId
+     * @param outOfService
+     * @throws Exception
+     */
+    public void setOutOfServiceProxy( String repoId, boolean outOfService )
+        throws Exception
+    {
+
+        RepositoryStatusResource status = new RepositoryStatusResource();
+        status.setId( repoId );
+        status.setRepoType( "proxy" );
+        if ( outOfService )
+        {
+            status.setLocalStatus( LocalStatus.OUT_OF_SERVICE.name() );
+        }
+        else
+        {
+            status.setLocalStatus( LocalStatus.IN_SERVICE.name() );
+        }
+        Response response = RepositoryStatusMessageUtil.changeStatus( status );
+
+        if ( !response.getStatus().isSuccess() )
+        {
+            Assert.fail( "Could not set proxy out of service status (Status: " + response.getStatus() + ": " + repoId
+                + "\n" + response.getEntity().getText() );
+        }
+
+        // wait for this action to be complete, since make no sense test if repo got out of service before oos was
+        // really enforced
+        TaskScheduleUtil.waitForAllTasksToStop();
+        getTest().getEventInspectorsUtil().waitForCalmPeriod();
+    }
+
 }
