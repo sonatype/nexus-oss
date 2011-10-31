@@ -6,10 +6,10 @@
  * Public License Version 3 as published by the Free Software Foundation.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License Version 3
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
  * for more details.
  *
- * You should have received a copy of the GNU Affero General Public License Version 3 along with this program. If not, see
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
  * http://www.gnu.org/licenses.
  *
  * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
@@ -52,7 +52,7 @@ public class ProgressListener
     {
         super.onTestFailure( tr );
 
-        showResult( tr, "FAILED", System.out );
+        showResult( tr, "FAILED",  System.out );
     }
 
     @Override
@@ -60,7 +60,7 @@ public class ProgressListener
     {
         super.onTestSkipped( tr );
 
-        showResult( tr, "skipped", System.out );
+        showResult( tr, "skipped",  System.out );
     }
 
     @Override
@@ -68,7 +68,7 @@ public class ProgressListener
     {
         super.onTestSuccess( tr );
 
-        showResult( tr, "SUCCESS", System.out );
+        showResult( tr, "SUCCESS",  System.out );
     }
 
     private void showResult( ITestResult result, String status, PrintStream printer )
