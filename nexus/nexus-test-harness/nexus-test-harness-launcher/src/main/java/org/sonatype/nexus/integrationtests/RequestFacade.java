@@ -725,37 +725,47 @@ public class RequestFacade
     {
         long t = System.currentTimeMillis();
 
-        HttpClient client = new HttpClient();
-        GetMethod get = new GetMethod( url.toString() );
-        int result = client.executeMethod( get );
-        assertThat( result, ResponseMatchers.isSuccessfulCode() );
-        InputStream in = get.getResponseBodyAsStream();
-        byte[] b;
-        if ( speedLimit != -1 )
+        GetMethod get = null;
+        InputStream in = null;
+        try
         {
-            b = new byte[speedLimit * 1024];
-        }
-        else
-        {
-            b = new byte[1024];
-        }
-        while ( in.read( b ) != -1 )
-        {
+            HttpClient client = new HttpClient();
+            get = new GetMethod( url.toString() );
+            int result = client.executeMethod( get );
+            assertThat( result, ResponseMatchers.isSuccessfulCode() );
+            in = get.getResponseBodyAsStream();
+            byte[] b;
             if ( speedLimit != -1 )
             {
-                try
+                b = new byte[speedLimit * 1024];
+            }
+            else
+            {
+                b = new byte[1024];
+            }
+            while ( in.read( b ) != -1 )
+            {
+                if ( speedLimit != -1 )
                 {
-                    Thread.sleep( 1000 );
-                }
-                catch ( InterruptedException e )
-                {
-                    // ignore
+                    try
+                    {
+                        Thread.sleep( 1000 );
+                    }
+                    catch ( InterruptedException e )
+                    {
+                        // ignore
+                    }
                 }
             }
         }
-
-        in.close();
-        get.releaseConnection();
+        finally
+        {
+            IOUtil.close( in );
+            if ( get != null )
+            {
+                get.releaseConnection();
+            }
+        }
 
         return System.currentTimeMillis() - t;
     }
