@@ -54,7 +54,7 @@ public class EventInspectorsUtil
     }
 
     /**
-     * Hold execution asynchronous events at nexus side stop running
+     * Hold execution until asynchronous events at nexus side stop running
      */
     public void waitForCalmPeriod()
         throws IOException, InterruptedException
