@@ -23,6 +23,7 @@ import org.hamcrest.Matcher;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers.InError;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers.IsRedirecting;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers.IsSuccessful;
+import org.sonatype.nexus.test.utils.NexusRequestMatchers.IsSuccessfulCode;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers.RedirectLocationMatches;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers.RespondsWithStatusCode;
 import org.sonatype.nexus.test.utils.NexusRequestMatchers.ResponseTextMatches;
@@ -64,6 +65,12 @@ public class ResponseMatchers
     public static RedirectLocationMatches redirectLocation( Matcher<String> matcher )
     {
         return new RedirectLocationMatches( matcher );
+    }
+
+    @Factory
+    public static IsSuccessfulCode isSuccessfulCode()
+    {
+        return new IsSuccessfulCode();
     }
 
 }

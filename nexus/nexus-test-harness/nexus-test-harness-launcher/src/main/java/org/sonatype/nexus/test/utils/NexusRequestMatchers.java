@@ -286,6 +286,32 @@ public class NexusRequestMatchers
 
     }
 
+    public static abstract class BaseCodeMatcher
+        extends TypeSafeMatcher<Integer>
+    {
+        @Override
+        protected void describeMismatchSafely( Integer code, Description mismatchDescription )
+        {
+            mismatchDescription.appendText( "was " ).appendText( code.toString() );
+        }
+    }
+
+    public static class IsSuccessfulCode
+        extends BaseCodeMatcher
+    {
+        @Override
+        protected boolean matchesSafely( Integer resp )
+        {
+            return Status.isSuccess( resp );
+        }
+
+        @Override
+        public void describeTo( Description description )
+        {
+            description.appendText( "response status to indicate success status 20x" );
+        }
+    }
+
     @Factory
     public static <T> IsSuccess isSuccess()
     {
@@ -334,4 +360,9 @@ public class NexusRequestMatchers
         return new ResponseTextMatches( matcher );
     }
 
+    @Factory
+    public static <T> IsSuccessfulCode isSuccessCode()
+    {
+        return new IsSuccessfulCode();
+    }
 }
