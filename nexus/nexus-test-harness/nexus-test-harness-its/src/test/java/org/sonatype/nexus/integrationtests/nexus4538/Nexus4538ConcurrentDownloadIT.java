@@ -27,6 +27,9 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+/**
+ * Test which makes sure that simultaneous requests for the same artifact are not serialized.
+ */
 public class Nexus4538ConcurrentDownloadIT
     extends AbstractNexusIntegrationTest
 {
@@ -45,7 +48,7 @@ public class Nexus4538ConcurrentDownloadIT
     }
 
     @Test
-    public void lock()
+    public void makeSureConcurrentDownloadisNotSerialized()
         throws Exception
     {
         String baseUrl =
