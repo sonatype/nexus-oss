@@ -4,23 +4,20 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.not;
+import static org.sonatype.nexus.integrationtests.RequestFacade.clockUrlDownload;
 import static org.sonatype.nexus.test.utils.FileTestingUtils.populate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.Thread.State;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.net.URL;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.maven.index.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.GavUtil;
-import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -54,7 +51,7 @@ public class Nexus4538ConcurrentDownloadIT
         String path = getRelitiveArtifactPath( gav );
         final URL url = new URL( baseUrl + path );
 
-        final long op = read( url );
+        final long op = clockUrlDownload( url );
 
         final Long[] time = new Long[1];
         final Throwable[] errors = new Throwable[1];
@@ -64,7 +61,8 @@ public class Nexus4538ConcurrentDownloadIT
             {
                 try
                 {
-                    time[0] = read( url, 100 );
+                    // limit speed to make sure it is gonna lock nexus for quite some time
+                    time[0] = clockUrlDownload( url, 10 );
                 }
                 catch ( Exception e )
                 {
@@ -83,6 +81,8 @@ public class Nexus4538ConcurrentDownloadIT
 
         // let java kill it if VM wanna quit
         t.setDaemon( true );
+
+        // start download in background
         t.start();
         for ( int i = 0; i < 10; i++ )
         {
@@ -91,7 +91,7 @@ public class Nexus4538ConcurrentDownloadIT
         }
 
         // while download is happening let's check if nexus still responsive
-        final long ping = read( url );
+        final long ping = clockUrlDownload( url );
 
         // check if ping was not blocked by download
         assertThat( "Ping took " + ping + " original pind " + op, ping, lessThan( op * 2 ) );
@@ -125,45 +125,6 @@ public class Nexus4538ConcurrentDownloadIT
     {
         // I know, I know, shouldn't be doing this
         t.stop();
-    }
-
-    private long read( URL url )
-        throws Exception
-    {
-        return read( url, -1 );
-    }
-
-    private long read( URL url, int speedLimit )
-        throws Exception
-    {
-        long t = System.currentTimeMillis();
-
-        HttpClient client = new HttpClient();
-        GetMethod get = new GetMethod( url.toString() );
-        int result = client.executeMethod( get );
-        assertThat( result, ResponseMatchers.isSuccessfulCode() );
-        InputStream in = get.getResponseBodyAsStream();
-        byte[] b;
-        if ( speedLimit != -1 )
-        {
-            b = new byte[speedLimit * 1024];
-        }
-        else
-        {
-            b = new byte[1024];
-        }
-        while ( in.read( b ) != -1 )
-        {
-            if ( speedLimit != -1 )
-            {
-                Thread.sleep( 1000 );
-            }
-        }
-
-        in.close();
-        get.releaseConnection();
-
-        return System.currentTimeMillis() - t;
     }
 
 }
