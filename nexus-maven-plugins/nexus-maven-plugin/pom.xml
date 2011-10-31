@@ -126,6 +126,7 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-plexus</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -137,7 +138,7 @@
       <version>${mavenVersion}</version>
       <exclusions>
         <exclusion>
-          <groupId>org.sonatype.plexus</groupId>
+          <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-container-default</artifactId>
         </exclusion>
       </exclusions>

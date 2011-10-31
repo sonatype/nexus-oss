@@ -521,7 +521,7 @@ public abstract class AbstractNexusIntegrationTest
                     // delete work dir
                     if ( fileToDelete != null )
                     {
-                        FileUtils.deleteDirectory( fileToDelete );
+                        FileUtils.forceDelete( fileToDelete );
                     }
                 }
             }
