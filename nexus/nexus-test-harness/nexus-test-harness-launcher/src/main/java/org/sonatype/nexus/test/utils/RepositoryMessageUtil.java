@@ -18,9 +18,11 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.inError;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccess;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 import java.io.IOException;
 import java.util.List;
@@ -517,7 +519,7 @@ public class RepositoryMessageUtil
      * @param block
      * @throws Exception
      */
-    public void setBlockProxy( String repoId, boolean block )
+    public void setBlockProxy( final String repoId, final boolean block )
         throws Exception
     {
         RepositoryStatusResource status = new RepositoryStatusResource();
@@ -536,11 +538,8 @@ public class RepositoryMessageUtil
         }
         Response response = RepositoryStatusMessageUtil.changeStatus( status );
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not unblock proxy: " + repoId + ", status: " + response.getStatus().getName() + " ("
-                + response.getStatus().getCode() + ") - " + response.getStatus().getDescription() );
-        }
+        assertThat( "Could not unblock proxy: " + repoId + ", status: " + response.getStatus().getName() + " ("
+            + response.getStatus().getCode() + ") - " + response.getStatus().getDescription(), response, isSuccessful() );
 
         // wait for this action to be complete, since make no sense test if repo got block before blocking was really
         // enforced
@@ -556,7 +555,7 @@ public class RepositoryMessageUtil
      * @param outOfService
      * @throws Exception
      */
-    public void setOutOfServiceProxy( String repoId, boolean outOfService )
+    public void setOutOfServiceProxy( final String repoId, final boolean outOfService )
         throws Exception
     {
 
@@ -573,11 +572,8 @@ public class RepositoryMessageUtil
         }
         Response response = RepositoryStatusMessageUtil.changeStatus( status );
 
-        if ( !response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Could not set proxy out of service status (Status: " + response.getStatus() + ": " + repoId
-                + "\n" + response.getEntity().getText() );
-        }
+        assertThat( "Could not set proxy out of service status (Status: " + response.getStatus() + ": " + repoId + "\n"
+            + response.getEntity().getText(), response, isSuccessful() );
 
         // wait for this action to be complete, since make no sense test if repo got out of service before oos was
         // really enforced

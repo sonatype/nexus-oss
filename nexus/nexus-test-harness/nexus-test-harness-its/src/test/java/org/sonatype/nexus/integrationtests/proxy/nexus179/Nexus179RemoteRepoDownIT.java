@@ -119,6 +119,7 @@ public class Nexus179RemoteRepoDownIT
         }
 
         TaskScheduleUtil.waitForAllTasksToStop();
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
 }
