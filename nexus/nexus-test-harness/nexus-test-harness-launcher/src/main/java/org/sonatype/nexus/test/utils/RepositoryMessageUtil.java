@@ -538,10 +538,16 @@ public class RepositoryMessageUtil
         }
         Response response = RepositoryStatusMessageUtil.changeStatus( status );
 
-        assertThat( "Could not unblock proxy: " + repoId + ", status: " + response.getStatus().getName() + " ("
-            + response.getStatus().getCode() + ") - " + response.getStatus().getDescription(), response, isSuccessful() );
-
-        RequestFacade.releaseResponse( response );
+        try
+        {
+            assertThat( "Could not unblock proxy: " + repoId + ", status: " + response.getStatus().getName() + " ("
+                + response.getStatus().getCode() + ") - " + response.getStatus().getDescription(), response,
+                isSuccessful() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
 
         // wait for this action to be complete, since make no sense test if repo got block before blocking was really
         // enforced
@@ -573,11 +579,15 @@ public class RepositoryMessageUtil
             status.setLocalStatus( LocalStatus.IN_SERVICE.name() );
         }
         Response response = RepositoryStatusMessageUtil.changeStatus( status );
-
-        assertThat( "Could not set proxy out of service status (Status: " + response.getStatus() + ": " + repoId + "\n"
-            + response.getEntity().getText(), response, isSuccessful() );
-
-        RequestFacade.releaseResponse( response );
+        try
+        {
+            assertThat( "Could not set proxy out of service status (Status: " + response.getStatus() + ": " + repoId
+                + "\n" + response.getEntity().getText(), response, isSuccessful() );
+        }
+        finally
+        {
+            RequestFacade.releaseResponse( response );
+        }
 
         // wait for this action to be complete, since make no sense test if repo got out of service before oos was
         // really enforced
