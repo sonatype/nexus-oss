@@ -152,7 +152,7 @@ public abstract class AbstractNexusMojo
 
             if ( logger != null )
             {
-                LoggerManager loggerManager = container.lookup( LoggerManager.class );
+                LoggerManager loggerManager = (LoggerManager) container.lookup( LoggerManager.class.getName() );
 
                 final int threshold = loggerManager.getThreshold();
 
@@ -166,7 +166,7 @@ public abstract class AbstractNexusMojo
                 }
             }
 
-            discoverer = container.lookup( NexusInstanceDiscoverer.class );
+            discoverer = (NexusInstanceDiscoverer) container.lookup( NexusInstanceDiscoverer.class.getName() );
         }
         catch ( ComponentLookupException e )
         {
