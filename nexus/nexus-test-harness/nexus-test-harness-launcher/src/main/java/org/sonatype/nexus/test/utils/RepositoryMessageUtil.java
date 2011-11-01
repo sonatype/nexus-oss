@@ -541,6 +541,8 @@ public class RepositoryMessageUtil
         assertThat( "Could not unblock proxy: " + repoId + ", status: " + response.getStatus().getName() + " ("
             + response.getStatus().getCode() + ") - " + response.getStatus().getDescription(), response, isSuccessful() );
 
+        RequestFacade.releaseResponse( response );
+
         // wait for this action to be complete, since make no sense test if repo got block before blocking was really
         // enforced
         TaskScheduleUtil.waitForAllTasksToStop();
@@ -574,6 +576,8 @@ public class RepositoryMessageUtil
 
         assertThat( "Could not set proxy out of service status (Status: " + response.getStatus() + ": " + repoId + "\n"
             + response.getEntity().getText(), response, isSuccessful() );
+
+        RequestFacade.releaseResponse( response );
 
         // wait for this action to be complete, since make no sense test if repo got out of service before oos was
         // really enforced
