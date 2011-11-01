@@ -40,6 +40,9 @@ import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * Util class to talk with nexus tasks
+ */
 public class TaskScheduleUtil
 {
     private static final Logger LOG = LoggerFactory.getLogger( TaskScheduleUtil.class );
@@ -138,30 +141,54 @@ public class TaskScheduleUtil
         }
     }
 
+    /**
+     * Holds execution until all tasks stop running
+     */
     public static void waitForAllTasksToStop()
         throws Exception
     {
         waitForAllTasksToStop( 300 );
     }
 
+    /**
+     * Holds execution until all tasks of a given type stop running
+     * 
+     * @param taskType task type
+     */
     public static void waitForAllTasksToStop( String taskType )
         throws Exception
     {
         waitForAllTasksToStop( 300, taskType );
     }
 
+    /**
+     * Holds execution until all tasks of a given type stop running
+     * 
+     * @param maxAttempts how many times check for tasks being stopped
+     */
     public static void waitForAllTasksToStop( int maxAttempts )
         throws Exception
     {
         waitForAllTasksToStop( maxAttempts, null );
     }
 
+    /**
+     * Holds execution until all tasks of a given type stop running
+     * 
+     * @param taskClass task type
+     */
     public static void waitForAllTasksToStop( Class<? extends NexusTask<?>> taskClass )
         throws Exception
     {
         waitForAllTasksToStop( taskClass.getSimpleName() );
     }
 
+    /**
+     * Holds execution until all tasks of a given type stop running
+     * 
+     * @param taskType task type
+     * @param maxAttempts how many times check for tasks being stopped
+     */
     public static void waitForAllTasksToStop( int maxAttempts, String taskType )
         throws Exception
     {

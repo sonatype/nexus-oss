@@ -20,11 +20,13 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 
-import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 
+/**
+ * Util class to talk with nexus events
+ */
 public class EventInspectorsUtil
     extends ITUtil
 {
@@ -51,6 +53,9 @@ public class EventInspectorsUtil
         }
     }
 
+    /**
+     * Hold execution until asynchronous events at nexus side stop running
+     */
     public void waitForCalmPeriod()
         throws IOException, InterruptedException
     {

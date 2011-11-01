@@ -68,7 +68,7 @@ public class Nexus2497ConcurrentRepoAccessIT
         // files[9] = populate( new File( "./target/downloads/nexus2497", "file0.jar" ) );
     }
 
-    @Test( enabled = false )
+    @Test
     public void doConcurrence()
         throws Exception
     {

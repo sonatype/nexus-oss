@@ -41,6 +41,7 @@ import org.apache.commons.httpclient.SimpleHttpConnectionManager;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.Matcher;
@@ -696,5 +697,76 @@ public class RequestFacade
             authInfo.setPassword( context.getPassword() );
         }
         return authInfo;
+    }
+
+    /**
+     * Clocks how much time it takes to download a give url
+     * 
+     * @param url address to download
+     * @return time in milliseconds
+     * @throws Exception
+     */
+    public static long clockUrlDownload( URL url )
+        throws IOException
+    {
+        return clockUrlDownload( url, -1 );
+    }
+
+    /**
+     * Clocks how much time it takes to download a give url
+     * 
+     * @param url address to download
+     * @param speedLimit max speed while downloading in Kbps, -1 to no speed limit
+     * @return time in milliseconds
+     * @throws Exception
+     */
+    public static long clockUrlDownload( URL url, int speedLimit )
+        throws IOException
+    {
+        long t = System.currentTimeMillis();
+
+        GetMethod get = null;
+        InputStream in = null;
+        try
+        {
+            HttpClient client = new HttpClient();
+            get = new GetMethod( url.toString() );
+            int result = client.executeMethod( get );
+            assertThat( result, ResponseMatchers.isSuccessfulCode() );
+            in = get.getResponseBodyAsStream();
+            byte[] b;
+            if ( speedLimit != -1 )
+            {
+                b = new byte[speedLimit * 1024];
+            }
+            else
+            {
+                b = new byte[1024];
+            }
+            while ( in.read( b ) != -1 )
+            {
+                if ( speedLimit != -1 )
+                {
+                    try
+                    {
+                        Thread.sleep( 1000 );
+                    }
+                    catch ( InterruptedException e )
+                    {
+                        // ignore
+                    }
+                }
+            }
+        }
+        finally
+        {
+            IOUtil.close( in );
+            if ( get != null )
+            {
+                get.releaseConnection();
+            }
+        }
+
+        return System.currentTimeMillis() - t;
     }
 }
