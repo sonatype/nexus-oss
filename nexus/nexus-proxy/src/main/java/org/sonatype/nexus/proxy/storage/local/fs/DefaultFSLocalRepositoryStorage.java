@@ -21,6 +21,7 @@ package org.sonatype.nexus.proxy.storage.local.fs;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -324,6 +325,14 @@ public class DefaultFSLocalRepositoryStorage
                     repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(), repository,
                         request, file );
                 }
+            }
+            catch ( FileNotFoundException e )
+            {
+                // It is possible for this file to have been removed after the call to target.exists()
+                // this could have been an external process
+                // See: https://issues.sonatype.org/browse/NEXUS-4570
+                getLogger().debug( "File '{}' removed before finished processing the directory listing", target, e );
+                throw new ItemNotFoundException( request, repository, e );
             }
             catch ( IOException e )
             {
