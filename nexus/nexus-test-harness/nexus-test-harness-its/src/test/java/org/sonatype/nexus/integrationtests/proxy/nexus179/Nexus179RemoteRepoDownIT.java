@@ -98,10 +98,7 @@ public class Nexus179RemoteRepoDownIT
         clearProxyCache();
 
         // unblock the proxy
-        this.setBlockProxy( this.getBaseNexusUrl(), REPO_RELEASE_PROXY_REPO1, false );
-
-        // run async events
-        getEventInspectorsUtil().waitForCalmPeriod();
+        repositoryUtil.setBlockProxy( REPO_RELEASE_PROXY_REPO1, false );
 
         File artifact = this.downloadArtifact( gav, "target/downloads" );
 
@@ -122,6 +119,7 @@ public class Nexus179RemoteRepoDownIT
         }
 
         TaskScheduleUtil.waitForAllTasksToStop();
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
 }

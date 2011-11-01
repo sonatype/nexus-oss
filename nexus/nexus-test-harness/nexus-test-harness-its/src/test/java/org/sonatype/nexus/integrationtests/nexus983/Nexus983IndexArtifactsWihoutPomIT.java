@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus983;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
 
 import java.io.File;
@@ -28,7 +30,7 @@ import org.apache.maven.index.SearchType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.testng.Assert;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.annotations.Test;
 
 /**
@@ -49,7 +51,7 @@ public class Nexus983IndexArtifactsWihoutPomIT
         getEventInspectorsUtil().waitForCalmPeriod();
 
         List<NexusArtifact> artifacts = getSearchMessageUtil().searchFor( "nexus983-artifact1", SearchType.EXACT );
-        Assert.assertEquals( artifacts.size(), 1, "Should find one artifact" );
+        assertThat( "Should find exactly one artifact", artifacts, hasSize( 1 ) );
     }
 
     @Test(groups = INDEX)
@@ -59,13 +61,17 @@ public class Nexus983IndexArtifactsWihoutPomIT
         File artifactFile = getTestFile( "artifact.jar" );
         FileUtils.copyFile( artifactFile, new File( nexusWorkDir, "storage/" + REPO_TEST_HARNESS_REPO
             + "/nexus983/nexus983-artifact2/1.0.0/nexus983-artifact2-1.0.0.jar" ) );
+
+        // if something is running, let it finish
+        TaskScheduleUtil.waitForAllTasksToStop();
+
         RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
 
         // wait to index up the changes
         getEventInspectorsUtil().waitForCalmPeriod();
 
         List<NexusArtifact> artifacts = getSearchMessageUtil().searchFor( "nexus983-artifact2", SearchType.EXACT );
-        Assert.assertEquals( artifacts.size(), 1, "Should find one artifact" );
+        assertThat( "Should find exactly one artifact", artifacts, hasSize( 1 ) );
     }
 
 }

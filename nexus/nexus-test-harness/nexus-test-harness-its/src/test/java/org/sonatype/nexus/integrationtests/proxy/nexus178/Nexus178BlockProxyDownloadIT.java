@@ -68,7 +68,7 @@ public class Nexus178BlockProxyDownloadIT
         File originalFile = this.downloadArtifact( gav, "target/downloads/original" );
 
         // blockProxy
-        this.setBlockProxy( this.getBaseNexusUrl(), TEST_RELEASE_REPO, true );
+        repositoryUtil.setBlockProxy( TEST_RELEASE_REPO, true );
 
         // change file on server
         File localFile = this.getLocalFile( TEST_RELEASE_REPO, gav );
@@ -89,7 +89,7 @@ public class Nexus178BlockProxyDownloadIT
             Assert.assertFalse( FileTestingUtils.compareFileSHA1s( originalFile, localFile ) );
 
             // if we don't unblock the proxy the other tests will be mad
-            this.setBlockProxy( this.getBaseNexusUrl(), TEST_RELEASE_REPO, false );
+            repositoryUtil.setBlockProxy( TEST_RELEASE_REPO, false );
         }
         finally
         {

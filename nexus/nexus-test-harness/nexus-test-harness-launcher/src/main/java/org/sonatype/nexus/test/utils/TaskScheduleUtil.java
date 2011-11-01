@@ -79,12 +79,18 @@ public class TaskScheduleUtil
         return null;
     }
 
+    /**
+     * @return only tasks visible from nexus UI
+     */
     public static List<ScheduledServiceListResource> getTasks()
         throws IOException
     {
         return getTaskRequest( "service/local/schedules" );
     }
 
+    /**
+     * @return all tasks, even internal ones
+     */
     public static List<ScheduledServiceListResource> getAllTasks()
         throws IOException
     {
