@@ -328,7 +328,11 @@ public class DefaultFSLocalRepositoryStorage
             }
             catch ( FileNotFoundException e )
             {
-                throw new ItemNotFoundException( request, repository );
+                // It is possible for this file to have been removed after the call to target.exists()
+                // this could have been an external process
+                // See: https://issues.sonatype.org/browse/NEXUS-4570
+                getLogger().debug( "File '{}' removed before finished processing the directory listing", target, e );
+                throw new ItemNotFoundException( request, repository, e );
             }
             catch ( IOException e )
             {

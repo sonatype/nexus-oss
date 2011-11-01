@@ -20,34 +20,36 @@
 package org.sonatype.nexus.proxy.storage.local.fs;
 
 import com.google.common.collect.Maps;
-import com.google.common.io.FileBackedOutputStream;
 import org.codehaus.plexus.util.FileUtils;
-import org.hamcrest.Matcher;
-import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.LinkPersister;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.mockito.Mockito.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests {@link DefaultFSLocalRepositoryStorage}
@@ -114,6 +116,50 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
         items = localRepositoryStorageUnderTest.listItems( repository, invalidRequest );
         assertThat( items.iterator().next().getName(), equalTo( "invalid.txt" ) );
         assertThat( items, hasSize( 1 ) );
+    }
 
+    /**
+     * Expects an already deleted file to thrown an ItemNotFoundException. More specifically if a file was deleted
+     * after the call to file.exists() was called.
+     *
+     * @throws Exception
+     */
+    @Test( expected = ItemNotFoundException.class )
+    public void testRetrieveItemFromFileThrowsItemNotFoundExceptionForDeletedFile()
+        throws Exception
+    {
+        // Mocks
+        Wastebasket wastebasket = mock( Wastebasket.class );
+        Repository repository = mock( Repository.class );
+        FSPeer fsPeer = mock( FSPeer.class );
+        MimeUtil mimeUtil = mock( MimeUtil.class );
+        Map<String, Long> repositoryContexts = Maps.newHashMap();
+
+        // mock file
+        File mockFile = mock( File.class );
+        when( mockFile.isDirectory() ).thenReturn( false );
+        when( mockFile.isFile() ).thenReturn( true );
+        when( mockFile.exists() ).thenReturn( true );
+
+
+        // needs to throw a FileNotFound when _opening_ the file
+        LinkPersister linkPersister = mock( LinkPersister.class );
+        when( linkPersister.isLinkContent( Mockito.any( ContentLocator.class ) ) ).thenThrow( new FileNotFoundException( "Expected to be thrown from mock." ) );
+
+        // object to test
+        DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeUtil, repositoryContexts, fsPeer )
+        {
+            // expose protected method
+            @Override
+            public AbstractStorageItem retrieveItemFromFile( Repository repository, ResourceStoreRequest request,
+                                                                File target )
+                throws ItemNotFoundException, LocalStorageException
+            {
+                return super.retrieveItemFromFile( repository, request, target );
+            }
+        };
+
+        // expected to throw a ItemNotFoundException
+        localRepositoryStorageUnderTest.retrieveItemFromFile( repository, new ResourceStoreRequest( "not-used" ), mockFile );
     }
 }

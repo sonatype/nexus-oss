@@ -168,6 +168,10 @@ public class DefaultFSPeer
     public void shredItem( Repository repository, ResourceStoreRequest request, File target )
         throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
     {
+        if( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Deleting file: " + target.getAbsolutePath() );
+        }
         if ( target.isDirectory() )
         {
             try
