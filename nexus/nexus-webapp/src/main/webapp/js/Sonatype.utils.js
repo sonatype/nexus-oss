@@ -241,13 +241,35 @@
         {
           message += serverMessage;
         }
+
+        var responseStatus = response.status;
+        var responseStatusText = response.statusText;
+
+        // the prompt is in the following format
+
+        // <message> (optional)
+        //
+        // <response text> (if 400)
+        //
+        // <detail> (include status code if valid)
+        //
+        // <retry message> (optional)
+
         Sonatype.MessageBox.show({
               title : "Error",
-              msg : ((message ? message : '')
-                  + (response.status == 400 && showResponseText ? ('<br /><br />' + response.responseText) : (options && options.hideErrorStatus ? '' : (response.status ? '<br /><br />Nexus returned an error: ERROR ' + response.status + ': '
-                      + response.statusText : '<br /><br />There was an error communicating with the Nexus server: ' + response.statusText + '<br />' + 'Check the status of the server, and log in to the application again.'))) + (offerRestart
-                  ? '<br /><br />Click OK to reload the console or ' + 'CANCEL if you wish to retry the same action in a little while.'
-                  : '')),
+              msg : ((message && (responseStatus != -1) ? message : '')
+                  + (responseStatus == 400 && showResponseText ?
+                      ('<br /><br />' + response.responseText) :
+                      (options && options.hideErrorStatus ? '' :
+                              ( (responseStatus && responseStatus != -1 ) ? // hide the "-1 status"
+                                      '<br /><br />Nexus returned an error: ERROR ' + responseStatus + ': ' + responseStatusText :
+                                      '<br /><br />There was an error communicating with the server: request timed out.')
+                              )
+                      )
+                  + (offerRestart ?
+                      '<br /><br />Click OK to reload the console or CANCEL if you wish to retry the same action in a little while.' :
+                      '')
+              ),
               buttons : offerRestart ? Sonatype.MessageBox.OKCANCEL : Sonatype.MessageBox.OK,
               icon : Sonatype.MessageBox.ERROR,
               animEl : 'mb3',
