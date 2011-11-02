@@ -36,6 +36,8 @@ public abstract class AbstractObrDownloadIT
 
     protected static final File FELIX_REPO = new File( "target/felix-repo" );
 
+    protected static final File FELIX_CONF = new File( "target/test-classes/config.properties" );
+
     public AbstractObrDownloadIT()
     {
         super();
@@ -55,7 +57,9 @@ public abstract class AbstractObrDownloadIT
         downloadFile( new URL( getRepositoryUrl( repoId ) + ".meta/obr.xml" ), "target/" + getTestId()
             + "/download/obr.xml" );
 
-        final ProcessBuilder pb = new ProcessBuilder( "java", "-jar", "bin/felix.jar" );
+        final ProcessBuilder pb = new ProcessBuilder( "java", "-Dfelix.config.properties="
+            + FELIX_CONF.toURI(), "-jar", "bin/felix.jar" );
+
         pb.directory( FELIX_HOME );
         pb.redirectErrorStream( true );
         final Process p = pb.start();
@@ -88,9 +92,6 @@ public abstract class AbstractObrDownloadIT
         {
             final InputStream input = p.getInputStream();
             final OutputStream output = p.getOutputStream();
-            waitFor( input, "g!" );
-            output.write( ( "obr:repos remove http://felix.apache.org/obr/releases.xml\r\n" ).getBytes() );
-            output.flush();
             waitFor( input, "g!" );
             output.write( ( "obr:repos add " + getRepositoryUrl( repoId ) + ".meta/obr.xml\r\n" ).getBytes() );
             output.flush();
