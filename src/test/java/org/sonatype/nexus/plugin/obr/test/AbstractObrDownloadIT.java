@@ -108,15 +108,35 @@ public abstract class AbstractObrDownloadIT
     private void waitFor( final InputStream input, final String expectedLine )
         throws Exception
     {
+        final long startMillis = System.currentTimeMillis();
         final StringBuilder content = new StringBuilder();
         do
         {
-            final byte[] bytes = new byte[input.available()];
-            input.read( bytes );
-            final String current = new String( bytes );
-            System.out.print( current );
-            content.append( current );
-            Thread.yield();
+            final int available = input.available();
+            if ( available > 0 )
+            {
+                final byte[] bytes = new byte[available];
+                input.read( bytes );
+                final String current = new String( bytes );
+                System.out.print( current );
+                content.append( current );
+                Thread.yield();
+            }
+            else if ( System.currentTimeMillis() - startMillis > 5 * 60 * 1000 )
+            {
+                throw new InterruptedException(); // waited for more than 5 minutes
+            }
+            else
+            {
+                try
+                {
+                    Thread.sleep( 100 );
+                }
+                catch ( final InterruptedException e )
+                {
+                    // continue...
+                }
+            }
         }
         while ( content.indexOf( expectedLine ) == -1 );
     }
