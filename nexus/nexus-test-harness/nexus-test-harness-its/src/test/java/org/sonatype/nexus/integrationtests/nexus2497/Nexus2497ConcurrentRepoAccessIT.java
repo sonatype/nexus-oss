@@ -68,7 +68,7 @@ public class Nexus2497ConcurrentRepoAccessIT
         // files[9] = populate( new File( "./target/downloads/nexus2497", "file0.jar" ) );
     }
 
-    @Test
+    @Test(enabled=false, description="Test is unstable - needs to be rewritten or replaced. See NEXUS-4606")
     public void doConcurrence()
         throws Exception
     {
