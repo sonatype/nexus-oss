@@ -117,7 +117,7 @@ public class LdapTestAuthenticationPlexusResource
         catch ( Exception e )
         {
             this.getLogger().debug( "Failed to connect to Ldap Server.", e );
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Failed to connect to Ldap Server:"
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Failed to connect to Ldap Server: "
                 + e.getMessage(), e );
         }
 
