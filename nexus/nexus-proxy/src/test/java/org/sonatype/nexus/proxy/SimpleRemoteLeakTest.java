@@ -18,8 +18,12 @@
  */
 package org.sonatype.nexus.proxy;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+
 import org.apache.commons.httpclient.CustomMultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.HttpClient;
+import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -29,6 +33,14 @@ import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 
+/**
+ * Httpclient caches connection in a connection pool. This test ensures we are using HttpClient API in correct way,
+ * and that the pool does not introduce a "leak" (ie. after a method is executed, the connection is closed and returned
+ * to pool). This test enforces real HTTP transport to happen multiple times, and checks for pool elements, there should
+ * be no more than 1 connection. Naturally, this test deeply depends on HttpClient 3.x API, so it will work only if
+ * RemoteRepositoryStorage is CommonsHttpClientRemoteStorage. The test is repeated twice, once with "good" transport
+ * and once with "bad" transport (by setting hostname intentionally to a unknown one).
+ */
 public class SimpleRemoteLeakTest
     extends AbstractProxyTestEnvironment
 {
@@ -45,13 +57,7 @@ public class SimpleRemoteLeakTest
     }
 
     @Test
-    public void testNothing()
-    {
-        assertTrue( true );
-    }
-
-    @Test
-    public void testSimplerRemoteLeak()
+    public void checkForConnectionPoolLeakWithGoodTransport()
         throws Exception
     {
         ProxyRepository repo1 = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );
@@ -62,16 +68,17 @@ public class SimpleRemoteLeakTest
         if ( !( repo1.getRemoteStorage() instanceof CommonsHttpClientRemoteStorage ) )
         {
             System.out.println( "Test disabled, RRS implementation is not of class "
-                + CommonsHttpClientRemoteStorage.class.getName() + " but "
-                + repo1.getRemoteStorage().getClass().getName() );
+                                    + CommonsHttpClientRemoteStorage.class.getName() + " but "
+                                    + repo1.getRemoteStorage().getClass().getName() );
 
             return;
         }
 
         // mangle one repos to have quasi different host, thus different HttpCommons HostConfig
         // but make it succeed! (127.0.0.1 is localhost, so will be able to connect)
-        repo1.setRemoteUrl( getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class ).getRemoteUrl().replace(
-            "localhost", "127.0.0.1" ) );
+        repo1.setRemoteUrl(
+            getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class ).getRemoteUrl().replace(
+                "localhost", "127.0.0.1" ) );
 
         ResourceStoreRequest req1 =
             new ResourceStoreRequest( "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false );
@@ -88,30 +95,35 @@ public class SimpleRemoteLeakTest
 
             // to force refetch
             getRepositoryRegistry().getRepository( item1.getRepositoryId() ).deleteItem( false,
-                new ResourceStoreRequest( item1 ) );
+                                                                                         new ResourceStoreRequest(
+                                                                                             item1 ) );
 
             getRepositoryRegistry().getRepository( item2.getRepositoryId() ).deleteItem( false,
-                new ResourceStoreRequest( item2 ) );
+                                                                                         new ResourceStoreRequest(
+                                                                                             item2 ) );
         }
 
         // get the default context, since they used it
         RemoteStorageContext ctx1 = repo1.getRemoteStorageContext();
 
         CustomMultiThreadedHttpConnectionManager cm1 =
-            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx1.getContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) ).getHttpConnectionManager();
+            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx1.getContextObject(
+                CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) ).getHttpConnectionManager();
 
-        assertEquals( 1, cm1.getConnectionsInPool() );
+        MatcherAssert.assertThat( cm1.getConnectionsInPool(), is( equalTo( 1 ) ) );
 
         RemoteStorageContext ctx2 = repo2.getRemoteStorageContext();
 
         CustomMultiThreadedHttpConnectionManager cm2 =
-            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx2.getContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) ).getHttpConnectionManager();
+            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx2.getContextObject(
+                CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) ).getHttpConnectionManager();
 
-        assertEquals( 1, cm2.getConnectionsInPool() );
+        MatcherAssert.assertThat( cm2.getConnectionsInPool(), is( equalTo( 1 ) ) );
     }
 
-    // DISABLED: move to IT, it takes too long (no route to host + java)
-    public void nonTestSimplerAvailabilityCheckRemoteLeak()
+
+    @Test
+    public void checkForConnectionPoolLeakWithFailingTransport()
         throws Exception
     {
         // mangle one repos to have quasi different host, thus different HttpCommons HostConfig
@@ -140,16 +152,17 @@ public class SimpleRemoteLeakTest
         RemoteStorageContext ctx1 = repo1.getRemoteStorageContext();
 
         CustomMultiThreadedHttpConnectionManager cm1 =
-            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx1.getContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) ).getHttpConnectionManager();
+            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx1.getContextObject(
+                CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) ).getHttpConnectionManager();
 
-        assertEquals( 1, cm1.getConnectionsInPool() );
+        MatcherAssert.assertThat( cm1.getConnectionsInPool(), is( equalTo( 1 ) ) );
 
         RemoteStorageContext ctx2 = repo2.getRemoteStorageContext();
 
         CustomMultiThreadedHttpConnectionManager cm2 =
-            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx2.getContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) ).getHttpConnectionManager();
+            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx2.getContextObject(
+                CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) ).getHttpConnectionManager();
 
-        assertEquals( 1, cm2.getConnectionsInPool() );
+        MatcherAssert.assertThat( cm2.getConnectionsInPool(), is( equalTo( 1 ) ) );
     }
-
 }
