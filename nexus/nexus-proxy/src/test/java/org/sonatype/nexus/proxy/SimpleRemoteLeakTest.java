@@ -31,6 +31,13 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 
+/**
+ * Httpclient caches connection in a connection pool. This test ensures we are using HttpClient API in correct way,
+ * and that the pool does not introduce a "leak" (ie. after a method is executed, the connection is closed and returned
+ * to pool). This test enforces real HTTP transport to happen multiple times, and checks for pool elements, there should
+ * be no more than 1 connection. Naturally, this test deeply depends on HttpClient 3.x API, so it will work only if
+ * RemoteRepositoryStorage is CommonsHttpClientRemoteStorage.
+ */
 public class SimpleRemoteLeakTest
     extends AbstractProxyTestEnvironment
 {
