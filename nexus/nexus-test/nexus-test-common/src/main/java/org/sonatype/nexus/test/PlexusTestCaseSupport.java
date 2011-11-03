@@ -33,6 +33,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.DefaultContext;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.MatcherAssert;
@@ -316,10 +317,41 @@ public abstract class PlexusTestCaseSupport
         return s.substring( 0, s.indexOf( "$" ) ) + ".xml";
     }
 
+    /**
+     * Get a configured {@link LoggerManager}
+     * <p>
+     * The LoggerManager returned has its threshold influenced by the system property
+     * {@code 'test.log.level'}. The values of DEBUG, INFO, WARN, ERROR will set the threshold
+     * of the LoggerManager to the corresponding value. See {@link https://issues.sonatype.org/browse/NXCM-3230}.
+     * 
+     * @return LoggerManager with threshold influenced by system property
+     * @throws ComponentLookupException if LoggerManager cannot be looked up
+     */
     protected LoggerManager getLoggerManager()
         throws ComponentLookupException
     {
-        return getContainer().lookup( LoggerManager.class );
+        LoggerManager loggerManager = getContainer().lookup( LoggerManager.class );
+        // system property helps configure logger - see NXCM-3230
+        String testLogLevel = System.getProperty("test.log.level");
+        if(testLogLevel != null){
+            if( testLogLevel.equalsIgnoreCase("DEBUG") )
+            {
+                loggerManager.setThresholds( Logger.LEVEL_DEBUG );
+            }
+            else if(testLogLevel.equalsIgnoreCase("INFO"))
+            {
+                loggerManager.setThresholds( Logger.LEVEL_INFO);
+            }
+            else if(testLogLevel.equalsIgnoreCase("WARN"))
+            {
+                loggerManager.setThresholds( Logger.LEVEL_WARN );
+            }
+            else if(testLogLevel.equalsIgnoreCase("ERROR"))
+            {
+                loggerManager.setThresholds( Logger.LEVEL_ERROR );
+            }
+        }
+        return loggerManager;
     }
 
     // ========================= CUSTOM NEXUS =====================
