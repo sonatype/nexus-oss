@@ -54,7 +54,7 @@ public class SimpleRemoteLeakTest
     }
 
     @Test
-    public void testSimplerRemoteLeak()
+    public void checkForConnectionPoolLeakWithGoodTransport()
         throws Exception
     {
         ProxyRepository repo1 = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );

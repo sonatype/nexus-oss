@@ -56,7 +56,7 @@ public class SimpleRemoteLeakLRTest
     }
 
     @Test
-    public void simplerAvailabilityCheckRemoteLeak()
+    public void checkForConnectionPoolLeakWithFailingTransport()
         throws Exception
     {
         // mangle one repos to have quasi different host, thus different HttpCommons HostConfig
