@@ -26,8 +26,10 @@ import org.apache.commons.httpclient.HttpClient;
 import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 
@@ -36,7 +38,8 @@ import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClie
  * and that the pool does not introduce a "leak" (ie. after a method is executed, the connection is closed and returned
  * to pool). This test enforces real HTTP transport to happen multiple times, and checks for pool elements, there should
  * be no more than 1 connection. Naturally, this test deeply depends on HttpClient 3.x API, so it will work only if
- * RemoteRepositoryStorage is CommonsHttpClientRemoteStorage.
+ * RemoteRepositoryStorage is CommonsHttpClientRemoteStorage. The test is repeated twice, once with "good" transport
+ * and once with "bad" transport (by setting hostname intentionally to a unknown one).
  */
 public class SimpleRemoteLeakTest
     extends AbstractProxyTestEnvironment
@@ -118,6 +121,48 @@ public class SimpleRemoteLeakTest
         MatcherAssert.assertThat( cm2.getConnectionsInPool(), is( equalTo( 1 ) ) );
     }
 
-    // NEXUS-4521: moved to SimpleRemoteLeakLRTest, it takes too long
-    // public void nonTestSimplerAvailabilityCheckRemoteLeak();
+
+    @Test
+    public void checkForConnectionPoolLeakWithFailingTransport()
+        throws Exception
+    {
+        // mangle one repos to have quasi different host, thus different HttpCommons HostConfig
+        // but make it fail! (unknown host, so will not be able to connect)
+        getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class ).setRemoteUrl(
+            getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class ).getRemoteUrl().replace(
+                "localhost", "1.1.1.1" ) );
+
+        ProxyRepository repo1 = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );
+        ProxyRepository repo2 = getRepositoryRegistry().getRepositoryWithFacet( "repo2", ProxyRepository.class );
+
+        // loop until we have some "sensible" result (not unknown, since this is async op)
+        // first unforced request will trigger the check, and wait until we have result
+        RemoteStatus rs1 = RemoteStatus.UNKNOWN;
+        RemoteStatus rs2 = RemoteStatus.UNKNOWN;
+
+        while ( RemoteStatus.UNKNOWN.equals( rs1 ) || RemoteStatus.UNKNOWN.equals( rs2 ) )
+        {
+            rs1 = repo1.getRemoteStatus( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ), false );
+            rs2 = repo2.getRemoteStatus( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ), false );
+
+            Thread.sleep( 1000 );
+        }
+
+        // get the default context, since they used it
+        RemoteStorageContext ctx1 = repo1.getRemoteStorageContext();
+
+        CustomMultiThreadedHttpConnectionManager cm1 =
+            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx1.getContextObject(
+                CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) ).getHttpConnectionManager();
+
+        MatcherAssert.assertThat( cm1.getConnectionsInPool(), is( equalTo( 1 ) ) );
+
+        RemoteStorageContext ctx2 = repo2.getRemoteStorageContext();
+
+        CustomMultiThreadedHttpConnectionManager cm2 =
+            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx2.getContextObject(
+                CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) ).getHttpConnectionManager();
+
+        MatcherAssert.assertThat( cm2.getConnectionsInPool(), is( equalTo( 1 ) ) );
+    }
 }
