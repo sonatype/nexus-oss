@@ -318,13 +318,14 @@ public abstract class PlexusTestCaseSupport
     }
 
     /**
-     * Get a suitable LoggerManager.
+     * Get a configured {@link LoggerManager}
      * <p>
      * The LoggerManager returned has its threshold influenced by the system property
      * {@code 'test.log.level'}. The values of DEBUG, INFO, WARN, ERROR will set the threshold
      * of the LoggerManager to the corresponding value. See {@link https://issues.sonatype.org/browse/NXCM-3230}.
-     * @return
-     * @throws ComponentLookupException
+     * 
+     * @return LoggerManager with threshold influenced by system property
+     * @throws ComponentLookupException if LoggerManager cannot be looked up
      */
     protected LoggerManager getLoggerManager()
         throws ComponentLookupException
