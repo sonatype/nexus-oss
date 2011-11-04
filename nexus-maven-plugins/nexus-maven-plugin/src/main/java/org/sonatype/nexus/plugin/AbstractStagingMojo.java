@@ -18,12 +18,31 @@
  */
 package org.sonatype.nexus.plugin;
 
+import static java.util.Arrays.asList;
+import static org.codehaus.plexus.util.FileUtils.createTempFile;
+import static org.codehaus.plexus.util.FileUtils.forceDelete;
+import static org.sonatype.nexus.restlight.common.AbstractRESTLightClient.SVC_BASE;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Properties;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.factory.ArtifactFactory;
+import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.DefaultArtifactRepository;
+import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.restlight.common.ProxyConfig;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
@@ -40,6 +59,21 @@ public abstract class AbstractStagingMojo
      * @parameter expression="${nexus.repositoryId}"
      */
     private String repositoryId;
+
+    /**
+     * @component
+     */
+    private ArtifactResolver artifactResolver;
+
+    /**
+     * @component
+     */
+    private ArtifactFactory artifactFactory;
+
+    /**
+     * @component
+     */
+    private WagonManager wagonManager;
 
     private StageClient client;
 
@@ -97,7 +131,8 @@ public abstract class AbstractStagingMojo
             if ( groupId != null )
             {
                 repos = getClient().getClosedStageRepositoriesForUser( groupId, artifactId, version );
-                builder.append( prompt ).append( " for: '" ).append( groupId ).append( ":" ).append( artifactId ).append(
+                builder.append( prompt ).append( " for: '" ).append( groupId ).append( ":" ).append(
+                    artifactId ).append(
                     ":" ).append( version ).append( "':" );
             }
             else
@@ -156,7 +191,8 @@ public abstract class AbstractStagingMojo
     {
         StringBuilder builder = new StringBuilder();
 
-        builder.append( "Id: " ).append( profile.getProfileId() ).append( "\tname: " ).append( profile.getName() ).append(
+        builder.append( "Id: " ).append( profile.getProfileId() ).append( "\tname: " ).append(
+            profile.getName() ).append(
             "\tmode: " ).append( profile.getMode() );
 
         return builder;
@@ -166,14 +202,25 @@ public abstract class AbstractStagingMojo
                                       final boolean allowAutoSelect )
         throws MojoExecutionException
     {
-        if ( stageRepos == null || stageRepos.isEmpty() )
+        List<StageRepository> stageRepositories = stageRepos;
+
+        if ( stageRepositories == null || stageRepositories.isEmpty() )
         {
             throw new MojoExecutionException( "No repositories available." );
         }
 
+        if ( allowAutoSelect && isAutomatic() )
+        {
+            stageRepositories = filterForAutomaticSelection( stageRepositories );
+            if ( stageRepositories == null || stageRepositories.isEmpty() )
+            {
+                throw new MojoExecutionException( "No repositories available." );
+            }
+        }
+
         if ( getRepositoryId() != null )
         {
-            for ( StageRepository repo : stageRepos )
+            for ( StageRepository repo : stageRepositories )
             {
                 if ( getRepositoryId().equals( repo.getRepositoryId() ) )
                 {
@@ -182,9 +229,9 @@ public abstract class AbstractStagingMojo
             }
         }
 
-        if ( allowAutoSelect && isAutomatic() && stageRepos.size() == 1 )
+        if ( allowAutoSelect && isAutomatic() && stageRepositories.size() == 1 )
         {
-            StageRepository repo = stageRepos.get( 0 );
+            StageRepository repo = stageRepositories.get( 0 );
             getLog().info( "Using the only staged repository available: " + repo.getRepositoryId() );
 
             return repo;
@@ -197,7 +244,7 @@ public abstract class AbstractStagingMojo
         menu.append( "\n\n\nAvailable Staging Repositories:\n\n" );
 
         int i = 0;
-        for ( StageRepository repo : stageRepos )
+        for ( StageRepository repo : stageRepositories )
         {
             ++i;
             repoMap.put( Integer.toString( i ), repo );
@@ -234,6 +281,144 @@ public abstract class AbstractStagingMojo
         }
     }
 
+    protected Identity whoAmI()
+        throws MojoExecutionException
+    {
+        final Artifact whoAmIArtifact = artifactFactory.createArtifact(
+            "whoami", "whoami", "1", null, "properties"
+        );
+        String serverId = getServerAuthId();
+        if ( serverId == null )
+        {
+            serverId = "nexus-maven-plugin";
+        }
+
+        ArtifactRepository fakeLocal = null;
+        try
+        {
+            final ArtifactRepository whoAmIRepository = new DefaultArtifactRepository(
+                serverId, formatUrl( getNexusUrl() ) + SVC_BASE + "/staging/", new DefaultRepositoryLayout()
+            )
+            {
+                @Override
+                public String getUsername()
+                {
+                    if ( AbstractStagingMojo.this.getUsername() != null )
+                    {
+                        return AbstractStagingMojo.this.getUsername();
+                    }
+                    return super.getUsername();
+                }
+
+                @Override
+                public String getPassword()
+                {
+                    if ( AbstractStagingMojo.this.getPassword() != null )
+                    {
+                        return AbstractStagingMojo.this.getPassword();
+                    }
+                    return super.getPassword();
+                }
+
+                @Override
+                public String toString()
+                {
+                    return "(WhoAmI) " + super.toString();
+                }
+            };
+
+            fakeLocal = new DefaultArtifactRepository(
+                "whoami", createTempFile( "whoami-", "", null ).toURI().toASCIIString(), new DefaultRepositoryLayout()
+            );
+
+            // looks like Maven 2 does not give any chance of artifact provided username/password so try a fallback
+            final AuthenticationInfo backupAuthInfo = wagonManager.getAuthenticationInfo( whoAmIRepository.getId() );
+            wagonManager.addAuthenticationInfo( whoAmIRepository.getId(), getUsername(), getPassword(), null, null );
+
+            try
+            {
+                artifactResolver.resolve( whoAmIArtifact, asList( whoAmIRepository ), fakeLocal );
+            }
+            finally
+            {
+                wagonManager.addAuthenticationInfo( whoAmIRepository.getId(),
+                                                    backupAuthInfo.getUserName(), backupAuthInfo.getPassword(),
+                                                    backupAuthInfo.getPrivateKey(), backupAuthInfo.getPassphrase() );
+            }
+            final File whoAmIFile = whoAmIArtifact.getFile();
+            if ( whoAmIFile != null && whoAmIFile.exists() )
+            {
+                InputStream in = null;
+                try
+                {
+                    in = new FileInputStream( whoAmIFile );
+                    final Properties whoAmIProperties = new Properties();
+                    whoAmIProperties.load( in );
+                    final String ipAddress = whoAmIProperties.getProperty( "ipAddress" );
+                    final String userAgent = whoAmIProperties.getProperty( "userAgent" );
+                    if ( ipAddress != null && userAgent != null )
+                    {
+                        return new Identity( ipAddress, userAgent );
+                    }
+                }
+                finally
+                {
+                    IOUtil.close( in );
+                }
+            }
+        }
+        catch ( Exception ignore )
+        {
+            // we ignore any exception during resolving as we could be talking with a nexus server that does not
+            // support it
+        }
+        finally
+        {
+            if ( fakeLocal != null )
+            {
+                try
+                {
+                    forceDelete( fakeLocal.getBasedir() );
+                }
+                catch ( IOException ignore )
+                {
+                    // we did our best
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Filters out all repositories that does not match the current user ip / user agent.
+     *
+     * @param repositories to be filtered
+     * @return filtered
+     * @throws MojoExecutionException in case current user agent could not be determined
+     */
+    private List<StageRepository> filterForAutomaticSelection( final List<StageRepository> repositories )
+        throws MojoExecutionException
+    {
+        final List<StageRepository> filtered = new ArrayList<StageRepository>();
+
+        final Identity i = whoAmI();
+        if ( i != null )
+        {
+            for ( final StageRepository repository : repositories )
+            {
+                if ( i.wasTheOneThatStaged( repository ) )
+                {
+                    filtered.add( repository );
+                }
+            }
+            return filtered;
+        }
+        else
+        {
+            return repositories;
+        }
+    }
+
     public String getRepositoryId()
     {
         return repositoryId;
@@ -242,6 +427,37 @@ public abstract class AbstractStagingMojo
     public void setRepositoryId( final String repositoryId )
     {
         this.repositoryId = repositoryId;
+    }
+
+    protected static class Identity
+    {
+
+        private final String ipAddress;
+
+        private final String userAgent;
+
+        private Identity( String ipAddress, String userAgent )
+        {
+
+            this.ipAddress = ipAddress;
+            this.userAgent = userAgent;
+        }
+
+        public String getIpAddress()
+        {
+            return ipAddress;
+        }
+
+        public String getUserAgent()
+        {
+            return userAgent;
+        }
+
+        public boolean wasTheOneThatStaged( final StageRepository repository )
+        {
+            return getIpAddress().equals( repository.getIpAddress() )
+                && getUserAgent().equals( repository.getUserAgent() );
+        }
     }
 
 }
