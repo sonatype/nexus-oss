@@ -128,18 +128,17 @@ public abstract class AbstractStagingMojo
 
         try
         {
+            builder.append( prompt );
             if ( groupId != null )
             {
                 repos = getClient().getClosedStageRepositoriesForUser( groupId, artifactId, version );
-                builder.append( prompt ).append( " for: '" ).append( groupId ).append( ":" ).append(
-                    artifactId ).append(
-                    ":" ).append( version ).append( "':" );
+                builder.append( String.format( " for: '%s:%s:%s'", groupId, artifactId, version ) );
             }
             else
             {
                 repos = getClient().getClosedStageRepositories();
-                builder.append( prompt ).append( ": " );
             }
+            builder.append( ": " );
         }
         catch ( RESTLightClientException e )
         {
@@ -180,9 +179,10 @@ public abstract class AbstractStagingMojo
             builder.append( "\n   Description: " ).append( repo.getDescription() );
         }
 
-        builder.append( "\n   Details: (user: " ).append( repo.getUser() ).append( ", " );
-        builder.append( "ip: " ).append( repo.getIpAddress() ).append( ", " );
-        builder.append( "user agent: " ).append( repo.getUserAgent() ).append( ")" );
+        builder.append( String.format(
+            "\n   Details: (user: %s, ip: %s, user agent: %s)",
+            repo.getUser(), repo.getIpAddress(), repo.getUserAgent() )
+        );
 
         return builder;
     }
@@ -191,9 +191,10 @@ public abstract class AbstractStagingMojo
     {
         StringBuilder builder = new StringBuilder();
 
-        builder.append( "Id: " ).append( profile.getProfileId() ).append( "\tname: " ).append(
-            profile.getName() ).append(
-            "\tmode: " ).append( profile.getMode() );
+        builder
+            .append( "Id: " ).append( profile.getProfileId() )
+            .append( "\tname: " ).append( profile.getName() )
+            .append( "\tmode: " ).append( profile.getMode() );
 
         return builder;
     }
