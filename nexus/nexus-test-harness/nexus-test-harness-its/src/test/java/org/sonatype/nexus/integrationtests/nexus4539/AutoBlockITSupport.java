@@ -20,8 +20,7 @@ package org.sonatype.nexus.integrationtests.nexus4539;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.notNullValue;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -163,7 +162,7 @@ public abstract class AutoBlockITSupport
      */
     protected void assertStatus( RepositoryStatusResource s, RemoteStatus status, ProxyMode mode )
     {
-        assertThat( s, not( nullValue() ) );
+        assertThat( s, notNullValue() );
         assertThat( s.getRemoteStatus(), equalTo( status.toString() ) );
         assertThat( s.getProxyMode(), equalTo( mode.toString() ) );
     }
