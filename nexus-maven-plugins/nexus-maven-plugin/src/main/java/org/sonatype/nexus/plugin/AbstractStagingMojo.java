@@ -299,34 +299,7 @@ public abstract class AbstractStagingMojo
         {
             final ArtifactRepository whoAmIRepository = new DefaultArtifactRepository(
                 serverId, formatUrl( getNexusUrl() ) + SVC_BASE + "/staging/", new DefaultRepositoryLayout()
-            )
-            {
-                @Override
-                public String getUsername()
-                {
-                    if ( AbstractStagingMojo.this.getUsername() != null )
-                    {
-                        return AbstractStagingMojo.this.getUsername();
-                    }
-                    return super.getUsername();
-                }
-
-                @Override
-                public String getPassword()
-                {
-                    if ( AbstractStagingMojo.this.getPassword() != null )
-                    {
-                        return AbstractStagingMojo.this.getPassword();
-                    }
-                    return super.getPassword();
-                }
-
-                @Override
-                public String toString()
-                {
-                    return "(WhoAmI) " + super.toString();
-                }
-            };
+            );
 
             fakeLocal = new DefaultArtifactRepository(
                 "local", createTempFile( "whoami-", "", null ).toURI().toASCIIString(), new DefaultRepositoryLayout()
