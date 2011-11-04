@@ -46,6 +46,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * every midnight that is earlier than local time and not on the same day of the year.
  * <p/>
  * This test simulates a client whose timezone offset is two hours more than the local timezone.
+ * <p/>
+ * Related issues with timezone problems in the scheduled tasks:
+ * <ul>
+ * <li> https://issues.sonatype.org/browse/NEXUS-4617 </li>
+ * <li> https://issues.sonatype.org/browse/NEXUS-4616 </li>
+ * </ul>
  *
  * @since 1.10.0
  */
@@ -67,6 +73,8 @@ public class Nexus3996ScheduledTasksTimezoneDifferentDayValidationIT
         task.setProperties( Lists.newArrayList( property ) );
 
         Calendar cal = Calendar.getInstance();
+
+        // simulating client timezone here: calculate offset from current timezone
 
         // client is tz+2 -> 3 hours ahead for local tz is one hour ahead for client tz
         cal.add( Calendar.HOUR_OF_DAY, 3 );
