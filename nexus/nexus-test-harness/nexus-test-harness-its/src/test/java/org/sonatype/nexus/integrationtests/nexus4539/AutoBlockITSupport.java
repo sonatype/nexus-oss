@@ -158,6 +158,9 @@ public abstract class AutoBlockITSupport
         throw new IllegalStateException();
     }
 
+    /**
+     * Assert status
+     */
     protected void assertStatus( RepositoryStatusResource s, RemoteStatus status, ProxyMode mode )
     {
         assertThat( s, not( nullValue() ) );

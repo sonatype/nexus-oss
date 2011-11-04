@@ -18,10 +18,6 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4539;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.not;
-
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.testng.annotations.BeforeMethod;
@@ -48,24 +44,19 @@ public class NEXUS4539ManualBlockIT
         // initial status, timing out
         waitFor( RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_AUTO );
 
-        // just make sure autoblock went remote
-        assertThat( pathsTouched, not( empty() ) );
-        pathsTouched.clear();
-
-        // enable manual block
+        // set manual block
         repoUtil.setBlockProxy( REPO, true );
-
         assertStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
 
         // server back to normal
         super.sleepTime = -1;
 
-        Thread.sleep( 5 * 1000 );
         // nexus shall not unblock
+        Thread.sleep( 15 * 1000 );
         assertStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
 
-        shakeNexus();
         // must still be manual blocked
+        shakeNexus();
         assertStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
     }
 
