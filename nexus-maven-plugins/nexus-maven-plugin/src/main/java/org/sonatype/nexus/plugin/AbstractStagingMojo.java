@@ -37,7 +37,7 @@ import org.apache.maven.artifact.factory.ArtifactFactory;
 import org.apache.maven.artifact.manager.WagonManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.DefaultArtifactRepository;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
 import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
@@ -74,6 +74,11 @@ public abstract class AbstractStagingMojo
      * @component
      */
     private WagonManager wagonManager;
+
+    /**
+     * @component roleHint="default"
+     */
+    private ArtifactRepositoryLayout defaultRepositoryLayout;
 
     private StageClient client;
 
@@ -298,11 +303,11 @@ public abstract class AbstractStagingMojo
         try
         {
             final ArtifactRepository whoAmIRepository = new DefaultArtifactRepository(
-                serverId, formatUrl( getNexusUrl() ) + SVC_BASE + "/staging/", new DefaultRepositoryLayout()
+                serverId, formatUrl( getNexusUrl() ) + SVC_BASE + "/staging/", defaultRepositoryLayout
             );
 
             fakeLocal = new DefaultArtifactRepository(
-                "local", createTempFile( "whoami-", "", null ).toURI().toASCIIString(), new DefaultRepositoryLayout()
+                "local", createTempFile( "whoami-", "", null ).toURI().toASCIIString(), defaultRepositoryLayout
             );
 
             // looks like Maven 2 does not give any chance of artifact provided username/password so try a fallback
