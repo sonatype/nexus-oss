@@ -79,7 +79,7 @@ public abstract class AbstractStagingMojo
             }
             catch ( RESTLightClientException e )
             {
-                throw new MojoExecutionException( "Failed to connect to Nexus at: " + getNexusUrl() );
+                throw new MojoExecutionException( "Failed to connect to Nexus at: " + getNexusUrl(), e );
             }
         }
 
