@@ -29,7 +29,9 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExpiredCredentialsException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.codec.Base64;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionException;
+import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
@@ -219,11 +221,10 @@ public class NexusHttpAuthenticationFilter
 
     protected boolean executeAnonymousLogin( ServletRequest request, ServletResponse response )
     {
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Attempting to authenticate Subject as Anonymous request..." );
-        }
+        getLogger().debug( "Attempting to authenticate Subject as Anonymous request..." );
 
+        boolean anonymousLoginSuccessful = false;
+        
         Subject subject = getSubject( request, response );
 
         UsernamePasswordToken usernamePasswordToken =
@@ -235,15 +236,31 @@ public class NexusHttpAuthenticationFilter
             request.setAttribute( ANONYMOUS_LOGIN, Boolean.TRUE );
 
             subject.login( usernamePasswordToken );
+        }
+        catch( UnknownSessionException e )
+        {
+            Session anonSession = subject.getSession( false );
 
-            if ( getLogger().isDebugEnabled() )
+            this.getLogger().warn( "UnknownSessionException was thrown for with session: '{}'", anonSession, e );
+            if( anonSession != null )
             {
-                getLogger().debug( "Successfully logged in as anonymous" );
+                // clear the session
+                this.getLogger().debug( "Logging out the current anonymous user, to clear the session." );
+                try
+                {
+                    subject.logout();
+                }
+                catch( UnknownSessionException expectedException )
+                {
+                    this.logger.trace( "Forced a logout with an Unknown Session so the current subject would get cleaned up.", e );
+                }
+
+                // login again
+                this.getLogger().debug( "Attempting to login as anonymous for the second time." );
+                subject.login( usernamePasswordToken );
+
+                anonymousLoginSuccessful = true;
             }
-
-            postAuthcEvent( request, getNexusConfiguration().getAnonymousUsername(), getUserAgent( request ), true );
-
-            return true;
         }
         catch ( AuthenticationException ae )
         {
@@ -251,10 +268,16 @@ public class NexusHttpAuthenticationFilter
                 "Unable to authenticate user [anonymous] from IP Address "
                     + RemoteIPFinder.findIP( (HttpServletRequest) request ) );
 
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "Unable to log in subject as anonymous", ae );
-            }
+            getLogger().debug( "Unable to log in subject as anonymous", ae );
+        }
+
+        if( anonymousLoginSuccessful )
+        {
+            getLogger().debug( "Successfully logged in as anonymous" );
+
+            postAuthcEvent( request, getNexusConfiguration().getAnonymousUsername(), getUserAgent( request ), true );
+
+            return true;
         }
 
         // always default to false. If we've made it to this point in the code, that
@@ -307,7 +330,7 @@ public class NexusHttpAuthenticationFilter
             {
                 getSubject( request, response ).logout();
             }
-            catch ( SessionException e )
+            catch ( SessionException e ) //TODO: investigate why this is getting thrown
             {
                 // we need to prevent log spam, just log this as trace
                 getLogger().trace( "Failed to find session for anonymous user.", e );

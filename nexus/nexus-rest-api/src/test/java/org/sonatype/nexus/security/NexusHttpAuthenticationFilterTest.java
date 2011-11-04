@@ -18,59 +18,171 @@
  */
 package org.sonatype.nexus.security;
 
-import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.eq;
-
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-
-import junit.framework.Assert;
-
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.realm.SimpleAccountRealm;
+import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.session.mgt.DelegatingSession;
 import org.apache.shiro.session.mgt.SimpleSession;
+import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.subject.support.DelegatingSubject;
 import org.apache.shiro.util.ThreadContext;
-import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.*;
+
+/**
+ * There is a problem either with Shiro (or how we are using it) that effects logging and logging out when using a DelegatingSession (Nexus).</BR>
+ * On logout the actual session is expired (see nexus-4378), but the DelegatingSession is not handling this.  Same for login (NEXUS-4257), if the RUNAS user attribute is set to a session that is expired, the user will NOT be able to login.</BR>
+ * </BR>
+ * NOTE: I don't know why the session has the RUNAS attribute set, we do not use this in nexus.
+ */
 public class NexusHttpAuthenticationFilterTest
 {
+    private DelegatingSubject subject;
+
+    private EnterpriseCacheSessionDAO sessionDAO;
+
+    private SimpleSession simpleSession;
+
+    private HttpServletRequest request;
+
+    private HttpServletResponse response;
+
+    private NexusConfiguration nexusConfiguration;
+
+    @Before
+    public void bindSubjectToThread()
+    {
+        // setup a simple realm for authc
+        SimpleAccountRealm simpleAccountRealm = new SimpleAccountRealm();
+        simpleAccountRealm.addAccount( "anonymous", "anonymous" );
+        DefaultSecurityManager securityManager = new DefaultSecurityManager();
+        securityManager.setRealm( simpleAccountRealm );
+
+        DefaultSessionManager sessionManager = (DefaultSessionManager) securityManager.getSessionManager();
+        sessionDAO = new EnterpriseCacheSessionDAO();
+        sessionManager.setSessionDAO( sessionDAO );
+
+        simpleSession = new SimpleSession();
+        sessionDAO.create( simpleSession );
+
+        List<PrincipalCollection> principalCollectionList = new ArrayList<PrincipalCollection>();
+        principalCollectionList.add( new SimplePrincipalCollection( "other Principal", "some-realm" ) );
+
+        simpleSession.setAttribute( DelegatingSubject.class.getName() + ".RUN_AS_PRINCIPALS_SESSION_KEY",
+                                    principalCollectionList );
+
+        DelegatingSession delegatingSession =
+            new DelegatingSession( sessionManager, new DefaultSessionKey( simpleSession.getId() ) );
+
+        // set the user
+
+        subject = new DelegatingSubject( new SimplePrincipalCollection( "anonymous", "realmName" ), true, null,
+                                         delegatingSession, securityManager );
+        ThreadContext.bind( subject );
+    }
+
+    @Before
+    public void setupMockResponseAndRequest()
+    {
+        // setup the MOCK
+        request = mock( HttpServletRequest.class );
+        when( request.getAttribute( eq( NexusHttpAuthenticationFilter.ANONYMOUS_LOGIN ) ) ).thenReturn( "true" );
+        when( request.getAttribute( eq( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED ) ) ).thenReturn( null );
+        // end fun with mocks
+
+        response = mock( HttpServletResponse.class );
+    }
+
+    @Before
+    public void setupNexusConfig()
+    {
+        nexusConfiguration = Mockito.mock( NexusConfiguration.class );
+        Mockito.when( nexusConfiguration.getAnonymousUsername() ).thenReturn( "anonymous" );
+        Mockito.when( nexusConfiguration.getAnonymousPassword() ).thenReturn( "anonymous" );
+    }
+
+    @After
+    public void unbindSubjectFromThread()
+    {
+        ThreadContext.remove();
+    }
+
     /**
      * Test post handles does not throw an exception if the anonymous users session has expired.
+     *
      * @throws Exception
      */
     @Test
     public void testPostHandleForExpiredSessions()
         throws Exception
     {
-        NexusHttpAuthenticationFilter filter = new NexusHttpAuthenticationFilter();
 
-        // set the user
-        DelegatingSubject subject = new DelegatingSubject( new SimplePrincipalCollection( "anonymous", "realmName" ), true, null, new SimpleSession(),  new DefaultSecurityManager() );
-        ThreadContext.bind( subject );
-        
-        Assert.assertNotNull( SecurityUtils.getSubject() );
+        // make sure the subject is returned, then expire the session
+        assertThat( SecurityUtils.getSubject(), equalTo( (Subject) subject ) );
         subject.getSession().setTimeout( 0 ); // expire the session
 
-        // setup the MOC
-        HttpServletRequest request = createNiceMock( HttpServletRequest.class );
-        expect( request.getAttribute( eq( NexusHttpAuthenticationFilter.ANONYMOUS_LOGIN ) ) )
-            .andReturn( "true" ).anyTimes();
-        expect( request.getAttribute( eq( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED ) ) )
-            .andReturn( null ).anyTimes();
-        EasyMock.replay( request );
-        // end fun with mocks
-
-        ServletResponse response = createNiceMock( ServletResponse.class );
 
         // Verify this does not throw an exception when the session is expired
+        NexusHttpAuthenticationFilter filter = new NexusHttpAuthenticationFilter();
         filter.postHandle( request, response );
+
+        // verify the session is nulled out
+        assertThat( subject.getSession( false ), nullValue() );
+    }
+
+    /**
+     * Test that executeAnonymousLogin will attempt to recover after an UnknownSessionException is thrown.
+     * @throws Exception
+     */
+    @Test
+    public void testExecuteAnonymousLoginForAnonUserWithInvalidSession()
+        throws Exception
+    {
+        // ******
+        // Delete the session directly to mimic what I think is the cause of the Unknown SessionException
+        // ******
+        sessionDAO.delete( simpleSession );
+
+
+        // Verify this does not throw an exception when the session is expired
+        boolean result = new NexusHttpAuthenticationFilter()
+        {
+            // expose protected method
+            @Override
+            public boolean executeAnonymousLogin( ServletRequest request, ServletResponse response )
+            {
+                return super.executeAnonymousLogin( request, response );
+            }
+
+            @Override
+            protected NexusConfiguration getNexusConfiguration()
+            {
+                return nexusConfiguration;
+            }
+        }.executeAnonymousLogin( request, response );
+        // what a hack... just to call a protected method
+        assertThat( "Anonymous user was not logged in after UnknownSessionException", result );
     }
 }
