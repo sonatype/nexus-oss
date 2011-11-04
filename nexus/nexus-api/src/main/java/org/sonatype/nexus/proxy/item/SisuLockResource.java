@@ -38,7 +38,15 @@ final class SisuLockResource
     @Override
     public void lockShared()
     {
-        lock.lockShared( Thread.currentThread() );
+        final Thread self = Thread.currentThread();
+        if ( lock.getExclusiveCount( self ) > 0 )
+        {
+            lock.lockExclusive( self );
+        }
+        else
+        {
+            lock.lockShared( self );
+        }
     }
 
     @Override
@@ -50,21 +58,14 @@ final class SisuLockResource
     @Override
     public void unlock()
     {
-        /*
-         * Maintains any exclusive access until the last unlock, as Nexus expects
-         */
         final Thread self = Thread.currentThread();
-        if ( lock.getSharedCount( self ) > 0 )
-        {
-            lock.unlockShared( self );
-        }
-        else if ( lock.getExclusiveCount( self ) > 0 )
+        if ( lock.getExclusiveCount( self ) > 0 )
         {
             lock.unlockExclusive( self );
         }
         else
         {
-            throw new IllegalStateException( self + " does not own this lock" );
+            lock.unlockShared( self );
         }
     }
 
