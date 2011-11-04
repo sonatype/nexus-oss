@@ -67,7 +67,7 @@ public class NEXUS4539AutoBlockIT
         assertThat( pathsTouched, not( empty() ) );
         pathsTouched.clear();
         // let is sit on ice for 30s
-        Thread.sleep( 30000 );
+        Thread.sleep( 30 * 1000 );
 
         // it must auto unblock again
         sleepTime = -1;

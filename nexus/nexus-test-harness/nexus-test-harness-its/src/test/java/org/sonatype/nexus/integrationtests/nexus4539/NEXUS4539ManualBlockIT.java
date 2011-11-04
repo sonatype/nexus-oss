@@ -20,12 +20,10 @@ package org.sonatype.nexus.integrationtests.nexus4539;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
-import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -57,36 +55,19 @@ public class NEXUS4539ManualBlockIT
         // enable manual block
         repoUtil.setBlockProxy( REPO, true );
 
-        RepositoryStatusResource status = repoUtil.getStatus( REPO );
-        assertThat( status.getRemoteStatus(), equalTo( RemoteStatus.UNAVAILABLE.name() ) );
-        assertThat( status.getProxyMode(), equalTo( ProxyMode.BLOCKED_MANUAL.name() ) );
+        assertStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
 
         // server back to normal
         super.sleepTime = -1;
 
-        waitPath();
-
-        status = repoUtil.getStatus( REPO );
+        Thread.sleep( 5 * 1000 );
         // nexus shall not unblock
-        assertThat( status.getRemoteStatus(), equalTo( RemoteStatus.UNAVAILABLE.name() ) );
-        assertThat( status.getProxyMode(), equalTo( ProxyMode.BLOCKED_MANUAL.name() ) );
+        assertStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
+
+        shakeNexus();
+        // must still be manual blocked
+        assertStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
     }
 
-    protected void waitPath()
-        throws Exception
-    {
-        for ( int i = 0; i < 1000; i++ )
-        {
-            // mean nexus did touch the remote server to auto unblock
-            if ( pathsTouched.contains( "repository/" ) )
-            {
-                return;
-            }
 
-            Thread.sleep( 500 );
-            System.out.println( pathsTouched );
-        }
-
-        throw new IllegalStateException();
-    }
 }

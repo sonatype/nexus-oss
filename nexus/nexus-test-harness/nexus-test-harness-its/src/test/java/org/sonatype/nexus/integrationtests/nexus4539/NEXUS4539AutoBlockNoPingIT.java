@@ -20,6 +20,8 @@ package org.sonatype.nexus.integrationtests.nexus4539;
 
 import java.io.IOException;
 
+import org.testng.SkipException;
+
 /**
  * Do as same as {@link NEXUS4539AutoBlockIT}, but instead of trying to download something from nexus to speed things up
  * it just relax an wait. This test take around 800 sec (more then 10 minutes).
@@ -32,5 +34,12 @@ public class NEXUS4539AutoBlockNoPingIT
         throws IOException
     {
         // do not ping
+    }
+
+    @Override
+    public void autoBlock()
+        throws Exception
+    {
+        throw new SkipException( "Not run this for now, take too much time" );
     }
 }

@@ -153,11 +153,16 @@ public abstract class AutoBlockITSupport
             Thread.sleep( 500 );
         }
 
+        assertStatus( s, status, mode );
+
+        throw new IllegalStateException();
+    }
+
+    protected void assertStatus( RepositoryStatusResource s, RemoteStatus status, ProxyMode mode )
+    {
         assertThat( s, not( nullValue() ) );
         assertThat( s.getRemoteStatus(), equalTo( status.toString() ) );
         assertThat( s.getProxyMode(), equalTo( mode.toString() ) );
-
-        throw new IllegalStateException();
     }
 
 }
