@@ -328,7 +328,7 @@ public abstract class AbstractStagingMojo
             };
 
             fakeLocal = new DefaultArtifactRepository(
-                "whoami", createTempFile( "whoami-", "", null ).toURI().toASCIIString(), new DefaultRepositoryLayout()
+                "local", createTempFile( "whoami-", "", null ).toURI().toASCIIString(), new DefaultRepositoryLayout()
             );
 
             // looks like Maven 2 does not give any chance of artifact provided username/password so try a fallback
