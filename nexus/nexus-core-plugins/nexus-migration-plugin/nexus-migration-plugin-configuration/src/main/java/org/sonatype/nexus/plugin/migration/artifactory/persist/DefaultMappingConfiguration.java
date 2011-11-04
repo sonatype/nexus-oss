@@ -179,7 +179,7 @@ public class DefaultMappingConfiguration
             }
             catch ( IOException e )
             {
-                // just releasing lock
+                getLogger().debug( "Error releasing lock for mapping configuration", e );
             }
         }
 
