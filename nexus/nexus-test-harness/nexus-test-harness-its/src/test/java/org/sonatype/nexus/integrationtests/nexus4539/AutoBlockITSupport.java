@@ -45,7 +45,9 @@ import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
 import com.google.common.collect.Lists;
@@ -165,6 +167,19 @@ public abstract class AutoBlockITSupport
         assertThat( s, notNullValue() );
         assertThat( s.getRemoteStatus(), equalTo( status.toString() ) );
         assertThat( s.getProxyMode(), equalTo( mode.toString() ) );
+    }
+
+    @BeforeClass
+    public static void fixAutoblockTime()
+    {
+        // NEXUS-4539 - to get test faster reduced autoblock check from 5 minutes to 30 seconds
+        System.setProperty( "plexus.autoblock.remote.status.retain.time", String.valueOf( 30 * 1000 ) );
+    }
+
+    @AfterClass
+    public static void restoreAutoblockTime()
+    {
+        System.clearProperty( "plexus.autoblock.remote.status.retain.time" );
     }
 
 }

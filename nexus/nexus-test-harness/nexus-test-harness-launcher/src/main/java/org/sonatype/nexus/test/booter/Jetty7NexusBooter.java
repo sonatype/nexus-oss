@@ -156,9 +156,6 @@ public class Jetty7NexusBooter
         // The proper fix is to make all Indexer related ITs behave "properly" (with some heuristics?), and have some
         // sort of "try-wait-try-failAfterSomeRetries" the search operation itself.
         System.setProperty( "mavenIndexerBlockingCommits", Boolean.TRUE.toString() );
-        
-        // NEXUS-4539 - to get test faster reduced autoblock check from 5 minutes to 30 seconds
-        System.setProperty( "plexus.autoblock.remote.status.retain.time", String.valueOf( 30*1000 ) );
 
         // ---------------
 
