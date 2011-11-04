@@ -72,6 +72,7 @@ import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import org.sonatype.nexus.util.ConstantNumberSequence;
 import org.sonatype.nexus.util.FibonacciNumberSequence;
 import org.sonatype.nexus.util.NumberSequence;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
@@ -84,8 +85,16 @@ public abstract class AbstractProxyRepository
     extends AbstractRepository
     implements ProxyRepository
 {
-    /** The time while we do NOT check an already known remote status: 5 mins. This value is system default. */
-    private static final long REMOTE_STATUS_RETAIN_TIME = 5L * 60L * 1000L;
+    /**
+     * Default time to do NOT check an already known remote status: 5 mins.
+     */
+    private static final long DEFAULT_REMOTE_STATUS_RETAIN_TIME = 5L * 60L * 1000L;
+
+    /**
+     * The time while we do NOT check an already known remote status
+     */
+    private static final long REMOTE_STATUS_RETAIN_TIME = SystemPropertiesHelper.getLong(
+        "plexus.autoblock.remote.status.retain.time", DEFAULT_REMOTE_STATUS_RETAIN_TIME );
 
     /**
      * The maximum amount of time to have a repository in AUTOBlock status: 60 minutes (1hr). This value is system
