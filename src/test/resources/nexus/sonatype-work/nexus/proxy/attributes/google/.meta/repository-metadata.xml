@@ -1,0 +1,28 @@
+<file>
+  <generation>2</generation>
+  <path>/.meta/repository-metadata.xml</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>google</repositoryId>
+  <created>1308832584832</created>
+  <modified>1308832584832</modified>
+  <storedLocally>1308832584835</storedLocally>
+  <lastTouched>1308832584835</lastTouched>
+  <lastRequested>1308832584836</lastRequested>
+  <expired>false</expired>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>d83f8481e0a7cb62f8b1b16e6a0c1e0f8cdd5e1f</string>
+    </entry>
+    <entry>
+      <string>contentGenerator</string>
+      <string>NexusRepositoryMetadataContentGenerator</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>e47de443c7bc7d108553bbe26ab3c08d</string>
+    </entry>
+  </attributes>
+  <length>345</length>
+</file>

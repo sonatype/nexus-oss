@@ -1,0 +1,507 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>de.is24.nexus</groupId>
+  <artifactId>nexus-yum-plugin</artifactId>
+  <version>1.13-SNAPSHOT</version>
+  <packaging>nexus-plugin</packaging>
+  <name>Nexus Yum Plugin</name>
+  <description>Nexus Plugin to let Nexus generate a RPM repository out of the repositories</description>
+  <url>http://code.google.com/p/nexus-yum-plugin/</url>
+
+  <organization>
+    <name>Immobilien Scout GmbH</name>
+    <url>http://www.immobilienscout24.de</url>
+  </organization>
+
+  <developers>
+    <developer>
+      <id>sherold</id>
+      <name>Sebastian Herold</name>
+      <email>sebastian.herold@immobilienscout24.de</email>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:svn:http://nexus-yum-plugin.googlecode.com/svn/trunk</connection>
+    <developerConnection>scm:svn:https://nexus-yum-plugin.googlecode.com/svn/trunk</developerConnection>
+  </scm>
+
+  <distributionManagement>
+    <repository>
+      <id>releases</id>
+      <name>Local Repository</name>
+      <url>${nexus.url}/content/repositories/releases/</url>
+    </repository>
+    <snapshotRepository>
+      <id>snapshots</id>
+      <name>Local Snapshots</name>
+      <url>${nexus.url}/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+
+
+  <properties>
+    <!-- Set the Nexus version here, against which you build the plugin -->
+    <nexus.version>1.9.2.3</nexus.version>
+    <cobertura.line.coverage>70</cobertura.line.coverage>
+    <cobertura.branch.coverage>70</cobertura.branch.coverage>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <hamcrest.version>1.2.1</hamcrest.version>
+    <cargo.jvm.args />
+    <cargo.start.goal>start</cargo.start.goal>
+  </properties>
+
+  <dependencies>
+
+    <!-- Pure Java RPM-library -->
+    <dependency>
+      <groupId>org.freecompany.redline</groupId>
+      <artifactId>redline</artifactId>
+      <version>1.1.5</version>
+    </dependency>
+
+    <!-- Main plugin API, pulling in what is needed -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <version>${nexus.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- This dependency is only needed if you want to include REST Resources -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rest-api</artifactId>
+      <version>${nexus.version}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>maven-repository-metadata</artifactId>
+          <groupId>org.apache.maven</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>maven-aether-provider</artifactId>
+          <groupId>org.apache.maven</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- Basic testing -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-test-api</artifactId>
+      <version>${nexus.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>maven-repository-metadata</artifactId>
+          <groupId>org.apache.maven</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>maven-aether-provider</artifactId>
+          <groupId>org.apache.maven</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- #ITSet BEGINS -->
+    <!-- Nexus IT setup (dependencies below are needed if you have extensive 
+      ITs and you want to use Nexus Environment) -->
+    <!-- There are plugins connected to this dependency, see below! -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <scope>test</scope>
+      <version>${nexus.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>maven-toolchain</artifactId>
+          <groupId>org.apache.maven</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>testng</artifactId>
+          <groupId>org.testng</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- #ITSet ENDS -->
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-exec</artifactId>
+      <version>1.1</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>1.4</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>xmlunit</groupId>
+      <artifactId>xmlunit</artifactId>
+      <version>1.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.tempus-fugit</groupId>
+      <artifactId>tempus-fugit</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>${hamcrest.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
+      <version>${hamcrest.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-repository-metadata</artifactId>
+      <version>3.0.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <version>3.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.1.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+      <version>4.1.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-embedder</artifactId>
+      <version>3.0.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-aether-provider</artifactId>
+      <version>3.0.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-api</artifactId>
+      <version>1.13</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-impl</artifactId>
+      <version>1.13</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-spi</artifactId>
+      <version>1.13</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-util</artifactId>
+      <version>1.13</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-connector-wagon</artifactId>
+      <version>1.13</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.wagon</groupId>
+      <artifactId>wagon-http</artifactId>
+      <version>1.0-beta-7</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <!-- #ITSet BEGINS -->
+  <!-- Nexus IT setup (dependencies below are needed if you have extensive 
+    ITs and you want to use Nexus Environment) -->
+  <!-- There are plugins and dependencies connected to this import, see below 
+    and above! -->
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-webapp-dependencies</artifactId>
+        <version>${nexus.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <!-- #ITSet ENDS -->
+
+  <build>
+    <plugins>
+
+      <!-- Needed for custom packaging -->
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <version>1.3</version>
+        <extensions>true</extensions>
+        <dependencies>
+          <dependency>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>app-lifecycle-nexus</artifactId>
+            <version>1.3</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>create-bundle</id>
+            <phase>package</phase>
+            <goals>
+              <goal>create-bundle</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Have to set source level to Java 6, we use annotations ;-) -->
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.1</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+
+      <!-- check the test coverage -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <check>
+            <branchRate>${cobertura.branch.coverage}</branchRate>
+            <lineRate>${cobertura.line.coverage}</lineRate>
+            <totalBranchRate>${cobertura.branch.coverage}</totalBranchRate>
+            <totalLineRate>${cobertura.line.coverage}</totalLineRate>
+            <packageLineRate>${cobertura.branch.coverage}</packageLineRate>
+            <packageBranchRate>${cobertura.line.coverage}</packageBranchRate>
+          </check>
+        </configuration>
+        <executions>
+          <execution>
+            <id>clean</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>instrument</id>
+            <phase>post-site</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- copy jar to sonatype config dir -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+          <execution>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <target>
+                <unzip
+                  src="${project.build.directory}/${project.build.finalName}-bundle.zip"
+                  dest="${project.build.directory}/test-classes/nexus/sonatype-work/nexus/plugin-repository" />
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- download Nexus Professional WAR-file -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.3</version>
+        <executions>
+          <execution>
+            <id>copy-nexus-war-file</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-professional</artifactId>
+                  <version>1.9.2.3</version>
+                  <type>war</type>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                  <destFileName>nexus-professional-${nexus.version}.war</destFileName>
+                </artifactItem>
+              </artifactItems>
+              <!-- other configurations here -->
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- run tomcat for nexus webapp -->
+      <plugin>
+        <groupId>org.codehaus.cargo</groupId>
+        <artifactId>cargo-maven2-plugin</artifactId>
+        <version>1.1.1</version>
+        <configuration>
+          <container>
+            <containerId>jetty6x</containerId>
+            <type>embedded</type>
+            <systemProperties>
+              <plexus.nexus-work>${project.build.directory}/test-classes/nexus/sonatype-work/nexus</plexus.nexus-work>
+            </systemProperties>
+          </container>
+          <configuration>
+
+            <deployables>
+              <deployable>
+                <groupId>org.sonatype.nexus</groupId>
+                <artifactId>nexus-webapp</artifactId>
+                <location>${project.build.directory}/nexus-professional-${nexus.version}.war</location>
+                <properties>
+                  <context>nexus</context>
+                </properties>
+                <type>war</type>
+              </deployable>
+            </deployables>
+          </configuration>
+        </configuration>
+        <executions>
+          <execution>
+            <id>start-tomcat</id>
+            <goals>
+              <goal>${cargo.start.goal}</goal>
+            </goals>
+            <phase>pre-integration-test</phase>
+            <configuration>
+              <configuration>
+                <properties>
+                  <cargo.jvmargs>${cargo.jvm.args} -server</cargo.jvmargs>
+                  <cargo.tomcat.ajp.port>18093</cargo.tomcat.ajp.port>
+                </properties>
+              </configuration>
+            </configuration>
+          </execution>
+          <execution>
+            <id>stop-tomcat</id>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+            <phase>post-integration-test</phase>
+            <configuration>
+              <configuration>
+                <properties>
+                  <cargo.tomcat.ajp.port>18093</cargo.tomcat.ajp.port>
+                </properties>
+              </configuration>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- run integration tests -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.9</version>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>verify</id>
+            <goals>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>debug-tomcat</id>
+      <properties>
+        <cargo.jvm.args>
+          -Xdebug
+          -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+          -Xnoagent
+          -Djava.compiler=NONE
+        </cargo.jvm.args>
+      </properties>
+    </profile>
+  </profiles>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <formats>
+            <format>html</format>
+            <format>xml</format>
+          </formats>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.7.2</version>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jdepend-maven-plugin</artifactId>
+        <version>2.0-beta-2</version>
+      </plugin>
+    </plugins>
+  </reporting>
+</project>

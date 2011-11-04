@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stagingConfiguration>
+  <version>1.0.7</version>
+  <profiles>
+    <profile>
+      <id>124c925916d85479</id>
+      <name>staging-test-profile</name>
+      <repositoryTargetId>1</repositoryTargetId>
+      <repositoryTemplateId>maven2yum_hosted_release</repositoryTemplateId>
+      <repositoryType>maven2</repositoryType>
+      <targetGroups>
+        <targetGroup>public</targetGroup>
+      </targetGroups>
+      <promoteTargetRepository>production</promoteTargetRepository>
+      <mode>BOTH</mode>
+    </profile>
+  </profiles>
+  <profileOrder>
+    <profileOrder>124c925916d85479</profileOrder>
+  </profileOrder>
+</stagingConfiguration>

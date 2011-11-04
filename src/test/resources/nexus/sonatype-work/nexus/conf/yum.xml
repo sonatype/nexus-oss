@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <repositoryCreationTimeout>150</repositoryCreationTimeout>
+  <aliasMappings>
+    <aliasMapping>
+      <repoId>releases</repoId>
+      <alias>trunk</alias>
+      <version>5.1.15-2</version>
+    </aliasMapping>
+    <aliasMapping>
+      <repoId>releases</repoId>
+      <alias>production</alias>
+      <version>5.1.15-1</version>
+    </aliasMapping>
+  </aliasMappings>
+</configuration>
