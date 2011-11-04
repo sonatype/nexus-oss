@@ -22,7 +22,7 @@ import java.io.IOException;
 
 /**
  * Do as same as {@link NEXUS4539AutoBlockIT}, but instead of trying to download something from nexus to speed things up
- * it just relax an wait. This test take around 800 sec (more then 10 minutes).
+ * it just relax an wait.
  */
 public class NEXUS4539AutoBlockNoPingIT
     extends NEXUS4539AutoBlockIT
