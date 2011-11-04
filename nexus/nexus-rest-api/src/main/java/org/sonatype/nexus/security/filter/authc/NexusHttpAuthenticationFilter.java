@@ -241,7 +241,7 @@ public class NexusHttpAuthenticationFilter
         {
             Session anonSession = subject.getSession( false );
 
-            this.getLogger().warn( "UnknownSessionException was thrown for with session: '{}'", anonSession, e );
+            this.getLogger().debug( "Unknown session exception while logging in anonymous user: '{}'", anonSession, e );
             if( anonSession != null )
             {
                 // clear the session
@@ -330,7 +330,7 @@ public class NexusHttpAuthenticationFilter
             {
                 getSubject( request, response ).logout();
             }
-            catch ( SessionException e ) //TODO: investigate why this is getting thrown
+            catch ( SessionException e ) //TODO: investigate why this is getting thrown (original issue NEXUS-4267)
             {
                 // we need to prevent log spam, just log this as trace
                 getLogger().trace( "Failed to find session for anonymous user.", e );
