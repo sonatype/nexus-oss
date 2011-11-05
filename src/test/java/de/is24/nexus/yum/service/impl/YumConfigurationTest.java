@@ -1,16 +1,23 @@
 package de.is24.nexus.yum.service.impl;
 
+import static java.lang.Thread.sleep;
+import static org.apache.commons.io.IOUtils.write;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedHashSet;
 import javax.inject.Inject;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -28,6 +35,8 @@ public class YumConfigurationTest {
   private static final int NEW_TIMEOUT = 5555;
 
   private static final String PRODUCTION_VERSION = "5.1.15-1";
+
+  private static final String NEW_PRODUCTION_VERSION = "5.5.5";
 
   private static final String PRODUCTION = "production";
 
@@ -117,6 +126,34 @@ public class YumConfigurationTest {
     yumConfiguration.setRepositoryCreationTimeout(NEW_TIMEOUT);
     yumConfiguration.load();
     assertThat(yumConfiguration.getRepositoryCreationTimeout(), is(NEW_TIMEOUT));
+  }
+
+  @Test
+  public void shouldUpdateConfigIfFileIsWritten() throws Exception {
+    yumConfiguration.load();
+    manipulateConfigFile();
+    assertEquals(NEW_PRODUCTION_VERSION, yumConfiguration.getVersion(MYREPO_ID, PRODUCTION));
+  }
+
+  private void manipulateConfigFile() throws FileNotFoundException, IOException, InterruptedException {
+    // wait one second, because last modification date of files has granularity
+    // 1 second.
+    sleep(1000);
+
+    String configContent;
+    InputStream inputStream = new FileInputStream(yumConfiguration.getConfigFile());
+    try {
+      configContent = IOUtils.toString(inputStream);
+    } finally {
+      inputStream.close();
+    }
+
+    OutputStream outputStream = new FileOutputStream(yumConfiguration.getConfigFile());
+    try {
+      write(configContent.replace(PRODUCTION_VERSION, NEW_PRODUCTION_VERSION), outputStream);
+    } finally {
+      outputStream.close();
+    }
   }
 
   private XmlYumConfiguration createXmlyumConfig() {

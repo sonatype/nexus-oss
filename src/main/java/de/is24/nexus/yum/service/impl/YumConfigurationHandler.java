@@ -29,6 +29,7 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
   private static final Object LOAD_WRITE_MUTEX = new Object();
 
   private String filename = YUM_XML;
+  private long fileLastModified;
 
   private NexusConfiguration nexusConfiguration;
 
@@ -36,13 +37,20 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
 
   private final ConcurrentHashMap<AliasKey, String> aliasMap = new ConcurrentHashMap<AliasKey, String>();
 
+  private final Unmarshaller unmarshaller;
+  private final Marshaller marshaller;
+
+  public YumConfigurationHandler() throws JAXBException {
+    final JAXBContext jc = JAXBContext.newInstance(XmlYumConfiguration.class, AliasMapping.class);
+    this.marshaller = jc.createMarshaller();
+    this.unmarshaller = jc.createUnmarshaller();
+  }
+
   public void load() {
     synchronized (LOAD_WRITE_MUTEX) {
       try {
-        final JAXBContext jc = JAXBContext.newInstance(XmlYumConfiguration.class, AliasMapping.class);
-        Unmarshaller u = jc.createUnmarshaller();
-        File configurationDirectory = nexusConfiguration.getConfigurationDirectory();
-        xmlYumConfiguration = (XmlYumConfiguration) u.unmarshal(new File(configurationDirectory.getPath(), filename));
+        xmlYumConfiguration = (XmlYumConfiguration) unmarshaller.unmarshal(getConfigFile());
+        fileLastModified = getConfigFile().lastModified();
         fillAliasMap();
       } catch (JAXBException e) {
         log.warn("can't load config file staing with old config", e);
@@ -60,18 +68,22 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
   public void saveConfig(XmlYumConfiguration configToUse) {
     synchronized (LOAD_WRITE_MUTEX) {
       try {
-        final JAXBContext jc = JAXBContext.newInstance(XmlYumConfiguration.class, AliasMapping.class);
-        Marshaller marshaller = jc.createMarshaller();
-        File configurationDirectory = nexusConfiguration.getConfigurationDirectory();
-        marshaller.marshal(configToUse, new File(configurationDirectory.getPath(), filename));
+        marshaller.marshal(configToUse, getConfigFile());
         xmlYumConfiguration = configToUse;
+        fileLastModified = getConfigFile().lastModified();
       } catch (JAXBException e) {
         throw new RuntimeException("can't save xmlyumConfig", e);
       }
     }
   }
 
+  public File getConfigFile() {
+    return new File(nexusConfiguration.getConfigurationDirectory(), filename);
+  }
+
   public String getVersion(String repositoryId, String alias) throws AliasNotFoundException {
+    checkForUpdates();
+
     final AliasKey aliasKey = new AliasKey(repositoryId, alias);
     final String resultVersion = aliasMap.get(aliasKey);
     if (resultVersion == null) {
@@ -107,15 +119,24 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
   }
 
   public boolean isRepositoryOfRepositoryVersionsActive() {
+    checkForUpdates();
     return xmlYumConfiguration.isRepositoryOfRepositoryVersionsActive();
   }
 
   public int getRepositoryCreationTimeout() {
+    checkForUpdates();
     return xmlYumConfiguration.getRepositoryCreationTimeout();
   }
 
   public XmlYumConfiguration getXmlYumConfiguration() {
+    checkForUpdates();
     return xmlYumConfiguration;
+  }
+
+  private void checkForUpdates() {
+    if (getConfigFile().lastModified() > fileLastModified) {
+      load();
+    }
   }
 
   public String getFilename() {
