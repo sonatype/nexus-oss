@@ -15,6 +15,7 @@ import org.sonatype.plugin.Managed;
   description = "Maven2-Yum Repository"
 )
 @Managed
+@SuppressWarnings("deprecation")
 public class M2YumRepository extends M2Repository {
   public static final String ID = "maven2yum";
 
@@ -24,7 +25,6 @@ public class M2YumRepository extends M2Repository {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   public void storeItem(boolean fromTask, StorageItem item) throws UnsupportedStorageOperationException,
     IllegalOperationException, StorageException {
     if (isYumRepoPath(item.getPath())) {

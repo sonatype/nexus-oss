@@ -32,33 +32,46 @@ public class DefaultRepositoryRpmManager implements RepositoryRpmManager {
   @Inject
   private GlobalRestApiSettings restApiSettings;
 
+  @Inject
+  private YumConfigurationHandler configHandler;
+
   private File rpmLocation;
 
   private Future<YumRepository> yumRepositoryFuture;
 
   public synchronized void updateRepository(MavenRepositoryInfo repositoryInfo) {
-    boolean needUpdate = false;
-    for (String version : repositoryInfo.getVersions()) {
-      File rpmFile = new File(getRpmCacheDir(), getRpmFileName(repositoryInfo.getId(), version));
-      if (!rpmFile.exists()) {
-        generateRpmForRepository(repositoryInfo.getId(), version);
-        needUpdate = true;
+    if (isActive()) {
+      boolean needUpdate = false;
+      for (String version : repositoryInfo.getVersions()) {
+        File rpmFile = new File(getRpmCacheDir(), getRpmFileName(repositoryInfo.getId(), version));
+        if (!rpmFile.exists()) {
+          generateRpmForRepository(repositoryInfo.getId(), version);
+          needUpdate = true;
+        }
       }
-    }
 
-    if (needUpdate) {
-      updateYumRepository();
+      if (needUpdate) {
+        updateYumRepository();
+      }
     }
   }
 
+  public boolean isActive() {
+    return configHandler.isRepositoryOfRepositoryVersionsActive();
+  }
+
   public File updateRepository(String repositoryId, String version) {
-    File rpmFile = new File(getRpmCacheDir(), getRpmFileName(repositoryId, version));
-    if (!rpmFile.exists()) {
-      generateRpmForRepository(repositoryId, version);
-      updateYumRepository();
+    if (isActive()) {
+      File rpmFile = new File(getRpmCacheDir(), getRpmFileName(repositoryId, version));
+      if (!rpmFile.exists()) {
+        generateRpmForRepository(repositoryId, version);
+        updateYumRepository();
+      }
+
+      return rpmFile;
     }
 
-    return rpmFile;
+    throw new IllegalStateException("Service is deactivated.");
   }
 
   private void updateYumRepository() {

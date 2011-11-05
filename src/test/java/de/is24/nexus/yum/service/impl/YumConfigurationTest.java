@@ -1,5 +1,6 @@
 package de.is24.nexus.yum.service.impl;
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -10,7 +11,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import javax.inject.Inject;
-import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -134,7 +134,7 @@ public class YumConfigurationTest {
         "expetedWrittenYum.xml"));
     final FileReader writtenFile = new FileReader(new File(nexusConfiguration.getConfigurationDirectory(),
         testConfFilename));
-    XMLAssert.assertXMLEqual(expectedFile, writtenFile);
+    assertXMLEqual(expectedFile, writtenFile);
   }
 
 }

@@ -11,10 +11,10 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import javax.inject.Named;
+import org.sonatype.plugin.Managed;
 import com.google.inject.Singleton;
 import de.is24.nexus.yum.repository.YumRepository;
 import de.is24.nexus.yum.repository.YumRepositoryGeneratorJob;
-import org.sonatype.plugin.Managed;
 
 
 /**
@@ -34,11 +34,10 @@ public class ThreadPoolYumRepositoryCreatorService implements YumRepositoryCreat
 
   private Thread dispatcherThread;
 
-  private static final Object DUMMY_VALUE = new Object();
-
   private static final Set<String> CURRENT_RUNNING_REPOS = Collections.synchronizedSet(new HashSet<String>());
 
-  private PriorityBlockingQueue<YumRepositoryGeneratorJobFutureTask> workQueue = new PriorityBlockingQueue();
+  private final PriorityBlockingQueue<YumRepositoryGeneratorJobFutureTask> workQueue =
+    new PriorityBlockingQueue<YumRepositoryGeneratorJobFutureTask>();
 
   private ThreadPoolExecutor executorService;
 

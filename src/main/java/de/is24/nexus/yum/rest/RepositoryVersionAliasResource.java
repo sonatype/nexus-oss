@@ -39,9 +39,8 @@ import de.is24.nexus.yum.service.RepositoryAliasService;
 @Singleton
 public class RepositoryVersionAliasResource extends AbstractPlexusResource implements PlexusResource {
   private static final String ALLOW_ANONYMOUS = "anon";
-  private static final String REPO_EXTENSION = ".repo";
   private static final String RPM_EXTENSION = ".rpm";
-  public static final String URL_PREFIX = "yum-alias";
+  public static final String URL_PREFIX = "yum/alias";
   private static final String PATH_PATTERN_TO_PROTECT = "/" + URL_PREFIX + "/*";
   public static final String REPOSITORY_ID_PARAM = "repositoryId";
   public static final String ALIAS_PARAM = "alias";

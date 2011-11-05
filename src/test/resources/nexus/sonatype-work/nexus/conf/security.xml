@@ -30,6 +30,7 @@
       <source>default</source>
       <roles>
         <role>admin</role>
+        <role>repository-any-full</role>
       </roles>
     </userRoleMapping>
     <userRoleMapping>
@@ -45,7 +46,7 @@
       <source>default</source>
       <roles>
         <role>admin</role>
-        <role>repository-any-read</role>
+        <role>repository-any-full</role>
       </roles>
     </userRoleMapping>
   </userRoleMappings>

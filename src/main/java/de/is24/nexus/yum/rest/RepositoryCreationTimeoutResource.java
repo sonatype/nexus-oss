@@ -45,7 +45,7 @@ public class RepositoryCreationTimeoutResource extends AbstractPlexusResource im
   @Override
   public String getResourceUri() {
     // note this must start with a '/'
-    return "/yumServer/timeout";
+    return "/yum/config/timeout";
   }
 
   @Override

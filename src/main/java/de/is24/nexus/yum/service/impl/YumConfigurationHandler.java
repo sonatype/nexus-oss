@@ -100,6 +100,16 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
     saveConfig(newConfig);
   }
 
+  public void setRepositoryOfRepositoryVersionsActive(boolean active) {
+    final XmlYumConfiguration newConfig = new XmlYumConfiguration(xmlYumConfiguration);
+    newConfig.setRepositoryOfRepositoryVersionsActive(active);
+    saveConfig(newConfig);
+  }
+
+  public boolean isRepositoryOfRepositoryVersionsActive() {
+    return xmlYumConfiguration.isRepositoryOfRepositoryVersionsActive();
+  }
+
   public int getRepositoryCreationTimeout() {
     return xmlYumConfiguration.getRepositoryCreationTimeout();
   }

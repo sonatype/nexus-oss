@@ -60,7 +60,7 @@ public class VersionizedYumRepositoryResourceTest {
 
   @Test
   public void shouldAllowResourceAccess() throws Exception {
-    assertEquals("/yum/{repository}/{version}", resource.getResourceUri());
+    assertEquals("/yum/repos/{repository}/{version}", resource.getResourceUri());
     assertEquals("/yum/*", resource.getResourceProtection().getPathPattern());
     assertEquals("anon", resource.getResourceProtection().getFilterExpression());
     assertNull(resource.getPayloadInstance());
@@ -82,7 +82,7 @@ public class VersionizedYumRepositoryResourceTest {
     Response response = createResponse(request);
     resource.get(null, request, response, null);
     assertEquals(Status.REDIRECTION_PERMANENT, response.getStatus());
-    assertEquals("http://localhost:8081/nexus/service/local/yum/" + TESTREPO + "/" + VERSION + "/",
+    assertEquals("http://localhost:8081/nexus/service/local/yum/repos/" + TESTREPO + "/" + VERSION + "/",
       response.getLocationRef().getIdentifier());
   }
 
@@ -138,7 +138,8 @@ public class VersionizedYumRepositoryResourceTest {
 
   private Request createRequest(String urlSuffix, String repository, String version) {
     Request request = new Request(Method.GET,
-      "http://localhost:8081/nexus/service/local/yum/" + repository + "/" + version + urlSuffix);
+      "http://localhost:8081/nexus/service/local/yum/repos/" + repository + "/" + version +
+      urlSuffix);
     request.setAttributes(createAttributes(repository, version));
     return request;
   }

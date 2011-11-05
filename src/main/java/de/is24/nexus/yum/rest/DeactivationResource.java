@@ -46,12 +46,17 @@ public class DeactivationResource extends AbstractPlexusResource implements Plex
   @Override
   public String getResourceUri() {
     // note this must start with a '/'
-    return "/yumServer/deactivate";
+    return "/yum/config/deactivate";
   }
 
   @Override
   public Object get(Context context, Request request, Response response,
     Variant variant) throws ResourceException {
+    return !yumService.isActive();
+  }
+
+  @Override
+  public Object post(Context context, Request request, Response response, Object payload) throws ResourceException {
     Form form = request.getResourceRef().getQueryAsForm();
     Parameter param = form.getFirst("code");
 

@@ -29,4 +29,6 @@ public interface YumService {
     boolean singleRpmPerDirectory);
 
   Future<YumRepository> addToYumRepository(Repository repository, String path);
+
+  boolean isActive();
 }

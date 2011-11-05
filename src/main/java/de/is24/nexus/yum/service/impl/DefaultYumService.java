@@ -8,16 +8,16 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.plugin.Managed;
 import com.google.inject.Singleton;
 import de.is24.nexus.yum.repository.YumGeneratorConfigurationBuilder;
 import de.is24.nexus.yum.repository.YumRepository;
 import de.is24.nexus.yum.repository.YumRepositoryGeneratorJob;
 import de.is24.nexus.yum.service.RepositoryCreationTimeoutHolder;
 import de.is24.nexus.yum.service.YumService;
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plugin.Managed;
 
 
 @Managed
@@ -155,5 +155,9 @@ public class DefaultYumService implements YumService {
     }
 
     return null;
+  }
+
+  public boolean isActive() {
+    return YumRepositoryGeneratorJob.isActive();
   }
 }

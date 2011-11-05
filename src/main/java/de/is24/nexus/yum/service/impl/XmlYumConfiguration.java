@@ -17,8 +17,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "configuration")
 public class XmlYumConfiguration {
   protected static final int DEFAULT_TIMEOUT_IN_SEC = 120;
+  protected static final boolean DEFAULT_REPOSITORY_OF_REPOSITORY_VERSIONS = true;
 
   private int repositoryCreationTimeout = DEFAULT_TIMEOUT_IN_SEC;
+
+  private boolean repositoryOfRepositoryVersionsActive = DEFAULT_REPOSITORY_OF_REPOSITORY_VERSIONS;
 
   @XmlElement(name = "aliasMapping")
   @XmlElementWrapper
@@ -83,6 +86,9 @@ public class XmlYumConfiguration {
     if (repositoryCreationTimeout != other.repositoryCreationTimeout) {
       return false;
     }
+    if (repositoryOfRepositoryVersionsActive != other.repositoryOfRepositoryVersionsActive) {
+      return false;
+    }
     return true;
   }
 
@@ -93,5 +99,12 @@ public class XmlYumConfiguration {
       aliasMappings + "]";
   }
 
+  public boolean isRepositoryOfRepositoryVersionsActive() {
+    return repositoryOfRepositoryVersionsActive;
+  }
+
+  public void setRepositoryOfRepositoryVersionsActive(boolean repositoryOfRepositoryVersionsActive) {
+    this.repositoryOfRepositoryVersionsActive = repositoryOfRepositoryVersionsActive;
+  }
 
 }

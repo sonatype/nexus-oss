@@ -29,7 +29,7 @@ public class RepositoryYumRepositoryResource extends AbstractYumRepositoryResour
 
   @Override
   protected String getUrlPrefixName() {
-    return URL_PREFIX;
+    return "yum";
   }
 
   @Override
@@ -39,7 +39,7 @@ public class RepositoryYumRepositoryResource extends AbstractYumRepositoryResour
 
   @Override
   protected int getSegmentCountAfterPrefix() {
-    return 0;
+    return 1;
   }
 
   @Override

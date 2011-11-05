@@ -5,9 +5,11 @@ import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.assertRepos
 import static de.is24.test.hamcrest.FileMatchers.exists;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import java.io.File;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.junit.Before;
 import org.junit.Test;
 import de.is24.nexus.yum.AbstractRepositoryTester;
 import de.is24.nexus.yum.service.RepositoryRpmManager;
@@ -19,6 +21,14 @@ public class DefaultRepositoryRpmManagerTest extends AbstractRepositoryTester {
   @Inject
   @Named(RepositoryRpmManager.DEFAULT_BEAN_NAME)
   private RepositoryRpmManager rpmManager;
+
+  @Inject
+  private YumConfigurationHandler configHandler;
+
+  @Before
+  public void setActive() {
+    configHandler.setRepositoryOfRepositoryVersionsActive(true);
+  }
 
   @Test
   public void shouldUpdateRepository() throws Exception {
@@ -36,4 +46,10 @@ public class DefaultRepositoryRpmManagerTest extends AbstractRepositoryTester {
     rpmManager.getYumRepository();
   }
 
+  @Test(expected = IllegalStateException.class)
+  public void shouldThrowExceptionIfDeactivated() throws Exception {
+    configHandler.setRepositoryOfRepositoryVersionsActive(false);
+    rpmManager.updateRepository("dummy-repo", "any-version");
+    fail("should throw an exeption before this line.");
+  }
 }

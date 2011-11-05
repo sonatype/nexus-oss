@@ -15,7 +15,6 @@ import static org.restlet.data.Method.GET;
 import static org.restlet.data.Method.POST;
 import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
 import javax.inject.Inject;
-import de.is24.nexus.yum.guice.NexusTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.restlet.data.Request;
@@ -23,6 +22,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
+import de.is24.nexus.yum.guice.NexusTestRunner;
 
 
 /**
@@ -81,7 +81,7 @@ public class RepositoryVersionAliasResourceTest {
     assertThat(resource.getPayloadInstance(), nullValue());
     assertThat(resource.getPayloadInstance(GET), nullValue());
     assertThat(resource.getPayloadInstance(POST), instanceOf(String.class));
-    assertThat(resource.getResourceProtection().getPathPattern(), is("/yum-alias/*"));
+    assertThat(resource.getResourceProtection().getPathPattern(), is("/yum/alias/*"));
     assertThat(resource.getResourceProtection().getFilterExpression(), is("anon"));
   }
 

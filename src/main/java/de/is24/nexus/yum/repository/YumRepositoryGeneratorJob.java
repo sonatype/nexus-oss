@@ -113,4 +113,8 @@ public class YumRepositoryGeneratorJob implements Callable<YumRepository>, ListF
     return new File(createBasePackageDir(), config.getId() + "-" + version + ".txt");
   }
 
+  public static boolean isActive() {
+    return activated;
+  }
+
 }

@@ -10,6 +10,7 @@ public class VersionizedRepositoryViewIT extends AbstractNexusTestBase {
 
   @Test
   public void shouldGetEmpytViewForRepository() throws Exception {
-    assertThat(executeGet("/yum/snapshots/1.0.0-SNAPSHOT/"), containsString("<a href=\"repodata/\">repodata/</a>"));
+    assertThat(executeGet("/yum/repos/snapshots/1.0.0-SNAPSHOT/"),
+      containsString("<a href=\"repodata/\">repodata/</a>"));
   }
 }

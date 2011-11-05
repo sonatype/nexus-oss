@@ -44,8 +44,8 @@ public class CreateNewRpmRepositoryIT extends AbstractNexusTestBase {
     Thread.sleep(5000);
 
     // is24-rel-next-try-1.0-repo-1-1.noarch.rpm
-    executeGet("/yum-repos/is24-rel-" + NEW_REPO_ID + "-" + ARTIFACT_VERSION_1 + "-repo-1-1.noarch.rpm");
-    executeGet("/yum-repos/is24-rel-" + NEW_REPO_ID + "-" + ARTIFACT_VERSION_2 + "-repo-1-1.noarch.rpm");
+    executeGet("/yum/repo/is24-rel-" + NEW_REPO_ID + "-" + ARTIFACT_VERSION_1 + "-repo-1-1.noarch.rpm");
+    executeGet("/yum/repo/is24-rel-" + NEW_REPO_ID + "-" + ARTIFACT_VERSION_2 + "-repo-1-1.noarch.rpm");
   }
 
   private void givenTestRepository() throws AuthenticationException, IOException, UnsupportedEncodingException,

@@ -20,11 +20,11 @@ import de.is24.nexus.yum.service.YumService;
 @Path(VersionizedYumRepositoryResource.RESOURCE_URI)
 @Singleton
 public class VersionizedYumRepositoryResource extends AbstractYumRepositoryResource implements PlexusResource {
-  private static final String YUM_REPO_PREFIX_NAME = "yum";
+  private static final String YUM_REPO_PREFIX_NAME = "yum/repos";
   private static final String YUM_REPO_PREFIX = "/" + YUM_REPO_PREFIX_NAME;
   private static final String VERSION_URL_PARAM = "version";
   private static final String REPOSITORY_URL_PARAM = "repository";
-  private static final int SEGMENTS_AFTER_REPO_PREFIX = 2;
+  private static final int SEGMENTS_AFTER_REPO_PREFIX = 3;
 
   public static final String RESOURCE_URI = YUM_REPO_PREFIX + "/{" + REPOSITORY_URL_PARAM + "}/{" + VERSION_URL_PARAM +
     "}";
@@ -43,7 +43,7 @@ public class VersionizedYumRepositoryResource extends AbstractYumRepositoryResou
 
   @Override
   protected String getUrlPrefixName() {
-    return YUM_REPO_PREFIX_NAME;
+    return "yum";
   }
 
   @Override
