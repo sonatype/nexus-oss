@@ -3,7 +3,7 @@ package de.is24.nexus.task.shell;
 import static de.is24.nexus.task.shell.ShellExecutionTaskDescriptor.COMMAND_FIELD_ID;
 import static de.is24.nexus.yum.execution.ExecutionUtil.execCommand;
 import static java.lang.String.format;
-import org.apache.commons.lang.StringUtils;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -27,7 +27,7 @@ public class ShellExecutionTask extends AbstractNexusTask<Object> {
   }
 
   private boolean isValidCommand() {
-    return (getCommand() != null) && StringUtils.isNotBlank(getCommand());
+    return (getCommand() != null) && isNotBlank(getCommand());
   }
 
   @Override
