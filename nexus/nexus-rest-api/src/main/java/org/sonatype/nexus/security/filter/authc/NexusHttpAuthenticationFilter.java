@@ -236,6 +236,7 @@ public class NexusHttpAuthenticationFilter
             request.setAttribute( ANONYMOUS_LOGIN, Boolean.TRUE );
 
             subject.login( usernamePasswordToken );
+            anonymousLoginSuccessful = true;
         }
         catch( UnknownSessionException e )
         {

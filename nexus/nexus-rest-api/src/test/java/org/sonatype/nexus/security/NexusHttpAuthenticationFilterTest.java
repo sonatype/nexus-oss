@@ -165,9 +165,29 @@ public class NexusHttpAuthenticationFilterTest
         // ******
         sessionDAO.delete( simpleSession );
 
-
         // Verify this does not throw an exception when the session is expired
-        boolean result = new NexusHttpAuthenticationFilter()
+        assertThat( "Anonymous user was not logged in after UnknownSessionException", callExecuteAnonymousLogin() );
+    }
+
+    /**
+     * Test the typical anonymous login path.  executeAnonymousLogin should return true.
+     * @throws Exception
+     */
+    @Test
+    public void testExecuteAnonymousLoginHappyPath()
+        throws Exception
+    {
+        // Verify this does not throw an exception when the session is expired
+        assertThat( "Anonymous user should have been logged in", callExecuteAnonymousLogin() );
+    }
+
+    /**
+     * Calls a protected the method 'executeAnonymousLogin' in NexusHttpAuthenticationFilter, and returns the result.
+     * @return
+     */
+    private boolean callExecuteAnonymousLogin()
+    {
+        return new NexusHttpAuthenticationFilter()
         {
             // expose protected method
             @Override
@@ -183,6 +203,7 @@ public class NexusHttpAuthenticationFilterTest
             }
         }.executeAnonymousLogin( request, response );
         // what a hack... just to call a protected method
-        assertThat( "Anonymous user was not logged in after UnknownSessionException", result );
     }
+
+
 }
