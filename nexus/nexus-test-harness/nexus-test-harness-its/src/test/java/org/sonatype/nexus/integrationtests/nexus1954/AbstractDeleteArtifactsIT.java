@@ -20,7 +20,6 @@ package org.sonatype.nexus.integrationtests.nexus1954;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -86,9 +85,8 @@ public abstract class AbstractDeleteArtifactsIT
         Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact1v1, REPO_TEST_HARNESS_REPO ).size() );
         Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact1v1, REPO_TEST_HARNESS_PROXY ).size() );
 
-        getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_REPO, artifact1v2, artifact );
-        getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_REPO, GavUtil.newGav( "nexus1954", "artifact2", "1.0" ),
-                                            artifact );
+        deployArtifact( REPO_TEST_HARNESS_REPO, artifact1v2 );
+        deployArtifact( REPO_TEST_HARNESS_REPO, artifact2v1 );
 
         updateIndexes();
         Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact1v1, REPO_TEST_HARNESS_REPO ).size() );
@@ -123,11 +121,23 @@ public abstract class AbstractDeleteArtifactsIT
         Assert.assertEquals( 0, getSearchMessageUtil().searchForGav( artifact2v1, REPO_TEST_HARNESS_PROXY ).size() );
     }
 
+    private void deployArtifact( final String repositoryId, final Gav gav )
+        throws IOException, InterruptedException
+    {
+        getDeployUtils().deployUsingGavWithRest( repositoryId, gav, artifact );
+
+        // we need to wait for indexer events to be processed
+        getEventInspectorsUtil().waitForCalmPeriod( 200 );
+    }
+
     private void deleteArtifact( Gav gav )
-        throws FileNotFoundException, IOException
+        throws InterruptedException, IOException
     {
         String dirPath = gav.getGroupId().replace( '.', '/' ) + "/" + gav.getArtifactId() + "/" + gav.getVersion();
         Assert.assertTrue( deleteFromRepository( REPO_TEST_HARNESS_REPO, dirPath ) );
+
+        // we need to wait for indexer events to be processed
+        getEventInspectorsUtil().waitForCalmPeriod( 200 );
     }
 
     private static final SimpleDateFormat df;

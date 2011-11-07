@@ -30,6 +30,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 public class EventInspectorsUtil
     extends ITUtil
 {
+
     public EventInspectorsUtil( AbstractNexusIntegrationTest test )
     {
         super( test );
@@ -49,7 +50,29 @@ public class EventInspectorsUtil
         else
         {
             throw new IOException( "The isCalmPeriod REST resource reported an error ("
-                + status + "), bailing out!" );
+                                       + status + "), bailing out!" );
+        }
+    }
+
+    /**
+     * Hold execution until asynchronous events at nexus side stop running
+     */
+    public void waitForCalmPeriod( final long waitMillis )
+        throws IOException, InterruptedException
+    {
+        Thread.yield();
+        if ( waitMillis > 0 )
+        {
+            Thread.sleep( waitMillis );
+        }
+
+        final Status status =
+            RequestFacade.doGetForStatus( "service/local/eventInspectors/isCalmPeriod?waitForCalm=true" );
+
+        if ( status.getCode() != Status.SUCCESS_OK.getCode() )
+        {
+            throw new IOException( "The isCalmPeriod REST resource reported an error ("
+                                       + status.toString() + "), bailing out!" );
         }
     }
 
@@ -59,13 +82,6 @@ public class EventInspectorsUtil
     public void waitForCalmPeriod()
         throws IOException, InterruptedException
     {
-        final Status status =
-            RequestFacade.doGetForStatus( "service/local/eventInspectors/isCalmPeriod?waitForCalm=true" );
-
-        if ( status.getCode() != Status.SUCCESS_OK.getCode() )
-        {
-            throw new IOException( "The isCalmPeriod REST resource reported an error ("
-                + status.toString() + "), bailing out!" );
-        }
+        waitForCalmPeriod( 0 );
     }
 }
