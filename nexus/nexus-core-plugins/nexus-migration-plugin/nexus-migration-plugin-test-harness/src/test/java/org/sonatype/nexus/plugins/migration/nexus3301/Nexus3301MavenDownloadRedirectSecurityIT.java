@@ -41,7 +41,7 @@ public class Nexus3301MavenDownloadRedirectSecurityIT
     protected void runOnce()
         throws Exception
     {
-        assertThat( "Migration is succesful", doMigration().isSuccess() );
+        assertThat( "Migration is successful", doMigration().isSuccess() );
     }
 
     @BeforeMethod
@@ -53,7 +53,7 @@ public class Nexus3301MavenDownloadRedirectSecurityIT
     }
 
     @Test
-    public void downloadWithPermition()
+    public void downloadWithPermission()
         throws Exception
     {
         AbstractMavenNexusIT.cleanRepository( new File( TestProperties.getString( "maven.local.repo" ) ), getTestId() );
@@ -65,7 +65,7 @@ public class Nexus3301MavenDownloadRedirectSecurityIT
     }
 
     @Test( expectedExceptions = VerificationException.class )
-    public void downloadWithoutPermition()
+    public void downloadWithoutPermission()
         throws Exception
     {
         download();
