@@ -21,6 +21,7 @@ package org.sonatype.nexus.test.utils;
 import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
 import org.restlet.data.Response;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 
 /**
  * Assertions on {@link Response}.
@@ -50,10 +51,7 @@ public class ResponseAssert
         }
         finally
         {
-            if(actual != null)
-            {
-                actual.release();
-            }
+            RequestFacade.releaseResponse(actual);
         }
     }
 
@@ -74,10 +72,7 @@ public class ResponseAssert
         }
         finally
         {
-            if(actual != null)
-            {
-                actual.release();
-            }
+            RequestFacade.releaseResponse(actual);
         }
     }
 
