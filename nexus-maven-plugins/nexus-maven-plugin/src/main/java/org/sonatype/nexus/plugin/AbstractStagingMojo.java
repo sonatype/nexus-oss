@@ -287,6 +287,15 @@ public abstract class AbstractStagingMojo
         }
     }
 
+    /**
+     * Determines the user identity as when the user would resolve an artifact via Maven from a Nexus server.
+     * The identity is determined by forcing Maven to resolve a fake artifact to a well known Nexus REST endpoint.
+     * The resolved artifact will contain the user identity attributes such as IP address and user agent.
+     *
+     * @return user identity
+     * @throws MojoExecutionException If deploying to Nexus via Maven fails
+     * @since 1.10.0
+     */
     protected Identity whoAmI()
         throws MojoExecutionException
     {
@@ -373,7 +382,7 @@ public abstract class AbstractStagingMojo
      *
      * @param repositories to be filtered
      * @return filtered
-     * @throws MojoExecutionException in case current user agent could not be determined
+     * @throws MojoExecutionException in case current user identity could not be determined
      */
     private List<StageRepository> filterForAutomaticSelection( final List<StageRepository> repositories )
         throws MojoExecutionException
@@ -408,16 +417,26 @@ public abstract class AbstractStagingMojo
         this.repositoryId = repositoryId;
     }
 
+    /**
+     * An user identity with regards to IP address and user agent.
+     *
+     * @since 1.10.0
+     */
     protected static class Identity
     {
 
+        /**
+         * IP address of user.
+         */
         private final String ipAddress;
 
+        /**
+         * User agent of user.
+         */
         private final String userAgent;
 
-        private Identity( String ipAddress, String userAgent )
+        private Identity( final String ipAddress, final String userAgent )
         {
-
             this.ipAddress = ipAddress;
             this.userAgent = userAgent;
         }
@@ -432,6 +451,12 @@ public abstract class AbstractStagingMojo
             return userAgent;
         }
 
+        /**
+         * Checks if the staged repository has being staged by the same user denoted by this identity.
+         *
+         * @param repository to be checked
+         * @return true, if the staged repository has being staged by the same user denoted by this identity
+         */
         public boolean wasTheOneThatStaged( final StageRepository repository )
         {
             return getIpAddress().equals( repository.getIpAddress() )
