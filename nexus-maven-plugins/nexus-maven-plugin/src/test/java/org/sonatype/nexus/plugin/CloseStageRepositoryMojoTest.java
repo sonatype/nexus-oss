@@ -33,6 +33,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.allOf;
@@ -266,6 +267,9 @@ public class CloseStageRepositoryMojoTest
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
         mojo.setDescription( "this is a description" );
+
+        // just make sure the URL my mojo is trying to access is the same server is started
+        assertThat( mojo.getNexusUrl(), containsString( String.valueOf( fixture.getPort() ) ) );
 
         runMojo( mojo );
 
