@@ -471,7 +471,7 @@
               <goal>perform</goal>
             </goals>
             <configuration>
-              <arguments>-DskipTests</arguments>
+              <arguments>-Dmaven.test.skip=true</arguments>
             </configuration>
           </execution>
         </executions>
