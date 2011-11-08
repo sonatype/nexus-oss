@@ -30,20 +30,88 @@ import org.sonatype.nexus.util.WrappingInputStream;
 public class HttpClientInputStream
     extends WrappingInputStream
 {
-    /** The method. */
+
+    /**
+     * The method.
+     */
     private final HttpMethod method;
 
     /**
      * Instantiates a new http client input stream.
-     * 
+     *
      * @param method the method
-     * @param is the is
+     * @param is     the is
      */
-    public HttpClientInputStream( HttpMethod method, InputStream is )
+    public HttpClientInputStream( final HttpMethod method, final InputStream is )
     {
         super( is );
-
         this.method = method;
+    }
+
+    @Override
+    public int read()
+        throws IOException
+    {
+        try
+        {
+            final int result = super.read();
+
+            if ( result == -1 )
+            {
+                release();
+            }
+
+            return result;
+        }
+        catch ( IOException e )
+        {
+            release();
+            throw e;
+        }
+    }
+
+    @Override
+    public int read( byte b[] )
+        throws IOException
+    {
+        try
+        {
+            final int result = super.read( b );
+
+            if ( result == -1 )
+            {
+                release();
+            }
+
+            return result;
+        }
+        catch ( IOException e )
+        {
+            release();
+            throw e;
+        }
+    }
+
+    @Override
+    public int read( byte b[], int off, int len )
+        throws IOException
+    {
+        try
+        {
+            final int result = super.read( b, off, len );
+
+            if ( result == -1 )
+            {
+                release();
+            }
+
+            return result;
+        }
+        catch ( IOException e )
+        {
+            release();
+            throw e;
+        }
     }
 
     @Override
@@ -56,8 +124,13 @@ public class HttpClientInputStream
         }
         finally
         {
-            method.releaseConnection();
+            release();
         }
+    }
+
+    protected void release()
+    {
+        method.releaseConnection();
     }
 
 }
