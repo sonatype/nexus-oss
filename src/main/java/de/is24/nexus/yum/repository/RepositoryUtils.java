@@ -12,6 +12,14 @@ public final class RepositoryUtils {
   }
 
   public static File getBaseDir(Repository repository) throws URISyntaxException, MalformedURLException {
-    return new File(new URL(repository.getLocalUrl()).toURI());
+    String localUrl = repository.getLocalUrl();
+    if (isFile(localUrl)) {
+      return new File(localUrl);
+    }
+    return new File(new URL(localUrl).toURI());
+  }
+
+  private static boolean isFile(String localUrl) {
+    return localUrl.startsWith("/");
   }
 }
