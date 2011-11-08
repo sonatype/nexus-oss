@@ -19,6 +19,8 @@ import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.util.ImportMessageUtil;
+import org.sonatype.nexus.test.utils.EventInspectorsUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public abstract class AbstractMigrationPrivilegeTest
     extends AbstractPrivilegeTest
@@ -33,7 +35,13 @@ public abstract class AbstractMigrationPrivilegeTest
     {
         MigrationSummaryDTO migrationSummary = ImportMessageUtil.importBackup( getBackupFile() );
 
-        return ImportMessageUtil.commitImport( migrationSummary ).getStatus();
+        Status status = ImportMessageUtil.commitImport( migrationSummary ).getStatus();
+
+        TaskScheduleUtil.waitForAllTasksToStop();
+        new EventInspectorsUtil( this ).waitForCalmPeriod();
+        TaskScheduleUtil.waitForAllTasksToStop();
+
+        return status;
     }
     
     @Override
