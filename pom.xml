@@ -5,7 +5,7 @@
 
   <groupId>de.is24.nexus</groupId>
   <artifactId>nexus-yum-plugin</artifactId>
-  <version>1.15-SNAPSHOT</version>
+  <version>1.14-SNAPSHOT</version>
   <packaging>nexus-plugin</packaging>
   <name>Nexus Yum Plugin</name>
   <description>Nexus Plugin to let Nexus generate a RPM repository out of the repositories</description>
