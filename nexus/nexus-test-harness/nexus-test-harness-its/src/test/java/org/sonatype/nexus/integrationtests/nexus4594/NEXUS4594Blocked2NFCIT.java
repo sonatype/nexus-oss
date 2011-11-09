@@ -16,41 +16,32 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.integrationtests.nexus4539;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
+package org.sonatype.nexus.integrationtests.nexus4594;
 
 import org.testng.annotations.Test;
 
-/**
- * Make sure normal case works, that is, a proxy whose remote is timing out blocks, and then unblocks when the remote is
- * available. It does take around 2 minutes to run.
- */
-public class NEXUS4539AutoBlockIT
-    extends AutoBlockITSupport
+public class NEXUS4594Blocked2NFCIT
+    extends Blocked2NFCITSupport
 {
 
     @Test
-    public void autoBlock()
+    public void whileNexusIsAutoBlockedItDoesNotAddPathsToNFC()
         throws Exception
     {
-        // initial status, no timing out
-        autoUnblockNexus();
-
-        // block Nexus
+        // auto block Nexus
         autoBlockNexus();
 
-        // it must unblock auto magically
+        // make a request to an arbitrary artifact and verify that Nexus did not went remote (repository is blocked)
+        // Nexus should not add it to NFC, but that will see later while re-requesting the artifact with Nexus unblocked
+        downloadArtifact( "foo", "bar", "5.0" );
+        verifyNexusDidNotWentRemote();
+
+        // unblock Nexus so we can request again the arbitrary artifact
         autoUnblockNexus();
 
-        // let's see if it will block again
-        autoBlockNexus();
-        // let is sit on ice for 30s
-        Thread.sleep( 30 * 1000 );
-
-        // it must auto unblock again
-        autoUnblockNexus();
+        // make a request and check that Nexus went remote (so is not in NFC)
+        downloadArtifact( "foo", "bar", "5.0" );
+        verifyNexusWentRemote();
     }
 
 }

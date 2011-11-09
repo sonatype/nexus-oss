@@ -19,8 +19,8 @@
 package org.sonatype.nexus.integrationtests.nexus4539;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.not;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.hamcrest.Matchers;
 import org.mortbay.jetty.servlet.ServletHolder;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -65,7 +66,7 @@ public abstract class AutoBlockITSupport
 
     protected Integer sleepTime;
 
-    protected List<Object> pathsTouched;
+    protected List<String> pathsTouched;
 
     protected RepositoryMessageUtil repoUtil;
 
@@ -122,16 +123,7 @@ public abstract class AutoBlockITSupport
         throws IOException
     {
         // don't wanna hit nexus NFC
-        Gav gav = GavUtil.newGav( "nexus4539", "a", "404-" + System.nanoTime() );
-        try
-        {
-            downloadArtifactFromRepository( REPO, gav, "target/downloads/nexus4539" );
-        }
-        catch ( FileNotFoundException e )
-        {
-            // ignore just fine
-            // e.printStackTrace();
-        }
+        downloadArtifact( "nexus4539", "a", "404-" + System.nanoTime() );
     }
 
     /**
@@ -154,19 +146,106 @@ public abstract class AutoBlockITSupport
             Thread.sleep( 500 );
         }
 
-        assertStatus( s, status, mode );
+        assertRepositoryStatus( s, status, mode );
 
         throw new IllegalStateException();
     }
 
     /**
-     * Assert status
+     * Set Nexus repository status to {@link ProxyMode#BLOCKED_MANUAL} and ensure the mode is set.
+     *
+     * @throws Exception re-thrown
      */
-    protected void assertStatus( RepositoryStatusResource s, RemoteStatus status, ProxyMode mode )
+    protected void manualBlockNexus()
+        throws Exception
     {
-        assertThat( s, notNullValue() );
-        assertThat( s.getRemoteStatus(), equalTo( status.toString() ) );
-        assertThat( s.getProxyMode(), equalTo( mode.toString() ) );
+        repoUtil.setBlockProxy( REPO, true );
+        assertRepositoryProxyMode( repoUtil.getStatus( REPO ), ProxyMode.BLOCKED_MANUAL );
+    }
+
+    /**
+     * Set Nexus repository status to {@link ProxyMode#ALLOW} and ensure the mode is set.
+     *
+     * @throws Exception re-thrown
+     */
+    protected void manualUnblockNexus()
+        throws Exception
+    {
+        repoUtil.setBlockProxy( REPO, false );
+        assertRepositoryProxyMode( repoUtil.getStatus( REPO ), ProxyMode.ALLOW );
+    }
+
+    /**
+     * Force Nexus into {@link ProxyMode#BLOCKED_AUTO} mode by not responding to its requests to proxy repository.
+     *
+     * @throws Exception re-thrown
+     */
+    protected void autoBlockNexus()
+        throws Exception
+    {
+        // let's stall the response
+        sleepTime = 100;
+        shakeNexus();
+        waitFor( RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_AUTO );
+        // ensure nexus did touch server
+        assertThat( pathsTouched, not( Matchers.<String>empty() ) );
+        pathsTouched.clear();
+    }
+
+    /**
+     * Force Nexus to get out from {@link ProxyMode#BLOCKED_AUTO} mode.
+     *
+     * @throws Exception re-thrown
+     */
+    protected void autoUnblockNexus()
+        throws Exception
+    {
+        sleepTime = -1;
+        waitFor( RemoteStatus.AVAILABLE, ProxyMode.ALLOW );
+        // ensure nexus did touch server
+        assertThat( pathsTouched, not( Matchers.<String>empty() ) );
+        pathsTouched.clear();
+    }
+
+    /**
+     * Assert repository remote status and proxy mode.
+     */
+    protected void assertRepositoryStatus( final RepositoryStatusResource status,
+                                           final RemoteStatus remoteStatus,
+                                           final ProxyMode mode )
+    {
+        assertRepositoryProxyMode( status, mode );
+        assertThat( status.getRemoteStatus(), equalTo( remoteStatus.toString() ) );
+    }
+
+    /**
+     * Assert repository remote and proxy mode status.
+     */
+    protected void assertRepositoryProxyMode( final RepositoryStatusResource status,
+                                              final ProxyMode mode )
+    {
+        assertThat( status, notNullValue() );
+        assertThat( status.getProxyMode(), equalTo( mode.toString() ) );
+    }
+
+    /**
+     * Download specified artifact, not failing if not found.
+     *
+     * @throws IOException re-thrown if not an {@link FileNotFoundException}
+     */
+    protected void downloadArtifact(final String groupId, final String artifactId, final String version)
+        throws IOException
+    {
+        final Gav gav = GavUtil.newGav( groupId, artifactId, version );
+        try
+        {
+            downloadArtifactFromRepository( REPO, gav, "target/downloads/" + getTestId() );
+        }
+        catch ( FileNotFoundException e )
+        {
+            // ignore just fine
+            // e.printStackTrace();
+        }
     }
 
     @BeforeClass

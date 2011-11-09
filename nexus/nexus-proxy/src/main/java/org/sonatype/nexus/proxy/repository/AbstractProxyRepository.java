@@ -656,7 +656,7 @@ public abstract class AbstractProxyRepository
     /**
      * Sets the item max age in (in minutes).
      * 
-     * @param itemMaxAgeInSeconds the new item max age in (in minutes).
+     * @param itemMaxAge the new item max age in (in minutes).
      */
     public void setItemMaxAge( int itemMaxAge )
     {
@@ -1669,6 +1669,29 @@ public abstract class AbstractProxyRepository
     protected boolean isActionAllowedReadOnly( Action action )
     {
         return action.equals( Action.read ) || action.equals( Action.delete );
+    }
+
+    /**
+     * Beside original behavior, only add to NFC when we are not in BLOCKED mode.
+     *
+     * @since 1.10.0
+     */
+    @Override
+    protected boolean shouldAddToNotFoundCache( final ResourceStoreRequest request )
+    {
+        boolean shouldAddToNFC = super.shouldAddToNotFoundCache( request );
+        if ( shouldAddToNFC )
+        {
+            shouldAddToNFC = getProxyMode() == null || getProxyMode().shouldProxy();
+            if ( !shouldAddToNFC && getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    String.format( "Repository '%s' is in proxy mode '%s', not adding path '%s' to NFC",
+                                   getId(), getProxyMode(), request.getRequestPath()
+                    ) );
+            }
+        }
+        return shouldAddToNFC;
     }
 
 }

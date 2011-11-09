@@ -46,18 +46,18 @@ public class NEXUS4539ManualBlockIT
 
         // set manual block
         repoUtil.setBlockProxy( REPO, true );
-        assertStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
+        assertRepositoryStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
 
         // server back to normal
         super.sleepTime = -1;
 
         // nexus shall not unblock
         Thread.sleep( 15 * 1000 );
-        assertStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
+        assertRepositoryStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
 
         // must still be manual blocked
         shakeNexus();
-        assertStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
+        assertRepositoryStatus( repoUtil.getStatus( REPO ), RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_MANUAL );
     }
 
 

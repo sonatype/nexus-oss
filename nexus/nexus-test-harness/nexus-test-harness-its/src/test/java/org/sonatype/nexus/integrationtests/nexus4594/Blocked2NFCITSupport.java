@@ -16,41 +16,35 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.integrationtests.nexus4539;
+package org.sonatype.nexus.integrationtests.nexus4594;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
 
-import org.testng.annotations.Test;
+import org.hamcrest.Matchers;
+import org.sonatype.nexus.integrationtests.nexus4539.AutoBlockITSupport;
 
-/**
- * Make sure normal case works, that is, a proxy whose remote is timing out blocks, and then unblocks when the remote is
- * available. It does take around 2 minutes to run.
- */
-public class NEXUS4539AutoBlockIT
+public class Blocked2NFCITSupport
     extends AutoBlockITSupport
 {
 
-    @Test
-    public void autoBlock()
-        throws Exception
+    /**
+     * Check that the Nexus made remote requests to our fake repository.
+     */
+    protected void verifyNexusWentRemote()
     {
-        // initial status, no timing out
-        autoUnblockNexus();
+        assertThat( pathsTouched, not( Matchers.<String>empty() ) );
+        assertThat( pathsTouched, hasItem( "/repository/foo/bar/5.0/bar-5.0.jar" ) );
+        pathsTouched.clear();
+    }
 
-        // block Nexus
-        autoBlockNexus();
-
-        // it must unblock auto magically
-        autoUnblockNexus();
-
-        // let's see if it will block again
-        autoBlockNexus();
-        // let is sit on ice for 30s
-        Thread.sleep( 30 * 1000 );
-
-        // it must auto unblock again
-        autoUnblockNexus();
+    /**
+     * Check that the Nexus did not made remote requests to our fake repository.
+     */
+    protected void verifyNexusDidNotWentRemote()
+    {
+        assertThat( pathsTouched, Matchers.<String>empty() );
     }
 
 }

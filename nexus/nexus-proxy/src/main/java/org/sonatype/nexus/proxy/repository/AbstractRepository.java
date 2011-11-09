@@ -826,8 +826,7 @@ public abstract class AbstractRepository
                 getLogger().debug( getId() + " retrieveItem() :: NOT FOUND " + uid.toString() );
             }
 
-            // if not local/remote only, add it to NFC
-            if ( !request.isRequestLocalOnly() && !request.isRequestRemoteOnly() )
+            if ( shouldAddToNotFoundCache( request ) )
             {
                 addToNotFoundCache( request );
             }
@@ -1163,6 +1162,7 @@ public abstract class AbstractRepository
      * 
      * @param path the path
      */
+    @Override
     public void addToNotFoundCache( ResourceStoreRequest request )
     {
         if ( isNotFoundCacheActive() )
@@ -1327,4 +1327,21 @@ public abstract class AbstractRepository
     {
         return action.isReadAction();
     }
+
+    /**
+     * Whether or not the requested path should be added to NFC.
+     *
+     * Item will be added to NFC if is not local/remote only.
+     *
+     * @param request resource store request
+     * @return true if requested path should be added to NFC
+     *
+     * @since 1.10.0
+     */
+    protected boolean shouldAddToNotFoundCache( final ResourceStoreRequest request )
+    {
+        // if not local/remote only, add it to NFC
+        return !request.isRequestLocalOnly() && !request.isRequestRemoteOnly();
+    }
+
 }
