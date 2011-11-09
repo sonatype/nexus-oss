@@ -1116,7 +1116,9 @@ public abstract class AbstractProxyRepository
                         }
                         catch ( StorageException ex )
                         {
-                            if ( ex instanceof RemoteStorageException )
+                            if ( ex instanceof RemoteStorageException
+                                // NEXUS-4593 HTTP status 403 should not lead to autoblock
+                                && !( ex instanceof RemoteAccessDeniedException ) )
                             {
                                 autoBlockProxying( ex );
                             }
