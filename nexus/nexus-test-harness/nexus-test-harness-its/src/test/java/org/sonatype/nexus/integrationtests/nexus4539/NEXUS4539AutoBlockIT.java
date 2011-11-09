@@ -18,9 +18,6 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4539;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
-
 import org.testng.annotations.Test;
 
 /**

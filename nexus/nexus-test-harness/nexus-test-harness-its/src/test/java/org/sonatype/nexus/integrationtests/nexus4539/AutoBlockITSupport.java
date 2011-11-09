@@ -19,8 +19,9 @@
 package org.sonatype.nexus.integrationtests.nexus4539;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
