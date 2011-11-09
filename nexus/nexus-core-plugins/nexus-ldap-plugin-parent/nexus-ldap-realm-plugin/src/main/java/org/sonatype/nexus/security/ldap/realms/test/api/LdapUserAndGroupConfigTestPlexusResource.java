@@ -201,6 +201,7 @@ public class LdapUserAndGroupConfigTestPlexusResource
         authConfig.setUserSubtree( dto.isUserSubtree() );
         authConfig.setGroupSubtree( dto.isGroupSubtree() );
         authConfig.setUserMemberOfAttribute( dto.getUserMemberOfAttribute() );
+        authConfig.setLdapFilter(dto.getLdapFilter());
 
         return authConfig;
     }

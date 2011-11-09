@@ -292,10 +292,11 @@ public class DefaultLdapUserDAO
             ctls.setCountLimit( limitCount );
         }
 
+        String f = configuration.getLdapFilter();
+        getLogger().debug("Specific filter rule: \"" + ( f != null ? f : "none" ) + "\"");
         String filter =
-            "(&(objectClass=" + configuration.getUserObjectClass() + ")(" + configuration.getUserIdAttribute() + "="
-                + ( username != null ? username : "*" ) + "))";
-
+                "(&(objectClass=" + configuration.getUserObjectClass() + ")(" + configuration.getUserIdAttribute() + "="
+                        + ( username != null ? username : "*" ) + ")" + ( f != null && !f.isEmpty() ? "(" + f + ")" : "" ) + ")";
         getLogger().debug( "Searching for users with filter: \'" + filter + "\'" );
         
         String baseDN = StringUtils.defaultString( configuration.getUserBaseDn(), "" );

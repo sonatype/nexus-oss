@@ -106,6 +106,8 @@ public class LdapUserAndGroupConfigurationDTO
      * attribute used to store the group string in the user object.
      */
     private String userMemberOfAttribute;
+
+    private String ldapFilter;
     
     /**
      * @return the emailAddressAttribute
@@ -345,6 +347,16 @@ public class LdapUserAndGroupConfigurationDTO
         this.userMemberOfAttribute = userMemberOfAttribute;
     }
 
+    public String getLdapFilter()
+    {
+        return ldapFilter;
+    }
+
+    public void setLdapFilter( String ldapFilter )
+    {
+        this.ldapFilter = ldapFilter;
+    }
+
     @Override
     public int hashCode()
     {
@@ -365,6 +377,7 @@ public class LdapUserAndGroupConfigurationDTO
         result = prime * result + ( ( userPasswordAttribute == null ) ? 0 : userPasswordAttribute.hashCode() );
         result = prime * result + ( ( userRealNameAttribute == null ) ? 0 : userRealNameAttribute.hashCode() );
         result = prime * result + ( userSubtree ? 1231 : 1237 );
+        result = prime * result + ( ( ldapFilter == null ) ? 0 : ldapFilter.hashCode() );
         return result;
     }
 

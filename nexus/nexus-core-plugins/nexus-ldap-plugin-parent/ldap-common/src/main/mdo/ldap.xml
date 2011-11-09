@@ -285,6 +285,14 @@
                     <required>true</required>
                     <description>Groups are generally one of two types in LDAP systems - static or dynamic. A static group maintains its own membership list. A dynamic group records its membership on a user entry. If dynamic groups this should be set to the attribute used to store the group string in the user object.</description>
                 </field>
+
+                <field>
+                    <name>ldapFilter</name>
+                    <version>1.0.0+</version>
+                    <type>String</type>
+                    <required>true</required>
+                    <description>Filter to limit user search to user with specific attribut.</description>
+                </field>
                 
             </fields>
         </class>
