@@ -30,6 +30,7 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.sonatype.nexus.test.utils.handler.ReturnErrorHandler;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -60,7 +61,7 @@ public class Nexus1111ProxyRemote500ErrorIT
 
         // start a server which always return HTTP-500 for get
         Server return500Server = new Server( port );
-        return500Server.setHandler( new Return500Handler() );
+        return500Server.setHandler( new ReturnErrorHandler( 500 ) );
         return500Server.start();
 
         // download again

@@ -32,12 +32,12 @@ import org.mortbay.log.Log;
 import org.restlet.data.Status;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
-import org.sonatype.nexus.integrationtests.proxy.nexus1111.Return500Handler;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.DownloadIndexesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.sonatype.nexus.test.utils.handler.ReturnErrorHandler;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -58,7 +58,7 @@ public class Nexus4341RunningTaskNotEditable
         server.stop();
         int port = server.getPort();
         Server return500Server = new Server( port );
-        return500Server.setHandler( new Return500Handler()
+        return500Server.setHandler( new ReturnErrorHandler( 500 )
         {
     
             @Override
