@@ -291,7 +291,7 @@
                     <version>1.0.0+</version>
                     <type>String</type>
                     <required>true</required>
-                    <description>Filter to limit user search to user with specific attribut.</description>
+                    <description>Filter to limit user search to user with specific attribute.</description>
                 </field>
                 
             </fields>

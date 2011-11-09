@@ -107,6 +107,9 @@ public class LdapUserAndGroupConfigurationDTO
      */
     private String userMemberOfAttribute;
 
+    /**
+     * Filter to retrieve only users with specific attribute set.
+     */
     private String ldapFilter;
     
     /**
@@ -347,11 +350,17 @@ public class LdapUserAndGroupConfigurationDTO
         this.userMemberOfAttribute = userMemberOfAttribute;
     }
 
+    /**
+     * @return the filter to select specific users
+     */
     public String getLdapFilter()
     {
         return ldapFilter;
     }
 
+    /**
+     * @param ldapFilter the filter to select specific users
+     */
     public void setLdapFilter( String ldapFilter )
     {
         this.ldapFilter = ldapFilter;
