@@ -47,9 +47,10 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
   }
 
   public void load() {
+    File configFile = getOrCreateConfigFile();
     synchronized (LOAD_WRITE_MUTEX) {
       try {
-        xmlYumConfiguration = (XmlYumConfiguration) unmarshaller.unmarshal(getConfigFile());
+        xmlYumConfiguration = (XmlYumConfiguration) unmarshaller.unmarshal(configFile);
         fileLastModified = getConfigFile().lastModified();
         fillAliasMap();
       } catch (JAXBException e) {
@@ -58,12 +59,6 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
     }
   }
 
-  private void fillAliasMap() {
-    aliasMap.clear();
-    for (AliasMapping aliasMapping : xmlYumConfiguration.getAliasMappings()) {
-      aliasMap.put(aliasMapping.getAliasKey(), aliasMapping.getVersion());
-    }
-  }
 
   public void saveConfig(XmlYumConfiguration configToUse) {
     synchronized (LOAD_WRITE_MUTEX) {
@@ -145,5 +140,20 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
 
   public void setFilename(String filename) {
     this.filename = filename;
+  }
+
+  private File getOrCreateConfigFile() {
+    File configFile = getConfigFile();
+    if (!configFile.exists()) {
+      saveConfig(xmlYumConfiguration);
+    }
+    return configFile;
+  }
+
+  private void fillAliasMap() {
+    aliasMap.clear();
+    for (AliasMapping aliasMapping : xmlYumConfiguration.getAliasMappings()) {
+      aliasMap.put(aliasMapping.getAliasKey(), aliasMapping.getVersion());
+    }
   }
 }

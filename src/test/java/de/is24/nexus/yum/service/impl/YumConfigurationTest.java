@@ -1,8 +1,14 @@
 package de.is24.nexus.yum.service.impl;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.lang.Thread.sleep;
 import static org.apache.commons.io.IOUtils.write;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -32,6 +38,8 @@ import de.is24.nexus.yum.service.AliasNotFoundException;
  */
 @RunWith(NexusTestRunner.class)
 public class YumConfigurationTest {
+  private static final String YUM_XML = "yum.xml";
+
   private static final int NEW_TIMEOUT = 5555;
 
   private static final String PRODUCTION_VERSION = "5.1.15-1";
@@ -133,6 +141,30 @@ public class YumConfigurationTest {
     yumConfiguration.load();
     manipulateConfigFile();
     assertEquals(NEW_PRODUCTION_VERSION, yumConfiguration.getVersion(MYREPO_ID, PRODUCTION));
+  }
+
+  @Test
+  public void shouldCreateConfigFileIfNotExists() throws Exception {
+    File tmpDir = createTmpDir();
+    assertThat(new File(tmpDir, YUM_XML).exists(), is(FALSE));
+
+    YumConfigurationHandler yumConfigurationHandler = new YumConfigurationHandler();
+    yumConfigurationHandler.setNexusConfiguration(createNexusConfig(tmpDir));
+    yumConfigurationHandler.load();
+    assertThat(new File(tmpDir, YUM_XML).exists(), is(TRUE));
+  }
+
+  private NexusConfiguration createNexusConfig(File tmpDir) {
+    NexusConfiguration nexusConfig = createMock(NexusConfiguration.class);
+    expect(nexusConfig.getConfigurationDirectory()).andReturn(tmpDir).anyTimes();
+    replay(nexusConfig);
+    return nexusConfig;
+  }
+
+  private File createTmpDir() {
+    File tmpDir = new File(".", "target/tmp/" + randomAlphabetic(10));
+    tmpDir.mkdirs();
+    return tmpDir;
   }
 
   private void manipulateConfigFile() throws FileNotFoundException, IOException, InterruptedException {
