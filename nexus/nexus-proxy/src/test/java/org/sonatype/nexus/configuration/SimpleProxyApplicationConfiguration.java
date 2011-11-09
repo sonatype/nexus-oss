@@ -52,9 +52,10 @@ public class SimpleProxyApplicationConfiguration
     {
         Configuration configuration = getConfigurationModel();
 
-        configuration.setGlobalConnectionSettings( new CRemoteConnectionSettings() );
-        configuration.getGlobalConnectionSettings().setConnectionTimeout( 1000 );
-        configuration.getGlobalConnectionSettings().setRetrievalRetryCount( 3 );
+        // NEXUS-4521: littering "defaults" all over the place is unhealthy
+        //configuration.setGlobalConnectionSettings( new CRemoteConnectionSettings() );
+        //configuration.getGlobalConnectionSettings().setConnectionTimeout( 1000 );
+        //configuration.getGlobalConnectionSettings().setRetrievalRetryCount( 3 );
         // configuration.setGlobalHttpProxySettings( new CRemoteHttpProxySettings() );
         configuration.setRouting( new CRouting() );
         configuration.setRepositoryGrouping( new CRepositoryGrouping() );

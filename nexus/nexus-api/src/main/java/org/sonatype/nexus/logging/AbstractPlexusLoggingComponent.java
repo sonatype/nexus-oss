@@ -18,25 +18,23 @@
  */
 package org.sonatype.nexus.logging;
 
-import javax.inject.Inject;
-
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.slf4j.Logger;
+import org.codehaus.plexus.logging.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Similar to Plexus' AbstractLogEnabled, but using Slf4j and straight-forward stuff! Consider using
- * {@code LoggerFactory.getLogger(getClass() )} directly instead, since unsure about the "value" of this class.
+ * Plexus' AbstractLogEnabled in compatibility way.
  *
- * @author cstamas
+ * @author: cstamas
+ * @deprecated To be used by components still relying on Plexus Logger, but in general, avoid this! Use SLF4J API instead!
  */
-public abstract class AbstractLoggingComponent
+public class AbstractPlexusLoggingComponent
 {
 
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger plexusLogger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     protected Logger getLogger()
     {
-        return logger;
+        return plexusLogger;
     }
+
 }

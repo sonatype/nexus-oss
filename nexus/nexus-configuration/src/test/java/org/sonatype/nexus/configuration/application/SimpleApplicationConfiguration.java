@@ -61,7 +61,7 @@ public class SimpleApplicationConfiguration
 
         this.configuration = new Configuration();
 
-        configuration.setGlobalConnectionSettings( new CRemoteConnectionSettings() );
+        // configuration.setGlobalConnectionSettings( new CRemoteConnectionSettings() );
         // configuration.setGlobalHttpProxySettings( new CRemoteHttpProxySettings() );
         configuration.setRouting( new CRouting() );
         configuration.setRepositoryGrouping( new CRepositoryGrouping() );
