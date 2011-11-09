@@ -17,6 +17,7 @@ uid: cstamas
 userpassword: cstamas123
 mail: cstamas@sonatype.com
 description: This is Tamas
+description: nexus
 
 dn: cn=brianf,ou=people,o=sonatype
 objectclass: inetOrgPerson
