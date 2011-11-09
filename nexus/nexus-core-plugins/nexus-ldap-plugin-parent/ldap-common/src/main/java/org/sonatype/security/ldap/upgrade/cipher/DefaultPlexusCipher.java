@@ -23,7 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
-
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -34,20 +33,22 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64Encoder;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="oleg@codehaus.org">Oleg Gusakov</a>
  */
 @Component( role = PlexusCipher.class )
 public class DefaultPlexusCipher
-    extends AbstractLogEnabled
     implements PlexusCipher
 {
     private static final int SALT_SIZE = 8;
 
     private static final String STRING_ENCODING = "UTF8";
+
+    private Logger logger = LoggerFactory.getLogger( getClass() );
 
     /**
      * Encryption algorithm to use by this instance. Needs protected scope for tests
@@ -64,6 +65,11 @@ public class DefaultPlexusCipher
     protected int iterationCount = 23;
 
     private final BouncyCastleProvider bouncyCastleProvider;
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
 
     public DefaultPlexusCipher()
     {

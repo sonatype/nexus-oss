@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -35,6 +34,7 @@ import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UnsupportedConfigurationVersionException;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
 /**
  * Default configuration updater, using versioned Modello models. It tried to detect version signature from existing
@@ -44,7 +44,7 @@ import org.sonatype.nexus.configuration.model.Configuration;
  */
 @Component( role = ApplicationConfigurationUpgrader.class )
 public class DefaultApplicationConfigurationUpgrader
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements ApplicationConfigurationUpgrader
 {
     @Requirement( role = SingleVersionUpgrader.class )

@@ -26,6 +26,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
@@ -59,8 +60,7 @@ public class DefaultLSAttributeStorage
 {
     private static final String ATTRIBUTE_PATH_PREFIX = "/.nexus/attributes";
 
-    @Requirement
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     /** The XStream. */
     private XStream xstream;

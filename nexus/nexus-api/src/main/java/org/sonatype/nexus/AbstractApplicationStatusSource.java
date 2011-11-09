@@ -28,13 +28,12 @@ import javax.inject.Inject;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 
 public abstract class AbstractApplicationStatusSource
     implements ApplicationStatusSource
 {
-    @Requirement
-    @Inject
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     /**
      * System status.

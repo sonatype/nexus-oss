@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.access.NexusItemAuthorizer;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -33,7 +33,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 @Component( role = RepositoryRegistry.class, hint = "protected" )
 public class ProtectedRepositoryRegistry
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements RepositoryRegistry
 {
 

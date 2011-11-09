@@ -18,10 +18,10 @@
  */
 package org.sonatype.nexus.configuration.source;
 
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.configuration.source.ConfigurationSource;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
 /**
  * Abstract class that encapsulates Modello model loading and saving with interpolation.
@@ -29,7 +29,7 @@ import org.sonatype.nexus.configuration.model.Configuration;
  * @author cstamas
  */
 public abstract class AbstractConfigurationSource
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements ConfigurationSource<Configuration>
 {
     /** Flag to mark update. */

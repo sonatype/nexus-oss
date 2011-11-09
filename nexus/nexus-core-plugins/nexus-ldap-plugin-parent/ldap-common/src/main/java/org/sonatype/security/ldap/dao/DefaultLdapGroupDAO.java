@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-
 import javax.naming.InvalidNameException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -35,7 +34,6 @@ import javax.naming.ldap.LdapName;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,14 +43,18 @@ import org.slf4j.LoggerFactory;
  */
 @Component( role = LdapGroupDAO.class )
 public class DefaultLdapGroupDAO
-    extends AbstractLogEnabled
     implements LdapGroupDAO
 {
     @Requirement
     private LdapUserDAO ldapUserManager;
 
     private Logger logger = LoggerFactory.getLogger( getClass() );
-    
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
+
     private static boolean isGroupsEnabled( LdapAuthConfiguration configuration )
     {
         return configuration.isLdapGroupsAsRoles();

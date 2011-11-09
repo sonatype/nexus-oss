@@ -38,17 +38,17 @@ import org.apache.commons.vfs.VFS;
 import org.apache.commons.vfs.impl.DefaultFileMonitor;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.plexus.appevents.Event;
 
 @Component( role = ScriptStorage.class )
 public class DefaultScriptStorage
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements ScriptStorage, Initializable, Disposable, FileListener
 {
 

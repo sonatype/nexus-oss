@@ -15,7 +15,7 @@
 <plexus>
 
 	<components>
-
+<!--
 		<component>
 			<role>org.codehaus.plexus.logging.LoggerManager</role>
 			<implementation>org.codehaus.plexus.logging.slf4j.Slf4jLoggerManager</implementation>
@@ -23,6 +23,6 @@
 				<threshold>DEBUG</threshold>
 			</configuration>
 		</component>
-
+-->
 	</components>
 </plexus>

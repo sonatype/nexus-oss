@@ -20,7 +20,7 @@ package org.sonatype.nexus.proxy.attributes;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 
 /**
  * The Class AbstractStorageFileItemInspector is a convenience class for implementing inspectors.
@@ -30,8 +30,7 @@ import org.codehaus.plexus.logging.Logger;
 public abstract class AbstractStorageItemInspector
     implements StorageItemInspector
 {
-    @Requirement
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
     
     protected Logger getLogger()
     {

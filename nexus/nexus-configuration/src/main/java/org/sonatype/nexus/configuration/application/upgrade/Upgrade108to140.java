@@ -28,12 +28,13 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
+import org.sonatype.nexus.configuration.model.v1_0_8.Configuration;
+import org.sonatype.nexus.configuration.model.v1_0_8.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.model.v1_4_0.CErrorReporting;
 import org.sonatype.nexus.configuration.model.v1_4_0.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.v1_4_0.CLocalStorage;
@@ -52,8 +53,7 @@ import org.sonatype.nexus.configuration.model.v1_4_0.CRouting;
 import org.sonatype.nexus.configuration.model.v1_4_0.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.v1_4_0.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_4_0.CSmtpConfiguration;
-import org.sonatype.nexus.configuration.model.v1_0_8.Configuration;
-import org.sonatype.nexus.configuration.model.v1_0_8.io.xpp3.NexusConfigurationXpp3Reader;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -74,7 +74,7 @@ import org.sonatype.security.realms.XmlAuthorizingRealm;
  */
 @Component( role = SingleVersionUpgrader.class, hint = "1.0.8" )
 public class Upgrade108to140
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
     @Requirement( hint = "file" )

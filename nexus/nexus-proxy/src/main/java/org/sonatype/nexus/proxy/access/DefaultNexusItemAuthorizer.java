@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -39,7 +39,7 @@ import org.sonatype.security.SecuritySystem;
  */
 @Component( role = NexusItemAuthorizer.class )
 public class DefaultNexusItemAuthorizer
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements NexusItemAuthorizer
 {
     @Requirement

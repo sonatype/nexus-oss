@@ -33,6 +33,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator;
@@ -47,8 +48,7 @@ import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator;
 public class MavenFileTypeValidator
     implements FileTypeValidator
 {
-    @Requirement
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     @Requirement
     private MimeUtil mimeUtil;

@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
@@ -37,10 +36,11 @@ import org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_0_8.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_8.upgrade.BasicVersionUpgrade;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
 @Component( role = SingleVersionUpgrader.class, hint = "1.0.7" )
 public class Upgrade107to108
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
     private BasicVersionUpgrade converter = new BasicVersionUpgrade()

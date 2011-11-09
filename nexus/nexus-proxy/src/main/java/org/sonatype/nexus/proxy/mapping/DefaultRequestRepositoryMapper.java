@@ -42,6 +42,7 @@ import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRepositoryGroupingCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
@@ -73,8 +74,7 @@ public class DefaultRequestRepositoryMapper
     extends AbstractConfigurable
     implements RequestRepositoryMapper
 {
-    @Requirement
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;

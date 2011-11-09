@@ -28,9 +28,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.plugins.PluginResponse;
 import org.sonatype.nexus.plugins.plugin.console.model.DocumentationLink;
@@ -40,7 +40,6 @@ import org.sonatype.nexus.plugins.rest.NexusDocumentationBundle;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plugin.metadata.GAVCoordinate;
-
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -49,7 +48,7 @@ import com.google.common.collect.Multimap;
  */
 @Component( role = PluginConsoleManager.class )
 public class DefaultPluginConsoleManager
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements PluginConsoleManager, Initializable
 {
     @Requirement

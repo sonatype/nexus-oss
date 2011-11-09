@@ -22,16 +22,15 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.PasswordHelper;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.plexus.components.cipher.PlexusCipherException;
-
 import com.thoughtworks.xstream.XStream;
 
 @Component( role = ConfigurationHelper.class )
 public class DefaultConfigurationHelper
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements ConfigurationHelper
 {
     @Requirement

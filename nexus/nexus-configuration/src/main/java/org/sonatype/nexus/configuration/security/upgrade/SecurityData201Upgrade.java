@@ -34,6 +34,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.security.model.v2_0_2.CPrivilege;
 import org.sonatype.security.model.v2_0_2.CProperty;
 import org.sonatype.security.model.v2_0_2.CRole;
@@ -48,8 +49,7 @@ public class SecurityData201Upgrade
     implements SecurityDataUpgrader
 {
 
-    @Requirement
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     @Override
     public void doUpgrade( Configuration configuration )

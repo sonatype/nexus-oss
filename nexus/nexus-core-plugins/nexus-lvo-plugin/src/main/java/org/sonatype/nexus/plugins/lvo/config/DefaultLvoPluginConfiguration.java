@@ -32,10 +32,10 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.lvo.NoSuchKeyException;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
 import org.sonatype.nexus.plugins.lvo.config.model.Configuration;
@@ -44,7 +44,7 @@ import org.sonatype.nexus.plugins.lvo.config.model.io.xpp3.NexusLvoPluginConfigu
 
 @Component( role = LvoPluginConfiguration.class )
 public class DefaultLvoPluginConfiguration
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements LvoPluginConfiguration
 {
     @org.codehaus.plexus.component.annotations.Configuration( value = "${nexus-work}/conf/lvo-plugin.xml" )

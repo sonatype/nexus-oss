@@ -40,6 +40,7 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRepositoryTargetCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.proxy.events.TargetRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.TargetRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -56,8 +57,7 @@ public class DefaultTargetRegistry
     extends AbstractConfigurable
     implements TargetRegistry
 {
-    @Requirement
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
