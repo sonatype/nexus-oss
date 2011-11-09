@@ -283,6 +283,11 @@ public abstract class AbstractScheduledServicePlexusResource
             cal.setTime( new Date( Long.parseLong( date ) ) );
             cal.add( Calendar.HOUR_OF_DAY, timeCalendar.get( Calendar.HOUR_OF_DAY ) );
             cal.add( Calendar.MINUTE, timeCalendar.get( Calendar.MINUTE ) );
+
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Parsed date from task creation request: " + cal.getTime() );
+            }
         }
         catch ( ParseException e )
         {
@@ -321,7 +326,8 @@ public abstract class AbstractScheduledServicePlexusResource
         throws InvalidConfigurationException
     {
         Calendar cal = Calendar.getInstance();
-        cal.setTime( new Date( Long.parseLong( date ) ) );
+        Date startDate = new Date( Long.parseLong( date ) );
+        cal.setTime( startDate );
 
         Calendar nowCal = Calendar.getInstance();
         nowCal.add( Calendar.DAY_OF_YEAR, -1 );
@@ -334,6 +340,11 @@ public abstract class AbstractScheduledServicePlexusResource
         // basic check that the day timestamp is roughly in the correct range
         if ( cal.before( nowCal ) )
         {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Validation error for startDate: " + startDate.toString() );
+            }
+
             ValidationResponse vr = new ApplicationValidationResponse();
             ValidationMessage vm = new ValidationMessage( "startDate", "Date cannot be in the past." );
             vr.addValidationError( vm );

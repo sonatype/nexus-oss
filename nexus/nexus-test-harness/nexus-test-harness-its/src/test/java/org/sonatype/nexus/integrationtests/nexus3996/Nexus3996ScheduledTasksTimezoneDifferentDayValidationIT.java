@@ -89,6 +89,8 @@ public class Nexus3996ScheduledTasksTimezoneDifferentDayValidationIT
         cal.add( Calendar.HOUR_OF_DAY, -2 );
         task.setStartDate( String.valueOf( cal.getTimeInMillis() ) );
 
+        log.debug( "request dates:\nmidnight: {}\ntime offset: {}", cal.getTime(), task.getStartTime() );
+
         assertThat( TaskScheduleUtil.create( task ), NexusRequestMatchers.hasStatusCode( 201 ) );
     }
 
