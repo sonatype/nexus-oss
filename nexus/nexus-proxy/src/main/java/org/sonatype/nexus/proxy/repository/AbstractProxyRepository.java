@@ -1685,10 +1685,10 @@ public abstract class AbstractProxyRepository
             shouldAddToNFC = getProxyMode() == null || getProxyMode().shouldProxy();
             if ( !shouldAddToNFC && getLogger().isDebugEnabled() )
             {
-                getLogger().debug(
-                    String.format( "Repository '%s' is in proxy mode '%s', not adding path '%s' to NFC",
-                                   getId(), getProxyMode(), request.getRequestPath()
-                    ) );
+                getLogger().debug( String.format(
+                    "Proxy repository '%s' is is not allowed to issue remote requests (%s), not adding path '%s' to NFC",
+                    getId(), getProxyMode(), request.getRequestPath()
+                ) );
             }
         }
         return shouldAddToNFC;
