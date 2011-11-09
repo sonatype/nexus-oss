@@ -880,6 +880,7 @@ public class DefaultIndexerManager
 
         if ( isAlreadyBeingIndexed( repository.getId() ) )
         {
+            logAlreadyBeingIndexed( repository.getId(), "re-indexing" );
             return;
         }
 
@@ -1003,6 +1004,7 @@ public class DefaultIndexerManager
 
         if ( isAlreadyBeingIndexed( repository.getId() ) )
         {
+            logAlreadyBeingIndexed( repository.getId(), "downloading index" );
             return false;
         }
 
@@ -1256,6 +1258,7 @@ public class DefaultIndexerManager
 
         if ( isAlreadyBeingIndexed( repository.getId() ) )
         {
+            logAlreadyBeingIndexed( repository.getId(), "publishing index" );
             return;
         }
 
@@ -2328,4 +2331,13 @@ public class DefaultIndexerManager
         // if I can't get a read lock means someone else has the write lock (index tasks do write lock)
         return !locked;
     }
+
+    private void logAlreadyBeingIndexed( final String repositoryId, final String processName )
+    {
+        getLogger().info( String.format(
+            "Repository '%s' is already in the process of being re-indexed. Skipping %s'.",
+            repositoryId, processName
+        ) );
+    }
+
 }
