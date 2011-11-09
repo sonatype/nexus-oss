@@ -67,7 +67,7 @@ public class HttpClientProxyUtil
 
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout( timeout );
         httpClient.getHttpConnectionManager().getParams().setSoTimeout( timeout );
-        httpClient.getHttpConnectionManager().getParams().setTcpNoDelay( true );
+        //httpClient.getHttpConnectionManager().getParams().setTcpNoDelay( true );
         httpClient.getHttpConnectionManager().getParams().setMaxTotalConnections( connectionPoolSize );
         // NOTE: connPool is _per_ repo, hence all of those will connect to same host (unless mirrors are used)
         // so, we are violating intentionally the RFC and we let the whole pool size to chase same host

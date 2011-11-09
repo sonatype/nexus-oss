@@ -79,6 +79,7 @@ public class SimpleRemoteLeakTest
         repo1.setRemoteUrl(
             getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class ).getRemoteUrl().replace(
                 "localhost", "127.0.0.1" ) );
+        repo1.commitChanges();
 
         ResourceStoreRequest req1 =
             new ResourceStoreRequest( "/repositories/repo1/activemq/activemq-core/1.2/activemq-core-1.2.jar", false );

@@ -54,7 +54,7 @@ import javax.inject.Inject;
 public abstract class AbstractLocalRepositoryStorage
     implements LocalRepositoryStorage
 {
-    private Logger logger = LoggerFactory.getLogger( AbstractLocalRepositoryStorage.class );
+    private Logger logger = LoggerFactory.getLogger( getClass() );
 
     /**
      * The wastebasket.

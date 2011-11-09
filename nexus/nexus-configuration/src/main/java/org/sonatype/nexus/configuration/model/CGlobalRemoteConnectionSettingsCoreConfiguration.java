@@ -37,7 +37,7 @@ public class CGlobalRemoteConnectionSettingsCoreConfiguration
             // create default
             CRemoteConnectionSettings newConn = new CRemoteConnectionSettings();
 
-            newConn.setConnectionTimeout( 1000 );
+            newConn.setConnectionTimeout( 20000 );
 
             newConn.setRetrievalRetryCount( 3 );
 
