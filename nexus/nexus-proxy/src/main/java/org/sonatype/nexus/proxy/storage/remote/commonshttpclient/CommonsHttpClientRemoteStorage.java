@@ -126,15 +126,8 @@ public class CommonsHttpClientRemoteStorage
             catch ( RemoteAccessDeniedException e )
             {
                 // NEXUS-3338: we have to swallow this on S3
-                if ( isRemotePeerAmazonS3Storage( repository ) )
-                {
-                    // this is S3 remote, and we got 403: just say all is well (for now)
-                    return true;
-                }
-                else
-                {
-                    throw e;
-                }
+                // NEXUS-4593: 403 is always "ok"
+                result = true;
             }
         }
         finally
@@ -535,10 +528,13 @@ public class CommonsHttpClientRemoteStorage
             method.releaseConnection();
 
             // HEAD returned error, but not exception, try GET before failing
-            if ( doGet == false && response != HttpStatus.SC_OK )
+            if ( !doGet && response != HttpStatus.SC_OK )
             {
+                // 401 and 403 will throw an exception in executeMethod, no need to check for those here
                 // try with GET unless some known to fail responses are in
-                doGet = ( response != HttpStatus.SC_UNAUTHORIZED ) && ( response != HttpStatus.SC_FORBIDDEN );
+                // doGet = ( response != HttpStatus.SC_UNAUTHORIZED ) && ( response != HttpStatus.SC_FORBIDDEN );
+
+                doGet = true;
 
                 getLogger().debug( "HEAD method failed, will attempt GET.  Status: " + response );
             }
