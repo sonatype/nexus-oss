@@ -192,6 +192,7 @@ public class RepositoryTemplatePlexusResource
         repoRes.setDownloadRemoteIndexes( repoCfg.isDownloadRemoteIndex() );
         repoRes.setArtifactMaxAge( repoCfg.getArtifactMaxAge() );
         repoRes.setMetadataMaxAge( repoCfg.getMetadataMaxAge() );
+        repoRes.setFileTypeValidation( repoCfg.isFileTypeValidation() );
 
         return repoRes;
     }
