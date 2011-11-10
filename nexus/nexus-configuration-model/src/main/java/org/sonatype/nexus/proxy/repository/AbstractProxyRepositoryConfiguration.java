@@ -53,7 +53,7 @@ public abstract class AbstractProxyRepositoryConfiguration
 
     public boolean isFileTypeValidation()
     {
-        return Boolean.valueOf( getNodeValue( getRootNode(), FILE_TYPE_VALIDATION, "false" ) );
+        return Boolean.valueOf( getNodeValue( getRootNode(), FILE_TYPE_VALIDATION, "true" ) );
     }
 
     public void setFileTypeValidation( boolean doValidate )
