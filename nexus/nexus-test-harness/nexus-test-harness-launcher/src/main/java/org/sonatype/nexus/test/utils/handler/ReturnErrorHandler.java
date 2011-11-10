@@ -37,9 +37,17 @@ public class ReturnErrorHandler
     {
         private final int status;
 
+        private boolean headOk = true;
+
         public ReturnErrorHandler( final int status )
         {
             this.status = status;
+        }
+
+        public ReturnErrorHandler( final int status, final boolean headOk )
+        {
+            this( status );
+            this.headOk = headOk;
         }
 
         public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
@@ -47,7 +55,7 @@ public class ReturnErrorHandler
             ServletException
         {
 
-            if ( request.getMethod().equals( Method.HEAD ) )
+            if ( isHeadOk() && request.getMethod().equals( Method.HEAD ) )
             {
                 response.setContentType( "text/html" );
                 response.setStatus( HttpServletResponse.SC_OK );
@@ -63,4 +71,8 @@ public class ReturnErrorHandler
             }
         }
 
+        public boolean isHeadOk()
+        {
+            return headOk;
+        }
     }

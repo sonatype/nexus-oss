@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (c) 2008-2011 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions
+
+    This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+    Public License Version 3 as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+    for more details.
+
+    You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+    http://www.gnu.org/licenses.
+
+    Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+    Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+    All other trademarks are the property of their respective owners.
+
+-->
+<nexusConfiguration>
+  <version>1.4.6</version>
+  <globalConnectionSettings>
+    <connectionTimeout>10000</connectionTimeout>
+    <retrievalRetryCount>3</retrievalRetryCount>
+    <queryString></queryString>
+  </globalConnectionSettings>
+
+  <restApi>
+    <baseUrl>http://localhost:${nexus-application-port}/nexus</baseUrl>
+    <uiTimeout>60000</uiTimeout>
+  </restApi>
+  <httpProxy>
+    <port>${nexus-proxy-port}</port>
+    <proxyPolicy>strict</proxyPolicy>
+  </httpProxy>
+  <routing>
+    <resolveLinks>true</resolveLinks>
+  </routing>
+
+  <repositories>
+    <repository>
+      <id>release-proxy-repo-1</id>
+      <name>Jetty Test Server</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>false</notFoundCacheActive>
+      <notFoundCacheTTL>0</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <localStorage>
+        <provider>file</provider>
+      </localStorage>
+      <remoteStorage>
+        <provider>apacheHttpClient3x</provider>
+        <url>${proxy-repo-base-url}release-proxy-repo-1</url>
+      </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>0</artifactMaxAge>
+        <itemMaxAge>0</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
+
+    </repository>
+  </repositories>
+
+  <smtpConfiguration>
+    <hostname>mail.test</hostname>
+    <port>25</port>
+    <username>smtp-username</username>
+    <password>{MsXdb4c7O3YH4wii3U+ge4xydRckZJk+KS2u8yHlQyg=}</password>
+    <systemEmailAddress>system@nexus.org</systemEmailAddress>
+  </smtpConfiguration>
+
+</nexusConfiguration>

@@ -25,25 +25,26 @@ import java.io.IOException;
 
 import org.mortbay.jetty.Server;
 import org.restlet.data.MediaType;
-import org.restlet.data.Response;
-import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
-import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
-import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.sonatype.nexus.test.utils.RepositoryStatusMessageUtil;
-import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.sonatype.nexus.test.utils.handler.ReturnErrorHandler;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
  * IT testing that a remote answering with '403 Forbidden' will not be auto-blocked.
+ * <p/>
+ * itemMaxAge is set to 0 to always hit the remote
+ * <p/>
+ * autoblock time is set to 3s for this test
+ * <p/>
+ * the test methods depend on the state of the repository left from the previous method.
+ * (using testng's dependOnMethod here)
  *
  * @since 1.10.0
  */
@@ -51,15 +52,25 @@ public class Nexus4593NoAutoblockFor403IT
     extends AbstractNexusProxyIntegrationTest
 {
 
-    private Server errorServer;
+    private Server server;
 
     @AfterMethod
     public void stopServer()
         throws Exception
     {
-        if ( errorServer != null )
+        if ( server != null && server.isStarted() )
         {
-            errorServer.stop();
+            server.stop();
+            for ( int i = 0; i < 10; i++ )
+            {
+                if ( server.isStopped() )
+                {
+                    return;
+                }
+                Thread.sleep( 100 );
+            }
+
+            throw new IllegalStateException( "server did not stop in 1s" );
         }
     }
 
@@ -73,37 +84,51 @@ public class Nexus4593NoAutoblockFor403IT
     }
 
     /**
-     * Verify that a remote answering with '403 Forbidden' will not be auto-blocked.
+     * Verify that a remote answering with '403 Forbidden' will not be auto-blocked
+     * with and without a local artifact cached.
      */
     @Test
     public void testNoAutoblockOn403()
         throws Exception
     {
-        startErrorServer( 403 );
+        startErrorServer( 403, true );
 
         try
         {
             downloadArtifact( GavUtil.newGav( "g", "a", "v" ), "target" );
+            assertThat( "should fail b/c of 403", false );
         }
         catch ( IOException e )
         {
             // expected, remote will answer with 403
         }
 
-        RepositoryStatusResource status = getStatus();
-        assertThat( ProxyMode.valueOf( status.getProxyMode() ), is( ProxyMode.ALLOW ) );
+        assertThat( ProxyMode.valueOf( getStatus().getProxyMode() ), is( ProxyMode.ALLOW ) );
+
+        // successfully fetch different artifact
+        stopServer();
+        this.proxyServer.start();
+        downloadArtifact( GavUtil.newGav( "nexus4593", "artifact", "1.0.0" ), "target" );
+        assertThat( ProxyMode.valueOf( getStatus().getProxyMode() ), is( ProxyMode.ALLOW ) );
+
+        // 403 for artifact again
+        startErrorServer( 403, true );
+        // download will not fail because we have a local copy cached, but the remote will be hit b/c maxAge is set to 0
+        downloadArtifact( GavUtil.newGav( "nexus4593", "artifact", "1.0.0" ), "target" );
+
+        assertThat( ProxyMode.valueOf( getStatus().getProxyMode() ), is( ProxyMode.ALLOW ) );
     }
 
     /**
      * Verify that a remote answering with '401' will still be auto-blocked.
      * <p/>
-     * This needs to be run after the 403-test-method, because this test will change repo status to auto blocked.
+     * This test will change repo status to auto blocked.
      */
-    @Test(dependsOnMethods = "testNoAutoblockOn403")
+    @Test( dependsOnMethods = "testNoAutoblockOn403" )
     public void testAutoblockOn401()
         throws Exception
     {
-        startErrorServer( 401 );
+        startErrorServer( 401, true );
 
         try
         {
@@ -119,17 +144,48 @@ public class Nexus4593NoAutoblockFor403IT
         assertThat( ProxyMode.valueOf( status.getProxyMode() ), is( ProxyMode.BLOCKED_AUTO ) );
     }
 
-    private void startErrorServer( final int code )
+    /**
+     * Verify that un-autoblocking a repo works when 'HEAD /' is giving 403.
+     */
+    @Test( dependsOnMethods = "testAutoblockOn401" )
+    public void testUnAutoblockFor403()
         throws Exception
     {
-        ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE );
-        server.stop();
+        startErrorServer( 403, false );
+        assertThat( ProxyMode.valueOf( getStatus().getProxyMode() ), is( ProxyMode.BLOCKED_AUTO ) );
 
-        int port = server.getPort();
+        for ( int i = 0; i < 10; i++ )
+        {
+            if ( ! ProxyMode.valueOf( getStatus().getProxyMode()).equals( ProxyMode.BLOCKED_AUTO ) )
+            {
+                break;
+            }
+            Thread.sleep( 1000 );
+        }
 
-        errorServer = new Server( port );
-        errorServer.setHandler( new ReturnErrorHandler( code ) );
-        errorServer.start();
+        assertThat( "No UnAutoblock in 10s", ProxyMode.valueOf( getStatus().getProxyMode() ), is( ProxyMode.ALLOW ) );
+    }
+
+    private void startErrorServer( final int code, final boolean headOk )
+        throws Exception
+    {
+        stopServer();
+        proxyServer.stop();
+
+        server = new Server( proxyPort );
+        server.setHandler( new ReturnErrorHandler( code, headOk ) );
+        server.start();
+
+        for ( int i = 0; i < 10; i++ )
+        {
+            Thread.sleep( 100 );
+            if ( server.isStarted() )
+            {
+                return;
+            }
+        }
+
+        throw new IllegalStateException( "Server did not start in 1s" );
     }
 
     private RepositoryStatusResource getStatus()
@@ -137,5 +193,17 @@ public class Nexus4593NoAutoblockFor403IT
     {
         return new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML ).getStatus(
             getTestRepositoryId() );
+    }
+
+    @BeforeClass
+    public static void setAutoblockTime()
+    {
+        System.setProperty( "plexus.autoblock.remote.status.retain.time", String.valueOf( 3 * 1000 ) );
+    }
+
+    @AfterClass
+    public static void restoreAutoblockTime()
+    {
+        System.clearProperty( "plexus.autoblock.remote.status.retain.time" );
     }
 }
