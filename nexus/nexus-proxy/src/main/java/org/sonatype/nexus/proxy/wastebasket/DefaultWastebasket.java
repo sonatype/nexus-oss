@@ -196,12 +196,29 @@ public class DefaultWastebasket
         }
     }
 
+    @Override
     public void delete( LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request )
+        throws LocalStorageException
+    {
+        DeleteOperation operation;
+        if ( request.getRequestContext().containsKey( DeleteOperation.DELETE_OPERATION_CTX_KEY ) )
+        {
+            operation = (DeleteOperation) request.getRequestContext().get( DeleteOperation.DELETE_OPERATION_CTX_KEY );
+        }
+        else
+        {
+            operation = getDeleteOperation();
+        }
+
+        delete( ls, repository, request, operation );
+    }
+
+    private void delete( LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request, DeleteOperation type)
         throws LocalStorageException
     {
         try
         {
-            if ( DeleteOperation.MOVE_TO_TRASH.equals( getDeleteOperation() ) )
+            if ( DeleteOperation.MOVE_TO_TRASH.equals( type ) )
             {
                 ResourceStoreRequest trashed =
                     new ResourceStoreRequest( getTrashPath( repository, request.getRequestPath() ) );

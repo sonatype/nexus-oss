@@ -43,6 +43,8 @@ public class SnapshotRemovalTaskDescriptor
 
     public static final String REMOVE_WHEN_RELEASED_FIELD_ID = "removeIfReleaseExists";
 
+    public static final String DELETE_IMMEDIATELY = "deleteImmediately";
+
     private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
                                                                                        FormField.MANDATORY );
 
@@ -64,6 +66,10 @@ public class SnapshotRemovalTaskDescriptor
                                "The job will purge all snapshots that have a corresponding released artifact (same version not including the -SNAPSHOT).",
                                FormField.OPTIONAL );
 
+    private final CheckboxFormField deleteImmediatelyField =
+        new CheckboxFormField( DELETE_IMMEDIATELY, "Delete immediately", "The job will not move deleted items into the repository trash but delete immediately.", FormField.OPTIONAL );
+
+
     public String getId()
     {
         return ID;
@@ -82,6 +88,7 @@ public class SnapshotRemovalTaskDescriptor
         fields.add( minToKeepField );
         fields.add( keepDaysField );
         fields.add( removeWhenReleasedField );
+        fields.add( deleteImmediatelyField );
 
         return fields;
     }
