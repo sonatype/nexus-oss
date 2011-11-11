@@ -39,18 +39,9 @@ import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
-public class Nexus4341RunningTaskNotEditable
+public class Nexus4341RunningTaskNotEditableIT
     extends AbstractNexusProxyIntegrationTest
 {
-    private static final String REPO_NAME = "release-proxy-repo-1";
-
-    private Server return500Server;
-
-    public Nexus4341RunningTaskNotEditable()
-    {
-        super( REPO_NAME );
-    }
-
     private void replaceServer()
         throws Exception
     {
@@ -97,7 +88,7 @@ public class Nexus4341RunningTaskNotEditable
     {
         ScheduledServicePropertyResource repositoryProp = new ScheduledServicePropertyResource();
         repositoryProp.setKey( DownloadIndexesTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
-        repositoryProp.setValue( REPO_NAME );
+        repositoryProp.setValue( getTestRepositoryId() );
 
         ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();
         scheduledTask.setEnabled( true );
@@ -126,7 +117,7 @@ public class Nexus4341RunningTaskNotEditable
 
         for ( ScheduledServiceListResource resource : tasks )
         {
-            System.err.println( "Starting task " + resource.getName() );
+            log.debug( "Starting task " + resource.getName() );
             Status status = TaskScheduleUtil.run( resource.getId() );
             Assert.assertTrue( status.isSuccess() );
         }
