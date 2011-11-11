@@ -63,6 +63,18 @@ public class MavenFileTypeValidator
         supportedTypeMap.put( "ear", Arrays.asList( "application/zip" ) );
         supportedTypeMap.put( "pom", Arrays.asList( "application/x-maven-pom", "application/xml", "text/xml" ) );
         supportedTypeMap.put( "xml", Arrays.asList( "application/xml", "text/xml" ) );
+        supportedTypeMap.put( "tar", Arrays.asList( "application/x-tar" ) );
+        // flex
+        supportedTypeMap.put( "swc", Arrays.asList( "application/zip" ) );
+        supportedTypeMap.put( "swf", Arrays.asList( "application/x-shockwave-flash" ) );
+        // tar.gz
+        supportedTypeMap.put( "gz", Arrays.asList( "application/x-tgz", "application/x-gzip" ) );
+        supportedTypeMap.put( "tgz", Arrays.asList( "application/x-tgz" ) );
+
+        // FIXME NEXUS-4632 eu.medsea.mimeutil.MimeUtil2 is resolving bzip2 to application/octet-stream
+        // tar.bz2
+        // supportedTypeMap.put( "bz2", Arrays.asList( "application/x-bzip", "application/x-bzip-compressed-tar" ) );
+        // supportedTypeMap.put( "tbz", Arrays.asList( "application/x-bzip-compressed-tar" ) );
     }
 
     @Override
