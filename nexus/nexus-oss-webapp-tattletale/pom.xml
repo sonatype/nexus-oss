@@ -41,7 +41,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <tattletale-source>${project.build.directory}/dependency/nexus-oss-webapp/nexus-oss-webapp-${project.version}/runtime/apps/nexus/lib</tattletale-source>
+        <tattletale-source>${project.build.directory}/dependency/nexus-oss-webapp/nexus-oss-webapp-${project.version}/nexus/WEB-INF/lib</tattletale-source>
         <tattletale-destination-directory>${project.build.directory}/tattletale</tattletale-destination-directory>
       </properties>
       <build>
@@ -119,6 +119,10 @@
                   </reports>
                   <failOnError>true</failOnError>
                   <failOnWarn>true</failOnWarn>
+                  <excludes>
+                    <!-- I hate this too, but other pattern did not help (ie. xmlpull-*.jar) At least build will fail anyway if version changes... -->
+                    <exclude>xmlpull-1.1.3.1.jar</exclude>
+                  </excludes>
                 </configuration>
               </execution>
             </executions>

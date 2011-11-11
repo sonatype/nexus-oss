@@ -43,7 +43,6 @@
 
     <plugin-repository.directory>${project.build.finalName}/WEB-INF/plugin-repository</plugin-repository.directory>
     <optional-plugins.directory>${project.build.finalName}/WEB-INF/optional-plugins</optional-plugins.directory>
-    <plugin-api.version>1.0.3</plugin-api.version>
     <jetty.version>7.4.4.v20110707</jetty.version>
   </properties>
 
