@@ -41,7 +41,7 @@ import org.sonatype.plexus.jetty.Jetty7;
 import org.sonatype.plexus.jetty.mangler.ContextAttributeGetterMangler;
 import org.sonatype.plexus.jetty.mangler.ContextGetterMangler;
 import org.sonatype.plexus.jetty.mangler.DisableShutdownHookMangler;
-import org.sonatype.plexus.util.JettyUtils;
+import org.sonatype.plexus.jetty.util.JettyUtils;
 
 import com.google.inject.Module;
 
