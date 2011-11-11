@@ -41,7 +41,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <tattletale-source>${project.build.directory}/dependency/nexus-oss-webapp/nexus-oss-webapp-${project.version}/runtime/apps/nexus/lib</tattletale-source>
+        <tattletale-source>${project.build.directory}/dependency/nexus-oss-webapp/nexus-oss-webapp-${project.version}/nexus/WEB-INF/lib</tattletale-source>
         <tattletale-destination-directory>${project.build.directory}/tattletale</tattletale-destination-directory>
       </properties>
       <build>
