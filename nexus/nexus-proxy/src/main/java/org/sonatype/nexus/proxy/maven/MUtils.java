@@ -103,7 +103,7 @@ public class MUtils
         return digest;
     }
 
-    private static boolean isDigest( String digest )
+    public static boolean isDigest( String digest )
     {
         return digest.length() >= 32 && digest.matches( "^[a-z0-9]+$" );
     }

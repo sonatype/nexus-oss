@@ -118,6 +118,18 @@ public class FileTypeValidationUtilTest
     // doTest( "something/else/bundle.bz2", "test.bz2", true );
     // }
 
+    @Test
+    public void testChecksum()
+        throws Exception
+    {
+        doTest( "something/else/file.jar.sha1", "no-doctype-pom.xml", false );
+        doTest( "something/else/file.jar.sha1", "test.md5", false );
+        doTest( "something/else/file.jar.sha1", "test.sha1", true );
+        doTest( "something/else/file.jar.md5", "no-doctype-pom.xml", false );
+        doTest( "something/else/file.jar.md5", "test.sha1", false );
+        doTest( "something/else/file.jar.md5", "test.md5", true );
+    }
+
     // ==
 
     protected Repository getDummyRepository()
