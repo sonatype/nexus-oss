@@ -25,7 +25,6 @@ import java.net.MalformedURLException;
 import java.net.Socket;
 import java.net.URL;
 
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
 
 /**
@@ -36,7 +35,6 @@ import org.codehaus.plexus.logging.Logger;
  * @author cstamas
  */
 public class HttpProxyHandler
-    extends AbstractLogEnabled
     implements Runnable
 {
     private HttpProxyService service;
@@ -45,17 +43,24 @@ public class HttpProxyHandler
 
     private final HttpProxyPolicy policy;
 
+    private Logger logger;
+
     public HttpProxyHandler( Logger logger, HttpProxyService service, HttpProxyPolicy policy, Socket socket )
     {
         super();
 
-        enableLogging( logger );
+        this.logger = logger;
 
         this.service = service;
 
         this.policy = policy;
 
         this.socket = socket;
+    }
+
+    protected Logger getLogger()
+    {
+        return logger;
     }
 
     public void run()

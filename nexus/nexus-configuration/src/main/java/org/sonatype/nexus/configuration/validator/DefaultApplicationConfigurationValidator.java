@@ -28,7 +28,6 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.validation.ValidationMessage;
@@ -51,6 +50,7 @@ import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
@@ -63,7 +63,7 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
  */
 @Component( role = ApplicationConfigurationValidator.class )
 public class DefaultApplicationConfigurationValidator
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements ApplicationConfigurationValidator, Contextualizable
 {
     private Random rand = new Random( System.currentTimeMillis() );

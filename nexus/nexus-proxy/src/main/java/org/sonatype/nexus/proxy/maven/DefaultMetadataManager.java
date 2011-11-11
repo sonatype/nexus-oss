@@ -22,9 +22,9 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
-
 import java.util.Locale;
 import java.util.TimeZone;
+
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
@@ -33,8 +33,8 @@ import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.VersionUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 
 /**
@@ -45,7 +45,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
  */
 @Component( role = MetadataManager.class )
 public class DefaultMetadataManager
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements MetadataManager
 {
     static final String LATEST_VERSION = "LATEST";

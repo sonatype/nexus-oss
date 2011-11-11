@@ -18,10 +18,6 @@
  */
 package com.sonatype.nexus.plugin.groovyconsole;
 
-import groovy.lang.Binding;
-import groovy.lang.GroovyShell;
-import groovy.util.AntBuilder;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,14 +28,16 @@ import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.plexus.appevents.Event;
-
 import com.sonatype.nexus.plugin.groovyconsole.rest.dto.GroovyScriptDTO;
+import groovy.lang.Binding;
+import groovy.lang.GroovyShell;
+import groovy.util.AntBuilder;
 
 @Component( role = GroovyScriptManager.class, instantiationStrategy = "singleton" )
 public class DefaultGroovyScriptManager
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements GroovyScriptManager
 {
     @Requirement

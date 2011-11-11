@@ -18,20 +18,43 @@
  */
 package org.sonatype.nexus.logging;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.codehaus.plexus.logging.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Plexus' AbstractLogEnabled in compatibility way.
  *
  * @author: cstamas
- * @deprecated To be used by components still relying on Plexus Logger, but in general, avoid this! Use SLF4J API instead!
+ * @deprecated To be used by components still relying on Plexus Logger only, but in general, avoid this! Use
+ *             AbstractLoggingComponent or directly SLF4J API instead!
  */
 public class AbstractPlexusLoggingComponent
 {
 
-    private final Logger plexusLogger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private final Logger plexusLogger;
 
+    protected AbstractPlexusLoggingComponent()
+    {
+        this.plexusLogger = checkNotNull( createLogger() );
+    }
+
+    /**
+     * Creates logger instance to be used with component instance. It might be overridden by subclasses to implement
+     * alternative logger naming strategy. By default, this method does the "usual" fluff: {@code Slf4jPlexusLogger.getPlexusLogger(getClass() )}.
+     *
+     * @return The Logger instance to be used by component for logging.
+     */
+    protected Logger createLogger()
+    {
+        return Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    }
+
+    /**
+     * Returns the Logger instance of this component. Never returns {@code null}.
+     *
+     * @return
+     */
     protected Logger getLogger()
     {
         return plexusLogger;

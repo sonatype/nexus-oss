@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
@@ -33,7 +33,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 @Component( role = FeedArtifactEventFilter.class )
 public class DefaultFeedArtifactEventFilter
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements FeedArtifactEventFilter
 {
     @Requirement

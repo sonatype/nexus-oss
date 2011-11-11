@@ -22,7 +22,7 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -33,7 +33,7 @@ import org.sonatype.nexus.repository.metadata.restlet.RestletRawTransport;
 
 @Component( role = NexusRepositoryMetadataHandler.class )
 public class DefaultNexusRepositoryMetadataHandler
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements NexusRepositoryMetadataHandler
 {
     @Requirement

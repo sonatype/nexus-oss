@@ -21,7 +21,7 @@ package org.sonatype.nexus.proxy.walker;
 import java.util.Collection;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -40,7 +40,7 @@ import org.sonatype.scheduling.TaskInterruptedException;
  */
 @Component( role = Walker.class )
 public class DefaultWalker
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements Walker
 {
     public static final String WALKER_WALKED_COLLECTION_COUNT = Walker.class.getSimpleName() + ".collCount";

@@ -23,7 +23,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
@@ -31,6 +30,7 @@ import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.model.CNotificationTarget;
 import org.sonatype.nexus.configuration.model.v1_4_6.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.configuration.security.upgrade.SecurityData204Upgrade;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
 /**
  * Upgrades configuration model from version 1.4.5 to 1.4.6.<BR>
@@ -39,7 +39,7 @@ import org.sonatype.nexus.configuration.security.upgrade.SecurityData204Upgrade;
  */
 @Component( role = SingleVersionUpgrader.class, hint = "1.4.5" )
 public class Upgrade145to146
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
 

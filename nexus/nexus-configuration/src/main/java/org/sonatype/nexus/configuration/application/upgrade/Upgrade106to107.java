@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
@@ -54,6 +53,7 @@ import org.sonatype.nexus.configuration.model.v1_0_7.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.v1_0_7.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_0_7.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_7.CSmtpConfiguration;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
 /**
  * Upgrades configuration model from version 1.0.6 to 1.0.7.
@@ -62,7 +62,7 @@ import org.sonatype.nexus.configuration.model.v1_0_7.CSmtpConfiguration;
  */
 @Component( role = SingleVersionUpgrader.class, hint = "1.0.6" )
 public class Upgrade106to107
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
     public Object loadConfiguration( File file )

@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
@@ -63,7 +62,7 @@ import org.sonatype.nexus.configuration.model.v1_0_4.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.v1_0_4.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_0_4.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_4.CSmtpConfiguration;
-
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -75,7 +74,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 @Component( role = SingleVersionUpgrader.class, hint = "1.0.3" )
 public class Upgrade103to104
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements SingleVersionUpgrader
 {
     private File tasksFile;

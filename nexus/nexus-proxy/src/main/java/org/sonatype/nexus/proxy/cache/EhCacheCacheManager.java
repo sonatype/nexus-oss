@@ -20,7 +20,7 @@ package org.sonatype.nexus.proxy.cache;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 
 /**
@@ -30,7 +30,7 @@ import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
  */
 @Component( role = CacheManager.class )
 public class EhCacheCacheManager
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements CacheManager
 {
     @Requirement

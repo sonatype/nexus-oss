@@ -31,10 +31,10 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.logging.Logger;
-import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.attributes.DefaultFSAttributeStorage;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
@@ -61,7 +61,7 @@ public abstract class AbstractProxyTestEnvironment
 {
 
     /** The logger. */
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     /** The config */
     private ApplicationConfiguration applicationConfiguration;
@@ -211,10 +211,6 @@ public abstract class AbstractProxyTestEnvironment
         throws Exception
     {
         super.setUp();
-
-        LoggerManager loggerManager = getLoggerManager();
-
-        this.logger = loggerManager.getLoggerForComponent( this.getClass().toString() );
 
         applicationConfiguration = lookup( ApplicationConfiguration.class );
 

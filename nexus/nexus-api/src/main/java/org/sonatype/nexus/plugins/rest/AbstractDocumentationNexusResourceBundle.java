@@ -30,13 +30,13 @@ import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.mime.MimeUtil;
 
 public abstract class AbstractDocumentationNexusResourceBundle
     implements NexusDocumentationBundle
 {
-    @Requirement
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     @Requirement
     private MimeUtil mimeUtil;

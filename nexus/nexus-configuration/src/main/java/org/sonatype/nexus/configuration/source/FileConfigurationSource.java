@@ -305,7 +305,7 @@ public class FileConfigurationSource
                         + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
                         + "******************************************************************************";
 
-                getLogger().fatalError( message );
+                getLogger().error( message );
             }
 
             // copy the current nexus config file as file.bak

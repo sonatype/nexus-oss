@@ -29,8 +29,8 @@ import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.maven.metadata.operations.AddPluginOperation;
@@ -47,7 +47,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.TimeUtil;
 
 @Component( role = MetadataUpdater.class )
 public class DefaultMetadataUpdater
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements MetadataUpdater
 {
     @Requirement
