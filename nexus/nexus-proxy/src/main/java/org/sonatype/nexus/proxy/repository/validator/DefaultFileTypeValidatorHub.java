@@ -19,19 +19,23 @@
 package org.sonatype.nexus.proxy.repository.validator;
 
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator.FileTypeValidity;
 
 @Component( role = FileTypeValidatorHub.class )
 public class DefaultFileTypeValidatorHub
+    extends AbstractLoggingComponent
     implements FileTypeValidatorHub
 {
+
     @Requirement( role = FileTypeValidator.class )
-    private List<FileTypeValidator> fileTypeValidators;
+    private Map<String, FileTypeValidator> fileTypeValidators;
 
     @Override
     public boolean isExpectedFileType( final StorageItem item )
@@ -40,12 +44,14 @@ public class DefaultFileTypeValidatorHub
         {
             StorageFileItem file = (StorageFileItem) item;
 
-            for ( FileTypeValidator fileTypeValidator : fileTypeValidators )
+            for ( Map.Entry<String, FileTypeValidator> fileTypeValidatorEntry : fileTypeValidators.entrySet() )
             {
-                FileTypeValidity validity = fileTypeValidator.isExpectedFileType( file );
+                FileTypeValidity validity = fileTypeValidatorEntry.getValue().isExpectedFileType( file );
 
                 if ( FileTypeValidity.INVALID.equals( validity ) )
                 {
+                    getLogger().info( "File item {} evaluated as INVALID during file type validation (validator={})",
+                                      file.getRepositoryItemUid().toString(), fileTypeValidatorEntry.getKey() );
                     // fail fast
                     return false;
                 }
