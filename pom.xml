@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -58,9 +59,9 @@
 
     <!-- Pure Java RPM-library -->
     <dependency>
-      <groupId>org.freecompany.redline</groupId>
+      <groupId>org.redline-rpm</groupId>
       <artifactId>redline</artifactId>
-      <version>1.1.5</version>
+      <version>1.1.9</version>
     </dependency>
 
     <!-- Main plugin API, pulling in what is needed -->
@@ -68,7 +69,6 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
       <version>${nexus.version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <!-- This dependency is only needed if you want to include REST Resources -->
@@ -76,7 +76,6 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
       <version>${nexus.version}</version>
-      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <artifactId>maven-repository-metadata</artifactId>
@@ -87,6 +86,13 @@
           <groupId>org.apache.maven</groupId>
         </exclusion>
       </exclusions>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-configuration</artifactId>
+      <version>${nexus.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- Basic testing -->
@@ -112,7 +118,7 @@
       <version>4.8.2</version>
       <scope>test</scope>
     </dependency>
-
+    
     <!-- #ITSet BEGINS -->
     <!-- Nexus IT setup (dependencies below are needed if you have extensive 
       ITs and you want to use Nexus Environment) -->
@@ -296,6 +302,16 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+      
+      <!-- Fork Tests because of problems with Sisu-Guice-Version -->
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.9</version>
+        <configuration>
+          <forkMode>always</forkMode>
+          <threadCount>1</threadCount>
+        </configuration>
+      </plugin>
 
       <!-- check the test coverage -->
       <plugin>
@@ -339,7 +355,9 @@
             <phase>pre-integration-test</phase>
             <configuration>
               <target>
-                <unzip src="${project.build.directory}/${project.build.finalName}-bundle.zip" dest="${project.build.directory}/test-classes/nexus/sonatype-work/nexus/plugin-repository" />
+                <unzip
+                  src="${project.build.directory}/${project.build.finalName}-bundle.zip"
+                  dest="${project.build.directory}/test-classes/nexus/sonatype-work/nexus/plugin-repository" />
               </target>
             </configuration>
             <goals>
@@ -459,12 +477,12 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <!-- don't execute tests twice during release process -->
       <plugin>
-      	<groupId>org.apache.maven.plugins</groupId>
-      	<artifactId>maven-release-plugin</artifactId>
-      	<version>2.2.1</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.2.1</version>
         <executions>
           <execution>
             <goals>

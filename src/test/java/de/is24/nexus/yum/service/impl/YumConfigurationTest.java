@@ -40,7 +40,7 @@ import de.is24.nexus.yum.service.AliasNotFoundException;
 public class YumConfigurationTest {
   private static final String YUM_XML = "yum.xml";
 
-  private static final int NEW_TIMEOUT = 5555;
+	private static final int NEW_TIMEOUT = 5555;
 
   private static final String PRODUCTION_VERSION = "5.1.15-1";
 
