@@ -1,8 +1,8 @@
 package de.is24.nexus.yum.service.impl;
 
-import java.util.concurrent.Future;
+import org.sonatype.scheduling.ScheduledTask;
+import de.is24.nexus.yum.repository.YumMetadataGenerationTask;
 import de.is24.nexus.yum.repository.YumRepository;
-import de.is24.nexus.yum.repository.YumRepositoryGeneratorJob;
 
 
 /**
@@ -17,7 +17,7 @@ public interface YumRepositoryCreatorService {
 
   boolean isShutdown();
 
-  Future<YumRepository> submit(YumRepositoryGeneratorJob yumRepositoryGeneratorJob);
+  ScheduledTask<YumRepository> submit(YumMetadataGenerationTask yumMetadataGenerationTask);
 
   void shutdown();
 
@@ -26,4 +26,6 @@ public interface YumRepositoryCreatorService {
   int getActiveWorkerCount();
 
   int size();
+
+  <T> T createTaskInstance(Class<T> taskClass);
 }

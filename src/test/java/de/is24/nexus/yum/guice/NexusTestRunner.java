@@ -9,10 +9,27 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.RejectedExecutionException;
+import javax.inject.Singleton;
+import org.codehaus.plexus.logging.slf4j.Slf4jLogger;
+import org.junit.runners.model.InitializationError;
+import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plexus.appevents.SimpleApplicationEventMulticaster;
+import org.sonatype.scheduling.NoSuchTaskException;
+import org.sonatype.scheduling.ScheduledTask;
+import org.sonatype.scheduling.schedules.Schedule;
 import com.google.inject.AbstractModule;
 import com.google.inject.name.Names;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.plugin.impl.DefaultRepositoryRegistry;
+import de.is24.nexus.yum.repository.YumMetadataGenerationTask;
 import de.is24.nexus.yum.service.AliasMapper;
 import de.is24.nexus.yum.service.RepositoryAliasService;
 import de.is24.nexus.yum.service.RepositoryCreationTimeoutHolder;
@@ -25,13 +42,6 @@ import de.is24.nexus.yum.service.impl.ThreadPoolYumRepositoryCreatorService;
 import de.is24.nexus.yum.service.impl.YumConfigurationHandler;
 import de.is24.nexus.yum.service.impl.YumRepositoryCreatorService;
 import de.is24.test.guice.GuiceTestRunner;
-import org.codehaus.plexus.logging.slf4j.Slf4jLogger;
-import org.junit.runners.model.InitializationError;
-import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.SimpleApplicationEventMulticaster;
 
 
 public class NexusTestRunner extends GuiceTestRunner {
@@ -59,6 +69,7 @@ public class NexusTestRunner extends GuiceTestRunner {
           bind(RepositoryCreationTimeoutHolder.class).annotatedWith(
             Names.named(RepositoryCreationTimeoutHolder.DEFAULT_BEAN_NAME)).to(
             YumConfigurationHandler.class);
+          bind(NexusScheduler.class).to(DummyScheduler.class);
         }
 
         private ApplicationEventMulticaster createEventMulticaster() {
@@ -96,5 +107,62 @@ public class NexusTestRunner extends GuiceTestRunner {
           return settings;
         }
       });
+  }
+
+  @Singleton
+  public static class DummyScheduler implements NexusScheduler {
+    @Override
+    public void initializeTasks() {
+      throw new IllegalStateException("Method not supported");
+    }
+
+    @Override
+    public <T> ScheduledTask<T> submit(String name, NexusTask<T> nexusTask) throws RejectedExecutionException,
+      NullPointerException {
+      throw new IllegalStateException("Method not supported");
+    }
+
+    @Override
+    public <T> ScheduledTask<T> schedule(String name, NexusTask<T> nexusTask, Schedule schedule)
+      throws RejectedExecutionException, NullPointerException {
+      throw new IllegalStateException("Method not supported");
+    }
+
+    @Override
+    public <T> ScheduledTask<T> updateSchedule(ScheduledTask<T> task) throws RejectedExecutionException,
+      NullPointerException {
+      throw new IllegalStateException("Method not supported");
+    }
+
+    @Override
+    public Map<String, List<ScheduledTask<?>>> getActiveTasks() {
+      throw new IllegalStateException("Method not supported");
+    }
+
+    @Override
+    public Map<String, List<ScheduledTask<?>>> getAllTasks() {
+      throw new IllegalStateException("Method not supported");
+    }
+
+    @Override
+    public ScheduledTask<?> getTaskById(String id) throws NoSuchTaskException {
+      throw new IllegalStateException("Method not supported");
+    }
+
+    @Override
+    public NexusTask<?> createTaskInstance(String taskType) throws IllegalArgumentException {
+      throw new IllegalStateException("Method not supported");
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T createTaskInstance(Class<T> taskType) throws IllegalArgumentException {
+      if (YumMetadataGenerationTask.class.equals(taskType)) {
+        YumMetadataGenerationTask task = new YumMetadataGenerationTask();
+        return (T) task;
+      }
+      throw new IllegalArgumentException("Type " + taskType + " not supported");
+    }
+
   }
 }

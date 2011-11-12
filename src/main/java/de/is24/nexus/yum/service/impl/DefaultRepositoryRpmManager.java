@@ -4,7 +4,6 @@ import static java.lang.String.format;
 import java.io.File;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -12,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.plugin.Managed;
+import org.sonatype.scheduling.ScheduledTask;
 import de.is24.nexus.yum.plugin.impl.MavenRepositoryInfo;
 import de.is24.nexus.yum.repository.RepositoryRpmGenerator;
 import de.is24.nexus.yum.repository.YumRepository;
@@ -37,8 +37,9 @@ public class DefaultRepositoryRpmManager implements RepositoryRpmManager {
 
   private File rpmLocation;
 
-  private Future<YumRepository> yumRepositoryFuture;
+  private ScheduledTask<YumRepository> yumRepositoryFuture;
 
+  @Override
   public synchronized void updateRepository(MavenRepositoryInfo repositoryInfo) {
     if (isActive()) {
       boolean needUpdate = false;
@@ -60,6 +61,7 @@ public class DefaultRepositoryRpmManager implements RepositoryRpmManager {
     return configHandler.isRepositoryOfRepositoryVersionsActive();
   }
 
+  @Override
   public File updateRepository(String repositoryId, String version) {
     if (isActive()) {
       File rpmFile = new File(getRpmCacheDir(), getRpmFileName(repositoryId, version));
@@ -110,6 +112,7 @@ public class DefaultRepositoryRpmManager implements RepositoryRpmManager {
     return rpmLocation;
   }
 
+  @Override
   public YumRepository getYumRepository() throws InterruptedException, ExecutionException {
     if ((yumRepositoryFuture == null) || !yumRepositoryFuture.get().getBaseDir().exists()) {
       updateYumRepository();

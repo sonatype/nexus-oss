@@ -30,7 +30,15 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     return "Generation YUM repository metadata";
   }
 
-  public void setConfiguration(YumDefaultGeneratorConfiguration config) {
+  public void setConfiguration(YumGeneratorConfiguration config) {
     job = new YumRepositoryGeneratorJob(config);
+  }
+
+  public YumRepositoryGeneratorJob getJob() {
+    return job;
+  }
+
+  public void setJob(YumRepositoryGeneratorJob job) {
+    this.job = job;
   }
 }

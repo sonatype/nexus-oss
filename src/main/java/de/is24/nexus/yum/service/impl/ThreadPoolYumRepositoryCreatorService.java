@@ -6,13 +6,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import javax.inject.Inject;
 import javax.inject.Named;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plugin.Managed;
+import org.sonatype.scheduling.ScheduledTask;
 import com.google.inject.Singleton;
+import de.is24.nexus.yum.repository.YumMetadataGenerationTask;
 import de.is24.nexus.yum.repository.YumRepository;
 import de.is24.nexus.yum.repository.YumRepositoryGeneratorJob;
 
@@ -41,29 +44,41 @@ public class ThreadPoolYumRepositoryCreatorService implements YumRepositoryCreat
 
   private ThreadPoolExecutor executorService;
 
+  @Inject
+  private NexusScheduler nexusScheduler;
+
   public ThreadPoolYumRepositoryCreatorService() {
     activate();
   }
 
+  @Override
+  public <T> T createTaskInstance(Class<T> taskClass) {
+    return nexusScheduler.createTaskInstance(taskClass);
+  }
+
+  @Override
   public boolean isShutdown() {
     return isShutdown;
   }
 
+  @Override
   public int size() {
     return workQueue.size();
   }
 
-  public Future<YumRepository> submit(YumRepositoryGeneratorJob yumRepositoryGeneratorJob) {
+  @Override
+  public ScheduledTask<YumRepository> submit(final YumMetadataGenerationTask yumMetadataGenerationTask) {
     if (isShutdown) {
       throw new IllegalStateException("don't accept new jobs when shutdown");
     }
 
     final YumRepositoryGeneratorJobFutureTask result = new YumRepositoryGeneratorJobFutureTask(
-      yumRepositoryGeneratorJob);
+      yumMetadataGenerationTask.getJob());
     workQueue.put(result);
-    return result;
+    return new ScheduledTaskAdapter(yumMetadataGenerationTask, result);
   }
 
+  @Override
   public synchronized void shutdown() {
     isShutdown = true;
     dispatcherThread.interrupt();
@@ -74,6 +89,7 @@ public class ThreadPoolYumRepositoryCreatorService implements YumRepositoryCreat
     executorService = null;
   }
 
+  @Override
   public synchronized void activate() {
     executorService = newThreadPool();
     isShutdown = false;
@@ -85,6 +101,7 @@ public class ThreadPoolYumRepositoryCreatorService implements YumRepositoryCreat
     return (ThreadPoolExecutor) Executors.newFixedThreadPool(THREAD_POOL_SIZE);
   }
 
+  @Override
   public int getActiveWorkerCount() {
     return (executorService != null) ? executorService.getActiveCount() : 0;
   }
@@ -93,6 +110,7 @@ public class ThreadPoolYumRepositoryCreatorService implements YumRepositoryCreat
     final List<YumRepositoryGeneratorJobFutureTask> othersOfSameRepoAreRunning =
       new LinkedList<YumRepositoryGeneratorJobFutureTask>();
 
+    @Override
     public void run() {
       YumRepositoryGeneratorJobFutureTask current;
       while (!isShutdown) {
@@ -151,6 +169,7 @@ public class ThreadPoolYumRepositoryCreatorService implements YumRepositoryCreat
       CURRENT_RUNNING_REPOS.remove(repoId);
     }
 
+    @Override
     public int compareTo(YumRepositoryGeneratorJobFutureTask o) {
       return o.creationTime.compareTo(this.creationTime);
     }
