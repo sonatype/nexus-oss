@@ -2,16 +2,16 @@ package de.is24.nexus.yum.plugin.impl;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import javax.inject.Inject;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
-import de.is24.nexus.yum.repository.RepositoryScanningJob;
+import de.is24.nexus.yum.repository.RepositoryScanningTask;
 import de.is24.nexus.yum.service.RepositoryRpmManager;
 
 
@@ -19,12 +19,10 @@ import de.is24.nexus.yum.service.RepositoryRpmManager;
 public class DefaultRepositoryRegistry implements RepositoryRegistry {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultRepositoryRegistry.class);
 
-  private static final int REPOSITORY_SCANNING_THREAD_POOL_SIZE = 3;
-
   private final Map<String, MavenRepositoryInfo> repositories = new ConcurrentHashMap<String, MavenRepositoryInfo>();
 
-  private final ThreadPoolExecutor repositoryScanningExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(
-    REPOSITORY_SCANNING_THREAD_POOL_SIZE);
+  @Requirement
+  private NexusScheduler nexusScheduler;
 
   @Inject
   private RepositoryRpmManager repositoryRpmManager;
@@ -36,7 +34,10 @@ public class DefaultRepositoryRegistry implements RepositoryRegistry {
       repositories.put(repository.getId(), repositoryInfo);
       LOG.info("Marked repository as RPM-repository : {}", repository.getId());
 
-      repositoryScanningExecutor.submit(new RepositoryScanningJob(repositoryRpmManager, repositoryInfo));
+      RepositoryScanningTask task = nexusScheduler.createTaskInstance(RepositoryScanningTask.class);
+      task.setRepositoryRpmManager(repositoryRpmManager);
+      task.setMavenRepositoryInfo(repositoryInfo);
+      nexusScheduler.submit(RepositoryScanningTask.ID, task);
     }
   }
 
