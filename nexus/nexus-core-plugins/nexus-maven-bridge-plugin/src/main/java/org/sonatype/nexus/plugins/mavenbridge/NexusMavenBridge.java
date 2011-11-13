@@ -32,22 +32,29 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 
 public interface NexusMavenBridge
 {
-    Model buildModel( ModelSource pom, List<MavenRepository> repositories, RepositoryListener... listeners )
+
+    Model buildModel( ModelSource pom,
+                      List<MavenRepository> repositories,
+                      RepositoryListener... listeners )
         throws ModelBuildingException;
 
-    DependencyNode collectDependencies( Dependency node, List<MavenRepository> repositories,
+    DependencyNode collectDependencies( Dependency dependency,
+                                        List<MavenRepository> repositories,
                                         RepositoryListener... listeners )
         throws DependencyCollectionException, ArtifactResolutionException;
 
-    DependencyNode resolveDependencies( Dependency node, List<MavenRepository> repositories,
+    DependencyNode resolveDependencies( Dependency node,
+                                        List<MavenRepository> repositories,
                                         RepositoryListener... listeners )
         throws DependencyCollectionException, ArtifactResolutionException;
 
-    DependencyNode collectDependencies( Model model, List<MavenRepository> repositories,
+    DependencyNode collectDependencies( Model model,
+                                        List<MavenRepository> repositories,
                                         RepositoryListener... listeners )
         throws DependencyCollectionException, ArtifactResolutionException;
 
-    DependencyNode resolveDependencies( Model model, List<MavenRepository> repositories,
+    DependencyNode resolveDependencies( Model model,
+                                        List<MavenRepository> repositories,
                                         RepositoryListener... listeners )
         throws DependencyCollectionException, ArtifactResolutionException;
 
