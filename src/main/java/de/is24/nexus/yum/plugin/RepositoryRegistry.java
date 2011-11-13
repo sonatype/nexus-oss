@@ -1,15 +1,11 @@
 package de.is24.nexus.yum.plugin;
 
-import de.is24.nexus.yum.plugin.impl.MavenRepositoryInfo;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plugin.Managed;
+import de.is24.nexus.yum.plugin.impl.MavenRepositoryInfo;
 
 
-@Managed
 public interface RepositoryRegistry {
-  String DEFAULT_BEAN_NAME = "repositoryRegistry";
-
   void unregisterRepository(Repository repository);
 
   MavenRepository findRepositoryForId(String repositoryId);

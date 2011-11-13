@@ -8,7 +8,6 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 import java.util.ArrayList;
 import javax.inject.Inject;
-import javax.inject.Named;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -24,11 +23,9 @@ public class DefaultRepositoryRegistryTest extends AbstractRepositoryTester {
   private static final String REPOSITORY_RPM_FILENAME = "is24-rel-" + REPO_ID + "-1.3-repo-1-1.noarch.rpm";
 
   @Inject
-  @Named(RepositoryRegistry.DEFAULT_BEAN_NAME)
   private RepositoryRegistry repositoryRegistry;
 
   @Inject
-  @Named(RepositoryRpmManager.DEFAULT_BEAN_NAME)
   private RepositoryRpmManager repositoryRpmManager;
 
   @Test

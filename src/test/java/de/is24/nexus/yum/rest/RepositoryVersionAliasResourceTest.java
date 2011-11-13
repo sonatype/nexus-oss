@@ -7,38 +7,47 @@ import static de.is24.nexus.yum.rest.RepositoryVersionAliasResource.RESOURCE_URI
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.restlet.data.Method.GET;
 import static org.restlet.data.Method.POST;
 import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
 import javax.inject.Inject;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
-import de.is24.nexus.yum.guice.NexusTestRunner;
+import org.sonatype.plexus.rest.resource.PlexusResource;
+import de.is24.nexus.yum.AbstractYumNexusTestCase;
+import de.is24.nexus.yum.service.YumConfiguration;
 
 
 /**
  * @author BVoss
  *
  */
-@RunWith(NexusTestRunner.class)
-public class RepositoryVersionAliasResourceTest {
+public class RepositoryVersionAliasResourceTest extends AbstractYumNexusTestCase {
   private static final String EXISTING_VERSION = "trunk";
   private static final String RELEASES = "releases";
   private static final String TRUNK_VERSION = "5.1.15-2";
   private static final String NOT_EXISTING_REPOSITORY = "blablup-repo";
   private static final String VERSION_TO_CREATE = "new-version";
   private static final String ALIAS_TO_CREATE = "alias-to-create";
+
+  @Requirement(hint = "RepositoryVersionAliasResource")
+  private PlexusResource resource;
+
   @Inject
-  private RepositoryVersionAliasResource resource;
+  private YumConfiguration yumConfiguration;
+
+  @Before
+  public void loadYumConfig() {
+    yumConfiguration.load();
+  }
 
   @Test
   public void requestedAliasNotfound() throws Exception {
@@ -54,15 +63,15 @@ public class RepositoryVersionAliasResourceTest {
   public void requestedAliasReturnedRpmFile() throws Exception {
     final Request request = createRequest(RELEASES, "trunk.rpm");
     final FileRepresentation rpmFile = (FileRepresentation) resource.get(null, request, null, null);
-    assertEquals("application/x-rpm", rpmFile.getMediaType().getName());
-    assertTrue(rpmFile.getFile().getName().contains(TRUNK_VERSION));
+    Assert.assertEquals("application/x-rpm", rpmFile.getMediaType().getName());
+    Assert.assertTrue(rpmFile.getFile().getName().contains(TRUNK_VERSION));
   }
 
   @Test
   public void requestedAliasReturnedVersionString() throws Exception {
     final Request request = createRequest(RELEASES, EXISTING_VERSION);
     final StringRepresentation version = (StringRepresentation) resource.get(null, request, null, null);
-    assertEquals(TRUNK_VERSION, version.getText());
+    Assert.assertEquals(TRUNK_VERSION, version.getText());
   }
 
   @Test
@@ -107,7 +116,7 @@ public class RepositoryVersionAliasResourceTest {
   private void check400ForPayload(Object payload) {
     try {
       resource.post(null, createRequest(NOT_EXISTING_REPOSITORY, RELEASES), null, payload);
-      fail();
+      Assert.fail();
     } catch (ResourceException e) {
       assertThat(e.getStatus(), is(CLIENT_ERROR_BAD_REQUEST));
     }
@@ -116,9 +125,9 @@ public class RepositoryVersionAliasResourceTest {
   private void assert404(final Request request) {
     try {
       resource.get(null, request, null, null);
-      fail(ResourceException.class + " expected");
+      Assert.fail(ResourceException.class + " expected");
     } catch (ResourceException e) {
-      assertEquals(Status.CLIENT_ERROR_NOT_FOUND, e.getStatus());
+      Assert.assertEquals(Status.CLIENT_ERROR_NOT_FOUND, e.getStatus());
     }
   }
 

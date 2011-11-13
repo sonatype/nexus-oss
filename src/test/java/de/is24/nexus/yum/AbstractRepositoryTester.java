@@ -15,10 +15,6 @@ import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import com.google.code.tempusfugit.temporal.Condition;
-import com.google.code.tempusfugit.temporal.Duration;
-import com.google.code.tempusfugit.temporal.ThreadSleep;
-import com.google.code.tempusfugit.temporal.Timeout;
-import com.google.code.tempusfugit.temporal.WaitFor;
 import de.is24.nexus.yum.repository.utils.RepositoryTestUtils;
 import de.is24.nexus.yum.service.impl.YumRepositoryCreatorService;
 
@@ -31,12 +27,12 @@ public abstract class AbstractRepositoryTester extends AbstractYumNexusTestCase 
 
   @After
   public void waitForThreadPool() throws Exception {
-    WaitFor.waitOrTimeout(new Condition() {
+    waitFor(new Condition() {
         @Override
         public boolean isSatisfied() {
           return yumRepositoryCreatorService.getActiveWorkerCount() == 0;
         }
-      }, Timeout.timeout(Duration.seconds(60)), new ThreadSleep(Duration.millis(30)));
+      });
   }
 
 

@@ -7,22 +7,22 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import java.io.File;
 import javax.inject.Inject;
-import javax.inject.Named;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import de.is24.nexus.yum.AbstractRepositoryTester;
 import de.is24.nexus.yum.service.RepositoryRpmManager;
+import de.is24.nexus.yum.service.YumConfiguration;
 
 
 public class DefaultRepositoryRpmManagerTest extends AbstractRepositoryTester {
   private static final String FILE_PATH = "is24-rel-snapshots-0.1.2-snapshot-repo-1-1.noarch.rpm";
 
   @Inject
-  @Named(RepositoryRpmManager.DEFAULT_BEAN_NAME)
   private RepositoryRpmManager rpmManager;
 
   @Inject
-  private YumConfigurationHandler configHandler;
+  private YumConfiguration configHandler;
 
   @Before
   public void setActive() {
@@ -49,6 +49,6 @@ public class DefaultRepositoryRpmManagerTest extends AbstractRepositoryTester {
   public void shouldThrowExceptionIfDeactivated() throws Exception {
     configHandler.setRepositoryOfRepositoryVersionsActive(false);
     rpmManager.updateRepository("dummy-repo", "any-version");
-    fail("should throw an exeption before this line.");
+    Assert.fail("should throw an exeption before this line.");
   }
 }

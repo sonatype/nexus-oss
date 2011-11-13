@@ -1,6 +1,5 @@
 package de.is24.nexus.yum.plugin.m2yum;
 
-import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.Collection;
 import org.junit.Assert;
@@ -28,8 +27,8 @@ public class M2YumRepositoryTest {
       });
   }
 
-  private String path;
-  private boolean expectedMetaData;
+  private final String path;
+  private final boolean expectedMetaData;
 
   public M2YumRepositoryTest(final String path, final Boolean isExpectedMetaData) {
     this.path = path;

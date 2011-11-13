@@ -3,33 +3,28 @@ package de.is24.nexus.yum.service.impl;
 import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.plugin.Managed;
-import com.google.inject.Singleton;
-import de.is24.nexus.yum.service.AliasMapper;
 import de.is24.nexus.yum.service.AliasNotFoundException;
-import de.is24.nexus.yum.service.RepositoryCreationTimeoutHolder;
+import de.is24.nexus.yum.service.YumConfiguration;
 
 
-@Managed
-@Named(AliasMapper.DEFAULT_BEAN_NAME)
-@Singleton
-public class YumConfigurationHandler implements AliasMapper, RepositoryCreationTimeoutHolder {
+@Component(role = YumConfiguration.class)
+public class DefaultYumConfiguration implements YumConfiguration {
   public static final String YUM_XML = "yum.xml";
 
-  private static final Logger log = LoggerFactory.getLogger(YumConfigurationHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(DefaultYumConfiguration.class);
 
   private static final Object LOAD_WRITE_MUTEX = new Object();
 
   private String filename = YUM_XML;
-  private long fileLastModified;
+  private long fileLastModified = 0;
 
   private NexusConfiguration nexusConfiguration;
 
@@ -40,12 +35,13 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
   private final Unmarshaller unmarshaller;
   private final Marshaller marshaller;
 
-  public YumConfigurationHandler() throws JAXBException {
+  public DefaultYumConfiguration() throws JAXBException {
     final JAXBContext jc = JAXBContext.newInstance(XmlYumConfiguration.class, AliasMapping.class);
     this.marshaller = jc.createMarshaller();
     this.unmarshaller = jc.createUnmarshaller();
   }
 
+  @Override
   public void load() {
     File configFile = getOrCreateConfigFile();
     synchronized (LOAD_WRITE_MUTEX) {
@@ -59,7 +55,7 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
     }
   }
 
-
+  @Override
   public void saveConfig(XmlYumConfiguration configToUse) {
     synchronized (LOAD_WRITE_MUTEX) {
       try {
@@ -72,10 +68,12 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
     }
   }
 
+  @Override
   public File getConfigFile() {
     return new File(nexusConfiguration.getConfigurationDirectory(), filename);
   }
 
+  @Override
   public String getVersion(String repositoryId, String alias) throws AliasNotFoundException {
     checkForUpdates();
 
@@ -87,6 +85,7 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
     return resultVersion;
   }
 
+  @Override
   public void setAlias(String repositoryId, String alias, String version) {
     final XmlYumConfiguration newConfig = new XmlYumConfiguration(xmlYumConfiguration);
     final AliasMapping newAliasMapping = new AliasMapping(repositoryId, alias, version);
@@ -101,28 +100,20 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
     load();
   }
 
-  public void setRepositoryCreationTimeout(int seconds) {
-    final XmlYumConfiguration newConfig = new XmlYumConfiguration(xmlYumConfiguration);
-    newConfig.setRepositoryCreationTimeout(seconds);
-    saveConfig(newConfig);
-  }
-
+  @Override
   public void setRepositoryOfRepositoryVersionsActive(boolean active) {
     final XmlYumConfiguration newConfig = new XmlYumConfiguration(xmlYumConfiguration);
     newConfig.setRepositoryOfRepositoryVersionsActive(active);
     saveConfig(newConfig);
   }
 
+  @Override
   public boolean isRepositoryOfRepositoryVersionsActive() {
     checkForUpdates();
     return xmlYumConfiguration.isRepositoryOfRepositoryVersionsActive();
   }
 
-  public int getRepositoryCreationTimeout() {
-    checkForUpdates();
-    return xmlYumConfiguration.getRepositoryCreationTimeout();
-  }
-
+  @Override
   public XmlYumConfiguration getXmlYumConfiguration() {
     checkForUpdates();
     return xmlYumConfiguration;
@@ -138,6 +129,7 @@ public class YumConfigurationHandler implements AliasMapper, RepositoryCreationT
     return filename;
   }
 
+  @Override
   public void setFilename(String filename) {
     this.filename = filename;
   }

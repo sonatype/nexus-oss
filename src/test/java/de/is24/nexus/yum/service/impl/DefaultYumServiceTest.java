@@ -1,38 +1,31 @@
 package de.is24.nexus.yum.service.impl;
 
 import static junit.framework.Assert.assertNotSame;
-import static junit.framework.Assert.assertNull;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertNotNull;
 import java.io.File;
 import java.net.URL;
 import javax.inject.Inject;
-import javax.inject.Named;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import de.is24.nexus.yum.guice.NexusTestRunner;
+import de.is24.nexus.yum.AbstractYumNexusTestCase;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.repository.YumRepository;
 import de.is24.nexus.yum.service.YumService;
 
 
-@RunWith(NexusTestRunner.class)
-public class DefaultYumServiceTest {
+public class DefaultYumServiceTest extends AbstractYumNexusTestCase {
   private static final String REPO_BASE_URL = "http://localhost:8081/nexus/service/local/snapshots/1.0";
   private static final String VERSION_1_0 = "1.0";
   private static final String SNAPSHOTS = "snapshots";
 
   @Inject
-  @Named(YumService.DEFAULT_BEAN_NAME)
   private YumService yumService;
 
   @Inject
-  @Named(RepositoryRegistry.DEFAULT_BEAN_NAME)
   private RepositoryRegistry repositoryRegistry;
 
   @Before
@@ -61,18 +54,18 @@ public class DefaultYumServiceTest {
   @Test
   public void shouldNotCreateYumRepo() throws Exception {
     yumService.deactivate();
-    assertNull(yumService.createYumRepository(createRepository(SNAPSHOTS)));
+    Assert.assertNull(yumService.createYumRepository(createRepository(SNAPSHOTS)));
   }
 
   @Test
   public void shouldNotFindRepository() throws Exception {
-    assertNull(repositoryRegistry.findRepositoryForId("blablup"));
+    Assert.assertNull(repositoryRegistry.findRepositoryForId("blablup"));
   }
 
   @Test
   public void shouldFindRepository() throws Exception {
     repositoryRegistry.registerRepository(createRepository(SNAPSHOTS));
-    assertNotNull(repositoryRegistry.findRepositoryForId(SNAPSHOTS));
+    Assert.assertNotNull(repositoryRegistry.findRepositoryForId(SNAPSHOTS));
   }
 
   public static MavenRepository createRepository(String id) {

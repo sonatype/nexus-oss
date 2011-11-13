@@ -5,13 +5,11 @@ import static de.is24.nexus.yum.repository.YumGeneratorConfigurationBuilder.newC
 import java.io.File;
 import java.net.URL;
 import javax.inject.Inject;
-import javax.inject.Named;
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plugin.Managed;
 import org.sonatype.scheduling.ScheduledTask;
-import com.google.inject.Singleton;
 import de.is24.nexus.yum.repository.YumGeneratorConfigurationBuilder;
 import de.is24.nexus.yum.repository.YumMetadataGenerationTask;
 import de.is24.nexus.yum.repository.YumRepository;
@@ -19,9 +17,7 @@ import de.is24.nexus.yum.repository.YumRepositoryGeneratorJob;
 import de.is24.nexus.yum.service.YumService;
 
 
-@Managed
-@Named(YumService.DEFAULT_BEAN_NAME)
-@Singleton
+@Component(role = YumService.class)
 public class DefaultYumService implements YumService {
   private static final String CACHE_DIR_PREFIX = ".cache-";
 

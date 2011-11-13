@@ -8,8 +8,6 @@ import de.is24.nexus.yum.repository.YumRepository;
 
 
 public interface YumService {
-  String DEFAULT_BEAN_NAME = "yumService";
-
   ScheduledTask<YumRepository> createYumRepository(Repository repository);
 
   ScheduledTask<YumRepository> createYumRepository(Repository repository, String version, File yumRepoDir,

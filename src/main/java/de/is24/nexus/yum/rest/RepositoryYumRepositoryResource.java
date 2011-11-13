@@ -2,9 +2,8 @@ package de.is24.nexus.yum.rest;
 
 import static de.is24.nexus.yum.service.RepositoryRpmManager.URL_PREFIX;
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.Path;
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import de.is24.nexus.yum.repository.YumRepository;
@@ -19,12 +18,11 @@ import de.is24.nexus.yum.service.RepositoryRpmManager;
  * @author sherold
  *
  */
+@Component(role = PlexusResource.class, hint = "RepositoryYumRepositoryResource")
 @Path(RepositoryYumRepositoryResource.RESOURCE_URI)
-@Singleton
 public class RepositoryYumRepositoryResource extends AbstractYumRepositoryResource implements PlexusResource {
   public static final String RESOURCE_URI = "/" + URL_PREFIX;
   @Inject
-  @Named(RepositoryRpmManager.DEFAULT_BEAN_NAME)
   private RepositoryRpmManager repositoryRpmManager;
 
   @Override

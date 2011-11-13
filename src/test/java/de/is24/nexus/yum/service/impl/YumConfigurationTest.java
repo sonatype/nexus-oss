@@ -10,7 +10,6 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
 import java.io.File;
@@ -24,23 +23,22 @@ import java.io.OutputStream;
 import java.util.LinkedHashSet;
 import javax.inject.Inject;
 import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.xml.sax.SAXException;
-import de.is24.nexus.yum.guice.NexusTestRunner;
+import de.is24.nexus.yum.AbstractYumNexusTestCase;
 import de.is24.nexus.yum.service.AliasNotFoundException;
+import de.is24.nexus.yum.service.YumConfiguration;
 
 
 /**
  * Created by IntelliJ IDEA. User: MKrautz Date: 7/8/11 Time: 3:02 PM To change
  * this template use File | Settings | File Templates.
  */
-@RunWith(NexusTestRunner.class)
-public class YumConfigurationTest {
+public class YumConfigurationTest extends AbstractYumNexusTestCase {
   private static final String YUM_XML = "yum.xml";
-
-	private static final int NEW_TIMEOUT = 5555;
 
   private static final String PRODUCTION_VERSION = "5.1.15-1";
 
@@ -61,10 +59,15 @@ public class YumConfigurationTest {
   private static final String MYREPO_ID = "releases";
 
   @Inject
-  private YumConfigurationHandler yumConfiguration;
+  private YumConfiguration yumConfiguration;
 
   @Inject
   private NexusConfiguration nexusConfiguration;
+
+  @Before
+  public void loadYumConfig() {
+    yumConfiguration.load();
+  }
 
   @Test
   public void loadConfigFile() throws Exception {
@@ -72,7 +75,7 @@ public class YumConfigurationTest {
 
     final XmlYumConfiguration configuration = yumConfiguration.getXmlYumConfiguration();
 
-    assertEquals(expectedXmlConf, configuration);
+    Assert.assertEquals(expectedXmlConf, configuration);
   }
 
   @Test
@@ -81,7 +84,7 @@ public class YumConfigurationTest {
     yumConfiguration.setFilename(testConfFilename);
 
     final XmlYumConfiguration confToWrite = createXmlyumConfig();
-    confToWrite.setRepositoryCreationTimeout(90);
+    confToWrite.setRepositoryCreationTimeout(150);
     confToWrite.getAliasMappings().add(new AliasMapping(NEW_REPO_NAME, NEW_ALIAS, NEW_ALIAS_VERSION));
 
     yumConfiguration.saveConfig(confToWrite);
@@ -98,7 +101,7 @@ public class YumConfigurationTest {
   @Test
   public void loadedVersionFound() throws Exception {
     final String version = yumConfiguration.getVersion(MYREPO_ID, TRUNK);
-    assertEquals(TRUNK_VERSION, version);
+    Assert.assertEquals(TRUNK_VERSION, version);
   }
 
   @Test
@@ -107,7 +110,7 @@ public class YumConfigurationTest {
     yumConfiguration.setAlias(MYREPO_ID, TRUNK, newVersion);
 
     final String actual = yumConfiguration.getVersion(MYREPO_ID, TRUNK);
-    assertEquals(newVersion, actual);
+    Assert.assertEquals(newVersion, actual);
   }
 
   @Test
@@ -126,21 +129,14 @@ public class YumConfigurationTest {
     yumConfiguration.setAlias(newRepo, newAlias, version);
 
     final String actual = yumConfiguration.getVersion(newRepo, newAlias);
-    assertEquals(version, actual);
-  }
-
-  @Test
-  public void saveTimout() throws Exception {
-    yumConfiguration.setRepositoryCreationTimeout(NEW_TIMEOUT);
-    yumConfiguration.load();
-    assertThat(yumConfiguration.getRepositoryCreationTimeout(), is(NEW_TIMEOUT));
+    Assert.assertEquals(version, actual);
   }
 
   @Test
   public void shouldUpdateConfigIfFileIsWritten() throws Exception {
     yumConfiguration.load();
     manipulateConfigFile();
-    assertEquals(NEW_PRODUCTION_VERSION, yumConfiguration.getVersion(MYREPO_ID, PRODUCTION));
+    Assert.assertEquals(NEW_PRODUCTION_VERSION, yumConfiguration.getVersion(MYREPO_ID, PRODUCTION));
   }
 
   @Test
@@ -148,7 +144,7 @@ public class YumConfigurationTest {
     File tmpDir = createTmpDir();
     assertThat(new File(tmpDir, YUM_XML).exists(), is(FALSE));
 
-    YumConfigurationHandler yumConfigurationHandler = new YumConfigurationHandler();
+    DefaultYumConfiguration yumConfigurationHandler = new DefaultYumConfiguration();
     yumConfigurationHandler.setNexusConfiguration(createNexusConfig(tmpDir));
     yumConfigurationHandler.load();
     assertThat(new File(tmpDir, YUM_XML).exists(), is(TRUE));

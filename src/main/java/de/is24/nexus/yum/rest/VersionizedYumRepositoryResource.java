@@ -3,22 +3,21 @@ package de.is24.nexus.yum.rest;
 import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
 import static org.restlet.data.Status.CLIENT_ERROR_NOT_FOUND;
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.Path;
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.plugin.impl.MavenRepositoryInfo;
 import de.is24.nexus.yum.repository.YumRepository;
-import de.is24.nexus.yum.service.AliasMapper;
 import de.is24.nexus.yum.service.AliasNotFoundException;
+import de.is24.nexus.yum.service.YumConfiguration;
 import de.is24.nexus.yum.service.YumService;
 
 
+@Component(role = PlexusResource.class, hint = "VersionizedYumRepositoryResource")
 @Path(VersionizedYumRepositoryResource.RESOURCE_URI)
-@Singleton
 public class VersionizedYumRepositoryResource extends AbstractYumRepositoryResource implements PlexusResource {
   private static final String YUM_REPO_PREFIX_NAME = "yum/repos";
   private static final String YUM_REPO_PREFIX = "/" + YUM_REPO_PREFIX_NAME;
@@ -30,15 +29,12 @@ public class VersionizedYumRepositoryResource extends AbstractYumRepositoryResou
     "}";
 
   @Inject
-  @Named(RepositoryRegistry.DEFAULT_BEAN_NAME)
   private RepositoryRegistry repositoryRegistry;
 
   @Inject
-  @Named(AliasMapper.DEFAULT_BEAN_NAME)
-  private AliasMapper aliasMapper;
+  private YumConfiguration aliasMapper;
 
   @Inject
-  @Named(YumService.DEFAULT_BEAN_NAME)
   private YumService yumService;
 
   @Override

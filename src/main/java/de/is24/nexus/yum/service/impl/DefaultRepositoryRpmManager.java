@@ -4,36 +4,32 @@ import static java.lang.String.format;
 import java.io.File;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
-import org.sonatype.plugin.Managed;
 import org.sonatype.scheduling.ScheduledTask;
 import de.is24.nexus.yum.plugin.impl.MavenRepositoryInfo;
 import de.is24.nexus.yum.repository.RepositoryRpmGenerator;
 import de.is24.nexus.yum.repository.YumRepository;
 import de.is24.nexus.yum.service.RepositoryRpmManager;
+import de.is24.nexus.yum.service.YumConfiguration;
 import de.is24.nexus.yum.service.YumService;
 
 
-@Managed
-@Named(RepositoryRpmManager.DEFAULT_BEAN_NAME)
-@Singleton
+@Component(role = RepositoryRpmManager.class)
 public class DefaultRepositoryRpmManager implements RepositoryRpmManager {
   private static final Logger log = LoggerFactory.getLogger(DefaultRepositoryRpmManager.class);
 
-  @Inject
-  @Named(YumService.DEFAULT_BEAN_NAME)
+  @Requirement
   private YumService yumService;
 
-  @Inject
+  @Requirement
   private GlobalRestApiSettings restApiSettings;
 
-  @Inject
-  private YumConfigurationHandler configHandler;
+  @Requirement
+  private YumConfiguration configHandler;
 
   private File rpmLocation;
 

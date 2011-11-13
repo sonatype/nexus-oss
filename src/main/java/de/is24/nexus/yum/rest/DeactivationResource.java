@@ -1,7 +1,9 @@
 package de.is24.nexus.yum.rest;
 
 import javax.inject.Inject;
-import javax.inject.Named;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Parameter;
@@ -20,11 +22,14 @@ import de.is24.nexus.yum.service.YumService;
  * Resource to deactivate Yum Repository Processing
  * http://localhost:8081/nexus/service/local/yumServer/deactivate
  */
+@Component(role = PlexusResource.class, hint = "DeactivationResource")
+@Path(DeactivationResource.RESOURCE_URI)
+@Produces({ "application/xml", "application/json" })
 public class DeactivationResource extends AbstractPlexusResource implements PlexusResource {
+  public static final String RESOURCE_URI = "/yum/config/deactivate";
   private static final String DEACTIVATION_CODE = "2HO_K_yoEtN8Rn9J";
 
   @Inject
-  @Named(YumService.DEFAULT_BEAN_NAME)
   private YumService yumService;
 
   @Override
@@ -46,7 +51,7 @@ public class DeactivationResource extends AbstractPlexusResource implements Plex
   @Override
   public String getResourceUri() {
     // note this must start with a '/'
-    return "/yum/config/deactivate";
+    return RESOURCE_URI;
   }
 
   @Override

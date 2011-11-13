@@ -1,28 +1,24 @@
 package de.is24.nexus.yum.rest;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.restlet.data.Method.GET;
 import static org.restlet.data.Method.POST;
-import javax.inject.Inject;
-import javax.inject.Named;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
-import de.is24.nexus.yum.guice.NexusTestRunner;
+import org.sonatype.plexus.rest.resource.PlexusResource;
+import de.is24.nexus.yum.AbstractYumNexusTestCase;
 import de.is24.nexus.yum.service.YumService;
 
 
-@RunWith(NexusTestRunner.class)
-public class DeactivationResourceTest {
-  @Inject
-  @Named(YumService.DEFAULT_BEAN_NAME)
+public class DeactivationResourceTest extends AbstractYumNexusTestCase {
+  @Requirement
   private YumService yumService;
 
-  @Inject
-  private DeactivationResource resource;
+  @Requirement(hint = "DeactivationResource")
+  private PlexusResource resource;
 
   @After
   public void reactivate() {
@@ -31,10 +27,10 @@ public class DeactivationResourceTest {
 
   @Test
   public void shouldReturnUriAndNoSecurity() throws Exception {
-    assertNull(resource.getPayloadInstance());
-    assertEquals("/yum/config/deactivate", resource.getResourceUri());
-    assertEquals("/yum/config/deactivate", resource.getResourceProtection().getPathPattern());
-    assertEquals("anon", resource.getResourceProtection().getFilterExpression());
+    Assert.assertNull(resource.getPayloadInstance());
+    Assert.assertEquals("/yum/config/deactivate", resource.getResourceUri());
+    Assert.assertEquals("/yum/config/deactivate", resource.getResourceProtection().getPathPattern());
+    Assert.assertEquals("anon", resource.getResourceProtection().getFilterExpression());
   }
 
   @Test(expected = ResourceException.class)
@@ -54,7 +50,7 @@ public class DeactivationResourceTest {
     resource.post(null,
       new Request(POST, "http://localhost:8081/nexus/service/local/yum/config/deactivate?code=2HO_K_yoEtN8Rn9J"),
       null, null);
-    assertEquals(true,
+    Assert.assertEquals(true,
       resource.get(null, new Request(GET, "http://localhost:8081/nexus/service/local/yum/config/deactivate"), null,
         null));
   }

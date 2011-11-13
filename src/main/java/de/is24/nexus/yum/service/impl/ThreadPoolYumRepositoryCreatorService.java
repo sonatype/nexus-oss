@@ -10,11 +10,9 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import javax.inject.Inject;
-import javax.inject.Named;
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.plugin.Managed;
 import org.sonatype.scheduling.ScheduledTask;
-import com.google.inject.Singleton;
 import de.is24.nexus.yum.repository.YumMetadataGenerationTask;
 import de.is24.nexus.yum.repository.YumRepository;
 import de.is24.nexus.yum.repository.YumRepositoryGeneratorJob;
@@ -27,9 +25,7 @@ import de.is24.nexus.yum.repository.YumRepositoryGeneratorJob;
  * Time: 18:16
  * To change this template use File | Settings | File Templates.
  */
-@Managed
-@Named(YumRepositoryCreatorService.DEFAULT_BEAN_NAME)
-@Singleton
+@Component(role = YumRepositoryCreatorService.class)
 public class ThreadPoolYumRepositoryCreatorService implements YumRepositoryCreatorService {
   private static final int THREAD_POOL_SIZE = 10;
 

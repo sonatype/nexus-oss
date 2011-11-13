@@ -3,17 +3,13 @@ package de.is24.nexus.yum.rest;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
-import javax.inject.Named;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Request;
@@ -23,47 +19,52 @@ import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.plexus.rest.resource.PlexusResource;
+import com.google.code.tempusfugit.temporal.Condition;
 import com.noelios.restlet.http.HttpResponse;
-import de.is24.nexus.yum.guice.NexusTestRunner;
+import de.is24.nexus.yum.AbstractYumNexusTestCase;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.repository.utils.RepositoryTestUtils;
-import de.is24.nexus.yum.service.AliasMapper;
+import de.is24.nexus.yum.service.YumConfiguration;
 
 
-@RunWith(NexusTestRunner.class)
-public class VersionizedYumRepositoryResourceTest {
+public class VersionizedYumRepositoryResourceTest extends AbstractYumNexusTestCase {
   private static final String VERSION = "2.2-1";
   private static final String TESTREPO = "conflict-artifact";
   private static final String ALIAS = "myAlias";
 
-  @Inject
-  private VersionizedYumRepositoryResource resource;
+  @Requirement(hint = "VersionizedYumRepositoryResource")
+  private PlexusResource resource;
 
   @Inject
-  @Named(RepositoryRegistry.DEFAULT_BEAN_NAME)
   private RepositoryRegistry repositoryRegistry;
 
   @Inject
-  @Named(AliasMapper.DEFAULT_BEAN_NAME)
-  private AliasMapper aliasMapper;
+  private YumConfiguration aliasMapper;
 
   private MavenRepository repository;
 
   @Before
-  public void registerRepository() {
+  public void registerRepository() throws Exception {
     if (repository == null) {
       repository = createRepository(TESTREPO);
     }
     repositoryRegistry.registerRepository(repository);
+    waitFor(new Condition() {
+        @Override
+        public boolean isSatisfied() {
+          return repositoryRegistry.findRepositoryInfoForId(TESTREPO).getVersions().size() == 5;
+        }
+      });
     aliasMapper.setAlias(TESTREPO, ALIAS, VERSION);
   }
 
   @Test
   public void shouldAllowResourceAccess() throws Exception {
-    assertEquals("/yum/repos/{repository}/{version}", resource.getResourceUri());
-    assertEquals("/yum/*", resource.getResourceProtection().getPathPattern());
-    assertEquals("anon", resource.getResourceProtection().getFilterExpression());
-    assertNull(resource.getPayloadInstance());
+    Assert.assertEquals("/yum/repos/{repository}/{version}", resource.getResourceUri());
+    Assert.assertEquals("/yum/*", resource.getResourceProtection().getPathPattern());
+    Assert.assertEquals("anon", resource.getResourceProtection().getFilterExpression());
+    Assert.assertNull(resource.getPayloadInstance());
   }
 
   @Test(expected = ResourceException.class)
@@ -81,24 +82,26 @@ public class VersionizedYumRepositoryResourceTest {
     Request request = createRequest("", TESTREPO, VERSION);
     Response response = createResponse(request);
     resource.get(null, request, response, null);
-    assertEquals(Status.REDIRECTION_PERMANENT, response.getStatus());
-    assertEquals("http://localhost:8081/nexus/service/local/yum/repos/" + TESTREPO + "/" + VERSION + "/",
+    Assert.assertEquals(Status.REDIRECTION_PERMANENT, response.getStatus());
+    Assert.assertEquals("http://localhost:8081/nexus/service/local/yum/repos/" + TESTREPO + "/" + VERSION + "/",
       response.getLocationRef().getIdentifier());
   }
 
   @Test
   public void shouldProvideFile() throws Exception {
     Request request = createRequest("/repodata/repomd.xml", TESTREPO, VERSION);
+    System.out.println(repositoryRegistry.findRepositoryInfoForId(TESTREPO).getVersions());
+
     FileRepresentation representation = (FileRepresentation) resource.get(null, request, null, null);
-    assertTrue(representation.getFile().exists());
+    Assert.assertTrue(representation.getFile().exists());
   }
 
   @Test
   public void shouldGenerateFileIndex() throws Exception {
     Request request = createRequest("/repodata/", TESTREPO, VERSION);
     StringRepresentation representation = (StringRepresentation) resource.get(null, request, null, null);
-    assertEquals(MediaType.TEXT_HTML, representation.getMediaType());
-    assertTrue(representation.getText().contains("repomd.xml"));
+    Assert.assertEquals(MediaType.TEXT_HTML, representation.getMediaType());
+    Assert.assertTrue(representation.getText().contains("repomd.xml"));
   }
 
   @Test
@@ -115,7 +118,7 @@ public class VersionizedYumRepositoryResourceTest {
   public void shouldNotFindFilesOutsideTheRepository() throws Exception {
     Request request = createRequest("/any-rpm.rpm", TESTREPO, VERSION);
     FileRepresentation representation = (FileRepresentation) resource.get(null, request, null, null);
-    assertFalse(representation.getFile().exists());
+    Assert.assertFalse(representation.getFile().exists());
   }
 
   @Test(expected = ResourceException.class)
@@ -128,8 +131,8 @@ public class VersionizedYumRepositoryResourceTest {
     throws ResourceException {
     Request request = createRequest("/", repo, version);
     StringRepresentation representation = (StringRepresentation) resource.get(null, request, null, null);
-    assertEquals(MediaType.TEXT_HTML, representation.getMediaType());
-    assertTrue(representation.getText().contains("repodata/"));
+    Assert.assertEquals(MediaType.TEXT_HTML, representation.getMediaType());
+    Assert.assertTrue(representation.getText().contains("repodata/"));
   }
 
   private Response createResponse(Request request) {

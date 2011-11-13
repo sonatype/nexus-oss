@@ -1,7 +1,6 @@
 package de.is24.nexus.yum.plugin.impl;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,17 +24,15 @@ public class RpmDeployedListener extends AbstractEventListener {
   private static final Logger LOG = LoggerFactory.getLogger(ItemEventListener.class);
 
   @Inject
-  @Named(RepositoryRegistry.DEFAULT_BEAN_NAME)
   private RepositoryRegistry repositoryRegistry;
 
   @Inject
-  @Named(YumService.DEFAULT_BEAN_NAME)
   private YumService yumService;
 
   @Inject
-  @Named(RepositoryRpmManager.DEFAULT_BEAN_NAME)
   private RepositoryRpmManager repositoryRpmManager;
 
+  @Override
   public void onEvent(Event<?> evt) {
     if (evt instanceof RepositoryItemEventStore) {
       processRepositoryItem((RepositoryItemEventStore) evt);

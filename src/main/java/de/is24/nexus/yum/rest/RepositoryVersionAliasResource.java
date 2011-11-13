@@ -4,9 +4,9 @@ import static org.restlet.data.MediaType.TEXT_PLAIN;
 import static org.restlet.data.Method.POST;
 import java.io.File;
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -20,9 +20,9 @@ import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import de.is24.nexus.yum.service.AliasMapper;
 import de.is24.nexus.yum.service.AliasNotFoundException;
 import de.is24.nexus.yum.service.RepositoryAliasService;
+import de.is24.nexus.yum.service.YumConfiguration;
 
 
 /**
@@ -35,8 +35,9 @@ import de.is24.nexus.yum.service.RepositoryAliasService;
  * @author sherold
  *
  */
+@Component(role = PlexusResource.class, hint = "RepositoryVersionAliasResource")
 @Path(RepositoryVersionAliasResource.RESOURCE_URI)
-@Singleton
+@Produces({ "application/xml", "application/json", "text/plain" })
 public class RepositoryVersionAliasResource extends AbstractPlexusResource implements PlexusResource {
   private static final String ALLOW_ANONYMOUS = "anon";
   private static final String RPM_EXTENSION = ".rpm";
@@ -47,12 +48,10 @@ public class RepositoryVersionAliasResource extends AbstractPlexusResource imple
   public static final String RESOURCE_URI = "/" + URL_PREFIX + "/{" + REPOSITORY_ID_PARAM + "}/{" + ALIAS_PARAM + "}";
 
   @Inject
-  @Named(RepositoryAliasService.DEFAULT_BEAN_NAME)
   private RepositoryAliasService repositoryAliasService;
 
   @Inject
-  @Named(AliasMapper.DEFAULT_BEAN_NAME)
-  private AliasMapper aliasMapper;
+  private YumConfiguration aliasMapper;
 
   public RepositoryVersionAliasResource() {
     setModifiable(true);

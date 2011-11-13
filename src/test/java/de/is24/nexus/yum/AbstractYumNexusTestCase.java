@@ -1,5 +1,8 @@
 package de.is24.nexus.yum;
 
+import static com.google.code.tempusfugit.temporal.Duration.millis;
+import static com.google.code.tempusfugit.temporal.Duration.seconds;
+import static com.google.code.tempusfugit.temporal.WaitFor.waitOrTimeout;
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.BASE_CACHE_DIR;
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FileUtils.copyDirectory;
@@ -9,9 +12,14 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 import javax.inject.Inject;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.AbstractNexusTestCase;
-import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import com.google.code.tempusfugit.temporal.Condition;
+import com.google.code.tempusfugit.temporal.ThreadSleep;
+import com.google.code.tempusfugit.temporal.Timeout;
 
 
 public class AbstractYumNexusTestCase extends AbstractNexusTestCase {
@@ -21,22 +29,51 @@ public class AbstractYumNexusTestCase extends AbstractNexusTestCase {
 
   private String oldTmpDir;
 
+  protected void waitFor(Condition condition) throws TimeoutException, InterruptedException {
+    waitOrTimeout(condition, Timeout.timeout(seconds(60)), new ThreadSleep(millis(30)));
+  }
+
   @Override
   protected void setUp() throws Exception {
     super.setUp();
 
+    copyTestConf();
+
     initConfigurations();
     initRestApiSettings();
 
+    injectFields();
+  }
+
+
+  private void copyTestConf() {
+    try {
+      copyDirectory(NEXUS_CONF_DIR, getConfHomeDir());
+    } catch (IOException e) {
+      throw new RuntimeException("Could not copy nexus configuration to a temp dir : " + NEXUS_CONF_DIR, e);
+    }
+  }
+
+  private void injectFields() throws Exception, IllegalAccessException {
     for (Field field : getAllFields()) {
       if (field.getAnnotation(Inject.class) != null) {
-        Object value = lookup(field.getType());
-        if (!field.isAccessible()) {
-          field.setAccessible(true);
-          field.set(this, value);
-          field.setAccessible(false);
-        }
+        lookupField(field, "");
+        continue;
       }
+
+      Requirement requirement = field.getAnnotation(Requirement.class);
+      if (requirement != null) {
+        lookupField(field, requirement.hint());
+      }
+    }
+  }
+
+  private void lookupField(Field field, String hint) throws Exception, IllegalAccessException {
+    Object value = lookup(field.getType(), hint);
+    if (!field.isAccessible()) {
+      field.setAccessible(true);
+      field.set(this, value);
+      field.setAccessible(false);
     }
   }
 
@@ -52,9 +89,8 @@ public class AbstractYumNexusTestCase extends AbstractNexusTestCase {
   }
 
   private void initRestApiSettings() throws Exception {
-    GlobalRestApiSettings apiSettings = lookup(GlobalRestApiSettings.class);
-    apiSettings.setBaseUrl(NEXUS_BASE_URL);
-    apiSettings.commitChanges();
+    NexusConfiguration config = lookup(NexusConfiguration.class);
+    config.loadConfiguration(true);
   }
 
   private List<Field> getAllFields() {
@@ -83,5 +119,10 @@ public class AbstractYumNexusTestCase extends AbstractNexusTestCase {
     return tmpDir;
   }
 
+
+  @Override
+  protected boolean loadConfigurationAtSetUp() {
+    return false;
+  }
 
 }

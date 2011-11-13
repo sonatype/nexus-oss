@@ -2,26 +2,22 @@ package de.is24.nexus.yum.service.impl;
 
 import java.io.File;
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import org.sonatype.plugin.Managed;
-import de.is24.nexus.yum.service.AliasMapper;
+import org.codehaus.plexus.component.annotations.Component;
 import de.is24.nexus.yum.service.AliasNotFoundException;
 import de.is24.nexus.yum.service.RepositoryAliasService;
 import de.is24.nexus.yum.service.RepositoryRpmManager;
+import de.is24.nexus.yum.service.YumConfiguration;
 
 
-@Managed
-@Named(RepositoryAliasService.DEFAULT_BEAN_NAME)
-@Singleton
+@Component(role = RepositoryAliasService.class)
 public class DefaultRepositoryAliasService implements RepositoryAliasService {
   @Inject
-  private AliasMapper aliasMapper;
+  private YumConfiguration aliasMapper;
 
   @Inject
-  @Named(RepositoryRpmManager.DEFAULT_BEAN_NAME)
   private RepositoryRpmManager repositoryRpmManager;
 
+  @Override
   public File getFile(String repositoryId, String alias) throws AliasNotFoundException {
     String version = aliasMapper.getVersion(repositoryId, alias);
     return repositoryRpmManager.updateRepository(repositoryId, version);
