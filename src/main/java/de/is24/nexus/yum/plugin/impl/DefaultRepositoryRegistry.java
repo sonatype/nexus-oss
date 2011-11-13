@@ -33,12 +33,15 @@ public class DefaultRepositoryRegistry implements RepositoryRegistry {
       MavenRepositoryInfo repositoryInfo = new MavenRepositoryInfo(repository);
       repositories.put(repository.getId(), repositoryInfo);
       LOG.info("Marked repository as RPM-repository : {}", repository.getId());
-
-      RepositoryScanningTask task = nexusScheduler.createTaskInstance(RepositoryScanningTask.class);
-      task.setRepositoryRpmManager(repositoryRpmManager);
-      task.setMavenRepositoryInfo(repositoryInfo);
-      nexusScheduler.submit(RepositoryScanningTask.ID, task);
+      runScanningTask(repositoryInfo);
     }
+  }
+
+  private void runScanningTask(MavenRepositoryInfo repositoryInfo) {
+    RepositoryScanningTask task = nexusScheduler.createTaskInstance(RepositoryScanningTask.class);
+    task.setRepositoryRpmManager(repositoryRpmManager);
+    task.setMavenRepositoryInfo(repositoryInfo);
+    nexusScheduler.submit(RepositoryScanningTask.ID, task);
   }
 
   @Override
