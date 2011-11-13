@@ -5,7 +5,6 @@ import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.assertRepos
 import static de.is24.test.hamcrest.FileMatchers.exists;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import java.io.File;
 import javax.inject.Inject;
 import javax.inject.Named;

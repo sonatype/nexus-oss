@@ -1,34 +1,28 @@
 package de.is24.nexus.yum.plugin.impl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import javax.inject.Inject;
-import javax.inject.Named;
-import de.is24.nexus.yum.AbstractRepositoryTester;
-import de.is24.nexus.yum.guice.NexusTestRunner;
-import de.is24.nexus.yum.plugin.RepositoryRegistry;
-import de.is24.nexus.yum.service.YumService;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import de.is24.nexus.yum.AbstractRepositoryTester;
+import de.is24.nexus.yum.plugin.ItemEventListener;
+import de.is24.nexus.yum.plugin.RepositoryRegistry;
+import de.is24.nexus.yum.service.YumService;
 
 
-@RunWith(NexusTestRunner.class)
 public class RpmDeployedListenerTest extends AbstractRepositoryTester {
   @Inject
-  private RpmDeployedListener listener;
+  private ItemEventListener listener;
 
   @Inject
-  @Named(RepositoryRegistry.DEFAULT_BEAN_NAME)
   private RepositoryRegistry repositoryRegistry;
 
   @Inject
-  @Named(YumService.DEFAULT_BEAN_NAME)
   private YumService yumService;
 
   @Before
@@ -45,7 +39,7 @@ public class RpmDeployedListenerTest extends AbstractRepositoryTester {
   public void shouldRegisterRepository() throws Exception {
     Repository repo = createRepository(true);
     listener.onEvent(new RepositoryRegistryEventAdd(null, repo));
-    assertTrue(repositoryRegistry.isRegistered(repo));
+    Assert.assertTrue(repositoryRegistry.isRegistered(repo));
   }
 
   @Test
@@ -53,7 +47,7 @@ public class RpmDeployedListenerTest extends AbstractRepositoryTester {
     Repository repo = createRepository(false);
     repositoryRegistry.unregisterRepository(repo);
     listener.onEvent(new RepositoryRegistryEventAdd(null, repo));
-    assertFalse(repositoryRegistry.isRegistered(repo));
+    Assert.assertFalse(repositoryRegistry.isRegistered(repo));
   }
 
   @Test

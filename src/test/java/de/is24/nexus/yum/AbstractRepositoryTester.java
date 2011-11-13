@@ -7,37 +7,24 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import java.io.File;
 import javax.inject.Inject;
-import com.google.code.tempusfugit.temporal.Condition;
-import com.google.code.tempusfugit.temporal.Duration;
-import com.google.code.tempusfugit.temporal.ThreadSleep;
-import com.google.code.tempusfugit.temporal.Timeout;
-import com.google.code.tempusfugit.temporal.WaitFor;
-import de.is24.nexus.yum.guice.NexusTestRunner;
-import de.is24.nexus.yum.repository.utils.RepositoryTestUtils;
-import de.is24.nexus.yum.service.impl.DefaultYumService;
-import de.is24.nexus.yum.service.impl.YumRepositoryCreatorService;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import com.google.code.tempusfugit.temporal.Condition;
+import com.google.code.tempusfugit.temporal.Duration;
+import com.google.code.tempusfugit.temporal.ThreadSleep;
+import com.google.code.tempusfugit.temporal.Timeout;
+import com.google.code.tempusfugit.temporal.WaitFor;
+import de.is24.nexus.yum.repository.utils.RepositoryTestUtils;
+import de.is24.nexus.yum.service.impl.YumRepositoryCreatorService;
 
 
-@RunWith(NexusTestRunner.class)
-public abstract class AbstractRepositoryTester {
+public abstract class AbstractRepositoryTester extends AbstractYumNexusTestCase {
   private static final String SNAPSHOTS = "snapshots";
-  private static final Logger log = LoggerFactory.getLogger(AbstractRepositoryTester.class);
-
-  private static final long SLEEP_TIME = 30;
-  private static final long MAX_TIMEOUT = 10000;
-
-  @Inject
-  private DefaultYumService yumService;
 
   @Inject
   private YumRepositoryCreatorService yumRepositoryCreatorService;
@@ -45,6 +32,7 @@ public abstract class AbstractRepositoryTester {
   @After
   public void waitForThreadPool() throws Exception {
     WaitFor.waitOrTimeout(new Condition() {
+        @Override
         public boolean isSatisfied() {
           return yumRepositoryCreatorService.getActiveWorkerCount() == 0;
         }

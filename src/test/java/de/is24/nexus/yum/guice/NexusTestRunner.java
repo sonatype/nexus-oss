@@ -1,14 +1,14 @@
 package de.is24.nexus.yum.guice;
 
+import static de.is24.nexus.yum.AbstractYumNexusTestCase.NEXUS_BASE_URL;
+import static de.is24.nexus.yum.AbstractYumNexusTestCase.NEXUS_CONF_DIR;
+import static de.is24.nexus.yum.AbstractYumNexusTestCase.cloneToTempDir;
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.BASE_CACHE_DIR;
-import static org.apache.commons.io.FileUtils.copyDirectory;
-import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
 import static org.codehaus.plexus.logging.Logger.LEVEL_INFO;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
@@ -83,26 +83,15 @@ public class NexusTestRunner extends GuiceTestRunner {
           NexusConfiguration config = createMock(NexusConfiguration.class);
           expect(config.getTemporaryDirectory()).andReturn(BASE_CACHE_DIR).anyTimes();
 
-          File tmpDir = cloneToTempDir(new File(".", "target/test-classes/nexus/sonatype-work/nexus/conf/"));
+          File tmpDir = cloneToTempDir(NEXUS_CONF_DIR);
           expect(config.getConfigurationDirectory()).andReturn(tmpDir).anyTimes();
           replay(config);
           return config;
         }
 
-        private File cloneToTempDir(File sourceDir) {
-          File tmpDir = new File(".", "target/tmp/" + randomAlphabetic(10));
-          tmpDir.mkdirs();
-          try {
-            copyDirectory(sourceDir, tmpDir);
-          } catch (IOException e) {
-            throw new RuntimeException("Could not copy nexus configuration to a temp dir : " + tmpDir, e);
-          }
-          return tmpDir;
-        }
-
         private GlobalRestApiSettings createRestApiSettings() {
           GlobalRestApiSettings settings = createMock(GlobalRestApiSettings.class);
-          expect(settings.getBaseUrl()).andReturn("http://localhost:8081/nexus").anyTimes();
+          expect(settings.getBaseUrl()).andReturn(NEXUS_BASE_URL).anyTimes();
           replay(settings);
           return settings;
         }

@@ -10,12 +10,10 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import javax.inject.Inject;
-import javax.inject.Named;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
@@ -25,7 +23,7 @@ import com.google.code.tempusfugit.concurrency.ConcurrentRule;
 import com.google.code.tempusfugit.concurrency.RepeatingRule;
 import com.google.code.tempusfugit.concurrency.annotations.Concurrent;
 import de.is24.nexus.yum.AbstractRepositoryTester;
-import de.is24.nexus.yum.guice.NexusTestRunner;
+import de.is24.nexus.yum.plugin.ItemEventListener;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.repository.utils.RepositoryTestUtils;
 import de.is24.nexus.yum.service.YumService;
@@ -39,7 +37,6 @@ import de.is24.nexus.yum.service.impl.YumRepositoryCreatorService;
  * Time: 17:32
  * To change this template use File | Settings | File Templates.
  */
-@RunWith(NexusTestRunner.class)
 public class ConcurrentRpmDeployedListenerTest extends AbstractRepositoryTester {
   private static final Logger log = LoggerFactory.getLogger(ConcurrentRpmDeployedListenerTest.class);
 
@@ -50,14 +47,12 @@ public class ConcurrentRpmDeployedListenerTest extends AbstractRepositoryTester 
   public RepeatingRule repeatedly = new RepeatingRule();
 
   @Inject
-  private RpmDeployedListener listener;
+  private ItemEventListener listener;
 
   @Inject
-  @Named(RepositoryRegistry.DEFAULT_BEAN_NAME)
   private RepositoryRegistry repositoryRegistry;
 
   @Inject
-  @Named(YumService.DEFAULT_BEAN_NAME)
   private YumService yumService;
 
   @Inject
