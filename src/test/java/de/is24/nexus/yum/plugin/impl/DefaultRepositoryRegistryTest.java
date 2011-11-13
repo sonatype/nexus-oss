@@ -7,12 +7,15 @@ import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertThat;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.concurrent.TimeoutException;
 import javax.inject.Inject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
+import com.google.code.tempusfugit.temporal.Condition;
 import de.is24.nexus.yum.AbstractRepositoryTester;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.service.RepositoryRpmManager;
@@ -28,6 +31,9 @@ public class DefaultRepositoryRegistryTest extends AbstractRepositoryTester {
   @Inject
   private RepositoryRpmManager repositoryRpmManager;
 
+  @Inject
+  private NexusScheduler nexusScheduler;
+
   @Test
   public void shouldScanRepository() throws Exception {
     MavenRepository repository = createMock(MavenRepository.class);
@@ -36,7 +42,7 @@ public class DefaultRepositoryRegistryTest extends AbstractRepositoryTester {
     replay(repository);
 
     repositoryRegistry.registerRepository(repository);
-    Thread.sleep(5000);
+    waitForAllTasksToBeDone();
     Assert.assertNotNull(repositoryRegistry.findRepositoryForId(REPO_ID));
     assertThat(repositoryRpmManager.getYumRepository().getFile(REPOSITORY_RPM_FILENAME), exists());
   }
@@ -56,6 +62,14 @@ public class DefaultRepositoryRegistryTest extends AbstractRepositoryTester {
     public void onEvent(Event<?> evt) {
       add(evt);
     }
+  }
 
+  private void waitForAllTasksToBeDone() throws TimeoutException, InterruptedException {
+    waitFor(new Condition() {
+        @Override
+        public boolean isSatisfied() {
+          return nexusScheduler.getActiveTasks().isEmpty();
+        }
+      });
   }
 }

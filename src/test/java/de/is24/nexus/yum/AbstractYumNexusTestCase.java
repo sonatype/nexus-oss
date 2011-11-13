@@ -45,7 +45,6 @@ public class AbstractYumNexusTestCase extends AbstractNexusTestCase {
     injectFields();
   }
 
-
   private void copyTestConf() {
     try {
       copyDirectory(NEXUS_CONF_DIR, getConfHomeDir());
