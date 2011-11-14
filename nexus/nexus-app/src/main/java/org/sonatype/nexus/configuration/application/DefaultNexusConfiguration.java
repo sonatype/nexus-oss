@@ -926,4 +926,16 @@ public class DefaultNexusConfiguration
     {
         return this.securitySystem;
     }
+
+    @Override
+    public String getNexusVersion()
+    {
+        return getConfigurationModel().getNexusVersion();
+    }
+
+    @Override
+    public void setNexusVersion( String version )
+    {
+        getConfigurationModel().setNexusVersion( version );
+    }
 }

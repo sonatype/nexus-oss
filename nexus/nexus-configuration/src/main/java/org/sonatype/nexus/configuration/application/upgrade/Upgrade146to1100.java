@@ -23,12 +23,14 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.v1_10_0.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfiguration;
@@ -43,6 +45,9 @@ public class Upgrade146to1100
     extends AbstractLogEnabled
     implements SingleVersionUpgrader
 {
+
+    @Requirement
+    private ApplicationStatusSource applicationStatusSource;
 
     public Object loadConfiguration( File file )
         throws IOException, ConfigurationIsCorruptedException
@@ -104,6 +109,7 @@ public class Upgrade146to1100
         org.sonatype.nexus.configuration.model.Configuration newc = versionConverter.upgradeConfiguration( oldc );
 
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        newc.setNexusVersion( applicationStatusSource.getSystemStatus().getVersion() );
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }

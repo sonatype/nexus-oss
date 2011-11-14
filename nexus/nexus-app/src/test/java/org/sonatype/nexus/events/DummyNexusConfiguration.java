@@ -339,4 +339,18 @@ public class DummyNexusConfiguration
         return null;
     }
 
+    @Override
+    public String getNexusVersion()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setNexusVersion( String version )
+    {
+        // TODO Auto-generated method stub
+
+    }
+
 }

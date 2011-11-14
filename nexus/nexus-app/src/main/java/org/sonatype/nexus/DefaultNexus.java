@@ -65,6 +65,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.proxy.events.NexusVersionChangedEvent;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -614,7 +615,20 @@ public class DefaultNexus
 
             applicationStatusSource.getSystemStatus().setFirstStart( nexusConfiguration.isConfigurationDefaulted() );
 
-            applicationStatusSource.getSystemStatus().setInstanceUpgraded( nexusConfiguration.isInstanceUpgraded() );
+            final String currentVersion = applicationStatusSource.getSystemStatus().getVersion();
+            final String previousVersion = nexusConfiguration.getNexusVersion();
+            if ( currentVersion.equals( previousVersion ) )
+            {
+                applicationStatusSource.getSystemStatus().setInstanceUpgraded( false );
+            }
+            else
+            {
+                applicationStatusSource.getSystemStatus().setInstanceUpgraded( true );
+                nexusConfiguration.setNexusVersion( currentVersion );
+                nexusConfiguration.saveConfiguration();
+                applicationEventMulticaster.notifyEventListeners( new NexusVersionChangedEvent( this, previousVersion,
+                    currentVersion ) );
+            }
 
             applicationStatusSource.getSystemStatus().setConfigurationUpgraded( nexusConfiguration.isConfigurationUpgraded() );
 
