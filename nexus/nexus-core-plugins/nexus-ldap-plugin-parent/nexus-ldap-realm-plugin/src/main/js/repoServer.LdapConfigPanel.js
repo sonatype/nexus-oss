@@ -290,8 +290,8 @@ Sonatype.repoServer.LdapConfigPanel = function( config ) {
               },
               {
                 xtype: 'textfield',
-                fieldLabel: 'User filter attribute',
-                helpText: 'LDAP attribute to limit user search.',
+                fieldLabel: 'User Filter',
+                helpText: 'LDAP search filter to additionally limit user search (for example "attribute=foo" or "(|(mail=*@domain.com)(uid=dom*))".',
                 name: 'ldapFilter',
                 anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
                 allowBlank: true

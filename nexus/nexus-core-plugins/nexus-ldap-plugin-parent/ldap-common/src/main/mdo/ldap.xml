@@ -75,7 +75,7 @@
                 
                 <field>
                     <name>userRoleMappings</name>
-                    <version>1.0.0</version>
+                    <version>1.0.0+</version>
                     <description>The mapping between users and roles if LDAP groups are not used.</description>
                     <association>
                     	<type>CUserRoleMapping</type>
@@ -288,7 +288,7 @@
 
                 <field>
                     <name>ldapFilter</name>
-                    <version>1.0.0+</version>
+                    <version>1.0.1+</version>
                     <type>String</type>
                     <required>true</required>
                     <description>Filter to limit user search to user with specific attribute.</description>
@@ -300,19 +300,19 @@
         
         <class>
             <name>CUserRoleMapping</name>
-            <version>1.0.0</version>
+            <version>1.0.0+</version>
             <description>Defines the mapping between users and roles, if LDAP groups are not used.</description>
             <fields>
                 <field>
                     <name>userId</name>
-                    <version>1.0.0</version>
+                    <version>1.0.0+</version>
                     <type>String</type>
                     <required>true</required>
                     <description>User ID.  The id of the user.</description>
                 </field>
                  <field>
                     <name>roles</name>
-                    <version>1.0.0</version>
+                    <version>1.0.0+</version>
                     <association>
                         <type>String</type>
                         <multiplicity>*</multiplicity>
