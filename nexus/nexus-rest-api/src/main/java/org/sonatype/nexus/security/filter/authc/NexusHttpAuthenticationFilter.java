@@ -243,7 +243,8 @@ public class NexusHttpAuthenticationFilter
         {
             Session anonSession = subject.getSession( false );
 
-            this.getLogger().debug( "Unknown session exception while logging in anonymous user: '{}'", anonSession, e );
+            this.getLogger().debug( "Unknown session exception while logging in anonymous user: '{}' with principal '{}'", new Object[]{ anonSession, subject.getPrincipal(), e} );
+
             if ( anonSession != null )
             {
                 // clear the session
@@ -360,42 +361,6 @@ public class NexusHttpAuthenticationFilter
 
                 sendForbidden( request, response );
             }
-        }
-    }
-
-    @Override
-    public void afterCompletion( ServletRequest request, ServletResponse response, Exception exception )
-        throws Exception
-    {
-        // NOTE: this exception (if any) is logged, wrapped, and thrown in the cleanup method that calls this one.
-        try
-        {
-            if ( request.getAttribute( ANONYMOUS_LOGIN ) != null )
-            {
-                try
-                {
-                    getSubject( request, response ).logout();
-                }
-                catch ( SessionException e ) //TODO: investigate why this is getting thrown (original issue NEXUS-4267)
-                {
-                    // we need to prevent log spam, just log this as trace
-                    getLogger().trace( "Failed to find session for anonymous user.", e );
-                }
-                if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
-                {
-                    HttpSession session = ( (HttpServletRequest) request ).getSession( false );
-
-                    if ( session != null )
-                    {
-                        session.invalidate();
-                    }
-                }
-            }
-        }
-        finally
-        {
-            // clear all thread locals
-            ThreadContext.remove();
         }
     }
 
