@@ -56,9 +56,9 @@ public class DefaultAttributesHandler
     implements AttributesHandler
 {
     /**
-     * Default value of lastRequested attribute updates resolution: 24h
+     * Default value of lastRequested attribute updates resolution: 12h
      */
-    private static final long LAST_REQUESTED_ATTRIBUTE_RESOLUTION_DEFAULT = 86400000L;
+    private static final long LAST_REQUESTED_ATTRIBUTE_RESOLUTION_DEFAULT = 43200000L;
 
     /**
      * The value of lastRequested attribute updates resolution. Is enforced to be positive long. Setting it to 0 makes
