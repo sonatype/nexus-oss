@@ -29,8 +29,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -57,8 +58,6 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.util.ItemPathUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-
-import javax.inject.Inject;
 
 /**
  * The Class DefaultFSLocalRepositoryStorage.
@@ -282,21 +281,7 @@ public class DefaultFSLocalRepositoryStorage
                         link.setCreated( target.lastModified() );
                         result = link;
 
-                        // the "default"
-                        boolean doTouch = touchLastRequested;
-
-                        if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
-                        {
-                            // this is a hosted repository
-                            doTouch = touchLastRequestedForHostedRepositories;
-                        }
-                        else if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-                        {
-                            // this is a proxy repository
-                            doTouch = touchLastRequestedForProxyRepositories;
-                        }
-
-                        if ( doTouch )
+                        if ( doTouchLastRequested( repository ) )
                         {
                             repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(),
                                 repository, request, link );
@@ -322,8 +307,11 @@ public class DefaultFSLocalRepositoryStorage
                     file.setLength( target.length() );
                     result = file;
 
-                    repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(), repository,
-                        request, file );
+                    if ( doTouchLastRequested( repository ) )
+                    {
+                        repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(),
+                            repository, request, file );
+                    }
                 }
             }
             catch ( FileNotFoundException e )
@@ -345,6 +333,25 @@ public class DefaultFSLocalRepositoryStorage
         }
 
         return result;
+    }
+    
+    protected boolean doTouchLastRequested( final Repository repository )
+    {
+        // the "default"
+        boolean doTouch = touchLastRequested;
+
+        if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
+        {
+            // this is a hosted repository
+            doTouch = touchLastRequestedForHostedRepositories;
+        }
+        else if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        {
+            // this is a proxy repository
+            doTouch = touchLastRequestedForProxyRepositories;
+        }
+        
+        return doTouch;
     }
 
     public boolean isReachable( Repository repository, ResourceStoreRequest request )
