@@ -34,7 +34,7 @@ import org.sonatype.nexus.configuration.model.v1_10_0.upgrade.BasicVersionUpgrad
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfiguration;
 
 /**
- * Upgrades configuration model from version 1.4.5 to 1.4.6.<BR>
+ * Upgrades configuration model from version 1.4.6 to 1.10.0.<BR>
  * 
  * @author velo
  */
