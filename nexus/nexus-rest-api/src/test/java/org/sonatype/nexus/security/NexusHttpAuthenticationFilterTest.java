@@ -130,12 +130,12 @@ public class NexusHttpAuthenticationFilterTest
     }
 
     /**
-     * Test post handles does not throw an exception if the anonymous users session has expired.
+     * Test afterCompletion does not throw an exception if the anonymous users session has expired.
      *
      * @throws Exception
      */
     @Test
-    public void testPostHandleForExpiredSessions()
+    public void testAfterCompletionForExpiredSessions()
         throws Exception
     {
 
@@ -146,7 +146,7 @@ public class NexusHttpAuthenticationFilterTest
 
         // Verify this does not throw an exception when the session is expired
         NexusHttpAuthenticationFilter filter = new NexusHttpAuthenticationFilter();
-        filter.postHandle( request, response );
+        filter.afterCompletion( request, response, null );
 
         // verify the session is nulled out
         assertThat( subject.getSession( false ), nullValue() );
