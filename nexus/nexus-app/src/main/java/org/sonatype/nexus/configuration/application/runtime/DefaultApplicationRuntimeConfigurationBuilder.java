@@ -22,11 +22,11 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -37,7 +37,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 @Component( role = ApplicationRuntimeConfigurationBuilder.class )
 public class DefaultApplicationRuntimeConfigurationBuilder
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements ApplicationRuntimeConfigurationBuilder
 {
     @Requirement

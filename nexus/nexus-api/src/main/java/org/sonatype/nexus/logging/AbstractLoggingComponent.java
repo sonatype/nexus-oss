@@ -18,9 +18,8 @@
  */
 package org.sonatype.nexus.logging;
 
-import javax.inject.Inject;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +32,32 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractLoggingComponent
 {
 
-    private final Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger;
 
+    /**
+     * Default constructor that creates logger for component upon instantiation.
+     */
+    protected AbstractLoggingComponent()
+    {
+        this.logger = checkNotNull( createLogger() );
+    }
+
+    /**
+     * Creates logger instance to be used with component instance. It might be overridden by subclasses to implement
+     * alternative logger naming strategy. By default, this method does the "usual" fluff: {@code LoggerFactory.getLogger(getClass())}.
+     *
+     * @return The Logger instance to be used by component for logging.
+     */
+    protected Logger createLogger()
+    {
+        return LoggerFactory.getLogger( getClass() );
+    }
+
+    /**
+     * Returns the Logger instance of this component. Never returns {@code null}.
+     *
+     * @return
+     */
     protected Logger getLogger()
     {
         return logger;

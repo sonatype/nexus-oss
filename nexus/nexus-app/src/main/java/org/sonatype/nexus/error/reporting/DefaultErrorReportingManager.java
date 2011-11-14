@@ -65,6 +65,7 @@ import org.sonatype.nexus.configuration.model.ConfigurationHelper;
 import org.sonatype.nexus.error.report.ErrorReportBundleContentContributor;
 import org.sonatype.nexus.error.report.ErrorReportBundleEntry;
 import org.sonatype.nexus.error.report.ErrorReportComponent;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.plexus.encryptor.PlexusEncryptor;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
@@ -75,8 +76,7 @@ public class DefaultErrorReportingManager
     extends AbstractConfigurable
     implements ErrorReportingManager
 {
-    @Requirement
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     @Requirement
     private NexusConfiguration nexusConfig;

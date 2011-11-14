@@ -21,8 +21,14 @@ package org.sonatype.nexus.plugins.mavenbridge.internal.guice;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.sisu.maven.bridge.internal.ModelResolverFactory;
-
+import org.apache.maven.repository.internal.DefaultServiceLocator;
+import org.sonatype.aether.spi.locator.ServiceLocator;
+import org.sonatype.sisu.maven.bridge.MavenArtifactResolver;
+import org.sonatype.sisu.maven.bridge.MavenDependencyTreeResolver;
+import org.sonatype.sisu.maven.bridge.MavenModelResolver;
+import org.sonatype.sisu.maven.bridge.support.artifact.RemoteMavenArtifactResolver;
+import org.sonatype.sisu.maven.bridge.support.dependency.RemoteMavenDependencyTreeResolver;
+import org.sonatype.sisu.maven.bridge.support.model.RemoteMavenModelResolver;
 import com.google.inject.AbstractModule;
 
 @Named
@@ -30,9 +36,14 @@ import com.google.inject.AbstractModule;
 public class GuiceModule
     extends AbstractModule
 {
+
     @Override
     protected void configure()
     {
-        bind( ModelResolverFactory.class ).to( NexusModelResolverFactory.class );
+        bind( ServiceLocator.class ).to( DefaultServiceLocator.class );
+        bind( MavenArtifactResolver.class ).to( RemoteMavenArtifactResolver.class );
+        bind( MavenModelResolver.class ).to( RemoteMavenModelResolver.class );
+        bind( MavenDependencyTreeResolver.class ).to( RemoteMavenDependencyTreeResolver.class );
     }
+
 }

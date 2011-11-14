@@ -33,14 +33,14 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CNotification;
 import org.sonatype.nexus.configuration.model.CNotificationConfiguration;
 import org.sonatype.nexus.configuration.model.CNotificationTarget;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 
 @Component( role = NotificationManager.class )
 public class DefaultNotificationManager
     extends AbstractConfigurable
     implements NotificationManager
 {
-    @Requirement
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     @Requirement
     private NexusConfiguration nexusConfig;

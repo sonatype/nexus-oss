@@ -20,12 +20,12 @@ package org.sonatype.nexus.proxy.events;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 
 public abstract class AbstractEventInspector
     implements EventInspector
 {
-    @Requirement
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     protected Logger getLogger()
     {

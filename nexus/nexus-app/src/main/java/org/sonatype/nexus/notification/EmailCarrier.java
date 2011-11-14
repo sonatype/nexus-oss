@@ -29,6 +29,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.MailRequest;
 import org.sonatype.nexus.email.NexusEmailer;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -40,8 +41,7 @@ public class EmailCarrier
 {
     public static final String KEY = "email";
 
-    @Requirement
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     @Requirement
     private NexusEmailer nexusEmailer;

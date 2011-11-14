@@ -141,8 +141,7 @@ public class Slf4jPlexusLogger
     @Override
     public int getThreshold()
     {
-        // lie is "debug" to have all legacy code that are nested in the if/else checking for DEBUG level
-        // actually execute, and the real Slf4j backed will decide what to do with it.
+        // unused
         return LEVEL_DEBUG;
     }
 
@@ -177,6 +176,18 @@ public class Slf4jPlexusLogger
      */
     public static org.codehaus.plexus.logging.Logger getPlexusLogger( final Class<?> owner )
     {
-        return new Slf4jPlexusLogger( LoggerFactory.getLogger( owner ) );
+        return getPlexusLogger( LoggerFactory.getLogger( owner ) );
     }
+
+    /**
+     * Factory method for Plexus Logger instances, that wraps existing Slf4j Logger instances.
+     *
+     * @param logger
+     * @return
+     */
+    public static org.codehaus.plexus.logging.Logger getPlexusLogger( final Logger logger )
+    {
+        return new Slf4jPlexusLogger( logger );
+    }
+
 }

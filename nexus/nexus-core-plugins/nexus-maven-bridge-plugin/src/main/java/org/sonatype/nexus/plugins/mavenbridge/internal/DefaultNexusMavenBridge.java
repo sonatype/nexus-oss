@@ -18,8 +18,10 @@
  */
 package org.sonatype.nexus.plugins.mavenbridge.internal;
 
-import java.util.List;
+import static org.sonatype.sisu.maven.bridge.support.CollectRequestBuilder.tree;
+import static org.sonatype.sisu.maven.bridge.support.ModelBuildingRequestBuilder.model;
 
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -38,77 +40,85 @@ import org.sonatype.nexus.plugins.mavenbridge.NexusAether;
 import org.sonatype.nexus.plugins.mavenbridge.NexusMavenBridge;
 import org.sonatype.nexus.plugins.mavenbridge.workspace.NexusWorkspace;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.sisu.maven.bridge.MavenBridge;
+import org.sonatype.sisu.maven.bridge.MavenDependencyTreeResolver;
+import org.sonatype.sisu.maven.bridge.MavenModelResolver;
 
 @Named
 @Singleton
 public class DefaultNexusMavenBridge
     implements NexusMavenBridge
 {
+
     private final NexusAether nexusAether;
 
-    private final MavenBridge mavenBridge;
+    private final MavenModelResolver modelResolver;
+
+    private final MavenDependencyTreeResolver dependencyTreeResolver;
 
     @Inject
-    DefaultNexusMavenBridge( final NexusAether nexusAether, final MavenBridge mavenBridge )
+    DefaultNexusMavenBridge( final NexusAether nexusAether,
+                             final MavenModelResolver modelResolver,
+                             final MavenDependencyTreeResolver dependencyTreeResolver )
     {
         this.nexusAether = nexusAether;
-
-        this.mavenBridge = mavenBridge;
+        this.modelResolver = modelResolver;
+        this.dependencyTreeResolver = dependencyTreeResolver;
     }
 
     @Override
-    public Model buildModel( ModelSource pom, List<MavenRepository> repositories, RepositoryListener... listeners )
+    public Model buildModel( final ModelSource pom,
+                             final List<MavenRepository> repositories,
+                             final RepositoryListener... listeners )
         throws ModelBuildingException
     {
-        RepositorySystemSession session = createSession( repositories );
-        return mavenBridge.buildModel( session, pom );
+        final RepositorySystemSession session = createSession( repositories );
+        return modelResolver.resolveModel( model().setModelSource( pom ), session );
     }
 
     @Override
-    public DependencyNode collectDependencies( Dependency node, List<MavenRepository> repositories,
-                                               RepositoryListener... listeners )
+    public DependencyNode collectDependencies( final Dependency dependency,
+                                               final List<MavenRepository> repositories,
+                                               final RepositoryListener... listeners )
         throws DependencyCollectionException, ArtifactResolutionException
     {
-        RepositorySystemSession session = createSession( repositories );
-        return mavenBridge.buildDependencyTree( session, node );
+        final RepositorySystemSession session = createSession( repositories );
+        return dependencyTreeResolver.resolveDependencyTree( tree().dependency( dependency ), session );
     }
 
     @Override
-    public DependencyNode resolveDependencies( Dependency node, List<MavenRepository> repositories,
-                                               RepositoryListener... listeners )
+    public DependencyNode resolveDependencies( final Dependency dependency,
+                                               final List<MavenRepository> repositories,
+                                               final RepositoryListener... listeners )
         throws DependencyCollectionException, ArtifactResolutionException
     {
-        RepositorySystemSession session = createSession( repositories );
-
-        DependencyNode dnode = mavenBridge.buildDependencyTree( session, node );
-
-        nexusAether.getRepositorySystem().resolveDependencies( session, dnode, null );
-
-        return dnode;
+        final RepositorySystemSession session = createSession( repositories );
+        final DependencyNode node = dependencyTreeResolver.resolveDependencyTree(
+            tree().dependency( dependency ), session
+        );
+        nexusAether.getRepositorySystem().resolveDependencies( session, node, null );
+        return node;
     }
 
     @Override
-    public DependencyNode collectDependencies( Model model, List<MavenRepository> repositories,
-                                               RepositoryListener... listeners )
+    public DependencyNode collectDependencies( final Model model,
+                                               final List<MavenRepository> repositories,
+                                               final RepositoryListener... listeners )
         throws DependencyCollectionException, ArtifactResolutionException
     {
-        RepositorySystemSession session = createSession( repositories );
-        return mavenBridge.buildDependencyTree( session, model );
+        final RepositorySystemSession session = createSession( repositories );
+        return dependencyTreeResolver.resolveDependencyTree( tree().model( model ), session );
     }
 
     @Override
-    public DependencyNode resolveDependencies( Model model, List<MavenRepository> repositories,
-                                               RepositoryListener... listeners )
+    public DependencyNode resolveDependencies( final Model model,
+                                               final List<MavenRepository> repositories,
+                                               final RepositoryListener... listeners )
         throws DependencyCollectionException, ArtifactResolutionException
     {
-        RepositorySystemSession session = createSession( repositories );
-
-        DependencyNode dnode = mavenBridge.buildDependencyTree( session, model );
-
-        nexusAether.getRepositorySystem().resolveDependencies( session, dnode, null );
-
-        return dnode;
+        final RepositorySystemSession session = createSession( repositories );
+        final DependencyNode node = dependencyTreeResolver.resolveDependencyTree( tree().model( model ), session );
+        nexusAether.getRepositorySystem().resolveDependencies( session, node, null );
+        return node;
     }
 
     // ==
@@ -118,11 +128,9 @@ public class DefaultNexusMavenBridge
     {
         final NexusWorkspace nexusWorkspace = nexusAether.createWorkspace( repositories );
 
-        final RepositorySystemSession session =
-            nexusAether.getNexusEnabledRepositorySystemSession( nexusWorkspace, new ChainedRepositoryListener(
-                listeners ) );
-
-        return session;
+        return nexusAether.getNexusEnabledRepositorySystemSession(
+            nexusWorkspace, new ChainedRepositoryListener( listeners )
+        );
     }
 
 }

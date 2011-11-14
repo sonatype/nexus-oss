@@ -24,17 +24,16 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.error.report.ErrorReportBundleContentContributor;
 import org.sonatype.nexus.error.report.ErrorReportBundleEntry;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.plugin.console.PluginConsoleManager;
 import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
-
 import com.thoughtworks.xstream.XStream;
 
 @Component( role = ErrorReportBundleContentContributor.class, hint = "pluginList" )
 public class PluginListErrorReportBundleContentContributor
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements ErrorReportBundleContentContributor
 {
 

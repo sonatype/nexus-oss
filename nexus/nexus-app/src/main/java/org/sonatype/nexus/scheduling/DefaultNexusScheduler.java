@@ -25,7 +25,7 @@ import java.util.concurrent.RejectedExecutionException;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.Scheduler;
@@ -38,7 +38,7 @@ import org.sonatype.scheduling.schedules.Schedule;
  */
 @Component( role = NexusScheduler.class )
 public class DefaultNexusScheduler
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements NexusScheduler
 {
     @Requirement

@@ -78,13 +78,14 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
  * So, this implementation is used in both "simple" repository cases: hosted and proxy, but in 1st case there is no
  * remote storage.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractProxyRepository
     extends AbstractRepository
     implements ProxyRepository
 {
+
     /**
      * Default time to do NOT check an already known remote status: 5 mins.
      */
@@ -112,32 +113,50 @@ public abstract class AbstractProxyRepository
      */
     private Thread repositoryStatusCheckerThread;
 
-    /** if remote url changed, need special handling after save */
+    /**
+     * if remote url changed, need special handling after save
+     */
     private boolean remoteUrlChanged = false;
 
-    /** The proxy remote status */
+    /**
+     * The proxy remote status
+     */
     private volatile RemoteStatus remoteStatus = RemoteStatus.UNKNOWN;
 
-    /** Last time remote status was updated */
+    /**
+     * Last time remote status was updated
+     */
     private volatile long remoteStatusUpdated = 0;
 
-    /** How much should be the last known remote status be retained. */
+    /**
+     * How much should be the last known remote status be retained.
+     */
     private volatile NumberSequence remoteStatusRetainTimeSequence = new ConstantNumberSequence(
         REMOTE_STATUS_RETAIN_TIME );
 
-    /** The remote storage. */
+    /**
+     * The remote storage.
+     */
     private RemoteRepositoryStorage remoteStorage;
 
-    /** Remote storage context to store connection configs. */
+    /**
+     * Remote storage context to store connection configs.
+     */
     private RemoteStorageContext remoteStorageContext;
 
-    /** Proxy selector, if set */
+    /**
+     * Proxy selector, if set
+     */
     private ProxySelector proxySelector;
 
-    /** Download mirrors */
+    /**
+     * Download mirrors
+     */
     private DownloadMirrors dMirrors;
 
-    /** Item content validators */
+    /**
+     * Item content validators
+     */
     private Map<String, ItemContentValidator> itemContentValidators;
 
     @Override
@@ -191,7 +210,7 @@ public abstract class AbstractProxyRepository
         {
             Collection<String> result =
                 doEvictUnusedItems( request, timestamp, new EvictUnusedItemsWalkerProcessor( timestamp ),
-                    new EvictUnusedItemsWalkerFilter() );
+                                    new EvictUnusedItemsWalkerFilter() );
 
             getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventEvictUnusedItems( this ) );
 
@@ -332,7 +351,7 @@ public abstract class AbstractProxyRepository
     /**
      * ProxyMode is a persisted configuration property, hence it modifies configuration! It is the caller responsibility
      * to save configuration.
-     * 
+     *
      * @param proxyMode
      * @param sendNotification
      * @param cause
@@ -441,7 +460,7 @@ public abstract class AbstractProxyRepository
      * This method should be called by AbstractProxyRepository and it's descendants only. Since this method modifies the
      * ProxyMode property of this repository, and this property is part of configuration, this call will result in
      * configuration flush too (potentially saving any other unsaved changes)!
-     * 
+     *
      * @param cause
      */
     protected void autoBlockProxying( Throwable cause )
@@ -490,7 +509,7 @@ public abstract class AbstractProxyRepository
             StringBuilder sb = new StringBuilder();
 
             sb.append( "Remote peer of proxy repository \"" + getName() + "\" (id=" + getId() + ") threw a "
-                + cause.getClass().getName() + " exception." );
+                           + cause.getClass().getName() + " exception." );
 
             if ( cause instanceof RemoteAccessException )
             {
@@ -498,14 +517,16 @@ public abstract class AbstractProxyRepository
             }
             else if ( cause instanceof StorageException )
             {
-                sb.append( " Connection/transport problems occured while connecting to remote peer of the repository." );
+                sb.append(
+                    " Connection/transport problems occured while connecting to remote peer of the repository." );
             }
 
             // nag about autoblock if needed
             if ( autoBlockActive )
             {
-                sb.append( " Auto-blocking this repository to prevent further connection-leaks and known-to-fail outbound"
-                    + " connections until administrator fixes the problems, or Nexus detects remote repository as healthy." );
+                sb.append(
+                    " Auto-blocking this repository to prevent further connection-leaks and known-to-fail outbound"
+                        + " connections until administrator fixes the problems, or Nexus detects remote repository as healthy." );
             }
 
             // log the event
@@ -639,13 +660,13 @@ public abstract class AbstractProxyRepository
         else
         {
             throw new RemoteStorageException( "No remote storage set on repository \"" + getName() + "\" (ID=\""
-                + getId() + "\"), cannot set remoteUrl!" );
+                                                  + getId() + "\"), cannot set remoteUrl!" );
         }
     }
 
     /**
      * Gets the item max age in (in minutes).
-     * 
+     *
      * @return the item max age in (in minutes)
      */
     public int getItemMaxAge()
@@ -655,7 +676,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Sets the item max age in (in minutes).
-     * 
+     *
      * @param itemMaxAge the new item max age in (in minutes).
      */
     public void setItemMaxAge( int itemMaxAge )
@@ -668,7 +689,9 @@ public abstract class AbstractProxyRepository
         remoteStatusUpdated = 0;
     }
 
-    /** Is checking in progress? */
+    /**
+     * Is checking in progress?
+     */
     private volatile boolean _remoteStatusChecking = false;
 
     public RemoteStatus getRemoteStatus( ResourceStoreRequest request, boolean forceCheck )
@@ -1043,7 +1066,8 @@ public abstract class AbstractProxyRepository
                                 if ( getLogger().isDebugEnabled() )
                                 {
                                     getLogger().debug(
-                                        "No newer version of item " + request.toString() + " found on remote storage." );
+                                        "No newer version of item " + request.toString()
+                                            + " found on remote storage." );
                                 }
                             }
                             else
@@ -1051,7 +1075,8 @@ public abstract class AbstractProxyRepository
                                 if ( getLogger().isDebugEnabled() )
                                 {
                                     getLogger().debug(
-                                        "Newer version of item " + request.toString() + " is found on remote storage." );
+                                        "Newer version of item " + request.toString()
+                                            + " is found on remote storage." );
                                 }
                             }
 
@@ -1174,7 +1199,8 @@ public abstract class AbstractProxyRepository
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug(
-                        "Item " + request.toString() + " does exist locally and cannot go remote, returning local one." );
+                        "Item " + request.toString()
+                            + " does exist locally and cannot go remote, returning local one." );
                 }
 
                 item = localItem;
@@ -1220,7 +1246,7 @@ public abstract class AbstractProxyRepository
      * Validates integrity of content of <code>item</code>. Retruns <code>true</code> if item content is valid and
      * <code>false</code> if item content is corrupted. Note that this method is called doRetrieveRemoteItem, so
      * implementation must retrieve checksum files directly from remote storage <code>
-     *   getRemoteStorage().retrieveItem( this, context, getRemoteUrl(), checksumUid.getPath() );
+     * getRemoteStorage().retrieveItem( this, context, getRemoteUrl(), checksumUid.getPath() );
      * </code>
      */
     protected boolean doValidateRemoteItemContent( ResourceStoreRequest req, String baseUrl, AbstractStorageItem item,
@@ -1228,19 +1254,30 @@ public abstract class AbstractProxyRepository
     {
         boolean isValid = true;
 
-        for ( ItemContentValidator icv : getItemContentValidators().values() )
+        for ( Map.Entry<String, ItemContentValidator> icventry : getItemContentValidators().entrySet() )
         {
             try
             {
-                isValid = isValid && icv.isRemoteItemContentValid( this, req, baseUrl, item, events );
-                // loop all
+                boolean isValidByCurrentItemContentValidator =
+                    icventry.getValue().isRemoteItemContentValid( this, req, baseUrl, item, events );
+
+                if ( !isValidByCurrentItemContentValidator )
+                {
+                    getLogger().info(
+                        String.format(
+                            "Proxied item %s evaluated as INVALID during file type validation (validator=%s, sourceUrl=%s)",
+                            item.getRepositoryItemUid().toString(), icventry.getKey(), item.getRemoteUrl() ) );
+                }
+
+                isValid = isValid && isValidByCurrentItemContentValidator;
             }
             catch ( StorageException e )
             {
-                // TODO subclass StorageException with RemoteStorageException and RemoteStorageException
-                this.getLogger().warn(
-                    "Item: '" + item.getPath() + "' in repository: " + this.getId() + "failed validation, cause: "
-                        + e.getMessage(), e );
+                getLogger().info(
+                    String.format(
+                        "Proxied item %s evaluated as INVALID during file type validation (validator=%s, sourceUrl=%s)",
+                        item.getRepositoryItemUid().toString(), icventry.getKey(), item.getRemoteUrl() ), e );
+
                 isValid = false;
             }
         }
@@ -1250,7 +1287,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks for remote existence of local item.
-     * 
+     *
      * @param localItem
      * @param request
      * @return
@@ -1283,10 +1320,10 @@ public abstract class AbstractProxyRepository
      * item operation from the url failed with StorageException, AccessDenied or InvalidItemContent error but the item
      * was successfully retrieve from another url.</li> <li>Mirror url will be removed from blacklist after 30 minutes.</li>
      * The following matrix summarises retry/blacklist behaviour
-     * 
+     * <p/>
      * <pre>
      * Error condition      Retry?        Blacklist?
-     * 
+     *
      * InetNotFound         no            no
      * AccessDedied         no            yes
      * InvalidContent       no            no
@@ -1321,7 +1358,8 @@ public abstract class AbstractProxyRepository
 
             try
             {
-                all_urls: for ( Mirror mirror : mirrors )
+                all_urls:
+                for ( Mirror mirror : mirrors )
                 {
                     int retryCount = 1;
 
@@ -1557,7 +1595,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks if item is old with "default" maxAge.
-     * 
+     *
      * @param item the item
      * @return true, if it is old
      */
@@ -1568,7 +1606,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks if item is old with given maxAge.
-     * 
+     *
      * @param maxAge
      * @param item
      * @return
@@ -1613,6 +1651,7 @@ public abstract class AbstractProxyRepository
     private class RemoteStatusUpdateCallable
         implements Callable<Object>
     {
+
         private ResourceStoreRequest request;
 
         public RemoteStatusUpdateCallable( ResourceStoreRequest request )

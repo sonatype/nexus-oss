@@ -32,9 +32,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
 import org.sonatype.security.ldap.dao.password.PasswordEncoderManager;
@@ -47,9 +48,10 @@ import org.sonatype.security.ldap.upgrade.cipher.PlexusCipherException;
 
 @Component( role = LdapConfiguration.class, hint = "default", instantiationStrategy = "singleton" )
 public class DefaultLdapConfiguration
-    extends AbstractLogEnabled
     implements LdapConfiguration
 {
+    private Logger logger = LoggerFactory.getLogger( getClass() );
+    
     @org.codehaus.plexus.component.annotations.Configuration( value = "${application-conf}/ldap.xml" )
     private File configurationFile;
 
@@ -68,6 +70,11 @@ public class DefaultLdapConfiguration
     private ApplicationEventMulticaster applicationEventMulticaster;
 
     private ReentrantLock lock = new ReentrantLock();
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
 
     public CConnectionInfo readConnectionInfo()
     {

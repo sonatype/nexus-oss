@@ -43,6 +43,7 @@ import org.sonatype.nexus.configuration.model.CProps;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CScheduledTaskCoreConfiguration;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.scheduling.TaskUtils;
 import org.sonatype.scheduling.schedules.CronSchedule;
@@ -65,8 +66,7 @@ public class DefaultTaskConfigManager
     implements TaskConfigManager
 {
 
-    @Requirement
-    private Logger logger;
+    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     /**
      * The app config holding tasks.

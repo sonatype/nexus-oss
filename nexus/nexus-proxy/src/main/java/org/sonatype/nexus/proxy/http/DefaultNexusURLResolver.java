@@ -26,8 +26,8 @@ import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -41,7 +41,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 @Component(role=NexusURLResolver.class)
 public class DefaultNexusURLResolver
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements NexusURLResolver, Contextualizable
 {
 

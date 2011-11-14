@@ -23,7 +23,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
@@ -32,13 +31,14 @@ import org.sonatype.micromailer.MailRequest;
 import org.sonatype.micromailer.MailRequestStatus;
 import org.sonatype.micromailer.imp.DefaultMailType;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
 /**
  * @author velo
  */
 @Component( role = SmtpSettingsValidator.class )
 public class DefaultSmtpSettingsValidator
-    extends AbstractLogEnabled
+    extends AbstractLoggingComponent
     implements SmtpSettingsValidator, Contextualizable
 {
 

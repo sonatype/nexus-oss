@@ -78,11 +78,6 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-common</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-slf4j-logging</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
