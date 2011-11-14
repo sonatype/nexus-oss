@@ -20,10 +20,9 @@ package org.sonatype.nexus.proxy.repository.validator;
 
 import java.io.File;
 
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -74,6 +73,61 @@ public class FileTypeValidationUtilTest
     {
         doTest( "something/else/image.jpg", "no-doctype-pom.xml", true );
         doTest( "something/else/image.avi", "no-doctype-pom.xml", true );
+    }
+
+    @Test
+    public void testFlexArtifacts()
+        throws Exception
+    {
+        doTest( "something/else/library.swc", "no-doctype-pom.xml", false );
+        doTest( "something/else/library.swc", "test.swc", true );
+        doTest( "something/else/app.swf", "no-doctype-pom.xml", false );
+        doTest( "something/else/app.swf", "test.swf", true );
+    }
+
+    @Test
+    public void testTar()
+        throws Exception
+    {
+        doTest( "something/else/bundle.tar", "no-doctype-pom.xml", false );
+        doTest( "something/else/bundle.tar", "test.tar", true );
+    }
+
+    @Test
+    public void testTarGz()
+        throws Exception
+    {
+        doTest( "something/else/bundle.tar.gz", "no-doctype-pom.xml", false );
+        doTest( "something/else/bundle.tar.gz", "test.tar.gz", true );
+        doTest( "something/else/bundle.tgz", "no-doctype-pom.xml", false );
+        doTest( "something/else/bundle.tgz", "test.tgz", true );
+        doTest( "something/else/bundle.gz", "no-doctype-pom.xml", false );
+        doTest( "something/else/bundle.gz", "test.gz", true );
+    }
+
+    // @Test
+    // public void testTarBz2()
+    // throws Exception
+    // {
+    // FIXME NEXUS-4632 eu.medsea.mimeutil.MimeUtil2 is resolving bzip2 to application/octet-stream
+    // doTest( "something/else/bundle.tar.bz2", "no-doctype-pom.xml", false );
+    // doTest( "something/else/bundle.tar.bz2", "test.tar.bz2", true );
+    // doTest( "something/else/bundle.tbz", "no-doctype-pom.xml", false );
+    // doTest( "something/else/bundle.tbz", "test.tbz", true );
+    // doTest( "something/else/bundle.bz2", "no-doctype-pom.xml", false );
+    // doTest( "something/else/bundle.bz2", "test.bz2", true );
+    // }
+
+    @Test
+    public void testChecksum()
+        throws Exception
+    {
+        doTest( "something/else/file.jar.sha1", "no-doctype-pom.xml", false );
+        doTest( "something/else/file.jar.sha1", "test.md5", false );
+        doTest( "something/else/file.jar.sha1", "test.sha1", true );
+        doTest( "something/else/file.jar.md5", "no-doctype-pom.xml", false );
+        doTest( "something/else/file.jar.md5", "test.sha1", false );
+        doTest( "something/else/file.jar.md5", "test.md5", true );
     }
 
     // ==

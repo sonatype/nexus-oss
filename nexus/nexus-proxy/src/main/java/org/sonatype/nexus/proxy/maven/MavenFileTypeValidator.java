@@ -63,12 +63,25 @@ public class MavenFileTypeValidator
         supportedTypeMap.put( "ear", Arrays.asList( "application/zip" ) );
         supportedTypeMap.put( "pom", Arrays.asList( "application/x-maven-pom", "application/xml", "text/xml" ) );
         supportedTypeMap.put( "xml", Arrays.asList( "application/xml", "text/xml" ) );
+        supportedTypeMap.put( "tar", Arrays.asList( "application/x-tar" ) );
+        // flex
+        supportedTypeMap.put( "swc", Arrays.asList( "application/zip" ) );
+        supportedTypeMap.put( "swf", Arrays.asList( "application/x-shockwave-flash" ) );
+        // tar.gz
+        supportedTypeMap.put( "gz", Arrays.asList( "application/x-tgz", "application/x-gzip" ) );
+        supportedTypeMap.put( "tgz", Arrays.asList( "application/x-tgz" ) );
+
+        // FIXME NEXUS-4632 eu.medsea.mimeutil.MimeUtil2 is resolving bzip2 to application/octet-stream
+        // tar.bz2
+        // supportedTypeMap.put( "bz2", Arrays.asList( "application/x-bzip", "application/x-bzip-compressed-tar" ) );
+        // supportedTypeMap.put( "tbz", Arrays.asList( "application/x-bzip-compressed-tar" ) );
     }
 
     @Override
     public FileTypeValidity isExpectedFileType( final StorageFileItem file )
     {
-        if ( file.getPath().toLowerCase().endsWith( "pom" ) )
+        final String filePath = file.getPath().toLowerCase();
+        if ( filePath.endsWith( "pom" ) )
         {
             if ( logger.isDebugEnabled() )
             {
@@ -108,13 +121,44 @@ public class MavenFileTypeValidator
 
             return FileTypeValidity.INVALID;
         }
+        else if ( filePath.endsWith( "sha1" ) || filePath.endsWith( "md5" ) )
+        {
+            if ( logger.isDebugEnabled() )
+            {
+                logger.debug( "Checking if Maven checksum: " + file.getRepositoryItemUid().toString() + " is valid." );
+            }
+
+            try
+            {
+                String digest = MUtils.readDigestFromFileItem( file );
+                if ( MUtils.isDigest( digest ) )
+                {
+                    if ( filePath.endsWith( "sha1" ) && digest.length() == 40 )
+                    {
+                        return FileTypeValidity.VALID;
+                    }
+                    if ( filePath.endsWith( "md5" ) && digest.length() == 32 )
+                    {
+                        return FileTypeValidity.VALID;
+                    }
+                }
+                return FileTypeValidity.INVALID;
+            }
+            catch ( IOException e )
+            {
+                logger.warn( "Cannot access content of StorageFileItem: " + file.getRepositoryItemUid().toString(), e );
+
+                return FileTypeValidity.NEUTRAL;
+            }
+
+        }
         else
         {
             Set<String> expectedMimeTypes = new HashSet<String>();
 
             for ( Entry<String, List<String>> entry : supportedTypeMap.entrySet() )
             {
-                if ( file.getPath().toLowerCase().endsWith( entry.getKey() ) )
+                if ( filePath.endsWith( entry.getKey() ) )
                 {
                     expectedMimeTypes.addAll( entry.getValue() );
                 }
