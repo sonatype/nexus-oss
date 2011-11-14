@@ -49,6 +49,7 @@
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
         <repositoryPolicy>RELEASE</repositoryPolicy>
+        <fileTypeValidation>true</fileTypeValidation>
       </externalConfiguration>
     </repository>
     <repository>
@@ -80,6 +81,7 @@
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
         <repositoryPolicy>RELEASE</repositoryPolicy>
+        <fileTypeValidation>false</fileTypeValidation>
       </externalConfiguration>
     </repository>
     <repository>
