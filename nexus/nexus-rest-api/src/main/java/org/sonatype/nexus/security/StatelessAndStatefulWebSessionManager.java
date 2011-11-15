@@ -65,7 +65,7 @@ public class StatelessAndStatefulWebSessionManager
             {
                 // we still need to set the session id, WHY?
                 ( (SimpleSession) session ).setId( fakeSessionIdGenerator.generateId( session ) );
-                log.debug( "Stateless client sesion {} is not persisted.", session.getId() );
+                log.debug( "Stateless client session {} is not persisted.", session.getId() );
             }
             else
             {
