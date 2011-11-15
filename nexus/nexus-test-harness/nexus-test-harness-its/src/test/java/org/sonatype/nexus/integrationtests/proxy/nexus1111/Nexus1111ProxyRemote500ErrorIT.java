@@ -19,8 +19,8 @@
 package org.sonatype.nexus.integrationtests.proxy.nexus1111;
 
 import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+import static org.sonatype.tests.http.server.fluent.Behaviours.error;
 
-import org.mortbay.jetty.Server;
 import org.restlet.data.MediaType;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
@@ -30,6 +30,10 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.sonatype.tests.http.server.api.ServerProvider;
+import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.behaviour.ErrorBehaviour;
+import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -59,9 +63,7 @@ public class Nexus1111ProxyRemote500ErrorIT
         int port = server.getPort();
 
         // start a server which always return HTTP-500 for get
-        Server return500Server = new Server( port );
-        return500Server.setHandler( new Return500Handler() );
-        return500Server.start();
+        Server return500Server = Server.withPort( port ).serve( "/*" ).withBehaviours( error( 500 ) );
 
         // download again
         try

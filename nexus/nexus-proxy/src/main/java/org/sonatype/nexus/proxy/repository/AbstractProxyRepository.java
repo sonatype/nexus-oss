@@ -1081,6 +1081,14 @@ public abstract class AbstractProxyRepository
                             }
 
                         }
+                        catch ( RemoteAccessDeniedException ex )
+                        {
+                            // NEXUS-4593 do not autoblock, 403 is "ok"
+
+                            // do not go remote, but we did not mark it as "remote checked" also.
+                            // let the user do proper setup and probably it will try again
+                            shouldGetRemote = false;
+                        }
                         catch ( RemoteStorageException ex )
                         {
                             autoBlockProxying( ex );
@@ -1116,7 +1124,9 @@ public abstract class AbstractProxyRepository
                         }
                         catch ( StorageException ex )
                         {
-                            if ( ex instanceof RemoteStorageException )
+                            if ( ex instanceof RemoteStorageException
+                                // NEXUS-4593 HTTP status 403 should not lead to autoblock
+                                && !( ex instanceof RemoteAccessDeniedException ) )
                             {
                                 autoBlockProxying( ex );
                             }

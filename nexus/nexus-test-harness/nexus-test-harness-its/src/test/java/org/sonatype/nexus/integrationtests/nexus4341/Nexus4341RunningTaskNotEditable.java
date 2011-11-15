@@ -18,27 +18,25 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4341;
 
+import static org.sonatype.sisu.goodies.common.Time.time;
+import static org.sonatype.tests.http.server.fluent.Behaviours.error;
+import static org.sonatype.tests.http.server.fluent.Behaviours.pause;
+
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.mortbay.jetty.Server;
-import org.mortbay.log.Log;
 import org.restlet.data.Status;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
-import org.sonatype.nexus.integrationtests.proxy.nexus1111.Return500Handler;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.DownloadIndexesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.sonatype.tests.http.server.fluent.Server;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 public class Nexus4341RunningTaskNotEditable
@@ -46,39 +44,32 @@ public class Nexus4341RunningTaskNotEditable
 {
     private static final String REPO_NAME = "release-proxy-repo-1";
 
+    private Server return500Server;
+
     public Nexus4341RunningTaskNotEditable()
     {
         super( REPO_NAME );
     }
 
     private void replaceServer()
-        throws ComponentLookupException, StoppingException, Exception
+        throws Exception
     {
         ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE );
         server.stop();
         int port = server.getPort();
-        Server return500Server = new Server( port );
-        return500Server.setHandler( new Return500Handler()
+
+        return500Server =
+            Server.withPort( port ).serve( "/*" ).withBehaviours( pause( time( 30, TimeUnit.SECONDS ) ), error( 500 ) ).start();
+    }
+
+    @AfterMethod
+    public void stopServer()
+        throws Exception
+    {
+        if ( return500Server != null )
         {
-    
-            @Override
-            public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
-                throws IOException, ServletException
-            {
-                Log.info( "Got connection... Waiting..." );
-                try
-                {
-                    Thread.sleep( 30000 );
-                }
-                catch ( InterruptedException e )
-                {
-                }
-                super.handle( target, request, response, dispatch );
-            }
-    
-        } );
-    
-        return500Server.start();
+            return500Server.stop();
+        }
     }
 
     private void createDownloadIndexesTask( String name )
