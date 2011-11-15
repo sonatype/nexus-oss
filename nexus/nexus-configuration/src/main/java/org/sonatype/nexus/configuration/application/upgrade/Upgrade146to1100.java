@@ -88,9 +88,9 @@ public class Upgrade146to1100
             public CRepository upgradeCRepository( org.sonatype.nexus.configuration.model.v1_4_6.CRepository cRepository )
             {
                 CRepository newRepo = super.upgradeCRepository( cRepository );
-                if ( cRepository.getRemoteStorage() != null )
+                Xpp3Dom dom = (Xpp3Dom) cRepository.getExternalConfiguration();
+                if ( cRepository.getRemoteStorage() != null && dom != null )
                 {
-                    Xpp3Dom dom = (Xpp3Dom) cRepository.getExternalConfiguration();
                     Xpp3Dom validate = dom.getChild( AbstractProxyRepositoryConfiguration.FILE_TYPE_VALIDATION );
                     if ( validate != null )
                     {
