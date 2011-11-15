@@ -203,6 +203,8 @@ public class StatelessAndStatefulWebSessionManager
 
         final String userAgent = getUserAgent( request );
 
+        log.trace( "Found User-Agent: {} in request", userAgent );
+
         if ( userAgent != null && userAgent.trim().length() > 0 )
         {
             // maven 2.0.10+
