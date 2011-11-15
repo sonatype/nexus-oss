@@ -530,10 +530,6 @@ public class CommonsHttpClientRemoteStorage
             // HEAD returned error, but not exception, try GET before failing
             if ( !doGet && response != HttpStatus.SC_OK )
             {
-                // 401 and 403 will throw an exception in executeMethod, no need to check for those here
-                // try with GET unless some known to fail responses are in
-                // doGet = ( response != HttpStatus.SC_UNAUTHORIZED ) && ( response != HttpStatus.SC_FORBIDDEN );
-
                 doGet = true;
 
                 getLogger().debug( "HEAD method failed, will attempt GET.  Status: " + response );
