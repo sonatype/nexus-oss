@@ -43,7 +43,7 @@ import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 public class StatelessAndStatefulWebSessionManager
     extends DefaultWebSessionManager
 {
-    private static final Logger log = LoggerFactory.getLogger( DefaultWebSessionManager.class );
+    private static final Logger log = LoggerFactory.getLogger( StatelessAndStatefulWebSessionManager.class );
 
     public static final String NO_SESSION_HEADER = "X-Nexus-Session";
 
