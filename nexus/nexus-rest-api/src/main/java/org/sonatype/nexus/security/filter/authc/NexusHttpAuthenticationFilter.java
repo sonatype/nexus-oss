@@ -18,12 +18,6 @@
  */
 package org.sonatype.nexus.security.filter.authc;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExpiredCredentialsException;
@@ -33,6 +27,7 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionException;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.codehaus.plexus.PlexusConstants;
@@ -47,6 +42,12 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.rest.RemoteIPFinder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 public class NexusHttpAuthenticationFilter
     extends BasicHttpAuthenticationFilter
@@ -224,12 +225,12 @@ public class NexusHttpAuthenticationFilter
         getLogger().debug( "Attempting to authenticate Subject as Anonymous request..." );
 
         boolean anonymousLoginSuccessful = false;
-        
+
         Subject subject = getSubject( request, response );
 
         UsernamePasswordToken usernamePasswordToken =
             new UsernamePasswordToken( getNexusConfiguration().getAnonymousUsername(),
-                getNexusConfiguration().getAnonymousPassword() );
+                                       getNexusConfiguration().getAnonymousPassword() );
 
         try
         {
@@ -238,12 +239,13 @@ public class NexusHttpAuthenticationFilter
             subject.login( usernamePasswordToken );
             anonymousLoginSuccessful = true;
         }
-        catch( UnknownSessionException e )
+        catch ( UnknownSessionException e )
         {
             Session anonSession = subject.getSession( false );
 
-            this.getLogger().debug( "Unknown session exception while logging in anonymous user: '{}'", anonSession, e );
-            if( anonSession != null )
+            this.getLogger().debug( "Unknown session exception while logging in anonymous user: '{}' with principal '{}'", new Object[]{ anonSession, subject.getPrincipal(), e} );
+
+            if ( anonSession != null )
             {
                 // clear the session
                 this.getLogger().debug( "Logging out the current anonymous user, to clear the session." );
@@ -251,9 +253,10 @@ public class NexusHttpAuthenticationFilter
                 {
                     subject.logout();
                 }
-                catch( UnknownSessionException expectedException )
+                catch ( UnknownSessionException expectedException )
                 {
-                    this.logger.trace( "Forced a logout with an Unknown Session so the current subject would get cleaned up.", e );
+                    this.logger.trace(
+                        "Forced a logout with an Unknown Session so the current subject would get cleaned up.", e );
                 }
 
                 // login again
@@ -265,14 +268,13 @@ public class NexusHttpAuthenticationFilter
         }
         catch ( AuthenticationException ae )
         {
-            getLogger().info(
-                "Unable to authenticate user [anonymous] from IP Address "
-                    + RemoteIPFinder.findIP( (HttpServletRequest) request ) );
+            getLogger().info( "Unable to authenticate user [anonymous] from IP Address " + RemoteIPFinder.findIP(
+                (HttpServletRequest) request ) );
 
             getLogger().debug( "Unable to log in subject as anonymous", ae );
         }
 
-        if( anonymousLoginSuccessful )
+        if ( anonymousLoginSuccessful )
         {
             getLogger().debug( "Successfully logged in as anonymous" );
 
@@ -291,8 +293,12 @@ public class NexusHttpAuthenticationFilter
         if ( applicationEventMulticaster != null )
         {
             applicationEventMulticaster.notifyEventListeners( new NexusAuthenticationEvent( this,
-                new AuthenticationItem( username, RemoteIPFinder.findIP( (HttpServletRequest) request ), userAgent,
-                    success ) ) );
+                                                                                            new AuthenticationItem(
+                                                                                                username,
+                                                                                                RemoteIPFinder.findIP(
+                                                                                                    (HttpServletRequest) request ),
+                                                                                                userAgent,
+                                                                                                success ) ) );
         }
     }
 
@@ -325,28 +331,6 @@ public class NexusHttpAuthenticationFilter
     public void postHandle( ServletRequest request, ServletResponse response )
         throws Exception
     {
-        if ( request.getAttribute( ANONYMOUS_LOGIN ) != null )
-        {
-            try
-            {
-                getSubject( request, response ).logout();
-            }
-            catch ( SessionException e ) //TODO: investigate why this is getting thrown (original issue NEXUS-4267)
-            {
-                // we need to prevent log spam, just log this as trace
-                getLogger().trace( "Failed to find session for anonymous user.", e );
-            }
-            if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
-            {
-                HttpSession session = ( (HttpServletRequest) request ).getSession( false );
-
-                if ( session != null )
-                {
-                    session.invalidate();
-                }
-            }
-        }
-
         if ( request.getAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED ) != null )
         {
             if ( request.getAttribute( ANONYMOUS_LOGIN ) != null )
@@ -372,8 +356,7 @@ public class NexusHttpAuthenticationFilter
                     }
 
                     getLogger().debug(
-                        "Request processing is rejected because user \"" + username + "\" lacks permissions."
-                    );
+                        "Request processing is rejected because user \"" + username + "\" lacks permissions." );
                 }
 
                 sendForbidden( request, response );
@@ -451,7 +434,7 @@ public class NexusHttpAuthenticationFilter
             return null;
         }
 
-        return new String[] { parts[0], decoded.substring( parts[0].length() + 1 ) };
+        return new String[]{ parts[0], decoded.substring( parts[0].length() + 1 ) };
     }
 
     // ==
