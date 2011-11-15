@@ -20,17 +20,20 @@ package org.sonatype.nexus.integrationtests.nexus4593;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.tests.http.server.fluent.Behaviours.error;
 
 import java.io.IOException;
 
-import org.mortbay.jetty.Server;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.sonatype.nexus.test.utils.handler.ReturnErrorHandler;
+import org.sonatype.tests.http.server.api.Behaviour;
+import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.jetty.behaviour.ErrorBehaviour;
+import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -58,29 +61,10 @@ public class Nexus4593NoAutoblockFor403IT
     public void stopServer()
         throws Exception
     {
-        if ( server != null && server.isStarted() )
+        if ( server != null )
         {
             server.stop();
-            for ( int i = 0; i < 10; i++ )
-            {
-                if ( server.isStopped() )
-                {
-                    return;
-                }
-                Thread.sleep( 100 );
-            }
-
-            throw new IllegalStateException( "server did not stop in 1s" );
         }
-    }
-
-    @Test
-    public void test()
-        throws Exception
-    {
-        System.err.println( proxyPort );
-        startErrorServer( 403, true );
-        Thread.sleep( 300000 );
     }
 
     /**
@@ -91,7 +75,7 @@ public class Nexus4593NoAutoblockFor403IT
     public void testNoAutoblockOn403()
         throws Exception
     {
-        startErrorServer( 403, true );
+        startErrorServer( 403 );
 
         try
         {
@@ -112,7 +96,7 @@ public class Nexus4593NoAutoblockFor403IT
         assertThat( ProxyMode.valueOf( getStatus().getProxyMode() ), is( ProxyMode.ALLOW ) );
 
         // 403 for artifact again
-        startErrorServer( 403, true );
+        startErrorServer( 403 );
         // download will not fail because we have a local copy cached, but the remote will be hit b/c maxAge is set to 0
         downloadArtifact( GavUtil.newGav( "nexus4593", "artifact", "1.0.0" ), "target" );
 
@@ -128,7 +112,7 @@ public class Nexus4593NoAutoblockFor403IT
     public void testAutoblockOn401()
         throws Exception
     {
-        startErrorServer( 401, true );
+        startErrorServer( 401 );
 
         try
         {
@@ -151,12 +135,12 @@ public class Nexus4593NoAutoblockFor403IT
     public void testUnAutoblockFor403()
         throws Exception
     {
-        startErrorServer( 403, false );
+        startErrorServer( 403 );
         assertThat( ProxyMode.valueOf( getStatus().getProxyMode() ), is( ProxyMode.BLOCKED_AUTO ) );
 
         for ( int i = 0; i < 10; i++ )
         {
-            if ( ! ProxyMode.valueOf( getStatus().getProxyMode()).equals( ProxyMode.BLOCKED_AUTO ) )
+            if ( !ProxyMode.valueOf( getStatus().getProxyMode() ).equals( ProxyMode.BLOCKED_AUTO ) )
             {
                 break;
             }
@@ -166,26 +150,13 @@ public class Nexus4593NoAutoblockFor403IT
         assertThat( "No UnAutoblock in 10s", ProxyMode.valueOf( getStatus().getProxyMode() ), is( ProxyMode.ALLOW ) );
     }
 
-    private void startErrorServer( final int code, final boolean headOk )
+    private void startErrorServer( final int code )
         throws Exception
     {
         stopServer();
         proxyServer.stop();
 
-        server = new Server( proxyPort );
-        server.setHandler( new ReturnErrorHandler( code, headOk ) );
-        server.start();
-
-        for ( int i = 0; i < 10; i++ )
-        {
-            Thread.sleep( 100 );
-            if ( server.isStarted() )
-            {
-                return;
-            }
-        }
-
-        throw new IllegalStateException( "Server did not start in 1s" );
+        server = Server.withPort( proxyPort ).serve( "/*" ).withBehaviours( error( code ) ).start();
     }
 
     private RepositoryStatusResource getStatus()
