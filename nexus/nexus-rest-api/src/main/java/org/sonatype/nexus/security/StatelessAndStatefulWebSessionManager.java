@@ -57,15 +57,26 @@ public class StatelessAndStatefulWebSessionManager
             log.trace( "Creating session for host {}", session.getHost() );
         }
 
-        if ( WebUtils.isHttp( context ) && isStatelessClient( WebUtils.getHttpRequest( context ) ) )
-        {   
-            // we still need to set the session id, WHY?
-            ( (SimpleSession) session ).setId( fakeSessionIdGenerator.generateId( session ) );
-            log.debug( "Stateless client sesion {} is not persisted.", session.getId() );
-        }
-        else
+        if( WebUtils.isHttp( context ) )
         {
-            create( session );
+            HttpServletRequest request = WebUtils.getHttpRequest( context );
+
+            if ( isStatelessClient( request ) )
+            {
+                // we still need to set the session id, WHY?
+                ( (SimpleSession) session ).setId( fakeSessionIdGenerator.generateId( session ) );
+                log.debug( "Stateless client sesion {} is not persisted.", session.getId() );
+            }
+            else
+            {
+                create( session );
+            }
+
+            // add a little more logging.
+            if ( log.isTraceEnabled() )
+            {
+                log.trace( "Session {} was created for User-Agent {}", session.getId(), getUserAgent( request ) );
+            }
         }
 
         return session;
