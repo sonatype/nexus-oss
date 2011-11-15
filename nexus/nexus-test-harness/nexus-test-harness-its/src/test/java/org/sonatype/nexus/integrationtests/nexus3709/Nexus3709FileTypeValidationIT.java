@@ -21,13 +21,10 @@ package org.sonatype.nexus.integrationtests.nexus3709;
 import java.net.URL;
 
 import org.apache.maven.index.artifact.Gav;
-import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.rest.model.RepositoryProxyResource;
-import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -38,26 +35,6 @@ public class Nexus3709FileTypeValidationIT
     public Nexus3709FileTypeValidationIT()
     {
         super( "nexus3709" );
-    }
-
-    @Override
-    protected void runOnce()
-        throws Exception
-    {
-        super.runOnce();
-
-        // enable file type validation
-        RepositoryMessageUtil repoUtil =
-            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
-
-        RepositoryProxyResource resource =
-            (RepositoryProxyResource) repoUtil.getRepository( this.getTestRepositoryId() );
-        // this should be false to start with
-        Assert.assertTrue( resource.isFileTypeValidation(), "Expected fileTypeValidation to be false after startup." );
-        resource.setFileTypeValidation( true );
-
-        // update it
-        repoUtil.updateRepo( resource );
     }
 
     @Test
