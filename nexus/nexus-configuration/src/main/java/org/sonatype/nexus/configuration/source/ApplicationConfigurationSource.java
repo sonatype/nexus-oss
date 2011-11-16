@@ -48,4 +48,14 @@ public interface ApplicationConfigurationSource
     void backupConfiguration()
         throws IOException;
 
+    /**
+     * Is nexus instance upgraded
+     */
+    boolean isInstanceUpgraded();
+
+    /**
+     * Setter for nexus instance upgraded
+     */
+    void setInstanceUpgraded( boolean instanceUpgraded );
+
 }

@@ -104,7 +104,4 @@ public interface NexusConfiguration
     NexusStreamResponse getConfigurationAsStreamByKey( String key )
         throws IOException;
 
-    String getNexusVersion();
-
-    void setNexusVersion( String version );
 }

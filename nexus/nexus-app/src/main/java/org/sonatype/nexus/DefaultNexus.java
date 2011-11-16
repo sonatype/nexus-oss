@@ -615,20 +615,7 @@ public class DefaultNexus
 
             applicationStatusSource.getSystemStatus().setFirstStart( nexusConfiguration.isConfigurationDefaulted() );
 
-            final String currentVersion = applicationStatusSource.getSystemStatus().getVersion();
-            final String previousVersion = nexusConfiguration.getNexusVersion();
-            if ( currentVersion.equals( previousVersion ) )
-            {
-                applicationStatusSource.getSystemStatus().setInstanceUpgraded( false );
-            }
-            else
-            {
-                applicationStatusSource.getSystemStatus().setInstanceUpgraded( true );
-                nexusConfiguration.setNexusVersion( currentVersion );
-                nexusConfiguration.saveConfiguration();
-                applicationEventMulticaster.notifyEventListeners( new NexusVersionChangedEvent( this, previousVersion,
-                    currentVersion ) );
-            }
+            applicationStatusSource.getSystemStatus().setInstanceUpgraded( nexusConfiguration.isInstanceUpgraded() );
 
             applicationStatusSource.getSystemStatus().setConfigurationUpgraded( nexusConfiguration.isConfigurationUpgraded() );
 
