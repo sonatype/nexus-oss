@@ -148,15 +148,7 @@ public class TaskHelperPlexusResource
 
     private boolean isTaskCompleted( ScheduledTask<?> task )
     {
-        // always have to wait for internal tasks
-        if ( RunNowSchedule.class.isAssignableFrom( task.getClass() ) )
-        {
-            return false;
-        }
-
-        // otherwise, just check the status
         return !task.getTaskState().isActiveOrSubmitted();
-
     }
 
     private ScheduledTask<?> getTaskByName( String name )
