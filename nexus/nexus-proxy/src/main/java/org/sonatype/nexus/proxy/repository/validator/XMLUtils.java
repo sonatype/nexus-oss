@@ -26,14 +26,38 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator.FileTypeValidity;
 
+/**
+ * Some static helper classes to make "XML like" files probation for some patterns or expected content.
+ * 
+ * @author cstamas
+ */
 public class XMLUtils
 {
+    /**
+     * Validate an "XML like file" using at most 200 lines. See
+     * {@link #validateXmlLikeFile(StorageFileItem, String, int)} for details.
+     * 
+     * @param file
+     * @param expectedPattern
+     * @return
+     * @throws IOException
+     */
     public static FileTypeValidity validateXmlLikeFile( final StorageFileItem file, final String expectedPattern )
         throws IOException
     {
         return validateXmlLikeFile( file, expectedPattern, 200 );
     }
 
+    /**
+     * Validate an "XML like file" by searching for passed in patterns (using plain string matching), consuming at most
+     * lines as passed in as parameter.
+     * 
+     * @param file
+     * @param expectedPattern
+     * @param linesToCheck
+     * @return
+     * @throws IOException
+     */
     public static FileTypeValidity validateXmlLikeFile( final StorageFileItem file, final String expectedPattern,
                                                         final int linesToCheck )
         throws IOException
