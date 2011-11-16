@@ -107,21 +107,4 @@ public class DefaultMimeSupportTest
     {
         assertThat( mimeSupport.guessMimeTypeFromPath( null, "/some/path/artifact.pom" ), equalTo( "application/xml" ) );
     }
-
-    @Test
-    public void testGuessMimesTypeFromPath()
-    {
-        System.out.println( mimeSupport.guessMimeTypesFromPath( "/some/path/artifact.pom" ) );
-        System.out.println( mimeSupport.guessMimeTypesFromPath( "/some/path/artifact.jar" ) );
-        System.out.println( mimeSupport.guessMimeTypesFromPath( "/some/path/artifact-sources.jar" ) );
-        System.out.println( mimeSupport.guessMimeTypesFromPath( "/some/path/maven-metadata.xml" ) );
-        System.out.println( mimeSupport.guessMimeTypesFromPath( "/some/path/some.xml" ) );
-        System.out.println( mimeSupport.guessMimeTypesFromPath( "/some/path/some.tar.gz" ) );
-        System.out.println( mimeSupport.guessMimeTypesFromPath( "/some/path/some.tar.bz2" ) );
-        System.out.println( mimeSupport.guessMimeTypesFromPath( "/some/path/some.zip" ) );
-        System.out.println( mimeSupport.guessMimeTypesFromPath( "/some/path/some.war" ) );
-        System.out.println( mimeSupport.guessMimeTypesFromPath( "/some/path/some.ear" ) );
-        System.out.println( mimeSupport.guessMimeTypesFromPath( "/some/path/some.ejb" ) );
-    }
-
 }
