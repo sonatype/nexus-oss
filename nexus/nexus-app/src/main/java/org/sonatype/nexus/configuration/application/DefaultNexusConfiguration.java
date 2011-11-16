@@ -924,5 +924,4 @@ public class DefaultNexusConfiguration
     {
         return this.securitySystem;
     }
-
 }

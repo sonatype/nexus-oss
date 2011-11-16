@@ -103,5 +103,4 @@ public interface NexusConfiguration
      */
     NexusStreamResponse getConfigurationAsStreamByKey( String key )
         throws IOException;
-
 }
