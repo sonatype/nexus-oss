@@ -155,12 +155,8 @@ public class TaskHelperPlexusResource
         }
 
         // otherwise, just check the status
-        if ( TaskState.RUNNING.equals( task.getTaskState() ) || TaskState.SLEEPING.equals( task.getTaskState() ) )
-        {
-            return false;
-        }
+        return !task.getTaskState().isActiveOrSubmitted();
 
-        return true;
     }
 
     private ScheduledTask<?> getTaskByName( String name )
