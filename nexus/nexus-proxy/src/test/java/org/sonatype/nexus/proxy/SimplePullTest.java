@@ -120,13 +120,20 @@ public class SimplePullTest
         Collection<StorageItem> dir = ( (StorageCollectionItem) item ).list();
         // we should have listed in root only those things/dirs we pulled, se above!
         assertEquals( 4, dir.size() );
+        
+        // SO FAR, IT's OLD Unit test, except CacheCreate events were changed (it was Cache event).
+        // Now below, we add some more, to cover NXCM-3525 too:
 
         // NXCM-3525
-        // Now we expire local cache, and touch the "remote" files and do it again
+        // Now we expire local cache, and touch the "remote" files to make it newer and hence, to
+        // make nexus refetch them and do all the pulls again:
+        
+        // expire caches
         getRepositoryRegistry().getRepository( "repo1" ).expireCaches( new ResourceStoreRequest( "/" ) );
         getRepositoryRegistry().getRepository( "repo2" ).expireCaches( new ResourceStoreRequest( "/" ) );
         getRepositoryRegistry().getRepository( "repo3" ).expireCaches( new ResourceStoreRequest( "/" ) );
 
+        // touch remote files
         final long now = System.currentTimeMillis();
         getRemoteFile( getRepositoryRegistry().getRepository( "repo1" ),
             "/activemq/activemq-core/1.2/activemq-core-1.2.jar" ).setLastModified( now );
@@ -136,6 +143,7 @@ public class SimplePullTest
             now );
         getRemoteFile( getRepositoryRegistry().getRepository( "repo3" ), "/repo3.txt" ).setLastModified( now );
 
+        // and here we go again
         getTestEventListener().reset();
 
         item =
