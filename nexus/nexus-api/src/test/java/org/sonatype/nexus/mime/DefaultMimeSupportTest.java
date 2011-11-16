@@ -53,7 +53,7 @@ public class DefaultMimeSupportTest
         assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/maven-metadata.xml" ), equalTo( "application/xml" ) );
         assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/some.xml" ), equalTo( "application/xml" ) );
         assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/some.tar.gz" ), equalTo( "application/x-gzip" ) );
-        assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/some.tar.bz2" ), equalTo( "application/x-bzip2" ) );
+        assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/some.tar.bz2" ), equalTo( "application/x-bzip" ) );
         assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/some.zip" ), equalTo( "application/zip" ) );
         assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/some.war" ), equalTo( "application/zip" ) );
         assertThat( mimeSupport.guessMimeTypeFromPath( "/some/path/some.ear" ), equalTo( "application/zip" ) );
