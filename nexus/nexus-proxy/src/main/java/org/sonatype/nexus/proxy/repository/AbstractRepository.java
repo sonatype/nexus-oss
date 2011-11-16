@@ -1002,6 +1002,8 @@ public abstract class AbstractRepository
 
         uidUploaderLock.lock( Action.create );
 
+        final Action action = getResultingActionOnWrite( item.getResourceStoreRequest() );
+
         try
         {
             // NEXUS-4550: we are shared-locking the actual UID (to not prevent downloaders while
@@ -1030,8 +1032,6 @@ public abstract class AbstractRepository
 
         // remove the "request" item from n-cache if there
         removeFromNotFoundCache( item.getResourceStoreRequest() );
-
-        final Action action = getResultingActionOnWrite( item.getResourceStoreRequest() );
 
         if ( Action.create.equals( action ) )
         {

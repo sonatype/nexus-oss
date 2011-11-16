@@ -867,6 +867,8 @@ public abstract class AbstractProxyRepository
 
             itemLock.lock( Action.create );
 
+            final Action action = getResultingActionOnWrite( item.getResourceStoreRequest() );
+
             try
             {
                 getLocalStorage().storeItem( this, item );
@@ -881,7 +883,7 @@ public abstract class AbstractProxyRepository
                 itemLock.unlock();
             }
 
-            final Action action = getResultingActionOnWrite( item.getResourceStoreRequest() );
+            result.getItemContext().putAll( item.getItemContext() );
 
             if ( Action.create.equals( action ) )
             {
@@ -891,8 +893,6 @@ public abstract class AbstractProxyRepository
             {
                 getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventCacheUpdate( this, result ) );
             }
-
-            result.getItemContext().putAll( item.getItemContext() );
         }
         catch ( ItemNotFoundException ex )
         {
