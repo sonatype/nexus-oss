@@ -23,17 +23,10 @@ import java.io.IOException;
 
 import org.apache.maven.index.artifact.Gav;
 import org.restlet.data.MediaType;
-import org.restlet.data.Response;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.ProxyMode;
-import org.sonatype.nexus.proxy.repository.RemoteStatus;
-import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.sonatype.nexus.test.utils.RepositoryStatusMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
@@ -115,4 +108,5 @@ public abstract class AbstractNexusProxyIntegrationTest
         FileTestingUtils.interpolationDirectoryCopy( source, new File( localStorageDir ), getTestProperties() );
 
     }
+
 }

@@ -32,6 +32,8 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.LinkPersister;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
@@ -96,6 +98,7 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
 
         // create Repository Mock
         Repository repository = mock( Repository.class );
+        when( repository.getRepositoryKind() ).thenReturn( new DefaultRepositoryKind( HostedRepository.class, null) );
         when( repository.getLocalUrl() ).thenReturn( repoLocation.toURI().toURL().toString() );
         AttributesHandler attributesHandler = mock( AttributesHandler.class );
         when( repository.getAttributesHandler() ).thenReturn( attributesHandler );

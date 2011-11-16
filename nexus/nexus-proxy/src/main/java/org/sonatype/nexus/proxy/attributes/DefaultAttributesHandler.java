@@ -29,10 +29,9 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -44,17 +43,30 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
  * The Class DefaultAttributesHandler.
- * 
+ *
  * @author cstamas
  */
 @Component( role = AttributesHandler.class )
 public class DefaultAttributesHandler
+    extends AbstractLoggingComponent
     implements AttributesHandler
 {
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    /**
+     * Default value of lastRequested attribute updates resolution: 12h
+     */
+    private static final long LAST_REQUESTED_ATTRIBUTE_RESOLUTION_DEFAULT = 43200000L;
+
+    /**
+     * The value of lastRequested attribute updates resolution. Is enforced to be positive long. Setting it to 0 makes
+     * Nexus behave in "old" (update always) way.
+     */
+    private static final long LAST_REQUESTED_ATTRIBUTE_RESOLUTION =
+        Math.abs( SystemPropertiesHelper.getLong( "nexus.attributes.lastRequestedResolution",
+                                                  LAST_REQUESTED_ATTRIBUTE_RESOLUTION_DEFAULT ) );
 
     /**
      * The application configuration.
@@ -82,14 +94,9 @@ public class DefaultAttributesHandler
 
     // ==
 
-    protected Logger getLogger()
-    {
-        return logger;
-    }
-
     /**
      * Gets the attribute storage.
-     * 
+     *
      * @return the attribute storage
      */
     public AttributeStorage getAttributeStorage()
@@ -99,7 +106,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the attribute storage.
-     * 
+     *
      * @param attributeStorage the new attribute storage
      */
     public void setAttributeStorage( AttributeStorage attributeStorage )
@@ -109,7 +116,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the item inspector list.
-     * 
+     *
      * @return the item inspector list
      */
     public List<StorageItemInspector> getItemInspectorList()
@@ -119,7 +126,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the item inspector list.
-     * 
+     *
      * @param itemInspectorList the new item inspector list
      */
     public void setItemInspectorList( List<StorageItemInspector> itemInspectorList )
@@ -129,7 +136,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the file item inspector list.
-     * 
+     *
      * @return the file item inspector list
      */
     public List<StorageFileItemInspector> getFileItemInspectorList()
@@ -139,7 +146,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the file item inspector list.
-     * 
+     *
      * @param fileItemInspectorList the new file item inspector list
      */
     public void setFileItemInspectorList( List<StorageFileItemInspector> fileItemInspectorList )
@@ -261,14 +268,25 @@ public class DefaultAttributesHandler
                                         StorageItem storageItem )
         throws ItemNotFoundException, LocalStorageException
     {
-        // TODO: touch it only if this is user-originated request
+        // Touch it only if this is user-originated request (request incoming over HTTP, not a plugin or "internal" one)
         // Currently, we test for IP address presence, since that makes sure it is user request (from REST API) and not
         // a request from "internals" (ie. a running task).
         if ( request.getRequestContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
         {
-            storageItem.setLastRequested( timestamp );
+            final long diff = timestamp - storageItem.getLastRequested();
 
-            getAttributeStorage().putAttribute( storageItem );
+            // if timestamp < storageItem.getLastRequested() => diff will be negative => DO THE UPDATE
+            // ie. programatically "resetting" lastAccessTime to some past point for whatever reason
+            // if timestamp == to storageItem.getLastRequested() => diff will be 0 => SKIP THE UPDATE
+            // ie. trying to set to same value, just lessen the needless IO since values are already equal
+            // if timestamp > storageItem.getLastRequested() => diff will be positive => DO THE UPDATE IF diff bigger than resolution
+            // ie. the "usual" case, obey the resolution then
+            if ( diff < 0 || ( ( diff > 0 ) && ( diff > LAST_REQUESTED_ATTRIBUTE_RESOLUTION ) ) )
+            {
+                storageItem.setLastRequested( timestamp );
+
+                getAttributeStorage().putAttribute( storageItem );
+            }
         }
     }
 
@@ -283,9 +301,9 @@ public class DefaultAttributesHandler
 
     /**
      * Expand custom item attributes.
-     * 
-     * @param item the item
-     * @param inputStream the input stream
+     *
+     * @param item    the item
+     * @param content the input stream
      */
     protected void expandCustomItemAttributes( StorageItem item, ContentLocator content )
     {
@@ -333,7 +351,7 @@ public class DefaultAttributesHandler
                         // unpack the file
                         tmpFile =
                             File.createTempFile( "px-" + item.getName(), ".tmp",
-                                applicationConfiguration.getTemporaryDirectory() );
+                                                 applicationConfiguration.getTemporaryDirectory() );
 
                         inputStream = content.getContent();
 

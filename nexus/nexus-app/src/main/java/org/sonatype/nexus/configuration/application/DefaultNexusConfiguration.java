@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -243,7 +244,7 @@ public class DefaultNexusConfiguration
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
             String userId = null;
-            Subject subject = securitySystem.getSubject();
+            Subject subject = ThreadContext.getSubject(); // Use ThreadContext directly, SecurityUtils will associate a new Subject with the thread.
             if ( subject != null && subject.getPrincipal() != null )
             {
                 userId = subject.getPrincipal().toString();
