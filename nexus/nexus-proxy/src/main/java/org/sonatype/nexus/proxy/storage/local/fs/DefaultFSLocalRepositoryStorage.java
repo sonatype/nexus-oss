@@ -33,7 +33,7 @@ import javax.inject.Inject;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -52,6 +52,7 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.AbstractLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
@@ -79,14 +80,13 @@ public class DefaultFSLocalRepositoryStorage
     private static final boolean touchLastRequestedForProxyRepositories = SystemPropertiesHelper.getBoolean(
         "nexus.ls.file.touchLastRequested.proxy", touchLastRequested );
 
-
     private FSPeer fsPeer;
 
     @Inject
-    public DefaultFSLocalRepositoryStorage( Wastebasket wastebasket, LinkPersister linkPersister, MimeUtil mimeUtil,
-                                            Map<String, Long> repositoryContexts, FSPeer fsPeer )
+    public DefaultFSLocalRepositoryStorage( Wastebasket wastebasket, LinkPersister linkPersister,
+                                            MimeSupport mimeSupport, Map<String, Long> repositoryContexts, FSPeer fsPeer )
     {
-        super( wastebasket, linkPersister, mimeUtil, repositoryContexts );
+        super( wastebasket, linkPersister, mimeSupport, repositoryContexts );
         this.fsPeer = fsPeer;
     }
 
@@ -300,7 +300,8 @@ public class DefaultFSLocalRepositoryStorage
                 {
                     DefaultStorageFileItem file =
                         new DefaultStorageFileItem( repository, request, target.canRead(), target.canWrite(),
-                            new FileContentLocator( target, getMimeUtil().getMimeType( target ) ) );
+                            new FileContentLocator( target, getMimeSupport().guessRepositoryMimeTypeFromPath(
+                                repository, target.getAbsolutePath() ) ) );
                     repository.getAttributesHandler().fetchAttributes( file );
                     file.setModified( target.lastModified() );
                     file.setCreated( target.lastModified() );
@@ -334,23 +335,28 @@ public class DefaultFSLocalRepositoryStorage
 
         return result;
     }
-    
+
     protected boolean doTouchLastRequested( final Repository repository )
     {
         // the "default"
         boolean doTouch = touchLastRequested;
 
-        if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
+        final RepositoryKind repositoryKind = repository.getRepositoryKind();
+
+        if ( repositoryKind != null )
         {
-            // this is a hosted repository
-            doTouch = touchLastRequestedForHostedRepositories;
+            if ( repositoryKind.isFacetAvailable( HostedRepository.class ) )
+            {
+                // this is a hosted repository
+                doTouch = touchLastRequestedForHostedRepositories;
+            }
+            else if ( repositoryKind.isFacetAvailable( ProxyRepository.class ) )
+            {
+                // this is a proxy repository
+                doTouch = touchLastRequestedForProxyRepositories;
+            }
         }
-        else if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            // this is a proxy repository
-            doTouch = touchLastRequestedForProxyRepositories;
-        }
-        
+
         return doTouch;
     }
 
@@ -492,9 +498,10 @@ public class DefaultFSLocalRepositoryStorage
                 {
                     result.add( retrieveItemFromFile( repository, collMemberReq, file ) );
                 }
-                catch( ItemNotFoundException e)
+                catch ( ItemNotFoundException e )
                 {
-                    getLogger().debug( "ItemNotFoundException while listing directory, for request: {}", collMemberReq.getRequestPath(), e );
+                    getLogger().debug( "ItemNotFoundException while listing directory, for request: {}",
+                        collMemberReq.getRequestPath(), e );
                 }
 
                 request.popRequestPath();

@@ -31,7 +31,7 @@ import java.util.zip.ZipFile;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.logging.Slf4jPlexusLogger;
-import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.mime.MimeSupport;
 
 public abstract class AbstractDocumentationNexusResourceBundle
     implements NexusDocumentationBundle
@@ -39,7 +39,7 @@ public abstract class AbstractDocumentationNexusResourceBundle
     private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     @Requirement
-    private MimeUtil mimeUtil;
+    private MimeSupport mimeSupport;
 
     protected Logger getLogger()
     {
@@ -78,7 +78,7 @@ public abstract class AbstractDocumentationNexusResourceBundle
                 // system-wide clashes are much harder to resolve
                 String path = "/" + getPluginId() + "/" + getUrlSnippet() + name;
 
-                resources.add( new DefaultStaticResource( url, path, mimeUtil.getMimeType( name ) ) );
+                resources.add( new DefaultStaticResource( url, path, mimeSupport.guessMimeTypeFromPath( name ) ) );
             }
 
             if ( getLogger().isDebugEnabled() )

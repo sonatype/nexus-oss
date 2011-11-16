@@ -42,6 +42,7 @@ import org.sonatype.guice.nexus.binders.NexusAnnotatedBeanModule;
 import org.sonatype.guice.plexus.binders.PlexusXmlBeanModule;
 import org.sonatype.guice.plexus.config.PlexusBeanModule;
 import org.sonatype.inject.Parameters;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
@@ -85,7 +86,7 @@ public final class DefaultNexusPluginManager
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
     @Inject
-    private MimeUtil mimeUtil;
+    private MimeSupport mimeSupport;
 
     @Inject
     private DefaultPlexusContainer container;
@@ -319,7 +320,7 @@ public final class DefaultNexusPluginManager
             final String path = getPublishedPath( url );
             if ( path != null )
             {
-                staticResources.add( new PluginStaticResource( url, path, mimeUtil.getMimeType( url ) ) );
+                staticResources.add( new PluginStaticResource( url, path, mimeSupport.guessMimeTypeFromPath( url.getPath() ) ) );
             }
         }
 

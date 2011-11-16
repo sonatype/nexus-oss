@@ -92,7 +92,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
-import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -194,7 +194,7 @@ public class DefaultIndexerManager
     private ArtifactContextProducer artifactContextProducer;
 
     @Requirement
-    private MimeUtil mimeUtil;
+    private MimeSupport mimeSupport;
 
     @Requirement
     private IndexTreeView indexTreeView;
@@ -1367,7 +1367,7 @@ public class DefaultIndexerManager
             ResourceStoreRequest request = new ResourceStoreRequest( path );
             DefaultStorageFileItem fItem =
                 new DefaultStorageFileItem( repository, request, true, true, new PreparedContentLocator( fis,
-                    mimeUtil.getMimeType( file ) ) );
+                    mimeSupport.guessRepositoryMimeTypeFromPath( repository, file.getAbsolutePath() ) ) );
 
             if ( context.getTimestamp() == null )
             {
@@ -2334,10 +2334,9 @@ public class DefaultIndexerManager
 
     private void logAlreadyBeingIndexed( final String repositoryId, final String processName )
     {
-        getLogger().info( String.format(
-            "Repository '%s' is already in the process of being re-indexed. Skipping %s'.",
-            repositoryId, processName
-        ) );
+        getLogger().info(
+            String.format( "Repository '%s' is already in the process of being re-indexed. Skipping %s'.",
+                repositoryId, processName ) );
     }
 
 }

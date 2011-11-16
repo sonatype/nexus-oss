@@ -18,39 +18,46 @@
  */
 package org.sonatype.nexus.mime;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
+import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.proxy.item.ContentLocator;
+import org.sonatype.nexus.proxy.repository.Repository;
+
+import com.google.common.base.Strings;
+import com.google.common.io.Closeables;
 
 import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil2;
 import eu.medsea.mimeutil.detector.ExtensionMimeDetector;
 import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
 
-@Deprecated
-@Component( role = MimeUtil.class )
-public class DefaultMimeUtil
-    implements MimeUtil
+@Component( role = MimeSupport.class )
+public class DefaultMimeSupport
+    extends AbstractLoggingComponent
+    implements MimeSupport
 {
-    private MimeUtil2 nonTouchingMimeUtil;
+    private final MimeUtil2 nonTouchingMimeUtil;
 
-    private MimeUtil2 touchingMimeUtil;
+    private final MimeUtil2 touchingMimeUtil;
 
-    public DefaultMimeUtil()
+    public DefaultMimeSupport()
     {
         // MimeUtil2 by design will start (try to) read the file/stream if some "eager" detector is registered
         // so we follow the "private instance" pattern, and we handle two instances for now
-        
+
         // uses Extension only for now (speed, no IO, but less accuracy)
+        // See src/main/resources/mime-types.properties for customizations
         nonTouchingMimeUtil = new MimeUtil2();
         nonTouchingMimeUtil.registerMimeDetector( ExtensionMimeDetector.class.getName() );
 
         // uses magic-mime (IO and lower speed but more accuracy)
+        // See src/main/resources/magic.mime for customizations
         touchingMimeUtil = new MimeUtil2();
         touchingMimeUtil.registerMimeDetector( MagicMimeMimeDetector.class.getName() );
     }
@@ -66,66 +73,68 @@ public class DefaultMimeUtil
     }
 
     @Override
-    public String getMimeType( String fileName )
+    public String guessRepositoryMimeTypeFromPath( final Repository repository, final String path )
     {
-        return MimeUtil2.getMostSpecificMimeType( getNonTouchingMimeUtil2().getMimeTypes( fileName ) ).toString();
+        return guessMimeTypeFromPath( repository.getMimeRulesSource(), path );
     }
 
     @Override
-    public String getMimeType( File file )
+    public String guessMimeTypeFromPath( final MimeRulesSource mimeRulesSource, final String path )
     {
-        return MimeUtil2.getMostSpecificMimeType( getNonTouchingMimeUtil2().getMimeTypes( file ) ).toString();
+        if ( mimeRulesSource != null )
+        {
+            final String hardRule = mimeRulesSource.getRuleForPath( path );
+
+            if ( !Strings.isNullOrEmpty( hardRule ) )
+            {
+                return hardRule;
+            }
+        }
+
+        return guessMimeTypeFromPath( path );
     }
 
     @Override
-    public String getMimeType( URL url )
+    public String guessMimeTypeFromPath( final String path )
     {
-        return MimeUtil2.getMostSpecificMimeType( getNonTouchingMimeUtil2().getMimeTypes( url ) ).toString();
+        return MimeUtil2.getMostSpecificMimeType( getNonTouchingMimeUtil2().getMimeTypes( path ) ).toString();
     }
 
     @Override
-    public String getMimeType( InputStream is )
+    public Set<String> guessMimeTypesFromPath( final String path )
     {
-        return MimeUtil2.getMostSpecificMimeType( getTouchingMimeUtil2().getMimeTypes( is ) ).toString();
+        return toStringSet( getNonTouchingMimeUtil2().getMimeTypes( path ) );
     }
 
     @Override
-    @SuppressWarnings( "unchecked" )
-    public Set<String> getMimeTypes( String fileName )
+    public Set<String> detectMimeTypesFromContent( final ContentLocator content )
+        throws IOException
     {
-        return this.toStringSet( getNonTouchingMimeUtil2().getMimeTypes( fileName ) );
-    }
-
-    @Override
-    @SuppressWarnings( "unchecked" )
-    public Set<String> getMimeTypes( File file )
-    {
-        return this.toStringSet( getNonTouchingMimeUtil2().getMimeTypes( file ) );
-    }
-
-    @Override
-    @SuppressWarnings( "unchecked" )
-    public Set<String> getMimeTypes( URL url )
-    {
-        return this.toStringSet( getNonTouchingMimeUtil2().getMimeTypes( url ) );
-    }
-
-    @Override
-    @SuppressWarnings( "unchecked" )
-    public Set<String> getMimeTypes( InputStream is )
-    {
-        return toStringSet( getTouchingMimeUtil2().getMimeTypes( is ) );
+        Set<String> magicMimeTypes = new HashSet<String>();
+        BufferedInputStream bis = null;
+        try
+        {
+            magicMimeTypes.addAll( toStringSet( getTouchingMimeUtil2().getMimeTypes(
+                bis = new BufferedInputStream( content.getContent() ) ) ) );
+        }
+        finally
+        {
+            Closeables.closeQuietly( bis );
+        }
+        return magicMimeTypes;
     }
 
     // ==
 
-    private Set<String> toStringSet( Collection<MimeType> mimeTypes )
+    @SuppressWarnings( "unchecked" )
+    private Set<String> toStringSet( final Collection<?> mimeTypes )
     {
         Set<String> result = new HashSet<String>();
-        for ( MimeType mimeType : mimeTypes )
+        for ( MimeType mimeType : (Collection<MimeType>) mimeTypes )
         {
             result.add( mimeType.toString() );
         }
         return result;
     }
+
 }

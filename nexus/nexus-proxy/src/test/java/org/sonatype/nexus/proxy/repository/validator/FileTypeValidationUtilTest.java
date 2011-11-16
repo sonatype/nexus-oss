@@ -29,12 +29,17 @@ import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.maven.MavenFileTypeValidator;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
 
+/**
+ * This test actually tests MavenFileTypeValidator. Also, it uses non-LAX XML validation! This test would pass in LAX
+ * XML validation too, except one assertion, see testPom() for why's.
+ */
 public class FileTypeValidationUtilTest
     extends AbstractNexusTestCase
 {
@@ -64,6 +69,13 @@ public class FileTypeValidationUtilTest
         doTest( "something/else/myapp.pom", "pom.xml", true );
         doTest( "something/else/myapp.xml", "pom.xml", true );
         doTest( "something/else/myapp.xml", "simple.xml", true );
+        // Note: this last line makes this test fail for LAX XML validation
+        // In LAX mode, we do not expect from XML to have preamble but do expect it to be "plain text"
+        // Obviously, the HTML used for testing passes here.
+        // The point is, that the path "myapp.xml" is not a POM path despite this test
+        // is named as such, hence, this is actually XML validation test.
+        // And since we agreed to lax XML validation (many XMLs lacks the preamble)
+        // we cannot decide this below, unless LAX XML validation is OFF
         doTest( "something/else/myapp.xml", "error.html", false );
     }
 
@@ -105,18 +117,17 @@ public class FileTypeValidationUtilTest
         doTest( "something/else/bundle.gz", "test.gz", true );
     }
 
-    // @Test
-    // public void testTarBz2()
-    // throws Exception
-    // {
-    // FIXME NEXUS-4632 eu.medsea.mimeutil.MimeUtil2 is resolving bzip2 to application/octet-stream
-    // doTest( "something/else/bundle.tar.bz2", "no-doctype-pom.xml", false );
-    // doTest( "something/else/bundle.tar.bz2", "test.tar.bz2", true );
-    // doTest( "something/else/bundle.tbz", "no-doctype-pom.xml", false );
-    // doTest( "something/else/bundle.tbz", "test.tbz", true );
-    // doTest( "something/else/bundle.bz2", "no-doctype-pom.xml", false );
-    // doTest( "something/else/bundle.bz2", "test.bz2", true );
-    // }
+    @Test
+    public void testTarBz2()
+        throws Exception
+    {
+        doTest( "something/else/bundle.tar.bz2", "no-doctype-pom.xml", false );
+        doTest( "something/else/bundle.tar.bz2", "test.tar.bz2", true );
+        doTest( "something/else/bundle.tbz", "no-doctype-pom.xml", false );
+        doTest( "something/else/bundle.tbz", "test.tbz", true );
+        doTest( "something/else/bundle.bz2", "no-doctype-pom.xml", false );
+        doTest( "something/else/bundle.bz2", "test.bz2", true );
+    }
 
     @Test
     public void testChecksum()
@@ -164,6 +175,7 @@ public class FileTypeValidationUtilTest
         DefaultStorageFileItem file =
             new DefaultStorageFileItem( getDummyRepository(), new ResourceStoreRequest( expectedFileName ), true, true,
                 new FileContentLocator( testFile, "this-is-neglected-in-this-test" ) );
+        file.getItemContext().put( MavenFileTypeValidator.XML_DETECTION_LAX_KEY, "false" );
 
         boolean result = getValidationUtil().isExpectedFileType( file );
 

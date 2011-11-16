@@ -18,7 +18,6 @@
  */
 package org.sonatype.nexus.proxy.repository.validator;
 
-import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;

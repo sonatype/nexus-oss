@@ -23,27 +23,86 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Set;
 
+import org.sonatype.nexus.proxy.item.StorageFileItem;
+
 /**
  * A simple component that hides MIME detection code. Singular methods returns the "best" applicable MIME type, while
  * plural methods returns all detected MIME types in ascending order.
  * 
  * @author cstamas
+ * @deprecated Use {@link MimeSupport} instead.
  */
 public interface MimeUtil
 {
+    /**
+     * Returns the most applicable MIME type from "guessed" ones, based on path (usually extension).
+     * 
+     * @param fileName
+     * @return
+     * @deprecated Use {@link #guessMimeTypeFromPath(String)} instead.
+     */
     String getMimeType( String fileName );
 
+    /**
+     * See {@link #getMimeType(String)}.
+     * 
+     * @param file
+     * @return
+     * @deprecated Use {@link #guessMimeTypeFromPath(String)} instead.
+     */
     String getMimeType( File file );
 
+    /**
+     * Returns the most applicable MIME type from "guessed" ones, based on path portion of URL (usually extension).
+     * 
+     * @param url
+     * @return
+     * @deprecated Use {@link #guessMimeTypeFromPath(String)} instead.
+     */
     String getMimeType( URL url );
 
+    /**
+     * Returns the most applicable MIME type from detected ones, based on stream content (using "magic" matching).
+     * 
+     * @param is
+     * @return
+     * @deprecated Use {@link #detectMimeTypesFromContent(StorageFileItem)} instead.
+     */
     String getMimeType( InputStream is );
 
+    /**
+     * Returns all matched MIME types from "guessed" ones, based on path (usually extension).
+     * 
+     * @param fileName
+     * @return
+     * @deprecated No replacement.
+     */
     Set<String> getMimeTypes( String fileName );
 
+    /**
+     * Returns all matched MIME types from "guessed" ones, based on path (usually extension).
+     * 
+     * @param fileName
+     * @return
+     * @deprecated No replacement.
+     */
     Set<String> getMimeTypes( File file );
 
+    /**
+     * Returns all matched MIME types from "guessed" ones, based on path (usually extension).
+     * 
+     * @param fileName
+     * @return
+     * @deprecated No replacement.
+     */
     Set<String> getMimeTypes( URL url );
 
+    /**
+     * Returns all the MIME types from detected ones, based on stream content (using "magic" matching).
+     * 
+     * @param fileName
+     * @return
+     * @deprecated No replacement.
+     */
     Set<String> getMimeTypes( InputStream is );
 }

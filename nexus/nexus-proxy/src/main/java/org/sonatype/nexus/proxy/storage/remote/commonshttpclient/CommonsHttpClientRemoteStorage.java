@@ -70,7 +70,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 public class CommonsHttpClientRemoteStorage
     extends AbstractRemoteRepositoryStorage
     implements RemoteRepositoryStorage
-{   
+{
     public static final String PROVIDER_STRING = "apacheHttpClient3x";
 
     public static final String CTX_KEY = PROVIDER_STRING;
@@ -80,7 +80,7 @@ public class CommonsHttpClientRemoteStorage
     public static final String CTX_KEY_HTTP_CONFIGURATION = CTX_KEY + ".httpConfiguration";
 
     public static final String CTX_KEY_S3_FLAG = CTX_KEY + ".remoteIsAmazonS3";
-    
+
     public static final String NEXUS_MISSING_ARTIFACT_HEADER = "x-nexus-missing-artifact";
 
     // ===============================================================================
@@ -101,7 +101,7 @@ public class CommonsHttpClientRemoteStorage
             if ( !"http".equals( u.getProtocol().toLowerCase() ) && !"https".equals( u.getProtocol().toLowerCase() ) )
             {
                 throw new RemoteStorageException( "Unsupported protocol, only HTTP/HTTPS protocols are supported: "
-                                            + u.getProtocol().toLowerCase() );
+                    + u.getProtocol().toLowerCase() );
             }
         }
         catch ( MalformedURLException e )
@@ -167,8 +167,8 @@ public class CommonsHttpClientRemoteStorage
                 method.releaseConnection();
 
                 throw new ItemNotFoundException(
-                                                 "The remoteURL we got to looks like is a collection, and Nexus cannot fetch collections over plain HTTP (remoteUrl=\""
-                                                                 + remoteURL.toString() + "\")", request, repository );
+                    "The remoteURL we got to looks like is a collection, and Nexus cannot fetch collections over plain HTTP (remoteUrl=\""
+                        + remoteURL.toString() + "\")", request, repository );
             }
 
             GetMethod get = (GetMethod) method;
@@ -179,7 +179,7 @@ public class CommonsHttpClientRemoteStorage
             {
                 is = get.getResponseBodyAsStream();
                 if ( get.getResponseHeader( "Content-Encoding" ) != null
-                     && "gzip".equals( get.getResponseHeader( "Content-Encoding" ).getValue() ) )
+                    && "gzip".equals( get.getResponseHeader( "Content-Encoding" ).getValue() ) )
                 {
                     is = new GZIPInputStream( is );
                 }
@@ -192,13 +192,12 @@ public class CommonsHttpClientRemoteStorage
                 }
                 else
                 {
-                    mimeType = getMimeUtil().getMimeType( request.getRequestPath() );
+                    mimeType = getMimeSupport().guessRepositoryMimeTypeFromPath( repository, request.getRequestPath() );
                 }
 
                 DefaultStorageFileItem httpItem =
-                    new DefaultStorageFileItem( repository, request, true, true,
-                                                new PreparedContentLocator( new HttpClientInputStream( get, is ),
-                                                                            mimeType ) );
+                    new DefaultStorageFileItem( repository, request, true, true, new PreparedContentLocator(
+                        new HttpClientInputStream( get, is ), mimeType ) );
 
                 if ( get.getResponseContentLength() != -1 )
                 {
@@ -221,8 +220,8 @@ public class CommonsHttpClientRemoteStorage
                 method.releaseConnection();
 
                 throw new RemoteStorageException( "IO Error during response stream handling [repositoryId=\""
-                                            + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
-                                            + "\", remoteUrl=\"" + remoteURL.toString() + "\"]!", ex );
+                    + repository.getId() + "\", requestPath=\"" + request.getRequestPath() + "\", remoteUrl=\""
+                    + remoteURL.toString() + "\"]!", ex );
             }
             catch ( RuntimeException ex )
             {
@@ -238,15 +237,14 @@ public class CommonsHttpClientRemoteStorage
             if ( response == HttpStatus.SC_NOT_FOUND )
             {
                 throw new ItemNotFoundException(
-                                                 "The remoteURL we requested does not exists on remote server (remoteUrl=\""
-                                                                 + remoteURL.toString() + "\")", request, repository );
+                    "The remoteURL we requested does not exists on remote server (remoteUrl=\"" + remoteURL.toString()
+                        + "\")", request, repository );
             }
             else
             {
                 throw new RemoteStorageException( "The method execution returned result code " + response
-                                            + ". [repositoryId=\"" + repository.getId() + "\", requestPath=\""
-                                            + request.getRequestPath() + "\", remoteUrl=\"" + remoteURL.toString()
-                                            + "\"]" );
+                    + ". [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                    + "\", remoteUrl=\"" + remoteURL.toString() + "\"]" );
             }
         }
     }
@@ -269,26 +267,25 @@ public class CommonsHttpClientRemoteStorage
 
         try
         {
-            method.setRequestEntity( new InputStreamRequestEntity( fItem.getInputStream(), fItem.getLength(), fItem
-                            .getMimeType() ) );
+            method.setRequestEntity( new InputStreamRequestEntity( fItem.getInputStream(), fItem.getLength(),
+                fItem.getMimeType() ) );
 
             int response = executeMethod( repository, request, method, remoteURL );
 
             if ( response != HttpStatus.SC_OK && response != HttpStatus.SC_CREATED
-                 && response != HttpStatus.SC_NO_CONTENT && response != HttpStatus.SC_ACCEPTED )
+                && response != HttpStatus.SC_NO_CONTENT && response != HttpStatus.SC_ACCEPTED )
             {
                 throw new RemoteStorageException( "Unexpected response code while executing " + method.getName()
-                                            + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\""
-                                            + request.getRequestPath() + "\", remoteUrl=\"" + remoteURL.toString()
-                                            + "\"]. Expected: \"any success (2xx)\". Received: " + response + " : "
-                                            + HttpStatus.getStatusText( response ) );
+                    + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                    + "\", remoteUrl=\"" + remoteURL.toString() + "\"]. Expected: \"any success (2xx)\". Received: "
+                    + response + " : " + HttpStatus.getStatusText( response ) );
             }
         }
         catch ( IOException e )
         {
             throw new RemoteStorageException( e.getMessage() + " [repositoryId=\"" + repository.getId()
-                                        + "\", requestPath=\"" + request.getRequestPath() + "\", remoteUrl=\""
-                                        + remoteURL.toString() + "\"]", e );
+                + "\", requestPath=\"" + request.getRequestPath() + "\", remoteUrl=\"" + remoteURL.toString() + "\"]",
+                e );
         }
         finally
         {
@@ -297,7 +294,8 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException, RemoteStorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException,
+        RemoteStorageException
     {
         URL remoteURL = getAbsoluteUrlFromBase( repository, request );
 
@@ -308,13 +306,12 @@ public class CommonsHttpClientRemoteStorage
             int response = executeMethod( repository, request, method, remoteURL );
 
             if ( response != HttpStatus.SC_OK && response != HttpStatus.SC_NO_CONTENT
-                 && response != HttpStatus.SC_ACCEPTED )
+                && response != HttpStatus.SC_ACCEPTED )
             {
-                throw new RemoteStorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code "
-                                            + response + " : " + HttpStatus.getStatusText( response )
-                                            + " [repositoryId=\"" + repository.getId() + "\", requestPath=\""
-                                            + request.getRequestPath() + "\", remoteUrl=\"" + remoteURL.toString()
-                                            + "\"]" );
+                throw new RemoteStorageException( "The response to HTTP " + method.getName()
+                    + " was unexpected HTTP Code " + response + " : " + HttpStatus.getStatusText( response )
+                    + " [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                    + "\", remoteUrl=\"" + remoteURL.toString() + "\"]" );
             }
         }
         finally
@@ -332,7 +329,7 @@ public class CommonsHttpClientRemoteStorage
     {
         getLogger().info(
             "Remote storage settings change detected for ProxyRepository ID=\"" + repository.getId() + "\" (\""
-                            + repository.getName() + "\"), updating HttpClient..." );
+                + repository.getName() + "\"), updating HttpClient..." );
 
         HttpClient httpClient = new HttpClient( new CustomMultiThreadedHttpConnectionManager() );
 
@@ -377,8 +374,7 @@ public class CommonsHttpClientRemoteStorage
 
         HttpClient httpClient = (HttpClient) ctx.getContextObject( CTX_KEY_CLIENT );
 
-        HostConfiguration httpConfiguration =
-            (HostConfiguration) ctx.getContextObject( CTX_KEY_HTTP_CONFIGURATION );
+        HostConfiguration httpConfiguration = (HostConfiguration) ctx.getContextObject( CTX_KEY_HTTP_CONFIGURATION );
 
         method.setRequestHeader( new Header( "user-agent", formatUserAgentString( ctx, repository ) ) );
         method.setRequestHeader( new Header( "accept", "*/*" ) );
@@ -409,23 +405,25 @@ public class CommonsHttpClientRemoteStorage
             resultCode = httpClient.executeMethod( httpConfiguration, method );
 
             checkForRemotePeerAmazonS3Storage( repository, method );
-            
+
             Header proxyReturnedErrorHeader = method.getResponseHeader( NEXUS_MISSING_ARTIFACT_HEADER );
-            boolean proxyReturnedError = proxyReturnedErrorHeader != null && Boolean.valueOf( proxyReturnedErrorHeader.getValue() );
+            boolean proxyReturnedError =
+                proxyReturnedErrorHeader != null && Boolean.valueOf( proxyReturnedErrorHeader.getValue() );
 
             if ( resultCode == HttpStatus.SC_FORBIDDEN )
             {
-                throw new RemoteAccessDeniedException( repository, remoteUrl, HttpStatus
-                                .getStatusText( HttpStatus.SC_FORBIDDEN ) );
+                throw new RemoteAccessDeniedException( repository, remoteUrl,
+                    HttpStatus.getStatusText( HttpStatus.SC_FORBIDDEN ) );
             }
             else if ( resultCode == HttpStatus.SC_UNAUTHORIZED )
             {
-                throw new RemoteAuthenticationNeededException( repository, HttpStatus
-                                .getStatusText( HttpStatus.SC_UNAUTHORIZED ) );
+                throw new RemoteAuthenticationNeededException( repository,
+                    HttpStatus.getStatusText( HttpStatus.SC_UNAUTHORIZED ) );
             }
-            else if( resultCode == HttpStatus.SC_OK  && proxyReturnedError )
-            {   
-                throw new RemoteStorageException( "Invalid artifact found, most likely a proxy redirected to an HTML error page." );
+            else if ( resultCode == HttpStatus.SC_OK && proxyReturnedError )
+            {
+                throw new RemoteStorageException(
+                    "Invalid artifact found, most likely a proxy redirected to an HTML error page." );
             }
         }
         catch ( RemoteStorageException e )
@@ -439,16 +437,16 @@ public class CommonsHttpClientRemoteStorage
             method.releaseConnection();
 
             throw new RemoteStorageException( "Protocol error while executing " + method.getName()
-                                        + " method. [repositoryId=\"" + repository.getId() + "\", requestPath=\""
-                                        + request.getRequestPath() + "\", remoteUrl=\"" + methodURI + "\"]", ex );
+                + " method. [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                + "\", remoteUrl=\"" + methodURI + "\"]", ex );
         }
         catch ( IOException ex )
         {
             method.releaseConnection();
 
             throw new RemoteStorageException( "Transport error while executing " + method.getName()
-                                        + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\""
-                                        + request.getRequestPath() + "\", remoteUrl=\"" + methodURI + "\"]", ex );
+                + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                + "\", remoteUrl=\"" + methodURI + "\"]", ex );
         }
 
         return resultCode;
@@ -572,17 +570,16 @@ public class CommonsHttpClientRemoteStorage
                 return makeDateFromHeader( method.getResponseHeader( "last-modified" ) ) > newerThen;
             }
             else if ( ( response >= HttpStatus.SC_MULTIPLE_CHOICES && response < HttpStatus.SC_BAD_REQUEST )
-                      || response == HttpStatus.SC_NOT_FOUND )
+                || response == HttpStatus.SC_NOT_FOUND )
             {
                 return false;
             }
             else
             {
                 throw new RemoteStorageException( "Unexpected response code while executing " + method.getName()
-                                            + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\""
-                                            + request.getRequestPath() + "\", remoteUrl=\"" + remoteURL.toString()
-                                            + "\"]. Expected: \"SUCCESS (200)\". Received: " + response + " : "
-                                            + HttpStatus.getStatusText( response ) );
+                    + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                    + "\", remoteUrl=\"" + remoteURL.toString() + "\"]. Expected: \"SUCCESS (200)\". Received: "
+                    + response + " : " + HttpStatus.getStatusText( response ) );
             }
         }
     }
@@ -606,10 +603,8 @@ public class CommonsHttpClientRemoteStorage
         // if flag is False, we know it is not S3
         // if flag is null, we still did not contact remote, so we were not able to tell yet
         return ctx.hasContextObject( CTX_KEY_S3_FLAG )
-               && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject(
-                   CTX_KEY_S3_FLAG ) ).isFlag() != null
-               && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject(
-                   CTX_KEY_S3_FLAG ) ).isFlag();
+            && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject( CTX_KEY_S3_FLAG ) ).isFlag() != null
+            && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject( CTX_KEY_S3_FLAG ) ).isFlag();
     }
 
     protected void checkForRemotePeerAmazonS3Storage( ProxyRepository repository, HttpMethod method )
@@ -619,8 +614,7 @@ public class CommonsHttpClientRemoteStorage
 
         // we already know the result, do nothing
         if ( ctx.hasContextObject( CTX_KEY_S3_FLAG )
-             && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject(
-                 CTX_KEY_S3_FLAG ) ).isFlag() != null )
+            && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject( CTX_KEY_S3_FLAG ) ).isFlag() != null )
         {
             return;
         }
@@ -637,11 +631,12 @@ public class CommonsHttpClientRemoteStorage
 
         if ( isAmazonS3 )
         {
-            getLogger().warn( "The proxy repository \""
-                                                + repository.getName()
-                                                + "\" (ID="
-                                                + repository.getId()
-                                                + ") is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of your setup (baseUrl of proxy repository)!" );
+            getLogger().warn(
+                "The proxy repository \""
+                    + repository.getName()
+                    + "\" (ID="
+                    + repository.getId()
+                    + ") is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of your setup (baseUrl of proxy repository)!" );
         }
     }
 

@@ -28,7 +28,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.logging.Slf4jPlexusLogger;
-import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
@@ -48,7 +48,7 @@ public abstract class AbstractRemoteRepositoryStorage
     private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     @Requirement
-    private MimeUtil mimeUtil;
+    private MimeSupport mimeSupport;
 
     @Requirement
     private ApplicationStatusSource applicationStatusSource;
@@ -66,9 +66,9 @@ public abstract class AbstractRemoteRepositoryStorage
         return logger;
     }
 
-    protected MimeUtil getMimeUtil()
+    protected MimeSupport getMimeSupport()
     {
-        return mimeUtil;
+        return mimeSupport;
     }
 
     /**
