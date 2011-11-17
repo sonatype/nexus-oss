@@ -67,15 +67,21 @@ public class DefaultLdapConnector
     public Set<String> getUserRoles( String userId )
         throws LdapDAOException, NoLdapUserRolesFoundException
     {
+        LdapContext context = null;
         try
         {
-            return this.getUserRoles( userId, this.getLdapContextFactory().getSystemLdapContext(), this
+            context = this.getLdapContextFactory().getSystemLdapContext();
+            return this.getUserRoles( userId, context, this
                 .getLdapAuthConfiguration() );
         }
         catch ( NamingException e )
         {
             String message = "Failed to retrieve ldap user roles for user" + userId;
             throw new LdapDAOException( message, e );
+        }
+        finally
+        {
+            this.closeContext( context );
         }
     }
 
