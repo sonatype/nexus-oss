@@ -229,9 +229,15 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
       }, {
         name : 'schedule'
       }, {
-        name : 'nextRunTime'
+        name : 'nextRunTimeInMillis',
+        convert : function(v) {
+          return v?new Date(v):'n/a';
+        }
       }, {
-        name : 'lastRunTime'
+        name : 'lastRunTimeInMillis',
+        convert : function(v) {
+          return v?new Date(v):'n/a';
+        }
       }, {
         name : 'lastRunResult'
       }]);
@@ -913,22 +919,22 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
             }, {
               header : 'Status',
               dataIndex : 'readableStatus',
-              width : 175,
+              width : 100,
               id : 'schedule-config-service-status-col'
             }, {
               header : 'Schedule',
               dataIndex : 'schedule',
-              width : 175,
+              width : 100,
               id : 'schedule-config-service-schedule-col'
             }, {
               header : 'Next Run',
-              dataIndex : 'nextRunTime',
-              width : 175,
+              dataIndex : 'nextRunTimeInMillis',
+              width : 250,
               id : 'schedule-config-service-next-run-col'
             }, {
               header : 'Last Run',
-              dataIndex : 'lastRunTime',
-              width : 175,
+              dataIndex : 'lastRunTimeInMillis',
+              width : 250,
               id : 'schedule-config-service-last-run-col'
             }, {
               header : 'Last Result',
@@ -1374,8 +1380,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               readableStatus : receivedData.readableStatus,
               alertEmail : receivedData.resource.alertEmail,
               schedule : receivedData.resource.schedule,
-              nextRunTime : receivedData.nextRunTime,
-              lastRunTime : receivedData.lastRunTime,
+              nextRunTimeInMillis : receivedData.nextRunTimeInMillis?new Date(receivedData.nextRunTimeInMillis):'n/a',
+              lastRunTimeInMillis : receivedData.lastRunTimeInMillis?new Date(receivedData.lastRunTimeInMillis):'n/a',
               lastRunResult : receivedData.lastRunResult
             };
 
@@ -1483,8 +1489,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         rec.set('alertEmail', receivedData.resource.alertEmail);
         rec.set('schedule', receivedData.resource.schedule);
         rec.set('readableStatus', receivedData.readableStatus);
-        rec.set('nextRunTime', receivedData.nextRunTime);
-        rec.set('lastRunTime', receivedData.lastRunTime);
+        rec.set('nextRunTimeInMillis', receivedData.nextRunTimeInMillis?new Date(receivedData.nextRunTimeInMillis):'n/a');
+        rec.set('lastRunTimeInMillis', receivedData.lastRunTimeInMillis?new Date(receivedData.lastRunTimeInMillis):'n/a');
         rec.set('lastRunResult', receivedData.lastRunResult);
         rec.commit();
         rec.endEdit();

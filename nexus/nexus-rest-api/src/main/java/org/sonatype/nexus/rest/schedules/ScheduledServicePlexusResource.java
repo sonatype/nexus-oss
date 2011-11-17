@@ -196,6 +196,18 @@ public class ScheduledServicePlexusResource
                 resourceStatus.setLastRunResult( getLastRunResult( task ) );
                 resourceStatus.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
                 resourceStatus.setNextRunTime( task.getNextRun() == null ? "n/a" : task.getNextRun().toString() );
+                if ( task.getScheduledAt() != null )
+                {
+                    resourceStatus.setCreatedInMillis( task.getScheduledAt().getTime() );
+                }
+                if ( task.getLastRun() != null )
+                {
+                    resourceStatus.setLastRunTimeInMillis( task.getLastRun().getTime() );
+                }
+                if ( task.getNextRun() != null )
+                {
+                    resourceStatus.setNextRunTimeInMillis( task.getNextRun().getTime() );
+                }
 
                 result = new ScheduledServiceResourceStatusResponse();
                 result.setData( resourceStatus );

@@ -515,14 +515,14 @@ public abstract class AbstractScheduledServicePlexusResource
         return resource;
     }
 
-    protected <T> String getNextRunTime( ScheduledTask<T> task )
+    protected <T> Date getNextRunTime( ScheduledTask<T> task )
     {
-        String nextRunTime = "n/a";
+        Date nextRunTime = null;
 
         // Run now type tasks should never have a next run time
         if ( !task.getSchedule().getClass().isAssignableFrom( RunNowSchedule.class ) && task.getNextRun() != null )
         {
-            nextRunTime = task.getNextRun().toString();
+            nextRunTime = task.getNextRun();
         }
 
         return nextRunTime;

@@ -19,6 +19,7 @@
 package org.sonatype.nexus.rest.schedules;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
@@ -67,6 +68,8 @@ public class ScheduledServiceListPlexusResource
     extends AbstractScheduledServicePlexusResource
 {
     public static final String RESOURCE_URI = "/schedules";
+
+    private static final Long UNKNOWN = null;
 
     public ScheduledServiceListPlexusResource()
     {
@@ -163,7 +166,20 @@ public class ScheduledServiceListPlexusResource
                     }
                     item.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
                     item.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
-                    item.setNextRunTime( getNextRunTime( task ) );
+                    final Date nextRunTime = getNextRunTime( task );
+                    item.setNextRunTime( nextRunTime == null ? "n/a" : nextRunTime.toString() );
+                    if ( task.getScheduledAt() != null )
+                    {
+                        item.setCreatedInMillis( task.getScheduledAt().getTime() );
+                    }
+                    if ( task.getLastRun() != null )
+                    {
+                        item.setLastRunTimeInMillis( task.getLastRun().getTime() );
+                    }
+                    if ( nextRunTime != null )
+                    {
+                        item.setNextRunTimeInMillis( nextRunTime.getTime() );
+                    }
                     item.setSchedule( getScheduleShortName( task.getSchedule() ) );
                     item.setEnabled( task.isEnabled() );
 
@@ -225,6 +241,18 @@ public class ScheduledServiceListPlexusResource
                 resourceStatus.setLastRunResult( TaskState.BROKEN.equals( task.getTaskState() ) ? "Error" : "Ok" );
                 resourceStatus.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
                 resourceStatus.setNextRunTime( task.getNextRun() == null ? "n/a" : task.getNextRun().toString() );
+                if ( task.getScheduledAt() != null )
+                {
+                    resourceStatus.setCreatedInMillis( task.getScheduledAt().getTime() );
+                }
+                if ( task.getLastRun() != null )
+                {
+                    resourceStatus.setLastRunTimeInMillis( task.getLastRun().getTime() );
+                }
+                if ( task.getNextRun() != null )
+                {
+                    resourceStatus.setNextRunTimeInMillis( task.getNextRun().getTime() );
+                }
 
                 result = new ScheduledServiceResourceStatusResponse();
                 result.setData( resourceStatus );

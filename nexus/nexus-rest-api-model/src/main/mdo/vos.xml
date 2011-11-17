@@ -1772,14 +1772,35 @@
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
-          <description>The result of the last service run.</description>
+          <description>The result of the last scheduled service run.</description>
         </field>
         <field>
           <name>created</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
-          <description>The date the service was created.</description>
+          <description>The date the scheduled service was created.</description>
+        </field>
+        <field>
+          <name>nextRunTimeInMillis</name>
+          <version>1.0.0+</version>
+          <type>Long</type>
+          <required>true</required>
+          <description>The next time the scheduled service will run (in milliseconds).</description>
+        </field>
+        <field>
+          <name>lastRunTimeInMillis</name>
+          <version>1.0.0+</version>
+          <type>Long</type>
+          <required>true</required>
+          <description>The last time the scheduled service ran (in milliseconds).</description>
+        </field>
+        <field>
+          <name>createdInMillis</name>
+          <version>1.0.0+</version>
+          <type>Long</type>
+          <required>true</required>
+          <description>The date the scheduled service was created (in milliseconds).</description>
         </field>
       </fields>
     </class>
@@ -1873,6 +1894,27 @@
           <type>String</type>
           <required>true</required>
           <description>The date the service was created.</description>
+        </field>
+        <field>
+          <name>nextRunTimeInMillis</name>
+          <version>1.0.0+</version>
+          <type>Long</type>
+          <required>true</required>
+          <description>The next time the scheduled service will run (in milliseconds).</description>
+        </field>
+        <field>
+          <name>lastRunTimeInMillis</name>
+          <version>1.0.0+</version>
+          <type>Long</type>
+          <required>true</required>
+          <description>The last time the scheduled service ran (in milliseconds).</description>
+        </field>
+        <field>
+          <name>createdInMillis</name>
+          <version>1.0.0+</version>
+          <type>Long</type>
+          <required>true</required>
+          <description>The date the scheduled service was created (in milliseconds).</description>
         </field>
       </fields>
     </class>
