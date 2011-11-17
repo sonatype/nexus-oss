@@ -38,6 +38,7 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
+import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
 
 @Component( role = PlexusResource.class, hint = "TaskHelperResource" )
@@ -148,10 +149,33 @@ public class TaskHelperPlexusResource
 
     private boolean isTaskCompleted( ScheduledTask<?> task )
     {
-        return TaskState.WAITING.equals( task.getTaskState() )
-            || TaskState.FINISHED.equals( task.getTaskState() )
-            || TaskState.BROKEN.equals( task.getTaskState() )
-            || TaskState.CANCELLED.equals( task.getTaskState() );
+        if ( task.getSchedule() instanceof RunNowSchedule )
+        {
+            // runNow scheduled tasks will _dissapear_ when done. So, the fact they are PRESENT simply
+            // means they are not YET complete
+            return false;
+        }
+        else
+        {
+            final TaskState state = task.getTaskState();
+
+            if ( task.getSchedule() instanceof ManualRunSchedule )
+            {
+                // MnuallRunSchedule stuff goes back to SUBMITTED state and sit there for next "kick"
+                // but we _know_ it ran once at least if lastRun date != null AND is in some of the following
+                // states
+                // Note: I _think_ ManualRunScheduled task never go into WAITING state! (unverified claim)
+                return task.getLastRun() != null
+                    && ( TaskState.SUBMITTED.equals( state ) || TaskState.WAITING.equals( state )
+                        || TaskState.FINISHED.equals( state ) || TaskState.BROKEN.equals( state ) || TaskState.CANCELLED.equals( state ) );
+            }
+            else
+            {
+                // the rest of tasks are completed if in any of these statuses
+                return TaskState.WAITING.equals( state ) || TaskState.FINISHED.equals( state )
+                    || TaskState.BROKEN.equals( state ) || TaskState.CANCELLED.equals( state );
+            }
+        }
     }
 
     private ScheduledTask<?> getTaskByName( String name )
