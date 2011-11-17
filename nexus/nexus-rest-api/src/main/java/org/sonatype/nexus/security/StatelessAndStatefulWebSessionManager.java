@@ -43,7 +43,7 @@ import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 public class StatelessAndStatefulWebSessionManager
     extends DefaultWebSessionManager
 {
-    private static final Logger log = LoggerFactory.getLogger( DefaultWebSessionManager.class );
+    private static final Logger log = LoggerFactory.getLogger( StatelessAndStatefulWebSessionManager.class );
 
     public static final String NO_SESSION_HEADER = "X-Nexus-Session";
 
@@ -57,15 +57,26 @@ public class StatelessAndStatefulWebSessionManager
             log.trace( "Creating session for host {}", session.getHost() );
         }
 
-        if ( WebUtils.isHttp( context ) && isStatelessClient( WebUtils.getHttpRequest( context ) ) )
-        {   
-            // we still need to set the session id, WHY?
-            ( (SimpleSession) session ).setId( fakeSessionIdGenerator.generateId( session ) );
-            log.debug( "Stateless client sesion {} is not persisted.", session.getId() );
-        }
-        else
+        if( WebUtils.isHttp( context ) )
         {
-            create( session );
+            HttpServletRequest request = WebUtils.getHttpRequest( context );
+
+            if ( isStatelessClient( request ) )
+            {
+                // we still need to set the session id, WHY?
+                ( (SimpleSession) session ).setId( fakeSessionIdGenerator.generateId( session ) );
+                log.debug( "Stateless client session {} is not persisted.", session.getId() );
+            }
+            else
+            {
+                create( session );
+            }
+
+            // add a little more logging.
+            if ( log.isTraceEnabled() )
+            {
+                log.trace( "Session {} was created for User-Agent {}", session.getId(), getUserAgent( request ) );
+            }
         }
 
         return session;
@@ -191,6 +202,8 @@ public class StatelessAndStatefulWebSessionManager
         }
 
         final String userAgent = getUserAgent( request );
+
+        log.trace( "Found User-Agent: {} in request", userAgent );
 
         if ( userAgent != null && userAgent.trim().length() > 0 )
         {
