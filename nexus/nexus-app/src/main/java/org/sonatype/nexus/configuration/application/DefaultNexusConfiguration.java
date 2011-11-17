@@ -310,10 +310,7 @@ public class DefaultNexusConfiguration
 
     public boolean isInstanceUpgraded()
     {
-        // TODO: this is not quite true: we might keep model ver but upgrade JARs of Nexus only in a release
-        // we should store the nexus version somewhere in working storage and trigger some household stuff
-        // if version changes.
-        return configurationSource.isConfigurationUpgraded();
+        return configurationSource.isInstanceUpgraded();
     }
 
     public boolean isConfigurationUpgraded()

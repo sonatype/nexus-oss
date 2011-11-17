@@ -16,41 +16,30 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.configuration.source;
+package org.sonatype.nexus.configuration.application.upgrade;
 
-import java.io.IOException;
+import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.SystemState;
+import org.sonatype.nexus.SystemStatus;
 
-import org.sonatype.configuration.source.ConfigurationSource;
-import org.sonatype.nexus.configuration.model.Configuration;
-
-/**
- * The Interface ApplicationConfigurationSource, responsible to fetch Nexus user configuration by some means. It also
- * stores one instance of Configuration object maintained thru life of Nexus. This component is also able to persist
- * user config.
- * 
- * @author cstamas
- */
-public interface ApplicationConfigurationSource
-    extends ConfigurationSource<Configuration>
+@Component(role=ApplicationStatusSource.class)
+public class DummyApplicationStatusSource
+    implements ApplicationStatusSource
 {
-    /**
-     * Returns the configuration that this configuration uses for defaulting.
-     * 
-     * @return a config source that is default source for this config or null
-     */
-    ApplicationConfigurationSource getDefaultsSource();
 
-    /**
-     * Backup the current configuration.
-     * 
-     * @throws IOException
-     */
-    void backupConfiguration()
-        throws IOException;
+    @Override
+    public SystemStatus getSystemStatus()
+    {
+        SystemStatus status = new SystemStatus();
+        status.setVersion( "1.0" );
+        return status;
+    }
 
-    /**
-     * Is nexus instance upgraded
-     */
-    boolean isInstanceUpgraded();
+    @Override
+    public boolean setState( SystemState state )
+    {
+        return false;
+    }
 
 }

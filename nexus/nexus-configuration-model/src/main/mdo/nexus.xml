@@ -59,6 +59,13 @@
           <required>true</required>
         </field>
         <field>
+          <name>nexusVersion</name>
+          <version>1.10.0+</version>
+          <description>The Nexus version. Should be equal to the version of Nexus that stored this configuration.</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
           <name>globalConnectionSettings</name>
           <version>1.4.0+</version>
           <description>

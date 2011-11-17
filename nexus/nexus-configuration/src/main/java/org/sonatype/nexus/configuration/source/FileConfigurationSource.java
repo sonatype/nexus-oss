@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.configuration.source;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -32,6 +34,7 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.application.upgrade.ApplicationConfigurationUpgrader;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
@@ -83,6 +86,9 @@ public class FileConfigurationSource
 
     /** Flag to mark defaulted config */
     private boolean configurationDefaulted;
+
+    @Requirement
+    private ApplicationStatusSource applicationStatusSource;
 
     /**
      * Gets the configuration validator.
@@ -179,6 +185,8 @@ public class FileConfigurationSource
             this.eventMulticaster.notifyEventListeners( new SecurityConfigurationChangedEvent( null ) );
         }
 
+        upgradeNexusVersion();
+
         ValidationResponse vResponse =
             getConfigurationValidator().validateModel( new ValidationRequest( getConfiguration() ) );
 
@@ -199,6 +207,24 @@ public class FileConfigurationSource
         {
             throw new InvalidConfigurationException( vResponse );
         }
+    }
+
+    protected void upgradeNexusVersion()
+        throws IOException
+    {
+        final String currentVersion = checkNotNull( applicationStatusSource.getSystemStatus().getVersion() );
+        final String previousVersion = getConfiguration().getNexusVersion();
+        if ( currentVersion.equals( previousVersion ) )
+        {
+            setInstanceUpgraded( false );
+        }
+        else
+        {
+            setInstanceUpgraded( true );
+            getConfiguration().setNexusVersion( currentVersion );
+            storeConfiguration();
+        }
+
     }
 
     public void storeConfiguration()
