@@ -79,7 +79,7 @@ public class DefaultLdapConnectionTester
         try
         {
             SortedSet<LdapUser> users = this.ldapUserDao.getUsers(
-                ldapContextFactory.getSystemLdapContext(),
+                ctx,
                 ldapAuthConfiguration,
                 numberOfResults );
 
