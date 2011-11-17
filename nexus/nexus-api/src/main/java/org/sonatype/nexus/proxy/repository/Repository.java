@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.sonatype.nexus.configuration.Configurable;
+import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -280,6 +281,14 @@ public interface Repository
 
     // ==================================================
     // LocalStorage et al
+
+    /**
+     * Returns the Repository specific MIME rules source.
+     * 
+     * @return
+     * @since 1.10.0
+     */
+    MimeRulesSource getMimeRulesSource();
 
     /**
      * Returns the attribute handler used by repository.

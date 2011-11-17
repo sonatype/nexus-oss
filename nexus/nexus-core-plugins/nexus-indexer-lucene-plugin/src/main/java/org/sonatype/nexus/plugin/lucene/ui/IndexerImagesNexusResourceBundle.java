@@ -24,7 +24,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.plugins.rest.AbstractNexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.DefaultStaticResource;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
@@ -37,7 +37,7 @@ public class IndexerImagesNexusResourceBundle
 {
 
     @Inject
-    private MimeUtil mimeUtil;
+    private MimeSupport mimeSupport;
 
     @Override
     public List<StaticResource> getContributedResouces()
@@ -52,7 +52,7 @@ public class IndexerImagesNexusResourceBundle
     private StaticResource newStaticResource( String path )
     {
         return new DefaultStaticResource( getClass().getResource( "/static" + path ), path,
-            this.mimeUtil.getMimeType( path ) );
+            mimeSupport.guessMimeTypeFromPath( path ));
     }
 
 }

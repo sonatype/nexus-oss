@@ -19,11 +19,25 @@
 
 package org.sonatype.nexus.proxy.storage.local.fs;
 
-import com.google.common.collect.Maps;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -38,20 +52,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import com.google.common.collect.Maps;
 
 /**
  * Tests {@link DefaultFSLocalRepositoryStorage}
@@ -88,7 +89,7 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
         // Mocks
         Wastebasket wastebasket = mock( Wastebasket.class );
         LinkPersister linkPersister = mock( LinkPersister.class );
-        MimeUtil mimeUtil = mock( MimeUtil.class );
+        MimeSupport mimeUtil = mock( MimeSupport.class );
         Map<String, Long> repositoryContexts = Maps.newHashMap();
 
         // Mock FSPeer to return the results created above
@@ -135,7 +136,7 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
         Wastebasket wastebasket = mock( Wastebasket.class );
         Repository repository = mock( Repository.class );
         FSPeer fsPeer = mock( FSPeer.class );
-        MimeUtil mimeUtil = mock( MimeUtil.class );
+        MimeSupport mimeSupport = mock( MimeSupport.class );
         Map<String, Long> repositoryContexts = Maps.newHashMap();
 
         // mock file
@@ -150,7 +151,7 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
         when( linkPersister.isLinkContent( Mockito.any( ContentLocator.class ) ) ).thenThrow( new FileNotFoundException( "Expected to be thrown from mock." ) );
 
         // object to test
-        DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeUtil, repositoryContexts, fsPeer )
+        DefaultFSLocalRepositoryStorage localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeSupport, repositoryContexts, fsPeer )
         {
             // expose protected method
             @Override

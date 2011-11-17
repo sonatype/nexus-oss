@@ -1288,7 +1288,7 @@ public abstract class AbstractProxyRepository
                 {
                     getLogger().info(
                         String.format(
-                            "Proxied item %s evaluated as INVALID during file type validation (validator=%s, sourceUrl=%s)",
+                            "Proxied item %s evaluated as INVALID during content validation (validator=%s, sourceUrl=%s)",
                             item.getRepositoryItemUid().toString(), icventry.getKey(), item.getRemoteUrl() ) );
                 }
 
@@ -1298,7 +1298,7 @@ public abstract class AbstractProxyRepository
             {
                 getLogger().info(
                     String.format(
-                        "Proxied item %s evaluated as INVALID during file type validation (validator=%s, sourceUrl=%s)",
+                        "Proxied item %s evaluated as INVALID during content validation (validator=%s, sourceUrl=%s)",
                         item.getRepositoryItemUid().toString(), icventry.getKey(), item.getRemoteUrl() ), e );
 
                 isValid = false;

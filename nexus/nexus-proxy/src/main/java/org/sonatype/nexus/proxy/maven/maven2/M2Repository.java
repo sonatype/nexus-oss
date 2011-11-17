@@ -374,7 +374,7 @@ public class M2Repository
                     content = mdOutput.toByteArray();
                 }
 
-                String mimeType = getMimeUtil().getMimeType( request.getRequestPath() );
+                String mimeType = getMimeSupport().guessMimeTypeFromPath( getMimeRulesSource(), request.getRequestPath() );
                 ContentLocator contentLocator = new ByteArrayContentLocator( content, mimeType );
 
                 DefaultStorageFileItem result = new DefaultStorageFileItem( this, request, true, false, contentLocator );

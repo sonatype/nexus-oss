@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -60,6 +61,11 @@ public class DummyRepository
     public String getId()
     {
         return id;
+    }
+    
+    public MimeRulesSource getMimeRulesSource()
+    {
+        return MimeRulesSource.NOOP;
     }
 
     public StorageItem retrieveItem( ResourceStoreRequest request )

@@ -29,7 +29,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.mime.MimeUtil;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreIteratorRequest;
@@ -42,8 +42,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
-
-import javax.inject.Inject;
 
 /**
  * Abstract Storage class. It have ID and defines logger. Predefines all write methods to be able to "decorate"
@@ -67,9 +65,9 @@ public abstract class AbstractLocalRepositoryStorage
     private LinkPersister linkPersister;
 
     /**
-     * The MIME util.
+     * The MIME support.
      */
-    private MimeUtil mimeUtil;
+    private MimeSupport mimeSupport;
 
     /**
      * Since storages are shared, we are tracking the last changes from each of them.
@@ -77,12 +75,12 @@ public abstract class AbstractLocalRepositoryStorage
     private Map<String, Long> repositoryContexts = new HashMap<String, Long>();
 
 
-    protected AbstractLocalRepositoryStorage( Wastebasket wastebasket, LinkPersister linkPersister, MimeUtil mimeUtil,
+    protected AbstractLocalRepositoryStorage( Wastebasket wastebasket, LinkPersister linkPersister, MimeSupport mimeSupport,
                                               Map<String, Long> repositoryContexts )
     {
         this.wastebasket = wastebasket;
         this.linkPersister = linkPersister;
-        this.mimeUtil = mimeUtil;
+        this.mimeSupport = mimeSupport;
         this.repositoryContexts = repositoryContexts;
     }
 
@@ -101,9 +99,9 @@ public abstract class AbstractLocalRepositoryStorage
         return linkPersister;
     }
 
-    protected MimeUtil getMimeUtil()
+    protected MimeSupport getMimeSupport()
     {
-        return mimeUtil;
+        return mimeSupport;
     }
 
     // ==

@@ -46,6 +46,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.AbstractHandler;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -434,6 +435,11 @@ public class MavenRepositoryReaderTest
         public FakeProxyRepo( String remoteUrl )
         {
             this.remoteUrl = remoteUrl;
+        }
+
+        public MimeRulesSource getMimeRulesSource()
+        {
+            return MimeRulesSource.NOOP;
         }
 
         public String getProviderRole()

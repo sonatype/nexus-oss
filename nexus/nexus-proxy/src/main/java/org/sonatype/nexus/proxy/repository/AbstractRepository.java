@@ -34,6 +34,8 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.logging.Slf4jPlexusLogger;
+import org.sonatype.nexus.mime.MimeRulesSource;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -132,6 +134,9 @@ public abstract class AbstractRepository
     private MimeUtil mimeUtil;
 
     @Requirement
+    private MimeSupport mimeSupport;
+
+    @Requirement
     private FeedRecorder feedRecorder;
 
     @Requirement( role = ContentGenerator.class )
@@ -165,9 +170,21 @@ public abstract class AbstractRepository
         return logger;
     }
 
+    @Deprecated
     protected MimeUtil getMimeUtil()
     {
         return mimeUtil;
+    }
+
+    protected MimeSupport getMimeSupport()
+    {
+        return mimeSupport;
+    }
+
+    @Override
+    public MimeRulesSource getMimeRulesSource()
+    {
+        return MimeRulesSource.NOOP;
     }
 
     protected FeedRecorder getFeedRecorder()
@@ -645,7 +662,7 @@ public abstract class AbstractRepository
 
         DefaultStorageFileItem fItem =
             new DefaultStorageFileItem( this, request, true, true, new PreparedContentLocator( is,
-                getMimeUtil().getMimeType( request.getRequestPath() ) ) );
+                getMimeSupport().guessMimeTypeFromPath( getMimeRulesSource(), request.getRequestPath() ) ) );
 
         if ( userAttributes != null )
         {
@@ -1329,13 +1346,10 @@ public abstract class AbstractRepository
     }
 
     /**
-     * Whether or not the requested path should be added to NFC.
-     *
-     * Item will be added to NFC if is not local/remote only.
-     *
+     * Whether or not the requested path should be added to NFC. Item will be added to NFC if is not local/remote only.
+     * 
      * @param request resource store request
      * @return true if requested path should be added to NFC
-     *
      * @since 1.10.0
      */
     protected boolean shouldAddToNotFoundCache( final ResourceStoreRequest request )
