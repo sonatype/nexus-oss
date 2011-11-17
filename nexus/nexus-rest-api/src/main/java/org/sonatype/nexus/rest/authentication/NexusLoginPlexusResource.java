@@ -42,9 +42,10 @@ import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 @Component( role = PlexusResource.class, hint = "LoginPlexusResource" )
 @Path( AbstractLoginPlexusResource.RESOURCE_URI )
 @Produces( { "application/xml", "application/json" } )
-public class NexusLogingPlexusResource
+public class NexusLoginPlexusResource
     extends AbstractLoginPlexusResource
 {
+
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {

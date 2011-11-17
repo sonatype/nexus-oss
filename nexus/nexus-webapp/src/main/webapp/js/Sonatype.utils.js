@@ -791,6 +791,18 @@
               {
                 Sonatype.repoServer.RepoServer.loginForm.find('name', 'password')[0].focus(true);
               }
+              
+              Ext.Ajax.request({
+                  scope : this,
+                  method : 'GET',
+                  url : Sonatype.config.repos.urls.logout,
+                  callback : function(options, success, response) {
+                	Sonatype.utils.clearCookie('JSESSIONID');
+                    Sonatype.utils.authToken = null;
+                    Sonatype.view.justLoggedOut = true;
+                  }
+                });
+              
             }
 
           });
