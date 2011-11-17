@@ -50,6 +50,10 @@ import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeSet;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventCacheCreate;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventCacheUpdate;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreUpdate;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
@@ -863,6 +867,8 @@ public abstract class AbstractProxyRepository
 
             itemLock.lock( Action.create );
 
+            final Action action = getResultingActionOnWrite( item.getResourceStoreRequest() );
+
             try
             {
                 getLocalStorage().storeItem( this, item );
@@ -877,9 +883,16 @@ public abstract class AbstractProxyRepository
                 itemLock.unlock();
             }
 
-            getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventCache( this, result ) );
-
             result.getItemContext().putAll( item.getItemContext() );
+
+            if ( Action.create.equals( action ) )
+            {
+                getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventCacheCreate( this, result ) );
+            }
+            else
+            {
+                getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventCacheUpdate( this, result ) );
+            }
         }
         catch ( ItemNotFoundException ex )
         {
