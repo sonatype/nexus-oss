@@ -25,6 +25,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * The event fired on item store when overwrite happens (update).
  * 
  * @author cstamas
+ * @since 1.10.0
  */
 public class RepositoryItemEventStoreUpdate
     extends RepositoryItemEventStore
