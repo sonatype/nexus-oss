@@ -27,7 +27,6 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.ContentLocator;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 import com.google.common.base.Strings;
 import com.google.common.io.Closeables;
@@ -37,6 +36,12 @@ import eu.medsea.mimeutil.MimeUtil2;
 import eu.medsea.mimeutil.detector.ExtensionMimeDetector;
 import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
 
+/**
+ * Default implementation of {@link MimeSupport} component using MimeUtil2 library.
+ * 
+ * @author cstamas
+ * @since 1.10.0
+ */
 @Component( role = MimeSupport.class )
 public class DefaultMimeSupport
     extends AbstractLoggingComponent
@@ -70,12 +75,6 @@ public class DefaultMimeSupport
     protected MimeUtil2 getTouchingMimeUtil2()
     {
         return touchingMimeUtil;
-    }
-
-    @Override
-    public String guessRepositoryMimeTypeFromPath( final Repository repository, final String path )
-    {
-        return guessMimeTypeFromPath( repository.getMimeRulesSource(), path );
     }
 
     @Override

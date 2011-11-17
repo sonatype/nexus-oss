@@ -32,6 +32,13 @@ import eu.medsea.mimeutil.MimeUtil2;
 import eu.medsea.mimeutil.detector.ExtensionMimeDetector;
 import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
 
+/**
+ * Default implementation of {@link MimeUtil} component using MimeUtil2 library.
+ * 
+ * @author cstamas
+ * @deprecated This implementation is deprecated since the {@link MimeUtil} component that this class implements is
+ *             deprecated. See the component interface for substitutions.
+ */
 @Deprecated
 @Component( role = MimeUtil.class )
 public class DefaultMimeUtil
@@ -45,7 +52,7 @@ public class DefaultMimeUtil
     {
         // MimeUtil2 by design will start (try to) read the file/stream if some "eager" detector is registered
         // so we follow the "private instance" pattern, and we handle two instances for now
-        
+
         // uses Extension only for now (speed, no IO, but less accuracy)
         nonTouchingMimeUtil = new MimeUtil2();
         nonTouchingMimeUtil.registerMimeDetector( ExtensionMimeDetector.class.getName() );

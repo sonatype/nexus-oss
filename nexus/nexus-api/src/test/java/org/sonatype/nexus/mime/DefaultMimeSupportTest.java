@@ -22,8 +22,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
 public class DefaultMimeSupportTest
@@ -65,7 +63,7 @@ public class DefaultMimeSupportTest
      * {@link #testGuessMimeTypeFromPath()} passes, their conjunction proves it works.
      */
     @Test
-    public void testGuessRepositoryMimeTypeFromPath()
+    public void testGuessfakeMimeRulesSourceMimeTypeFromPath()
     {
         MimeRulesSource fakeMimeRulesSource = new MimeRulesSource()
         {
@@ -75,30 +73,28 @@ public class DefaultMimeSupportTest
                 return "foo/bar";
             }
         };
-        Repository repository = Mockito.mock( Repository.class );
-        Mockito.when( repository.getMimeRulesSource() ).thenReturn( fakeMimeRulesSource );
 
-        assertThat( mimeSupport.guessRepositoryMimeTypeFromPath( repository, "/some/path/artifact.pom" ),
+        assertThat( mimeSupport.guessMimeTypeFromPath( fakeMimeRulesSource, "/some/path/artifact.pom" ),
             equalTo( "foo/bar" ) );
-        assertThat( mimeSupport.guessRepositoryMimeTypeFromPath( repository, "/some/path/artifact.jar" ),
+        assertThat( mimeSupport.guessMimeTypeFromPath( fakeMimeRulesSource, "/some/path/artifact.jar" ),
             equalTo( "foo/bar" ) );
-        assertThat( mimeSupport.guessRepositoryMimeTypeFromPath( repository, "/some/path/artifact-sources.jar" ),
+        assertThat( mimeSupport.guessMimeTypeFromPath( fakeMimeRulesSource, "/some/path/artifact-sources.jar" ),
             equalTo( "foo/bar" ) );
-        assertThat( mimeSupport.guessRepositoryMimeTypeFromPath( repository, "/some/path/maven-metadata.xml" ),
+        assertThat( mimeSupport.guessMimeTypeFromPath( fakeMimeRulesSource, "/some/path/maven-metadata.xml" ),
             equalTo( "foo/bar" ) );
-        assertThat( mimeSupport.guessRepositoryMimeTypeFromPath( repository, "/some/path/some.xml" ),
+        assertThat( mimeSupport.guessMimeTypeFromPath( fakeMimeRulesSource, "/some/path/some.xml" ),
             equalTo( "foo/bar" ) );
-        assertThat( mimeSupport.guessRepositoryMimeTypeFromPath( repository, "/some/path/some.tar.gz" ),
+        assertThat( mimeSupport.guessMimeTypeFromPath( fakeMimeRulesSource, "/some/path/some.tar.gz" ),
             equalTo( "foo/bar" ) );
-        assertThat( mimeSupport.guessRepositoryMimeTypeFromPath( repository, "/some/path/some.tar.bz2" ),
+        assertThat( mimeSupport.guessMimeTypeFromPath( fakeMimeRulesSource, "/some/path/some.tar.bz2" ),
             equalTo( "foo/bar" ) );
-        assertThat( mimeSupport.guessRepositoryMimeTypeFromPath( repository, "/some/path/some.zip" ),
+        assertThat( mimeSupport.guessMimeTypeFromPath( fakeMimeRulesSource, "/some/path/some.zip" ),
             equalTo( "foo/bar" ) );
-        assertThat( mimeSupport.guessRepositoryMimeTypeFromPath( repository, "/some/path/some.war" ),
+        assertThat( mimeSupport.guessMimeTypeFromPath( fakeMimeRulesSource, "/some/path/some.war" ),
             equalTo( "foo/bar" ) );
-        assertThat( mimeSupport.guessRepositoryMimeTypeFromPath( repository, "/some/path/some.ear" ),
+        assertThat( mimeSupport.guessMimeTypeFromPath( fakeMimeRulesSource, "/some/path/some.ear" ),
             equalTo( "foo/bar" ) );
-        assertThat( mimeSupport.guessRepositoryMimeTypeFromPath( repository, "/some/path/some.ejb" ),
+        assertThat( mimeSupport.guessMimeTypeFromPath( fakeMimeRulesSource, "/some/path/some.ejb" ),
             equalTo( "foo/bar" ) );
     }
 

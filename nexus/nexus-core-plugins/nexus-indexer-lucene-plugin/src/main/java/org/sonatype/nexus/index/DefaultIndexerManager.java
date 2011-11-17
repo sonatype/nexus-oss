@@ -1367,7 +1367,7 @@ public class DefaultIndexerManager
             ResourceStoreRequest request = new ResourceStoreRequest( path );
             DefaultStorageFileItem fItem =
                 new DefaultStorageFileItem( repository, request, true, true, new PreparedContentLocator( fis,
-                    mimeSupport.guessRepositoryMimeTypeFromPath( repository, file.getAbsolutePath() ) ) );
+                    mimeSupport.guessMimeTypeFromPath( repository.getMimeRulesSource(), file.getAbsolutePath() ) ) );
 
             if ( context.getTimestamp() == null )
             {

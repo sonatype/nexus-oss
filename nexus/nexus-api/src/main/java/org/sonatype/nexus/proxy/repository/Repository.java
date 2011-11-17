@@ -286,6 +286,7 @@ public interface Repository
      * Returns the Repository specific MIME rules source.
      * 
      * @return
+     * @since 1.10.0
      */
     MimeRulesSource getMimeRulesSource();
 

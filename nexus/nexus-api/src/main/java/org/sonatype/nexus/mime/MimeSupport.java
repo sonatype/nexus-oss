@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Set;
 
 import org.sonatype.nexus.proxy.item.ContentLocator;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * A utility component for working with MIME type detection, either "without touching" (the content), that is
@@ -34,17 +33,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public interface MimeSupport
 {
-    /**
-     * Makes a "guess" (usually based on file extension) about the MIME type that is most applicable to the given path
-     * taking into consideration the requester Repository MIME rules. See
-     * {@link #guessMimeTypeFromPath(MimeRulesSource, String)} for details. This method should be used
-     * whenever a MIME type of a file item that is contained <b>within</b> given repository is about to be guessed.
-     * 
-     * @param path to guess for.
-     * @return the most applicable MIME type as String.
-     */
-    String guessRepositoryMimeTypeFromPath( Repository repository, String path );
-
     /**
      * Makes a "guess" (usually based on file extension) about the MIME type that is most applicable to the given path
      * taking into consideration the requester MimeRulesSource MIME rules. When no "hard rule" present from

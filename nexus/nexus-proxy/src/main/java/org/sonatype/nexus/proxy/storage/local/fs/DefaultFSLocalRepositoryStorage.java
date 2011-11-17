@@ -300,8 +300,8 @@ public class DefaultFSLocalRepositoryStorage
                 {
                     DefaultStorageFileItem file =
                         new DefaultStorageFileItem( repository, request, target.canRead(), target.canWrite(),
-                            new FileContentLocator( target, getMimeSupport().guessRepositoryMimeTypeFromPath(
-                                repository, target.getAbsolutePath() ) ) );
+                            new FileContentLocator( target, getMimeSupport().guessMimeTypeFromPath(
+                                repository.getMimeRulesSource(), target.getAbsolutePath() ) ) );
                     repository.getAttributesHandler().fetchAttributes( file );
                     file.setModified( target.lastModified() );
                     file.setCreated( target.lastModified() );

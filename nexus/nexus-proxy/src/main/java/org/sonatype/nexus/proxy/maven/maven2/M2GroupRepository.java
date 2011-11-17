@@ -332,7 +332,7 @@ public class M2GroupRepository
         String digestFileName = request.getRequestPath() + "." + algorithm.toLowerCase();
 
         // see nexus-configuration mime-types.properties (defaulted to text/plain, as central reports them)
-        String mimeType = getMimeSupport().guessRepositoryMimeTypeFromPath( this, digestFileName );
+        String mimeType = getMimeSupport().guessMimeTypeFromPath( getMimeRulesSource(), digestFileName );
 
         byte[] bytes = ( digest + '\n' ).getBytes( "UTF-8" );
 
@@ -354,7 +354,7 @@ public class M2GroupRepository
     {
         // we are creating file maven-metadata.xml, and ask the MimeUtil for it's exact MIME type to honor potential
         // user configuration
-        String mimeType = getMimeSupport().guessRepositoryMimeTypeFromPath( this, "maven-metadata.xml" );
+        String mimeType = getMimeSupport().guessMimeTypeFromPath( getMimeRulesSource(), "maven-metadata.xml" );
 
         ContentLocator contentLocator = new ByteArrayContentLocator( content, mimeType );
 

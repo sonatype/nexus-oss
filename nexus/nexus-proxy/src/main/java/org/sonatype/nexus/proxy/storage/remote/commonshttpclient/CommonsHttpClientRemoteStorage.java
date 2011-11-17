@@ -192,7 +192,7 @@ public class CommonsHttpClientRemoteStorage
                 }
                 else
                 {
-                    mimeType = getMimeSupport().guessRepositoryMimeTypeFromPath( repository, request.getRequestPath() );
+                    mimeType = getMimeSupport().guessMimeTypeFromPath( repository.getMimeRulesSource(), request.getRequestPath() );
                 }
 
                 DefaultStorageFileItem httpItem =

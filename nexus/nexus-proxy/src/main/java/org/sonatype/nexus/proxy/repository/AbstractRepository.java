@@ -662,7 +662,7 @@ public abstract class AbstractRepository
 
         DefaultStorageFileItem fItem =
             new DefaultStorageFileItem( this, request, true, true, new PreparedContentLocator( is,
-                getMimeSupport().guessRepositoryMimeTypeFromPath( this, request.getRequestPath() ) ) );
+                getMimeSupport().guessMimeTypeFromPath( getMimeRulesSource(), request.getRequestPath() ) ) );
 
         if ( userAttributes != null )
         {
