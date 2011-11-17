@@ -148,7 +148,10 @@ public class TaskHelperPlexusResource
 
     private boolean isTaskCompleted( ScheduledTask<?> task )
     {
-        return !task.getTaskState().isActiveOrSubmitted();
+        return TaskState.WAITING.equals( task.getTaskState() )
+            || TaskState.FINISHED.equals( task.getTaskState() )
+            || TaskState.BROKEN.equals( task.getTaskState() )
+            || TaskState.CANCELLED.equals( task.getTaskState() );
     }
 
     private ScheduledTask<?> getTaskByName( String name )
