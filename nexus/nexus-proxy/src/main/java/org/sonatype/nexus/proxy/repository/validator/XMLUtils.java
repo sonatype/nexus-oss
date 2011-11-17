@@ -27,20 +27,22 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.validator.FileTypeValidator.FileTypeValidity;
 
 /**
- * Some static helper classes to make "XML like" files probation for some patterns or expected content.
+ * Static helper methods to make "XML like" files probation against some patterns or expected content easier and
+ * reusable.
  * 
  * @author cstamas
+ * @since 1.10.0
  */
 public class XMLUtils
 {
     /**
-     * Validate an "XML like file" using at most 200 lines. See
+     * Validate an "XML like file" using at most 200 lines from it's beginning. See
      * {@link #validateXmlLikeFile(StorageFileItem, String, int)} for details.
      * 
-     * @param file
-     * @param expectedPattern
-     * @return
-     * @throws IOException
+     * @param file file who's content needs to be checked for.
+     * @param expectedPattern the expected String pattern to search for.
+     * @return {@link FileTypeValidity.VALID} if pattern found, {@link FileTypeValidity.INVALID} otherwise.
+     * @throws IOException in case of IO problem while reading file content.
      */
     public static FileTypeValidity validateXmlLikeFile( final StorageFileItem file, final String expectedPattern )
         throws IOException
@@ -52,17 +54,17 @@ public class XMLUtils
      * Validate an "XML like file" by searching for passed in patterns (using plain string matching), consuming at most
      * lines as passed in as parameter.
      * 
-     * @param file
-     * @param expectedPattern
-     * @param linesToCheck
-     * @return
-     * @throws IOException
+     * @param file file who's content needs to be checked for.
+     * @param expectedPattern the expected String pattern to search for.
+     * @param linesToCheck amount of lines (as detected by Scanner) to consume during check.
+     * @return {@link FileTypeValidity.VALID} if pattern found, {@link FileTypeValidity.INVALID} otherwise.
+     * @throws IOException in case of IO problem while reading file content.
      */
     public static FileTypeValidity validateXmlLikeFile( final StorageFileItem file, final String expectedPattern,
                                                         final int linesToCheck )
         throws IOException
     {
-        int lineCount = 0; // only process a few lines
+        int lineCount = 0;
         BufferedInputStream bis = null;
         try
         {
