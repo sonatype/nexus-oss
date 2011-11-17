@@ -94,13 +94,23 @@ public class SnapshotRemoverTask
                              Boolean.toString( removeIfReleaseExists ) );
     }
 
+    public boolean isDeleteImmediately()
+    {
+        return Boolean.parseBoolean( getParameters().get( SnapshotRemovalTaskDescriptor.DELETE_IMMEDIATELY ) );
+    }
+
+    public void setDeleteImmediately( boolean deleteImmediately )
+    {
+        getParameters().put( SnapshotRemovalTaskDescriptor.DELETE_IMMEDIATELY, Boolean.toString( deleteImmediately ) );
+    }
+
     @Override
     public SnapshotRemovalResult doRun()
         throws Exception
     {
         SnapshotRemovalRequest req =
             new SnapshotRemovalRequest( getRepositoryId(), getMinSnapshotsToKeep(), getRemoveOlderThanDays(),
-                isRemoveIfReleaseExists() );
+                isRemoveIfReleaseExists(), isDeleteImmediately());
 
         return snapshotRemover.removeSnapshots( req );
     }

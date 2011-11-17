@@ -35,11 +35,23 @@ public class SnapshotRemovalRequest
     
     private final Set<String> processedRepos;
 
-    public SnapshotRemovalRequest( String repositoryId, int minCountOfSnapshotsToKeep,
-        int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists )
-    {
-        super();
+    private final boolean deleteImmediately;
 
+    /**
+     * Old behavior without changing trash or delete (always trash).
+     * <p/>
+     * (see NEXUS-4579)
+     */
+    public SnapshotRemovalRequest( String repositoryId, int minCountOfSnapshotsToKeep,
+                                   int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists )
+    {
+
+        this( repositoryId, minCountOfSnapshotsToKeep, removeSnapshotsOlderThanDays, removeIfReleaseExists, false );
+    }
+
+    public SnapshotRemovalRequest( String repositoryId, int minCountOfSnapshotsToKeep,
+                                   int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists, boolean deleteImmediately )
+    {
         this.repositoryId = repositoryId;
 
         this.minCountOfSnapshotsToKeep = minCountOfSnapshotsToKeep;
@@ -49,9 +61,12 @@ public class SnapshotRemovalRequest
         this.removeIfReleaseExists = removeIfReleaseExists;
 
         this.metadataRebuildPaths = new HashSet<String>();
-        
+
         this.processedRepos = new HashSet<String>();
+
+        this.deleteImmediately = deleteImmediately;
     }
+
 
     public String getRepositoryId()
     {
@@ -86,5 +101,10 @@ public class SnapshotRemovalRequest
     public boolean isProcessedRepo( String repoId )
     {
         return this.processedRepos.contains( repoId );
+    }
+
+    public boolean isDeleteImmediately()
+    {
+        return deleteImmediately;
     }
 }

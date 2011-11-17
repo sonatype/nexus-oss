@@ -60,6 +60,7 @@ import org.sonatype.nexus.proxy.walker.DottedStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
+import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
 import org.sonatype.nexus.util.ItemPathUtils;
 import org.sonatype.scheduling.TaskUtil;
 
@@ -205,6 +206,8 @@ public class DefaultSnapshotRemover
         DefaultWalkerContext ctxMain =
             new DefaultWalkerContext( repository, new ResourceStoreRequest( "/" ), new DottedStoreWalkerFilter() );
 
+        ctxMain.getContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, getDeleteOperation( request ) );
+
         ctxMain.getProcessors().add( snapshotRemoveProcessor );
 
         walker.walk( ctxMain );
@@ -229,7 +232,7 @@ public class DefaultSnapshotRemover
         repository.expireCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
 
         RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor =
-            new RecreateMavenMetadataWalkerProcessor( Slf4jPlexusLogger.getPlexusLogger( getLogger() ) );
+            new RecreateMavenMetadataWalkerProcessor( Slf4jPlexusLogger.getPlexusLogger( getLogger() ), getDeleteOperation( request ) );
 
         for ( String path : request.getMetadataRebuildPaths() )
         {
@@ -255,6 +258,11 @@ public class DefaultSnapshotRemover
         }
 
         return result;
+    }
+
+    private DeleteOperation getDeleteOperation( final SnapshotRemovalRequest request )
+    {
+        return request.isDeleteImmediately() ? DeleteOperation.DELETE_PERMANENTLY : DeleteOperation.MOVE_TO_TRASH;
     }
 
     private void logDetails( SnapshotRemovalRequest request )
@@ -479,7 +487,7 @@ public class DefaultSnapshotRemover
                             // preserve possible subdirs
                             if ( !( item instanceof StorageCollectionItem ) )
                             {
-                                repository.deleteItem( false, new ResourceStoreRequest( item ) );
+                                repository.deleteItem( false, createResourceStoreRequest( item, context ) );
                             }
                         }
                         catch ( ItemNotFoundException e )
@@ -559,7 +567,7 @@ public class DefaultSnapshotRemover
 
                             gav = (Gav) file.getItemContext().get( Gav.class.getName() );
 
-                            repository.deleteItem( false, new ResourceStoreRequest( file ) );
+                            repository.deleteItem( false, createResourceStoreRequest( file, context ) );
 
                             deletedFiles++;
                         }
@@ -582,6 +590,11 @@ public class DefaultSnapshotRemover
 
             updateMetadataIfNecessary( context, coll );
 
+        }
+
+        private DeleteOperation getDeleteOperation( final WalkerContext context )
+        {
+            return (DeleteOperation) context.getContext().get( DeleteOperation.DELETE_OPERATION_CTX_KEY );
         }
 
         private void updateMetadataIfNecessary( WalkerContext context, StorageCollectionItem coll )
@@ -617,7 +630,8 @@ public class DefaultSnapshotRemover
                         "Removing the empty directory leftover: UID=" + coll.getRepositoryItemUid().toString() );
                 }
 
-                repository.deleteItem( false, new ResourceStoreRequest( coll ) );
+                // directory is empty, never move to trash
+                repository.deleteItem( false, createResourceStoreRequest( coll, DeleteOperation.DELETE_PERMANENTLY ) );
             }
             catch ( ItemNotFoundException e )
             {
@@ -691,6 +705,26 @@ public class DefaultSnapshotRemover
             }
 
             return false;
+        }
+
+        private ResourceStoreRequest createResourceStoreRequest( final StorageItem item, final WalkerContext ctx )
+        {
+            ResourceStoreRequest request = new ResourceStoreRequest( item );
+
+            if ( ctx.getContext().containsKey( DeleteOperation.DELETE_OPERATION_CTX_KEY ) )
+            {
+                request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, ctx.getContext().get( DeleteOperation.DELETE_OPERATION_CTX_KEY )  );
+            }
+
+            return request;
+        }
+
+        private ResourceStoreRequest createResourceStoreRequest( final StorageCollectionItem item,
+                                                                 final DeleteOperation operation )
+        {
+            ResourceStoreRequest request = new ResourceStoreRequest( item );
+            request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, operation );
+            return request;
         }
 
         public int getDeletedSnapshots()

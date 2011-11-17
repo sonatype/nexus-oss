@@ -28,4 +28,6 @@ public enum DeleteOperation
     DELETE_PERMANENTLY,
 
     MOVE_TO_TRASH;
+
+    public static final String DELETE_OPERATION_CTX_KEY = DeleteOperation.class.getSimpleName();
 }
