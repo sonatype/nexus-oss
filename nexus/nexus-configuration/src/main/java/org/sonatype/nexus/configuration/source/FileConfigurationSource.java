@@ -40,7 +40,6 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ConfigurationValidator;
-import org.sonatype.nexus.proxy.events.NexusVersionChangedEvent;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.events.SecurityConfigurationChangedEvent;
 
@@ -224,8 +223,6 @@ public class FileConfigurationSource
             setInstanceUpgraded( true );
             getConfiguration().setNexusVersion( currentVersion );
             storeConfiguration();
-            eventMulticaster.notifyEventListeners( new NexusVersionChangedEvent( this, previousVersion,
-                currentVersion ) );
         }
 
     }

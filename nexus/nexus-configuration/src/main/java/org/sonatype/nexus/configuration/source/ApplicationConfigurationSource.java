@@ -53,9 +53,4 @@ public interface ApplicationConfigurationSource
      */
     boolean isInstanceUpgraded();
 
-    /**
-     * Setter for nexus instance upgraded
-     */
-    void setInstanceUpgraded( boolean instanceUpgraded );
-
 }
