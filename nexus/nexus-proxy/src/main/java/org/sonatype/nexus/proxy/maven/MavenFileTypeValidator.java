@@ -44,8 +44,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 public class MavenFileTypeValidator
     extends AbstractMimeMagicFileTypeValidator
 {
-    public static final String XML_DETECTION_LAX_KEY = MavenFileTypeValidator.class.getName()
-        + ".relaxedXmlValidation";
+    public static final String XML_DETECTION_LAX_KEY = MavenFileTypeValidator.class.getName() + ".relaxedXmlValidation";
 
     private static final boolean XML_DETECTION_LAX_DEFAULT = true;
 
@@ -136,19 +135,31 @@ public class MavenFileTypeValidator
                 }
             }
 
-            final FileTypeValidity mimeDetectionResult = isExpectedFileTypeByDetectedMimeType( file, expectedMimeTypes );
+            try
+            {
+                final FileTypeValidity mimeDetectionResult =
+                    isExpectedFileTypeByDetectedMimeType( file, expectedMimeTypes );
 
-            if ( FileTypeValidity.INVALID.equals( mimeDetectionResult ) )
-            {
-                // we go LAX way, if MIME detection says INVALID (does for XMLs missing preamble too)
-                // we just stay put saying we are "neutral" on this question
-                // If LAX disabled, the strict check will happen at the end of this if-else anyway
-                // doing proper checks and proper INVALID
-                return FileTypeValidity.NEUTRAL;
+                if ( FileTypeValidity.INVALID.equals( mimeDetectionResult ) )
+                {
+                    // we go LAX way, if MIME detection says INVALID (does for XMLs missing preamble too)
+                    // we just stay put saying we are "neutral" on this question
+                    // If LAX disabled, the strict check will happen at the end of this if-else anyway
+                    // doing proper checks and proper INVALID
+                    return FileTypeValidity.NEUTRAL;
+                }
+                else
+                {
+                    return mimeDetectionResult;
+                }
             }
-            else
+            catch ( IOException e )
             {
-                return mimeDetectionResult;
+                getLogger().warn(
+                    "Cannot detect MIME type and validate content of StorageFileItem: " + file.getRepositoryItemUid(),
+                    e );
+
+                return FileTypeValidity.NEUTRAL;
             }
         }
         else if ( filePath.endsWith( ".sha1" ) || filePath.endsWith( ".md5" ) )
@@ -190,8 +201,20 @@ public class MavenFileTypeValidator
                     expectedMimeTypes.addAll( entry.getValue() );
                 }
             }
+            try
+            {
+                // the expectedMimeTypes will be empty, see map in constructor which extensions we check at all.
+                // The isExpectedFileTypeByDetectedMimeType() method will claim NEUTRAL when expectancies are empty/null
+                return isExpectedFileTypeByDetectedMimeType( file, expectedMimeTypes );
+            }
+            catch ( IOException e )
+            {
+                getLogger().warn(
+                    "Cannot detect MIME type and validate content of StorageFileItem: " + file.getRepositoryItemUid(),
+                    e );
 
-            return isExpectedFileTypeByDetectedMimeType( file, expectedMimeTypes );
+                return FileTypeValidity.NEUTRAL;
+            }
         }
     }
 }

@@ -20,6 +20,12 @@ package org.sonatype.nexus.proxy.repository.validator;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
+/**
+ * Helper base class for implementing {@link FileTypeValidator} components.
+ * 
+ * @author cstamas
+ * @since 1.10.0
+ */
 public abstract class AbstractFileTypeValidator
     extends AbstractLoggingComponent
     implements FileTypeValidator

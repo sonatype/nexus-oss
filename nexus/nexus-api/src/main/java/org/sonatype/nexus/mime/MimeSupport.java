@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * supersedes the {@link MimeUtil} one that is completely deprecated and should be avoided.
  * 
  * @author cstamas
+ * @since 1.10.0
  */
 public interface MimeSupport
 {
