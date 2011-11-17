@@ -22,15 +22,16 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The event fired on item cache (will probably be followed by retrieve!).
+ * The event fired on item store when no overwrite happens (create).
  * 
  * @author cstamas
+ * @since 1.10.0
  */
-public abstract class RepositoryItemEventCache
-    extends RepositoryItemEvent
+public class RepositoryItemEventStoreCreate
+    extends RepositoryItemEventStore
 {
 
-    public RepositoryItemEventCache( final Repository repository, final StorageItem item )
+    public RepositoryItemEventStoreCreate( final Repository repository, final StorageItem item )
     {
         super( repository, item );
     }

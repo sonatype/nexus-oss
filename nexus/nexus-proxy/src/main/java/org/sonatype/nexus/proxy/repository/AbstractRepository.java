@@ -54,7 +54,8 @@ import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreUpdate;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentGenerator;
@@ -714,28 +715,18 @@ public abstract class AbstractRepository
         return targetRegistry.hasAnyApplicableTarget( this );
     }
 
-    public Action getResultingActionOnWrite( ResourceStoreRequest rsr )
+    public Action getResultingActionOnWrite( final ResourceStoreRequest rsr )
+        throws LocalStorageException
     {
-        try
-        {
-            boolean isInLocalStorage = getLocalStorage().containsItem( this, rsr );
+        final boolean isInLocalStorage = getLocalStorage().containsItem( this, rsr );
 
-            if ( isInLocalStorage )
-            {
-                return Action.update;
-            }
-            else
-            {
-                return Action.create;
-            }
+        if ( isInLocalStorage )
+        {
+            return Action.update;
         }
-        catch ( StorageException e )
+        else
         {
-            getLogger().error(
-                "Could not resolve the local presence of \"" + rsr.getRequestPath() + "\" path in repository ID=\""
-                    + getId() + "\"!", e );
-
-            return null;
+            return Action.create;
         }
     }
 
@@ -1011,6 +1002,8 @@ public abstract class AbstractRepository
 
         uidUploaderLock.lock( Action.create );
 
+        final Action action = getResultingActionOnWrite( item.getResourceStoreRequest() );
+
         try
         {
             // NEXUS-4550: we are shared-locking the actual UID (to not prevent downloaders while
@@ -1040,7 +1033,14 @@ public abstract class AbstractRepository
         // remove the "request" item from n-cache if there
         removeFromNotFoundCache( item.getResourceStoreRequest() );
 
-        getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventStore( this, item ) );
+        if ( Action.create.equals( action ) )
+        {
+            getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventStoreCreate( this, item ) );
+        }
+        else
+        {
+            getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventStoreUpdate( this, item ) );
+        }
     }
 
     public Collection<StorageItem> list( boolean fromTask, ResourceStoreRequest request )
