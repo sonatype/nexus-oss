@@ -61,6 +61,9 @@ public class ContentPlexusResource
         // default this presentation to HTML to enable user browsing
         result.add( 0, new Variant( MediaType.TEXT_HTML ) );
 
+        // also support plain text content inside Nexus repositories
+        result.add( new Variant( MediaType.TEXT_PLAIN ) );
+
         return result;
     }
 
