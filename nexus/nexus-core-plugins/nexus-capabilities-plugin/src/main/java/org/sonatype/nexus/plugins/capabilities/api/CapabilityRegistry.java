@@ -18,15 +18,54 @@
  */
 package org.sonatype.nexus.plugins.capabilities.api;
 
+import java.util.Collection;
+
+/**
+ * Registry of current configured capabilities.
+ */
 public interface CapabilityRegistry
 {
 
+    /**
+     * Adds a capability to registry.
+     *
+     * @param capability to add
+     */
     void add( Capability capability );
 
+    /**
+     * Removed a capability from registry. If there is no capability with specified id in the registry it will pass
+     * silently.
+     *
+     * @param capabilityId to remove
+     */
     void remove( String capabilityId );
 
+    /**
+     * Retrieves the capability from registry with specified id. If there is no capability with specified id in the
+     * registry it will return null.
+     *
+     * @param capabilityId to retrieve
+     * @return capability with specified id or null if not found
+     */
     Capability get( String capabilityId );
 
+    /**
+     * Retrieves all capabilities from registry. If no capability exists, result will be empty.
+     *
+     * @return collection of capabilities, never null
+     * @since 1.10.0
+     */
+    Collection<Capability> getAll();
+
+    /**
+     * Creates a capability given its id/type. if there is no capability available for specified type it will throw an
+     * runtime exception.
+     *
+     * @param capabilityId   id of capability to be created
+     * @param capabilityType type of capability to be created
+     * @return created capability
+     */
     Capability create( String capabilityId, String capabilityType );
 
 }

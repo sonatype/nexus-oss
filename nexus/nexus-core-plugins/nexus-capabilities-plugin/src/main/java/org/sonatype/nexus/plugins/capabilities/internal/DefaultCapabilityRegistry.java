@@ -18,9 +18,11 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal;
 
+import static java.lang.String.format;
+
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -59,6 +61,12 @@ public class DefaultCapabilityRegistry
         return capabilities.get( capabilityId );
     }
 
+    @Override
+    public Collection<Capability> getAll()
+    {
+        return capabilities.values();
+    }
+
     public void remove( final String capabilityId )
     {
         capabilities.remove( capabilityId );
@@ -71,7 +79,7 @@ public class DefaultCapabilityRegistry
         final CapabilityFactory factory = factories.get( capabilityType );
         if ( factory == null )
         {
-            throw new RuntimeException( String.format( "No factory found for a capability of type %s", capabilityType ) );
+            throw new RuntimeException( format( "No factory found for a capability of type %s", capabilityType ) );
         }
 
         final Capability capability = factory.create( capabilityId );
