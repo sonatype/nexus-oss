@@ -103,8 +103,6 @@ public class CapabilityPlexusResource
 
     /**
      * Get the details of a capability.
-     * 
-     * @param capabilityId The id of capability.
      */
     @Override
     @GET
@@ -134,8 +132,6 @@ public class CapabilityPlexusResource
 
     /**
      * Update the configuration of an existing capability.
-     * 
-     * @param capabilityId ID of capability to update.
      */
     @Override
     @PUT

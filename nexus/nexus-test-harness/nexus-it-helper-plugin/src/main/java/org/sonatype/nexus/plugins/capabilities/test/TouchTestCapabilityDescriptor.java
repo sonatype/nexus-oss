@@ -20,6 +20,7 @@ package org.sonatype.nexus.plugins.capabilities.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.formfields.FormField;
@@ -61,6 +62,12 @@ public class TouchTestCapabilityDescriptor
     public boolean isExposed()
     {
         return true;
+    }
+
+    @Override
+    public String describe( final Map<String, String> properties )
+    {
+        return "test";
     }
 
 }

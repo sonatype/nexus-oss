@@ -19,20 +19,57 @@
 package org.sonatype.nexus.plugins.capabilities.api.descriptor;
 
 import java.util.List;
+import java.util.Map;
 
 import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
 import org.sonatype.plugin.ExtensionPoint;
 
+/**
+ * Describes a capability (its type).
+ */
 @ExtensionPoint
 public interface CapabilityDescriptor
 {
 
+    /**
+     * Returns the unique identifier of capability. This ID is used to related the descriptor to
+     * {@link CapabilityFactory}.
+     *
+     * @return unique identifier of capability
+     */
     String id();
 
+    /**
+     * Returns a user friendly name of capability (to be presented in UI).
+     *
+     * @return capability type name.
+     */
     String name();
-    
+
+    /**
+     * Returns capability form fields (properties).
+     *
+     * @return capability form fields (properties).
+     */
     List<FormField> formFields();
 
+    /**
+     * Whether or not this capability is user facing = user should be able to configure it or it is a capability that
+     * will be created via other means (e.g. created by some other Nexus functionality)
+     *
+     * @return if capability is user facing.
+     */
     boolean isExposed();
+
+    /**
+     * Describes the capability based on capability configuration properties. The method is called in case that
+     * capability name on creation/update of capability.
+     *
+     * @param properties capability configuration properties
+     * @return capability description
+     * @since 1.10.0
+     */
+    String describe( Map<String, String> properties );
 
 }

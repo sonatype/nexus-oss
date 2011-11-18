@@ -45,12 +45,6 @@ public class DefaultCapabilityConfigurationValidator
 
             response.addValidationError( msg );
         }
-        if ( StringUtils.isEmpty( capability.getName() ) )
-        {
-            final ValidationMessage msg = new ValidationMessage( "name", "Capability name cannot be empty." );
-
-            response.addValidationError( msg );
-        }
         if ( StringUtils.isEmpty( capability.getTypeId() ) )
         {
             final ValidationMessage msg = new ValidationMessage( "typeId", "Capability type cannot be empty." );

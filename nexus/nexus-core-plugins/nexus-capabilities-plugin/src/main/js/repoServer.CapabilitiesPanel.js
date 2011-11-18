@@ -220,19 +220,10 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           xtype : 'checkbox',
           fieldLabel : 'Enabled',
           labelStyle : 'margin-left: 15px; width: 185px;',
-          helpText : 'This flag determines if the capability is currently active.  To disable this capability for a period of time, de-select this checkbox.',
+          helpText : 'This flag determines if the capability is currently active. To disable this capability for a period of time, de-select this checkbox.',
           name : 'enabled',
           allowBlank : false,
           checked : true
-        }, {
-          xtype : 'textfield',
-          fieldLabel : 'Name',
-          labelStyle : 'margin-left: 15px; width: 185px;',
-          itemCls : 'required-field',
-          helpText : "Name of configured capability",
-          name : 'name',
-          width : this.COMBO_WIDTH,
-          allowBlank : false
         }, {
           xtype : 'combo',
           fieldLabel : 'Type',
@@ -251,6 +242,15 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           selectOnFocus : true,
           allowBlank : false,
           width : this.COMBO_WIDTH
+        }, {
+          xtype : 'textfield',
+          fieldLabel : 'Name',
+          labelStyle : 'margin-left: 15px; width: 185px;',
+          itemCls : '',
+          helpText : "Optional name of configured capability. If left empty a default value will be assigned.",
+          name : 'name',
+          width : this.COMBO_WIDTH,
+          allowBlank : true
         }, {
           xtype : 'panel',
           id : 'capability-type-config-card-panel',
@@ -491,7 +491,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               id : id
             });
         config = this.configUniqueIdHelper(id, config);
-        Ext.apply(config.items[3].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
+        Ext.apply(config.items[4].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
         var formPanel = new Ext.FormPanel(config);
 
         formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -771,7 +771,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                 id : id
               });
           config = this.configUniqueIdHelper(id, config);
-          Ext.apply(config.items[4].items, FormFieldGenerator(id, 'Capability Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
+          Ext.apply(config.items[4].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
           formPanel = new Ext.FormPanel(config);
 
           formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);

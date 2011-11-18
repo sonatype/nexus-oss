@@ -75,7 +75,7 @@ public class DefaultCapabilityConfigurationValidatorTest
 
         ValidationResponse res = validator.validate( cap, false );
         assertTrue( res.getValidationWarnings().isEmpty() );
-        assertEquals( 4, res.getValidationErrors().size() );
+        assertEquals( 3, res.getValidationErrors().size() );
     }
 
     @Test

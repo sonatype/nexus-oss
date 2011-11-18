@@ -18,9 +18,8 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.config;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import static org.sonatype.nexus.plugins.capabilities.internal.config.DefaultCapabilityConfiguration.asMap;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -32,7 +31,6 @@ import org.sonatype.nexus.plugins.capabilities.internal.config.events.Capability
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationRemoveEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationUpdateEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
-import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
 
@@ -135,19 +133,6 @@ public class CapabilityConfigurationEventInspector
             capability.passivate();
             capability.remove();
         }
-    }
-
-    private Map<String, String> asMap( final List<CCapabilityProperty> properties )
-    {
-        final Map<String, String> map = new HashMap<String, String>();
-        if ( properties != null )
-        {
-            for ( final CCapabilityProperty property : properties )
-            {
-                map.put( property.getKey(), property.getValue() );
-            }
-        }
-        return map;
     }
 
 }

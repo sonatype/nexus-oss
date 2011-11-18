@@ -30,6 +30,9 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -46,11 +49,14 @@ import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationAddEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationLoadEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationRemoveEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationUpdateEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
+import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.Configuration;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Reader;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Writer;
@@ -63,14 +69,13 @@ public class DefaultCapabilityConfiguration
     implements CapabilityConfiguration
 {
 
-    // @Inject
     private final ApplicationEventMulticaster applicationEventMulticaster;
 
-    // @Inject
     private final CapabilityConfigurationValidator validator;
 
-    // @Inject
     private final ConfigurationIdGenerator idGenerator;
+
+    private final CapabilityDescriptorRegistry descriptors;
 
     private final File configurationFile;
 
@@ -82,11 +87,13 @@ public class DefaultCapabilityConfiguration
     public DefaultCapabilityConfiguration( final ApplicationConfiguration applicationConfiguration,
                                            final ApplicationEventMulticaster applicationEventMulticaster,
                                            final CapabilityConfigurationValidator validator,
-                                           final ConfigurationIdGenerator idGenerator )
+                                           final ConfigurationIdGenerator idGenerator,
+                                           final CapabilityDescriptorRegistry descriptors )
     {
         this.applicationEventMulticaster = applicationEventMulticaster;
         this.validator = validator;
         this.idGenerator = idGenerator;
+        this.descriptors = descriptors;
 
         configurationFile = new File( applicationConfiguration.getWorkingDirectory(), "conf/capabilities.xml" );
     }
@@ -108,6 +115,7 @@ public class DefaultCapabilityConfiguration
             final String generatedId = idGenerator.generateId();
 
             capability.setId( generatedId );
+            capability.setName( getName( capability ) );
             getConfiguration().addCapability( capability );
 
             save();
@@ -144,6 +152,7 @@ public class DefaultCapabilityConfiguration
             if ( stored != null )
             {
                 getConfiguration().removeCapability( stored );
+                capability.setName( getName( capability ) );
                 getConfiguration().addCapability( capability );
                 save();
 
@@ -238,8 +247,9 @@ public class DefaultCapabilityConfiguration
 
             configuration = reader.read( fr );
 
-            final ValidationResponse vr =
-                validator.validateModel( new ValidationRequest<Configuration>( configuration ) );
+            final ValidationResponse vr = validator.validateModel(
+                new ValidationRequest<Configuration>( configuration )
+            );
 
             if ( vr.getValidationErrors().size() > 0 )
             {
@@ -327,6 +337,39 @@ public class DefaultCapabilityConfiguration
     public void clearCache()
     {
         configuration = null;
+    }
+
+    private String getName( final CCapability capability )
+    {
+        if ( StringUtils.isEmpty( capability.getName() ) )
+        {
+            final CapabilityDescriptor descriptor = descriptors.get( capability.getTypeId() );
+            if ( descriptor != null )
+            {
+                try
+                {
+                    return descriptor.describe( asMap( capability.getProperties() ) );
+                }
+                catch ( Exception ignore )
+                {
+                    getLogger().warn( "Capability descriptor '{}' failed to describe capability", descriptor.id() );
+                }
+            }
+        }
+        return capability.getName();
+    }
+
+    static Map<String, String> asMap( final List<CCapabilityProperty> properties )
+    {
+        final Map<String, String> map = new HashMap<String, String>();
+        if ( properties != null )
+        {
+            for ( final CCapabilityProperty property : properties )
+            {
+                map.put( property.getKey(), property.getValue() );
+            }
+        }
+        return map;
     }
 
 }
