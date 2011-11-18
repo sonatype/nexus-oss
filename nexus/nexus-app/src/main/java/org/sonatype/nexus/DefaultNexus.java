@@ -63,6 +63,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -553,6 +554,8 @@ public class DefaultNexus
         applicationStatusSource.getSystemStatus().setOperationMode( OperationMode.STANDALONE );
 
         applicationStatusSource.getSystemStatus().setInitializedAt( new Date() );
+
+        applicationEventMulticaster.notifyEventListeners( new NexusInitializedEvent( this ) );
     }
 
     public void start()
