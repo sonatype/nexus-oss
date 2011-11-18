@@ -151,7 +151,7 @@ public class DefaultCapabilityConfiguration
                     "Updated capability [{}] with properties [{}]", capability.getName(), capability.getProperties()
                 );
                 applicationEventMulticaster.notifyEventListeners(
-                    new CapabilityConfigurationUpdateEvent( capability ) );
+                    new CapabilityConfigurationUpdateEvent( capability, stored ) );
             }
         }
         finally

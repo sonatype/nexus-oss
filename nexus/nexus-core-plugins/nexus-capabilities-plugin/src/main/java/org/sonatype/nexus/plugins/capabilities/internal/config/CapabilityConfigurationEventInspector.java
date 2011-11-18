@@ -21,7 +21,6 @@ package org.sonatype.nexus.plugins.capabilities.internal.config;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -87,7 +86,7 @@ public class CapabilityConfigurationEventInspector
         final Capability capability = registry.create( capabilityConfig.getId(), capabilityConfig.getTypeId() );
         registry.add( capability );
         capability.create( asMap( capabilityConfig.getProperties() ) );
-        if ( capability instanceof Capability.LifeCycle )
+        if ( capabilityConfig.isEnabled() && capability instanceof Capability.LifeCycle )
         {
             ( (Capability.LifeCycle) capability ).activate();
         }
@@ -99,7 +98,7 @@ public class CapabilityConfigurationEventInspector
         final Capability capability = registry.create( capabilityConfig.getId(), capabilityConfig.getTypeId() );
         registry.add( capability );
         capability.load( asMap( capabilityConfig.getProperties() ) );
-        if ( capability instanceof Capability.LifeCycle )
+        if ( capabilityConfig.isEnabled() && capability instanceof Capability.LifeCycle )
         {
             ( (Capability.LifeCycle) capability ).activate();
         }
@@ -111,7 +110,16 @@ public class CapabilityConfigurationEventInspector
         final Capability capability = registry.get( capabilityConfig.getId() );
         if ( capability != null )
         {
+            final CCapability previousCapabilityConfig = evt.getPreviousCapability();
+            if ( previousCapabilityConfig.isEnabled() && capability instanceof Capability.LifeCycle )
+            {
+                ( (Capability.LifeCycle) capability ).passivate();
+            }
             capability.update( asMap( capabilityConfig.getProperties() ) );
+            if ( capabilityConfig.isEnabled() && capability instanceof Capability.LifeCycle )
+            {
+                ( (Capability.LifeCycle) capability ).activate();
+            }
         }
     }
 

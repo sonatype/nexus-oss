@@ -20,13 +20,33 @@ package org.sonatype.nexus.plugins.capabilities.internal.config.events;
 
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 
+/**
+ * Event triggered after the configuration gets updated.
+ */
 public class CapabilityConfigurationUpdateEvent
     extends CapabilityConfigurationEvent
 {
 
-    public CapabilityConfigurationUpdateEvent( final CCapability capability )
+    /**
+     * Capability configuration as it was prior to update.
+     */
+    private final CCapability previous;
+
+    public CapabilityConfigurationUpdateEvent( final CCapability capability, final CCapability previous )
     {
         super( capability );
+        this.previous = previous;
+    }
+
+    /**
+     * Returns the capability configuration as it was prior to update.
+     *
+     * @return previous configuration
+     * @since 1.10.0
+     */
+    public CCapability getPreviousCapability()
+    {
+        return previous;
     }
 
 }
