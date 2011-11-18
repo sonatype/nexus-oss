@@ -60,6 +60,9 @@ public class StatelessAndStatefulWebSessionManagerTest
     @Before
     public void setupSecurityObjects()
     {
+        // make sure the static securityManager is NOT set
+        SecurityUtils.setSecurityManager(null);
+
         SimpleAccountRealm simpleAccountRealm = new SimpleAccountRealm();
         simpleAccountRealm.addAccount( "user", "user123" );
 
@@ -68,8 +71,6 @@ public class StatelessAndStatefulWebSessionManagerTest
                                               new HashMap<String, RolePermissionResolver>() );
         securityManager.setRealm( simpleAccountRealm );
         securityManager.init();
-
-        SecurityUtils.setSecurityManager( securityManager );
 
         sessionManager =
             (StatelessAndStatefulWebSessionManager) securityManager.getSessionManager();
