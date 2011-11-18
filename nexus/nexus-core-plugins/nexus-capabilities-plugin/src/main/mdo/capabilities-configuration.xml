@@ -110,6 +110,7 @@
           <type>boolean</type>
           <version>1.0.0+</version>
           <required>true</required>
+          <defaultValue>true</defaultValue>
           <description>The flag determining if the capability is enabled</description>
         </field>
         <field>

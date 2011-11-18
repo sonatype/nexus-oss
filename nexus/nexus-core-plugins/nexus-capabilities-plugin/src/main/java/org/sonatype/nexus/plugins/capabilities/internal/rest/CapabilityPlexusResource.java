@@ -203,6 +203,7 @@ public class CapabilityPlexusResource
 
         capability.setId( resource.getId() );
         capability.setName( resource.getName() );
+        capability.setEnabled( resource.isEnabled() );
         capability.setTypeId( resource.getTypeId() );
 
         if ( resource.getProperties() != null )
@@ -228,6 +229,7 @@ public class CapabilityPlexusResource
 
         resource.setId( capability.getId() );
         resource.setName( capability.getName() );
+        resource.setEnabled( capability.isEnabled() );
         resource.setTypeId( capability.getTypeId() );
 
         if ( capability.getProperties() != null )
@@ -270,6 +272,7 @@ public class CapabilityPlexusResource
         final CapabilityListItemResource item = new CapabilityListItemResource();
         item.setId( capability.getId() );
         item.setName( capability.getName() );
+        item.setEnabled( capability.isEnabled() );
         item.setTypeId( capability.getTypeId() );
         item.setTypeName( capabilityDescriptorRegistry.get( capability.getTypeId() ).name() );
 

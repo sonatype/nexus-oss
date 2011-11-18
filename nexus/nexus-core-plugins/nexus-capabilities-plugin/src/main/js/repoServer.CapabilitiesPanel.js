@@ -86,6 +86,8 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
         name : 'name',
         sortType : Ext.data.SortTypes.asUCString
       }, {
+        name : 'enabled'
+      }, {
         name : 'typeName'
       }, {
         name : 'typeId'
@@ -215,6 +217,14 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           xtype : 'hidden',
           name : 'id'
         }, {
+          xtype : 'checkbox',
+          fieldLabel : 'Enabled',
+          labelStyle : 'margin-left: 15px; width: 185px;',
+          helpText : 'This flag determines if the capability is currently active.  To disable this capability for a period of time, de-select this checkbox.',
+          name : 'enabled',
+          allowBlank : false,
+          checked : true
+        }, {
           xtype : 'textfield',
           fieldLabel : 'Name',
           labelStyle : 'margin-left: 15px; width: 185px;',
@@ -313,6 +323,11 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
         loadMask : true,
         deferredRender : false,
         columns : [{
+              header : 'Enabled',
+              dataIndex : 'enabled',
+              width : 50,
+              id : 'capabilities-enabled-col'
+            }, {
               header : 'Type',
               dataIndex : 'typeName',
               width : 175,
@@ -646,6 +661,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             var dataObj = {
               id : receivedData.id,
               name : receivedData.name,
+              enabled : receivedData.enabled,
               resourceURI : receivedData.resourceURI,
               typeId : receivedData.typeId,
               typeName : receivedData.typeName
@@ -699,6 +715,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         rec.beginEdit();
         rec.set('name', receivedData.name);
         rec.set('typeId', receivedData.typeId);
+        rec.set('enabled', receivedData.enabled);
         rec.set('typeName', receivedData.typeName);
         rec.commit();
         rec.endEdit();
@@ -754,7 +771,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                 id : id
               });
           config = this.configUniqueIdHelper(id, config);
-          Ext.apply(config.items[3].items, FormFieldGenerator(id, 'Capability Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
+          Ext.apply(config.items[4].items, FormFieldGenerator(id, 'Capability Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
           formPanel = new Ext.FormPanel(config);
 
           formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
