@@ -225,7 +225,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           allowBlank : false
         }, {
           xtype : 'combo',
-          fieldLabel : 'Capability Type',
+          fieldLabel : 'Type',
           labelStyle : 'margin-left: 15px; width: 185px;',
           itemCls : 'required-field',
           helpText : "Type of configured capability",
@@ -476,7 +476,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               id : id
             });
         config = this.configUniqueIdHelper(id, config);
-        Ext.apply(config.items[3].items, FormFieldGenerator(id, 'Capability Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
+        Ext.apply(config.items[3].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
         var formPanel = new Ext.FormPanel(config);
 
         formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
