@@ -16,48 +16,27 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.config;
+package org.sonatype.nexus.plugins.capabilities.internal.config.test;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.NexusStartedEvent;
-import org.sonatype.plexus.appevents.Event;
+import org.junit.Test;
+import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
+import org.sonatype.nexus.plugins.capabilities.internal.config.NexusInitializedEventInspector;
+import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 
-@Singleton
-public class NexusStartedEventInspector
-    implements EventInspector
+public class NexusInitializedEventInspectorTest
 {
 
-    private final CapabilityConfiguration capabilitiesConfiguration;
-
-    @Inject
-    public NexusStartedEventInspector( final CapabilityConfiguration capabilitiesConfiguration )
+    @Test
+    public void capabilitiesAreLoadedWhenNexusIsInitialized()
+        throws Exception
     {
-        this.capabilitiesConfiguration = capabilitiesConfiguration;
-    }
+        final CapabilityConfiguration capabilityConfiguration = mock( CapabilityConfiguration.class );
+        new NexusInitializedEventInspector( capabilityConfiguration ).inspect( new NexusInitializedEvent( this ) );
 
-    public boolean accepts( final Event<?> evt )
-    {
-        return evt != null
-            && evt instanceof NexusStartedEvent;
-    }
-
-    public void inspect( final Event<?> evt )
-    {
-        if ( !accepts( evt ) )
-        {
-            return;
-        }
-        try
-        {
-            capabilitiesConfiguration.load();
-        }
-        catch ( final Exception e )
-        {
-            throw new RuntimeException( "Could not load configurations", e );
-        }
+        verify( capabilityConfiguration ).load();
     }
 
 }
