@@ -20,8 +20,6 @@ package org.sonatype.nexus.proxy.events;
 
 /**
  * The event that is fired as last step of nexus initialization process.
- * 
- * @author cstamas
  */
 public class NexusInitializedEvent
     extends NexusStateChangeEvent
