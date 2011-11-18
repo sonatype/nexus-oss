@@ -23,6 +23,7 @@ import java.util.Random;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -45,7 +46,8 @@ public class DefaultRepositoryItemUidLRTest
     @Test
     public void testLocking()
     {
-        Repository repository = new DummyRepository( "dummy" );
+        final Repository repository = Mockito.mock( Repository.class );
+        Mockito.when( repository.getId() ).thenReturn( "dummy" );
 
         DefaultRepositoryItemUid uid = factory.createUid( repository, "/some/path.txt" );
 
@@ -93,7 +95,8 @@ public class DefaultRepositoryItemUidLRTest
     public void testMultiThreadedLocking()
         throws InterruptedException
     {
-        Repository repository = new DummyRepository( "dummy" );
+        final Repository repository = Mockito.mock( Repository.class );
+        Mockito.when( repository.getId() ).thenReturn( "dummy" );
 
         Sleeper sleeper1 = new Sleeper()
         {
@@ -161,7 +164,8 @@ public class DefaultRepositoryItemUidLRTest
     public void testMultiThreadedLockingSharedUid()
         throws InterruptedException
     {
-        Repository repository = new DummyRepository( "dummy" );
+        final Repository repository = Mockito.mock( Repository.class );
+        Mockito.when( repository.getId() ).thenReturn( "dummy" );
 
         Sleeper sleeper1 = new Sleeper()
         {
