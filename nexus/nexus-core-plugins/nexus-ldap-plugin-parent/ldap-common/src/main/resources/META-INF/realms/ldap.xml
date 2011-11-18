@@ -39,6 +39,7 @@
     <ldapGroupsAsRoles>true</ldapGroupsAsRoles>
     <userSubtree>false</userSubtree>
     <groupSubtree>false</groupSubtree>
-    
+    <!-- <ldapFilter></ldapFilter> --> <!-- Default to null -->
+
   </userAndGroupConfig>
 </ldapConfiguration>

@@ -119,6 +119,8 @@ public class LdapAuthConfiguration
     /** If not, don't parse it as a labelUri. */
     private boolean isWebsiteAttributeLabelUri = true;
 
+    private String ldapFilter;
+
     private boolean ldapGroupsAsRoles;
     
     private boolean userSubtree;
@@ -560,6 +562,16 @@ public class LdapAuthConfiguration
         this.userMemberOfAttribute = userMemberOfAttribute;
     }
 
+    public String getLdapFilter()
+    {
+        return ldapFilter;
+    }
+
+    public void setLdapFilter(String ldapFilter)
+    {
+        this.ldapFilter = ldapFilter;
+    }
+
     @Override
     public int hashCode()
     {
@@ -585,6 +597,7 @@ public class LdapAuthConfiguration
         result = prime * result + ( userSubtree ? 1231 : 1237 );
         result = prime * result + ( ( websiteAttribute == null ) ? 0 : websiteAttribute.hashCode() );
         result = prime * result + ( ( websiteUriLabel == null ) ? 0 : websiteUriLabel.hashCode() );
+        result = prime * result + ( ( ldapFilter == null) ? 0 : ldapFilter.hashCode() );
         return result;
     }
 
@@ -717,6 +730,13 @@ public class LdapAuthConfiguration
                 return false;
         }
         else if ( !websiteUriLabel.equals( other.websiteUriLabel ) )
+            return false;
+        if ( ldapFilter == null )
+        {
+            if ( other.ldapFilter != null )
+                return false;
+        }
+        else if ( !ldapFilter.equals( other.ldapFilter ) )
             return false;
         return true;
     }

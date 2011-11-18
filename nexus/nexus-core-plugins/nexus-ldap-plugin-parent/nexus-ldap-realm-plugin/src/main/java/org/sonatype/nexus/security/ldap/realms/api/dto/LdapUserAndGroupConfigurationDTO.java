@@ -106,6 +106,11 @@ public class LdapUserAndGroupConfigurationDTO
      * attribute used to store the group string in the user object.
      */
     private String userMemberOfAttribute;
+
+    /**
+     * Filter to retrieve only users with specific attribute set.
+     */
+    private String ldapFilter;
     
     /**
      * @return the emailAddressAttribute
@@ -345,6 +350,22 @@ public class LdapUserAndGroupConfigurationDTO
         this.userMemberOfAttribute = userMemberOfAttribute;
     }
 
+    /**
+     * @return the filter to select specific users
+     */
+    public String getLdapFilter()
+    {
+        return ldapFilter;
+    }
+
+    /**
+     * @param ldapFilter the filter to select specific users
+     */
+    public void setLdapFilter( String ldapFilter )
+    {
+        this.ldapFilter = ldapFilter;
+    }
+
     @Override
     public int hashCode()
     {
@@ -365,6 +386,7 @@ public class LdapUserAndGroupConfigurationDTO
         result = prime * result + ( ( userPasswordAttribute == null ) ? 0 : userPasswordAttribute.hashCode() );
         result = prime * result + ( ( userRealNameAttribute == null ) ? 0 : userRealNameAttribute.hashCode() );
         result = prime * result + ( userSubtree ? 1231 : 1237 );
+        result = prime * result + ( ( ldapFilter == null ) ? 0 : ldapFilter.hashCode() );
         return result;
     }
 
