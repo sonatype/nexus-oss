@@ -47,7 +47,7 @@ public class CapabilityConfigurationEventInspectorTest
     @Test
     public void capabilityUpdated01()
     {
-        TestCapability capability = prepareForUpdate( true, false );
+        Capability capability = prepareForUpdate( true, false );
 
         verify( capability ).passivate();
         verify( capability ).update( Matchers.<Map<String, String>>any() );
@@ -60,7 +60,7 @@ public class CapabilityConfigurationEventInspectorTest
     @Test
     public void capabilityUpdated02()
     {
-        TestCapability capability = prepareForUpdate( false, false );
+        Capability capability = prepareForUpdate( false, false );
 
         verify( capability ).update( Matchers.<Map<String, String>>any() );
         verifyNoMoreInteractions( capability );
@@ -72,7 +72,7 @@ public class CapabilityConfigurationEventInspectorTest
     @Test
     public void capabilityUpdated03()
     {
-        TestCapability capability = prepareForUpdate( true, true );
+        Capability capability = prepareForUpdate( true, true );
 
         verify( capability ).update( Matchers.<Map<String, String>>any() );
         verifyNoMoreInteractions( capability );
@@ -84,16 +84,16 @@ public class CapabilityConfigurationEventInspectorTest
     @Test
     public void capabilityUpdated04()
     {
-        TestCapability capability = prepareForUpdate( false, true );
+        Capability capability = prepareForUpdate( false, true );
 
         verify( capability ).update( Matchers.<Map<String, String>>any() );
         verify( capability ).activate();
         verifyNoMoreInteractions( capability );
     }
 
-    private TestCapability prepareForUpdate( final boolean oldEnabled, final boolean newEnabled )
+    private Capability prepareForUpdate( final boolean oldEnabled, final boolean newEnabled )
     {
-        final TestCapability capability = mock( TestCapability.class );
+        final Capability capability = mock( Capability.class );
         when( capability.id() ).thenReturn( "test" );
 
         final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
@@ -111,12 +111,6 @@ public class CapabilityConfigurationEventInspectorTest
         );
 
         return capability;
-    }
-
-    private static interface TestCapability
-        extends Capability, Capability.LifeCycle
-    {
-
     }
 
 }

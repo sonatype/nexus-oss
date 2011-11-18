@@ -57,19 +57,15 @@ public class NexusStoppedEventInspector
         }
         for ( final Capability capability : new ArrayList<Capability>( registry.getAll() ) )
         {
-            if ( capability instanceof Capability.LifeCycle )
+            try
             {
-                try
-                {
-                    ( (Capability.LifeCycle) capability ).passivate();
-                }
-                catch ( Exception e )
-                {
-                    getLogger().error(
-                        "Could not passivate capability with id '{}' ({})",
-                        new Object[]{ capability.id(), capability, e }
-                    );
-                }
+                capability.passivate();
+            }
+            catch ( Exception e )
+            {
+                getLogger().error(
+                    "Could not passivate capability with id '{}' ({})", new Object[]{ capability.id(), capability, e }
+                );
             }
         }
     }

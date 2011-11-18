@@ -33,29 +33,45 @@ public abstract class AbstractCapability
         this.id = id;
     }
 
+    @Override
     public String id()
     {
         return id;
     }
 
+    @Override
     public void create( final Map<String, String> properties )
     {
         // do nothing
     }
 
+    @Override
     public void load( final Map<String, String> properties )
     {
         // do nothing
     }
 
+    @Override
     public void update( final Map<String, String> properties )
     {
         // do nothing
     }
 
+    @Override
     public void remove()
     {
         // do nothing
     }
 
+    @Override
+    public void activate()
+    {
+        // do nothing
+    }
+
+    @Override
+    public void passivate()
+    {
+        // do nothing
+    }
 }

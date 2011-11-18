@@ -86,9 +86,9 @@ public class CapabilityConfigurationEventInspector
         final Capability capability = registry.create( capabilityConfig.getId(), capabilityConfig.getTypeId() );
         registry.add( capability );
         capability.create( asMap( capabilityConfig.getProperties() ) );
-        if ( capabilityConfig.isEnabled() && capability instanceof Capability.LifeCycle )
+        if ( capabilityConfig.isEnabled() )
         {
-            ( (Capability.LifeCycle) capability ).activate();
+            capability.activate();
         }
     }
 
@@ -98,9 +98,9 @@ public class CapabilityConfigurationEventInspector
         final Capability capability = registry.create( capabilityConfig.getId(), capabilityConfig.getTypeId() );
         registry.add( capability );
         capability.load( asMap( capabilityConfig.getProperties() ) );
-        if ( capabilityConfig.isEnabled() && capability instanceof Capability.LifeCycle )
+        if ( capabilityConfig.isEnabled() )
         {
-            ( (Capability.LifeCycle) capability ).activate();
+            capability.activate();
         }
     }
 
@@ -112,17 +112,15 @@ public class CapabilityConfigurationEventInspector
         {
             final CCapability previousCapabilityConfig = evt.getPreviousCapability();
             if ( previousCapabilityConfig.isEnabled()
-                && !capabilityConfig.isEnabled()
-                && capability instanceof Capability.LifeCycle )
+                && !capabilityConfig.isEnabled() )
             {
-                ( (Capability.LifeCycle) capability ).passivate();
+                capability.passivate();
             }
             capability.update( asMap( capabilityConfig.getProperties() ) );
             if ( capabilityConfig.isEnabled()
-                && !previousCapabilityConfig.isEnabled()
-                && capability instanceof Capability.LifeCycle )
+                && !previousCapabilityConfig.isEnabled() )
             {
-                ( (Capability.LifeCycle) capability ).activate();
+                capability.activate();
             }
         }
     }
@@ -134,10 +132,7 @@ public class CapabilityConfigurationEventInspector
         if ( capability != null )
         {
             registry.remove( capability.id() );
-            if ( capability instanceof Capability.LifeCycle )
-            {
-                ( (Capability.LifeCycle) capability ).passivate();
-            }
+            capability.passivate();
             capability.remove();
         }
     }

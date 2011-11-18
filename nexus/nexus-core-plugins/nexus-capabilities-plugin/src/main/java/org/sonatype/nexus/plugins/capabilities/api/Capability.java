@@ -57,26 +57,15 @@ public interface Capability
     void remove();
 
     /**
-     * Capability life cycle. Optionally to be implemented by capabilities that need to react on activation /
-     * passivation.
-     *
-     * @since 1.10.0
+     * Callback when capability is activated. Activation is triggered on create/load (if capability is not disabled)
+     * , or when capability is re-enabled.
      */
-    static interface LifeCycle
-    {
+    void activate();
 
-        /**
-         * Callback when capability is activated. Activation is triggered on create/load (if capability is not disabled)
-         * , or when capability is re-enabled.
-         */
-        void activate();
-
-        /**
-         * Callback when capability is passivated. Passivation will be triggered before a capability is removed, on
-         * Nexus shutdown or when capability is disabled.
-         */
-        void passivate();
-
-    }
+    /**
+     * Callback when capability is passivated. Passivation will be triggered before a capability is removed, on
+     * Nexus shutdown or when capability is disabled.
+     */
+    void passivate();
 
 }

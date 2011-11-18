@@ -39,23 +39,16 @@ public class NexusStoppedEventInspectorTest
         throws Exception
     {
         final Capability capability1 = mock( Capability.class );
-        final TestCapability capability2 = mock( TestCapability.class );
+        final Capability capability2 = mock( Capability.class );
         when( capability2.id() ).thenReturn( "capability-2" );
         doThrow( new RuntimeException( "something went wrong" ) ).when( capability2 ).passivate();
-        final TestCapability capability3 = mock( TestCapability.class );
         final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( capability1, capability2, capability3 ) );
+        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( capability1, capability2 ) );
 
         new NexusStoppedEventInspector( capabilityRegistry ).inspect( new NexusStoppedEvent( this ) );
 
+        verify( capability1 ).passivate();
         verify( capability2 ).passivate();
-        verify( capability3 ).passivate();
-    }
-
-    private static interface TestCapability
-        extends Capability, Capability.LifeCycle
-    {
-
     }
 
 }
