@@ -18,198 +18,68 @@
  */
 package org.sonatype.nexus.security;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authz.permission.RolePermissionResolver;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
 import org.apache.shiro.cache.ehcache.EhCache;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
-import org.apache.shiro.realm.SimpleAccountRealm;
-import org.apache.shiro.session.UnknownSessionException;
-import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
-import org.apache.shiro.util.ThreadContext;
-import org.apache.shiro.web.subject.WebSubject;
-
 import org.hamcrest.MatcherAssert;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
+import java.io.Serializable;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 /**
- * Tests for StatelessAndStatefulWebSessionManager
+ * Repeats the tests of StatelessAndStatefulWebSessionManager, using ehCache as the session store.
+ * This test will check the cache instance directly (using the ehcache API to verify the cached contents)
  */
-public class StatelessAndStatefulWebSessionManagerEhCacheTest
+public class StatelessAndStatefulWebSessionManagerEhCacheTest extends StatelessAndStatefulWebSessionManagerTest
 {
+    private CacheManager cacheManager = null;
 
-    private NexusWebRealmSecurityManager securityManager;
-    private StatelessAndStatefulWebSessionManager sessionManager;
-    private CachingSessionDAO sessionDAO;
-
-    @Before
-    public void setupSecurityObjects()
+    protected void setupCacheManager( NexusWebRealmSecurityManager securityManager )
     {
-        SimpleAccountRealm simpleAccountRealm = new SimpleAccountRealm();
-        simpleAccountRealm.addAccount( "user", "user123" );
+        EhCacheManager ehCacheManager = new EhCacheManager();
+        ehCacheManager.init();
 
-        securityManager =
-            new NexusWebRealmSecurityManager( LoggerFactory.getLogger( getClass() ),
-                                              new HashMap<String, RolePermissionResolver>() );
-        securityManager.setRealm( simpleAccountRealm );
-        securityManager.init();
+        cacheManager = ehCacheManager.getCacheManager();
 
-        SecurityUtils.setSecurityManager( securityManager );
-
-        sessionManager =
-            (StatelessAndStatefulWebSessionManager) securityManager.getSessionManager();
-        sessionDAO = (CachingSessionDAO) sessionManager.getSessionDAO();
-        // init the cache safely by calling GetActiveSessions
-        sessionDAO.getActiveSessions();
-
-        // verify 0 active sessions to start
-        MatcherAssert.assertThat( sessionDAO.getActiveSessions().size(), equalTo( 0 ));
-
+        // by default use the default implementation
+        securityManager.setCacheManager( ehCacheManager );
     }
 
-    /**
-     * Verifies a session is NOT stored in the when a stateless client logs in.  (uses the default MapCache impl)
-     */
-    @Test
-    public void testStatelessSession()
+    protected void initCache( CachingSessionDAO sessionDAO )
     {
-        // mock a stateless client connection
-        HttpServletRequest request = Mockito.mock( HttpServletRequest.class );
-        Mockito.when( request.getHeader( "X-Nexus-Session" ) ).thenReturn( "none" );
-        HttpServletResponse response = Mockito.mock( HttpServletResponse.class );
+        super.initCache( sessionDAO );
 
-        // create a user and login
-        WebSubject subject = new WebSubject.Builder( securityManager, request, response ).buildWebSubject();
-        subject.login( new UsernamePasswordToken( "user", "user123" ) );
-
-        // verify 0 active sessions
-        MatcherAssert.assertThat( sessionDAO.getActiveSessions().size(), equalTo( 0 ));
-
-        // verify accessing the session does not blow up
-        subject.getSession().getAttributeKeys();
-
-        // verify the session is NOT stored in a cache
-        try
-        {
-            sessionManager.getSession(
-                new DefaultSessionKey( subject.getSession().getId() ) ); // again using the sessionManager
-            Assert.fail( "expected UnknownSessionException" );
-        }
-        catch ( UnknownSessionException e )
-        {
-            // expected
-        }
-
-        // force clearing the ehcache
-        sessionDAO.getActiveSessionsCache().clear();
-
-        // verify accessing the session does not blow up
-        subject.getSession().getAttributeKeys();
-
-        // using the sessionManager API will fail
-        try
-        {
-            sessionManager.getSession(
-                new DefaultSessionKey( subject.getSession().getId() ) ); // again using the sessionManager
-            Assert.fail( "expected UnknownSessionException" );
-        }
-        catch ( UnknownSessionException e )
-        {
-            // expected
-        }
+        // verify ehCache was set for this test
+        MatcherAssert.assertThat( sessionDAO.getActiveSessionsCache(), is( instanceOf( EhCache.class ) ) );
     }
 
 
-    /**
-     * Verifies a session IS stored in the when a state-full client logs in.  (uses the default MapCache impl)
-     */
-    @Test
-    public void testStateFullSession()
+    protected void verifyNoSessionStored()
     {
-        // mock a state-full client connection
-        HttpServletRequest request = Mockito.mock( HttpServletRequest.class );
-        HttpServletResponse response = Mockito.mock( HttpServletResponse.class );
+        super.verifyNoSessionStored();
 
-        // create a user and login
-        WebSubject subject = new WebSubject.Builder( securityManager, request, response ).buildWebSubject();
-        subject.login( new UsernamePasswordToken( "user", "user123" ) );
+        // use the EhCache API to verify no sessions are stored
+        MatcherAssert.assertThat( cacheManager.getCache( CachingSessionDAO.ACTIVE_SESSION_CACHE_NAME ).getSize(), is( 0 ) );
 
-        // verify 1 active sessions
-        MatcherAssert.assertThat( sessionDAO.getActiveSessions().size(), equalTo( 1 ));
-
-        // verify accessing the session does not blow up
-        subject.getSession().getAttributeKeys(); // directly against the subject object
-        sessionManager.getSession(
-            new DefaultSessionKey( subject.getSession().getId() ) ); // again using the sessionManager
-
-        // force clearing the ehcache
-        sessionDAO.getActiveSessionsCache().clear();
-
-
-
-        // now the session should not be found
-        try
-        {
-            subject.getSession().getAttributeKeys(); // directly against the subject object
-            Assert.fail( "expected UnknownSessionException" );
-        }
-        catch ( UnknownSessionException e )
-        {
-            // expected
-        }
-
-        try
-        {
-            sessionManager.getSession(
-                new DefaultSessionKey( subject.getSession().getId() ) ); // again using the sessionManager
-            Assert.fail( "expected UnknownSessionException" );
-        }
-        catch ( UnknownSessionException e )
-        {
-            // expected
-        }
     }
 
-    /**
-     * Verifies a session is NOT stored in the when a stateless client logs in.  (uses the EhCache impl)
-     */
-    @Test
-    public void testStatelessSessionWithEhCache()
+    protected void verifySingleSessionStored( Serializable sessionId )
     {
-        this.securityManager.setCacheManager( new EhCacheManager() );
+        super.verifySingleSessionStored( sessionId );
 
-        // verify ehcache was set for this test
-        MatcherAssert.assertThat( this.sessionDAO.getActiveSessionsCache(), is( instanceOf( EhCache.class ) ) );
+        // use the EhCache API to verify 1 sessions are stored
 
-        testStatelessSession();
-    }
+        Cache cache = cacheManager.getCache( CachingSessionDAO.ACTIVE_SESSION_CACHE_NAME );
 
-    /**
-     * Verifies a session is NOT stored in the when a stateless client logs in.  (uses the EhCache impl)
-     */
-    @Test
-    public void testStateFullSessionWithEhCache()
-    {
-        this.securityManager.setCacheManager( new EhCacheManager() );
-        testStateFullSession();
-    }
+        MatcherAssert.assertThat( cache.getSize(), is( 1 ) );
+       // again using the sessionId
+        MatcherAssert.assertThat( cache.get( sessionId ), notNullValue() );
 
-    @After
-    public void clearSecurityThreadLocals()
-    {
-        ThreadContext.remove();
     }
 
 }
