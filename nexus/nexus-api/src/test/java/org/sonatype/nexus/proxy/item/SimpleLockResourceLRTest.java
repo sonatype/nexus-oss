@@ -18,6 +18,9 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Random;
 
 import org.junit.Test;
@@ -32,11 +35,11 @@ public class SimpleLockResourceLRTest
     {
         LockResource repoLock = new SimpleLockResource();
 
-        Thread t1 = new Thread( new Locker( repoLock ) );
-        Thread t2 = new Thread( new Locker( repoLock ) );
-        Thread t3 = new Thread( new Locker( repoLock ) );
-        Thread t4 = new Thread( new Locker( repoLock ) );
-        Thread t5 = new Thread( new Locker( repoLock ) );
+        Locker t1 = createThread( repoLock, "t1" );
+        Locker t2 = createThread( repoLock, "t2" );
+        Locker t3 = createThread( repoLock, "t3" );
+        Locker t4 = createThread( repoLock, "t4" );
+        Locker t5 = createThread( repoLock, "t5" );
 
         t1.start();
         t2.start();
@@ -49,35 +52,63 @@ public class SimpleLockResourceLRTest
         t3.join();
         t4.join();
         t5.join();
+
+        assertThreadNotFailed( t1 );
+        assertThreadNotFailed( t2 );
+        assertThreadNotFailed( t3 );
+        assertThreadNotFailed( t4 );
+        assertThreadNotFailed( t5 );
+    }
+
+    protected Locker createThread( final LockResource repoLock, final String name )
+    {
+        final Locker locker = new Locker( repoLock );
+        locker.setName( name );
+        return locker;
+    }
+
+    protected void assertThreadNotFailed( final Locker t )
+    {
+        final Throwable throwable = t.getThrowable();
+
+        if ( throwable != null )
+        {
+            assertThat( t.getName() + " failed with: " + throwable.getMessage(), false );
+        }
+    }
+
+    // ==
+
+    private static int sharedResource = 0;
+
+    protected static int getSharedResource()
+    {
+        return sharedResource;
+    }
+
+    protected static void setSharedResource( int val )
+    {
+        if ( val != ( sharedResource + 1 ) )
+        {
+            throw new IllegalArgumentException( Thread.currentThread().getName()
+                + " thread would overwrite shared resource with a stale state!" );
+        }
+
+        sharedResource = val;
     }
 
     // ==
 
     public static class Locker
-        implements Runnable
+        extends Thread
+        implements UncaughtExceptionHandler
     {
-        private static int sharedResource = 0;
-
-        private static int getSharedResource()
-        {
-            // logger.info( "Thread {} reads {}", Thread.currentThread().getName(), sharedResource );
-
-            return sharedResource;
-        }
-
-        private static void setSharedResource( int val )
-        {
-            // logger.info( "Thread {} sets {} to {}", new Object[] { Thread.currentThread().getName(), sharedResource,
-            // val } );
-
-            sharedResource = val;
-        }
-
         private final LockResource lock;
 
         public Locker( final LockResource lock )
         {
             this.lock = lock;
+            setUncaughtExceptionHandler( this );
         }
 
         @Override
@@ -87,17 +118,13 @@ public class SimpleLockResourceLRTest
             {
                 for ( int i = 0; i < 100; i++ )
                 {
-                    lock.lockShared();
-
                     int sharedBeforeChange = getSharedResource();
-
                     int shared = -1;
+
+                    lock.lockShared();
 
                     try
                     {
-                        // do something
-                        Thread.sleep( rnd.nextInt( 50 ) );
-
                         // do something needing write
                         lock.lockExclusively();
 
@@ -126,28 +153,27 @@ public class SimpleLockResourceLRTest
                         {
                             lock.unlock();
                         }
-
-                        // this test uses the following fact: Write lock, once acquired is held all the way, even we
-                        // stepped out of the "boxed" access (unlock above). See SmartLock class, "upgrade"
-                        // happens, but
-                        // not downgrade. Simply, if you have read locks in a moment you acquire write lock, they will
-                        // be "converted"
-                        // to write locks (to maintain boxing depth and number of unlock() invocations).
-
-                        // So, the code below STILL EXECUTES IN EXCLUSIVE lock!
-                        int sharedAfterChange = getSharedResource();
-
-                        // Assertion (note, it's STRICTLY LESS-THEN):
-                        // sharedBeforeChange < shared = sharedAfterChange
-                        if ( !( ( sharedBeforeChange < shared ) && ( shared == sharedAfterChange ) ) )
-                        {
-                            throw new IllegalStateException( Thread.currentThread().getName() + " before:"
-                                + sharedBeforeChange + " shared:" + shared + " after:" + sharedAfterChange );
-                        }
                     }
                     finally
                     {
                         lock.unlock();
+                    }
+
+                    // kick other threads
+                    Thread.yield();
+
+                    // do something
+                    Thread.sleep( rnd.nextInt( 50 ) );
+
+                    // This code executes OUTSIDE of critical region!
+                    int sharedAfterChange = getSharedResource();
+
+                    // Assertion (note, it's STRICTLY LESS-THEN):
+                    // sharedBeforeChange < shared = sharedAfterChange
+                    if ( !( ( sharedBeforeChange < shared ) && ( shared <= sharedAfterChange ) ) )
+                    {
+                        throw new IllegalStateException( Thread.currentThread().getName() + " before:"
+                            + sharedBeforeChange + " shared:" + shared + " after:" + sharedAfterChange );
                     }
                 }
             }
@@ -155,6 +181,19 @@ public class SimpleLockResourceLRTest
             {
                 throw new IllegalStateException( e );
             }
+        }
+
+        private Throwable throwable;
+
+        @Override
+        public void uncaughtException( Thread t, Throwable e )
+        {
+            this.throwable = e;
+        }
+
+        public Throwable getThrowable()
+        {
+            return this.throwable;
         }
     }
 
