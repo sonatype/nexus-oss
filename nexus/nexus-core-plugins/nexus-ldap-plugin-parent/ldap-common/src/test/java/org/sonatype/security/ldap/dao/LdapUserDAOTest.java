@@ -85,6 +85,18 @@ public class LdapUserDAOTest
             // good
         }
 
+        configuration.setLdapFilter( "description=nexus" );
+        // must succeed because cstamas has the attribute description set to nexus
+        user = lum.getUser( "cstamas", initialContext, configuration);
+        try {
+            // must fail because of the ldapFilter that jvanzyl user don't have
+            user = lum.getUser( "jvanzyl", initialContext, configuration);
+            fail();
+        }
+        catch ( NoSuchLdapUserException e)
+        {
+            // good
+        }
     }
 
 }

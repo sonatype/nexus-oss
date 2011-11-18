@@ -75,7 +75,7 @@
                 
                 <field>
                     <name>userRoleMappings</name>
-                    <version>1.0.0</version>
+                    <version>1.0.0+</version>
                     <description>The mapping between users and roles if LDAP groups are not used.</description>
                     <association>
                     	<type>CUserRoleMapping</type>
@@ -285,6 +285,14 @@
                     <required>true</required>
                     <description>Groups are generally one of two types in LDAP systems - static or dynamic. A static group maintains its own membership list. A dynamic group records its membership on a user entry. If dynamic groups this should be set to the attribute used to store the group string in the user object.</description>
                 </field>
+
+                <field>
+                    <name>ldapFilter</name>
+                    <version>1.0.1+</version>
+                    <type>String</type>
+                    <required>true</required>
+                    <description>Filter to limit user search to user with specific attribute.</description>
+                </field>
                 
             </fields>
         </class>
@@ -292,19 +300,19 @@
         
         <class>
             <name>CUserRoleMapping</name>
-            <version>1.0.0</version>
+            <version>1.0.0+</version>
             <description>Defines the mapping between users and roles, if LDAP groups are not used.</description>
             <fields>
                 <field>
                     <name>userId</name>
-                    <version>1.0.0</version>
+                    <version>1.0.0+</version>
                     <type>String</type>
                     <required>true</required>
                     <description>User ID.  The id of the user.</description>
                 </field>
                  <field>
                     <name>roles</name>
-                    <version>1.0.0</version>
+                    <version>1.0.0+</version>
                     <association>
                         <type>String</type>
                         <multiplicity>*</multiplicity>

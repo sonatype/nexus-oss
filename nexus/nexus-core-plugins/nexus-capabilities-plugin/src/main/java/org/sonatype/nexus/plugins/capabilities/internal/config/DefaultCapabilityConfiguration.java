@@ -31,12 +31,10 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.concurrent.locks.ReentrantLock;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -47,6 +45,7 @@ import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationAddEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationLoadEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationRemoveEvent;
@@ -60,6 +59,7 @@ import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 @Singleton
 @Named
 public class DefaultCapabilityConfiguration
+    extends AbstractLoggingComponent
     implements CapabilityConfiguration
 {
 
@@ -72,9 +72,6 @@ public class DefaultCapabilityConfiguration
     // @Inject
     private final ConfigurationIdGenerator idGenerator;
 
-    // @Inject
-    private final Logger logger;
-
     private final File configurationFile;
 
     private final ReentrantLock lock = new ReentrantLock();
@@ -85,12 +82,11 @@ public class DefaultCapabilityConfiguration
     public DefaultCapabilityConfiguration( final ApplicationConfiguration applicationConfiguration,
                                            final ApplicationEventMulticaster applicationEventMulticaster,
                                            final CapabilityConfigurationValidator validator,
-                                           final ConfigurationIdGenerator idGenerator, final Logger logger )
+                                           final ConfigurationIdGenerator idGenerator )
     {
         this.applicationEventMulticaster = applicationEventMulticaster;
         this.validator = validator;
         this.idGenerator = idGenerator;
-        this.logger = logger;
 
         configurationFile = new File( applicationConfiguration.getWorkingDirectory(), "conf/capabilities.xml" );
     }
@@ -116,8 +112,9 @@ public class DefaultCapabilityConfiguration
 
             save();
 
-            logger.debug( String.format( "Added capability [%s] with properties %s", capability.getName(),
-                capability.getProperties() ) );
+            getLogger().debug(
+                "Added capability [{}] with properties [{}]", capability.getName(), capability.getProperties()
+            );
             applicationEventMulticaster.notifyEventListeners( new CapabilityConfigurationAddEvent( capability ) );
 
             return generatedId;
@@ -150,9 +147,11 @@ public class DefaultCapabilityConfiguration
                 getConfiguration().addCapability( capability );
                 save();
 
-                logger.debug( String.format( "Updated capability [%s] with properties %s", capability.getName(),
-                    capability.getProperties() ) );
-                applicationEventMulticaster.notifyEventListeners( new CapabilityConfigurationUpdateEvent( capability ) );
+                getLogger().debug(
+                    "Updated capability [{}] with properties [{}]", capability.getName(), capability.getProperties()
+                );
+                applicationEventMulticaster.notifyEventListeners(
+                    new CapabilityConfigurationUpdateEvent( capability ) );
             }
         }
         finally
@@ -174,8 +173,9 @@ public class DefaultCapabilityConfiguration
                 getConfiguration().removeCapability( stored );
                 save();
 
-                logger.debug( String.format( "Removed capability [%s] with properties %s", stored.getName(),
-                    stored.getProperties() ) );
+                getLogger().debug(
+                    "Removed capability [{}] with properties [{}]", stored.getName(), stored.getProperties()
+                );
                 applicationEventMulticaster.notifyEventListeners( new CapabilityConfigurationRemoveEvent( stored ) );
             }
         }
@@ -280,8 +280,9 @@ public class DefaultCapabilityConfiguration
         final Collection<CCapability> capabilities = getAll();
         for ( final CCapability capability : capabilities )
         {
-            logger.debug( String.format( "Loading capability [%s] with properties [%s]", capability.getName(),
-                capability.getProperties() ) );
+            getLogger().debug(
+                "Loading capability [{}] with properties [{}]", capability.getName(), capability.getProperties()
+            );
             applicationEventMulticaster.notifyEventListeners( new CapabilityConfigurationLoadEvent( capability ) );
         }
     }
@@ -326,11 +327,6 @@ public class DefaultCapabilityConfiguration
     public void clearCache()
     {
         configuration = null;
-    }
-
-    private Logger getLogger()
-    {
-        return logger;
     }
 
 }

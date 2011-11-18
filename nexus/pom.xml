@@ -935,6 +935,13 @@
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>org.mockito</groupId>
+        <artifactId>mockito-core</artifactId>
+        <version>1.9.0-rc1</version>
+        <type>jar</type>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
         <groupId>org.uncommons</groupId>
         <artifactId>reportng</artifactId>
         <version>1.1.2</version>

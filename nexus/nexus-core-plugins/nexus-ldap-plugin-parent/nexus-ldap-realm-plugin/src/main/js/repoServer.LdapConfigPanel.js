@@ -55,7 +55,8 @@ Sonatype.repoServer.LdapConfigPanel = function( config ) {
       userRealNameAttribute: '',
       userSubtree: false,
       groupSubtree: false,
-      userMemberOfAttribute: ''
+      userMemberOfAttribute: '',
+      ldapFilter: ''
     }
   };
   
@@ -286,6 +287,14 @@ Sonatype.repoServer.LdapConfigPanel = function( config ) {
                 anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
                 itemCls: 'required-field',
                 allowBlank: false
+              },
+              {
+                xtype: 'textfield',
+                fieldLabel: 'User Filter',
+                helpText: 'LDAP search filter to additionally limit user search (for example "attribute=foo" or "(|(mail=*@domain.com)(uid=dom*))".',
+                name: 'ldapFilter',
+                anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+                allowBlank: true
               },
               {
                 xtype: 'textfield',

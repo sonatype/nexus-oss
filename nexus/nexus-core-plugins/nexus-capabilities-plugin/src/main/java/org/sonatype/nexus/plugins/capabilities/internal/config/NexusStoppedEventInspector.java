@@ -18,30 +18,35 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.config;
 
+import java.util.ArrayList;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.plugins.capabilities.api.Capability;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.plexus.appevents.Event;
 
 @Singleton
-public class NexusStartedEventInspector
+public class NexusStoppedEventInspector
+    extends AbstractLoggingComponent
     implements EventInspector
 {
 
-    private final CapabilityConfiguration capabilitiesConfiguration;
+    private final CapabilityRegistry registry;
 
     @Inject
-    public NexusStartedEventInspector( final CapabilityConfiguration capabilitiesConfiguration )
+    public NexusStoppedEventInspector( final CapabilityRegistry registry )
     {
-        this.capabilitiesConfiguration = capabilitiesConfiguration;
+        this.registry = registry;
     }
 
     public boolean accepts( final Event<?> evt )
     {
         return evt != null
-            && evt instanceof NexusStartedEvent;
+            && evt instanceof NexusStoppedEvent;
     }
 
     public void inspect( final Event<?> evt )
@@ -50,13 +55,22 @@ public class NexusStartedEventInspector
         {
             return;
         }
-        try
+        for ( final Capability capability : new ArrayList<Capability>( registry.getAll() ) )
         {
-            capabilitiesConfiguration.load();
-        }
-        catch ( final Exception e )
-        {
-            throw new RuntimeException( "Could not load configurations", e );
+            if ( capability instanceof Capability.LifeCycle )
+            {
+                try
+                {
+                    ( (Capability.LifeCycle) capability ).passivate();
+                }
+                catch ( Exception e )
+                {
+                    getLogger().error(
+                        "Could not passivate capability with id '{}' ({})",
+                        new Object[]{ capability.id(), capability, e }
+                    );
+                }
+            }
         }
     }
 

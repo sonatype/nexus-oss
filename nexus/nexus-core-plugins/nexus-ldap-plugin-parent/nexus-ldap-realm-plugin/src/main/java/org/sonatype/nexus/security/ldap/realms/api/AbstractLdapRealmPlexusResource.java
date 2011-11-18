@@ -122,6 +122,7 @@ public abstract class AbstractLdapRealmPlexusResource
         cConf.setUserMemberOfAttribute( userAndGroupConf.getUserMemberOfAttribute() );
         cConf.setGroupSubtree( userAndGroupConf.isGroupSubtree() );
         cConf.setUserSubtree( userAndGroupConf.isUserSubtree() );
+        cConf.setLdapFilter( userAndGroupConf.getLdapFilter() );
 
         return cConf;
     }
@@ -145,6 +146,7 @@ public abstract class AbstractLdapRealmPlexusResource
         cConf.setUserMemberOfAttribute( userAndGroupConf.getUserMemberOfAttribute() );
         cConf.setGroupSubtree( userAndGroupConf.isGroupSubtree() );
         cConf.setUserSubtree( userAndGroupConf.isUserSubtree() );
+        cConf.setLdapFilter( userAndGroupConf.getLdapFilter() );
 
         return cConf;
     }

@@ -87,6 +87,10 @@ public class CapabilityConfigurationEventInspector
         final Capability capability = registry.create( capabilityConfig.getId(), capabilityConfig.getTypeId() );
         registry.add( capability );
         capability.create( asMap( capabilityConfig.getProperties() ) );
+        if ( capability instanceof Capability.LifeCycle )
+        {
+            ( (Capability.LifeCycle) capability ).activate();
+        }
     }
 
     private void handle( final CapabilityConfigurationLoadEvent evt )
@@ -95,6 +99,10 @@ public class CapabilityConfigurationEventInspector
         final Capability capability = registry.create( capabilityConfig.getId(), capabilityConfig.getTypeId() );
         registry.add( capability );
         capability.load( asMap( capabilityConfig.getProperties() ) );
+        if ( capability instanceof Capability.LifeCycle )
+        {
+            ( (Capability.LifeCycle) capability ).activate();
+        }
     }
 
     private void handle( final CapabilityConfigurationUpdateEvent evt )
@@ -114,6 +122,10 @@ public class CapabilityConfigurationEventInspector
         if ( capability != null )
         {
             registry.remove( capability.id() );
+            if ( capability instanceof Capability.LifeCycle )
+            {
+                ( (Capability.LifeCycle) capability ).passivate();
+            }
             capability.remove();
         }
     }

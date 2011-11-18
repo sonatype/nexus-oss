@@ -23,14 +23,60 @@ import java.util.Map;
 public interface Capability
 {
 
+    /**
+     * Returns an unique capability identifier.
+     *
+     * @return identifier
+     */
     String id();
 
+    /**
+     * Callback when a new capability is created.
+     *
+     * @param properties capability configuration
+     */
     void create( Map<String, String> properties );
 
+    /**
+     * Callback when a capability configuration is loaded from persisted store (configuration file).
+     *
+     * @param properties capability configuration
+     */
     void load( Map<String, String> properties );
 
+    /**
+     * Callback when a capability configuration is updated.
+     *
+     * @param properties capability configuration
+     */
     void update( Map<String, String> properties );
 
+    /**
+     * Callback when a capability is removed.
+     */
     void remove();
+
+    /**
+     * Capability life cycle. Optionally to be implemented by capabilities that need to react on activation /
+     * passivation.
+     *
+     * @since 1.10.0
+     */
+    static interface LifeCycle
+    {
+
+        /**
+         * Callback when capability is activated. Activation is triggered on create/load (if capability is not disabled)
+         * , or when capability is re-enabled.
+         */
+        void activate();
+
+        /**
+         * Callback when capability is passivated. Passivation will be triggered before a capability is removed, on
+         * Nexus shutdown or when capability is disabled.
+         */
+        void passivate();
+
+    }
 
 }

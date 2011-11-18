@@ -173,7 +173,7 @@
               <goal>xpp3-writer</goal>
             </goals>
             <configuration>
-              <version>1.0.0</version>
+              <version>1.0.1</version>
               <models>
                 <model>src/main/mdo/ldap.xml</model>
               </models>
