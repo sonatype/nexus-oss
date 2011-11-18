@@ -111,12 +111,16 @@ public class CapabilityConfigurationEventInspector
         if ( capability != null )
         {
             final CCapability previousCapabilityConfig = evt.getPreviousCapability();
-            if ( previousCapabilityConfig.isEnabled() && capability instanceof Capability.LifeCycle )
+            if ( previousCapabilityConfig.isEnabled()
+                && !capabilityConfig.isEnabled()
+                && capability instanceof Capability.LifeCycle )
             {
                 ( (Capability.LifeCycle) capability ).passivate();
             }
             capability.update( asMap( capabilityConfig.getProperties() ) );
-            if ( capabilityConfig.isEnabled() && capability instanceof Capability.LifeCycle )
+            if ( capabilityConfig.isEnabled()
+                && !previousCapabilityConfig.isEnabled()
+                && capability instanceof Capability.LifeCycle )
             {
                 ( (Capability.LifeCycle) capability ).activate();
             }

@@ -42,8 +42,7 @@ public class CapabilityConfigurationEventInspectorTest
 {
 
     /**
-     * If previous configuration was enabled, passivate is called and no activate is called because new configuration is
-     * not enabled.
+     * If previous configuration was enabled and new configuration is not enabled, passivate is called.
      */
     @Test
     public void capabilityUpdated01()
@@ -56,8 +55,7 @@ public class CapabilityConfigurationEventInspectorTest
     }
 
     /**
-     * If previous configuration was not enabled, passivate is not called and no activate is called because new
-     * configuration is not enabled.
+     * If previous configuration was not enabled and new configuration is not enabled, passivate is not called.
      */
     @Test
     public void capabilityUpdated02()
@@ -69,23 +67,19 @@ public class CapabilityConfigurationEventInspectorTest
     }
 
     /**
-     * If previous configuration was enabled, passivate is called and activate is called because new configuration is
-     * enabled.
+     * If previous configuration was enabled and new configuration is enabled, activate is not called.
      */
     @Test
     public void capabilityUpdated03()
     {
         TestCapability capability = prepareForUpdate( true, true );
 
-        verify( capability ).passivate();
         verify( capability ).update( Matchers.<Map<String, String>>any() );
-        verify( capability ).activate();
         verifyNoMoreInteractions( capability );
     }
 
     /**
-     * If previous configuration was not enabled, passivate is not called and activate is called because new
-     * configuration is enabled.
+     * If previous configuration was not enabled and new configuration is enabled, activate is called.
      */
     @Test
     public void capabilityUpdated04()
