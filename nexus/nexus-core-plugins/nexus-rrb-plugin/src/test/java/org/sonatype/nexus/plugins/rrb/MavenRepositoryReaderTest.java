@@ -153,7 +153,7 @@ public class MavenRepositoryReaderTest
     public void testReadHtml()
     {
         List<RepositoryDirectory> result =
-            reader.extract( "htmlExample", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "htmlExample", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 7, result.size() );
     }
 
@@ -161,7 +161,7 @@ public class MavenRepositoryReaderTest
     public void testReadS3()
     {
         List<RepositoryDirectory> result =
-            reader.extract( "s3Example", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "s3Example", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 13, result.size() );
     }
 
@@ -173,7 +173,7 @@ public class MavenRepositoryReaderTest
         // "public browsing".
         List<RepositoryDirectory> result =
             reader.extract( "s3Example-foreign", localUrl,
-                getFaceProxyRepository( "http://coova-dev.s3.amazonaws.com/mvn/" ), "test" );
+                getFakeProxyRepository( "http://coova-dev.s3.amazonaws.com/mvn/" ), "test" );
         assertEquals( 0, result.size() );
     }
 
@@ -184,7 +184,7 @@ public class MavenRepositoryReaderTest
         localUrl =
             "http://localhost:8081/nexus/service/local/repositories/ArtyJavaNet/remotebrowser/http://repo.jfrog.org/artifactory/java.net";
         List<RepositoryDirectory> result =
-            reader.extract( "Artifactory.java.net.htm", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "Artifactory.java.net.htm", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 30, result.size() );
     }
 
@@ -199,7 +199,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://s3.amazonaws.com/maven.springframework.org
         List<RepositoryDirectory> result =
-            reader.extract( "/", localUrl, getFaceProxyRepository( getRemoteUrl() + "Amazon_20100118" ), "test" );
+            reader.extract( "/", localUrl, getFakeProxyRepository( getRemoteUrl() + "Amazon_20100118" ), "test" );
         assertEquals( 997, result.size() );
 
         for ( RepositoryDirectory repositoryDirectory : result )
@@ -215,7 +215,7 @@ public class MavenRepositoryReaderTest
         // Fetched from URI http://repository.springsource.com/?prifix=maven/bundles/release&delimiter=/
         // and http://repository.springsource.com/maven/bundles/release/com
         List<RepositoryDirectory> result =
-            reader.extract( "/com/", localUrl, getFaceProxyRepository( getRemoteUrl()
+            reader.extract( "/com/", localUrl, getFakeProxyRepository( getRemoteUrl()
                 + "Amazon_20110112/maven/bundles/release" ), "test" );
         assertEquals( "Result: " + result, 1, result.size() );
 
@@ -233,7 +233,7 @@ public class MavenRepositoryReaderTest
         // and http://repository.springsource.com/maven/bundles/release/
         List<RepositoryDirectory> result =
             reader.extract( "/", localUrl,
-                getFaceProxyRepository( getRemoteUrl() + "Amazon_20110112/maven/bundles/release" ), "test" );
+                getFakeProxyRepository( getRemoteUrl() + "Amazon_20110112/maven/bundles/release" ), "test" );
         assertEquals( "Result: " + result, 2, result.size() );
 
         RepositoryDirectory repositoryDirectory1 = result.get( 0 );
@@ -252,7 +252,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://repository.apache.org/snapshots
         List<RepositoryDirectory> result =
-            reader.extract( "Apache_Snapshots_20100118", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "Apache_Snapshots_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 9, result.size() );
     }
 
@@ -261,7 +261,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://snapshots.repository.codehaus.org/
         List<RepositoryDirectory> result =
-            reader.extract( "Codehaus_Snapshots_20100118", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "Codehaus_Snapshots_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 3, result.size() );
     }
 
@@ -270,7 +270,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://google-caja.googlecode.com/svn/maven
         List<RepositoryDirectory> result =
-            reader.extract( "Google_Caja_20100118", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "Google_Caja_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 3, result.size() );
     }
 
@@ -279,7 +279,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://oauth.googlecode.com/svn/code/maven
         List<RepositoryDirectory> result =
-            reader.extract( "Google_Oauth_20100118", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "Google_Oauth_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 4, result.size() );
     }
 
@@ -288,7 +288,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://repository.jboss.org/maven2/
         List<RepositoryDirectory> result =
-            reader.extract( "JBoss_Maven_Release_Repository_20100118", localUrl, getFaceProxyRepository( getRemoteUrl() ),
+            reader.extract( "JBoss_Maven_Release_Repository_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ),
                 "test" );
         assertEquals( 201, result.size() );
     }
@@ -298,7 +298,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://repo1.maven.org/maven2
         List<RepositoryDirectory> result =
-            reader.extract( "Maven_Central_20100118", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "Maven_Central_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 647, result.size() );
     }
 
@@ -307,7 +307,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://repository.sonatype.org/content/groups/forge
         List<RepositoryDirectory> result =
-            reader.extract( "Nexus_Repository_Manager_20100118", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "Nexus_Repository_Manager_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 173, result.size() );
     }
 
@@ -316,7 +316,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://www.eviware.com/repository/maven2/
         List<RepositoryDirectory> result =
-            reader.extract( "Eviwares_Maven_repo_20100118", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "Eviwares_Maven_repo_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 67, result.size() );
     }
 
@@ -325,7 +325,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://download.java.net/maven/1/
         List<RepositoryDirectory> result =
-            reader.extract( "java.net_repo_20100118", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "java.net_repo_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 94, result.size() );
     }
 
@@ -334,7 +334,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://repository.codehaus.org/
         List<RepositoryDirectory> result =
-            reader.extract( "Codehaus_20100118", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "Codehaus_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 5, result.size() );
     }
 
@@ -343,7 +343,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://download.java.net/maven/2/
         List<RepositoryDirectory> result =
-            reader.extract( "java.net2_20100118", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "java.net2_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 57, result.size() );
     }
 
@@ -352,7 +352,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://repo.open.iona.com/maven2/
         List<RepositoryDirectory> result =
-            reader.extract( "Open.iona.com_Releases_20100118", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "Open.iona.com_Releases_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 8, result.size() );
     }
 
@@ -367,7 +367,7 @@ public class MavenRepositoryReaderTest
     {
         // Fetched from URI http://repository.springsource.com/
         List<RepositoryDirectory> result =
-            reader.extract( "Springsource_20100118", localUrl, getFaceProxyRepository( getRemoteUrl() ), "test" );
+            reader.extract( "Springsource_20100118", localUrl, getFakeProxyRepository( getRemoteUrl() ), "test" );
         assertEquals( 995, result.size() );
     }
 
@@ -379,7 +379,7 @@ public class MavenRepositoryReaderTest
         return "http://" + nameOfConnector + "/";
     }
     
-    private ProxyRepository getFaceProxyRepository(final String remoteUrl)
+    private ProxyRepository getFakeProxyRepository(final String remoteUrl)
     {
         final ProxyRepository repository = Mockito.mock( ProxyRepository.class );
         Mockito.when( repository.getRemoteUrl() ).thenReturn( remoteUrl );
