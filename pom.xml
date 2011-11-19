@@ -47,7 +47,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <nexus.version>1.10.0-SNAPSHOT</nexus.version>
-    <sisu.assembler.tags>nexus,nexus-plugins</sisu.assembler.tags>
+    <nexusPluginType>nexus-plugin</nexusPluginType>
   </properties>
 
   <dependencyManagement>
@@ -77,6 +77,12 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-api</artifactId>
+      <version>${nexus.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
       <version>${nexus.version}</version>
       <scope>provided</scope>
@@ -97,7 +103,7 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-p2-bridge-plugin</artifactId>
       <version>1.0-SNAPSHOT</version>
-      <type>nexus-plugin</type>
+      <type>${nexusPluginType}</type>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -125,7 +131,7 @@
       <version>1.3.RC2</version>
       <scope>test</scope>
     </dependency>
-      <!-- core To override any version from transitive dependencies. -->
+    <!-- core To override any version from transitive dependencies. -->
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-core</artifactId>
@@ -183,7 +189,7 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
       <version>${nexus.version}</version>
-      <type>nexus-plugin</type>
+      <type>${nexusPluginType}</type>
       <scope>provided</scope>
     </dependency>
 
@@ -206,100 +212,6 @@
           <target>1.6</target>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>${nexus.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>setup-nexus-plugin-environment</goal>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <nexusBundleArtifact>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-oss-webapp</artifactId>
-            <version>${nexus.version}</version>
-            <type>zip</type>
-            <classifier>bundle</classifier>
-          </nexusBundleArtifact>
-          <nexusBundleName>nexus-oss-webapp-${nexus.version}</nexusBundleName>
-          <nexusVersion>${nexus.version}</nexusVersion>
-          <nexusPluginsArtifacts>
-            <plugin>
-              <groupId>org.sonatype.nexus.plugins</groupId>
-              <artifactId>nexus-capabilities-plugin</artifactId>
-              <version>${nexus.version}</version>
-              <classifier>bundle</classifier>
-              <type>zip</type>
-            </plugin>
-            <plugin>
-              <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-it-helper-plugin</artifactId>
-              <version>${nexus.version}</version>
-              <classifier>cp</classifier>
-              <type>jar</type>
-            </plugin>
-            <plugin>
-              <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-it-helper-plugin</artifactId>
-              <version>${nexus.version}</version>
-              <classifier>bundle</classifier>
-              <type>zip</type>
-            </plugin>
-          </nexusPluginsArtifacts>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.8.1</version>
-        <executions>
-          <execution>
-            <id>integration-test</id>
-            <goals>
-              <goal>integration-test</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>verify</id>
-            <goals>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven.surefire</groupId>
-            <artifactId>surefire-junit4</artifactId>
-            <version>2.8.1</version>
-            <scope>compile</scope>
-          </dependency>
-        </dependencies>
-        <configuration>
-          <junitArtifactName>junit:junit-dep</junitArtifactName>
-          <forkMode>always</forkMode>
-          <properties>
-            <property>
-              <name>listener</name>
-              <value>org.junit.runner.notification.RunListener</value>
-            </property>
-          </properties>
-          <argLine>-Xmx512m</argLine>
-          <testNGArtifactName>org.testng:testng</testNGArtifactName>
-          <failIfNoTests>false</failIfNoTests>
-          <systemProperties>
-            <property>
-              <name>user.home</name>
-              <value>${project.build.directory}/user_home</value>
-            </property>
-          </systemProperties>
-        </configuration>
-      </plugin>
-
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.8.1</version>
@@ -335,24 +247,120 @@
 
   <profiles>
     <profile>
-      <id>skipITs</id>
+      <id>it</id>
+
+      <activation>
+        <property>
+          <name>it</name>
+          <value>true</value>
+        </property>
+      </activation>
+
       <build>
         <plugins>
           <plugin>
-            <artifactId>maven-failsafe-plugin</artifactId>
+            <groupId>org.sonatype.nexus.plugins</groupId>
+            <artifactId>nexus-test-environment-maven-plugin</artifactId>
+            <version>${nexus.version}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>setup-nexus-plugin-environment</goal>
+                  <goal>package</goal>
+                </goals>
+              </execution>
+            </executions>
             <configuration>
-              <skip>true</skip>
+              <nexusBundleArtifact>
+                <groupId>org.sonatype.nexus</groupId>
+                <artifactId>nexus-oss-webapp</artifactId>
+                <version>${nexus.version}</version>
+                <type>zip</type>
+                <classifier>bundle</classifier>
+              </nexusBundleArtifact>
+              <nexusBundleName>nexus-oss-webapp-${nexus.version}</nexusBundleName>
+              <nexusVersion>${nexus.version}</nexusVersion>
+              <nexusPluginsArtifacts>
+                <plugin>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-capabilities-plugin</artifactId>
+                  <version>${nexus.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                </plugin>
+                <plugin>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-it-helper-plugin</artifactId>
+                  <version>${nexus.version}</version>
+                  <classifier>cp</classifier>
+                  <type>jar</type>
+                </plugin>
+                <plugin>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-it-helper-plugin</artifactId>
+                  <version>${nexus.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                </plugin>
+              </nexusPluginsArtifacts>
             </configuration>
           </plugin>
+
           <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>nexus-test-environment-maven-plugin</artifactId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>2.8.1</version>
+            <executions>
+              <execution>
+                <id>integration-test</id>
+                <goals>
+                  <goal>integration-test</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>verify</id>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.apache.maven.surefire</groupId>
+                <artifactId>surefire-junit4</artifactId>
+                <version>2.8.1</version>
+                <scope>compile</scope>
+              </dependency>
+            </dependencies>
             <configuration>
-              <testSkip>true</testSkip>
+              <junitArtifactName>junit:junit-dep</junitArtifactName>
+              <forkMode>always</forkMode>
+              <properties>
+                <property>
+                  <name>listener</name>
+                  <value>org.junit.runner.notification.RunListener</value>
+                </property>
+              </properties>
+              <argLine>-Xmx512m</argLine>
+              <testNGArtifactName>org.testng:testng</testNGArtifactName>
+              <failIfNoTests>false</failIfNoTests>
+              <systemProperties>
+                <property>
+                  <name>user.home</name>
+                  <value>${project.build.directory}/user_home</value>
+                </property>
+              </systemProperties>
             </configuration>
           </plugin>
         </plugins>
       </build>
+    </profile>
+
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
+    <profile>
+      <id>idea</id>
+      <properties>
+        <nexusPluginType>jar</nexusPluginType>
+      </properties>
     </profile>
     <profile>
       <id>coverage</id>
