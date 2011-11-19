@@ -80,4 +80,22 @@ public class CompositeCapability
         }
     }
 
+    @Override
+    public void activate()
+    {
+        for ( final Capability capability : capabilities )
+        {
+            capability.activate();
+        }
+    }
+
+    @Override
+    public void passivate()
+    {
+        for ( final Capability capability : capabilities )
+        {
+            capability.passivate();
+        }
+    }
+
 }
