@@ -43,40 +43,42 @@ public class P2MetadataGeneratorCapability
     @Override
     public void create( final Map<String, String> properties )
     {
-        configuration = new P2MetadataGeneratorConfiguration( properties );
-        service.addConfiguration( configuration );
-
-        super.create( properties );
+        configuration = createConfiguration( properties );
     }
 
     @Override
     public void load( final Map<String, String> properties )
     {
-        configuration = new P2MetadataGeneratorConfiguration( properties );
-        service.addConfiguration( configuration );
-
-        super.load( properties );
+        create( properties );
     }
 
     @Override
     public void update( final Map<String, String> properties )
     {
-        final P2MetadataGeneratorConfiguration newConfiguration = new P2MetadataGeneratorConfiguration( properties );
+        final P2MetadataGeneratorConfiguration newConfiguration = createConfiguration( properties );
         if ( !configuration.equals( newConfiguration ) )
         {
-            remove();
-            create( properties );
+            passivate();
+            configuration = newConfiguration;
+            activate();
         }
-
-        super.update( properties );
     }
 
     @Override
-    public void remove()
+    public void activate()
+    {
+        service.addConfiguration( configuration );
+    }
+
+    @Override
+    public void passivate()
     {
         service.removeConfiguration( configuration );
+    }
 
-        super.remove();
+    private P2MetadataGeneratorConfiguration createConfiguration( final Map<String, String> properties )
+    {
+        return new P2MetadataGeneratorConfiguration( properties );
     }
 
 }
