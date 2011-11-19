@@ -435,6 +435,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             },
             serviceDataObj : {
               id : "",
+              enabled : true,
               name : "",
               typeId : "",
               properties : [{
