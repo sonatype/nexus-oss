@@ -26,7 +26,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.DelegatingSession;
 import org.apache.shiro.session.mgt.SessionContext;
+import org.apache.shiro.session.mgt.SessionKey;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
 import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
@@ -35,6 +37,7 @@ import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
 import org.apache.shiro.web.servlet.ShiroHttpSession;
 import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.apache.shiro.web.session.mgt.WebSessionKey;
 import org.apache.shiro.web.util.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +49,7 @@ public class StatelessAndStatefulWebSessionManager
     private static final Logger log = LoggerFactory.getLogger( StatelessAndStatefulWebSessionManager.class );
 
     public static final String NO_SESSION_HEADER = "X-Nexus-Session";
+    public static final String DO_NOT_STORE_SESSION_KEY = "NO_SESSION";
 
     private SessionIdGenerator fakeSessionIdGenerator = new JavaUuidSessionIdGenerator();
 
@@ -66,6 +70,7 @@ public class StatelessAndStatefulWebSessionManager
                 // we still need to set the session id, WHY?
                 ( (SimpleSession) session ).setId( fakeSessionIdGenerator.generateId( session ) );
                 log.debug( "Stateless client session {} is not persisted.", session.getId() );
+                session.setAttribute( DO_NOT_STORE_SESSION_KEY, Boolean.TRUE );
             }
             else
             {
@@ -80,6 +85,35 @@ public class StatelessAndStatefulWebSessionManager
         }
 
         return session;
+    }
+
+    /**
+     * Does NOT store the session on change if the DO_NOT_STORE_SESSION_KEY is set as an attribute.
+     * @param session
+     */
+    @Override
+    protected void onChange( Session session )
+    {
+        if( !(SimpleSession.class.isInstance( session ) && Boolean.TRUE == session.getAttribute( DO_NOT_STORE_SESSION_KEY )  ) )
+        {
+            super.onChange( session );
+        }
+    }
+
+    /**
+     * If this Session has the DO_NOT_STORE_SESSION_KEY it will be returned as is so it can be directly attached to the subject, otherwise we just call super.
+     * @param session
+     * @param context
+     */
+    @Override
+    protected Session createExposedSession(Session session, SessionContext context)
+    {
+        if( (SimpleSession.class.isInstance( session ) && Boolean.TRUE == session.getAttribute( DO_NOT_STORE_SESSION_KEY )  ) )
+        {
+            return session;
+        }
+
+        return super.createExposedSession( session, context );
     }
 
     @Override
@@ -304,8 +338,8 @@ public class StatelessAndStatefulWebSessionManager
     {
         if ( request instanceof HttpServletRequest )
         {
-            final String userAgent = ( (HttpServletRequest) request ).getHeader( headerName );
-            return userAgent;
+            final String headerValue = ( (HttpServletRequest) request ).getHeader( headerName );
+            return headerValue;
         }
         return null;
     }
