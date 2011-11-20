@@ -18,17 +18,20 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm1903;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.testng.annotations.Test;
 
 public class NXCM1903ValidateMaxAgeSettingsIT
     extends AbstractNexusIntegrationTest
 {
+
     private final RepositoryMessageUtil repoUtil;
 
     public NXCM1903ValidateMaxAgeSettingsIT()
@@ -72,8 +75,8 @@ public class NXCM1903ValidateMaxAgeSettingsIT
 
         updatesiterepo = (RepositoryProxyResource) repoUtil.getRepository( updatesiterepo.getId() );
 
-        Assert.assertEquals( 100, updatesiterepo.getArtifactMaxAge() );
-        Assert.assertEquals( 200, updatesiterepo.getMetadataMaxAge() );
+        assertThat( updatesiterepo.getArtifactMaxAge(), is( 100 ) );
+        assertThat( updatesiterepo.getMetadataMaxAge(), is( 200 ) );
 
         // now do an update
         updatesiterepo.setArtifactMaxAge( 300 );
@@ -83,8 +86,8 @@ public class NXCM1903ValidateMaxAgeSettingsIT
 
         updatesiterepo = (RepositoryProxyResource) repoUtil.getRepository( updatesiterepo.getId() );
 
-        Assert.assertEquals( 300, updatesiterepo.getArtifactMaxAge() );
-        Assert.assertEquals( 400, updatesiterepo.getMetadataMaxAge() );
+        assertThat( updatesiterepo.getArtifactMaxAge(), is( 300 ) );
+        assertThat( updatesiterepo.getMetadataMaxAge(), is( 400 ) );
     }
 
     @Test
@@ -122,8 +125,8 @@ public class NXCM1903ValidateMaxAgeSettingsIT
 
         p2repo = (RepositoryProxyResource) repoUtil.getRepository( p2repo.getId() );
 
-        Assert.assertEquals( 100, p2repo.getArtifactMaxAge() );
-        Assert.assertEquals( 200, p2repo.getMetadataMaxAge() );
+        assertThat( p2repo.getArtifactMaxAge(), is( 100 ) );
+        assertThat( p2repo.getMetadataMaxAge(), is( 200 ) );
 
         // now do an update
         p2repo.setArtifactMaxAge( 300 );
@@ -133,7 +136,8 @@ public class NXCM1903ValidateMaxAgeSettingsIT
 
         p2repo = (RepositoryProxyResource) repoUtil.getRepository( p2repo.getId() );
 
-        Assert.assertEquals( 300, p2repo.getArtifactMaxAge() );
-        Assert.assertEquals( 400, p2repo.getMetadataMaxAge() );
+        assertThat( p2repo.getArtifactMaxAge(), is( 300 ) );
+        assertThat( p2repo.getMetadataMaxAge(), is( 400 ) );
     }
+
 }

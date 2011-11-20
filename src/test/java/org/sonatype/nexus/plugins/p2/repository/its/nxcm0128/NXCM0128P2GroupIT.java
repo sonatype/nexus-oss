@@ -18,11 +18,16 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm0128;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isDirectory;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readable;
+
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
+import org.testng.annotations.Test;
 
 public class NXCM0128P2GroupIT
     extends AbstractNexusProxyP2IT
@@ -39,17 +44,22 @@ public class NXCM0128P2GroupIT
     {
         final File installDir = new File( "target/eclipse/nxcm0128" );
 
-        installUsingP2( getGroupUrl( getTestRepositoryId() ), "com.sonatype.nexus.p2.its.feature2.feature.group",
-            installDir.getCanonicalPath() );
+        installUsingP2(
+            getGroupUrl( getTestRepositoryId() ),
+            "com.sonatype.nexus.p2.its.feature2.feature.group",
+            installDir.getCanonicalPath()
+        );
 
         final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
-        Assert.assertTrue( feature.exists() && feature.isDirectory() );
+        assertThat( feature, exists() );
+        assertThat( feature, isDirectory() );
 
         final File feature2 = new File( installDir, "features/com.sonatype.nexus.p2.its.feature2_1.0.0" );
-        Assert.assertTrue( feature2.exists() && feature2.isDirectory() );
+        assertThat( feature2, exists() );
+        assertThat( feature2, isDirectory() );
 
         final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
-        Assert.assertTrue( bundle.canRead() );
+        assertThat( bundle, is( readable() ) );
     }
 
 }

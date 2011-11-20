@@ -18,18 +18,21 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm1691;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.testng.annotations.Test;
 
 public class NXCM1691P2ProxyTestStatusIT
     extends AbstractNexusProxyP2IT
 {
+
     public NXCM1691P2ProxyTestStatusIT()
     {
         super( "nxcm1691-content-xml" );
@@ -39,8 +42,9 @@ public class NXCM1691P2ProxyTestStatusIT
     public void test()
         throws Exception
     {
-        final RepositoryMessageUtil repoUtil =
-            new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
+        final RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(
+            this, getXMLXStream(), MediaType.APPLICATION_XML
+        );
 
         for ( String s : P2Constants.METADATA_FILE_PATHS )
         {
@@ -64,6 +68,6 @@ public class NXCM1691P2ProxyTestStatusIT
             status = statusResource.getRemoteStatus();
             Thread.sleep( 100 );
         }
-        Assert.assertEquals( "Unexpected status for repository id=" + repoId, expectedStatus.toString(), status );
+        assertThat( expectedStatus.toString(), is( status ) );
     }
 }

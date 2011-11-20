@@ -18,18 +18,20 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm1719;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.integrationtests.RequestFacade.doGetRequest;
+import static org.sonatype.nexus.test.utils.TaskScheduleUtil.waitForAllTasksToStop;
+
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
-import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.annotations.Test;
 
 public class NXCM1719UpdateSiteProxyIT
     extends AbstractNexusProxyP2IT
@@ -44,50 +46,26 @@ public class NXCM1719UpdateSiteProxyIT
     public void test()
         throws Exception
     {
-        final String nexusTestRepoUrl = getNexusTestRepoUrl();
+        {
+            final Response response = doGetRequest( "content/repositories/" + getTestRepositoryId() + "/features/" );
+            assertThat( response.getStatus().isSuccess(), is( false ) );
+        }
 
-        final File installDir = new File( "target/eclipse/nxcm1719" );
-
-        final String correctURL = TestProperties.getString( "proxy-repo-base-url" ) + "nxcm1719/";
-        TaskScheduleUtil.waitForAllTasksToStop();
-
-        // try
-        // {
-        Response response = RequestFacade.doGetRequest( "content/repositories/" + getTestRepositoryId() + "/features/" );
-        final String responseText = response.getEntity().getText();
-        Assert.assertFalse( "response: " + response.getStatus() + "\n" + responseText, response.getStatus().isSuccess() );
-
-        // installUsingP2(
-        // nexusTestRepoUrl,
-        // "com.sonatype.nexus.p2.its.feature.feature.group",
-        // installDir.getCanonicalPath() );
-        // Assert.fail( "Expected failer, because the remote URL is wrong" );
-        // }
-        // catch( Exception e )
-        // {
-        // // expected
-        // }
-
-        final RepositoryMessageUtil repoUtil =
-            new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
+        final RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(
+            this, getXMLXStream(), MediaType.APPLICATION_XML
+        );
         final RepositoryProxyResource repo = (RepositoryProxyResource) repoUtil.getRepository( getTestRepositoryId() );
-
-        repo.getRemoteStorage().setRemoteStorageUrl( correctURL );
+        repo.getRemoteStorage().setRemoteStorageUrl( TestProperties.getString( "proxy-repo-base-url" ) + "nxcm1719/" );
         repoUtil.updateRepo( repo );
 
-        // wait for the tasks
-        TaskScheduleUtil.waitForAllTasksToStop();
+        waitForAllTasksToStop();
 
-        response = RequestFacade.doGetRequest( "content/repositories/" + getTestRepositoryId() + "/features/" );
-        Assert.assertTrue( "expected success: " + response.getStatus(), response.getStatus().isSuccess() );
+        {
+            final Response response = doGetRequest( "content/repositories/" + getTestRepositoryId() + "/features/" );
+            assertThat( response.getStatus().isSuccess(), is( true ) );
+        }
 
-        installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
-            installDir.getCanonicalPath() );
-
-        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
-        Assert.assertTrue( feature.exists() && feature.isDirectory() );
-
-        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
-        Assert.assertTrue( bundle.canRead() );
+        installAndVerifyP2Feature();
     }
+
 }

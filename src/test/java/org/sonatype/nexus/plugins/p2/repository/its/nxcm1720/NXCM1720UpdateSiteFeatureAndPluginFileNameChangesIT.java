@@ -18,16 +18,20 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm1720;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.annotations.Test;
 
 public class NXCM1720UpdateSiteFeatureAndPluginFileNameChangesIT
     extends AbstractNexusProxyP2IT
 {
+
     public NXCM1720UpdateSiteFeatureAndPluginFileNameChangesIT()
     {
         super( "nxcm1720" );
@@ -42,13 +46,18 @@ public class NXCM1720UpdateSiteFeatureAndPluginFileNameChangesIT
         TaskScheduleUtil.run( "1" );
         TaskScheduleUtil.waitForAllTasksToStop();
 
-        Assert.assertFalse( new File( nexusDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0-feature.jar" ).exists() );
-        Assert.assertFalse( new File( nexusDir, "features/com.sonatype.nexus.p2.its.feature.local_1.0.0-feature.jar" ).exists() );
-        Assert.assertTrue( new File( nexusDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0.jar" ).exists() );
-        Assert.assertTrue( new File( nexusDir, "features/com.sonatype.nexus.p2.its.feature2_1.0.0.jar" ).exists() );
-        Assert.assertTrue( new File( nexusDir, "features/com.sonatype.nexus.p2.its.feature.local_1.0.0.jar" ).exists() );
-        Assert.assertTrue( new File( nexusDir, "features/com.sonatype.nexus.p2.its.feature2.local_1.0.0.jar" ).exists() );
-        Assert.assertTrue( new File( nexusDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" ).exists() );
-        Assert.assertTrue( new File( nexusDir, "plugins/com.sonatype.nexus.p2.its.bundle.local_1.0.0.jar" ).exists() );
+        assertThat(
+            new File( nexusDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0-feature.jar" ), not( exists() )
+        );
+        assertThat(
+            new File( nexusDir, "features/com.sonatype.nexus.p2.its.feature.local_1.0.0-feature.jar" ), not( exists() )
+        );
+        assertThat( new File( nexusDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0.jar" ), exists() );
+        assertThat( new File( nexusDir, "features/com.sonatype.nexus.p2.its.feature2_1.0.0.jar" ), exists() );
+        assertThat( new File( nexusDir, "features/com.sonatype.nexus.p2.its.feature.local_1.0.0.jar" ), exists() );
+        assertThat( new File( nexusDir, "features/com.sonatype.nexus.p2.its.feature2.local_1.0.0.jar" ), exists() );
+        assertThat( new File( nexusDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" ), exists() );
+        assertThat( new File( nexusDir, "plugins/com.sonatype.nexus.p2.its.bundle.local_1.0.0.jar" ), exists() );
     }
+
 }

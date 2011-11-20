@@ -19,6 +19,7 @@
 package org.sonatype.nexus.plugins.p2.repository.its;
 
 import org.sonatype.jettytestsuite.ServletServer;
+import org.testng.annotations.BeforeClass;
 
 public abstract class AbstractNexusProxyP2SecureIT
     extends AbstractNexusProxyP2IT
@@ -29,19 +30,15 @@ public abstract class AbstractNexusProxyP2SecureIT
         super( testRepositoryId );
     }
 
-    @Override
+    @BeforeClass( alwaysRun = true )
     public void startProxy()
         throws Exception
     {
-        final ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE, "secure" );
-        server.start();
+        if ( proxyServer == null )
+        {
+            proxyServer = (ServletServer) this.lookup( ServletServer.ROLE, "secure" );
+            proxyServer.start();
+        }
     }
 
-    @Override
-    public void stopProxy()
-        throws Exception
-    {
-        final ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE, "secure" );
-        server.stop();
-    }
 }

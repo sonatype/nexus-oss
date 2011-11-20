@@ -120,10 +120,17 @@
     </dependency>
 
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit-dep</artifactId>
-      <version>4.8.2</version>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>5.11</version>
+      <classifier>jdk15</classifier>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
@@ -196,7 +203,14 @@
     <dependency>
       <groupId>org.apache.maven.shared</groupId>
       <artifactId>maven-verifier</artifactId>
-      <version>1.3-SNAPSHOT</version>
+      <version>1.3</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.litmus</groupId>
+      <artifactId>litmus-testsupport</artifactId>
+      <version>1.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -214,7 +228,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.8.1</version>
+        <version>2.10</version>
         <configuration>
           <testNGArtifactName>none:none</testNGArtifactName>
           <argLine>-Xmx512m</argLine>
@@ -241,7 +255,6 @@
           </dependency>
         </dependencies>
       </plugin>
-
     </plugins>
   </build>
 
@@ -305,48 +318,26 @@
           </plugin>
           <plugin>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.8.1</version>
+            <version>2.10</version>
             <executions>
               <execution>
-                <id>integration-test</id>
                 <goals>
                   <goal>integration-test</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>verify</id>
-                <goals>
                   <goal>verify</goal>
                 </goals>
+                <configuration>
+                  <forkMode>always</forkMode>
+                  <argLine>-Xmx512m</argLine>
+                  <junitArtifactName>none:none</junitArtifactName>
+                  <testNGArtifactName>org.testng:testng</testNGArtifactName>
+                  <failIfNoTests>false</failIfNoTests>
+                  <excludes>
+                    <exclude>**/*$*</exclude>
+                    <exclude>**/Abstract*</exclude>
+                  </excludes>
+                </configuration>
               </execution>
             </executions>
-            <dependencies>
-              <dependency>
-                <groupId>org.apache.maven.surefire</groupId>
-                <artifactId>surefire-junit4</artifactId>
-                <version>2.8.1</version>
-                <scope>compile</scope>
-              </dependency>
-            </dependencies>
-            <configuration>
-              <junitArtifactName>junit:junit-dep</junitArtifactName>
-              <forkMode>always</forkMode>
-              <properties>
-                <property>
-                  <name>listener</name>
-                  <value>org.junit.runner.notification.RunListener</value>
-                </property>
-              </properties>
-              <argLine>-Xmx512m</argLine>
-              <testNGArtifactName>org.testng:testng</testNGArtifactName>
-              <failIfNoTests>false</failIfNoTests>
-              <systemProperties>
-                <property>
-                  <name>user.home</name>
-                  <value>${project.build.directory}/user_home</value>
-                </property>
-              </systemProperties>
-            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -358,20 +349,6 @@
       <properties>
         <nexusPluginType>jar</nexusPluginType>
       </properties>
-    </profile>
-    <profile>
-      <id>coverage</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>nexus-test-environment-maven-plugin</artifactId>
-            <configuration>
-              <testSkip>false</testSkip>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 </project>

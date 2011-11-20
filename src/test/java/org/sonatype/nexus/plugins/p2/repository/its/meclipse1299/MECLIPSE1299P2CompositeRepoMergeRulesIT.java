@@ -18,17 +18,21 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.meclipse1299;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.contains;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+
 import java.io.File;
 import java.net.URL;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
+import org.testng.annotations.Test;
 
 public class MECLIPSE1299P2CompositeRepoMergeRulesIT
     extends AbstractNexusProxyP2IT
 {
+
     public MECLIPSE1299P2CompositeRepoMergeRulesIT()
     {
         super( "meclipse1299" );
@@ -39,18 +43,25 @@ public class MECLIPSE1299P2CompositeRepoMergeRulesIT
         throws Exception
     {
         final File artifactsXmlFile = new File( "target/downloads/meclipse1299/artifacts.xml" );
-        Assert.assertFalse( artifactsXmlFile.exists() );
+        if ( artifactsXmlFile.exists() )
+        {
+            assertThat( artifactsXmlFile.delete(), is( true ) );
+        }
 
-        downloadFile( new URL( getRepositoryUrl( getTestRepositoryId() ) + "/artifacts.xml" ),
-            artifactsXmlFile.getAbsolutePath() );
-        Assert.assertTrue( artifactsXmlFile.exists() );
+        downloadFile(
+            new URL( getRepositoryUrl( getTestRepositoryId() ) + "/artifacts.xml" ),
+            artifactsXmlFile.getAbsolutePath()
+        );
+        assertThat( artifactsXmlFile, exists() );
 
-        final String artifactsXmlContent = FileUtils.fileRead( artifactsXmlFile );
-        Assert.assertTrue( artifactsXmlContent.contains( "<mappings size=\"5\">" ) );
-        Assert.assertTrue( artifactsXmlContent.contains( "<rule output=\"${repoUrl}/plugins/${id}_${version}.jar\" filter=\"(&amp; (classifier=osgi.bundle))\" />" ) );
-        Assert.assertTrue( artifactsXmlContent.contains( "<rule output=\"${repoUrl}/binary/${id}_${version}\" filter=\"(&amp; (classifier=binary))\" />" ) );
-        Assert.assertTrue( artifactsXmlContent.contains( "<rule output=\"${repoUrl}/features/${id}_${version}.jar\" filter=\"(&amp; (classifier=org.eclipse.update.feature))\" />" ) );
-        Assert.assertTrue( artifactsXmlContent.contains( "<rule output=\"foo.bar\" filter=\"(&amp; (classifier=foo))\" />" ) );
-        Assert.assertTrue( artifactsXmlContent.contains( "<rule output=\"bar.foo\" filter=\"(&amp; (classifier=bar))\" />" ) );
+        assertThat( artifactsXmlFile, contains(
+            "<mappings size=\"5\">",
+            "<rule output=\"${repoUrl}/plugins/${id}_${version}.jar\" filter=\"(&amp; (classifier=osgi.bundle))\" />",
+            "<rule output=\"${repoUrl}/binary/${id}_${version}\" filter=\"(&amp; (classifier=binary))\" />",
+            "<rule output=\"${repoUrl}/features/${id}_${version}.jar\" filter=\"(&amp; (classifier=org.eclipse.update.feature))\" />",
+            "<rule output=\"foo.bar\" filter=\"(&amp; (classifier=foo))\" />",
+            "<rule output=\"bar.foo\" filter=\"(&amp; (classifier=bar))\" />"
+        ) );
     }
+
 }

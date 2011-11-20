@@ -20,8 +20,8 @@ package org.sonatype.nexus.plugins.p2.repository.its.nexus0977;
 
 import java.net.URL;
 
-import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
+import org.testng.annotations.Test;
 
 public class NEXUS0977P2GroupOfGroupsIT
     extends AbstractNexusProxyP2IT
@@ -36,8 +36,9 @@ public class NEXUS0977P2GroupOfGroupsIT
     public void test()
         throws Exception
     {
-        downloadFile( new URL( getRepositoryUrl( "nexus0977g1" ) + "/content.xml" ),
-            "target/downloads/nexus0977/content.xml" );
+        downloadFile(
+            new URL( getRepositoryUrl( "nexus0977g1" ) + "/content.xml" ), "target/downloads/nexus0977/content.xml"
+        );
     }
 
 }

@@ -18,21 +18,23 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its;
 
+import static org.sonatype.nexus.test.utils.FileTestingUtils.interpolationDirectoryCopy;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 
 public abstract class AbstractNexusProxyP2IT
     extends AbstractNexusP2IT
 {
+
     @Override
     protected void customizeContainerConfiguration( final ContainerConfiguration configuration )
     {
@@ -40,7 +42,7 @@ public abstract class AbstractNexusProxyP2IT
         configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
     }
 
-    protected static ServletServer server;
+    protected static ServletServer proxyServer;
 
     protected static final String localStorageDir;
 
@@ -54,43 +56,23 @@ public abstract class AbstractNexusProxyP2IT
         super( testRepositoryId );
     }
 
-    @Override
-    protected void copyConfigFiles()
-        throws IOException
-    {
-        super.copyConfigFiles();
-    }
-
-    @Before
+    @BeforeClass( alwaysRun = true )
     public void startProxy()
         throws Exception
     {
-        if ( server == null )
-        {
-            server = (ServletServer) lookup( ServletServer.ROLE );
-            server.start();
-        }
+        proxyServer = (ServletServer) lookup( ServletServer.ROLE );
+        proxyServer.start();
     }
 
-    @After
+    @AfterClass( alwaysRun = true )
     public void stopProxy()
         throws Exception
     {
-        if ( server != null )
+        if ( proxyServer != null )
         {
-            server = (ServletServer) lookup( ServletServer.ROLE );
-            server.stop();
-            server = null;
+            proxyServer.stop();
+            proxyServer = null;
         }
-    }
-
-    @Override
-    public void oncePerClassSetUp()
-        throws Exception
-    {
-        startProxy();
-
-        super.oncePerClassSetUp();
     }
 
     protected void replaceInFile( final String filename, final String target, final String replacement )
@@ -113,8 +95,7 @@ public abstract class AbstractNexusProxyP2IT
             return;
         }
 
-        FileTestingUtils.interpolationDirectoryCopy( source, new File( localStorageDir ), TestProperties.getAll() );
-
+        interpolationDirectoryCopy( source, new File( localStorageDir ), TestProperties.getAll() );
     }
 
 }

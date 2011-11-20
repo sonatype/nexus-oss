@@ -18,16 +18,21 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm1960;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isDirectory;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readable;
+
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
+import org.testng.annotations.Test;
 
 public class NXCM1960SetProxyIT
     extends AbstractNexusProxyP2IT
@@ -44,18 +49,7 @@ public class NXCM1960SetProxyIT
     {
         setupProxyConfig();
 
-        final String nexusTestRepoUrl = getNexusTestRepoUrl();
-
-        final File installDir = new File( "target/eclipse/nxcm1960" );
-
-        installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
-            installDir.getCanonicalPath() );
-
-        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
-        Assert.assertTrue( feature.exists() && feature.isDirectory() );
-
-        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
-        Assert.assertTrue( bundle.canRead() );
+        installAndVerifyP2Feature();
     }
 
     private void setupProxyConfig()
@@ -78,6 +72,7 @@ public class NXCM1960SetProxyIT
 
         final Status status = SettingsMessageUtil.save( resource );
 
-        Assert.assertTrue( status.isSuccess() );
+        assertThat( status.isSuccess(), is( true ) );
     }
+
 }

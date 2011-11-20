@@ -18,9 +18,12 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm1871;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.test.utils.TaskScheduleUtil.waitForAllTasksToStop;
+
 import java.io.IOException;
 
-import org.junit.Assert;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -29,6 +32,7 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class CacheMessageUtil
 {
+
     public static void expireRepositoryCache( final String... repositories )
         throws Exception
     {
@@ -53,11 +57,11 @@ public class CacheMessageUtil
 
             final Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
             final Status status = response.getStatus();
-            Assert.assertTrue( "Fail to update " + repo + " repository index " + status, status.isSuccess() );
+            assertThat( "Fail to update " + repo + " repository index " + status, status.isSuccess(), is( true ) );
         }
 
-        // let s w8 a few time for indexes
-        TaskScheduleUtil.waitForAllTasksToStop();
+        // let w8 a few time for indexes
+        waitForAllTasksToStop();
     }
 
     public static void expireGroupCache( final String... groups )
@@ -65,4 +69,5 @@ public class CacheMessageUtil
     {
         reindex( true, groups );
     }
+
 }

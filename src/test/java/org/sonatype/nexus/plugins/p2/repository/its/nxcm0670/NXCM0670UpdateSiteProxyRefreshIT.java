@@ -18,17 +18,22 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm0670;
 
+import static org.codehaus.plexus.util.FileUtils.copyFile;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+
 import java.io.File;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.annotations.Test;
 
 public class NXCM0670UpdateSiteProxyRefreshIT
     extends AbstractNexusProxyP2IT
 {
+
     public NXCM0670UpdateSiteProxyRefreshIT()
     {
         super( "nxcm0670" );
@@ -44,14 +49,14 @@ public class NXCM0670UpdateSiteProxyRefreshIT
         TaskScheduleUtil.run( "1" );
         TaskScheduleUtil.waitForAllTasksToStop();
 
-        Assert.assertTrue( new File( nexusDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" ).exists() );
+        assertThat( new File( nexusDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" ), exists() );
 
-        FileUtils.copyFile( new File( remoteDir, "site-empty.xml" ), new File( remoteDir, "site.xml" ) );
+        copyFile( new File( remoteDir, "site-empty.xml" ), new File( remoteDir, "site.xml" ) );
 
         TaskScheduleUtil.run( "1" );
         TaskScheduleUtil.waitForAllTasksToStop();
 
-        Assert.assertFalse( new File( nexusDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" ).exists() );
-
+        assertThat( new File( nexusDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" ), not( exists() ) );
     }
+
 }

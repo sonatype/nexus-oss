@@ -18,15 +18,21 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.meclipse0465x02;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readable;
+
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2SecureIT;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class MECLIPSE0465x02ProxyAuthenticatedP2RepoBadPasswordIT
     extends AbstractNexusProxyP2SecureIT
 {
+
     public MECLIPSE0465x02ProxyAuthenticatedP2RepoBadPasswordIT()
     {
         super( "meclipse0465x02" );
@@ -36,14 +42,9 @@ public class MECLIPSE0465x02ProxyAuthenticatedP2RepoBadPasswordIT
     public void test()
         throws Exception
     {
-        final String nexusTestRepoUrl = getNexusTestRepoUrl();
-
-        final File installDir = new File( "target/eclipse/meclipse0465x02" );
-
         try
         {
-            installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
-                installDir.getCanonicalPath() );
+            installAndVerifyP2Feature();
             Assert.fail( "Expected P2 Exception containing text: [Unable to load repositories.]" );
         }
         catch ( final Exception e )
@@ -53,11 +54,6 @@ public class MECLIPSE0465x02ProxyAuthenticatedP2RepoBadPasswordIT
                 throw e;
             }
         }
-
-        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
-        Assert.assertFalse( feature.exists() );
-
-        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
-        Assert.assertFalse( bundle.canRead() );
     }
+
 }

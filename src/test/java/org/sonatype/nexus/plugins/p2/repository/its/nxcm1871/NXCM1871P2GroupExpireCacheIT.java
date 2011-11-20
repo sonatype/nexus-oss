@@ -18,17 +18,22 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm1871;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.contains;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+
 import java.io.File;
 import java.net.URL;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.annotations.Test;
 
 public class NXCM1871P2GroupExpireCacheIT
     extends AbstractNexusProxyP2IT
@@ -44,21 +49,20 @@ public class NXCM1871P2GroupExpireCacheIT
         throws Exception
     {
         // check original content
-        final File f1 =
-            downloadFile( new URL( getGroupUrl( getTestRepositoryId() ) + "/content.xml" ),
-                "target/downloads/nxcm1871/1/content.xml" );
-        Assert.assertTrue( f1.exists() );
-        String c = FileUtils.fileRead( f1 );
-        Assert.assertTrue( c.contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) );
-        Assert.assertFalse( c.contains( "com.sonatype.nexus.p2.its.feature3.feature.jar" ) );
+        final File f1 = downloadFile(
+            new URL( getGroupUrl( getTestRepositoryId() ) + "/content.xml" ),
+            "target/downloads/nxcm1871/1/content.xml"
+        );
+        assertThat( f1, exists() );
+        assertThat( f1, contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) );
+        assertThat( f1, not( contains( "com.sonatype.nexus.p2.its.feature3.feature.jar" ) ) );
 
         final File repo_nxcm1871_2 = new File( localStorageDir, "nxcm1871-2" );
 
         final File newContentXml = new File( localStorageDir, "nxcm1871-3/content.xml" );
-        Assert.assertTrue( newContentXml.exists() );
-        c = FileUtils.fileRead( newContentXml );
-        Assert.assertFalse( c.contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) );
-        Assert.assertTrue( c.contains( "com.sonatype.nexus.p2.its.feature3.feature.jar" ) );
+        assertThat( newContentXml, exists() );
+        assertThat( newContentXml, not( contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) ) );
+        assertThat( newContentXml, contains( "com.sonatype.nexus.p2.its.feature3.feature.jar" ) );
 
         FileUtils.copyFileToDirectory( newContentXml, repo_nxcm1871_2 );
 
@@ -72,15 +76,15 @@ public class NXCM1871P2GroupExpireCacheIT
         TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, prop );
 
         // make sure nexus has the right content after reindex
-        final File f2 =
-            downloadFile( new URL( getGroupUrl( getTestRepositoryId() ) + "/content.xml" ),
-                "target/downloads/nxcm1871/2/content.xml" );
-        Assert.assertTrue( f2.exists() );
-        c = FileUtils.fileRead( f2 );
-        Assert.assertFalse( c.contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) );
-        Assert.assertTrue( c.contains( "com.sonatype.nexus.p2.its.feature3.feature.jar" ) );
+        final File f2 = downloadFile(
+            new URL( getGroupUrl( getTestRepositoryId() ) + "/content.xml" ),
+            "target/downloads/nxcm1871/2/content.xml"
+        );
+        assertThat( f2, exists() );
+        assertThat( f2, not( contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) ) );
+        assertThat( f2, contains( "com.sonatype.nexus.p2.its.feature3.feature.jar" ) );
 
-        Assert.assertFalse( FileTestingUtils.compareFileSHA1s( f1, f2 ) );
+        assertThat( FileTestingUtils.compareFileSHA1s( f1, f2 ), is( false ) );
     }
 
 }

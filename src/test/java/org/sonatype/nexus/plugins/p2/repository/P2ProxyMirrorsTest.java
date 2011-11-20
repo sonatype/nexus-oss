@@ -16,7 +16,7 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.p2.repository.proxy;
+package org.sonatype.nexus.plugins.p2.repository;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +30,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.plugins.p2.repository.P2Constants;
+import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;

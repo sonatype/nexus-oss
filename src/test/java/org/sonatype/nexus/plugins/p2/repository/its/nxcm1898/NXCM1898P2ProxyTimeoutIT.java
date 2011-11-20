@@ -18,17 +18,49 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm1898;
 
-import org.junit.Assert;
-import org.junit.Test;
+import java.io.File;
+import java.io.IOException;
 
-public class NXCM1898P2ProxyTimeoutIT
-    extends AbstractProxyTimeout
+import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
+import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
+import org.sonatype.nexus.test.utils.SettingsMessageUtil;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
+
+public abstract class NXCM1898P2ProxyTimeoutIT
+    extends AbstractNexusProxyP2IT
 {
-    @Test
-    public void test()
+
+    public NXCM1898P2ProxyTimeoutIT()
+    {
+        super( "nxcm1898" );
+        // System.setProperty( "org.eclipse.ecf.provider.filetransfer.retrieve.readTimeout", "30000" );
+    }
+
+    @Override
+    @BeforeClass( alwaysRun = true )
+    public void startProxy()
         throws Exception
     {
-        Assert.assertTrue( true );
-        // doTest( 5000 );
+        proxyServer = (ServletServer) lookup( ServletServer.ROLE, "timeout" );
+        proxyServer.start();
     }
+
+    @Test( enabled = false )
+    protected void test( final int timeout )
+        throws IOException, Exception
+    {
+        final String nexusTestRepoUrl = getNexusTestRepoUrl();
+
+        final File installDir = new File( "target/eclipse/nxcm1898" );
+
+        // give it a good amount of time
+        final GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+        settings.getGlobalConnectionSettings().setConnectionTimeout( timeout );
+        SettingsMessageUtil.save( settings );
+
+        installAndVerifyP2Feature();
+    }
+
 }

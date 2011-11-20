@@ -18,6 +18,12 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isDirectory;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readable;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,7 +56,6 @@ public abstract class AbstractNexusP2IT
         FileUtils.deleteDirectory( destination );
 
         final File basedir = ResourceExtractor.simpleExtractResources( getClass(), "/run-p2" );
-        final Verifier verifier = new Verifier( basedir.getAbsolutePath() );
 
         final Map<String, String> env = new HashMap<String, String>();
         env.put( "org.eclipse.ecf.provider.filetransfer.retrieve.readTimeout", "30000" );
@@ -65,9 +70,48 @@ public abstract class AbstractNexusP2IT
             env.putAll( extraEnv );
         }
 
+        final Verifier verifier = new Verifier( basedir.getAbsolutePath() );
+        verifier.setLogFileName( getTestId() + "-maven-output.log" );
         verifier.executeGoals( Arrays.asList( "verify" ), env );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+    }
+
+    protected void installAndVerifyP2Feature()
+        throws Exception
+    {
+        installAndVerifyP2Feature(
+            "com.sonatype.nexus.p2.its.feature.feature.group",
+            new String[]{ "com.sonatype.nexus.p2.its.feature_1.0.0" },
+            new String[]{ "com.sonatype.nexus.p2.its.bundle_1.0.0.jar" }
+        );
+    }
+
+    protected void installAndVerifyP2Feature( final String featureToInstall,
+                                              final String[] features,
+                                              final String[] plugins )
+        throws Exception
+    {
+        final File installDir = new File( "target/eclipse/" + getTestId() );
+
+        installUsingP2(
+            getNexusTestRepoUrl(),
+            featureToInstall,
+            installDir.getCanonicalPath()
+        );
+
+        for ( final String feature : features )
+        {
+            final File featureFile = new File( installDir, "features/" + feature );
+            assertThat( featureFile, exists() );
+            assertThat( featureFile, isDirectory() );
+        }
+
+        for ( final String plugin : plugins )
+        {
+            final File pluginFile = new File( installDir, "plugins/" + plugin );
+            assertThat( pluginFile, is( readable() ) );
+        }
     }
 
 }

@@ -19,25 +19,27 @@
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm2093;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.contains;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class NXCM2093CheckSumValidationIT
     extends AbstractNexusProxyP2IT
 {
+
     public NXCM2093CheckSumValidationIT()
     {
         super( "nxcm2093-bad-checksum" );
@@ -50,32 +52,41 @@ public class NXCM2093CheckSumValidationIT
         final File installDir = new File( "target/eclipse/nxcm2093" );
 
         // the must work one
-        installUsingP2( getNexusTestRepoUrl( "nxcm2093-ok-checksum" ), "org.mortbay.jetty.util",
-            installDir.getCanonicalPath() );
+        installUsingP2(
+            getNexusTestRepoUrl( "nxcm2093-ok-checksum" ),
+            "org.mortbay.jetty.util",
+            installDir.getCanonicalPath()
+        );
 
         try
         {
             final Map<String, String> env = new HashMap<String, String>();
             env.put( "eclipse.p2.MD5Check", "false" );
 
-            installUsingP2( getNexusTestRepoUrl(), "com.sonatype.nexus.p2.its.feature.feature.group",
-                installDir.getCanonicalPath(), env );
+            installUsingP2(
+                getNexusTestRepoUrl(),
+                "com.sonatype.nexus.p2.its.feature.feature.group",
+                installDir.getCanonicalPath(), env
+            );
             Assert.fail();
         }
         catch ( final Exception e )
         {
             assertThat(
-                FileUtils.fileRead( getNexusLogFile() ),
-                containsString( "Validation failed due: The artifact /features/com.sonatype.nexus.p2.its.feature_1.0.0.jar and it's remote checksums does not match in repository nxcm2093-bad-checksum! The checksumPolicy of repository forbids downloading of it." ) );
+                getNexusLogFile(),
+                contains(
+                    "Proxied item nxcm2093-bad-checksum:/plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar evaluated as INVALID"
+                )
+            );
         }
 
-        final RepositoryMessageUtil repoUtil =
-            new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
+        final RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(
+            this, getXMLXStream(), MediaType.APPLICATION_XML
+        );
         final RepositoryStatusResource repoStatusResource = repoUtil.getStatus( getTestRepositoryId() );
 
-        Assert.assertEquals( ProxyMode.ALLOW.name(), repoStatusResource.getProxyMode() );
-        // Assert.assertEquals( RemoteStatus.AVAILABLE.name(), repoStatusResource.getRemoteStatus() );
-        Assert.assertEquals( LocalStatus.IN_SERVICE.name(), repoStatusResource.getLocalStatus() );
-
+        assertThat( repoStatusResource.getProxyMode(), is( equalTo( ProxyMode.ALLOW.name() ) ) );
+        assertThat( repoStatusResource.getLocalStatus(), is( equalTo( LocalStatus.IN_SERVICE.name() ) ) );
     }
+
 }

@@ -18,15 +18,19 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm1995;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.contains;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+
 import java.io.File;
 import java.net.URL;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.testng.annotations.Test;
 
 public class NXCM1995MetadataCacheIT
     extends AbstractNexusProxyP2IT
@@ -37,41 +41,40 @@ public class NXCM1995MetadataCacheIT
         super( "nxcm1995" );
     }
 
-    @Ignore
-    @Test
+    @Test( enabled = false )
     public void test()
         throws Exception
     {
         // check original content
-        final File f1 =
-            downloadFile( new URL( getNexusTestRepoUrl() + "/content.xml" ), "target/downloads/nxcm1995/1/content.xml" );
-        Assert.assertTrue( f1.exists() );
-        String c = FileUtils.fileRead( f1 );
-        Assert.assertTrue( c.contains( "com.adobe.flexbuilder.utils.osnative.win" ) );
-        Assert.assertFalse( c.contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) );
+        final File f1 = downloadFile(
+            new URL( getNexusTestRepoUrl() + "/content.xml" ),
+            "target/downloads/nxcm1995/1/content.xml"
+        );
+        assertThat( f1, exists() );
+        assertThat( f1, contains( "com.adobe.flexbuilder.utils.osnative.win" ) );
+        assertThat( f1, not( contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) ) );
 
         // check original artifact
-        final File a1 =
-            downloadFile( new URL( getNexusTestRepoUrl() + "/artifacts.xml" ),
-                "target/downloads/nxcm1995/1/artifacts.xml" );
-        Assert.assertTrue( a1.exists() );
-        String a = FileUtils.fileRead( a1 );
-        Assert.assertTrue( a.contains( "com.adobe.flexbuilder.multisdk" ) );
-        Assert.assertFalse( a.contains( "com.sonatype.nexus.p2.its.feature2" ) );
+        final File a1 = downloadFile(
+            new URL( getNexusTestRepoUrl() + "/artifacts.xml" ),
+            "target/downloads/nxcm1995/1/artifacts.xml"
+        );
+        assertThat( a1, exists() );
+        assertThat( a1, contains( "com.adobe.flexbuilder.multisdk" ) );
+        assertThat( a1, not( contains( "com.sonatype.nexus.p2.its.feature2" ) ) );
 
         final File reponxcm1995 = new File( localStorageDir, "nxcm1995" );
 
         // check new content
         final File newContentXml = new File( localStorageDir, "p2repo2/content.xml" );
-        Assert.assertTrue( newContentXml.exists() );
-        c = FileUtils.fileRead( newContentXml );
-        Assert.assertFalse( c.contains( "com.adobe.flexbuilder.utils.osnative.win" ) );
-        Assert.assertTrue( c.contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) );
+        assertThat( newContentXml, exists() );
+        assertThat( newContentXml, not( contains( "com.adobe.flexbuilder.utils.osnative.win" ) ) );
+        assertThat( newContentXml, contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) );
         FileUtils.copyFileToDirectory( newContentXml, new File( reponxcm1995, "memberrepo1" ) );
         FileUtils.copyFileToDirectory( newContentXml, new File( reponxcm1995, "memberrepo2" ) );
 
         final File newArtifactsXml = new File( localStorageDir, "p2repo2/artifacts.xml" );
-        Assert.assertTrue( newArtifactsXml.exists() );
+        assertThat( newArtifactsXml, exists() );
         FileUtils.copyFileToDirectory( newArtifactsXml, new File( reponxcm1995, "memberrepo1" ) );
         FileUtils.copyFileToDirectory( newArtifactsXml, new File( reponxcm1995, "memberrepo2" ) );
 
@@ -89,25 +92,26 @@ public class NXCM1995MetadataCacheIT
         // TaskScheduleUtil.waitForAllTasksToStop();
 
         // make sure nexus has the right content after metadata cache expires
-        final File f2 =
-            downloadFile( new URL( getNexusTestRepoUrl() + "/content.xml" ), "target/downloads/nxcm1995/2/content.xml" );
-        Assert.assertTrue( f2.exists() );
-        c = FileUtils.fileRead( f2 );
-        Assert.assertFalse( c.contains( "com.adobe.flexbuilder.utils.osnative.win" ) );
-        Assert.assertTrue( c.contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) );
+        final File f2 = downloadFile(
+            new URL( getNexusTestRepoUrl() + "/content.xml" ),
+            "target/downloads/nxcm1995/2/content.xml"
+        );
+        assertThat( f2, exists() );
+        assertThat( f2, not( contains( "com.adobe.flexbuilder.utils.osnative.win" ) ) );
+        assertThat( f2, contains( "com.sonatype.nexus.p2.its.feature2.feature.jar" ) );
 
-        Assert.assertFalse( FileTestingUtils.compareFileSHA1s( f1, f2 ) );
+        assertThat( FileTestingUtils.compareFileSHA1s( f1, f2 ), is( false ) );
 
         // make sure nexus has the right content after metadata cache expires
-        final File a2 =
-            downloadFile( new URL( getNexusTestRepoUrl() + "/artifacts.xml" ),
-                "target/downloads/nxcm1995/2/artifacts.xml" );
-        Assert.assertTrue( a2.exists() );
-        a = FileUtils.fileRead( a2 );
-        Assert.assertFalse( a.contains( "com.adobe.flexbuilder.multisdk" ) );
-        Assert.assertTrue( a.contains( "com.sonatype.nexus.p2.its.feature2" ) );
+        final File a2 = downloadFile(
+            new URL( getNexusTestRepoUrl() + "/artifacts.xml" ),
+            "target/downloads/nxcm1995/2/artifacts.xml"
+        );
+        assertThat( a2, exists() );
+        assertThat( a2, not( contains( "com.adobe.flexbuilder.multisdk" ) ) );
+        assertThat( a2, contains( "com.sonatype.nexus.p2.its.feature2" ) );
 
-        Assert.assertFalse( FileTestingUtils.compareFileSHA1s( a1, a2 ) );
+        assertThat( FileTestingUtils.compareFileSHA1s( a1, a2 ), is( false ) );
     }
 
 }

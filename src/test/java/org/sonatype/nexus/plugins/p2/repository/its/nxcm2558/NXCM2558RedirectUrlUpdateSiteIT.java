@@ -18,10 +18,16 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm2558;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.nexus.test.utils.TaskScheduleUtil.runTask;
+import static org.sonatype.nexus.test.utils.TaskScheduleUtil.waitForAllTasksToStop;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isDirectory;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readable;
+
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
@@ -29,6 +35,7 @@ import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteMirrorTask;
 import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteMirrorTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.annotations.Test;
 
 public class NXCM2558RedirectUrlUpdateSiteIT
     extends AbstractNexusProxyP2IT
@@ -50,22 +57,16 @@ public class NXCM2558RedirectUrlUpdateSiteIT
         final ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setKey( UpdateSiteMirrorTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
         repo.setValue( getTestRepositoryId() );
-        TaskScheduleUtil.runTask( UpdateSiteMirrorTask.ROLE_HINT, repo );
-        // wait for the tasks
-        TaskScheduleUtil.waitForAllTasksToStop();
 
-        final Response response =
-            RequestFacade.doGetRequest( "content/repositories/" + getTestRepositoryId() + "/features/" );
-        Assert.assertTrue( "expected success: " + response.getStatus(), response.getStatus().isSuccess() );
+        runTask( UpdateSiteMirrorTask.ROLE_HINT, repo );
+        waitForAllTasksToStop();
 
-        installUsingP2( nexusTestRepoUrl, "com.sonatype.nexus.p2.its.feature.feature.group",
-            installDir.getCanonicalPath() );
+        final Response response = RequestFacade.doGetRequest(
+            "content/repositories/" + getTestRepositoryId() + "/features/"
+        );
+        assertThat( response.getStatus().isSuccess(), is( true ) );
 
-        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
-        Assert.assertTrue( feature.exists() && feature.isDirectory() );
-
-        final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
-        Assert.assertTrue( bundle.canRead() );
+        installAndVerifyP2Feature();
     }
 
 }
