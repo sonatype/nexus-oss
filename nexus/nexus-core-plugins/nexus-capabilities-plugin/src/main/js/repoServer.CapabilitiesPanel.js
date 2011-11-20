@@ -83,7 +83,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
       }, {
         name : 'id'
       }, {
-        name : 'name',
+        name : 'description',
         sortType : Ext.data.SortTypes.asUCString
       }, {
         name : 'enabled'
@@ -189,7 +189,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
         url : CAPABILITIES_SERVICE_PATH,
         reader : this.capabilitiesReader,
         sortInfo : {
-          field : 'name',
+          field : 'description',
           direction : 'ASC'
         },
         autoLoad : true
@@ -244,11 +244,11 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           width : this.COMBO_WIDTH
         }, {
           xtype : 'textfield',
-          fieldLabel : 'Name',
+          fieldLabel : 'Description',
           labelStyle : 'margin-left: 15px; width: 185px;',
           itemCls : '',
-          helpText : "Optional name of configured capability. If left empty a default value will be assigned.",
-          name : 'name',
+          helpText : "Optional description of configured capability. If left empty a default value will be assigned.",
+          name : 'description',
           width : this.COMBO_WIDTH,
           allowBlank : true
         }, {
@@ -317,7 +317,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
         // grid view options
         ds : this.capabilitiesDataStore,
         sortInfo : {
-          field : 'name',
+          field : 'description',
           direction : "ASC"
         },
         loadMask : true,
@@ -333,12 +333,12 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
               width : 175,
               id : 'capabilities-type-col'
             }, {
-              header : 'Name',
-              dataIndex : 'name',
+              header : 'Description',
+              dataIndex : 'description',
               width : 175,
-              id : 'capabilities-name-col'
+              id : 'capabilities-description-col'
             }],
-        autoExpandColumn : 'capabilities-name-col',
+        autoExpandColumn : 'capabilities-description-col',
         disableSelection : false,
         viewConfig : {
           emptyText : 'Click "Add" to configure a capability.'
@@ -436,7 +436,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             serviceDataObj : {
               id : "",
               enabled : true,
-              name : "",
+              description : "",
               typeId : "",
               properties : [{
                     key : "",
@@ -579,7 +579,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             Sonatype.MessageBox.show({
                   animEl : this.capabilitiesGridPanel.getEl(),
                   title : 'Delete Capability configuration?',
-                  msg : 'Delete the ' + rec.get('name') + ' capability?',
+                  msg : 'Delete the ' + rec.get('description') + ' capability?',
                   buttons : Sonatype.MessageBox.YESNO,
                   scope : this,
                   icon : Sonatype.MessageBox.QUESTION,
@@ -661,7 +661,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             var sentData = action.output.data;
             var dataObj = {
               id : receivedData.id,
-              name : receivedData.name,
+              description : receivedData.description,
               enabled : receivedData.enabled,
               resourceURI : receivedData.resourceURI,
               typeId : receivedData.typeId,
@@ -714,7 +714,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
       updateCapabilityRecord : function(rec, receivedData) {
         rec.beginEdit();
-        rec.set('name', receivedData.name);
+        rec.set('description', receivedData.description);
         rec.set('typeId', receivedData.typeId);
         rec.set('enabled', receivedData.enabled);
         rec.set('typeName', receivedData.typeName);

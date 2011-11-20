@@ -105,11 +105,11 @@
 					<description>The id of the capability.</description>
 				</field>
 				<field>
-					<name>name</name>
+					<name>description</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
-					<description>The name of the capability.</description>
+					<description>The description of the capability.</description>
 				</field>
         <field>
           <name>enabled</name>
@@ -244,11 +244,11 @@
 					<description>The id of the capability.</description>
 				</field>
 				<field>
-					<name>name</name>
+					<name>description</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
-					<description>The name of the capability.</description>
+					<description>The description of the capability.</description>
 				</field>
         <field>
           <name>enabled</name>

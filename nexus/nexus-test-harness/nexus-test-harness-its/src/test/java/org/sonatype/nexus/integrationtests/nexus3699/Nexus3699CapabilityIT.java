@@ -58,7 +58,7 @@ public class Nexus3699CapabilityIT
     {
         // create
         CapabilityResource cap = new CapabilityResource();
-        cap.setName( "crud-test" );
+        cap.setDescription( "crud-test" );
         cap.setTypeId( "TouchTest" );
         CapabilityPropertyResource prop = new CapabilityPropertyResource();
         prop.setKey( "repoOrGroupId" );
@@ -75,16 +75,16 @@ public class Nexus3699CapabilityIT
         // read
         CapabilityResource read = CapabilitiesMessageUtil.read( r.getId() );
         Assert.assertEquals( r.getId(), read.getId() );
-        Assert.assertEquals( cap.getName(), read.getName() );
+        Assert.assertEquals( cap.getDescription(), read.getDescription() );
         Assert.assertEquals( cap.getTypeId(), read.getTypeId() );
         Assert.assertEquals( cap.getProperties().size(), read.getProperties().size() );
 
         // update
-        read.setName( "updateCrudTest" );
+        read.setDescription( "updateCrudTest" );
         CapabilityListItemResource updated = CapabilitiesMessageUtil.update( read );
-        Assert.assertEquals( "updateCrudTest", updated.getName() );
+        Assert.assertEquals( "updateCrudTest", updated.getDescription() );
         read = CapabilitiesMessageUtil.read( r.getId() );
-        Assert.assertEquals( "updateCrudTest", read.getName() );
+        Assert.assertEquals( "updateCrudTest", read.getDescription() );
 
         // delete
         CapabilitiesMessageUtil.delete( r.getId() );
@@ -98,7 +98,7 @@ public class Nexus3699CapabilityIT
 
         Assert.assertFalse( data.isEmpty() );
         MatcherAssert.assertThat( data.get( 0 ).getId(), CoreMatchers.equalTo( "4fde59a80f4" ) );
-        MatcherAssert.assertThat( data.get( 0 ).getName(), CoreMatchers.equalTo( "test-capability" ) );
+        MatcherAssert.assertThat( data.get( 0 ).getDescription(), CoreMatchers.equalTo( "test-capability" ) );
         MatcherAssert.assertThat( data.get( 0 ).getTypeId(), CoreMatchers.equalTo( "TouchTest" ) );
 
         File touch = new File( nexusWorkDir, "storage/nexus-test-harness-repo/capability/test.txt" );

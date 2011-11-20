@@ -166,8 +166,6 @@ public class CapabilityPlexusResource
 
     /**
      * Delete an existing capability.
-     * 
-     * @param capabilityId The scheduled task to access.
      */
     @Override
     @DELETE
@@ -198,7 +196,7 @@ public class CapabilityPlexusResource
         final CCapability capability = new CCapability();
 
         capability.setId( resource.getId() );
-        capability.setName( resource.getName() );
+        capability.setDescription( resource.getDescription() );
         capability.setEnabled( resource.isEnabled() );
         capability.setTypeId( resource.getTypeId() );
 
@@ -224,7 +222,7 @@ public class CapabilityPlexusResource
         final CapabilityResource resource = new CapabilityResource();
 
         resource.setId( capability.getId() );
-        resource.setName( capability.getName() );
+        resource.setDescription( capability.getDescription() );
         resource.setEnabled( capability.isEnabled() );
         resource.setTypeId( capability.getTypeId() );
 
@@ -267,7 +265,7 @@ public class CapabilityPlexusResource
 
         final CapabilityListItemResource item = new CapabilityListItemResource();
         item.setId( capability.getId() );
-        item.setName( capability.getName() );
+        item.setDescription( capability.getDescription() );
         item.setEnabled( capability.isEnabled() );
         item.setTypeId( capability.getTypeId() );
         item.setTypeName( capabilityDescriptorRegistry.get( capability.getTypeId() ).name() );

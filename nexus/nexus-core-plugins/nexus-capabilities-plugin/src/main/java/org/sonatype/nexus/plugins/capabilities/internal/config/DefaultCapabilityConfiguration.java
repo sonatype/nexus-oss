@@ -115,13 +115,13 @@ public class DefaultCapabilityConfiguration
             final String generatedId = idGenerator.generateId();
 
             capability.setId( generatedId );
-            capability.setName( getName( capability ) );
+            capability.setDescription( getDescription( capability ) );
             getConfiguration().addCapability( capability );
 
             save();
 
             getLogger().debug(
-                "Added capability [{}] with properties [{}]", capability.getName(), capability.getProperties()
+                "Added capability [{}] with properties [{}]", capability.getDescription(), capability.getProperties()
             );
             applicationEventMulticaster.notifyEventListeners( new CapabilityConfigurationAddEvent( capability ) );
 
@@ -152,12 +152,12 @@ public class DefaultCapabilityConfiguration
             if ( stored != null )
             {
                 getConfiguration().removeCapability( stored );
-                capability.setName( getName( capability ) );
+                capability.setDescription( getDescription( capability ) );
                 getConfiguration().addCapability( capability );
                 save();
 
                 getLogger().debug(
-                    "Updated capability [{}] with properties [{}]", capability.getName(), capability.getProperties()
+                    "Updated capability [{}] with properties [{}]", capability.getDescription(), capability.getProperties()
                 );
                 applicationEventMulticaster.notifyEventListeners(
                     new CapabilityConfigurationUpdateEvent( capability, stored ) );
@@ -183,7 +183,7 @@ public class DefaultCapabilityConfiguration
                 save();
 
                 getLogger().debug(
-                    "Removed capability [{}] with properties [{}]", stored.getName(), stored.getProperties()
+                    "Removed capability [{}] with properties [{}]", stored.getDescription(), stored.getProperties()
                 );
                 applicationEventMulticaster.notifyEventListeners( new CapabilityConfigurationRemoveEvent( stored ) );
             }
@@ -291,7 +291,7 @@ public class DefaultCapabilityConfiguration
         for ( final CCapability capability : capabilities )
         {
             getLogger().debug(
-                "Loading capability [{}] with properties [{}]", capability.getName(), capability.getProperties()
+                "Loading capability [{}] with properties [{}]", capability.getDescription(), capability.getProperties()
             );
             applicationEventMulticaster.notifyEventListeners( new CapabilityConfigurationLoadEvent( capability ) );
         }
@@ -339,9 +339,9 @@ public class DefaultCapabilityConfiguration
         configuration = null;
     }
 
-    private String getName( final CCapability capability )
+    private String getDescription( final CCapability capability )
     {
-        if ( StringUtils.isEmpty( capability.getName() ) )
+        if ( StringUtils.isEmpty( capability.getDescription() ) )
         {
             final CapabilityDescriptor descriptor = descriptors.get( capability.getTypeId() );
             if ( descriptor != null )
@@ -356,7 +356,7 @@ public class DefaultCapabilityConfiguration
                 }
             }
         }
-        return capability.getName();
+        return capability.getDescription();
     }
 
     static Map<String, String> asMap( final List<CCapabilityProperty> properties )

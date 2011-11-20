@@ -53,7 +53,7 @@ public class DefaultCapabilityConfigurationTest
 
         // create
         CCapability cap = new CCapability();
-        cap.setName( "Configuration Test" );
+        cap.setDescription( "Configuration Test" );
         cap.setTypeId( "AnyTest" );
         configuration.add( cap );
 
@@ -66,17 +66,17 @@ public class DefaultCapabilityConfigurationTest
 
         CCapability read = configuration.get( cap.getId() );
         assertEquals( read.getId(), cap.getId() );
-        assertEquals( read.getName(), cap.getName() );
+        assertEquals( read.getDescription(), cap.getDescription() );
         assertEquals( read.getTypeId(), cap.getTypeId() );
         assertEquals( read.getProperties().size(), cap.getProperties().size() );
 
 
         // update
-        cap.setName( "NewCapName" );
+        cap.setDescription( "NewCapDescription" );
         configuration.update( cap );
         configuration.clearCache();
         read = configuration.get( cap.getId() );
-        assertEquals( read.getName(), cap.getName() );
+        assertEquals( read.getDescription(), cap.getDescription() );
 
         // load eventing
         final List<CapabilityConfigurationLoadEvent> events = new ArrayList<CapabilityConfigurationLoadEvent>();

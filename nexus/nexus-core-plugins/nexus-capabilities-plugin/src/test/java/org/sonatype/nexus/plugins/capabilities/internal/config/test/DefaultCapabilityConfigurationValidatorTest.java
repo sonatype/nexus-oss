@@ -57,7 +57,7 @@ public class DefaultCapabilityConfigurationValidatorTest
     {
         CCapability cap = new CCapability();
         cap.setId( "0x00AABB" );
-        cap.setName( "UnitTest" );
+        cap.setDescription( "UnitTest" );
         cap.setTypeId( "AnyType" );
         CCapabilityProperty prop = new CCapabilityProperty();
         prop.setKey( "key" );
