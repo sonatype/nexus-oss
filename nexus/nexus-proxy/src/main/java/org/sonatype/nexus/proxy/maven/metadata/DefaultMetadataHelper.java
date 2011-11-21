@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
 
 /**
  * Default MetadataHelper in Nexus, works based on a Repository.
@@ -42,14 +43,23 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 public class DefaultMetadataHelper
     extends AbstractMetadataHelper
 {
-    private MavenRepository repository;
+    private final MavenRepository repository;
+
+    private final DeleteOperation operation;
 
     public DefaultMetadataHelper( Logger logger, MavenRepository repository )
+    {
+        this( logger, repository, DeleteOperation.MOVE_TO_TRASH );
+    }
+
+    public DefaultMetadataHelper( Logger logger, MavenRepository repository, DeleteOperation operation )
     {
         super( logger );
 
         this.repository = repository;
+        this.operation = operation;
     }
+
 
     @Override
     public void store( String content, String path )
@@ -165,7 +175,9 @@ public class DefaultMetadataHelper
     {
         try
         {
-            repository.deleteItem( false, new ResourceStoreRequest( path, true ) );
+            ResourceStoreRequest request = new ResourceStoreRequest( path, true );
+            request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, operation );
+            repository.deleteItem( false, request );
         }
         catch ( Exception e )
         {

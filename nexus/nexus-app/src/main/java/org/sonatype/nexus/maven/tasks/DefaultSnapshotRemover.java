@@ -282,6 +282,7 @@ public class DefaultSnapshotRemover
             getLogger().debug( "    MinCountOfSnapshotsToKeep: " + request.getMinCountOfSnapshotsToKeep() );
             getLogger().debug( "    RemoveSnapshotsOlderThanDays: " + request.getRemoveSnapshotsOlderThanDays() );
             getLogger().debug( "    RemoveIfReleaseExists: " + request.isRemoveIfReleaseExists() );
+            getLogger().debug( "    DeleteImmediately: " + request.isDeleteImmediately() );
         }
     }
 

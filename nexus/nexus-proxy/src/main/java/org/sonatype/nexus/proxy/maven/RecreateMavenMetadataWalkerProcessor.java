@@ -68,7 +68,7 @@ public class RecreateMavenMetadataWalkerProcessor
 
         if ( repository != null )
         {
-            mdHelper = new DefaultMetadataHelper( logger, repository );
+            mdHelper = new DefaultMetadataHelper( logger, repository, deleteOperation );
 
             isHostedRepo = repository.getRepositoryKind().isFacetAvailable( HostedRepository.class );
         }
