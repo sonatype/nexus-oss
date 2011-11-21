@@ -19,14 +19,24 @@
 package org.sonatype.nexus.proxy.attributes;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.uid.IsMetadataMaintainedAttribute;
 
-/**
- * The Class AbstractStorageFileItemInspector is a convenience class for implementing inspectors.
- * 
- * @author cstamas
- */
-public abstract class AbstractStorageItemInspector
+public abstract class AbstractAttributeStorage
     extends AbstractLoggingComponent
-    implements StorageItemInspector
 {
+    protected boolean isMetadataMaintained( RepositoryItemUid uid )
+    {
+        Boolean isMetadataMaintained = uid.getAttributeValue( IsMetadataMaintainedAttribute.class );
+
+        if ( isMetadataMaintained != null )
+        {
+            return isMetadataMaintained.booleanValue();
+        }
+        else
+        {
+            // safest
+            return true;
+        }
+    }
 }

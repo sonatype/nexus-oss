@@ -22,92 +22,62 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
-import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageCompositeFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.item.uid.IsMetadataMaintainedAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.XStreamException;
-
 /**
- * AttributeStorage implementation driven by XStream, and uses LocalRepositoryStorage of repositories to store
- * attributes "along" the artifacts (well, not along but in same storage but hidden).
+ * AttributeStorage implementation that uses LocalRepositoryStorage of repositories to store attributes "along" the
+ * artifacts (well, not along but in same storage but hidden).
  * 
  * @author cstamas
  */
-@Component( role = AttributeStorage.class, hint = "ls" )
+@Typed( AttributeStorage.class )
+@Named( "ls" )
+@Singleton
 public class DefaultLSAttributeStorage
+    extends AbstractAttributeStorage
     implements AttributeStorage
 {
     private static final String ATTRIBUTE_PATH_PREFIX = "/.nexus/attributes";
 
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
-
-    /** The XStream. */
-    private XStream xstream;
+    private final Marshaller marshaller;
 
     /**
      * Instantiates a new FSX stream attribute storage.
      */
-    public DefaultLSAttributeStorage()
+    @Inject
+    public DefaultLSAttributeStorage( @Named( "xstream-xml" ) final Marshaller marshaller )
     {
-        super();
-        this.xstream = new XStream();
-        this.xstream.alias( "file", DefaultStorageFileItem.class );
-        this.xstream.alias( "compositeFile", DefaultStorageCompositeFileItem.class );
-        this.xstream.alias( "collection", DefaultStorageCollectionItem.class );
-        this.xstream.alias( "link", DefaultStorageLinkItem.class );
-    }
-
-    protected Logger getLogger()
-    {
-        return logger;
-    }
-
-    protected boolean IsMetadataMaintained( RepositoryItemUid uid )
-    {
-        Boolean isMetadataMaintained = uid.getAttributeValue( IsMetadataMaintainedAttribute.class );
-
-        if ( isMetadataMaintained != null )
-        {
-            return isMetadataMaintained.booleanValue();
-        }
-        else
-        {
-            // safest
-            return true;
-        }
+        this.marshaller = marshaller;
     }
 
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
-        if ( !IsMetadataMaintained( uid ) )
+        if ( !isMetadataMaintained( uid ) )
         {
             // do nothing
             return false;
         }
 
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
-        
+
         uidLock.lock( Action.delete );
 
         try
@@ -151,7 +121,7 @@ public class DefaultLSAttributeStorage
 
     public AbstractStorageItem getAttributes( RepositoryItemUid uid )
     {
-        if ( !IsMetadataMaintained( uid ) )
+        if ( !isMetadataMaintained( uid ) )
         {
             // do nothing
             return null;
@@ -190,7 +160,7 @@ public class DefaultLSAttributeStorage
 
     public void putAttribute( StorageItem item )
     {
-        if ( !IsMetadataMaintained( item.getRepositoryItemUid() ) )
+        if ( !isMetadataMaintained( item.getRepositoryItemUid() ) )
         {
             // do nothing
             return;
@@ -238,7 +208,7 @@ public class DefaultLSAttributeStorage
 
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-                xstream.toXML( item, bos );
+                marshaller.marshal( item, bos );
 
                 final Repository repository = origUid.getRepository();
 
@@ -312,7 +282,7 @@ public class DefaultLSAttributeStorage
 
                 attributeStream = attributeItem.getContentLocator().getContent();
 
-                result = (AbstractStorageItem) xstream.fromXML( attributeStream );
+                result = (AbstractStorageItem) marshaller.unmarshal( attributeStream );
 
                 result.setRepositoryItemUid( uid );
 
@@ -331,45 +301,26 @@ public class DefaultLSAttributeStorage
                 }
             }
         }
+        catch ( InvalidInputException e )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                // we log the stacktrace
+                getLogger().info( "Attributes of " + uid + " are corrupt, deleting it.", e );
+            }
+            else
+            {
+                // just remark about this
+                getLogger().info( "Attributes of " + uid + " are corrupt, deleting it." );
+            }
+
+            corrupt = true;
+        }
         catch ( IOException e )
         {
             getLogger().info( "While reading attributes of " + uid + " we got IOException:", e );
 
             throw e;
-        }
-        catch ( NullPointerException e )
-        {
-            // NEXUS-3911: seems that on malformed XML the XMLpull parser throws NPE?
-            // org.xmlpull.mxp1.MXParser.fillBuf(MXParser.java:3020) : NPE
-            // it is corrupt
-            if ( getLogger().isDebugEnabled() )
-            {
-                // we log the stacktrace
-                getLogger().info( "Attributes of " + uid + " are corrupt, deleting it.", e );
-            }
-            else
-            {
-                // just remark about this
-                getLogger().info( "Attributes of " + uid + " are corrupt, deleting it." );
-            }
-
-            corrupt = true;
-        }
-        catch ( XStreamException e )
-        {
-            // it is corrupt -- so says XStream, but see above and NEXUS-3911
-            if ( getLogger().isDebugEnabled() )
-            {
-                // we log the stacktrace
-                getLogger().info( "Attributes of " + uid + " are corrupt, deleting it.", e );
-            }
-            else
-            {
-                // just remark about this
-                getLogger().info( "Attributes of " + uid + " are corrupt, deleting it." );
-            }
-
-            corrupt = true;
         }
         catch ( ItemNotFoundException e )
         {

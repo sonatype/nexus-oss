@@ -27,12 +27,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -45,18 +42,16 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.util.ItemPathUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
-@Component( role = FSPeer.class )
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+@Named
+@Singleton
 public class DefaultFSPeer
+    extends AbstractLoggingComponent
     implements FSPeer
 {
     private static final String HIDDEN_TARGET_SUFFIX = ".nx-upload";
-
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
-
-    protected Logger getLogger()
-    {
-        return logger;
-    }
 
     public boolean isReachable( Repository repository, ResourceStoreRequest request, File target )
         throws LocalStorageException
@@ -213,8 +208,8 @@ public class DefaultFSPeer
             }
             catch ( IOException e )
             {
-                logger.warn( "Unable to move item, falling back to copy+delete: " + toTarget.getPath(),
-                    logger.isDebugEnabled() ? e : null );
+                getLogger().warn( "Unable to move item, falling back to copy+delete: " + toTarget.getPath(),
+                    getLogger().isDebugEnabled() ? e : null );
 
                 if ( fromTarget.isDirectory() )
                 {
@@ -241,7 +236,7 @@ public class DefaultFSPeer
                 else
                 {
                     // TODO throw exception?
-                    logger.error( "Unexpected item kind: " + toTarget.getClass() );
+                    getLogger().error( "Unexpected item kind: " + toTarget.getClass() );
                 }
                 shredItem( repository, from, fromTarget );
             }

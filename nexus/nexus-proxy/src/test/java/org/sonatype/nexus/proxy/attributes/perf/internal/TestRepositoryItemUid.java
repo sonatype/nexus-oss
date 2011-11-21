@@ -16,17 +16,35 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.attributes;
+package org.sonatype.nexus.proxy.attributes.perf.internal;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.proxy.item.DefaultRepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
+import org.sonatype.nexus.proxy.item.uid.Attribute;
+import org.sonatype.nexus.proxy.item.uid.IsMetadataMaintainedAttribute;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The Class AbstractStorageFileItemInspector is a convenience class for implementing inspectors.
- * 
- * @author cstamas
+ *
  */
-public abstract class AbstractStorageItemInspector
-    extends AbstractLoggingComponent
-    implements StorageItemInspector
+public class TestRepositoryItemUid
+    extends DefaultRepositoryItemUid
 {
+    public TestRepositoryItemUid( RepositoryItemUidFactory factory, Repository repository, String path )
+    {
+        super( factory, repository, path );
+    }
+
+    @Override
+    public <A extends Attribute<V>, V> V getAttributeValue( Class<A> attrClass )
+    {
+        if ( IsMetadataMaintainedAttribute.class.getName().equals( attrClass.getName() ) )
+        {
+            return (V) Boolean.TRUE;
+        }
+        else
+        {
+            return super.getAttributeValue( attrClass );
+        }
+    }
 }
