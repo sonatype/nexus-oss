@@ -309,11 +309,11 @@ public class DefaultAttributesHandler
         // Touch it only if this is user-originated request (request incoming over HTTP, not a plugin or "internal" one)
         // Currently, we test for IP address presence, since that makes sure it is user request (from REST API) and not
         // a request from "internals" (ie. a running task).
-        // TODO: maybe the other nexus.ls.file.touchLastRequested* props should be moved here
 
+        // we do this only for requests originating from REST API (user initiated)
         if ( request.getRequestContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
         {
-            // if we need to do this at all...
+            // if we need to do this at all... user might turn this feature completely off
             if ( doTouchLastRequested( repository ) )
             {
                 final long diff = timestamp - storageItem.getLastRequested();
