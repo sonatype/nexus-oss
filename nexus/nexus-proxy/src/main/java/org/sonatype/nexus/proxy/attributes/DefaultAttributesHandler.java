@@ -65,7 +65,7 @@ public class DefaultAttributesHandler
      * Nexus behave in "old" (update always) way.
      */
     private static final long LAST_REQUESTED_ATTRIBUTE_RESOLUTION =
-        Math.abs( SystemPropertiesHelper.getLong( "nexus.attributes.lastRequestedResolution",
+        Math.abs( SystemPropertiesHelper.getLong( "org.sonatype.nexus.proxy.attributes.DefaultAttributesHandler.lastRequestedResolution",
                                                   LAST_REQUESTED_ATTRIBUTE_RESOLUTION_DEFAULT ) );
 
     /**
