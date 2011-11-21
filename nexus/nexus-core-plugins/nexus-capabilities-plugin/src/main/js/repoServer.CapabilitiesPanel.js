@@ -643,7 +643,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         }
         else
         {
-          Sonatype.utils.connectionError(response, 'The server did not delete the task.', null, null, true);
+          Sonatype.utils.connectionError(response, 'The server did not delete the capability.', null, null, true);
         }
       },
 
