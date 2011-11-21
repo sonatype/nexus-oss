@@ -709,6 +709,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             var sortState = this.capabilitiesDataStore.getSortState();
             this.capabilitiesDataStore.sort(sortState.field, sortState.direction);
           }
+          action.options.fpanel.find('name', 'description')[0].setValue(receivedData.description);
         }
       },
 
