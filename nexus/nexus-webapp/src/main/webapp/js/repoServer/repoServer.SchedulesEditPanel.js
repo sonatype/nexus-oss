@@ -1945,7 +1945,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         var hours = startDate.getHours();
         var minutes = startDate.getMinutes();
 
-        var importedTime = hours + ':' + minutes;
+        var importedTime = (hours<10?'0':'') + hours + ':' + (minutes<10?'0':'') + minutes;
         selectedStartTime.setValue(importedTime);
         return importedTime;
       },
@@ -1968,7 +1968,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         var hours = startDate.getHours();
         var minutes = startDate.getMinutes();
 
-        var importedTime = hours + ':' + minutes;
+        var importedTime = (hours<10?'0':'') + hours + ':' + (minutes<10?'0':'') + minutes;
         selectedRecurringTime.setValue(importedTime);
         return importedTime;
       },
