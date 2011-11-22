@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 
+import org.junit.Ignore;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.attributes.AttributeStorage;
 import org.sonatype.nexus.proxy.attributes.DefaultFSAttributeStorage;
@@ -36,6 +37,7 @@ import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 //@BenchmarkHistoryChart()
 //@BenchmarkMethodChart()
 //@AxisRange(min = 0)
+@Ignore
 public class JacksonJSONFSAttributeStoragePerformanceTest
     extends AttributeStoragePerformanceTestSupport
 {

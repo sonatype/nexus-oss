@@ -59,9 +59,9 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 /**
  *
  */
-@BenchmarkHistoryChart()
-@BenchmarkMethodChart()
-@AxisRange(min = 0)
+@BenchmarkHistoryChart( )
+@BenchmarkMethodChart( )
+@AxisRange( min = 0 )
 public class DefaultFSLocalRepositoryStoragePerformanceITTest
     extends AbstractNexusTestEnvironment
 {
@@ -76,11 +76,9 @@ public class DefaultFSLocalRepositoryStoragePerformanceITTest
 
     private long originalLastAccessTime;
 
-//    private AttributeStorage attributeStorage = new HashMapAttributeStorage();
-    private AttributeStorage attributeStorage;
-
     @Before
-    public void setup() throws Exception
+    public void setup()
+        throws Exception
     {
         ApplicationConfiguration applicationConfiguration = this.lookup( ApplicationConfiguration.class );
 
@@ -113,22 +111,26 @@ public class DefaultFSLocalRepositoryStoragePerformanceITTest
 
         localRepositoryStorageUnderTest = repository.getLocalStorage();
 
-        attributeStorage = repository.getAttributesHandler().getAttributeStorage();
-
         // write a test file
         File testFile = new File( repositoryStorageDir, testFilePath );
         FileUtils.writeStringToFile( testFile, "CONTENT" );
-        
-        // this test expects "old" behaviour:
-        ((DefaultAttributesHandler)repository.getAttributesHandler()).setLastRequestedResolution( 0 );
 
+        // this test expects "old" behaviour:
+        ( (DefaultAttributesHandler) repository.getAttributesHandler() ).setLastRequestedResolution( 0 );
 
         // prime the retrieve
-        ResourceStoreRequest resourceRequest = new ResourceStoreRequest( testFilePath );
-        originalLastAccessTime = localRepositoryStorageUnderTest.retrieveItem( repository, resourceRequest ).getLastRequested();
+        originalLastAccessTime = primeLastRequestedTimestamp();
     }
 
-    @BenchmarkOptions(benchmarkRounds = 10, warmupRounds = 1)
+    protected long primeLastRequestedTimestamp()
+        throws LocalStorageException, ItemNotFoundException
+    {
+        ResourceStoreRequest resourceRequest = new ResourceStoreRequest( testFilePath );
+        resourceRequest.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, "127.0.0.1" );
+        return localRepositoryStorageUnderTest.retrieveItem( repository, resourceRequest ).getLastRequested();
+    }
+
+    @BenchmarkOptions( benchmarkRounds = 10, warmupRounds = 1 )
     @Test
     public void testRetieveItemWithoutLastAccessUpdate()
         throws LocalStorageException, ItemNotFoundException
@@ -141,7 +143,7 @@ public class DefaultFSLocalRepositoryStoragePerformanceITTest
         MatcherAssert.assertThat( storageItem.getLastRequested(), Matchers.equalTo( originalLastAccessTime ) );
     }
 
-    @BenchmarkOptions(benchmarkRounds = 10, warmupRounds = 1 )
+    @BenchmarkOptions( benchmarkRounds = 10, warmupRounds = 1 )
     @Test
     public void testRetieveItemWithLastAccessUpdate()
         throws LocalStorageException, ItemNotFoundException
@@ -155,7 +157,7 @@ public class DefaultFSLocalRepositoryStoragePerformanceITTest
         MatcherAssert.assertThat( storageItem.getLastRequested(), Matchers.greaterThan( originalLastAccessTime ) );
     }
 
-    @BenchmarkOptions(benchmarkRounds = 10, warmupRounds = 1 )
+    @BenchmarkOptions( benchmarkRounds = 10, warmupRounds = 1 )
     @Test
     public void validateRetieveItemWithoutLastAccessUpdate()
         throws LocalStorageException, ItemNotFoundException
@@ -170,10 +172,10 @@ public class DefaultFSLocalRepositoryStoragePerformanceITTest
         MatcherAssert.assertThat( storageItem, Matchers.notNullValue() );
         MatcherAssert.assertThat( storageItem.getLastRequested(), Matchers.equalTo( originalLastAccessTime ) );
 
-        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).getAttributes( Mockito.<RepositoryItemUid>any() );
+        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).getAttributes( Mockito.<RepositoryItemUid> any() );
     }
 
-    @BenchmarkOptions(benchmarkRounds = 10, warmupRounds = 1 )
+    @BenchmarkOptions( benchmarkRounds = 10, warmupRounds = 1 )
     @Test
     public void validateRetieveItemWithLastAccessUpdate()
         throws LocalStorageException, ItemNotFoundException
@@ -189,17 +191,20 @@ public class DefaultFSLocalRepositoryStoragePerformanceITTest
         MatcherAssert.assertThat( storageItem, Matchers.notNullValue() );
         MatcherAssert.assertThat( storageItem.getLastRequested(), Matchers.greaterThan( originalLastAccessTime ) );
 
-        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).putAttribute( Mockito.<StorageItem>any() );
-        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).getAttributes( Mockito.<RepositoryItemUid>any() );
+        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).putAttribute( Mockito.<StorageItem> any() );
+        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).getAttributes( Mockito.<RepositoryItemUid> any() );
 
     }
 
-    @BenchmarkOptions(benchmarkRounds = 10, warmupRounds = 1 )
+    @BenchmarkOptions( benchmarkRounds = 10, warmupRounds = 1 )
     @Test
     public void validateRetieveItemWithOutLastAccessUpdateTimeDelay()
         throws LocalStorageException, ItemNotFoundException
     {
-        ( (DefaultAttributesHandler) repository.getAttributesHandler() ).setLastRequestedResolution( 100 );
+        // do the test, but make sure the _iterations_ will not get out of the "resolution" span!
+        // Note: this test is just broken as is, what guarantees it will finish the cycles in given X millis?
+        // Meaning, the assertions + rounds is wrong.
+        ( (DefaultAttributesHandler) repository.getAttributesHandler() ).setLastRequestedResolution( 30000L );
         AttributeStorage attributeStorageSpy = Mockito.spy( repository.getAttributesHandler().getAttributeStorage() );
         repository.getAttributesHandler().setAttributeStorage( attributeStorageSpy );
 
@@ -211,12 +216,12 @@ public class DefaultFSLocalRepositoryStoragePerformanceITTest
         MatcherAssert.assertThat( storageItem, Matchers.notNullValue() );
         MatcherAssert.assertThat( storageItem.getLastRequested(), Matchers.equalTo( originalLastAccessTime ) );
 
-        Mockito.verify( attributeStorageSpy, Mockito.times( 0 ) ).putAttribute( Mockito.<StorageItem>any() );
-        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).getAttributes( Mockito.<RepositoryItemUid>any() );
+        Mockito.verify( attributeStorageSpy, Mockito.times( 0 ) ).putAttribute( Mockito.<StorageItem> any() );
+        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).getAttributes( Mockito.<RepositoryItemUid> any() );
 
     }
 
-    @BenchmarkOptions(benchmarkRounds = 1, warmupRounds = 0 )
+    @BenchmarkOptions( benchmarkRounds = 1, warmupRounds = 0 )
     @Test
     public void validateRetieveItemWithLastAccessUpdateTimeDelay()
         throws Exception
@@ -224,9 +229,9 @@ public class DefaultFSLocalRepositoryStoragePerformanceITTest
         // need to ensure we wait 100 ms
         int wait = 100;
 
-       ( (DefaultAttributesHandler) repository.getAttributesHandler() ).setLastRequestedResolution( wait );
+        ( (DefaultAttributesHandler) repository.getAttributesHandler() ).setLastRequestedResolution( wait );
         Thread.sleep( wait );
-        
+
         AttributeStorage attributeStorageSpy = Mockito.spy( repository.getAttributesHandler().getAttributeStorage() );
         repository.getAttributesHandler().setAttributeStorage( attributeStorageSpy );
 
@@ -238,8 +243,8 @@ public class DefaultFSLocalRepositoryStoragePerformanceITTest
         MatcherAssert.assertThat( storageItem, Matchers.notNullValue() );
         MatcherAssert.assertThat( storageItem.getLastRequested(), Matchers.greaterThan( originalLastAccessTime ) );
 
-        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).putAttribute( Mockito.<StorageItem>any() );
-        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).getAttributes( Mockito.<RepositoryItemUid>any() );
+        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).putAttribute( Mockito.<StorageItem> any() );
+        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).getAttributes( Mockito.<RepositoryItemUid> any() );
 
     }
 
