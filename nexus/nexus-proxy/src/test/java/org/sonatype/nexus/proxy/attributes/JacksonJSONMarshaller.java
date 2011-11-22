@@ -33,6 +33,9 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
+/**
+ * Jackson JSON Attribute marshaller. Part of NEXUS-4628 "alternate" AttributeStorage implementations.
+ */
 @Singleton
 @Named( "jackson-json" )
 public class JacksonJSONMarshaller

@@ -18,18 +18,22 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
-import javax.enterprise.inject.Typed;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
-@Typed( AttributeStorage.class )
-@Named( "delegating" )
-@Singleton
+/**
+ * AttributeStorage that actually delegates the work to other instance of AttributeStorage, and having an option of
+ * "fallback" to some other instance. Usable for scenarios where "transitioning" (smooth upgrade for example) is to be
+ * used, the "main" attribute storage would be "upgraded" from "legacy" attribute storage as the attributes are
+ * requested over the time from this instance.
+ * 
+ * @author cstamas
+ */
+// @Typed( AttributeStorage.class )
+// @Named( "delegating" )
+// @Singleton
 public class DelegatingAttributeStorage
     extends AbstractLoggingComponent
     implements AttributeStorage
@@ -38,8 +42,8 @@ public class DelegatingAttributeStorage
 
     private final AttributeStorage fallbackAttributeStorage;
 
-    public DelegatingAttributeStorage( @Named( "ls" ) final AttributeStorage mainAttributeStorage,
-                                       @Named( "fs" ) final AttributeStorage fallbackAttributeStorage )
+    public DelegatingAttributeStorage( final AttributeStorage mainAttributeStorage,
+                                       final AttributeStorage fallbackAttributeStorage )
     {
         super();
         this.mainAttributeStorage = mainAttributeStorage;

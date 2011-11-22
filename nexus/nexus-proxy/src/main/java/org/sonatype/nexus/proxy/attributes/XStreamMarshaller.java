@@ -34,6 +34,11 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 
+/**
+ * The Nexus default marshaller: uses XStream to marshall complete StorageItem instances as XML.
+ * 
+ * @author cstamas
+ */
 @Singleton
 @Named( "xstream-xml" )
 public class XStreamMarshaller

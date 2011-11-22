@@ -21,15 +21,15 @@ package org.sonatype.nexus.proxy.attributes;
 import java.io.IOException;
 
 /**
- * Exception thrown when {@link Marshaller} does not "plain" IOException, but rather it is able to read the content but
- * it detects the content is corrupt, unreadable or in any other way unexpectedly formatted and unprocessable.
+ * Exception thrown when {@link Marshaller} does not hit "plain" IOException, is able to read the content but it detects
+ * the content as corrupt, unreadable or in any other way unexpectedly formatted and unprocessable.
  * 
  * @author cstamas
  */
 public class InvalidInputException
     extends IOException
 {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -1729104533714236869L;
 
     public InvalidInputException( String message )
     {

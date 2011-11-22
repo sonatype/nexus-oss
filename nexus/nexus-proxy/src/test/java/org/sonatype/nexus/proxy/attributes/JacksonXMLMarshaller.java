@@ -35,6 +35,9 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 
 import com.fasterxml.jackson.xml.XmlMapper;
 
+/**
+ * Jackson XML backed Attribute marshaller. Part of NEXUS-4628 "alternate" AttributeStorage implementations.
+ */
 @Singleton
 @Named( "jackson-xml" )
 public class JacksonXMLMarshaller

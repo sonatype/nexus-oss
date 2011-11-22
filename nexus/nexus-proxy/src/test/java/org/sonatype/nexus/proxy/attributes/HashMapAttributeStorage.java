@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * A HashMap implementation of Attribute Storage. Usable for tests etc, since it actually does not persists anything.
+ * Part of NEXUS-4628 "alternate" AttributeStorage implementations.
  */
 @Typed( AttributeStorage.class )
 @Named( "hashmap" )

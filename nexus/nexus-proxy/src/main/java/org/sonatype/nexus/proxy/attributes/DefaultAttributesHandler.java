@@ -51,7 +51,8 @@ import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
- * The Class DefaultAttributesHandler.
+ * The default implementation of AttributesHandler. Has support for various "lastRequested" attribute tuning, but does
+ * not have any assumption regarding actual AttributeStorage it uses.
  * 
  * @author cstamas
  */

@@ -57,7 +57,7 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.util.ItemPathUtils;
 
 /**
- * The Class DefaultFSLocalRepositoryStorage.
+ * LocalRepositoryStorage that uses plain File System (relies on {@link File}) to implement it's functionality.
  * 
  * @author cstamas
  */

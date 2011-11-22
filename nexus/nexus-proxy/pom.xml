@@ -135,14 +135,7 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-aether-provider</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml</groupId>
-      <artifactId>jackson-xml-databind</artifactId>
-    </dependency>
+
     <!-- Sisu -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
@@ -193,6 +186,19 @@
       <artifactId>shiro-web</artifactId>
       <scope>test</scope>
     </dependency>
+    
+    <!-- NEXUS-4628: Attributes perf tests, for now the "alternate" imples are in tests not getting into core -->
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml</groupId>
+      <artifactId>jackson-xml-databind</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
   </dependencies>
 
   <build>

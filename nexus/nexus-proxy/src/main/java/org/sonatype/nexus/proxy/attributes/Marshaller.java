@@ -25,7 +25,7 @@ import java.io.OutputStream;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
- * Component handling the marshalling and unmarshalling.
+ * Component handling the marshalling and unmarshalling of attributes.
  * 
  * @author cstamas
  */

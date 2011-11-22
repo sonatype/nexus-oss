@@ -22,9 +22,20 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.uid.IsMetadataMaintainedAttribute;
 
+/**
+ * Abstract superclass for AttributeStorage implementations.
+ * 
+ * @author cstamas
+ */
 public abstract class AbstractAttributeStorage
     extends AbstractLoggingComponent
 {
+    /**
+     * Returns true if the attributes should be maintained at all.
+     * 
+     * @param uid
+     * @return true if attributes should exists for given UID.
+     */
     protected boolean isMetadataMaintained( RepositoryItemUid uid )
     {
         Boolean isMetadataMaintained = uid.getAttributeValue( IsMetadataMaintainedAttribute.class );

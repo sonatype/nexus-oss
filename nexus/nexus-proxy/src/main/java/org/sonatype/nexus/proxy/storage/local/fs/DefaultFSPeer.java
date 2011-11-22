@@ -45,6 +45,12 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+/**
+ * The default FSPeer implementation, directly implementating it. There might be alternate implementations, like doing
+ * 2nd level caching and so on.
+ * 
+ * @author cstamas
+ */
 @Named
 @Singleton
 public class DefaultFSPeer
@@ -163,7 +169,7 @@ public class DefaultFSPeer
     public void shredItem( Repository repository, ResourceStoreRequest request, File target )
         throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
     {
-        if( getLogger().isDebugEnabled() )
+        if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "Deleting file: " + target.getAbsolutePath() );
         }
