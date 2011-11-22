@@ -32,7 +32,7 @@ public class DefaultStorageCompositeFileItem
     extends DefaultStorageFileItem
     implements StorageCompositeFileItem
 {
-    private List<StorageItem> sources;
+    private transient List<StorageItem> sources;
 
     public DefaultStorageCompositeFileItem( Repository repository, ResourceStoreRequest request, boolean canRead,
                                             boolean canWrite, ContentLocator contentLocator, List<StorageItem> sources )

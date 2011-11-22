@@ -38,9 +38,9 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
@@ -197,18 +197,18 @@ public class DefaultAttributesHandler
     // ======================================================================
     // AttributesHandler iface
 
-    public boolean deleteAttributes( RepositoryItemUid uid )
+    public boolean deleteAttributes( final RepositoryItemUid uid )
     {
         return getAttributeStorage().deleteAttributes( uid );
     }
 
-    public void fetchAttributes( StorageItem item )
+    public void fetchAttributes( final StorageItem item )
     {
-        StorageItem mdItem = getAttributeStorage().getAttributes( item.getRepositoryItemUid() );
+        final Attributes attributes = getAttributeStorage().getAttributes( item.getRepositoryItemUid() );
 
-        if ( mdItem != null )
+        if ( attributes != null )
         {
-            item.overlay( mdItem );
+            item.overlayAttributes( attributes );
         }
         else
         {
@@ -230,6 +230,11 @@ public class DefaultAttributesHandler
 
     public void storeAttributes( final StorageItem item, final ContentLocator content )
     {
+        if ( item instanceof StorageCollectionItem )
+        {
+            // not storing attributes of directories
+            return;
+        }
         if ( content != null )
         {
             // resetting some important values
@@ -249,7 +254,7 @@ public class DefaultAttributesHandler
             expandCustomItemAttributes( item, content );
         }
 
-        getAttributeStorage().putAttribute( item );
+        getAttributeStorage().putAttributes( item.getRepositoryItemUid(), item.getRepositoryItemAttributes() );
     }
 
     // ==
@@ -265,19 +270,16 @@ public class DefaultAttributesHandler
     {
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
-        AbstractStorageItem item = getAttributeStorage().getAttributes( uid );
+        Attributes item = getAttributeStorage().getAttributes( uid );
 
         if ( item != null )
         {
-            item.setResourceStoreRequest( request );
-
-            item.setRepositoryItemUid( uid );
-
-            item.setRemoteChecked( timestamp );
-
+            item.setRepositoryId( uid.getRepository().getId() );
+            item.setPath( uid.getPath() );
+            item.setCheckedRemotely( timestamp );
             item.setExpired( false );
 
-            getAttributeStorage().putAttribute( item );
+            getAttributeStorage().putAttributes( uid, item );
         }
     }
 
@@ -292,20 +294,32 @@ public class DefaultAttributesHandler
     {
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
-        AbstractStorageItem item = getAttributeStorage().getAttributes( uid );
+        Attributes item = getAttributeStorage().getAttributes( uid );
 
         if ( item != null )
         {
-            item.setResourceStoreRequest( request );
+            item.setRepositoryId( uid.getRepository().getId() );
+            item.setPath( uid.getPath() );
 
-            item.setRepositoryItemUid( uid );
-
-            touchItemLastRequested( timestamp, repository, request, item );
+            touchItemLastRequested( timestamp, request,  uid, item );
         }
     }
 
     public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request,
                                         StorageItem storageItem )
+        throws ItemNotFoundException, LocalStorageException
+    {
+        if ( storageItem instanceof StorageCollectionItem )
+        {
+            return;
+        }
+
+        touchItemLastRequested( timestamp, request, storageItem.getRepositoryItemUid(),
+            storageItem.getRepositoryItemAttributes() );
+    }
+
+    protected void touchItemLastRequested( final long timestamp, final ResourceStoreRequest request,
+                                           final RepositoryItemUid uid, final Attributes attributes )
         throws ItemNotFoundException, LocalStorageException
     {
         // Touch it only if this is user-originated request (request incoming over HTTP, not a plugin or "internal" one)
@@ -316,9 +330,9 @@ public class DefaultAttributesHandler
         if ( request.getRequestContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
         {
             // if we need to do this at all... user might turn this feature completely off
-            if ( doTouchLastRequested( repository ) )
+            if ( doTouchLastRequested( uid.getRepository() ) )
             {
-                final long diff = timestamp - storageItem.getLastRequested();
+                final long diff = timestamp - attributes.getLastRequested();
 
                 // if timestamp < storageItem.getLastRequested() => diff will be negative => DO THE UPDATE
                 // ie. programatically "resetting" lastAccessTime to some past point for whatever reason
@@ -330,9 +344,9 @@ public class DefaultAttributesHandler
                 // ie. the "usual" case, obey the resolution then
                 if ( diff < 0 || ( ( diff > 0 ) && ( diff > lastRequestedResolution ) ) )
                 {
-                    storageItem.setLastRequested( timestamp );
+                    attributes.setLastRequested( timestamp );
 
-                    getAttributeStorage().putAttribute( storageItem );
+                    getAttributeStorage().putAttributes( uid, attributes );
                 }
             }
         }
@@ -365,7 +379,7 @@ public class DefaultAttributesHandler
     public void updateItemAttributes( Repository repository, ResourceStoreRequest request, StorageItem item )
         throws ItemNotFoundException, LocalStorageException
     {
-        getAttributeStorage().putAttribute( item );
+        getAttributeStorage().putAttributes( item.getRepositoryItemUid(), item.getRepositoryItemAttributes() );
     }
 
     // ======================================================================

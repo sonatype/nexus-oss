@@ -19,9 +19,7 @@
 package org.sonatype.nexus.proxy.attributes;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * AttributeStorage that actually delegates the work to other instance of AttributeStorage, and having an option of
@@ -51,9 +49,9 @@ public class DelegatingAttributeStorage
     }
 
     @Override
-    public AbstractStorageItem getAttributes( RepositoryItemUid uid )
+    public Attributes getAttributes( final RepositoryItemUid uid )
     {
-        AbstractStorageItem result = mainAttributeStorage.getAttributes( uid );
+        Attributes result = mainAttributeStorage.getAttributes( uid );
 
         if ( result == null && fallbackAttributeStorage != null )
         {
@@ -61,7 +59,7 @@ public class DelegatingAttributeStorage
 
             if ( result != null )
             {
-                mainAttributeStorage.putAttribute( result );
+                mainAttributeStorage.putAttributes( uid, result );
                 fallbackAttributeStorage.deleteAttributes( uid );
             }
         }
@@ -70,18 +68,18 @@ public class DelegatingAttributeStorage
     }
 
     @Override
-    public void putAttribute( StorageItem item )
+    public void putAttributes( final RepositoryItemUid uid, final Attributes item )
     {
-        mainAttributeStorage.putAttribute( item );
+        mainAttributeStorage.putAttributes( uid, item );
 
         if ( fallbackAttributeStorage != null )
         {
-            fallbackAttributeStorage.deleteAttributes( item.getRepositoryItemUid() );
+            fallbackAttributeStorage.deleteAttributes( uid );
         }
     }
 
     @Override
-    public boolean deleteAttributes( RepositoryItemUid uid )
+    public boolean deleteAttributes( final RepositoryItemUid uid )
     {
         return mainAttributeStorage.deleteAttributes( uid )
             || ( fallbackAttributeStorage != null && fallbackAttributeStorage.deleteAttributes( uid ) );

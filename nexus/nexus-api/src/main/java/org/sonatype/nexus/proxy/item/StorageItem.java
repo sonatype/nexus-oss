@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.attributes.Attributes;
 
 /**
  * The Interface StorageItem, a top of the item abstraction.
@@ -175,8 +176,16 @@ public interface StorageItem
      * Gets the user attributes. These are saved and persisted.
      * 
      * @return the attributes
+     * @
      */
     Map<String, String> getAttributes();
+
+    /**
+     * Returns the item attributes. They are persisted and share lifecycle together with item.
+     * 
+     * @return the item attributes
+     */
+    Attributes getRepositoryItemAttributes();
 
     /**
      * Gets the item context. It is living only during item processing, it is not stored.
@@ -189,8 +198,18 @@ public interface StorageItem
      * Overlay.
      * 
      * @param item the item
+     * @deprecated Whoever used this outside Nexus core is doomed.
      */
     void overlay( StorageItem item );
+
+    /**
+     * Overlays the the given attributes over this instance attributes (in case of overlapping keys this instance
+     * attribute "wins").
+     * 
+     * @param item the item
+     * @since 1.10.0
+     */
+    void overlayAttributes( Attributes attributes );
 
     /**
      * Returns the generation of the attributes. For Nexus internal use only!

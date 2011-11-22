@@ -44,6 +44,7 @@ import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.AttributeStorage;
+import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.attributes.DefaultAttributesHandler;
 import org.sonatype.nexus.proxy.attributes.StorageFileItemInspector;
 import org.sonatype.nexus.proxy.attributes.StorageItemInspector;
@@ -88,7 +89,7 @@ public abstract class AttributeStoragePerformanceTestSupport
 
     private AttributeStorage attributeStorage;
 
-    private ApplicationConfiguration applicationConfiguration;
+    protected ApplicationConfiguration applicationConfiguration;
 
     final protected String testFilePath = "content/file.txt";
 
@@ -127,6 +128,8 @@ public abstract class AttributeStoragePerformanceTestSupport
 
         // Application Config
         applicationConfiguration = mock( ApplicationConfiguration.class );
+        when( applicationConfiguration.getWorkingDirectory( eq( "proxy/attributes-ng" ) ) ).thenReturn(
+            new File( "target/" + this.getClass().getSimpleName() + "/attributes-ng" ) );
         when( applicationConfiguration.getWorkingDirectory( eq( "proxy/attributes" ) ) ).thenReturn(
             new File( "target/" + this.getClass().getSimpleName() + "/attributes" ) );
 
@@ -190,8 +193,8 @@ public abstract class AttributeStoragePerformanceTestSupport
     @Test
     public void test3GetAttribute()
     {
-        AbstractStorageItem storageItem = getStorageItemFromAttributeStore( "/a.txt" );
-        assertThat( storageItem.getAttributes().get( SHA1_ATTRIBUTE_KEY ), equalTo( SHA1_ATTRIBUTE_VALUE ) );
+        Attributes storageItem = getStorageItemFromAttributeStore( "/a.txt" );
+        assertThat( storageItem.get( SHA1_ATTRIBUTE_KEY ), equalTo( SHA1_ATTRIBUTE_VALUE ) );
     }
 
     @Test
@@ -254,15 +257,15 @@ public abstract class AttributeStoragePerformanceTestSupport
         storageFileItem.getAttributes().put( "digest.md5", "f62472816fb17de974a87513e2257d63" );
         storageFileItem.getAttributes().put( "request.address", "127.0.0.1" );
 
-        attributeStorage.putAttribute( storageFileItem );
+        attributeStorage.putAttributes( storageFileItem.getRepositoryItemUid(),
+            storageFileItem.getRepositoryItemAttributes() );
     }
 
-    protected AbstractStorageItem getStorageItemFromAttributeStore( String path )
+    protected Attributes getStorageItemFromAttributeStore( String path )
     {
         RepositoryItemUid repositoryItemUid = new TestRepositoryItemUid( repositoryItemUidFactory, repository, path );
 
-        AbstractStorageItem storageItem = attributeStorage.getAttributes( repositoryItemUid );
-        return storageItem;
+        return attributeStorage.getAttributes( repositoryItemUid );
     }
 
     private void deleteStorageItemFromAttributeStore( String path )

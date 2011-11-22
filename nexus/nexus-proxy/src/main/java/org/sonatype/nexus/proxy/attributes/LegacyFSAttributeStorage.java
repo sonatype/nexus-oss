@@ -20,7 +20,6 @@ package org.sonatype.nexus.proxy.attributes;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.enterprise.inject.Typed;
@@ -34,24 +33,36 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageCompositeFileItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
 
 import com.google.common.io.Closeables;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
 
 /**
- * AttributeStorage implementation that uses it's own FS storage to store attributes in separate place then
- * LocalStorage. This is the "old" default storage.
+ * Legacy AttributeStorage implementation that uses it's own FS storage to store attributes, by persisting StorageItem
+ * as whole using XStream. This is the "old" default storage, used in all Nexuses up to version 1.10.0. Note: this
+ * component is ReadOnly and should be used to perform transitioning upgrade from older Nexus instances. Only
+ * {@link #deleteAttributes(RepositoryItemUid)} and {@link #getAttributes(RepositoryItemUid)} will do anyting, while
+ * {@link #putAttribute(RepositoryItemUid, Attributes)} will throw exception. In case the "legacy" attribute directory
+ * is not present (ie. new install), this component remains dormant.
  * 
  * @author cstamas
  */
 @Typed( AttributeStorage.class )
-@Named( "fs" )
+@Named( "legacy" )
 @Singleton
-public class DefaultFSAttributeStorage
+public class LegacyFSAttributeStorage
     extends AbstractAttributeStorage
     implements AttributeStorage, EventListener, Initializable, Disposable
 {
@@ -59,7 +70,7 @@ public class DefaultFSAttributeStorage
 
     private final ApplicationConfiguration applicationConfiguration;
 
-    private final Marshaller marshaller;
+    private final XStream marshaller;
 
     /**
      * The base dir.
@@ -73,13 +84,17 @@ public class DefaultFSAttributeStorage
      * @param applicationConfiguration
      */
     @Inject
-    public DefaultFSAttributeStorage( final ApplicationEventMulticaster applicationEventMulticaster,
-                                      final ApplicationConfiguration applicationConfiguration,
-                                      @Named( "xstream-xml" ) final Marshaller marshaller )
+    public LegacyFSAttributeStorage( final ApplicationEventMulticaster applicationEventMulticaster,
+                                     final ApplicationConfiguration applicationConfiguration,
+                                     @Named( "xstream-xml" ) final Marshaller marshaller )
     {
         this.applicationConfiguration = applicationConfiguration;
         this.applicationEventMulticaster = applicationEventMulticaster;
-        this.marshaller = marshaller;
+        this.marshaller = new XStream();
+        this.marshaller.alias( "file", DefaultStorageFileItem.class );
+        this.marshaller.alias( "compositeFile", DefaultStorageCompositeFileItem.class );
+        this.marshaller.alias( "collection", DefaultStorageCollectionItem.class );
+        this.marshaller.alias( "link", DefaultStorageLinkItem.class );
     }
 
     // == Events to keep config in sync
@@ -121,7 +136,7 @@ public class DefaultFSAttributeStorage
     {
         if ( workingDirectory == null )
         {
-            workingDirectory = applicationConfiguration.getWorkingDirectory( "proxy/attributes-ng" );
+            workingDirectory = applicationConfiguration.getWorkingDirectory( "proxy/attributes" );
 
             if ( workingDirectory.exists() )
             {
@@ -133,16 +148,9 @@ public class DefaultFSAttributeStorage
             }
             else
             {
-                getLogger().info( "Attribute storage directory does not exists, creating it here: " + workingDirectory );
-
-                if ( !workingDirectory.mkdirs() )
-                {
-                    if ( !workingDirectory.isDirectory() )
-                    {
-                        throw new IllegalArgumentException( "Could not create the attribute storage directory on path "
-                            + workingDirectory.getAbsolutePath() );
-                    }
-                }
+                getLogger().info(
+                    "Legacy Attribute storage directory does not exists, not creating it here (ZZZzzz): "
+                        + workingDirectory );
             }
         }
 
@@ -158,6 +166,11 @@ public class DefaultFSAttributeStorage
 
     public boolean deleteAttributes( final RepositoryItemUid uid )
     {
+        if ( workingDirectory == null )
+        {
+            // noop
+            return false;
+        }
         if ( !isMetadataMaintained( uid ) )
         {
             // do nothing
@@ -198,6 +211,11 @@ public class DefaultFSAttributeStorage
 
     public Attributes getAttributes( final RepositoryItemUid uid )
     {
+        if ( workingDirectory == null )
+        {
+            // noop
+            return null;
+        }
         if ( !isMetadataMaintained( uid ) )
         {
             // do nothing
@@ -217,7 +235,18 @@ public class DefaultFSAttributeStorage
 
             try
             {
-                return doGetAttributes( uid );
+                AbstractStorageItem result = null;
+
+                result = doGetAttributes( uid );
+                if ( result == null )
+                {
+                    return null;
+                }
+                else
+                {
+                    result.upgrade();
+                    return result.getRepositoryItemAttributes();
+                }
             }
             catch ( IOException ex )
             {
@@ -232,79 +261,9 @@ public class DefaultFSAttributeStorage
         }
     }
 
-    public void putAttributes( final RepositoryItemUid uid, Attributes attributes )
+    public void putAttributes( final RepositoryItemUid uid, final Attributes item )
     {
-        if ( !isMetadataMaintained( uid ) )
-        {
-            // do nothing
-            return;
-        }
-
-        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
-
-        uidLock.lock( Action.create );
-
-        try
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "Storing attributes on UID=" + uid.toString() );
-            }
-
-            try
-            {
-                Attributes onDisk = doGetAttributes( uid );
-
-                if ( onDisk != null && ( onDisk.getGeneration() > attributes.getGeneration() ) )
-                {
-                    onDisk.overlayAttributes( attributes );
-
-                    // and overlay other things too
-                    onDisk.setRepositoryId( uid.getRepository().getId() );
-                    onDisk.setPath( uid.getPath() );
-                    onDisk.setReadable( attributes.isReadable() );
-                    onDisk.setWritable( attributes.isWritable() );
-
-                    attributes = onDisk;
-                }
-
-                File target = getFileFromBase( uid );
-
-                target.getParentFile().mkdirs();
-
-                if ( target.getParentFile().exists() && target.getParentFile().isDirectory() )
-                {
-                    FileOutputStream fos = null;
-
-                    try
-                    {
-                        fos = new FileOutputStream( target );
-
-                        attributes.incrementGeneration();
-
-                        marshaller.marshal( attributes, fos );
-                    }
-                    finally
-                    {
-                        Closeables.closeQuietly( fos );
-                    }
-                }
-                else
-                {
-                    getLogger().error(
-                        "Could not store attributes on UID=" + uid.toString()
-                            + ", parent exists but is not a directory!" );
-                }
-            }
-            catch ( IOException ex )
-            {
-                getLogger().error( "Got IOException during store of UID=" + uid.toString(), ex );
-            }
-        }
-        finally
-        {
-            uidLock.unlock();
-        }
+        throw new UnsupportedOperationException( "Legacy AttributeStorage is read only!" );
     }
 
     /**
@@ -349,12 +308,12 @@ public class DefaultFSAttributeStorage
      * @return the attributes
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    protected Attributes doGetAttributes( final RepositoryItemUid uid )
+    protected AbstractStorageItem doGetAttributes( final RepositoryItemUid uid )
         throws IOException
     {
         final File target = getFileFromBase( uid );
 
-        Attributes result = null;
+        AbstractStorageItem result = null;
 
         boolean corrupt = false;
 
@@ -366,15 +325,14 @@ public class DefaultFSAttributeStorage
             {
                 fis = new FileInputStream( target );
 
-                result = marshaller.unmarshal( fis );
+                result = (AbstractStorageItem) (StorageItem) marshaller.fromXML( fis );
 
-                result.setRepositoryId( uid.getRepository().getId() );
-                result.setPath( uid.getPath() );
+                result.setRepositoryItemUid( uid );
 
                 // fixing remoteChecked
-                if ( result.getCheckedRemotely() == 0 || result.getCheckedRemotely() == 1 )
+                if ( result.getRemoteChecked() == 0 || result.getRemoteChecked() == 1 )
                 {
-                    result.setCheckedRemotely( System.currentTimeMillis() );
+                    result.setRemoteChecked( System.currentTimeMillis() );
 
                     result.setExpired( true );
                 }
@@ -385,8 +343,25 @@ public class DefaultFSAttributeStorage
                     result.setLastRequested( System.currentTimeMillis() );
                 }
             }
-            catch ( InvalidInputException e )
+            catch ( NullPointerException e )
             {
+                // see NEXUS-3911: XPP3 throws sometimes NPE on "corrupted XMLs in some specific way"
+                if ( getLogger().isDebugEnabled() )
+                {
+                    // we log the stacktrace
+                    getLogger().info( "Attributes of " + uid + " are corrupt, deleting it.", e );
+                }
+                else
+                {
+                    // just remark about this
+                    getLogger().info( "Attributes of " + uid + " are corrupt, deleting it." );
+                }
+
+                corrupt = true;
+            }
+            catch ( XStreamException e )
+            {
+                // it is corrupt -- so says XStream, but see above and NEXUS-3911
                 if ( getLogger().isDebugEnabled() )
                 {
                     // we log the stacktrace

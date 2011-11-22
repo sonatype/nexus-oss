@@ -19,15 +19,18 @@
 package org.sonatype.nexus.proxy.item;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.attributes.Attributes;
+import org.sonatype.nexus.proxy.attributes.internal.AttributesImpl;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.util.ItemPathUtils;
+
+import com.google.common.base.Strings;
 
 /**
  * The Class AbstractStorageItem.
@@ -48,6 +51,9 @@ public abstract class AbstractStorageItem
 
     /** The item context */
     private transient RequestContext context;
+
+    /** the attributes */
+    private transient Attributes itemAttributes;
 
     /** Used for versioning of attribute */
     private int generation = 0;
@@ -89,6 +95,44 @@ public abstract class AbstractStorageItem
     /** The persisted attributes. */
     private Map<String, String> attributes;
 
+    // ==
+
+    public Attributes getRepositoryItemAttributes()
+    {
+        return itemAttributes;
+    }
+
+    public void overlayAttributes( final Attributes repositoryItemAttributes )
+    {
+        getRepositoryItemAttributes().overlayAttributes( repositoryItemAttributes );
+    }
+
+    /**
+     * This method should be called ONLY when you load up a _legacy_ attribute using _legacy_ attribute store!
+     */
+    public void upgrade()
+    {
+        getRepositoryItemAttributes().putAll( attributes );
+
+        getRepositoryItemAttributes().setGeneration( generation );
+        getRepositoryItemAttributes().setPath( path );
+        getRepositoryItemAttributes().setReadable( readable );
+        getRepositoryItemAttributes().setWritable( writable );
+        getRepositoryItemAttributes().setRepositoryId( repositoryId );
+        getRepositoryItemAttributes().setCreated( created );
+        getRepositoryItemAttributes().setModified( modified );
+        getRepositoryItemAttributes().setStoredLocally( storedLocally );
+        getRepositoryItemAttributes().setCheckedRemotely( lastTouched );
+        getRepositoryItemAttributes().setLastRequested( lastRequested );
+        getRepositoryItemAttributes().setExpired( expired );
+        if ( !Strings.isNullOrEmpty( remoteUrl ) )
+        {
+            getRepositoryItemAttributes().setRemoteUrl( remoteUrl );
+        }
+    }
+
+    // ==
+
     /**
      * Instantiates a new abstract storage item.
      * 
@@ -99,14 +143,15 @@ public abstract class AbstractStorageItem
     public AbstractStorageItem( ResourceStoreRequest request, boolean readable, boolean writable )
     {
         super();
-        setPath( request.getRequestPath() );
         this.request = request;
         this.context = new RequestContext( request.getRequestContext() );
-        this.readable = readable;
-        this.writable = writable;
-        this.expired = false;
-        this.created = System.currentTimeMillis();
-        this.modified = this.created;
+        this.itemAttributes = new AttributesImpl();
+        setPath( request.getRequestPath() );
+        setReadable( readable );
+        setWritable( writable );
+        setExpired( false );
+        setCreated( System.currentTimeMillis() );
+        setModified( getCreated() );
     }
 
     /**
@@ -121,8 +166,8 @@ public abstract class AbstractStorageItem
     {
         this( request, readable, writable );
         this.store = repository;
-        this.repositoryItemUid = repository.createUid( path );
-        this.repositoryId = repository.getId();
+        this.repositoryItemUid = repository.createUid( getPath() );
+        setRepositoryId( repository.getId() );
     }
 
     /**
@@ -139,8 +184,6 @@ public abstract class AbstractStorageItem
     {
         this( request, readable, writable );
         this.store = router;
-        this.repositoryItemUid = null;
-        this.repositoryId = null;
     }
 
     /**
@@ -192,17 +235,15 @@ public abstract class AbstractStorageItem
     public void setRepositoryItemUid( RepositoryItemUid repositoryItemUid )
     {
         this.repositoryItemUid = repositoryItemUid;
-
         this.store = repositoryItemUid.getRepository();
 
-        this.repositoryId = repositoryItemUid.getRepository().getId();
-
-        this.path = repositoryItemUid.getPath();
+        getRepositoryItemAttributes().setRepositoryId( repositoryItemUid.getRepository().getId() );
+        getRepositoryItemAttributes().setPath( repositoryItemUid.getPath() );
     }
 
     public String getRepositoryId()
     {
-        return repositoryId;
+        return getRepositoryItemAttributes().getRepositoryId();
     }
 
     /**
@@ -212,12 +253,12 @@ public abstract class AbstractStorageItem
      */
     public void setRepositoryId( String repositoryId )
     {
-        this.repositoryId = repositoryId;
+        getRepositoryItemAttributes().setRepositoryId( repositoryId );
     }
 
     public long getCreated()
     {
-        return created;
+        return getRepositoryItemAttributes().getCreated();
     }
 
     /**
@@ -227,12 +268,12 @@ public abstract class AbstractStorageItem
      */
     public void setCreated( long created )
     {
-        this.created = created;
+        getRepositoryItemAttributes().setCreated( created );
     }
 
     public long getModified()
     {
-        return modified;
+        return getRepositoryItemAttributes().getModified();
     }
 
     /**
@@ -242,12 +283,12 @@ public abstract class AbstractStorageItem
      */
     public void setModified( long modified )
     {
-        this.modified = modified;
+        getRepositoryItemAttributes().setModified( modified );
     }
 
     public boolean isReadable()
     {
-        return readable;
+        return getRepositoryItemAttributes().isReadable();
     }
 
     /**
@@ -257,12 +298,12 @@ public abstract class AbstractStorageItem
      */
     public void setReadable( boolean readable )
     {
-        this.readable = readable;
+        getRepositoryItemAttributes().setReadable( readable );
     }
 
     public boolean isWritable()
     {
-        return writable;
+        return getRepositoryItemAttributes().isWritable();
     }
 
     /**
@@ -272,12 +313,12 @@ public abstract class AbstractStorageItem
      */
     public void setWritable( boolean writable )
     {
-        this.writable = writable;
+        getRepositoryItemAttributes().setWritable( writable );
     }
 
     public String getPath()
     {
-        return path;
+        return getRepositoryItemAttributes().getPath();
     }
 
     /**
@@ -287,12 +328,12 @@ public abstract class AbstractStorageItem
      */
     public void setPath( String path )
     {
-        this.path = ItemPathUtils.cleanUpTrailingSlash( path );
+        getRepositoryItemAttributes().setPath( ItemPathUtils.cleanUpTrailingSlash( path ) );
     }
 
     public boolean isExpired()
     {
-        return expired;
+        return getRepositoryItemAttributes().isExpired();
     }
 
     /**
@@ -302,7 +343,7 @@ public abstract class AbstractStorageItem
      */
     public void setExpired( boolean expired )
     {
-        this.expired = expired;
+        getRepositoryItemAttributes().setExpired( expired );
     }
 
     public String getName()
@@ -317,12 +358,7 @@ public abstract class AbstractStorageItem
 
     public Map<String, String> getAttributes()
     {
-        if ( attributes == null )
-        {
-            attributes = new HashMap<String, String>();
-        }
-
-        return attributes;
+        return itemAttributes;
     }
 
     public RequestContext getItemContext()
@@ -337,7 +373,7 @@ public abstract class AbstractStorageItem
 
     public String getRemoteUrl()
     {
-        return remoteUrl;
+        return getRepositoryItemAttributes().getRemoteUrl();
     }
 
     /**
@@ -347,12 +383,12 @@ public abstract class AbstractStorageItem
      */
     public void setRemoteUrl( String remoteUrl )
     {
-        this.remoteUrl = remoteUrl;
+        getRepositoryItemAttributes().setRemoteUrl( remoteUrl );
     }
 
     public long getStoredLocally()
     {
-        return storedLocally;
+        return getRepositoryItemAttributes().getStoredLocally();
     }
 
     /**
@@ -362,12 +398,12 @@ public abstract class AbstractStorageItem
      */
     public void setStoredLocally( long storedLocally )
     {
-        this.storedLocally = storedLocally;
+        getRepositoryItemAttributes().setStoredLocally( storedLocally );
     }
 
     public long getRemoteChecked()
     {
-        return lastTouched;
+        return getRepositoryItemAttributes().getCheckedRemotely();
     }
 
     /**
@@ -377,12 +413,12 @@ public abstract class AbstractStorageItem
      */
     public void setRemoteChecked( long lastTouched )
     {
-        this.lastTouched = lastTouched;
+        getRepositoryItemAttributes().setCheckedRemotely( lastTouched );
     }
 
     public long getLastRequested()
     {
-        return lastRequested;
+        return getRepositoryItemAttributes().getLastRequested();
     }
 
     /**
@@ -392,17 +428,17 @@ public abstract class AbstractStorageItem
      */
     public void setLastRequested( long lastRequested )
     {
-        this.lastRequested = lastRequested;
+        getRepositoryItemAttributes().setLastRequested( lastRequested );
     }
 
     public int getGeneration()
     {
-        return generation;
+        return getRepositoryItemAttributes().getGeneration();
     }
 
     public void incrementGeneration()
     {
-        this.generation++;
+        getRepositoryItemAttributes().incrementGeneration();
     }
 
     public void overlay( StorageItem item )

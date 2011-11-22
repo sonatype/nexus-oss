@@ -18,14 +18,8 @@
  */
 package org.sonatype.nexus.proxy.attributes.perf;
 
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import java.io.File;
-
-import org.junit.Ignore;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.attributes.AttributeStorage;
 import org.sonatype.nexus.proxy.attributes.DefaultFSAttributeStorage;
 import org.sonatype.nexus.proxy.attributes.JacksonXMLMarshaller;
@@ -37,7 +31,6 @@ import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 // @BenchmarkHistoryChart()
 // @BenchmarkMethodChart()
 // @AxisRange(min = 0)
-@Ignore
 public class JacksonXMLFSAttributeStoragePerformanceTest
     extends AttributeStoragePerformanceTestSupport
 {
@@ -47,9 +40,6 @@ public class JacksonXMLFSAttributeStoragePerformanceTest
     public AttributeStorage getAttributeStorage()
     {
         ApplicationEventMulticaster applicationEventMulticaster = mock( ApplicationEventMulticaster.class );
-        ApplicationConfiguration applicationConfiguration = mock( ApplicationConfiguration.class );
-        when( applicationConfiguration.getWorkingDirectory( eq( "proxy/attributes" ) ) ).thenReturn(
-            new File( "target/" + this.getClass().getSimpleName() + "/attributes" ) );
 
         DefaultFSAttributeStorage attributeStorage =
             new DefaultFSAttributeStorage( applicationEventMulticaster, applicationConfiguration,

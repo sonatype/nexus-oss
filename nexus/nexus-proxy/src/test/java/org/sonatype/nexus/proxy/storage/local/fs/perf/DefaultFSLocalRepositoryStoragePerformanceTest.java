@@ -66,15 +66,15 @@ import com.google.common.collect.Maps;
 /**
  *
  */
-@BenchmarkHistoryChart()
-@BenchmarkMethodChart()
-@AxisRange(min = 0)
+@BenchmarkHistoryChart( )
+@BenchmarkMethodChart( )
+@AxisRange( min = 0 )
 public class DefaultFSLocalRepositoryStoragePerformanceTest
 {
     @Rule
     public MethodRule benchmarkRun = new BenchmarkRule();
-    
-    private ApplicationConfiguration applicationConfiguration;
+
+    public ApplicationConfiguration applicationConfiguration;
 
     final private String testFilePath = "content/file.txt";
 
@@ -85,31 +85,37 @@ public class DefaultFSLocalRepositoryStoragePerformanceTest
     private long originalLastAccessTime;
 
     @Before
-    public void setup() throws Exception
+    public void setup()
+        throws Exception
     {
-        File repoStorageDir = new File( "target/"+ getClass().getSimpleName() + "/repo-storage/" );
+        File repoStorageDir = new File( "target/" + getClass().getSimpleName() + "/repo-storage/" );
         String repoLocalURL = repoStorageDir.getAbsoluteFile().toURI().toString();
 
         // write a test file
         File testFile = new File( repoStorageDir, testFilePath );
         FileUtils.writeStringToFile( testFile, "CONTENT" );
 
-         // Mocks
+        // Mocks
         Wastebasket wastebasket = mock( Wastebasket.class );
         LinkPersister linkPersister = mock( LinkPersister.class );
-        MimeSupport mimeSupport = mock(MimeSupport.class);
+        MimeSupport mimeSupport = mock( MimeSupport.class );
         Map<String, Long> repositoryContexts = Maps.newHashMap();
 
         // Application Config
         applicationConfiguration = mock( ApplicationConfiguration.class );
-        when( applicationConfiguration.getWorkingDirectory( eq("proxy/attributes")) ).thenReturn( new File( "target/"+ this.getClass().getSimpleName() +"/attributes" ) );
+        when( applicationConfiguration.getWorkingDirectory( eq( "proxy/attributes-ng" ) ) ).thenReturn(
+            new File( "target/" + this.getClass().getSimpleName() + "/attributes-ng" ) );
+        when( applicationConfiguration.getWorkingDirectory( eq( "proxy/attributes" ) ) ).thenReturn(
+            new File( "target/" + this.getClass().getSimpleName() + "/attributes" ) );
 
         // remove any event inspectors from the timing
         List<StorageItemInspector> itemInspectorList = new ArrayList<StorageItemInspector>();
         List<StorageFileItemInspector> fileItemInspectorList = new ArrayList<StorageFileItemInspector>();
 
         // set the AttributeStorage on the Attribute Handler
-        DefaultAttributesHandler attributesHandler = new DefaultAttributesHandler(applicationConfiguration, getAttributeStorage(), itemInspectorList, fileItemInspectorList );
+        DefaultAttributesHandler attributesHandler =
+            new DefaultAttributesHandler( applicationConfiguration, getAttributeStorage(), itemInspectorList,
+                fileItemInspectorList );
 
         // Need to use the MockRepository
         repository = new TMockRepository( "testRetieveItem-repo", new DummyRepositoryItemUidFactory() );
@@ -117,28 +123,33 @@ public class DefaultFSLocalRepositoryStoragePerformanceTest
         repository.setAttributesHandler( attributesHandler );
 
         // setup the class under test
-        localRepositoryStorageUnderTest = new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeSupport, repositoryContexts, new DefaultFSPeer() );
+        localRepositoryStorageUnderTest =
+            new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeSupport, repositoryContexts,
+                new DefaultFSPeer() );
 
         // this test expects "old" behaviour:
-        ((DefaultAttributesHandler)repository.getAttributesHandler()).setLastRequestedResolution( 0 );
+        ( (DefaultAttributesHandler) repository.getAttributesHandler() ).setLastRequestedResolution( 0 );
 
         // prime the retrieve
         ResourceStoreRequest resourceRequest = new ResourceStoreRequest( testFilePath );
-        originalLastAccessTime = localRepositoryStorageUnderTest.retrieveItem( repository, resourceRequest ).getLastRequested();
+        originalLastAccessTime =
+            localRepositoryStorageUnderTest.retrieveItem( repository, resourceRequest ).getLastRequested();
     }
 
     private AttributeStorage getAttributeStorage()
     {
         // Mock out the events
         ApplicationEventMulticaster applicationEventMulticaster = mock( ApplicationEventMulticaster.class );
-        
-        DefaultFSAttributeStorage attributeStorage =  new DefaultFSAttributeStorage( applicationEventMulticaster, applicationConfiguration, new XStreamMarshaller() );
+
+        DefaultFSAttributeStorage attributeStorage =
+            new DefaultFSAttributeStorage( applicationEventMulticaster, applicationConfiguration,
+                new XStreamMarshaller() );
         attributeStorage.initializeWorkingDirectory();
 
         return attributeStorage;
     }
 
-    @BenchmarkOptions(benchmarkRounds = 1000, warmupRounds = 1 )
+    @BenchmarkOptions( benchmarkRounds = 1000, warmupRounds = 1 )
     @Test
     public void testRetieveItemWithLastAccessUpdate()
         throws LocalStorageException, ItemNotFoundException
@@ -152,7 +163,7 @@ public class DefaultFSLocalRepositoryStoragePerformanceTest
         MatcherAssert.assertThat( storageItem.getLastRequested(), Matchers.greaterThan( originalLastAccessTime ) );
     }
 
-    @BenchmarkOptions(benchmarkRounds = 1000, warmupRounds = 1)
+    @BenchmarkOptions( benchmarkRounds = 1000, warmupRounds = 1 )
     @Test
     public void testRetieveItemWithoutLastAccessUpdate()
         throws LocalStorageException, ItemNotFoundException

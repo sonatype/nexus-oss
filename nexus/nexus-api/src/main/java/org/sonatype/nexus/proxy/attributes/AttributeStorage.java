@@ -18,9 +18,7 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
 /**
@@ -32,25 +30,26 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 public interface AttributeStorage
 {
     /**
-     * Gets the attributes.
+     * Gets the attributes for given key.
      * 
-     * @param uid the uid
+     * @param uid the key for which attributes needs to be fetched
      * @return the attributes
      */
-    AbstractStorageItem getAttributes( RepositoryItemUid uid );
+    Attributes getAttributes( RepositoryItemUid uid );
 
     /**
-     * Put attribute.
+     * Put attributes for given key.
      * 
-     * @param item the item
+     * @param uid the key
+     * @param attributes the attributes to store
      */
-    void putAttribute( StorageItem item );
+    void putAttributes( RepositoryItemUid uid, Attributes attributes );
 
     /**
-     * Delete attributes.
+     * Delete attributes associated with given key.
      * 
      * @param uid the uid
-     * @return true, if successful
+     * @return true, if delete actually happened
      */
     boolean deleteAttributes( RepositoryItemUid uid );
 }
