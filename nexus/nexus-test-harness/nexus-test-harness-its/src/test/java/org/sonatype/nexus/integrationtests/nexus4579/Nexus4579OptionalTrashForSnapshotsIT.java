@@ -28,10 +28,12 @@ import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -84,6 +86,14 @@ public class Nexus4579OptionalTrashForSnapshotsIT
 
         TaskScheduleUtil.waitForAllTasksToStop();
         new EventInspectorsUtil( this ).waitForCalmPeriod();
+    }
+
+    @AfterMethod( alwaysRun = true )
+    public void cleanTrash()
+        throws IOException
+    {
+        // clean trash before tests to remove possible leftovers from previous tests
+        FileUtils.deleteDirectory( trashPath );
     }
 
     @Test
