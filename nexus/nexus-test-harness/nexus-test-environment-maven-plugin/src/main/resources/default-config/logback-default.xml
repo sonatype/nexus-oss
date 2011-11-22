@@ -48,7 +48,6 @@
     <appender-ref ref="console"/>
   </logger>
   <logger name="org.apache.http" level="WARN"/>
-  <logger name="org.sonatype.nexus" level="INFO"/>
   <logger name="org.restlet" level="WARN">
     <appender-ref ref="console"/>
   </logger>
