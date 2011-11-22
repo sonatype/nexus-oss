@@ -27,19 +27,25 @@ public interface CapabilityRegistry
 {
 
     /**
-     * Adds a capability to registry.
+     * Creates a capability given its id/type. if there is no capability available for specified type it will throw an
+     * runtime exception.
      *
-     * @param capability to add
+     * @param capabilityId   id of capability to be created
+     * @param capabilityType type of capability to be created
+     * @return created capability
+     * @since 1.10.0
      */
-    void add( Capability capability );
+    CapabilityReference create( String capabilityId, String capabilityType );
 
     /**
      * Removed a capability from registry. If there is no capability with specified id in the registry it will pass
      * silently.
      *
      * @param capabilityId to remove
+     * @return removed capability (if any), null otherwise
+     * @since 1.10.0
      */
-    void remove( String capabilityId );
+    CapabilityReference remove( String capabilityId );
 
     /**
      * Retrieves the capability from registry with specified id. If there is no capability with specified id in the
@@ -47,8 +53,9 @@ public interface CapabilityRegistry
      *
      * @param capabilityId to retrieve
      * @return capability with specified id or null if not found
+     * @since 1.10.0
      */
-    Capability get( String capabilityId );
+    CapabilityReference get( String capabilityId );
 
     /**
      * Retrieves all capabilities from registry. If no capability exists, result will be empty.
@@ -56,16 +63,6 @@ public interface CapabilityRegistry
      * @return collection of capabilities, never null
      * @since 1.10.0
      */
-    Collection<Capability> getAll();
-
-    /**
-     * Creates a capability given its id/type. if there is no capability available for specified type it will throw an
-     * runtime exception.
-     *
-     * @param capabilityId   id of capability to be created
-     * @param capabilityType type of capability to be created
-     * @return created capability
-     */
-    Capability create( String capabilityId, String capabilityType );
+    Collection<CapabilityReference> getAll();
 
 }

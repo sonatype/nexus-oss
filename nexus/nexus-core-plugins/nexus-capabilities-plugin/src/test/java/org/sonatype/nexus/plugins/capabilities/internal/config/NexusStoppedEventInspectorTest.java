@@ -18,47 +18,42 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.config;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.util.Arrays;
 
+import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.plugins.capabilities.internal.config.NexusStoppedEventInspector;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
-import org.sonatype.plexus.appevents.Event;
 
-@Singleton
-public class NexusStoppedEventInspector
-    implements EventInspector
+/**
+ * {@link NexusStoppedEventInspector} UTs.
+ *
+ * @since 1.10.0
+ */
+public class NexusStoppedEventInspectorTest
 {
 
-    private final CapabilityRegistry registry;
-
-    @Inject
-    public NexusStoppedEventInspector( final CapabilityRegistry registry )
+    /**
+     * When Nexus stops all capabilities are passivated.
+     */
+    @Test
+    public void capabilitiesArePassivated()
     {
-        this.registry = checkNotNull( registry );
-    }
+        final CapabilityReference ref1 = mock( CapabilityReference.class );
+        final CapabilityReference ref2 = mock( CapabilityReference.class );
 
-    public boolean accepts( final Event<?> evt )
-    {
-        return evt != null
-            && evt instanceof NexusStoppedEvent;
-    }
+        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1, ref2 ) );
 
-    public void inspect( final Event<?> evt )
-    {
-        if ( !accepts( evt ) )
-        {
-            return;
-        }
-        for ( final CapabilityReference reference : new ArrayList<CapabilityReference>( registry.getAll() ) )
-        {
-            reference.passivate();
-        }
+        new NexusStoppedEventInspector( capabilityRegistry ).inspect( new NexusStoppedEvent( this ) );
+
+        verify( ref1 ).passivate();
+        verify( ref1 ).passivate();
     }
 
 }

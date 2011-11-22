@@ -23,7 +23,7 @@ import static org.sonatype.nexus.plugins.capabilities.internal.config.DefaultCap
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.api.Capability;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationAddEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationEvent;
@@ -81,44 +81,39 @@ public class CapabilityConfigurationEventInspector
     private void handle( final CapabilityConfigurationAddEvent evt )
     {
         final CCapability capabilityConfig = evt.getCapability();
-        final Capability capability = registry.create( capabilityConfig.getId(), capabilityConfig.getTypeId() );
-        registry.add( capability );
-        capability.create( asMap( capabilityConfig.getProperties() ) );
+        final CapabilityReference ref = registry.create( capabilityConfig.getId(), capabilityConfig.getTypeId() );
+        ref.capability().create( asMap( capabilityConfig.getProperties() ) );
         if ( capabilityConfig.isEnabled() )
         {
-            capability.activate();
+            ref.activate();
         }
     }
 
     private void handle( final CapabilityConfigurationLoadEvent evt )
     {
         final CCapability capabilityConfig = evt.getCapability();
-        final Capability capability = registry.create( capabilityConfig.getId(), capabilityConfig.getTypeId() );
-        registry.add( capability );
-        capability.load( asMap( capabilityConfig.getProperties() ) );
+        final CapabilityReference ref = registry.create( capabilityConfig.getId(), capabilityConfig.getTypeId() );
+        ref.capability().load( asMap( capabilityConfig.getProperties() ) );
         if ( capabilityConfig.isEnabled() )
         {
-            capability.activate();
+            ref.activate();
         }
     }
 
     private void handle( final CapabilityConfigurationUpdateEvent evt )
     {
         final CCapability capabilityConfig = evt.getCapability();
-        final Capability capability = registry.get( capabilityConfig.getId() );
-        if ( capability != null )
+        final CapabilityReference ref = registry.get( capabilityConfig.getId() );
+        if ( ref != null )
         {
-            final CCapability previousCapabilityConfig = evt.getPreviousCapability();
-            if ( previousCapabilityConfig.isEnabled()
-                && !capabilityConfig.isEnabled() )
+            if ( ref.isActive() && !capabilityConfig.isEnabled() )
             {
-                capability.passivate();
+                ref.passivate();
             }
-            capability.update( asMap( capabilityConfig.getProperties() ) );
-            if ( capabilityConfig.isEnabled()
-                && !previousCapabilityConfig.isEnabled() )
+            ref.capability().update( asMap( capabilityConfig.getProperties() ) );
+            if ( capabilityConfig.isEnabled() && !ref.isActive() )
             {
-                capability.activate();
+                ref.activate();
             }
         }
     }
@@ -126,12 +121,12 @@ public class CapabilityConfigurationEventInspector
     private void handle( final CapabilityConfigurationRemoveEvent evt )
     {
         final CCapability capabilityConfig = evt.getCapability();
-        final Capability capability = registry.get( capabilityConfig.getId() );
-        if ( capability != null )
+        final CapabilityReference ref = registry.get( capabilityConfig.getId() );
+        if ( ref != null )
         {
-            registry.remove( capability.id() );
-            capability.passivate();
-            capability.remove();
+            registry.remove( ref.capability().id() );
+            ref.passivate();
+            ref.capability().remove();
         }
     }
 

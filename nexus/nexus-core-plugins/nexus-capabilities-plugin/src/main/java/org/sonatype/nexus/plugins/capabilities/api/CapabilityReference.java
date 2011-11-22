@@ -16,27 +16,38 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.config.test;
+package org.sonatype.nexus.plugins.capabilities.api;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
-import org.junit.Test;
-import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
-import org.sonatype.nexus.plugins.capabilities.internal.config.NexusInitializedEventInspector;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
-
-public class NexusInitializedEventInspectorTest
+/**
+ * Reference to a capability and its state.
+ *
+ * @since 1.10.0
+ */
+public interface CapabilityReference
 {
 
-    @Test
-    public void capabilitiesAreLoadedWhenNexusIsInitialized()
-        throws Exception
-    {
-        final CapabilityConfiguration capabilityConfiguration = mock( CapabilityConfiguration.class );
-        new NexusInitializedEventInspector( capabilityConfiguration ).inspect( new NexusInitializedEvent( this ) );
+    /**
+     * Returns referenced capability.
+     *
+     * @return referenced capability
+     */
+    Capability capability();
 
-        verify( capabilityConfiguration ).load();
-    }
+    /**
+     * Whether the referenced capability is active.
+     *
+     * @return true, if capability was activated and not yet passivated
+     */
+    boolean isActive();
+
+    /**
+     * Activates the referenced capability.
+     */
+    void activate();
+
+    /**
+     * Passivate the referenced capability.
+     */
+    void passivate();
 
 }

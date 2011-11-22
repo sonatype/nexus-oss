@@ -16,11 +16,11 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.config.test;
+package org.sonatype.nexus.plugins.capabilities.internal.config;
 
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Map;
@@ -28,6 +28,7 @@ import java.util.Map;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfigurationEventInspector;
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationUpdateEvent;
@@ -47,11 +48,11 @@ public class CapabilityConfigurationEventInspectorTest
     @Test
     public void capabilityUpdated01()
     {
-        Capability capability = prepareForUpdate( true, false );
+        CapabilityReference reference = prepareForUpdate( true, false );
+        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).passivate();
 
-        verify( capability ).passivate();
-        verify( capability ).update( Matchers.<Map<String, String>>any() );
-        verifyNoMoreInteractions( capability );
+        verify( reference ).passivate();
+        verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
     }
 
     /**
@@ -60,10 +61,11 @@ public class CapabilityConfigurationEventInspectorTest
     @Test
     public void capabilityUpdated02()
     {
-        Capability capability = prepareForUpdate( false, false );
+        CapabilityReference reference = prepareForUpdate( false, false );
+        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).passivate();
+        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( reference ).passivate();
 
-        verify( capability ).update( Matchers.<Map<String, String>>any() );
-        verifyNoMoreInteractions( capability );
+        verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
     }
 
     /**
@@ -72,10 +74,11 @@ public class CapabilityConfigurationEventInspectorTest
     @Test
     public void capabilityUpdated03()
     {
-        Capability capability = prepareForUpdate( true, true );
+        CapabilityReference reference = prepareForUpdate( true, true );
+        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).passivate();
+        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( reference ).passivate();
 
-        verify( capability ).update( Matchers.<Map<String, String>>any() );
-        verifyNoMoreInteractions( capability );
+        verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
     }
 
     /**
@@ -84,20 +87,24 @@ public class CapabilityConfigurationEventInspectorTest
     @Test
     public void capabilityUpdated04()
     {
-        Capability capability = prepareForUpdate( false, true );
+        CapabilityReference reference = prepareForUpdate( false, true );
+        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( reference ).passivate();
 
-        verify( capability ).update( Matchers.<Map<String, String>>any() );
-        verify( capability ).activate();
-        verifyNoMoreInteractions( capability );
+        verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
+        verify( reference ).activate();
     }
 
-    private Capability prepareForUpdate( final boolean oldEnabled, final boolean newEnabled )
+    private CapabilityReference prepareForUpdate( final boolean oldEnabled, final boolean newEnabled )
     {
         final Capability capability = mock( Capability.class );
         when( capability.id() ).thenReturn( "test" );
+        final CapabilityReference reference = mock( CapabilityReference.class );
+        when( reference.capability() ).thenReturn( capability );
+        when( capability.id() ).thenReturn( "test" );
+        when( reference.isActive() ).thenReturn( oldEnabled );
 
         final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
-        when( capabilityRegistry.get( "test" ) ).thenReturn( capability );
+        when( capabilityRegistry.get( "test" ) ).thenReturn( reference );
 
         final CCapability oldCapability = new CCapability();
         oldCapability.setId( "test" );
@@ -110,7 +117,7 @@ public class CapabilityConfigurationEventInspectorTest
             new CapabilityConfigurationUpdateEvent( newCapability, oldCapability )
         );
 
-        return capability;
+        return reference;
     }
 
 }

@@ -29,11 +29,15 @@ import javax.inject.Singleton;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 
+/**
+ * Default {@link CapabilityRegistry} implementation.
+ */
 @Singleton
 @Named
-public class DefaultCapabilityRegistry
+class DefaultCapabilityRegistry
     implements CapabilityRegistry
 {
 
@@ -41,38 +45,25 @@ public class DefaultCapabilityRegistry
     @Requirement( role = CapabilityFactory.class )
     private Map<String, CapabilityFactory> factories;
 
-    private final Map<String, Capability> capabilities;
+    private final Map<String, CapabilityReference> capabilities;
 
-    public DefaultCapabilityRegistry()
+    DefaultCapabilityRegistry()
     {
-        capabilities = new HashMap<String, Capability>();
+        capabilities = new HashMap<String, CapabilityReference>();
     }
 
-    public void add( final Capability capability )
-    {
-        assert capability != null : "Capability cannot be null";
-        assert capability.id() != null : "Capability id cannot be null";
-
-        capabilities.put( capability.id(), capability );
-    }
-
-    public Capability get( final String capabilityId )
+    public CapabilityReference get( final String capabilityId )
     {
         return capabilities.get( capabilityId );
     }
 
     @Override
-    public Collection<Capability> getAll()
+    public Collection<CapabilityReference> getAll()
     {
         return capabilities.values();
     }
 
-    public void remove( final String capabilityId )
-    {
-        capabilities.remove( capabilityId );
-    }
-
-    public Capability create( final String capabilityId, final String capabilityType )
+    public CapabilityReference create( final String capabilityId, final String capabilityType )
     {
         assert capabilityId != null : "Capability id cannot be null";
 
@@ -84,7 +75,12 @@ public class DefaultCapabilityRegistry
 
         final Capability capability = factory.create( capabilityId );
 
-        return capability;
+        return new DefaultCapabilityReference( capability );
+    }
+
+    public CapabilityReference remove( final String capabilityId )
+    {
+        return capabilities.remove( capabilityId );
     }
 
 }
