@@ -23,6 +23,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 
 /**
  * Default {@link CapabilityReference} implementation.
@@ -38,9 +40,17 @@ class DefaultCapabilityReference
 
     private boolean active;
 
-    DefaultCapabilityReference( final Capability capability )
+    private final ActivationContext activationContext;
+
+    private final Condition activateCondition;
+
+    private ActivationContextListener activationListener;
+
+    DefaultCapabilityReference( final ActivationContext activationContext, final Capability capability )
     {
+        this.activationContext = checkNotNull( activationContext );
         this.capability = checkNotNull( capability );
+        this.activateCondition = capability.activationCondition();
     }
 
     @Override
@@ -60,16 +70,26 @@ class DefaultCapabilityReference
     {
         if ( !isActive() )
         {
-            try
+            if ( activateCondition == null || activateCondition.isSatisfied() )
             {
-                capability().activate();
-                active = true;
+                getLogger().debug( "Activating capability with id '{}' ({})", capability.id(), capability );
+                try
+                {
+                    capability().activate();
+                    active = true;
+                }
+                catch ( Exception e )
+                {
+                    getLogger().error(
+                        "Could not activate capability with id '{}' ({})",
+                        new Object[]{ capability.id(), capability, e }
+                    );
+                }
             }
-            catch ( Exception e )
+            if ( activateCondition != null )
             {
-                getLogger().error(
-                    "Could not activate capability with id '{}' ({})", new Object[]{ capability.id(), capability, e }
-                );
+                activationListener = new ActivationContextListener();
+                activationContext.addListener( activationListener );
             }
         }
     }
@@ -79,17 +99,48 @@ class DefaultCapabilityReference
     {
         if ( isActive() )
         {
-            try
+            activationContext.removeListener( activationListener );
+            // check again as it could be that in the mean time we deactivate
+            if ( isActive() )
             {
-                active = false;
-                capability().passivate();
-            }
-            catch ( Exception e )
-            {
-                getLogger().error(
-                    "Could not passivate capability with id '{}' ({})", new Object[]{ capability.id(), capability, e }
-                );
+                getLogger().debug( "Passivating capability with id '{}' ({})", capability.id(), capability );
+                try
+                {
+                    active = false;
+                    capability().passivate();
+                }
+                catch ( Exception e )
+                {
+                    getLogger().error(
+                        "Could not passivate capability with id '{}' ({})",
+                        new Object[]{ capability.id(), capability, e }
+                    );
+                }
             }
         }
+    }
+
+    private class ActivationContextListener
+        implements ActivationContext.Listener
+    {
+
+        @Override
+        public void onSatisfied( final Condition condition )
+        {
+            if ( condition == activateCondition )
+            {
+                activate();
+            }
+        }
+
+        @Override
+        public void onUnsatisfied( final Condition condition )
+        {
+            if ( condition == activateCondition )
+            {
+                passivate();
+            }
+        }
+
     }
 }

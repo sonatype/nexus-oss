@@ -25,9 +25,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.atLeastOnce;
 
 import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
+import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 
 /**
  * {@link DefaultCapabilityReference} UTs.
@@ -43,8 +45,9 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void activateWhenNotActive()
     {
+        final ActivationContext activationContext = mock( ActivationContext.class );
         final Capability capability = mock( Capability.class );
-        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( capability );
+        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( activationContext, capability );
         underTest.activate();
         assertThat( underTest.isActive(), is( true ) );
         verify( capability ).activate();
@@ -56,15 +59,16 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void activateWhenActive()
     {
+        final ActivationContext activationContext = mock( ActivationContext.class );
         final Capability capability = mock( Capability.class );
-        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( capability );
+        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( activationContext, capability );
         underTest.activate();
         assertThat( underTest.isActive(), is( true ) );
         verify( capability ).activate();
 
+        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( capability ).activate();
         underTest.activate();
         assertThat( underTest.isActive(), is( true ) );
-        verifyNoMoreInteractions( capability );
     }
 
     /**
@@ -73,13 +77,14 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void passivateWhenNotActive()
     {
+        final ActivationContext activationContext = mock( ActivationContext.class );
         final Capability capability = mock( Capability.class );
-        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( capability );
+        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( activationContext, capability );
 
         assertThat( underTest.isActive(), is( false ) );
+        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).passivate();
         underTest.passivate();
         assertThat( underTest.isActive(), is( false ) );
-        verifyNoMoreInteractions( capability );
     }
 
     /**
@@ -88,8 +93,9 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void passivateWhenActive()
     {
+        final ActivationContext activationContext = mock( ActivationContext.class );
         final Capability capability = mock( Capability.class );
-        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( capability );
+        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( activationContext, capability );
 
         underTest.activate();
         assertThat( underTest.isActive(), is( true ) );
@@ -105,17 +111,17 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void activateProblem()
     {
+        final ActivationContext activationContext = mock( ActivationContext.class );
         final Capability capability = mock( Capability.class );
         when( capability.id() ).thenReturn( "test" );
         doThrow( new UnsupportedOperationException( "on purpose" ) ).when( capability ).activate();
-        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( capability );
+        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( activationContext, capability );
 
         underTest.activate();
         assertThat( underTest.isActive(), is( false ) );
         verify( capability ).activate();
-        verify( capability ).id();
+        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).passivate();
         underTest.passivate();
-        verifyNoMoreInteractions( capability );
     }
 
     /**
@@ -124,10 +130,11 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void passivateProblem()
     {
+        final ActivationContext activationContext = mock( ActivationContext.class );
         final Capability capability = mock( Capability.class );
         when( capability.id() ).thenReturn( "test" );
         doThrow( new UnsupportedOperationException( "on purpose" ) ).when( capability ).passivate();
-        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( capability );
+        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( activationContext, capability );
 
         underTest.activate();
         assertThat( underTest.isActive(), is( true ) );

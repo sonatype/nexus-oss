@@ -19,68 +19,228 @@
 package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static java.lang.String.format;
+import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
+import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 
 /**
  * Default {@link CapabilityRegistry} implementation.
+ * <p/>
+ * TODO add locking
  */
 @Singleton
 @Named
 class DefaultCapabilityRegistry
+    extends AbstractLoggingComponent
     implements CapabilityRegistry
 {
 
-    // TODO temporary. To be replaced when new container inplace
-    @Requirement( role = CapabilityFactory.class )
-    private Map<String, CapabilityFactory> factories;
+    private final Map<String, CapabilityFactory> factories;
 
-    private final Map<String, CapabilityReference> capabilities;
+    private final Map<String, CapabilityReference> references;
 
-    DefaultCapabilityRegistry()
+    private final ActivationContext activationContext;
+
+    private final Set<Listener> listeners;
+
+    private final ReentrantReadWriteLock lock;
+
+    @Inject
+    DefaultCapabilityRegistry( final Map<String, CapabilityFactory> factories,
+                               final ActivationContext activationContext )
     {
-        capabilities = new HashMap<String, CapabilityReference>();
+        this.activationContext = checkNotNull( activationContext );
+        this.factories = checkNotNull( factories );
+        references = new HashMap<String, CapabilityReference>();
+        listeners = new HashSet<Listener>();
+        lock = new ReentrantReadWriteLock();
     }
 
+    @Override
+    public CapabilityReference create( final String capabilityId, final String capabilityType )
+    {
+        assert capabilityId != null : "Capability id cannot be null";
+
+        try
+        {
+            lock.writeLock().lock();
+
+            final CapabilityFactory factory = factories.get( capabilityType );
+            if ( factory == null )
+            {
+                throw new RuntimeException( format( "No factory found for a capability of type %s", capabilityType ) );
+            }
+
+            final Capability capability = factory.create( capabilityId );
+
+            final DefaultCapabilityReference reference = new DefaultCapabilityReference(
+                activationContext, capability
+            );
+
+            references.put( capabilityId, reference );
+
+            getLogger().debug( "Created capability {}. Notifying listeners...", reference );
+
+            notifyAdded( reference );
+
+            return reference;
+        }
+        finally
+        {
+            lock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public CapabilityReference remove( final String capabilityId )
+    {
+        try
+        {
+            lock.writeLock().lock();
+
+            final CapabilityReference reference = references.remove( capabilityId );
+            if ( reference != null )
+            {
+                getLogger().debug( "Removed capability {}. Notifying listeners...", reference );
+                notifyRemoved( reference );
+            }
+            return reference;
+        }
+        finally
+        {
+            lock.writeLock().unlock();
+        }
+    }
+
+    @Override
     public CapabilityReference get( final String capabilityId )
     {
-        return capabilities.get( capabilityId );
+        try
+        {
+            lock.readLock().lock();
+
+            return references.get( capabilityId );
+        }
+        finally
+        {
+            lock.readLock().unlock();
+        }
     }
 
     @Override
     public Collection<CapabilityReference> getAll()
     {
-        return capabilities.values();
+        try
+        {
+            lock.readLock().lock();
+
+            return references.values();
+        }
+        finally
+        {
+            lock.readLock().unlock();
+        }
     }
 
-    public CapabilityReference create( final String capabilityId, final String capabilityType )
+    @Override
+    public DefaultCapabilityRegistry addListener( final Listener listener )
     {
-        assert capabilityId != null : "Capability id cannot be null";
-
-        final CapabilityFactory factory = factories.get( capabilityType );
-        if ( factory == null )
+        try
         {
-            throw new RuntimeException( format( "No factory found for a capability of type %s", capabilityType ) );
+            lock.writeLock().lock();
+
+            listeners.add( checkNotNull( listener ) );
+            getLogger().debug( "Added listener {}. Notifying about existing capabilities...", listener );
+            for ( final CapabilityReference reference : references.values() )
+            {
+                try
+                {
+                    listener.onAdd( reference );
+                }
+                catch ( Exception e )
+                {
+                    getLogger().warn(
+                        "Catched exception while notifying listener {} about existing capability {}",
+                        new Object[]{ listener, reference, e }
+                    );
+                }
+            }
+        }
+        finally
+        {
+            lock.writeLock().unlock();
         }
 
-        final Capability capability = factory.create( capabilityId );
-
-        return new DefaultCapabilityReference( capability );
+        return this;
     }
 
-    public CapabilityReference remove( final String capabilityId )
+    @Override
+    public DefaultCapabilityRegistry removeListener( final Listener listener )
     {
-        return capabilities.remove( capabilityId );
+        try
+        {
+            lock.writeLock().lock();
+
+            listeners.remove( checkNotNull( listener ) );
+            getLogger().debug( "Removed listener {}", listener );
+        }
+        finally
+        {
+            lock.writeLock().unlock();
+        }
+
+        return this;
+    }
+
+    private void notifyAdded( final CapabilityReference reference )
+    {
+        for ( final Listener listener : listeners )
+        {
+            try
+            {
+                listener.onAdd( reference );
+            }
+            catch ( Exception e )
+            {
+                getLogger().warn(
+                    "Catched exception while notifying listener {} about capability {} being created",
+                    new Object[]{ listener, reference, e }
+                );
+            }
+        }
+    }
+
+    private void notifyRemoved( final CapabilityReference reference )
+    {
+        for ( final Listener listener : listeners )
+        {
+            try
+            {
+                listener.onRemove( reference );
+            }
+            catch ( Exception e )
+            {
+                getLogger().warn(
+                    "Catched exception while notifying listener {} about capability {} being removed",
+                    new Object[]{ listener, reference, e }
+                );
+            }
+        }
     }
 
 }
