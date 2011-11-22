@@ -20,7 +20,10 @@ package org.sonatype.nexus.plugins.capabilities.api;
 
 import java.util.Map;
 
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
+
 public abstract class AbstractCapability
+    extends AbstractLoggingComponent
     implements Capability
 {
 
