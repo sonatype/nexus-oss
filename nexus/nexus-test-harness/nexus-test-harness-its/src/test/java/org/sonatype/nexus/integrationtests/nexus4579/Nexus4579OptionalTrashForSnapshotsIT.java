@@ -19,18 +19,19 @@
 package org.sonatype.nexus.integrationtests.nexus4579;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -39,6 +40,7 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -61,6 +63,8 @@ public class Nexus4579OptionalTrashForSnapshotsIT
 
     private File trashGroupIdFolder;
 
+    private File trashPath;
+
     public Nexus4579OptionalTrashForSnapshotsIT()
     {
         super( "nexus-test-harness-snapshot-repo" );
@@ -72,7 +76,8 @@ public class Nexus4579OptionalTrashForSnapshotsIT
     {
         repositoryPath = new File( nexusWorkDir, "storage/nexus-test-harness-snapshot-repo" );
 
-        final File trashPath = new File( repositoryPath, ".nexus/trash" );
+        trashPath = new File( repositoryPath, ".nexus/trash" );
+
         final String groupIdRelativePath = "nexus4579/";
         final String artifactRelativePath = groupIdRelativePath + "artifact/1.0-SNAPSHOT";
 
@@ -111,7 +116,7 @@ public class Nexus4579OptionalTrashForSnapshotsIT
     public void removeAllSnapshotsToTrash()
         throws Exception
     {
-        runSnapshotRemover( "move-to-trash", getTestRepositoryId(), -1, -1, false );
+        runSnapshotRemover( "move-to-trash", false );
 
         assertThat( "artifact folder was not removed", artifactFolder.list(), nullValue() );
         assertThat( "removed snapshots did not go into trash", trashArtifactFolder.isDirectory(), is( true ) );
@@ -123,13 +128,13 @@ public class Nexus4579OptionalTrashForSnapshotsIT
     public void removeAllSnapshotsDirectly()
         throws Exception
     {
-        Matcher<Collection<Object>> empty = Matchers.empty();
+        Matcher<Collection<Object>> empty = empty();
 
         // need local variables because generics won't compile otherwise
         Collection<Object> files = FileUtils.listFiles( groupFolder, null, true );
         assertThat( files, not( empty ) );
 
-        runSnapshotRemover( "remove-directly", getTestRepositoryId(), -1, -1, true );
+        runSnapshotRemover( "remove-directly", true );
 
         // need local variables because generics won't compile otherwise
         files = FileUtils.listFiles( groupFolder, null, true );
@@ -139,22 +144,21 @@ public class Nexus4579OptionalTrashForSnapshotsIT
                     trashGroupIdFolder.list(), nullValue() );
     }
 
-    protected void runSnapshotRemover( String name, String repositoryId, int minSnapshotsToKeep,
-                                       int removeOlderThanDays,
+    protected void runSnapshotRemover( String name,
                                        boolean deleteImmediately )
         throws Exception
     {
         ScheduledServicePropertyResource repositoryProp = new ScheduledServicePropertyResource();
         repositoryProp.setKey( SnapshotRemovalTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
-        repositoryProp.setValue( repositoryId );
+        repositoryProp.setValue( getTestRepositoryId() );
 
         ScheduledServicePropertyResource keepSnapshotsProp = new ScheduledServicePropertyResource();
         keepSnapshotsProp.setKey( SnapshotRemovalTaskDescriptor.MIN_TO_KEEP_FIELD_ID );
-        keepSnapshotsProp.setValue( String.valueOf( minSnapshotsToKeep ) );
+        keepSnapshotsProp.setValue( "-1" );
 
         ScheduledServicePropertyResource ageProp = new ScheduledServicePropertyResource();
         ageProp.setKey( SnapshotRemovalTaskDescriptor.KEEP_DAYS_FIELD_ID );
-        ageProp.setValue( String.valueOf( removeOlderThanDays ) );
+        ageProp.setValue( "-1" );
 
         ScheduledServicePropertyResource removeReleasedProp = new ScheduledServicePropertyResource();
         removeReleasedProp.setKey( SnapshotRemovalTaskDescriptor.REMOVE_WHEN_RELEASED_FIELD_ID );
