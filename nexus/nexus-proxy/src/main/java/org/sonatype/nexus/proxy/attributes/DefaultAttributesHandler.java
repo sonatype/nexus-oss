@@ -122,7 +122,8 @@ public class DefaultAttributesHandler
 
     @Inject
     public DefaultAttributesHandler( ApplicationConfiguration applicationConfiguration,
-                                     AttributeStorage attributeStorage, List<StorageItemInspector> itemInspectorList,
+                                     @Named( "fs" ) AttributeStorage attributeStorage,
+                                     List<StorageItemInspector> itemInspectorList,
                                      List<StorageFileItemInspector> fileItemInspectorList )
     {
         this.applicationConfiguration = applicationConfiguration;
