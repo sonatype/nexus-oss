@@ -49,7 +49,7 @@ public class CapabilityConfigurationEventInspectorTest
     public void capabilityUpdated01()
     {
         CapabilityReference reference = prepareForUpdate( true, false );
-        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).passivate();
+        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).activate();
 
         verify( reference ).passivate();
         verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
@@ -62,7 +62,7 @@ public class CapabilityConfigurationEventInspectorTest
     public void capabilityUpdated02()
     {
         CapabilityReference reference = prepareForUpdate( false, false );
-        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).passivate();
+        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).activate();
         doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( reference ).passivate();
 
         verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
@@ -75,7 +75,7 @@ public class CapabilityConfigurationEventInspectorTest
     public void capabilityUpdated03()
     {
         CapabilityReference reference = prepareForUpdate( true, true );
-        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).passivate();
+        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).activate();
         doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( reference ).passivate();
 
         verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );

@@ -75,7 +75,11 @@ class DefaultCapabilityRegistry
 
         final Capability capability = factory.create( capabilityId );
 
-        return new DefaultCapabilityReference( capability );
+        final DefaultCapabilityReference reference = new DefaultCapabilityReference( capability );
+
+        capabilities.put( capabilityId, reference );
+
+        return reference;
     }
 
     public CapabilityReference remove( final String capabilityId )
