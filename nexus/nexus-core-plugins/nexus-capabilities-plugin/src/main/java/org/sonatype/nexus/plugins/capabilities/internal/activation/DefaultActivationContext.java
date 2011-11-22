@@ -44,8 +44,14 @@ class DefaultActivationContext
     implements ActivationContext
 {
 
+    /**
+     * Set of listeners on all conditions. Never null.
+     */
     private final Set<Listener> allConditionsListeners;
 
+    /**
+     * Map between listeners and conditions they are listening to. Never null.
+     */
     private final Map<Condition, Set<Listener>> conditionListeners;
 
     @Inject
@@ -125,6 +131,12 @@ class DefaultActivationContext
         return this;
     }
 
+    /**
+     * Notifies listeners about a condition being satisfied.
+     *
+     * @param condition condition that was satisfied
+     * @param listeners to be notified
+     */
     private void notifySatisfied( final Condition condition, final Set<Listener> listeners )
     {
         if ( listeners != null )
@@ -147,6 +159,12 @@ class DefaultActivationContext
         }
     }
 
+    /**
+     * Notifies listeners about a condition being unsatisfied.
+     *
+     * @param condition condition that was unsatisfied
+     * @param listeners to be notified
+     */
     private void notifyUnsatisfied( final Condition condition, final Set<Listener> listeners )
     {
         if ( listeners != null )

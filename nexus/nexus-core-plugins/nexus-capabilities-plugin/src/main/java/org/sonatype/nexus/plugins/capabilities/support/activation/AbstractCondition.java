@@ -30,7 +30,7 @@ public abstract class AbstractCondition
     implements Condition
 {
 
-    private ActivationContext activationContext;
+    private final ActivationContext activationContext;
 
     private boolean satisfied;
 

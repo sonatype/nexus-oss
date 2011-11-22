@@ -19,7 +19,7 @@
 package org.sonatype.nexus.plugins.capabilities.api.activation;
 
 /**
- * Activation context.
+ * Activation context. Used by conditions to send notifications about being satisfied/unsatisfied.
  *
  * @since 1.10.0
  */

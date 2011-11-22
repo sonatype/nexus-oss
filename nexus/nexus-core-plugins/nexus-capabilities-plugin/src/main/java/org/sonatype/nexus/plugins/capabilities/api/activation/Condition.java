@@ -24,6 +24,11 @@ package org.sonatype.nexus.plugins.capabilities.api.activation;
 public interface Condition
 {
 
+    /**
+     * Whether or not the condition is satisfied.
+     *
+     * @return true, if condition is satisfied
+     */
     boolean isSatisfied();
 
 }
