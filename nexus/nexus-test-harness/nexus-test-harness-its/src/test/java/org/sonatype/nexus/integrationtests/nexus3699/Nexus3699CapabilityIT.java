@@ -90,42 +90,4 @@ public class Nexus3699CapabilityIT
         CapabilitiesMessageUtil.delete( r.getId() );
     }
 
-    @Test
-    public void execution()
-        throws Exception
-    {
-        List<CapabilityListItemResource> data = CapabilitiesMessageUtil.list();
-
-        Assert.assertFalse( data.isEmpty() );
-        MatcherAssert.assertThat( data.get( 0 ).getId(), CoreMatchers.equalTo( "4fde59a80f4" ) );
-        MatcherAssert.assertThat( data.get( 0 ).getDescription(), CoreMatchers.equalTo( "test-capability" ) );
-        MatcherAssert.assertThat( data.get( 0 ).getTypeId(), CoreMatchers.equalTo( "TouchTest" ) );
-
-        File touch = new File( nexusWorkDir, "storage/nexus-test-harness-repo/capability/test.txt" );
-        assertTrue( touch.exists() );
-
-        String content = FileUtils.readFileToString( touch );
-        MatcherAssert.assertThat( content, containsString( "capabilities test!" ) );
-        MatcherAssert.assertThat( content, containsString( "repo_nexus-test-harness-repo" ) );
-
-        CapabilityResource cap = CapabilitiesMessageUtil.read( "4fde59a80f4" );
-        setMessage( cap, "capability updated!" );
-        CapabilitiesMessageUtil.update( cap );
-
-        content = FileUtils.readFileToString( touch );
-        MatcherAssert.assertThat( content, containsString( "capability updated!" ) );
-        MatcherAssert.assertThat( content, containsString( "repo_nexus-test-harness-repo" ) );
-    }
-
-    private void setMessage( CapabilityResource cap, String msg )
-    {
-        for ( CapabilityPropertyResource prop : cap.getProperties() )
-        {
-            if ( prop.getKey().equals( "message" ) )
-            {
-                prop.setValue( msg );
-            }
-        }
-    }
-
 }

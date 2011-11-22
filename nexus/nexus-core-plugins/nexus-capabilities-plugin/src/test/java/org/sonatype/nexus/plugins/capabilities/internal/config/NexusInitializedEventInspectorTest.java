@@ -16,39 +16,32 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.config.test;
+package org.sonatype.nexus.plugins.capabilities.internal.config;
 
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
 
 import org.junit.Test;
-import org.sonatype.nexus.plugins.capabilities.api.Capability;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.internal.config.NexusStoppedEventInspector;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
+import org.sonatype.nexus.plugins.capabilities.internal.config.NexusInitializedEventInspector;
+import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 
-public class NexusStoppedEventInspectorTest
+/**
+ * {@link NexusInitializedEvent} UTs.
+ *
+ * @since 1.10.0
+ */
+public class NexusInitializedEventInspectorTest
 {
 
     @Test
-    public void capabilitiesArePassivated()
+    public void capabilitiesAreLoadedWhenNexusIsInitialized()
         throws Exception
     {
-        final Capability capability1 = mock( Capability.class );
-        final Capability capability2 = mock( Capability.class );
-        when( capability2.id() ).thenReturn( "capability-2" );
-        doThrow( new RuntimeException( "something went wrong" ) ).when( capability2 ).passivate();
-        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( capability1, capability2 ) );
+        final CapabilityConfiguration capabilityConfiguration = mock( CapabilityConfiguration.class );
+        new NexusInitializedEventInspector( capabilityConfiguration ).inspect( new NexusInitializedEvent( this ) );
 
-        new NexusStoppedEventInspector( capabilityRegistry ).inspect( new NexusStoppedEvent( this ) );
-
-        verify( capability1 ).passivate();
-        verify( capability2 ).passivate();
+        verify( capabilityConfiguration ).load();
     }
 
 }

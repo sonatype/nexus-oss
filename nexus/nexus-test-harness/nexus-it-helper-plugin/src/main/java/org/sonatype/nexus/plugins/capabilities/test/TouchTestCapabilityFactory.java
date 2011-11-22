@@ -29,12 +29,9 @@ public class TouchTestCapabilityFactory
     implements CapabilityFactory
 {
 
-    @Requirement
-    private RepositoryRegistry repositoryRegistry;
-
     public Capability create( String id )
     {
-        return new TouchTestCapability( id, repositoryRegistry );
+        return new TouchTestCapability( id );
     }
 
 }
