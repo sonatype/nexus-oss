@@ -95,6 +95,7 @@ public class LegacyFSAttributeStorage
         this.marshaller.alias( "compositeFile", DefaultStorageCompositeFileItem.class );
         this.marshaller.alias( "collection", DefaultStorageCollectionItem.class );
         this.marshaller.alias( "link", DefaultStorageLinkItem.class );
+        getLogger().info( "Legacy FS AttributeStorage in place." );
     }
 
     // == Events to keep config in sync
@@ -121,17 +122,6 @@ public class LegacyFSAttributeStorage
 
     // == Config
 
-    /**
-     * Gets the base dir.
-     * 
-     * @return the base dir
-     */
-    public File getWorkingDirectory()
-        throws IOException
-    {
-        return workingDirectory;
-    }
-
     public synchronized File initializeWorkingDirectory()
     {
         if ( workingDirectory == null )
@@ -149,17 +139,12 @@ public class LegacyFSAttributeStorage
             else
             {
                 getLogger().info(
-                    "Legacy Attribute storage directory does not exists, not creating it here (ZZZzzz): "
-                        + workingDirectory );
+                    "Legacy Attribute storage directory does not exists, was expecting it here {}, legacy AttributeStorage will not be used.",
+                    workingDirectory );
             }
         }
 
         return workingDirectory;
-    }
-
-    public synchronized void setWorkingDirectory( final File baseDir )
-    {
-        this.workingDirectory = baseDir;
     }
 
     // == Main iface: AttributeStorage
@@ -169,11 +154,6 @@ public class LegacyFSAttributeStorage
         if ( workingDirectory == null )
         {
             // noop
-            return false;
-        }
-        if ( !isMetadataMaintained( uid ) )
-        {
-            // do nothing
             return false;
         }
 
@@ -214,11 +194,6 @@ public class LegacyFSAttributeStorage
         if ( workingDirectory == null )
         {
             // noop
-            return null;
-        }
-        if ( !isMetadataMaintained( uid ) )
-        {
-            // do nothing
             return null;
         }
 
@@ -275,7 +250,7 @@ public class LegacyFSAttributeStorage
     protected File getFileFromBase( final RepositoryItemUid uid )
         throws IOException
     {
-        final File repoBase = new File( getWorkingDirectory(), uid.getRepository().getId() );
+        final File repoBase = new File( workingDirectory, uid.getRepository().getId() );
 
         File result = null;
 
@@ -288,10 +263,10 @@ public class LegacyFSAttributeStorage
         // to be foolproof
         // 2007.11.09. - Believe or not, Nexus deleted my whole USB rack! (cstamas)
         // ok, now you may laugh :)
-        if ( !result.getAbsolutePath().startsWith( getWorkingDirectory().getAbsolutePath() ) )
+        if ( !result.getAbsolutePath().startsWith( workingDirectory.getAbsolutePath() ) )
         {
             throw new IOException( "FileFromBase evaluated directory wrongly! baseDir="
-                + getWorkingDirectory().getAbsolutePath() + ", target=" + result.getAbsolutePath() );
+                + workingDirectory.getAbsolutePath() + ", target=" + result.getAbsolutePath() );
         }
         else
         {

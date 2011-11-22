@@ -33,7 +33,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * AttributeStorage implementation driven by XStream.
- *
+ * 
  * @author cstamas
  */
 public class AbstractAttributesHandlerTest
@@ -73,11 +73,15 @@ public class AbstractAttributesHandlerTest
         exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
         exRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
 
-        if ( attributesHandler.getAttributeStorage() instanceof DefaultFSAttributeStorage )
+        if ( attributesHandler.getAttributeStorage().getDelegate() instanceof DefaultFSAttributeStorage )
         {
-            FileUtils.deleteDirectory( ( (DefaultFSAttributeStorage) attributesHandler.getAttributeStorage() ).getWorkingDirectory() );
+            FileUtils.deleteDirectory( ( (DefaultFSAttributeStorage) attributesHandler.getAttributeStorage().getDelegate() ).getWorkingDirectory() );
         }
-        else
+        else if ( attributesHandler.getAttributeStorage().getDelegate() instanceof DefaultLSAttributeStorage )
+        {
+            FileUtils.deleteDirectory( new File( localStorageDirectory, ".nexus/attributes" ) );
+        }
+        else if ( attributesHandler.getAttributeStorage().getDelegate() instanceof TransitioningAttributeStorage )
         {
             FileUtils.deleteDirectory( new File( localStorageDirectory, ".nexus/attributes" ) );
         }

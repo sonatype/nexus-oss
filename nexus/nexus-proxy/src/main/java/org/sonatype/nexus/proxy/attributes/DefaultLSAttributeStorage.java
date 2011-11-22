@@ -64,16 +64,11 @@ public class DefaultLSAttributeStorage
     public DefaultLSAttributeStorage( @Named( "xstream-xml" ) final Marshaller marshaller )
     {
         this.marshaller = marshaller;
+        getLogger().info( "Default LS AttributeStorage in place." );
     }
 
     public boolean deleteAttributes( final RepositoryItemUid uid )
     {
-        if ( !isMetadataMaintained( uid ) )
-        {
-            // do nothing
-            return false;
-        }
-
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.delete );
@@ -119,12 +114,6 @@ public class DefaultLSAttributeStorage
 
     public Attributes getAttributes( final RepositoryItemUid uid )
     {
-        if ( !isMetadataMaintained( uid ) )
-        {
-            // do nothing
-            return null;
-        }
-
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.read );
@@ -154,12 +143,6 @@ public class DefaultLSAttributeStorage
 
     public void putAttributes( final RepositoryItemUid uid,  Attributes attributes )
     {
-        if ( !isMetadataMaintained( uid ) )
-        {
-            // do nothing
-            return;
-        }
-
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.create );

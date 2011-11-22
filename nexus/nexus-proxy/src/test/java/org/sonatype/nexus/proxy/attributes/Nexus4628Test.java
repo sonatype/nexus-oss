@@ -83,8 +83,7 @@ public class Nexus4628Test
     {
         Attributes aitem;
 
-        AttributeStorage attributeStorageSpy = Mockito.spy( repository.getAttributesHandler().getAttributeStorage() );
-        repository.getAttributesHandler().setAttributeStorage( attributeStorageSpy );
+        final AttributeStorage attributeStorageSpy = spyOnRealAttributeStorage();
 
         aitem = attributesHandler.getAttributeStorage().getAttributes( uid );
         checkNotNull( aitem );
@@ -115,8 +114,7 @@ public class Nexus4628Test
     {
         Attributes aitem;
 
-        AttributeStorage attributeStorageSpy = Mockito.spy( repository.getAttributesHandler().getAttributeStorage() );
-        repository.getAttributesHandler().setAttributeStorage( attributeStorageSpy );
+        final AttributeStorage attributeStorageSpy = spyOnRealAttributeStorage();
 
         aitem = attributesHandler.getAttributeStorage().getAttributes( uid );
         checkNotNull( aitem );
@@ -140,6 +138,17 @@ public class Nexus4628Test
         Mockito.verify( attributeStorageSpy, Mockito.times( 3 ) ).getAttributes( Mockito.<RepositoryItemUid> any() );
         Mockito.verify( attributeStorageSpy, Mockito.times( 2 ) ).putAttributes( Mockito.<RepositoryItemUid> any(),
             Mockito.<Attributes> any() );
+    }
+
+    // ==
+
+    protected AttributeStorage spyOnRealAttributeStorage()
+    {
+        final DelegatingAttributeStorage das =
+            (DelegatingAttributeStorage) repository.getAttributesHandler().getAttributeStorage();
+        final AttributeStorage attributeStorageSpy = Mockito.spy( das.getDelegate() );
+        repository.getAttributesHandler().setAttributeStorage( attributeStorageSpy );
+        return attributeStorageSpy;
     }
 
 }

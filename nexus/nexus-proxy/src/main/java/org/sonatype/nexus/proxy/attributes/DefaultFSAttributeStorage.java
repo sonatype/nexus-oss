@@ -80,6 +80,7 @@ public class DefaultFSAttributeStorage
         this.applicationConfiguration = applicationConfiguration;
         this.applicationEventMulticaster = applicationEventMulticaster;
         this.marshaller = marshaller;
+        getLogger().info( "Default FS AttributeStorage in place." );
     }
 
     // == Events to keep config in sync
@@ -158,12 +159,6 @@ public class DefaultFSAttributeStorage
 
     public boolean deleteAttributes( final RepositoryItemUid uid )
     {
-        if ( !isMetadataMaintained( uid ) )
-        {
-            // do nothing
-            return false;
-        }
-
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.delete );
@@ -198,12 +193,6 @@ public class DefaultFSAttributeStorage
 
     public Attributes getAttributes( final RepositoryItemUid uid )
     {
-        if ( !isMetadataMaintained( uid ) )
-        {
-            // do nothing
-            return null;
-        }
-
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.read );
@@ -234,12 +223,6 @@ public class DefaultFSAttributeStorage
 
     public void putAttributes( final RepositoryItemUid uid, Attributes attributes )
     {
-        if ( !isMetadataMaintained( uid ) )
-        {
-            // do nothing
-            return;
-        }
-
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.create );

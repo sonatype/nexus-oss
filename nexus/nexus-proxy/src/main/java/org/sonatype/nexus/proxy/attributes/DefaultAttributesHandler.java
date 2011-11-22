@@ -108,7 +108,7 @@ public class DefaultAttributesHandler
     /**
      * The attribute storage.
      */
-    private AttributeStorage attributeStorage;
+    private DelegatingAttributeStorage attributeStorage;
 
     /**
      * The item inspector list.
@@ -122,12 +122,12 @@ public class DefaultAttributesHandler
 
     @Inject
     public DefaultAttributesHandler( ApplicationConfiguration applicationConfiguration,
-                                     @Named( "fs" ) AttributeStorage attributeStorage,
+                                     @Named( "transitioning" ) AttributeStorage attributeStorage,
                                      List<StorageItemInspector> itemInspectorList,
                                      List<StorageFileItemInspector> fileItemInspectorList )
     {
         this.applicationConfiguration = applicationConfiguration;
-        this.attributeStorage = attributeStorage;
+        this.attributeStorage = new DelegatingAttributeStorage( attributeStorage );
         this.itemInspectorList = itemInspectorList;
         this.fileItemInspectorList = fileItemInspectorList;
     }
@@ -139,7 +139,7 @@ public class DefaultAttributesHandler
      * 
      * @return the attribute storage
      */
-    public AttributeStorage getAttributeStorage()
+    public DelegatingAttributeStorage getAttributeStorage()
     {
         return attributeStorage;
     }
@@ -149,9 +149,9 @@ public class DefaultAttributesHandler
      * 
      * @param attributeStorage the new attribute storage
      */
-    public void setAttributeStorage( AttributeStorage attributeStorage )
+    public void setAttributeStorage( final AttributeStorage attributeStorage )
     {
-        this.attributeStorage = attributeStorage;
+        this.attributeStorage = new DelegatingAttributeStorage( attributeStorage );
     }
 
     /**
@@ -301,7 +301,7 @@ public class DefaultAttributesHandler
             item.setRepositoryId( uid.getRepository().getId() );
             item.setPath( uid.getPath() );
 
-            touchItemLastRequested( timestamp, request,  uid, item );
+            touchItemLastRequested( timestamp, request, uid, item );
         }
     }
 

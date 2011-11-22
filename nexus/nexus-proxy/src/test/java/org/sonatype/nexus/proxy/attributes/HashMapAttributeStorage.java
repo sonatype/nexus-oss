@@ -42,31 +42,18 @@ public class HashMapAttributeStorage
     @Override
     public Attributes getAttributes( final RepositoryItemUid uid )
     {
-        if ( isMetadataMaintained( uid ) )
-        {
-            return storageMap.get( uid.getKey() );
-        }
-
-        return null;
+        return storageMap.get( uid.getKey() );
     }
 
     @Override
     public void putAttributes( final RepositoryItemUid uid, final Attributes item )
     {
-        if ( isMetadataMaintained( uid ) )
-        {
-            storageMap.put( uid.getKey(), item );
-        }
+        storageMap.put( uid.getKey(), item );
     }
 
     @Override
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
-        if ( isMetadataMaintained( uid ) )
-        {
-            return storageMap.remove( uid.getKey() ) != null;
-        }
-
-        return false;
+        return storageMap.remove( uid.getKey() ) != null;
     }
 }
