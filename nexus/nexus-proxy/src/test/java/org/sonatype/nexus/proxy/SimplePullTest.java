@@ -119,7 +119,8 @@ public class SimplePullTest
         item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test/", false ) );
         Collection<StorageItem> dir = ( (StorageCollectionItem) item ).list();
         // we should have listed in root only those things/dirs we pulled, se above!
-        assertEquals( 4, dir.size() );
+        // ".nexus" is here too!
+        assertEquals( 5, dir.size() );
         
         // SO FAR, IT's OLD Unit test, except CacheCreate events were changed (it was Cache event).
         // Now below, we add some more, to cover NXCM-3525 too:
