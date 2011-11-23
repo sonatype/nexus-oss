@@ -252,7 +252,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           fieldLabel : 'Description',
           labelStyle : 'margin-left: 15px; width: 185px;',
           itemCls : '',
-          helpText : "Optional description of configured capability. If left empty a default value will be assigned.",
+          helpText : "Optional description of configured capability",
           name : 'description',
           width : this.COMBO_WIDTH,
           allowBlank : true
