@@ -85,7 +85,7 @@ public class CapabilityConfigurationEventInspector
         ref.capability().create( asMap( capabilityConfig.getProperties() ) );
         if ( capabilityConfig.isEnabled() )
         {
-            ref.activate();
+            ref.enable();
         }
     }
 
@@ -96,24 +96,25 @@ public class CapabilityConfigurationEventInspector
         ref.capability().load( asMap( capabilityConfig.getProperties() ) );
         if ( capabilityConfig.isEnabled() )
         {
-            ref.activate();
+            ref.enable();
         }
     }
 
     private void handle( final CapabilityConfigurationUpdateEvent evt )
     {
         final CCapability capabilityConfig = evt.getCapability();
+        final CCapability previousCapabilityConfig = evt.getPreviousCapability();
         final CapabilityReference ref = registry.get( capabilityConfig.getId() );
         if ( ref != null )
         {
-            if ( ref.isActive() && !capabilityConfig.isEnabled() )
+            if ( previousCapabilityConfig.isEnabled() && !capabilityConfig.isEnabled() )
             {
-                ref.passivate();
+                ref.disable();
             }
             ref.capability().update( asMap( capabilityConfig.getProperties() ) );
-            if ( capabilityConfig.isEnabled() && !ref.isActive() )
+            if ( !previousCapabilityConfig.isEnabled() && capabilityConfig.isEnabled() )
             {
-                ref.activate();
+                ref.enable();
             }
         }
     }
@@ -125,7 +126,7 @@ public class CapabilityConfigurationEventInspector
         if ( ref != null )
         {
             registry.remove( ref.capability().id() );
-            ref.passivate();
+            ref.disable();
             ref.capability().remove();
         }
     }

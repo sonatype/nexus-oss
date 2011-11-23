@@ -55,6 +55,7 @@ public class DefaultCapabilityReferenceTest
         capability = mock( Capability.class );
         when( capability.id() ).thenReturn( "test" );
         underTest = new DefaultCapabilityReference( capabilityRegistry, activationContext, capability );
+
     }
 
     /**
@@ -63,7 +64,7 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void activateWhenNotActive()
     {
-        underTest.activate();
+        underTest.enable();
         assertThat( underTest.isActive(), is( true ) );
         verify( capability ).activate();
         verify( capabilityRegistry ).notify(
@@ -77,7 +78,7 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void activateWhenActive()
     {
-        underTest.activate();
+        underTest.enable();
         assertThat( underTest.isActive(), is( true ) );
         verify( capability ).activate();
 
@@ -104,7 +105,7 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void passivateWhenActive()
     {
-        underTest.activate();
+        underTest.enable();
         assertThat( underTest.isActive(), is( true ) );
 
         underTest.passivate();
@@ -123,7 +124,7 @@ public class DefaultCapabilityReferenceTest
     {
         doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).activate();
 
-        underTest.activate();
+        underTest.enable();
         assertThat( underTest.isActive(), is( false ) );
         verify( capability ).activate();
         doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).passivate();
@@ -138,7 +139,7 @@ public class DefaultCapabilityReferenceTest
     {
         doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).passivate();
 
-        underTest.activate();
+        underTest.enable();
         assertThat( underTest.isActive(), is( true ) );
         underTest.passivate();
         verify( capability ).passivate();

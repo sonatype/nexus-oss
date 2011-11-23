@@ -43,55 +43,55 @@ public class CapabilityConfigurationEventInspectorTest
 {
 
     /**
-     * If previous configuration was enabled and new configuration is not enabled, passivate is called.
+     * If previous configuration was enabled and new configuration is not enabled, disable() is called.
      */
     @Test
     public void capabilityUpdated01()
     {
         CapabilityReference reference = prepareForUpdate( true, false );
-        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).activate();
+        doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
 
-        verify( reference ).passivate();
+        verify( reference ).disable();
         verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
     }
 
     /**
-     * If previous configuration was not enabled and new configuration is not enabled, passivate is not called.
+     * If previous configuration was not enabled and new configuration is not enabled, enable() is not called.
      */
     @Test
     public void capabilityUpdated02()
     {
         CapabilityReference reference = prepareForUpdate( false, false );
-        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).activate();
-        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( reference ).passivate();
+        doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
+        doThrow( new AssertionError( "Disable not expected to be called" ) ).when( reference ).disable();
 
         verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
     }
 
     /**
-     * If previous configuration was enabled and new configuration is enabled, activate is not called.
+     * If previous configuration was enabled and new configuration is enabled, enable() is not called.
      */
     @Test
     public void capabilityUpdated03()
     {
         CapabilityReference reference = prepareForUpdate( true, true );
-        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).activate();
-        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( reference ).passivate();
+        doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
+        doThrow( new AssertionError( "Disable not expected to be called" ) ).when( reference ).disable();
 
         verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
     }
 
     /**
-     * If previous configuration was not enabled and new configuration is enabled, activate is called.
+     * If previous configuration was not enabled and new configuration is enabled, enable() is called.
      */
     @Test
     public void capabilityUpdated04()
     {
         CapabilityReference reference = prepareForUpdate( false, true );
-        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( reference ).passivate();
+        doThrow( new AssertionError( "Disable not expected to be called" ) ).when( reference ).disable();
 
+        verify( reference ).enable();
         verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
-        verify( reference ).activate();
     }
 
     private CapabilityReference prepareForUpdate( final boolean oldEnabled, final boolean newEnabled )

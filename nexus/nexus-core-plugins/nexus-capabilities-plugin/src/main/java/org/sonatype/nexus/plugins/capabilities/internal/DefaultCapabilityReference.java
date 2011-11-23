@@ -47,6 +47,8 @@ class DefaultCapabilityReference
 
     private boolean active;
 
+    private boolean enabled;
+
     private ActivationContextListener activationListener;
 
     DefaultCapabilityReference( final DefaultCapabilityRegistry registry,
@@ -57,12 +59,52 @@ class DefaultCapabilityReference
         this.activationContext = checkNotNull( activationContext );
         this.capability = checkNotNull( capability );
         this.activateCondition = capability.activationCondition();
+        active = false;
+        enabled = false;
     }
 
     @Override
     public Capability capability()
     {
         return capability;
+    }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+    @Override
+    public void enable()
+    {
+        if ( !isEnabled() )
+        {
+            getLogger().debug( "Enabling capability with id '{}' ({})", capability.id(), capability );
+            enabled = true;
+            activate();
+            if ( activateCondition != null )
+            {
+                activationListener = new ActivationContextListener();
+                activationContext.addListener( activationListener, activateCondition );
+            }
+        }
+    }
+
+    @Override
+    public void disable()
+    {
+        if ( isEnabled() )
+        {
+            getLogger().debug( "Disable capability with id '{}' ({})", capability.id(), capability );
+            if ( activationListener != null )
+            {
+                activationContext.removeListener( activationListener, activateCondition );
+                activationListener = null;
+            }
+            passivate();
+            enabled = false;
+        }
     }
 
     @Override
@@ -74,73 +116,56 @@ class DefaultCapabilityReference
     @Override
     public void activate()
     {
-        if ( !isActive() )
+        if ( isEnabled() && !isActive() && ( activateCondition == null || activateCondition.isSatisfied() ) )
         {
-            if ( activateCondition == null || activateCondition.isSatisfied() )
+            getLogger().debug( "Activating capability with id '{}' ({})", capability.id(), capability );
+            try
             {
-                getLogger().debug( "Activating capability with id '{}' ({})", capability.id(), capability );
-                try
+                capability().activate();
+                active = true;
+                registry.notify( this, new DefaultCapabilityRegistry.Notifier( "activated" )
                 {
-                    capability().activate();
-                    active = true;
-                    registry.notify( this, new DefaultCapabilityRegistry.Notifier( "activated" )
+                    @Override
+                    void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
                     {
-                        @Override
-                        void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
-                        {
-                            listener.onActivate( reference );
-                        }
-                    } );
-                }
-                catch ( Exception e )
-                {
-                    getLogger().error(
-                        "Could not activate capability with id '{}' ({})",
-                        new Object[]{ capability.id(), capability, e }
-                    );
-                }
+                        listener.onActivate( reference );
+                    }
+                } );
             }
-            if ( activateCondition != null )
+            catch ( Exception e )
             {
-                activationListener = new ActivationContextListener();
-                activationContext.addListener( activationListener, activateCondition );
+                getLogger().error(
+                    "Could not activate capability with id '{}' ({})", new Object[]{ capability.id(), capability, e }
+                );
             }
+
         }
     }
 
     @Override
     public void passivate()
     {
-        if ( isActive() )
+        if ( isEnabled() && isActive() )
         {
-            if ( activationListener != null )
+            getLogger().debug( "Passivating capability with id '{}' ({})", capability.id(), capability );
+            try
             {
-                activationContext.removeListener( activationListener, activateCondition );
-            }
-            // check again as it could be that in the mean time we deactivate
-            if ( isActive() )
-            {
-                getLogger().debug( "Passivating capability with id '{}' ({})", capability.id(), capability );
-                try
+                active = false;
+                registry.notify( this, new DefaultCapabilityRegistry.Notifier( "passivated" )
                 {
-                    active = false;
-                    registry.notify( this, new DefaultCapabilityRegistry.Notifier( "passivated" )
+                    @Override
+                    void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
                     {
-                        @Override
-                        void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
-                        {
-                            listener.onPassivate( reference );
-                        }
-                    } );
-                    capability().passivate();
-                }
-                catch ( Exception e )
-                {
-                    getLogger().error(
-                        "Could not passivate capability with id '{}' ({})",
-                        new Object[]{ capability.id(), capability, e }
-                    );
-                }
+                        listener.onPassivate( reference );
+                    }
+                } );
+                capability().passivate();
+            }
+            catch ( Exception e )
+            {
+                getLogger().error(
+                    "Could not passivate capability with id '{}' ({})", new Object[]{ capability.id(), capability, e }
+                );
             }
         }
     }
