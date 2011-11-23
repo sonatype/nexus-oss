@@ -335,6 +335,20 @@
                     <exclude>**/*$*</exclude>
                     <exclude>**/Abstract*</exclude>
                   </excludes>
+                  <properties>
+                    <property>
+                      <name>usedefaultlisteners</name>
+                      <value>true</value>
+                    </property>
+                    <property>
+                      <name>reporter</name>
+                      <value>org.testng.reporters.JUnitXMLReporter</value>
+                    </property>
+                    <property>
+                      <name>listener</name>
+                      <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
+                    </property>
+                  </properties>
                 </configuration>
               </execution>
             </executions>
