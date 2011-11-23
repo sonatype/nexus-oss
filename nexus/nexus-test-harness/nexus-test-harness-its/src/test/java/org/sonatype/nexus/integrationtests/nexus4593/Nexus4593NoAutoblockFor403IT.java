@@ -20,7 +20,9 @@ package org.sonatype.nexus.integrationtests.nexus4593;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.tests.http.server.fluent.Behaviours.content;
 import static org.sonatype.tests.http.server.fluent.Behaviours.error;
+import static org.sonatype.tests.http.server.fluent.Behaviours.get;
 
 import java.io.IOException;
 
@@ -30,10 +32,7 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.sonatype.tests.http.server.api.Behaviour;
 import org.sonatype.tests.http.server.fluent.Server;
-import org.sonatype.tests.http.server.jetty.behaviour.ErrorBehaviour;
-import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
@@ -75,30 +74,33 @@ public class Nexus4593NoAutoblockFor403IT
     public void testNoAutoblockOn403()
         throws Exception
     {
-        startErrorServer( 403 );
+        stopProxy();
+
+        server = Server.withPort( proxyPort ).start();
+
+        server.serve( "/" ).withBehaviours( content( "ok" ) );
+        server.serve( "/remote/release-proxy-repo-1/nexus4593/*" ).withBehaviours( get( getTestFile( "/" ) ) );
+
+        downloadArtifact( GavUtil.newGav( "nexus4593", "artifact", "1.0.0" ), "target" );
+
+        assertThat( ProxyMode.valueOf( getStatus().getProxyMode() ), is( ProxyMode.ALLOW ) );
+
+        server.serve( "/*" ).withBehaviours( error( 403 ) );
+
+        // download will not fail because we have a local copy cached, but the remote will be hit b/c maxAge is set to 0
+        downloadArtifact( GavUtil.newGav( "nexus4593", "artifact", "1.0.0" ), "target" );
+
+        assertThat( ProxyMode.valueOf( getStatus().getProxyMode() ), is( ProxyMode.ALLOW ) );
 
         try
         {
-            downloadArtifact( GavUtil.newGav( "g", "a", "v" ), "target" );
+            downloadArtifact( GavUtil.newGav( "g", "a", "403" ), "target" );
             assertThat( "should fail b/c of 403", false );
         }
         catch ( IOException e )
         {
             // expected, remote will answer with 403
         }
-
-        assertThat( ProxyMode.valueOf( getStatus().getProxyMode() ), is( ProxyMode.ALLOW ) );
-
-        // successfully fetch different artifact
-        stopServer();
-        this.proxyServer.start();
-        downloadArtifact( GavUtil.newGav( "nexus4593", "artifact", "1.0.0" ), "target" );
-        assertThat( ProxyMode.valueOf( getStatus().getProxyMode() ), is( ProxyMode.ALLOW ) );
-
-        // 403 for artifact again
-        startErrorServer( 403 );
-        // download will not fail because we have a local copy cached, but the remote will be hit b/c maxAge is set to 0
-        downloadArtifact( GavUtil.newGav( "nexus4593", "artifact", "1.0.0" ), "target" );
 
         assertThat( ProxyMode.valueOf( getStatus().getProxyMode() ), is( ProxyMode.ALLOW ) );
     }
@@ -116,7 +118,7 @@ public class Nexus4593NoAutoblockFor403IT
 
         try
         {
-            downloadArtifact( GavUtil.newGav( "g", "a", "v" ), "target" );
+            downloadArtifact( GavUtil.newGav( "g", "a", "401" ), "target" );
         }
         catch ( IOException e )
         {
