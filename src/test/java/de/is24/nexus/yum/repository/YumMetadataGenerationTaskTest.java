@@ -76,7 +76,7 @@ public class YumMetadataGenerationTaskTest {
 
 	private YumMetadataGenerationTask task(String repo, String version) {
 		YumMetadataGenerationTask task = new YumMetadataGenerationTask();
-		YumGeneratorConfiguration config = new YumDefaultGeneratorConfiguration(RPM_DIR, RPM_URL, RPM_DIR, RPM_URL, repo, version, RPM_DIR,
+		YumGeneratorConfiguration config = new DefaultYumGeneratorConfiguration(RPM_DIR, RPM_URL, RPM_DIR, RPM_URL, repo, version, RPM_DIR,
 				null,
 				true);
 		task.setJob(new YumRepositoryGeneratorJob(config) {

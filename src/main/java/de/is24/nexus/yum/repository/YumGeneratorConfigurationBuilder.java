@@ -64,7 +64,7 @@ public class YumGeneratorConfigurationBuilder {
   }
 
   public YumGeneratorConfiguration toConfig() {
-    return new YumDefaultGeneratorConfiguration(rpmDir, rpmUrl,
+    return new DefaultYumGeneratorConfiguration(rpmDir, rpmUrl,
       repoDir, repoUrl, id, version,
       cacheDir, addedFile, singleRpmPerDirectory);
   }

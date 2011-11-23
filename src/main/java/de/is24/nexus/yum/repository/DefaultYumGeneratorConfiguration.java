@@ -5,7 +5,7 @@ import java.io.File;
 import org.apache.commons.lang.StringUtils;
 
 
-public class YumDefaultGeneratorConfiguration implements YumGeneratorConfiguration {
+public class DefaultYumGeneratorConfiguration implements YumGeneratorConfiguration {
   private final File rpmDir;
   private final String rpmUrl;
   private final File repoDir;
@@ -16,7 +16,7 @@ public class YumDefaultGeneratorConfiguration implements YumGeneratorConfigurati
   private final String addedFile;
   private final boolean singleRpmPerDirectory;
 
-  public YumDefaultGeneratorConfiguration(File rpmDir, String rpmUrl,
+  public DefaultYumGeneratorConfiguration(File rpmDir, String rpmUrl,
     File repoDir, String repoUrl, String id, String version,
     File cacheDir, String addedFile, boolean singleRpmPerDirectory) {
     this.rpmDir = assertFile(rpmDir);
@@ -30,7 +30,7 @@ public class YumDefaultGeneratorConfiguration implements YumGeneratorConfigurati
     this.singleRpmPerDirectory = singleRpmPerDirectory;
   }
 
-  public YumDefaultGeneratorConfiguration(File rpmDir, String rpmUrl,
+  public DefaultYumGeneratorConfiguration(File rpmDir, String rpmUrl,
     File repoDir, String id,
     File cacheDir) {
     this(rpmDir, rpmUrl, repoDir, rpmUrl, id, null, cacheDir, null, true);
