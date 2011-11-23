@@ -16,46 +16,33 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal;
+package org.sonatype.nexus.plugins.capabilities.internal.config;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.plugins.capabilities.api.descriptor.AbstractCapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 
-@Named
+/**
+ * Test descriptor used by {@link DefaultCapabilityConfigurationTest}.
+ *
+ * @since 1.10.0
+ */
+@Named( DefaultCapabilityConfigurationTestDescriptor.ID )
 @Singleton
-class DefaultCapabilityDescriptorRegistry
-    implements CapabilityDescriptorRegistry
+public class DefaultCapabilityConfigurationTestDescriptor
+    extends AbstractCapabilityDescriptor
+    implements CapabilityDescriptor
 {
 
-    private final List<CapabilityDescriptor> descriptors;
+    public static final String ID = "DefaultCapabilityConfigurationTest";
 
-    @Inject
-    DefaultCapabilityDescriptorRegistry( final List<CapabilityDescriptor> descriptors )
+    public DefaultCapabilityConfigurationTestDescriptor()
     {
-        this.descriptors = checkNotNull( descriptors );
+        super( ID, "Default capability configuration test" );
     }
 
-    public CapabilityDescriptor get( final String capabilityDescriptorId )
-    {
-        for ( final CapabilityDescriptor descriptor : descriptors )
-        {
-            if ( descriptor.id().equals( capabilityDescriptorId ) )
-            {
-                return descriptor;
-            }
-        }
-        return null;
-    }
-
-    public CapabilityDescriptor[] getAll()
-    {
-        return descriptors.toArray( new CapabilityDescriptor[descriptors.size()] );
-    }
 }

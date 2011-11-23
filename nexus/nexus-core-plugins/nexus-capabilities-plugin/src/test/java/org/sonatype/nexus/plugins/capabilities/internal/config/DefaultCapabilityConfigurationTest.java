@@ -54,7 +54,7 @@ public class DefaultCapabilityConfigurationTest
         // create
         CCapability cap = new CCapability();
         cap.setDescription( "Configuration Test" );
-        cap.setTypeId( "AnyTest" );
+        cap.setTypeId( DefaultCapabilityConfigurationTestDescriptor.ID );
         configuration.add( cap );
 
         // make sure it will reload from disk
@@ -67,6 +67,7 @@ public class DefaultCapabilityConfigurationTest
         CCapability read = configuration.get( cap.getId() );
         assertEquals( read.getId(), cap.getId() );
         assertEquals( read.getDescription(), cap.getDescription() );
+        assertEquals( read.getPropertiesDescription(), cap.getPropertiesDescription() );
         assertEquals( read.getTypeId(), cap.getTypeId() );
         assertEquals( read.getProperties().size(), cap.getProperties().size() );
 

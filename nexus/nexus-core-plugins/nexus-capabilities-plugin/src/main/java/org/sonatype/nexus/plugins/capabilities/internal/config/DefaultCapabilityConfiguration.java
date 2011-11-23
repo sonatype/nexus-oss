@@ -115,14 +115,16 @@ public class DefaultCapabilityConfiguration
             final String generatedId = idGenerator.generateId();
 
             capability.setId( generatedId );
-            capability.setDescription( getDescription( capability ) );
+            capability.setPropertiesDescription( getPropertiesDescription( capability ) );
             getConfiguration().addCapability( capability );
 
             save();
 
             getLogger().debug(
-                "Added capability [{}] with properties [{}]", capability.getDescription(), capability.getProperties()
+                "Added capability '{}' of type '{}' with properties '{}'",
+                new Object[]{ capability.getId(), capability.getTypeId(), capability.getProperties() }
             );
+
             applicationEventMulticaster.notifyEventListeners( new CapabilityConfigurationAddEvent( capability ) );
 
             return generatedId;
@@ -152,13 +154,15 @@ public class DefaultCapabilityConfiguration
             if ( stored != null )
             {
                 getConfiguration().removeCapability( stored );
-                capability.setDescription( getDescription( capability ) );
+                capability.setPropertiesDescription( getPropertiesDescription( capability ) );
                 getConfiguration().addCapability( capability );
                 save();
 
                 getLogger().debug(
-                    "Updated capability [{}] with properties [{}]", capability.getDescription(), capability.getProperties()
+                    "Updated capability '{}' of type '{}' with properties '{}'",
+                    new Object[]{ capability.getId(), capability.getTypeId(), capability.getProperties() }
                 );
+
                 applicationEventMulticaster.notifyEventListeners(
                     new CapabilityConfigurationUpdateEvent( capability, stored ) );
             }
@@ -183,7 +187,8 @@ public class DefaultCapabilityConfiguration
                 save();
 
                 getLogger().debug(
-                    "Removed capability [{}] with properties [{}]", stored.getDescription(), stored.getProperties()
+                    "Removed capability '{}' of type '{}' with properties '{}'",
+                    new Object[]{ stored.getId(), stored.getTypeId(), stored.getProperties() }
                 );
                 applicationEventMulticaster.notifyEventListeners( new CapabilityConfigurationRemoveEvent( stored ) );
             }
@@ -291,7 +296,8 @@ public class DefaultCapabilityConfiguration
         for ( final CCapability capability : capabilities )
         {
             getLogger().debug(
-                "Loading capability [{}] with properties [{}]", capability.getDescription(), capability.getProperties()
+                "Loading capability '{}' of type '{}' with properties '{}'",
+                new Object[]{ capability.getId(), capability.getTypeId(), capability.getProperties() }
             );
             applicationEventMulticaster.notifyEventListeners( new CapabilityConfigurationLoadEvent( capability ) );
         }
@@ -339,21 +345,18 @@ public class DefaultCapabilityConfiguration
         configuration = null;
     }
 
-    private String getDescription( final CCapability capability )
+    private String getPropertiesDescription( final CCapability capability )
     {
-        if ( StringUtils.isEmpty( capability.getDescription() ) )
+        final CapabilityDescriptor descriptor = descriptors.get( capability.getTypeId() );
+        if ( descriptor != null )
         {
-            final CapabilityDescriptor descriptor = descriptors.get( capability.getTypeId() );
-            if ( descriptor != null )
+            try
             {
-                try
-                {
-                    return descriptor.describe( asMap( capability.getProperties() ) );
-                }
-                catch ( Exception ignore )
-                {
-                    getLogger().warn( "Capability descriptor '{}' failed to describe capability", descriptor.id() );
-                }
+                return descriptor.describe( asMap( capability.getProperties() ) );
+            }
+            catch ( Exception ignore )
+            {
+                getLogger().warn( "Capability descriptor '{}' failed to describe capability", descriptor.id() );
             }
         }
         return capability.getDescription();

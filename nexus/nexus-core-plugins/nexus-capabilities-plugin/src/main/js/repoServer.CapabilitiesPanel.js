@@ -86,6 +86,9 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
         name : 'description',
         sortType : Ext.data.SortTypes.asUCString
       }, {
+        name : 'propertiesDescription',
+        sortType : Ext.data.SortTypes.asUCString
+      }, {
         name : 'enabled'
       }, {
         name : 'active'
@@ -339,6 +342,11 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
               dataIndex : 'typeName',
               width : 175,
               id : 'capabilities-type-col'
+            }, {
+              header : 'Settings',
+              dataIndex : 'propertiesDescription',
+              width : 250,
+              id : 'capabilities-properties-description-col'
             }, {
               header : 'Description',
               dataIndex : 'description',
@@ -669,6 +677,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             var dataObj = {
               id : receivedData.id,
               description : receivedData.description,
+              propertiesDescription : receivedData.propertiesDescription,
               enabled : receivedData.enabled,
               active : receivedData.active,
               resourceURI : receivedData.resourceURI,
@@ -724,6 +733,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       updateCapabilityRecord : function(rec, receivedData) {
         rec.beginEdit();
         rec.set('description', receivedData.description);
+        rec.set('propertiesDescription', receivedData.propertiesDescription);
         rec.set('typeId', receivedData.typeId);
         rec.set('enabled', receivedData.enabled);
         rec.set('active', receivedData.active);
