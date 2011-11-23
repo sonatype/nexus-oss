@@ -16,73 +16,50 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.api;
+package org.sonatype.nexus.plugins.capabilities.support.activation;
 
-import java.util.Map;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 
-public abstract class AbstractCapability
-    extends AbstractLoggingComponent
-    implements Capability
+/**
+ * {@link Condition} implementation support.
+ */
+public abstract class AbstractCondition
+    implements Condition
 {
 
-    private final String id;
+    private final ActivationContext activationContext;
 
-    protected AbstractCapability( final String id )
+    private boolean satisfied;
+
+    public AbstractCondition( final ActivationContext activationContext )
     {
-        assert id != null : "Capability id cannot be null";
-
-        this.id = id;
+        this.activationContext = checkNotNull( activationContext );
     }
 
     @Override
-    public String id()
+    public boolean isSatisfied()
     {
-        return id;
+        return satisfied;
     }
 
-    @Override
-    public void create( final Map<String, String> properties )
+    public void setSatisfied( final boolean satisfied )
     {
-        // do nothing
-    }
+        if ( this.satisfied != satisfied )
+        {
+            this.satisfied = satisfied;
+            if ( this.satisfied )
+            {
+                activationContext.notifySatisfied( this );
+            }
+            else
+            {
+                activationContext.notifyUnsatisfied( this );
+            }
+        }
 
-    @Override
-    public void load( final Map<String, String> properties )
-    {
-        // do nothing
-    }
-
-    @Override
-    public void update( final Map<String, String> properties )
-    {
-        // do nothing
-    }
-
-    @Override
-    public void remove()
-    {
-        // do nothing
-    }
-
-    @Override
-    public void activate()
-    {
-        // do nothing
-    }
-
-    @Override
-    public void passivate()
-    {
-        // do nothing
-    }
-
-    @Override
-    public Condition activationCondition()
-    {
-        return null;
     }
 
 }
