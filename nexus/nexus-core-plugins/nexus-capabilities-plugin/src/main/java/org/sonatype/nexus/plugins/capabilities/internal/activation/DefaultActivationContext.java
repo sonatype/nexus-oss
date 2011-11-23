@@ -84,7 +84,7 @@ class DefaultActivationContext
     @Override
     public ActivationContext addListener( final Listener listener, final Condition... conditions )
     {
-        if ( conditions == null )
+        if ( conditions == null || conditions.length == 0 )
         {
             allConditionsListeners.add( listener );
             getLogger().debug( "Added listener {} for all conditions", listener );
@@ -110,7 +110,7 @@ class DefaultActivationContext
     @Override
     public ActivationContext removeListener( final Listener listener, final Condition... conditions )
     {
-        if ( conditions == null )
+        if ( conditions == null|| conditions.length == 0 )
         {
             allConditionsListeners.remove( listener );
             getLogger().debug( "Removed listener {} for all conditions", listener );
