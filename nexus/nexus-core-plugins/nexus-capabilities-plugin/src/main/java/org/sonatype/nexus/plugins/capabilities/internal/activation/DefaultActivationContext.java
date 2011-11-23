@@ -21,9 +21,9 @@ package org.sonatype.nexus.plugins.capabilities.internal.activation;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -57,8 +57,58 @@ class DefaultActivationContext
     @Inject
     DefaultActivationContext()
     {
-        allConditionsListeners = new HashSet<Listener>();
+        allConditionsListeners = new CopyOnWriteArraySet<Listener>();
         conditionListeners = new HashMap<Condition, Set<Listener>>();
+    }
+
+    @Override
+    public ActivationContext addListener( final Listener listener, final Condition... conditions )
+    {
+        if ( conditions == null || conditions.length == 0 )
+        {
+            allConditionsListeners.add( listener );
+            getLogger().debug( "Added listener {} for all conditions", listener );
+        }
+        else
+        {
+            for ( final Condition condition : conditions )
+            {
+                Set<Listener> listeners = conditionListeners.get( condition );
+                if ( listeners == null )
+                {
+                    listeners = new CopyOnWriteArraySet<Listener>();
+                    conditionListeners.put( condition, listeners );
+                }
+                listeners.add( listener );
+            }
+            getLogger().debug( "Added listener {} for conditions {}", listener, conditions );
+        }
+
+        return this;
+    }
+
+    @Override
+    public ActivationContext removeListener( final Listener listener, final Condition... conditions )
+    {
+        if ( conditions == null || conditions.length == 0 )
+        {
+            allConditionsListeners.remove( listener );
+            getLogger().debug( "Removed listener {} for all conditions", listener );
+        }
+        else
+        {
+            getLogger().debug( "Removed listener {} for conditions {}", listener, conditions );
+            for ( final Condition condition : conditions )
+            {
+                final Set<Listener> listeners = conditionListeners.get( condition );
+                if ( listeners != null )
+                {
+                    listeners.remove( listener );
+                }
+            }
+        }
+
+        return this;
     }
 
     @Override
@@ -81,56 +131,6 @@ class DefaultActivationContext
         return this;
     }
 
-    @Override
-    public ActivationContext addListener( final Listener listener, final Condition... conditions )
-    {
-        if ( conditions == null || conditions.length == 0 )
-        {
-            allConditionsListeners.add( listener );
-            getLogger().debug( "Added listener {} for all conditions", listener );
-        }
-        else
-        {
-            for ( final Condition condition : conditions )
-            {
-                Set<Listener> listeners = conditionListeners.get( condition );
-                if ( listeners == null )
-                {
-                    listeners = new HashSet<Listener>();
-                    conditionListeners.put( condition, listeners );
-                }
-                listeners.add( listener );
-            }
-            getLogger().debug( "Added listener {} for conditions {}", listener, conditions );
-        }
-
-        return this;
-    }
-
-    @Override
-    public ActivationContext removeListener( final Listener listener, final Condition... conditions )
-    {
-        if ( conditions == null|| conditions.length == 0 )
-        {
-            allConditionsListeners.remove( listener );
-            getLogger().debug( "Removed listener {} for all conditions", listener );
-        }
-        else
-        {
-            getLogger().debug( "Removed listener {} for conditions {}", listener, conditions );
-            for ( final Condition condition : conditions )
-            {
-                final Set<Listener> listeners = conditionListeners.get( condition );
-                if ( listeners != null )
-                {
-                    listeners.remove( listener );
-                }
-            }
-        }
-
-        return this;
-    }
-
     /**
      * Notifies listeners about a condition being satisfied.
      *
@@ -139,6 +139,7 @@ class DefaultActivationContext
      */
     private void notifySatisfied( final Condition condition, final Set<Listener> listeners )
     {
+
         if ( listeners != null )
         {
             for ( final Listener listener : listeners )
