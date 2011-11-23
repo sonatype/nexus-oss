@@ -114,7 +114,7 @@ class DefaultActivationContext
     @Override
     public ActivationContext notifySatisfied( final Condition condition )
     {
-        getLogger().debug( "Condition {} has been satisfied. Notifying listeners...", condition );
+        getLogger().debug( "Condition {} has been satisfied", condition );
         notifySatisfied( checkNotNull( condition ), allConditionsListeners );
         notifySatisfied( condition, conditionListeners.get( condition ) );
 
@@ -124,7 +124,7 @@ class DefaultActivationContext
     @Override
     public ActivationContext notifyUnsatisfied( final Condition condition )
     {
-        getLogger().debug( "Condition {} has been unsatisfied. Notifying listeners...", condition );
+        getLogger().debug( "Condition {} has been unsatisfied", condition );
         notifyUnsatisfied( checkNotNull( condition ), allConditionsListeners );
         notifyUnsatisfied( condition, conditionListeners.get( condition ) );
 
@@ -139,9 +139,9 @@ class DefaultActivationContext
      */
     private void notifySatisfied( final Condition condition, final Set<Listener> listeners )
     {
-
         if ( listeners != null )
         {
+            getLogger().debug( "Notifying {} activation context listeners...", listeners.size() );
             for ( final Listener listener : listeners )
             {
                 getLogger().debug( "Notifying listener {} about condition {} being satisfied", listener, condition );
@@ -170,6 +170,7 @@ class DefaultActivationContext
     {
         if ( listeners != null )
         {
+            getLogger().debug( "Notifying {} listeners...", listeners.size() );
             for ( final Listener listener : listeners )
             {
                 getLogger().debug( "Notifying listener {} about condition {} being unsatisfied", listener, condition );

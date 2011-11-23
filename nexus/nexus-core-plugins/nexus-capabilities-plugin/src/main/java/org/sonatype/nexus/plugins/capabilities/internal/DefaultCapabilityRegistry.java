@@ -94,7 +94,7 @@ class DefaultCapabilityRegistry
 
             references.put( capabilityId, reference );
 
-            getLogger().debug( "Created capability {}. Notifying listeners...", reference );
+            getLogger().debug( "Created capability {}", reference );
 
             notify( reference, new Notifier( "added" )
             {
@@ -123,7 +123,7 @@ class DefaultCapabilityRegistry
             final CapabilityReference reference = references.remove( capabilityId );
             if ( reference != null )
             {
-                getLogger().debug( "Removed capability {}. Notifying listeners...", reference );
+                getLogger().debug( "Removed capability {}", reference );
                 notify( reference, new Notifier( "removed" )
                 {
                     @Override
@@ -179,7 +179,7 @@ class DefaultCapabilityRegistry
             lock.writeLock().lock();
 
             listeners.add( checkNotNull( listener ) );
-            getLogger().debug( "Added listener {}. Notifying about existing capabilities...", listener );
+            getLogger().debug( "Added listener {}. Notifying it about existing capabilities...", listener );
             for ( final CapabilityReference reference : references.values() )
             {
                 try
@@ -225,6 +225,7 @@ class DefaultCapabilityRegistry
     {
         try
         {
+            getLogger().debug( "Notifying {} capability registry listeners...", listeners.size() );
             lock.readLock().lock();
 
             for ( final Listener listener : listeners )
