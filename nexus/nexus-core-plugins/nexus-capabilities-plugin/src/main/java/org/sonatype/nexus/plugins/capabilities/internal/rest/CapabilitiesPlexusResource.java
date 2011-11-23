@@ -18,8 +18,11 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
-import java.io.IOException;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPlexusResource.asCapabilityListItemResource;
+import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPlexusResource.asCapabilityStatusResponseResource;
 
+import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
@@ -36,20 +39,20 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.xstream.AliasingListConverter;
-
 import com.thoughtworks.xstream.XStream;
 
 @Singleton
@@ -67,17 +70,21 @@ public class CapabilitiesPlexusResource
 
     private CapabilityDescriptorRegistry capabilityDescriptorRegistry;
 
+    private CapabilityRegistry capabilityRegistry;
+
     // TODO get rid of this constructor as it is here because enunciate plugin fails without a default constructor
     public CapabilitiesPlexusResource()
     {
     }
-    
+
     @Inject
     public CapabilitiesPlexusResource( final CapabilityConfiguration capabilitiesConfiguration,
-                                   final CapabilityDescriptorRegistry capabilityDescriptorRegistry )
+                                       final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+                                       final CapabilityRegistry capabilityRegistry )
     {
-        this.capabilitiesConfiguration = capabilitiesConfiguration;
-        this.capabilityDescriptorRegistry = capabilityDescriptorRegistry;
+        this.capabilitiesConfiguration = checkNotNull( capabilitiesConfiguration );
+        this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
+        this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.setModifiable( true );
     }
 
@@ -132,8 +139,14 @@ public class CapabilitiesPlexusResource
         {
             for ( final CCapability capability : capabilitiesConfiguration.getAll() )
             {
-                result.addData( CapabilityPlexusResource.asCapabilityListItemResource( capability, createChildReference(
-                    request, this, capability.getId() ).toString(), capabilityDescriptorRegistry ) );
+                result.addData(
+                    asCapabilityListItemResource(
+                        capability,
+                        createChildReference( request, this, capability.getId() ).toString(),
+                        capabilityDescriptorRegistry,
+                        capabilityRegistry
+                    )
+                );
             }
         }
         catch ( final InvalidConfigurationException e )
@@ -144,7 +157,7 @@ public class CapabilitiesPlexusResource
         catch ( final IOException e )
         {
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
-                "Could not manage capabilities configuration persistence store" );
+                                         "Could not manage capabilities configuration persistence store" );
         }
 
         return result;
@@ -166,9 +179,12 @@ public class CapabilitiesPlexusResource
             capabilitiesConfiguration.add( capability );
             capabilitiesConfiguration.save();
 
-            final CapabilityStatusResponseResource result =
-                CapabilityPlexusResource.asCapabilityStatusResponseResource( capability, createChildReference( request, this,
-                capability.getId() ).toString(), capabilityDescriptorRegistry );
+            final CapabilityStatusResponseResource result = asCapabilityStatusResponseResource(
+                capability,
+                createChildReference( request, this, capability.getId() ).toString(),
+                capabilityDescriptorRegistry,
+                capabilityRegistry
+            );
             return result;
         }
         catch ( final InvalidConfigurationException e )
@@ -179,7 +195,7 @@ public class CapabilitiesPlexusResource
         catch ( final IOException e )
         {
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
-                "Could not manage capabilities configuration persistence store" );
+                                         "Could not manage capabilities configuration persistence store" );
         }
     }
 

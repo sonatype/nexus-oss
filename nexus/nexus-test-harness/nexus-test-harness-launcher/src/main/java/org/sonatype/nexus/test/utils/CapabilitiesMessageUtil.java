@@ -49,7 +49,7 @@ public class CapabilitiesMessageUtil
 
     static {
         xstream = XStreamFactory.getXmlXStream();
-        new CapabilitiesPlexusResource(null, null).configureXStream(xstream);
+        new CapabilitiesPlexusResource().configureXStream(xstream);
     }
 
     public static List<CapabilityListItemResource> list()

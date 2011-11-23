@@ -258,6 +258,14 @@
           <defaultValue>true</defaultValue>
           <description>The flag determining if the capability is enabled</description>
         </field>
+        <field>
+          <name>active</name>
+          <type>boolean</type>
+          <version>1.0.0+</version>
+          <required>true</required>
+          <defaultValue>true</defaultValue>
+          <description>The flag determining if the capability is active</description>
+        </field>
 				<field>
 					<name>typeId</name>
 					<version>1.0.0+</version>
