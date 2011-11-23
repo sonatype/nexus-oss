@@ -67,7 +67,7 @@ class DefaultActivationContext
         if ( conditions == null || conditions.length == 0 )
         {
             allConditionsListeners.add( listener );
-            getLogger().debug( "Added listener {} for all conditions", listener );
+            getLogger().debug( "Added listener '{}' for all conditions", listener );
         }
         else
         {
@@ -81,7 +81,7 @@ class DefaultActivationContext
                 }
                 listeners.add( listener );
             }
-            getLogger().debug( "Added listener {} for conditions {}", listener, conditions );
+            getLogger().debug( "Added listener '{}' for conditions {}", listener, conditions );
         }
 
         return this;
@@ -93,11 +93,11 @@ class DefaultActivationContext
         if ( conditions == null || conditions.length == 0 )
         {
             allConditionsListeners.remove( listener );
-            getLogger().debug( "Removed listener {} for all conditions", listener );
+            getLogger().debug( "Removed listener '{}' for all conditions", listener );
         }
         else
         {
-            getLogger().debug( "Removed listener {} for conditions {}", listener, conditions );
+            getLogger().debug( "Removed listener '{}' for conditions {}", listener, conditions );
             for ( final Condition condition : conditions )
             {
                 final Set<Listener> listeners = conditionListeners.get( condition );
@@ -114,7 +114,7 @@ class DefaultActivationContext
     @Override
     public ActivationContext notifySatisfied( final Condition condition )
     {
-        getLogger().debug( "Condition {} has been satisfied", condition );
+        getLogger().debug( "Condition '{}' has been satisfied", condition );
         notifySatisfied( checkNotNull( condition ), allConditionsListeners, "all conditions" );
         notifySatisfied( condition, conditionListeners.get( condition ), "condition bounded" );
 
@@ -124,7 +124,7 @@ class DefaultActivationContext
     @Override
     public ActivationContext notifyUnsatisfied( final Condition condition )
     {
-        getLogger().debug( "Condition {} has been unsatisfied", condition );
+        getLogger().debug( "Condition '{}' has been unsatisfied", condition );
         notifyUnsatisfied( checkNotNull( condition ), allConditionsListeners, "all conditions" );
         notifyUnsatisfied( condition, conditionListeners.get( condition ), "condition bounded" );
 
@@ -142,10 +142,10 @@ class DefaultActivationContext
     {
         if ( listeners != null && listeners.size() > 0 )
         {
-            getLogger().debug( "Notifying {} activation context listeners...", listeners.size() );
+            getLogger().debug( "Notifying {} activation context {} listeners...", listeners.size(), type );
             for ( final Listener listener : listeners )
             {
-                getLogger().debug( "Notifying listener {} about condition {} being satisfied", listener, condition );
+                getLogger().debug( "Notifying '{}' about condition '{}' being satisfied", listener, condition );
                 try
                 {
                     listener.onSatisfied( condition );
@@ -153,7 +153,7 @@ class DefaultActivationContext
                 catch ( Exception e )
                 {
                     getLogger().warn(
-                        "Catched exception while notifying listener {} about condition {} being satisfied",
+                        "Catched exception while notifying '{}' about condition '{}' being satisfied",
                         new Object[]{ listener, condition, e }
                     );
                 }
@@ -175,7 +175,7 @@ class DefaultActivationContext
             getLogger().debug( "Notifying {} activation context {} listeners...", listeners.size(), type );
             for ( final Listener listener : listeners )
             {
-                getLogger().debug( "Notifying listener {} about condition {} being unsatisfied", listener, condition );
+                getLogger().debug( "Notifying '{}' about condition '{}' being unsatisfied", listener, condition );
                 try
                 {
                     listener.onUnsatisfied( condition );
@@ -183,7 +183,7 @@ class DefaultActivationContext
                 catch ( Exception e )
                 {
                     getLogger().warn(
-                        "Catched exception while notifying listener {} about condition {} being unsatisfied",
+                        "Catched exception while notifying '{}' about condition '{}' being unsatisfied",
                         new Object[]{ listener, condition, e }
                     );
                 }

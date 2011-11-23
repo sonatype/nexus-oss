@@ -92,7 +92,7 @@ class DefaultCapabilityRegistry
 
             references.put( capabilityId, reference );
 
-            getLogger().debug( "Created capability {}", reference );
+            getLogger().debug( "Created capability '{}'", reference );
 
             notify( reference, new Notifier( "added" )
             {
@@ -121,7 +121,7 @@ class DefaultCapabilityRegistry
             final CapabilityReference reference = references.remove( capabilityId );
             if ( reference != null )
             {
-                getLogger().debug( "Removed capability {}", reference );
+                getLogger().debug( "Removed capability '{}'", reference );
                 notify( reference, new Notifier( "removed" )
                 {
                     @Override
@@ -177,7 +177,7 @@ class DefaultCapabilityRegistry
             lock.writeLock().lock();
 
             listeners.add( checkNotNull( listener ) );
-            getLogger().debug( "Added listener {}. Notifying it about existing capabilities...", listener );
+            getLogger().debug( "Added listener '{}'. Notifying it about existing capabilities...", listener );
             for ( final CapabilityReference reference : references.values() )
             {
                 try
@@ -187,7 +187,7 @@ class DefaultCapabilityRegistry
                 catch ( Exception e )
                 {
                     getLogger().warn(
-                        "Catched exception while notifying listener {} about existing capability {}",
+                        "Catched exception while notifying '{}' about existing capability '{}'",
                         new Object[]{ listener, reference, e }
                     );
                 }
@@ -209,7 +209,7 @@ class DefaultCapabilityRegistry
             lock.writeLock().lock();
 
             listeners.remove( checkNotNull( listener ) );
-            getLogger().debug( "Removed listener {}", listener );
+            getLogger().debug( "Removed listener '{}'", listener );
         }
         finally
         {
@@ -229,7 +229,7 @@ class DefaultCapabilityRegistry
             for ( final Listener listener : listeners )
             {
                 getLogger().debug(
-                    "Notifying listener {} about {} capability {}",
+                    "Notifying '{}' about {} capability '{}'",
                     new Object[]{ listener, notifier.description, reference }
                 );
                 try
@@ -239,7 +239,7 @@ class DefaultCapabilityRegistry
                 catch ( Exception e )
                 {
                     getLogger().warn(
-                        "Catched exception while notifying listener {} about {} capability {}",
+                        "Catched exception while notifying '{}' about {} capability '{}'",
                         new Object[]{ listener, notifier.description, reference, e }
                     );
                 }

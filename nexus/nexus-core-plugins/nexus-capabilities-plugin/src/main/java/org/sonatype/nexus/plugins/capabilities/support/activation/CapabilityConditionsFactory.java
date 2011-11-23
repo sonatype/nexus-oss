@@ -85,7 +85,7 @@ public class CapabilityConditionsFactory
         @Override
         public void onRemove( final CapabilityReference reference )
         {
-            if ( isSatisfied(  ) && type.isAssignableFrom( reference.capability().getClass() ) )
+            if ( isSatisfied() && type.isAssignableFrom( reference.capability().getClass() ) )
             {
                 checkAllCapabilities();
             }
@@ -130,7 +130,7 @@ public class CapabilityConditionsFactory
         @Override
         public String toString()
         {
-            return getClass().getSimpleName() + "{type=" + type + '}';
+            return type.getSimpleName() + " exists";
         }
 
     }
@@ -168,6 +168,11 @@ public class CapabilityConditionsFactory
             }
         }
 
+        @Override
+        public String toString()
+        {
+            return "Active " + type.getSimpleName();
+        }
     }
 
 }

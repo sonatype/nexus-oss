@@ -201,7 +201,10 @@ class DefaultCapabilityReference
         @Override
         public String toString()
         {
-            return getClass().getSimpleName() + "{condition=" + activateCondition + '}';
+            return String.format(
+                "Capability '%s (id=%s)' watching for '%s' condition",
+                capability(), capability().id(), activateCondition
+            );
         }
 
     }
