@@ -115,8 +115,8 @@ class DefaultActivationContext
     public ActivationContext notifySatisfied( final Condition condition )
     {
         getLogger().debug( "Condition {} has been satisfied", condition );
-        notifySatisfied( checkNotNull( condition ), allConditionsListeners );
-        notifySatisfied( condition, conditionListeners.get( condition ) );
+        notifySatisfied( checkNotNull( condition ), allConditionsListeners, "all conditions" );
+        notifySatisfied( condition, conditionListeners.get( condition ), "condition bounded" );
 
         return this;
     }
@@ -125,8 +125,8 @@ class DefaultActivationContext
     public ActivationContext notifyUnsatisfied( final Condition condition )
     {
         getLogger().debug( "Condition {} has been unsatisfied", condition );
-        notifyUnsatisfied( checkNotNull( condition ), allConditionsListeners );
-        notifyUnsatisfied( condition, conditionListeners.get( condition ) );
+        notifyUnsatisfied( checkNotNull( condition ), allConditionsListeners, "all conditions" );
+        notifyUnsatisfied( condition, conditionListeners.get( condition ), "condition bounded" );
 
         return this;
     }
@@ -136,10 +136,11 @@ class DefaultActivationContext
      *
      * @param condition condition that was satisfied
      * @param listeners to be notified
+     * @param type      listeners type
      */
-    private void notifySatisfied( final Condition condition, final Set<Listener> listeners )
+    private void notifySatisfied( final Condition condition, final Set<Listener> listeners, final String type )
     {
-        if ( listeners != null )
+        if ( listeners != null && listeners.size() > 0 )
         {
             getLogger().debug( "Notifying {} activation context listeners...", listeners.size() );
             for ( final Listener listener : listeners )
@@ -165,12 +166,13 @@ class DefaultActivationContext
      *
      * @param condition condition that was unsatisfied
      * @param listeners to be notified
+     * @param type      listeners type
      */
-    private void notifyUnsatisfied( final Condition condition, final Set<Listener> listeners )
+    private void notifyUnsatisfied( final Condition condition, final Set<Listener> listeners, final String type )
     {
-        if ( listeners != null )
+        if ( listeners != null && listeners.size() > 0 )
         {
-            getLogger().debug( "Notifying {} listeners...", listeners.size() );
+            getLogger().debug( "Notifying {} activation context {} listeners...", listeners.size(), type );
             for ( final Listener listener : listeners )
             {
                 getLogger().debug( "Notifying listener {} about condition {} being unsatisfied", listener, condition );
