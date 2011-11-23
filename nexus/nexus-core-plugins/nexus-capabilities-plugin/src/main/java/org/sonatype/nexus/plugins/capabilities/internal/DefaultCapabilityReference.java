@@ -103,7 +103,7 @@ class DefaultCapabilityReference
             if ( activateCondition != null )
             {
                 activationListener = new ActivationContextListener();
-                activationContext.addListener( activationListener );
+                activationContext.addListener( activationListener, activateCondition );
             }
         }
     }
@@ -115,7 +115,7 @@ class DefaultCapabilityReference
         {
             if ( activationListener != null )
             {
-                activationContext.removeListener( activationListener );
+                activationContext.removeListener( activationListener, activateCondition );
             }
             // check again as it could be that in the mean time we deactivate
             if ( isActive() )
