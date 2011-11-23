@@ -115,7 +115,7 @@ public class DefaultCapabilityConfiguration
             final String generatedId = idGenerator.generateId();
 
             capability.setId( generatedId );
-            capability.setPropertiesDescription( getPropertiesDescription( capability ) );
+            capability.setDescription( getDescription( capability ) );
             getConfiguration().addCapability( capability );
 
             save();
@@ -154,7 +154,7 @@ public class DefaultCapabilityConfiguration
             if ( stored != null )
             {
                 getConfiguration().removeCapability( stored );
-                capability.setPropertiesDescription( getPropertiesDescription( capability ) );
+                capability.setDescription( getDescription( capability ) );
                 getConfiguration().addCapability( capability );
                 save();
 
@@ -345,7 +345,7 @@ public class DefaultCapabilityConfiguration
         configuration = null;
     }
 
-    private String getPropertiesDescription( final CCapability capability )
+    private String getDescription( final CCapability capability )
     {
         final CapabilityDescriptor descriptor = descriptors.get( capability.getTypeId() );
         if ( descriptor != null )

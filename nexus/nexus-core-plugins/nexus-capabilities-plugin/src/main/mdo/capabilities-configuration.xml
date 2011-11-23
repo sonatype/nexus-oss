@@ -103,14 +103,14 @@
           <type>String</type>
           <version>1.0.0+</version>
           <required>true</required>
-          <description>The description of the capability (as given by user)</description>
+          <description>The description of the capability (generated)</description>
         </field>
         <field>
-          <name>propertiesDescription</name>
+          <name>notes</name>
           <type>String</type>
           <version>1.0.0+</version>
           <required>true</required>
-          <description>The description of the capability properties</description>
+          <description>Optional (user) notes about capability</description>
         </field>
         <field>
           <name>enabled</name>

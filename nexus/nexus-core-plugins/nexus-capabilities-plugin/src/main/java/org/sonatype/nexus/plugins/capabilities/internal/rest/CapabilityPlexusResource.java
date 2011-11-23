@@ -208,7 +208,7 @@ public class CapabilityPlexusResource
         final CCapability capability = new CCapability();
 
         capability.setId( resource.getId() );
-        capability.setDescription( resource.getDescription() );
+        capability.setNotes( resource.getNotes() );
         capability.setEnabled( resource.isEnabled() );
         capability.setTypeId( resource.getTypeId() );
 
@@ -234,7 +234,7 @@ public class CapabilityPlexusResource
         final CapabilityResource resource = new CapabilityResource();
 
         resource.setId( capability.getId() );
-        resource.setDescription( capability.getDescription() );
+        resource.setNotes( capability.getNotes() );
         resource.setEnabled( capability.isEnabled() );
         resource.setTypeId( capability.getTypeId() );
 
@@ -284,7 +284,7 @@ public class CapabilityPlexusResource
         final CapabilityListItemResource item = new CapabilityListItemResource();
         item.setId( capability.getId() );
         item.setDescription( capability.getDescription() );
-        item.setPropertiesDescription( capability.getPropertiesDescription() );
+        item.setNotes( capability.getNotes() );
         item.setEnabled( capability.isEnabled() );
         item.setTypeId( capability.getTypeId() );
 
