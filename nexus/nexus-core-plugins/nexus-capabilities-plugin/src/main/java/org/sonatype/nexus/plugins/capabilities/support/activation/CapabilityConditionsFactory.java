@@ -54,12 +54,17 @@ public class CapabilityConditionsFactory
         return new CapabilityOfTypeExistsCondition( type );
     }
 
-    public class CapabilityOfTypeExistsCondition
+    public Condition capabilityOfTypeActive( final Class<?> type )
+    {
+        return new CapabilityOfTypeActiveCondition( type );
+    }
+
+    private class CapabilityOfTypeExistsCondition
         extends AbstractCondition
         implements CapabilityRegistry.Listener
     {
 
-        private final Class<?> type;
+        final Class<?> type;
 
         CapabilityOfTypeExistsCondition( final Class<?> type )
         {
@@ -73,7 +78,7 @@ public class CapabilityConditionsFactory
         {
             for ( final CapabilityReference ref : capabilityRegistry.getAll() )
             {
-                if ( type.isAssignableFrom( ref.capability().getClass() ) )
+                if ( isSatisfied( ref ) )
                 {
                     setSatisfied( true );
                     break;
@@ -86,7 +91,7 @@ public class CapabilityConditionsFactory
         {
             for ( final CapabilityReference ref : capabilityRegistry.getAll() )
             {
-                if ( type.isAssignableFrom( ref.capability().getClass() ) )
+                if ( isSatisfied( ref ) )
                 {
                     return;
                 }
@@ -94,6 +99,33 @@ public class CapabilityConditionsFactory
             setSatisfied( false );
         }
 
+        boolean isSatisfied( final CapabilityReference ref )
+        {
+            return type.isAssignableFrom( ref.capability().getClass() );
+        }
+
+        @Override
+        public String toString()
+        {
+            return getClass().getSimpleName() + "{type=" + type + '}';
+        }
+
+    }
+
+    class CapabilityOfTypeActiveCondition
+        extends CapabilityOfTypeExistsCondition
+    {
+
+        CapabilityOfTypeActiveCondition( final Class<?> type )
+        {
+            super( type );
+        }
+
+        @Override
+        boolean isSatisfied( final CapabilityReference ref )
+        {
+            return super.isSatisfied( ref ) && ref.isActive();
+        }
     }
 
 }
