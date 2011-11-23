@@ -223,23 +223,32 @@ class DefaultCapabilityRegistry
 
     void notify( final CapabilityReference reference, final Notifier notifier )
     {
-        for ( final Listener listener : listeners )
+        try
         {
-            getLogger().debug(
-                "Notifying listener {} about {} capability {}",
-                new Object[]{ listener, notifier.description, reference }
-            );
-            try
+            lock.readLock().lock();
+
+            for ( final Listener listener : listeners )
             {
-                notifier.run( listener, reference );
-            }
-            catch ( Exception e )
-            {
-                getLogger().warn(
-                    "Catched exception while notifying listener {} about {} capability {}",
-                    new Object[]{ listener, notifier.description, reference, e }
+                getLogger().debug(
+                    "Notifying listener {} about {} capability {}",
+                    new Object[]{ listener, notifier.description, reference }
                 );
+                try
+                {
+                    notifier.run( listener, reference );
+                }
+                catch ( Exception e )
+                {
+                    getLogger().warn(
+                        "Catched exception while notifying listener {} about {} capability {}",
+                        new Object[]{ listener, notifier.description, reference, e }
+                    );
+                }
             }
+        }
+        finally
+        {
+            lock.readLock().unlock();
         }
     }
 
