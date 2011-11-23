@@ -99,7 +99,10 @@ class DefaultCapabilityReference
     {
         if ( isActive() )
         {
-            activationContext.removeListener( activationListener );
+            if ( activationListener != null )
+            {
+                activationContext.removeListener( activationListener );
+            }
             // check again as it could be that in the mean time we deactivate
             if ( isActive() )
             {
@@ -118,6 +121,12 @@ class DefaultCapabilityReference
                 }
             }
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName() + "{active=" + active + ", capability=" + capability + '}';
     }
 
     private class ActivationContextListener
@@ -142,5 +151,12 @@ class DefaultCapabilityReference
             }
         }
 
+        @Override
+        public String toString()
+        {
+            return getClass().getSimpleName() + "{condition=" + activateCondition + '}';
+        }
+
     }
+
 }
