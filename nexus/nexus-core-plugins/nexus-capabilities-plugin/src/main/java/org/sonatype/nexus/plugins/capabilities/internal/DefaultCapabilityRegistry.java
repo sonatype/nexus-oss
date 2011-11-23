@@ -211,6 +211,7 @@ class DefaultCapabilityRegistry
     {
         for ( final Listener listener : listeners )
         {
+            getLogger().debug( "Notifying listener {} about added capability {}", listener, reference );
             try
             {
                 listener.onAdd( reference );
@@ -218,7 +219,7 @@ class DefaultCapabilityRegistry
             catch ( Exception e )
             {
                 getLogger().warn(
-                    "Catched exception while notifying listener {} about capability {} being created",
+                    "Catched exception while notifying listener {} about added capability {}",
                     new Object[]{ listener, reference, e }
                 );
             }
@@ -229,6 +230,7 @@ class DefaultCapabilityRegistry
     {
         for ( final Listener listener : listeners )
         {
+            getLogger().debug( "Notifying listener {} about removed capability {}", listener, reference );
             try
             {
                 listener.onRemove( reference );
@@ -236,7 +238,7 @@ class DefaultCapabilityRegistry
             catch ( Exception e )
             {
                 getLogger().warn(
-                    "Catched exception while notifying listener {} about capability {} being removed",
+                    "Catched exception while notifying listener {} about removed capability {}",
                     new Object[]{ listener, reference, e }
                 );
             }
