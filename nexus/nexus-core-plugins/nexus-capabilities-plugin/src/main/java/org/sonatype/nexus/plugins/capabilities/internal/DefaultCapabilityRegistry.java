@@ -40,8 +40,6 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 
 /**
  * Default {@link CapabilityRegistry} implementation.
- * <p/>
- * TODO add locking
  */
 @Singleton
 @Named
