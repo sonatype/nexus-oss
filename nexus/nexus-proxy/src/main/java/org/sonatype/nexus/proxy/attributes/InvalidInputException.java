@@ -25,6 +25,7 @@ import java.io.IOException;
  * the content as corrupt, unreadable or in any other way unexpectedly formatted and unprocessable.
  * 
  * @author cstamas
+ * @since 1.10.0
  */
 public class InvalidInputException
     extends IOException

@@ -100,13 +100,6 @@ public class DefaultStorageLinkItem
         throws IllegalArgumentException
     {
         super.overlay( item );
-
-        StorageLinkItem otherLink = (StorageLinkItem) item;
-
-        if ( otherLink.getTarget() != null )
-        {
-            setTarget( otherLink.getTarget() );
-        }
     }
 
     // ==

@@ -27,6 +27,7 @@ import java.io.OutputStream;
  * Component handling the marshalling and unmarshalling of attributes.
  * 
  * @author cstamas
+ * @since 1.10.0
  */
 public interface Marshaller
 {

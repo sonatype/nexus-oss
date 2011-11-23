@@ -89,7 +89,7 @@ public class ZipFileInspector
                 }
             }
 
-            item.getAttributes().put( ZIP_FILES, files.toString() );
+            item.getRepositoryItemAttributes().put( ZIP_FILES, files.toString() );
             // result.setBoolean( LocalStorageFileItem.LOCAL_FILE_IS_CONTAINER_KEY, true );
         }
         finally

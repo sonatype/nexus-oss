@@ -107,7 +107,7 @@ public abstract class AbstractChecksumContentValidator
 
     protected String retrieveLocalHash( AbstractStorageItem item, String inspector )
     {
-        return item.getAttributes().get( inspector );
+        return item.getRepositoryItemAttributes().get( inspector );
     }
 
     protected abstract void cleanup( ProxyRepository proxy, RemoteHashResponse remoteHash, boolean contentValid )
@@ -135,7 +135,7 @@ public abstract class AbstractChecksumContentValidator
 
         nae.addEventContext(item.getItemContext() );
         
-        nae.addItemAttributes( item.getAttributes() );
+        nae.addItemAttributes( item.getRepositoryItemAttributes().asMap() );
 
         return nae;
     }

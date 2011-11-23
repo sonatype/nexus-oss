@@ -253,9 +253,9 @@ public abstract class AttributeStoragePerformanceTestSupport
         StorageFileItem storageFileItem =
             new DefaultStorageFileItem( repository, new ResourceStoreRequest( path ), true, true, getContentLocator() );
 
-        storageFileItem.getAttributes().put( SHA1_ATTRIBUTE_KEY, SHA1_ATTRIBUTE_VALUE );
-        storageFileItem.getAttributes().put( "digest.md5", "f62472816fb17de974a87513e2257d63" );
-        storageFileItem.getAttributes().put( "request.address", "127.0.0.1" );
+        storageFileItem.getRepositoryItemAttributes().put( SHA1_ATTRIBUTE_KEY, SHA1_ATTRIBUTE_VALUE );
+        storageFileItem.getRepositoryItemAttributes().put( "digest.md5", "f62472816fb17de974a87513e2257d63" );
+        storageFileItem.getRepositoryItemAttributes().put( "request.address", "127.0.0.1" );
 
         attributeStorage.putAttributes( storageFileItem.getRepositoryItemUid(),
             storageFileItem.getRepositoryItemAttributes() );

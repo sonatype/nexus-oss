@@ -79,13 +79,13 @@ public class AuditingInspector
      */
     private void addIfExistsButDontContains( StorageFileItem item, String contextKey )
     {
-        if ( item.getItemContext().containsKey( contextKey ) && !item.getAttributes().containsKey( contextKey ) )
+        if ( item.getItemContext().containsKey( contextKey ) && !item.getRepositoryItemAttributes().containsKey( contextKey ) )
         {
             Object val = item.getItemContext().get( contextKey );
 
             if ( val != null )
             {
-                item.getAttributes().put( contextKey, val.toString() );
+                item.getRepositoryItemAttributes().put( contextKey, val.toString() );
             }
         }
     }

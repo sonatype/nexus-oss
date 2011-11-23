@@ -666,7 +666,7 @@ public abstract class AbstractRepository
 
         if ( userAttributes != null )
         {
-            fItem.getAttributes().putAll( userAttributes );
+            fItem.getRepositoryItemAttributes().putAll( userAttributes );
         }
 
         storeItem( false, fItem );
@@ -684,7 +684,7 @@ public abstract class AbstractRepository
 
         if ( userAttributes != null )
         {
-            coll.getAttributes().putAll( userAttributes );
+            coll.getRepositoryItemAttributes().putAll( userAttributes );
         }
 
         storeItem( false, coll );

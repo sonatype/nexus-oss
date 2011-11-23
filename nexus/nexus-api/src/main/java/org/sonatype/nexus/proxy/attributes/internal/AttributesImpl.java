@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.proxy.attributes.internal;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,22 +27,69 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 
 import com.google.common.base.Preconditions;
 
+/**
+ * Default implementation of Attributes.
+ * 
+ * @author cstamas
+ * @since 1.10.0
+ */
 public class AttributesImpl
-    extends HashMap<String, String>
     implements Attributes
 {
-    private static final long serialVersionUID = 879646089367097825L;
+    private final HashMap<String, String> defaults;
+
+    private final HashMap<String, String> values;
 
     public AttributesImpl()
     {
         super();
+        this.defaults = new HashMap<String, String>();
+        this.values = new HashMap<String, String>();
     }
 
     public AttributesImpl( final Map<String, String> m )
     {
-        super( m );
+        this();
+        overlayMap( m );
     }
 
+    // ==
+
+    @Override
+    public boolean containsKey( String key )
+    {
+        return values.containsKey( key ) || defaults.containsKey( key );
+    }
+
+    @Override
+    public String get( String key )
+    {
+        if ( values.containsKey( key ) )
+        {
+            return values.get( key );
+        }
+        return defaults.get( key );
+    }
+
+    @Override
+    public String put( String key, String value )
+    {
+        return values.put( Preconditions.checkNotNull( key ), Preconditions.checkNotNull( value ) );
+    }
+
+    @Override
+    public String remove( String key )
+    {
+        return values.remove( key );
+    }
+
+    @Override
+    public void putAll( Map<? extends String, ? extends String> map )
+    {
+        values.putAll( map );
+    }
+
+    // ==
     protected int getInteger( final String key, final int defaultValue )
     {
         if ( containsKey( key ) )
@@ -118,17 +166,15 @@ public class AttributesImpl
 
     // ==
 
+    protected void overlayMap( Map<String, String> map )
+    {
+        defaults.putAll( map );
+    }
+
     @Override
     public void overlayAttributes( final Attributes repositoryItemAttributes )
     {
-        putAll( repositoryItemAttributes );
-//        for ( Map.Entry<String, String> entry : repositoryItemAttributes.entrySet() )
-//        {
-//            if ( !containsKey( entry.getKey() ) )
-//            {
-//                put( entry.getKey(), entry.getValue() );
-//            }
-//        }
+        overlayMap( repositoryItemAttributes.asMap() );
     }
 
     @Override
@@ -291,5 +337,14 @@ public class AttributesImpl
     public void setLength( final long value )
     {
         setLong( getKeyForAttribute( "length" ), value );
+    }
+
+    @Override
+    public Map<String, String> asMap()
+    {
+        final HashMap<String, String> result = new HashMap<String, String>();
+        result.putAll( defaults );
+        result.putAll( values );
+        return Collections.unmodifiableMap( result );
     }
 }

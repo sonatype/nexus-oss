@@ -176,7 +176,7 @@ public interface StorageItem
      * Gets the user attributes. These are saved and persisted.
      * 
      * @return the attributes
-     * @
+     * @deprecated Use {@link #getRepositoryItemAttributes()} instead!
      */
     Map<String, String> getAttributes();
 

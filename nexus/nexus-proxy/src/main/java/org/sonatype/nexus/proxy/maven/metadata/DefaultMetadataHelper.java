@@ -127,14 +127,14 @@ public class DefaultMetadataHelper
     public String buildMd5( String path )
         throws IOException
     {
-        return getStorageItem( path, true ).getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
+        return getStorageItem( path, true ).getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
     }
 
     @Override
     public String buildSh1( String path )
         throws IOException
     {
-        return getStorageItem( path, true ).getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+        return getStorageItem( path, true ).getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
     }
 
     private AbstractStorageItem getStorageItem( final String path, final boolean localOnly )

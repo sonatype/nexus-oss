@@ -261,7 +261,7 @@ public class DefaultRepositoryRouter
                         try
                         {
                             toRoute.getTargetedRepository().storeItem( to, ( (StorageFileItem) item ).getInputStream(),
-                                item.getAttributes() );
+                                item.getRepositoryItemAttributes().asMap() );
                         }
                         catch ( IOException e )
                         {
@@ -271,7 +271,7 @@ public class DefaultRepositoryRouter
                     }
                     else if ( item instanceof StorageCollectionItem )
                     {
-                        toRoute.getTargetedRepository().createCollection( to, item.getAttributes() );
+                        toRoute.getTargetedRepository().createCollection( to, item.getRepositoryItemAttributes().asMap() );
                     }
                     else
                     {

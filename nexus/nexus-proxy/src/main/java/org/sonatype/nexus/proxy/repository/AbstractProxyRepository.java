@@ -1602,7 +1602,7 @@ public abstract class AbstractProxyRepository
 
         nae.addEventContext( iice.getRemoteItem().getItemContext() );
 
-        nae.addItemAttributes( iice.getRemoteItem().getAttributes() );
+        nae.addItemAttributes( iice.getRemoteItem().getRepositoryItemAttributes().asMap() );
 
         getFeedRecorder().addNexusArtifactEvent( nae );
     }

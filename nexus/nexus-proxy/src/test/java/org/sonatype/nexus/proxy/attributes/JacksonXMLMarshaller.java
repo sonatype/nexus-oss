@@ -52,7 +52,7 @@ public class JacksonXMLMarshaller
     public void marshal( final Attributes item, final OutputStream outputStream )
         throws IOException
     {
-        objectMapper.writeValue( outputStream, item );
+        objectMapper.writeValue( outputStream, item.asMap() );
         outputStream.flush();
     }
 

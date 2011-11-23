@@ -651,7 +651,7 @@ public class DefaultIndexerManager
                             if ( ai.sha1 == null )
                             {
                                 // if repo has no sha1 checksum, odd nexus one
-                                ai.sha1 = item.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+                                ai.sha1 = item.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
                             }
                         }
                     }

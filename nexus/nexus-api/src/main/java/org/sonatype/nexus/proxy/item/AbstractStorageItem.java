@@ -26,6 +26,7 @@ import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.attributes.internal.AttributesImpl;
+import org.sonatype.nexus.proxy.attributes.internal.AttributesMapAdapter;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.util.ItemPathUtils;
@@ -149,7 +150,6 @@ public abstract class AbstractStorageItem
         setPath( request.getRequestPath() );
         setReadable( readable );
         setWritable( writable );
-        setExpired( false );
         setCreated( System.currentTimeMillis() );
         setModified( getCreated() );
     }
@@ -356,9 +356,10 @@ public abstract class AbstractStorageItem
         return ItemPathUtils.getParentPath( getPath() );
     }
 
+    @Deprecated
     public Map<String, String> getAttributes()
     {
-        return itemAttributes;
+        return new AttributesMapAdapter( itemAttributes );
     }
 
     public RequestContext getItemContext()
@@ -450,36 +451,38 @@ public abstract class AbstractStorageItem
                 + this.getClass().getName() );
         }
 
-        if ( isOverlayable( item ) )
-        {
-            // TODO: WHY?
-            // these do not overlays:
-            // path
-            // readable
-            // writable
-            // repositoryItemUid
-            // store
+        // this is noop, is not used in core at all
 
-            // these do overlays:
-            setRepositoryId( item.getRepositoryId() );
-            setCreated( item.getCreated() );
-            setModified( item.getModified() );
-            setStoredLocally( item.getStoredLocally() );
-            setRemoteChecked( item.getRemoteChecked() );
-            setLastRequested( item.getLastRequested() );
-            setExpired( item.isExpired() );
-            setRemoteUrl( item.getRemoteUrl() );
-            getAttributes().putAll( item.getAttributes() );
-            if ( item.getItemContext() != null )
-            {
-                getItemContext().putAll( item.getItemContext() );
-            }
-        }
-        else
-        {
-            throw new IllegalArgumentException( "Cannot overlay storage item of class " + item.getClass().getName()
-                + " onto this item of class " + this.getClass().getName() );
-        }
+        // if ( isOverlayable( item ) )
+        // {
+        // // TODO: WHY?
+        // // these do not overlays:
+        // // path
+        // // readable
+        // // writable
+        // // repositoryItemUid
+        // // store
+        //
+        // // these do overlays:
+        // setRepositoryId( item.getRepositoryId() );
+        // setCreated( item.getCreated() );
+        // setModified( item.getModified() );
+        // setStoredLocally( item.getStoredLocally() );
+        // setRemoteChecked( item.getRemoteChecked() );
+        // setLastRequested( item.getLastRequested() );
+        // setExpired( item.isExpired() );
+        // setRemoteUrl( item.getRemoteUrl() );
+        // getAttributes().putAll( item.getAttributes() );
+        // if ( item.getItemContext() != null )
+        // {
+        // getItemContext().putAll( item.getItemContext() );
+        // }
+        // }
+        // else
+        // {
+        // throw new IllegalArgumentException( "Cannot overlay storage item of class " + item.getClass().getName()
+        // + " onto this item of class " + this.getClass().getName() );
+        // }
     }
 
     protected boolean isOverlayable( StorageItem item )

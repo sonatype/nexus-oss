@@ -21,7 +21,6 @@ package org.sonatype.nexus.proxy.attributes;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -37,6 +36,7 @@ import com.thoughtworks.xstream.converters.collections.MapConverter;
  * The Nexus default marshaller: uses XStream to marshall complete StorageItem instances as XML.
  * 
  * @author cstamas
+ * @since 1.10.0
  */
 @Singleton
 @Named( "xstream-xml" )
@@ -55,8 +55,8 @@ public class XStreamMarshaller
     public void marshal( final Attributes item, final OutputStream outputStream )
         throws IOException
     {
-        final HashMap<String, String> copy = new HashMap<String, String>( item );
-        xstream.toXML( copy, outputStream );
+        final Map<String, String> attrs = item.asMap();
+        xstream.toXML( attrs, outputStream );
         outputStream.flush();
     }
 

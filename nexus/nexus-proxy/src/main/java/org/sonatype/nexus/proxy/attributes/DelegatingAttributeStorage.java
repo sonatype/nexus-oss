@@ -27,6 +27,7 @@ import com.google.common.base.Preconditions;
  * Simple wrapping AttributeStorage that delegates only when needed.
  * 
  * @author cstamas
+ * @since 1.10.0
  */
 public class DelegatingAttributeStorage
     extends AbstractAttributeStorage

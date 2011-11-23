@@ -100,7 +100,7 @@ public class JarFileInspector
                 }
             }
 
-            item.getAttributes().put( JAR_CLASSES, classes.toString() );
+            item.getRepositoryItemAttributes().put( JAR_CLASSES, classes.toString() );
             // result.setBoolean( LocalStorageFileItem.LOCAL_FILE_IS_CONTAINER_KEY, true );
 
             Manifest mf = jFile.getManifest();
@@ -114,7 +114,7 @@ public class JarFileInspector
                     mfEntries
                         .append( atrKey.toString() ).append( "=" ).append( mAttr.getValue( atrKey ) ).append( "\n" );
                 }
-                item.getAttributes().put( JAR_MF, mfEntries.toString() );
+                item.getRepositoryItemAttributes().put( JAR_MF, mfEntries.toString() );
             }
         }
         finally

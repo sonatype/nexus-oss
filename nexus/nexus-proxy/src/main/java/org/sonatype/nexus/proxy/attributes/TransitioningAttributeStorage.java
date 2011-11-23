@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
  * requested over the time from this instance.
  * 
  * @author cstamas
+ * @since 1.10.0
  */
 @Typed( AttributeStorage.class )
 @Named( "transitioning" )
