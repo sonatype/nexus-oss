@@ -20,17 +20,24 @@ package org.sonatype.nexus.proxy.attributes.perf;
 
 import static org.mockito.Mockito.mock;
 
+import org.junit.runner.RunWith;
 import org.sonatype.nexus.proxy.attributes.AttributeStorage;
 import org.sonatype.nexus.proxy.attributes.DefaultFSAttributeStorage;
 import org.sonatype.nexus.proxy.attributes.JacksonXMLMarshaller;
+import org.sonatype.nexus.proxy.attributes.perf.internal.OrderedRunner;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+
+import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
+import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
+import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 
 /**
  * Performance test for DefaultFSAttributeStorage
  */
-// @BenchmarkHistoryChart()
-// @BenchmarkMethodChart()
-// @AxisRange(min = 0)
+@BenchmarkHistoryChart
+@BenchmarkMethodChart
+@AxisRange( min = 0 )
+@RunWith( OrderedRunner.class )
 public class JacksonXMLFSAttributeStoragePerformanceTest
     extends AttributeStoragePerformanceTestSupport
 {

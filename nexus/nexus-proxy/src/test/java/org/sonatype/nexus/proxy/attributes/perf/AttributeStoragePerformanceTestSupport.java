@@ -36,7 +36,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.MethodRule;
-import org.junit.runner.RunWith;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -48,7 +47,6 @@ import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.attributes.DefaultAttributesHandler;
 import org.sonatype.nexus.proxy.attributes.StorageFileItemInspector;
 import org.sonatype.nexus.proxy.attributes.StorageItemInspector;
-import org.sonatype.nexus.proxy.attributes.perf.internal.OrderedRunner;
 import org.sonatype.nexus.proxy.attributes.perf.internal.TMockRepository;
 import org.sonatype.nexus.proxy.attributes.perf.internal.TestRepositoryItemUid;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -67,18 +65,11 @@ import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
-import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
-import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
-import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 import com.google.common.collect.Maps;
 
 /**
  * The performance tests for specific implementations of AttributesStorage.
  */
-@BenchmarkHistoryChart( )
-@BenchmarkMethodChart( )
-@AxisRange( min = 0 )
-@RunWith( OrderedRunner.class )
 public abstract class AttributeStoragePerformanceTestSupport
 {
 
