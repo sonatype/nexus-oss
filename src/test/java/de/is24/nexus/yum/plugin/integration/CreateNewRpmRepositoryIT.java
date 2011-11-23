@@ -2,13 +2,12 @@ package de.is24.nexus.yum.plugin.integration;
 
 import static java.lang.String.format;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.apache.http.util.EntityUtils.consume;
 import static org.junit.Assert.assertEquals;
-import java.io.IOException;
+
 import java.io.UnsupportedEncodingException;
+
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthenticationException;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.entity.StringEntity;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -48,15 +47,11 @@ public class CreateNewRpmRepositoryIT extends AbstractNexusTestBase {
     executeGet("/yum/repo/is24-rel-" + NEW_REPO_ID + "-" + ARTIFACT_VERSION_2 + "-repo-1-1.noarch.rpm");
   }
 
-  private void givenTestRepository() throws AuthenticationException, IOException, UnsupportedEncodingException,
-    ClientProtocolException {
-    HttpResponse response = executeGetWithResponse("/repositories/" + NEW_REPO_ID);
-    int statusCode = response.getStatusLine().getStatusCode();
-    response.getEntity().getContent().close();
-    if (statusCode != SC_OK) {
-      response = executePost("/repositories", createRepositoryXml(NEW_REPO_ID));
-      assertEquals(content(response), SC_CREATED, statusCode(response));
-    }
+	private void givenTestRepository() throws Exception {
+		HttpResponse response = executeDeleteWithResponse("/repositories/" + NEW_REPO_ID);
+		consume(response.getEntity());
+		response = executePost("/repositories", createRepositoryXml(NEW_REPO_ID));
+		assertEquals(content(response), SC_CREATED, statusCode(response));
   }
 
   private StringEntity createRepositoryXml(String repositoryId) throws UnsupportedEncodingException {

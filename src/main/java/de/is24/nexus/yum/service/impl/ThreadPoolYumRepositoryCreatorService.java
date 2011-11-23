@@ -1,5 +1,6 @@
 package de.is24.nexus.yum.service.impl;
 
+import static de.is24.nexus.yum.repository.YumMetadataGenerationTask.ID;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -68,10 +69,7 @@ public class ThreadPoolYumRepositoryCreatorService implements YumRepositoryCreat
       throw new IllegalStateException("don't accept new jobs when shutdown");
     }
 
-    final YumRepositoryGeneratorJobFutureTask result = new YumRepositoryGeneratorJobFutureTask(
-      yumMetadataGenerationTask.getJob());
-    workQueue.put(result);
-    return new ScheduledTaskAdapter(yumMetadataGenerationTask, result);
+    return nexusScheduler.submit(ID, yumMetadataGenerationTask);
   }
 
   @Override

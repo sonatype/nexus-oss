@@ -1,15 +1,27 @@
 package de.is24.nexus.yum.service.impl;
 
+import static org.easymock.EasyMock.createNiceMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
+
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.scheduling.ScheduledTask;
+
+import com.google.code.tempusfugit.temporal.Condition;
+
 import de.is24.nexus.yum.repository.AbstractSchedulerTest;
+import de.is24.nexus.yum.repository.YumGeneratorConfiguration;
 import de.is24.nexus.yum.repository.YumMetadataGenerationTask;
 import de.is24.nexus.yum.repository.YumRepository;
 import de.is24.nexus.yum.repository.YumRepositoryGeneratorJob;
@@ -18,16 +30,30 @@ import de.is24.nexus.yum.repository.YumRepositoryGeneratorJob;
 public class ThreadPoolYumRespositoryCreatorServiceTest extends AbstractSchedulerTest {
   public static final int PARALLEL_THREAD_COUNT = 5;
   public static final Logger LOG = LoggerFactory.getLogger(ThreadPoolYumRespositoryCreatorServiceTest.class);
-  private final ThreadPoolYumRepositoryCreatorService service = new ThreadPoolYumRepositoryCreatorService();
+
+  @Requirement
+  private YumRepositoryCreatorService service;
+
   private final Set<String> threadNames = new HashSet<String>();
-  private int currentOrder = 0;
+
+  private final int currentOrder = 0;
+
+  @After
+  public void waitForAllTasks() throws TimeoutException, InterruptedException {
+    waitFor(new Condition() {
+        @Override
+        public boolean isSatisfied() {
+          return nexusScheduler.getActiveTasks().isEmpty();
+        }
+      });
+  }
 
   @Test
   public void shouldExecuteSeveralThreadInParallel() throws Exception {
     List<ScheduledTask<YumRepository>> futures = new ArrayList<ScheduledTask<YumRepository>>();
 
     for (int repositoryId = 0; repositoryId < PARALLEL_THREAD_COUNT; repositoryId++) {
-      futures.add(service.submit(taskFromJob(createYumRepositoryTask(repositoryId))));
+      futures.add(service.submit(taskFromJob(createYumRepositoryJob(repositoryId))));
     }
 
     for (ScheduledTask<YumRepository> future : futures) {
@@ -35,60 +61,8 @@ public class ThreadPoolYumRespositoryCreatorServiceTest extends AbstractSchedule
     }
   }
 
-  @Test
-  public void shouldExecuteTasksForTheSameRepositoryInCreationOrder() throws Exception {
-    List<ScheduledTask<YumRepository>> futures = new ArrayList<ScheduledTask<YumRepository>>();
-
-    for (int order = 1; order < PARALLEL_THREAD_COUNT; order++) {
-      futures.add(service.submit(taskFromJob(createOrderedYumRepositoryJob(order))));
-      Thread.sleep(500);
-    }
-
-    for (ScheduledTask<YumRepository> future : futures) {
-      future.get();
-    }
-    Assert.assertEquals(PARALLEL_THREAD_COUNT - 1, currentOrder);
-  }
-
-  private YumRepositoryGeneratorJob createOrderedYumRepositoryJob(final int order) {
-    return new YumRepositoryGeneratorJob(null) {
-      @Override
-      public String getRepositoryId() {
-        return "CONSTANT_REPO";
-      }
-
-      @Override
-      public YumRepository call() throws Exception {
-        checkOrder(order);
-        Thread.sleep(500);
-        checkOrderEqual(order);
-        return null;
-      }
-    };
-  }
-
-  public synchronized void checkOrder(int order) {
-    if (order != (currentOrder + 1)) {
-      Assert.fail("Execution is not in correct order. Current order is " + currentOrder +
-        " and now tried to execute order " +
-        order);
-    }
-    currentOrder++;
-  }
-
-  public synchronized void checkOrderEqual(final int order) {
-    if (currentOrder != order) {
-      Assert.fail("CurrentOrder (" + currentOrder + ") not equal to " + order);
-    }
-  }
-
-  private YumRepositoryGeneratorJob createYumRepositoryTask(final int repositoryId) {
-    return new YumRepositoryGeneratorJob(null) {
-      @Override
-      public String getRepositoryId() {
-        return "REPO_" + repositoryId;
-      }
-
+  private YumRepositoryGeneratorJob createYumRepositoryJob(final int repositoryId) {
+    return new YumRepositoryGeneratorJob(mockConfig("REPO_" + repositoryId)) {
       @Override
       public YumRepository call() throws Exception {
         String threadName = Thread.currentThread().getName();
@@ -102,8 +76,15 @@ public class ThreadPoolYumRespositoryCreatorServiceTest extends AbstractSchedule
     };
   }
 
+  private YumGeneratorConfiguration mockConfig(String repositoryId) {
+    final YumGeneratorConfiguration config = createNiceMock(YumGeneratorConfiguration.class);
+    expect(config.getId()).andReturn(repositoryId).anyTimes();
+    replay(config);
+    return config;
+  }
+
   private YumMetadataGenerationTask taskFromJob(YumRepositoryGeneratorJob job) {
-    YumMetadataGenerationTask task = scheduler.createTaskInstance(YumMetadataGenerationTask.class);
+    YumMetadataGenerationTask task = nexusScheduler.createTaskInstance(YumMetadataGenerationTask.class);
     task.setJob(job);
     return task;
   }

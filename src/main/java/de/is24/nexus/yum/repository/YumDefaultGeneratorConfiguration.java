@@ -1,6 +1,7 @@
 package de.is24.nexus.yum.repository;
 
 import java.io.File;
+
 import org.apache.commons.lang.StringUtils;
 
 
@@ -35,31 +36,46 @@ public class YumDefaultGeneratorConfiguration implements YumGeneratorConfigurati
     this(rpmDir, rpmUrl, repoDir, rpmUrl, id, null, cacheDir, null, true);
   }
 
-  public File getBaseRpmDir() {
+	@Override
+	public boolean conflictsWith(YumGeneratorConfiguration config) {
+		if (StringUtils.equals(getId(), config.getId())) {
+			return StringUtils.equals(getVersion(), config.getVersion());
+		}
+		return false;
+	}
+
+  @Override
+	public File getBaseRpmDir() {
     return rpmDir;
   }
 
-  public String getBaseRpmUrl() {
+  @Override
+	public String getBaseRpmUrl() {
     return rpmUrl;
   }
 
-  public File getBaseRepoDir() {
+  @Override
+	public File getBaseRepoDir() {
     return repoDir;
   }
 
-  public String getBaseRepoUrl() {
+  @Override
+	public String getBaseRepoUrl() {
     return repoUrl;
   }
 
-  public String getId() {
+  @Override
+	public String getId() {
     return id;
   }
 
-  public String getVersion() {
+  @Override
+	public String getVersion() {
     return version;
   }
 
-  public File getBaseCacheDir() {
+  @Override
+	public File getBaseCacheDir() {
     return cacheDir;
   }
 
@@ -79,11 +95,13 @@ public class YumDefaultGeneratorConfiguration implements YumGeneratorConfigurati
     return file;
   }
 
-  public String getAddedFile() {
+  @Override
+	public String getAddedFile() {
     return addedFile;
   }
 
-  public boolean isSingleRpmPerDirectory() {
+  @Override
+	public boolean isSingleRpmPerDirectory() {
     return singleRpmPerDirectory;
   }
 

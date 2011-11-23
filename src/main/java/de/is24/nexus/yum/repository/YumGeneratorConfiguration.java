@@ -70,4 +70,11 @@ public interface YumGeneratorConfiguration {
    */
   boolean isSingleRpmPerDirectory();
 
+	/**
+	 * @param config
+	 *          another config to ckeck against
+	 * @return <code>true</code>, if both configs should not be executed at ones
+	 */
+	boolean conflictsWith(YumGeneratorConfiguration config);
+
 }

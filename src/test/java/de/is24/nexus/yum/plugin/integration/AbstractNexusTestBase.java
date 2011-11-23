@@ -5,10 +5,12 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -19,6 +21,7 @@ import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -77,6 +80,16 @@ public class AbstractNexusTestBase {
     setCredentials(request);
     return client.execute(request);
   }
+
+	protected HttpResponse executeDeleteWithResponse(String url) throws AuthenticationException, IOException {
+		if (!url.startsWith("http")) {
+			url = SERVICE_BASE_URL + url;
+		}
+
+		HttpDelete request = new HttpDelete(url);
+		setCredentials(request);
+		return client.execute(request);
+	}
 
   protected int statusCode(HttpResponse response) {
     return response.getStatusLine().getStatusCode();

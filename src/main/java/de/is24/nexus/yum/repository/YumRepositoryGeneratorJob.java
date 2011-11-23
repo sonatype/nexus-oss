@@ -30,10 +30,15 @@ public class YumRepositoryGeneratorJob implements Callable<YumRepository>, ListF
     this.config = config;
   }
 
+  public YumGeneratorConfiguration getConfig() {
+    return config;
+  }
+
   public String getRepositoryId() {
     return config.getId();
   }
 
+  @Override
   public YumRepository call() throws Exception {
     if (activated) {
       LOG.info("Generating Yum-Repository for '{}' ...", config.getBaseRpmDir());
@@ -99,6 +104,7 @@ public class YumRepositoryGeneratorJob implements Callable<YumRepository>, ListF
     activated = true;
   }
 
+  @Override
   public File getRpmListFile(String repositoryId) {
     return new File(createBasePackageDir(), config.getId() + ".txt");
   }
@@ -109,6 +115,7 @@ public class YumRepositoryGeneratorJob implements Callable<YumRepository>, ListF
     return basePackageDir;
   }
 
+  @Override
   public File getRpmListFile(String repositoryId, String version) {
     return new File(createBasePackageDir(), config.getId() + "-" + version + ".txt");
   }
