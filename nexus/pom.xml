@@ -187,7 +187,7 @@
     <slf4j.version>1.6.2</slf4j.version>
     <spice-timeline.version>2.1-SNAPSHOT</spice-timeline.version>
     <spice-utils.version>1.0.0</spice-utils.version>
-    <surefire.version>2.9</surefire.version>
+    <surefire.version>2.10</surefire.version>
     <!-- HACK: Workaround for issue with IDEA loading nexus-plugins -->
     <nexus-plugin.type>nexus-plugin</nexus-plugin.type>
   </properties>
