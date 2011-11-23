@@ -104,6 +104,20 @@ public interface CapabilityRegistry
          */
         void onRemove( CapabilityReference reference );
 
+        /**
+         * Callback after the passed in capability is activated.
+         *
+         * @param reference activated capability (reference)
+         */
+        void onActivate( CapabilityReference reference );
+
+        /**
+         * Callback before the passed in capability is passivated.
+         *
+         * @param reference passivated capability (reference)
+         */
+        void onPassivate( CapabilityReference reference );
+
     }
 
 }

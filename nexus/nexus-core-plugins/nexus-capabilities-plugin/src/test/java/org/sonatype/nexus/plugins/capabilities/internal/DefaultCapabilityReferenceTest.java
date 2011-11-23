@@ -20,15 +20,17 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.atLeastOnce;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 
 /**
@@ -39,18 +41,34 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 public class DefaultCapabilityReferenceTest
 {
 
+    private Capability capability;
+
+    private DefaultCapabilityReference underTest;
+
+    private DefaultCapabilityRegistry capabilityRegistry;
+
+    @Before
+    public void setUp()
+    {
+        capabilityRegistry = mock( DefaultCapabilityRegistry.class );
+        final ActivationContext activationContext = mock( ActivationContext.class );
+        capability = mock( Capability.class );
+        when( capability.id() ).thenReturn( "test" );
+        underTest = new DefaultCapabilityReference( capabilityRegistry, activationContext, capability );
+    }
+
     /**
      * Capability is activated and active flag is set on activate.
      */
     @Test
     public void activateWhenNotActive()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final Capability capability = mock( Capability.class );
-        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( activationContext, capability );
         underTest.activate();
         assertThat( underTest.isActive(), is( true ) );
         verify( capability ).activate();
+        verify( capabilityRegistry ).notify(
+            notNull( CapabilityReference.class ), notNull( DefaultCapabilityRegistry.Notifier.class )
+        );
     }
 
     /**
@@ -59,9 +77,6 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void activateWhenActive()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final Capability capability = mock( Capability.class );
-        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( activationContext, capability );
         underTest.activate();
         assertThat( underTest.isActive(), is( true ) );
         verify( capability ).activate();
@@ -77,10 +92,6 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void passivateWhenNotActive()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final Capability capability = mock( Capability.class );
-        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( activationContext, capability );
-
         assertThat( underTest.isActive(), is( false ) );
         doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).passivate();
         underTest.passivate();
@@ -93,16 +104,15 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void passivateWhenActive()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final Capability capability = mock( Capability.class );
-        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( activationContext, capability );
-
         underTest.activate();
         assertThat( underTest.isActive(), is( true ) );
 
         underTest.passivate();
         assertThat( underTest.isActive(), is( false ) );
         verify( capability ).passivate();
+        verify( capabilityRegistry, times( 2 ) ).notify(
+            notNull( CapabilityReference.class ), notNull( DefaultCapabilityRegistry.Notifier.class )
+        );
     }
 
     /**
@@ -111,11 +121,7 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void activateProblem()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final Capability capability = mock( Capability.class );
-        when( capability.id() ).thenReturn( "test" );
-        doThrow( new UnsupportedOperationException( "on purpose" ) ).when( capability ).activate();
-        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( activationContext, capability );
+        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).activate();
 
         underTest.activate();
         assertThat( underTest.isActive(), is( false ) );
@@ -130,11 +136,7 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void passivateProblem()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final Capability capability = mock( Capability.class );
-        when( capability.id() ).thenReturn( "test" );
-        doThrow( new UnsupportedOperationException( "on purpose" ) ).when( capability ).passivate();
-        final DefaultCapabilityReference underTest = new DefaultCapabilityReference( activationContext, capability );
+        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).passivate();
 
         underTest.activate();
         assertThat( underTest.isActive(), is( true ) );

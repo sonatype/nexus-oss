@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 
@@ -36,18 +37,23 @@ class DefaultCapabilityReference
     implements CapabilityReference
 {
 
-    private final Capability capability;
+    private final DefaultCapabilityRegistry registry;
 
-    private boolean active;
+    private final Capability capability;
 
     private final ActivationContext activationContext;
 
     private final Condition activateCondition;
 
+    private boolean active;
+
     private ActivationContextListener activationListener;
 
-    DefaultCapabilityReference( final ActivationContext activationContext, final Capability capability )
+    DefaultCapabilityReference( final DefaultCapabilityRegistry registry,
+                                final ActivationContext activationContext,
+                                final Capability capability )
     {
+        this.registry = checkNotNull( registry );
         this.activationContext = checkNotNull( activationContext );
         this.capability = checkNotNull( capability );
         this.activateCondition = capability.activationCondition();
@@ -77,6 +83,14 @@ class DefaultCapabilityReference
                 {
                     capability().activate();
                     active = true;
+                    registry.notify( this, new DefaultCapabilityRegistry.Notifier( "activated" )
+                    {
+                        @Override
+                        void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
+                        {
+                            listener.onActivate( reference );
+                        }
+                    } );
                 }
                 catch ( Exception e )
                 {
@@ -110,6 +124,14 @@ class DefaultCapabilityReference
                 try
                 {
                     active = false;
+                    registry.notify( this, new DefaultCapabilityRegistry.Notifier( "passivated" )
+                    {
+                        @Override
+                        void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
+                        {
+                            listener.onPassivate( reference );
+                        }
+                    } );
                     capability().passivate();
                 }
                 catch ( Exception e )

@@ -89,14 +89,21 @@ class DefaultCapabilityRegistry
             final Capability capability = factory.create( capabilityId );
 
             final DefaultCapabilityReference reference = new DefaultCapabilityReference(
-                activationContext, capability
+                this, activationContext, capability
             );
 
             references.put( capabilityId, reference );
 
             getLogger().debug( "Created capability {}. Notifying listeners...", reference );
 
-            notifyAdded( reference );
+            notify( reference, new Notifier( "added" )
+            {
+                @Override
+                void run( final Listener listener, final CapabilityReference reference )
+                {
+                    listener.onAdd( reference );
+                }
+            } );
 
             return reference;
         }
@@ -117,7 +124,14 @@ class DefaultCapabilityRegistry
             if ( reference != null )
             {
                 getLogger().debug( "Removed capability {}. Notifying listeners...", reference );
-                notifyRemoved( reference );
+                notify( reference, new Notifier( "removed" )
+                {
+                    @Override
+                    void run( final Listener listener, final CapabilityReference reference )
+                    {
+                        listener.onRemove( reference );
+                    }
+                } );
             }
             return reference;
         }
@@ -207,42 +221,39 @@ class DefaultCapabilityRegistry
         return this;
     }
 
-    private void notifyAdded( final CapabilityReference reference )
+    void notify( final CapabilityReference reference, final Notifier notifier )
     {
         for ( final Listener listener : listeners )
         {
-            getLogger().debug( "Notifying listener {} about added capability {}", listener, reference );
+            getLogger().debug(
+                "Notifying listener {} about {} capability {}",
+                new Object[]{ listener, notifier.description, reference }
+            );
             try
             {
-                listener.onAdd( reference );
+                notifier.run( listener, reference );
             }
             catch ( Exception e )
             {
                 getLogger().warn(
-                    "Catched exception while notifying listener {} about added capability {}",
-                    new Object[]{ listener, reference, e }
+                    "Catched exception while notifying listener {} about {} capability {}",
+                    new Object[]{ listener, notifier.description, reference, e }
                 );
             }
         }
     }
 
-    private void notifyRemoved( final CapabilityReference reference )
+    abstract static class Notifier
     {
-        for ( final Listener listener : listeners )
+
+        private String description;
+
+        Notifier( final String description )
         {
-            getLogger().debug( "Notifying listener {} about removed capability {}", listener, reference );
-            try
-            {
-                listener.onRemove( reference );
-            }
-            catch ( Exception e )
-            {
-                getLogger().warn(
-                    "Catched exception while notifying listener {} about removed capability {}",
-                    new Object[]{ listener, reference, e }
-                );
-            }
+            this.description = description;
         }
+
+        abstract void run( Listener listener, CapabilityReference reference );
     }
 
 }

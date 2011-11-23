@@ -76,32 +76,55 @@ public class CapabilityConditionsFactory
         @Override
         public void onAdd( final CapabilityReference reference )
         {
-            for ( final CapabilityReference ref : capabilityRegistry.getAll() )
+            if ( !isSatisfied() && type.isAssignableFrom( reference.capability().getClass() ) )
             {
-                if ( isSatisfied( ref ) )
-                {
-                    setSatisfied( true );
-                    break;
-                }
+                checkAllCapabilities();
             }
         }
 
         @Override
         public void onRemove( final CapabilityReference reference )
         {
+            if ( isSatisfied(  ) && type.isAssignableFrom( reference.capability().getClass() ) )
+            {
+                checkAllCapabilities();
+            }
+        }
+
+        @Override
+        public void onActivate( final CapabilityReference reference )
+        {
+            // ignore
+        }
+
+        @Override
+        public void onPassivate( final CapabilityReference reference )
+        {
+            // ignore
+        }
+
+        void checkAllCapabilities()
+        {
             for ( final CapabilityReference ref : capabilityRegistry.getAll() )
             {
                 if ( isSatisfied( ref ) )
                 {
+                    if ( !isSatisfied() )
+                    {
+                        setSatisfied( true );
+                    }
                     return;
                 }
             }
-            setSatisfied( false );
+            if ( isSatisfied() )
+            {
+                setSatisfied( false );
+            }
         }
 
-        boolean isSatisfied( final CapabilityReference ref )
+        boolean isSatisfied( final CapabilityReference reference )
         {
-            return type.isAssignableFrom( ref.capability().getClass() );
+            return type.isAssignableFrom( reference.capability().getClass() );
         }
 
         @Override
@@ -122,10 +145,29 @@ public class CapabilityConditionsFactory
         }
 
         @Override
-        boolean isSatisfied( final CapabilityReference ref )
+        boolean isSatisfied( final CapabilityReference reference )
         {
-            return super.isSatisfied( ref ) && ref.isActive();
+            return super.isSatisfied( reference ) && reference.isActive();
         }
+
+        @Override
+        public void onActivate( final CapabilityReference reference )
+        {
+            if ( !isSatisfied() && type.isAssignableFrom( reference.capability().getClass() ) )
+            {
+                checkAllCapabilities();
+            }
+        }
+
+        @Override
+        public void onPassivate( final CapabilityReference reference )
+        {
+            if ( isSatisfied() && type.isAssignableFrom( reference.capability().getClass() ) )
+            {
+                checkAllCapabilities();
+            }
+        }
+
     }
 
 }
