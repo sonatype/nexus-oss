@@ -37,6 +37,7 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.OnDemandCondition;
 
 /**
  * {@link CapabilityConditions} UTs.

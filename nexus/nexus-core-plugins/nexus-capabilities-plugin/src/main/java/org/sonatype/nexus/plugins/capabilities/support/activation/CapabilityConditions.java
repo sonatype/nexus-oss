@@ -25,10 +25,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeActiveCondition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeExistsCondition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.OnDemandCondition;
 
 /**
  * Factory of {@link Condition}s related to Capabilities.
@@ -81,189 +83,33 @@ public class CapabilityConditions
      */
     public OnDemand onDemand()
     {
-        return new OnDemand( activationContext );
+        return new OnDemandCondition( activationContext );
     }
 
-    /**
-     * A condition that is satisfied when a capability of a specified type exists.
-     *
-     * @since 1.10.0
-     */
-    private static class CapabilityOfTypeExistsCondition
-        extends AbstractCondition
-        implements CapabilityRegistry.Listener
+    public static interface OnDemand
+        extends Condition
     {
-
-        private final CapabilityRegistry capabilityRegistry;
-
-        final Class<?> type;
-
-        CapabilityOfTypeExistsCondition( final ActivationContext activationContext,
-                                         final CapabilityRegistry capabilityRegistry,
-                                         final Class<? extends Capability> type )
-        {
-            super( activationContext );
-            this.capabilityRegistry = checkNotNull( capabilityRegistry );
-            this.type = type;
-            capabilityRegistry.addListener( this );
-        }
-
-        @Override
-        public void onAdd( final CapabilityReference reference )
-        {
-            if ( !isSatisfied() && type.isAssignableFrom( reference.capability().getClass() ) )
-            {
-                checkAllCapabilities();
-            }
-        }
-
-        @Override
-        public void onRemove( final CapabilityReference reference )
-        {
-            if ( isSatisfied() && type.isAssignableFrom( reference.capability().getClass() ) )
-            {
-                checkAllCapabilities();
-            }
-        }
-
-        @Override
-        public void onActivate( final CapabilityReference reference )
-        {
-            // ignore
-        }
-
-        @Override
-        public void onPassivate( final CapabilityReference reference )
-        {
-            // ignore
-        }
-
-        void checkAllCapabilities()
-        {
-            for ( final CapabilityReference ref : capabilityRegistry.getAll() )
-            {
-                if ( isSatisfied( ref ) )
-                {
-                    if ( !isSatisfied() )
-                    {
-                        setSatisfied( true );
-                    }
-                    return;
-                }
-            }
-            if ( isSatisfied() )
-            {
-                setSatisfied( false );
-            }
-        }
-
-        boolean isSatisfied( final CapabilityReference reference )
-        {
-            return type.isAssignableFrom( reference.capability().getClass() );
-        }
-
-        @Override
-        public String toString()
-        {
-            return type.getSimpleName() + " exists";
-        }
-
-    }
-
-    /**
-     * A condition that is satisfied when a capability of a specified type exists and is in an active state.
-     *
-     * @since 1.10.0
-     */
-    private static class CapabilityOfTypeActiveCondition
-        extends CapabilityOfTypeExistsCondition
-    {
-
-        CapabilityOfTypeActiveCondition( final ActivationContext activationContext,
-                                         final CapabilityRegistry capabilityRegistry,
-                                         final Class<? extends Capability> type )
-        {
-            super( activationContext, capabilityRegistry, type );
-        }
-
-        @Override
-        boolean isSatisfied( final CapabilityReference reference )
-        {
-            return super.isSatisfied( reference ) && reference.isActive();
-        }
-
-        @Override
-        public void onActivate( final CapabilityReference reference )
-        {
-            if ( !isSatisfied() && type.isAssignableFrom( reference.capability().getClass() ) )
-            {
-                checkAllCapabilities();
-            }
-        }
-
-        @Override
-        public void onPassivate( final CapabilityReference reference )
-        {
-            if ( isSatisfied() && type.isAssignableFrom( reference.capability().getClass() ) )
-            {
-                checkAllCapabilities();
-            }
-        }
-
-        @Override
-        public String toString()
-        {
-            return "Active " + type.getSimpleName();
-        }
-    }
-
-    /**
-     * A condition that allows a targeted capability to activated / passivated.
-     *
-     * @since 1.10.0
-     */
-    public static class OnDemand
-        extends AbstractCondition
-    {
-
-        OnDemand( final ActivationContext activationContext )
-        {
-            super( activationContext, true );
-        }
 
         /**
          * Reactivates the condition, fact that can trigger passivate / activate on capability using it.
          *
          * @return itself, for fluent api usage
          */
-        public OnDemand reactivate()
-        {
-            unsatisfy();
-            satisfy();
-            return this;
-        }
+        OnDemand reactivate();
 
         /**
          * Marks condition as satisfied, fact that can trigger activation of capability using it.
          *
          * @return itself, for fluent api usage
          */
-        public OnDemand satisfy()
-        {
-            setSatisfied( true );
-            return this;
-        }
+        OnDemand satisfy();
 
         /**
          * Marks condition as unsatisfied, fact that can trigger passivation of capability using it.
          *
          * @return itself, for fluent api usage
          */
-        public OnDemand unsatisfy()
-        {
-            setSatisfied( false );
-            return this;
-        }
+        OnDemand unsatisfy();
 
     }
 
