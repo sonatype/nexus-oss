@@ -189,7 +189,23 @@ class DefaultCapabilityReference
     {
         if ( !sameProperties( previousProperties, properties ) )
         {
+            registry.notify( this, new DefaultCapabilityRegistry.Notifier( "updated" )
+            {
+                @Override
+                void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
+                {
+                    listener.beforeUpdate( reference );
+                }
+            } );
             capability().update( properties );
+            registry.notify( this, new DefaultCapabilityRegistry.Notifier( "updated" )
+            {
+                @Override
+                void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
+                {
+                    listener.afterUpdate( reference );
+                }
+            } );
         }
     }
 

@@ -208,6 +208,9 @@ public class DefaultCapabilityReferenceTest
         final HashMap<String, String> previousProperties = new HashMap<String, String>();
         underTest.update( properties, previousProperties );
         verify( capability ).update( properties );
+        verify( capabilityRegistry, times( 2 ) ).notify(
+            notNull( CapabilityReference.class ), notNull( DefaultCapabilityRegistry.Notifier.class )
+        );
     }
 
     /**
