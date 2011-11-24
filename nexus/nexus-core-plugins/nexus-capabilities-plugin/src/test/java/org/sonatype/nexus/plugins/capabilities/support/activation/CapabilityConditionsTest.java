@@ -30,6 +30,7 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeActiveCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeExistsCondition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.PassivateCapabilityDuringUpdateCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.OnDemandCondition;
 
 /**
@@ -69,6 +70,23 @@ public class CapabilityConditionsTest
         assertThat(
             underTest.capabilityOfTypeActive( Capability.class ),
             is( Matchers.<Condition>instanceOf( CapabilityOfTypeActiveCondition.class ) )
+        );
+    }
+
+    /**
+     * reactivateCapabilityOnUpdate() factory method returns expected condition.
+     */
+    @Test
+    public void reactivateCapabilityOnUpdate()
+    {
+        final Capability capability = mock( Capability.class );
+        final ActivationContext activationContext = mock( ActivationContext.class );
+        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        final CapabilityConditions underTest = new CapabilityConditions( activationContext, capabilityRegistry );
+
+        assertThat(
+            underTest.pasivateCapabilityDuringUpdate( capability ),
+            is( Matchers.<Condition>instanceOf( PassivateCapabilityDuringUpdateCondition.class ) )
         );
     }
 

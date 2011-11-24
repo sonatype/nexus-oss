@@ -30,6 +30,7 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeActiveCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeExistsCondition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.PassivateCapabilityDuringUpdateCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.OnDemandCondition;
 
 /**
@@ -74,6 +75,18 @@ public class CapabilityConditions
     public Condition capabilityOfTypeActive( final Class<? extends Capability> type )
     {
         return new CapabilityOfTypeActiveCondition( activationContext, capabilityRegistry, type );
+    }
+
+    /**
+     * Creates a new condition that is becoming unsatisfied before an capability is updated and becomes satisfied after
+     * capability was updated.
+     *
+     * @param capability capability that should be passivated during update updated
+     * @return created condition
+     */
+    public Condition pasivateCapabilityDuringUpdate( final Capability capability )
+    {
+        return new PassivateCapabilityDuringUpdateCondition( activationContext, capabilityRegistry, capability );
     }
 
     /**
