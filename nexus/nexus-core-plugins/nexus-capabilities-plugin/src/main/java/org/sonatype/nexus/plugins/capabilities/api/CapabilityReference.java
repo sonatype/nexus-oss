@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.plugins.capabilities.api;
 
+import java.util.Map;
+
 /**
  * Reference to a capability and its state.
  * <p/>
@@ -74,5 +76,32 @@ public interface CapabilityReference
      * Passivate the referenced capability.
      */
     void passivate();
+
+    /**
+     * Callback when a new capability is created.
+     *
+     * @param properties capability configuration
+     */
+    void create( Map<String, String> properties );
+
+    /**
+     * Callback when a capability configuration is loaded from persisted store (configuration file).
+     *
+     * @param properties capability configuration
+     */
+    void load( Map<String, String> properties );
+
+    /**
+     * Callback when a capability configuration is updated.
+     *
+     * @param properties         capability configuration
+     * @param previousProperties previous capability configuration
+     */
+    void update( Map<String, String> properties, final Map<String, String> previousProperties );
+
+    /**
+     * Callback when a capability configuration is removed.
+     */
+    void remove();
 
 }

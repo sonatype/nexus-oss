@@ -18,13 +18,10 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.config;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfigurationEventInspector.sameProperties;
 
 import java.util.Map;
 
@@ -33,6 +30,9 @@ import org.mockito.Matchers;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
+import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationAddEvent;
+import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationLoadEvent;
+import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationRemoveEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationUpdateEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
@@ -49,152 +49,192 @@ public class CapabilityConfigurationEventInspectorTest
 
     private static final boolean DISABLED = false;
 
-    private static final boolean SAME_PROPERTIES = true;
-
-    private static final boolean DIFFERENT_PROPERTIES = false;
-
     /**
-     * If previous configuration was enabled and new configuration is not enabled, disable() is called.
+     * When an enabled capability configuration is created, create a reference, call create and enable it.
      */
     @Test
-    public void capabilityUpdated01()
+    public void onAddEnabled()
     {
-        CapabilityReference reference = prepareForUpdate( ENABLED, DISABLED, DIFFERENT_PROPERTIES );
-        doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
+        CapabilityReference reference = prepareForCreate( ENABLED );
 
-        verify( reference ).disable();
-        verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
+        verify( reference ).create( Matchers.<Map<String, String>>any() );
+        verify( reference ).enable();
+    }
+
+    /**
+     * When an disabled capability configuration is created, create a reference, call create on it, but not enable.
+     */
+    @Test
+    public void onAddDisabled()
+    {
+        CapabilityReference reference = prepareForCreate( DISABLED );
+
+        verify( reference ).create( Matchers.<Map<String, String>>any() );
+    }
+
+    /**
+     * When an enabled capability configuration is loaded, create a reference, call create and enable it.
+     */
+    @Test
+    public void onLoadEnabled()
+    {
+        CapabilityReference reference = prepareForLoad( ENABLED );
+
+        verify( reference ).load( Matchers.<Map<String, String>>any() );
+        verify( reference ).enable();
+    }
+
+    /**
+     * When an disabled capability configuration is loaded, create a reference, call create on it, but not enable.
+     */
+    @Test
+    public void onLoadDisabled()
+    {
+        CapabilityReference reference = prepareForLoad( DISABLED );
+
+        verify( reference ).load( Matchers.<Map<String, String>>any() );
     }
 
     /**
      * If previous configuration was enabled and new configuration is not enabled, disable() is called.
-     * Update not called as they have same properties.
      */
     @Test
-    public void capabilityUpdated01SameProperties()
+    public void onUpdate01()
     {
-        CapabilityReference reference = prepareForUpdate( ENABLED, DISABLED, SAME_PROPERTIES );
+        CapabilityReference reference = prepareForUpdate( ENABLED, DISABLED );
         doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
 
         verify( reference ).disable();
+        verify( reference ).update( Matchers.<Map<String, String>>any(), Matchers.<Map<String, String>>any() );
     }
 
     /**
      * If previous configuration was not enabled and new configuration is not enabled, enable() is not called.
      */
     @Test
-    public void capabilityUpdated02()
+    public void onUpdate02()
     {
-        CapabilityReference reference = prepareForUpdate( DISABLED, DISABLED, DIFFERENT_PROPERTIES );
+        CapabilityReference reference = prepareForUpdate( DISABLED, DISABLED );
         doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
         doThrow( new AssertionError( "Disable not expected to be called" ) ).when( reference ).disable();
 
-        verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
-    }
-
-    /**
-     * If previous configuration was not enabled and new configuration is not enabled, enable() is not called.
-     * Update not called as they have same properties.
-     */
-    @Test
-    public void capabilityUpdated02SameProperties()
-    {
-        CapabilityReference reference = prepareForUpdate( DISABLED, DISABLED, SAME_PROPERTIES );
-        doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
-        doThrow( new AssertionError( "Disable not expected to be called" ) ).when( reference ).disable();
+        verify( reference ).update( Matchers.<Map<String, String>>any(), Matchers.<Map<String, String>>any() );
     }
 
     /**
      * If previous configuration was enabled and new configuration is enabled, enable() is not called.
      */
     @Test
-    public void capabilityUpdated03()
+    public void onUpdate03()
     {
-        CapabilityReference reference = prepareForUpdate( ENABLED, DISABLED, DIFFERENT_PROPERTIES );
+        CapabilityReference reference = prepareForUpdate( ENABLED, DISABLED );
         doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
         doThrow( new AssertionError( "Disable not expected to be called" ) ).when( reference ).disable();
 
-        verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
-    }
-
-    /**
-     * If previous configuration was enabled and new configuration is enabled, enable() is not called.
-     * Update not called as they have same properties.
-     */
-    @Test
-    public void capabilityUpdated03SameProperties()
-    {
-        CapabilityReference reference = prepareForUpdate( ENABLED, DISABLED, DIFFERENT_PROPERTIES );
-        doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
-        doThrow( new AssertionError( "Disable not expected to be called" ) ).when( reference ).disable();
+        verify( reference ).update( Matchers.<Map<String, String>>any(), Matchers.<Map<String, String>>any() );
     }
 
     /**
      * If previous configuration was not enabled and new configuration is enabled, enable() is called.
      */
     @Test
-    public void capabilityUpdated04()
+    public void onUpdate04()
     {
-        CapabilityReference reference = prepareForUpdate( DISABLED, ENABLED, DIFFERENT_PROPERTIES );
+        CapabilityReference reference = prepareForUpdate( DISABLED, ENABLED );
         doThrow( new AssertionError( "Disable not expected to be called" ) ).when( reference ).disable();
 
         verify( reference ).enable();
-        verify( reference.capability() ).update( Matchers.<Map<String, String>>any() );
+        verify( reference ).update( Matchers.<Map<String, String>>any(), Matchers.<Map<String, String>>any() );
     }
 
-    /**
-     * If previous configuration was not enabled and new configuration is enabled, enable() is called.
-     * Update not called as they have same properties.
-     */
-    @Test
-    public void capabilityUpdated04SameProperties()
-    {
-        CapabilityReference reference = prepareForUpdate( DISABLED, ENABLED, DIFFERENT_PROPERTIES );
-        doThrow( new AssertionError( "Disable not expected to be called" ) ).when( reference ).disable();
-
-        verify( reference ).enable();
-    }
-
-    private CapabilityReference prepareForUpdate( final boolean oldEnabled,
-                                                  final boolean newEnabled,
-                                                  final boolean sameProperties )
+    private CapabilityReference prepareForCreate( final boolean enabled )
     {
         final Capability capability = mock( Capability.class );
-        when( capability.id() ).thenReturn( "test" );
+        when( capability.id() ).thenReturn( "test-cc" );
+
         final CapabilityReference reference = mock( CapabilityReference.class );
         when( reference.capability() ).thenReturn( capability );
-        when( capability.id() ).thenReturn( "test" );
+
+        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        when( capabilityRegistry.create( "test-cc", "test" ) ).thenReturn( reference );
+
+        final CCapability cc = new CCapability();
+        cc.setId( "test-cc" );
+        cc.setTypeId( "test" );
+        cc.setEnabled( enabled );
+
+        new CapabilityConfigurationEventInspector( capabilityRegistry ).inspect(
+            new CapabilityConfigurationAddEvent( cc )
+        );
+
+        return reference;
+    }
+
+    /**
+     * When an capability configuration is removed, call remove on reference.
+     */
+    @Test
+    public void onRemove()
+    {
+        CapabilityReference reference = prepareForRemove();
+
+        verify( reference ).remove();
+    }
+
+    private CapabilityReference prepareForLoad( final boolean enabled )
+    {
+        final Capability capability = mock( Capability.class );
+        when( capability.id() ).thenReturn( "test-cc" );
+
+        final CapabilityReference reference = mock( CapabilityReference.class );
+        when( reference.capability() ).thenReturn( capability );
+
+        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        when( capabilityRegistry.create( "test-cc", "test" ) ).thenReturn( reference );
+
+        final CCapability cc = new CCapability();
+        cc.setId( "test-cc" );
+        cc.setTypeId( "test" );
+        cc.setEnabled( enabled );
+
+        new CapabilityConfigurationEventInspector( capabilityRegistry ).inspect(
+            new CapabilityConfigurationLoadEvent( cc )
+        );
+
+        return reference;
+    }
+
+    private CapabilityReference prepareForUpdate( final boolean oldEnabled, final boolean newEnabled )
+    {
+        final Capability capability = mock( Capability.class );
+        when( capability.id() ).thenReturn( "test-cc" );
+
+        final CapabilityReference reference = mock( CapabilityReference.class );
+        when( reference.capability() ).thenReturn( capability );
         when( reference.isActive() ).thenReturn( oldEnabled );
 
         final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
-        when( capabilityRegistry.get( "test" ) ).thenReturn( reference );
+        when( capabilityRegistry.get( "test-cc" ) ).thenReturn( reference );
 
         final CCapability oldCapability = new CCapability();
-        oldCapability.setId( "test" );
+        oldCapability.setId( "test-cc" );
         oldCapability.setEnabled( oldEnabled );
+
         final CCapability newCapability = new CCapability();
-        newCapability.setId( "test" );
+        newCapability.setId( "test-cc" );
         newCapability.setEnabled( newEnabled );
 
-        if ( sameProperties )
         {
-            doThrow( new AssertionError( "Capability update not expected to be called" ) ).when( capability ).update(
-                Matchers.<Map<String, String>>any() );
+            final CCapabilityProperty ccp = new CCapabilityProperty();
+            ccp.setKey( "foo" );
+            ccp.setKey( "bar" );
+            oldCapability.getProperties().add( ccp );
         }
-        else
         {
-            {
-                final CCapabilityProperty ccp = new CCapabilityProperty();
-                ccp.setKey( "foo" );
-                ccp.setKey( "bar" );
-                oldCapability.getProperties().add( ccp );
-            }
-            {
-                final CCapabilityProperty ccp = new CCapabilityProperty();
-                ccp.setKey( "bar" );
-                ccp.setKey( "foo" );
-                newCapability.getProperties().add( ccp );
-            }
+            final CCapabilityProperty ccp = new CCapabilityProperty();
+            ccp.setKey( "bar" );
+            ccp.setKey( "foo" );
+            newCapability.getProperties().add( ccp );
         }
 
         new CapabilityConfigurationEventInspector( capabilityRegistry ).inspect(
@@ -204,107 +244,25 @@ public class CapabilityConfigurationEventInspectorTest
         return reference;
     }
 
-    @Test
-    public void samePropertiesWhenBothNull()
+    private CapabilityReference prepareForRemove()
     {
-        final CCapability cc1 = new CCapability();
-        cc1.setProperties( null );
-        final CCapability cc2 = new CCapability();
-        cc2.setProperties( null );
-        assertThat( sameProperties( cc1, cc2 ), is( true ) );
-    }
+        final Capability capability = mock( Capability.class );
+        when( capability.id() ).thenReturn( "test-cc" );
 
-    @Test
-    public void samePropertiesWhenOldAreNull()
-    {
-        final CCapability cc1 = new CCapability();
-        cc1.setProperties( null );
-        final CCapability cc2 = new CCapability();
-        final CCapabilityProperty ccp2 = new CCapabilityProperty();
-        ccp2.setKey( "ccp2" );
-        ccp2.setValue( "ccp2" );
-        cc2.getProperties().add( ccp2 );
-        assertThat( sameProperties( cc1, cc2 ), is( false ) );
-    }
+        final CapabilityReference reference = mock( CapabilityReference.class );
+        when( reference.capability() ).thenReturn( capability );
 
-    @Test
-    public void samePropertiesWhenNewAreNull()
-    {
-        final CCapability cc1 = new CCapability();
-        final CCapabilityProperty ccp1 = new CCapabilityProperty();
-        ccp1.setKey( "ccp1" );
-        ccp1.setValue( "ccp1" );
-        cc1.getProperties().add( ccp1 );
-        final CCapability cc2 = new CCapability();
-        cc2.setProperties( null );
-        assertThat( sameProperties( cc1, cc2 ), is( false ) );
-    }
+        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        when( capabilityRegistry.get( "test-cc" ) ).thenReturn( reference );
 
-    @Test
-    public void samePropertiesWhenBothAreSame()
-    {
-        final CCapability cc1 = new CCapability();
-        final CCapabilityProperty ccp1 = new CCapabilityProperty();
-        ccp1.setKey( "ccp" );
-        ccp1.setValue( "ccp" );
-        cc1.getProperties().add( ccp1 );
-        final CCapability cc2 = new CCapability();
-        final CCapabilityProperty ccp2 = new CCapabilityProperty();
-        ccp2.setKey( "ccp" );
-        ccp2.setValue( "ccp" );
-        cc2.getProperties().add( ccp2 );
-        assertThat( sameProperties( cc1, cc2 ), is( true ) );
-    }
+        final CCapability cc = new CCapability();
+        cc.setId( "test-cc" );
 
-    @Test
-    public void samePropertiesWhenDifferentValueSameKey()
-    {
-        final CCapability cc1 = new CCapability();
-        final CCapabilityProperty ccp1 = new CCapabilityProperty();
-        ccp1.setKey( "ccp" );
-        ccp1.setValue( "ccp1" );
-        cc1.getProperties().add( ccp1 );
-        final CCapability cc2 = new CCapability();
-        final CCapabilityProperty ccp2 = new CCapabilityProperty();
-        ccp2.setKey( "ccp" );
-        ccp2.setValue( "ccp2" );
-        cc2.getProperties().add( ccp2 );
-        assertThat( sameProperties( cc1, cc2 ), is( false ) );
-    }
+        new CapabilityConfigurationEventInspector( capabilityRegistry ).inspect(
+            new CapabilityConfigurationRemoveEvent( cc )
+        );
 
-    @Test
-    public void samePropertiesWhenDifferentSize()
-    {
-        final CCapability cc1 = new CCapability();
-        final CCapabilityProperty ccp1 = new CCapabilityProperty();
-        ccp1.setKey( "ccp" );
-        ccp1.setValue( "ccp1" );
-        final CCapabilityProperty ccp1_1 = new CCapabilityProperty();
-        ccp1_1.setKey( "ccp1.1" );
-        ccp1_1.setValue( "ccp1.1" );
-        cc1.getProperties().add( ccp1 );
-        final CCapability cc2 = new CCapability();
-        final CCapabilityProperty ccp2 = new CCapabilityProperty();
-        ccp2.setKey( "ccp" );
-        ccp2.setValue( "ccp2" );
-        cc2.getProperties().add( ccp2 );
-        assertThat( sameProperties( cc1, cc2 ), is( false ) );
-    }
-
-    @Test
-    public void samePropertiesWhenDifferentKeys()
-    {
-        final CCapability cc1 = new CCapability();
-        final CCapabilityProperty ccp1 = new CCapabilityProperty();
-        ccp1.setKey( "ccp1" );
-        ccp1.setValue( "ccp" );
-        cc1.getProperties().add( ccp1 );
-        final CCapability cc2 = new CCapability();
-        final CCapabilityProperty ccp2 = new CCapabilityProperty();
-        ccp2.setKey( "ccp2" );
-        ccp2.setValue( "ccp" );
-        cc2.getProperties().add( ccp2 );
-        assertThat( sameProperties( cc1, cc2 ), is( false ) );
+        return reference;
     }
 
 }
