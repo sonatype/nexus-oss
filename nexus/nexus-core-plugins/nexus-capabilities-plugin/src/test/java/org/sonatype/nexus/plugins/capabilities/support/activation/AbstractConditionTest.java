@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 
 /**
- * {@link org.sonatype.nexus.plugins.capabilities.support.activation.Conditions} UTs.
+ * {@link AbstractCondition} UTs.
  *
  * @since 1.10.0
  */
