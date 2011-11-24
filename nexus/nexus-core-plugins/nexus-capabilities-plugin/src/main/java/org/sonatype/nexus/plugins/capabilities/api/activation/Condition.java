@@ -31,4 +31,11 @@ public interface Condition
      */
     boolean isSatisfied();
 
+    /**
+     * Releases (eventual) resources used by condition. After releasing condition should not be used anymore.
+     *
+     * @return itself, for fluent api usage
+     */
+    Condition release();
+
 }

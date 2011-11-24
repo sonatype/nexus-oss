@@ -19,9 +19,11 @@
 package org.sonatype.nexus.plugins.capabilities.support.activation;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import com.google.common.base.Preconditions;
 
 /**
  * {@link Condition} implementation support.
@@ -34,19 +36,36 @@ public abstract class AbstractCondition
 
     private boolean satisfied;
 
+    private boolean valid;
+
     public AbstractCondition( final ActivationContext activationContext )
     {
         this.activationContext = checkNotNull( activationContext );
+        valid = true;
+    }
+
+    protected ActivationContext getActivationContext()
+    {
+        return activationContext;
     }
 
     @Override
     public boolean isSatisfied()
     {
+        checkState( valid, "Condition has already been released" );
         return satisfied;
+    }
+
+    @Override
+    public Condition release()
+    {
+        valid = false;
+        return this;
     }
 
     public void setSatisfied( final boolean satisfied )
     {
+        checkState( valid, "Condition has already been released" );
         if ( this.satisfied != satisfied )
         {
             this.satisfied = satisfied;
@@ -59,7 +78,6 @@ public abstract class AbstractCondition
                 activationContext.notifyUnsatisfied( this );
             }
         }
-
     }
 
 }
