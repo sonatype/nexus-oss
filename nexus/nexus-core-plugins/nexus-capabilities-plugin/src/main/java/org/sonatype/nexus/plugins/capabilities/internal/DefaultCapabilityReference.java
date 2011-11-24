@@ -181,7 +181,7 @@ class DefaultCapabilityReference
     @Override
     public void load( final Map<String, String> properties )
     {
-        capability.load( properties );
+        capability().load( properties );
     }
 
     @Override
@@ -196,7 +196,7 @@ class DefaultCapabilityReference
     @Override
     public void remove()
     {
-        capability.remove();
+        capability().remove();
     }
 
     @Override
