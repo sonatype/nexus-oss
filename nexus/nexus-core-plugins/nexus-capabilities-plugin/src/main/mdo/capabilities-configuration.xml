@@ -20,20 +20,20 @@
 
 -->
 <model xmlns="http://modello.codehaus.org/MODELLO/1.4.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.0 http://modello.codehaus.org/xsd/modello-1.4.0.xsd"
-  xsd.namespace="http://www.sonatype.com/xsd/nexus-capabilities-configuration-1.0.0"
-  xsd.targetNamespace="http://www.sonatype.com/xsd/nexus-capabilities-configuration-1.0.0">
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.0 http://modello.codehaus.org/xsd/modello-1.4.0.xsd"
+       xsd.namespace="http://www.sonatype.com/xsd/nexus-capabilities-configuration-1.0.0"
+       xsd.targetNamespace="http://www.sonatype.com/xsd/nexus-capabilities-configuration-1.0.0">
 
   <id>capabilities-configuration</id>
   <name>NexusCapabilitiesConfiguration</name>
 
-	<description>
-        <![CDATA[
+  <description>
+    <![CDATA[
         <p>Nexus Capabilities Configuration.</p>
         ]]>
-	</description>
-	
+  </description>
+
   <defaults>
     <default>
       <key>package</key>
@@ -150,6 +150,7 @@
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <identifier>true</identifier>
           <description>Property key.</description>
         </field>
         <field>
@@ -157,23 +158,12 @@
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <identifier>true</identifier>
           <description>Property value.</description>
         </field>
       </fields>
-      <codeSegments>
-        <codeSegment>
-          <version>1.0.0</version>
-          <code><![CDATA[
-    @Override
-    public String toString()
-    {
-        return String.format( "%s=%s", key, value );
-    }
-]]></code>
-        </codeSegment>
-      </codeSegments>      
     </class>
-    
+
   </classes>
-  
+
 </model>
