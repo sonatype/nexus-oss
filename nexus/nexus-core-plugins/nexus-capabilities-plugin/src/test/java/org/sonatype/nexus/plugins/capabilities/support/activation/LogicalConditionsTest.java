@@ -32,7 +32,7 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 
 /**
- * {@link CapabilityConditions} UTs.
+ * {@link LogicalConditions} UTs.
  *
  * @since 1.10.0
  */

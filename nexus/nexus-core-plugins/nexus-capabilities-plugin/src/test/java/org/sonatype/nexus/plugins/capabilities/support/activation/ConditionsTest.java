@@ -26,7 +26,7 @@ import static org.mockito.Mockito.mock;
 import org.junit.Test;
 
 /**
- * {@link org.sonatype.nexus.plugins.capabilities.support.activation.CapabilityConditions} UTs.
+ * {@link Conditions} UTs.
  *
  * @since 1.10.0
  */
