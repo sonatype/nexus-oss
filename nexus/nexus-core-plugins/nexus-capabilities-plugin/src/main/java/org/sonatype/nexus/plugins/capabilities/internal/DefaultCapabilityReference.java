@@ -98,7 +98,7 @@ class DefaultCapabilityReference
     {
         if ( isEnabled() )
         {
-            getLogger().debug( "Disable capability with id '{}' ({})", capability.id(), capability );
+            getLogger().debug( "Disabling capability with id '{}' ({})", capability.id(), capability );
             if ( activationListener != null )
             {
                 activationContext.removeListener( activationListener, activateCondition );
