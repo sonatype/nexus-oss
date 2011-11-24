@@ -125,8 +125,8 @@ public class CapabilityConfigurationEventInspector
         final CapabilityReference ref = registry.get( capabilityConfig.getId() );
         if ( ref != null )
         {
-            registry.remove( ref.capability().id() );
             ref.remove();
+            registry.remove( capabilityConfig.getId() );
         }
     }
 
