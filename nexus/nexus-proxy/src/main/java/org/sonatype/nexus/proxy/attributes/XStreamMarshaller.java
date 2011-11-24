@@ -21,13 +21,12 @@ package org.sonatype.nexus.proxy.attributes;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Map;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.attributes.internal.AttributesImpl;
-
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.converters.collections.MapConverter;
@@ -55,7 +54,7 @@ public class XStreamMarshaller
     public void marshal( final Attributes item, final OutputStream outputStream )
         throws IOException
     {
-        final Map<String, String> attrs = item.asMap();
+        final Map<String, String> attrs = new HashMap( item.asMap() );
         xstream.toXML( attrs, outputStream );
         outputStream.flush();
     }

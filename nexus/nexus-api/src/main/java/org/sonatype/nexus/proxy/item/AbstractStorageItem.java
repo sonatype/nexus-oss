@@ -35,65 +35,102 @@ import com.google.common.base.Strings;
 
 /**
  * The Class AbstractStorageItem.
- * 
+ *
  * @author cstamas
  */
 public abstract class AbstractStorageItem
     implements StorageItem
 {
-    /** The request */
+
+    /**
+     * The request
+     */
     private transient ResourceStoreRequest request;
 
-    /** The repository item uid. */
+    /**
+     * The repository item uid.
+     */
     private transient RepositoryItemUid repositoryItemUid;
 
-    /** The store. */
+    /**
+     * The store.
+     */
     private transient ResourceStore store;
 
-    /** The item context */
+    /**
+     * The item context
+     */
     private transient RequestContext context;
 
-    /** the attributes */
+    /**
+     * the attributes
+     */
     private transient Attributes itemAttributes;
 
-    /** Used for versioning of attribute */
+    /**
+     * Used for versioning of attribute
+     */
     private int generation = 0;
 
-    /** The path. */
+    /**
+     * The path.
+     */
     private String path;
 
-    /** The readable. */
+    /**
+     * The readable.
+     */
     private boolean readable;
 
-    /** The writable. */
+    /**
+     * The writable.
+     */
     private boolean writable;
 
-    /** The repository id. */
+    /**
+     * The repository id.
+     */
     private String repositoryId;
 
-    /** The created. */
+    /**
+     * The created.
+     */
     private long created;
 
-    /** The modified. */
+    /**
+     * The modified.
+     */
     private long modified;
 
-    /** The stored locally. */
+    /**
+     * The stored locally.
+     */
     private long storedLocally;
 
-    /** The last remoteCheck timestamp. */
+    /**
+     * The last remoteCheck timestamp.
+     */
     // TODO: leave the field name as-is coz of persistence and old nexuses!
     private long lastTouched;
 
-    /** The last requested timestamp. */
+    /**
+     * The last requested timestamp.
+     */
     private long lastRequested;
 
-    /** Expired flag */
+    /**
+     * Expired flag
+     */
     private boolean expired;
 
-    /** The remote url. */
+    /**
+     * The remote url.
+     */
     private String remoteUrl;
 
-    /** The persisted attributes. */
+    /**
+     * The persisted attributes.
+     */
     private Map<String, String> attributes;
 
     // ==
@@ -113,6 +150,9 @@ public abstract class AbstractStorageItem
      */
     public void upgrade()
     {
+        this.context = new RequestContext();
+        this.itemAttributes = new AttributesImpl();
+
         getRepositoryItemAttributes().putAll( attributes );
 
         getRepositoryItemAttributes().setGeneration( generation );
@@ -134,19 +174,24 @@ public abstract class AbstractStorageItem
 
     // ==
 
+    private AbstractStorageItem()
+    {
+        this.context = new RequestContext();
+        this.itemAttributes = new AttributesImpl();
+    }
+
     /**
      * Instantiates a new abstract storage item.
-     * 
-     * @param path the path
+     *
+     * @param path     the path
      * @param readable the readable
      * @param writable the writable
      */
-    public AbstractStorageItem( ResourceStoreRequest request, boolean readable, boolean writable )
+    public AbstractStorageItem( final ResourceStoreRequest request, final boolean readable, final boolean writable )
     {
-        super();
+        this();
         this.request = request;
-        this.context = new RequestContext( request.getRequestContext() );
-        this.itemAttributes = new AttributesImpl();
+        this.context.setParentContext( request.getRequestContext() );
         setPath( request.getRequestPath() );
         setReadable( readable );
         setWritable( writable );
@@ -156,13 +201,14 @@ public abstract class AbstractStorageItem
 
     /**
      * Instantiates a new abstract storage item.
-     * 
+     *
      * @param repository the repository
-     * @param path the path
-     * @param readable the readable
-     * @param writable the writable
+     * @param path       the path
+     * @param readable   the readable
+     * @param writable   the writable
      */
-    public AbstractStorageItem( Repository repository, ResourceStoreRequest request, boolean readable, boolean writable )
+    public AbstractStorageItem( Repository repository, ResourceStoreRequest request, boolean readable,
+                                boolean writable )
     {
         this( request, readable, writable );
         this.store = repository;
@@ -172,10 +218,10 @@ public abstract class AbstractStorageItem
 
     /**
      * Instantiates a new abstract storage item.
-     * 
-     * @param router the router
-     * @param path the path
-     * @param virtual the virtual
+     *
+     * @param router   the router
+     * @param path     the path
+     * @param virtual  the virtual
      * @param readable the readable
      * @param writable the writable
      */
@@ -188,7 +234,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Gets the store.
-     * 
+     *
      * @return the store
      */
     public ResourceStore getStore()
@@ -198,7 +244,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Sets the store.
-     * 
+     *
      * @param store
      */
     public void setStore( ResourceStore store )
@@ -229,7 +275,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Sets the UID.
-     * 
+     *
      * @param repositoryItemUid
      */
     public void setRepositoryItemUid( RepositoryItemUid repositoryItemUid )
@@ -248,7 +294,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Sets the repository id.
-     * 
+     *
      * @param repositoryId the new repository id
      */
     public void setRepositoryId( String repositoryId )
@@ -263,7 +309,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Sets the created.
-     * 
+     *
      * @param created the new created
      */
     public void setCreated( long created )
@@ -278,7 +324,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Sets the modified.
-     * 
+     *
      * @param modified the new modified
      */
     public void setModified( long modified )
@@ -293,7 +339,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Sets the readable.
-     * 
+     *
      * @param readable the new readable
      */
     public void setReadable( boolean readable )
@@ -308,7 +354,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Sets the writable.
-     * 
+     *
      * @param writable the new writable
      */
     public void setWritable( boolean writable )
@@ -323,7 +369,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Sets the path.
-     * 
+     *
      * @param path the new path
      */
     public void setPath( String path )
@@ -338,7 +384,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Sets the expired flag.
-     * 
+     *
      * @param expired
      */
     public void setExpired( boolean expired )
@@ -379,7 +425,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Sets the remote url.
-     * 
+     *
      * @param remoteUrl the new remote url
      */
     public void setRemoteUrl( String remoteUrl )
@@ -394,7 +440,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Sets the stored locally.
-     * 
+     *
      * @param storedLocally the new stored locally
      */
     public void setStoredLocally( long storedLocally )
@@ -409,7 +455,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Sets the remote checked.
-     * 
+     *
      * @param remoteChecked the new remote checked
      */
     public void setRemoteChecked( long lastTouched )
@@ -424,7 +470,7 @@ public abstract class AbstractStorageItem
 
     /**
      * Sets the last requested timestamp.
-     * 
+     *
      * @param lastRequested
      */
     public void setLastRequested( long lastRequested )
@@ -448,7 +494,7 @@ public abstract class AbstractStorageItem
         if ( item == null )
         {
             throw new NullPointerException( "Cannot overlay null item onto this item of class "
-                + this.getClass().getName() );
+                                                + this.getClass().getName() );
         }
 
         // this is noop, is not used in core at all

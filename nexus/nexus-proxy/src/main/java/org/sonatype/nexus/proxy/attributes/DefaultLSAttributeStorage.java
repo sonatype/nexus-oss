@@ -222,7 +222,6 @@ public class DefaultLSAttributeStorage
      * Gets the attributes.
      * 
      * @param uid the uid
-     * @param isCollection the is collection
      * @return the attributes
      * @throws IOException Signals that an I/O exception has occurred.
      */

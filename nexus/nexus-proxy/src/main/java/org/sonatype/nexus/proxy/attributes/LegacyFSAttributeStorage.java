@@ -21,7 +21,6 @@ package org.sonatype.nexus.proxy.attributes;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -40,11 +39,9 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
-import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
-
 import com.google.common.io.Closeables;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
@@ -54,7 +51,7 @@ import com.thoughtworks.xstream.XStreamException;
  * as whole using XStream. This is the "old" default storage, used in all Nexuses up to version 1.10.0. Note: this
  * component is ReadOnly and should be used to perform transitioning upgrade from older Nexus instances. Only
  * {@link #deleteAttributes(RepositoryItemUid)} and {@link #getAttributes(RepositoryItemUid)} will do anyting, while
- * {@link #putAttribute(RepositoryItemUid, Attributes)} will throw exception. In case the "legacy" attribute directory
+ * {@link #putAttributes(RepositoryItemUid, Attributes)} will throw exception. In case the "legacy" attribute directory
  * is not present (ie. new install), this component remains dormant.
  * 
  * @author cstamas
@@ -86,8 +83,7 @@ public class LegacyFSAttributeStorage
      */
     @Inject
     public LegacyFSAttributeStorage( final ApplicationEventMulticaster applicationEventMulticaster,
-                                     final ApplicationConfiguration applicationConfiguration,
-                                     @Named( "xstream-xml" ) final Marshaller marshaller )
+                                     final ApplicationConfiguration applicationConfiguration )
     {
         this.applicationConfiguration = applicationConfiguration;
         this.applicationEventMulticaster = applicationEventMulticaster;
@@ -220,7 +216,6 @@ public class LegacyFSAttributeStorage
                 }
                 else
                 {
-                    result.upgrade();
                     return result.getRepositoryItemAttributes();
                 }
             }
@@ -301,7 +296,8 @@ public class LegacyFSAttributeStorage
             {
                 fis = new FileInputStream( target );
 
-                result = (AbstractStorageItem) (StorageItem) marshaller.fromXML( fis );
+                result = (AbstractStorageItem) marshaller.fromXML( fis );
+                result.upgrade();
 
                 result.setRepositoryItemUid( uid );
 
