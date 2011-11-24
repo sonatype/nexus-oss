@@ -37,7 +37,7 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
  */
 @Named
 @Singleton
-public class CapabilityConditionsFactory
+public class CapabilityConditions
 {
 
     private final CapabilityRegistry capabilityRegistry;
@@ -45,8 +45,8 @@ public class CapabilityConditionsFactory
     private final ActivationContext activationContext;
 
     @Inject
-    public CapabilityConditionsFactory( final CapabilityRegistry capabilityRegistry,
-                                        final ActivationContext activationContext )
+    public CapabilityConditions( final CapabilityRegistry capabilityRegistry,
+                                 final ActivationContext activationContext )
     {
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.activationContext = checkNotNull( activationContext );

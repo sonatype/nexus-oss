@@ -39,11 +39,11 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 
 /**
- * {@link CapabilityConditionsFactory} UTs.
+ * {@link CapabilityConditions} UTs.
  *
  * @since 1.10.0
  */
-public class CapabilityConditionsFactoryTest
+public class CapabilityConditionsTest
 {
 
     private ActivationContext activationContext;
@@ -54,7 +54,7 @@ public class CapabilityConditionsFactoryTest
 
     private CapabilityReference ref3;
 
-    private CapabilityConditionsFactory underTest;
+    private CapabilityConditions underTest;
 
     private CapabilityRegistry capabilityRegistry;
 
@@ -67,7 +67,7 @@ public class CapabilityConditionsFactoryTest
     {
         activationContext = mock( ActivationContext.class );
         capabilityRegistry = mock( CapabilityRegistry.class );
-        underTest = new CapabilityConditionsFactory(
+        underTest = new CapabilityConditions(
             capabilityRegistry, activationContext
         );
 

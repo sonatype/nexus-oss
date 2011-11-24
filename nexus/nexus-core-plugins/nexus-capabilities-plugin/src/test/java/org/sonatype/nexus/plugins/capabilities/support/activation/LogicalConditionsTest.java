@@ -32,11 +32,11 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 
 /**
- * {@link org.sonatype.nexus.plugins.capabilities.support.activation.CapabilityConditionsFactory} UTs.
+ * {@link CapabilityConditions} UTs.
  *
  * @since 1.10.0
  */
-public class LogicalConditionsFactoryTest
+public class LogicalConditionsTest
 {
 
     static final boolean UNSATISFIED = false;
@@ -45,7 +45,7 @@ public class LogicalConditionsFactoryTest
 
     private ActivationContext activationContext;
 
-    private LogicalConditionsFactory underTest;
+    private LogicalConditions underTest;
 
     private ActivationContext.Listener listener;
 
@@ -57,7 +57,7 @@ public class LogicalConditionsFactoryTest
     public void setUp()
     {
         activationContext = mock( ActivationContext.class );
-        underTest = new LogicalConditionsFactory( activationContext );
+        underTest = new LogicalConditions( activationContext );
         left = mock( Condition.class );
         right = mock( Condition.class );
     }

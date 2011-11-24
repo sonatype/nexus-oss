@@ -24,7 +24,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 
@@ -35,13 +34,13 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
  */
 @Named
 @Singleton
-public class LogicalConditionsFactory
+public class LogicalConditions
 {
 
     private final ActivationContext activationContext;
 
     @Inject
-    public LogicalConditionsFactory( final ActivationContext activationContext )
+    public LogicalConditions( final ActivationContext activationContext )
     {
         this.activationContext = checkNotNull( activationContext );
     }
