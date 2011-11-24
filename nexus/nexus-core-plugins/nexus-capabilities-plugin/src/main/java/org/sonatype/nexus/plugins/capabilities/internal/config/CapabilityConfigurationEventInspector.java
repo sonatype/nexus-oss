@@ -126,7 +126,6 @@ public class CapabilityConfigurationEventInspector
         if ( ref != null )
         {
             registry.remove( ref.capability().id() );
-            ref.disable();
             ref.remove();
         }
     }

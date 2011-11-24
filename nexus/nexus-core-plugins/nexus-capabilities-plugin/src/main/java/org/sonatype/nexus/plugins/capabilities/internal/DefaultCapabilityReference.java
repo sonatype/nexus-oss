@@ -212,6 +212,11 @@ class DefaultCapabilityReference
     @Override
     public void remove()
     {
+        if ( activateCondition != null )
+        {
+            activateCondition.release();
+        }
+        disable();
         capability().remove();
     }
 

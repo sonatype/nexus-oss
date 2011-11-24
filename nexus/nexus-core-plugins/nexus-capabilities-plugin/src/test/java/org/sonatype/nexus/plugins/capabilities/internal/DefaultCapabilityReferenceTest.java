@@ -20,6 +20,7 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -37,6 +38,7 @@ import org.mockito.Matchers;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 
 /**
  * {@link DefaultCapabilityReference} UTs.
@@ -52,13 +54,20 @@ public class DefaultCapabilityReferenceTest
 
     private DefaultCapabilityRegistry capabilityRegistry;
 
+    private ActivationContext activationContext;
+
+    private Condition activationCondition;
+
     @Before
     public void setUp()
     {
         capabilityRegistry = mock( DefaultCapabilityRegistry.class );
-        final ActivationContext activationContext = mock( ActivationContext.class );
+        activationContext = mock( ActivationContext.class );
         capability = mock( Capability.class );
         when( capability.id() ).thenReturn( "test" );
+        activationCondition = mock( Condition.class );
+        when( activationCondition.isSatisfied() ).thenReturn( true );
+        when( capability.activationCondition() ).thenReturn( activationCondition );
         underTest = new DefaultCapabilityReference( capabilityRegistry, activationContext, capability );
 
     }
@@ -72,6 +81,9 @@ public class DefaultCapabilityReferenceTest
         assertThat( underTest.isEnabled(), is( false ) );
         underTest.enable();
         assertThat( underTest.isEnabled(), is( true ) );
+        verify( activationContext ).addListener(
+            Matchers.<ActivationContext.Listener>any(), eq( activationCondition )
+        );
     }
 
     /**
@@ -222,7 +234,7 @@ public class DefaultCapabilityReferenceTest
         final HashMap<String, String> properties = new HashMap<String, String>();
         final HashMap<String, String> previousProperties = new HashMap<String, String>();
         doThrow( new AssertionError( "Update not expected to be called" ) ).when( capability ).update(
-            Matchers.<Map<String,String>>any()
+            Matchers.<Map<String, String>>any()
         );
         underTest.update( properties, previousProperties );
     }
@@ -233,8 +245,12 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void removeIsForwardedToCapability()
     {
+        underTest.enable();
         underTest.remove();
         verify( capability ).remove();
+        verify( activationContext ).removeListener(
+            Matchers.<ActivationContext.Listener>any(), eq( activationCondition )
+        );
     }
 
     @Test
