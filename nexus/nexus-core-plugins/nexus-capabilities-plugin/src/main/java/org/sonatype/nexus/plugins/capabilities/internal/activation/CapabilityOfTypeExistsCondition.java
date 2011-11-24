@@ -74,6 +74,15 @@ public class CapabilityOfTypeExistsCondition
         // ignore
     }
 
+    @Override
+    public CapabilityOfTypeExistsCondition release()
+    {
+        capabilityRegistry.removeListener( this );
+        super.release();
+
+        return this;
+    }
+
     void checkAllCapabilities()
     {
         for ( final CapabilityReference ref : capabilityRegistry.getAll() )

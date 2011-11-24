@@ -70,6 +70,15 @@ public class PassivateCapabilityDuringUpdateCondition
     }
 
     @Override
+    public PassivateCapabilityDuringUpdateCondition release()
+    {
+        capabilityRegistry.removeListener( this );
+        super.release();
+
+        return this;
+    }
+
+    @Override
     public String toString()
     {
         return "Passivate during update of " + capability;

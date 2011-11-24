@@ -55,7 +55,7 @@ public class CapabilityOfTypeExistsConditionTest
 
     private CapabilityRegistry.Listener listener;
 
-    private Condition underTest;
+    private CapabilityOfTypeExistsCondition underTest;
 
     @Before
     public void setUp()
@@ -172,6 +172,17 @@ public class CapabilityOfTypeExistsConditionTest
 
         verify( activationContext, times( 1 ) ).notifySatisfied( underTest );
         verify( activationContext, times( 1 ) ).notifyUnsatisfied( underTest );
+    }
+
+    /**
+     * Capability registry listener is removed when releasing.
+     */
+    @Test
+    public void releaseRemovesItselfAsListener()
+    {
+        underTest.release();
+
+        verify( capabilityRegistry ).removeListener( underTest );
     }
 
     private static class TestCapability

@@ -18,25 +18,17 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.activation;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.sonatype.nexus.plugins.capabilities.api.AbstractCapability;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
-import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 
 /**
  * {@link PassivateCapabilityDuringUpdateCondition} UTs.
@@ -52,14 +44,15 @@ public class PassivateCapabilityDuringUpdateConditionTest
 
     private CapabilityRegistry.Listener listener;
 
-    private Condition underTest;
+    private PassivateCapabilityDuringUpdateCondition underTest;
+
+    private CapabilityRegistry capabilityRegistry;
 
     @Before
     public void setUp()
     {
         activationContext = mock( ActivationContext.class );
-
-        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        capabilityRegistry = mock( CapabilityRegistry.class );
 
         final Capability capability = mock( Capability.class );
         this.reference = mock( CapabilityReference.class );
@@ -86,9 +79,19 @@ public class PassivateCapabilityDuringUpdateConditionTest
         listener.beforeUpdate( reference );
         listener.afterUpdate( reference );
 
-        verify( activationContext).notifyUnsatisfied( underTest );
-        verify( activationContext).notifySatisfied( underTest );
+        verify( activationContext ).notifyUnsatisfied( underTest );
+        verify( activationContext ).notifySatisfied( underTest );
     }
 
+    /**
+     * Capability registry listener is removed when releasing.
+     */
+    @Test
+    public void releaseRemovesItselfAsListener()
+    {
+        underTest.release();
+
+        verify( capabilityRegistry ).removeListener( underTest );
+    }
 
 }
