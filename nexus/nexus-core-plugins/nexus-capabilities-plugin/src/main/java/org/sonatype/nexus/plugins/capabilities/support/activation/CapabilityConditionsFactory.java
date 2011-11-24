@@ -24,13 +24,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 
 /**
- * A {@link Condition} that checks an existence of a capability of a specified type.
+ * Factory of {@link Condition}s related to Capabilities.
+ *
+ * @since 1.10.0
  */
 @Named
 @Singleton
@@ -49,16 +52,31 @@ public class CapabilityConditionsFactory
         this.activationContext = checkNotNull( activationContext );
     }
 
-    public Condition capabilityOfTypeExists( final Class<?> type )
+    /**
+     * Creates a new condition that is satisfied when a capability of a specified type exists.
+     *
+     * @param type class of capability that should exist
+     * @return created condition
+     */
+    public Condition capabilityOfTypeExists( final Class<? extends Capability> type )
     {
         return new CapabilityOfTypeExistsCondition( type );
     }
 
-    public Condition capabilityOfTypeActive( final Class<?> type )
+    /**
+     * Creates a new condition that is satisfied when a capability of a specified type exists and is in an active state.
+     *
+     * @param type class of capability that should exist and be active
+     * @return created condition
+     */
+    public Condition capabilityOfTypeActive( final Class<? extends Capability> type )
     {
         return new CapabilityOfTypeActiveCondition( type );
     }
 
+    /**
+     * A condition that is satisfied when a capability of a specified type exists.
+     */
     private class CapabilityOfTypeExistsCondition
         extends AbstractCondition
         implements CapabilityRegistry.Listener
@@ -66,7 +84,7 @@ public class CapabilityConditionsFactory
 
         final Class<?> type;
 
-        CapabilityOfTypeExistsCondition( final Class<?> type )
+        CapabilityOfTypeExistsCondition( final Class<? extends Capability> type )
         {
             super( activationContext );
             this.type = type;
@@ -135,11 +153,14 @@ public class CapabilityConditionsFactory
 
     }
 
+    /**
+     * A condition that is satisfied when a capability of a specified type exists and is in an active state.
+     */
     class CapabilityOfTypeActiveCondition
         extends CapabilityOfTypeExistsCondition
     {
 
-        CapabilityOfTypeActiveCondition( final Class<?> type )
+        CapabilityOfTypeActiveCondition( final Class<? extends Capability> type )
         {
             super( type );
         }
