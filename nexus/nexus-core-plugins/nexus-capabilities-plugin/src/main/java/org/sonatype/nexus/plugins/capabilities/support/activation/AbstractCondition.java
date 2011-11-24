@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
-import com.google.common.base.Preconditions;
 
 /**
  * {@link Condition} implementation support.
@@ -38,9 +37,15 @@ public abstract class AbstractCondition
 
     private boolean valid;
 
-    public AbstractCondition( final ActivationContext activationContext )
+    protected AbstractCondition( final ActivationContext activationContext )
+    {
+        this( activationContext, false );
+    }
+
+    protected AbstractCondition( final ActivationContext activationContext, final boolean satisfied )
     {
         this.activationContext = checkNotNull( activationContext );
+        this.satisfied = satisfied;
         valid = true;
     }
 
@@ -63,7 +68,7 @@ public abstract class AbstractCondition
         return this;
     }
 
-    public void setSatisfied( final boolean satisfied )
+    protected void setSatisfied( final boolean satisfied )
     {
         checkState( valid, "Condition has already been released" );
         if ( this.satisfied != satisfied )

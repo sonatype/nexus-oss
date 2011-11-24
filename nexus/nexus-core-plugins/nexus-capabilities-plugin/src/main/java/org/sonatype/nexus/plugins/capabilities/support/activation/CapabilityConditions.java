@@ -60,7 +60,7 @@ public class CapabilityConditions
      */
     public Condition capabilityOfTypeExists( final Class<? extends Capability> type )
     {
-        return new CapabilityOfTypeExistsCondition( type );
+        return new CapabilityOfTypeExistsCondition( activationContext, capabilityRegistry, type );
     }
 
     /**
@@ -71,22 +71,39 @@ public class CapabilityConditions
      */
     public Condition capabilityOfTypeActive( final Class<? extends Capability> type )
     {
-        return new CapabilityOfTypeActiveCondition( type );
+        return new CapabilityOfTypeActiveCondition( activationContext, capabilityRegistry, type );
+    }
+
+    /**
+     * Creates a new condition that can be programatically satisfied/unsatisfied.
+     *
+     * @return created condition
+     */
+    public OnDemand onDemand()
+    {
+        return new OnDemand( activationContext );
     }
 
     /**
      * A condition that is satisfied when a capability of a specified type exists.
+     *
+     * @since 1.10.0
      */
-    private class CapabilityOfTypeExistsCondition
+    private static class CapabilityOfTypeExistsCondition
         extends AbstractCondition
         implements CapabilityRegistry.Listener
     {
 
+        private final CapabilityRegistry capabilityRegistry;
+
         final Class<?> type;
 
-        CapabilityOfTypeExistsCondition( final Class<? extends Capability> type )
+        CapabilityOfTypeExistsCondition( final ActivationContext activationContext,
+                                         final CapabilityRegistry capabilityRegistry,
+                                         final Class<? extends Capability> type )
         {
             super( activationContext );
+            this.capabilityRegistry = checkNotNull( capabilityRegistry );
             this.type = type;
             capabilityRegistry.addListener( this );
         }
@@ -155,14 +172,18 @@ public class CapabilityConditions
 
     /**
      * A condition that is satisfied when a capability of a specified type exists and is in an active state.
+     *
+     * @since 1.10.0
      */
-    class CapabilityOfTypeActiveCondition
+    private static class CapabilityOfTypeActiveCondition
         extends CapabilityOfTypeExistsCondition
     {
 
-        CapabilityOfTypeActiveCondition( final Class<? extends Capability> type )
+        CapabilityOfTypeActiveCondition( final ActivationContext activationContext,
+                                         final CapabilityRegistry capabilityRegistry,
+                                         final Class<? extends Capability> type )
         {
-            super( type );
+            super( activationContext, capabilityRegistry, type );
         }
 
         @Override
@@ -194,6 +215,56 @@ public class CapabilityConditions
         {
             return "Active " + type.getSimpleName();
         }
+    }
+
+    /**
+     * A condition that allows a targeted capability to activated / passivated.
+     *
+     * @since 1.10.0
+     */
+    public static class OnDemand
+        extends AbstractCondition
+    {
+
+        OnDemand( final ActivationContext activationContext )
+        {
+            super( activationContext, true );
+        }
+
+        /**
+         * Reactivates the condition, fact that can trigger passivate / activate on capability using it.
+         *
+         * @return itself, for fluent api usage
+         */
+        public OnDemand reactivate()
+        {
+            unsatisfy();
+            satisfy();
+            return this;
+        }
+
+        /**
+         * Marks condition as satisfied, fact that can trigger activation of capability using it.
+         *
+         * @return itself, for fluent api usage
+         */
+        public OnDemand satisfy()
+        {
+            setSatisfied( true );
+            return this;
+        }
+
+        /**
+         * Marks condition as unsatisfied, fact that can trigger passivation of capability using it.
+         *
+         * @return itself, for fluent api usage
+         */
+        public OnDemand unsatisfy()
+        {
+            setSatisfied( false );
+            return this;
+        }
+
     }
 
 }

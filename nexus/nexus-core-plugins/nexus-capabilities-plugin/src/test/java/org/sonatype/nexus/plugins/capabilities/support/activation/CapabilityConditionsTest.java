@@ -344,6 +344,55 @@ public class CapabilityConditionsTest
         verify( activationContext, times( 1 ) ).notifySatisfied( condition );
     }
 
+    /**
+     * Tests on demand condition.
+     * <p/>
+     * On reactivate context condition should become first unsatisfied followed by becoming satisfied.
+     */
+    @Test
+    public void onDemand01()
+    {
+        final CapabilityConditions.OnDemand condition = underTest.onDemand();
+
+        assertThat( condition.isSatisfied(), is( true ) );
+        condition.reactivate();
+        verify( activationContext ).notifyUnsatisfied( condition );
+        verify( activationContext ).notifySatisfied( condition );
+    }
+
+    /**
+     * Tests on demand condition.
+     * <p/>
+     * When unsatisfied condition becomes unsatisfied.
+     */
+    @Test
+    public void onDemand02()
+    {
+        final CapabilityConditions.OnDemand condition = underTest.onDemand();
+
+        assertThat( condition.isSatisfied(), is( true ) );
+        condition.unsatisfy();
+        verify( activationContext ).notifyUnsatisfied( condition );
+    }
+
+    /**
+     * Tests on demand condition.
+     * <p/>
+     * When satisfied condition becomes satisfied.
+     */
+    @Test
+    public void onDemand03()
+    {
+        final CapabilityConditions.OnDemand condition = underTest.onDemand();
+
+        assertThat( condition.isSatisfied(), is( true ) );
+        condition.unsatisfy();
+        verify( activationContext ).notifyUnsatisfied( condition );
+
+        condition.satisfy();
+        verify( activationContext ).notifySatisfied( condition );
+    }
+
     private void prepare( final Condition condition )
     {
         this.condition = condition;
