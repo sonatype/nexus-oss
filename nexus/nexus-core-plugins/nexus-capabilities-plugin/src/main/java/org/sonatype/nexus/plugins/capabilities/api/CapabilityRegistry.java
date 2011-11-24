@@ -118,6 +118,20 @@ public interface CapabilityRegistry
          */
         void onPassivate( CapabilityReference reference );
 
+        /**
+         * Callback before the passed in capability is updated.
+         *
+         * @param reference capability (reference) to be updated
+         */
+        void beforeUpdate( CapabilityReference reference );
+
+        /**
+         * Callback after the passed in capability is updated.
+         *
+         * @param reference capability (reference) that was updated
+         */
+        void afterUpdate( CapabilityReference reference );
+
     }
 
 }

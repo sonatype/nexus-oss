@@ -62,6 +62,18 @@ public class CapabilityOfTypeExistsCondition
         // ignore
     }
 
+    @Override
+    public void beforeUpdate( final CapabilityReference reference )
+    {
+        // ignore
+    }
+
+    @Override
+    public void afterUpdate( final CapabilityReference reference )
+    {
+        // ignore
+    }
+
     void checkAllCapabilities()
     {
         for ( final CapabilityReference ref : capabilityRegistry.getAll() )
