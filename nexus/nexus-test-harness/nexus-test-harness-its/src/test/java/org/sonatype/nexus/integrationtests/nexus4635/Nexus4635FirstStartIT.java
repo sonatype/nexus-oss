@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.StatusResource;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -57,18 +57,10 @@ public class Nexus4635FirstStartIT
         }
     }
 
-    public NexusConfigUtil getNexusConfigUtil()
+    @BeforeClass
+    public void setSecureTest()
     {
-        // prevent IT from creating nexus.xml
-        return new NexusConfigUtil( this )
-        {
-            @Override
-            public void validateConfig()
-                throws Exception
-            {
-                // do nothing
-            }
-        };
+        this.setVerifyNexusConfigBeforeStart( false );
     }
 
     @Test
@@ -80,4 +72,5 @@ public class Nexus4635FirstStartIT
         assertFalse( status.isInstanceUpgraded() );
         assertFalse( status.isConfigurationUpgraded() );
     }
+
 }
