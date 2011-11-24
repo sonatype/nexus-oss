@@ -73,6 +73,12 @@ public class DefaultNotificationManager
     }
 
     @Override
+    protected boolean isConfigured()
+    {
+        return super.isConfigured() && getCurrentConfiguration( false ) != null;
+    }
+
+    @Override
     protected ApplicationConfiguration getApplicationConfiguration()
     {
         return nexusConfig;

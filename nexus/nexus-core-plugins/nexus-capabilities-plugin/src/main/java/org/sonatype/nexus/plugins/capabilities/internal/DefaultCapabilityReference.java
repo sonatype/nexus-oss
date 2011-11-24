@@ -23,6 +23,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
+import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 
 /**
  * Default {@link CapabilityReference} implementation.
@@ -34,19 +37,74 @@ class DefaultCapabilityReference
     implements CapabilityReference
 {
 
+    private final DefaultCapabilityRegistry registry;
+
     private final Capability capability;
+
+    private final ActivationContext activationContext;
+
+    private final Condition activateCondition;
 
     private boolean active;
 
-    DefaultCapabilityReference( final Capability capability )
+    private boolean enabled;
+
+    private ActivationContextListener activationListener;
+
+    DefaultCapabilityReference( final DefaultCapabilityRegistry registry,
+                                final ActivationContext activationContext,
+                                final Capability capability )
     {
+        this.registry = checkNotNull( registry );
+        this.activationContext = checkNotNull( activationContext );
         this.capability = checkNotNull( capability );
+        this.activateCondition = capability.activationCondition();
+        active = false;
+        enabled = false;
     }
 
     @Override
     public Capability capability()
     {
         return capability;
+    }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return enabled;
+    }
+
+    @Override
+    public void enable()
+    {
+        if ( !isEnabled() )
+        {
+            getLogger().debug( "Enabling capability with id '{}' ({})", capability.id(), capability );
+            enabled = true;
+            activate();
+            if ( activateCondition != null )
+            {
+                activationListener = new ActivationContextListener();
+                activationContext.addListener( activationListener, activateCondition );
+            }
+        }
+    }
+
+    @Override
+    public void disable()
+    {
+        if ( isEnabled() )
+        {
+            getLogger().debug( "Disable capability with id '{}' ({})", capability.id(), capability );
+            if ( activationListener != null )
+            {
+                activationContext.removeListener( activationListener, activateCondition );
+                activationListener = null;
+            }
+            passivate();
+            enabled = false;
+        }
     }
 
     @Override
@@ -58,12 +116,21 @@ class DefaultCapabilityReference
     @Override
     public void activate()
     {
-        if ( !isActive() )
+        if ( isEnabled() && !isActive() && ( activateCondition == null || activateCondition.isSatisfied() ) )
         {
+            getLogger().debug( "Activating capability with id '{}' ({})", capability.id(), capability );
             try
             {
                 capability().activate();
                 active = true;
+                registry.notify( this, new DefaultCapabilityRegistry.Notifier( "activated" )
+                {
+                    @Override
+                    void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
+                    {
+                        listener.onActivate( reference );
+                    }
+                } );
             }
             catch ( Exception e )
             {
@@ -71,17 +138,27 @@ class DefaultCapabilityReference
                     "Could not activate capability with id '{}' ({})", new Object[]{ capability.id(), capability, e }
                 );
             }
+
         }
     }
 
     @Override
     public void passivate()
     {
-        if ( isActive() )
+        if ( isEnabled() && isActive() )
         {
+            getLogger().debug( "Passivating capability with id '{}' ({})", capability.id(), capability );
             try
             {
                 active = false;
+                registry.notify( this, new DefaultCapabilityRegistry.Notifier( "passivated" )
+                {
+                    @Override
+                    void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
+                    {
+                        listener.onPassivate( reference );
+                    }
+                } );
                 capability().passivate();
             }
             catch ( Exception e )
@@ -92,4 +169,44 @@ class DefaultCapabilityReference
             }
         }
     }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName() + "{active=" + active + ", capability=" + capability + '}';
+    }
+
+    private class ActivationContextListener
+        implements ActivationContext.Listener
+    {
+
+        @Override
+        public void onSatisfied( final Condition condition )
+        {
+            if ( condition == activateCondition )
+            {
+                activate();
+            }
+        }
+
+        @Override
+        public void onUnsatisfied( final Condition condition )
+        {
+            if ( condition == activateCondition )
+            {
+                passivate();
+            }
+        }
+
+        @Override
+        public String toString()
+        {
+            return String.format(
+                "Capability '%s (id=%s)' watching for '%s' condition",
+                capability(), capability().id(), activateCondition
+            );
+        }
+
+    }
+
 }

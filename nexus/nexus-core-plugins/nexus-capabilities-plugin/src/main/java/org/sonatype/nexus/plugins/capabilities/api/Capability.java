@@ -20,6 +20,8 @@ package org.sonatype.nexus.plugins.capabilities.api;
 
 import java.util.Map;
 
+import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+
 public interface Capability
 {
 
@@ -68,4 +70,10 @@ public interface Capability
      */
     void passivate();
 
+    /**
+     * Returns the condition that should be satisfied in order for this capability to be active.
+     *
+     * @return activation condition. If null, it considers that condition is always activatable.
+     */
+    Condition activationCondition();
 }

@@ -20,6 +20,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.config;
 
 import static org.sonatype.nexus.plugins.capabilities.internal.config.DefaultCapabilityConfiguration.asMap;
 
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -31,6 +32,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.config.events.Capability
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationRemoveEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationUpdateEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
+import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
 
@@ -85,7 +87,7 @@ public class CapabilityConfigurationEventInspector
         ref.capability().create( asMap( capabilityConfig.getProperties() ) );
         if ( capabilityConfig.isEnabled() )
         {
-            ref.activate();
+            ref.enable();
         }
     }
 
@@ -96,24 +98,28 @@ public class CapabilityConfigurationEventInspector
         ref.capability().load( asMap( capabilityConfig.getProperties() ) );
         if ( capabilityConfig.isEnabled() )
         {
-            ref.activate();
+            ref.enable();
         }
     }
 
     private void handle( final CapabilityConfigurationUpdateEvent evt )
     {
         final CCapability capabilityConfig = evt.getCapability();
+        final CCapability previousCapabilityConfig = evt.getPreviousCapability();
         final CapabilityReference ref = registry.get( capabilityConfig.getId() );
         if ( ref != null )
         {
-            if ( ref.isActive() && !capabilityConfig.isEnabled() )
+            if ( previousCapabilityConfig.isEnabled() && !capabilityConfig.isEnabled() )
             {
-                ref.passivate();
+                ref.disable();
             }
-            ref.capability().update( asMap( capabilityConfig.getProperties() ) );
-            if ( capabilityConfig.isEnabled() && !ref.isActive() )
+            if ( !sameProperties( previousCapabilityConfig, capabilityConfig ) )
             {
-                ref.activate();
+                ref.capability().update( asMap( capabilityConfig.getProperties() ) );
+            }
+            if ( !previousCapabilityConfig.isEnabled() && capabilityConfig.isEnabled() )
+            {
+                ref.enable();
             }
         }
     }
@@ -125,9 +131,29 @@ public class CapabilityConfigurationEventInspector
         if ( ref != null )
         {
             registry.remove( ref.capability().id() );
-            ref.passivate();
+            ref.disable();
             ref.capability().remove();
         }
+    }
+
+    // @TestAccessible //
+    static boolean sameProperties( final CCapability capability1, final CCapability capability2 )
+    {
+        final List<CCapabilityProperty> p1 = capability1.getProperties();
+        final List<CCapabilityProperty> p2 = capability2.getProperties();
+        if ( p1 == null )
+        {
+            return p2 == null;
+        }
+        else if ( p2 == null )
+        {
+            return false;
+        }
+        if ( p1.size() != p2.size() )
+        {
+            return false;
+        }
+        return p1.equals( p2 );
     }
 
 }

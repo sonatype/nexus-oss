@@ -18,8 +18,9 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
-import java.io.IOException;
+import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
@@ -38,6 +39,9 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
+import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
@@ -69,17 +73,21 @@ public class CapabilityPlexusResource
 
     private CapabilityDescriptorRegistry capabilityDescriptorRegistry;
 
+    private CapabilityRegistry capabilityRegistry;
+
     // TODO get rid of this constructor as it is here because enunciate plugin fails without a default constructor
     public CapabilityPlexusResource()
     {
     }
-    
+
     @Inject
     public CapabilityPlexusResource( final CapabilityConfiguration capabilitiesConfiguration,
-                                  final CapabilityDescriptorRegistry capabilityDescriptorRegistry )
+                                     final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+                                     final CapabilityRegistry capabilityRegistry )
     {
-        this.capabilitiesConfiguration = capabilitiesConfiguration;
-        this.capabilityDescriptorRegistry = capabilityDescriptorRegistry;
+        this.capabilitiesConfiguration = checkNotNull( capabilitiesConfiguration );
+        this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
+        this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.setModifiable( true );
     }
 
@@ -106,7 +114,8 @@ public class CapabilityPlexusResource
      */
     @Override
     @GET
-    @ResourceMethodSignature( pathParams = { @PathParam( CapabilityPlexusResource.CAPABILITIES_ID_KEY ) }, output = CapabilityResponseResource.class )
+    @ResourceMethodSignature( pathParams = { @PathParam( CapabilityPlexusResource.CAPABILITIES_ID_KEY ) },
+                              output = CapabilityResponseResource.class )
     public Object get( final Context context, final Request request, final Response response, final Variant variant )
         throws ResourceException
     {
@@ -126,7 +135,7 @@ public class CapabilityPlexusResource
         catch ( final Exception e )
         {
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
-                "Could not manage capabilities configuration persistence store" );
+                                         "Could not manage capabilities configuration persistence store" );
         }
     }
 
@@ -135,7 +144,8 @@ public class CapabilityPlexusResource
      */
     @Override
     @PUT
-    @ResourceMethodSignature( pathParams = { @PathParam( CapabilityPlexusResource.CAPABILITIES_ID_KEY ) }, input = CapabilityRequestResource.class, output = CapabilityStatusResponseResource.class )
+    @ResourceMethodSignature( pathParams = { @PathParam( CapabilityPlexusResource.CAPABILITIES_ID_KEY ) },
+                              input = CapabilityRequestResource.class, output = CapabilityStatusResponseResource.class )
     public Object put( final Context context, final Request request, final Response response, final Object payload )
         throws ResourceException
     {
@@ -146,10 +156,12 @@ public class CapabilityPlexusResource
             capabilitiesConfiguration.update( capability );
             capabilitiesConfiguration.save();
 
-            final CapabilityStatusResponseResource result =
-                asCapabilityStatusResponseResource( capability,
+            final CapabilityStatusResponseResource result = asCapabilityStatusResponseResource(
+                capability,
                 createChildReference( request, this, capability.getId() ).toString(),
-                capabilityDescriptorRegistry );
+                capabilityDescriptorRegistry,
+                capabilityRegistry
+            );
             return result;
         }
         catch ( final InvalidConfigurationException e )
@@ -160,7 +172,7 @@ public class CapabilityPlexusResource
         catch ( final IOException e )
         {
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
-                "Could not manage capabilities configuration persistence store" );
+                                         "Could not manage capabilities configuration persistence store" );
         }
     }
 
@@ -185,7 +197,7 @@ public class CapabilityPlexusResource
         catch ( final IOException e )
         {
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
-                "Could not manage capabilities configuration persistence store" );
+                                         "Could not manage capabilities configuration persistence store" );
         }
     }
 
@@ -196,7 +208,7 @@ public class CapabilityPlexusResource
         final CCapability capability = new CCapability();
 
         capability.setId( resource.getId() );
-        capability.setDescription( resource.getDescription() );
+        capability.setNotes( resource.getNotes() );
         capability.setEnabled( resource.isEnabled() );
         capability.setTypeId( resource.getTypeId() );
 
@@ -222,7 +234,7 @@ public class CapabilityPlexusResource
         final CapabilityResource resource = new CapabilityResource();
 
         resource.setId( capability.getId() );
-        resource.setDescription( capability.getDescription() );
+        resource.setNotes( capability.getNotes() );
         resource.setEnabled( capability.isEnabled() );
         resource.setTypeId( capability.getTypeId() );
 
@@ -245,30 +257,42 @@ public class CapabilityPlexusResource
     }
 
     static CapabilityStatusResponseResource asCapabilityStatusResponseResource(
-                                                                          final CCapability capability,
-                                                                          final String uri,
-                                                                          final CapabilityDescriptorRegistry capabilityDescriptorRegistry )
+        final CCapability capability,
+        final String uri,
+        final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+        final CapabilityRegistry capabilityRegistry )
     {
         assert capability != null : "Capability cannot be null";
 
         final CapabilityStatusResponseResource status = new CapabilityStatusResponseResource();
 
-        status.setData( asCapabilityListItemResource( capability, uri, capabilityDescriptorRegistry ) );
+        status.setData( asCapabilityListItemResource(
+            capability, uri, capabilityDescriptorRegistry, capabilityRegistry )
+        );
 
         return status;
     }
 
-    static CapabilityListItemResource asCapabilityListItemResource( final CCapability capability, final String uri,
-                                                              final CapabilityDescriptorRegistry capabilityDescriptorRegistry )
+    static CapabilityListItemResource asCapabilityListItemResource(
+        final CCapability capability,
+        final String uri,
+        final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+        final CapabilityRegistry capabilityRegistry )
     {
         assert capability != null : "Capability cannot be null";
 
         final CapabilityListItemResource item = new CapabilityListItemResource();
         item.setId( capability.getId() );
         item.setDescription( capability.getDescription() );
+        item.setNotes( capability.getNotes() );
         item.setEnabled( capability.isEnabled() );
         item.setTypeId( capability.getTypeId() );
-        item.setTypeName( capabilityDescriptorRegistry.get( capability.getTypeId() ).name() );
+
+        final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( capability.getTypeId() );
+        item.setTypeName( descriptor == null ? "" : descriptor.name() );
+
+        final CapabilityReference reference = capabilityRegistry.get( capability.getId() );
+        item.setActive( reference != null && reference.isActive() );
 
         item.setResourceURI( uri );
 

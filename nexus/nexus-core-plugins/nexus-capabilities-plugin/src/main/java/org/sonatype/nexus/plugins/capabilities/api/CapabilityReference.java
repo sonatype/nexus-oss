@@ -20,6 +20,14 @@ package org.sonatype.nexus.plugins.capabilities.api;
 
 /**
  * Reference to a capability and its state.
+ * <p/>
+ * A capability can be enabled/disabled, usually at user request and can be active in case that:<br/>
+ * * is enabled<br/>
+ * * capability did not fail activation<br/>
+ * * activation condition is satisfied.<br/>
+ * In above is not fulfilled capability is inactive.
+ * <p/>
+ * Whenever the active state changes {@link Capability#activate()} / {@link Capability#passivate()} is called.
  *
  * @since 1.10.0
  */
@@ -32,6 +40,23 @@ public interface CapabilityReference
      * @return referenced capability
      */
     Capability capability();
+
+    /**
+     * Whether the referenced capability is enabled.
+     *
+     * @return true, if capability is enabled
+     */
+    boolean isEnabled();
+
+    /**
+     * Enables the referenced capability.
+     */
+    void enable();
+
+    /**
+     * Disables the referenced capability.
+     */
+    void disable();
 
     /**
      * Whether the referenced capability is active.
