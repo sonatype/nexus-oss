@@ -741,6 +741,32 @@
         <version>0.9</version>
         <type>jar</type>
       </dependency>
+      
+      <!-- Jackson -->
+      <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-core-asl</artifactId>
+        <version>1.9.2</version>
+        <type>jar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-mapper-asl</artifactId>
+        <version>1.9.2</version>
+        <type>jar</type>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml</groupId>
+        <artifactId>jackson-xml-databind</artifactId>
+        <version>0.6.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.xml.stream</groupId>
+            <artifactId>stax-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      
       <dependency>
         <groupId>com.thoughtworks.xstream</groupId>
         <artifactId>xstream</artifactId>
@@ -999,6 +1025,13 @@
         <artifactId>nexus-api</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-api</artifactId>
+          <version>${project.version}</version>
+          <classifier>tests</classifier>
+          <scope>test</scope>
+        </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-oss-edition</artifactId>

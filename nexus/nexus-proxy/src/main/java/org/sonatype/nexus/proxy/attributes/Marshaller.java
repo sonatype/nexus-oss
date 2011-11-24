@@ -18,16 +18,37 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
-import org.sonatype.nexus.logging.AbstractPlexusLoggingComponent;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
- * The Class AbstractStorageFileItemInspector is a convenience class for implementing inspectors.
+ * Component handling the marshalling and unmarshalling of attributes.
  * 
  * @author cstamas
  */
-public abstract class AbstractStorageFileItemInspector
-    extends AbstractPlexusLoggingComponent
-    implements StorageFileItemInspector
+public interface Marshaller
 {
+    /**
+     * Marshals the item into bytes written into output stream.
+     * 
+     * @param item
+     * @param outputStream
+     * @throws IOException
+     */
+    void marshal( StorageItem item, OutputStream outputStream )
+        throws IOException;
 
+    /**
+     * Unmarshalls the item from bytes provided on inputStream.
+     * 
+     * @param inputStream
+     * @return
+     * @throws IOException
+     * @throws InvalidInputException When the content is available, but it's corrupted, not expected, etc.
+     */
+    StorageItem unmarshal( InputStream inputStream )
+        throws IOException, InvalidInputException;
 }

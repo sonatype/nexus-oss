@@ -49,19 +49,15 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
-import org.sonatype.nexus.proxy.repository.HostedRepository;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.AbstractLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.util.ItemPathUtils;
-import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
- * The Class DefaultFSLocalRepositoryStorage.
+ * LocalRepositoryStorage that uses plain File System (relies on {@link File}) to implement it's functionality.
  * 
  * @author cstamas
  */
@@ -70,15 +66,6 @@ public class DefaultFSLocalRepositoryStorage
     extends AbstractLocalRepositoryStorage
 {
     public static final String PROVIDER_STRING = "file";
-
-    private static final boolean touchLastRequested = SystemPropertiesHelper.getBoolean(
-        "nexus.ls.file.touchLastRequested", true );
-
-    private static final boolean touchLastRequestedForHostedRepositories = SystemPropertiesHelper.getBoolean(
-        "nexus.ls.file.touchLastRequested.hosted", touchLastRequested );
-
-    private static final boolean touchLastRequestedForProxyRepositories = SystemPropertiesHelper.getBoolean(
-        "nexus.ls.file.touchLastRequested.proxy", touchLastRequested );
 
     private FSPeer fsPeer;
 
@@ -281,11 +268,8 @@ public class DefaultFSLocalRepositoryStorage
                         link.setCreated( target.lastModified() );
                         result = link;
 
-                        if ( doTouchLastRequested( repository ) )
-                        {
-                            repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(),
-                                repository, request, link );
-                        }
+                        repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(),
+                            repository, request, link );
                     }
                     catch ( NoSuchRepositoryException e )
                     {
@@ -308,11 +292,8 @@ public class DefaultFSLocalRepositoryStorage
                     file.setLength( target.length() );
                     result = file;
 
-                    if ( doTouchLastRequested( repository ) )
-                    {
-                        repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(),
-                            repository, request, file );
-                    }
+                    repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(), repository,
+                        request, file );
                 }
             }
             catch ( FileNotFoundException e )
@@ -334,30 +315,6 @@ public class DefaultFSLocalRepositoryStorage
         }
 
         return result;
-    }
-
-    protected boolean doTouchLastRequested( final Repository repository )
-    {
-        // the "default"
-        boolean doTouch = touchLastRequested;
-
-        final RepositoryKind repositoryKind = repository.getRepositoryKind();
-
-        if ( repositoryKind != null )
-        {
-            if ( repositoryKind.isFacetAvailable( HostedRepository.class ) )
-            {
-                // this is a hosted repository
-                doTouch = touchLastRequestedForHostedRepositories;
-            }
-            else if ( repositoryKind.isFacetAvailable( ProxyRepository.class ) )
-            {
-                // this is a proxy repository
-                doTouch = touchLastRequestedForProxyRepositories;
-            }
-        }
-
-        return doTouch;
     }
 
     public boolean isReachable( Repository repository, ResourceStoreRequest request )

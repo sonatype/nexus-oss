@@ -16,18 +16,36 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.attributes;
+package org.sonatype.nexus.proxy.attributes.perf;
 
-import org.sonatype.nexus.logging.AbstractPlexusLoggingComponent;
+import org.sonatype.nexus.proxy.attributes.AttributeStorage;
+import org.sonatype.nexus.proxy.attributes.HashMapAttributeStorage;
 
 /**
- * The Class AbstractStorageFileItemInspector is a convenience class for implementing inspectors.
- * 
- * @author cstamas
+ * Performance test for DefaultFSAttributeStorage
  */
-public abstract class AbstractStorageFileItemInspector
-    extends AbstractPlexusLoggingComponent
-    implements StorageFileItemInspector
+//@BenchmarkHistoryChart()
+//@BenchmarkMethodChart()
+//@AxisRange(min = 0)
+public class HashMapAttributeStoragePerformanceTest
+    extends AttributeStoragePerformanceTestSupport
 {
+//    @Rule
+//    public MethodRule benchmarkRun = new BenchmarkRule();
 
+    private AttributeStorage attributeStorage =  new HashMapAttributeStorage();
+
+    public void setup()
+        throws Exception
+    {
+        super.setup();
+
+        test1PutAttribute();
+        test2PutAttributeX100();
+    }
+
+    public AttributeStorage getAttributeStorage()
+    {
+        return attributeStorage;
+    }
 }

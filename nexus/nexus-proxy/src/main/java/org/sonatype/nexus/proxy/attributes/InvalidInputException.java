@@ -18,16 +18,26 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
-import org.sonatype.nexus.logging.AbstractPlexusLoggingComponent;
+import java.io.IOException;
 
 /**
- * The Class AbstractStorageFileItemInspector is a convenience class for implementing inspectors.
+ * Exception thrown when {@link Marshaller} does not hit "plain" IOException, is able to read the content but it detects
+ * the content as corrupt, unreadable or in any other way unexpectedly formatted and unprocessable.
  * 
  * @author cstamas
  */
-public abstract class AbstractStorageFileItemInspector
-    extends AbstractPlexusLoggingComponent
-    implements StorageFileItemInspector
+public class InvalidInputException
+    extends IOException
 {
+    private static final long serialVersionUID = -1729104533714236869L;
 
+    public InvalidInputException( String message )
+    {
+        super( message );
+    }
+
+    public InvalidInputException( String message, Throwable cause )
+    {
+        super( message, cause );
+    }
 }
