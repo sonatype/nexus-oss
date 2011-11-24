@@ -1,15 +1,21 @@
 package de.is24.nexus.yum.plugin.impl;
 
+import static de.is24.nexus.yum.repository.YumMetadataGenerationTask.ID;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
+import static org.sonatype.scheduling.TaskState.RUNNING;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
+
 import javax.inject.Inject;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -19,23 +25,23 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.scheduling.ScheduledTask;
+
 import com.google.code.tempusfugit.concurrency.ConcurrentRule;
 import com.google.code.tempusfugit.concurrency.RepeatingRule;
 import com.google.code.tempusfugit.concurrency.annotations.Concurrent;
+
 import de.is24.nexus.yum.AbstractRepositoryTester;
 import de.is24.nexus.yum.plugin.ItemEventListener;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.repository.utils.RepositoryTestUtils;
 import de.is24.nexus.yum.service.YumService;
-import de.is24.nexus.yum.service.impl.YumRepositoryCreatorService;
 
 
 /**
- * Created by IntelliJ IDEA.
- * User: BVoss
- * Date: 01.08.11
- * Time: 17:32
- * To change this template use File | Settings | File Templates.
+ * @author sherold
+ * @author bvoss
  */
 public class ConcurrentRpmDeployedListenerTest extends AbstractRepositoryTester {
   private static final Logger log = LoggerFactory.getLogger(ConcurrentRpmDeployedListenerTest.class);
@@ -47,6 +53,9 @@ public class ConcurrentRpmDeployedListenerTest extends AbstractRepositoryTester 
   public RepeatingRule repeatedly = new RepeatingRule();
 
   @Inject
+	private NexusScheduler nexusScheduler;
+
+	@Inject
   private ItemEventListener listener;
 
   @Inject
@@ -54,9 +63,6 @@ public class ConcurrentRpmDeployedListenerTest extends AbstractRepositoryTester 
 
   @Inject
   private YumService yumService;
-
-  @Inject
-  private YumRepositoryCreatorService yumRepositoryCreatorService;
 
   @Before
   public void activateRepo() {
@@ -97,8 +103,21 @@ public class ConcurrentRpmDeployedListenerTest extends AbstractRepositoryTester 
 
     listener.onEvent(new RepositoryItemEventStore(repo, storageItem));
 
-    final int activeWorker = yumRepositoryCreatorService.getActiveWorkerCount();
-    log.info("active worker: " + activeWorker + " size: " + yumRepositoryCreatorService.size());
+		final int activeWorker = getRunningTasks();
+		log.info("active worker: " + activeWorker);
     assertThat(activeWorker, is(lessThanOrEqualTo(10)));
   }
+
+	private int getRunningTasks() {
+		List<ScheduledTask<?>> tasks = nexusScheduler.getActiveTasks().get(ID);
+		int count = 0;
+		if (tasks != null) {
+			for (ScheduledTask<?> task : tasks) {
+				if (RUNNING.equals(task.getTaskState())) {
+					count++;
+				}
+			}
+		}
+		return count;
+	}
 }

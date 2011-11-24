@@ -1,11 +1,12 @@
 package de.is24.nexus.yum.repository;
 
-import static de.is24.nexus.yum.repository.YumRepositoryGeneratorJob.activated;
+import static de.is24.nexus.yum.repository.YumMetadataGenerationTask.isActive;
 import static java.io.File.separator;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.IOUtils.readLines;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -20,6 +21,7 @@ import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,7 +151,7 @@ public class RpmListWriter {
       Writer writer = new FileWriter(rpmListFile);
       try {
         for (Entry<String, String> entry : fileMap.entrySet()) {
-          if (!activated) {
+					if (!isActive()) {
             return;
           }
           writer.append(format("%s%s\n", entry.getKey(), entry.getValue()));

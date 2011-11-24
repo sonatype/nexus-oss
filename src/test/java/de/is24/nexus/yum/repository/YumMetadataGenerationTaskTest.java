@@ -1,7 +1,6 @@
 package de.is24.nexus.yum.repository;
 
 import static de.is24.nexus.yum.repository.YumMetadataGenerationTask.ID;
-import static java.lang.System.currentTimeMillis;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.sonatype.scheduling.TaskState.RUNNING;
@@ -70,23 +69,18 @@ public class YumMetadataGenerationTaskTest {
 		return new MockScheduledTask<YumRepository>(task);
 	}
 
-	private Date before() {
-		return new Date(currentTimeMillis() - 1000);
-	}
-
 	private YumMetadataGenerationTask task(String repo, String version) {
-		YumMetadataGenerationTask task = new YumMetadataGenerationTask();
-		YumGeneratorConfiguration config = new DefaultYumGeneratorConfiguration(RPM_DIR, RPM_URL, RPM_DIR, RPM_URL, repo, version, RPM_DIR,
-				null,
-				true);
-		task.setJob(new YumRepositoryGeneratorJob(config) {
+		YumMetadataGenerationTask task = new YumMetadataGenerationTask() {
 
 			@Override
-			public YumRepository call() throws Exception {
+			protected YumRepository doRun() throws Exception {
 				return null;
 			}
 
-		});
+		};
+		YumGeneratorConfiguration config = new DefaultYumGeneratorConfiguration(RPM_DIR, RPM_URL, RPM_DIR, RPM_URL, repo, version, RPM_DIR,
+				null, true);
+		task.setConfiguration(config);
 		return task;
 	}
 

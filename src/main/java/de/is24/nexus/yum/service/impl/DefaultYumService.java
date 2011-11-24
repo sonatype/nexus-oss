@@ -2,18 +2,24 @@ package de.is24.nexus.yum.service.impl;
 
 import static de.is24.nexus.yum.repository.RepositoryUtils.getBaseDir;
 import static de.is24.nexus.yum.repository.YumGeneratorConfigurationBuilder.newConfigBuilder;
+import static de.is24.nexus.yum.repository.YumMetadataGenerationTask.ID;
+
 import java.io.File;
 import java.net.URL;
+
 import javax.inject.Inject;
+
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
+
 import de.is24.nexus.yum.repository.YumGeneratorConfigurationBuilder;
 import de.is24.nexus.yum.repository.YumMetadataGenerationTask;
 import de.is24.nexus.yum.repository.YumRepository;
-import de.is24.nexus.yum.repository.YumRepositoryGeneratorJob;
 import de.is24.nexus.yum.service.YumService;
 
 
@@ -22,10 +28,10 @@ public class DefaultYumService implements YumService {
   private static final String CACHE_DIR_PREFIX = ".cache-";
 
   @Inject
-  private YumRepositoryCreatorService executorService;
-
-  @Inject
   private GlobalRestApiSettings restApiSettings;
+
+	@Requirement
+	private NexusScheduler nexusScheduler;
 
   @Inject
   private NexusConfiguration nexusConfiguration;
@@ -40,8 +46,7 @@ public class DefaultYumService implements YumService {
 
   @Override
   public void deactivate() {
-    executorService.shutdown();
-    YumRepositoryGeneratorJob.deactivate();
+		YumMetadataGenerationTask.deactivate();
   }
 
   @Override
@@ -49,7 +54,7 @@ public class DefaultYumService implements YumService {
     URL yumRepoUrl, String id,
     boolean singleRpmPerDirectory) {
     try {
-      if (!executorService.isShutdown()) {
+			if (YumMetadataGenerationTask.isActive()) {
         YumGeneratorConfigurationBuilder config = newConfigBuilder();
         config.rpmDir(rpmBaseDir);
         config.rpmUrl(rpmBaseUrl);
@@ -58,7 +63,7 @@ public class DefaultYumService implements YumService {
         config.repoUrl(yumRepoUrl.toString());
         config.cacheDir(createCacheDir("nexus-yum-repo"));
         config.singleRpmPerDirectory(singleRpmPerDirectory);
-        return executorService.submit(createTask(config));
+				return nexusScheduler.submit(ID, createTask(config));
       }
     } catch (Exception e) {
       throw new RuntimeException("Unable to create repository", e);
@@ -72,7 +77,7 @@ public class DefaultYumService implements YumService {
     URL yumRepoUrl) {
     try {
       File rpmBaseDir = getBaseDir(repository);
-      if (!executorService.isShutdown()) {
+			if (YumMetadataGenerationTask.isActive()) {
         YumGeneratorConfigurationBuilder config = newConfigBuilder();
         config.rpmDir(rpmBaseDir);
         config.rpmUrl(getBaseUrl(repository));
@@ -81,7 +86,7 @@ public class DefaultYumService implements YumService {
         config.id(repository.getId());
         config.version(version);
         config.cacheDir(createCacheDir(repository.getId()));
-        return executorService.submit(createTask(config));
+				return nexusScheduler.submit(ID, createTask(config));
       }
     } catch (Exception e) {
       throw new RuntimeException("Unable to create repository", e);
@@ -108,7 +113,7 @@ public class DefaultYumService implements YumService {
   }
 
   private YumMetadataGenerationTask createTask(YumGeneratorConfigurationBuilder config) {
-    YumMetadataGenerationTask task = executorService.createTaskInstance(YumMetadataGenerationTask.class);
+		YumMetadataGenerationTask task = nexusScheduler.createTaskInstance(YumMetadataGenerationTask.class);
     task.setConfiguration(config.toConfig());
     return task;
   }
@@ -137,24 +142,21 @@ public class DefaultYumService implements YumService {
 
   @Override
   public void activate() {
-    YumRepositoryGeneratorJob.activate();
-    if (executorService.isShutdown()) {
-      executorService.activate();
-    }
+		YumMetadataGenerationTask.activate();
   }
 
   @Override
   public ScheduledTask<YumRepository> addToYumRepository(Repository repository, String filePath) {
     try {
       File rpmBaseDir = getBaseDir(repository);
-      if (!executorService.isShutdown()) {
+			if (YumMetadataGenerationTask.isActive()) {
         YumGeneratorConfigurationBuilder config = newConfigBuilder();
         config.rpmDir(rpmBaseDir);
         config.rpmUrl(getBaseUrl(repository));
         config.id(repository.getId());
         config.cacheDir(createCacheDir(repository.getId()));
         config.addedFile(filePath);
-        return executorService.submit(createTask(config));
+				return nexusScheduler.submit(ID, createTask(config));
       }
     } catch (Exception e) {
       throw new RuntimeException("Unable to create repository", e);
@@ -165,6 +167,6 @@ public class DefaultYumService implements YumService {
 
   @Override
   public boolean isActive() {
-    return YumRepositoryGeneratorJob.isActive();
+		return YumMetadataGenerationTask.isActive();
   }
 }

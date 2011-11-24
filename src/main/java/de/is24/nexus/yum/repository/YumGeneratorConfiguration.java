@@ -6,10 +6,10 @@ import java.io.File;
 /**
  * Configuration holding all information needed to generate a Yum repository.
  * It's typically created via the {@link YumGeneratorConfigurationBuilder} and
- * handed over to the {@link YumRepositoryGeneratorJob}.
- *
+ * handed over to the {@link YumMetadataGenerationTask}.
+ * 
  * @author sherold
- *
+ * 
  */
 public interface YumGeneratorConfiguration {
   /**

@@ -7,8 +7,10 @@ import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.RPM_BASE_FI
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.TARGET_DIR;
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.assertRepository;
 import static org.apache.commons.io.FileUtils.deleteDirectory;
+
 import java.io.File;
 import java.util.concurrent.ExecutionException;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,7 +27,7 @@ public class YumRepositoryGeneratorJobTest extends AbstractSchedulerTest {
     super.setUp();
     deleteDirectory(PACKAGE_CACHE_DIR);
     deleteDirectory(REPODATA_DIR);
-    YumRepositoryGeneratorJob.activate();
+		YumMetadataGenerationTask.activate();
   }
 
   @Test
@@ -37,7 +39,7 @@ public class YumRepositoryGeneratorJobTest extends AbstractSchedulerTest {
 
   @Test
   public void shouldNotExecuteCreateRepoIfDeactivated() throws Exception {
-    YumRepositoryGeneratorJob.deactivate();
+		YumMetadataGenerationTask.deactivate();
     executeJob(new DefaultYumGeneratorConfiguration(RPM_BASE_FILE, BASE_URL, TARGET_DIR, SNAPSHOTS, BASE_CACHE_DIR));
     Assert.assertFalse(REPODATA_DIR.exists());
   }

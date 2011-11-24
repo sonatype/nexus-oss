@@ -5,8 +5,14 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+import static org.sonatype.scheduling.TaskState.RUNNING;
+
 import java.io.File;
+import java.util.List;
+import java.util.Map.Entry;
+
 import javax.inject.Inject;
+
 import org.junit.After;
 import org.junit.Before;
 import org.sonatype.nexus.proxy.RequestContext;
@@ -14,23 +20,34 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.scheduling.ScheduledTask;
+
 import com.google.code.tempusfugit.temporal.Condition;
+
 import de.is24.nexus.yum.repository.utils.RepositoryTestUtils;
-import de.is24.nexus.yum.service.impl.YumRepositoryCreatorService;
 
 
 public abstract class AbstractRepositoryTester extends AbstractYumNexusTestCase {
   private static final String SNAPSHOTS = "snapshots";
 
   @Inject
-  private YumRepositoryCreatorService yumRepositoryCreatorService;
+	private NexusScheduler nexusScheduler;
 
   @After
   public void waitForThreadPool() throws Exception {
     waitFor(new Condition() {
         @Override
         public boolean isSatisfied() {
-          return yumRepositoryCreatorService.getActiveWorkerCount() == 0;
+				int running = 0;
+				for (Entry<String, List<ScheduledTask<?>>> entry : nexusScheduler.getActiveTasks().entrySet()) {
+					for (ScheduledTask<?> task : entry.getValue()) {
+						if (RUNNING.equals(task.getTaskState())) {
+							running++;
+						}
+					}
+				}
+				return running == 0;
         }
       });
   }
