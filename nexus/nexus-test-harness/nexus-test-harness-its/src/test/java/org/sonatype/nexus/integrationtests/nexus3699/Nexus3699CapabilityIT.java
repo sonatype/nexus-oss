@@ -58,7 +58,7 @@ public class Nexus3699CapabilityIT
     {
         // create
         CapabilityResource cap = new CapabilityResource();
-        cap.setDescription( "crud-test" );
+        cap.setNotes( "crud-test" );
         cap.setTypeId( "TouchTest" );
         CapabilityPropertyResource prop = new CapabilityPropertyResource();
         prop.setKey( "repoOrGroupId" );
@@ -75,16 +75,16 @@ public class Nexus3699CapabilityIT
         // read
         CapabilityResource read = CapabilitiesMessageUtil.read( r.getId() );
         Assert.assertEquals( r.getId(), read.getId() );
-        Assert.assertEquals( cap.getDescription(), read.getDescription() );
+        Assert.assertEquals( cap.getNotes(), read.getNotes() );
         Assert.assertEquals( cap.getTypeId(), read.getTypeId() );
         Assert.assertEquals( cap.getProperties().size(), read.getProperties().size() );
 
         // update
-        read.setDescription( "updateCrudTest" );
+        read.setNotes( "updateCrudTest" );
         CapabilityListItemResource updated = CapabilitiesMessageUtil.update( read );
-        Assert.assertEquals( "updateCrudTest", updated.getDescription() );
+        Assert.assertEquals( "updateCrudTest", updated.getNotes() );
         read = CapabilitiesMessageUtil.read( r.getId() );
-        Assert.assertEquals( "updateCrudTest", read.getDescription() );
+        Assert.assertEquals( "updateCrudTest", read.getNotes() );
 
         // delete
         CapabilitiesMessageUtil.delete( r.getId() );
