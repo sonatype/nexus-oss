@@ -21,22 +21,15 @@ package org.sonatype.nexus.plugins.capabilities.support.activation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
-import java.util.Collections;
-
-import org.junit.Before;
+import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.sonatype.nexus.plugins.capabilities.api.AbstractCapability;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeActiveCondition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.OnDemandCondition;
 
 /**
@@ -47,374 +40,52 @@ import org.sonatype.nexus.plugins.capabilities.internal.activation.OnDemandCondi
 public class CapabilityConditionsTest
 {
 
-    private ActivationContext activationContext;
-
-    private CapabilityReference ref1;
-
-    private CapabilityReference ref2;
-
-    private CapabilityReference ref3;
-
-    private CapabilityConditions underTest;
-
-    private CapabilityRegistry capabilityRegistry;
-
-    private CapabilityRegistry.Listener listener;
-
-    private Condition condition;
-
-    @Before
-    public void setUp()
+    /**
+     * capabilityOfTypeExists() factory method returns expected condition.
+     */
+    @Test
+    public void capabilityOfTypeExists()
     {
-        activationContext = mock( ActivationContext.class );
-        capabilityRegistry = mock( CapabilityRegistry.class );
-        underTest = new CapabilityConditions(
-            capabilityRegistry, activationContext
+        final ActivationContext activationContext = mock( ActivationContext.class );
+        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        final CapabilityConditions underTest = new CapabilityConditions( activationContext, capabilityRegistry );
+
+        assertThat(
+            underTest.capabilityOfTypeExists( Capability.class ),
+            is( Matchers.<Condition>instanceOf( CapabilityOfTypeExistsCondition.class ) )
         );
-
-        final TestCapability testCapability = new TestCapability();
-        ref1 = mock( CapabilityReference.class );
-        when( ref1.capability() ).thenReturn( testCapability );
-        ref2 = mock( CapabilityReference.class );
-        when( ref2.capability() ).thenReturn( testCapability );
-        ref3 = mock( CapabilityReference.class );
-        when( ref3.capability() ).thenReturn( mock( Capability.class ) );
     }
 
     /**
-     * Tests condition on a capability of certain type to exist.
-     * <p/>
-     * Condition should become satisfied if an active capability of specified type is added.
+     * capabilityOfTypeActive() factory method returns expected condition.
      */
     @Test
-    public void capabilityOfTypeExists01()
+    public void capabilityOfTypeActive()
     {
-        prepare( underTest.capabilityOfTypeExists( TestCapability.class ) );
+        final ActivationContext activationContext = mock( ActivationContext.class );
+        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        final CapabilityConditions underTest = new CapabilityConditions( activationContext, capabilityRegistry );
 
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
-        when( ref1.isActive() ).thenReturn( true );
-        listener.onAdd( ref1 );
-        assertThat( condition.isSatisfied(), is( true ) );
-        verify( activationContext, times( 1 ) ).notifySatisfied( condition );
-    }
-
-    /**
-     * Tests condition on a capability of certain type to exist.
-     * <p/>
-     * Condition should become satisfied if a non active capability of specified type is added.
-     */
-    @Test
-    public void capabilityOfTypeExists02()
-    {
-        prepare( underTest.capabilityOfTypeExists( TestCapability.class ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
-        when( ref1.isActive() ).thenReturn( false );
-        listener.onAdd( ref1 );
-        assertThat( condition.isSatisfied(), is( true ) );
-        verify( activationContext, times( 1 ) ).notifySatisfied( condition );
-    }
-
-    /**
-     * Tests condition on a capability of certain type to exist.
-     * <p/>
-     * Condition should not be re-satisfied if a new active capability of specified type is added.
-     */
-    @Test
-    public void capabilityOfTypeExists03()
-    {
-        prepare( underTest.capabilityOfTypeExists( TestCapability.class ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
-        listener.onAdd( ref1 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1, ref2 ) );
-        listener.onAdd( ref2 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        verify( activationContext, times( 1 ) ).notifySatisfied( condition );
-    }
-
-    /**
-     * Tests condition on a capability of certain type to exist.
-     * <p/>
-     * Condition should remain satisfied if another capability of the specified type is removed.
-     */
-    @Test
-    public void capabilityOfTypeExists04()
-    {
-        prepare( underTest.capabilityOfTypeExists( TestCapability.class ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
-        listener.onAdd( ref1 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1, ref2 ) );
-        listener.onAdd( ref2 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref2 ) );
-        listener.onRemove( ref1 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        verify( activationContext, times( 1 ) ).notifySatisfied( condition );
-    }
-
-    /**
-     * Tests condition on a capability of certain type to exist.
-     * <p/>
-     * Condition should become unsatisfied when all capabilities have been removed.
-     */
-    @Test
-    public void capabilityOfTypeExists05()
-    {
-        prepare( underTest.capabilityOfTypeExists( TestCapability.class ) );
-
-        // now remove the capability to check if condition becomes unsatisfied
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
-        listener.onAdd( ref1 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Collections.<CapabilityReference>emptyList() );
-        listener.onRemove( ref1 );
-        assertThat( condition.isSatisfied(), is( false ) );
-
-        verify( activationContext, times( 1 ) ).notifySatisfied( condition );
-        verify( activationContext, times( 1 ) ).notifyUnsatisfied( condition );
-    }
-
-    /**
-     * Tests condition on a capability of certain type to be active.
-     * <p/>
-     * Condition should not be satisfied if capability of specified type exists but is not active.
-     */
-    @Test
-    public void capabilityOfTypeActive01()
-    {
-        prepare( underTest.capabilityOfTypeActive( TestCapability.class ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
-        when( ref1.isActive() ).thenReturn( false );
-        listener.onAdd( ref1 );
-        assertThat( condition.isSatisfied(), is( false ) );
-    }
-
-    /**
-     * Tests condition on a capability of certain type to be active.
-     * <p/>
-     * Condition should be satisfied if capability of specified type exists and is active.
-     */
-    @Test
-    public void capabilityOfTypeActive02()
-    {
-        prepare( underTest.capabilityOfTypeActive( TestCapability.class ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
-        when( ref1.isActive() ).thenReturn( true );
-        listener.onActivate( ref1 );
-        verify( activationContext, times( 1 ) ).notifySatisfied( condition );
-    }
-
-    /**
-     * Tests condition on a capability of certain type to be active.
-     * <p/>
-     * Condition should not be re-satisfied if a new active capability of specified type is added.
-     */
-    @Test
-    public void capabilityOfTypeActive03()
-    {
-        prepare( underTest.capabilityOfTypeActive( TestCapability.class ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
-        when( ref1.isActive() ).thenReturn( true );
-        listener.onAdd( ref2 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1, ref2 ) );
-        when( ref2.isActive() ).thenReturn( true );
-        listener.onAdd( ref2 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        verify( activationContext, times( 1 ) ).notifySatisfied( condition );
-    }
-
-    /**
-     * Tests condition on a capability of certain type to be active.
-     * <p/>
-     * Condition should remain satisfied if another active capability of the specified type is removed.
-     */
-    @Test
-    public void capabilityOfTypeActive04()
-    {
-        prepare( underTest.capabilityOfTypeActive( TestCapability.class ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
-        when( ref1.isActive() ).thenReturn( true );
-        listener.onAdd( ref1 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1, ref2 ) );
-        when( ref2.isActive() ).thenReturn( true );
-        listener.onAdd( ref2 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref2 ) );
-        listener.onRemove( ref1 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        verify( activationContext, times( 1 ) ).notifySatisfied( condition );
-    }
-
-    /**
-     * Tests condition on a capability of certain type to be active.
-     * <p/>
-     * Condition should remain satisfied if another active capability of the specified type is passivated.
-     */
-    @Test
-    public void capabilityOfTypeActive05()
-    {
-        prepare( underTest.capabilityOfTypeActive( TestCapability.class ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
-        when( ref1.isActive() ).thenReturn( true );
-        listener.onAdd( ref1 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1, ref2 ) );
-        when( ref2.isActive() ).thenReturn( true );
-        listener.onAdd( ref2 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1, ref2 ) );
-        when( ref1.isActive() ).thenReturn( true );
-        listener.onPassivate( ref1 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        verify( activationContext, times( 1 ) ).notifySatisfied( condition );
-    }
-
-    /**
-     * Tests condition on a capability of certain type to be active.
-     * <p/>
-     * Condition should become unsatisfied when all capabilities have been removed.
-     */
-    @Test
-    public void capabilityOfTypeActive06()
-    {
-        prepare( underTest.capabilityOfTypeActive( TestCapability.class ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
-        when( ref1.isActive() ).thenReturn( true );
-        listener.onAdd( ref1 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Collections.<CapabilityReference>emptyList() );
-        listener.onRemove( ref1 );
-        assertThat( condition.isSatisfied(), is( false ) );
-
-        verify( activationContext, times( 1 ) ).notifySatisfied( condition );
-        verify( activationContext, times( 1 ) ).notifyUnsatisfied( condition );
-    }
-
-    /**
-     * Tests condition on a capability of certain type to be active.
-     * <p/>
-     * Condition should remain satisfied if a condition of a different type is passivated.
-     */
-    @Test
-    public void capabilityOfTypeActive07()
-    {
-        prepare( underTest.capabilityOfTypeActive( TestCapability.class ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
-        when( ref1.isActive() ).thenReturn( true );
-        listener.onAdd( ref1 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1, ref3 ) );
-        when( ref3.isActive() ).thenReturn( true );
-        listener.onAdd( ref3 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1, ref3 ) );
-        when( ref3.isActive() ).thenReturn( false );
-        listener.onPassivate( ref3 );
-        assertThat( condition.isSatisfied(), is( true ) );
-
-        verify( activationContext, times( 1 ) ).notifySatisfied( condition );
-    }
-
-    /**
-     * Tests on demand condition.
-     * <p/>
-     * On reactivate context condition should become first unsatisfied followed by becoming satisfied.
-     */
-    @Test
-    public void onDemand01()
-    {
-        final CapabilityConditions.OnDemand condition = underTest.onDemand();
-
-        assertThat( condition.isSatisfied(), is( true ) );
-        condition.reactivate();
-        verify( activationContext ).notifyUnsatisfied( condition );
-        verify( activationContext ).notifySatisfied( condition );
-    }
-
-    /**
-     * Tests on demand condition.
-     * <p/>
-     * When unsatisfied condition becomes unsatisfied.
-     */
-    @Test
-    public void onDemand02()
-    {
-        final CapabilityConditions.OnDemand condition = underTest.onDemand();
-
-        assertThat( condition.isSatisfied(), is( true ) );
-        condition.unsatisfy();
-        verify( activationContext ).notifyUnsatisfied( condition );
-    }
-
-    /**
-     * Tests on demand condition.
-     * <p/>
-     * When satisfied condition becomes satisfied.
-     */
-    @Test
-    public void onDemand03()
-    {
-        final CapabilityConditions.OnDemand condition = underTest.onDemand();
-
-        assertThat( condition.isSatisfied(), is( true ) );
-        condition.unsatisfy();
-        verify( activationContext ).notifyUnsatisfied( condition );
-
-        condition.satisfy();
-        verify( activationContext ).notifySatisfied( condition );
-    }
-
-    private void prepare( final Condition condition )
-    {
-        this.condition = condition;
-
-        ArgumentCaptor<CapabilityRegistry.Listener> listenerCaptor = ArgumentCaptor.forClass(
-            CapabilityRegistry.Listener.class
+        assertThat(
+            underTest.capabilityOfTypeActive( Capability.class ),
+            is( Matchers.<Condition>instanceOf( CapabilityOfTypeActiveCondition.class ) )
         );
-
-        verify( capabilityRegistry ).addListener( listenerCaptor.capture() );
-        listener = listenerCaptor.getValue();
     }
 
-    private static class TestCapability
-        extends AbstractCapability
+    /**
+     * onDemand() factory method returns expected condition.
+     */
+    @Test
+    public void onDemand()
     {
+        final ActivationContext activationContext = mock( ActivationContext.class );
+        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        final CapabilityConditions underTest = new CapabilityConditions( activationContext, capabilityRegistry );
 
-        protected TestCapability()
-        {
-            super( "test-capability" );
-        }
-
+        assertThat(
+            underTest.onDemand(),
+            is( Matchers.<Condition>instanceOf( OnDemandCondition.class ) )
+        );
     }
 
 }

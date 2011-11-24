@@ -47,8 +47,8 @@ public class CapabilityConditions
     private final ActivationContext activationContext;
 
     @Inject
-    public CapabilityConditions( final CapabilityRegistry capabilityRegistry,
-                                 final ActivationContext activationContext )
+    public CapabilityConditions( final ActivationContext activationContext,
+                                 final CapabilityRegistry capabilityRegistry )
     {
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.activationContext = checkNotNull( activationContext );
