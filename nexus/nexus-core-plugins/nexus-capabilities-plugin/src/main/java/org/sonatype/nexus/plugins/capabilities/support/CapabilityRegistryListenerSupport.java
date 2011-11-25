@@ -16,26 +16,52 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.api.activation;
+package org.sonatype.nexus.plugins.capabilities.support;
+
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 
 /**
- * Capability activation condition.
+ * {@link org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry.Listener} implementation support.
  */
-public interface Condition
+public class CapabilityRegistryListenerSupport
+    implements CapabilityRegistry.Listener
 {
 
-    /**
-     * Whether or not the condition is satisfied.
-     *
-     * @return true, if condition is satisfied
-     */
-    boolean isSatisfied();
+    @Override
+    public void onAdd( final CapabilityReference reference )
+    {
+        // do nothing
+    }
 
-    /**
-     * Releases (eventual) resources used by condition. After releasing condition should not be used anymore.
-     *
-     * @return itself, for fluent api usage
-     */
-    Condition release();
+    @Override
+    public void onRemove( final CapabilityReference reference )
+    {
+        // do nothing
+    }
+
+    @Override
+    public void onActivate( final CapabilityReference reference )
+    {
+        // do nothing
+    }
+
+    @Override
+    public void onPassivate( final CapabilityReference reference )
+    {
+        // do nothing
+    }
+
+    @Override
+    public void beforeUpdate( final CapabilityReference reference )
+    {
+        // do nothing
+    }
+
+    @Override
+    public void afterUpdate( final CapabilityReference reference )
+    {
+        // do nothing
+    }
 
 }

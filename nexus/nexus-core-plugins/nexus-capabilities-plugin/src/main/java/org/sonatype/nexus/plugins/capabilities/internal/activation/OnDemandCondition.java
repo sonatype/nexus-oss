@@ -16,26 +16,53 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.api.activation;
+package org.sonatype.nexus.plugins.capabilities.internal.activation;
+
+import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.support.activation.AbstractCondition;
+import org.sonatype.nexus.plugins.capabilities.support.activation.CapabilityConditions;
 
 /**
- * Capability activation condition.
+ * A condition that allows a targeted capability to activated / passivated.
+ *
+ * @since 1.10.0
  */
-public interface Condition
+public class OnDemandCondition
+    extends AbstractCondition
+    implements CapabilityConditions.OnDemand
 {
 
-    /**
-     * Whether or not the condition is satisfied.
-     *
-     * @return true, if condition is satisfied
-     */
-    boolean isSatisfied();
+    public OnDemandCondition( final ActivationContext activationContext )
+    {
+        super( activationContext, true );
+    }
 
-    /**
-     * Releases (eventual) resources used by condition. After releasing condition should not be used anymore.
-     *
-     * @return itself, for fluent api usage
-     */
-    Condition release();
+    @Override
+    public OnDemandCondition reactivate()
+    {
+        unsatisfy();
+        satisfy();
+        return this;
+    }
+
+    @Override
+    public OnDemandCondition satisfy()
+    {
+        setSatisfied( true );
+        return this;
+    }
+
+    @Override
+    public OnDemandCondition unsatisfy()
+    {
+        setSatisfied( false );
+        return this;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "on-demand";
+    }
 
 }

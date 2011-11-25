@@ -16,26 +16,34 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.api.activation;
+package org.sonatype.nexus.plugins.capabilities.support.activation;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+
+import org.junit.Test;
 
 /**
- * Capability activation condition.
+ * {@link Conditions} UTs.
+ *
+ * @since 1.10.0
  */
-public interface Condition
+public class ConditionsTest
 {
 
     /**
-     * Whether or not the condition is satisfied.
-     *
-     * @return true, if condition is satisfied
+     * Passed in factories are returned.
      */
-    boolean isSatisfied();
-
-    /**
-     * Releases (eventual) resources used by condition. After releasing condition should not be used anymore.
-     *
-     * @return itself, for fluent api usage
-     */
-    Condition release();
+    @Test
+    public void and01()
+    {
+        final LogicalConditions logicalConditions = mock( LogicalConditions.class );
+        final CapabilityConditions capabilityConditions = mock( CapabilityConditions.class );
+        final Conditions underTest = new Conditions( logicalConditions, capabilityConditions );
+        assertThat( underTest.logical(), is( equalTo( logicalConditions ) ) );
+        assertThat( underTest.capabilities(), is( equalTo( capabilityConditions ) ) );
+    }
 
 }

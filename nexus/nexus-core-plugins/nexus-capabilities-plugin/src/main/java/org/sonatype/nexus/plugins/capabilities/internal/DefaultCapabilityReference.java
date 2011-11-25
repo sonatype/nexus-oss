@@ -20,6 +20,8 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Map;
+
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
@@ -96,7 +98,7 @@ class DefaultCapabilityReference
     {
         if ( isEnabled() )
         {
-            getLogger().debug( "Disable capability with id '{}' ({})", capability.id(), capability );
+            getLogger().debug( "Disabling capability with id '{}' ({})", capability.id(), capability );
             if ( activationListener != null )
             {
                 activationContext.removeListener( activationListener, activateCondition );
@@ -171,9 +173,75 @@ class DefaultCapabilityReference
     }
 
     @Override
+    public void create( final Map<String, String> properties )
+    {
+        capability().create( properties );
+    }
+
+    @Override
+    public void load( final Map<String, String> properties )
+    {
+        capability().load( properties );
+    }
+
+    @Override
+    public void update( final Map<String, String> properties, final Map<String, String> previousProperties )
+    {
+        if ( !sameProperties( previousProperties, properties ) )
+        {
+            registry.notify( this, new DefaultCapabilityRegistry.Notifier( "updated" )
+            {
+                @Override
+                void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
+                {
+                    listener.beforeUpdate( reference );
+                }
+            } );
+            capability().update( properties );
+            registry.notify( this, new DefaultCapabilityRegistry.Notifier( "updated" )
+            {
+                @Override
+                void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
+                {
+                    listener.afterUpdate( reference );
+                }
+            } );
+        }
+    }
+
+    @Override
+    public void remove()
+    {
+        if ( activateCondition != null )
+        {
+            activateCondition.release();
+        }
+        disable();
+        capability().remove();
+    }
+
+    @Override
     public String toString()
     {
         return getClass().getSimpleName() + "{active=" + active + ", capability=" + capability + '}';
+    }
+
+    // @TestAccessible //
+    static boolean sameProperties( final Map<String, String> p1, final Map<String, String> p2 )
+    {
+        if ( p1 == null )
+        {
+            return p2 == null;
+        }
+        else if ( p2 == null )
+        {
+            return false;
+        }
+        if ( p1.size() != p2.size() )
+        {
+            return false;
+        }
+        return p1.equals( p2 );
     }
 
     private class ActivationContextListener
