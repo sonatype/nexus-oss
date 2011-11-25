@@ -40,22 +40,46 @@ public class Conditions
 
     private CapabilityConditions capabilityConditions;
 
+    private final RepositoryConditions repositoryConditions;
+
     @Inject
     public Conditions( final LogicalConditions logicalConditions,
-                       final CapabilityConditions capabilityConditions )
+                       final CapabilityConditions capabilityConditions,
+                       final RepositoryConditions repositoryConditions )
     {
         this.logicalConditions = checkNotNull( logicalConditions );
         this.capabilityConditions = checkNotNull( capabilityConditions );
+        this.repositoryConditions = checkNotNull( repositoryConditions );
     }
 
+    /**
+     * Access to logical conditions.
+     *
+     * @return logical conditions factory
+     */
     public LogicalConditions logical()
     {
         return logicalConditions;
     }
 
+    /**
+     * Access to capability related conditions.
+     *
+     * @return capability related conditions factory
+     */
     public CapabilityConditions capabilities()
     {
         return capabilityConditions;
+    }
+
+    /**
+     * Access to repository specific conditions.
+     *
+     * @return repository specific conditions factory
+     */
+    public RepositoryConditions repository()
+    {
+        return repositoryConditions;
     }
 
 }

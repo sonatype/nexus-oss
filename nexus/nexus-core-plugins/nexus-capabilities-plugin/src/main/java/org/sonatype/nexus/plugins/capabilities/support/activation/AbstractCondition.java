@@ -21,6 +21,7 @@ package org.sonatype.nexus.plugins.capabilities.support.activation;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 
@@ -28,6 +29,7 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
  * {@link Condition} implementation support.
  */
 public abstract class AbstractCondition
+    extends AbstractLoggingComponent
     implements Condition
 {
 
