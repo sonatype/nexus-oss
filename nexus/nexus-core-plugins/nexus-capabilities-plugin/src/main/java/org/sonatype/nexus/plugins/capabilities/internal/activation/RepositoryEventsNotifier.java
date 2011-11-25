@@ -104,6 +104,14 @@ public class RepositoryEventsNotifier
     {
 
         /**
+         * Callback after a repository was added (happens also on start of nexus when repositories are loaded from
+         * configuration).
+         *
+         * @param repository added repository
+         */
+        void onAdded( Repository repository );
+
+        /**
          * Callback when the repository configuration changed.
          *
          * @param repository updated repository

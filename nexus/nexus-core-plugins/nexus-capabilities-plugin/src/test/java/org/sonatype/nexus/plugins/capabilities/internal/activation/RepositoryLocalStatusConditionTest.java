@@ -30,7 +30,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.support.activation.RepositoryConditions;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -52,8 +51,6 @@ public class RepositoryLocalStatusConditionTest
 
     private Repository repository;
 
-    private RepositoryRegistry repositoryRegistry;
-
     private RepositoryEventsNotifier repositoryEventsNotifier;
 
     private RepositoryConditions.RepositoryId repositoryId;
@@ -70,11 +67,9 @@ public class RepositoryLocalStatusConditionTest
         repository = mock( Repository.class );
         when( repository.getId() ).thenReturn( TEST_REPOSITORY );
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
-        repositoryRegistry = mock( RepositoryRegistry.class );
-        when( repositoryRegistry.getRepository( TEST_REPOSITORY ) ).thenReturn( repository );
 
         underTest = new RepositoryLocalStatusCondition(
-            activationContext, repositoryRegistry, repositoryEventsNotifier, LocalStatus.IN_SERVICE, repositoryId
+            activationContext, repositoryEventsNotifier, LocalStatus.IN_SERVICE, repositoryId
         );
         underTest.bind();
 
@@ -84,51 +79,16 @@ public class RepositoryLocalStatusConditionTest
 
         verify( repositoryEventsNotifier ).addListener( listenerCaptor.capture() );
         listener = listenerCaptor.getValue();
-    }
 
-    /**
-     * When repository exists on start, condition should be unsatisfied and notification sent.
-     */
-    @Test
-    public void repositoryIsInService01()
-    {
-        assertThat( underTest.isSatisfied(), is( true ) );
-        verify( activationContext ).notifySatisfied( underTest );
-    }
-
-    /**
-     * When repository does not exist on start, condition should be unsatisfied.
-     */
-    @Test
-    public void repositoryIsInService02()
-    {
-        when( repositoryId.get() ).thenReturn( "unexistent" );
-        underTest = new RepositoryLocalStatusCondition(
-            activationContext, repositoryRegistry, repositoryEventsNotifier, LocalStatus.IN_SERVICE, repositoryId
-        );
-        underTest.bind();
         assertThat( underTest.isSatisfied(), is( false ) );
-    }
-
-    /**
-     * When repository is not in service on start, condition should be unsatisfied,
-     */
-    @Test
-    public void repositoryIsInService03()
-    {
-        when( repository.getLocalStatus() ).thenReturn( LocalStatus.OUT_OF_SERVICE );
-        underTest = new RepositoryLocalStatusCondition(
-            activationContext, repositoryRegistry, repositoryEventsNotifier, LocalStatus.IN_SERVICE, repositoryId
-        );
-        underTest.bind();
-        assertThat( underTest.isSatisfied(), is( false ) );
+        listener.onAdded( repository );
     }
 
     /**
      * Condition should become unsatisfied and notification sent when repository is out of service.
      */
     @Test
-    public void repositoryIsInService04()
+    public void repositoryIsInService01()
     {
         assertThat( underTest.isSatisfied(), is( true ) );
 
@@ -143,7 +103,7 @@ public class RepositoryLocalStatusConditionTest
      * Condition should become satisfied and notification sent when repository is back on service.
      */
     @Test
-    public void repositoryIsInService05()
+    public void repositoryIsInService02()
     {
         assertThat( underTest.isSatisfied(), is( true ) );
 

@@ -27,6 +27,8 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEvent;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.plexus.appevents.Event;
 
@@ -53,7 +55,7 @@ public class RepositoryEventInspector
     public boolean accepts( final Event<?> evt )
     {
         return evt != null
-            && evt instanceof RepositoryConfigurationUpdatedEvent;
+            && ( evt instanceof RepositoryConfigurationUpdatedEvent || evt instanceof RepositoryRegistryEvent );
     }
 
     public void inspect( final Event<?> evt )
@@ -66,6 +68,10 @@ public class RepositoryEventInspector
         {
             handle( (RepositoryConfigurationUpdatedEvent) evt );
         }
+        else if ( evt instanceof RepositoryRegistryEventAdd )
+        {
+            handle( (RepositoryRegistryEventAdd) evt );
+        }
     }
 
     private void handle( final RepositoryConfigurationUpdatedEvent evt )
@@ -76,6 +82,19 @@ public class RepositoryEventInspector
             void run( final RepositoryEventsNotifier.Listener listener, final Repository repository )
             {
                 listener.onUpdated( repository );
+            }
+
+        } );
+    }
+
+    private void handle( final RepositoryRegistryEventAdd evt )
+    {
+        repositoryEventsNotifier.notify( evt.getRepository(), new RepositoryEventsNotifier.Notifier( "added" )
+        {
+            @Override
+            void run( final RepositoryEventsNotifier.Listener listener, final Repository repository )
+            {
+                listener.onAdded( repository );
             }
 
         } );

@@ -28,7 +28,6 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryEventsNotifier;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryLocalStatusCondition;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
  * {@link RepositoryConditions} UTs.
@@ -45,10 +44,9 @@ public class RepositoryConditionsTest
     public void capabilityOfTypeExists()
     {
         final ActivationContext activationContext = mock( ActivationContext.class );
-        final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
         final RepositoryEventsNotifier repositoryEventsNotifier = mock( RepositoryEventsNotifier.class );
         final RepositoryConditions underTest = new RepositoryConditions(
-            activationContext, repositoryRegistry, repositoryEventsNotifier
+            activationContext, repositoryEventsNotifier
         );
 
         assertThat(

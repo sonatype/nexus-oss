@@ -28,7 +28,6 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryEventsNotifier;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryLocalStatusCondition;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 
 /**
@@ -45,15 +44,11 @@ public class RepositoryConditions
 
     private final ActivationContext activationContext;
 
-    private final RepositoryRegistry repositoryRegistry;
-
     @Inject
     public RepositoryConditions( final ActivationContext activationContext,
-                                 final RepositoryRegistry repositoryRegistry,
                                  final RepositoryEventsNotifier repositoryEventsNotifier )
     {
         this.activationContext = checkNotNull( activationContext );
-        this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.repositoryEventsNotifier = checkNotNull( repositoryEventsNotifier );
     }
 
@@ -66,7 +61,7 @@ public class RepositoryConditions
     public Condition repositoryIsInService( final RepositoryId repositoryId )
     {
         return new RepositoryLocalStatusCondition(
-            activationContext, repositoryRegistry, repositoryEventsNotifier, LocalStatus.IN_SERVICE, repositoryId
+            activationContext, repositoryEventsNotifier, LocalStatus.IN_SERVICE, repositoryId
         );
     }
 

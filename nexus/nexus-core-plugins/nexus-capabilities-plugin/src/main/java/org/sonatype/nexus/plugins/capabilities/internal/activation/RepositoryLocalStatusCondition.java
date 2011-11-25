@@ -44,16 +44,12 @@ public class RepositoryLocalStatusCondition
 
     private final RepositoryConditions.RepositoryId repositoryId;
 
-    private final RepositoryRegistry repositoryRegistry;
-
     public RepositoryLocalStatusCondition( final ActivationContext activationContext,
-                                           final RepositoryRegistry repositoryRegistry,
                                            final RepositoryEventsNotifier repositoryEventsNotifier,
                                            final LocalStatus localStatus,
                                            final RepositoryConditions.RepositoryId repositoryId )
     {
         super( activationContext, false );
-        this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.repositoryEventsNotifier = checkNotNull( repositoryEventsNotifier );
         this.localStatus = checkNotNull( localStatus );
         this.repositoryId = checkNotNull( repositoryId );
@@ -63,30 +59,18 @@ public class RepositoryLocalStatusCondition
     protected void doBind()
     {
         repositoryEventsNotifier.addListener( this );
-        try
-        {
-            final String watchedRepositoryId = repositoryId.get();
-            try
-            {
-                final Repository repository = checkNotNull( repositoryRegistry ).getRepository( watchedRepositoryId );
-                setSatisfied( repository != null && localStatus.equals( repository.getLocalStatus() ) );
-            }
-            catch ( NoSuchRepositoryException ignore )
-            {
-                getLogger().warn( "Repository with id '{}' does not exist", watchedRepositoryId );
-                setSatisfied( false );
-            }
-        }
-        catch ( Exception e )
-        {
-            getLogger().error( "Exception catched during initialization", e );
-        }
     }
 
     @Override
     public void doRelease()
     {
         repositoryEventsNotifier.removeListener( this );
+    }
+
+    @Override
+    public void onAdded( final Repository repository )
+    {
+        onUpdated( repository );
     }
 
     @Override
