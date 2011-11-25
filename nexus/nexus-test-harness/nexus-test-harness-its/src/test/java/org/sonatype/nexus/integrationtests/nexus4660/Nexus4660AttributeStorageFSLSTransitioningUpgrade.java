@@ -24,14 +24,11 @@ import java.io.IOException;
 import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.json.JSONObject;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
-import com.sun.tools.internal.ws.processor.util.DirectoryUtil;
 
 /**
  * NEXUS-4660: Testing the upgrade path of NG attributes. We simulate an "upgrade" by providing "old" nexus files
