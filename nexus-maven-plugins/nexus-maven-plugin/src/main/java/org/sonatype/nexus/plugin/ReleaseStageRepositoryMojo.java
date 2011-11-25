@@ -59,7 +59,7 @@ public class ReleaseStageRepositoryMojo
         List<StageRepository> repos;
         try
         {
-            repos = client.getClosedStageRepositoriesForUser();
+            repos = filterUserAgent( client.getClosedStageRepositoriesForUser() );
         }
         catch ( RESTLightClientException e )
         {

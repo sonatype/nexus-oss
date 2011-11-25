@@ -40,7 +40,7 @@ public class ListStageRepositoriesMojo
         List<StageRepository> repos;
         try
         {
-            repos = client.getOpenStageRepositories();
+            repos = filterUserAgent( client.getOpenStageRepositories() );
         }
         catch ( RESTLightClientException e )
         {
@@ -50,7 +50,7 @@ public class ListStageRepositoriesMojo
         if ( repos != null )
         {
             StringBuilder builder = new StringBuilder();
-            builder.append( "The following OPEN staging repositories were found: " );
+            builder.append( String.format( "The following OPEN staging repositories were found for user-agent: '%s'", getUserAgent() ) );
 
             if ( !repos.isEmpty() )
             {

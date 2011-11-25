@@ -85,7 +85,7 @@ public class CloseStageRepositoryMojo
         List<StageRepository> repos;
         try
         {
-            repos = client.getOpenStageRepositoriesForUser( groupId, artifactId, version );
+            repos = filterUserAgent( client.getOpenStageRepositoriesForUser( groupId, artifactId, version ) );
         }
         catch ( RESTLightClientException e )
         {
