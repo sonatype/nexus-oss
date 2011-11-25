@@ -92,8 +92,6 @@ public abstract class AbstractApplicationConfigurationSource
         throws IOException,
             ConfigurationException
     {
-        setConfigurationUpgraded( false );
-
         Reader fr = null;
 
         try

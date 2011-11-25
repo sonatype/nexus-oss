@@ -167,12 +167,18 @@ public class FileConfigurationSource
         try
         {
             loadConfiguration( getConfigurationFile() );
+
+            // was able to load configuration w/o upgrading it
+            setConfigurationUpgraded( false );
         }
         catch ( ConfigurationException e )
         {
             getLogger().info( "Configuration file is invalid, attempting upgrade" );
 
             upgradeConfiguration( getConfigurationFile() );
+
+            // had to upgrade configuration before I was able to load it
+            setConfigurationUpgraded( true );
 
             loadConfiguration( getConfigurationFile() );
 
@@ -262,9 +268,6 @@ public class FileConfigurationSource
         getLogger().info( "Creating backup from the old file and saving the upgraded configuration." );
 
         backupConfiguration();
-
-        // set the upgradeInstance to warn Nexus about this
-        setConfigurationUpgraded( true );
 
         saveConfiguration( file );
     }
