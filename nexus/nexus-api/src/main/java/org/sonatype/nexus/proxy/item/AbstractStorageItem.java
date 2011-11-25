@@ -25,12 +25,11 @@ import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.Attributes;
-import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import org.sonatype.nexus.proxy.attributes.internal.AttributesMapAdapter;
+import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.util.ItemPathUtils;
-
 import com.google.common.base.Strings;
 
 /**
@@ -140,11 +139,6 @@ public abstract class AbstractStorageItem
         return itemAttributes;
     }
 
-    public void overlayAttributes( final Attributes repositoryItemAttributes )
-    {
-        getRepositoryItemAttributes().overlayAttributes( repositoryItemAttributes );
-    }
-
     /**
      * This method should be called ONLY when you load up a _legacy_ attribute using _legacy_ attribute store!
      */
@@ -174,6 +168,9 @@ public abstract class AbstractStorageItem
 
     // ==
 
+    /**
+     * Default constructor.
+     */
     private AbstractStorageItem()
     {
         this.context = new RequestContext();
@@ -182,10 +179,6 @@ public abstract class AbstractStorageItem
 
     /**
      * Instantiates a new abstract storage item.
-     *
-     * @param path     the path
-     * @param readable the readable
-     * @param writable the writable
      */
     public AbstractStorageItem( final ResourceStoreRequest request, final boolean readable, final boolean writable )
     {
@@ -201,11 +194,6 @@ public abstract class AbstractStorageItem
 
     /**
      * Instantiates a new abstract storage item.
-     *
-     * @param repository the repository
-     * @param path       the path
-     * @param readable   the readable
-     * @param writable   the writable
      */
     public AbstractStorageItem( Repository repository, ResourceStoreRequest request, boolean readable,
                                 boolean writable )
@@ -218,12 +206,6 @@ public abstract class AbstractStorageItem
 
     /**
      * Instantiates a new abstract storage item.
-     *
-     * @param router   the router
-     * @param path     the path
-     * @param virtual  the virtual
-     * @param readable the readable
-     * @param writable the writable
      */
     public AbstractStorageItem( RepositoryRouter router, ResourceStoreRequest request, boolean readable,
                                 boolean writable )
@@ -402,6 +384,9 @@ public abstract class AbstractStorageItem
         return ItemPathUtils.getParentPath( getPath() );
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Deprecated
     public Map<String, String> getAttributes()
     {
@@ -456,7 +441,7 @@ public abstract class AbstractStorageItem
     /**
      * Sets the remote checked.
      *
-     * @param remoteChecked the new remote checked
+     * @param lastTouched the new remote checked
      */
     public void setRemoteChecked( long lastTouched )
     {
@@ -488,6 +473,7 @@ public abstract class AbstractStorageItem
         getRepositoryItemAttributes().incrementGeneration();
     }
 
+    @Deprecated
     public void overlay( StorageItem item )
         throws IllegalArgumentException
     {
@@ -496,39 +482,9 @@ public abstract class AbstractStorageItem
             throw new NullPointerException( "Cannot overlay null item onto this item of class "
                                                 + this.getClass().getName() );
         }
-
-        // this is noop, is not used in core at all
-
-        // if ( isOverlayable( item ) )
-        // {
-        // // TODO: WHY?
-        // // these do not overlays:
-        // // path
-        // // readable
-        // // writable
-        // // repositoryItemUid
-        // // store
-        //
-        // // these do overlays:
-        // setRepositoryId( item.getRepositoryId() );
-        // setCreated( item.getCreated() );
-        // setModified( item.getModified() );
-        // setStoredLocally( item.getStoredLocally() );
-        // setRemoteChecked( item.getRemoteChecked() );
-        // setLastRequested( item.getLastRequested() );
-        // setExpired( item.isExpired() );
-        // setRemoteUrl( item.getRemoteUrl() );
-        // getAttributes().putAll( item.getAttributes() );
-        // if ( item.getItemContext() != null )
-        // {
-        // getItemContext().putAll( item.getItemContext() );
-        // }
-        // }
-        // else
-        // {
-        // throw new IllegalArgumentException( "Cannot overlay storage item of class " + item.getClass().getName()
-        // + " onto this item of class " + this.getClass().getName() );
-        // }
+        // here was the "overlay" implemented, which was moved to DefaultAttributes#overlayAttributes method
+        // instead with much cleaner implementation. Here, it was unlear and code looked "arbitrary" (why
+        // some fields "win" over others).
     }
 
     protected boolean isOverlayable( StorageItem item )

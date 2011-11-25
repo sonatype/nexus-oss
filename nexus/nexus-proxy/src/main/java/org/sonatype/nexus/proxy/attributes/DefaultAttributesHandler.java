@@ -208,7 +208,7 @@ public class DefaultAttributesHandler
 
         if ( attributes != null )
         {
-            item.overlayAttributes( attributes );
+            item.getRepositoryItemAttributes().overlayAttributes( attributes );
         }
         else
         {

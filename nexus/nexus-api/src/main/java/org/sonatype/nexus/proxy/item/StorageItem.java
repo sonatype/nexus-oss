@@ -176,8 +176,11 @@ public interface StorageItem
      * Gets the user attributes. These are saved and persisted.
      * 
      * @return the attributes
-     * @deprecated Use {@link #getRepositoryItemAttributes()} instead!
+     * @deprecated Use {@link #getRepositoryItemAttributes()} instead! While this method still returns a mutable map
+     * (a map "view" of {@link Attributes} returned by {@link #getRepositoryItemAttributes()}), the Map mutation
+     * over iterators (key, value or entry-set) is not implemented and will yield in runtime exception!
      */
+    @Deprecated
     Map<String, String> getAttributes();
 
     /**
@@ -198,18 +201,11 @@ public interface StorageItem
      * Overlay.
      * 
      * @param item the item
-     * @deprecated Whoever used this outside Nexus core is doomed.
+     * @deprecated This method is for internal use only. You really don't want to use this method, but to
+     * modify Attributes with {@link Attributes#get(String)} and {@link Attributes#put(String, String)} instead. See {@link Attributes}.
      */
+    @Deprecated
     void overlay( StorageItem item );
-
-    /**
-     * Overlays the the given attributes over this instance attributes (in case of overlapping keys this instance
-     * attribute "wins").
-     * 
-     * @param item the item
-     * @since 1.10.0
-     */
-    void overlayAttributes( Attributes attributes );
 
     /**
      * Returns the generation of the attributes. For Nexus internal use only!

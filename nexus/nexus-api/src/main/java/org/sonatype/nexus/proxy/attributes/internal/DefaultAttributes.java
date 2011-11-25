@@ -160,7 +160,6 @@ public class DefaultAttributes
 
     protected String getKeyForAttribute( final String attributeName )
     {
-        // TODO: Jackson will use the key as XML element!
         return String.format( "%s-%s", StorageItem.class.getName(), Preconditions.checkNotNull( attributeName ) );
     }
 
