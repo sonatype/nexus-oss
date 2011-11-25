@@ -47,6 +47,7 @@ public class OnDemandConditionTest
         activationContext = mock( ActivationContext.class );
 
         underTest = new OnDemandCondition( activationContext );
+        underTest.bind();
     }
 
     /**

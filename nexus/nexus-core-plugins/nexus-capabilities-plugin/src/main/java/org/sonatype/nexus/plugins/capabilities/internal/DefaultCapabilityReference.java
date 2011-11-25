@@ -45,7 +45,7 @@ class DefaultCapabilityReference
 
     private final ActivationContext activationContext;
 
-    private final Condition activateCondition;
+    private Condition activateCondition;
 
     private boolean active;
 
@@ -60,7 +60,7 @@ class DefaultCapabilityReference
         this.registry = checkNotNull( registry );
         this.activationContext = checkNotNull( activationContext );
         this.capability = checkNotNull( capability );
-        this.activateCondition = capability.activationCondition();
+
         active = false;
         enabled = false;
     }
@@ -85,8 +85,10 @@ class DefaultCapabilityReference
             getLogger().debug( "Enabling capability with id '{}' ({})", capability.id(), capability );
             enabled = true;
             activate();
+            activateCondition = capability().activationCondition();
             if ( activateCondition != null )
             {
+                activateCondition.bind();
                 activationListener = new ActivationContextListener();
                 activationContext.addListener( activationListener, activateCondition );
             }
@@ -103,6 +105,11 @@ class DefaultCapabilityReference
             {
                 activationContext.removeListener( activationListener, activateCondition );
                 activationListener = null;
+            }
+            if ( activateCondition != null )
+            {
+                activateCondition.release();
+                activateCondition = null;
             }
             passivate();
             enabled = false;

@@ -48,7 +48,18 @@ public class PassivateCapabilityDuringUpdateCondition
         super( activationContext, true );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.capability = checkNotNull( capability );
+    }
+
+    @Override
+    protected void doBind()
+    {
         capabilityRegistry.addListener( this );
+    }
+
+    @Override
+    public void doRelease()
+    {
+        capabilityRegistry.removeListener( this );
     }
 
     @Override
@@ -85,15 +96,6 @@ public class PassivateCapabilityDuringUpdateCondition
     public void afterUpdate( final CapabilityReference reference )
     {
         setSatisfied( true );
-    }
-
-    @Override
-    public PassivateCapabilityDuringUpdateCondition release()
-    {
-        capabilityRegistry.removeListener( this );
-        super.release();
-
-        return this;
     }
 
     @Override

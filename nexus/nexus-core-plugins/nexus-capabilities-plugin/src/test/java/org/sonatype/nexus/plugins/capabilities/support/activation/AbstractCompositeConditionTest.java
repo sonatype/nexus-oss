@@ -39,8 +39,6 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 public class AbstractCompositeConditionTest
 {
 
-    static final boolean SATISFIED = true;
-
     private ActivationContext activationContext;
 
     private Condition c1;
@@ -63,6 +61,12 @@ public class AbstractCompositeConditionTest
     private Condition prepare()
     {
         final AbstractCompositeCondition underTest = new TestCondition( activationContext, c1, c2, c3 );
+        underTest.bind();
+
+        verify( c1 ).bind();
+        verify( c2 ).bind();
+        verify( c3 ).bind();
+
         ArgumentCaptor<ActivationContext.Listener> listenerCaptor = ArgumentCaptor.forClass(
             ActivationContext.Listener.class
         );
@@ -167,6 +171,9 @@ public class AbstractCompositeConditionTest
     {
         final Condition underTest = prepare();
         underTest.release();
+        verify( c1 ).release();
+        verify( c2 ).release();
+        verify( c3 ).release();
         verify( activationContext ).removeListener( listener, c1, c2, c3 );
     }
 

@@ -64,6 +64,8 @@ public class LogicalConditionsTest
 
     public Condition prepare( final Condition condition, boolean leftSatisfied, boolean rightSatisfied )
     {
+        condition.bind();
+
         ArgumentCaptor<ActivationContext.Listener> listenerCaptor = ArgumentCaptor.forClass(
             ActivationContext.Listener.class
         );

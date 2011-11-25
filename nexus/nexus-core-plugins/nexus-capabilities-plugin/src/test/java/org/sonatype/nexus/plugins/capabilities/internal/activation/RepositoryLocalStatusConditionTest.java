@@ -76,6 +76,7 @@ public class RepositoryLocalStatusConditionTest
         underTest = new RepositoryLocalStatusCondition(
             activationContext, repositoryRegistry, repositoryEventsNotifier, LocalStatus.IN_SERVICE, repositoryId
         );
+        underTest.bind();
 
         ArgumentCaptor<RepositoryEventsNotifier.Listener> listenerCaptor = ArgumentCaptor.forClass(
             RepositoryEventsNotifier.Listener.class
@@ -105,6 +106,7 @@ public class RepositoryLocalStatusConditionTest
         underTest = new RepositoryLocalStatusCondition(
             activationContext, repositoryRegistry, repositoryEventsNotifier, LocalStatus.IN_SERVICE, repositoryId
         );
+        underTest.bind();
         assertThat( underTest.isSatisfied(), is( false ) );
     }
 
@@ -118,6 +120,7 @@ public class RepositoryLocalStatusConditionTest
         underTest = new RepositoryLocalStatusCondition(
             activationContext, repositoryRegistry, repositoryEventsNotifier, LocalStatus.IN_SERVICE, repositoryId
         );
+        underTest.bind();
         assertThat( underTest.isSatisfied(), is( false ) );
     }
 

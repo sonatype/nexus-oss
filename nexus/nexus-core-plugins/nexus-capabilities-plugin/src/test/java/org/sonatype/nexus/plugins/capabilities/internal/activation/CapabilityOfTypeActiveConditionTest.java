@@ -78,6 +78,7 @@ public class CapabilityOfTypeActiveConditionTest
         underTest = new CapabilityOfTypeActiveCondition(
             activationContext, capabilityRegistry, TestCapability.class
         );
+        underTest.bind();
 
         ArgumentCaptor<CapabilityRegistry.Listener> listenerCaptor = ArgumentCaptor.forClass(
             CapabilityRegistry.Listener.class

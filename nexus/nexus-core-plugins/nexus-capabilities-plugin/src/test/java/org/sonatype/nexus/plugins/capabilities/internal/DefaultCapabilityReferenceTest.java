@@ -81,6 +81,7 @@ public class DefaultCapabilityReferenceTest
         assertThat( underTest.isEnabled(), is( false ) );
         underTest.enable();
         assertThat( underTest.isEnabled(), is( true ) );
+        verify( activationCondition ).bind();
         verify( activationContext ).addListener(
             Matchers.<ActivationContext.Listener>any(), eq( activationCondition )
         );
@@ -97,6 +98,11 @@ public class DefaultCapabilityReferenceTest
         assertThat( underTest.isEnabled(), is( true ) );
         underTest.disable();
         assertThat( underTest.isEnabled(), is( false ) );
+
+        verify( activationCondition ).release();
+        verify( activationContext ).removeListener(
+            Matchers.<ActivationContext.Listener>any(), eq( activationCondition )
+        );
     }
 
     /**

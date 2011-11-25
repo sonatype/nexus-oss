@@ -72,6 +72,7 @@ public class CapabilityOfTypeExistsConditionTest
         underTest = new CapabilityOfTypeExistsCondition(
             activationContext, capabilityRegistry, TestCapability.class
         );
+        underTest.bind();
 
         ArgumentCaptor<CapabilityRegistry.Listener> listenerCaptor = ArgumentCaptor.forClass(
             CapabilityRegistry.Listener.class

@@ -44,6 +44,7 @@ public class AbstractConditionTest
     {
         final ActivationContext activationContext = mock( ActivationContext.class );
         final AbstractCondition underTest = new TestCondition( activationContext );
+        underTest.bind();
         assertThat( underTest.isSatisfied(), is( false ) );
     }
 
@@ -55,6 +56,7 @@ public class AbstractConditionTest
     {
         final ActivationContext activationContext = mock( ActivationContext.class );
         final AbstractCondition underTest = new TestCondition( activationContext );
+        underTest.bind();
 
         underTest.setSatisfied( true );
         assertThat( underTest.isSatisfied(), is( true ) );
@@ -70,6 +72,7 @@ public class AbstractConditionTest
     {
         final ActivationContext activationContext = mock( ActivationContext.class );
         final AbstractCondition underTest = new TestCondition( activationContext );
+        underTest.bind();
 
         underTest.setSatisfied( true );
         assertThat( underTest.isSatisfied(), is( true ) );
@@ -87,6 +90,7 @@ public class AbstractConditionTest
     {
         final ActivationContext activationContext = mock( ActivationContext.class );
         final AbstractCondition underTest = new TestCondition( activationContext );
+        underTest.bind();
 
         underTest.setSatisfied( true );
         assertThat( underTest.isSatisfied(), is( true ) );
@@ -106,6 +110,7 @@ public class AbstractConditionTest
     {
         final ActivationContext activationContext = mock( ActivationContext.class );
         final AbstractCondition underTest = new TestCondition( activationContext );
+        underTest.bind();
 
         underTest.setSatisfied( true );
         assertThat( underTest.isSatisfied(), is( true ) );
@@ -125,6 +130,7 @@ public class AbstractConditionTest
     {
         final ActivationContext activationContext = mock( ActivationContext.class );
         final AbstractCondition underTest = new TestCondition( activationContext );
+        underTest.bind();
 
         underTest.release();
         underTest.isSatisfied();
@@ -161,6 +167,18 @@ public class AbstractConditionTest
         public TestCondition( final ActivationContext activationContext )
         {
             super( activationContext );
+        }
+
+        @Override
+        protected void doBind()
+        {
+            // do nothing
+        }
+
+        @Override
+        protected void doRelease()
+        {
+            // do nothing
         }
     }
 

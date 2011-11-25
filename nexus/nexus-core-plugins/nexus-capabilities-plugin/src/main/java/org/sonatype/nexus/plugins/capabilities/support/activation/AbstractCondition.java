@@ -37,7 +37,7 @@ public abstract class AbstractCondition
 
     private boolean satisfied;
 
-    private boolean valid;
+    private boolean active;
 
     protected AbstractCondition( final ActivationContext activationContext )
     {
@@ -48,7 +48,7 @@ public abstract class AbstractCondition
     {
         this.activationContext = checkNotNull( activationContext );
         this.satisfied = satisfied;
-        valid = true;
+        active = false;
     }
 
     protected ActivationContext getActivationContext()
@@ -59,20 +59,50 @@ public abstract class AbstractCondition
     @Override
     public boolean isSatisfied()
     {
-        checkState( valid, "Condition has already been released" );
+        checkState( active, "Condition has already been released or was not bounded" );
         return satisfied;
     }
 
     @Override
-    public Condition release()
+    public final Condition bind()
     {
-        valid = false;
+        if ( !active )
+        {
+            active = true;
+            doBind();
+        }
         return this;
     }
 
+    @Override
+    public final Condition release()
+    {
+        if ( active )
+        {
+            doRelease();
+            active = false;
+        }
+        return this;
+    }
+
+    /**
+     * Template method to be implemented by subclasses for doing specific binding.
+     */
+    protected abstract void doBind();
+
+    /**
+     * Template method to be implemented by subclasses for doing specific releasing.
+     */
+    protected abstract void doRelease();
+
+    /**
+     * Sets teh satisfied status and notify activation context about thsi condition being satisfied/unsatisfied.
+     *
+     * @param satisfied true, if condition is satisfied
+     */
     protected void setSatisfied( final boolean satisfied )
     {
-        checkState( valid, "Condition has already been released" );
+        checkState( active, "Condition has already been released or was not bounded" );
         if ( this.satisfied != satisfied )
         {
             this.satisfied = satisfied;

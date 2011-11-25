@@ -47,7 +47,18 @@ public class CapabilityOfTypeExistsCondition
         super( activationContext );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.type = type;
+    }
+
+    @Override
+    protected void doBind()
+    {
         capabilityRegistry.addListener( this );
+    }
+
+    @Override
+    public void doRelease()
+    {
+        capabilityRegistry.removeListener( this );
     }
 
     @Override
@@ -90,15 +101,6 @@ public class CapabilityOfTypeExistsCondition
     public void afterUpdate( final CapabilityReference reference )
     {
         // ignore
-    }
-
-    @Override
-    public CapabilityOfTypeExistsCondition release()
-    {
-        capabilityRegistry.removeListener( this );
-        super.release();
-
-        return this;
     }
 
     void checkAllCapabilities()

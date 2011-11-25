@@ -60,6 +60,18 @@ public class OnDemandCondition
     }
 
     @Override
+    protected void doBind()
+    {
+        // do nothing
+    }
+
+    @Override
+    protected void doRelease()
+    {
+        // do nothing
+    }
+
+    @Override
     public String toString()
     {
         return "on-demand";

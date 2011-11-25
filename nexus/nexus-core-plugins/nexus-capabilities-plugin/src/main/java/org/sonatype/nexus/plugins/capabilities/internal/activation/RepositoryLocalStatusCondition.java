@@ -57,11 +57,10 @@ public class RepositoryLocalStatusCondition
         this.repositoryEventsNotifier = checkNotNull( repositoryEventsNotifier );
         this.localStatus = checkNotNull( localStatus );
         this.repositoryId = checkNotNull( repositoryId );
-
-        bind();
     }
 
-    private void bind()
+    @Override
+    protected void doBind()
     {
         repositoryEventsNotifier.addListener( this );
         try
@@ -75,6 +74,7 @@ public class RepositoryLocalStatusCondition
             catch ( NoSuchRepositoryException ignore )
             {
                 getLogger().warn( "Repository with id '{}' does not exist", watchedRepositoryId );
+                setSatisfied( false );
             }
         }
         catch ( Exception e )
@@ -84,11 +84,9 @@ public class RepositoryLocalStatusCondition
     }
 
     @Override
-    public RepositoryLocalStatusCondition release()
+    public void doRelease()
     {
         repositoryEventsNotifier.removeListener( this );
-        super.release();
-        return this;
     }
 
     @Override

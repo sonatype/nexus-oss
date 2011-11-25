@@ -35,13 +35,24 @@ public abstract class AbstractCompositeCondition
 
     private ActivationContext.Listener listener;
 
+    private final ActivationContext activationContext;
+
     public AbstractCompositeCondition( final ActivationContext activationContext,
                                        final Condition... conditions )
     {
         super( activationContext );
+        this.activationContext = checkNotNull( activationContext );
         this.conditions = checkNotNull( conditions );
         checkArgument( conditions.length > 1, "A composite mush have at least 2 conditions" );
+    }
 
+    @Override
+    protected void doBind()
+    {
+        for ( final Condition condition : conditions )
+        {
+            condition.bind();
+        }
         activationContext.addListener(
             listener = new ActivationContext.Listener()
             {
@@ -56,17 +67,25 @@ public abstract class AbstractCompositeCondition
                 {
                     setSatisfied( check( conditions ) );
                 }
+
+                @Override
+                public String toString()
+                {
+                    return "Re-evaluate " + AbstractCompositeCondition.this;
+                }
             },
             conditions
         );
     }
 
     @Override
-    public AbstractCompositeCondition release()
+    public void doRelease()
     {
         getActivationContext().removeListener( listener, conditions );
-        super.release();
-        return this;
+        for ( final Condition condition : conditions )
+        {
+            condition.release();
+        }
     }
 
     /**
@@ -76,5 +95,10 @@ public abstract class AbstractCompositeCondition
      * @return true, if conditions are satisfied as a unit
      */
     protected abstract boolean check( final Condition... conditions );
+
+    protected Condition[] getConditions()
+    {
+        return conditions;
+    }
 
 }

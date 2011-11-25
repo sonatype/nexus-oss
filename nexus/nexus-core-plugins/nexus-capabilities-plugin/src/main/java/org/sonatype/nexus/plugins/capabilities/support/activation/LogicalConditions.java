@@ -99,6 +99,21 @@ public class LogicalConditions
             return true;
         }
 
+        @Override
+        public String toString()
+        {
+            final StringBuilder sb = new StringBuilder();
+            for ( final Condition condition : getConditions() )
+            {
+                if ( sb.length() > 0 )
+                {
+                    sb.append( " AND " );
+                }
+                sb.append( condition );
+            }
+            return sb.toString();
+        }
+
     }
 
     /**
@@ -129,6 +144,21 @@ public class LogicalConditions
                 }
             }
             return false;
+        }
+
+        @Override
+        public String toString()
+        {
+            final StringBuilder sb = new StringBuilder();
+            for ( final Condition condition : getConditions() )
+            {
+                if ( sb.length() > 0 )
+                {
+                    sb.append( " OR " );
+                }
+                sb.append( condition );
+            }
+            return sb.toString();
         }
 
     }

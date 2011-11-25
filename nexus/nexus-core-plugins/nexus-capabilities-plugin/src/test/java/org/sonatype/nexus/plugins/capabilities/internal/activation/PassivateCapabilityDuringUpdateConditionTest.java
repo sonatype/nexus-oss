@@ -61,6 +61,7 @@ public class PassivateCapabilityDuringUpdateConditionTest
         underTest = new PassivateCapabilityDuringUpdateCondition(
             activationContext, capabilityRegistry, capability
         );
+        underTest.bind();
 
         ArgumentCaptor<CapabilityRegistry.Listener> listenerCaptor = ArgumentCaptor.forClass(
             CapabilityRegistry.Listener.class
