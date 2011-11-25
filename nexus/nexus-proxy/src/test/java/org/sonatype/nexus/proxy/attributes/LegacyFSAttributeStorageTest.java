@@ -20,24 +20,19 @@ package org.sonatype.nexus.proxy.attributes;
 
 import java.io.File;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.proxy.attributes.internal.AttributesImpl;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 
 /**
  * AttributeStorage implementation driven by XStream.
@@ -117,7 +112,7 @@ public class LegacyFSAttributeStorageTest
     public void testPutAttributes()
     {
         final RepositoryItemUid uid = createUid( "/some/path" );
-        attributeStorage.putAttributes( uid, new AttributesImpl() );
+        attributeStorage.putAttributes( uid, new DefaultAttributes() );
     }
 
     @Test

@@ -33,21 +33,21 @@ import com.google.common.base.Preconditions;
  * @author cstamas
  * @since 1.10.0
  */
-public class AttributesImpl
+public class DefaultAttributes
     implements Attributes
 {
     private final HashMap<String, String> defaults;
 
     private final HashMap<String, String> values;
 
-    public AttributesImpl()
+    public DefaultAttributes()
     {
         super();
         this.defaults = new HashMap<String, String>();
         this.values = new HashMap<String, String>();
     }
 
-    public AttributesImpl( final Map<String, String> m )
+    public DefaultAttributes( final Map<String, String> m )
     {
         this();
         overlayMap( m );

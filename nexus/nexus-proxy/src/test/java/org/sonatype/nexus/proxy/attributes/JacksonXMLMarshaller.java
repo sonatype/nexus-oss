@@ -21,6 +21,7 @@ package org.sonatype.nexus.proxy.attributes;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Named;
@@ -28,7 +29,7 @@ import javax.inject.Singleton;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
-import org.sonatype.nexus.proxy.attributes.internal.AttributesImpl;
+import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 
 import com.fasterxml.jackson.xml.XmlMapper;
 
@@ -52,7 +53,8 @@ public class JacksonXMLMarshaller
     public void marshal( final Attributes item, final OutputStream outputStream )
         throws IOException
     {
-        objectMapper.writeValue( outputStream, item.asMap() );
+        final Map<String, String> attrs = new HashMap( item.asMap() );
+        objectMapper.writeValue( outputStream, attrs );
         outputStream.flush();
     }
 
@@ -61,7 +63,7 @@ public class JacksonXMLMarshaller
         throws IOException
     {
         final Map<String, String> attributesMap = objectMapper.readValue( inputStream, new TypeReference<Map<String, String>>() {} );
-        return new AttributesImpl( attributesMap );
+        return new DefaultAttributes( attributesMap );
     }
 
 }

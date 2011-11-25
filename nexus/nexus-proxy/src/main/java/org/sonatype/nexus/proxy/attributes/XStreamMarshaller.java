@@ -26,7 +26,7 @@ import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.attributes.internal.AttributesImpl;
+import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.converters.collections.MapConverter;
@@ -66,7 +66,7 @@ public class XStreamMarshaller
         try
         {
             final Map<String, String> copy = (Map<String, String>) xstream.fromXML( inputStream );
-            return new AttributesImpl( copy );
+            return new DefaultAttributes( copy );
         }
         catch ( NullPointerException e )
         {

@@ -25,7 +25,7 @@ import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.Attributes;
-import org.sonatype.nexus.proxy.attributes.internal.AttributesImpl;
+import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import org.sonatype.nexus.proxy.attributes.internal.AttributesMapAdapter;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
@@ -151,7 +151,7 @@ public abstract class AbstractStorageItem
     public void upgrade()
     {
         this.context = new RequestContext();
-        this.itemAttributes = new AttributesImpl();
+        this.itemAttributes = new DefaultAttributes();
 
         getRepositoryItemAttributes().putAll( attributes );
 
@@ -177,7 +177,7 @@ public abstract class AbstractStorageItem
     private AbstractStorageItem()
     {
         this.context = new RequestContext();
-        this.itemAttributes = new AttributesImpl();
+        this.itemAttributes = new DefaultAttributes();
     }
 
     /**
