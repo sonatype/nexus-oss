@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryEventsNotifier;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryLocalStatusCondition;
 
 /**
@@ -41,7 +42,7 @@ public class RepositoryConditionsTest
      * repositoryIsInService() factory method returns expected condition.
      */
     @Test
-    public void capabilityOfTypeExists()
+    public void repositoryIsInService()
     {
         final ActivationContext activationContext = mock( ActivationContext.class );
         final RepositoryEventsNotifier repositoryEventsNotifier = mock( RepositoryEventsNotifier.class );
@@ -52,6 +53,24 @@ public class RepositoryConditionsTest
         assertThat(
             underTest.repositoryIsInService( mock( RepositoryConditions.RepositoryId.class ) ),
             is( Matchers.<Condition>instanceOf( RepositoryLocalStatusCondition.class ) )
+        );
+    }
+
+    /**
+     * repositoryExists() factory method returns expected condition.
+     */
+    @Test
+    public void repositoryExists()
+    {
+        final ActivationContext activationContext = mock( ActivationContext.class );
+        final RepositoryEventsNotifier repositoryEventsNotifier = mock( RepositoryEventsNotifier.class );
+        final RepositoryConditions underTest = new RepositoryConditions(
+            activationContext, repositoryEventsNotifier
+        );
+
+        assertThat(
+            underTest.repositoryExists( mock( RepositoryConditions.RepositoryId.class ) ),
+            is( Matchers.<Condition>instanceOf( RepositoryExistsCondition.class ) )
         );
     }
 

@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryEventsNotifier;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryLocalStatusCondition;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 
@@ -62,6 +63,19 @@ public class RepositoryConditions
     {
         return new RepositoryLocalStatusCondition(
             activationContext, repositoryEventsNotifier, LocalStatus.IN_SERVICE, repositoryId
+        );
+    }
+
+    /**
+     * Creates a new condition that is satisfied when a repository exists.
+     *
+     * @param repositoryId getter for repository id (usually condition specific property)
+     * @return created condition
+     */
+    public Condition repositoryExists( final RepositoryId repositoryId )
+    {
+        return new RepositoryExistsCondition(
+            activationContext, repositoryEventsNotifier, repositoryId
         );
     }
 

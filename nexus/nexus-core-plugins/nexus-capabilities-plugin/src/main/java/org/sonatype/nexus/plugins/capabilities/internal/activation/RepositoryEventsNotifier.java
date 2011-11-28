@@ -118,6 +118,13 @@ public class RepositoryEventsNotifier
          */
         void onUpdated( Repository repository );
 
+        /**
+         * Callback when a repository has been removed.
+         *
+         * @param repository updated repository
+         */
+        void onRemoved( Repository repository );
+
     }
 
     abstract static class Notifier
