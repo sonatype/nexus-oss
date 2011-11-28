@@ -24,14 +24,16 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 
 /**
  * AttributeStorage that actually delegates the work to other instance of AttributeStorage, and having an option of
  * "fallback" to some secondary instance. Usable for scenarios where "transitioning" (smooth upgrade for example) is to
  * be used, the "main" attribute storage would be "upgraded" from "legacy" attribute storage as the attributes are
  * requested over the time from this instance.
- * 
+ *
  * @author cstamas
  * @since 1.10.0
  */
@@ -42,6 +44,7 @@ public class TransitioningAttributeStorage
     extends AbstractLoggingComponent
     implements AttributeStorage
 {
+
     private final AttributeStorage mainAttributeStorage;
 
     private final AttributeStorage fallbackAttributeStorage;
@@ -59,38 +62,80 @@ public class TransitioningAttributeStorage
     @Override
     public Attributes getAttributes( final RepositoryItemUid uid )
     {
-        Attributes result = mainAttributeStorage.getAttributes( uid );
+        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
-        if ( result == null && fallbackAttributeStorage != null )
+        uidLock.lock( Action.read );
+
+        try
         {
-            result = fallbackAttributeStorage.getAttributes( uid );
+            Attributes result = mainAttributeStorage.getAttributes( uid );
 
-            if ( result != null )
+            if ( result == null && fallbackAttributeStorage != null )
             {
-                mainAttributeStorage.putAttributes( uid, result );
-                fallbackAttributeStorage.deleteAttributes( uid );
-            }
-        }
+                uidLock.lock( Action.create );
 
-        return result;
+                try
+                {
+                    result = fallbackAttributeStorage.getAttributes( uid );
+
+                    if ( result != null )
+                    {
+                        mainAttributeStorage.putAttributes( uid, result );
+                        fallbackAttributeStorage.deleteAttributes( uid );
+                    }
+                }
+                finally
+                {
+                    uidLock.unlock();
+                }
+            }
+            
+            return result;
+        }
+        finally
+        {
+            uidLock.unlock();
+        }
     }
 
     @Override
     public void putAttributes( final RepositoryItemUid uid, final Attributes item )
     {
-        mainAttributeStorage.putAttributes( uid, item );
+        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
-        if ( fallbackAttributeStorage != null )
+        uidLock.lock( Action.create );
+
+        try
         {
-            fallbackAttributeStorage.deleteAttributes( uid );
+            mainAttributeStorage.putAttributes( uid, item );
+
+            if ( fallbackAttributeStorage != null )
+            {
+                fallbackAttributeStorage.deleteAttributes( uid );
+            }
+        }
+        finally
+        {
+            uidLock.unlock();
         }
     }
 
     @Override
     public boolean deleteAttributes( final RepositoryItemUid uid )
     {
-        return mainAttributeStorage.deleteAttributes( uid )
-            || ( fallbackAttributeStorage != null && fallbackAttributeStorage.deleteAttributes( uid ) );
+        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
+
+        uidLock.lock( Action.delete );
+
+        try
+        {
+            return mainAttributeStorage.deleteAttributes( uid )
+                || ( fallbackAttributeStorage != null && fallbackAttributeStorage.deleteAttributes( uid ) );
+        }
+        finally
+        {
+            uidLock.unlock();
+        }
     }
 
 }
