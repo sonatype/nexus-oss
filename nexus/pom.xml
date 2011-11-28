@@ -1543,7 +1543,7 @@
               <it.test.log.level>${it.test.log.level}</it.test.log.level>
               <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
             </systemPropertyVariables>
-            <excludes>
+            <excludes combine.children="append">
               <exclude>**/Abstract*</exclude>
             </excludes>
           </configuration>
@@ -1565,7 +1565,7 @@
             </execution>
           </executions>
           <configuration>
-            <excludes>
+            <excludes combine.children="append">
               <exclude>**/Abstract*</exclude>
             </excludes>
             <properties>
@@ -1829,7 +1829,6 @@
               <artifactId>maven-surefire-plugin</artifactId>
               <configuration>
                 <excludes>
-                  <exclude>**/Abstract*</exclude>
                   <exclude>**/*LRTest.java</exclude>
                 </excludes>
               </configuration>
