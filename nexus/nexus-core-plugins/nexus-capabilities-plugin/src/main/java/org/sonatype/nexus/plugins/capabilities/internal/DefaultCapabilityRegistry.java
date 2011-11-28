@@ -37,6 +37,9 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
+import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
+import com.google.common.base.Preconditions;
 
 /**
  * Default {@link CapabilityRegistry} implementation.
@@ -50,9 +53,13 @@ class DefaultCapabilityRegistry
 
     private final Map<String, CapabilityFactory> factories;
 
-    private final Map<String, CapabilityReference> references;
-
     private final ActivationContext activationContext;
+
+    private final CapabilityConfiguration configuration;
+
+    private final Conditions conditions;
+
+    private final Map<String, CapabilityReference> references;
 
     private final Set<Listener> listeners;
 
@@ -60,10 +67,15 @@ class DefaultCapabilityRegistry
 
     @Inject
     DefaultCapabilityRegistry( final Map<String, CapabilityFactory> factories,
-                               final ActivationContext activationContext )
+                               final ActivationContext activationContext,
+                               final CapabilityConfiguration configuration,
+                               final Conditions conditions )
     {
         this.activationContext = checkNotNull( activationContext );
         this.factories = checkNotNull( factories );
+        this.configuration = Preconditions.checkNotNull( configuration );
+        this.conditions = Preconditions.checkNotNull( conditions );
+
         references = new HashMap<String, CapabilityReference>();
         listeners = new HashSet<Listener>();
         lock = new ReentrantReadWriteLock();
@@ -86,9 +98,7 @@ class DefaultCapabilityRegistry
 
             final Capability capability = factory.create( capabilityId );
 
-            final DefaultCapabilityReference reference = new DefaultCapabilityReference(
-                this, activationContext, capability
-            );
+            final CapabilityReference reference = createReference( capability );
 
             references.put( capabilityId, reference );
 
@@ -249,6 +259,14 @@ class DefaultCapabilityRegistry
         {
             lock.readLock().unlock();
         }
+    }
+
+    // @TestAccessible
+    CapabilityReference createReference( final Capability capability )
+    {
+        return new DefaultCapabilityReference(
+            this, activationContext, configuration, conditions, capability
+        );
     }
 
     abstract static class Notifier

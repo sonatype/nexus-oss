@@ -69,4 +69,10 @@ public class NexusIsActiveCondition
         // do nothing
     }
 
+    @Override
+    public String toString()
+    {
+        return "Nexus is active";
+    }
+
 }
