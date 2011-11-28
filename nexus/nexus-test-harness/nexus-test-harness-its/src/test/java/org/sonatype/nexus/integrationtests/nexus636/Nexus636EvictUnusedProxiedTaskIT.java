@@ -28,6 +28,9 @@ import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.proxy.attributes.Attributes;
+import org.sonatype.nexus.proxy.attributes.Marshaller;
+import org.sonatype.nexus.proxy.attributes.XStreamMarshaller;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
@@ -63,8 +66,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
     {
 
         repositoryPath = new File( nexusWorkDir, "storage/" + REPO_RELEASE_PROXY_REPO1 );
-        // attributesPath = new File( nexusWorkDir, "storage/" + REPO_RELEASE_PROXY_REPO1 + "/.nexus/attributes" );
-        attributesPath = new File( nexusWorkDir, "proxy/attributes/" + REPO_RELEASE_PROXY_REPO1 );
+        attributesPath = new File( nexusWorkDir, "storage/" + REPO_RELEASE_PROXY_REPO1 + "/.nexus/attributes" );
 
         File repo = getTestFile( "repo" );
 
@@ -76,7 +78,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         // rebuild attributes
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setKey( "repositoryId" );
-        prop.setValue(  this.getTestRepositoryId() );
+        prop.setValue( this.getTestRepositoryId() );
         TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, prop );
 
     }
@@ -160,38 +162,45 @@ public class Nexus636EvictUnusedProxiedTaskIT
         TaskScheduleUtil.runTask( taskName, EvictUnusedItemsTaskDescriptor.ID, repo, age );
     }
 
-    private XStream getXStream()
+    private Marshaller getMarshaller()
     {
-        XStream xstream = new XStream();
-        xstream.alias( "file", DefaultStorageFileItem.class );
-        xstream.alias( "collection", DefaultStorageCollectionItem.class );
-        xstream.alias( "link", DefaultStorageLinkItem.class );
-
-        return xstream;
+        return new XStreamMarshaller();
     }
 
     private void changeProxyAttributeDate( File attributeFile, int daysFromToday )
         throws IOException
     {
         // load file
+        Attributes attributes;
         FileInputStream fis = new FileInputStream( attributeFile );
-        // Object obj = this.getXStream().fromXML( fis );
-        DefaultStorageFileItem fileItem = (DefaultStorageFileItem) this.getXStream().fromXML( fis );
-        fis.close();
+        try
+        {
+            attributes = getMarshaller().unmarshal( fis );
+        }
+        finally
+        {
+            fis.close();
+        }
 
         Calendar cal = Calendar.getInstance();
         cal.setTime( new Date() );
         cal.add( Calendar.DATE, daysFromToday );
 
         // edit object
-        fileItem.incrementGeneration();
-        fileItem.setLastRequested( cal.getTime().getTime() );
-        fileItem.setRemoteChecked( cal.getTime().getTime() );
+        attributes.incrementGeneration();
+        attributes.setLastRequested( cal.getTime().getTime() );
+        attributes.setCheckedRemotely( cal.getTime().getTime() );
 
         // save file
         FileOutputStream fos = new FileOutputStream( attributeFile );
-        this.getXStream().toXML( fileItem, fos );
-        fos.close();
+        try
+        {
+            getMarshaller().marshal( attributes, fos );
+        }
+        finally
+        {
+            fos.close();
+        }
     }
 
 }
