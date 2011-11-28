@@ -87,7 +87,15 @@ public class RepositoryExistsCondition
     @Override
     public String toString()
     {
-        return "Repository exists";
+        try
+        {
+            final String id = repositoryId.get();
+            return String.format( "Repository '%s' exists", id );
+        }
+        catch ( Exception ignore )
+        {
+            return "Repository '(could not be evaluated)' exists";
+        }
     }
 
 }

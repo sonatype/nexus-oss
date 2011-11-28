@@ -92,7 +92,15 @@ public class RepositoryLocalStatusCondition
     @Override
     public String toString()
     {
-        return "Repository is " + localStatus.toString();
+        try
+        {
+            final String id = repositoryId.get();
+            return String.format( "Repository '%s' is %s", id, localStatus.toString() );
+        }
+        catch ( Exception ignore )
+        {
+            return String.format( "Repository '(could not be evaluated)' is %s", localStatus.toString() );
+        }
     }
 
 }
