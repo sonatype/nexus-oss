@@ -514,13 +514,16 @@ public abstract class AbstractRESTLightClient
             throw validationError( method );
         }
 
+        String body = null;
         try
         {
-            return new SAXBuilder().build( method.getResponseBodyAsStream() );
+            body = method.getResponseBodyAsString();
+            return new SAXBuilder().build( body );
         }
         catch ( JDOMException e )
         {
-            throw new RESTLightClientException( "Failed to parse response body as XML for GET request.", e );
+            throw new RESTLightClientException( "Failed to parse response body as XML for GET request. Content: \n"
+                + body, e );
         }
         catch ( IOException e )
         {
