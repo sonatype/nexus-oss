@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.InversionCondition;
 
 /**
  * Factory of logical {@link Condition}s.
@@ -67,6 +68,17 @@ public class LogicalConditions
     public Condition or( final Condition left, final Condition right )
     {
         return new DisjunctionCondition( activationContext, left, right );
+    }
+
+    /**
+     * Creates a new condition that is satisfied when at another condition is not satisfied (logical NOT).
+     *
+     * @param condition negated condition
+     * @return created condition
+     */
+    public Condition not( final Condition condition )
+    {
+        return new InversionCondition( activationContext, condition );
     }
 
     /**

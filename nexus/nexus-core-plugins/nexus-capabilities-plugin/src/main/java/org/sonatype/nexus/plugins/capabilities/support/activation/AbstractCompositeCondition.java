@@ -40,10 +40,18 @@ public abstract class AbstractCompositeCondition
     public AbstractCompositeCondition( final ActivationContext activationContext,
                                        final Condition... conditions )
     {
-        super( activationContext );
+        super( activationContext, false );
         this.activationContext = checkNotNull( activationContext );
         this.conditions = checkNotNull( conditions );
         checkArgument( conditions.length > 1, "A composite mush have at least 2 conditions" );
+    }
+
+    public AbstractCompositeCondition( final ActivationContext activationContext,
+                                       final Condition condition )
+    {
+        super( activationContext, false );
+        this.activationContext = checkNotNull( activationContext );
+        this.conditions = new Condition[]{ checkNotNull( condition ) };
     }
 
     @Override
@@ -76,6 +84,7 @@ public abstract class AbstractCompositeCondition
             },
             conditions
         );
+        setSatisfied( check( conditions ) );
     }
 
     @Override
