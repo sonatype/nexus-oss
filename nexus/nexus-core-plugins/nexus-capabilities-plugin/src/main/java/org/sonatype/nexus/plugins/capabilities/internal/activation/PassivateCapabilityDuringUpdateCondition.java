@@ -89,13 +89,19 @@ public class PassivateCapabilityDuringUpdateCondition
     @Override
     public void beforeUpdate( final CapabilityReference reference )
     {
-        setSatisfied( false );
+        if ( reference.capability() == capability )
+        {
+            setSatisfied( false );
+        }
     }
 
     @Override
     public void afterUpdate( final CapabilityReference reference )
     {
-        setSatisfied( true );
+        if ( reference.capability() == capability )
+        {
+            setSatisfied( true );
+        }
     }
 
     @Override
