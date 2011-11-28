@@ -85,7 +85,7 @@ public class CapabilityConditionsTest
         final CapabilityConditions underTest = new CapabilityConditions( activationContext, capabilityRegistry );
 
         assertThat(
-            underTest.pasivateCapabilityDuringUpdate( capability ),
+            underTest.passivateCapabilityDuringUpdate( capability ),
             is( Matchers.<Condition>instanceOf( PassivateCapabilityDuringUpdateCondition.class ) )
         );
     }

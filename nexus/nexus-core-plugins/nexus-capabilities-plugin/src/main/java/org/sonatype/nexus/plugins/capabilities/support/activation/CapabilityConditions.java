@@ -84,7 +84,7 @@ public class CapabilityConditions
      * @param capability capability that should be passivated during update updated
      * @return created condition
      */
-    public Condition pasivateCapabilityDuringUpdate( final Capability capability )
+    public Condition passivateCapabilityDuringUpdate( final Capability capability )
     {
         return new PassivateCapabilityDuringUpdateCondition( activationContext, capabilityRegistry, capability );
     }
