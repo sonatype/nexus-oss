@@ -21,9 +21,13 @@ package org.sonatype.nexus.plugins.capabilities.internal.activation;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -45,10 +49,12 @@ public class RepositoryEventsNotifierTest
     @Before
     public void setUp()
     {
+        final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
+        when( repositoryRegistry.getRepositories() ).thenReturn( Collections.<Repository>emptyList() );
         repository = mock( Repository.class );
         notifier = mock( RepositoryEventsNotifier.Notifier.class );
         listener = mock( RepositoryEventsNotifier.Listener.class );
-        underTest = new RepositoryEventsNotifier();
+        underTest = new RepositoryEventsNotifier( repositoryRegistry );
         underTest.addListener( listener );
     }
 

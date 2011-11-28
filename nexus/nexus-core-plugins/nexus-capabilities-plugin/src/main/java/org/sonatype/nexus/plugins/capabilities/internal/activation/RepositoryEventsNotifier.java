@@ -18,6 +18,9 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.activation;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import javax.inject.Inject;
@@ -26,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.plexus.appevents.Event;
 
@@ -40,14 +44,18 @@ public class RepositoryEventsNotifier
     extends AbstractLoggingComponent
 {
 
+    private final RepositoryRegistry repositoryRegistry;
+
     /**
      * Registered listeners. Never null.
      */
     private final Set<Listener> listeners;
 
     @Inject
-    RepositoryEventsNotifier()
+    RepositoryEventsNotifier( final RepositoryRegistry repositoryRegistry )
     {
+        this.repositoryRegistry = checkNotNull( repositoryRegistry );
+
         listeners = new CopyOnWriteArraySet<Listener>();
     }
 
@@ -60,7 +68,21 @@ public class RepositoryEventsNotifier
     public RepositoryEventsNotifier addListener( final Listener listener )
     {
         listeners.add( listener );
-        getLogger().debug( "Added listener '{}'", listener );
+        getLogger().debug( "Added listener '{}'.Notifying it about existing repositories...", listener );
+        for ( final Repository repository : new ArrayList<Repository>( repositoryRegistry.getRepositories() ) )
+        {
+            try
+            {
+                listener.onAdded( repository );
+            }
+            catch ( Exception e )
+            {
+                getLogger().warn(
+                    "Catched exception while notifying '{}' about existing repository '{}'",
+                    new Object[]{ listener, repository, e }
+                );
+            }
+        }
         return this;
     }
 
