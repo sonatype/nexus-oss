@@ -42,6 +42,9 @@ import org.testng.annotations.Test;
 public class Nexus4341RunningTaskNotEditableIT
     extends AbstractNexusProxyIntegrationTest
 {
+
+    private Server return500Server;
+
     private void replaceServer()
         throws Exception
     {
