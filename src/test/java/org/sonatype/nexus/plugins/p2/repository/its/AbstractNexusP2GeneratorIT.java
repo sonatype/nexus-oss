@@ -50,7 +50,7 @@ public abstract class AbstractNexusP2GeneratorIT
         throws Exception
     {
         final CapabilityResource capability = new CapabilityResource();
-        capability.setDescription( P2MetadataGenerator.class.getName() );
+        capability.setNotes( P2MetadataGenerator.class.getName() );
         capability.setTypeId( P2MetadataGeneratorCapability.ID );
 
         final CapabilityPropertyResource repoProp = new CapabilityPropertyResource();
@@ -66,7 +66,7 @@ public abstract class AbstractNexusP2GeneratorIT
         throws Exception
     {
         final CapabilityResource capability = new CapabilityResource();
-        capability.setDescription( P2RepositoryAggregator.class.getName() );
+        capability.setNotes( P2RepositoryAggregator.class.getName() );
         capability.setTypeId( P2RepositoryAggregatorCapability.ID );
 
         final CapabilityPropertyResource repoProp = new CapabilityPropertyResource();
