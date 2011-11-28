@@ -102,7 +102,7 @@ class DefaultCapabilityRegistry
 
             references.put( capabilityId, reference );
 
-            getLogger().debug( "Created capability '{}'", reference );
+            getLogger().debug( "Created capability '{}'", capability );
 
             notify( reference, new Notifier( "added" )
             {
@@ -131,7 +131,7 @@ class DefaultCapabilityRegistry
             final CapabilityReference reference = references.remove( capabilityId );
             if ( reference != null )
             {
-                getLogger().debug( "Removed capability '{}'", reference );
+                getLogger().debug( "Removed capability '{}'", reference.capability() );
                 notify( reference, new Notifier( "removed" )
                 {
                     @Override
@@ -198,7 +198,7 @@ class DefaultCapabilityRegistry
                 {
                     getLogger().warn(
                         "Catched exception while notifying '{}' about existing capability '{}'",
-                        new Object[]{ listener, reference, e }
+                        new Object[]{ listener, reference.capability(), e }
                     );
                 }
             }
@@ -240,7 +240,7 @@ class DefaultCapabilityRegistry
             {
                 getLogger().debug(
                     "Notifying '{}' about {} capability '{}'",
-                    new Object[]{ listener, notifier.description, reference }
+                    new Object[]{ listener, notifier.description, reference.capability() }
                 );
                 try
                 {
@@ -250,7 +250,7 @@ class DefaultCapabilityRegistry
                 {
                     getLogger().warn(
                         "Catched exception while notifying '{}' about {} capability '{}'",
-                        new Object[]{ listener, notifier.description, reference, e }
+                        new Object[]{ listener, notifier.description, reference.capability(), e }
                     );
                 }
             }
