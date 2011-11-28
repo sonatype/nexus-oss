@@ -59,7 +59,7 @@ public class NXCM1928ManualErrorReportIT
         Assert.assertEquals( ITS_USER, reporter.getName() );
     }
 
-    @Test( enabled = false )
+    @Test
     public void invalidUsers()
         throws Exception
     {
