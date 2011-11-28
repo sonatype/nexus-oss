@@ -269,8 +269,7 @@ public class DefaultFSLocalRepositoryStorage
                         link.setCreated( target.lastModified() );
                         result = link;
 
-                        repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(),
-                            repository, request, link );
+                        repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(), link );
                     }
                     catch ( NoSuchRepositoryException e )
                     {
@@ -293,8 +292,7 @@ public class DefaultFSLocalRepositoryStorage
                     file.setLength( target.length() );
                     result = file;
 
-                    repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(), repository,
-                        request, file );
+                    repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(), file );
                 }
             }
             catch ( FileNotFoundException e )

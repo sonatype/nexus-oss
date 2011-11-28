@@ -50,7 +50,7 @@ import com.thoughtworks.xstream.XStreamException;
  * Legacy AttributeStorage implementation that uses it's own FS storage to store attributes, by persisting StorageItem
  * as whole using XStream. This is the "old" default storage, used in all Nexuses up to version 1.10.0. Note: this
  * component is ReadOnly and should be used to perform transitioning upgrade from older Nexus instances. Only
- * {@link #deleteAttributes(RepositoryItemUid)} and {@link #getAttributes(RepositoryItemUid)} will do anyting, while
+ * {@link #deleteAttributes(RepositoryItemUid)} and {@link #getAttributes(RepositoryItemUid)} will do anything, while
  * {@link #putAttributes(RepositoryItemUid, Attributes)} will throw exception. In case the "legacy" attribute directory
  * is not present (ie. new install), this component remains dormant.
  * 

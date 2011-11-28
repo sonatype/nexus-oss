@@ -51,9 +51,11 @@ import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
- * The default implementation of AttributesHandler. Has support for various "lastRequested" attribute tuning, but does
- * not have any assumption regarding actual AttributeStorage it uses.
- * 
+ * The default implementation of AttributesHandler. Does not have any assumption regarding actual AttributeStorage
+ * it uses. It uses {@link StorageItemInspector} and {@link StorageFileItemInspector} components for "expansion"
+ * of core (and custom) attributes (those components might come from plugins too). This class also implements some
+ * "optimizations" for attribute "lastRequested", by using coarser resolution for it (saving it very n-th hour or so).
+ *
  * @author cstamas
  */
 @Named
@@ -62,6 +64,7 @@ public class DefaultAttributesHandler
     extends AbstractLoggingComponent
     implements AttributesHandler
 {
+
     /**
      * Default value of lastRequested attribute updates resolution: 12h
      */
@@ -136,7 +139,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the attribute storage.
-     * 
+     *
      * @return the attribute storage
      */
     public DelegatingAttributeStorage getAttributeStorage()
@@ -146,9 +149,11 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the attribute storage.
-     * 
+     *
      * @param attributeStorage the new attribute storage
+     * @deprecated For UT use only!
      */
+    @Deprecated
     public void setAttributeStorage( final AttributeStorage attributeStorage )
     {
         this.attributeStorage = new DelegatingAttributeStorage( attributeStorage );
@@ -156,7 +161,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the item inspector list.
-     * 
+     *
      * @return the item inspector list
      */
     public List<StorageItemInspector> getItemInspectorList()
@@ -166,7 +171,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the item inspector list.
-     * 
+     *
      * @param itemInspectorList the new item inspector list
      */
     public void setItemInspectorList( List<StorageItemInspector> itemInspectorList )
@@ -176,7 +181,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the file item inspector list.
-     * 
+     *
      * @return the file item inspector list
      */
     public List<StorageFileItemInspector> getFileItemInspectorList()
@@ -186,7 +191,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the file item inspector list.
-     * 
+     *
      * @param fileItemInspectorList the new file item inspector list
      */
     public void setFileItemInspectorList( List<StorageFileItemInspector> fileItemInspectorList )
@@ -197,13 +202,21 @@ public class DefaultAttributesHandler
     // ======================================================================
     // AttributesHandler iface
 
+    @Override
     public boolean deleteAttributes( final RepositoryItemUid uid )
     {
         return getAttributeStorage().deleteAttributes( uid );
     }
 
+    @Override
     public void fetchAttributes( final StorageItem item )
     {
+        if ( item instanceof StorageCollectionItem )
+        {
+            // not storing attributes of directories
+            return;
+        }
+
         final Attributes attributes = getAttributeStorage().getAttributes( item.getRepositoryItemUid() );
 
         if ( attributes != null )
@@ -228,6 +241,19 @@ public class DefaultAttributesHandler
         }
     }
 
+    @Override
+    public void storeAttributes( final StorageItem item )
+    {
+        if ( item instanceof StorageCollectionItem )
+        {
+            // not storing attributes of directories
+            return;
+        }
+
+        getAttributeStorage().putAttributes( item.getRepositoryItemUid(), item.getRepositoryItemAttributes() );
+    }
+
+    @Override
     public void storeAttributes( final StorageItem item, final ContentLocator content )
     {
         if ( item instanceof StorageCollectionItem )
@@ -235,6 +261,7 @@ public class DefaultAttributesHandler
             // not storing attributes of directories
             return;
         }
+
         if ( content != null )
         {
             // resetting some important values
@@ -254,73 +281,49 @@ public class DefaultAttributesHandler
             expandCustomItemAttributes( item, content );
         }
 
-        getAttributeStorage().putAttributes( item.getRepositoryItemUid(), item.getRepositoryItemAttributes() );
+        storeAttributes( item );
+    }
+
+    @Override
+    public void touchItemCheckedRemotely( final long timestamp, final StorageItem storageItem )
+    {
+        if ( storageItem instanceof StorageCollectionItem )
+        {
+            // not storing attributes of directories
+            return;
+        }
+
+        final RepositoryItemUid uid = storageItem.getRepositoryItemUid();
+        final Attributes attributes = getAttributeStorage().getAttributes( uid );
+
+        if ( attributes != null )
+        {
+            attributes.setRepositoryId( uid.getRepository().getId() );
+            attributes.setPath( uid.getPath() );
+            attributes.setCheckedRemotely( timestamp );
+            attributes.setExpired( false );
+
+            getAttributeStorage().putAttributes( uid, attributes );
+        }
+    }
+
+    @Override
+    public void touchItemLastRequested( final long timestamp, final StorageItem storageItem )
+    {
+        if ( storageItem instanceof StorageCollectionItem )
+        {
+            // not storing attributes of directories
+            return;
+        }
+
+        touchItemLastRequested( timestamp, storageItem.getResourceStoreRequest(), storageItem.getRepositoryItemUid(),
+                                storageItem.getRepositoryItemAttributes() );
     }
 
     // ==
 
-    public void touchItemRemoteChecked( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, LocalStorageException
-    {
-        touchItemRemoteChecked( System.currentTimeMillis(), repository, request );
-    }
-
-    public void touchItemRemoteChecked( long timestamp, Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, LocalStorageException
-    {
-        RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
-
-        Attributes item = getAttributeStorage().getAttributes( uid );
-
-        if ( item != null )
-        {
-            item.setRepositoryId( uid.getRepository().getId() );
-            item.setPath( uid.getPath() );
-            item.setCheckedRemotely( timestamp );
-            item.setExpired( false );
-
-            getAttributeStorage().putAttributes( uid, item );
-        }
-    }
-
-    public void touchItemLastRequested( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, LocalStorageException
-    {
-        touchItemLastRequested( System.currentTimeMillis(), repository, request );
-    }
-
-    public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, LocalStorageException
-    {
-        RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
-
-        Attributes item = getAttributeStorage().getAttributes( uid );
-
-        if ( item != null )
-        {
-            item.setRepositoryId( uid.getRepository().getId() );
-            item.setPath( uid.getPath() );
-
-            touchItemLastRequested( timestamp, request, uid, item );
-        }
-    }
-
-    public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request,
-                                        StorageItem storageItem )
-        throws ItemNotFoundException, LocalStorageException
-    {
-        if ( storageItem instanceof StorageCollectionItem )
-        {
-            return;
-        }
-
-        touchItemLastRequested( timestamp, request, storageItem.getRepositoryItemUid(),
-            storageItem.getRepositoryItemAttributes() );
-    }
-
     protected void touchItemLastRequested( final long timestamp, final ResourceStoreRequest request,
                                            final RepositoryItemUid uid, final Attributes attributes )
-        throws ItemNotFoundException, LocalStorageException
     {
         // Touch it only if this is user-originated request (request incoming over HTTP, not a plugin or "internal" one)
         // Currently, we test for IP address presence, since that makes sure it is user request (from REST API) and not
@@ -330,7 +333,7 @@ public class DefaultAttributesHandler
         if ( request.getRequestContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
         {
             // if we need to do this at all... user might turn this feature completely off
-            if ( doTouchLastRequested( uid.getRepository() ) )
+            if ( isTouchLastRequestedEnabled( uid.getRepository() ) )
             {
                 final long diff = timestamp - attributes.getLastRequested();
 
@@ -352,7 +355,7 @@ public class DefaultAttributesHandler
         }
     }
 
-    protected boolean doTouchLastRequested( final Repository repository )
+    protected boolean isTouchLastRequestedEnabled( final Repository repository )
     {
         // the "default"
         boolean doTouch = LAST_REQUEST_ATTRIBUTE_ENABLED;
@@ -376,19 +379,93 @@ public class DefaultAttributesHandler
         return doTouch;
     }
 
+    // == Below is junkyard, deprecated methods
+
+    @Override
+    @Deprecated
+    public void touchItemRemoteChecked( Repository repository, ResourceStoreRequest request )
+        throws ItemNotFoundException, LocalStorageException
+    {
+        touchItemRemoteChecked( System.currentTimeMillis(), repository, request );
+    }
+
+    @Override
+    @Deprecated
+    public void touchItemRemoteChecked( long timestamp, Repository repository, ResourceStoreRequest request )
+        throws ItemNotFoundException, LocalStorageException
+    {
+        RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
+
+        Attributes item = getAttributeStorage().getAttributes( uid );
+
+        if ( item != null )
+        {
+            item.setRepositoryId( uid.getRepository().getId() );
+            item.setPath( uid.getPath() );
+            item.setCheckedRemotely( timestamp );
+            item.setExpired( false );
+
+            getAttributeStorage().putAttributes( uid, item );
+        }
+    }
+
+    @Override
+    @Deprecated
+    public void touchItemLastRequested( Repository repository, ResourceStoreRequest request )
+        throws ItemNotFoundException, LocalStorageException
+    {
+        touchItemLastRequested( System.currentTimeMillis(), repository, request );
+    }
+
+    @Override
+    @Deprecated
+    public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request )
+        throws ItemNotFoundException, LocalStorageException
+    {
+        RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
+
+        Attributes item = getAttributeStorage().getAttributes( uid );
+
+        if ( item != null )
+        {
+            item.setRepositoryId( uid.getRepository().getId() );
+            item.setPath( uid.getPath() );
+
+            touchItemLastRequested( timestamp, request, uid, item );
+        }
+    }
+
+    @Override
+    @Deprecated
+    public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request,
+                                        StorageItem storageItem )
+        throws ItemNotFoundException, LocalStorageException
+    {
+        if ( storageItem instanceof StorageCollectionItem )
+        {
+            return;
+        }
+
+        touchItemLastRequested( timestamp, request, storageItem.getRepositoryItemUid(),
+                                storageItem.getRepositoryItemAttributes() );
+    }
+
+    @Override
+    @Deprecated
     public void updateItemAttributes( Repository repository, ResourceStoreRequest request, StorageItem item )
         throws ItemNotFoundException, LocalStorageException
     {
-        getAttributeStorage().putAttributes( item.getRepositoryItemUid(), item.getRepositoryItemAttributes() );
+        storeAttributes( item );
     }
 
     // ======================================================================
     // Internal
 
     /**
-     * Expand custom item attributes.
-     * 
-     * @param item the item
+     * Expand custom item attributes using registered StorageFileItemInspector (for files) or StorageItemInspector
+     * (for everything else) components.
+     *
+     * @param item    the item
      * @param content the input stream
      */
     protected void expandCustomItemAttributes( StorageItem item, ContentLocator content )
@@ -437,7 +514,7 @@ public class DefaultAttributesHandler
                         // unpack the file
                         tmpFile =
                             File.createTempFile( "px-" + item.getName(), ".tmp",
-                                applicationConfiguration.getTemporaryDirectory() );
+                                                 applicationConfiguration.getTemporaryDirectory() );
 
                         inputStream = content.getContent();
 
@@ -521,14 +598,13 @@ public class DefaultAttributesHandler
                 }
             }
         }
-        // result.setDate( LocalStorageItem.LOCAL_ITEM_LAST_INSPECTED_KEY, new Date() );
     }
 
     // ==
 
     /**
      * For UT access!
-     * 
+     *
      * @return
      */
     public long getLastRequestedResolution()
@@ -538,7 +614,7 @@ public class DefaultAttributesHandler
 
     /**
      * For UT access!
-     * 
+     *
      * @param lastRequestedResolution
      */
     public void setLastRequestedResolution( long lastRequestedResolution )

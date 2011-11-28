@@ -60,8 +60,8 @@ public abstract class AbstractShadowRepositoryTest
         long lastRequest = System.currentTimeMillis() - 10 * A_DAY;
 
         // now set the lastRequest stamp programatically to both items to this "old" timestamp
-        shadowRepository.getAttributesHandler().touchItemLastRequested( lastRequest, shadowRepository, shadowRequest );
-        masterRepository.getAttributesHandler().touchItemLastRequested( lastRequest, masterRepository, masterRequest );
+        shadowRepository.getAttributesHandler().touchItemLastRequested( lastRequest, shadowItem );
+        masterRepository.getAttributesHandler().touchItemLastRequested( lastRequest, masterItem );
 
         // now request the object, the lastRequested timestamp should be updated
         shadowItem = shadowRepository.retrieveItem( shadowRequest );

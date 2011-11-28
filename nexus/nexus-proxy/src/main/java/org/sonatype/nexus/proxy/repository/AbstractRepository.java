@@ -1318,14 +1318,6 @@ public abstract class AbstractRepository
             {
                 getLogger().debug( "Item " + request.toString() + " found in local storage." );
             }
-
-            // this "self correction" is needed to nexus build for himself the needed metadata
-            if ( localItem.getRemoteChecked() == 0 )
-            {
-                getAttributesHandler().touchItemRemoteChecked( this, request );
-
-                localItem = getLocalStorage().retrieveItem( this, request );
-            }
         }
         catch ( ItemNotFoundException ex )
         {
