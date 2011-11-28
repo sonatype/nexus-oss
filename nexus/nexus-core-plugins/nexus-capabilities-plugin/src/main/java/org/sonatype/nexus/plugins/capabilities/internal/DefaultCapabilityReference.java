@@ -79,8 +79,6 @@ class DefaultCapabilityReference
 
         active = false;
         enabled = false;
-
-        nexusActiveListener = new NexusActiveListener().bind();
     }
 
     @Override
@@ -201,12 +199,20 @@ class DefaultCapabilityReference
     public void create( final Map<String, String> properties )
     {
         capability().create( properties );
+        if ( nexusActiveListener == null )
+        {
+            nexusActiveListener = new NexusActiveListener().bind();
+        }
     }
 
     @Override
     public void load( final Map<String, String> properties )
     {
         capability().load( properties );
+        if ( nexusActiveListener == null )
+        {
+            nexusActiveListener = new NexusActiveListener().bind();
+        }
     }
 
     @Override
@@ -242,7 +248,10 @@ class DefaultCapabilityReference
             activateCondition.release();
         }
         disable();
-        nexusActiveListener.release();
+        if ( nexusActiveListener!=null )
+        {
+            nexusActiveListener.release();
+        }
         capability().remove();
     }
 

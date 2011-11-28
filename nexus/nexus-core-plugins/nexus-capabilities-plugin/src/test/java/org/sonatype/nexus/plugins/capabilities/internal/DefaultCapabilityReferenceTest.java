@@ -29,6 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.plugins.capabilities.internal.DefaultCapabilityReference.sameProperties;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -99,6 +100,7 @@ public class DefaultCapabilityReferenceTest
         underTest = new DefaultCapabilityReference(
             capabilityRegistry, activationContext, configuration, conditions, capability
         );
+        underTest.create( Collections.<String, String>emptyMap() );
     }
 
     /**
@@ -223,14 +225,12 @@ public class DefaultCapabilityReferenceTest
     }
 
     /**
-     * Calling create forwards to capability.
+     * Calling create forwards to capability (no need to call create as it is done in setup).
      */
     @Test
     public void createIsForwardedToCapability()
     {
-        final HashMap<String, String> properties = new HashMap<String, String>();
-        underTest.create( properties );
-        verify( capability ).create( properties );
+        verify( capability ).create( Matchers.<Map<String, String>>any() );
     }
 
     /**
