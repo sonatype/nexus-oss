@@ -18,38 +18,41 @@
  */
 package org.sonatype.nexus.plugins.capabilities.support.activation;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.junit.Test;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.NexusIsActiveCondition;
 
 /**
- * {@link Conditions} UTs.
+ * Factory of {@link Condition}s related to Nexus.
  *
  * @since 1.10.0
  */
-public class ConditionsTest
+@Named
+@Singleton
+public class NexusConditions
 {
 
-    /**
-     * Passed in factories are returned.
-     */
-    @Test
-    public void and01()
+    private NexusIsActiveCondition nexusIsActiveCondition;
+
+    @Inject
+    public NexusConditions( final NexusIsActiveCondition nexusIsActiveCondition )
     {
-        final LogicalConditions logicalConditions = mock( LogicalConditions.class );
-        final CapabilityConditions capabilityConditions = mock( CapabilityConditions.class );
-        final RepositoryConditions repositoryConditions = mock( RepositoryConditions.class );
-        final NexusConditions nexusConditions = mock( NexusConditions.class );
-        final Conditions underTest = new Conditions(
-            logicalConditions, capabilityConditions, repositoryConditions, nexusConditions
-        );
-        assertThat( underTest.logical(), is( equalTo( logicalConditions ) ) );
-        assertThat( underTest.capabilities(), is( equalTo( capabilityConditions ) ) );
-        assertThat( underTest.repository(), is( equalTo( repositoryConditions ) ) );
-        assertThat( underTest.nexus(), is( equalTo( nexusConditions ) ) );
+        this.nexusIsActiveCondition = checkNotNull( nexusIsActiveCondition );
+    }
+
+    /**
+     * Creates a new condition that is satisfied when Nexus is active (started but not stopped).
+     *
+     * @return created condition
+     */
+    public Condition active()
+    {
+        return nexusIsActiveCondition;
     }
 
 }

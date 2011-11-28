@@ -42,14 +42,18 @@ public class Conditions
 
     private final RepositoryConditions repositoryConditions;
 
+    private final NexusConditions nexusConditions;
+
     @Inject
     public Conditions( final LogicalConditions logicalConditions,
                        final CapabilityConditions capabilityConditions,
-                       final RepositoryConditions repositoryConditions )
+                       final RepositoryConditions repositoryConditions,
+                       final NexusConditions nexusConditions )
     {
         this.logicalConditions = checkNotNull( logicalConditions );
         this.capabilityConditions = checkNotNull( capabilityConditions );
         this.repositoryConditions = checkNotNull( repositoryConditions );
+        this.nexusConditions = checkNotNull( nexusConditions );
     }
 
     /**
@@ -80,6 +84,16 @@ public class Conditions
     public RepositoryConditions repository()
     {
         return repositoryConditions;
+    }
+
+    /**
+     * Access to nexus specific conditions.
+     *
+     * @return nexus specific conditions factory
+     */
+    public NexusConditions nexus()
+    {
+        return nexusConditions;
     }
 
 }

@@ -19,37 +19,38 @@
 package org.sonatype.nexus.plugins.capabilities.support.activation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.NexusIsActiveCondition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryEventsNotifier;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryLocalStatusCondition;
 
 /**
- * {@link Conditions} UTs.
+ * {@link NexusConditions} UTs.
  *
  * @since 1.10.0
  */
-public class ConditionsTest
+public class NexusConditionsTest
 {
 
     /**
-     * Passed in factories are returned.
+     * active() factory method returns expected condition.
      */
     @Test
-    public void and01()
+    public void active()
     {
-        final LogicalConditions logicalConditions = mock( LogicalConditions.class );
-        final CapabilityConditions capabilityConditions = mock( CapabilityConditions.class );
-        final RepositoryConditions repositoryConditions = mock( RepositoryConditions.class );
-        final NexusConditions nexusConditions = mock( NexusConditions.class );
-        final Conditions underTest = new Conditions(
-            logicalConditions, capabilityConditions, repositoryConditions, nexusConditions
+        final NexusIsActiveCondition nexusIsActiveCondition = mock( NexusIsActiveCondition.class );
+        final NexusConditions underTest = new NexusConditions( nexusIsActiveCondition );
+
+        assertThat(
+            underTest.active(),
+            is( Matchers.<Condition>instanceOf( NexusIsActiveCondition.class ) )
         );
-        assertThat( underTest.logical(), is( equalTo( logicalConditions ) ) );
-        assertThat( underTest.capabilities(), is( equalTo( capabilityConditions ) ) );
-        assertThat( underTest.repository(), is( equalTo( repositoryConditions ) ) );
-        assertThat( underTest.nexus(), is( equalTo( nexusConditions ) ) );
     }
 
 }
