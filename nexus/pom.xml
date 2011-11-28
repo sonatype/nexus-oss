@@ -1543,6 +1543,9 @@
               <it.test.log.level>${it.test.log.level}</it.test.log.level>
               <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
             </systemPropertyVariables>
+            <excludes combine.children="append">
+              <exclude>**/Abstract*</exclude>
+            </excludes>
           </configuration>
         </plugin>
         <plugin>
@@ -1562,6 +1565,9 @@
             </execution>
           </executions>
           <configuration>
+            <excludes combine.children="append">
+              <exclude>**/Abstract*</exclude>
+            </excludes>
             <properties>
               <property>
                 <name>usedefaultlisteners</name>
