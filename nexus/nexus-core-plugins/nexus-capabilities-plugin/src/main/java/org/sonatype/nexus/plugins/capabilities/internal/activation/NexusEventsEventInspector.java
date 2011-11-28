@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStateChangeEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.plexus.appevents.Event;
 
@@ -43,8 +44,7 @@ public class NexusEventsEventInspector
 
     public boolean accepts( final Event<?> evt )
     {
-        return evt != null &&
-            ( evt instanceof NexusStartedEvent || evt instanceof NexusStoppedEvent );
+        return evt != null && evt instanceof NexusStateChangeEvent;
     }
 
     public void inspect( final Event<?> evt )
