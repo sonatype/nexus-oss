@@ -67,10 +67,6 @@ import org.apache.maven.index.context.DocumentFilter;
 import org.apache.maven.index.context.IndexCreator;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.context.UnsupportedExistingLuceneIndexException;
-import org.apache.maven.index.creator.JarFileContentsIndexCreator;
-import org.apache.maven.index.creator.MavenArchetypeArtifactInfoIndexCreator;
-import org.apache.maven.index.creator.MavenPluginArtifactInfoIndexCreator;
-import org.apache.maven.index.creator.MinimalArtifactInfoIndexCreator;
 import org.apache.maven.index.expr.SearchExpression;
 import org.apache.maven.index.packer.IndexPacker;
 import org.apache.maven.index.packer.IndexPackingRequest;
@@ -175,17 +171,8 @@ public class DefaultIndexerManager
     @Requirement( hint = "maven2" )
     private ContentClass maven2;
 
-    @Requirement( role = IndexCreator.class, hint = MinimalArtifactInfoIndexCreator.ID )
-    private IndexCreator icMin;
-
-    @Requirement( role = IndexCreator.class, hint = MavenPluginArtifactInfoIndexCreator.ID )
-    private IndexCreator icMavenPlugin;
-
-    @Requirement( role = IndexCreator.class, hint = MavenArchetypeArtifactInfoIndexCreator.ID )
-    private IndexCreator icMavenArchetype;
-
-    @Requirement( role = IndexCreator.class, hint = JarFileContentsIndexCreator.ID )
-    private IndexCreator icJar;
+    @Requirement( role = IndexCreator.class )
+    private List<IndexCreator> indexCreators;
 
     @Requirement
     private IndexArtifactFilter indexArtifactFilter;
@@ -383,8 +370,7 @@ public class DefaultIndexerManager
                 // add context for repository
                 ctx =
                     nexusIndexer.addIndexingContextForced( getContextId( repository.getId() ), repository.getId(),
-                        repoRoot, indexDirectory, null, null,
-                        Arrays.asList( icMin, icMavenArchetype, icMavenPlugin, icJar ) );
+                        repoRoot, indexDirectory, null, null, indexCreators );
                 ctx.setSearchable( repository.isSearchable() );
             }
 
