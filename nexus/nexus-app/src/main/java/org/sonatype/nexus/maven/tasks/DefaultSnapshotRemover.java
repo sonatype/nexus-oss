@@ -52,6 +52,7 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
@@ -189,6 +190,12 @@ public class DefaultSnapshotRemover
         {
             return result;
         }
+        // TODO: unsure do we really want to enable this if-block below
+        // if this is not a hosted repo, do nothing
+        // if ( !repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
+        // {
+        //    return result;
+        // }
 
         if ( getLogger().isDebugEnabled() )
         {
@@ -229,30 +236,42 @@ public class DefaultSnapshotRemover
                     + " files on repository " + repository.getId() );
         }
 
-        repository.expireCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
+        // Why are we expiring caches in the 1st places? But:
+        // better: Not costly operation, does not walk just flushes EHCache
+        // repository.expireNotFoundCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
+        // was: Very costly operation, it flushes EHCache AND Walks the repository to flip "expired" flags
+        // On hosted repositories?
+        // repository.expireCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
 
-        RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor =
-            new RecreateMavenMetadataWalkerProcessor( Slf4jPlexusLogger.getPlexusLogger( getLogger() ), getDeleteOperation( request ) );
-
-        for ( String path : request.getMetadataRebuildPaths() )
+        // if we are processing a hosted-snapshot repository, we need to rebuild maven metadata
+        // without this if below, the walk would happen against proxy repositories too, but doing nothing!
+        if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
         {
-            TaskUtil.checkInterruption();
+            RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor =
+                new RecreateMavenMetadataWalkerProcessor( Slf4jPlexusLogger.getPlexusLogger( getLogger() ),
+                                                          getDeleteOperation( request ) );
 
-            DefaultWalkerContext ctxMd =
-                new DefaultWalkerContext( repository, new ResourceStoreRequest( path ), new DottedStoreWalkerFilter() );
-
-            ctxMd.getProcessors().add( metadataRebuildProcessor );
-
-            try
+            for ( String path : request.getMetadataRebuildPaths() )
             {
-                walker.walk( ctxMd );
-            }
-            catch ( WalkerException e )
-            {
-                if ( !( e.getCause() instanceof ItemNotFoundException ) )
+                TaskUtil.checkInterruption();
+
+                DefaultWalkerContext ctxMd =
+                    new DefaultWalkerContext( repository, new ResourceStoreRequest( path ),
+                                              new DottedStoreWalkerFilter() );
+
+                ctxMd.getProcessors().add( metadataRebuildProcessor );
+
+                try
                 {
-                    // do not ignore it
-                    throw e;
+                    walker.walk( ctxMd );
+                }
+                catch ( WalkerException e )
+                {
+                    if ( !( e.getCause() instanceof ItemNotFoundException ) )
+                    {
+                        // do not ignore it
+                        throw e;
+                    }
                 }
             }
         }
@@ -689,13 +708,7 @@ public class DefaultSnapshotRemover
 
                             req.getRequestContext().putAll( context );
 
-                            mrepository.retrieveItem( false, req );
-
-                            return true;
-                        }
-                        catch ( ItemNotFoundException e )
-                        {
-                            // nothing
+                            return mrepository.getLocalStorage().containsItem( mrepository, req );
                         }
                         catch ( Exception e )
                         {
@@ -714,7 +727,8 @@ public class DefaultSnapshotRemover
 
             if ( ctx.getContext().containsKey( DeleteOperation.DELETE_OPERATION_CTX_KEY ) )
             {
-                request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, ctx.getContext().get( DeleteOperation.DELETE_OPERATION_CTX_KEY )  );
+                request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY,
+                                                 ctx.getContext().get( DeleteOperation.DELETE_OPERATION_CTX_KEY ) );
             }
 
             return request;
