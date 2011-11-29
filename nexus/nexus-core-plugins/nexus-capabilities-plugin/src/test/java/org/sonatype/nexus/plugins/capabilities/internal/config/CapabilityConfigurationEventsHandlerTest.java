@@ -38,11 +38,11 @@ import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapa
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 
 /**
- * {@link CapabilityConfigurationEventInspector} UTs.
+ * {@link CapabilityConfigurationEventsHandler} UTs.
  *
  * @since 1.10.0
  */
-public class CapabilityConfigurationEventInspectorTest
+public class CapabilityConfigurationEventsHandlerTest
 {
 
     private static final boolean ENABLED = true;
@@ -163,7 +163,7 @@ public class CapabilityConfigurationEventInspectorTest
         cc.setTypeId( "test" );
         cc.setEnabled( enabled );
 
-        new CapabilityConfigurationEventInspector( capabilityRegistry ).inspect(
+        new CapabilityConfigurationEventsHandler( capabilityRegistry ).handle(
             new CapabilityConfigurationAddEvent( cc )
         );
 
@@ -197,7 +197,7 @@ public class CapabilityConfigurationEventInspectorTest
         cc.setTypeId( "test" );
         cc.setEnabled( enabled );
 
-        new CapabilityConfigurationEventInspector( capabilityRegistry ).inspect(
+        new CapabilityConfigurationEventsHandler( capabilityRegistry ).handle(
             new CapabilityConfigurationLoadEvent( cc )
         );
 
@@ -237,7 +237,7 @@ public class CapabilityConfigurationEventInspectorTest
             newCapability.getProperties().add( ccp );
         }
 
-        new CapabilityConfigurationEventInspector( capabilityRegistry ).inspect(
+        new CapabilityConfigurationEventsHandler( capabilityRegistry ).handle(
             new CapabilityConfigurationUpdateEvent( newCapability, oldCapability )
         );
 
@@ -258,7 +258,7 @@ public class CapabilityConfigurationEventInspectorTest
         final CCapability cc = new CCapability();
         cc.setId( "test-cc" );
 
-        new CapabilityConfigurationEventInspector( capabilityRegistry ).inspect(
+        new CapabilityConfigurationEventsHandler( capabilityRegistry ).handle(
             new CapabilityConfigurationRemoveEvent( cc )
         );
 

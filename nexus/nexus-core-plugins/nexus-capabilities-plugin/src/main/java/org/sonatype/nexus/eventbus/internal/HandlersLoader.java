@@ -16,32 +16,28 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.config;
+package org.sonatype.nexus.eventbus.internal;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-import org.junit.Test;
-import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
-import org.sonatype.nexus.plugins.capabilities.internal.config.NexusInitializedEventInspector;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
+import org.sonatype.inject.EagerSingleton;
+import org.sonatype.nexus.eventbus.NexusEventBus;
 
-/**
- * {@link NexusInitializedEvent} UTs.
- *
- * @since 1.10.0
- */
-public class NexusInitializedEventInspectorTest
+@Named
+@EagerSingleton
+class HandlersLoader
 {
 
-    @Test
-    public void capabilitiesAreLoadedWhenNexusIsInitialized()
-        throws Exception
+    @Inject
+    HandlersLoader( final NexusEventBus eventBus,
+                    final List<NexusEventBus.Handler> handlers )
     {
-        final CapabilityConfiguration capabilityConfiguration = mock( CapabilityConfiguration.class );
-        new NexusInitializedEventInspector( capabilityConfiguration ).inspect( new NexusInitializedEvent( this ) );
-
-        verify( capabilityConfiguration ).load();
+        for ( final NexusEventBus.Handler handler : handlers )
+        {
+            eventBus.register( handler );
+        }
     }
 
 }

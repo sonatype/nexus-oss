@@ -48,6 +48,7 @@ import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
@@ -60,16 +61,17 @@ import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapa
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.Configuration;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Reader;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Writer;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
+import com.google.common.eventbus.Subscribe;
 
 @Singleton
 @Named
 public class DefaultCapabilityConfiguration
     extends AbstractLoggingComponent
-    implements CapabilityConfiguration
+    implements CapabilityConfiguration, NexusEventBus.Handler
 {
 
-    private final ApplicationEventMulticaster applicationEventMulticaster;
+    private final NexusEventBus eventBus;
 
     private final CapabilityConfigurationValidator validator;
 
@@ -85,12 +87,12 @@ public class DefaultCapabilityConfiguration
 
     @Inject
     public DefaultCapabilityConfiguration( final ApplicationConfiguration applicationConfiguration,
-                                           final ApplicationEventMulticaster applicationEventMulticaster,
+                                           final NexusEventBus eventBus,
                                            final CapabilityConfigurationValidator validator,
                                            final ConfigurationIdGenerator idGenerator,
                                            final CapabilityDescriptorRegistry descriptors )
     {
-        this.applicationEventMulticaster = applicationEventMulticaster;
+        this.eventBus = eventBus;
         this.validator = validator;
         this.idGenerator = idGenerator;
         this.descriptors = descriptors;
@@ -125,7 +127,7 @@ public class DefaultCapabilityConfiguration
                 new Object[]{ capability.getId(), capability.getTypeId(), capability.getProperties() }
             );
 
-            applicationEventMulticaster.notifyEventListeners( new CapabilityConfigurationAddEvent( capability ) );
+            eventBus.post( new CapabilityConfigurationAddEvent( capability ) );
 
             return generatedId;
         }
@@ -163,8 +165,7 @@ public class DefaultCapabilityConfiguration
                     new Object[]{ capability.getId(), capability.getTypeId(), capability.getProperties() }
                 );
 
-                applicationEventMulticaster.notifyEventListeners(
-                    new CapabilityConfigurationUpdateEvent( capability, stored ) );
+                eventBus.post( new CapabilityConfigurationUpdateEvent( capability, stored ) );
             }
         }
         finally
@@ -190,7 +191,7 @@ public class DefaultCapabilityConfiguration
                     "Removed capability '{}' of type '{}' with properties '{}'",
                     new Object[]{ stored.getId(), stored.getTypeId(), stored.getProperties() }
                 );
-                applicationEventMulticaster.notifyEventListeners( new CapabilityConfigurationRemoveEvent( stored ) );
+                eventBus.post( new CapabilityConfigurationRemoveEvent( stored ) );
             }
         }
         finally
@@ -299,7 +300,7 @@ public class DefaultCapabilityConfiguration
                 "Loading capability '{}' of type '{}' with properties '{}'",
                 new Object[]{ capability.getId(), capability.getTypeId(), capability.getProperties() }
             );
-            applicationEventMulticaster.notifyEventListeners( new CapabilityConfigurationLoadEvent( capability ) );
+            eventBus.post( new CapabilityConfigurationLoadEvent( capability ) );
         }
     }
 
@@ -343,6 +344,19 @@ public class DefaultCapabilityConfiguration
     public void clearCache()
     {
         configuration = null;
+    }
+
+    @Subscribe
+    public void automaticallyLoadWhen( final NexusInitializedEvent evt )
+    {
+        try
+        {
+            load();
+        }
+        catch ( final Exception e )
+        {
+            throw new RuntimeException( "Could not load configurations", e );
+        }
     }
 
     private String getDescription( final CCapability capability )

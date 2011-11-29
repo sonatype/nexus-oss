@@ -16,32 +16,33 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.config;
+package org.sonatype.nexus.eventbus.internal;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.plexus.appevents.Event;
 
 @Singleton
-public class NexusInitializedEventInspector
+public class NexusEventBusForwarderEventInspector
     implements EventInspector
 {
 
-    private final CapabilityConfiguration capabilitiesConfiguration;
+    private final NexusEventBus eventBus;
 
     @Inject
-    public NexusInitializedEventInspector( final CapabilityConfiguration capabilitiesConfiguration )
+    public NexusEventBusForwarderEventInspector( final NexusEventBus eventBus )
     {
-        this.capabilitiesConfiguration = capabilitiesConfiguration;
+        this.eventBus = checkNotNull( eventBus );
     }
 
     public boolean accepts( final Event<?> evt )
     {
-        return evt != null
-            && evt instanceof NexusInitializedEvent;
+        return evt != null;
     }
 
     public void inspect( final Event<?> evt )
@@ -50,14 +51,7 @@ public class NexusInitializedEventInspector
         {
             return;
         }
-        try
-        {
-            capabilitiesConfiguration.load();
-        }
-        catch ( final Exception e )
-        {
-            throw new RuntimeException( "Could not load configurations", e );
-        }
+        eventBus.post( evt );
     }
 
 }
