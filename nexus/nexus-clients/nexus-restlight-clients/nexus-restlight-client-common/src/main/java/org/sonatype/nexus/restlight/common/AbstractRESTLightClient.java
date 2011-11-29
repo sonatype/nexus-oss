@@ -20,6 +20,7 @@ package org.sonatype.nexus.restlight.common;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -518,7 +519,7 @@ public abstract class AbstractRESTLightClient
         try
         {
             body = method.getResponseBodyAsString();
-            return new SAXBuilder().build( body );
+            return new SAXBuilder().build( new StringReader( body ) );
         }
         catch ( JDOMException e )
         {
