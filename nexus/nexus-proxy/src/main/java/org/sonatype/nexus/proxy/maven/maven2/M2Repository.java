@@ -54,7 +54,6 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
@@ -134,7 +133,7 @@ public class M2Repository
     /**
      * Should serve by policies.
      * 
-     * @param uid the uid
+     * @param request the request
      * @return true, if successful
      */
     @Override
@@ -179,16 +178,16 @@ public class M2Repository
         throws LocalStorageException
     {
         // if the item is file, is M2 repository metadata and this repo is release-only or snapshot-only
-        if ( isCleanseRepositoryMetadata() && StorageFileItem.class.isAssignableFrom( item.getClass() )
+        if ( isCleanseRepositoryMetadata() && item instanceof StorageFileItem
             && M2ArtifactRecognizer.isMetadata( item.getPath() ) )
         {
             InputStream orig = null;
             StorageFileItem mdFile = (StorageFileItem) item;
             ByteArrayInputStream backup = null;
+            ByteArrayOutputStream backup1 = new ByteArrayOutputStream();
             try
             {
                 // remote item is not reusable, and we usually cache remote stuff locally
-                ByteArrayOutputStream backup1 = new ByteArrayOutputStream();
                 try
                 {
                     orig = mdFile.getInputStream();
@@ -223,7 +222,7 @@ public class M2Repository
                 {
                     // get backup and continue operation
                     backup.reset();
-                    mdFile.setContentLocator( new PreparedContentLocator( backup, mdFile.getMimeType() ) );
+                    mdFile.setContentLocator( new ByteArrayContentLocator( backup1.toByteArray(), mdFile.getMimeType() ) );
                 }
             }
         }

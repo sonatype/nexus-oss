@@ -37,20 +37,28 @@ public class ByteArrayContentLocator
         this.mimeType = mimeType;
     }
 
+    @Override
     public InputStream getContent()
         throws IOException
     {
         return new ByteArrayInputStream( content );
     }
 
+    @Override
     public String getMimeType()
     {
         return mimeType;
     }
 
+    @Override
     public boolean isReusable()
     {
         return true;
+    }
+
+    public long getLength()
+    {
+        return content.length;
     }
 
     public byte[] getByteArray()

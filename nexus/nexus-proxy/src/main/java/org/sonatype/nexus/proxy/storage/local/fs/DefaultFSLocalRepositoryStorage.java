@@ -18,7 +18,6 @@
  */
 package org.sonatype.nexus.proxy.storage.local.fs;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
 import javax.inject.Inject;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -39,12 +37,12 @@ import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.LinkPersister;
-import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -209,12 +207,6 @@ public class DefaultFSLocalRepositoryStorage
 
     /**
      * Retrieve item from file.
-     * 
-     * @param uid the uid
-     * @param target the target
-     * @return the abstract storage item
-     * @throws ItemNotFoundException the item not found exception
-     * @throws LocalStorageException the storage exception
      */
     protected AbstractStorageItem retrieveItemFromFile( Repository repository, ResourceStoreRequest request, File target )
         throws ItemNotFoundException, LocalStorageException
@@ -372,7 +364,7 @@ public class DefaultFSLocalRepositoryStorage
                 throw new LocalStorageException( "Problem ", e );
             }
 
-            cl = new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/xml" );
+            cl = new ByteArrayContentLocator( bos.toByteArray(), "text/xml" );
         }
 
         getFSPeer().storeItem( repository, item, target, cl );

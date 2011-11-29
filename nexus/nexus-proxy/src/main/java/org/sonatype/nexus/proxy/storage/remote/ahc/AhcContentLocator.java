@@ -85,14 +85,14 @@ public class AhcContentLocator
         return inputStream == null;
     }
 
-    public String getItemUrl()
-    {
-        return itemUrl;
-    }
-
     public long getLength()
     {
         return length;
+    }
+
+    public String getItemUrl()
+    {
+        return itemUrl;
     }
 
     public long getLastModified()

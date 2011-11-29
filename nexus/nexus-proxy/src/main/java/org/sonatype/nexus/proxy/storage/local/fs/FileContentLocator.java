@@ -42,29 +42,35 @@ public class FileContentLocator
         super();
 
         this.file = file;
-
         this.mimeType = mimeType;
     }
 
+    @Override
     public InputStream getContent()
         throws IOException
     {
         return new FileInputStream( file );
     }
 
+    @Override
     public String getMimeType()
     {
         return mimeType;
     }
 
+    @Override
     public boolean isReusable()
     {
         return true;
+    }
+
+    public long getLength()
+    {
+        return file.length();
     }
 
     public File getFile()
     {
         return file;
     }
-
 }
