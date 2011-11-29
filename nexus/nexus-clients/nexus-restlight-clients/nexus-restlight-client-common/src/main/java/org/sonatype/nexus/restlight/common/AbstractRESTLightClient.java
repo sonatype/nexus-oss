@@ -524,7 +524,7 @@ public abstract class AbstractRESTLightClient
         catch ( JDOMException e )
         {
             throw new RESTLightClientException( "Failed to parse response body as XML for GET request. Content: \n"
-                + body, e );
+                + body + "\nStatus: " + statusText, e );
         }
         catch ( IOException e )
         {
