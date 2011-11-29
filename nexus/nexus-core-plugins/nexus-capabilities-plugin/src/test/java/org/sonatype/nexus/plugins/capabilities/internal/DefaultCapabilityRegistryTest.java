@@ -44,6 +44,8 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
+import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
 
 /**
  * {@link DefaultCapabilityRegistry} UTs.
@@ -58,6 +60,8 @@ public class DefaultCapabilityRegistryTest
     private HashMap<String, CapabilityFactory> factoryMap;
 
     private ActivationContext activationContext;
+
+    private DefaultCapabilityRegistry underTest;
 
     @Before
     public void setUp()
@@ -78,6 +82,18 @@ public class DefaultCapabilityRegistryTest
 
         } );
         activationContext = mock( ActivationContext.class );
+
+        final CapabilityConfiguration configuration = mock( CapabilityConfiguration.class );
+        final Conditions conditions = mock( Conditions.class );
+
+        underTest = new DefaultCapabilityRegistry( factoryMap, activationContext, configuration, conditions )
+        {
+            @Override
+            CapabilityReference createReference( final Capability capability )
+            {
+                return mock( CapabilityReference.class );
+            }
+        };
     }
 
     /**
@@ -86,11 +102,8 @@ public class DefaultCapabilityRegistryTest
     @Test
     public void createWithoutListeners()
     {
-        final DefaultCapabilityRegistry underTest = new DefaultCapabilityRegistry( factoryMap, activationContext );
         final CapabilityReference reference = underTest.create( "capability-1", CAPABILITY_TYPE );
         assertThat( reference, is( not( nullValue() ) ) );
-        assertThat( reference.isActive(), is( false ) );
-        assertThat( reference.capability(), is( not( nullValue() ) ) );
     }
 
     /**
@@ -99,7 +112,6 @@ public class DefaultCapabilityRegistryTest
     @Test
     public void removeWithoutListeners()
     {
-        final DefaultCapabilityRegistry underTest = new DefaultCapabilityRegistry( factoryMap, activationContext );
         final CapabilityReference reference = underTest.create( "capability-1", CAPABILITY_TYPE );
         final CapabilityReference reference1 = underTest.remove( "capability-1" );
 
@@ -112,8 +124,7 @@ public class DefaultCapabilityRegistryTest
     @Test
     public void removeInexistentWithoutListeners()
     {
-        final DefaultCapabilityRegistry underTest = new DefaultCapabilityRegistry( factoryMap, activationContext );
-        final CapabilityReference reference = underTest.create( "capability-1", CAPABILITY_TYPE );
+        underTest.create( "capability-1", CAPABILITY_TYPE );
         final CapabilityReference reference1 = underTest.remove( "capability-2" );
 
         assertThat( reference1, is( nullValue() ) );
@@ -125,13 +136,10 @@ public class DefaultCapabilityRegistryTest
     @Test
     public void get()
     {
-        final DefaultCapabilityRegistry underTest = new DefaultCapabilityRegistry( factoryMap, activationContext );
         underTest.create( "capability-1", CAPABILITY_TYPE );
         final CapabilityReference reference1 = underTest.get( "capability-1" );
 
         assertThat( reference1, is( not( nullValue() ) ) );
-        assertThat( reference1.isActive(), is( false ) );
-        assertThat( reference1.capability(), is( not( nullValue() ) ) );
     }
 
     /**
@@ -140,7 +148,6 @@ public class DefaultCapabilityRegistryTest
     @Test
     public void getInexistent()
     {
-        final DefaultCapabilityRegistry underTest = new DefaultCapabilityRegistry( factoryMap, activationContext );
         underTest.create( "capability-1", CAPABILITY_TYPE );
         final CapabilityReference reference = underTest.get( "capability-2" );
 
@@ -153,7 +160,6 @@ public class DefaultCapabilityRegistryTest
     @Test
     public void getAll()
     {
-        final DefaultCapabilityRegistry underTest = new DefaultCapabilityRegistry( factoryMap, activationContext );
         underTest.create( "capability-1", CAPABILITY_TYPE );
         underTest.create( "capability-2", CAPABILITY_TYPE );
         final Collection<CapabilityReference> references = underTest.getAll();
@@ -174,18 +180,15 @@ public class DefaultCapabilityRegistryTest
         );
         final CapabilityRegistry.Listener listener2 = mock( CapabilityRegistry.Listener.class );
 
-        final DefaultCapabilityRegistry underTest = new DefaultCapabilityRegistry( factoryMap, activationContext );
-
         underTest.addListener( listener1 );
         underTest.addListener( listener2 );
 
         final CapabilityReference reference = underTest.create( "capability-1", CAPABILITY_TYPE );
         assertThat( reference, is( not( nullValue() ) ) );
-        assertThat( reference.isActive(), is( false ) );
-        assertThat( reference.capability(), is( not( nullValue() ) ) );
 
         verify( listener1 ).onAdd( reference );
         verify( listener2 ).onAdd( reference );
+
     }
 
     /**
@@ -200,8 +203,6 @@ public class DefaultCapabilityRegistryTest
             Mockito.<CapabilityReference>any()
         );
         final CapabilityRegistry.Listener listener2 = mock( CapabilityRegistry.Listener.class );
-
-        final DefaultCapabilityRegistry underTest = new DefaultCapabilityRegistry( factoryMap, activationContext );
 
         final CapabilityReference reference = underTest.create( "capability-1", CAPABILITY_TYPE );
 
@@ -225,8 +226,6 @@ public class DefaultCapabilityRegistryTest
         );
         final CapabilityRegistry.Listener listener2 = mock( CapabilityRegistry.Listener.class );
 
-        final DefaultCapabilityRegistry underTest = new DefaultCapabilityRegistry( factoryMap, activationContext );
-
         underTest.addListener( listener1 );
         underTest.addListener( listener2 );
 
@@ -249,8 +248,6 @@ public class DefaultCapabilityRegistryTest
             Mockito.<CapabilityReference>any()
         );
         final CapabilityRegistry.Listener listener2 = mock( CapabilityRegistry.Listener.class );
-
-        final DefaultCapabilityRegistry underTest = new DefaultCapabilityRegistry( factoryMap, activationContext );
 
         underTest.addListener( listener1 );
         underTest.addListener( listener2 );

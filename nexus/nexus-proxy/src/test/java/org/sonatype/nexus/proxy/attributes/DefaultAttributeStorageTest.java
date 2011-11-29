@@ -73,7 +73,7 @@ public class DefaultAttributeStorageTest
     {
         super.setUp();
 
-        attributeStorage = lookup( AttributeStorage.class );
+        attributeStorage = lookup( AttributeStorage.class, "fs" );
 
         repositoryItemUidFactory = lookup( RepositoryItemUidFactory.class );
 
@@ -100,7 +100,7 @@ public class DefaultAttributeStorageTest
         {
             FileUtils.deleteDirectory( ( (DefaultFSAttributeStorage) attributeStorage ).getWorkingDirectory() );
         }
-        else
+        else if (attributeStorage instanceof DefaultLSAttributeStorage)
         {
             FileUtils.deleteDirectory( new File( localStorageDirectory, ".nexus/attributes" ) );
         }

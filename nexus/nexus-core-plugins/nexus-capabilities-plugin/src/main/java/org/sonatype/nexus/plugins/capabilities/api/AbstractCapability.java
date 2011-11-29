@@ -79,10 +79,25 @@ public abstract class AbstractCapability
         // do nothing
     }
 
+    /**
+     * Returns null, meaning that this capability is always active.
+     *
+     * @return null
+     */
     @Override
     public Condition activationCondition()
     {
         return null;
     }
 
+    /**
+     * Returns null, meaning that this capability is always valid.
+     *
+     * @return null
+     */
+    @Override
+    public Condition validityCondition()
+    {
+        return null;
+    }
 }

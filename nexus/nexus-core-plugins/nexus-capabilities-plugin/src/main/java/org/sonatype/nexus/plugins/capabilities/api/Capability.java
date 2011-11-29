@@ -76,4 +76,16 @@ public interface Capability
      * @return activation condition. If null, it considers that condition is always activatable.
      */
     Condition activationCondition();
+
+    /**
+     * Returns the condition that should be satisfied in order for this capability to be valid. When this condition
+     * becomes unsatisfied, the capability will be automatically removed.
+     *
+     * Example of such a condition will be a capability that applies to a repository should be automatically be removed
+     * when repository is removed.
+     *
+     * @return activation condition. If null, it considers that condition is always valid.
+     */
+    Condition validityCondition();
+
 }

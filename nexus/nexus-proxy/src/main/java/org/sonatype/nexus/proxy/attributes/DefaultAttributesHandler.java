@@ -26,9 +26,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.io.IOUtils;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -41,16 +43,21 @@ import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
- * The Class DefaultAttributesHandler.
- *
+ * The default implementation of AttributesHandler. Has support for various "lastRequested" attribute tuning, but does
+ * not have any assumption regarding actual AttributeStorage it uses.
+ * 
  * @author cstamas
  */
-@Component( role = AttributesHandler.class )
+@Named
+@Singleton
 public class DefaultAttributesHandler
     extends AbstractLoggingComponent
     implements AttributesHandler
@@ -64,39 +71,72 @@ public class DefaultAttributesHandler
      * The value of lastRequested attribute updates resolution. Is enforced to be positive long. Setting it to 0 makes
      * Nexus behave in "old" (update always) way.
      */
-    private static final long LAST_REQUESTED_ATTRIBUTE_RESOLUTION =
-        Math.abs( SystemPropertiesHelper.getLong( "nexus.attributes.lastRequestedResolution",
-                                                  LAST_REQUESTED_ATTRIBUTE_RESOLUTION_DEFAULT ) );
+    private static final long LAST_REQUESTED_ATTRIBUTE_RESOLUTION = Math.abs( SystemPropertiesHelper.getLong(
+        "org.sonatype.nexus.proxy.attributes.DefaultAttributesHandler.lastRequested.resolution",
+        LAST_REQUESTED_ATTRIBUTE_RESOLUTION_DEFAULT ) );
+
+    /**
+     * Flag to completely enable/disable the lastRequested attribute maintenance.
+     */
+    private static final boolean LAST_REQUEST_ATTRIBUTE_ENABLED = SystemPropertiesHelper.getBoolean(
+        "org.sonatype.nexus.proxy.attributes.DefaultAttributesHandler.lastRequested.enabled", true );
+
+    /**
+     * Flag to completely enable/disable the lastRequested attribute maintenance for hosted repositories.
+     */
+    private static final boolean LAST_REQUEST_ATTRIBUTE_ENABLED_FOR_HOSTED = SystemPropertiesHelper.getBoolean(
+        "org.sonatype.nexus.proxy.attributes.DefaultAttributesHandler.lastRequested.enabled.hosted",
+        LAST_REQUEST_ATTRIBUTE_ENABLED );
+
+    /**
+     * Flag to completely enable/disable the lastRequested attribute maintenance for proxy repositories.
+     */
+    private static final boolean LAST_REQUEST_ATTRIBUTE_ENABLED_FOR_PROXY = SystemPropertiesHelper.getBoolean(
+        "org.sonatype.nexus.proxy.attributes.DefaultAttributesHandler.lastRequested.enabled.proxy",
+        LAST_REQUEST_ATTRIBUTE_ENABLED );
+
+    /**
+     * The actual value of lastRequest attribute's resolution.
+     */
+    private long lastRequestedResolution = LAST_REQUESTED_ATTRIBUTE_RESOLUTION;
 
     /**
      * The application configuration.
      */
-    @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
     /**
      * The attribute storage.
      */
-    @Requirement
     private AttributeStorage attributeStorage;
 
     /**
      * The item inspector list.
      */
-    @Requirement( role = StorageItemInspector.class )
     protected List<StorageItemInspector> itemInspectorList;
 
     /**
      * The item inspector list.
      */
-    @Requirement( role = StorageFileItemInspector.class )
     protected List<StorageFileItemInspector> fileItemInspectorList;
+
+    @Inject
+    public DefaultAttributesHandler( ApplicationConfiguration applicationConfiguration,
+                                     @Named( "fs" ) AttributeStorage attributeStorage,
+                                     List<StorageItemInspector> itemInspectorList,
+                                     List<StorageFileItemInspector> fileItemInspectorList )
+    {
+        this.applicationConfiguration = applicationConfiguration;
+        this.attributeStorage = attributeStorage;
+        this.itemInspectorList = itemInspectorList;
+        this.fileItemInspectorList = fileItemInspectorList;
+    }
 
     // ==
 
     /**
      * Gets the attribute storage.
-     *
+     * 
      * @return the attribute storage
      */
     public AttributeStorage getAttributeStorage()
@@ -106,7 +146,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the attribute storage.
-     *
+     * 
      * @param attributeStorage the new attribute storage
      */
     public void setAttributeStorage( AttributeStorage attributeStorage )
@@ -116,7 +156,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the item inspector list.
-     *
+     * 
      * @return the item inspector list
      */
     public List<StorageItemInspector> getItemInspectorList()
@@ -126,7 +166,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the item inspector list.
-     *
+     * 
      * @param itemInspectorList the new item inspector list
      */
     public void setItemInspectorList( List<StorageItemInspector> itemInspectorList )
@@ -136,7 +176,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the file item inspector list.
-     *
+     * 
      * @return the file item inspector list
      */
     public List<StorageFileItemInspector> getFileItemInspectorList()
@@ -146,7 +186,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the file item inspector list.
-     *
+     * 
      * @param fileItemInspectorList the new file item inspector list
      */
     public void setFileItemInspectorList( List<StorageFileItemInspector> fileItemInspectorList )
@@ -271,23 +311,55 @@ public class DefaultAttributesHandler
         // Touch it only if this is user-originated request (request incoming over HTTP, not a plugin or "internal" one)
         // Currently, we test for IP address presence, since that makes sure it is user request (from REST API) and not
         // a request from "internals" (ie. a running task).
+
+        // we do this only for requests originating from REST API (user initiated)
         if ( request.getRequestContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
         {
-            final long diff = timestamp - storageItem.getLastRequested();
-
-            // if timestamp < storageItem.getLastRequested() => diff will be negative => DO THE UPDATE
-            // ie. programatically "resetting" lastAccessTime to some past point for whatever reason
-            // if timestamp == to storageItem.getLastRequested() => diff will be 0 => SKIP THE UPDATE
-            // ie. trying to set to same value, just lessen the needless IO since values are already equal
-            // if timestamp > storageItem.getLastRequested() => diff will be positive => DO THE UPDATE IF diff bigger than resolution
-            // ie. the "usual" case, obey the resolution then
-            if ( diff < 0 || ( ( diff > 0 ) && ( diff > LAST_REQUESTED_ATTRIBUTE_RESOLUTION ) ) )
+            // if we need to do this at all... user might turn this feature completely off
+            if ( doTouchLastRequested( repository ) )
             {
-                storageItem.setLastRequested( timestamp );
+                final long diff = timestamp - storageItem.getLastRequested();
 
-                getAttributeStorage().putAttribute( storageItem );
+                // if timestamp < storageItem.getLastRequested() => diff will be negative => DO THE UPDATE
+                // ie. programatically "resetting" lastAccessTime to some past point for whatever reason
+                // if timestamp == to storageItem.getLastRequested() => diff will be 0 => SKIP THE UPDATE
+                // ie. trying to set to same value, just lessen the needless IO since values are already equal
+                // if timestamp > storageItem.getLastRequested() => diff will be positive => DO THE UPDATE IF diff
+                // bigger
+                // than resolution
+                // ie. the "usual" case, obey the resolution then
+                if ( diff < 0 || ( ( diff > 0 ) && ( diff > lastRequestedResolution ) ) )
+                {
+                    storageItem.setLastRequested( timestamp );
+
+                    getAttributeStorage().putAttribute( storageItem );
+                }
             }
         }
+    }
+
+    protected boolean doTouchLastRequested( final Repository repository )
+    {
+        // the "default"
+        boolean doTouch = LAST_REQUEST_ATTRIBUTE_ENABLED;
+
+        final RepositoryKind repositoryKind = repository.getRepositoryKind();
+
+        if ( repositoryKind != null )
+        {
+            if ( repositoryKind.isFacetAvailable( HostedRepository.class ) )
+            {
+                // this is a hosted repository
+                doTouch = LAST_REQUEST_ATTRIBUTE_ENABLED_FOR_HOSTED;
+            }
+            else if ( repositoryKind.isFacetAvailable( ProxyRepository.class ) )
+            {
+                // this is a proxy repository
+                doTouch = LAST_REQUEST_ATTRIBUTE_ENABLED_FOR_PROXY;
+            }
+        }
+
+        return doTouch;
     }
 
     public void updateItemAttributes( Repository repository, ResourceStoreRequest request, StorageItem item )
@@ -301,8 +373,8 @@ public class DefaultAttributesHandler
 
     /**
      * Expand custom item attributes.
-     *
-     * @param item    the item
+     * 
+     * @param item the item
      * @param content the input stream
      */
     protected void expandCustomItemAttributes( StorageItem item, ContentLocator content )
@@ -351,7 +423,7 @@ public class DefaultAttributesHandler
                         // unpack the file
                         tmpFile =
                             File.createTempFile( "px-" + item.getName(), ".tmp",
-                                                 applicationConfiguration.getTemporaryDirectory() );
+                                applicationConfiguration.getTemporaryDirectory() );
 
                         inputStream = content.getContent();
 
@@ -438,4 +510,25 @@ public class DefaultAttributesHandler
         // result.setDate( LocalStorageItem.LOCAL_ITEM_LAST_INSPECTED_KEY, new Date() );
     }
 
+    // ==
+
+    /**
+     * For UT access!
+     * 
+     * @return
+     */
+    public long getLastRequestedResolution()
+    {
+        return lastRequestedResolution;
+    }
+
+    /**
+     * For UT access!
+     * 
+     * @param lastRequestedResolution
+     */
+    public void setLastRequestedResolution( long lastRequestedResolution )
+    {
+        this.lastRequestedResolution = lastRequestedResolution;
+    }
 }

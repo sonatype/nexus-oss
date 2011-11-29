@@ -20,18 +20,31 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.notNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.capabilities.internal.DefaultCapabilityReference.sameProperties;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.NexusIsActiveCondition;
+import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
+import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
+import org.sonatype.nexus.plugins.capabilities.support.activation.NexusConditions;
 
 /**
  * {@link DefaultCapabilityReference} UTs.
@@ -47,15 +60,80 @@ public class DefaultCapabilityReferenceTest
 
     private DefaultCapabilityRegistry capabilityRegistry;
 
+    private ActivationContext activationContext;
+
+    private Condition activationCondition;
+
+    private CapabilityConfiguration configuration;
+
+    private Conditions conditions;
+
+    private NexusIsActiveCondition nexusIsActiveCondition;
+
+    private Condition validityCondition;
+
     @Before
     public void setUp()
     {
         capabilityRegistry = mock( DefaultCapabilityRegistry.class );
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        capability = mock( Capability.class );
-        when( capability.id() ).thenReturn( "test" );
-        underTest = new DefaultCapabilityReference( capabilityRegistry, activationContext, capability );
+        activationContext = mock( ActivationContext.class );
+        configuration = mock( CapabilityConfiguration.class );
+        conditions = mock( Conditions.class );
 
+        final NexusConditions nexusConditions = mock( NexusConditions.class );
+        nexusIsActiveCondition = mock( NexusIsActiveCondition.class );
+        when( nexusIsActiveCondition.isSatisfied() ).thenReturn( true );
+        when( nexusConditions.active() ).thenReturn( nexusIsActiveCondition );
+        when( conditions.nexus() ).thenReturn( nexusConditions );
+
+        capability = mock( Capability.class );
+        when( capability.id() ).thenReturn( "test-capability" );
+
+        activationCondition = mock( Condition.class );
+        when( activationCondition.isSatisfied() ).thenReturn( true );
+        when( capability.activationCondition() ).thenReturn( activationCondition );
+
+        validityCondition = mock( Condition.class );
+        when( validityCondition.isSatisfied() ).thenReturn( true );
+        when( capability.validityCondition() ).thenReturn( validityCondition );
+
+        underTest = new DefaultCapabilityReference(
+            capabilityRegistry, activationContext, configuration, conditions, capability
+        );
+        underTest.create( Collections.<String, String>emptyMap() );
+    }
+
+    /**
+     * Capability is enabled and enable flag is set.
+     */
+    @Test
+    public void enableWhenNotEnabled()
+    {
+        assertThat( underTest.isEnabled(), is( false ) );
+        underTest.enable();
+        assertThat( underTest.isEnabled(), is( true ) );
+        verify( activationCondition ).bind();
+        verify( activationContext ).addListener(
+            Matchers.<ActivationContext.Listener>any(), eq( activationCondition )
+        );
+    }
+
+    /**
+     * Capability is disabled and enable flag is set.
+     */
+    @Test
+    public void disableWhenEnabled()
+    {
+        assertThat( underTest.isEnabled(), is( false ) );
+        underTest.enable();
+        assertThat( underTest.isEnabled(), is( true ) );
+        underTest.disable();
+        assertThat( underTest.isEnabled(), is( false ) );
+
+        verify( activationCondition ).release();
+        verify( activationContext ).removeListener(
+            Matchers.<ActivationContext.Listener>any(), eq( activationCondition )
+        );
     }
 
     /**
@@ -144,6 +222,171 @@ public class DefaultCapabilityReferenceTest
         underTest.passivate();
         verify( capability ).passivate();
         assertThat( underTest.isActive(), is( false ) );
+    }
+
+    /**
+     * Calling create forwards to capability (no need to call create as it is done in setup).
+     */
+    @Test
+    public void createIsForwardedToCapability()
+    {
+        verify( capability ).create( Matchers.<Map<String, String>>any() );
+    }
+
+    /**
+     * Calling load forwards to capability.
+     */
+    @Test
+    public void loadIsForwardedToCapability()
+    {
+        final HashMap<String, String> properties = new HashMap<String, String>();
+        underTest.load( properties );
+        verify( capability ).load( properties );
+    }
+
+    /**
+     * Calling update forwards to capability if properties are different.
+     */
+    @Test
+    public void updateIsForwardedToCapability()
+    {
+        final HashMap<String, String> properties = new HashMap<String, String>();
+        properties.put( "p", "p" );
+        final HashMap<String, String> previousProperties = new HashMap<String, String>();
+        underTest.update( properties, previousProperties );
+        verify( capability ).update( properties );
+        verify( capabilityRegistry, times( 2 ) ).notify(
+            notNull( CapabilityReference.class ), notNull( DefaultCapabilityRegistry.Notifier.class )
+        );
+    }
+
+    /**
+     * Calling update does not forwards to capability if properties are same.
+     */
+    @Test
+    public void updateIsNotForwardedToCapabilityIfSameProperties()
+    {
+        final HashMap<String, String> properties = new HashMap<String, String>();
+        final HashMap<String, String> previousProperties = new HashMap<String, String>();
+        doThrow( new AssertionError( "Update not expected to be called" ) ).when( capability ).update(
+            Matchers.<Map<String, String>>any()
+        );
+        underTest.update( properties, previousProperties );
+    }
+
+    /**
+     * Calling remove forwards to capability and listeners are removed.
+     */
+    @Test
+    public void removeIsForwardedToCapability()
+    {
+        underTest.enable();
+        underTest.remove();
+        verify( capability ).remove();
+        verify( activationContext ).removeListener(
+            Matchers.<ActivationContext.Listener>any(), eq( activationCondition )
+        );
+        verify( activationContext ).removeListener(
+            Matchers.<ActivationContext.Listener>any(), eq( nexusIsActiveCondition )
+        );
+        verify( activationContext ).removeListener(
+            Matchers.<ActivationContext.Listener>any(), eq( validityCondition )
+        );
+    }
+
+    @Test
+    public void samePropertiesWhenBothNull()
+    {
+        assertThat( sameProperties( null, null ), is( true ) );
+    }
+
+    @Test
+    public void samePropertiesWhenOldAreNull()
+    {
+        final HashMap<String, String> p2 = new HashMap<String, String>();
+        p2.put( "p2", "p2" );
+        assertThat( sameProperties( null, p2 ), is( false ) );
+    }
+
+    @Test
+    public void samePropertiesWhenNewAreNull()
+    {
+        final HashMap<String, String> p1 = new HashMap<String, String>();
+        p1.put( "p1", "p1" );
+        assertThat( sameProperties( p1, null ), is( false ) );
+    }
+
+    @Test
+    public void samePropertiesWhenBothAreSame()
+    {
+        final HashMap<String, String> p1 = new HashMap<String, String>();
+        p1.put( "p", "p" );
+        final HashMap<String, String> p2 = new HashMap<String, String>();
+        p2.put( "p", "p" );
+        assertThat( sameProperties( p1, p2 ), is( true ) );
+    }
+
+    @Test
+    public void samePropertiesWhenDifferentValueSameKey()
+    {
+        final HashMap<String, String> p1 = new HashMap<String, String>();
+        p1.put( "p", "p1" );
+        final HashMap<String, String> p2 = new HashMap<String, String>();
+        p2.put( "p", "p2" );
+        assertThat( sameProperties( p1, p2 ), is( false ) );
+    }
+
+    @Test
+    public void samePropertiesWhenDifferentSize()
+    {
+        final HashMap<String, String> p1 = new HashMap<String, String>();
+        p1.put( "p1.1", "p1.1" );
+        p1.put( "p1.2", "p1.2" );
+        final HashMap<String, String> p2 = new HashMap<String, String>();
+        p2.put( "p2", "p2" );
+        assertThat( sameProperties( p1, p2 ), is( false ) );
+    }
+
+    @Test
+    public void samePropertiesWhenDifferentKeys()
+    {
+        final HashMap<String, String> p1 = new HashMap<String, String>();
+        p1.put( "p1", "p" );
+        final HashMap<String, String> p2 = new HashMap<String, String>();
+        p2.put( "p2", "p" );
+        assertThat( sameProperties( p1, p2 ), is( false ) );
+    }
+
+    /**
+     * When created it automatically listens to nexus becoming active (to be able to handle validity condition) and
+     * for validity condition.
+     */
+    @Test
+    public void listensToNexusIsActiveAndValidityConditions()
+    {
+        verify( activationContext ).addListener(
+            Matchers.<ActivationContext.Listener>any(), eq( nexusIsActiveCondition )
+        );
+        verify( activationContext ).addListener(
+            Matchers.<ActivationContext.Listener>any(), eq( validityCondition )
+        );
+    }
+
+    /**
+     * When validity condition becomes unsatisfied, capability is automatically removed.
+     *
+     * @throws Exception re-thrown
+     */
+    @Test
+    public void automaticallyRemoveWhenValidityConditionIsUnsatisfied()
+        throws Exception
+    {
+        final ArgumentCaptor<ActivationContext.Listener> listenerCaptor = ArgumentCaptor.forClass(
+            ActivationContext.Listener.class
+        );
+        verify( activationContext ).addListener( listenerCaptor.capture(), eq( validityCondition ) );
+        listenerCaptor.getValue().onUnsatisfied( validityCondition );
+        verify( configuration ).remove( capability.id() );
     }
 
 }

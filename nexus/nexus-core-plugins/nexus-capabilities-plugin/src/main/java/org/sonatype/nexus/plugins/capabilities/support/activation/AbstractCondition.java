@@ -19,7 +19,9 @@
 package org.sonatype.nexus.plugins.capabilities.support.activation;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 
@@ -27,6 +29,7 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
  * {@link Condition} implementation support.
  */
 public abstract class AbstractCondition
+    extends AbstractLoggingComponent
     implements Condition
 {
 
@@ -34,19 +37,72 @@ public abstract class AbstractCondition
 
     private boolean satisfied;
 
-    public AbstractCondition( final ActivationContext activationContext )
+    private boolean active;
+
+    protected AbstractCondition( final ActivationContext activationContext )
+    {
+        this( activationContext, false );
+    }
+
+    protected AbstractCondition( final ActivationContext activationContext, final boolean satisfied )
     {
         this.activationContext = checkNotNull( activationContext );
+        this.satisfied = satisfied;
+        active = false;
+    }
+
+    protected ActivationContext getActivationContext()
+    {
+        return activationContext;
     }
 
     @Override
     public boolean isSatisfied()
     {
+        checkState( active, "Condition has already been released or was not bounded" );
         return satisfied;
     }
 
-    public void setSatisfied( final boolean satisfied )
+    @Override
+    public final Condition bind()
     {
+        if ( !active )
+        {
+            active = true;
+            doBind();
+        }
+        return this;
+    }
+
+    @Override
+    public final Condition release()
+    {
+        if ( active )
+        {
+            doRelease();
+            active = false;
+        }
+        return this;
+    }
+
+    /**
+     * Template method to be implemented by subclasses for doing specific binding.
+     */
+    protected abstract void doBind();
+
+    /**
+     * Template method to be implemented by subclasses for doing specific releasing.
+     */
+    protected abstract void doRelease();
+
+    /**
+     * Sets teh satisfied status and notify activation context about thsi condition being satisfied/unsatisfied.
+     *
+     * @param satisfied true, if condition is satisfied
+     */
+    protected void setSatisfied( final boolean satisfied )
+    {
+        checkState( active, "Condition has already been released or was not bounded" );
         if ( this.satisfied != satisfied )
         {
             this.satisfied = satisfied;
@@ -59,7 +115,6 @@ public abstract class AbstractCondition
                 activationContext.notifyUnsatisfied( this );
             }
         }
-
     }
 
 }
