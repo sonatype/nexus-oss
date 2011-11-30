@@ -190,12 +190,6 @@ public class DefaultSnapshotRemover
         {
             return result;
         }
-        // TODO: unsure do we really want to enable this if-block below
-        // if this is not a hosted repo, do nothing
-        // if ( !repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
-        // {
-        //    return result;
-        // }
 
         if ( getLogger().isDebugEnabled() )
         {
@@ -236,17 +230,13 @@ public class DefaultSnapshotRemover
                     + " files on repository " + repository.getId() );
         }
 
-        // Why are we expiring caches in the 1st places? But:
-        // better: Not costly operation, does not walk just flushes EHCache
-        // repository.expireNotFoundCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
-        // was: Very costly operation, it flushes EHCache AND Walks the repository to flip "expired" flags
-        // On hosted repositories?
-        // repository.expireCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
-
         // if we are processing a hosted-snapshot repository, we need to rebuild maven metadata
         // without this if below, the walk would happen against proxy repositories too, but doing nothing!
         if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
         {
+            // expire NFC since we might create new maven metadata files
+            repository.expireNotFoundCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
+
             RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor =
                 new RecreateMavenMetadataWalkerProcessor( Slf4jPlexusLogger.getPlexusLogger( getLogger() ),
                                                           getDeleteOperation( request ) );
