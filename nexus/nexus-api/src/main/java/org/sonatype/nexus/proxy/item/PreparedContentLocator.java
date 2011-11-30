@@ -36,21 +36,23 @@ public class PreparedContentLocator
     public PreparedContentLocator( final InputStream content, final String mimeType )
     {
         this.content = content;
-
         this.mimeType = mimeType;
     }
 
+    @Override
     public InputStream getContent()
         throws IOException
     {
         return content;
     }
 
+    @Override
     public String getMimeType()
     {
         return mimeType;
     }
 
+    @Override
     public boolean isReusable()
     {
         return false;
