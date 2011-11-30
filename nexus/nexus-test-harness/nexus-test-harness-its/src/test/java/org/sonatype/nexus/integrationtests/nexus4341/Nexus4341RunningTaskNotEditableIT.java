@@ -18,14 +18,24 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4341;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
 import static org.sonatype.sisu.goodies.common.Time.time;
 import static org.sonatype.tests.http.server.fluent.Behaviours.error;
 import static org.sonatype.tests.http.server.fluent.Behaviours.pause;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.collect.Sets;
 import org.restlet.data.Status;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
@@ -33,10 +43,13 @@ import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.DownloadIndexesTaskDescriptor;
+import org.sonatype.nexus.test.utils.NexusRequestMatchers;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.sonatype.sisu.goodies.common.Time;
 import org.sonatype.tests.http.server.fluent.Server;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class Nexus4341RunningTaskNotEditableIT
@@ -45,7 +58,9 @@ public class Nexus4341RunningTaskNotEditableIT
 
     private Server return500Server;
 
-    private void replaceServer()
+
+    @BeforeMethod(alwaysRun = true)
+    public void replaceServer()
         throws Exception
     {
         ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE );
@@ -53,10 +68,10 @@ public class Nexus4341RunningTaskNotEditableIT
         int port = server.getPort();
 
         return500Server =
-            Server.withPort( port ).serve( "/*" ).withBehaviours( pause( time( 30, TimeUnit.SECONDS ) ), error( 500 ) ).start();
+            Server.withPort( port ).serve( "/*" ).withBehaviours( pause( time( 10, TimeUnit.SECONDS ) ), error( 500 ) ).start();
     }
 
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void stopServer()
         throws Exception
     {
@@ -71,20 +86,19 @@ public class Nexus4341RunningTaskNotEditableIT
     {
         ScheduledServiceBaseResource scheduledTask = getScheduledTaskTemplate( name );
 
-        Status status = TaskScheduleUtil.create( scheduledTask );
-
-        Assert.assertTrue( status.isSuccess() );
+        TaskScheduleUtil.create( scheduledTask, isSuccessful() );
     }
 
     private void verifyNoUpdate( ScheduledServiceListResource resource )
         throws IOException
     {
-        System.err.println( String.format( "Trying to update %s (%s)", resource.getName(), resource.getStatus() ) );
+        log.info( "Trying to update {} ({})", resource.getName(), resource.getStatus() );
+
         ScheduledServiceBaseResource changed = getScheduledTaskTemplate( "changed" );
         changed.setId( resource.getId() );
         Status status = TaskScheduleUtil.update( changed );
-        Assert.assertTrue( status.isClientError(), "Should not have been able to update task with state "
-            + resource.getStatus() + ", " + status.getDescription() );
+        assertThat( "Should not have been able to update task with state " + resource.getStatus() + ", "
+                        + status.getDescription(), status, isClientError() );
     }
 
     private ScheduledServiceBaseResource getScheduledTaskTemplate( String name )
@@ -107,20 +121,16 @@ public class Nexus4341RunningTaskNotEditableIT
     public void testNoUpdateForRunningTasks()
         throws Exception
     {
-        replaceServer();
-
-        Thread.sleep( 1000 );
-
         createDownloadIndexesTask( "Nexus4341Task1" );
         createDownloadIndexesTask( "Nexus4341Task2" );
 
         List<ScheduledServiceListResource> tasks = TaskScheduleUtil.getTasks();
 
-        Assert.assertEquals( 2, tasks.size() );
+        assertThat( tasks, hasSize( 2 ) );
 
         for ( ScheduledServiceListResource resource : tasks )
         {
-            log.debug( "Starting task " + resource.getName() );
+            log.info( "Starting task: {}", resource.getName() );
             Status status = TaskScheduleUtil.run( resource.getId() );
             Assert.assertTrue( status.isSuccess() );
         }
@@ -129,7 +139,7 @@ public class Nexus4341RunningTaskNotEditableIT
         while ( ticks <= 60 )
         {
             tasks = TaskScheduleUtil.getTasks();
-            Assert.assertEquals( tasks.size(), 2 );
+            assertThat( tasks, hasSize( 2 ) );
             if ( tasks.get( 0 ).getStatus().equals( "RUNNING" ) && tasks.get( 1 ).getStatus().equals( "SLEEPING" ) )
             {
                 break;
@@ -141,39 +151,39 @@ public class Nexus4341RunningTaskNotEditableIT
             
             ticks++;
             Thread.yield();
-            Thread.sleep( 1000 );
+            Time.seconds( 1 ).sleep();
         }
 
-        boolean triedSleeping = false;
-        boolean triedRunning = false;
-        boolean triedCancelling = false;
+        assertThat( "did not find RUNNING/SLEEPING state for two tasks in 60s", ticks, lessThanOrEqualTo( 60 ) );
 
-        for ( ScheduledServiceListResource resource : TaskScheduleUtil.getAllTasks() )
+        tasks = TaskScheduleUtil.getTasks();
+        assertThat( tasks, hasSize( 2 ) );
+
+        Set<String> seenStates = Sets.newHashSet();
+
+        for ( ScheduledServiceListResource task : tasks )
         {
-            System.err.println( "Found task with state " + resource.getStatus() );
-            if ( resource.getStatus().equals( "SLEEPING" ) )
+            seenStates.add( task.getStatus() );
+            log.info( "Found task {} with state {}", task.getName(), task.getStatus() );
+            if ( task.getStatus().equals( "SLEEPING" ) )
             {
-                verifyNoUpdate( resource );
-                TaskScheduleUtil.cancel( resource.getId() );
-                triedSleeping = true;
+                verifyNoUpdate( task );
+                TaskScheduleUtil.cancel( task.getId() );
             }
-            else if ( resource.getStatus().equals( "RUNNING" ) )
+            else if ( task.getStatus().equals( "RUNNING" ) )
             {
-                verifyNoUpdate( resource );
-                triedRunning = true;
+                verifyNoUpdate( task );
 
-                // Cancel running task and try to update again
-                TaskScheduleUtil.cancel( resource.getId() );
-                resource = TaskScheduleUtil.getTask( resource.getName() );
-                Assert.assertEquals( resource.getStatus(), "CANCELLING" );
+                log.info( "Canceling running task and trying to update" );
+                TaskScheduleUtil.cancel( task.getId() );
+                task = TaskScheduleUtil.getTask( task.getName() );
 
-                verifyNoUpdate( resource );
-                triedCancelling = true;
+                seenStates.add( task.getStatus() );
+
+                verifyNoUpdate( task );
             }
         }
 
-        Assert.assertTrue( triedSleeping, "Did not see state SLEEPING" );
-        Assert.assertTrue( triedRunning, "Did not see state RUNNING" );
-        Assert.assertTrue( triedCancelling, "Did not see state CANCELLING" );
+        assertThat( seenStates, containsInAnyOrder( "SLEEPING", "RUNNING", "CANCELLING" ) );
     }
 }

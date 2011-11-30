@@ -109,6 +109,23 @@ public class NexusRequestMatchers
         }
     }
 
+    public static class IsClientError
+        extends BaseStatusMatcher
+    {
+
+        @Override
+        protected boolean matchesSafely( Status item )
+        {
+            return item.isClientError();
+        }
+
+        @Override
+        public void describeTo( Description description )
+        {
+            description.appendText( "client error" );
+        }
+    }
+
     // **************** Response Matchers ******************
 
     public static abstract class BaseResponseMatcher
@@ -322,6 +339,12 @@ public class NexusRequestMatchers
     public static <T> IsError isError()
     {
         return new IsError();
+    }
+
+    @Factory
+    public static <T> IsClientError isClientError()
+    {
+        return new IsClientError();
     }
 
     @Factory
