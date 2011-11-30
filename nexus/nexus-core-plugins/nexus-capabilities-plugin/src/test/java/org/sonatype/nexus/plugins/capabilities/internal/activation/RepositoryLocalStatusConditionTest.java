@@ -21,15 +21,16 @@ package org.sonatype.nexus.plugins.capabilities.internal.activation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.support.activation.RepositoryConditions;
+import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -39,49 +40,41 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @since 1.10.0
  */
 public class RepositoryLocalStatusConditionTest
+    extends NexusEventBusTestSupport
 {
 
     static final String TEST_REPOSITORY = "test-repository";
 
-    private ActivationContext activationContext;
-
     private RepositoryLocalStatusCondition underTest;
-
-    private RepositoryEventsNotifier.Listener listener;
 
     private Repository repository;
 
-    private RepositoryEventsNotifier repositoryEventsNotifier;
-
-    private RepositoryConditions.RepositoryId repositoryId;
-
+    @Override
     @Before
     public void setUp()
         throws Exception
     {
-        activationContext = mock( ActivationContext.class );
-        repositoryEventsNotifier = mock( RepositoryEventsNotifier.class );
-        repositoryId = mock( RepositoryConditions.RepositoryId.class );
+        super.setUp();
+
+        final RepositoryConditions.RepositoryId repositoryId = mock( RepositoryConditions.RepositoryId.class );
         when( repositoryId.get() ).thenReturn( TEST_REPOSITORY );
 
         repository = mock( Repository.class );
         when( repository.getId() ).thenReturn( TEST_REPOSITORY );
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
 
+        final RepositoryRegistry repositoryRegistry = mock( RepositoryRegistry.class );
+
         underTest = new RepositoryLocalStatusCondition(
-            activationContext, repositoryEventsNotifier, LocalStatus.IN_SERVICE, repositoryId
+            eventBus, repositoryRegistry, LocalStatus.IN_SERVICE, repositoryId
         );
         underTest.bind();
 
-        ArgumentCaptor<RepositoryEventsNotifier.Listener> listenerCaptor = ArgumentCaptor.forClass(
-            RepositoryEventsNotifier.Listener.class
-        );
-
-        verify( repositoryEventsNotifier ).addListener( listenerCaptor.capture() );
-        listener = listenerCaptor.getValue();
+        verify( eventBus ).register( underTest );
 
         assertThat( underTest.isSatisfied(), is( false ) );
-        listener.onAdded( repository );
+
+        underTest.handle( new RepositoryRegistryEventAdd( repositoryRegistry, repository ) );
     }
 
     /**
@@ -93,10 +86,10 @@ public class RepositoryLocalStatusConditionTest
         assertThat( underTest.isSatisfied(), is( true ) );
 
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.OUT_OF_SERVICE );
-        listener.onUpdated( repository );
+        underTest.handle( new RepositoryConfigurationUpdatedEvent( repository ) );
         assertThat( underTest.isSatisfied(), is( false ) );
 
-        verify( activationContext ).notifyUnsatisfied( underTest );
+        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
     }
 
     /**
@@ -108,14 +101,24 @@ public class RepositoryLocalStatusConditionTest
         assertThat( underTest.isSatisfied(), is( true ) );
 
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.OUT_OF_SERVICE );
-        listener.onUpdated( repository );
+        underTest.handle( new RepositoryConfigurationUpdatedEvent( repository ) );
 
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
-        listener.onUpdated( repository );
+        underTest.handle( new RepositoryConfigurationUpdatedEvent( repository ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
-        // twice as one is the initial notification on start
-        verify( activationContext, times( 2 ) ).notifySatisfied( underTest );
+        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ), satisfied( underTest ) );
+    }
+
+    /**
+     * Event bus handler is removed when releasing.
+     */
+    @Test
+    public void releaseRemovesItselfAsHandler()
+    {
+        underTest.release();
+
+        verify( eventBus ).unregister( underTest );
     }
 
 }

@@ -52,10 +52,6 @@ import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
-import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationAddEvent;
-import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationLoadEvent;
-import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationRemoveEvent;
-import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationUpdateEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.Configuration;
@@ -64,11 +60,14 @@ import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xp
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import com.google.common.eventbus.Subscribe;
 
+/**
+ * Handles persistence of capabilities configuration.
+ */
 @Singleton
 @Named
 public class DefaultCapabilityConfiguration
     extends AbstractLoggingComponent
-    implements CapabilityConfiguration, NexusEventBus.Handler
+    implements CapabilityConfiguration
 {
 
     private final NexusEventBus eventBus;
@@ -127,7 +126,7 @@ public class DefaultCapabilityConfiguration
                 new Object[]{ capability.getId(), capability.getTypeId(), capability.getProperties() }
             );
 
-            eventBus.post( new CapabilityConfigurationAddEvent( capability ) );
+            eventBus.post( new CapabilityConfigurationEvent.Added( capability ) );
 
             return generatedId;
         }
@@ -165,7 +164,7 @@ public class DefaultCapabilityConfiguration
                     new Object[]{ capability.getId(), capability.getTypeId(), capability.getProperties() }
                 );
 
-                eventBus.post( new CapabilityConfigurationUpdateEvent( capability, stored ) );
+                eventBus.post( new CapabilityConfigurationEvent.Updated( capability, stored ) );
             }
         }
         finally
@@ -191,7 +190,7 @@ public class DefaultCapabilityConfiguration
                     "Removed capability '{}' of type '{}' with properties '{}'",
                     new Object[]{ stored.getId(), stored.getTypeId(), stored.getProperties() }
                 );
-                eventBus.post( new CapabilityConfigurationRemoveEvent( stored ) );
+                eventBus.post( new CapabilityConfigurationEvent.Removed( stored ) );
             }
         }
         finally
@@ -300,7 +299,7 @@ public class DefaultCapabilityConfiguration
                 "Loading capability '{}' of type '{}' with properties '{}'",
                 new Object[]{ capability.getId(), capability.getTypeId(), capability.getProperties() }
             );
-            eventBus.post( new CapabilityConfigurationLoadEvent( capability ) );
+            eventBus.post( new CapabilityConfigurationEvent.Loaded( capability ) );
         }
     }
 
@@ -344,19 +343,6 @@ public class DefaultCapabilityConfiguration
     public void clearCache()
     {
         configuration = null;
-    }
-
-    @Subscribe
-    public void automaticallyLoadWhen( final NexusInitializedEvent evt )
-    {
-        try
-        {
-            load();
-        }
-        catch ( final Exception e )
-        {
-            throw new RuntimeException( "Could not load configurations", e );
-        }
     }
 
     private String getDescription( final CCapability capability )

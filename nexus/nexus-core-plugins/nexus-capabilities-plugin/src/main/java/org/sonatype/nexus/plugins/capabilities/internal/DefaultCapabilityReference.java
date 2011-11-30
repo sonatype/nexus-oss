@@ -21,15 +21,19 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
 import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
+import org.sonatype.nexus.proxy.IllegalOperationException;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Default {@link CapabilityReference} implementation.
@@ -41,15 +45,20 @@ class DefaultCapabilityReference
     implements CapabilityReference
 {
 
-    private final DefaultCapabilityRegistry registry;
-
     private final Capability capability;
 
-    private final ActivationContext activationContext;
+    private final NexusEventBus eventBus;
 
     private final CapabilityConfiguration configuration;
 
     private final Conditions conditions;
+
+    private final ReentrantReadWriteLock stateLock;
+
+    /**
+     * A reference is valid until is removed. Once removed all calls will throw an {@link IllegalOperationException}.
+     */
+    private boolean valid;
 
     private boolean active;
 
@@ -65,20 +74,21 @@ class DefaultCapabilityReference
 
     private NexusActiveListener nexusActiveListener;
 
-    DefaultCapabilityReference( final DefaultCapabilityRegistry registry,
-                                final ActivationContext activationContext,
+    DefaultCapabilityReference( final NexusEventBus eventBus,
                                 final CapabilityConfiguration configuration,
                                 final Conditions conditions,
                                 final Capability capability )
     {
-        this.registry = checkNotNull( registry );
-        this.activationContext = checkNotNull( activationContext );
+        this.eventBus = checkNotNull( eventBus );
         this.configuration = checkNotNull( configuration );
         this.conditions = checkNotNull( conditions );
         this.capability = checkNotNull( capability );
 
         active = false;
         enabled = false;
+        valid = true;
+
+        stateLock = new ReentrantReadWriteLock();
     }
 
     @Override
@@ -90,128 +100,200 @@ class DefaultCapabilityReference
     @Override
     public boolean isEnabled()
     {
-        return enabled;
+        try
+        {
+            stateLock.readLock().lock();
+            checkValid();
+
+            return enabled;
+        }
+        finally
+        {
+            stateLock.readLock().unlock();
+        }
     }
 
     @Override
     public void enable()
     {
-        if ( !isEnabled() )
+        try
         {
-            getLogger().debug( "Enabling capability with id '{}' ({})", capability.id(), capability );
-            enabled = true;
-            activate();
-            activateCondition = capability().activationCondition();
-            if ( activateCondition != null )
+            stateLock.writeLock().lock();
+            checkValid();
+
+            if ( !isEnabled() )
             {
-                activateCondition.bind();
-                activationListener = new ActivationListener();
-                activationContext.addListener( activationListener, activateCondition );
+                getLogger().debug( "Enabling capability {} ({})", capability, capability.id() );
+                enabled = true;
+                activateCondition = capability().activationCondition();
+                if ( activateCondition != null )
+                {
+                    activateCondition.bind();
+                    activationListener = new ActivationListener();
+                    eventBus.register( activationListener );
+                }
+                activate();
             }
+        }
+        finally
+        {
+            stateLock.writeLock().unlock();
         }
     }
 
     @Override
     public void disable()
     {
-        if ( isEnabled() )
+        try
         {
-            getLogger().debug( "Disabling capability with id '{}' ({})", capability.id(), capability );
-            if ( activationListener != null )
+            stateLock.writeLock().lock();
+            checkValid();
+
+            if ( isEnabled() )
             {
-                activationContext.removeListener( activationListener, activateCondition );
-                activationListener = null;
+                getLogger().debug( "Disabling capability {} ({})", capability, capability.id() );
+                if ( activationListener != null )
+                {
+                    eventBus.unregister( activationListener );
+                    activationListener = null;
+                }
+                if ( activateCondition != null )
+                {
+                    activateCondition.release();
+                    activateCondition = null;
+                }
+                passivate();
+                enabled = false;
             }
-            if ( activateCondition != null )
-            {
-                activateCondition.release();
-                activateCondition = null;
-            }
-            passivate();
-            enabled = false;
+        }
+        finally
+        {
+            stateLock.writeLock().unlock();
         }
     }
 
     @Override
     public boolean isActive()
     {
-        return active;
+        try
+        {
+            stateLock.readLock().lock();
+            checkValid();
+
+            return active;
+        }
+        finally
+        {
+            stateLock.readLock().unlock();
+        }
     }
 
     @Override
     public void activate()
     {
-        if ( isEnabled() && !isActive() && ( activateCondition == null || activateCondition.isSatisfied() ) )
+        try
         {
-            getLogger().debug( "Activating capability with id '{}' ({})", capability.id(), capability );
-            try
-            {
-                capability().activate();
-                active = true;
-                registry.notify( this, new DefaultCapabilityRegistry.Notifier( "activated" )
-                {
-                    @Override
-                    void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
-                    {
-                        listener.onActivate( reference );
-                    }
-                } );
-            }
-            catch ( Exception e )
-            {
-                getLogger().error(
-                    "Could not activate capability with id '{}' ({})", new Object[]{ capability.id(), capability, e }
-                );
-            }
+            stateLock.writeLock().lock();
+            checkValid();
 
+            if ( isEnabled() && !isActive() )
+            {
+                if ( activateCondition == null || activateCondition.isSatisfied() )
+                {
+                    getLogger().debug( "Activating capability {} ({})", capability, capability.id() );
+                    try
+                    {
+                        capability().activate();
+                        active = true;
+                        eventBus.post( new CapabilityEvent.AfterActivated( this ) );
+                    }
+                    catch ( Exception e )
+                    {
+                        getLogger().error(
+                            "Could not activate capability {} ({})", new Object[]{ capability, capability.id(), e }
+                        );
+                    }
+                }
+                else
+                {
+                    getLogger().debug( "Capability {} ({}) is not yet activatable", capability, capability.id() );
+                }
+            }
+        }
+        finally
+        {
+            stateLock.writeLock().unlock();
         }
     }
 
     @Override
     public void passivate()
     {
-        if ( isEnabled() && isActive() )
+        try
         {
-            getLogger().debug( "Passivating capability with id '{}' ({})", capability.id(), capability );
-            try
+            stateLock.writeLock().lock();
+            checkValid();
+
+            if ( isEnabled() && isActive() )
             {
-                active = false;
-                registry.notify( this, new DefaultCapabilityRegistry.Notifier( "passivated" )
+                getLogger().debug( "Passivating capability {} ({})", capability, capability.id() );
+                try
                 {
-                    @Override
-                    void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
-                    {
-                        listener.onPassivate( reference );
-                    }
-                } );
-                capability().passivate();
+                    active = false;
+                    eventBus.post( new CapabilityEvent.BeforePassivated( this ) );
+                    capability().passivate();
+                }
+                catch ( Exception e )
+                {
+                    getLogger().error(
+                        "Could not passivate capability {} ({})", new Object[]{ capability, capability.id(), e }
+                    );
+                }
             }
-            catch ( Exception e )
-            {
-                getLogger().error(
-                    "Could not passivate capability with id '{}' ({})", new Object[]{ capability.id(), capability, e }
-                );
-            }
+        }
+        finally
+        {
+            stateLock.writeLock().unlock();
         }
     }
 
     @Override
     public void create( final Map<String, String> properties )
     {
-        capability().create( properties );
-        if ( nexusActiveListener == null )
+        try
         {
-            nexusActiveListener = new NexusActiveListener().bind();
+            stateLock.writeLock().lock();
+            checkValid();
+
+            capability().create( properties );
+            if ( nexusActiveListener == null )
+            {
+                nexusActiveListener = new NexusActiveListener().bind();
+            }
+        }
+        finally
+        {
+            stateLock.writeLock().unlock();
         }
     }
 
     @Override
     public void load( final Map<String, String> properties )
     {
-        capability().load( properties );
-        if ( nexusActiveListener == null )
+        try
         {
-            nexusActiveListener = new NexusActiveListener().bind();
+            stateLock.writeLock().lock();
+            checkValid();
+
+            capability().load( properties );
+            if ( nexusActiveListener == null )
+            {
+                nexusActiveListener = new NexusActiveListener().bind();
+            }
+        }
+        finally
+        {
+            stateLock.writeLock().unlock();
         }
     }
 
@@ -220,45 +302,64 @@ class DefaultCapabilityReference
     {
         if ( !sameProperties( previousProperties, properties ) )
         {
-            registry.notify( this, new DefaultCapabilityRegistry.Notifier( "updated" )
+            try
             {
-                @Override
-                void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
-                {
-                    listener.beforeUpdate( reference );
-                }
-            } );
-            capability().update( properties );
-            registry.notify( this, new DefaultCapabilityRegistry.Notifier( "updated" )
+                stateLock.writeLock().lock();
+                checkValid();
+
+                eventBus.post( new CapabilityEvent.BeforeUpdate( this ) );
+                capability().update( properties );
+                eventBus.post( new CapabilityEvent.AfterUpdate( this ) );
+            }
+            finally
             {
-                @Override
-                void run( final CapabilityRegistry.Listener listener, final CapabilityReference reference )
-                {
-                    listener.afterUpdate( reference );
-                }
-            } );
+                stateLock.writeLock().unlock();
+            }
         }
     }
 
     @Override
     public void remove()
     {
-        if ( activateCondition != null )
+        try
         {
-            activateCondition.release();
+            stateLock.writeLock().lock();
+            checkValid();
+
+            if ( activateCondition != null )
+            {
+                activateCondition.release();
+            }
+            disable();
+            if ( nexusActiveListener != null )
+            {
+                nexusActiveListener.release();
+            }
+            capability().remove();
         }
-        disable();
-        if ( nexusActiveListener!=null )
+        finally
         {
-            nexusActiveListener.release();
+            valid = false;
+            stateLock.writeLock().unlock();
         }
-        capability().remove();
     }
 
     @Override
     public String toString()
     {
-        return getClass().getSimpleName() + "{active=" + active + ", capability=" + capability + '}';
+        return String.format( "capability %s (enabled=%s, active=%s)", capability, enabled, active );
+    }
+
+    /**
+     * Check if this reference is valid. A reference will be valid until is removed. After that it will throw an
+     * {@link IllegalOperationException} on all operations.
+     */
+    private void checkValid()
+    {
+        if ( !valid )
+        {
+            throw new IllegalStateException( "Capability reference is no longer valid (capability has been removed)" );
+        }
     }
 
     // @TestAccessible //
@@ -279,23 +380,22 @@ class DefaultCapabilityReference
         return p1.equals( p2 );
     }
 
-    private class ActivationListener
-        implements ActivationContext.Listener
+    public class ActivationListener
     {
 
-        @Override
-        public void onSatisfied( final Condition condition )
+        @Subscribe
+        public void handle( final ConditionEvent.Satisfied event )
         {
-            if ( condition == activateCondition )
+            if ( event.getCondition() == activateCondition )
             {
                 activate();
             }
         }
 
-        @Override
-        public void onUnsatisfied( final Condition condition )
+        @Subscribe
+        public void handle( final ConditionEvent.Unsatisfied event )
         {
-            if ( condition == activateCondition )
+            if ( event.getCondition() == activateCondition )
             {
                 passivate();
             }
@@ -305,27 +405,20 @@ class DefaultCapabilityReference
         public String toString()
         {
             return String.format(
-                "Capability '%s (id=%s)' watching for '%s' condition to activate itself",
-                capability(), capability().id(), activateCondition
+                "Watching '%s' condition to activate/passivate capability '%s (id=%s)'",
+                activateCondition, capability, capability.id()
             );
         }
 
     }
 
-    private class ValidityListener
-        implements ActivationContext.Listener
+    public class ValidityListener
     {
 
-        @Override
-        public void onSatisfied( final Condition condition )
+        @Subscribe
+        public void handle( final ConditionEvent.Unsatisfied event )
         {
-            // do nothing
-        }
-
-        @Override
-        public void onUnsatisfied( final Condition condition )
-        {
-            if ( condition == validityCondition )
+            if ( event.getCondition() == validityCondition )
             {
                 try
                 {
@@ -342,48 +435,51 @@ class DefaultCapabilityReference
         public String toString()
         {
             return String.format(
-                "Capability '%s (id=%s)' watching for '%s' condition to validate itself",
-                capability(), capability().id(), validityCondition
+                "Watching '%s' condition to validate/invalidate capability '%s (id=%s)'",
+                validityCondition, capability, capability.id()
             );
         }
 
     }
 
-    private class NexusActiveListener
-        implements ActivationContext.Listener
+    public class NexusActiveListener
     {
 
         private Condition nexusActiveCondition;
 
-        @Override
-        public void onSatisfied( final Condition condition )
+        @Subscribe
+        public void handle( final ConditionEvent.Satisfied event )
         {
-            if ( condition == nexusActiveCondition )
+            if ( event.getCondition() == nexusActiveCondition )
             {
                 validityCondition = capability().validityCondition();
                 if ( validityCondition != null )
                 {
                     validityCondition.bind();
                     validityListener = new ValidityListener();
-                    activationContext.addListener( validityListener, validityCondition );
+                    eventBus.register( validityListener );
                 }
             }
         }
 
-        @Override
-        public void onUnsatisfied( final Condition condition )
+        @Subscribe
+        public void handle( final ConditionEvent.Unsatisfied event )
         {
-            if ( condition == nexusActiveCondition )
+            if ( event.getCondition() == nexusActiveCondition )
             {
                 if ( validityListener != null )
                 {
-                    activationContext.removeListener( validityListener, validityCondition );
+                    eventBus.unregister( validityListener );
                     validityListener = null;
                 }
                 if ( validityCondition != null )
                 {
                     validityCondition.release();
                     validityCondition = null;
+                }
+                if ( isActive() )
+                {
+                    passivate();
                 }
             }
         }
@@ -392,8 +488,8 @@ class DefaultCapabilityReference
         public String toString()
         {
             return String.format(
-                "Capability '%s (id=%s)' watching for '%s' condition to activate validation check",
-                capability(), capability().id(), nexusActiveCondition
+                "Watching '%s' condition to trigger validation of capability '%s (id=%s)'",
+                nexusActiveCondition, capability, capability.id()
             );
         }
 
@@ -402,10 +498,10 @@ class DefaultCapabilityReference
             if ( nexusActiveCondition == null )
             {
                 nexusActiveCondition = conditions.nexus().active();
-                activationContext.addListener( this, nexusActiveCondition );
+                eventBus.register( this );
                 if ( nexusActiveCondition.isSatisfied() )
                 {
-                    onSatisfied( nexusActiveCondition );
+                    handle( new ConditionEvent.Satisfied( nexusActiveCondition ) );
                 }
             }
             return this;
@@ -415,8 +511,8 @@ class DefaultCapabilityReference
         {
             if ( nexusActiveCondition != null )
             {
-                onUnsatisfied( nexusActiveCondition );
-                activationContext.removeListener( this, nexusActiveCondition );
+                handle( new ConditionEvent.Unsatisfied( nexusActiveCondition ) );
+                eventBus.unregister( this );
             }
             return this;
         }

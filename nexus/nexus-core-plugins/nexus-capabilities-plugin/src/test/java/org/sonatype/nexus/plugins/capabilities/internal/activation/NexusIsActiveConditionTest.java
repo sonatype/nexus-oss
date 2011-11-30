@@ -20,13 +20,13 @@ package org.sonatype.nexus.plugins.capabilities.internal.activation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
+import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 
 /**
  * {@link NexusIsActiveCondition} UTs.
@@ -34,17 +34,22 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
  * @since 1.10.0
  */
 public class NexusIsActiveConditionTest
+    extends NexusEventBusTestSupport
 {
-
-    private ActivationContext activationContext;
 
     private NexusIsActiveCondition underTest;
 
+    @Override
     @Before
     public void setUp()
+        throws Exception
     {
-        activationContext = mock( ActivationContext.class );
-        underTest = new NexusIsActiveCondition( activationContext);
+        super.setUp();
+
+        underTest = new NexusIsActiveCondition( eventBus );
+        underTest.bind();
+
+        verify( eventBus ).register( underTest );
     }
 
     /**
@@ -62,9 +67,10 @@ public class NexusIsActiveConditionTest
     @Test
     public void satisfiedWhenNexusStarted()
     {
-        underTest.acknowledgeNexusStarted();
+        underTest.handle( new NexusStartedEvent( this ) );
         assertThat( underTest.isSatisfied(), is( true ) );
-        verify( activationContext ).notifySatisfied( underTest );
+
+        verifyEventBusEvents( satisfied( underTest ) );
     }
 
     /**
@@ -73,10 +79,22 @@ public class NexusIsActiveConditionTest
     @Test
     public void unsatisfiedWhenNexusStopped()
     {
-        underTest.acknowledgeNexusStarted();
-        underTest.acknowledgeNexusStopped();
+        underTest.handle( new NexusStartedEvent( this ) );
+        underTest.handle( new NexusStoppedEvent( this ) );
         assertThat( underTest.isSatisfied(), is( false ) );
-        verify( activationContext ).notifyUnsatisfied( underTest );
+
+        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
+    }
+
+    /**
+     * Event bus handler is removed when releasing.
+     */
+    @Test
+    public void releaseRemovesItselfAsHandler()
+    {
+        underTest.release();
+
+        verify( eventBus ).unregister( underTest );
     }
 
 }

@@ -18,7 +18,7 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.activation;
 
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.activation.AbstractCompositeCondition;
 
@@ -34,15 +34,15 @@ public class InversionCondition
 
     private final Condition condition;
 
-    public InversionCondition( final ActivationContext activationContext,
+    public InversionCondition( final NexusEventBus eventBus,
                                final Condition condition )
     {
-        super( activationContext, condition );
+        super( eventBus, condition );
         this.condition = condition;
     }
 
     @Override
-    protected boolean check( final Condition... conditions )
+    protected boolean reevaluate( final Condition... conditions )
     {
         return !conditions[0].isSatisfied();
     }

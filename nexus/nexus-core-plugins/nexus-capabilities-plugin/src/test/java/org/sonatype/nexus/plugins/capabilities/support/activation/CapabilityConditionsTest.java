@@ -23,15 +23,15 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeActiveCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.PassivateCapabilityDuringUpdateCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.activation.OnDemandCondition;
 
 /**
  * {@link CapabilityConditions} UTs.
@@ -41,16 +41,22 @@ import org.sonatype.nexus.plugins.capabilities.internal.activation.OnDemandCondi
 public class CapabilityConditionsTest
 {
 
+    private CapabilityConditions underTest;
+
+    @Before
+    public void setUp()
+    {
+        final NexusEventBus eventBus = mock( NexusEventBus.class );
+        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        underTest = new CapabilityConditions( eventBus, capabilityRegistry );
+    }
+
     /**
      * capabilityOfTypeExists() factory method returns expected condition.
      */
     @Test
     public void capabilityOfTypeExists()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
-        final CapabilityConditions underTest = new CapabilityConditions( activationContext, capabilityRegistry );
-
         assertThat(
             underTest.capabilityOfTypeExists( Capability.class ),
             is( Matchers.<Condition>instanceOf( CapabilityOfTypeExistsCondition.class ) )
@@ -63,10 +69,6 @@ public class CapabilityConditionsTest
     @Test
     public void capabilityOfTypeActive()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
-        final CapabilityConditions underTest = new CapabilityConditions( activationContext, capabilityRegistry );
-
         assertThat(
             underTest.capabilityOfTypeActive( Capability.class ),
             is( Matchers.<Condition>instanceOf( CapabilityOfTypeActiveCondition.class ) )
@@ -80,29 +82,10 @@ public class CapabilityConditionsTest
     public void reactivateCapabilityOnUpdate()
     {
         final Capability capability = mock( Capability.class );
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
-        final CapabilityConditions underTest = new CapabilityConditions( activationContext, capabilityRegistry );
 
         assertThat(
             underTest.passivateCapabilityDuringUpdate( capability ),
             is( Matchers.<Condition>instanceOf( PassivateCapabilityDuringUpdateCondition.class ) )
-        );
-    }
-
-    /**
-     * onDemand() factory method returns expected condition.
-     */
-    @Test
-    public void onDemand()
-    {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
-        final CapabilityConditions underTest = new CapabilityConditions( activationContext, capabilityRegistry );
-
-        assertThat(
-            underTest.onDemand(),
-            is( Matchers.<Condition>instanceOf( OnDemandCondition.class ) )
         );
     }
 

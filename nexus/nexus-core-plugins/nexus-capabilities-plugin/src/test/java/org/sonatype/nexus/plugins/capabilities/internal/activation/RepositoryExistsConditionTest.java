@@ -21,15 +21,16 @@ package org.sonatype.nexus.plugins.capabilities.internal.activation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.support.activation.RepositoryConditions;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -39,24 +40,24 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @since 1.10.0
  */
 public class RepositoryExistsConditionTest
+    extends NexusEventBusTestSupport
 {
 
     static final String TEST_REPOSITORY = "test-repository";
 
-    private ActivationContext activationContext;
-
     private RepositoryExistsCondition underTest;
-
-    private RepositoryEventsNotifier.Listener listener;
 
     private Repository repository;
 
+    private RepositoryRegistry repositoryRegistry;
+
+    @Override
     @Before
     public void setUp()
         throws Exception
     {
-        activationContext = mock( ActivationContext.class );
-        final RepositoryEventsNotifier repositoryEventsNotifier = mock( RepositoryEventsNotifier.class );
+        super.setUp();
+
         final RepositoryConditions.RepositoryId repositoryId = mock( RepositoryConditions.RepositoryId.class );
         when( repositoryId.get() ).thenReturn( TEST_REPOSITORY );
 
@@ -64,20 +65,16 @@ public class RepositoryExistsConditionTest
         when( repository.getId() ).thenReturn( TEST_REPOSITORY );
         when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
 
-        underTest = new RepositoryExistsCondition(
-            activationContext, repositoryEventsNotifier, repositoryId
-        );
+        repositoryRegistry = mock( RepositoryRegistry.class );
+
+        underTest = new RepositoryExistsCondition( eventBus, repositoryRegistry, repositoryId );
         underTest.bind();
 
-        ArgumentCaptor<RepositoryEventsNotifier.Listener> listenerCaptor = ArgumentCaptor.forClass(
-            RepositoryEventsNotifier.Listener.class
-        );
-
-        verify( repositoryEventsNotifier ).addListener( listenerCaptor.capture() );
-        listener = listenerCaptor.getValue();
+        verify( eventBus ).register( underTest );
 
         assertThat( underTest.isSatisfied(), is( false ) );
-        listener.onAdded( repository );
+
+        underTest.handle( new RepositoryRegistryEventAdd( repositoryRegistry, repository ) );
     }
 
     /**
@@ -97,10 +94,10 @@ public class RepositoryExistsConditionTest
     {
         assertThat( underTest.isSatisfied(), is( true ) );
 
-        listener.onRemoved( repository );
+        underTest.handle( new RepositoryRegistryEventRemove( repositoryRegistry, repository ) );
         assertThat( underTest.isSatisfied(), is( false ) );
 
-        verify( activationContext, times( 1 ) ).notifyUnsatisfied( underTest );
+        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
     }
 
     /**
@@ -111,12 +108,11 @@ public class RepositoryExistsConditionTest
     {
         assertThat( underTest.isSatisfied(), is( true ) );
 
-        listener.onRemoved( repository );
-        listener.onAdded( repository );
+        underTest.handle( new RepositoryRegistryEventRemove( repositoryRegistry, repository ) );
+        underTest.handle( new RepositoryRegistryEventAdd( repositoryRegistry, repository ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
-        // twice as one is the initial notification
-        verify( activationContext, times( 2) ).notifySatisfied( underTest );
+        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ), satisfied( underTest ) );
     }
 
     /**
@@ -128,8 +124,19 @@ public class RepositoryExistsConditionTest
         assertThat( underTest.isSatisfied(), is( true ) );
         final Repository anotherRepository = mock( Repository.class );
         when( anotherRepository.getId() ).thenReturn( "another" );
-        listener.onRemoved( anotherRepository );
+        underTest.handle( new RepositoryRegistryEventRemove( repositoryRegistry, anotherRepository ) );
         assertThat( underTest.isSatisfied(), is( true ) );
+    }
+
+    /**
+     * Event bus handler is removed when releasing.
+     */
+    @Test
+    public void releaseRemovesItselfAsHandler()
+    {
+        underTest.release();
+
+        verify( eventBus ).unregister( underTest );
     }
 
 }

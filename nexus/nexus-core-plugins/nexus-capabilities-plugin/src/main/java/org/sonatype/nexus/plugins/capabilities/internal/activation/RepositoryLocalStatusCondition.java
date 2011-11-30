@@ -20,11 +20,18 @@ package org.sonatype.nexus.plugins.capabilities.internal.activation;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.support.activation.AbstractCondition;
 import org.sonatype.nexus.plugins.capabilities.support.activation.RepositoryConditions;
+import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * A condition that is satisfied when a repository has a specified local status.
@@ -33,59 +40,90 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public class RepositoryLocalStatusCondition
     extends AbstractCondition
-    implements RepositoryEventsNotifier.Listener
 {
 
-    private final RepositoryEventsNotifier repositoryEventsNotifier;
+    private final RepositoryRegistry repositoryRegistry;
 
     private final LocalStatus localStatus;
 
     private final RepositoryConditions.RepositoryId repositoryId;
 
-    public RepositoryLocalStatusCondition( final ActivationContext activationContext,
-                                           final RepositoryEventsNotifier repositoryEventsNotifier,
+    private final ReentrantReadWriteLock bindLock;
+
+    public RepositoryLocalStatusCondition( final NexusEventBus eventBus,
+                                           final RepositoryRegistry repositoryRegistry,
                                            final LocalStatus localStatus,
                                            final RepositoryConditions.RepositoryId repositoryId )
     {
-        super( activationContext, false );
-        this.repositoryEventsNotifier = checkNotNull( repositoryEventsNotifier );
+        super( eventBus, false );
+        this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.localStatus = checkNotNull( localStatus );
         this.repositoryId = checkNotNull( repositoryId );
+        bindLock = new ReentrantReadWriteLock();
     }
 
     @Override
     protected void doBind()
     {
-        repositoryEventsNotifier.addListener( this );
+        try
+        {
+            bindLock.writeLock().lock();
+            for ( final Repository repository : repositoryRegistry.getRepositories() )
+            {
+                handle( new RepositoryRegistryEventAdd( repositoryRegistry, repository ) );
+            }
+        }
+        finally
+        {
+            bindLock.writeLock().unlock();
+        }
+        getEventBus().register( this );
     }
 
     @Override
     public void doRelease()
     {
-        repositoryEventsNotifier.removeListener( this );
+        getEventBus().unregister( this );
     }
 
-    @Override
-    public void onAdded( final Repository repository )
+    @Subscribe
+    public void handle( final RepositoryRegistryEventAdd event )
     {
-        onUpdated( repository );
-    }
-
-    @Override
-    public void onUpdated( final Repository repository )
-    {
-        if ( repository != null && repository.getId().equals( repositoryId.get() ) )
+        if ( event.getRepository().getId().equals( repositoryId.get() ) )
         {
-            setSatisfied( localStatus.equals( repository.getLocalStatus() ) );
+            setSatisfied( localStatus.equals( event.getRepository().getLocalStatus() ) );
+        }
+    }
+
+    @Subscribe
+    public void handle( final RepositoryConfigurationUpdatedEvent event )
+    {
+        if ( event.getRepository().getId().equals( repositoryId.get() ) )
+        {
+            setSatisfied( localStatus.equals( event.getRepository().getLocalStatus() ) );
+        }
+    }
+
+    @Subscribe
+    public void handle( final RepositoryRegistryEventRemove event )
+    {
+        if ( event.getRepository().getId().equals( repositoryId.get() ) )
+        {
+            setSatisfied( false );
         }
     }
 
     @Override
-    public void onRemoved( final Repository repository )
+    protected void setSatisfied( final boolean satisfied )
     {
-        if ( repository != null && repository.getId().equals( repositoryId.get() ) )
+        try
         {
-            setSatisfied( false );
+            bindLock.readLock().lock();
+            super.setSatisfied( satisfied );
+        }
+        finally
+        {
+            bindLock.readLock().unlock();
         }
     }
 

@@ -24,11 +24,8 @@ import static org.mockito.Mockito.mock;
 
 import org.hamcrest.Matchers;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.NexusIsActiveCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryEventsNotifier;
-import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryLocalStatusCondition;
 
 /**
  * {@link NexusConditions} UTs.

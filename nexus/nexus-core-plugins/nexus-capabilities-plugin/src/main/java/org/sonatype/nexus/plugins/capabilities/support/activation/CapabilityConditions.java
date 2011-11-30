@@ -24,17 +24,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeActiveCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.PassivateCapabilityDuringUpdateCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.activation.OnDemandCondition;
 
 /**
- * Factory of {@link Condition}s related to Capabilities.
+ * Factory of {@link Condition}s related to capabilities.
  *
  * @since 1.10.0
  */
@@ -45,14 +44,14 @@ public class CapabilityConditions
 
     private final CapabilityRegistry capabilityRegistry;
 
-    private final ActivationContext activationContext;
+    private final NexusEventBus eventBus;
 
     @Inject
-    public CapabilityConditions( final ActivationContext activationContext,
+    public CapabilityConditions( final NexusEventBus eventBus,
                                  final CapabilityRegistry capabilityRegistry )
     {
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
-        this.activationContext = checkNotNull( activationContext );
+        this.eventBus = checkNotNull( eventBus );
     }
 
     /**
@@ -63,7 +62,7 @@ public class CapabilityConditions
      */
     public Condition capabilityOfTypeExists( final Class<? extends Capability> type )
     {
-        return new CapabilityOfTypeExistsCondition( activationContext, capabilityRegistry, type );
+        return new CapabilityOfTypeExistsCondition( eventBus, capabilityRegistry, type );
     }
 
     /**
@@ -74,7 +73,7 @@ public class CapabilityConditions
      */
     public Condition capabilityOfTypeActive( final Class<? extends Capability> type )
     {
-        return new CapabilityOfTypeActiveCondition( activationContext, capabilityRegistry, type );
+        return new CapabilityOfTypeActiveCondition( eventBus, capabilityRegistry, type );
     }
 
     /**
@@ -86,44 +85,7 @@ public class CapabilityConditions
      */
     public Condition passivateCapabilityDuringUpdate( final Capability capability )
     {
-        return new PassivateCapabilityDuringUpdateCondition( activationContext, capabilityRegistry, capability );
-    }
-
-    /**
-     * Creates a new condition that can be programatically satisfied/unsatisfied.
-     *
-     * @return created condition
-     */
-    public OnDemand onDemand()
-    {
-        return new OnDemandCondition( activationContext );
-    }
-
-    public static interface OnDemand
-        extends Condition
-    {
-
-        /**
-         * Reactivates the condition, fact that can trigger passivate / activate on capability using it.
-         *
-         * @return itself, for fluent api usage
-         */
-        OnDemand reactivate();
-
-        /**
-         * Marks condition as satisfied, fact that can trigger activation of capability using it.
-         *
-         * @return itself, for fluent api usage
-         */
-        OnDemand satisfy();
-
-        /**
-         * Marks condition as unsatisfied, fact that can trigger passivation of capability using it.
-         *
-         * @return itself, for fluent api usage
-         */
-        OnDemand unsatisfy();
-
+        return new PassivateCapabilityDuringUpdateCondition( eventBus, capability );
     }
 
 }

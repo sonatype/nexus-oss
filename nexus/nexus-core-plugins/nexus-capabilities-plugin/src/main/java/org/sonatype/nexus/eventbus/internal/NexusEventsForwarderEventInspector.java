@@ -16,22 +16,47 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.config.events;
+package org.sonatype.nexus.eventbus.internal;
 
-import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
-import org.sonatype.plexus.appevents.AbstractEvent;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public class CapabilityConfigurationEvent
-    extends AbstractEvent<CCapability>
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.plexus.appevents.Event;
+
+/**
+ * Listens to Nexus events and forwards them to {@link NexusEventBus}.
+ *
+ * @since 1.10.0
+ */
+@Singleton
+public class NexusEventsForwarderEventInspector
+    implements EventInspector
 {
-    public CapabilityConfigurationEvent( final CCapability capability )
+
+    private final NexusEventBus eventBus;
+
+    @Inject
+    public NexusEventsForwarderEventInspector( final NexusEventBus eventBus )
     {
-        super( capability );
+        this.eventBus = checkNotNull( eventBus );
     }
 
-    public CCapability getCapability()
+    public boolean accepts( final Event<?> evt )
     {
-        return getEventSender();
+        return evt != null;
+    }
+
+    public void inspect( final Event<?> evt )
+    {
+        if ( !accepts( evt ) )
+        {
+            return;
+        }
+        eventBus.post( evt );
     }
 
 }

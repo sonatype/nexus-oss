@@ -22,12 +22,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.activation.AbstractCondition;
+import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import com.google.common.eventbus.Subscribe;
 
 /**
- * Support class for conditions based on Nexus state.
+ * A condition that is satisfied when nexus is active.
  *
  * @since 1.10.0
  */
@@ -35,38 +38,38 @@ import org.sonatype.nexus.plugins.capabilities.support.activation.AbstractCondit
 @Singleton
 public class NexusIsActiveCondition
     extends AbstractCondition
-    implements Condition
+    implements Condition, NexusEventBus.LoadOnStart
 {
 
     @Inject
-    NexusIsActiveCondition( final ActivationContext activationContext )
+    NexusIsActiveCondition( final NexusEventBus eventBus )
     {
-        super( activationContext, false );
+        super( eventBus, false );
         bind();
     }
 
-    NexusIsActiveCondition acknowledgeNexusStarted()
+    @Subscribe
+    public void handle( final NexusStartedEvent event )
     {
         setSatisfied( true );
-        return this;
     }
 
-    NexusIsActiveCondition acknowledgeNexusStopped()
+    @Subscribe
+    public void handle( final NexusStoppedEvent event )
     {
         setSatisfied( false );
-        return this;
     }
 
     @Override
     protected void doBind()
     {
-        // do nothing
+        getEventBus().register( this );
     }
 
     @Override
     protected void doRelease()
     {
-        // do nothing
+        getEventBus().unregister( this );
     }
 
     @Override
@@ -74,5 +77,8 @@ public class NexusIsActiveCondition
     {
         return "Nexus is active";
     }
+
+
+
 
 }

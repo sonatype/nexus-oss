@@ -20,16 +20,14 @@ package org.sonatype.nexus.plugins.capabilities.support.activation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
 
 /**
  * {@link LogicalConditions} UTs.
@@ -37,61 +35,54 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
  * @since 1.10.0
  */
 public class LogicalConditionsTest
+    extends NexusEventBusTestSupport
 {
 
     static final boolean UNSATISFIED = false;
 
     static final boolean SATISFIED = true;
 
-    private ActivationContext activationContext;
-
     private LogicalConditions underTest;
-
-    private ActivationContext.Listener listener;
 
     private Condition left;
 
     private Condition right;
 
+    @Override
     @Before
     public void setUp()
+        throws Exception
     {
-        activationContext = mock( ActivationContext.class );
-        underTest = new LogicalConditions( activationContext );
+        super.setUp();
+
+        underTest = new LogicalConditions( eventBus );
         left = mock( Condition.class );
         right = mock( Condition.class );
     }
 
-    public Condition prepare( final Condition condition, boolean leftSatisfied, boolean rightSatisfied )
+    public Condition prepare( final AbstractCompositeCondition condition, boolean leftSatisfied, boolean rightSatisfied )
     {
         condition.bind();
-
-        ArgumentCaptor<ActivationContext.Listener> listenerCaptor = ArgumentCaptor.forClass(
-            ActivationContext.Listener.class
-        );
-
-        verify( activationContext ).addListener( listenerCaptor.capture(), eq( left ), eq( right ) );
-        listener = listenerCaptor.getValue();
 
         when( left.isSatisfied() ).thenReturn( leftSatisfied );
         when( right.isSatisfied() ).thenReturn( rightSatisfied );
 
         if ( leftSatisfied )
         {
-            listener.onSatisfied( left );
+            condition.handle( new ConditionEvent.Satisfied( left ) );
         }
         else
         {
-            listener.onUnsatisfied( left );
+            condition.handle( new ConditionEvent.Unsatisfied( left ) );
         }
 
         if ( rightSatisfied )
         {
-            listener.onSatisfied( right );
+            condition.handle( new ConditionEvent.Satisfied( right ) );
         }
         else
         {
-            listener.onUnsatisfied( right );
+            condition.handle( new ConditionEvent.Unsatisfied( right ) );
         }
 
         return condition;
@@ -105,7 +96,7 @@ public class LogicalConditionsTest
     @Test
     public void and01()
     {
-        final Condition and = prepare( underTest.and( left, right ), UNSATISFIED, UNSATISFIED );
+        final Condition and = prepare( (AbstractCompositeCondition)underTest.and( left, right ), UNSATISFIED, UNSATISFIED );
         assertThat( and.isSatisfied(), is( false ) );
     }
 
@@ -117,7 +108,7 @@ public class LogicalConditionsTest
     @Test
     public void and02()
     {
-        final Condition and = prepare( underTest.and( left, right ), UNSATISFIED, SATISFIED );
+        final Condition and = prepare( (AbstractCompositeCondition)underTest.and( left, right ), UNSATISFIED, SATISFIED );
         assertThat( and.isSatisfied(), is( false ) );
     }
 
@@ -129,7 +120,7 @@ public class LogicalConditionsTest
     @Test
     public void and03()
     {
-        final Condition and = prepare( underTest.and( left, right ), SATISFIED, UNSATISFIED );
+        final Condition and = prepare( (AbstractCompositeCondition)underTest.and( left, right ), SATISFIED, UNSATISFIED );
         assertThat( and.isSatisfied(), is( false ) );
     }
 
@@ -141,7 +132,7 @@ public class LogicalConditionsTest
     @Test
     public void and04()
     {
-        final Condition and = prepare( underTest.and( left, right ), SATISFIED, SATISFIED );
+        final Condition and = prepare( (AbstractCompositeCondition)underTest.and( left, right ), SATISFIED, SATISFIED );
         assertThat( and.isSatisfied(), is( true ) );
     }
 
@@ -153,7 +144,7 @@ public class LogicalConditionsTest
     @Test
     public void or01()
     {
-        final Condition or = prepare( underTest.or( left, right ), UNSATISFIED, UNSATISFIED );
+        final Condition or = prepare( (AbstractCompositeCondition)underTest.or( left, right ), UNSATISFIED, UNSATISFIED );
         assertThat( or.isSatisfied(), is( false ) );
     }
 
@@ -165,7 +156,7 @@ public class LogicalConditionsTest
     @Test
     public void or02()
     {
-        final Condition or = prepare( underTest.or( left, right ), UNSATISFIED, SATISFIED );
+        final Condition or = prepare( (AbstractCompositeCondition)underTest.or( left, right ), UNSATISFIED, SATISFIED );
         assertThat( or.isSatisfied(), is( true ) );
     }
 
@@ -177,7 +168,7 @@ public class LogicalConditionsTest
     @Test
     public void or03()
     {
-        final Condition or = prepare( underTest.or( left, right ), SATISFIED, UNSATISFIED );
+        final Condition or = prepare( (AbstractCompositeCondition)underTest.or( left, right ), SATISFIED, UNSATISFIED );
         assertThat( or.isSatisfied(), is( true ) );
     }
 
@@ -189,7 +180,7 @@ public class LogicalConditionsTest
     @Test
     public void or04()
     {
-        final Condition or = prepare( underTest.or( left, right ), SATISFIED, SATISFIED );
+        final Condition or = prepare( (AbstractCompositeCondition)underTest.or( left, right ), SATISFIED, SATISFIED );
         assertThat( or.isSatisfied(), is( true ) );
     }
 

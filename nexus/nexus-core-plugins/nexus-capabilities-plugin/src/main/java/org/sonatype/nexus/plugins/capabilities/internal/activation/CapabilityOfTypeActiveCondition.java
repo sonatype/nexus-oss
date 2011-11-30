@@ -18,10 +18,12 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.activation;
 
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * A condition that is satisfied when a capability of a specified type exists and is in an active state.
@@ -32,32 +34,32 @@ public class CapabilityOfTypeActiveCondition
     extends CapabilityOfTypeExistsCondition
 {
 
-    public CapabilityOfTypeActiveCondition( final ActivationContext activationContext,
+    public CapabilityOfTypeActiveCondition( final NexusEventBus eventBus,
                                             final CapabilityRegistry capabilityRegistry,
                                             final Class<? extends Capability> type )
     {
-        super( activationContext, capabilityRegistry, type );
+        super( eventBus, capabilityRegistry, type );
     }
 
     @Override
-    boolean isSatisfied( final CapabilityReference reference )
+    boolean shouldEvaluateFor( final CapabilityReference reference )
     {
-        return super.isSatisfied( reference ) && reference.isActive();
+        return super.shouldEvaluateFor( reference ) && reference.isActive();
     }
 
-    @Override
-    public void onActivate( final CapabilityReference reference )
+    @Subscribe
+    public void handle( final CapabilityEvent.AfterActivated event )
     {
-        if ( !isSatisfied() && type.isAssignableFrom( reference.capability().getClass() ) )
+        if ( !isSatisfied() && type.isAssignableFrom( event.getReference().capability().getClass() ) )
         {
             checkAllCapabilities();
         }
     }
 
-    @Override
-    public void onPassivate( final CapabilityReference reference )
+    @Subscribe
+    public void handle( final CapabilityEvent.BeforePassivated event )
     {
-        if ( isSatisfied() && type.isAssignableFrom( reference.capability().getClass() ) )
+        if ( isSatisfied() && type.isAssignableFrom( event.getReference().capability().getClass() ) )
         {
             checkAllCapabilities();
         }

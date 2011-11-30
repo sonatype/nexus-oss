@@ -21,12 +21,11 @@ package org.sonatype.nexus.plugins.capabilities.support.activation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 
 /**
  * {@link AbstractCondition} UTs.
@@ -34,7 +33,21 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
  * @since 1.10.0
  */
 public class AbstractConditionTest
+    extends NexusEventBusTestSupport
 {
+
+    private TestCondition underTest;
+
+    @Override
+    @Before
+    public void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        underTest = new TestCondition( eventBus );
+        underTest.bind();
+    }
 
     /**
      * On creation, condition is not satisfied.
@@ -42,9 +55,6 @@ public class AbstractConditionTest
     @Test
     public void notSatisfiedInitially()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final AbstractCondition underTest = new TestCondition( activationContext );
-        underTest.bind();
         assertThat( underTest.isSatisfied(), is( false ) );
     }
 
@@ -54,13 +64,10 @@ public class AbstractConditionTest
     @Test
     public void satisfied()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final AbstractCondition underTest = new TestCondition( activationContext );
-        underTest.bind();
-
         underTest.setSatisfied( true );
         assertThat( underTest.isSatisfied(), is( true ) );
-        verify( activationContext ).notifySatisfied( underTest );
+
+        verifyEventBusEvents( satisfied( underTest ) );
     }
 
     /**
@@ -70,15 +77,12 @@ public class AbstractConditionTest
     @Test
     public void satisfiedOnAlreadySatisfied()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final AbstractCondition underTest = new TestCondition( activationContext );
-        underTest.bind();
+        underTest.setSatisfied( true );
+        assertThat( underTest.isSatisfied(), is( true ) );
+        underTest.setSatisfied( true );
+        assertThat( underTest.isSatisfied(), is( true ) );
 
-        underTest.setSatisfied( true );
-        assertThat( underTest.isSatisfied(), is( true ) );
-        underTest.setSatisfied( true );
-        assertThat( underTest.isSatisfied(), is( true ) );
-        verify( activationContext, times( 1 ) ).notifySatisfied( underTest );
+        verifyEventBusEvents( satisfied( underTest ) );
     }
 
     /**
@@ -88,18 +92,14 @@ public class AbstractConditionTest
     @Test
     public void unsatisfiedOnAlreadyUnsatisfied()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final AbstractCondition underTest = new TestCondition( activationContext );
-        underTest.bind();
-
         underTest.setSatisfied( true );
         assertThat( underTest.isSatisfied(), is( true ) );
         underTest.setSatisfied( false );
         assertThat( underTest.isSatisfied(), is( false ) );
         underTest.setSatisfied( false );
         assertThat( underTest.isSatisfied(), is( false ) );
-        verify( activationContext, times( 1 ) ).notifySatisfied( underTest );
-        verify( activationContext, times( 1 ) ).notifyUnsatisfied( underTest );
+
+        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
     }
 
     /**
@@ -108,18 +108,14 @@ public class AbstractConditionTest
     @Test
     public void satisfiedOnUnsatisfied()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final AbstractCondition underTest = new TestCondition( activationContext );
-        underTest.bind();
-
         underTest.setSatisfied( true );
         assertThat( underTest.isSatisfied(), is( true ) );
         underTest.setSatisfied( false );
         assertThat( underTest.isSatisfied(), is( false ) );
         underTest.setSatisfied( true );
         assertThat( underTest.isSatisfied(), is( true ) );
-        verify( activationContext, times( 2 ) ).notifySatisfied( underTest );
-        verify( activationContext, times( 1 ) ).notifyUnsatisfied( underTest );
+
+        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ), satisfied( underTest ) );
     }
 
     /**
@@ -128,10 +124,6 @@ public class AbstractConditionTest
     @Test( expected = IllegalStateException.class )
     public void isSatisfiedThrowsExceptionAfterRelease()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final AbstractCondition underTest = new TestCondition( activationContext );
-        underTest.bind();
-
         underTest.release();
         underTest.isSatisfied();
     }
@@ -142,9 +134,6 @@ public class AbstractConditionTest
     @Test( expected = IllegalStateException.class )
     public void setSatisfiedThrowsExceptionAfterRelease()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final AbstractCondition underTest = new TestCondition( activationContext );
-
         underTest.release();
         underTest.setSatisfied( true );
     }
@@ -155,18 +144,16 @@ public class AbstractConditionTest
     @Test
     public void getActivationContext()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final AbstractCondition underTest = new TestCondition( activationContext );
-        assertThat( underTest.getActivationContext(), is( equalTo( activationContext ) ) );
+        assertThat( underTest.getEventBus(), is( equalTo( eventBus ) ) );
     }
 
     private static class TestCondition
         extends AbstractCondition
     {
 
-        public TestCondition( final ActivationContext activationContext )
+        public TestCondition( final NexusEventBus eventBus )
         {
-            super( activationContext );
+            super( eventBus );
         }
 
         @Override

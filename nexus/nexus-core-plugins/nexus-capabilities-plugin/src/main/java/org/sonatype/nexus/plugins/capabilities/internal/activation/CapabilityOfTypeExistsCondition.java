@@ -20,11 +20,15 @@ package org.sonatype.nexus.plugins.capabilities.internal.activation;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
 import org.sonatype.nexus.plugins.capabilities.support.activation.AbstractCondition;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * A condition that is satisfied when a capability of a specified type exists.
@@ -33,81 +37,71 @@ import org.sonatype.nexus.plugins.capabilities.support.activation.AbstractCondit
  */
 public class CapabilityOfTypeExistsCondition
     extends AbstractCondition
-    implements CapabilityRegistry.Listener
 {
 
     private final CapabilityRegistry capabilityRegistry;
 
+    private final ReentrantReadWriteLock bindLock;
+
     final Class<?> type;
 
-    public CapabilityOfTypeExistsCondition( final ActivationContext activationContext,
+    public CapabilityOfTypeExistsCondition( final NexusEventBus eventBus,
                                             final CapabilityRegistry capabilityRegistry,
                                             final Class<? extends Capability> type )
     {
-        super( activationContext );
+        super( eventBus );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.type = type;
+        bindLock = new ReentrantReadWriteLock(  );
     }
 
     @Override
     protected void doBind()
     {
-        capabilityRegistry.addListener( this );
+        try
+        {
+            bindLock.writeLock().lock();
+            for ( final CapabilityReference reference : capabilityRegistry.getAll() )
+            {
+                handle( new CapabilityRegistryEvent.Created( reference ) );
+            }
+        }
+        finally
+        {
+            bindLock.writeLock().unlock();
+        }
+        getEventBus().register( this );
     }
 
     @Override
     public void doRelease()
     {
-        capabilityRegistry.removeListener( this );
+        getEventBus().unregister( this );
     }
 
-    @Override
-    public void onAdd( final CapabilityReference reference )
+    @Subscribe
+    public void handle( final CapabilityRegistryEvent.Created event )
     {
-        if ( !isSatisfied() && type.isAssignableFrom( reference.capability().getClass() ) )
+        if ( !isSatisfied() && type.isAssignableFrom( event.getReference().capability().getClass() ) )
         {
             checkAllCapabilities();
         }
     }
 
-    @Override
-    public void onRemove( final CapabilityReference reference )
+    @Subscribe
+    public void handle( final CapabilityRegistryEvent.Removed event )
     {
-        if ( isSatisfied() && type.isAssignableFrom( reference.capability().getClass() ) )
+        if ( isSatisfied() && type.isAssignableFrom( event.getReference().capability().getClass() ) )
         {
             checkAllCapabilities();
         }
-    }
-
-    @Override
-    public void onActivate( final CapabilityReference reference )
-    {
-        // ignore
-    }
-
-    @Override
-    public void onPassivate( final CapabilityReference reference )
-    {
-        // ignore
-    }
-
-    @Override
-    public void beforeUpdate( final CapabilityReference reference )
-    {
-        // ignore
-    }
-
-    @Override
-    public void afterUpdate( final CapabilityReference reference )
-    {
-        // ignore
     }
 
     void checkAllCapabilities()
     {
         for ( final CapabilityReference ref : capabilityRegistry.getAll() )
         {
-            if ( isSatisfied( ref ) )
+            if ( shouldEvaluateFor( ref ) )
             {
                 if ( !isSatisfied() )
                 {
@@ -122,9 +116,23 @@ public class CapabilityOfTypeExistsCondition
         }
     }
 
-    boolean isSatisfied( final CapabilityReference reference )
+    boolean shouldEvaluateFor( final CapabilityReference reference )
     {
         return type.isAssignableFrom( reference.capability().getClass() );
+    }
+
+    @Override
+    protected void setSatisfied( final boolean satisfied )
+    {
+        try
+        {
+            bindLock.readLock().lock();
+            super.setSatisfied( satisfied );
+        }
+        finally
+        {
+            bindLock.readLock().unlock();
+        }
     }
 
     @Override

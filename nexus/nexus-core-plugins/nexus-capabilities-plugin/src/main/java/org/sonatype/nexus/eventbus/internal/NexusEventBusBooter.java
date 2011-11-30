@@ -16,17 +16,33 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.config.events;
+package org.sonatype.nexus.eventbus.internal;
 
-import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
+import java.util.List;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-public class CapabilityConfigurationLoadEvent
-    extends CapabilityConfigurationEvent
+import org.sonatype.inject.EagerSingleton;
+import org.sonatype.nexus.eventbus.NexusEventBus;
+
+/**
+ * Eagerly creates an event bus and registers all {@link NexusEventBus.LoadOnStart} marked handlers.
+ *
+ * @since 1.10.0
+ */
+@Named
+@EagerSingleton
+class NexusEventBusBooter
 {
 
-    public CapabilityConfigurationLoadEvent( final CCapability capability )
+    @Inject
+    NexusEventBusBooter( final NexusEventBus eventBus,
+                         final List<NexusEventBus.LoadOnStart> handlers )
     {
-        super( capability );
+        for ( final NexusEventBus.LoadOnStart handler : handlers )
+        {
+            eventBus.register( handler );
+        }
     }
 
 }

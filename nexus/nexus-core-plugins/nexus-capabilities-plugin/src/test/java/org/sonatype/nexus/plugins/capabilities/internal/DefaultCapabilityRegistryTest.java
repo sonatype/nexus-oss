@@ -21,13 +21,13 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Collection;
@@ -35,15 +35,15 @@ import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
-import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
 import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
 
@@ -57,17 +57,18 @@ public class DefaultCapabilityRegistryTest
 
     static final String CAPABILITY_TYPE = "test";
 
-    private HashMap<String, CapabilityFactory> factoryMap;
-
-    private ActivationContext activationContext;
+    private NexusEventBus eventBus;
 
     private DefaultCapabilityRegistry underTest;
+
+    private ArgumentCaptor<CapabilityRegistryEvent> rec;
 
     @Before
     public void setUp()
     {
         final CapabilityFactory factory = mock( CapabilityFactory.class );
-        factoryMap = new HashMap<String, CapabilityFactory>();
+        final HashMap<String, CapabilityFactory> factoryMap = new HashMap<String, CapabilityFactory>();
+
         factoryMap.put( CAPABILITY_TYPE, factory );
         when( factory.create( Matchers.<String>any() ) ).thenAnswer( new Answer<Capability>()
         {
@@ -81,12 +82,12 @@ public class DefaultCapabilityRegistryTest
             }
 
         } );
-        activationContext = mock( ActivationContext.class );
+        eventBus = mock( NexusEventBus.class );
 
         final CapabilityConfiguration configuration = mock( CapabilityConfiguration.class );
         final Conditions conditions = mock( Conditions.class );
 
-        underTest = new DefaultCapabilityRegistry( factoryMap, activationContext, configuration, conditions )
+        underTest = new DefaultCapabilityRegistry( factoryMap, eventBus, configuration, conditions )
         {
             @Override
             CapabilityReference createReference( final Capability capability )
@@ -94,35 +95,47 @@ public class DefaultCapabilityRegistryTest
                 return mock( CapabilityReference.class );
             }
         };
+
+        rec = ArgumentCaptor.forClass( CapabilityRegistryEvent.class );
     }
 
     /**
-     * Create capability without listeners.
+     * Create capability creates a non null reference and posts create event.
      */
     @Test
-    public void createWithoutListeners()
+    public void create()
     {
         final CapabilityReference reference = underTest.create( "capability-1", CAPABILITY_TYPE );
         assertThat( reference, is( not( nullValue() ) ) );
+
+        verify( eventBus ).post( rec.capture() );
+        assertThat( rec.getValue(), is( instanceOf( CapabilityRegistryEvent.Created.class ) ) );
+        assertThat( rec.getValue().getReference(), is( equalTo( reference ) ) );
     }
 
     /**
-     * Remove an existent capability without listeners.
+     * Remove an existent capability posts remove event.
      */
     @Test
-    public void removeWithoutListeners()
+    public void remove()
     {
         final CapabilityReference reference = underTest.create( "capability-1", CAPABILITY_TYPE );
         final CapabilityReference reference1 = underTest.remove( "capability-1" );
 
         assertThat( reference1, is( equalTo( reference ) ) );
+
+        verify( eventBus, times( 2 ) ).post( rec.capture() );
+        assertThat( rec.getAllValues().get( 0 ), is( instanceOf( CapabilityRegistryEvent.Created.class ) ) );
+        assertThat( rec.getAllValues().get( 0 ).getReference(), is( equalTo( reference1 ) ) );
+        assertThat( rec.getAllValues().get( 1 ), is( instanceOf( CapabilityRegistryEvent.Removed.class ) ) );
+        assertThat( rec.getAllValues().get( 1 ).getReference(), is( equalTo( reference1 ) ) );
     }
 
     /**
-     * Remove an inexistent capability without listeners.
+     * Remove an inexistent capability does nothing and does not post remove event.
      */
     @Test
-    public void removeInexistentWithoutListeners()
+    public void removeInexistent()
     {
         underTest.create( "capability-1", CAPABILITY_TYPE );
         final CapabilityReference reference1 = underTest.remove( "capability-2" );
@@ -165,99 +178,6 @@ public class DefaultCapabilityRegistryTest
         final Collection<CapabilityReference> references = underTest.getAll();
 
         assertThat( references, hasSize( 2 ) );
-    }
-
-    /**
-     * Listeners get called when a capability is created.
-     * Ensures that exceptions are ignored (and logged).
-     */
-    @Test
-    public void createWithExistingListeners()
-    {
-        final CapabilityRegistry.Listener listener1 = mock( CapabilityRegistry.Listener.class );
-        doThrow( new UnsupportedOperationException( "Expected" ) ).when( listener1 ).onAdd(
-            Mockito.<CapabilityReference>any()
-        );
-        final CapabilityRegistry.Listener listener2 = mock( CapabilityRegistry.Listener.class );
-
-        underTest.addListener( listener1 );
-        underTest.addListener( listener2 );
-
-        final CapabilityReference reference = underTest.create( "capability-1", CAPABILITY_TYPE );
-        assertThat( reference, is( not( nullValue() ) ) );
-
-        verify( listener1 ).onAdd( reference );
-        verify( listener2 ).onAdd( reference );
-
-    }
-
-    /**
-     * Listeners get called for each capability even if added after capabilities were created.
-     * Ensures that exceptions are ignored (and logged).
-     */
-    @Test
-    public void addListenersAfterCreate()
-    {
-        final CapabilityRegistry.Listener listener1 = mock( CapabilityRegistry.Listener.class );
-        doThrow( new UnsupportedOperationException( "Expected" ) ).when( listener1 ).onAdd(
-            Mockito.<CapabilityReference>any()
-        );
-        final CapabilityRegistry.Listener listener2 = mock( CapabilityRegistry.Listener.class );
-
-        final CapabilityReference reference = underTest.create( "capability-1", CAPABILITY_TYPE );
-
-        underTest.addListener( listener1 );
-        underTest.addListener( listener2 );
-
-        verify( listener1 ).onAdd( reference );
-        verify( listener2 ).onAdd( reference );
-    }
-
-    /**
-     * Remove an existent capability with listeners should call listeners.
-     * Ensures that exceptions are ignored (and logged).
-     */
-    @Test
-    public void removeWithListeners()
-    {
-        final CapabilityRegistry.Listener listener1 = mock( CapabilityRegistry.Listener.class );
-        doThrow( new UnsupportedOperationException( "Expected" ) ).when( listener1 ).onAdd(
-            Mockito.<CapabilityReference>any()
-        );
-        final CapabilityRegistry.Listener listener2 = mock( CapabilityRegistry.Listener.class );
-
-        underTest.addListener( listener1 );
-        underTest.addListener( listener2 );
-
-        underTest.create( "capability-1", CAPABILITY_TYPE );
-        final CapabilityReference reference = underTest.remove( "capability-1" );
-
-        verify( listener1 ).onRemove( reference );
-        verify( listener2 ).onRemove( reference );
-    }
-
-    /**
-     * Remove an inexistent capability with listeners should not call listeners.
-     * Ensures that exceptions are ignored (and logged).
-     */
-    @Test
-    public void removeInexistentWithListeners()
-    {
-        final CapabilityRegistry.Listener listener1 = mock( CapabilityRegistry.Listener.class );
-        doThrow( new UnsupportedOperationException( "Expected" ) ).when( listener1 ).onAdd(
-            Mockito.<CapabilityReference>any()
-        );
-        final CapabilityRegistry.Listener listener2 = mock( CapabilityRegistry.Listener.class );
-
-        underTest.addListener( listener1 );
-        underTest.addListener( listener2 );
-
-        underTest.create( "capability-1", CAPABILITY_TYPE );
-        underTest.remove( "capability-2" );
-
-        verify( listener1 ).onAdd( Mockito.<CapabilityReference>any() );
-        verify( listener2 ).onAdd( Mockito.<CapabilityReference>any() );
-        verifyNoMoreInteractions( listener1, listener2 );
     }
 
 }

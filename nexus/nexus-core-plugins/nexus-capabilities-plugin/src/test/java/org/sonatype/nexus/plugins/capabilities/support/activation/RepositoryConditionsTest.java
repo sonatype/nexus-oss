@@ -23,12 +23,13 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
 import org.hamcrest.Matchers;
+import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
-import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryEventsNotifier;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryLocalStatusCondition;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
  * {@link RepositoryConditions} UTs.
@@ -38,18 +39,21 @@ import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryLoc
 public class RepositoryConditionsTest
 {
 
+    private RepositoryConditions underTest;
+
+    @Before
+    public void setUp()
+    {
+        final NexusEventBus eventBus = mock( NexusEventBus.class );
+        underTest = new RepositoryConditions( eventBus, mock( RepositoryRegistry.class ) );
+    }
+
     /**
      * repositoryIsInService() factory method returns expected condition.
      */
     @Test
     public void repositoryIsInService()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final RepositoryEventsNotifier repositoryEventsNotifier = mock( RepositoryEventsNotifier.class );
-        final RepositoryConditions underTest = new RepositoryConditions(
-            activationContext, repositoryEventsNotifier
-        );
-
         assertThat(
             underTest.repositoryIsInService( mock( RepositoryConditions.RepositoryId.class ) ),
             is( Matchers.<Condition>instanceOf( RepositoryLocalStatusCondition.class ) )
@@ -62,12 +66,6 @@ public class RepositoryConditionsTest
     @Test
     public void repositoryExists()
     {
-        final ActivationContext activationContext = mock( ActivationContext.class );
-        final RepositoryEventsNotifier repositoryEventsNotifier = mock( RepositoryEventsNotifier.class );
-        final RepositoryConditions underTest = new RepositoryConditions(
-            activationContext, repositoryEventsNotifier
-        );
-
         assertThat(
             underTest.repositoryExists( mock( RepositoryConditions.RepositoryId.class ) ),
             is( Matchers.<Condition>instanceOf( RepositoryExistsCondition.class ) )

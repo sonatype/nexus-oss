@@ -19,9 +19,10 @@
 package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.notNull;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -37,10 +38,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.NexusIsActiveCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
 import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
@@ -58,30 +61,28 @@ public class DefaultCapabilityReferenceTest
 
     private DefaultCapabilityReference underTest;
 
-    private DefaultCapabilityRegistry capabilityRegistry;
-
-    private ActivationContext activationContext;
+    private NexusEventBus eventBus;
 
     private Condition activationCondition;
 
     private CapabilityConfiguration configuration;
 
-    private Conditions conditions;
-
-    private NexusIsActiveCondition nexusIsActiveCondition;
-
     private Condition validityCondition;
+
+    private ArgumentCaptor<CapabilityEvent> re;
+
+    private ArgumentCaptor<Object> ebc;
 
     @Before
     public void setUp()
     {
-        capabilityRegistry = mock( DefaultCapabilityRegistry.class );
-        activationContext = mock( ActivationContext.class );
+        eventBus = mock( NexusEventBus.class );
         configuration = mock( CapabilityConfiguration.class );
-        conditions = mock( Conditions.class );
 
+        final Conditions conditions = mock( Conditions.class );
         final NexusConditions nexusConditions = mock( NexusConditions.class );
-        nexusIsActiveCondition = mock( NexusIsActiveCondition.class );
+        final NexusIsActiveCondition nexusIsActiveCondition = mock( NexusIsActiveCondition.class );
+
         when( nexusIsActiveCondition.isSatisfied() ).thenReturn( true );
         when( nexusConditions.active() ).thenReturn( nexusIsActiveCondition );
         when( conditions.nexus() ).thenReturn( nexusConditions );
@@ -98,9 +99,12 @@ public class DefaultCapabilityReferenceTest
         when( capability.validityCondition() ).thenReturn( validityCondition );
 
         underTest = new DefaultCapabilityReference(
-            capabilityRegistry, activationContext, configuration, conditions, capability
+            eventBus, configuration, conditions, capability
         );
         underTest.create( Collections.<String, String>emptyMap() );
+
+        re = ArgumentCaptor.forClass( CapabilityEvent.class );
+        ebc = ArgumentCaptor.forClass( Object.class );
     }
 
     /**
@@ -113,9 +117,7 @@ public class DefaultCapabilityReferenceTest
         underTest.enable();
         assertThat( underTest.isEnabled(), is( true ) );
         verify( activationCondition ).bind();
-        verify( activationContext ).addListener(
-            Matchers.<ActivationContext.Listener>any(), eq( activationCondition )
-        );
+        verify( eventBus ).register( isA( DefaultCapabilityReference.ActivationListener.class ) );
     }
 
     /**
@@ -131,9 +133,7 @@ public class DefaultCapabilityReferenceTest
         assertThat( underTest.isEnabled(), is( false ) );
 
         verify( activationCondition ).release();
-        verify( activationContext ).removeListener(
-            Matchers.<ActivationContext.Listener>any(), eq( activationCondition )
-        );
+        verify( eventBus ).unregister( isA( DefaultCapabilityReference.ActivationListener.class ) );
     }
 
     /**
@@ -145,9 +145,9 @@ public class DefaultCapabilityReferenceTest
         underTest.enable();
         assertThat( underTest.isActive(), is( true ) );
         verify( capability ).activate();
-        verify( capabilityRegistry ).notify(
-            notNull( CapabilityReference.class ), notNull( DefaultCapabilityRegistry.Notifier.class )
-        );
+        verify( eventBus ).post( re.capture() );
+        assertThat( re.getValue(), is( instanceOf( CapabilityEvent.AfterActivated.class ) ) );
+        assertThat( re.getValue().getReference(), is( equalTo( (CapabilityReference) underTest ) ) );
     }
 
     /**
@@ -189,9 +189,12 @@ public class DefaultCapabilityReferenceTest
         underTest.passivate();
         assertThat( underTest.isActive(), is( false ) );
         verify( capability ).passivate();
-        verify( capabilityRegistry, times( 2 ) ).notify(
-            notNull( CapabilityReference.class ), notNull( DefaultCapabilityRegistry.Notifier.class )
-        );
+
+        verify( eventBus, times( 2 ) ).post( re.capture() );
+        assertThat( re.getAllValues().get( 0 ), is( instanceOf( CapabilityEvent.AfterActivated.class ) ) );
+        assertThat( re.getAllValues().get( 0 ).getReference(), is( equalTo( (CapabilityReference) underTest ) ) );
+        assertThat( re.getAllValues().get( 1 ), is( instanceOf( CapabilityEvent.BeforePassivated.class ) ) );
+        assertThat( re.getAllValues().get( 1 ).getReference(), is( equalTo( (CapabilityReference) underTest ) ) );
     }
 
     /**
@@ -255,9 +258,12 @@ public class DefaultCapabilityReferenceTest
         final HashMap<String, String> previousProperties = new HashMap<String, String>();
         underTest.update( properties, previousProperties );
         verify( capability ).update( properties );
-        verify( capabilityRegistry, times( 2 ) ).notify(
-            notNull( CapabilityReference.class ), notNull( DefaultCapabilityRegistry.Notifier.class )
-        );
+
+        verify( eventBus, times( 2 ) ).post( re.capture() );
+        assertThat( re.getAllValues().get( 0 ), is( instanceOf( CapabilityEvent.BeforeUpdate.class ) ) );
+        assertThat( re.getAllValues().get( 0 ).getReference(), is( equalTo( (CapabilityReference) underTest ) ) );
+        assertThat( re.getAllValues().get( 1 ), is( instanceOf( CapabilityEvent.AfterUpdate.class ) ) );
+        assertThat( re.getAllValues().get( 1 ).getReference(), is( equalTo( (CapabilityReference) underTest ) ) );
     }
 
     /**
@@ -275,7 +281,7 @@ public class DefaultCapabilityReferenceTest
     }
 
     /**
-     * Calling remove forwards to capability and listeners are removed.
+     * Calling remove forwards to capability and handlers are removed.
      */
     @Test
     public void removeIsForwardedToCapability()
@@ -283,15 +289,7 @@ public class DefaultCapabilityReferenceTest
         underTest.enable();
         underTest.remove();
         verify( capability ).remove();
-        verify( activationContext ).removeListener(
-            Matchers.<ActivationContext.Listener>any(), eq( activationCondition )
-        );
-        verify( activationContext ).removeListener(
-            Matchers.<ActivationContext.Listener>any(), eq( nexusIsActiveCondition )
-        );
-        verify( activationContext ).removeListener(
-            Matchers.<ActivationContext.Listener>any(), eq( validityCondition )
-        );
+        verify( eventBus, times( 3 ) ).unregister( ebc.capture() );
     }
 
     @Test
@@ -364,11 +362,12 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void listensToNexusIsActiveAndValidityConditions()
     {
-        verify( activationContext ).addListener(
-            Matchers.<ActivationContext.Listener>any(), eq( nexusIsActiveCondition )
+        verify( eventBus, times( 2 ) ).register( ebc.capture() );
+        assertThat( ebc.getAllValues().get( 0 ), is( instanceOf(
+            DefaultCapabilityReference.NexusActiveListener.class ) )
         );
-        verify( activationContext ).addListener(
-            Matchers.<ActivationContext.Listener>any(), eq( validityCondition )
+        assertThat( ebc.getAllValues().get( 1 ), is( instanceOf(
+            DefaultCapabilityReference.ValidityListener.class ) )
         );
     }
 
@@ -381,11 +380,16 @@ public class DefaultCapabilityReferenceTest
     public void automaticallyRemoveWhenValidityConditionIsUnsatisfied()
         throws Exception
     {
-        final ArgumentCaptor<ActivationContext.Listener> listenerCaptor = ArgumentCaptor.forClass(
-            ActivationContext.Listener.class
+        verify( eventBus, times( 2 ) ).register( ebc.capture() );
+        assertThat( ebc.getAllValues().get( 0 ), is( instanceOf(
+            DefaultCapabilityReference.NexusActiveListener.class ) )
         );
-        verify( activationContext ).addListener( listenerCaptor.capture(), eq( validityCondition ) );
-        listenerCaptor.getValue().onUnsatisfied( validityCondition );
+        assertThat( ebc.getAllValues().get( 1 ), is( instanceOf(
+            DefaultCapabilityReference.ValidityListener.class ) )
+        );
+        ( (DefaultCapabilityReference.ValidityListener) ebc.getAllValues().get( 1 ) ).handle(
+            new ConditionEvent.Unsatisfied( validityCondition )
+        );
         verify( configuration ).remove( capability.id() );
     }
 

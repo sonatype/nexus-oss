@@ -21,11 +21,15 @@ package org.sonatype.nexus.plugins.capabilities.support.activation;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Composite {@link Condition} implementation support.
+ *
+ * @since 1.10.0
  */
 public abstract class AbstractCompositeCondition
     extends AbstractCondition
@@ -33,24 +37,18 @@ public abstract class AbstractCompositeCondition
 
     private final Condition[] conditions;
 
-    private ActivationContext.Listener listener;
-
-    private final ActivationContext activationContext;
-
-    public AbstractCompositeCondition( final ActivationContext activationContext,
+    public AbstractCompositeCondition( final NexusEventBus eventBus,
                                        final Condition... conditions )
     {
-        super( activationContext, false );
-        this.activationContext = checkNotNull( activationContext );
+        super( eventBus, false );
         this.conditions = checkNotNull( conditions );
         checkArgument( conditions.length > 1, "A composite mush have at least 2 conditions" );
     }
 
-    public AbstractCompositeCondition( final ActivationContext activationContext,
+    public AbstractCompositeCondition( final NexusEventBus eventBus,
                                        final Condition condition )
     {
-        super( activationContext, false );
-        this.activationContext = checkNotNull( activationContext );
+        super( eventBus, false );
         this.conditions = new Condition[]{ checkNotNull( condition ) };
     }
 
@@ -61,40 +59,42 @@ public abstract class AbstractCompositeCondition
         {
             condition.bind();
         }
-        activationContext.addListener(
-            listener = new ActivationContext.Listener()
-            {
-                @Override
-                public void onSatisfied( final Condition condition )
-                {
-                    setSatisfied( check( conditions ) );
-                }
-
-                @Override
-                public void onUnsatisfied( final Condition condition )
-                {
-                    setSatisfied( check( conditions ) );
-                }
-
-                @Override
-                public String toString()
-                {
-                    return "Re-evaluate " + AbstractCompositeCondition.this;
-                }
-            },
-            conditions
-        );
-        setSatisfied( check( conditions ) );
+        getEventBus().register( this );
+        setSatisfied( reevaluate( conditions ) );
     }
 
     @Override
     public void doRelease()
     {
-        getActivationContext().removeListener( listener, conditions );
+        getEventBus().unregister( this );
         for ( final Condition condition : conditions )
         {
             condition.release();
         }
+    }
+
+    @Subscribe
+    public void handle( final ConditionEvent.Satisfied event )
+    {
+        if ( shouldReevaluateFor( event.getCondition() ) )
+        {
+            setSatisfied( reevaluate( conditions ) );
+        }
+    }
+
+    @Subscribe
+    public void handle( final ConditionEvent.Unsatisfied event )
+    {
+        if ( shouldReevaluateFor( event.getCondition() ) )
+        {
+            setSatisfied( reevaluate( conditions ) );
+        }
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Re-evaluate " + AbstractCompositeCondition.this;
     }
 
     /**
@@ -103,11 +103,23 @@ public abstract class AbstractCompositeCondition
      * @param conditions to be checked (there are at least 2 conditions passed in)
      * @return true, if conditions are satisfied as a unit
      */
-    protected abstract boolean check( final Condition... conditions );
+    protected abstract boolean reevaluate( final Condition... conditions );
 
     protected Condition[] getConditions()
     {
         return conditions;
+    }
+
+    private boolean shouldReevaluateFor( final Condition condition )
+    {
+        for ( final Condition watched : conditions )
+        {
+            if ( watched == condition )
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

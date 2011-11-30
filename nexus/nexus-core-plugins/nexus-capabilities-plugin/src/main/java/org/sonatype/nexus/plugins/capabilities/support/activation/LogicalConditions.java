@@ -24,7 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.InversionCondition;
 
@@ -38,12 +38,12 @@ import org.sonatype.nexus.plugins.capabilities.internal.activation.InversionCond
 public class LogicalConditions
 {
 
-    private final ActivationContext activationContext;
+    private final NexusEventBus eventBus;
 
     @Inject
-    public LogicalConditions( final ActivationContext activationContext )
+    public LogicalConditions( final NexusEventBus eventBus )
     {
-        this.activationContext = checkNotNull( activationContext );
+        this.eventBus = checkNotNull( eventBus );
     }
 
     /**
@@ -55,7 +55,7 @@ public class LogicalConditions
      */
     public Condition and( final Condition left, final Condition right )
     {
-        return new ConjunctionCondition( activationContext, left, right );
+        return new ConjunctionCondition( eventBus, left, right );
     }
 
     /**
@@ -67,7 +67,7 @@ public class LogicalConditions
      */
     public Condition or( final Condition left, final Condition right )
     {
-        return new DisjunctionCondition( activationContext, left, right );
+        return new DisjunctionCondition( eventBus, left, right );
     }
 
     /**
@@ -78,7 +78,7 @@ public class LogicalConditions
      */
     public Condition not( final Condition condition )
     {
-        return new InversionCondition( activationContext, condition );
+        return new InversionCondition( eventBus, condition );
     }
 
     /**
@@ -91,15 +91,15 @@ public class LogicalConditions
         implements Condition
     {
 
-        public ConjunctionCondition( final ActivationContext activationContext,
+        public ConjunctionCondition( final NexusEventBus eventBus,
                                      final Condition left,
                                      final Condition right )
         {
-            super( activationContext, left, right );
+            super( eventBus, left, right );
         }
 
         @Override
-        protected boolean check( final Condition... conditions )
+        protected boolean reevaluate( final Condition... conditions )
         {
             for ( final Condition condition : conditions )
             {
@@ -138,15 +138,15 @@ public class LogicalConditions
         implements Condition
     {
 
-        public DisjunctionCondition( final ActivationContext activationContext,
+        public DisjunctionCondition( final NexusEventBus eventBus,
                                      final Condition left,
                                      final Condition right )
         {
-            super( activationContext, left, right );
+            super( eventBus, left, right );
         }
 
         @Override
-        protected boolean check( final Condition... conditions )
+        protected boolean reevaluate( final Condition... conditions )
         {
             for ( final Condition condition : conditions )
             {

@@ -20,16 +20,15 @@ package org.sonatype.nexus.plugins.capabilities.internal.activation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
 
 /**
  * {@link InversionCondition} UTs.
@@ -37,34 +36,25 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
  * @since 1.10.0
  */
 public class InversionConditionTest
+        extends NexusEventBusTestSupport
 {
-
-    static final boolean UNSATISFIED = false;
-
-    static final boolean SATISFIED = true;
-
-    private ActivationContext activationContext;
 
     private InversionCondition underTest;
 
-    private ActivationContext.Listener listener;
-
     private Condition condition;
 
+    @Override
     @Before
     public void setUp()
+        throws Exception
     {
-        activationContext = mock( ActivationContext.class );
+        super.setUp();
+
         condition = mock( Condition.class );
-        underTest = new InversionCondition( activationContext, condition );
+        underTest = new InversionCondition( eventBus, condition );
         underTest.bind();
 
-        ArgumentCaptor<ActivationContext.Listener> listenerCaptor = ArgumentCaptor.forClass(
-            ActivationContext.Listener.class
-        );
-
-        verify( activationContext ).addListener( listenerCaptor.capture(), eq( this.condition ) );
-        listener = listenerCaptor.getValue();
+        verify( eventBus ).register( underTest );
     }
 
     /**
@@ -83,8 +73,10 @@ public class InversionConditionTest
     public void not02()
     {
         when( condition.isSatisfied() ).thenReturn( true );
-        listener.onSatisfied( condition );
+        underTest.handle( new ConditionEvent.Satisfied( condition ) );
         assertThat( underTest.isSatisfied(), is( false ) );
+
+        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
     }
 
     /**
@@ -94,8 +86,21 @@ public class InversionConditionTest
     public void not03()
     {
         when( condition.isSatisfied() ).thenReturn( false );
-        listener.onSatisfied( condition );
+        underTest.handle( new ConditionEvent.Unsatisfied( condition ) );
         assertThat( underTest.isSatisfied(), is( true ) );
+
+        verifyEventBusEvents( satisfied( underTest ) );
+    }
+
+    /**
+     * Event bus handler is removed when releasing.
+     */
+    @Test
+    public void releaseRemovesItselfAsHandler()
+    {
+        underTest.release();
+
+        verify( eventBus ).unregister( underTest );
     }
 
 }

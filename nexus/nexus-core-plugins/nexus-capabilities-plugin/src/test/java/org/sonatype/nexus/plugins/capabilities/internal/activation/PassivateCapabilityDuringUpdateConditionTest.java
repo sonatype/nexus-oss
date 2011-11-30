@@ -24,11 +24,10 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
+import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 
 /**
  * {@link PassivateCapabilityDuringUpdateCondition} UTs.
@@ -36,63 +35,51 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
  * @since 1.10.0
  */
 public class PassivateCapabilityDuringUpdateConditionTest
+    extends NexusEventBusTestSupport
 {
-
-    private ActivationContext activationContext;
 
     private CapabilityReference reference;
 
-    private CapabilityRegistry.Listener listener;
-
     private PassivateCapabilityDuringUpdateCondition underTest;
 
-    private CapabilityRegistry capabilityRegistry;
-
+    @Override
     @Before
     public void setUp()
+        throws Exception
     {
-        activationContext = mock( ActivationContext.class );
-        capabilityRegistry = mock( CapabilityRegistry.class );
+        super.setUp();
 
         final Capability capability = mock( Capability.class );
         this.reference = mock( CapabilityReference.class );
         when( this.reference.capability() ).thenReturn( capability );
 
-        underTest = new PassivateCapabilityDuringUpdateCondition(
-            activationContext, capabilityRegistry, capability
-        );
+        underTest = new PassivateCapabilityDuringUpdateCondition( eventBus, capability );
         underTest.bind();
 
-        ArgumentCaptor<CapabilityRegistry.Listener> listenerCaptor = ArgumentCaptor.forClass(
-            CapabilityRegistry.Listener.class
-        );
-
-        verify( capabilityRegistry ).addListener( listenerCaptor.capture() );
-        listener = listenerCaptor.getValue();
+        verify( eventBus ).register( underTest );
     }
 
     /**
      * Condition should become unsatisfied before update and satisfied after update.
      */
     @Test
-    public void capabilityOfTypeExists01()
+    public void passivateDuringUpdate()
     {
-        listener.beforeUpdate( reference );
-        listener.afterUpdate( reference );
+        underTest.handle( new CapabilityEvent.BeforeUpdate( reference ) );
+        underTest.handle( new CapabilityEvent.AfterUpdate( reference ) );
 
-        verify( activationContext ).notifyUnsatisfied( underTest );
-        verify( activationContext ).notifySatisfied( underTest );
+        verifyEventBusEvents( unsatisfied( underTest ), satisfied( underTest ) );
     }
 
     /**
-     * Capability registry listener is removed when releasing.
+     * Event bus handler is removed when releasing.
      */
     @Test
-    public void releaseRemovesItselfAsListener()
+    public void releaseRemovesItselfAsHandler()
     {
         underTest.release();
 
-        verify( capabilityRegistry ).removeListener( underTest );
+        verify( eventBus ).unregister( underTest );
     }
 
 }

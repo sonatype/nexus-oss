@@ -20,16 +20,16 @@ package org.sonatype.nexus.plugins.capabilities.support.activation;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
 
 /**
  * {@link AbstractCompositeCondition} UTs.
@@ -37,9 +37,8 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
  * @since 1.10.0
  */
 public class AbstractCompositeConditionTest
+    extends NexusEventBusTestSupport
 {
-
-    private ActivationContext activationContext;
 
     private Condition c1;
 
@@ -47,34 +46,25 @@ public class AbstractCompositeConditionTest
 
     private Condition c3;
 
-    private ActivationContext.Listener listener;
+    private TestCondition underTest;
 
+    @Override
     @Before
     public void setUp()
+        throws Exception
     {
-        activationContext = mock( ActivationContext.class );
+        super.setUp();
+
         c1 = mock( Condition.class );
         c2 = mock( Condition.class );
         c3 = mock( Condition.class );
-    }
 
-    private Condition prepare()
-    {
-        final AbstractCompositeCondition underTest = new TestCondition( activationContext, c1, c2, c3 );
+        underTest = new TestCondition( eventBus, c1, c2, c3 );
         underTest.bind();
 
         verify( c1 ).bind();
         verify( c2 ).bind();
         verify( c3 ).bind();
-
-        ArgumentCaptor<ActivationContext.Listener> listenerCaptor = ArgumentCaptor.forClass(
-            ActivationContext.Listener.class
-        );
-
-        verify( activationContext ).addListener( listenerCaptor.capture(), eq( c1 ), eq( c2 ), eq( c3 ) );
-        listener = listenerCaptor.getValue();
-
-        return underTest;
     }
 
     /**
@@ -83,7 +73,6 @@ public class AbstractCompositeConditionTest
     @Test
     public void notSatisfiedInitially()
     {
-        final Condition underTest = prepare();
         assertThat( underTest.isSatisfied(), is( false ) );
     }
 
@@ -92,15 +81,13 @@ public class AbstractCompositeConditionTest
      * sent.
      */
     @Test
-    public void whenMemberConditionIsSatisfiedAndCheckReturnsTrue()
+    public void whenMemberConditionIsSatisfiedAndReevaluateReturnsTrue()
     {
-        final Condition underTest = prepare();
-
         when( c1.isSatisfied() ).thenReturn( true );
-        listener.onSatisfied( c1 );
+        underTest.handle( new ConditionEvent.Satisfied( c1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
-        verify( activationContext ).notifySatisfied( underTest );
+        verifyEventBusEvents( satisfied( underTest ) );
     }
 
     /**
@@ -110,18 +97,15 @@ public class AbstractCompositeConditionTest
     @Test
     public void whenMemberConditionIsSatisfiedAndCheckReturnsFalse()
     {
-        final Condition underTest = prepare();
-
         when( c1.isSatisfied() ).thenReturn( true );
-        listener.onSatisfied( c1 );
+        underTest.handle( new ConditionEvent.Satisfied( c1 ) );
 
         when( c1.isSatisfied() ).thenReturn( false );
         when( c2.isSatisfied() ).thenReturn( false );
-        listener.onSatisfied( c2 );
+        underTest.handle( new ConditionEvent.Satisfied( c2 ) );
         assertThat( underTest.isSatisfied(), is( false ) );
 
-        verify( activationContext ).notifySatisfied( underTest );
-        verify( activationContext ).notifyUnsatisfied( underTest );
+        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
     }
 
     /**
@@ -131,14 +115,12 @@ public class AbstractCompositeConditionTest
     @Test
     public void whenMemberConditionIsUnsatisfiedAndCheckReturnsTrue()
     {
-        final Condition underTest = prepare();
-
         when( c1.isSatisfied() ).thenReturn( false );
         when( c2.isSatisfied() ).thenReturn( true );
-        listener.onUnsatisfied( c1 );
+        underTest.handle( new ConditionEvent.Unsatisfied( c1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
-        verify( activationContext ).notifySatisfied( underTest );
+        verifyEventBusEvents( satisfied( underTest ) );
     }
 
     /**
@@ -148,47 +130,43 @@ public class AbstractCompositeConditionTest
     @Test
     public void whenMemberConditionIsUnsatisfiedAndCheckReturnsFalse()
     {
-        final Condition underTest = prepare();
-
         when( c1.isSatisfied() ).thenReturn( false );
         when( c2.isSatisfied() ).thenReturn( true );
-        listener.onUnsatisfied( c1 );
+        underTest.handle( new ConditionEvent.Unsatisfied( c1 ) );
 
         when( c1.isSatisfied() ).thenReturn( false );
         when( c2.isSatisfied() ).thenReturn( false );
-        listener.onUnsatisfied( c2 );
+        underTest.handle( new ConditionEvent.Unsatisfied( c2 ) );
         assertThat( underTest.isSatisfied(), is( false ) );
 
-        verify( activationContext ).notifySatisfied( underTest );
-        verify( activationContext ).notifyUnsatisfied( underTest );
+        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
     }
 
     /**
-     * On release activation context listener is removed.
+     * On release, member conditions are released and handler removed from event bus.
      */
     @Test
     public void listenerRemovedOnRelease()
     {
-        final Condition underTest = prepare();
         underTest.release();
         verify( c1 ).release();
         verify( c2 ).release();
         verify( c3 ).release();
-        verify( activationContext ).removeListener( listener, c1, c2, c3 );
+        verify( eventBus ).unregister( underTest );
     }
 
     private static class TestCondition
         extends AbstractCompositeCondition
     {
 
-        public TestCondition( final ActivationContext activationContext,
+        public TestCondition( final NexusEventBus eventBus,
                               final Condition... conditions )
         {
-            super( activationContext, conditions );
+            super( eventBus, conditions );
         }
 
         @Override
-        protected boolean check( final Condition... conditions )
+        protected boolean reevaluate( final Condition... conditions )
         {
             for ( final Condition condition : conditions )
             {

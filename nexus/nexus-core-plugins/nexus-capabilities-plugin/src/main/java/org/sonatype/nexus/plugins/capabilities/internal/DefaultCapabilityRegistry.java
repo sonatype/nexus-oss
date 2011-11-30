@@ -23,22 +23,22 @@ import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
 import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 
 /**
@@ -53,7 +53,7 @@ class DefaultCapabilityRegistry
 
     private final Map<String, CapabilityFactory> factories;
 
-    private final ActivationContext activationContext;
+    private final NexusEventBus eventBus;
 
     private final CapabilityConfiguration configuration;
 
@@ -61,23 +61,20 @@ class DefaultCapabilityRegistry
 
     private final Map<String, CapabilityReference> references;
 
-    private final Set<Listener> listeners;
-
     private final ReentrantReadWriteLock lock;
 
     @Inject
     DefaultCapabilityRegistry( final Map<String, CapabilityFactory> factories,
-                               final ActivationContext activationContext,
+                               final NexusEventBus eventBus,
                                final CapabilityConfiguration configuration,
                                final Conditions conditions )
     {
-        this.activationContext = checkNotNull( activationContext );
+        this.eventBus = checkNotNull( eventBus );
         this.factories = checkNotNull( factories );
         this.configuration = Preconditions.checkNotNull( configuration );
         this.conditions = Preconditions.checkNotNull( conditions );
 
         references = new HashMap<String, CapabilityReference>();
-        listeners = new HashSet<Listener>();
         lock = new ReentrantReadWriteLock();
     }
 
@@ -104,14 +101,7 @@ class DefaultCapabilityRegistry
 
             getLogger().debug( "Created capability '{}'", capability );
 
-            notify( reference, new Notifier( "added" )
-            {
-                @Override
-                void run( final Listener listener, final CapabilityReference reference )
-                {
-                    listener.onAdd( reference );
-                }
-            } );
+            eventBus.post( new CapabilityRegistryEvent.Created( reference ) );
 
             return reference;
         }
@@ -132,14 +122,7 @@ class DefaultCapabilityRegistry
             if ( reference != null )
             {
                 getLogger().debug( "Removed capability '{}'", reference.capability() );
-                notify( reference, new Notifier( "removed" )
-                {
-                    @Override
-                    void run( final Listener listener, final CapabilityReference reference )
-                    {
-                        listener.onRemove( reference );
-                    }
-                } );
+                eventBus.post( new CapabilityRegistryEvent.Removed( reference ) );
             }
             return reference;
         }
@@ -179,107 +162,12 @@ class DefaultCapabilityRegistry
         }
     }
 
-    @Override
-    public DefaultCapabilityRegistry addListener( final Listener listener )
-    {
-        try
-        {
-            lock.writeLock().lock();
-
-            listeners.add( checkNotNull( listener ) );
-            getLogger().debug( "Added listener '{}'. Notifying it about existing capabilities...", listener );
-            for ( final CapabilityReference reference : references.values() )
-            {
-                try
-                {
-                    listener.onAdd( reference );
-                }
-                catch ( Exception e )
-                {
-                    getLogger().warn(
-                        "Catched exception while notifying '{}' about existing capability '{}'",
-                        new Object[]{ listener, reference.capability(), e }
-                    );
-                }
-            }
-        }
-        finally
-        {
-            lock.writeLock().unlock();
-        }
-
-        return this;
-    }
-
-    @Override
-    public DefaultCapabilityRegistry removeListener( final Listener listener )
-    {
-        try
-        {
-            lock.writeLock().lock();
-
-            listeners.remove( checkNotNull( listener ) );
-            getLogger().debug( "Removed listener '{}'", listener );
-        }
-        finally
-        {
-            lock.writeLock().unlock();
-        }
-
-        return this;
-    }
-
-    void notify( final CapabilityReference reference, final Notifier notifier )
-    {
-        try
-        {
-            getLogger().debug( "Notifying {} capability registry listeners...", listeners.size() );
-            lock.readLock().lock();
-
-            for ( final Listener listener : listeners )
-            {
-                getLogger().debug(
-                    "Notifying '{}' about {} capability '{}'",
-                    new Object[]{ listener, notifier.description, reference.capability() }
-                );
-                try
-                {
-                    notifier.run( listener, reference );
-                }
-                catch ( Exception e )
-                {
-                    getLogger().warn(
-                        "Catched exception while notifying '{}' about {} capability '{}'",
-                        new Object[]{ listener, notifier.description, reference.capability(), e }
-                    );
-                }
-            }
-        }
-        finally
-        {
-            lock.readLock().unlock();
-        }
-    }
-
-    // @TestAccessible
+    @VisibleForTesting
     CapabilityReference createReference( final Capability capability )
     {
         return new DefaultCapabilityReference(
-            this, activationContext, configuration, conditions, capability
+            eventBus, configuration, conditions, capability
         );
-    }
-
-    abstract static class Notifier
-    {
-
-        private String description;
-
-        Notifier( final String description )
-        {
-            this.description = description;
-        }
-
-        abstract void run( Listener listener, CapabilityReference reference );
     }
 
 }

@@ -16,28 +16,54 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.eventbus.internal;
+package org.sonatype.nexus.plugins.capabilities.internal.config;
 
-import java.util.List;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.sonatype.inject.EagerSingleton;
 import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
+import com.google.common.eventbus.Subscribe;
 
+/**
+ * Loads configuration when Nexus is initialized.
+ *
+ * @since 1.10.0
+ */
 @Named
-@EagerSingleton
-class HandlersLoader
+@Singleton
+public class CapabilityConfigurationBooter
+    implements NexusEventBus.LoadOnStart
 {
 
+    private final CapabilityConfiguration capabilitiesConfiguration;
+
     @Inject
-    HandlersLoader( final NexusEventBus eventBus,
-                    final List<NexusEventBus.Handler> handlers )
+    public CapabilityConfigurationBooter( final CapabilityConfiguration capabilitiesConfiguration )
     {
-        for ( final NexusEventBus.Handler handler : handlers )
+        this.capabilitiesConfiguration = checkNotNull( capabilitiesConfiguration );
+    }
+
+    @Subscribe
+    public void handle( final NexusInitializedEvent event )
+    {
+        try
         {
-            eventBus.register( handler );
+            capabilitiesConfiguration.load();
         }
+        catch ( final Exception e )
+        {
+            throw new RuntimeException( "Could not load configurations", e );
+        }
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Load capabilities from persistence store when Nexus is initialized";
     }
 
 }

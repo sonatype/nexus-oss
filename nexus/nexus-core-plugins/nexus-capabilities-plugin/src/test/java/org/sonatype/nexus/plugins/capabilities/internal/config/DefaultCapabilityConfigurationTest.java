@@ -24,7 +24,6 @@ import java.util.List;
 import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.eventbus.NexusEventBus;
-import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationLoadEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import com.google.common.eventbus.Subscribe;
 
@@ -78,12 +77,12 @@ public class DefaultCapabilityConfigurationTest
         assertEquals( read.getNotes(), cap.getNotes() );
 
         // load eventing
-        final List<CapabilityConfigurationLoadEvent> events = new ArrayList<CapabilityConfigurationLoadEvent>();
+        final List<CapabilityConfigurationEvent.Loaded> events = new ArrayList<CapabilityConfigurationEvent.Loaded>();
         NexusEventBus eventBus = lookup( NexusEventBus.class );
         eventBus.register( new Object()
         {
             @Subscribe
-            public void handle( CapabilityConfigurationLoadEvent evt )
+            public void handle( CapabilityConfigurationEvent.Loaded evt )
             {
                 events.add( evt );
             }

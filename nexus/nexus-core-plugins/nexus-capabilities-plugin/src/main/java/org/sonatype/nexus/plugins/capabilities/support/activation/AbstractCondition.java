@@ -21,39 +21,42 @@ package org.sonatype.nexus.plugins.capabilities.support.activation;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
 
 /**
  * {@link Condition} implementation support.
+ *
+ * @since 1.10.0
  */
 public abstract class AbstractCondition
     extends AbstractLoggingComponent
     implements Condition
 {
 
-    private final ActivationContext activationContext;
+    private final NexusEventBus eventBus;
 
     private boolean satisfied;
 
     private boolean active;
 
-    protected AbstractCondition( final ActivationContext activationContext )
+    protected AbstractCondition( final NexusEventBus eventBus )
     {
-        this( activationContext, false );
+        this( eventBus, false );
     }
 
-    protected AbstractCondition( final ActivationContext activationContext, final boolean satisfied )
+    protected AbstractCondition( final NexusEventBus eventBus, final boolean satisfied )
     {
-        this.activationContext = checkNotNull( activationContext );
+        this.eventBus = checkNotNull( eventBus );
         this.satisfied = satisfied;
         active = false;
     }
 
-    protected ActivationContext getActivationContext()
+    public NexusEventBus getEventBus()
     {
-        return activationContext;
+        return eventBus;
     }
 
     @Override
@@ -108,11 +111,11 @@ public abstract class AbstractCondition
             this.satisfied = satisfied;
             if ( this.satisfied )
             {
-                activationContext.notifySatisfied( this );
+                eventBus.post( new ConditionEvent.Satisfied( this ) );
             }
             else
             {
-                activationContext.notifyUnsatisfied( this );
+                eventBus.post( new ConditionEvent.Unsatisfied( this ) );
             }
         }
     }

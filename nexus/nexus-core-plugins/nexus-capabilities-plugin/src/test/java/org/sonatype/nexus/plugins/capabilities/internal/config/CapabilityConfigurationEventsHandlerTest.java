@@ -30,10 +30,6 @@ import org.mockito.Matchers;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationAddEvent;
-import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationLoadEvent;
-import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationRemoveEvent;
-import org.sonatype.nexus.plugins.capabilities.internal.config.events.CapabilityConfigurationUpdateEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 
@@ -164,7 +160,7 @@ public class CapabilityConfigurationEventsHandlerTest
         cc.setEnabled( enabled );
 
         new CapabilityConfigurationEventsHandler( capabilityRegistry ).handle(
-            new CapabilityConfigurationAddEvent( cc )
+            new CapabilityConfigurationEvent.Added( cc )
         );
 
         return reference;
@@ -198,7 +194,7 @@ public class CapabilityConfigurationEventsHandlerTest
         cc.setEnabled( enabled );
 
         new CapabilityConfigurationEventsHandler( capabilityRegistry ).handle(
-            new CapabilityConfigurationLoadEvent( cc )
+            new CapabilityConfigurationEvent.Loaded( cc )
         );
 
         return reference;
@@ -238,7 +234,7 @@ public class CapabilityConfigurationEventsHandlerTest
         }
 
         new CapabilityConfigurationEventsHandler( capabilityRegistry ).handle(
-            new CapabilityConfigurationUpdateEvent( newCapability, oldCapability )
+            new CapabilityConfigurationEvent.Updated( newCapability, oldCapability )
         );
 
         return reference;
@@ -259,7 +255,7 @@ public class CapabilityConfigurationEventsHandlerTest
         cc.setId( "test-cc" );
 
         new CapabilityConfigurationEventsHandler( capabilityRegistry ).handle(
-            new CapabilityConfigurationRemoveEvent( cc )
+            new CapabilityConfigurationEvent.Removed( cc )
         );
 
         return reference;

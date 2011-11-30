@@ -20,11 +20,11 @@ package org.sonatype.nexus.plugins.capabilities.internal.activation;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.support.activation.AbstractCondition;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * A condition that is becoming unsatisfied before an capability is updated and becomes satisfied after capability was
@@ -34,71 +34,42 @@ import org.sonatype.nexus.plugins.capabilities.support.activation.AbstractCondit
  */
 public class PassivateCapabilityDuringUpdateCondition
     extends AbstractCondition
-    implements CapabilityRegistry.Listener
 {
-
-    private final CapabilityRegistry capabilityRegistry;
 
     private final Capability capability;
 
-    public PassivateCapabilityDuringUpdateCondition( final ActivationContext activationContext,
-                                                     final CapabilityRegistry capabilityRegistry,
+    public PassivateCapabilityDuringUpdateCondition( final NexusEventBus eventBus,
                                                      final Capability capability )
     {
-        super( activationContext, true );
-        this.capabilityRegistry = checkNotNull( capabilityRegistry );
+        super( eventBus, true );
         this.capability = checkNotNull( capability );
     }
 
     @Override
     protected void doBind()
     {
-        capabilityRegistry.addListener( this );
+        getEventBus().register( this );
     }
 
     @Override
     public void doRelease()
     {
-        capabilityRegistry.removeListener( this );
+        getEventBus().unregister( this );
     }
 
-    @Override
-    public void onAdd( final CapabilityReference reference )
+    @Subscribe
+    public void handle( final CapabilityEvent.BeforeUpdate event )
     {
-        // ignore
-    }
-
-    @Override
-    public void onRemove( final CapabilityReference reference )
-    {
-        // ignore
-    }
-
-    @Override
-    public void onActivate( final CapabilityReference reference )
-    {
-        // ignore
-    }
-
-    @Override
-    public void onPassivate( final CapabilityReference reference )
-    {
-        // ignore
-    }
-
-    @Override
-    public void beforeUpdate( final CapabilityReference reference )
-    {
-        if ( reference.capability() == capability )
+        if ( event.getReference().capability() == capability )
         {
             setSatisfied( false );
         }
     }
 
-    @Override
-    public void afterUpdate( final CapabilityReference reference )
+    @Subscribe
+    public void handle( final CapabilityEvent.AfterUpdate event )
     {
-        if ( reference.capability() == capability )
+        if ( event.getReference().capability() == capability )
         {
             setSatisfied( true );
         }

@@ -18,92 +18,94 @@
  */
 package org.sonatype.nexus.eventbus.internal;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
-import com.google.common.base.Throwables;
-import com.google.common.eventbus.EventBus;
+import org.sonatype.nexus.eventbus.internal.guava.EventBus;
+import org.sonatype.nexus.eventbus.internal.guava.EventHandler;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
+/**
+ * {@link NexusEventBus} implementation using guava event bus.
+ *
+ * It differs from guava event bus by dispatching events as they appear (is re-entrant). Guava will queue up all event
+ * and dispatch them in the order they were posted, without re-entrance.
+ *
+ * @since 1.10.0
+ */
 @Named
 @Singleton
 class DefaultNexusEventBus
+    extends AbstractLoggingComponent
     implements NexusEventBus
 {
 
-    private Map<Class<?>, CountDownLatch> latches;
-
     private EventBus eventBus;
-
-    private HandlerReflector finder;
 
     @Inject
     DefaultNexusEventBus()
     {
-        eventBus = new EventBus( "nexus" );
-        finder = new HandlerReflector( eventBus );
-        latches = new HashMap<Class<?>, CountDownLatch>();
+        eventBus = new EventBus( "nexus" )
+        {
+            /** queues of events for the current thread to dispatch */
+            private final ThreadLocal<ConcurrentLinkedQueue<EventWithHandler>> eventsToDispatch =
+                new ThreadLocal<ConcurrentLinkedQueue<EventWithHandler>>()
+                {
+                    @Override
+                    protected ConcurrentLinkedQueue<EventWithHandler> initialValue()
+                    {
+                        return new ConcurrentLinkedQueue<EventWithHandler>();
+                    }
+                };
+
+            @Override
+            protected void enqueueEvent( final Object event, final EventHandler handler )
+            {
+                eventsToDispatch.get().offer( new EventWithHandler( event, handler ) );
+            }
+
+            @Override
+            protected void dispatchQueuedEvents()
+            {
+                while ( true )
+                {
+                    EventWithHandler eventWithHandler = eventsToDispatch.get().poll();
+                    if ( eventWithHandler == null )
+                    {
+                        break;
+                    }
+
+                    dispatch( eventWithHandler.event, eventWithHandler.handler );
+                }
+            }
+        };
     }
 
     @Override
-    public NexusEventBus register( final Object object )
+    public NexusEventBus register( final Object handler )
     {
-        finder.publishHandlerRegisteredFor( object );
-        eventBus.register( object );
+        eventBus.register( handler );
+        getLogger().debug( "Registered handler '{}'", handler );
         return this;
     }
 
     @Override
-    public NexusEventBus unregister( final Object object )
+    public NexusEventBus unregister( final Object handler )
     {
-        eventBus.unregister( object );
-        finder.publishHandlerUnregisteredFor( object );
+        eventBus.unregister( handler );
+        getLogger().debug( "Unregistered handler '{}'", handler );
         return this;
     }
 
     @Override
     public NexusEventBus post( final Object event )
     {
-        final CountDownLatch latch = latches.get( event.getClass() );
-        if ( latch != null )
-        {
-            try
-            {
-                latch.await();
-            }
-            catch ( InterruptedException e )
-            {
-                throw Throwables.propagate( e );
-            }
-        }
+        getLogger().debug( "Event '{}' fired", event );
         eventBus.post( event );
         return this;
-    }
-
-    @Override
-    public Latch lock( final Class<?>... eventTypes )
-    {
-        final CountDownLatch latch = new CountDownLatch( 1 );
-        for ( final Class<?> eventType : eventTypes )
-        {
-            latches.put( eventType, latch );
-        }
-        return new Latch()
-        {
-            @Override
-            public void release()
-            {
-                for ( final Class<?> eventType : eventTypes )
-                {
-                    latches.remove( eventType );
-                }
-                latch.countDown();
-            }
-        };
     }
 
 }

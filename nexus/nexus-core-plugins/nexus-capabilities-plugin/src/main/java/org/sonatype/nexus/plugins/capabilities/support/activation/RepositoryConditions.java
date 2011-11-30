@@ -24,11 +24,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.api.activation.ActivationContext;
+import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
-import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryEventsNotifier;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryLocalStatusCondition;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 
 /**
@@ -41,16 +41,16 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 public class RepositoryConditions
 {
 
-    private final RepositoryEventsNotifier repositoryEventsNotifier;
+    private final NexusEventBus eventBus;
 
-    private final ActivationContext activationContext;
+    private final RepositoryRegistry repositoryRegistry;
 
     @Inject
-    public RepositoryConditions( final ActivationContext activationContext,
-                                 final RepositoryEventsNotifier repositoryEventsNotifier )
+    public RepositoryConditions( final NexusEventBus eventBus,
+                                 final RepositoryRegistry repositoryRegistry )
     {
-        this.activationContext = checkNotNull( activationContext );
-        this.repositoryEventsNotifier = checkNotNull( repositoryEventsNotifier );
+        this.eventBus = checkNotNull( eventBus );
+        this.repositoryRegistry = checkNotNull( repositoryRegistry );
     }
 
     /**
@@ -61,9 +61,7 @@ public class RepositoryConditions
      */
     public Condition repositoryIsInService( final RepositoryId repositoryId )
     {
-        return new RepositoryLocalStatusCondition(
-            activationContext, repositoryEventsNotifier, LocalStatus.IN_SERVICE, repositoryId
-        );
+        return new RepositoryLocalStatusCondition( eventBus, repositoryRegistry, LocalStatus.IN_SERVICE, repositoryId );
     }
 
     /**
@@ -74,9 +72,7 @@ public class RepositoryConditions
      */
     public Condition repositoryExists( final RepositoryId repositoryId )
     {
-        return new RepositoryExistsCondition(
-            activationContext, repositoryEventsNotifier, repositoryId
-        );
+        return new RepositoryExistsCondition( eventBus, repositoryRegistry, repositoryId );
     }
 
     public static interface RepositoryId
