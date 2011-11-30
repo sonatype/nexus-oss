@@ -20,12 +20,11 @@ package org.sonatype.nexus.proxy;
 
 import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.Assert;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -61,8 +60,8 @@ public abstract class AbstractShadowRepositoryTest
         long lastRequest = System.currentTimeMillis() - 10 * A_DAY;
 
         // now set the lastRequest stamp programatically to both items to this "old" timestamp
-        shadowRepository.getAttributesHandler().touchItemLastRequested( lastRequest, shadowRepository, shadowRequest );
-        masterRepository.getAttributesHandler().touchItemLastRequested( lastRequest, masterRepository, masterRequest );
+        shadowRepository.getAttributesHandler().touchItemLastRequested( lastRequest, shadowItem );
+        masterRepository.getAttributesHandler().touchItemLastRequested( lastRequest, masterItem );
 
         // now request the object, the lastRequested timestamp should be updated
         shadowItem = shadowRepository.retrieveItem( shadowRequest );
@@ -70,7 +69,7 @@ public abstract class AbstractShadowRepositoryTest
 
         // verify that shadow item lastRequested is updated, but master is still untouched
         // the attribute load will give us items without UIDs!
-        StorageItem shadowItem1 =
+        Attributes shadowItem1 =
             shadowRepository.getAttributesHandler().getAttributeStorage().getAttributes(
                 shadowRepository.createUid( shadowPath ) );
         Assert.assertTrue( "Shadow must have updated lastRequested field!",
@@ -78,7 +77,7 @@ public abstract class AbstractShadowRepositoryTest
 
         // verify that shadow item lastRequested is updated, but master is still untouched
         // the attribute load will give us items without UIDs!
-        StorageItem masterItem1 =
+        Attributes masterItem1 =
             masterRepository.getAttributesHandler().getAttributeStorage().getAttributes(
                 masterRepository.createUid( masterPath ) );
         Assert.assertTrue( "Master must have untouched lastRequested field!",
@@ -102,15 +101,15 @@ public abstract class AbstractShadowRepositoryTest
             masterLastRequested >= shadowLastRequested );
 
         // check the shadow attributes programatically
-        shadowItem =
+        Attributes shadowItemAttrs =
             shadowRepository.getAttributesHandler().getAttributeStorage().getAttributes(
                 shadowRepository.createUid( shadowPath ) );
-        Assert.assertEquals( "The attributes differ", shadowLastRequested, shadowItem.getLastRequested() );
+        Assert.assertEquals( "The attributes differ", shadowLastRequested, shadowItemAttrs.getLastRequested() );
 
         // check the master attributes programatically
-        masterItem =
+        Attributes masterItemAttrs =
             masterRepository.getAttributesHandler().getAttributeStorage().getAttributes(
                 masterRepository.createUid( masterPath ) );
-        Assert.assertEquals( "The attributes differ", masterLastRequested, masterItem.getLastRequested() );
+        Assert.assertEquals( "The attributes differ", masterLastRequested, masterItemAttrs.getLastRequested() );
     }
 }

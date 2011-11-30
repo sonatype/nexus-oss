@@ -28,9 +28,7 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
 
 /**
  * AttributeStorage implementation driven by XStream.
@@ -72,12 +70,11 @@ public class DefaultAttributesHandlerTest
 
         assertThat( attributesHandler.getAttributeStorage().getAttributes( uid ), notNullValue() );
 
-        AbstractStorageItem item = attributesHandler.getAttributeStorage().getAttributes( uid );
+        Attributes item = attributesHandler.getAttributeStorage().getAttributes( uid );
 
-        assertThat( "Item should be assignable from StorageFileItem class",
-            StorageFileItem.class.isAssignableFrom( item.getClass() ) );
+        assertThat(item, notNullValue());
 
-        assertThat( item.getAttributes().get( "one" ), equalTo( "1" ) );
-        assertThat( item.getAttributes().get( "two" ), equalTo( "2" ) );
+        assertThat( item.get( "one" ), equalTo( "1" ) );
+        assertThat( item.get( "two" ), equalTo( "2" ) );
     }
 }

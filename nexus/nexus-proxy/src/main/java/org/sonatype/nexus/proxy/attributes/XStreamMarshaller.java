@@ -21,23 +21,21 @@ package org.sonatype.nexus.proxy.attributes;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
+import java.util.HashMap;
+import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageCompositeFileItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
-import org.sonatype.nexus.proxy.item.StorageItem;
-
+import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
+import com.thoughtworks.xstream.converters.collections.MapConverter;
 
 /**
  * The Nexus default marshaller: uses XStream to marshall complete StorageItem instances as XML.
  * 
  * @author cstamas
+ * @since 1.10.0
  */
 @Singleton
 @Named( "xstream-xml" )
@@ -49,27 +47,26 @@ public class XStreamMarshaller
     public XStreamMarshaller()
     {
         this.xstream = new XStream();
-        this.xstream.alias( "file", DefaultStorageFileItem.class );
-        this.xstream.alias( "compositeFile", DefaultStorageCompositeFileItem.class );
-        this.xstream.alias( "collection", DefaultStorageCollectionItem.class );
-        this.xstream.alias( "link", DefaultStorageLinkItem.class );
+        this.xstream.registerConverter( new MapConverter( xstream.getMapper() ) );
     }
 
     @Override
-    public void marshal( final StorageItem item, final OutputStream outputStream )
+    public void marshal( final Attributes item, final OutputStream outputStream )
         throws IOException
     {
-        xstream.toXML( item, outputStream );
+        final Map<String, String> attrs = new HashMap( item.asMap() );
+        xstream.toXML( attrs, outputStream );
         outputStream.flush();
     }
 
     @Override
-    public StorageItem unmarshal( final InputStream inputStream )
+    public Attributes unmarshal( final InputStream inputStream )
         throws IOException
     {
         try
         {
-            return (StorageItem) xstream.fromXML( inputStream );
+            final Map<String, String> copy = (Map<String, String>) xstream.fromXML( inputStream );
+            return new DefaultAttributes( copy );
         }
         catch ( NullPointerException e )
         {

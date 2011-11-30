@@ -666,7 +666,7 @@ public abstract class AbstractRepository
 
         if ( userAttributes != null )
         {
-            fItem.getAttributes().putAll( userAttributes );
+            fItem.getRepositoryItemAttributes().putAll( userAttributes );
         }
 
         storeItem( false, fItem );
@@ -684,7 +684,7 @@ public abstract class AbstractRepository
 
         if ( userAttributes != null )
         {
-            coll.getAttributes().putAll( userAttributes );
+            coll.getRepositoryItemAttributes().putAll( userAttributes );
         }
 
         storeItem( false, coll );
@@ -1317,14 +1317,6 @@ public abstract class AbstractRepository
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( "Item " + request.toString() + " found in local storage." );
-            }
-
-            // this "self correction" is needed to nexus build for himself the needed metadata
-            if ( localItem.getRemoteChecked() == 0 )
-            {
-                getAttributesHandler().touchItemRemoteChecked( this, request );
-
-                localItem = getLocalStorage().retrieveItem( this, request );
             }
         }
         catch ( ItemNotFoundException ex )

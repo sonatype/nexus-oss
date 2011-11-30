@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,12 +36,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
@@ -123,11 +126,22 @@ public class AbstractEvictTaskIt
                     StorageItem storageItem = (StorageItem) xstream.fromXML( fis );
                     IOUtil.close( fis );
 
-                    // update it
-                    long variation = ( 1258582311671l - storageItem.getLastRequested() ) + timestamp;
-                    storageItem.setLastRequested( variation + offset );
+                    // get old value, update it and set it, but all this is done using reflection
+                    // Direct method access will work, since we mangle an item that will be persisted using "old" format
+                    // Once item "upgraded", there is no backward way to downgrade it, to persist it using old format
+                    final Field field = AbstractStorageItem.class.getDeclaredField( "lastRequested" );
+                    field.setAccessible( true );
 
-                    // write it
+                    // get old value
+                    final long itemLastRequested = (Long) field.get( storageItem );
+
+                    // calculate the variation
+                    long variation = ( 1258582311671l - itemLastRequested ) + timestamp;
+
+                    // and set the value with reflection, since we will again persist it using XStream in "old" format
+                    field.set( storageItem, variation + offset );
+
+                    // write it out in "old" format
                     fos = new FileOutputStream( attributeFile );
                     xstream.toXML( storageItem, fos );
                     IOUtil.close( fos );
@@ -279,26 +293,6 @@ public class AbstractEvictTaskIt
         }
 
         return buffer.toString();
-    }
-
-    protected SortedSet<String> getAttributeFilePaths()
-        throws IOException
-    {
-        SortedSet<String> result = new TreeSet<String>();
-        
-        SortedSet<String> attributes = getFilePaths( new File( new File( nexusWorkDir ), "proxy/attributes" ) );
-        // SortedSet<String> attributes = getFilePaths( getStorageWorkDir() );
-
-        for ( String attribute : attributes )
-        {
-            // if ( attribute.contains( "/.nexus/attributes" ) && !attribute.contains( "/.nexus/trash/.nexus/attributes" ) )
-            //{
-                // "tweak" the path, since test is dumb
-                result.add( attribute.replace( "/.nexus/attributes", "" ) );
-            //}
-        }
-
-        return result;
     }
 
     protected SortedSet<String> getItemFilePaths()

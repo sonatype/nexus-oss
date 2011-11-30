@@ -39,10 +39,10 @@ import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.AttributeStorage;
+import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.attributes.DefaultAttributesHandler;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
@@ -194,7 +194,8 @@ public class DefaultFSLocalRepositoryStoragePerformanceITTest
         MatcherAssert.assertThat( storageItem, Matchers.notNullValue() );
         MatcherAssert.assertThat( storageItem.getLastRequested(), Matchers.greaterThan( originalLastAccessTime ) );
 
-        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).putAttribute( Mockito.<StorageItem> any() );
+        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).putAttributes( Mockito.<RepositoryItemUid> any(),
+            Mockito.<Attributes> any() );
         Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).getAttributes( Mockito.<RepositoryItemUid> any() );
 
     }
@@ -219,7 +220,8 @@ public class DefaultFSLocalRepositoryStoragePerformanceITTest
         MatcherAssert.assertThat( storageItem, Matchers.notNullValue() );
         MatcherAssert.assertThat( storageItem.getLastRequested(), Matchers.equalTo( originalLastAccessTime ) );
 
-        Mockito.verify( attributeStorageSpy, Mockito.times( 0 ) ).putAttribute( Mockito.<StorageItem> any() );
+        Mockito.verify( attributeStorageSpy, Mockito.times( 0 ) ).putAttributes( Mockito.<RepositoryItemUid> any(),
+            Mockito.<Attributes> any() );
         Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).getAttributes( Mockito.<RepositoryItemUid> any() );
 
     }
@@ -246,7 +248,8 @@ public class DefaultFSLocalRepositoryStoragePerformanceITTest
         MatcherAssert.assertThat( storageItem, Matchers.notNullValue() );
         MatcherAssert.assertThat( storageItem.getLastRequested(), Matchers.greaterThan( originalLastAccessTime ) );
 
-        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).putAttribute( Mockito.<StorageItem> any() );
+        Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).putAttributes( Mockito.<RepositoryItemUid> any(),
+            Mockito.<Attributes> any() );
         Mockito.verify( attributeStorageSpy, Mockito.times( 1 ) ).getAttributes( Mockito.<RepositoryItemUid> any() );
 
     }

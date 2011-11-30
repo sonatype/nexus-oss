@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.attributes.Attributes;
 
 /**
  * The Interface StorageItem, a top of the item abstraction.
@@ -175,8 +176,19 @@ public interface StorageItem
      * Gets the user attributes. These are saved and persisted.
      * 
      * @return the attributes
+     * @deprecated Use {@link #getRepositoryItemAttributes()} instead! While this method still returns a mutable map
+     * (a map "view" of {@link Attributes} returned by {@link #getRepositoryItemAttributes()}), the Map mutation
+     * over iterators (key, value or entry-set) is not implemented and will yield in runtime exception!
      */
+    @Deprecated
     Map<String, String> getAttributes();
+
+    /**
+     * Returns the item attributes. They are persisted and share lifecycle together with item.
+     * 
+     * @return the item attributes
+     */
+    Attributes getRepositoryItemAttributes();
 
     /**
      * Gets the item context. It is living only during item processing, it is not stored.
@@ -189,7 +201,10 @@ public interface StorageItem
      * Overlay.
      * 
      * @param item the item
+     * @deprecated This method is for internal use only. You really don't want to use this method, but to
+     * modify Attributes with {@link Attributes#get(String)} and {@link Attributes#put(String, String)} instead. See {@link Attributes}.
      */
+    @Deprecated
     void overlay( StorageItem item );
 
     /**

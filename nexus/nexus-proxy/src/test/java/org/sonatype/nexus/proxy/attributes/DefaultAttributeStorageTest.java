@@ -46,12 +46,12 @@ import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
 
 /**
  * AttributeStorage implementation driven by XStream.
- *
+ * 
  * @author cstamas
  */
-@BenchmarkHistoryChart()
-@BenchmarkMethodChart()
-@AxisRange(min = 0)
+@BenchmarkHistoryChart( )
+@BenchmarkMethodChart( )
+@AxisRange( min = 0 )
 public class DefaultAttributeStorageTest
     extends AbstractNexusTestEnvironment
 {
@@ -100,7 +100,7 @@ public class DefaultAttributeStorageTest
         {
             FileUtils.deleteDirectory( ( (DefaultFSAttributeStorage) attributeStorage ).getWorkingDirectory() );
         }
-        else if (attributeStorage instanceof DefaultLSAttributeStorage)
+        else if ( attributeStorage instanceof DefaultLSAttributeStorage )
         {
             FileUtils.deleteDirectory( new File( localStorageDirectory, ".nexus/attributes" ) );
         }
@@ -118,13 +118,13 @@ public class DefaultAttributeStorageTest
 
         file.getAttributes().put( "kuku", "kuku" );
 
-        attributeStorage.putAttribute( file );
+        attributeStorage.putAttributes( file.getRepositoryItemUid(), file.getRepositoryItemAttributes() );
 
         RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
-        DefaultStorageFileItem file1 = (DefaultStorageFileItem) attributeStorage.getAttributes( uid );
+        Attributes file1 = attributeStorage.getAttributes( uid );
 
-        assertTrue( file1.getAttributes().containsKey( "kuku" ) );
-        assertTrue( "kuku".equals( file1.getAttributes().get( "kuku" ) ) );
+        assertTrue( file1.containsKey( "kuku" ) );
+        assertTrue( "kuku".equals( file1.get( "kuku" ) ) );
     }
 
     @Test
@@ -137,18 +137,20 @@ public class DefaultAttributeStorageTest
 
         file.getAttributes().put( "kuku", "kuku" );
 
-        attributeStorage.putAttribute( file );
+        attributeStorage.putAttributes( file.getRepositoryItemUid(), file.getRepositoryItemAttributes() );
 
         RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
-        DefaultStorageFileItem file1 = (DefaultStorageFileItem) attributeStorage.getAttributes( uid );
+        Attributes file1 = attributeStorage.getAttributes( uid );
 
-        assertTrue( file1.getAttributes().containsKey( "kuku" ) );
-        assertTrue( "kuku".equals( file1.getAttributes().get( "kuku" ) ) );
+        assertTrue( file1.containsKey( "kuku" ) );
+        assertTrue( "kuku".equals( file1.get( "kuku" ) ) );
 
         // this above is same as in testSimplePutGet(), but now we will replace the attribute file
 
         // reverted back to "old" attributes
-        File attributeFile = new File( ((DefaultFSAttributeStorage)attributeStorage).getWorkingDirectory(), repository.getId() + "/a.txt" );
+        File attributeFile =
+            new File( ( (DefaultFSAttributeStorage) attributeStorage ).getWorkingDirectory(), repository.getId()
+                + "/a.txt" );
         // File attributeFile = new File( localStorageDirectory, ".nexus/attributes/a.txt" );
 
         FileUtils.fileWrite( attributeFile.getAbsolutePath(), "<file" );
@@ -156,7 +158,7 @@ public class DefaultAttributeStorageTest
         // try to read it, we should not get NPE
         try
         {
-            file1 = (DefaultStorageFileItem) attributeStorage.getAttributes( uid );
+            file1 = attributeStorage.getAttributes( uid );
         }
         catch ( NullPointerException e )
         {
@@ -176,7 +178,7 @@ public class DefaultAttributeStorageTest
 
         file.getAttributes().put( "kuku", "kuku" );
 
-        attributeStorage.putAttribute( file );
+        attributeStorage.putAttributes( file.getRepositoryItemUid(), file.getRepositoryItemAttributes() );
 
         RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "/b.txt" );
 

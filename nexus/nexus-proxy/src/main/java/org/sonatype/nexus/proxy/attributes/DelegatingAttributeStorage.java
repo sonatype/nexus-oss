@@ -18,73 +18,84 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.uid.IsMetadataMaintainedAttribute;
+
+import com.google.common.base.Preconditions;
 
 /**
- * AttributeStorage that actually delegates the work to other instance of AttributeStorage, and having an option of
- * "fallback" to some other instance. Usable for scenarios where "transitioning" (smooth upgrade for example) is to be
- * used, the "main" attribute storage would be "upgraded" from "legacy" attribute storage as the attributes are
- * requested over the time from this instance.
+ * Simple wrapping AttributeStorage that delegates only when needed.
  * 
  * @author cstamas
+ * @since 1.10.0
  */
-// @Typed( AttributeStorage.class )
-// @Named( "delegating" )
-// @Singleton
 public class DelegatingAttributeStorage
-    extends AbstractLoggingComponent
+    extends AbstractAttributeStorage
     implements AttributeStorage
 {
-    private final AttributeStorage mainAttributeStorage;
+    private final AttributeStorage delegate;
 
-    private final AttributeStorage fallbackAttributeStorage;
-
-    public DelegatingAttributeStorage( final AttributeStorage mainAttributeStorage,
-                                       final AttributeStorage fallbackAttributeStorage )
+    public DelegatingAttributeStorage( final AttributeStorage delegate )
     {
-        super();
-        this.mainAttributeStorage = mainAttributeStorage;
-        this.fallbackAttributeStorage = fallbackAttributeStorage;
+        this.delegate = Preconditions.checkNotNull( delegate );
+    }
+
+    public AttributeStorage getDelegate()
+    {
+        return delegate;
     }
 
     @Override
-    public AbstractStorageItem getAttributes( RepositoryItemUid uid )
+    public Attributes getAttributes( RepositoryItemUid uid )
     {
-        AbstractStorageItem result = mainAttributeStorage.getAttributes( uid );
-
-        if ( result == null && fallbackAttributeStorage != null )
+        if ( isMetadataMaintained( uid ) )
         {
-            result = fallbackAttributeStorage.getAttributes( uid );
-
-            if ( result != null )
-            {
-                mainAttributeStorage.putAttribute( result );
-                fallbackAttributeStorage.deleteAttributes( uid );
-            }
+            return delegate.getAttributes( uid );
         }
 
-        return result;
+        return null;
     }
 
     @Override
-    public void putAttribute( StorageItem item )
+    public void putAttributes( RepositoryItemUid uid, Attributes attributes )
     {
-        mainAttributeStorage.putAttribute( item );
-
-        if ( fallbackAttributeStorage != null )
+        if ( isMetadataMaintained( uid ) )
         {
-            fallbackAttributeStorage.deleteAttributes( item.getRepositoryItemUid() );
+            delegate.putAttributes( uid, attributes );
         }
     }
 
     @Override
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
-        return mainAttributeStorage.deleteAttributes( uid )
-            || ( fallbackAttributeStorage != null && fallbackAttributeStorage.deleteAttributes( uid ) );
+        if ( isMetadataMaintained( uid ) )
+        {
+            return delegate.deleteAttributes( uid );
+        }
+
+        return false;
     }
 
+    // ==
+
+    /**
+     * Returns true if the attributes should be maintained at all.
+     * 
+     * @param uid
+     * @return true if attributes should exists for given UID.
+     */
+    protected boolean isMetadataMaintained( final RepositoryItemUid uid )
+    {
+        Boolean isMetadataMaintained = uid.getAttributeValue( IsMetadataMaintainedAttribute.class );
+
+        if ( isMetadataMaintained != null )
+        {
+            return isMetadataMaintained.booleanValue();
+        }
+        else
+        {
+            // safest
+            return true;
+        }
+    }
 }

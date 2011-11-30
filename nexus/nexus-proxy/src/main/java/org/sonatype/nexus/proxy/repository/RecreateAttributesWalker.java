@@ -45,7 +45,7 @@ public class RecreateAttributesWalker
     {
         if ( getInitialData() != null )
         {
-            item.getAttributes().putAll( initialData );
+            item.getRepositoryItemAttributes().putAll( initialData );
         }
 
         getRepository().getAttributesHandler().storeAttributes( item, item.getContentLocator() );

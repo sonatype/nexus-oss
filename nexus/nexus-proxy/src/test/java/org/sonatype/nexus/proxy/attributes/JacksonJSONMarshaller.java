@@ -21,17 +21,15 @@ package org.sonatype.nexus.proxy.attributes;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.codehaus.jackson.annotate.JsonMethod;
-import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.item.StorageItem;
+import org.codehaus.jackson.type.TypeReference;
+import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 
 /**
  * Jackson JSON Attribute marshaller. Part of NEXUS-4628 "alternate" AttributeStorage implementations.
@@ -46,30 +44,24 @@ public class JacksonJSONMarshaller
     public JacksonJSONMarshaller()
     {
         this.objectMapper = new ObjectMapper();
-        objectMapper.setVisibility( JsonMethod.FIELD, JsonAutoDetect.Visibility.ANY ) // auto-detect all member fields
-        .setVisibility( JsonMethod.GETTER, JsonAutoDetect.Visibility.NONE ) // but only public getters
-        .setVisibility( JsonMethod.IS_GETTER, JsonAutoDetect.Visibility.NONE ); // and none of "is-setters"
-
-        objectMapper.disable( DeserializationConfig.Feature.AUTO_DETECT_SETTERS );
-        objectMapper.disable( SerializationConfig.Feature.AUTO_DETECT_GETTERS );
-        objectMapper.disable( SerializationConfig.Feature.AUTO_DETECT_IS_GETTERS );
-
         objectMapper.writerWithDefaultPrettyPrinter();
     }
 
     @Override
-    public void marshal( final StorageItem item, final OutputStream outputStream )
+    public void marshal( final Attributes item, final OutputStream outputStream )
         throws IOException
     {
-        objectMapper.writeValue( outputStream, item );
+        final Map<String, String> attrs = new HashMap( item.asMap() );
+        objectMapper.writeValue( outputStream, attrs );
         outputStream.flush();
     }
 
     @Override
-    public StorageItem unmarshal( final InputStream inputStream )
+    public Attributes unmarshal( final InputStream inputStream )
         throws IOException
     {
-        return objectMapper.readValue( inputStream, DefaultStorageFileItem.class );
+        final Map<String, String> attributesMap = objectMapper.readValue( inputStream, new TypeReference<Map<String, String>>() {} );
+        return new DefaultAttributes( attributesMap );
     }
 
 }

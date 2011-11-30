@@ -378,12 +378,12 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 }
             }
             else if ( req.getConditions().getNoneMatch() != null && req.getConditions().getNoneMatch().size() > 0
-                && file.getAttributes().containsKey( DigestCalculatingInspector.DIGEST_SHA1_KEY ) )
+                && file.getRepositoryItemAttributes().containsKey( DigestCalculatingInspector.DIGEST_SHA1_KEY ) )
             {
                 Tag tag = req.getConditions().getNoneMatch().get( 0 );
 
                 // this is a conditional get using ETag
-                if ( !file.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ).equals( tag.getName() ) )
+                if ( !file.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ).equals( tag.getName() ) )
                 {
                     result = new StorageFileItemRepresentation( file );
                 }
@@ -712,7 +712,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
         result.addProperty( "virtual=" + item.isVirtual() );
 
         // attributes
-        for ( Map.Entry<String, String> entry : item.getAttributes().entrySet() )
+        for ( Map.Entry<String, String> entry : item.getRepositoryItemAttributes().asMap().entrySet() )
         {
             result.addAttribute( entry.toString() );
         }

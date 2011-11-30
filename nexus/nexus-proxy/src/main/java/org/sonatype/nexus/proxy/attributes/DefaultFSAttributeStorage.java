@@ -34,11 +34,8 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.access.Action;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
-import org.sonatype.nexus.proxy.item.StorageCollectionItem;
-import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
@@ -83,6 +80,7 @@ public class DefaultFSAttributeStorage
         this.applicationConfiguration = applicationConfiguration;
         this.applicationEventMulticaster = applicationEventMulticaster;
         this.marshaller = marshaller;
+        getLogger().info( "Default FS AttributeStorage in place." );
     }
 
     // == Events to keep config in sync
@@ -124,7 +122,7 @@ public class DefaultFSAttributeStorage
     {
         if ( workingDirectory == null )
         {
-            workingDirectory = applicationConfiguration.getWorkingDirectory( "proxy/attributes" );
+            workingDirectory = applicationConfiguration.getWorkingDirectory( "proxy/attributes-ng" );
 
             if ( workingDirectory.exists() )
             {
@@ -161,12 +159,6 @@ public class DefaultFSAttributeStorage
 
     public boolean deleteAttributes( final RepositoryItemUid uid )
     {
-        if ( !isMetadataMaintained( uid ) )
-        {
-            // do nothing
-            return false;
-        }
-
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.delete );
@@ -199,14 +191,8 @@ public class DefaultFSAttributeStorage
         }
     }
 
-    public AbstractStorageItem getAttributes( final RepositoryItemUid uid )
+    public Attributes getAttributes( final RepositoryItemUid uid )
     {
-        if ( !isMetadataMaintained( uid ) )
-        {
-            // do nothing
-            return null;
-        }
-
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.read );
@@ -220,11 +206,7 @@ public class DefaultFSAttributeStorage
 
             try
             {
-                AbstractStorageItem result = null;
-
-                result = doGetAttributes( uid );
-
-                return result;
+                return doGetAttributes( uid );
             }
             catch ( IOException ex )
             {
@@ -239,53 +221,37 @@ public class DefaultFSAttributeStorage
         }
     }
 
-    public void putAttribute( StorageItem item )
+    public void putAttributes( final RepositoryItemUid uid, Attributes attributes )
     {
-        if ( !isMetadataMaintained( item.getRepositoryItemUid() ) )
-        {
-            // do nothing
-            return;
-        }
-
-        final RepositoryItemUid origUid = item.getRepositoryItemUid();
-
-        final RepositoryItemUidLock uidLock = origUid.getAttributeLock();
+        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.create );
 
         try
         {
-            if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
-            {
-                // not saving attributes for directories anymore
-                return;
-            }
-
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug( "Storing attributes on UID=" + item.getRepositoryItemUid() );
+                getLogger().debug( "Storing attributes on UID=" + uid.toString() );
             }
 
             try
             {
-                AbstractStorageItem onDisk = doGetAttributes( item.getRepositoryItemUid() );
+                Attributes onDisk = doGetAttributes( uid );
 
-                if ( onDisk != null && ( onDisk.getGeneration() > item.getGeneration() ) )
+                if ( onDisk != null && ( onDisk.getGeneration() > attributes.getGeneration() ) )
                 {
-                    // change detected, overlay the to be saved onto the newer one and swap
-                    onDisk.setResourceStoreRequest( item.getResourceStoreRequest() );
-
-                    onDisk.overlay( item );
+                    onDisk.overlayAttributes( attributes );
 
                     // and overlay other things too
-                    onDisk.setRepositoryItemUid( item.getRepositoryItemUid() );
-                    onDisk.setReadable( item.isReadable() );
-                    onDisk.setWritable( item.isWritable() );
+                    onDisk.setRepositoryId( uid.getRepository().getId() );
+                    onDisk.setPath( uid.getPath() );
+                    onDisk.setReadable( attributes.isReadable() );
+                    onDisk.setWritable( attributes.isWritable() );
 
-                    item = onDisk;
+                    attributes = onDisk;
                 }
 
-                File target = getFileFromBase( item.getRepositoryItemUid() );
+                File target = getFileFromBase( uid );
 
                 target.getParentFile().mkdirs();
 
@@ -297,9 +263,9 @@ public class DefaultFSAttributeStorage
                     {
                         fos = new FileOutputStream( target );
 
-                        item.incrementGeneration();
+                        attributes.incrementGeneration();
 
-                        marshaller.marshal( item, fos );
+                        marshaller.marshal( attributes, fos );
                     }
                     finally
                     {
@@ -309,13 +275,13 @@ public class DefaultFSAttributeStorage
                 else
                 {
                     getLogger().error(
-                        "Could not store attributes on UID=" + item.getRepositoryItemUid()
+                        "Could not store attributes on UID=" + uid.toString()
                             + ", parent exists but is not a directory!" );
                 }
             }
             catch ( IOException ex )
             {
-                getLogger().error( "Got IOException during store of UID=" + item.getRepositoryItemUid(), ex );
+                getLogger().error( "Got IOException during store of UID=" + uid.toString(), ex );
             }
         }
         finally
@@ -366,12 +332,12 @@ public class DefaultFSAttributeStorage
      * @return the attributes
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    protected AbstractStorageItem doGetAttributes( final RepositoryItemUid uid )
+    protected Attributes doGetAttributes( final RepositoryItemUid uid )
         throws IOException
     {
         final File target = getFileFromBase( uid );
 
-        AbstractStorageItem result = null;
+        Attributes result = null;
 
         boolean corrupt = false;
 
@@ -383,14 +349,15 @@ public class DefaultFSAttributeStorage
             {
                 fis = new FileInputStream( target );
 
-                result = (AbstractStorageItem) marshaller.unmarshal( fis );
+                result = marshaller.unmarshal( fis );
 
-                result.setRepositoryItemUid( uid );
+                result.setRepositoryId( uid.getRepository().getId() );
+                result.setPath( uid.getPath() );
 
                 // fixing remoteChecked
-                if ( result.getRemoteChecked() == 0 || result.getRemoteChecked() == 1 )
+                if ( result.getCheckedRemotely() == 0 || result.getCheckedRemotely() == 1 )
                 {
-                    result.setRemoteChecked( System.currentTimeMillis() );
+                    result.setCheckedRemotely( System.currentTimeMillis() );
 
                     result.setExpired( true );
                 }

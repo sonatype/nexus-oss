@@ -38,9 +38,14 @@ public class StorageFileItemRepresentation
 
         setSize( file.getLength() );
 
-        if ( file.getAttributes().containsKey( DigestCalculatingInspector.DIGEST_SHA1_KEY ) )
+        if ( file.getRepositoryItemAttributes().containsKey( DigestCalculatingInspector.DIGEST_SHA1_KEY ) )
         {
-            setTag( new Tag( file.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ), false ) );
+            // Shield SHA1
+            // {SHA1{xxxx}}
+            final String tag =
+                String.format( "{SHA1{%s}}",
+                    file.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) );
+            setTag( new Tag( tag, false ) );
         }
 
         if ( file.getItemContext().containsKey( AbstractResourceStoreContentPlexusResource.OVERRIDE_FILENAME_KEY ) )

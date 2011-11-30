@@ -19,35 +19,16 @@
 package org.sonatype.nexus.proxy.attributes;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.uid.IsMetadataMaintainedAttribute;
 
 /**
  * Abstract superclass for AttributeStorage implementations.
  * 
  * @author cstamas
+ * @since 1.10.0
  */
 public abstract class AbstractAttributeStorage
     extends AbstractLoggingComponent
+    implements AttributeStorage
 {
-    /**
-     * Returns true if the attributes should be maintained at all.
-     * 
-     * @param uid
-     * @return true if attributes should exists for given UID.
-     */
-    protected boolean isMetadataMaintained( RepositoryItemUid uid )
-    {
-        Boolean isMetadataMaintained = uid.getAttributeValue( IsMetadataMaintainedAttribute.class );
 
-        if ( isMetadataMaintained != null )
-        {
-            return isMetadataMaintained.booleanValue();
-        }
-        else
-        {
-            // safest
-            return true;
-        }
-    }
 }

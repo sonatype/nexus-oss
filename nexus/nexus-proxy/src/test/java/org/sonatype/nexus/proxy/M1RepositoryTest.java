@@ -22,14 +22,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
-
-import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -201,7 +200,7 @@ public class M1RepositoryTest
         Assert.assertTrue( resultItem.getLastRequested() + " > " + lastRequest, resultItem.getLastRequested() > lastRequest );
 
         // check the shadow attributes
-        AbstractStorageItem shadowStorageItem = repository.getAttributesHandler().getAttributeStorage().getAttributes( repository.createUid( request.getRequestPath() ) );
+        Attributes shadowStorageItem = repository.getAttributesHandler().getAttributeStorage().getAttributes( repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
 
@@ -230,7 +229,7 @@ public class M1RepositoryTest
         Assert.assertTrue( resultItem.getLastRequested() > lastRequest );
 
         // check the shadow attributes
-        AbstractStorageItem shadowStorageItem = repository.getAttributesHandler().getAttributeStorage().getAttributes( repository.createUid( request.getRequestPath() ) );
+        Attributes shadowStorageItem = repository.getAttributesHandler().getAttributeStorage().getAttributes( repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
 

@@ -161,7 +161,7 @@ public class ArtifactResolvePlexusResource
 
             if ( resolvedFile != null )
             {
-                resource.setSha1( resolvedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) );
+                resource.setSha1( resolvedFile.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) );
             }
 
             resource.setGroupId( resolvedGav.getGroupId() );

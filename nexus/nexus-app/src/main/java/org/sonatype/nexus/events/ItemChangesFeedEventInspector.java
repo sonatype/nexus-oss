@@ -104,7 +104,7 @@ public class ItemChangesFeedEventInspector
                 // set context
                 nae.addEventContext( ievt.getItemContext() );
                 // set attributes
-                nae.addItemAttributes( ievt.getItem().getAttributes() );
+                nae.addItemAttributes( ievt.getItem().getRepositoryItemAttributes().asMap() );
 
                 getFeedRecorder().addNexusArtifactEvent( nae );
             }
