@@ -39,6 +39,13 @@ import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineException;
 import com.google.common.base.Predicate;
 
+/**
+ * This is the "real thing": implementation backed by spice Timeline. Until now, it was in Core, but it kept
+ * many important and key dependencies in core too, and making Nexus Core literally a hostage of it.
+ *
+ * @author cstamas
+ * @since 1.10.0
+ */
 @Component( role = NexusTimeline.class, hint = "real" )
 public class RealNexusTimeline
     implements NexusTimeline, Initializable, Startable

@@ -9,6 +9,7 @@ import com.google.common.base.Preconditions;
  * Wrapping timeline record into Entry.
  *
  * @author: cstamas
+ * @since 1.10.0
  */
 public class TimelineRecordWrapper
     implements Entry
