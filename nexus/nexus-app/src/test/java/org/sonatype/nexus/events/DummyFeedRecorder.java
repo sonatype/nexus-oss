@@ -27,8 +27,8 @@ import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
-import org.sonatype.timeline.TimelineFilter;
-import org.sonatype.timeline.TimelineResult;
+import org.sonatype.nexus.timeline.Entry;
+import com.google.common.base.Predicate;
 
 public class DummyFeedRecorder
     implements FeedRecorder
@@ -46,31 +46,27 @@ public class DummyFeedRecorder
     }
 
     @Override
-    public void addErrorWarningEvent( String action, String message )
+    public void addErrorWarningEvent( final String action, final String message )
     {
-        // TODO Auto-generated method stub
-
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void addErrorWarningEvent( String action, String message, Throwable throwable )
+    public void addErrorWarningEvent( final String action, final String message, final Throwable throwable )
     {
-        // TODO Auto-generated method stub
-
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void addNexusArtifactEvent( NexusArtifactEvent nae )
+    public void addNexusArtifactEvent( final NexusArtifactEvent nae )
     {
-        // TODO Auto-generated method stub
-
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void addSystemEvent( String action, String message )
+    public void addSystemEvent( final String action, final String message )
     {
-        // TODO Auto-generated method stub
-
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
@@ -80,70 +76,58 @@ public class DummyFeedRecorder
     }
 
     @Override
-    public SystemProcess systemProcessStarted( String action, String message )
+    public SystemProcess systemProcessStarted( final String action, final String message )
     {
-        // TODO Auto-generated method stub
-        return null;
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void systemProcessFinished( SystemProcess prc, String finishMessage )
+    public void systemProcessFinished( final SystemProcess prc, final String finishMessage )
     {
-        // TODO Auto-generated method stub
-
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void systemProcessCanceled( SystemProcess prc, String cancelMessage )
+    public void systemProcessCanceled( final SystemProcess prc, final String cancelMessage )
     {
-        // TODO Auto-generated method stub
-
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void systemProcessBroken( SystemProcess prc, Throwable e )
+    public void systemProcessBroken( final SystemProcess prc, final Throwable e )
     {
-        // TODO Auto-generated method stub
-
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public TimelineResult getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
-                                     TimelineFilter filter )
+    public List<NexusArtifactEvent> getNexusArtifectEvents( final Set<String> subtypes, final Integer from,
+                                                            final Integer count,
+                                                            final Predicate<Entry> filter )
     {
-        // TODO Auto-generated method stub
-        return null;
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
-                                                            TimelineFilter filter )
+    public List<SystemEvent> getSystemEvents( final Set<String> subtypes, final Integer from, final Integer count,
+                                              final Predicate<Entry> filter )
     {
-        // TODO Auto-generated method stub
-        return null;
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter )
+    public List<AuthcAuthzEvent> getAuthcAuthzEvents( final Set<String> subtypes, final Integer from,
+                                                      final Integer count,
+                                                      final Predicate<Entry> filter )
     {
-        // TODO Auto-generated method stub
-        return null;
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count,
-                                                      TimelineFilter filter )
+    public List<ErrorWarningEvent> getErrorWarningEvents( final Set<String> subtypes, final Integer from,
+                                                          final Integer count,
+                                                          final Predicate<Entry> filter )
     {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count,
-                                                          TimelineFilter filter )
-    {
-        // TODO Auto-generated method stub
-        return null;
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
 }

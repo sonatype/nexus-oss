@@ -18,33 +18,30 @@
  */
 package org.sonatype.nexus.timeline;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.sonatype.nexus.feeds.DefaultFeedRecorder;
-import org.sonatype.timeline.TimelineFilter;
-import org.sonatype.timeline.TimelineRecord;
+import org.sonatype.nexus.test.NexusTestSupport;
 
-public class RepositoryIdTimelineFilter
-    implements TimelineFilter
+public abstract class AbstractTimelineTest
+    extends NexusTestSupport
 {
-    private final Set<String> repositoryIds;
-
-    public RepositoryIdTimelineFilter( String repositoryId )
+    /**
+     * Handy method that does what was done before: keeps all in memory, but this is usable for small amount of data,
+     * like these in UT. This should NOT be used in production code, unless you want app that kills itself with OOM.
+     * 
+     * @param result
+     * @return
+     */
+    protected List<Entry> asList( Entries result )
     {
-        this.repositoryIds = new HashSet<String>();
+        ArrayList<Entry> records = new ArrayList<Entry>();
 
-        this.repositoryIds.add( repositoryId );
-    }
+        for ( Entry rec : result )
+        {
+            records.add( rec );
+        }
 
-    public RepositoryIdTimelineFilter( Set<String> repositoryIds )
-    {
-        this.repositoryIds = repositoryIds;
-    }
-
-    public boolean accept( TimelineRecord hit )
-    {
-        return ( hit.getData().containsKey( DefaultFeedRecorder.REPOSITORY ) && repositoryIds.contains( hit.getData().get(
-            DefaultFeedRecorder.REPOSITORY ) ) );
+        return records;
     }
 }

@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.junit.Test;
-import org.sonatype.timeline.TimelineRecord;
 
 public class DefaultNexusTimelineTest
     extends AbstractTimelineTest
@@ -36,7 +35,7 @@ public class DefaultNexusTimelineTest
     {
         super.setUp();
 
-        nexusTimeline = (NexusTimeline) this.lookup( NexusTimeline.class );
+        nexusTimeline = (NexusTimeline) this.lookup( NexusTimeline.class, "real" );
     }
 
     protected void tearDown()
@@ -56,7 +55,7 @@ public class DefaultNexusTimelineTest
 
         nexusTimeline.add( System.currentTimeMillis() - 1L * 60L * 60L * 1000L, "TEST", "2", data );
 
-        List<TimelineRecord> res =
+        List<Entry> res =
             asList( nexusTimeline.retrieve( 1, 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
                 new HashSet<String>( Arrays.asList( new String[] { "1" } ) ), null ) );
 
@@ -92,7 +91,7 @@ public class DefaultNexusTimelineTest
 
         nexusTimeline.add( System.currentTimeMillis() - 1L * 60L * 60L * 1000L, "TEST", "2", data );
 
-        List<TimelineRecord> res =
+        List<Entry> res =
             asList( nexusTimeline.retrieve( 0, 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
                 null, null ) );
 
@@ -162,7 +161,7 @@ public class DefaultNexusTimelineTest
 
         nexusTimeline.add( System.currentTimeMillis() - 1L * 60L * 60L * 1000L, "TEST", "1", data );
 
-        List<TimelineRecord> res =
+        List<Entry> res =
             asList( nexusTimeline.retrieve( 0, 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
                 new HashSet<String>( Arrays.asList( new String[] { "1" } ) ), null ) );
 

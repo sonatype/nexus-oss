@@ -37,13 +37,13 @@ import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.timeline.Timeline;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineException;
-import org.sonatype.timeline.TimelineFilter;
-import org.sonatype.timeline.TimelineResult;
+import com.google.common.base.Predicate;
 
-@Component( role = NexusTimeline.class )
-public class DefaultNexusTimeline
+@Component( role = NexusTimeline.class, hint = "real" )
+public class RealNexusTimeline
     implements NexusTimeline, Initializable, Startable
 {
+
     private static final String TIMELINE_BASEDIR = "timeline";
 
     private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
@@ -80,7 +80,7 @@ public class DefaultNexusTimeline
         try
         {
             getLogger().info( "Starting Nexus Timeline..." );
-            
+
             updateConfiguration();
         }
         catch ( TimelineException e )
@@ -148,6 +148,7 @@ public class DefaultNexusTimeline
         timeline.configure( config );
     }
 
+    @Override
     public void add( long timestamp, String type, String subType, Map<String, String> data )
     {
         // FIXME shouldn't handle this exception here, must handle the shutdown cycle properly
@@ -161,14 +162,32 @@ public class DefaultNexusTimeline
         }
     }
 
-    public TimelineResult retrieve( int fromItem, int count, Set<String> types, Set<String> subtypes,
-                                    TimelineFilter filter )
+    @Override
+    public Entries retrieve( int fromItem, int count, Set<String> types, Set<String> subtypes,
+                             Predicate<Entry> filter )
     {
-        return timeline.retrieve( fromItem, count, types, subtypes, filter );
+        if ( filter != null )
+        {
+            return new TimelineResultWrapper(
+                timeline.retrieve( fromItem, count, types, subtypes, new PredicateTimelineFilter( filter ) ) );
+        }
+        else
+        {
+            return new TimelineResultWrapper(
+                timeline.retrieve( fromItem, count, types, subtypes, null ) );
+        }
     }
 
-    public int purgeOlderThan( long timestamp, Set<String> types, Set<String> subTypes, TimelineFilter filter )
+    @Override
+    public int purgeOlderThan( long timestamp, Set<String> types, Set<String> subTypes, Predicate<Entry> filter )
     {
-        return timeline.purgeOlderThan( timestamp, types, subTypes, filter );
+        if ( filter != null )
+        {
+            return timeline.purgeOlderThan( timestamp, types, subTypes, new PredicateTimelineFilter( filter ) );
+        }
+        else
+        {
+            return timeline.purgeOlderThan( timestamp, types, subTypes, null );
+        }
     }
 }

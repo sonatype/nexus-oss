@@ -28,7 +28,6 @@ import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
-import org.sonatype.timeline.TimelineException;
 
 /**
  * Listens to {@link LoggingEvent}s of ERROR/WARN level and creates corresponding {@link FeedRecorder} entries. It is an
@@ -93,7 +92,7 @@ public class LoggingToFeedEventInspector
         if ( throwable != null )
         {
             String exClassName = throwable.getClass().getName();
-            if ( TimelineException.class.getName().equals( exClassName )
+            if ( "org.sonatype.timeline.TimelineException".equals( exClassName )
                 || ( exClassName.endsWith( "EofException" ) && exClassName.contains( "jetty" ) ) )
             {
                 return true;

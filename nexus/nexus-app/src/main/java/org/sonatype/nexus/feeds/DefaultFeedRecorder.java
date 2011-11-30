@@ -35,20 +35,21 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.logging.Slf4jPlexusLogger;
+import org.sonatype.nexus.timeline.Entries;
+import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.nexus.timeline.NexusTimeline;
-import org.sonatype.timeline.TimelineFilter;
-import org.sonatype.timeline.TimelineRecord;
-import org.sonatype.timeline.TimelineResult;
+import com.google.common.base.Predicate;
 
 /**
  * A feed recorder that uses DefaultNexus to record feeds.
- * 
+ *
  * @author cstamas
  */
 @Component( role = FeedRecorder.class )
 public class DefaultFeedRecorder
     implements FeedRecorder
 {
+
     public static final int DEFAULT_PAGE_SIZE = 40;
 
     public static final String REPOSITORY = "r";
@@ -75,6 +76,7 @@ public class DefaultFeedRecorder
     private static final String REPO_EVENT_TYPE = "REPO_EVENTS";
 
     private static final Set<String> REPO_EVENT_TYPE_SET = new HashSet<String>( 1 );
+
     {
         REPO_EVENT_TYPE_SET.add( REPO_EVENT_TYPE );
     }
@@ -85,6 +87,7 @@ public class DefaultFeedRecorder
     private static final String SYSTEM_EVENT_TYPE = "SYSTEM";
 
     private static final Set<String> SYSTEM_EVENT_TYPE_SET = new HashSet<String>( 1 );
+
     {
         SYSTEM_EVENT_TYPE_SET.add( SYSTEM_EVENT_TYPE );
     }
@@ -95,6 +98,7 @@ public class DefaultFeedRecorder
     private static final String AUTHC_AUTHZ_EVENT_TYPE = "AUTHC_AUTHZ";
 
     private static final Set<String> AUTHC_AUTHZ_EVENT_TYPE_SET = new HashSet<String>( 1 );
+
     {
         AUTHC_AUTHZ_EVENT_TYPE_SET.add( AUTHC_AUTHZ_EVENT_TYPE );
     }
@@ -105,6 +109,7 @@ public class DefaultFeedRecorder
     private static final String ERROR_WARNING_EVENT_TYPE = "ERROR_WARNING";
 
     private static final Set<String> ERROR_WARNING_EVENT_TYPE_SET = new HashSet<String>( 1 );
+
     {
         ERROR_WARNING_EVENT_TYPE_SET.add( ERROR_WARNING_EVENT_TYPE );
     }
@@ -156,11 +161,11 @@ public class DefaultFeedRecorder
         return eventDate;
     }
 
-    protected List<NexusArtifactEvent> getAisFromMaps( TimelineResult data )
+    protected List<NexusArtifactEvent> getAisFromMaps( Entries data )
     {
         List<NexusArtifactEvent> result = new ArrayList<NexusArtifactEvent>();
 
-        for ( TimelineRecord record : data )
+        for ( Entry record : data )
         {
             Map<String, String> map = record.getData();
 
@@ -213,11 +218,11 @@ public class DefaultFeedRecorder
         return this.feedArtifactEventFilter.filterArtifactEventList( result );
     }
 
-    protected List<SystemEvent> getSesFromMaps( TimelineResult data )
+    protected List<SystemEvent> getSesFromMaps( Entries data )
     {
         List<SystemEvent> result = new ArrayList<SystemEvent>();
 
-        for ( TimelineRecord record : data )
+        for ( Entry record : data )
         {
             Map<String, String> map = record.getData();
 
@@ -241,11 +246,11 @@ public class DefaultFeedRecorder
         return result;
     }
 
-    protected List<AuthcAuthzEvent> getAaesFromMaps( TimelineResult data )
+    protected List<AuthcAuthzEvent> getAaesFromMaps( Entries data )
     {
         List<AuthcAuthzEvent> result = new ArrayList<AuthcAuthzEvent>();
 
-        for ( TimelineRecord record : data )
+        for ( Entry record : data )
         {
             Map<String, String> map = record.getData();
 
@@ -270,11 +275,11 @@ public class DefaultFeedRecorder
         return result;
     }
 
-    protected List<ErrorWarningEvent> getEwesFromMaps( TimelineResult data )
+    protected List<ErrorWarningEvent> getEwesFromMaps( Entries data )
     {
         List<ErrorWarningEvent> result = new ArrayList<ErrorWarningEvent>();
 
-        for ( TimelineRecord record : data )
+        for ( Entry record : data )
         {
             Map<String, String> map = record.getData();
 
@@ -290,7 +295,7 @@ public class DefaultFeedRecorder
 
             ErrorWarningEvent evt =
                 new ErrorWarningEvent( getEventDate( map ), map.get( ACTION ), map.get( MESSAGE ),
-                    map.get( STACK_TRACE ) );
+                                       map.get( STACK_TRACE ) );
 
             evt.addEventContext( ctx );
 
@@ -302,7 +307,7 @@ public class DefaultFeedRecorder
 
     // ==
 
-    protected void releaseResult( TimelineResult result )
+    protected void releaseResult( Entries result )
     {
         if ( result != null )
         {
@@ -310,8 +315,8 @@ public class DefaultFeedRecorder
         }
     }
 
-    public TimelineResult getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
-                                     TimelineFilter filter )
+    public Entries getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
+                              Predicate<Entry> filter )
     {
         int cnt = count != null ? count : DEFAULT_PAGE_SIZE;
 
@@ -326,9 +331,9 @@ public class DefaultFeedRecorder
     }
 
     public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
-                                                            TimelineFilter filter )
+                                                            Predicate<Entry> filter )
     {
-        TimelineResult result = null;
+        Entries result = null;
 
         try
         {
@@ -342,9 +347,9 @@ public class DefaultFeedRecorder
         }
     }
 
-    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter )
+    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter )
     {
-        TimelineResult result = null;
+        Entries result = null;
 
         try
         {
@@ -359,9 +364,9 @@ public class DefaultFeedRecorder
     }
 
     public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count,
-                                                      TimelineFilter filter )
+                                                      Predicate<Entry> filter )
     {
-        TimelineResult result = null;
+        Entries result = null;
 
         try
         {
@@ -376,9 +381,9 @@ public class DefaultFeedRecorder
     }
 
     public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count,
-                                                          TimelineFilter filter )
+                                                          Predicate<Entry> filter )
     {
-        TimelineResult result = null;
+        Entries result = null;
 
         try
         {

@@ -21,8 +21,8 @@ package org.sonatype.nexus.feeds;
 import java.util.List;
 import java.util.Set;
 
-import org.sonatype.timeline.TimelineFilter;
-import org.sonatype.timeline.TimelineResult;
+import org.sonatype.nexus.timeline.Entry;
+import com.google.common.base.Predicate;
 
 /**
  * A recorder for events for later retrieval. The Actions are "generic" Nexus event related. For specific (Maven, P2)
@@ -144,15 +144,12 @@ public interface FeedRecorder
 
     // reading
 
-    TimelineResult getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
-        TimelineFilter filter );
-
     List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
-        TimelineFilter filter );
+        Predicate<Entry> filter );
     
-    List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter );
+    List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter );
 
-    List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter );
+    List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter );
     
-    List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter );
+    List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count, Predicate<Entry> filter );
 }

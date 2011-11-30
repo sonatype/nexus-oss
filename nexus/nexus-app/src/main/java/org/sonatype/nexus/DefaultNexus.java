@@ -46,6 +46,7 @@ import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.ErrorWarningEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
+import org.sonatype.nexus.feeds.RepositoryIdTimelineFilter;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.index.events.ReindexRepositoriesEvent;
@@ -80,11 +81,11 @@ import org.sonatype.nexus.templates.NoSuchTemplateIdException;
 import org.sonatype.nexus.templates.TemplateManager;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
-import org.sonatype.nexus.timeline.RepositoryIdTimelineFilter;
+import org.sonatype.nexus.timeline.Entry;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.timeline.TimelineFilter;
+import com.google.common.base.Predicate;
 
 /**
  * The default Nexus implementation.
@@ -428,7 +429,7 @@ public class DefaultNexus
 
     public List<NexusArtifactEvent> getRecentlyStorageChanges( Integer from, Integer count, Set<String> repositoryIds )
     {
-        TimelineFilter filter =
+        Predicate<Entry> filter =
             ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
                             : new RepositoryIdTimelineFilter( repositoryIds );
 
@@ -441,7 +442,7 @@ public class DefaultNexus
     public List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts( Integer from, Integer count,
                                                                           Set<String> repositoryIds )
     {
-        TimelineFilter filter =
+        Predicate<Entry> filter =
             ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
                             : new RepositoryIdTimelineFilter( repositoryIds );
 
@@ -452,7 +453,7 @@ public class DefaultNexus
 
     public List<NexusArtifactEvent> getRecentlyCachedArtifacts( Integer from, Integer count, Set<String> repositoryIds )
     {
-        TimelineFilter filter =
+        Predicate<Entry> filter =
             ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
                             : new RepositoryIdTimelineFilter( repositoryIds );
 
@@ -463,7 +464,7 @@ public class DefaultNexus
 
     public List<NexusArtifactEvent> getRecentlyDeployedArtifacts( Integer from, Integer count, Set<String> repositoryIds )
     {
-        TimelineFilter filter =
+        Predicate<Entry> filter =
             ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
                             : new RepositoryIdTimelineFilter( repositoryIds );
 
@@ -474,7 +475,7 @@ public class DefaultNexus
 
     public List<NexusArtifactEvent> getBrokenArtifacts( Integer from, Integer count, Set<String> repositoryIds )
     {
-        TimelineFilter filter =
+        Predicate<Entry> filter =
             ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
                             : new RepositoryIdTimelineFilter( repositoryIds );
 

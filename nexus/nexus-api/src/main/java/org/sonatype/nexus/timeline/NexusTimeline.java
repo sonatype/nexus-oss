@@ -21,8 +21,7 @@ package org.sonatype.nexus.timeline;
 import java.util.Map;
 import java.util.Set;
 
-import org.sonatype.timeline.TimelineFilter;
-import org.sonatype.timeline.TimelineResult;
+import com.google.common.base.Predicate;
 
 /**
  * NexusTimeline just decouples the spice Timeline interface from Nexus guts, to allow more freedom. It has pretty much
@@ -53,7 +52,7 @@ public interface NexusTimeline
      * @param filter filter, may be null.
      * @return the found records as result.
      */
-    TimelineResult retrieve( int fromItem, int count, Set<String> types, Set<String> subtypes, TimelineFilter filter );
+    Entries retrieve( int fromItem, int count, Set<String> types, Set<String> subtypes, Predicate<Entry> filter );
 
     /**
      * Purges all records from timeline that are older than timestamp, has one of the types and subtypes passed in, and
@@ -65,5 +64,5 @@ public interface NexusTimeline
      * @param filter filter, may be null.
      * @return the count of purged records.
      */
-    int purgeOlderThan( long timestamp, Set<String> types, Set<String> subTypes, TimelineFilter filter );
+    int purgeOlderThan( long timestamp, Set<String> types, Set<String> subTypes, Predicate<Entry> filter );
 }

@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
-import org.sonatype.timeline.TimelineRecord;
 
 public class LegacyNexusTimelineTest
     extends AbstractTimelineTest
@@ -38,9 +37,9 @@ public class LegacyNexusTimelineTest
 
         FileUtils.copyDirectoryStructure( legacyDataDir, legacyTimelineDir );
 
-        NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
+        NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class, "real" );
 
-        List<TimelineRecord> result = asList( nexusTimeline.retrieve( 0, 10, null, null, null ) );
+        List<Entry> result = asList( nexusTimeline.retrieve( 0, 10, null, null, null ) );
 
         assertTrue( !result.isEmpty() );
     }
@@ -61,9 +60,9 @@ public class LegacyNexusTimelineTest
 
         FileUtils.copyDirectoryStructure( newDataDir, newTimelineDir );
 
-        NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
+        NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class, "real" );
 
-        List<TimelineRecord> result = asList( nexusTimeline.retrieve( 0, 10, null, null, null ) );
+        List<Entry> result = asList( nexusTimeline.retrieve( 0, 10, null, null, null ) );
 
         assertEquals( 4, result.size() );
     }

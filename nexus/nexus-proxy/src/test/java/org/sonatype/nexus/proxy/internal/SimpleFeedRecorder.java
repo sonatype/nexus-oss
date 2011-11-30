@@ -18,128 +18,106 @@
  */
 package org.sonatype.nexus.proxy.internal;
 
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.ErrorWarningEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
-import org.sonatype.timeline.TimelineFilter;
-import org.sonatype.timeline.TimelineResult;
+import org.sonatype.nexus.timeline.Entry;
+import com.google.common.base.Predicate;
 
 @Component( role = FeedRecorder.class )
 public class SimpleFeedRecorder
     implements FeedRecorder
 
 {
-
-    public void addNexusArtifactEvent( NexusArtifactEvent nae )
+    @Override
+    public void addErrorWarningEvent( final String action, final String message )
     {
-    }
-
-    public void addSystemEvent( String action, String message )
-    {
-    }
-
-    public void systemProcessBroken( SystemProcess prc, Throwable e )
-    {
-    }
-
-    public void systemProcessFinished( SystemProcess prc, String finishMessage )
-    {
-    }
-
-    public void addAuthcAuthzEvent( AuthcAuthzEvent evt )
-    {
-    }
-
-    public SystemProcess systemProcessStarted( String action, String message )
-    {
-        return new SystemProcess( new Date(), action, message, new Date() );
-    }
-
-    public void startService()
-        throws StartingException
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void stopService()
-        throws StoppingException
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    public TimelineResult getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
-                                     TimelineFilter filter )
-    {
-        return TimelineResult.EMPTY_RESULT;
-    }
-
-    public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
-                                                            TimelineFilter filter )
-    {
-        return Collections.emptyList();
-    }
-
-    public List<NexusArtifactEvent> getNexusArtifactEvents( Set<String> subtypes, Long ts, Integer count,
-                                                            TimelineFilter filter )
-    {
-        return Collections.emptyList();
-    }
-
-    public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter )
-    {
-        return Collections.emptyList();
-    }
-
-    public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count,
-                                                      TimelineFilter filter )
-    {
-        return Collections.emptyList();
-    }
-
-    public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Long ts, Integer count,
-                                                      TimelineFilter filter )
-    {
-        return Collections.emptyList();
-    }
-
-    public void addErrorWarningEvent( String action, String message )
-    {
-    }
-
-    public void addErrorWarningEvent( String action, String message, Throwable throwable )
-    {
-    }
-
-    public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count,
-                                                          TimelineFilter filter )
-    {
-        return Collections.emptyList();
-    }
-
-    public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Long ts, Integer count,
-                                                          TimelineFilter filter )
-    {
-        return Collections.emptyList();
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     @Override
-    public void systemProcessCanceled( SystemProcess prc, String cancelMessage )
+    public void addErrorWarningEvent( final String action, final String message, final Throwable throwable )
     {
-        // TODO Auto-generated method stub
-
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    @Override
+    public void addNexusArtifactEvent( final NexusArtifactEvent nae )
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void addSystemEvent( final String action, final String message )
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void addAuthcAuthzEvent( final AuthcAuthzEvent evt )
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public SystemProcess systemProcessStarted( final String action, final String message )
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void systemProcessFinished( final SystemProcess prc, final String finishMessage )
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void systemProcessCanceled( final SystemProcess prc, final String cancelMessage )
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public void systemProcessBroken( final SystemProcess prc, final Throwable e )
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public List<NexusArtifactEvent> getNexusArtifectEvents( final Set<String> subtypes, final Integer from,
+                                                            final Integer count,
+                                                            final Predicate<Entry> filter )
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public List<SystemEvent> getSystemEvents( final Set<String> subtypes, final Integer from, final Integer count,
+                                              final Predicate<Entry> filter )
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public List<AuthcAuthzEvent> getAuthcAuthzEvents( final Set<String> subtypes, final Integer from,
+                                                      final Integer count,
+                                                      final Predicate<Entry> filter )
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public List<ErrorWarningEvent> getErrorWarningEvents( final Set<String> subtypes, final Integer from,
+                                                          final Integer count,
+                                                          final Predicate<Entry> filter )
+    {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
 }

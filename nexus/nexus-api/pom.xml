@@ -67,10 +67,6 @@
       <artifactId>plexus-task-scheduler</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-timeline</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.configuration</groupId>
       <artifactId>base-configuration</artifactId>
     </dependency>
