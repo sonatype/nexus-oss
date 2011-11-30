@@ -147,7 +147,13 @@ public abstract class AbstractStorageItem
         this.context = new RequestContext();
         this.itemAttributes = new DefaultAttributes();
 
-        getRepositoryItemAttributes().putAll( attributes );
+        // this here is for ITs only, some of them use "manually crafter" attributes XML files and would NPE
+        // In "real life", all the files stored in Nexus have at least sha1/md5 set as attributes, meaning,
+        // all the real life items has at least two attributes and this map would never be null!
+        if ( attributes != null )
+        {
+            getRepositoryItemAttributes().putAll( attributes );
+        }
 
         getRepositoryItemAttributes().setGeneration( generation );
         getRepositoryItemAttributes().setPath( path );
