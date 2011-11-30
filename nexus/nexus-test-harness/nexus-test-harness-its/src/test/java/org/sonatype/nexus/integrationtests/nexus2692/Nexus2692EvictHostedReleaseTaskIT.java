@@ -37,18 +37,12 @@ public class Nexus2692EvictHostedReleaseTaskIT
 
         // check files
         SortedSet<String> resultStorageFiles = getItemFilePaths();
-        SortedSet<String> resultAttributeFiles = getAttributeFilePaths();
 
         // unexpected deleted files
         SortedSet<String> storageDiff = new TreeSet<String>( getPathMap().keySet() );
         storageDiff.removeAll( resultStorageFiles );
 
-        SortedSet<String> attributeDiff = new TreeSet<String>( getPathMap().keySet() );
-        attributeDiff.removeAll( resultAttributeFiles );
-
         Assert.assertTrue( storageDiff.isEmpty(), "Files deleted that should not have been: "
             + prettyList( storageDiff ) );
-        Assert.assertTrue( attributeDiff.isEmpty(), "Files deleted that should not have been: "
-            + prettyList( attributeDiff ) );
     }
 }
