@@ -23,12 +23,12 @@ import java.io.IOException;
 import org.codehaus.swizzle.jira.Issue;
 import org.codehaus.swizzle.jira.Jira;
 import org.codehaus.swizzle.jira.User;
-import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ErrorReportResponse;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.ErrorReportUtil;
+import org.sonatype.nexus.test.utils.NexusRequestMatchers;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -39,7 +39,7 @@ public class NXCM1928ManualErrorReportIT
 
     private static final String ITS_USER = "sonatypeits";
 
-    // @Test
+    @Test( enabled = false )
     public void generateReportWithAuthentication()
         throws Exception
     {
@@ -59,16 +59,15 @@ public class NXCM1928ManualErrorReportIT
         Assert.assertEquals( ITS_USER, reporter.getName() );
     }
 
-    // @Test
+    @Test
     public void invalidUsers()
         throws Exception
     {
-        Response response =
-            ErrorReportUtil.generateProblemResponse( "sometitle", "somedescription",
-                                                     "someDummyUserToBreakIntegrationTest",
-                                                     Long.toHexString( System.nanoTime() ) );
-
-        Assert.assertEquals( Status.CLIENT_ERROR_BAD_REQUEST.getCode(), response.getStatus().getCode() );
+        ErrorReportUtil.matchProblemResponse(
+            "sometitle", "somedescription",
+            "someDummyUserToBreakIntegrationTest",
+            Long.toHexString( System.nanoTime() ),
+            NexusRequestMatchers.respondsWithStatus( Status.CLIENT_ERROR_BAD_REQUEST ) );
     }
 
     @Test
