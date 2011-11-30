@@ -20,6 +20,7 @@ package org.sonatype.nexus.restlight.common;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -514,13 +515,16 @@ public abstract class AbstractRESTLightClient
             throw validationError( method );
         }
 
+        String body = null;
         try
         {
-            return new SAXBuilder().build( method.getResponseBodyAsStream() );
+            body = method.getResponseBodyAsString();
+            return new SAXBuilder().build( new StringReader( body ) );
         }
         catch ( JDOMException e )
         {
-            throw new RESTLightClientException( "Failed to parse response body as XML for GET request.", e );
+            throw new RESTLightClientException( "Failed to parse response body as XML for GET request. Content: \n"
+                + body + "\nStatus: " + statusText, e );
         }
         catch ( IOException e )
         {

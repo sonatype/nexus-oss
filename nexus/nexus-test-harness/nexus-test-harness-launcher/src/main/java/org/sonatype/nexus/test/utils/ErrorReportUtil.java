@@ -18,6 +18,10 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import static org.hamcrest.Matchers.allOf;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.respondsWithStatusCode;
+
 import java.io.File;
 
 import java.io.IOException;
@@ -26,9 +30,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.hamcrest.Matcher;
 import org.restlet.data.MediaType;
-import org.restlet.data.Method;
-import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ErrorReportRequest;
@@ -54,17 +57,12 @@ public class ErrorReportUtil
                                                              String jiraPassword )
         throws IOException
     {
-        Response response = generateProblemResponse( title, description, jiraUser, jiraPassword );
-
-        Assert.assertNotNull( response );
-
         if ( title != null )
         {
-            final String text = response.getEntity().getText();
+            final String text = matchProblemResponse( title, description, jiraUser, jiraPassword, isSuccessful() );
 
-            Assert.assertTrue( response.getStatus().isSuccess(), text + "\n" + response.getStatus() );
-
-            XStreamRepresentation representation = new XStreamRepresentation( xstream, text, MediaType.APPLICATION_XML );
+            XStreamRepresentation representation =
+                new XStreamRepresentation( xstream, text, MediaType.APPLICATION_XML );
 
             ErrorReportResponse responseObj =
                 (ErrorReportResponse) representation.getPayload( new ErrorReportResponse() );
@@ -73,19 +71,23 @@ public class ErrorReportUtil
         }
         else
         {
-            Assert.assertFalse( response.getStatus().isSuccess() );
-            Assert.assertEquals( 400, response.getStatus().getCode() );
+            matchProblemResponse( title, description, jiraUser, jiraPassword, respondsWithStatusCode( 400 ) );
         }
-
         return null;
     }
 
-    /**
-     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
-     */
-    public static Response generateProblemResponse( String title, String description, String jiraUser,
-                                                    String jiraPassword )
+    public static String matchProblemResponse( String title, String description, String jiraUser,
+                                                    String jiraPassword, Matcher... matchers )
         throws IOException
+    {
+        return RequestFacade.doPutForText( "service/local/error_reporting",
+                             createErrorReportRequest( title, description, jiraUser, jiraPassword ),
+                             allOf( matchers ) );
+    }
+
+    private static XStreamRepresentation createErrorReportRequest( final String title, final String description,
+                                                                   final String jiraUser,
+                                                                   final String jiraPassword )
     {
         ErrorReportRequest request = new ErrorReportRequest();
         request.setData( new ErrorReportRequestDTO() );
@@ -100,9 +102,7 @@ public class ErrorReportUtil
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
         representation.setPayload( request );
-
-        String serviceURI = "service/local/error_reporting";
-        return RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
+        return representation;
     }
 
     public static void cleanErrorBundleDir( String directory )

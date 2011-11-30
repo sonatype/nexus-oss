@@ -337,6 +337,12 @@ public class NexusRequestMatchers
     }
 
     @Factory
+    public static <T> RespondsWithStatusCode respondsWithStatus( Status status )
+    {
+        return respondsWithStatusCode( status.getCode() );
+    }
+
+    @Factory
     public static <T> RespondsWithStatusCode respondsWithStatusCode( final int expectedStatusCode )
     {
         return new RespondsWithStatusCode( expectedStatusCode );

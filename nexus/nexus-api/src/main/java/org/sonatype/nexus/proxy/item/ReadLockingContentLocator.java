@@ -31,19 +31,17 @@ import org.sonatype.nexus.util.WrappingInputStream;
  * @author cstamas
  */
 public class ReadLockingContentLocator
-    implements ContentLocator
+    extends AbstractWrappingContentLocator
 {
     private final RepositoryItemUid wrappedUid;
 
-    private final ContentLocator wrappedLocator;
-
     public ReadLockingContentLocator( final RepositoryItemUid wrappedUid, final ContentLocator wrappedLocator )
     {
+        super(wrappedLocator);
         this.wrappedUid = wrappedUid;
-
-        this.wrappedLocator = wrappedLocator;
     }
 
+    @Override
     public InputStream getContent()
         throws IOException
     {
@@ -53,7 +51,7 @@ public class ReadLockingContentLocator
 
         try
         {
-            return new ReadLockingInputStream( lock, wrappedLocator.getContent() );
+            return new ReadLockingInputStream( lock, getTarget().getContent() );
         }
         catch ( IOException e )
         {
@@ -70,16 +68,6 @@ public class ReadLockingContentLocator
             w.initCause( e );
             throw w;
         }
-    }
-
-    public String getMimeType()
-    {
-        return wrappedLocator.getMimeType();
-    }
-
-    public boolean isReusable()
-    {
-        return wrappedLocator.isReusable();
     }
 
     // ==

@@ -120,6 +120,9 @@ public class DefaultFSLocalRepositoryStoragePerformanceITTest
 
         // prime the retrieve
         originalLastAccessTime = primeLastRequestedTimestamp();
+
+        // sleep so we are sure the clock is different when we validate the last update time.
+        Thread.sleep( 2 );
     }
 
     protected long primeLastRequestedTimestamp()
