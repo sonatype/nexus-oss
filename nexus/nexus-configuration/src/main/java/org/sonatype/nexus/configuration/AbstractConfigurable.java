@@ -76,7 +76,7 @@ public abstract class AbstractConfigurable
         applicationEventMulticaster.removeEventListener( this );
     }
 
-    public void onEvent( Event<?> evt )
+    public void onEvent( final Event<?> evt )
     {
         // act automatically on config events
         if ( evt instanceof ConfigurationPrepareForLoadEvent )
