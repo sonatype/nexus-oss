@@ -19,74 +19,34 @@
 package org.sonatype.nexus.integrationtests.nexus4341;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
-import static org.sonatype.sisu.goodies.common.Time.time;
-import static org.sonatype.tests.http.server.fluent.Behaviours.error;
-import static org.sonatype.tests.http.server.fluent.Behaviours.pause;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isClientError;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-import com.google.common.collect.Sets;
 import org.restlet.data.Status;
-import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
-import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.DownloadIndexesTaskDescriptor;
-import org.sonatype.nexus.test.utils.NexusRequestMatchers;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.sisu.goodies.common.Time;
-import org.sonatype.tests.http.server.fluent.Server;
-import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class Nexus4341RunningTaskNotEditableIT
-    extends AbstractNexusProxyIntegrationTest
+    extends AbstractNexusIntegrationTest
 {
 
-    private Server return500Server;
-
-
-    @BeforeMethod(alwaysRun = true)
-    public void replaceServer()
+    private ScheduledServiceListResource createTask()
         throws Exception
     {
-        ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE );
-        server.stop();
-        int port = server.getPort();
+        final String taskName = "SleepRepositoryTask_" + getTestRepositoryId() + "_" + System.nanoTime();
+        TaskScheduleUtil.runTask( taskName, "SleepRepositoryTask", 0,
+                                  TaskScheduleUtil.newProperty( "repositoryId", getTestRepositoryId() ),
+                                  TaskScheduleUtil.newProperty( "time", String.valueOf( 10 ) ) );
 
-        return500Server =
-            Server.withPort( port ).serve( "/*" ).withBehaviours( pause( time( 10, TimeUnit.SECONDS ) ), error( 500 ) ).start();
-    }
+        Time.seconds( 1 ).sleep();
 
-    @AfterMethod(alwaysRun = true)
-    public void stopServer()
-        throws Exception
-    {
-        if ( return500Server != null )
-        {
-            return500Server.stop();
-        }
-    }
-
-    private void createDownloadIndexesTask( String name )
-        throws Exception
-    {
-        ScheduledServiceBaseResource scheduledTask = getScheduledTaskTemplate( name );
-
-        TaskScheduleUtil.create( scheduledTask, isSuccessful() );
+        return TaskScheduleUtil.getTask( taskName );
     }
 
     private void verifyNoUpdate( ScheduledServiceListResource resource )
@@ -94,96 +54,39 @@ public class Nexus4341RunningTaskNotEditableIT
     {
         log.info( "Trying to update {} ({})", resource.getName(), resource.getStatus() );
 
-        ScheduledServiceBaseResource changed = getScheduledTaskTemplate( "changed" );
+        ScheduledServiceBaseResource changed = new ScheduledServiceBaseResource();
+        changed.setEnabled( true );
         changed.setId( resource.getId() );
+        changed.setName( "otherName" );
+        changed.setTypeId( resource.getTypeId() );
+        changed.setSchedule( resource.getSchedule() );
+        changed.addProperty( TaskScheduleUtil.newProperty( "repositoryId", getTestRepositoryId() ) );
+        changed.addProperty( TaskScheduleUtil.newProperty( "time", String.valueOf( 10 ) ) );
+
         Status status = TaskScheduleUtil.update( changed );
+
         assertThat( "Should not have been able to update task with state " + resource.getStatus() + ", "
                         + status.getDescription(), status, isClientError() );
-    }
-
-    private ScheduledServiceBaseResource getScheduledTaskTemplate( String name )
-    {
-        ScheduledServicePropertyResource repositoryProp = new ScheduledServicePropertyResource();
-        repositoryProp.setKey( DownloadIndexesTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
-        repositoryProp.setValue( getTestRepositoryId() );
-
-        ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();
-        scheduledTask.setEnabled( true );
-        scheduledTask.setId( null );
-        scheduledTask.setName( name );
-        scheduledTask.setTypeId( DownloadIndexesTaskDescriptor.ID );
-        scheduledTask.setSchedule( "manual" );
-        scheduledTask.addProperty( repositoryProp );
-        return scheduledTask;
     }
 
     @Test
     public void testNoUpdateForRunningTasks()
         throws Exception
     {
-        createDownloadIndexesTask( "Nexus4341Task1" );
-        createDownloadIndexesTask( "Nexus4341Task2" );
+        ScheduledServiceListResource running = createTask();
+        ScheduledServiceListResource sleeping = createTask();
 
-        List<ScheduledServiceListResource> tasks = TaskScheduleUtil.getTasks();
+        assertThat( running.getStatus(), is( "RUNNING" ) );
+        assertThat( sleeping.getStatus(), is( "SLEEPING" ) );
 
-        assertThat( tasks, hasSize( 2 ) );
+        verifyNoUpdate( sleeping );
+        TaskScheduleUtil.cancel( sleeping.getId() );
 
-        for ( ScheduledServiceListResource resource : tasks )
-        {
-            log.info( "Starting task: {}", resource.getName() );
-            Status status = TaskScheduleUtil.run( resource.getId() );
-            Assert.assertTrue( status.isSuccess() );
-        }
+        verifyNoUpdate( running );
+        TaskScheduleUtil.cancel( running.getId() );
 
-        int ticks = 1;
-        while ( ticks <= 60 )
-        {
-            tasks = TaskScheduleUtil.getTasks();
-            assertThat( tasks, hasSize( 2 ) );
-            if ( tasks.get( 0 ).getStatus().equals( "RUNNING" ) && tasks.get( 1 ).getStatus().equals( "SLEEPING" ) )
-            {
-                break;
-            }
-            else if ( tasks.get( 1 ).getStatus().equals( "RUNNING" ) && tasks.get( 0 ).getStatus().equals( "SLEEPING" ) )
-            {
-                break;
-            }
-            
-            ticks++;
-            Thread.yield();
-            Time.seconds( 1 ).sleep();
-        }
-
-        assertThat( "did not find RUNNING/SLEEPING state for two tasks in 60s", ticks, lessThanOrEqualTo( 60 ) );
-
-        tasks = TaskScheduleUtil.getTasks();
-        assertThat( tasks, hasSize( 2 ) );
-
-        Set<String> seenStates = Sets.newHashSet();
-
-        for ( ScheduledServiceListResource task : tasks )
-        {
-            seenStates.add( task.getStatus() );
-            log.info( "Found task {} with state {}", task.getName(), task.getStatus() );
-            if ( task.getStatus().equals( "SLEEPING" ) )
-            {
-                verifyNoUpdate( task );
-                TaskScheduleUtil.cancel( task.getId() );
-            }
-            else if ( task.getStatus().equals( "RUNNING" ) )
-            {
-                verifyNoUpdate( task );
-
-                log.info( "Canceling running task and trying to update" );
-                TaskScheduleUtil.cancel( task.getId() );
-                task = TaskScheduleUtil.getTask( task.getName() );
-
-                seenStates.add( task.getStatus() );
-
-                verifyNoUpdate( task );
-            }
-        }
-
-        assertThat( seenStates, containsInAnyOrder( "SLEEPING", "RUNNING", "CANCELLING" ) );
+        ScheduledServiceListResource cancelled = TaskScheduleUtil.getTask( running.getName() );
+        assertThat( cancelled.getStatus(), is( "CANCELLING" ) );
+        verifyNoUpdate( cancelled );
     }
 }
