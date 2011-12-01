@@ -18,13 +18,16 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import static org.hamcrest.Matchers.allOf;
 import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import org.hamcrest.Matcher;
 import org.restlet.data.MediaType;
+import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +57,7 @@ public class TaskScheduleUtil
         xstream = XStreamFactory.getXmlXStream();
     }
 
-    public static Status create( ScheduledServiceBaseResource task )
+    public static Status create( ScheduledServiceBaseResource task, Matcher<Response>... matchers )
         throws IOException
     {
         ScheduledServiceResourceResponse request = new ScheduledServiceResourceResponse();
@@ -64,7 +67,8 @@ public class TaskScheduleUtil
         representation.setPayload( request );
 
         String serviceURI = "service/local/schedules";
-        return RequestFacade.doPostForStatus( serviceURI, representation );
+        Matcher<Response> responseMatcher = allOf( matchers );
+        return RequestFacade.doPostForStatus( serviceURI, representation, responseMatcher );
     }
 
     public static ScheduledServiceListResource getTask( String name )
@@ -152,7 +156,7 @@ public class TaskScheduleUtil
 
     /**
      * Holds execution until all tasks of a given type stop running
-     * 
+     *
      * @param taskType task type
      */
     public static void waitForAllTasksToStop( String taskType )
@@ -163,7 +167,7 @@ public class TaskScheduleUtil
 
     /**
      * Holds execution until all tasks of a given type stop running
-     * 
+     *
      * @param maxAttempts how many times check for tasks being stopped
      */
     public static void waitForAllTasksToStop( int maxAttempts )
@@ -174,7 +178,7 @@ public class TaskScheduleUtil
 
     /**
      * Holds execution until all tasks of a given type stop running
-     * 
+     *
      * @param taskClass task type
      */
     public static void waitForAllTasksToStop( Class<? extends NexusTask<?>> taskClass )
@@ -185,7 +189,7 @@ public class TaskScheduleUtil
 
     /**
      * Holds execution until all tasks of a given type stop running
-     * 
+     *
      * @param taskType task type
      * @param maxAttempts how many times check for tasks being stopped
      */
@@ -240,7 +244,7 @@ public class TaskScheduleUtil
 
     }
 
-    public static Status update( ScheduledServiceBaseResource task )
+    public static Status update( ScheduledServiceBaseResource task, Matcher<Response>... matchers )
         throws IOException
     {
         ScheduledServiceResourceResponse request = new ScheduledServiceResourceResponse();
@@ -250,7 +254,8 @@ public class TaskScheduleUtil
         representation.setPayload( request );
 
         String serviceURI = "service/local/schedules/" + task.getId();
-        return RequestFacade.doPutForStatus( serviceURI, representation, null );
+        Matcher<Response> matcher = allOf( matchers );
+        return RequestFacade.doPutForStatus( serviceURI, representation, matcher );
     }
 
     public static Status deleteTask( String id )

@@ -36,7 +36,7 @@ import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.testng.annotations.Test;
 
-public class Nexus4372InvalidSearchStringYields400BadRequest
+public class Nexus4372InvalidSearchStringYields400BadRequestIT
     extends AbstractNexusIntegrationTest
 {
 
@@ -65,10 +65,10 @@ public class Nexus4372InvalidSearchStringYields400BadRequest
     {
 
         String serviceURIpart = "service/local/lucene/search?q=" + URLEncoder.encode( query, "UTF-8" );
-        log.info( "Testing query {}: {}", query, serviceURIpart );
+        log.debug( "Testing query {}: {}", query, serviceURIpart );
         String errorPayload = RequestFacade.doGetForText( serviceURIpart,
                                                           respondsWithStatusCode( 400 ) );
-        log.info( "Received 'Bad Request' error: " + errorPayload );
+        log.debug( "Received 'Bad Request' error: " + errorPayload );
         MediaType type = MediaType.APPLICATION_XML;
         XStreamRepresentation representation = new XStreamRepresentation( getXMLXStream(), errorPayload, type);
 
@@ -83,7 +83,7 @@ public class Nexus4372InvalidSearchStringYields400BadRequest
             "Cannot parse '([^']*)':.*",
             "$1" );
 
-        log.info( "msg: " + msg );
+        log.debug( "msg: " + msg );
 
         assertThat( msg, equalTo( expected ) );
     }
