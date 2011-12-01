@@ -44,7 +44,16 @@
       <artifactId>nexus-app</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rest-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
+    <dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>spice-timeline</artifactId>
@@ -96,6 +105,7 @@
             <configuration>
                <classpathDependencyExcludes>
                  <classpathDependencyExclude>org.sonatype.spice:spice-timeline</classpathDependencyExclude>
+                 <classpathDependencyExclude>rome:rome</classpathDependencyExclude>
               </classpathDependencyExcludes>
             </configuration>
           </execution>
@@ -129,6 +139,7 @@
               <artifactSet>
                 <includes>
                   <include>org.sonatype.spice:spice-timeline</include>
+                  <include>rome:rome</include>
                 </includes>
               </artifactSet>
             </configuration>

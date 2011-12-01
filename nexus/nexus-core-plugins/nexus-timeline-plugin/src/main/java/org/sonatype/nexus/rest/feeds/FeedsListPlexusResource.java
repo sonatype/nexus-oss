@@ -18,43 +18,43 @@
  */
 package org.sonatype.nexus.rest.feeds;
 
+import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.feeds.sources.FeedSource;
+import org.sonatype.nexus.rest.model.FeedListResource;
 import org.sonatype.nexus.rest.model.FeedListResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
- * A resource that delegates to another PlexusResource to list existing reachable feeds.
+ * A resource that lists existing feeds.
  * 
  * @author cstamas
  * @author dip
  */
-@Component( role = PlexusResource.class, hint = "feedList" )
+@Component( role = PlexusResource.class, hint = "TimelineFeedList" )
 @Path( FeedsListPlexusResource.RESOURCE_URI )
 @Produces( { "application/xml", "application/json" } )
 public class FeedsListPlexusResource
     extends AbstractNexusPlexusResource
 {
     public static final String RESOURCE_URI = "/feeds";
-
-    private volatile PlexusResource delegate;
-
-    public FeedsListPlexusResource()
-    {
-        super();
-        this.delegate = NoopFeedsListPlexusResource.INSTANCE;
-    }
+    
+    @Requirement( role = FeedSource.class )
+    private List<FeedSource> feeds;
 
     @Override
     public Object getPayloadInstance()
@@ -75,28 +75,31 @@ public class FeedsListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:feeds]" );
     }
 
-    protected void setDelegate( final PlexusResource plexusResource )
-    {
-        this.delegate = plexusResource;
-    }
-
-    protected PlexusResource getDelegate( final Context context )
-    {
-        return delegate;
-    }
-
     /**
      * Get the list of feeds available from the nexus server.
      */
     @Override
     @GET
     @ResourceMethodSignature( output = FeedListResourceResponse.class )
-    public Object get( final Context context, final Request req, final Response res, final Variant variant )
+    public Object get( Context context, Request req, Response res, Variant variant )
         throws ResourceException
     {
-        final PlexusResource delegate = getDelegate( context );
+        FeedListResourceResponse response = new FeedListResourceResponse();
 
-        return delegate.get( context, req, res, variant );
+        List<FeedSource> sources = feeds;
+
+        for ( FeedSource source : sources )
+        {
+            FeedListResource resource = new FeedListResource();
+
+            resource.setResourceURI( createChildReference( req, this, source.getFeedKey() ).toString() );
+
+            resource.setName( source.getFeedName() );
+
+            response.addData( resource );
+        }
+
+        return response;
     }
 
 }

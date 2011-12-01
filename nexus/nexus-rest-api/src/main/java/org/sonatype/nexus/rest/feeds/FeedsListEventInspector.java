@@ -16,43 +16,68 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.timeline;
+package org.sonatype.nexus.rest.feeds;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
+import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.appevents.Event;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
- * Event inspector that activates the search for "real" timeline when Nexus is initialized (plugins are loaded).
- *
- * @author: cstamas
+ * Event inspector that "nudges" the feed list resource to use Timeline based feeds when possible.
+ * 
+ * @author cstamas
  * @since 1.10.0
  */
-@Component( role = EventInspector.class, hint = "TimelinePluginEventInspector" )
-public class TimelinePluginEventInspector
+@Component( role = EventInspector.class, hint = "FeedsListEventInspector" )
+public class FeedsListEventInspector
     extends AbstractEventInspector
     implements EventInspector, AsynchronousEventInspector
 {
-
     @Requirement
-    private NexusTimeline nexusTimeline;
+    private PlexusContainer plexusContainer;
 
     @Override
-    public boolean accepts( final Event<?> evt )
+    public boolean accepts( Event<?> evt )
     {
-        return evt instanceof NexusInitializedEvent;
+        // we do this on started event, since this is actually user experience/UI related trick
+        return evt instanceof NexusStartedEvent;
     }
 
     @Override
-    public void inspect( final Event<?> evt )
+    public void inspect( Event<?> evt )
     {
-        if ( nexusTimeline instanceof RedirectingTimeline )
+        try
         {
-            ( (RedirectingTimeline) nexusTimeline ).tryToActivateTimeline();
+            final PlexusResource feedsList = plexusContainer.lookup( PlexusResource.class, "feedList" );
+
+            if ( feedsList instanceof FeedsListPlexusResource )
+            {
+                final PlexusResource delegate =
+                    (AbstractNexusPlexusResource) plexusContainer.lookup( PlexusResource.class, "TimelineFeedList" );
+
+                if ( delegate != null )
+                {
+                    ( (FeedsListPlexusResource) feedsList ).setDelegate( delegate );
+
+                    getLogger().info( "Timeline based feeds are present and enabled." );
+
+                    return;
+                }
+
+                getLogger().info( "Tried to enable Timeline based feeds but failed, fallback to NOOP Feeds." );
+            }
+        }
+        catch ( Exception e )
+        {
+            // huh
+            getLogger().debug( "Unexpected exception!", e );
         }
     }
 }

@@ -77,10 +77,6 @@
     </dependency>
 
     <dependency>
-      <groupId>rome</groupId>
-      <artifactId>rome</artifactId>
-    </dependency>
-    <dependency>
       <groupId>eu.medsea.mimeutil</groupId>
       <artifactId>mime-util</artifactId>
       <exclusions>

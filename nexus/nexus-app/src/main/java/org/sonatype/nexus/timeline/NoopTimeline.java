@@ -18,12 +18,10 @@
  */
 package org.sonatype.nexus.timeline;
 
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 
