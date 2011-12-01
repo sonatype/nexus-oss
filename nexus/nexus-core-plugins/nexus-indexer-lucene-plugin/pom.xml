@@ -158,6 +158,7 @@
             <configuration>
                <classpathDependencyExcludes>
                 <classpathDependencyExclude>org.apache.maven.indexer:indexer-core</classpathDependencyExclude>
+                <classpathDependencyExclude>org.apache.lucene:lucene-core</classpathDependencyExclude>
               </classpathDependencyExcludes>
             </configuration>
           </execution>
@@ -186,6 +187,7 @@
               <artifactSet>
                 <includes>
                   <include>org.apache.maven.indexer:indexer-core</include>
+                  <include>org.apache.lucene:lucene-core</include>
                 </includes>
               </artifactSet>
             </configuration>
