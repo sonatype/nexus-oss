@@ -132,8 +132,10 @@ public class DefaultFSLocalRepositoryStoragePerformanceTest
 
         // prime the retrieve
         ResourceStoreRequest resourceRequest = new ResourceStoreRequest( testFilePath );
-        originalLastAccessTime =
-            localRepositoryStorageUnderTest.retrieveItem( repository, resourceRequest ).getLastRequested();
+        originalLastAccessTime = localRepositoryStorageUnderTest.retrieveItem( repository, resourceRequest ).getLastRequested();
+
+        // sleep so we are sure the clock is different when we validate the last update time.
+        Thread.sleep( 2 );
     }
 
     private AttributeStorage getAttributeStorage()
