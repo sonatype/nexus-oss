@@ -698,11 +698,20 @@ public class DefaultSnapshotRemover
 
                             req.getRequestContext().putAll( context );
 
-                            return mrepository.getLocalStorage().containsItem( mrepository, req );
+                            getLogger().debug( "Checking for release counterpart in repository '{}' and path '{}'", mrepository.getId(), req.toString() );
+
+                            mrepository.retrieveItem( false, req );
+
+                            return true;
+                        }
+                        catch ( ItemNotFoundException e )
+                        {
+                            // nothing
                         }
                         catch ( Exception e )
                         {
                             // nothing
+                            getLogger().debug( "Unexpected exception!", e );
                         }
                     }
                 }
