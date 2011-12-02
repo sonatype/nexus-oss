@@ -204,6 +204,7 @@ class DefaultCapabilityReference
                     try
                     {
                         capability().activate();
+                        getLogger().debug( "Activated capability {} ({})", capability, capability.id() );
                         active = true;
                         eventBus.post( new CapabilityEvent.AfterActivated( this ) );
                     }
@@ -242,6 +243,7 @@ class DefaultCapabilityReference
                     active = false;
                     eventBus.post( new CapabilityEvent.BeforePassivated( this ) );
                     capability().passivate();
+                    getLogger().debug( "Passivated capability {} ({})", capability, capability.id() );
                 }
                 catch ( Exception e )
                 {
