@@ -69,7 +69,7 @@ import com.google.common.collect.Maps;
 @BenchmarkHistoryChart( )
 @BenchmarkMethodChart( )
 @AxisRange( min = 0 )
-public class DefaultFSLocalRepositoryStoragePerformanceTest
+public class DefaultFSLocalRepositoryStoragePerformanceLRTest
 {
     @Rule
     public MethodRule benchmarkRun = new BenchmarkRule();
