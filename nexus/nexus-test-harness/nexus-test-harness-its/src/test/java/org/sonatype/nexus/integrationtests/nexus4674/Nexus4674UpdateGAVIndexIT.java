@@ -34,7 +34,7 @@ import org.testng.annotations.Test;
  * 
  * @author velo
  */
-public class Nesxus4674UpdateGAVIndexIT
+public class Nexus4674UpdateGAVIndexIT
     extends AbstractNexusIntegrationTest
 {
 
