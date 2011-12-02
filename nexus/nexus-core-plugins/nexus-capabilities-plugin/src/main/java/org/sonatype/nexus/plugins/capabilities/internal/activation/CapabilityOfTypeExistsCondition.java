@@ -52,7 +52,7 @@ public class CapabilityOfTypeExistsCondition
         super( eventBus );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.type = type;
-        bindLock = new ReentrantReadWriteLock(  );
+        bindLock = new ReentrantReadWriteLock();
     }
 
     @Override
@@ -103,17 +103,11 @@ public class CapabilityOfTypeExistsCondition
         {
             if ( shouldEvaluateFor( ref ) )
             {
-                if ( !isSatisfied() )
-                {
-                    setSatisfied( true );
-                }
+                setSatisfied( true );
                 return;
             }
         }
-        if ( isSatisfied() )
-        {
-            setSatisfied( false );
-        }
+        setSatisfied( false );
     }
 
     boolean shouldEvaluateFor( final CapabilityReference reference )
