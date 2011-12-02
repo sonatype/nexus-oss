@@ -22,33 +22,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * Component handling the marshalling and unmarshalling of attributes.
  * 
  * @author cstamas
+ * @since 1.10.0
  */
 public interface Marshaller
 {
     /**
-     * Marshals the item into bytes written into output stream.
+     * Marshals the attributes into bytes written into output stream.
      * 
-     * @param item
+     * @param attributes
      * @param outputStream
      * @throws IOException
      */
-    void marshal( StorageItem item, OutputStream outputStream )
+    void marshal( Attributes attributes, OutputStream outputStream )
         throws IOException;
 
     /**
-     * Unmarshalls the item from bytes provided on inputStream.
+     * Unmarshalls the attributes from bytes provided on inputStream.
      * 
      * @param inputStream
      * @return
      * @throws IOException
      * @throws InvalidInputException When the content is available, but it's corrupted, not expected, etc.
      */
-    StorageItem unmarshal( InputStream inputStream )
+    Attributes unmarshal( InputStream inputStream )
         throws IOException, InvalidInputException;
 }

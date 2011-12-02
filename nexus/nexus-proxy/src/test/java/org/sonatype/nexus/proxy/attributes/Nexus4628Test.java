@@ -33,9 +33,7 @@ import org.mockito.Mockito;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * NEXUS-4628: Lessen the occurence of "lastRequested" attribute storing to 24h, to lessen IO in general.
@@ -64,7 +62,7 @@ public class Nexus4628Test
 
         uid = getRepositoryItemUidFactory().createUid( repository, fakeRemoteRequest.getRequestPath() );
 
-        AbstractStorageItem aitem = attributesHandler.getAttributeStorage().getAttributes( uid );
+        Attributes aitem = attributesHandler.getAttributeStorage().getAttributes( uid );
         assertThat( aitem, nullValue() );
 
         beforeCallTs = System.currentTimeMillis();
@@ -83,17 +81,16 @@ public class Nexus4628Test
     public void testSimpleTouchIsDoneOnceDaily()
         throws IOException, ItemNotFoundException
     {
-        AbstractStorageItem aitem;
+        Attributes aitem;
 
-        AttributeStorage attributeStorageSpy = Mockito.spy( repository.getAttributesHandler().getAttributeStorage() );
-        repository.getAttributesHandler().setAttributeStorage( attributeStorageSpy );
+        final AttributeStorage attributeStorageSpy = spyOnRealAttributeStorage();
 
         aitem = attributesHandler.getAttributeStorage().getAttributes( uid );
         checkNotNull( aitem );
         assertThat( aitem.getLastRequested(),
             allOf( greaterThanOrEqualTo( beforeCallTs ), lessThanOrEqualTo( afterCallTs ) ) );
 
-        attributesHandler.touchItemLastRequested( System.currentTimeMillis(), repository, fakeRemoteRequest, aitem );
+        attributesHandler.touchItemLastRequested( System.currentTimeMillis(), fakeRemoteRequest, uid, aitem );
 
         aitem = attributesHandler.getAttributeStorage().getAttributes( uid );
         checkNotNull( aitem );
@@ -101,7 +98,8 @@ public class Nexus4628Test
             allOf( greaterThanOrEqualTo( beforeCallTs ), lessThanOrEqualTo( afterCallTs ) ) );
 
         Mockito.verify( attributeStorageSpy, Mockito.times( 2 ) ).getAttributes( Mockito.<RepositoryItemUid> any() );
-        Mockito.verify( attributeStorageSpy, Mockito.times( 0 ) ).putAttribute( Mockito.<StorageItem> any() );
+        Mockito.verify( attributeStorageSpy, Mockito.times( 0 ) ).putAttributes( Mockito.<RepositoryItemUid> any(),
+            Mockito.<Attributes> any() );
     }
 
     /**
@@ -114,10 +112,9 @@ public class Nexus4628Test
     public void testSimpleTouchInPastAlwaysWork()
         throws IOException, ItemNotFoundException
     {
-        AbstractStorageItem aitem;
+        Attributes aitem;
 
-        AttributeStorage attributeStorageSpy = Mockito.spy( repository.getAttributesHandler().getAttributeStorage() );
-        repository.getAttributesHandler().setAttributeStorage( attributeStorageSpy );
+        final AttributeStorage attributeStorageSpy = spyOnRealAttributeStorage();
 
         aitem = attributesHandler.getAttributeStorage().getAttributes( uid );
         checkNotNull( aitem );
@@ -125,21 +122,33 @@ public class Nexus4628Test
             allOf( greaterThanOrEqualTo( beforeCallTs ), lessThanOrEqualTo( afterCallTs ) ) );
 
         final long past = System.currentTimeMillis() - 10000;
-        attributesHandler.touchItemLastRequested( past, repository, fakeRemoteRequest, aitem );
+        attributesHandler.touchItemLastRequested( past, fakeRemoteRequest, uid, aitem );
 
         aitem = attributesHandler.getAttributeStorage().getAttributes( uid );
         checkNotNull( aitem );
         assertThat( aitem.getLastRequested(), equalTo( past ) );
 
         final long past2 = past - 10000;
-        attributesHandler.touchItemLastRequested( past2, repository, fakeRemoteRequest, aitem );
+        attributesHandler.touchItemLastRequested( past2, fakeRemoteRequest, uid, aitem );
 
         aitem = attributesHandler.getAttributeStorage().getAttributes( uid );
         checkNotNull( aitem );
         assertThat( aitem.getLastRequested(), equalTo( past2 ) );
 
         Mockito.verify( attributeStorageSpy, Mockito.times( 3 ) ).getAttributes( Mockito.<RepositoryItemUid> any() );
-        Mockito.verify( attributeStorageSpy, Mockito.times( 2 ) ).putAttribute( Mockito.<StorageItem> any() );
+        Mockito.verify( attributeStorageSpy, Mockito.times( 2 ) ).putAttributes( Mockito.<RepositoryItemUid> any(),
+            Mockito.<Attributes> any() );
+    }
+
+    // ==
+
+    protected AttributeStorage spyOnRealAttributeStorage()
+    {
+        final DelegatingAttributeStorage das =
+            (DelegatingAttributeStorage) repository.getAttributesHandler().getAttributeStorage();
+        final AttributeStorage attributeStorageSpy = Mockito.spy( das.getDelegate() );
+        repository.getAttributesHandler().setAttributeStorage( attributeStorageSpy );
+        return attributeStorageSpy;
     }
 
 }

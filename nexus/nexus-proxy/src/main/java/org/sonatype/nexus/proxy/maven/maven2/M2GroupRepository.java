@@ -398,7 +398,7 @@ public class M2GroupRepository
 
         nae.addEventContext( item.getItemContext() );
 
-        nae.addItemAttributes( item.getAttributes() );
+        nae.addItemAttributes( item.getRepositoryItemAttributes().asMap() );
 
         return nae;
     }

@@ -24,9 +24,7 @@ import javax.enterprise.inject.Typed;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * A HashMap implementation of Attribute Storage. Usable for tests etc, since it actually does not persists anything.
@@ -39,36 +37,23 @@ public class HashMapAttributeStorage
     extends AbstractAttributeStorage
     implements AttributeStorage
 {
-    private HashMap<String, AbstractStorageItem> storageMap = new HashMap<String, AbstractStorageItem>();
+    private HashMap<String, Attributes> storageMap = new HashMap<String, Attributes>();
 
     @Override
-    public AbstractStorageItem getAttributes( RepositoryItemUid uid )
+    public Attributes getAttributes( final RepositoryItemUid uid )
     {
-        if ( isMetadataMaintained( uid ) )
-        {
-            return storageMap.get( uid.getKey() );
-        }
-
-        return null;
+        return storageMap.get( uid.getKey() );
     }
 
     @Override
-    public void putAttribute( StorageItem item )
+    public void putAttributes( final RepositoryItemUid uid, final Attributes item )
     {
-        if ( isMetadataMaintained( item.getRepositoryItemUid() ) )
-        {
-            storageMap.put( item.getRepositoryItemUid().getKey(), (AbstractStorageItem) item );
-        }
+        storageMap.put( uid.getKey(), item );
     }
 
     @Override
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
-        if ( isMetadataMaintained( uid ) )
-        {
-            return storageMap.remove( uid.getKey() ) != null;
-        }
-
-        return false;
+        return storageMap.remove( uid.getKey() ) != null;
     }
 }

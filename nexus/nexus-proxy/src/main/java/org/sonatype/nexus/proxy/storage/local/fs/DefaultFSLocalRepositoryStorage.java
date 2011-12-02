@@ -36,6 +36,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
@@ -260,8 +261,7 @@ public class DefaultFSLocalRepositoryStorage
                         link.setCreated( target.lastModified() );
                         result = link;
 
-                        repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(),
-                            repository, request, link );
+                        repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(), link );
                     }
                     catch ( NoSuchRepositoryException e )
                     {
@@ -284,8 +284,7 @@ public class DefaultFSLocalRepositoryStorage
                     file.setLength( target.length() );
                     result = file;
 
-                    repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(), repository,
-                        request, file );
+                    repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(), file );
                 }
             }
             catch ( FileNotFoundException e )
@@ -403,16 +402,16 @@ public class DefaultFSLocalRepositoryStorage
     {
         RepositoryItemUid fromUid = repository.createUid( from.getRequestPath() );
 
-        AbstractStorageItem fromAttr = repository.getAttributesHandler().getAttributeStorage().getAttributes( fromUid );
+        Attributes fromAttr =
+            repository.getAttributesHandler().getAttributeStorage().getAttributes( fromUid );
 
         // check does it have attrs at all
         if ( fromAttr != null )
         {
             RepositoryItemUid toUid = repository.createUid( to.getRequestPath() );
-
-            fromAttr.setRepositoryItemUid( toUid );
-
-            repository.getAttributesHandler().getAttributeStorage().putAttribute( fromAttr );
+            fromAttr.setRepositoryId( toUid.getRepository().getId() );
+            fromAttr.setPath( toUid.getPath() );
+            repository.getAttributesHandler().getAttributeStorage().putAttributes( toUid, fromAttr );
         }
 
         File fromTarget = getFileFromBase( repository, from );

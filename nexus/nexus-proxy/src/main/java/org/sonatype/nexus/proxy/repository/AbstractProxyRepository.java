@@ -1074,7 +1074,7 @@ public abstract class AbstractProxyRepository
 
                             if ( !shouldGetRemote )
                             {
-                                markItemRemotelyChecked( request );
+                                markItemRemotelyChecked( localItem );
 
                                 if ( getLogger().isDebugEnabled() )
                                 {
@@ -1258,11 +1258,11 @@ public abstract class AbstractProxyRepository
         }
     }
 
-    protected void markItemRemotelyChecked( ResourceStoreRequest request )
+    protected void markItemRemotelyChecked( final StorageItem item )
         throws StorageException, ItemNotFoundException
     {
         // remote file unchanged, touch the local one to renew it's Age
-        getAttributesHandler().touchItemRemoteChecked( this, request );
+        getAttributesHandler().touchItemCheckedRemotely( System.currentTimeMillis(), item );
     }
 
     /**
@@ -1602,7 +1602,7 @@ public abstract class AbstractProxyRepository
 
         nae.addEventContext( iice.getRemoteItem().getItemContext() );
 
-        nae.addItemAttributes( iice.getRemoteItem().getAttributes() );
+        nae.addItemAttributes( iice.getRemoteItem().getRepositoryItemAttributes().asMap() );
 
         getFeedRecorder().addNexusArtifactEvent( nae );
     }

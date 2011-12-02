@@ -108,13 +108,13 @@ public class DefaultMergedTreeNodeFactory
 
                 mnode.setArtifactTimestamp( item.getModified() );
 
-                mnode.setArtifactMd5Checksum( item.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY ) );
+                mnode.setArtifactMd5Checksum( item.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY ) );
 
-                mnode.setArtifactSha1Checksum( item.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) );
+                mnode.setArtifactSha1Checksum( item.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) );
 
-                mnode.setInitiatorUserId( item.getAttributes().get( AccessManager.REQUEST_USER ) );
+                mnode.setInitiatorUserId( item.getRepositoryItemAttributes().get( AccessManager.REQUEST_USER ) );
 
-                mnode.setInitiatorIpAddress( item.getAttributes().get( AccessManager.REQUEST_REMOTE_ADDRESS ) );
+                mnode.setInitiatorIpAddress( item.getRepositoryItemAttributes().get( AccessManager.REQUEST_REMOTE_ADDRESS ) );
 
                 mnode.setArtifactOriginUrl( item.getRemoteUrl() );
 

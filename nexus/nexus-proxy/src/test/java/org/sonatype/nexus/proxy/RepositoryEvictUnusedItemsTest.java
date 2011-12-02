@@ -66,7 +66,7 @@ public class RepositoryEvictUnusedItemsTest
         mangledItem.setLastRequested( System.currentTimeMillis() - ( 3 * DAY ) );
 
         // store the change
-        repo1.getAttributesHandler().updateItemAttributes( repo1, null, mangledItem );
+        repo1.getAttributesHandler().storeAttributes( mangledItem );
 
         // and evict all that are not "used" for 2 days
         Collection<String> evicted = repo1.evictUnusedItems( new ResourceStoreRequest(

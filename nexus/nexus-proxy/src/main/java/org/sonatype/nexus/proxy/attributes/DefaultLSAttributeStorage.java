@@ -36,9 +36,7 @@ import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
-import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -66,16 +64,11 @@ public class DefaultLSAttributeStorage
     public DefaultLSAttributeStorage( @Named( "xstream-xml" ) final Marshaller marshaller )
     {
         this.marshaller = marshaller;
+        getLogger().info( "Default LS AttributeStorage in place." );
     }
 
-    public boolean deleteAttributes( RepositoryItemUid uid )
+    public boolean deleteAttributes( final RepositoryItemUid uid )
     {
-        if ( !isMetadataMaintained( uid ) )
-        {
-            // do nothing
-            return false;
-        }
-
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.delete );
@@ -119,14 +112,8 @@ public class DefaultLSAttributeStorage
         }
     }
 
-    public AbstractStorageItem getAttributes( RepositoryItemUid uid )
+    public Attributes getAttributes( final RepositoryItemUid uid )
     {
-        if ( !isMetadataMaintained( uid ) )
-        {
-            // do nothing
-            return null;
-        }
-
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.read );
@@ -139,11 +126,7 @@ public class DefaultLSAttributeStorage
             }
             try
             {
-                AbstractStorageItem result = null;
-
-                result = doGetAttributes( uid );
-
-                return result;
+                return doGetAttributes( uid );
             }
             catch ( IOException ex )
             {
@@ -158,17 +141,9 @@ public class DefaultLSAttributeStorage
         }
     }
 
-    public void putAttribute( StorageItem item )
+    public void putAttributes( final RepositoryItemUid uid,  Attributes attributes )
     {
-        if ( !isMetadataMaintained( item.getRepositoryItemUid() ) )
-        {
-            // do nothing
-            return;
-        }
-
-        RepositoryItemUid origUid = item.getRepositoryItemUid();
-
-        final RepositoryItemUidLock uidLock = origUid.getAttributeLock();
+        final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
         uidLock.lock( Action.create );
 
@@ -176,57 +151,49 @@ public class DefaultLSAttributeStorage
         {
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug( "Storing attributes on UID=" + item.getRepositoryItemUid() );
-            }
-
-            if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
-            {
-                // not saving attributes for directories anymore
-                return;
+                getLogger().debug( "Storing attributes on UID=" + uid.toString() );
             }
 
             try
             {
-                AbstractStorageItem onDisk = doGetAttributes( item.getRepositoryItemUid() );
+                Attributes onDisk = doGetAttributes( uid );
 
-                if ( onDisk != null && ( onDisk.getGeneration() > item.getGeneration() ) )
+                if ( onDisk != null && ( onDisk.getGeneration() > attributes.getGeneration() ) )
                 {
                     // change detected, overlay the to be saved onto the newer one and swap
-                    onDisk.setResourceStoreRequest( item.getResourceStoreRequest() );
-
-                    onDisk.overlay( item );
+                    onDisk.overlayAttributes( attributes );
 
                     // and overlay other things too
-                    onDisk.setRepositoryItemUid( item.getRepositoryItemUid() );
-                    onDisk.setReadable( item.isReadable() );
-                    onDisk.setWritable( item.isWritable() );
+                    onDisk.setRepositoryId( uid.getRepository().getId() );
+                    onDisk.setPath( uid.getPath() );
+                    onDisk.setReadable( attributes.isReadable() );
+                    onDisk.setWritable( attributes.isWritable() );
 
-                    item = onDisk;
+                    attributes = onDisk;
                 }
 
-                item.incrementGeneration();
+                attributes.incrementGeneration();
 
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-                marshaller.marshal( item, bos );
+                marshaller.marshal( attributes, bos );
 
-                final Repository repository = origUid.getRepository();
+                final Repository repository = uid.getRepository();
 
                 final DefaultStorageFileItem attributeItem =
                     new DefaultStorageFileItem( repository, new ResourceStoreRequest( getAttributePath( repository,
-                        origUid.getPath() ) ), true, true, new ByteArrayContentLocator( bos.toByteArray(), "text/xml" ) );
+                        uid.getPath() ) ), true, true, new ByteArrayContentLocator( bos.toByteArray(), "text/xml" ) );
 
                 repository.getLocalStorage().storeItem( repository, attributeItem );
             }
             catch ( UnsupportedStorageOperationException ex )
             {
                 // TODO: what here? Is local storage unsuitable for storing attributes?
-                getLogger().error(
-                    "Got UnsupportedStorageOperationException during store of UID=" + item.getRepositoryItemUid(), ex );
+                getLogger().error( "Got UnsupportedStorageOperationException during store of UID=" + uid.toString(), ex );
             }
             catch ( IOException ex )
             {
-                getLogger().error( "Got IOException during store of UID=" + item.getRepositoryItemUid(), ex );
+                getLogger().error( "Got IOException during store of UID=" + uid.toString(), ex );
             }
         }
         finally
@@ -255,14 +222,13 @@ public class DefaultLSAttributeStorage
      * Gets the attributes.
      * 
      * @param uid the uid
-     * @param isCollection the is collection
      * @return the attributes
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    protected AbstractStorageItem doGetAttributes( RepositoryItemUid uid )
+    protected Attributes doGetAttributes( RepositoryItemUid uid )
         throws IOException
     {
-        AbstractStorageItem result = null;
+        Attributes result = null;
 
         InputStream attributeStream = null;
 
@@ -282,15 +248,15 @@ public class DefaultLSAttributeStorage
 
                 attributeStream = attributeItem.getContentLocator().getContent();
 
-                result = (AbstractStorageItem) marshaller.unmarshal( attributeStream );
+                result = marshaller.unmarshal( attributeStream );
 
-                result.setRepositoryItemUid( uid );
+                result.setRepositoryId( uid.getRepository().getId() );
+                result.setPath( uid.getPath() );
 
                 // fixing remoteChecked
-                if ( result.getRemoteChecked() == 0 || result.getRemoteChecked() == 1 )
+                if ( result.getCheckedRemotely() == 0 || result.getCheckedRemotely() == 1 )
                 {
-                    result.setRemoteChecked( System.currentTimeMillis() );
-
+                    result.setCheckedRemotely( System.currentTimeMillis() );
                     result.setExpired( true );
                 }
 

@@ -19,20 +19,13 @@
 package org.sonatype.nexus.proxy.attributes;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
@@ -40,7 +33,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * AttributeStorage implementation driven by XStream.
- *
+ * 
  * @author cstamas
  */
 public class AbstractAttributesHandlerTest
@@ -80,11 +73,15 @@ public class AbstractAttributesHandlerTest
         exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
         exRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
 
-        if ( attributesHandler.getAttributeStorage() instanceof DefaultFSAttributeStorage )
+        if ( attributesHandler.getAttributeStorage().getDelegate() instanceof DefaultFSAttributeStorage )
         {
-            FileUtils.deleteDirectory( ( (DefaultFSAttributeStorage) attributesHandler.getAttributeStorage() ).getWorkingDirectory() );
+            FileUtils.deleteDirectory( ( (DefaultFSAttributeStorage) attributesHandler.getAttributeStorage().getDelegate() ).getWorkingDirectory() );
         }
-        else
+        else if ( attributesHandler.getAttributeStorage().getDelegate() instanceof DefaultLSAttributeStorage )
+        {
+            FileUtils.deleteDirectory( new File( localStorageDirectory, ".nexus/attributes" ) );
+        }
+        else if ( attributesHandler.getAttributeStorage().getDelegate() instanceof TransitioningAttributeStorage )
         {
             FileUtils.deleteDirectory( new File( localStorageDirectory, ".nexus/attributes" ) );
         }

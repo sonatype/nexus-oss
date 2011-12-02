@@ -49,6 +49,14 @@ public class DefaultStorageFileItem
      */
     private String mimeType;
 
+    @Override
+    public void upgrade()
+    {
+        super.upgrade();
+        
+        getRepositoryItemAttributes().setLength( length );
+    }
+    
     /**
      * Instantiates a new default storage file item.
      * 
@@ -107,13 +115,13 @@ public class DefaultStorageFileItem
     @Override
     public long getLength()
     {
-        return length;
+        return getRepositoryItemAttributes().getLength();
     }
 
     @Override
     public void setLength( long length )
     {
-        this.length = length;
+        getRepositoryItemAttributes().setLength( length );
     }
 
     @Override
@@ -159,7 +167,7 @@ public class DefaultStorageFileItem
     {
         if ( isContentGenerated() )
         {
-            return getAttributes().get( ContentGenerator.CONTENT_GENERATOR_ID );
+            return getRepositoryItemAttributes().get( ContentGenerator.CONTENT_GENERATOR_ID );
         }
         else
         {
@@ -173,19 +181,19 @@ public class DefaultStorageFileItem
         if ( StringUtils.isBlank( contentGeneratorId ) )
         {
             // rempve it from attributes
-            getAttributes().remove( ContentGenerator.CONTENT_GENERATOR_ID );
+            getRepositoryItemAttributes().remove( ContentGenerator.CONTENT_GENERATOR_ID );
         }
         else
         {
             // add it to attributes
-            getAttributes().put( ContentGenerator.CONTENT_GENERATOR_ID, contentGeneratorId );
+            getRepositoryItemAttributes().put( ContentGenerator.CONTENT_GENERATOR_ID, contentGeneratorId );
         }
     }
 
     @Override
     public boolean isContentGenerated()
     {
-        return getAttributes().containsKey( ContentGenerator.CONTENT_GENERATOR_ID );
+        return getRepositoryItemAttributes().containsKey( ContentGenerator.CONTENT_GENERATOR_ID );
     }
 
     // ==

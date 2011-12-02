@@ -69,10 +69,9 @@ public class Nexus977GroupOfGroupsRebuildAttributesTaskIT
         String[] storageContent = scan.getIncludedFiles();
 
         scan = new DirectoryScanner();
-        //scan.setBasedir( new File( nexusWorkDir, "storage" ) );
-        scan.setBasedir( new File( nexusWorkDir, "proxy/attributes" ) );
+        scan.setBasedir( new File( nexusWorkDir, "storage" ) );
         scan.addDefaultExcludes();
-        // scan.setIncludes( new String[] { "**/.nexus/attributes/" } );
+        scan.setIncludes( new String[] { "**/.nexus/attributes/" } );
         scan.scan();
         String[] attributesContent = scan.getIncludedFiles();
 

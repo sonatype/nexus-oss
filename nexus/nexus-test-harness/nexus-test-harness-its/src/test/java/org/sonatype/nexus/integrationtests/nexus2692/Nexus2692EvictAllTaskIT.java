@@ -36,30 +36,19 @@ public class Nexus2692EvictAllTaskIT
 
         // check files
         SortedSet<String> resultStorageFiles = getItemFilePaths();
-        SortedSet<String> resultAttributeFiles = getAttributeFilePaths();
 
         SortedSet<String> expectedResults = buildListOfExpectedFilesForAllRepos( days );
 
         // calc the diff ( files that were deleted and should not have been )
         expectedResults.removeAll( resultStorageFiles );
-        Assert.assertTrue( expectedResults.isEmpty(), "The following files where deleted and should not have been: "
+        Assert.assertTrue( expectedResults.isEmpty(), "The following files were deleted and should not have been: "
             + expectedResults );
-
-        expectedResults = buildListOfExpectedFilesForAllRepos( days );
-        expectedResults.removeAll( resultAttributeFiles );
-        Assert.assertTrue( expectedResults.isEmpty(),
-            "The following attribute files where deleted and should not have been: " + expectedResults );
 
         // now the other way
         expectedResults = buildListOfExpectedFilesForAllRepos( days );
         resultStorageFiles.removeAll( expectedResults );
         Assert.assertTrue( resultStorageFiles.isEmpty(), "The following files should have been deleted: "
             + resultStorageFiles );
-
-        expectedResults = buildListOfExpectedFilesForAllRepos( days );
-        resultAttributeFiles.removeAll( expectedResults );
-        Assert.assertTrue( resultAttributeFiles.isEmpty(), "The following files should have been deleted: "
-            + resultAttributeFiles );
 
         // make sure we don't have any empty directories
         checkForEmptyDirectories();

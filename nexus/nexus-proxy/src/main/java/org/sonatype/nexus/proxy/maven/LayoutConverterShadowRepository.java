@@ -197,9 +197,9 @@ public abstract class LayoutConverterShadowRepository
 
             StorageFileItem storedFile = (StorageFileItem) retrieveItem( false, request );
 
-            String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+            String sha1Hash = storedFile.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
-            String md5Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
+            String md5Hash = storedFile.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
 
             if ( !StringUtils.isEmpty( sha1Hash ) )
             {
@@ -309,9 +309,9 @@ public abstract class LayoutConverterShadowRepository
 
             ResourceStoreRequest req = new ResourceStoreRequest( storedFile );
 
-            String sha1Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+            String sha1Hash = storedFile.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
 
-            String md5Hash = storedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
+            String md5Hash = storedFile.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
 
             if ( !StringUtils.isEmpty( sha1Hash ) )
             {

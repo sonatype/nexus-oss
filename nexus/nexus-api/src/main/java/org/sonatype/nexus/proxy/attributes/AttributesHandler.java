@@ -27,89 +27,121 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The Interface AttributesHandler. Used to decorate the items.
- * 
+ * AttributesHandler manages the storage of item attributes, does their recalculation if needed (how it's done is left
+ * to implementation) and offers some "shortcut" methods to perform updates on some (core used) attributes like
+ * "lastRequested" and other. All {@link org.sonatype.nexus.proxy.item.StorageCollectionItem} types does not have
+ * persisted attributes, and handler will simply not handle them.
+ *
  * @author cstamas
  */
 public interface AttributesHandler
 {
+
+    /**
+     * Returns the AttributeStorage used by this AttributesHandler instance.
+     *
+     * @return AttributeStorage used by this instance.
+     */
     AttributeStorage getAttributeStorage();
 
+    /**
+     * Sets the attribute storage used by this instance.
+     *
+     * @param attributeStorage
+     * @deprecated For UT uses only!
+     */
+    @Deprecated
     void setAttributeStorage( AttributeStorage attributeStorage );
 
     /**
-     * Fetches the item attributes and decorates the supplied item.
-     * 
-     * @param item the item
-     * @return Map of attributes or empty map if none found.
+     * Fetches the item attributes and decorates the supplied item instance with it.
+     *
+     * @param item the item to have attributes loaded up and decorated with.
      */
     void fetchAttributes( StorageItem item );
 
     /**
-     * Creates the item attributes and stores them.
-     * 
-     * @param item the item
-     * @param inputStream the input stream
+     * Stores the item attributes. If non-null content locator is supplied, attributes will be recalculated before saving.
+     *
+     * @param item    the item
+     * @param content the content of the item if we deal with StorageFileItem
      */
     void storeAttributes( StorageItem item, ContentLocator content );
 
     /**
-     * Removes the item attributes.
-     * 
+     * Stores item attributes, as-is, will not try attribute expansion either.
+     *
+     * @param item the item
+     */
+    void storeAttributes( StorageItem item );
+
+    /**
+     * Removes the item attributes from attribute storage.
+     *
      * @param uid the uid
      * @return true if attributes are found and deleted, false otherwise.
      */
     boolean deleteAttributes( RepositoryItemUid uid );
 
+    /**
+     * Sets the storageItem's "checkedRemotely" attribute (a timestamp in millis) to the passed in one and persists
+     * the modified attributes.
+     *
+     * @param timestamp
+     * @param storageItem
+     */
+    void touchItemCheckedRemotely( long timestamp, StorageItem storageItem );
+
+    /**
+     * Sets the storageItem's "lastRequested" attribute (a timestamp in millis) to the passed in one and persists
+     * the modified attributes.
+     *
+     * @param timestamp
+     * @param storageItem
+     */
+    void touchItemLastRequested( long timestamp, StorageItem storageItem );
+
     // ==
 
     /**
-     * Touch item and sets on it the current time.
-     * 
-     * @param uid the uid
-     * @throws LocalStorageException the storage exception
+     * Updates the "checkedRemotely" attribute of item in given repository Touch item and sets on it the current time.
+     *
+     * @deprecated Use {@link #touchItemCheckedRemotely(long, org.sonatype.nexus.proxy.item.StorageItem)} instead.
      */
+    @Deprecated
     void touchItemRemoteChecked( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException, LocalStorageException;
 
     /**
      * Touch item and sets on it the given timestamp.
-     * 
-     * @param uid the uid
-     * @param timestamp the ts to set on file, 0 to "expire" it
-     * @throws LocalStorageException the storage exception
+     *
+     * @deprecated Use {@link #touchItemCheckedRemotely(long, org.sonatype.nexus.proxy.item.StorageItem)} instead.
      */
+    @Deprecated
     void touchItemRemoteChecked( long timestamp, Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException, LocalStorageException;
 
     /**
      * Touch item last requested and sets on it the current time.
-     * 
-     * @param uid the uid
-     * @throws LocalStorageException the storage exception
+     *
+     * @deprecated Use {@link #touchItemLastRequested(long, org.sonatype.nexus.proxy.item.StorageItem)} instead.
      */
+    @Deprecated
     void touchItemLastRequested( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException, LocalStorageException;
 
     /**
      * Touch item last requested and sets on it the given timestamp.
-     * 
-     * @param uid the uid
-     * @param timestamp the ts to set on file, 0 to "expire" it
-     * @throws LocalStorageException the storage exception
+     *
+     * @deprecated Use {@link #touchItemLastRequested(long, org.sonatype.nexus.proxy.item.StorageItem)} instead.
      */
     void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException, LocalStorageException;
 
     /**
      * Touch only if request is user-request (coming from outside of nexus).
-     * 
-     * @param timestamp
-     * @param repository
-     * @param request
-     * @param storageItem
-     * @throws ItemNotFoundException
-     * @throws LocalStorageException
+     *
+     * @deprecated Use {@link #touchItemLastRequested(long, org.sonatype.nexus.proxy.item.StorageItem)} instead.
      */
     void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request,
                                  StorageItem storageItem )
@@ -117,10 +149,10 @@ public interface AttributesHandler
 
     /**
      * Update item attributes, does not modify the content of it.
-     * 
-     * @param item the item
-     * @throws LocalStorageException the storage exception
+     *
+     * @deprecated Use {@link #storeAttributes(org.sonatype.nexus.proxy.item.StorageItem)} instead!
      */
+    @Deprecated
     void updateItemAttributes( Repository repository, ResourceStoreRequest request, StorageItem item )
         throws ItemNotFoundException, LocalStorageException;
 }

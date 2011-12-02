@@ -18,39 +18,40 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
 /**
- * The Interface AttributeStorage, used by LocalStorages.
- * 
- * @see LocalRepositoryStorage
+ * AttributeStorage manages persistence of StorageItem Attributes. Is used by LocalStorages and should not be directly
+ * used (ie. by a plugin).
+ *
  * @author cstamas
+ * @see LocalRepositoryStorage
  */
 public interface AttributeStorage
 {
-    /**
-     * Gets the attributes.
-     * 
-     * @param uid the uid
-     * @return the attributes
-     */
-    AbstractStorageItem getAttributes( RepositoryItemUid uid );
 
     /**
-     * Put attribute.
-     * 
-     * @param item the item
+     * Returns the attributes for given key or {@code null} if no attributes found for given key.
+     *
+     * @param uid the key for which attributes needs to be fetched
+     * @return the attributes or {@code null} if no attributes found for given uid.
      */
-    void putAttribute( StorageItem item );
+    Attributes getAttributes( RepositoryItemUid uid );
 
     /**
-     * Delete attributes.
-     * 
+     * Put attributes for given key.
+     *
+     * @param uid        the key
+     * @param attributes the attributes to store
+     */
+    void putAttributes( RepositoryItemUid uid, Attributes attributes );
+
+    /**
+     * Deletes attributes associated with given key.
+     *
      * @param uid the uid
-     * @return true, if successful
+     * @return true, if delete actually happened (attributes for given uid existed).
      */
     boolean deleteAttributes( RepositoryItemUid uid );
 }

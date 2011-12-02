@@ -87,7 +87,7 @@ public class InfoArtifactViewProvider
         repositories.add( itemUid.getRepository().getId() );
 
         final String checksum =
-            fileItem == null ? null : fileItem.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+            fileItem == null ? null : fileItem.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
         if ( checksum != null )
         {
             IteratorSearchResponse searchResponse = null;
@@ -134,7 +134,7 @@ public class InfoArtifactViewProvider
                 {
                     StorageItem repoItem = repo.retrieveItem( repoRequest );
                     if ( checksum == null
-                        || checksum.equals( repoItem.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) ) )
+                        || checksum.equals( repoItem.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) ) )
                     {
                         repositories.add( repo.getId() );
                     }
@@ -162,12 +162,12 @@ public class InfoArtifactViewProvider
 
         if ( fileItem != null )
         {
-            resource.setMd5Hash( fileItem.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY ) );
+            resource.setMd5Hash( fileItem.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY ) );
             resource.setSha1Hash( checksum );
             resource.setLastChanged( fileItem.getModified() );
             resource.setSize( fileItem.getLength() );
             resource.setUploaded( fileItem.getCreated() );
-            resource.setUploader( fileItem.getAttributes().get( AccessManager.REQUEST_USER ) );
+            resource.setUploader( fileItem.getRepositoryItemAttributes().get( AccessManager.REQUEST_USER ) );
             resource.setMimeType( fileItem.getMimeType() );
 
             try

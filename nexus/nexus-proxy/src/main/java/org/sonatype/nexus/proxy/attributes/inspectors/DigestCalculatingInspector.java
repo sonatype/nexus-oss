@@ -64,11 +64,11 @@ public class DigestCalculatingInspector
         {
             if ( item.getItemContext().containsKey( StorageFileItem.DIGEST_SHA1_KEY ) )
             {
-                item.getAttributes().put( DIGEST_SHA1_KEY,
+                item.getRepositoryItemAttributes().put( DIGEST_SHA1_KEY,
                     String.valueOf( item.getItemContext().get( StorageFileItem.DIGEST_SHA1_KEY ) ) );
 
                 // do this one "blindly"
-                item.getAttributes().put( DIGEST_MD5_KEY,
+                item.getRepositoryItemAttributes().put( DIGEST_MD5_KEY,
                     String.valueOf( item.getItemContext().get( StorageFileItem.DIGEST_MD5_KEY ) ) );
 
                 // we did our job, we "lifted" the digest from context
@@ -103,8 +103,8 @@ public class DigestCalculatingInspector
             while ( numRead != -1 );
             String md5digestStr = new String( Hex.encodeHex( md5.digest() ) );
             String sha1DigestStr = new String( Hex.encodeHex( sha1.digest() ) );
-            item.getAttributes().put( DIGEST_MD5_KEY, md5digestStr );
-            item.getAttributes().put( DIGEST_SHA1_KEY, sha1DigestStr );
+            item.getRepositoryItemAttributes().put( DIGEST_MD5_KEY, md5digestStr );
+            item.getRepositoryItemAttributes().put( DIGEST_SHA1_KEY, sha1DigestStr );
         }
         finally
         {

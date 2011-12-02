@@ -99,6 +99,7 @@ public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
 
         // create Repository Mock
         Repository repository = mock( Repository.class );
+        when(repository.getId()).thenReturn( "mock" );
         when( repository.getRepositoryKind() ).thenReturn( new DefaultRepositoryKind( HostedRepository.class, null) );
         when( repository.getLocalUrl() ).thenReturn( repoLocation.toURI().toURL().toString() );
         AttributesHandler attributesHandler = mock( AttributesHandler.class );

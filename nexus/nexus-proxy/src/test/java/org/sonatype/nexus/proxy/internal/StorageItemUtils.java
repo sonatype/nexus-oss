@@ -47,7 +47,7 @@ public class StorageItemUtils
     public static void printStorageItem( PrintWriter pw, StorageItem item )
     {
         pw.println( item.getClass().getName() );
-        Map<String, String> dataMap = item.getAttributes();
+        Map<String, String> dataMap = item.getRepositoryItemAttributes().asMap();
         for ( String key : dataMap.keySet() )
         {
             pw.print( key );
