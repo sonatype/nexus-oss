@@ -163,6 +163,10 @@ public abstract class AbstractRepository
     /** if non-indexable -> indexable change occured, need special handling after save */
     private boolean madeSearchable = false;
 
+    /** if local status changed, need special handling after save */
+    private boolean localStatusChanged = false;
+
+
     // --
 
     protected Logger getLogger()
@@ -215,6 +219,8 @@ public abstract class AbstractRepository
 
         this.madeSearchable = false;
 
+        this.localStatusChanged = false;
+
         return wasDirty;
     }
 
@@ -224,6 +230,8 @@ public abstract class AbstractRepository
         this.localUrlChanged = false;
 
         this.madeSearchable = false;
+
+        this.localStatusChanged = false;
 
         return super.rollbackChanges();
     }
@@ -240,6 +248,7 @@ public abstract class AbstractRepository
 
         event.setLocalUrlChanged( this.localUrlChanged );
         event.setMadeSearchable( this.madeSearchable );
+        event.setLocalStatusChanged( localStatusChanged );
 
         return event;
     }
@@ -377,6 +386,8 @@ public abstract class AbstractRepository
             LocalStatus oldLocalStatus = getLocalStatus();
 
             super.setLocalStatus( localStatus );
+
+            localStatusChanged = true;
 
             getApplicationEventMulticaster().notifyEventListeners(
                 new RepositoryEventLocalStatusChanged( this, oldLocalStatus, localStatus ) );
