@@ -24,6 +24,7 @@ import java.util.Set;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import com.google.common.base.Predicate;
 
@@ -31,7 +32,7 @@ import com.google.common.base.Predicate;
  * A "smart" timeline that is able to detect presence of real timeline implementation. It looks for a
  * {@code NexusTimeline} role and hint of {@code "real"}. If component like this is found, it is used, if not NOOP
  * timeline is used.
- *
+ * 
  * @author: cstamas
  * @since 1.10.0
  */
@@ -58,14 +59,19 @@ public class RedirectingTimeline
             this.nexusTimeline = plexusContainer.lookup( NexusTimeline.class, "real" );
 
             getLogger().info( "Timeline present and enabled." );
+
+            return;
+        }
+        catch ( ComponentLookupException e )
+        {
+            getLogger().info( "Timeline not present, using NOOP Timeline." );
         }
         catch ( Exception e )
         {
-            getLogger().info( "Tried to enable Timeline but failed, fallback to NOOP Timeline." );
-
-            // silent
-            this.nexusTimeline = NoopTimeline.INSTANCE;
+            getLogger().info( "Timeline actvation failed, using NOOP Timeline.", e );
         }
+
+        this.nexusTimeline = NoopTimeline.INSTANCE;
     }
 
     protected NexusTimeline getDelegate()

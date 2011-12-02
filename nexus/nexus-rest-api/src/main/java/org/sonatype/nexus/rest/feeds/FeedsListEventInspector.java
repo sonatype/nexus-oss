@@ -21,6 +21,7 @@ package org.sonatype.nexus.rest.feeds;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
@@ -59,25 +60,31 @@ public class FeedsListEventInspector
 
             if ( feedsList instanceof FeedsListPlexusResource )
             {
-                final PlexusResource delegate =
-                    (AbstractNexusPlexusResource) plexusContainer.lookup( PlexusResource.class, "TimelineFeedList" );
-
-                if ( delegate != null )
+                try
                 {
-                    ( (FeedsListPlexusResource) feedsList ).setDelegate( delegate );
+                    final PlexusResource delegate =
+                        (AbstractNexusPlexusResource) plexusContainer.lookup( PlexusResource.class, "TimelineFeedList" );
 
-                    getLogger().info( "Timeline based feeds are present and enabled." );
+                    if ( delegate != null )
+                    {
+                        ( (FeedsListPlexusResource) feedsList ).setDelegate( delegate );
 
-                    return;
+                        getLogger().info( "Timeline based feeds are present and enabled." );
+
+                        return;
+                    }
                 }
-
-                getLogger().info( "Tried to enable Timeline based feeds but failed, fallback to NOOP Feeds." );
+                catch ( ComponentLookupException e )
+                {
+                    // expected if timeline plugin not present
+                    getLogger().info( "Timeline based feeds are not present, we have no timeline based feeds." );
+                }
             }
         }
         catch ( Exception e )
         {
             // huh
-            getLogger().debug( "Unexpected exception!", e );
+            getLogger().info( "Unexpected exception during activation of timeline based feeds, we have no feeds!", e );
         }
     }
 }
