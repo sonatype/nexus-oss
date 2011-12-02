@@ -19,7 +19,6 @@
 package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -39,12 +38,13 @@ public class HttpGetPropertiesDiscoveryStrategy
     extends HttpGetDiscoveryStrategy
 {
     public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
-        throws NoSuchRepositoryException, IOException
+        throws NoSuchRepositoryException,
+            IOException
     {
         DiscoveryResponse dr = new DiscoveryResponse( request );
 
         // handle
-        InputStream response = handleRequest( getRemoteUrl( request ) );
+        RequestResult response = handleRequest( getRemoteUrl( request ) );
 
         if ( response != null )
         {
@@ -52,7 +52,7 @@ public class HttpGetPropertiesDiscoveryStrategy
 
             try
             {
-                properties.load( response );
+                properties.load( response.getInputStream() );
             }
             finally
             {

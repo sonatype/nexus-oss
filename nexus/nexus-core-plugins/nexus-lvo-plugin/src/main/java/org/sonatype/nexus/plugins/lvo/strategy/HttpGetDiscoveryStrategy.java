@@ -22,23 +22,24 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.util.concurrent.Future;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.ahc.AhcProvider;
+import org.codehaus.plexus.util.IOUtil;
+import org.restlet.data.ClientInfo;
+import org.restlet.data.Method;
+import org.restlet.data.Request;
+import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.error.reporting.NexusProxyServerConfigurator;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-
-import com.ning.http.client.BodyDeferringAsyncHandler;
-import com.ning.http.client.BodyDeferringAsyncHandler.BodyDeferringInputStream;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
 
 /**
  * This is a "remote" strategy, uses HTTP GET for information fetch from the remoteUrl. Note: this class uses Restlet
@@ -51,24 +52,28 @@ public class HttpGetDiscoveryStrategy
     extends AbstractRemoteDiscoveryStrategy
 {
     @Requirement
-    private AhcProvider ahcProvider;
-
+    private GlobalRestApiSettings restApiSettings;
+    
+    @Requirement
+    private NexusConfiguration nexusConfig;
+    
     public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
-        throws NoSuchRepositoryException, IOException
+        throws NoSuchRepositoryException,
+            IOException
     {
         DiscoveryResponse dr = new DiscoveryResponse( request );
 
         // handle
-        InputStream response = handleRequest( getRemoteUrl( request ) );
+        RequestResult response = handleRequest( getRemoteUrl( request ) );
 
         if ( response != null )
         {
             try
             {
-                BufferedReader reader = new BufferedReader( new InputStreamReader( response ) );
-
+                BufferedReader reader = new BufferedReader( new InputStreamReader( response.getInputStream() ) );
+    
                 dr.setVersion( reader.readLine() );
-
+    
                 dr.setSuccessful( true );
             }
             finally
@@ -80,47 +85,78 @@ public class HttpGetDiscoveryStrategy
         return dr;
     }
 
-    protected InputStream handleRequest( String url )
+    protected RequestResult handleRequest( String url )
     {
-        Request request = new RequestBuilder().setFollowRedirects( true ).setUrl( url ).build();
-
+        HttpClient client = new HttpClient();
+        
+        new NexusProxyServerConfigurator( nexusConfig.getGlobalRemoteStorageContext(), new Slf4jPlexusLogger( getLogger() ) ).applyToClient( client );
+        
+        GetMethod method = new GetMethod( url );
+        
+        RequestResult result = null;
+        
         try
         {
-            final PipedOutputStream po = new PipedOutputStream();
-
-            final PipedInputStream pi = new PipedInputStream( po );
-
-            final BodyDeferringAsyncHandler bdah = new BodyDeferringAsyncHandler( po );
-
-            Future<Response> f = ahcProvider.getAsyncHttpClient().executeRequest( request, bdah );
-
-            BodyDeferringInputStream result = new BodyDeferringInputStream( f, bdah, pi );
-
-            if ( 200 == result.getAsapResponse().getStatusCode() )
+            int status = client.executeMethod( method );
+            
+            if ( HttpStatus.SC_OK == status )
             {
-                return result;
-            }
-            else
-            {
-                result.close();
-
-                return null;
+                result = new RequestResult( method );
             }
         }
         catch ( IOException e )
         {
             getLogger().debug( "Error retrieving lvo data", e );
         }
-        catch ( InterruptedException e )
-        {
-            getLogger().debug( "Error retrieving lvo data", e );
-        }
-
-        return null;
+        
+        return result;
     }
 
     protected String getRemoteUrl( DiscoveryRequest request )
     {
         return request.getLvoKey().getRemoteUrl();
+    }
+
+    protected Request getRestRequest( String url )
+    {
+        Request rr = new Request( Method.GET, url );
+
+        rr.setReferrerRef( restApiSettings.getBaseUrl() );
+
+        ClientInfo ci = new ClientInfo();
+
+        ci.setAgent( formatUserAgent() );
+
+        rr.setClientInfo( ci );
+
+        return rr;
+    }
+    
+    protected static final class RequestResult
+    {
+        private InputStream is;
+        private GetMethod method;
+        
+        public RequestResult( GetMethod method ) 
+            throws IOException
+        {
+            this.is = method.getResponseBodyAsStream();
+            this.method = method;
+        }
+        
+        public InputStream getInputStream()
+        {
+            return this.is;
+        }
+        
+        public void close()
+        {
+            IOUtil.close( is );
+            
+            if ( this.method != null )
+            {
+                this.method.releaseConnection();
+            }
+        }
     }
 }

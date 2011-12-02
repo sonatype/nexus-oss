@@ -19,7 +19,6 @@
 package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
@@ -56,18 +55,19 @@ public class HttpGetLvoDiscoveryStrategy
     }
 
     public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
-        throws NoSuchRepositoryException, IOException
+        throws NoSuchRepositoryException,
+            IOException
     {
         DiscoveryResponse dr = new DiscoveryResponse( request );
 
         // handle
-        InputStream response = handleRequest( getRemoteUrl( request ) );
+        RequestResult response = handleRequest( getRemoteUrl( request ) );
 
         if ( response != null )
         {
             try
             {
-                DiscoveryResponse remoteResponse = (DiscoveryResponse) getXStream().fromXML( response );
+                DiscoveryResponse remoteResponse = (DiscoveryResponse) getXStream().fromXML( response.getInputStream() );
 
                 return remoteResponse;
             }
