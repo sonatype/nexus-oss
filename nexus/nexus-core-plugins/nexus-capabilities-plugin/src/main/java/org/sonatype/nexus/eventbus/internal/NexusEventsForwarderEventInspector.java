@@ -20,6 +20,7 @@ package org.sonatype.nexus.eventbus.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -29,6 +30,8 @@ import org.sonatype.plexus.appevents.Event;
 
 /**
  * Listens to Nexus events and forwards them to {@link NexusEventBus}.
+ * <p/>
+ * It also registers all {@link NexusEventBus.LoadOnStart} marked handlers.
  *
  * @since 1.10.0
  */
@@ -40,9 +43,14 @@ public class NexusEventsForwarderEventInspector
     private final NexusEventBus eventBus;
 
     @Inject
-    public NexusEventsForwarderEventInspector( final NexusEventBus eventBus )
+    public NexusEventsForwarderEventInspector( final NexusEventBus eventBus,
+                                               final List<NexusEventBus.LoadOnStart> handlers )
     {
         this.eventBus = checkNotNull( eventBus );
+        for ( final NexusEventBus.LoadOnStart handler : checkNotNull( handlers ) )
+        {
+            eventBus.register( handler );
+        }
     }
 
     public boolean accepts( final Event<?> evt )
