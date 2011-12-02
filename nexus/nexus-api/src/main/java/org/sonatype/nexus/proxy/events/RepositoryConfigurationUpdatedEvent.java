@@ -36,6 +36,8 @@ public class RepositoryConfigurationUpdatedEvent
 
     private boolean madeSearchable = false;
 
+    private boolean localStatusChanged = false;
+
     public RepositoryConfigurationUpdatedEvent( Repository repository )
     {
         super( repository );
@@ -54,6 +56,11 @@ public class RepositoryConfigurationUpdatedEvent
     public boolean isDownloadRemoteIndexEnabled()
     {
         return downloadRemoteIndexEnabled;
+    }
+
+    public boolean isLocalStatusChanged()
+    {
+        return localStatusChanged;
     }
 
     public void setLocalUrlChanged( boolean localUrlChanged )
@@ -80,4 +87,10 @@ public class RepositoryConfigurationUpdatedEvent
     {
         this.madeSearchable = madeSearchable;
     }
+
+    public void setLocalStatusChanged( boolean localStatusChanged )
+    {
+        this.localStatusChanged = localStatusChanged;
+    }
+
 }
