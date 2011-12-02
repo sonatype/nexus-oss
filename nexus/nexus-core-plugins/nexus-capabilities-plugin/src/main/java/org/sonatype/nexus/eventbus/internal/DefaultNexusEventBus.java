@@ -18,7 +18,7 @@
  */
 package org.sonatype.nexus.eventbus.internal;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -27,10 +27,11 @@ import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.eventbus.internal.guava.EventBus;
 import org.sonatype.nexus.eventbus.internal.guava.EventHandler;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import com.google.common.collect.Lists;
 
 /**
  * {@link NexusEventBus} implementation using guava event bus.
- *
+ * <p/>
  * It differs from guava event bus by dispatching events as they appear (is re-entrant). Guava will queue up all event
  * and dispatch them in the order they were posted, without re-entrance.
  *
@@ -50,35 +51,31 @@ class DefaultNexusEventBus
     {
         eventBus = new EventBus( "nexus" )
         {
-            /** queues of events for the current thread to dispatch */
-            private final ThreadLocal<ConcurrentLinkedQueue<EventWithHandler>> eventsToDispatch =
-                new ThreadLocal<ConcurrentLinkedQueue<EventWithHandler>>()
-                {
-                    @Override
-                    protected ConcurrentLinkedQueue<EventWithHandler> initialValue()
-                    {
-                        return new ConcurrentLinkedQueue<EventWithHandler>();
-                    }
-                };
+            /** List of events for the current thread to dispatch */
+            private final ThreadLocal<List<EventWithHandler>> eventsToDispatch =
+                new ThreadLocal<List<EventWithHandler>>();
 
             @Override
             protected void enqueueEvent( final Object event, final EventHandler handler )
             {
-                eventsToDispatch.get().offer( new EventWithHandler( event, handler ) );
+                if ( eventsToDispatch.get() == null )
+                {
+                    eventsToDispatch.set( Lists.<EventWithHandler>newArrayList() );
+                }
+                eventsToDispatch.get().add( new EventWithHandler( event, handler ) );
             }
 
             @Override
             protected void dispatchQueuedEvents()
             {
-                while ( true )
+                final List<EventWithHandler> eventWithHandlers = eventsToDispatch.get();
+                if ( eventWithHandlers != null )
                 {
-                    EventWithHandler eventWithHandler = eventsToDispatch.get().poll();
-                    if ( eventWithHandler == null )
+                    eventsToDispatch.remove();
+                    for ( final EventWithHandler eventWithHandler : eventWithHandlers )
                     {
-                        break;
+                        dispatch( eventWithHandler.event, eventWithHandler.handler );
                     }
-
-                    dispatch( eventWithHandler.event, eventWithHandler.handler );
                 }
             }
         };
