@@ -250,12 +250,13 @@ public class DefaultApplicationConfigurationValidator
 
         if ( StringUtils.isEmpty( repo.getId() ) )
         {
-            response.addValidationError( "Repository ID's may not be empty!" );
+            response.addValidationError( new ValidationMessage( "id", "Repository ID's may not be empty!" ) );
         }
         else if ( !repo.getId().matches( REPOSITORY_ID_PATTERN ) )
         {
-            response
-                .addValidationError( "Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed in Repository ID" );
+            response.addValidationError(
+                new ValidationMessage( "id",
+                                       "Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed in Repository ID" ) );
         }
         // if repo id isn't valid, nothing below here will validate properly
         else
@@ -263,17 +264,19 @@ public class DefaultApplicationConfigurationValidator
             if ( StringUtils.isEmpty( repo.getName() ) )
             {
                 repo.setName( repo.getId() );
-    
-                response.addValidationWarning( "Repository with ID='" + repo.getId()
-                    + "' has no name, defaulted to it's ID." );
-    
+
+                response.addValidationWarning( new ValidationMessage( "id", "Repository with ID='" + repo.getId() )
+                                                   + "' has no name, defaulted to it's ID." );
+
                 response.setModified( true );
             }
-    
+
             if ( !validateLocalStatus( repo.getLocalStatus() ) )
             {
-                response.addValidationError( "LocalStatus of repository with ID='" + repo.getId() + "' is wrong " + repo.getLocalStatus() + "! (Allowed values are: '" + LocalStatus.IN_SERVICE + "' and '"
-                    + LocalStatus.OUT_OF_SERVICE + "')" );
+                response.addValidationError(
+                    new ValidationMessage( "id", "LocalStatus of repository with ID='" + repo.getId() ) + "' is wrong "
+                        + repo.getLocalStatus() + "! (Allowed values are: '" + LocalStatus.IN_SERVICE + "' and '"
+                        + LocalStatus.OUT_OF_SERVICE + "')" );
             }
     /*
             if ( !validateRepositoryType( repo.getType() ) )
@@ -318,7 +321,7 @@ public class DefaultApplicationConfigurationValidator
             {
                 if ( context.getExistingRepositoryIds().contains( repo.getId() ) )
                 {
-                    response.addValidationError( "Repository " + repo.getId() + " declared more than once!" );
+                    response.addValidationError( new ValidationMessage( "id", "Repository with ID=" + repo.getId() + " already exists!" ) );
                 }
     
                 context.getExistingRepositoryIds().add( repo.getId() );
@@ -328,8 +331,8 @@ public class DefaultApplicationConfigurationValidator
             {
                 if ( context.getExistingRepositoryShadowIds().contains( repo.getId() ) )
                 {
-                    response.addValidationError( "Repository " + repo.getId()
-                        + " conflicts with existing Shadow with same ID='" + repo.getId() + "'!" );
+                    response.addValidationError( new ValidationMessage( "id", "Repository " + repo.getId()
+                        + " conflicts with existing Shadow with same ID='" + repo.getId() + "'!" ) );
                 }
             }
     
@@ -337,8 +340,8 @@ public class DefaultApplicationConfigurationValidator
             {
                 if ( context.getExistingRepositoryGroupIds().contains( repo.getId() ) )
                 {
-                    response.addValidationError( "Repository " + repo.getId()
-                        + " conflicts with existing Group with same ID='" + repo.getId() + "'!" );
+                    response.addValidationError( new ValidationMessage( "id", "Repository " + repo.getId()
+                        + " conflicts with existing Group with same ID='" + repo.getId() + "'!" ) );
                 }
             }
         }
