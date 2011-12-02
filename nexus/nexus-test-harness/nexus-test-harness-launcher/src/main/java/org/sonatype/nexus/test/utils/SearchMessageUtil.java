@@ -19,6 +19,7 @@
 package org.sonatype.nexus.test.utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccess;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 import java.io.IOException;
@@ -647,4 +648,38 @@ public class SearchMessageUtil
         return resourceResponse;
     }
 
+    /**
+     * Reindex a given path.
+     */
+    public void reindexPath( String repo, String path )
+        throws IOException, Exception
+    {
+        String serviceURI = "service/local/data_incremental_index/repositories/" + repo + "/content/" + path;
+        Status status = RequestFacade.doDeleteForStatus( serviceURI, null );
+        assertThat( "Fail to update " + repo + " repository index " + status, status, isSuccess() );
+
+        // let s w8 a few time for indexes
+        TaskScheduleUtil.waitForAllTasksToStop();
+    }
+
+    /**
+     * Reindex a given GAV.
+     */
+    public void reindexGAV( String repo, Gav gav )
+        throws IOException, Exception
+    {
+        String path = gav.getGroupId().replace( '.', '/' ) + "/" + gav.getArtifactId() + "/" + gav.getVersion() + "/";
+        reindexPath( repo, path );
+    }
+
+    /**
+     * Reindex a given GA. <BR>
+     * Notice this won't include version
+     */
+    public void reindexGA( String repo, Gav ga )
+        throws IOException, Exception
+    {
+        String path = ga.getGroupId().replace( '.', '/' ) + "/" + ga.getArtifactId() + "/";
+        reindexPath( repo, path );
+    }
 }
