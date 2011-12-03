@@ -49,25 +49,23 @@ public class LogicalConditions
     /**
      * Creates a new condition that is satisfied when both conditions are satisfied (logical AND).
      *
-     * @param left  left operand condition
-     * @param right right operand condition
+     * @param conditions to be AND-ed
      * @return created condition
      */
-    public Condition and( final Condition left, final Condition right )
+    public Condition and( final Condition... conditions )
     {
-        return new ConjunctionCondition( eventBus, left, right );
+        return new ConjunctionCondition( eventBus, conditions );
     }
 
     /**
      * Creates a new condition that is satisfied when at least one condition is satisfied (logical OR).
      *
-     * @param left  left operand condition
-     * @param right right operand condition
+     * @param conditions to be OR-ed
      * @return created condition
      */
-    public Condition or( final Condition left, final Condition right )
+    public Condition or( final Condition... conditions )
     {
-        return new DisjunctionCondition( eventBus, left, right );
+        return new DisjunctionCondition( eventBus, conditions );
     }
 
     /**
@@ -92,10 +90,9 @@ public class LogicalConditions
     {
 
         public ConjunctionCondition( final NexusEventBus eventBus,
-                                     final Condition left,
-                                     final Condition right )
+                                     final Condition... conditions )
         {
-            super( eventBus, left, right );
+            super( eventBus, conditions );
         }
 
         @Override
@@ -139,10 +136,9 @@ public class LogicalConditions
     {
 
         public DisjunctionCondition( final NexusEventBus eventBus,
-                                     final Condition left,
-                                     final Condition right )
+                                     final Condition... conditions )
         {
-            super( eventBus, left, right );
+            super( eventBus, conditions );
         }
 
         @Override
