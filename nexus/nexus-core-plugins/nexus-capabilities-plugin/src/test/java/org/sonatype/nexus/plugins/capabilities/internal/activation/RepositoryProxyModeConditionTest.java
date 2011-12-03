@@ -32,23 +32,24 @@ import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
 /**
- * {@link RepositoryLocalStatusCondition} UTs.
+ * {@link RepositoryProxyModeCondition} UTs.
  *
  * @since 1.10.0
  */
-public class RepositoryLocalStatusConditionTest
+public class RepositoryProxyModeConditionTest
     extends NexusEventBusTestSupport
 {
 
     static final String TEST_REPOSITORY = "test-repository";
 
-    private RepositoryLocalStatusCondition underTest;
+    private RepositoryProxyModeCondition underTest;
 
-    private Repository repository;
+    private ProxyRepository repository;
 
     private RepositoryRegistry repositoryRegistry;
 
@@ -62,14 +63,19 @@ public class RepositoryLocalStatusConditionTest
         final RepositoryConditions.RepositoryId repositoryId = mock( RepositoryConditions.RepositoryId.class );
         when( repositoryId.get() ).thenReturn( TEST_REPOSITORY );
 
-        repository = mock( Repository.class );
+        final RepositoryKind repositoryKind = mock( RepositoryKind.class );
+        when( repositoryKind.isFacetAvailable( ProxyRepository.class ) ).thenReturn( true );
+
+        repository = mock( ProxyRepository.class );
         when( repository.getId() ).thenReturn( TEST_REPOSITORY );
-        when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
+        when( repository.getRepositoryKind() ).thenReturn( repositoryKind );
+        when( repository.getProxyMode() ).thenReturn( ProxyMode.ALLOW );
+        when( repository.adaptToFacet( ProxyRepository.class ) ).thenReturn( repository );
 
         repositoryRegistry = mock( RepositoryRegistry.class );
 
-        underTest = new RepositoryLocalStatusCondition(
-            eventBus, repositoryRegistry, LocalStatus.IN_SERVICE, repositoryId
+        underTest = new RepositoryProxyModeCondition(
+            eventBus, repositoryRegistry, ProxyMode.ALLOW, repositoryId
         );
         underTest.bind();
 
@@ -81,14 +87,14 @@ public class RepositoryLocalStatusConditionTest
     }
 
     /**
-     * Condition should become unsatisfied and notification sent when repository is out of service.
+     * Condition should become unsatisfied and notification sent when repository is auto blocked.
      */
     @Test
-    public void unsatisfiedWhenRepositoryIsOutOfService()
+    public void repositoryIsAutoBlocked()
     {
         assertThat( underTest.isSatisfied(), is( true ) );
 
-        when( repository.getLocalStatus() ).thenReturn( LocalStatus.OUT_OF_SERVICE );
+        when( repository.getProxyMode() ).thenReturn( ProxyMode.BLOCKED_AUTO );
         underTest.handle( new RepositoryConfigurationUpdatedEvent( repository ) );
         assertThat( underTest.isSatisfied(), is( false ) );
 
@@ -96,17 +102,32 @@ public class RepositoryLocalStatusConditionTest
     }
 
     /**
-     * Condition should become satisfied and notification sent when repository is back on service.
+     * Condition should become unsatisfied and notification sent when repository is manually blocked.
      */
     @Test
-    public void satisfiedWhenRepositoryIsBackToService()
+    public void satisfiedWhenRepositoryIsManuallyBlocked()
     {
         assertThat( underTest.isSatisfied(), is( true ) );
 
-        when( repository.getLocalStatus() ).thenReturn( LocalStatus.OUT_OF_SERVICE );
+        when( repository.getProxyMode() ).thenReturn( ProxyMode.BLOCKED_MANUAL );
+        underTest.handle( new RepositoryConfigurationUpdatedEvent( repository ) );
+        assertThat( underTest.isSatisfied(), is( false ) );
+
+        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
+    }
+
+    /**
+     * Condition should become satisfied and notification sent when repository is not blocked anymore.
+     */
+    @Test
+    public void satisfiedWhenRepositoryIsNotBlockingAnymore()
+    {
+        assertThat( underTest.isSatisfied(), is( true ) );
+
+        when( repository.getProxyMode() ).thenReturn( ProxyMode.BLOCKED_AUTO );
         underTest.handle( new RepositoryConfigurationUpdatedEvent( repository ) );
 
-        when( repository.getLocalStatus() ).thenReturn( LocalStatus.IN_SERVICE );
+        when( repository.getProxyMode() ).thenReturn( ProxyMode.ALLOW );
         underTest.handle( new RepositoryConfigurationUpdatedEvent( repository ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 

@@ -26,45 +26,52 @@ import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import com.google.common.eventbus.Subscribe;
 
 /**
- * A condition that is satisfied when a repository has a specified local status.
+ * A condition that is satisfied when a repository has a specified proxy mode.
  *
  * @since 1.10.0
  */
-public class RepositoryLocalStatusCondition
+public class RepositoryProxyModeCondition
     extends AbstractRepositoryCondition
 {
 
-    private final LocalStatus localStatus;
+    private final ProxyMode proxyMode;
 
-    public RepositoryLocalStatusCondition( final NexusEventBus eventBus,
-                                           final RepositoryRegistry repositoryRegistry,
-                                           final LocalStatus localStatus,
-                                           final RepositoryConditions.RepositoryId repositoryId )
+    public RepositoryProxyModeCondition( final NexusEventBus eventBus,
+                                         final RepositoryRegistry repositoryRegistry,
+                                         final ProxyMode proxyMode,
+                                         final RepositoryConditions.RepositoryId repositoryId )
     {
         super( eventBus, repositoryRegistry, repositoryId );
-        this.localStatus = checkNotNull( localStatus );
+        this.proxyMode = checkNotNull( proxyMode );
     }
 
     @Override
     @Subscribe
     public void handle( final RepositoryRegistryEventAdd event )
     {
-        if ( sameRepositoryAs( event.getRepository().getId() ) )
+        if ( sameRepositoryAs( event.getRepository().getId() )
+            && event.getRepository().getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
-            setSatisfied( localStatus.equals( event.getRepository().getLocalStatus() ) );
+            setSatisfied( proxyMode.equals(
+                event.getRepository().adaptToFacet( ProxyRepository.class ).getProxyMode() )
+            );
         }
     }
 
     @Subscribe
     public void handle( final RepositoryConfigurationUpdatedEvent event )
     {
-        if ( sameRepositoryAs( event.getRepository().getId() ) )
+        if ( sameRepositoryAs( event.getRepository().getId() )
+            && event.getRepository().getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
-            setSatisfied( localStatus.equals( event.getRepository().getLocalStatus() ) );
+            setSatisfied( proxyMode.equals(
+                event.getRepository().adaptToFacet( ProxyRepository.class ).getProxyMode() )
+            );
         }
     }
 
@@ -83,11 +90,11 @@ public class RepositoryLocalStatusCondition
         try
         {
             final String id = getRepositoryId();
-            return String.format( "Repository '%s' is %s", id, localStatus.toString() );
+            return String.format( "Repository '%s' is %s", id, proxyMode.toString() );
         }
         catch ( Exception ignore )
         {
-            return String.format( "Repository '(could not be evaluated)' is %s", localStatus.toString() );
+            return String.format( "Repository '(could not be evaluated)' is %s", proxyMode.toString() );
         }
     }
 

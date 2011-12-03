@@ -39,53 +39,21 @@ import com.google.common.eventbus.Subscribe;
  * @since 1.10.0
  */
 public class RepositoryExistsCondition
-    extends AbstractCondition
+    extends AbstractRepositoryCondition
 {
-
-    private final RepositoryRegistry repositoryRegistry;
-
-    private final RepositoryConditions.RepositoryId repositoryId;
-
-    private final ReentrantReadWriteLock bindLock;
 
     public RepositoryExistsCondition( final NexusEventBus eventBus,
                                       final RepositoryRegistry repositoryRegistry,
                                       final RepositoryConditions.RepositoryId repositoryId )
     {
-        super( eventBus, false );
-        this.repositoryRegistry = checkNotNull( repositoryRegistry );
-        this.repositoryId = checkNotNull( repositoryId );
-        bindLock = new ReentrantReadWriteLock(  );
+        super( eventBus, repositoryRegistry, repositoryId );
     }
 
     @Override
-    protected void doBind()
-    {
-        try
-        {
-            bindLock.writeLock().lock();
-            for ( final Repository repository : repositoryRegistry.getRepositories() )
-            {
-                handle( new RepositoryRegistryEventAdd( repositoryRegistry, repository ) );
-            }
-        }
-        finally
-        {
-            bindLock.writeLock().unlock();
-        }
-        getEventBus().register( this );
-    }
-
-    @Override
-    public void doRelease()
-    {
-        getEventBus().unregister( this );
-    }
-
     @Subscribe
     public void handle( final RepositoryRegistryEventAdd event )
     {
-        if ( event.getRepository().getId().equals( repositoryId.get() ) )
+        if ( sameRepositoryAs( event.getRepository().getId() ) )
         {
             setSatisfied( true );
         }
@@ -94,23 +62,9 @@ public class RepositoryExistsCondition
     @Subscribe
     public void handle( final RepositoryRegistryEventRemove event )
     {
-        if ( event.getRepository().getId().equals( repositoryId.get() ) )
+        if ( sameRepositoryAs( event.getRepository().getId() ) )
         {
             setSatisfied( false );
-        }
-    }
-
-    @Override
-    protected void setSatisfied( final boolean satisfied )
-    {
-        try
-        {
-            bindLock.readLock().lock();
-            super.setSatisfied( satisfied );
-        }
-        finally
-        {
-            bindLock.readLock().unlock();
         }
     }
 
@@ -119,7 +73,7 @@ public class RepositoryExistsCondition
     {
         try
         {
-            final String id = repositoryId.get();
+            final String id = getRepositoryId();
             return String.format( "Repository '%s' exists", id );
         }
         catch ( Exception ignore )

@@ -28,8 +28,10 @@ import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryLocalStatusCondition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryProxyModeCondition;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
 
 /**
  * Factory of {@link Condition}s related to repositories.
@@ -62,6 +64,17 @@ public class RepositoryConditions
     public Condition repositoryIsInService( final RepositoryId repositoryId )
     {
         return new RepositoryLocalStatusCondition( eventBus, repositoryRegistry, LocalStatus.IN_SERVICE, repositoryId );
+    }
+
+    /**
+     * Creates a new condition that is satisfied when a proxy repository proxy mode allows proxy-ing (ALLOW).
+     *
+     * @param repositoryId getter for repository id (usually condition specific property)
+     * @return created condition
+     */
+    public Condition repositoryIsNotBlocked( final RepositoryId repositoryId )
+    {
+        return new RepositoryProxyModeCondition( eventBus, repositoryRegistry, ProxyMode.ALLOW, repositoryId );
     }
 
     /**

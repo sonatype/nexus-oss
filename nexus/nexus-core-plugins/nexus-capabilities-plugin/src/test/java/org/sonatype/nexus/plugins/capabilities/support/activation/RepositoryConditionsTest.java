@@ -29,6 +29,7 @@ import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryLocalStatusCondition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.RepositoryProxyModeCondition;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 /**
@@ -57,6 +58,18 @@ public class RepositoryConditionsTest
         assertThat(
             underTest.repositoryIsInService( mock( RepositoryConditions.RepositoryId.class ) ),
             is( Matchers.<Condition>instanceOf( RepositoryLocalStatusCondition.class ) )
+        );
+    }
+
+    /**
+     * repositoryIsNotBlocked() factory method returns expected condition.
+     */
+    @Test
+    public void repositoryIsNotBlocked()
+    {
+        assertThat(
+            underTest.repositoryIsNotBlocked( mock( RepositoryConditions.RepositoryId.class ) ),
+            is( Matchers.<Condition>instanceOf( RepositoryProxyModeCondition.class ) )
         );
     }
 

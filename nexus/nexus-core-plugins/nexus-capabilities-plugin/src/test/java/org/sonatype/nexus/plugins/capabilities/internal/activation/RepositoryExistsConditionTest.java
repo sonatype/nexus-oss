@@ -87,20 +87,6 @@ public class RepositoryExistsConditionTest
     }
 
     /**
-     * Condition should become unsatisfied and notification sent when repository is removed.
-     */
-    @Test
-    public void unsatisfiedWhenRepositoryRemoved()
-    {
-        assertThat( underTest.isSatisfied(), is( true ) );
-
-        underTest.handle( new RepositoryRegistryEventRemove( repositoryRegistry, repository ) );
-        assertThat( underTest.isSatisfied(), is( false ) );
-
-        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
-    }
-
-    /**
      * Condition should become satisfied and notification sent when repository is added.
      */
     @Test
@@ -113,6 +99,20 @@ public class RepositoryExistsConditionTest
         assertThat( underTest.isSatisfied(), is( true ) );
 
         verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ), satisfied( underTest ) );
+    }
+
+    /**
+     * Condition should become unsatisfied when repository is removed.
+     */
+    @Test
+    public void repositoryIsRemoved()
+    {
+        assertThat( underTest.isSatisfied(), is( true ) );
+
+        underTest.handle( new RepositoryRegistryEventRemove( repositoryRegistry, repository ) );
+        assertThat( underTest.isSatisfied(), is( false ) );
+
+        verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
     }
 
     /**
