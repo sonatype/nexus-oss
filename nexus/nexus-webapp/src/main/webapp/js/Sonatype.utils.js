@@ -22,6 +22,7 @@
     passwordPlaceholder : '|$|N|E|X|U|S|$|',
     edition : '',
     editionShort : '',
+    version : '',
     attributionsURL : '',
     purchaseURL : '',
     userLicenseURL : '',
@@ -835,6 +836,7 @@
 
                 Sonatype.utils.edition = respObj.data.editionLong;
                 Sonatype.utils.editionShort = respObj.data.editionShort;
+                Sonatype.utils.version = respObj.data.version;
                 Sonatype.utils.attributionsURL = respObj.data.attributionsURL;
                 Sonatype.utils.purchaseURL = respObj.data.purchaseURL;
                 Sonatype.utils.userLicenseURL = respObj.data.userLicenseURL;

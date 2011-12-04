@@ -22,12 +22,12 @@ Sonatype.Events.addListener( 'nexusStatus', function() {
   if ( !checkedNewVersion
     && Sonatype.lib.Permissions.checkPermission('nexus:status', Sonatype.lib.Permissions.READ)
     && !Ext.isEmpty( Sonatype.utils.editionShort )
-    && !Ext.isEmpty( Sonatype.utils.versionShort )){
+    && !Ext.isEmpty( Sonatype.utils.version)){
     Ext.Ajax.request( {
       method: 'GET',
       suppressStatus: [404,401,-1],
       url: Sonatype.config.servicePath + '/lvo/nexus-' +
-        Sonatype.utils.editionShort.substr( 0, 3 ).toLowerCase() + '/' + Sonatype.utils.versionShort,
+        Sonatype.utils.editionShort.substr( 0, 3 ).toLowerCase() + '/' + Sonatype.utils.version,
       success: function( response, options ) {
         checkedNewVersion = true;
         var r = Ext.decode( response.responseText );

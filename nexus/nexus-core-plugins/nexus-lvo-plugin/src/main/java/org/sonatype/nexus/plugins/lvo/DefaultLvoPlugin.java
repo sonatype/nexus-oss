@@ -21,10 +21,15 @@ package org.sonatype.nexus.plugins.lvo;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.maven.index.ArtifactInfo;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.sonatype.aether.util.version.GenericVersionScheme;
+import org.sonatype.aether.version.InvalidVersionSpecificationException;
+import org.sonatype.aether.version.Version;
+import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.lvo.config.LvoPluginConfiguration;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
@@ -35,6 +40,9 @@ public class DefaultLvoPlugin
     extends AbstractLoggingComponent
     implements LvoPlugin
 {
+
+    private static final Logger log = LoggerFactory.getLogger( DefaultLvoPlugin.class );
+
     @Requirement
     private LvoPluginConfiguration lvoPluginConfiguration;
 
@@ -43,9 +51,9 @@ public class DefaultLvoPlugin
 
     public DiscoveryResponse getLatestVersionForKey( String key )
         throws NoSuchKeyException,
-            NoSuchStrategyException,
-            NoSuchRepositoryException,
-            IOException
+        NoSuchStrategyException,
+        NoSuchRepositoryException,
+        IOException
     {
         if ( lvoPluginConfiguration.isEnabled() )
         {
@@ -55,8 +63,9 @@ public class DefaultLvoPlugin
 
             if ( StringUtils.isEmpty( strategyId ) )
             {
-                // default it
-                strategyId = "index";
+                // default value was 'index', not available anymore
+                log.warn( "Misconfigured version check key '{}': strategy ID missing.", key );
+                throw new NoSuchStrategyException( info.getStrategy() );
             }
 
             if ( strategies.containsKey( strategyId ) )
@@ -80,9 +89,9 @@ public class DefaultLvoPlugin
 
     public DiscoveryResponse queryLatestVersionForKey( String key, String v )
         throws NoSuchKeyException,
-            NoSuchStrategyException,
-            NoSuchRepositoryException,
-            IOException
+        NoSuchStrategyException,
+        NoSuchRepositoryException,
+        IOException
     {
         if ( lvoPluginConfiguration.isEnabled() )
         {
@@ -94,26 +103,27 @@ public class DefaultLvoPlugin
                 return lv;
             }
 
+            VersionScheme versionScheme = new GenericVersionScheme();
+
             // compare the two versions
 
-            ArtifactInfo ca = new ArtifactInfo();
-            ca.groupId = "dummy";
-            ca.artifactId = "dummy";
-            ca.version = "[" + v + "]";
-
-            ArtifactInfo la = new ArtifactInfo();
-            la.groupId = "dummy";
-            la.artifactId = "dummy";
-            la.version = "[" + lv.getVersion() + "]";
-
-            if ( ArtifactInfo.VERSION_COMPARATOR.compare( la, ca ) >= 0 )
+            try
             {
-                lv.getResponse().clear();
-
-                lv.setSuccessful( true );
+                Version versionCurrent = versionScheme.parseVersion( v );
+                Version versionReceived = versionScheme.parseVersion( lv.getVersion() );
+                if ( versionReceived.compareTo( versionCurrent ) >= 0 )
+                {
+                    return lv;
+                }
             }
+            catch ( InvalidVersionSpecificationException e )
+            {
+                log.warn( "Could not parse version ({}/{}/{})",
+                          new String[]{ key, v, lv.getVersion() } );
+                return null;
+            }
+            return null;
 
-            return lv;
         }
         else
         {

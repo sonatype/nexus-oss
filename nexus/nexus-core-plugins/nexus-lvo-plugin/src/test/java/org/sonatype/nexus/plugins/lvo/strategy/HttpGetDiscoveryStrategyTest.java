@@ -66,7 +66,6 @@ public class HttpGetDiscoveryStrategyTest
     public void testSimple()
         throws Exception
     {
-
     }
 
 }

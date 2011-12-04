@@ -74,6 +74,10 @@ public class HttpGetPropertiesDiscoveryStrategy
                 }
             }
         }
+        else
+        {
+            dr.setSuccessful( false );
+        }
 
         return dr;
     }
