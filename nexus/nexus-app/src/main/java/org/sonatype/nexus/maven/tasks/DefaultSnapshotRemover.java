@@ -52,6 +52,7 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
@@ -229,30 +230,38 @@ public class DefaultSnapshotRemover
                     + " files on repository " + repository.getId() );
         }
 
-        repository.expireCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
-
-        RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor =
-            new RecreateMavenMetadataWalkerProcessor( Slf4jPlexusLogger.getPlexusLogger( getLogger() ), getDeleteOperation( request ) );
-
-        for ( String path : request.getMetadataRebuildPaths() )
+        // if we are processing a hosted-snapshot repository, we need to rebuild maven metadata
+        // without this if below, the walk would happen against proxy repositories too, but doing nothing!
+        if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
         {
-            TaskUtil.checkInterruption();
+            // expire NFC since we might create new maven metadata files
+            repository.expireNotFoundCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
 
-            DefaultWalkerContext ctxMd =
-                new DefaultWalkerContext( repository, new ResourceStoreRequest( path ), new DottedStoreWalkerFilter() );
+            RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor =
+                new RecreateMavenMetadataWalkerProcessor( Slf4jPlexusLogger.getPlexusLogger( getLogger() ),
+                                                          getDeleteOperation( request ) );
 
-            ctxMd.getProcessors().add( metadataRebuildProcessor );
-
-            try
+            for ( String path : request.getMetadataRebuildPaths() )
             {
-                walker.walk( ctxMd );
-            }
-            catch ( WalkerException e )
-            {
-                if ( !( e.getCause() instanceof ItemNotFoundException ) )
+                TaskUtil.checkInterruption();
+
+                DefaultWalkerContext ctxMd =
+                    new DefaultWalkerContext( repository, new ResourceStoreRequest( path ),
+                                              new DottedStoreWalkerFilter() );
+
+                ctxMd.getProcessors().add( metadataRebuildProcessor );
+
+                try
                 {
-                    // do not ignore it
-                    throw e;
+                    walker.walk( ctxMd );
+                }
+                catch ( WalkerException e )
+                {
+                    if ( !( e.getCause() instanceof ItemNotFoundException ) )
+                    {
+                        // do not ignore it
+                        throw e;
+                    }
                 }
             }
         }
@@ -689,6 +698,8 @@ public class DefaultSnapshotRemover
 
                             req.getRequestContext().putAll( context );
 
+                            getLogger().debug( "Checking for release counterpart in repository '{}' and path '{}'", mrepository.getId(), req.toString() );
+
                             mrepository.retrieveItem( false, req );
 
                             return true;
@@ -700,6 +711,7 @@ public class DefaultSnapshotRemover
                         catch ( Exception e )
                         {
                             // nothing
+                            getLogger().debug( "Unexpected exception!", e );
                         }
                     }
                 }
@@ -714,7 +726,8 @@ public class DefaultSnapshotRemover
 
             if ( ctx.getContext().containsKey( DeleteOperation.DELETE_OPERATION_CTX_KEY ) )
             {
-                request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY, ctx.getContext().get( DeleteOperation.DELETE_OPERATION_CTX_KEY )  );
+                request.getRequestContext().put( DeleteOperation.DELETE_OPERATION_CTX_KEY,
+                                                 ctx.getContext().get( DeleteOperation.DELETE_OPERATION_CTX_KEY ) );
             }
 
             return request;
