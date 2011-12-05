@@ -55,14 +55,15 @@ public class StatelessAndStatefulWebSessionManager
 
     protected Session doCreateSession( SessionContext context )
     {
-        Session session = newSessionInstance( context );
-        if ( log.isTraceEnabled() )
-        {
-            log.trace( "Creating session for host {}", session.getHost() );
-        }
-
+        Session session;
         if( WebUtils.isHttp( context ) )
         {
+            session = newSessionInstance( context );
+            if ( log.isTraceEnabled() )
+            {
+                log.trace( "Creating session for host {}", session.getHost() );
+            }
+
             HttpServletRequest request = WebUtils.getHttpRequest( context );
 
             if ( isStatelessClient( request ) )
@@ -82,6 +83,11 @@ public class StatelessAndStatefulWebSessionManager
             {
                 log.trace( "Session {} was created for User-Agent {}", session.getId(), getUserAgent( request ) );
             }
+        }
+        else
+        {
+            log.trace( "Non http request, falling back to default implementation." );
+            session = super.doCreateSession( context );
         }
 
         return session;
