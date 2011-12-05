@@ -35,7 +35,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
  */
 @Component( role = DiscoveryStrategy.class, hint = "http-get-properties" )
 public class HttpGetPropertiesDiscoveryStrategy
-    extends HttpGetDiscoveryStrategy
+    extends AbstractRemoteDiscoveryStrategy
 {
     public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
         throws NoSuchRepositoryException,

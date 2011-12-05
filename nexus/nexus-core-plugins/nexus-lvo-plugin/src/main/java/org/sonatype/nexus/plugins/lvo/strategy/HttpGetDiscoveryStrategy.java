@@ -53,10 +53,7 @@ public class HttpGetDiscoveryStrategy
 {
     @Requirement
     private GlobalRestApiSettings restApiSettings;
-    
-    @Requirement
-    private NexusConfiguration nexusConfig;
-    
+
     public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
         throws NoSuchRepositoryException,
             IOException
@@ -85,38 +82,6 @@ public class HttpGetDiscoveryStrategy
         return dr;
     }
 
-    protected RequestResult handleRequest( String url )
-    {
-        HttpClient client = new HttpClient();
-        
-        new NexusProxyServerConfigurator( nexusConfig.getGlobalRemoteStorageContext(), new Slf4jPlexusLogger( getLogger() ) ).applyToClient( client );
-        
-        GetMethod method = new GetMethod( url );
-        
-        RequestResult result = null;
-        
-        try
-        {
-            int status = client.executeMethod( method );
-            
-            if ( HttpStatus.SC_OK == status )
-            {
-                result = new RequestResult( method );
-            }
-        }
-        catch ( IOException e )
-        {
-            getLogger().debug( "Error retrieving lvo data", e );
-        }
-        
-        return result;
-    }
-
-    protected String getRemoteUrl( DiscoveryRequest request )
-    {
-        return request.getLvoKey().getRemoteUrl();
-    }
-
     protected Request getRestRequest( String url )
     {
         Request rr = new Request( Method.GET, url );
@@ -131,32 +96,5 @@ public class HttpGetDiscoveryStrategy
 
         return rr;
     }
-    
-    protected static final class RequestResult
-    {
-        private InputStream is;
-        private GetMethod method;
-        
-        public RequestResult( GetMethod method ) 
-            throws IOException
-        {
-            this.is = method.getResponseBodyAsStream();
-            this.method = method;
-        }
-        
-        public InputStream getInputStream()
-        {
-            return this.is;
-        }
-        
-        public void close()
-        {
-            IOUtil.close( is );
-            
-            if ( this.method != null )
-            {
-                this.method.releaseConnection();
-            }
-        }
-    }
+
 }

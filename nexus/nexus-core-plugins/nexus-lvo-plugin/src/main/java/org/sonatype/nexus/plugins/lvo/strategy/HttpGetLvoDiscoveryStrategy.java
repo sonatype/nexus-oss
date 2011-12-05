@@ -38,7 +38,7 @@ import com.thoughtworks.xstream.io.xml.XppDomDriver;
  */
 @Component( role = DiscoveryStrategy.class, hint = "http-get-lvo" )
 public class HttpGetLvoDiscoveryStrategy
-    extends HttpGetDiscoveryStrategy
+    extends AbstractRemoteDiscoveryStrategy
 {
     private XStream xstream;
 
