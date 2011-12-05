@@ -21,6 +21,7 @@ package org.sonatype.nexus.plugins.lvo;
 import java.io.IOException;
 import java.util.Map;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -48,6 +49,21 @@ public class DefaultLvoPlugin
 
     @Requirement( role = DiscoveryStrategy.class )
     private Map<String, DiscoveryStrategy> strategies;
+
+    /**
+     * For plexus injection.
+     */
+    public DefaultLvoPlugin()
+    {
+    }
+
+    @VisibleForTesting
+    DefaultLvoPlugin( final LvoPluginConfiguration lvoPluginConfiguration,
+                             final Map<String, DiscoveryStrategy> strategies )
+    {
+        this.lvoPluginConfiguration = lvoPluginConfiguration;
+        this.strategies = strategies;
+    }
 
     public DiscoveryResponse getLatestVersionForKey( String key )
         throws NoSuchKeyException,
@@ -95,12 +111,12 @@ public class DefaultLvoPlugin
     {
         if ( lvoPluginConfiguration.isEnabled() )
         {
-            DiscoveryResponse lv = getLatestVersionForKey( key );
+            DiscoveryResponse response = getLatestVersionForKey( key );
 
-            if ( !lv.isSuccessful() )
+            if ( !response.isSuccessful() )
             {
                 // nothing to compare to
-                return lv;
+                return response;
             }
 
             VersionScheme versionScheme = new GenericVersionScheme();
@@ -110,20 +126,21 @@ public class DefaultLvoPlugin
             try
             {
                 Version versionCurrent = versionScheme.parseVersion( v );
-                Version versionReceived = versionScheme.parseVersion( lv.getVersion() );
-                if ( versionReceived.compareTo( versionCurrent ) >= 0 )
+                Version versionReceived = versionScheme.parseVersion( response.getVersion() );
+                if ( versionReceived.compareTo( versionCurrent ) <= 0 )
                 {
-                    return lv;
+                    // version not newer
+                    response.setSuccessful( false );
                 }
             }
             catch ( InvalidVersionSpecificationException e )
             {
                 log.warn( "Could not parse version ({}/{}/{})",
-                          new String[]{ key, v, lv.getVersion() } );
-                return null;
+                          new String[]{ key, v, response.getVersion() } );
+                response.setSuccessful( false );
             }
-            return null;
 
+            return response;
         }
         else
         {
@@ -135,7 +152,7 @@ public class DefaultLvoPlugin
     {
         DiscoveryResponse response = new DiscoveryResponse( null );
 
-        response.setSuccessful( true );
+        response.setSuccessful( false );
 
         return response;
     }
