@@ -86,7 +86,7 @@ public class StatelessAndStatefulWebSessionManager
         }
         else
         {
-            log.trace( "Non http request, falling back to default implemenation." );
+            log.trace( "Non http request, falling back to default implementation." );
             session = super.doCreateSession( context );
         }
 
