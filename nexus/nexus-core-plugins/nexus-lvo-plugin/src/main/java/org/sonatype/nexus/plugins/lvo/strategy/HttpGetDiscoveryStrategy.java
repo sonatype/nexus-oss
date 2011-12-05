@@ -20,22 +20,14 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.ClientInfo;
 import org.restlet.data.Method;
 import org.restlet.data.Request;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.error.reporting.NexusProxyServerConfigurator;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;

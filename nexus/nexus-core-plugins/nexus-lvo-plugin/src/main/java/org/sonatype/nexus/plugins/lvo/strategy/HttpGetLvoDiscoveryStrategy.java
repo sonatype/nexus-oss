@@ -20,15 +20,14 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.IOException;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
+import com.thoughtworks.xstream.io.xml.XppDomDriver;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.XStreamException;
-import com.thoughtworks.xstream.io.xml.XppDomDriver;
 
 /**
  * This is a "remote" strategy, uses HTTP GET to get a remote LVO Plugin response. It extends the

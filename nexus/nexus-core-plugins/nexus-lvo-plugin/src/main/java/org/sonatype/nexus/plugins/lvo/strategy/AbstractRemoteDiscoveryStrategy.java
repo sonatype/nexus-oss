@@ -21,7 +21,6 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 import java.io.IOException;
 import java.io.InputStream;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;

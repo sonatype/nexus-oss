@@ -21,7 +21,6 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.ignoreStubs;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,9 +29,7 @@ import java.io.IOException;
 
 import com.google.common.base.Throwables;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
