@@ -21,14 +21,15 @@ package org.sonatype.nexus.proxy.attributes;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.FilenameUtils;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.access.Action;
@@ -42,6 +43,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
+
 import com.google.common.io.Closeables;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
@@ -250,9 +252,9 @@ public class LegacyFSAttributeStorage
 
         File result = null;
 
-        String path = FilenameUtils.getPath( uid.getPath() );
+        String path = FileUtils.getPath(  uid.getPath() );
 
-        String name = FilenameUtils.getName( uid.getPath() );
+        String name = FileUtils.removePath(  uid.getPath() );
 
         result = new File( repoBase, path + "/" + name );
 

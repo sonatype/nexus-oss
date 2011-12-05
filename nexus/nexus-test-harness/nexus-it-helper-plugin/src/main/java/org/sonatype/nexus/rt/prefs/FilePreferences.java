@@ -31,7 +31,7 @@ import java.util.TreeMap;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 
-import org.apache.commons.io.IOUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,7 +168,7 @@ public class FilePreferences
                 }
                 finally
                 {
-                    IOUtils.closeQuietly( in );
+                    IOUtil.close( in );
                 }
 
                 StringBuilder sb = new StringBuilder();
@@ -234,7 +234,7 @@ public class FilePreferences
                     }
                     finally
                     {
-                        IOUtils.closeQuietly( in );
+                        IOUtil.close( in );
                     }
 
                     List<String> toRemove = new ArrayList<String>();
@@ -278,7 +278,7 @@ public class FilePreferences
                 }
                 finally
                 {
-                    IOUtils.closeQuietly( out );
+                    IOUtil.close( out );
                 }
             }
             catch ( IOException e )

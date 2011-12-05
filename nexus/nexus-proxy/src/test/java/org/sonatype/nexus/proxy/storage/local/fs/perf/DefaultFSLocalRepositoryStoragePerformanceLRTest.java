@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -93,7 +92,7 @@ public class DefaultFSLocalRepositoryStoragePerformanceLRTest
 
         // write a test file
         File testFile = new File( repoStorageDir, testFilePath );
-        FileUtils.writeStringToFile( testFile, "CONTENT" );
+        org.codehaus.plexus.util.FileUtils.fileWrite( testFile, "CONTENT" );
 
         // Mocks
         Wastebasket wastebasket = mock( Wastebasket.class );

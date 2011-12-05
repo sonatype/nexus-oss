@@ -28,9 +28,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.FilenameUtils;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.access.Action;
@@ -303,9 +303,9 @@ public class DefaultFSAttributeStorage
 
         File result = null;
 
-        String path = FilenameUtils.getPath( uid.getPath() );
+        String path = FileUtils.getPath( uid.getPath() );
 
-        String name = FilenameUtils.getName( uid.getPath() );
+        String name = FileUtils.removePath( uid.getPath() );
 
         result = new File( repoBase, path + "/" + name );
 

@@ -30,7 +30,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -520,7 +519,7 @@ public class DefaultAttributesHandler
 
                         tmpFileStream = new FileOutputStream( tmpFile );
 
-                        IOUtils.copy( inputStream, tmpFileStream );
+                        IOUtil.copy( inputStream, tmpFileStream );
 
                         tmpFileStream.flush();
 
