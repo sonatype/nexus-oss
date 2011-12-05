@@ -18,14 +18,12 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import java.util.Date;
 import java.util.List;
 
-import org.sonatype.nexus.artifact.NexusItemInfo;
-import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.events.RepositoryItemValidationEvent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
@@ -38,9 +36,9 @@ public abstract class AbstractChecksumContentValidator
         super();
     }
 
-    public boolean isRemoteItemContentValid( ProxyRepository proxy, ResourceStoreRequest req, String baseUrl,
-                                             AbstractStorageItem item, List<NexusArtifactEvent> events )
-        throws StorageException
+    public boolean isRemoteItemContentValid(final  ProxyRepository proxy, final ResourceStoreRequest req, final String baseUrl,
+                                             final AbstractStorageItem item, final List<RepositoryItemValidationEvent> events )
+        throws LocalStorageException
     {
         ChecksumPolicy checksumPolicy = getChecksumPolicy( proxy, item );
         if ( checksumPolicy == null || !checksumPolicy.shouldCheckChecksum() )
@@ -98,7 +96,7 @@ public abstract class AbstractChecksumContentValidator
             getLogger().debug( "Validation failed due: " + msg );
         }
 
-        events.add( newChechsumFailureEvent( item, msg ) );
+        events.add( newChechsumFailureEvent( proxy, item, msg ) );
 
         cleanup( proxy, remoteHash, contentValid );
 
@@ -111,33 +109,18 @@ public abstract class AbstractChecksumContentValidator
     }
 
     protected abstract void cleanup( ProxyRepository proxy, RemoteHashResponse remoteHash, boolean contentValid )
-        throws StorageException;
+        throws LocalStorageException;
 
     protected abstract RemoteHashResponse retrieveRemoteHash( AbstractStorageItem item, ProxyRepository proxy,
                                                               String baseUrl )
-        throws StorageException;
+        throws LocalStorageException;
 
     protected abstract ChecksumPolicy getChecksumPolicy( ProxyRepository proxy, AbstractStorageItem item )
-        throws StorageException;
+        throws LocalStorageException;
 
-    private NexusArtifactEvent newChechsumFailureEvent( AbstractStorageItem item, String msg )
+    private RepositoryItemValidationEvent newChechsumFailureEvent( final ProxyRepository proxy, final AbstractStorageItem item, final String msg )
     {
-        NexusItemInfo ai = new NexusItemInfo();
-
-        ai.setPath( item.getPath() );
-
-        ai.setRepositoryId( item.getRepositoryId() );
-
-        ai.setRemoteUrl( item.getRemoteUrl() );
-
-        NexusArtifactEvent nae =
-            new NexusArtifactEvent( new Date(), NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM, msg, ai );
-
-        nae.addEventContext(item.getItemContext() );
-        
-        nae.addItemAttributes( item.getRepositoryItemAttributes().asMap() );
-
-        return nae;
+        return new ChecksumContentValidationEventFailed( proxy, item, msg );
     }
 
 }

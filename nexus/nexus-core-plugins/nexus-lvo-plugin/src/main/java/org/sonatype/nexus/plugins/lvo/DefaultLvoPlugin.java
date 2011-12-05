@@ -28,7 +28,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.aether.util.version.GenericVersionScheme;
-import org.sonatype.aether.version.InvalidVersionSpecificationException;
 import org.sonatype.aether.version.Version;
 import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -41,8 +40,7 @@ public class DefaultLvoPlugin
     extends AbstractLoggingComponent
     implements LvoPlugin
 {
-
-    private static final Logger log = LoggerFactory.getLogger( DefaultLvoPlugin.class );
+    private final VersionScheme versionScheme = new GenericVersionScheme();
 
     @Requirement
     private LvoPluginConfiguration lvoPluginConfiguration;
@@ -118,8 +116,6 @@ public class DefaultLvoPlugin
                 // nothing to compare to
                 return response;
             }
-
-            VersionScheme versionScheme = new GenericVersionScheme();
 
             // compare the two versions
 

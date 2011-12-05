@@ -100,19 +100,20 @@ public class NexusTargetMappingAuthorizationFilter
 
         return rsr;
     }
-    
+
     @Override
-    protected String getHttpMethodAction(ServletRequest request) {
-        
-        String method = ((HttpServletRequest) request).getMethod().toLowerCase();
-            
+    protected String getHttpMethodAction( ServletRequest request )
+    {
+
+        String method = ( (HttpServletRequest) request ).getMethod().toLowerCase();
+
         if ( "put".equals( method ) )
         {
             // heavy handed thing
             // doing a LOCAL ONLY request to check is this exists?
             try
             {
-                getNexus( request ).getRootRouter().retrieveItem( getResourceStoreRequest( request, true ) );
+                getNexus().getRootRouter().retrieveItem( getResourceStoreRequest( request, true ) );
             }
             catch ( ItemNotFoundException e )
             {

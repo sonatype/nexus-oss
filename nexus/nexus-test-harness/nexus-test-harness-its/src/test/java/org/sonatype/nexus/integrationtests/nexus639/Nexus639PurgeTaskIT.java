@@ -22,9 +22,9 @@ import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.PurgeTimelineTaskDescriptor;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.sonatype.nexus.timeline.tasks.PurgeTimelineTaskDescriptor;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

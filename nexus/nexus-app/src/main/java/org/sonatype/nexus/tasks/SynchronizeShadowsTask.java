@@ -20,7 +20,6 @@ package org.sonatype.nexus.tasks;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.SynchronizeShadowTaskDescriptor;
@@ -35,6 +34,11 @@ import org.sonatype.scheduling.SchedulerTask;
 public class SynchronizeShadowsTask
     extends AbstractNexusRepositoriesTask<Object>
 {
+    /**
+     * System event action: shadow sync
+     */
+    public static final String ACTION = "SYNC_SHADOW";
+
     @Override
     protected String getRepositoryFieldId()
     {
@@ -81,7 +85,7 @@ public class SynchronizeShadowsTask
     @Override
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_SYNC_SHADOW_ACTION;
+        return ACTION;
     }
 
     @Override

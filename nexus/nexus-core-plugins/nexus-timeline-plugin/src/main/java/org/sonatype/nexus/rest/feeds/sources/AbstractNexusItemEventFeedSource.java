@@ -64,7 +64,7 @@ public abstract class AbstractNexusItemEventFeedSource
                 entries.add( getSyndEntryBuilder( event ).buildEntry( event ) );
             }
         }
-        
+
         feed.setEntries( entries );
 
         return feed;
@@ -78,7 +78,7 @@ public abstract class AbstractNexusItemEventFeedSource
 
         feed.setDescription( getDescription() );
 
-        feed.setAuthor( "Nexus " + getNexus().getSystemStatus().getVersion() );
+        feed.setAuthor( "Nexus " + getApplicationStatusSource().getSystemStatus().getVersion() );
 
         feed.setPublishedDate( new Date() );
 

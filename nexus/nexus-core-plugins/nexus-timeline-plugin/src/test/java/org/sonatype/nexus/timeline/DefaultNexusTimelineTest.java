@@ -35,7 +35,7 @@ public class DefaultNexusTimelineTest
     {
         super.setUp();
 
-        nexusTimeline = (NexusTimeline) this.lookup( NexusTimeline.class, "real" );
+        nexusTimeline = (NexusTimeline) this.lookup( NexusTimeline.class );
     }
 
     protected void tearDown()

@@ -259,6 +259,13 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- NEXUS-639 (Timeline) -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-timeline-plugin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- NEXUS-156 (RRB perms) -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>

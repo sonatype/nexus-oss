@@ -19,7 +19,6 @@
 package org.sonatype.nexus.tasks;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
@@ -35,6 +34,11 @@ import org.sonatype.scheduling.SchedulerTask;
 public class ExpireCacheTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
+    /**
+     * System event action: expire cache
+     */
+    public static final String ACTION = "EXPIRE_CACHE";
+
     @Override
     protected String getRepositoryFieldId()
     {
@@ -74,7 +78,7 @@ public class ExpireCacheTask
     @Override
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_EXPIRE_CACHE_ACTION;
+        return ACTION;
     }
 
     @Override

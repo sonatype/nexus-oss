@@ -20,17 +20,10 @@ package org.sonatype.nexus;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.feeds.AuthcAuthzEvent;
-import org.sonatype.nexus.feeds.ErrorWarningEvent;
-import org.sonatype.nexus.feeds.NexusArtifactEvent;
-import org.sonatype.nexus.feeds.SystemEvent;
-import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -151,7 +144,7 @@ public interface Nexus
     // ----------------------------------------------------------------------------
 
     // creating
-
+/*
     @Deprecated
     void addNexusArtifactEvent( NexusArtifactEvent nae );
 
@@ -190,7 +183,7 @@ public interface Nexus
     List<AuthcAuthzEvent> getAuthcAuthzEvents( Integer from, Integer count );
 
     List<ErrorWarningEvent> getErrorWarningEvents( Integer from, Integer count );
-
+*/
     // ----------------------------------------------------------------------------
     // Repo templates
     // ----------------------------------------------------------------------------

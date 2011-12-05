@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.DownloadIndexesTaskDescriptor;
@@ -37,6 +36,11 @@ import org.sonatype.scheduling.SchedulerTask;
 public class DownloadIndexesTask
     extends AbstractNexusRepositoriesTask<Object>
 {
+    /**
+     * System event action: download indexes
+     */
+    public static final String ACTION = "DOWNLOADINDEX";
+
     @Requirement
     private IndexerManager indexerManager;
 
@@ -72,7 +76,7 @@ public class DownloadIndexesTask
     @Override
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_DOWNLOADINDEX_ACTION;
+        return ACTION;
     }
 
     @Override

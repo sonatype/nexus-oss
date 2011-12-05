@@ -24,6 +24,7 @@ import org.sonatype.nexus.email.NexusPostOffice;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -45,7 +46,7 @@ public class NexusTaskFailureAlertEmailSender
      */
     public boolean accepts( final Event<?> evt )
     {
-        return evt != null && evt instanceof NexusTaskFailureEvent;
+        return evt != null && evt instanceof NexusTaskEventStoppedFailed<?>;
     }
 
     /**
@@ -57,14 +58,14 @@ public class NexusTaskFailureAlertEmailSender
         {
             return;
         }
-        final NexusTaskFailureEvent<?> failureEvent = (NexusTaskFailureEvent<?>) evt;
+        final NexusTaskEventStoppedFailed<?> failureEvent = (NexusTaskEventStoppedFailed<?>) evt;
         final NexusTask<?> failedTask = failureEvent.getNexusTask();
         if ( failedTask == null || !failedTask.shouldSendAlertEmail() )
         {
             return;
         }
         m_postOffice.sendNexusTaskFailure( failedTask.getAlertEmail(), failedTask.getId(), failedTask.getName(),
-            failureEvent.getCause() );
+            failureEvent.getFailureCause() );
     }
 
 }

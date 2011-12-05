@@ -19,7 +19,8 @@
 package org.sonatype.nexus.rest.feeds.sources;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
@@ -34,19 +35,27 @@ public abstract class AbstractFeedSource
     implements FeedSource
 {
     @Requirement
-    private Nexus nexus;
-    
+    private ApplicationStatusSource applicationStatusSource;
+
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    protected Nexus getNexus()
+    @Requirement
+    private FeedRecorder feedRecorder;
+
+    protected FeedRecorder getFeedRecorder()
     {
-        return nexus;
+        return feedRecorder;
     }
-    
+
     protected RepositoryRegistry getRepositoryRegistry()
     {
         return repositoryRegistry;
+    }
+    
+    protected ApplicationStatusSource getApplicationStatusSource()
+    {
+        return applicationStatusSource;
     }
 
     public abstract String getTitle();

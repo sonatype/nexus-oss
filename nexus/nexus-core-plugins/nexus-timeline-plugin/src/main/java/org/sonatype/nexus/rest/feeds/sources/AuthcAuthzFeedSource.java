@@ -68,7 +68,7 @@ public class AuthcAuthzFeedSource
     public SyndFeed getFeed( Integer from, Integer count, Map<String, String> params )
         throws IOException
     {
-        List<AuthcAuthzEvent> items = getNexus().getAuthcAuthzEvents( from, count );
+        List<AuthcAuthzEvent> items = getFeedRecorder().getAuthcAuthzEvents( null, from, count, null );
 
         SyndFeedImpl feed = new SyndFeedImpl();
 
@@ -76,7 +76,7 @@ public class AuthcAuthzFeedSource
 
         feed.setDescription( getDescription() );
 
-        feed.setAuthor( "Nexus " + getNexus().getSystemStatus().getVersion() );
+        feed.setAuthor( "Nexus " + getApplicationStatusSource().getSystemStatus().getVersion() );
 
         feed.setPublishedDate( new Date() );
 
@@ -114,9 +114,9 @@ public class AuthcAuthzFeedSource
             entry.setDescription( content );
 
             entries.add( entry );
-            
+
         }
-        
+
         feed.setEntries( entries );
 
         return feed;

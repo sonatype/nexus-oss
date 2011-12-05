@@ -18,16 +18,17 @@
  */
 package org.sonatype.nexus.scheduling;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.error.reporting.ErrorReportRequest;
-import org.sonatype.nexus.error.reporting.ErrorReportingManager;
-import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.feeds.SystemProcess;
+import org.sonatype.nexus.scheduling.events.NexusTaskEventStarted;
+import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedCanceled;
+import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedDone;
+import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.scheduling.AbstractSchedulerTask;
 import org.sonatype.scheduling.ScheduledTask;
@@ -42,15 +43,7 @@ public abstract class AbstractNexusTask<T>
     public static final long A_DAY = 24L * 60L * 60L * 1000L;
 
     @Requirement
-    private ErrorReportingManager errorManager;
-
-    @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
-
-    @Requirement
-    private FeedRecorder feedRecorder;
-
-    private SystemProcess prc;
 
     protected AbstractNexusTask()
     {
@@ -144,7 +137,9 @@ public abstract class AbstractNexusTask<T>
     public final T call()
         throws Exception
     {
-        prc = feedRecorder.systemProcessStarted( getAction(), getMessage() );
+        final NexusTaskEventStarted<T> startedEvent = new NexusTaskEventStarted<T>( this );
+        final Date startedDate = startedEvent.getEventDate();
+        applicationEventMulticaster.notifyEventListeners( startedEvent );
 
         T result = null;
 
@@ -160,11 +155,12 @@ public abstract class AbstractNexusTask<T>
 
             if ( TaskUtil.getCurrentProgressListener().isCanceled() )
             {
-                feedRecorder.systemProcessCanceled( prc, getMessage() );
+                applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedCanceled<T>( this,
+                    startedDate ) );
             }
             else
             {
-                feedRecorder.systemProcessFinished( prc, getMessage() );
+                applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedDone<T>( this, startedDate ) );
             }
 
             afterRun();
@@ -178,26 +174,16 @@ public abstract class AbstractNexusTask<T>
             if ( e instanceof TaskInterruptedException )
             {
                 // just return, nothing happened just task cancelled
-                feedRecorder.systemProcessCanceled( prc, getMessage() );
+                applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedCanceled<T>( this,
+                    startedDate ) );
 
                 return null;
             }
             else
             {
-                feedRecorder.systemProcessBroken( prc, e );
-
                 // notify that there was a failure
-                applicationEventMulticaster.notifyEventListeners( new NexusTaskFailureEvent<T>( this, e ) );
-
-                if ( errorManager.isEnabled() )
-                {
-                    ErrorReportRequest request = new ErrorReportRequest();
-                    request.setThrowable( e );
-                    request.getContext().put( "taskClass", getClass().getName() );
-                    request.getContext().putAll( getParameters() );
-
-                    errorManager.handleError( request );
-                }
+                applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedFailed<T>( this,
+                    startedDate, e ) );
 
                 throw e;
             }

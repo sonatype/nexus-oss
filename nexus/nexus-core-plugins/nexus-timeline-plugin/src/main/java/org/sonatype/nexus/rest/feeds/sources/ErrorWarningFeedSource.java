@@ -72,7 +72,7 @@ public class ErrorWarningFeedSource
     public SyndFeed getFeed( Integer from, Integer count, Map<String, String> params )
         throws IOException
     {
-        List<ErrorWarningEvent> items = getNexus().getErrorWarningEvents( from, count );
+        List<ErrorWarningEvent> items = getFeedRecorder().getErrorWarningEvents( null, from, count, null );
 
         SyndFeedImpl feed = new SyndFeedImpl();
 
@@ -80,7 +80,7 @@ public class ErrorWarningFeedSource
 
         feed.setDescription( getDescription() );
 
-        feed.setAuthor( "Nexus " + getNexus().getSystemStatus().getVersion() );
+        feed.setAuthor( "Nexus " + getApplicationStatusSource().getSystemStatus().getVersion() );
 
         feed.setPublishedDate( new Date() );
 

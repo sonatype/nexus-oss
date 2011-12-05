@@ -29,6 +29,13 @@ import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.SnapshotRemoverTask;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
+import org.sonatype.nexus.tasks.EmptyTrashTask;
+import org.sonatype.nexus.tasks.EvictUnusedProxiedItemsTask;
+import org.sonatype.nexus.tasks.ExpireCacheTask;
+import org.sonatype.nexus.tasks.RebuildAttributesTask;
+import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
+import org.sonatype.nexus.timeline.tasks.PurgeTimeline;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
@@ -57,7 +64,7 @@ public abstract class AbstractSystemFeedSource
 
         feed.setDescription( getDescription() );
 
-        feed.setAuthor( "Nexus " + getNexus().getSystemStatus().getVersion() );
+        feed.setAuthor( "Nexus " + getApplicationStatusSource().getSystemStatus().getVersion() );
 
         feed.setPublishedDate( new Date() );
 
@@ -71,12 +78,8 @@ public abstract class AbstractSystemFeedSource
 
         String ipAddress = null;
 
-        int i = 0;
-
         for ( SystemEvent item : items )
         {
-            i++;
-
             if ( item.getEventContext().containsKey( AccessManager.REQUEST_USER ) )
             {
                 username = (String) item.getEventContext().get( AccessManager.REQUEST_USER );
@@ -117,22 +120,6 @@ public abstract class AbstractSystemFeedSource
             {
                 entry.setTitle( "Configuration change" );
             }
-            else if ( FeedRecorder.SYSTEM_TL_PURGE_ACTION.equals( item.getAction() ) )
-            {
-                entry.setTitle( "Timeline purge" );
-            }
-            else if ( FeedRecorder.SYSTEM_REINDEX_ACTION.equals( item.getAction() ) )
-            {
-                entry.setTitle( "Reindexing" );
-            }
-            else if ( FeedRecorder.SYSTEM_PUBLISHINDEX_ACTION.equals( item.getAction() ) )
-            {
-                entry.setTitle( "Publishing indexes" );
-            }
-            else if ( FeedRecorder.SYSTEM_REBUILDATTRIBUTES_ACTION.equals( item.getAction() ) )
-            {
-                entry.setTitle( "Rebuilding attributes" );
-            }
             else if ( FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION.equals( item.getAction() ) )
             {
                 entry.setTitle( "Repository local status change" );
@@ -145,11 +132,40 @@ public abstract class AbstractSystemFeedSource
             {
                 entry.setTitle( "Repository proxy mode change (user intervention may be needed!)" );
             }
-            else if ( FeedRecorder.SYSTEM_EXPIRE_CACHE_ACTION.equals( item.getAction() ) )
+            // manually set to not be dependent on it
+            else if ( "REINDEX".equals( item.getAction() ) )
+            {
+                entry.setTitle( "Reindexing" );
+            }
+            else if ( "PUBLISHINDEX".equals( item.getAction() ) )
+            {
+                entry.setTitle( "Publishing indexes" );
+            }
+            else if ( "DOWNLOADINDEX".equals( item.getAction() ) )
+            {
+                entry.setTitle( "Downloading Indexes" );
+            }
+            else if ( "OPTIMIZE_INDEX".equals( item.getAction() ) )
+            {
+                entry.setTitle( "Optimizing Indexes" );
+            }
+            else if ( "PUBLISHINDEX".equals( item.getAction() ) )
+            {
+                entry.setTitle( "Publishing Indexes" );
+            }
+            else if ( RebuildAttributesTask.ACTION.equals( item.getAction() ) )
+            {
+                entry.setTitle( "Rebuilding attributes" );
+            }
+            else if ( PurgeTimeline.ACTION.equals( item.getAction() ) )
+            {
+                entry.setTitle( "Timeline purge" );
+            }
+            else if ( ExpireCacheTask.ACTION.equals( item.getAction() ) )
             {
                 entry.setTitle( "Expiring caches" );
             }
-            else if ( FeedRecorder.SYSTEM_EVICT_UNUSED_PROXIED_ITEMS_ACTION.equals( item.getAction() ) )
+            else if ( EvictUnusedProxiedItemsTask.ACTION.equals( item.getAction() ) )
             {
                 entry.setTitle( "Evicting unused proxied items" );
             }
@@ -157,25 +173,21 @@ public abstract class AbstractSystemFeedSource
             {
                 entry.setTitle( "Removing snapshots" );
             }
-            else if ( FeedRecorder.SYSTEM_REMOVE_REPO_FOLDER_ACTION.equals( item.getAction() ) )
+            else if ( DeleteRepositoryFoldersTask.ACTION.equals( item.getAction() ) )
             {
-            	entry.setTitle( "Removing repository folder" );
+                entry.setTitle( "Removing repository folder" );
             }
-            else if ( FeedRecorder.SYSTEM_EMPTY_TRASH_ACTION.equals( item.getAction() ) )
+            else if ( EmptyTrashTask.ACTION.equals( item.getAction() ) )
             {
                 entry.setTitle( "Emptying Trash" );
             }
-            else if ( FeedRecorder.SYSTEM_SYNC_SHADOW_ACTION.equals( item.getAction() ) )
+            else if ( SynchronizeShadowsTask.ACTION.equals( item.getAction() ) )
             {
                 entry.setTitle( "Synchronizing Shadow Repository" );
             }
             else if ( RebuildMavenMetadataTask.REBUILD_MAVEN_METADATA_ACTION.equals( item.getAction() ) )
             {
                 entry.setTitle( "Rebuilding maven metadata files" );
-            }
-            else if ( FeedRecorder.SYSTEM_DOWNLOADINDEX_ACTION.equals( item.getAction() ))
-            {
-                entry.setTitle( "Downloading Indexes" );
             }
             else
             {

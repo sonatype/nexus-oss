@@ -45,7 +45,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author cstamas
  * @author dip
  */
-@Component( role = PlexusResource.class, hint = "TimelineFeedList" )
+@Component( role = PlexusResource.class, hint = "FeedsListPlexusResource" )
 @Path( FeedsListPlexusResource.RESOURCE_URI )
 @Produces( { "application/xml", "application/json" } )
 public class FeedsListPlexusResource

@@ -19,7 +19,6 @@
 package org.sonatype.nexus.security.filter.authz;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -27,15 +26,19 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authz.HttpMethodPermissionFilter;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.PlexusContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.auth.ClientInfo;
+import org.sonatype.nexus.auth.NexusAuthorizationEvent;
+import org.sonatype.nexus.auth.ResourceInfo;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.feeds.AuthcAuthzEvent;
-import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.rest.RemoteIPFinder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 /**
  * A filter that maps the action from the HTTP Verb.
@@ -45,14 +48,40 @@ import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 public class FailureLoggingHttpMethodPermissionFilter
     extends HttpMethodPermissionFilter
 {
-
     private final Logger logger = LoggerFactory.getLogger( this.getClass() );
 
-    private AuthcAuthzEvent currentAuthzEvt;
+    // this comes from attributes set by plexus helper listener (nexus-web-utils module)
+    private PlexusContainer plexusContainer;
+
+    // this comes from Plexus IoC but we need to "lift" them manually, no injection here
+    private Nexus nexus;
+    
+    // this comes from Plexus IoC but we need to "lift" them manually, no injection here
+    private NexusConfiguration nexusConfiguration;
+
+    // this comes from Plexus IoC but we need to "lift" them manually, no injection here
+    private ApplicationEventMulticaster applicationEventMulticaster;
+
+    protected void onFilterConfigSet()
+        throws Exception
+    {
+        super.onFilterConfigSet();
+
+        plexusContainer = (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
+
+        nexus = plexusContainer.lookup( Nexus.class );
+        nexusConfiguration = plexusContainer.lookup( NexusConfiguration.class );
+        applicationEventMulticaster = plexusContainer.lookup( ApplicationEventMulticaster.class );
+    }
 
     protected Logger getLogger()
     {
         return logger;
+    }
+    
+    protected Nexus getNexus()
+    {
+        return nexus;
     }
 
     @Override
@@ -70,92 +99,27 @@ public class FailureLoggingHttpMethodPermissionFilter
     {
         Subject subject = getSubject( request, response );
 
-        if ( getNexusConfiguration().getAnonymousUsername().equals( subject.getPrincipal() ) )
+        if ( nexusConfiguration.getAnonymousUsername().equals( subject.getPrincipal() ) )
         {
             return;
         }
 
-        String action = getHttpMethodAction( request );
+        final Action action = Action.valueOf( getHttpMethodAction( request ) );
 
-        String method = ( (HttpServletRequest) request ).getMethod();
+        final ClientInfo clientInfo =
+            new ClientInfo( String.valueOf( subject.getPrincipal() ),
+                RemoteIPFinder.findIP( (HttpServletRequest) request ), "n/a" );
+        final ResourceInfo resInfo =
+            new ResourceInfo( "HTTP", ( (HttpServletRequest) request ).getMethod(), action,
+                ( (HttpServletRequest) request ).getRequestURI() );
+        final NexusAuthorizationEvent evt = new NexusAuthorizationEvent( this, clientInfo, resInfo, false );
 
-        String msg =
-            "Unable to authorize user [" + subject.getPrincipal() + "] for " + action + "(HTTP method \"" + method
-                + "\") to " + ( (HttpServletRequest) request ).getRequestURI() + " from IP Address "
-                + RemoteIPFinder.findIP( (HttpServletRequest) request );
+        applicationEventMulticaster.notifyEventListeners( evt );
 
-        if ( isSimilarEvent( msg ) )
-        {
-            return;
-        }
-
-        getLogger().debug( msg );
-
-        AuthcAuthzEvent authzEvt = new AuthcAuthzEvent( new Date(), FeedRecorder.SYSTEM_AUTHZ, msg );
-
-        if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
-        {
-            String ip = RemoteIPFinder.findIP( (HttpServletRequest) request );
-
-            if ( ip != null )
-            {
-                authzEvt.getEventContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, ip );
-            }
-        }
-
-        Nexus nexus = getNexus( request );
-
-        if ( nexus != null )
-        {
-            try
-            {
-                nexus.addAuthcAuthzEvent( authzEvt );
-            }
-            catch ( Exception e )
-            {
-                // just neglect it, it should not disturb actual authz operation
-            }
-        }
-
-        currentAuthzEvt = authzEvt;
-    }
-
-    private boolean isSimilarEvent( String msg )
-    {
-        if ( currentAuthzEvt == null )
-        {
-            return false;
-        }
-
-        if ( currentAuthzEvt.getMessage().equals( msg )
-            && ( System.currentTimeMillis() - currentAuthzEvt.getEventDate().getTime() < 2000L ) )
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    protected Nexus getNexus( ServletRequest request )
-    {
-        Nexus nexus = (Nexus) request.getAttribute( Nexus.class.getName() );
-
-        if ( nexus == null )
-        {
-            nexus = (Nexus) getServletContext().getAttribute( Nexus.class.getName() );
-        }
-
-        return nexus;
-    }
-
-    protected NexusConfiguration getNexusConfiguration()
-    {
-        return (NexusConfiguration) getAttribute( NexusConfiguration.class.getName() );
     }
 
     protected Object getAttribute( String key )
     {
-        return this.getFilterConfig().getServletContext().getAttribute( key );
+        return getFilterConfig().getServletContext().getAttribute( key );
     }
-
 }

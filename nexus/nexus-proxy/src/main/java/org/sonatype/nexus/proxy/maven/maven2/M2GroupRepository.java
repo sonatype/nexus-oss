@@ -22,7 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -34,16 +33,15 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
-import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.events.RepositoryItemValidationEvent;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageCompositeFileItem;
@@ -53,6 +51,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.MavenRepositoryMetadataValidationEventFailed;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
@@ -251,7 +250,7 @@ public class M2GroupRepository
                         "IOException during parse of metadata UID=\"" + fileItem.getRepositoryItemUid().toString()
                             + "\", will be skipped from aggregation!", e );
 
-                    getFeedRecorder().addNexusArtifactEvent(
+                    getApplicationEventMulticaster().notifyEventListeners(
                         newMetadataFailureEvent( fileItem,
                             "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
                 }
@@ -261,7 +260,7 @@ public class M2GroupRepository
                         "Metadata exception during parse of metadata from UID=\""
                             + fileItem.getRepositoryItemUid().toString() + "\", will be skipped from aggregation!", e );
 
-                    getFeedRecorder().addNexusArtifactEvent(
+                    getApplicationEventMulticaster().notifyEventListeners(
                         newMetadataFailureEvent( fileItem,
                             "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
                 }
@@ -382,24 +381,8 @@ public class M2GroupRepository
         return result;
     }
 
-    // TODO: clean up this! This is a copy+paste from org.sonatype.nexus.proxy.maven.ChecksumContentValidator
-    // centralize this!
-    private NexusArtifactEvent newMetadataFailureEvent( StorageFileItem item, String msg )
+    private RepositoryItemValidationEvent newMetadataFailureEvent( StorageFileItem item, String msg )
     {
-        NexusItemInfo ai = new NexusItemInfo();
-
-        ai.setPath( item.getPath() );
-
-        ai.setRepositoryId( item.getRepositoryId() );
-
-        ai.setRemoteUrl( item.getRemoteUrl() );
-
-        NexusArtifactEvent nae = new NexusArtifactEvent( new Date(), NexusArtifactEvent.ACTION_BROKEN, msg, ai );
-
-        nae.addEventContext( item.getItemContext() );
-
-        nae.addItemAttributes( item.getRepositoryItemAttributes().asMap() );
-
-        return nae;
+        return new MavenRepositoryMetadataValidationEventFailed( this, item, msg );
     }
 }

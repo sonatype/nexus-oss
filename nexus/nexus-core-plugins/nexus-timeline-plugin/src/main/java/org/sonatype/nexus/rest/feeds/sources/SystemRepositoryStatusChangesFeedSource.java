@@ -18,10 +18,13 @@
  */
 package org.sonatype.nexus.rest.feeds.sources;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.SystemEvent;
 
 /**
@@ -37,7 +40,10 @@ public class SystemRepositoryStatusChangesFeedSource
 
     public List<SystemEvent> getEventList( Integer from, Integer count, Map<String, String> params )
     {
-        return getNexus().getRepositoryStatusChanges( from, count );
+        return getFeedRecorder().getSystemEvents(
+            new HashSet<String>( Arrays.asList( FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION,
+                FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION, FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION ) ),
+            from, count, null );
     }
 
     public String getFeedKey()

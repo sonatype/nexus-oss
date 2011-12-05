@@ -37,7 +37,7 @@ public class LegacyNexusTimelineTest
 
         FileUtils.copyDirectoryStructure( legacyDataDir, legacyTimelineDir );
 
-        NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class, "real" );
+        NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
 
         List<Entry> result = asList( nexusTimeline.retrieve( 0, 10, null, null, null ) );
 
@@ -60,7 +60,7 @@ public class LegacyNexusTimelineTest
 
         FileUtils.copyDirectoryStructure( newDataDir, newTimelineDir );
 
-        NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class, "real" );
+        NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
 
         List<Entry> result = asList( nexusTimeline.retrieve( 0, 10, null, null, null ) );
 
