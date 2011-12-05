@@ -64,13 +64,11 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 @Component( role = ApplicationConfigurationValidator.class )
 public class DefaultApplicationConfigurationValidator
     extends AbstractLoggingComponent
-    implements ApplicationConfigurationValidator, Contextualizable
+    implements ApplicationConfigurationValidator
 {
-    private Random rand = new Random( System.currentTimeMillis() );
+    private final Random rand = new Random( System.currentTimeMillis() );
     
     public static final String REPOSITORY_ID_PATTERN = "^[a-zA-Z0-9_\\-\\.]+$";
-
-    private PlexusContainer plexusContainer;
 
     public String generateId()
     {
@@ -250,12 +248,13 @@ public class DefaultApplicationConfigurationValidator
 
         if ( StringUtils.isEmpty( repo.getId() ) )
         {
-            response.addValidationError( "Repository ID's may not be empty!" );
+            response.addValidationError( new ValidationMessage( "id", "Repository ID's may not be empty!" ) );
         }
         else if ( !repo.getId().matches( REPOSITORY_ID_PATTERN ) )
         {
-            response
-                .addValidationError( "Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed in Repository ID" );
+            response.addValidationError(
+                new ValidationMessage( "id",
+                                       "Only letters, digits, underscores(_), hyphens(-), and dots(.) are allowed in Repository ID" ) );
         }
         // if repo id isn't valid, nothing below here will validate properly
         else
@@ -263,62 +262,25 @@ public class DefaultApplicationConfigurationValidator
             if ( StringUtils.isEmpty( repo.getName() ) )
             {
                 repo.setName( repo.getId() );
-    
-                response.addValidationWarning( "Repository with ID='" + repo.getId()
-                    + "' has no name, defaulted to it's ID." );
-    
+
+                response.addValidationWarning( new ValidationMessage( "id", "Repository with ID='" + repo.getId()
+                                                   + "' has no name, defaulted to it's ID." ) );
+
                 response.setModified( true );
             }
-    
+
             if ( !validateLocalStatus( repo.getLocalStatus() ) )
             {
-                response.addValidationError( "LocalStatus of repository with ID='" + repo.getId() + "' is wrong " + repo.getLocalStatus() + "! (Allowed values are: '" + LocalStatus.IN_SERVICE + "' and '"
-                    + LocalStatus.OUT_OF_SERVICE + "')" );
+                response.addValidationError(
+                    new ValidationMessage( "id", "LocalStatus of repository with ID='" + repo.getId() ) + "' is wrong "
+                        + repo.getLocalStatus() + "! (Allowed values are: '" + LocalStatus.IN_SERVICE + "' and '"
+                        + LocalStatus.OUT_OF_SERVICE + "')" );
             }
-    /*
-            if ( !validateRepositoryType( repo.getType() ) )
-            {
-                response.addValidationError( "TYPE='" + repo.getType() + "' of repository with ID='" + repo.getId()
-                    + "' is wrong!" );
-            }
-    
-            if ( !CRepository.PROXY_MODE_ALLOW.equals( repo.getProxyMode() )
-                && !CRepository.PROXY_MODE_BLOCKED_MANUAL.equals( repo.getProxyMode() )
-                && !CRepository.PROXY_MODE_BLOCKED_AUTO.equals( repo.getProxyMode() ) )
-            {
-                response.addValidationError( "ProxyMode of repository with ID='" + repo.getId()
-                    + "' is wrong! (Allowed values are: " + CRepository.PROXY_MODE_ALLOW + ", "
-                    + CRepository.PROXY_MODE_BLOCKED_MANUAL + " and " + CRepository.PROXY_MODE_BLOCKED_AUTO + ")" );
-            }
-    
-            if ( repo.getRepositoryPolicy() == null
-                || ( !CRepository.REPOSITORY_POLICY_RELEASE.equals( repo.getRepositoryPolicy() ) && !CRepository.REPOSITORY_POLICY_SNAPSHOT
-                    .equals( repo.getRepositoryPolicy() ) ) )
-            {
-                response.addValidationError( "Repository " + repo.getId() + " have wrong repository policy: \""
-                    + repo.getRepositoryPolicy() + "\". Repository policy may be \""
-                    + CRepository.REPOSITORY_POLICY_RELEASE + "\" or \"" + CRepository.REPOSITORY_POLICY_SNAPSHOT
-                    + "\" only." );
-            }
-    
-            if ( repo.getChecksumPolicy() == null
-                || ( !CRepository.CHECKSUM_POLICY_IGNORE.equals( repo.getChecksumPolicy() )
-                    && !CRepository.CHECKSUM_POLICY_WARN.equals( repo.getChecksumPolicy() )
-                    && !CRepository.CHECKSUM_POLICY_STRICT.equals( repo.getChecksumPolicy() ) && !CRepository.CHECKSUM_POLICY_STRICT_IF_EXISTS
-                    .equals( repo.getChecksumPolicy() ) ) )
-            {
-                response.addValidationError( "Repository " + repo.getId() + " have wrong checksum policy: \""
-                    + repo.getChecksumPolicy() + "\". Repository checksum policy may be \""
-                    + CRepository.CHECKSUM_POLICY_IGNORE + "\", \"" + CRepository.CHECKSUM_POLICY_WARN + "\", \""
-                    + CRepository.CHECKSUM_POLICY_STRICT_IF_EXISTS + "\" or \"" + CRepository.CHECKSUM_POLICY_STRICT
-                    + "\" only." );
-            }
-    */
             if ( context.getExistingRepositoryIds() != null )
             {
                 if ( context.getExistingRepositoryIds().contains( repo.getId() ) )
                 {
-                    response.addValidationError( "Repository " + repo.getId() + " declared more than once!" );
+                    response.addValidationError( new ValidationMessage( "id", "Repository with ID=" + repo.getId() + " already exists!" ) );
                 }
     
                 context.getExistingRepositoryIds().add( repo.getId() );
@@ -328,8 +290,8 @@ public class DefaultApplicationConfigurationValidator
             {
                 if ( context.getExistingRepositoryShadowIds().contains( repo.getId() ) )
                 {
-                    response.addValidationError( "Repository " + repo.getId()
-                        + " conflicts with existing Shadow with same ID='" + repo.getId() + "'!" );
+                    response.addValidationError( new ValidationMessage( "id", "Repository " + repo.getId()
+                        + " conflicts with existing Shadow with same ID='" + repo.getId() + "'!" ) );
                 }
             }
     
@@ -337,8 +299,8 @@ public class DefaultApplicationConfigurationValidator
             {
                 if ( context.getExistingRepositoryGroupIds().contains( repo.getId() ) )
                 {
-                    response.addValidationError( "Repository " + repo.getId()
-                        + " conflicts with existing Group with same ID='" + repo.getId() + "'!" );
+                    response.addValidationError( new ValidationMessage( "id", "Repository " + repo.getId()
+                        + " conflicts with existing Group with same ID='" + repo.getId() + "'!" ) );
                 }
             }
         }
@@ -361,7 +323,7 @@ public class DefaultApplicationConfigurationValidator
 
         if ( settings.getPathMappings() != null )
         {
-            for ( CPathMappingItem item : (List<CPathMappingItem>) settings.getPathMappings() )
+            for ( CPathMappingItem item : settings.getPathMappings() )
             {
                 response.append( validateGroupsSettingPathMappingItem( context, item ) );
             }
@@ -412,7 +374,7 @@ public class DefaultApplicationConfigurationValidator
             response.addValidationError( "The Route with ID='" + item.getId() + "' must contain at least one Route Pattern." );
         }
 
-        for ( String regexp : (List<String>) item.getRoutePatterns() )
+        for ( String regexp : item.getRoutePatterns() )
         {
             if ( !isValidRegexp( regexp ) )
             {
@@ -436,20 +398,10 @@ public class DefaultApplicationConfigurationValidator
                 + CPathMappingItem.BLOCKING_RULE_TYPE + "'." );
         }
 
-        if ( !CPathMappingItem.BLOCKING_RULE_TYPE.equals( item.getRouteType() ) )
-        {
-            // NOT TRUE ANYMORE:
-            // if you delete a repo(ses) that were belonging to a route, we insist on
-            // leaving the route "empty" (to save a users hardly concieved regexp) but with empty
-            // repo list
-
-            // here we must have a repo list
-            // if ( item.getRepositories() == null || item.getRepositories().size() == 0 )
-            // {
-            // response.addValidationError( "The repository list in Route with ID='" + item.getId()
-            // + "' is not valid: it cannot be empty!" );
-            // }
-        }
+        // REMOVED: check that a blocking route is not empty
+        // if you delete a repo(ses) that were belonging to a route, we insist on
+        // leaving the route "empty" (to save a users hardly concieved regexp) but with empty
+        // repo list
 
         if ( context.getExistingRepositoryIds() != null && context.getExistingRepositoryShadowIds() != null )
         {
@@ -457,7 +409,7 @@ public class DefaultApplicationConfigurationValidator
 
             List<String> existingShadows = context.getExistingRepositoryShadowIds();
 
-            for ( String repoId : (List<String>) item.getRepositories() )
+            for ( String repoId : item.getRepositories() )
             {
                 if ( !existingReposes.contains( repoId ) && !existingShadows.contains( repoId ) )
                 {
@@ -478,8 +430,6 @@ public class DefaultApplicationConfigurationValidator
         {
             response.setContext( ctx );
         }
-
-        // ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
 
         if ( settings.getPort() < 80 )
         {
@@ -777,18 +727,6 @@ public class DefaultApplicationConfigurationValidator
         return LocalStatus.IN_SERVICE.name().equals( ls ) || LocalStatus.OUT_OF_SERVICE.name().equals( ls );
     }
 
-    protected boolean validateRepositoryType( String type )
-    {
-        // TODO introduce getComponentDescriptor(Class, String)
-        return plexusContainer.getComponentDescriptor( Repository.class.getName(), type ) != null;
-    }
-
-    protected boolean validateShadowRepositoryType( String type )
-    {
-        // TODO introduce getComponentDescriptor(Class, String)
-        return plexusContainer.getComponentDescriptor( ShadowRepository.class.getName(), type ) != null;
-    }
-
     protected boolean isValidRegexp( String regexp )
     {
         if ( regexp == null )
@@ -806,11 +744,5 @@ public class DefaultApplicationConfigurationValidator
         {
             return false;
         }
-    }
-
-    public void contextualize( Context ctx )
-        throws ContextException
-    {
-        this.plexusContainer = (PlexusContainer) ctx.get( PlexusConstants.PLEXUS_KEY );
     }
 }
