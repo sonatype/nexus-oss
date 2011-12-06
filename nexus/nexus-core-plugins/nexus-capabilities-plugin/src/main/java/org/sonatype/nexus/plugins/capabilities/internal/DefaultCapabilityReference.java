@@ -594,7 +594,7 @@ class DefaultCapabilityReference
         @Override
         public String stateDescription()
         {
-            return "active";
+            return "Active";
         }
 
         @Override
