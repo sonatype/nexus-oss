@@ -119,7 +119,7 @@ public class NexusRestClient
     }
 
     @SuppressWarnings( "unchecked" )
-    public List<RepositoryListResource> getRespositories()
+    public List<RepositoryListResource> getRepositories()
         throws NexusConnectionException, NexusClientException
     {
         Object tempObj = this.getClientHelper().getList( REPO_SERVICE );
@@ -156,7 +156,7 @@ public class NexusRestClient
         throws NexusClientException, NexusConnectionException
     {
 
-        List<RepositoryListResource> repoList = this.getRespositories();
+        List<RepositoryListResource> repoList = this.getRepositories();
 
         for ( RepositoryListResource repositoryListResource : repoList )
         {

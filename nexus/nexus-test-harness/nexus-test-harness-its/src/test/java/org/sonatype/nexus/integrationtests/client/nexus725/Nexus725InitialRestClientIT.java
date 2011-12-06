@@ -73,7 +73,7 @@ public class Nexus725InitialRestClientIT
     {
         NexusClient client = this.getConnectedNexusClient();
 
-        List<RepositoryListResource> repos = client.getRespositories();
+        List<RepositoryListResource> repos = client.getRepositories();
         Assert.assertTrue( repos.size() > 0, "Expected list of repos to be larger then 0" );
 
         List<String> knownRepos = new ArrayList<String>();

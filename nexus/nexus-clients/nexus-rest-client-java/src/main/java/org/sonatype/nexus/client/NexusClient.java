@@ -42,8 +42,7 @@ public interface NexusClient
     
     public void deleteRepository( String id ) throws NexusClientException, NexusConnectionException;
     
-    public List<RepositoryListResource> getRespositories() throws NexusClientException, NexusConnectionException;
-    
+    public List<RepositoryListResource> getRepositories() throws NexusClientException, NexusConnectionException;
     
     public NexusArtifact searchBySHA1(String sha1) throws NexusClientException, NexusConnectionException;
     
