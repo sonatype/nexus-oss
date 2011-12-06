@@ -342,6 +342,12 @@ class DefaultCapabilityReference
         {
             return getClass().getSimpleName();
         }
+
+        void setDescription( final String description )
+        {
+            // do nothing
+        }
+
     }
 
     public class NewState
@@ -437,6 +443,7 @@ class DefaultCapabilityReference
                     "Could not update capability {} ({}).", new Object[]{ capability, capability.id(), e }
                 );
                 DefaultCapabilityReference.this.passivate();
+                state.setDescription( "Update failed: " + e.getMessage() );
             }
         }
 
@@ -477,16 +484,16 @@ class DefaultCapabilityReference
         extends ValidState
     {
 
-        private final String reason;
+        private String description;
 
         EnabledState()
         {
             this( "enabled" );
         }
 
-        EnabledState( final String reason )
+        EnabledState( final String description )
         {
-            this.reason = reason;
+            this.description = description;
         }
 
         @Override
@@ -528,6 +535,7 @@ class DefaultCapabilityReference
                     getLogger().error(
                         "Could not activate capability {} ({})", new Object[]{ capability, capability.id(), e }
                     );
+                    state.setDescription( "Activation failed: " + e.getMessage() );
                 }
             }
             else
@@ -545,7 +553,7 @@ class DefaultCapabilityReference
         @Override
         public String stateDescription()
         {
-            return activationHandler.isConditionSatisfied()?reason:activationHandler.explainWhyNotSatisfied();
+            return activationHandler.isConditionSatisfied() ? description : activationHandler.explainWhyNotSatisfied();
         }
 
         @Override
@@ -554,6 +562,11 @@ class DefaultCapabilityReference
             return "ENABLED";
         }
 
+        @Override
+        void setDescription( final String description )
+        {
+            this.description = description;
+        }
     }
 
     public class ActiveState
@@ -588,6 +601,7 @@ class DefaultCapabilityReference
                 getLogger().error(
                     "Could not passivate capability {} ({})", new Object[]{ capability, capability.id(), e }
                 );
+                state.setDescription( "Passivation failed: " + e.getMessage() );
             }
         }
 
