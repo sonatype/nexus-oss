@@ -21,6 +21,9 @@ package org.sonatype.nexus.plugins.capabilities.internal.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.context.Context;
 import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.eventbus.NexusEventBus;
@@ -40,6 +43,13 @@ public class DefaultCapabilityConfigurationTest
         super.setUp();
 
         configuration = lookup( CapabilityConfiguration.class );
+    }
+
+    @Override
+    protected void customizeContainerConfiguration( final ContainerConfiguration configuration )
+    {
+        super.customizeContainerConfiguration(configuration );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
     }
 
     @Test

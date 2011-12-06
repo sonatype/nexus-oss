@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.config;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.junit.Test;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -42,6 +44,14 @@ public class DefaultCapabilityConfigurationValidatorTest
 
         validator = lookup( CapabilityConfigurationValidator.class );
     }
+
+    @Override
+    protected void customizeContainerConfiguration( final ContainerConfiguration configuration )
+    {
+        super.customizeContainerConfiguration(configuration );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
+    }
+
 
     @Test
     public void testPassValidate()
