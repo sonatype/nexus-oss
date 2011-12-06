@@ -64,17 +64,16 @@ class DefaultCapabilityReference
 
     private boolean enabled;
 
-    private Condition activateCondition;
-
-    private ActivationListener activationListener;
-
     private Condition validityCondition;
 
     private ValidityListener validityListener;
 
     private NexusActiveListener nexusActiveListener;
 
+    private final ActivationListenerFactory.Listener activationListener;
+
     DefaultCapabilityReference( final NexusEventBus eventBus,
+                                final ActivationListenerFactory activationListenerFactory,
                                 final CapabilityConfiguration configuration,
                                 final Conditions conditions,
                                 final Capability capability )
@@ -89,6 +88,8 @@ class DefaultCapabilityReference
         valid = true;
 
         stateLock = new ReentrantReadWriteLock();
+
+        activationListener = checkNotNull( activationListenerFactory ).create(this);
     }
 
     @Override
@@ -125,14 +126,7 @@ class DefaultCapabilityReference
             {
                 getLogger().debug( "Enabling capability {} ({})", capability, capability.id() );
                 enabled = true;
-                activateCondition = capability().activationCondition();
-                if ( activateCondition != null )
-                {
-                    activateCondition.bind();
-                    activationListener = new ActivationListener();
-                    eventBus.register( activationListener );
-                }
-                activate();
+                activationListener.bind();
             }
         }
         finally
@@ -152,17 +146,7 @@ class DefaultCapabilityReference
             if ( isEnabled() )
             {
                 getLogger().debug( "Disabling capability {} ({})", capability, capability.id() );
-                if ( activationListener != null )
-                {
-                    eventBus.unregister( activationListener );
-                    activationListener = null;
-                }
-                if ( activateCondition != null )
-                {
-                    activateCondition.release();
-                    activateCondition = null;
-                }
-                passivate();
+                activationListener.release();
                 enabled = false;
             }
         }
@@ -198,7 +182,7 @@ class DefaultCapabilityReference
 
             if ( isEnabled() && !isActive() )
             {
-                if ( activateCondition == null || activateCondition.isSatisfied() )
+                if ( activationListener.isConditionSatisfied() )
                 {
                     getLogger().debug( "Activating capability {} ({})", capability, capability.id() );
                     try
@@ -267,7 +251,15 @@ class DefaultCapabilityReference
             stateLock.writeLock().lock();
             checkValid();
 
-            capability().create( properties );
+            try
+            {
+                capability().create( properties );
+            }
+            catch ( Exception e )
+            {
+                // TODO
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
             if ( nexusActiveListener == null )
             {
                 nexusActiveListener = new NexusActiveListener().bind();
@@ -287,7 +279,15 @@ class DefaultCapabilityReference
             stateLock.writeLock().lock();
             checkValid();
 
-            capability().load( properties );
+            try
+            {
+                capability().load( properties );
+            }
+            catch ( Exception e )
+            {
+                // TODO
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
             if ( nexusActiveListener == null )
             {
                 nexusActiveListener = new NexusActiveListener().bind();
@@ -310,7 +310,15 @@ class DefaultCapabilityReference
                 checkValid();
 
                 eventBus.post( new CapabilityEvent.BeforeUpdate( this ) );
-                capability().update( properties );
+                try
+                {
+                    capability().update( properties );
+                }
+                catch ( Exception e )
+                {
+                    // TODO
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
                 eventBus.post( new CapabilityEvent.AfterUpdate( this ) );
             }
             finally
@@ -328,16 +336,20 @@ class DefaultCapabilityReference
             stateLock.writeLock().lock();
             checkValid();
 
-            if ( activateCondition != null )
-            {
-                activateCondition.release();
-            }
             disable();
             if ( nexusActiveListener != null )
             {
                 nexusActiveListener.release();
             }
-            capability().remove();
+            try
+            {
+                capability().remove();
+            }
+            catch ( Exception e )
+            {
+                // TODO
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
         }
         finally
         {
@@ -380,38 +392,6 @@ class DefaultCapabilityReference
             return false;
         }
         return p1.equals( p2 );
-    }
-
-    public class ActivationListener
-    {
-
-        @Subscribe
-        public void handle( final ConditionEvent.Satisfied event )
-        {
-            if ( event.getCondition() == activateCondition )
-            {
-                activate();
-            }
-        }
-
-        @Subscribe
-        public void handle( final ConditionEvent.Unsatisfied event )
-        {
-            if ( event.getCondition() == activateCondition )
-            {
-                passivate();
-            }
-        }
-
-        @Override
-        public String toString()
-        {
-            return String.format(
-                "Watching '%s' condition to activate/passivate capability '%s (id=%s)'",
-                activateCondition, capability, capability.id()
-            );
-        }
-
     }
 
     public class ValidityListener

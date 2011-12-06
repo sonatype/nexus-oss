@@ -63,14 +63,18 @@ class DefaultCapabilityRegistry
 
     private final ReentrantReadWriteLock lock;
 
+    private final ActivationListenerFactory activationListenerFactory;
+
     @Inject
     DefaultCapabilityRegistry( final Map<String, CapabilityFactory> factories,
                                final NexusEventBus eventBus,
+                               final ActivationListenerFactory activationListenerFactory,
                                final CapabilityConfiguration configuration,
                                final Conditions conditions )
     {
         this.eventBus = checkNotNull( eventBus );
         this.factories = checkNotNull( factories );
+        this.activationListenerFactory = checkNotNull( activationListenerFactory );
         this.configuration = Preconditions.checkNotNull( configuration );
         this.conditions = Preconditions.checkNotNull( conditions );
 
@@ -166,7 +170,7 @@ class DefaultCapabilityRegistry
     CapabilityReference createReference( final Capability capability )
     {
         return new DefaultCapabilityReference(
-            eventBus, configuration, conditions, capability
+            eventBus, activationListenerFactory, configuration, conditions, capability
         );
     }
 

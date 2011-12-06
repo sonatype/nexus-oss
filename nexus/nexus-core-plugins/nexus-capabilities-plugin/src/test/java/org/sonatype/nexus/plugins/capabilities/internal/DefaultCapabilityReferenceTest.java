@@ -99,7 +99,7 @@ public class DefaultCapabilityReferenceTest
         when( capability.validityCondition() ).thenReturn( validityCondition );
 
         underTest = new DefaultCapabilityReference(
-            eventBus, configuration, conditions, capability
+            eventBus, new ActivationListenerFactory( eventBus ), configuration, conditions, capability
         );
         underTest.create( Collections.<String, String>emptyMap() );
 
@@ -117,7 +117,7 @@ public class DefaultCapabilityReferenceTest
         underTest.enable();
         assertThat( underTest.isEnabled(), is( true ) );
         verify( activationCondition ).bind();
-        verify( eventBus ).register( isA( DefaultCapabilityReference.ActivationListener.class ) );
+        verify( eventBus ).register( isA( ActivationListenerFactory.Listener.class ) );
     }
 
     /**
@@ -133,7 +133,7 @@ public class DefaultCapabilityReferenceTest
         assertThat( underTest.isEnabled(), is( false ) );
 
         verify( activationCondition ).release();
-        verify( eventBus ).unregister( isA( DefaultCapabilityReference.ActivationListener.class ) );
+        verify( eventBus ).unregister( isA( ActivationListenerFactory.Listener.class ) );
     }
 
     /**
