@@ -528,6 +528,7 @@ class DefaultCapabilityReference
             getLogger().debug( "Passivating capability {} ({})", capability, capability.id() );
             try
             {
+                state = new EnabledState();
                 eventBus.post( new CapabilityEvent.BeforePassivated( DefaultCapabilityReference.this ) );
                 capability().passivate();
                 getLogger().debug( "Passivated capability {} ({})", capability, capability.id() );
@@ -538,7 +539,6 @@ class DefaultCapabilityReference
                     "Could not passivate capability {} ({})", new Object[]{ capability, capability.id(), e }
                 );
             }
-            state = new EnabledState();
         }
 
         @Override
