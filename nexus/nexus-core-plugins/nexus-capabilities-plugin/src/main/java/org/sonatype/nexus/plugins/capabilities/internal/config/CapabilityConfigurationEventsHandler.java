@@ -59,6 +59,7 @@ class CapabilityConfigurationEventsHandler
         if ( capabilityConfig.isEnabled() )
         {
             ref.enable();
+            ref.activate();
         }
     }
 
@@ -71,6 +72,7 @@ class CapabilityConfigurationEventsHandler
         if ( capabilityConfig.isEnabled() )
         {
             ref.enable();
+            ref.activate();
         }
     }
 

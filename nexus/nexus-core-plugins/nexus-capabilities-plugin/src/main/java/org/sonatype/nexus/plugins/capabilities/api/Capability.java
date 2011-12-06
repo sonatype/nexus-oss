@@ -35,7 +35,9 @@ public interface Capability
     /**
      * Callback when a new capability is created.
      * <p/>
-     * If an exception occurs, during invocation of this method, the capability will not be activatable.
+     * If an exception occurs, during invocation of this method,  the exception will be ignored and capability will be
+     * in an invalid state.
+     * Any further interaction with this capability will result in an {@link IllegalStateException}.
      *
      * @param properties capability configuration
      */
@@ -44,7 +46,9 @@ public interface Capability
     /**
      * Callback when a capability configuration is loaded from persisted store (configuration file).
      * <p/>
-     * If an exception occurs, during invocation of this method, the capability will not be activatable.
+     * If an exception occurs, during invocation of this method,  the exception will be ignored and capability will be
+     * in an invalid state.
+     * Any further interaction with this capability will result in an {@link IllegalStateException}.
      *
      * @param properties capability configuration
      */
@@ -53,8 +57,8 @@ public interface Capability
     /**
      * Callback when a capability configuration is updated.
      * <p/>
-     * If an exception occurs, during invocation of this method, the capability will not be activatable and will be
-     * automatically passivated.
+     * If an exception occurs, during invocation of this method, the exception will be ignored and capability, if
+     * active, will be automatically passivated.
      *
      * @param properties capability configuration
      */
@@ -63,7 +67,8 @@ public interface Capability
     /**
      * Callback when a capability is removed.
      * <p/>
-     * If an exception occurs, during invocation of this method, the capability will still be removed.
+     * If an exception occurs, during invocation of this method, the exception will be ignored and capability will be in
+     * a removed state.
      */
     void remove();
 
@@ -71,8 +76,8 @@ public interface Capability
      * Callback when capability is activated. Activation is triggered on create/load (if capability is not disabled),
      * or when capability is re-enabled.
      * <p/>
-     * If an exception occurs, during invocation of this method, the capability will be put in an non active state
-     * (as when it would not heave been activated).
+     * If an exception occurs, during invocation of this method, the exception will be ignored and capability will be in
+     * an non active state.
      */
     void activate();
 
@@ -80,7 +85,7 @@ public interface Capability
      * Callback when capability is passivated. Passivation will be triggered before a capability is removed, on
      * Nexus shutdown or when capability is disabled.
      * <p/>
-     * If an exception occurs, during invocation of this method,, the capability will be put in an non active state.
+     * If an exception occurs, during invocation of this method, the exception will be ignored.
      */
     void passivate();
 

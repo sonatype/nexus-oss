@@ -86,7 +86,6 @@ public class ValidityConditionHandler
         if ( event.getCondition() == nexusActiveCondition )
         {
             releaseValidity();
-            reference.passivate();
         }
         else if ( event.getCondition() == validityCondition )
         {

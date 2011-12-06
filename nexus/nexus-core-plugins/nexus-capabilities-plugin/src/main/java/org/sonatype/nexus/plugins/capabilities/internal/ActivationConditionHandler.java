@@ -87,10 +87,6 @@ public class ActivationConditionHandler
             }
             activationCondition.bind();
             eventBus.register( this );
-            if ( activationCondition.isSatisfied() )
-            {
-                handle( new ConditionEvent.Satisfied( activationCondition ) );
-            }
         }
         return this;
     }
@@ -101,7 +97,6 @@ public class ActivationConditionHandler
         {
             eventBus.unregister( this );
             activationCondition.release();
-            handle( new ConditionEvent.Unsatisfied( activationCondition ) );
             activationCondition = null;
         }
         return this;

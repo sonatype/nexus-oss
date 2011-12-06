@@ -76,6 +76,10 @@ public class DefaultCapabilityReferenceTest
 
     private ArgumentCaptor<Object> ebc;
 
+    private ActivationConditionHandlerFactory achf;
+
+    private ValidityConditionHandlerFactory vchf;
+
     @Before
     public void setUp()
     {
@@ -101,7 +105,7 @@ public class DefaultCapabilityReferenceTest
         when( validityCondition.isSatisfied() ).thenReturn( true );
         when( capability.validityCondition() ).thenReturn( validityCondition );
 
-        final ActivationConditionHandlerFactory achf = mock( ActivationConditionHandlerFactory.class );
+        achf = mock( ActivationConditionHandlerFactory.class );
         when( achf.create( any( DefaultCapabilityReference.class ) ) ).thenAnswer(
             new Answer<ActivationConditionHandler>()
             {
@@ -116,7 +120,7 @@ public class DefaultCapabilityReferenceTest
             }
         );
 
-        final ValidityConditionHandlerFactory vchf = mock( ValidityConditionHandlerFactory.class );
+        vchf = mock( ValidityConditionHandlerFactory.class );
         when( vchf.create( any( DefaultCapabilityReference.class ) ) ).thenAnswer(
             new Answer<ValidityConditionHandler>()
             {
@@ -174,6 +178,7 @@ public class DefaultCapabilityReferenceTest
     public void activateWhenNotActive()
     {
         underTest.enable();
+        underTest.activate();
         assertThat( underTest.isActive(), is( true ) );
         verify( capability ).activate();
         verify( eventBus ).post( re.capture() );
@@ -188,6 +193,7 @@ public class DefaultCapabilityReferenceTest
     public void activateWhenActive()
     {
         underTest.enable();
+        underTest.activate();
         assertThat( underTest.isActive(), is( true ) );
         verify( capability ).activate();
 
@@ -203,9 +209,12 @@ public class DefaultCapabilityReferenceTest
     public void passivateWhenNotActive()
     {
         assertThat( underTest.isActive(), is( false ) );
-        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).passivate();
+        underTest.enable();
         underTest.passivate();
         assertThat( underTest.isActive(), is( false ) );
+
+        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).passivate();
+        underTest.passivate();
     }
 
     /**
@@ -215,6 +224,7 @@ public class DefaultCapabilityReferenceTest
     public void passivateWhenActive()
     {
         underTest.enable();
+        underTest.activate();
         assertThat( underTest.isActive(), is( true ) );
 
         underTest.passivate();
@@ -229,7 +239,8 @@ public class DefaultCapabilityReferenceTest
     }
 
     /**
-     * Capability is not passivated when activation fails.
+     * When activation fails, active state is false and capability remains enabled.
+     * Calling passivate will do nothing.
      */
     @Test
     public void activateProblem()
@@ -237,14 +248,20 @@ public class DefaultCapabilityReferenceTest
         doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).activate();
 
         underTest.enable();
+        assertThat( underTest.isEnabled(), is( true ) );
+        assertThat( underTest.isActive(), is( false ) );
+
+        underTest.activate();
+        assertThat( underTest.isEnabled(), is( true ) );
         assertThat( underTest.isActive(), is( false ) );
         verify( capability ).activate();
+
         doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).passivate();
         underTest.passivate();
     }
 
     /**
-     * Active flag is set when passivation problem.
+     * When passivation fails, active state is false and capability remains enabled.
      */
     @Test
     public void passivateProblem()
@@ -252,10 +269,59 @@ public class DefaultCapabilityReferenceTest
         doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).passivate();
 
         underTest.enable();
+        underTest.activate();
+        assertThat( underTest.isEnabled(), is( true ) );
         assertThat( underTest.isActive(), is( true ) );
+
         underTest.passivate();
         verify( capability ).passivate();
+        assertThat( underTest.isEnabled(), is( true ) );
         assertThat( underTest.isActive(), is( false ) );
+    }
+
+    /**
+     * When update fails and capability is not active, no exception is propagated and passivate is not called.
+     */
+    @Test
+    public void updateProblemWhenNotActive()
+    {
+        final HashMap<String, String> properties = new HashMap<String, String>();
+        properties.put( "p", "p" );
+        final HashMap<String, String> previousProperties = new HashMap<String, String>();
+        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).update( properties );
+        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).passivate();
+
+        underTest.enable();
+        assertThat( underTest.isEnabled(), is( true ) );
+        assertThat( underTest.isActive(), is( false ) );
+
+        underTest.update( properties, previousProperties );
+        verify( capability ).update( properties );
+        assertThat( underTest.isEnabled(), is( true ) );
+        assertThat( underTest.isActive(), is( false ) );
+    }
+
+    /**
+     * When update fails and capability is active, no exception is propagated and capability is passivated.
+     */
+    @Test
+    public void updateProblemWhenActive()
+    {
+        final HashMap<String, String> properties = new HashMap<String, String>();
+        properties.put( "p", "p" );
+        final HashMap<String, String> previousProperties = new HashMap<String, String>();
+        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).update( properties );
+
+        underTest.enable();
+        underTest.activate();
+        assertThat( underTest.isEnabled(), is( true ) );
+        assertThat( underTest.isActive(), is( true ) );
+
+        underTest.update( properties, previousProperties );
+        verify( capability ).update( properties );
+        assertThat( underTest.isEnabled(), is( true ) );
+        assertThat( underTest.isActive(), is( false ) );
+        verify( capability ).passivate();
     }
 
     /**
@@ -273,8 +339,10 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void loadIsForwardedToCapability()
     {
+        underTest = new DefaultCapabilityReference( eventBus, achf, vchf, capability );
         final HashMap<String, String> properties = new HashMap<String, String>();
         underTest.load( properties );
+
         verify( capability ).load( properties );
     }
 
@@ -409,9 +477,7 @@ public class DefaultCapabilityReferenceTest
         verify( eventBus ).register( ebc.capture() );
         assertThat( ebc.getValue(), is( instanceOf( ValidityConditionHandler.class ) ) );
 
-        final ValidityConditionHandler validityConditionHandler = (ValidityConditionHandler) ebc.getValue();
-
-        validityConditionHandler.handle( new ConditionEvent.Unsatisfied( validityCondition ) );
+        ( (ValidityConditionHandler) ebc.getValue() ).handle( new ConditionEvent.Unsatisfied( validityCondition ) );
 
         verify( configurations ).remove( capability.id() );
     }

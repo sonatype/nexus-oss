@@ -28,7 +28,6 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.proxy.IllegalOperationException;
 
 /**
  * Default {@link CapabilityReference} implementation.
@@ -50,14 +49,7 @@ class DefaultCapabilityReference
 
     private final ReentrantReadWriteLock stateLock;
 
-    /**
-     * A reference is valid until is removed. Once removed all calls will throw an {@link IllegalOperationException}.
-     */
-    private boolean valid;
-
-    private boolean active;
-
-    private boolean enabled;
+    private State state;
 
     DefaultCapabilityReference( final NexusEventBus eventBus,
                                 final ActivationConditionHandlerFactory activationListenerFactory,
@@ -67,14 +59,12 @@ class DefaultCapabilityReference
         this.eventBus = checkNotNull( eventBus );
         this.capability = checkNotNull( capability );
 
-        active = false;
-        enabled = false;
-        valid = true;
-
         stateLock = new ReentrantReadWriteLock();
 
         activationHandler = checkNotNull( activationListenerFactory ).create( this );
         validityHandler = checkNotNull( validityConditionHandlerFactory ).create( this );
+
+        state = new NewState();
     }
 
     @Override
@@ -89,9 +79,7 @@ class DefaultCapabilityReference
         try
         {
             stateLock.readLock().lock();
-            checkValid();
-
-            return enabled;
+            return state.isEnabled();
         }
         finally
         {
@@ -105,14 +93,7 @@ class DefaultCapabilityReference
         try
         {
             stateLock.writeLock().lock();
-            checkValid();
-
-            if ( !isEnabled() )
-            {
-                getLogger().debug( "Enabling capability {} ({})", capability, capability.id() );
-                enabled = true;
-                activationHandler.bind();
-            }
+            state.enable();
         }
         finally
         {
@@ -126,14 +107,7 @@ class DefaultCapabilityReference
         try
         {
             stateLock.writeLock().lock();
-            checkValid();
-
-            if ( isEnabled() )
-            {
-                getLogger().debug( "Disabling capability {} ({})", capability, capability.id() );
-                activationHandler.release();
-                enabled = false;
-            }
+            state.disable();
         }
         finally
         {
@@ -147,9 +121,7 @@ class DefaultCapabilityReference
         try
         {
             stateLock.readLock().lock();
-            checkValid();
-
-            return active;
+            return state.isActive();
         }
         finally
         {
@@ -163,32 +135,7 @@ class DefaultCapabilityReference
         try
         {
             stateLock.writeLock().lock();
-            checkValid();
-
-            if ( isEnabled() && !isActive() )
-            {
-                if ( activationHandler.isConditionSatisfied() )
-                {
-                    getLogger().debug( "Activating capability {} ({})", capability, capability.id() );
-                    try
-                    {
-                        capability().activate();
-                        getLogger().debug( "Activated capability {} ({})", capability, capability.id() );
-                        active = true;
-                        eventBus.post( new CapabilityEvent.AfterActivated( this ) );
-                    }
-                    catch ( Exception e )
-                    {
-                        getLogger().error(
-                            "Could not activate capability {} ({})", new Object[]{ capability, capability.id(), e }
-                        );
-                    }
-                }
-                else
-                {
-                    getLogger().debug( "Capability {} ({}) is not yet activatable", capability, capability.id() );
-                }
-            }
+            state.activate();
         }
         finally
         {
@@ -202,25 +149,7 @@ class DefaultCapabilityReference
         try
         {
             stateLock.writeLock().lock();
-            checkValid();
-
-            if ( isEnabled() && isActive() )
-            {
-                getLogger().debug( "Passivating capability {} ({})", capability, capability.id() );
-                try
-                {
-                    active = false;
-                    eventBus.post( new CapabilityEvent.BeforePassivated( this ) );
-                    capability().passivate();
-                    getLogger().debug( "Passivated capability {} ({})", capability, capability.id() );
-                }
-                catch ( Exception e )
-                {
-                    getLogger().error(
-                        "Could not passivate capability {} ({})", new Object[]{ capability, capability.id(), e }
-                    );
-                }
-            }
+            state.passivate();
         }
         finally
         {
@@ -234,18 +163,7 @@ class DefaultCapabilityReference
         try
         {
             stateLock.writeLock().lock();
-            checkValid();
-
-            try
-            {
-                capability().create( properties );
-            }
-            catch ( Exception e )
-            {
-                // TODO
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-            validityHandler.bind();
+            state.create( properties );
         }
         finally
         {
@@ -259,18 +177,7 @@ class DefaultCapabilityReference
         try
         {
             stateLock.writeLock().lock();
-            checkValid();
-
-            try
-            {
-                capability().load( properties );
-            }
-            catch ( Exception e )
-            {
-                // TODO
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-            validityHandler.bind();
+            state.load( properties );
         }
         finally
         {
@@ -286,19 +193,7 @@ class DefaultCapabilityReference
             try
             {
                 stateLock.writeLock().lock();
-                checkValid();
-
-                eventBus.post( new CapabilityEvent.BeforeUpdate( this ) );
-                try
-                {
-                    capability().update( properties );
-                }
-                catch ( Exception e )
-                {
-                    // TODO
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-                eventBus.post( new CapabilityEvent.AfterUpdate( this ) );
+                state.update( properties, previousProperties );
             }
             finally
             {
@@ -313,23 +208,10 @@ class DefaultCapabilityReference
         try
         {
             stateLock.writeLock().lock();
-            checkValid();
-
-            disable();
-            validityHandler.release();
-            try
-            {
-                capability().remove();
-            }
-            catch ( Exception e )
-            {
-                // TODO
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
+            state.remove();
         }
         finally
         {
-            valid = false;
             stateLock.writeLock().unlock();
         }
     }
@@ -337,19 +219,7 @@ class DefaultCapabilityReference
     @Override
     public String toString()
     {
-        return String.format( "capability %s (enabled=%s, active=%s)", capability, enabled, active );
-    }
-
-    /**
-     * Check if this reference is valid. A reference will be valid until is removed. After that it will throw an
-     * {@link IllegalOperationException} on all operations.
-     */
-    private void checkValid()
-    {
-        if ( !valid )
-        {
-            throw new IllegalStateException( "Capability reference is no longer valid (capability has been removed)" );
-        }
+        return String.format( "capability %s (enabled=%s, active=%s)", capability, isEnabled(), isActive() );
     }
 
     // @TestAccessible //
@@ -368,6 +238,346 @@ class DefaultCapabilityReference
             return false;
         }
         return p1.equals( p2 );
+    }
+
+    private class State
+        implements CapabilityReference
+    {
+
+        State()
+        {
+            getLogger().debug(
+                "Capability {} ({}) state changed to {}", new Object[]{ capability, capability.id(), this }
+            );
+        }
+
+        @Override
+        public Capability capability()
+        {
+            return capability;
+        }
+
+        @Override
+        public boolean isEnabled()
+        {
+            return false;
+        }
+
+        @Override
+        public void enable()
+        {
+            throw new IllegalStateException( "State '" + toString() + "' does not permit 'enable' operation" );
+        }
+
+        @Override
+        public void disable()
+        {
+            throw new IllegalStateException( "State '" + toString() + "' does not permit 'disable' operation" );
+        }
+
+        @Override
+        public boolean isActive()
+        {
+            return false;
+        }
+
+        @Override
+        public void activate()
+        {
+            throw new IllegalStateException( "State '" + toString() + "' does not permit 'activate' operation" );
+        }
+
+        @Override
+        public void passivate()
+        {
+            throw new IllegalStateException( "State '" + toString() + "' does not permit 'passivate' operation" );
+        }
+
+        @Override
+        public void create( final Map<String, String> properties )
+        {
+            throw new IllegalStateException( "State '" + toString() + "' does not permit 'create' operation" );
+        }
+
+        @Override
+        public void load( final Map<String, String> properties )
+        {
+            throw new IllegalStateException( "State '" + toString() + "' does not permit 'load' operation" );
+        }
+
+        @Override
+        public void update( final Map<String, String> properties, final Map<String, String> previousProperties )
+        {
+            throw new IllegalStateException( "State '" + toString() + "' does not permit 'update' operation" );
+        }
+
+        @Override
+        public void remove()
+        {
+            throw new IllegalStateException( "State '" + toString() + "' does not permit 'remove' operation" );
+        }
+
+        @Override
+        public String toString()
+        {
+            return getClass().getSimpleName();
+        }
+    }
+
+    public class NewState
+        extends State
+    {
+
+        @Override
+        public void create( final Map<String, String> properties )
+        {
+            try
+            {
+                capability().create( properties );
+                validityHandler.bind();
+                state = new ValidState();
+            }
+            catch ( Exception e )
+            {
+                state = new InvalidState( "Failed to load: " + e.getMessage() );
+                getLogger().error(
+                    "Could not create capability {} ({})", new Object[]{ capability, capability.id(), e }
+                );
+            }
+        }
+
+        @Override
+        public void load( final Map<String, String> properties )
+        {
+            try
+            {
+                capability().load( properties );
+                validityHandler.bind();
+                state = new ValidState();
+            }
+            catch ( Exception e )
+            {
+                state = new InvalidState( "Failed to load: " + e.getMessage() );
+                getLogger().error(
+                    "Could not load capability {} ({})", new Object[]{ capability, capability.id(), e }
+                );
+            }
+        }
+
+        @Override
+        public String toString()
+        {
+            return "NEW";
+        }
+
+    }
+
+    public class ValidState
+        extends State
+    {
+
+        @Override
+        public void enable()
+        {
+            getLogger().debug( "Enabling capability {} ({})", capability, capability.id() );
+            state = new EnabledState();
+            activationHandler.bind();
+        }
+
+        @Override
+        public void disable()
+        {
+            // do nothing (not yet enabled)
+        }
+
+        @Override
+        public void passivate()
+        {
+            // do nothing (not yet activated)
+        }
+
+        @Override
+        public void update( final Map<String, String> properties, final Map<String, String> previousProperties )
+        {
+            try
+            {
+                eventBus.post( new CapabilityEvent.BeforeUpdate( DefaultCapabilityReference.this ) );
+                capability().update( properties );
+                eventBus.post( new CapabilityEvent.AfterUpdate( DefaultCapabilityReference.this ) );
+            }
+            catch ( Exception e )
+            {
+                getLogger().error(
+                    "Could not update capability {} ({}).", new Object[]{ capability, capability.id(), e }
+                );
+                DefaultCapabilityReference.this.passivate();
+            }
+        }
+
+        @Override
+        public void remove()
+        {
+            try
+            {
+                DefaultCapabilityReference.this.disable();
+                validityHandler.release();
+                capability().remove();
+                state = new RemovedState();
+            }
+            catch ( Exception e )
+            {
+                state = new InvalidState( "Failed to remove: " + e.getMessage() );
+                getLogger().error(
+                    "Could not remove capability {} ({})", new Object[]{ capability, capability.id(), e }
+                );
+            }
+        }
+
+        @Override
+        public String toString()
+        {
+            return "VALID";
+        }
+
+    }
+
+    public class EnabledState
+        extends ValidState
+    {
+
+        @Override
+        public boolean isEnabled()
+        {
+            return true;
+        }
+
+        @Override
+        public void enable()
+        {
+            // do nothing (already enabled)
+        }
+
+        @Override
+        public void disable()
+        {
+            getLogger().debug( "Disabling capability {} ({})", capability, capability.id() );
+            activationHandler.release();
+            DefaultCapabilityReference.this.passivate();
+            state = new ValidState();
+        }
+
+        @Override
+        public void activate()
+        {
+            if ( activationHandler.isConditionSatisfied() )
+            {
+                getLogger().debug( "Activating capability {} ({})", capability, capability.id() );
+                try
+                {
+                    capability().activate();
+                    getLogger().debug( "Activated capability {} ({})", capability, capability.id() );
+                    state = new ActiveState();
+                    eventBus.post( new CapabilityEvent.AfterActivated( DefaultCapabilityReference.this ) );
+                }
+                catch ( Exception e )
+                {
+                    getLogger().error(
+                        "Could not activate capability {} ({})", new Object[]{ capability, capability.id(), e }
+                    );
+                }
+            }
+            else
+            {
+                getLogger().debug( "Capability {} ({}) is not yet activatable", capability, capability.id() );
+            }
+        }
+
+        @Override
+        public void passivate()
+        {
+            // do nothing (not yet activated)
+        }
+
+        @Override
+        public String toString()
+        {
+            return "ENABLED";
+        }
+
+    }
+
+    public class ActiveState
+        extends EnabledState
+    {
+
+        @Override
+        public boolean isActive()
+        {
+            return true;
+        }
+
+        @Override
+        public void activate()
+        {
+            // do nothing (already active)
+        }
+
+        @Override
+        public void passivate()
+        {
+            getLogger().debug( "Passivating capability {} ({})", capability, capability.id() );
+            try
+            {
+                eventBus.post( new CapabilityEvent.BeforePassivated( DefaultCapabilityReference.this ) );
+                capability().passivate();
+                getLogger().debug( "Passivated capability {} ({})", capability, capability.id() );
+            }
+            catch ( Exception e )
+            {
+                getLogger().error(
+                    "Could not passivate capability {} ({})", new Object[]{ capability, capability.id(), e }
+                );
+            }
+            state = new EnabledState();
+        }
+
+        @Override
+        public String toString()
+        {
+            return "ACTIVE";
+        }
+
+    }
+
+    public class InvalidState
+        extends State
+    {
+
+        private final String reason;
+
+        InvalidState( final String reason )
+        {
+            this.reason = reason;
+        }
+
+        @Override
+        public String toString()
+        {
+            return "INVALID (" + reason + ")";
+        }
+
+    }
+
+    public class RemovedState
+        extends State
+    {
+
+        @Override
+        public String toString()
+        {
+            return "REMOVED";
+        }
+
     }
 
 }
