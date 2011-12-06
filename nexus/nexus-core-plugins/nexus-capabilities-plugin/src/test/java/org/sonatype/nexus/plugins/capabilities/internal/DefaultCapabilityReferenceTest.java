@@ -60,6 +60,8 @@ import org.sonatype.nexus.plugins.capabilities.support.activation.NexusCondition
 public class DefaultCapabilityReferenceTest
 {
 
+    static final Map<String, String> NULL_PROPERTIES = null;
+
     private Capability capability;
 
     private DefaultCapabilityReference underTest;
@@ -175,9 +177,12 @@ public class DefaultCapabilityReferenceTest
 
     /**
      * Capability is activated and active flag is set on activate.
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void activateWhenNotActive()
+        throws Exception
     {
         underTest.enable();
         underTest.activate();
@@ -190,9 +195,12 @@ public class DefaultCapabilityReferenceTest
 
     /**
      * Capability is not activated activated again once it has been activated.
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void activateWhenActive()
+        throws Exception
     {
         underTest.enable();
         underTest.activate();
@@ -206,9 +214,12 @@ public class DefaultCapabilityReferenceTest
 
     /**
      * Capability is not passivated when is not active.
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void passivateWhenNotActive()
+        throws Exception
     {
         assertThat( underTest.isActive(), is( false ) );
         underTest.enable();
@@ -221,9 +232,12 @@ public class DefaultCapabilityReferenceTest
 
     /**
      * Capability is passivated when is active.
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void passivateWhenActive()
+        throws Exception
     {
         underTest.enable();
         underTest.activate();
@@ -243,9 +257,12 @@ public class DefaultCapabilityReferenceTest
     /**
      * When activation fails, active state is false and capability remains enabled.
      * Calling passivate will do nothing.
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void activateProblem()
+        throws Exception
     {
         doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).activate();
 
@@ -264,9 +281,12 @@ public class DefaultCapabilityReferenceTest
 
     /**
      * When passivation fails, active state is false and capability remains enabled.
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void passivateProblem()
+        throws Exception
     {
         doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).passivate();
 
@@ -283,9 +303,13 @@ public class DefaultCapabilityReferenceTest
 
     /**
      * When update fails and capability is not active, no exception is propagated and passivate is not called.
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void updateProblemWhenNotActive()
+        throws Exception
+
     {
         final HashMap<String, String> properties = new HashMap<String, String>();
         properties.put( "p", "p" );
@@ -305,9 +329,12 @@ public class DefaultCapabilityReferenceTest
 
     /**
      * When update fails and capability is active, no exception is propagated and capability is passivated.
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void updateProblemWhenActive()
+        throws Exception
     {
         final HashMap<String, String> properties = new HashMap<String, String>();
         properties.put( "p", "p" );
@@ -328,18 +355,25 @@ public class DefaultCapabilityReferenceTest
 
     /**
      * Calling create forwards to capability (no need to call create as it is done in setup).
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void createIsForwardedToCapability()
+
+        throws Exception
     {
         verify( capability ).create( Matchers.<Map<String, String>>any() );
     }
 
     /**
      * Calling load forwards to capability.
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void loadIsForwardedToCapability()
+        throws Exception
     {
         underTest = new DefaultCapabilityReference( eventBus, achf, vchf, capability );
         final HashMap<String, String> properties = new HashMap<String, String>();
@@ -350,9 +384,12 @@ public class DefaultCapabilityReferenceTest
 
     /**
      * Calling update forwards to capability if properties are different.
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void updateIsForwardedToCapability()
+        throws Exception
     {
         final HashMap<String, String> properties = new HashMap<String, String>();
         properties.put( "p", "p" );
@@ -369,9 +406,12 @@ public class DefaultCapabilityReferenceTest
 
     /**
      * Calling update does not forwards to capability if properties are same.
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void updateIsNotForwardedToCapabilityIfSameProperties()
+        throws Exception
     {
         final HashMap<String, String> properties = new HashMap<String, String>();
         final HashMap<String, String> previousProperties = new HashMap<String, String>();
@@ -383,9 +423,12 @@ public class DefaultCapabilityReferenceTest
 
     /**
      * Calling remove forwards to capability and handlers are removed.
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void removeIsForwardedToCapability()
+        throws Exception
     {
         underTest.enable();
         underTest.remove();
@@ -396,7 +439,7 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void samePropertiesWhenBothNull()
     {
-        assertThat( sameProperties( null, null ), is( true ) );
+        assertThat( sameProperties( NULL_PROPERTIES, NULL_PROPERTIES ), is( true ) );
     }
 
     @Test
@@ -404,7 +447,7 @@ public class DefaultCapabilityReferenceTest
     {
         final HashMap<String, String> p2 = new HashMap<String, String>();
         p2.put( "p2", "p2" );
-        assertThat( sameProperties( null, p2 ), is( false ) );
+        assertThat( sameProperties( NULL_PROPERTIES, p2 ), is( false ) );
     }
 
     @Test
@@ -412,7 +455,7 @@ public class DefaultCapabilityReferenceTest
     {
         final HashMap<String, String> p1 = new HashMap<String, String>();
         p1.put( "p1", "p1" );
-        assertThat( sameProperties( p1, null ), is( false ) );
+        assertThat( sameProperties( p1, NULL_PROPERTIES ), is( false ) );
     }
 
     @Test
@@ -486,9 +529,12 @@ public class DefaultCapabilityReferenceTest
 
     /**
      * When Nexus is shutdown capability is passivated.
+     *
+     * @throws Exception re-thrown
      */
     @Test
     public void passivateWhenNexusIsShutdown()
+        throws Exception
     {
         underTest.enable();
         underTest.activate();

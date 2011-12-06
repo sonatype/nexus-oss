@@ -45,36 +45,42 @@ public abstract class AbstractCapability
 
     @Override
     public void create( final Map<String, String> properties )
+        throws Exception
     {
         // do nothing
     }
 
     @Override
     public void load( final Map<String, String> properties )
+        throws Exception
     {
         // do nothing
     }
 
     @Override
     public void update( final Map<String, String> properties )
+        throws Exception
     {
         // do nothing
     }
 
     @Override
     public void remove()
+        throws Exception
     {
         // do nothing
     }
 
     @Override
     public void activate()
+        throws Exception
     {
         // do nothing
     }
 
     @Override
     public void passivate()
+        throws Exception
     {
         // do nothing
     }

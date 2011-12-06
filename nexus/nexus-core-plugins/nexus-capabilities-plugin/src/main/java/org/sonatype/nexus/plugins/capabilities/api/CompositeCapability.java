@@ -46,6 +46,7 @@ public class CompositeCapability
 
     @Override
     public void create( final Map<String, String> properties )
+        throws Exception
     {
         for ( final Capability capability : capabilities )
         {
@@ -55,6 +56,7 @@ public class CompositeCapability
 
     @Override
     public void load( final Map<String, String> properties )
+        throws Exception
     {
         for ( final Capability capability : capabilities )
         {
@@ -64,6 +66,7 @@ public class CompositeCapability
 
     @Override
     public void update( final Map<String, String> properties )
+        throws Exception
     {
         for ( final Capability capability : capabilities )
         {
@@ -73,6 +76,7 @@ public class CompositeCapability
 
     @Override
     public void remove()
+        throws Exception
     {
         for ( final Capability capability : capabilities )
         {
@@ -82,6 +86,7 @@ public class CompositeCapability
 
     @Override
     public void activate()
+        throws Exception
     {
         for ( final Capability capability : capabilities )
         {
@@ -91,6 +96,7 @@ public class CompositeCapability
 
     @Override
     public void passivate()
+        throws Exception
     {
         for ( final Capability capability : capabilities )
         {

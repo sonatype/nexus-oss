@@ -40,8 +40,10 @@ public interface Capability
      * Any further interaction with this capability will result in an {@link IllegalStateException}.
      *
      * @param properties capability configuration
+     * @throws Exception If capability cannot be create
      */
-    void create( Map<String, String> properties );
+    void create( Map<String, String> properties )
+        throws Exception;
 
     /**
      * Callback when a capability configuration is loaded from persisted store (configuration file).
@@ -51,8 +53,10 @@ public interface Capability
      * Any further interaction with this capability will result in an {@link IllegalStateException}.
      *
      * @param properties capability configuration
+     * @throws Exception If capability cannot be loaded
      */
-    void load( Map<String, String> properties );
+    void load( Map<String, String> properties )
+        throws Exception;
 
     /**
      * Callback when a capability configuration is updated.
@@ -61,16 +65,21 @@ public interface Capability
      * active, will be automatically passivated.
      *
      * @param properties capability configuration
+     * @throws Exception If capability cannot be updated
      */
-    void update( Map<String, String> properties );
+    void update( Map<String, String> properties )
+        throws Exception;
 
     /**
      * Callback when a capability is removed.
      * <p/>
      * If an exception occurs, during invocation of this method, the exception will be ignored and capability will be in
      * a removed state.
+     *
+     * @throws Exception If capability cannot be removed
      */
-    void remove();
+    void remove()
+        throws Exception;
 
     /**
      * Callback when capability is activated. Activation is triggered on create/load (if capability is not disabled),
@@ -78,16 +87,22 @@ public interface Capability
      * <p/>
      * If an exception occurs, during invocation of this method, the exception will be ignored and capability will be in
      * an non active state.
+     *
+     * @throws Exception If capability cannot be activated
      */
-    void activate();
+    void activate()
+        throws Exception;
 
     /**
      * Callback when capability is passivated. Passivation will be triggered before a capability is removed, on
      * Nexus shutdown or when capability is disabled.
      * <p/>
      * If an exception occurs, during invocation of this method, the exception will be ignored.
+     *
+     * @throws Exception If capability cannot be passivated
      */
-    void passivate();
+    void passivate()
+        throws Exception;
 
     /**
      * Returns the condition that should be satisfied in order for this capability to be active.
