@@ -106,6 +106,7 @@ public class ValidityConditionHandler
         if ( nexusActiveCondition == null )
         {
             nexusActiveCondition = conditions.nexus().active();
+            nexusActiveCondition.bind();
             eventBus.register( this );
             if ( nexusActiveCondition.isSatisfied() )
             {
@@ -121,6 +122,7 @@ public class ValidityConditionHandler
         {
             handle( new ConditionEvent.Unsatisfied( nexusActiveCondition ) );
             eventBus.unregister( this );
+            nexusActiveCondition.release();
         }
         return this;
     }

@@ -28,6 +28,7 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.SatisfiedCondition;
+import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 
@@ -44,12 +45,19 @@ public class ActivationConditionHandler
 
     private final CapabilityReference reference;
 
+    private final Conditions conditions;
+
     private Condition activationCondition;
 
+    private Condition nexusActiveCondition;
+
     @Inject
-    ActivationConditionHandler( final NexusEventBus eventBus, final @Assisted CapabilityReference reference )
+    ActivationConditionHandler( final NexusEventBus eventBus,
+                                final Conditions conditions,
+                                final @Assisted CapabilityReference reference )
     {
         this.eventBus = checkNotNull( eventBus );
+        this.conditions = checkNotNull( conditions );
         this.reference = checkNotNull( reference );
     }
 
@@ -70,7 +78,7 @@ public class ActivationConditionHandler
     @Subscribe
     public void handle( final ConditionEvent.Unsatisfied event )
     {
-        if ( event.getCondition() == activationCondition )
+        if ( event.getCondition() == activationCondition || event.getCondition() == nexusActiveCondition )
         {
             reference.passivate();
         }
@@ -80,11 +88,13 @@ public class ActivationConditionHandler
     {
         if ( activationCondition == null )
         {
+            nexusActiveCondition = conditions.nexus().active();
             activationCondition = reference.capability().activationCondition();
             if ( activationCondition == null )
             {
                 activationCondition = new SatisfiedCondition( "Capability has no activation condition" );
             }
+            nexusActiveCondition.bind();
             activationCondition.bind();
             eventBus.register( this );
         }
@@ -96,6 +106,7 @@ public class ActivationConditionHandler
         if ( activationCondition != null )
         {
             eventBus.unregister( this );
+            nexusActiveCondition.release();
             activationCondition.release();
             activationCondition = null;
         }

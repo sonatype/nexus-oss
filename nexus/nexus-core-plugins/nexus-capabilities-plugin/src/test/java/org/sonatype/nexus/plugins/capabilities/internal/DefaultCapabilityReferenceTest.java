@@ -80,6 +80,8 @@ public class DefaultCapabilityReferenceTest
 
     private ValidityConditionHandlerFactory vchf;
 
+    private NexusIsActiveCondition nexusIsActiveCondition;
+
     @Before
     public void setUp()
     {
@@ -88,7 +90,7 @@ public class DefaultCapabilityReferenceTest
 
         final Conditions conditions = mock( Conditions.class );
         final NexusConditions nexusConditions = mock( NexusConditions.class );
-        final NexusIsActiveCondition nexusIsActiveCondition = mock( NexusIsActiveCondition.class );
+        nexusIsActiveCondition = mock( NexusIsActiveCondition.class );
 
         when( nexusIsActiveCondition.isSatisfied() ).thenReturn( true );
         when( nexusConditions.active() ).thenReturn( nexusIsActiveCondition );
@@ -114,7 +116,7 @@ public class DefaultCapabilityReferenceTest
                     throws Throwable
                 {
                     return new ActivationConditionHandler(
-                        eventBus, (CapabilityReference) invocation.getArguments()[0]
+                        eventBus, conditions, (CapabilityReference) invocation.getArguments()[0]
                     );
                 }
             }
@@ -480,6 +482,25 @@ public class DefaultCapabilityReferenceTest
         ( (ValidityConditionHandler) ebc.getValue() ).handle( new ConditionEvent.Unsatisfied( validityCondition ) );
 
         verify( configurations ).remove( capability.id() );
+    }
+
+    /**
+     * When Nexus is shutdown capability is passivated.
+     */
+    @Test
+    public void passivateWhenNexusIsShutdown()
+    {
+        underTest.enable();
+        underTest.activate();
+        verify( eventBus, times( 2 ) ).register( ebc.capture() );
+        assertThat( ebc.getAllValues().get( 0 ), is( instanceOf( ValidityConditionHandler.class ) ) );
+        assertThat( ebc.getAllValues().get( 1 ), is( instanceOf( ActivationConditionHandler.class ) ) );
+
+        ( (ActivationConditionHandler) ebc.getAllValues().get( 1 ) ).handle(
+            new ConditionEvent.Unsatisfied( nexusIsActiveCondition )
+        );
+
+        verify( capability ).passivate();
     }
 
 }
