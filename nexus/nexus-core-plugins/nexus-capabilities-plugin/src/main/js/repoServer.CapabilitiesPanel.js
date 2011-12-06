@@ -658,6 +658,8 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
           }
 
           store.remove(store.getById(resourceId));
+
+          this.capabilitiesDataStore.reload();
         }
         else
         {
