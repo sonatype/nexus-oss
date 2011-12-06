@@ -28,6 +28,7 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.SatisfiedCondition;
+import org.sonatype.nexus.plugins.capabilities.internal.activation.UnsatisfiedCondition;
 import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
@@ -89,7 +90,18 @@ public class ActivationConditionHandler
         if ( activationCondition == null )
         {
             nexusActiveCondition = conditions.nexus().active();
-            activationCondition = reference.capability().activationCondition();
+            try
+            {
+                activationCondition = reference.capability().activationCondition();
+            }
+            catch ( Exception e )
+            {
+                activationCondition = new UnsatisfiedCondition( "Failed to determine activation condition" );
+                getLogger().error(
+                    "Could not get activation condition from capability {} ({}). Considering it as non activatable",
+                    new Object[]{ reference.capability(), reference.capability().id(), e }
+                );
+            }
             if ( activationCondition == null )
             {
                 activationCondition = new SatisfiedCondition( "Capability has no activation condition" );

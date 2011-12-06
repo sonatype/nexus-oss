@@ -131,7 +131,20 @@ public class ValidityConditionHandler
     {
         if ( validityCondition == null )
         {
-            validityCondition = reference.capability().validityCondition();
+            try
+            {
+                validityCondition = reference.capability().validityCondition();
+            }
+            catch ( Exception e )
+            {
+                validityCondition = new SatisfiedCondition(
+                    "Always satisfied (failed to determine validity condition)"
+                );
+                getLogger().error(
+                    "Could not get validation condition from capability {} ({}). Considering it as always valid",
+                    new Object[]{ reference.capability(), reference.capability().id(), e }
+                );
+            }
             if ( validityCondition == null )
             {
                 validityCondition = new SatisfiedCondition( "Always satisfied (capability has no validity condition)" );
