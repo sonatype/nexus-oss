@@ -16,30 +16,18 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.guice;
+package org.sonatype.nexus.plugins.capabilities.internal;
 
-import javax.inject.Named;
-
-import org.sonatype.nexus.plugins.capabilities.internal.ActivationConditionHandlerFactory;
-import org.sonatype.nexus.plugins.capabilities.internal.ValidityConditionHandlerFactory;
-import com.google.inject.AbstractModule;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 
 /**
- * Capabilities plugin Guice module.
+ * Factory of {@link ValidityConditionHandler}.
  *
- * @since 1.0
+ * @since 1.10.0
  */
-@Named
-public class GuiceModule
-    extends AbstractModule
+public interface ValidityConditionHandlerFactory
 {
 
-    @Override
-    protected void configure()
-    {
-        install( new FactoryModuleBuilder().build( ActivationConditionHandlerFactory.class ) );
-        install( new FactoryModuleBuilder().build( ValidityConditionHandlerFactory.class ) );
-    }
+    ValidityConditionHandler create( final CapabilityReference reference );
 
 }

@@ -36,10 +36,7 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
-import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
-import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Preconditions;
 
 /**
  * Default {@link CapabilityRegistry} implementation.
@@ -51,32 +48,28 @@ class DefaultCapabilityRegistry
     implements CapabilityRegistry
 {
 
-    private final Map<String, CapabilityFactory> factories;
-
     private final NexusEventBus eventBus;
 
-    private final CapabilityConfiguration configuration;
+    private final ActivationConditionHandlerFactory activationConditionHandlerFactory;
 
-    private final Conditions conditions;
+    private final ValidityConditionHandlerFactory validityConditionHandlerFactory;
+
+    private final Map<String, CapabilityFactory> capabilityFactories;
 
     private final Map<String, CapabilityReference> references;
 
     private final ReentrantReadWriteLock lock;
 
-    private final ActivationConditionHandlerFactory activationListenerFactory;
-
     @Inject
-    DefaultCapabilityRegistry( final Map<String, CapabilityFactory> factories,
+    DefaultCapabilityRegistry( final Map<String, CapabilityFactory> capabilityFactories,
                                final NexusEventBus eventBus,
-                               final ActivationConditionHandlerFactory activationListenerFactory,
-                               final CapabilityConfiguration configuration,
-                               final Conditions conditions )
+                               final ActivationConditionHandlerFactory activationConditionHandlerFactory,
+                               final ValidityConditionHandlerFactory validityConditionHandlerFactory )
     {
         this.eventBus = checkNotNull( eventBus );
-        this.factories = checkNotNull( factories );
-        this.activationListenerFactory = checkNotNull( activationListenerFactory );
-        this.configuration = Preconditions.checkNotNull( configuration );
-        this.conditions = Preconditions.checkNotNull( conditions );
+        this.capabilityFactories = checkNotNull( capabilityFactories );
+        this.activationConditionHandlerFactory = checkNotNull( activationConditionHandlerFactory );
+        this.validityConditionHandlerFactory = checkNotNull( validityConditionHandlerFactory );
 
         references = new HashMap<String, CapabilityReference>();
         lock = new ReentrantReadWriteLock();
@@ -91,7 +84,7 @@ class DefaultCapabilityRegistry
         {
             lock.writeLock().lock();
 
-            final CapabilityFactory factory = factories.get( capabilityType );
+            final CapabilityFactory factory = capabilityFactories.get( capabilityType );
             if ( factory == null )
             {
                 throw new RuntimeException( format( "No factory found for a capability of type %s", capabilityType ) );
@@ -170,7 +163,7 @@ class DefaultCapabilityRegistry
     CapabilityReference createReference( final Capability capability )
     {
         return new DefaultCapabilityReference(
-            eventBus, activationListenerFactory, configuration, conditions, capability
+            eventBus, activationConditionHandlerFactory, validityConditionHandlerFactory, capability
         );
     }
 

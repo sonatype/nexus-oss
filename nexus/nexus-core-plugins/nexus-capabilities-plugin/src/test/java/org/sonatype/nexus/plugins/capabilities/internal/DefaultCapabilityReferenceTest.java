@@ -68,7 +68,7 @@ public class DefaultCapabilityReferenceTest
 
     private Condition activationCondition;
 
-    private CapabilityConfiguration configuration;
+    private CapabilityConfiguration configurations;
 
     private Condition validityCondition;
 
@@ -80,7 +80,7 @@ public class DefaultCapabilityReferenceTest
     public void setUp()
     {
         eventBus = mock( NexusEventBus.class );
-        configuration = mock( CapabilityConfiguration.class );
+        configurations = mock( CapabilityConfiguration.class );
 
         final Conditions conditions = mock( Conditions.class );
         final NexusConditions nexusConditions = mock( NexusConditions.class );
@@ -101,23 +101,37 @@ public class DefaultCapabilityReferenceTest
         when( validityCondition.isSatisfied() ).thenReturn( true );
         when( capability.validityCondition() ).thenReturn( validityCondition );
 
-        final ActivationConditionHandlerFactory activationListenerFactory = mock( ActivationConditionHandlerFactory.class );
-        when( activationListenerFactory.create( any( DefaultCapabilityReference.class ) ) ).thenAnswer(
+        final ActivationConditionHandlerFactory achf = mock( ActivationConditionHandlerFactory.class );
+        when( achf.create( any( DefaultCapabilityReference.class ) ) ).thenAnswer(
             new Answer<ActivationConditionHandler>()
             {
                 @Override
                 public ActivationConditionHandler answer( final InvocationOnMock invocation )
                     throws Throwable
                 {
-                    return new ActivationConditionHandler( eventBus,
-                                                           (CapabilityReference) invocation.getArguments()[0] );
+                    return new ActivationConditionHandler(
+                        eventBus, (CapabilityReference) invocation.getArguments()[0]
+                    );
                 }
             }
         );
 
-        underTest = new DefaultCapabilityReference(
-            eventBus, activationListenerFactory, configuration, conditions, capability
+        final ValidityConditionHandlerFactory vchf = mock( ValidityConditionHandlerFactory.class );
+        when( vchf.create( any( DefaultCapabilityReference.class ) ) ).thenAnswer(
+            new Answer<ValidityConditionHandler>()
+            {
+                @Override
+                public ValidityConditionHandler answer( final InvocationOnMock invocation )
+                    throws Throwable
+                {
+                    return new ValidityConditionHandler(
+                        eventBus, configurations, conditions, (CapabilityReference) invocation.getArguments()[0]
+                    );
+                }
+            }
         );
+
+        underTest = new DefaultCapabilityReference( eventBus, achf, vchf, capability );
         underTest.create( Collections.<String, String>emptyMap() );
 
         re = ArgumentCaptor.forClass( CapabilityEvent.class );
@@ -306,7 +320,7 @@ public class DefaultCapabilityReferenceTest
         underTest.enable();
         underTest.remove();
         verify( capability ).remove();
-        verify( eventBus, times( 3 ) ).unregister( ebc.capture() );
+        verify( eventBus, times( 2 ) ).unregister( ebc.capture() );
     }
 
     @Test
@@ -379,13 +393,8 @@ public class DefaultCapabilityReferenceTest
     @Test
     public void listensToNexusIsActiveAndValidityConditions()
     {
-        verify( eventBus, times( 2 ) ).register( ebc.capture() );
-        assertThat( ebc.getAllValues().get( 0 ), is( instanceOf(
-            DefaultCapabilityReference.NexusActiveListener.class ) )
-        );
-        assertThat( ebc.getAllValues().get( 1 ), is( instanceOf(
-            DefaultCapabilityReference.ValidityListener.class ) )
-        );
+        verify( eventBus ).register( ebc.capture() );
+        assertThat( ebc.getValue(), is( instanceOf( ValidityConditionHandler.class ) ) );
     }
 
     /**
@@ -397,17 +406,14 @@ public class DefaultCapabilityReferenceTest
     public void automaticallyRemoveWhenValidityConditionIsUnsatisfied()
         throws Exception
     {
-        verify( eventBus, times( 2 ) ).register( ebc.capture() );
-        assertThat( ebc.getAllValues().get( 0 ), is( instanceOf(
-            DefaultCapabilityReference.NexusActiveListener.class ) )
-        );
-        assertThat( ebc.getAllValues().get( 1 ), is( instanceOf(
-            DefaultCapabilityReference.ValidityListener.class ) )
-        );
-        ( (DefaultCapabilityReference.ValidityListener) ebc.getAllValues().get( 1 ) ).handle(
-            new ConditionEvent.Unsatisfied( validityCondition )
-        );
-        verify( configuration ).remove( capability.id() );
+        verify( eventBus ).register( ebc.capture() );
+        assertThat( ebc.getValue(), is( instanceOf( ValidityConditionHandler.class ) ) );
+
+        final ValidityConditionHandler validityConditionHandler = (ValidityConditionHandler) ebc.getValue();
+
+        validityConditionHandler.handle( new ConditionEvent.Unsatisfied( validityCondition ) );
+
+        verify( configurations ).remove( capability.id() );
     }
 
 }

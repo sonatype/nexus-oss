@@ -28,12 +28,7 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
-import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
-import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
 import org.sonatype.nexus.proxy.IllegalOperationException;
-import com.google.common.eventbus.Subscribe;
 
 /**
  * Default {@link CapabilityReference} implementation.
@@ -49,9 +44,9 @@ class DefaultCapabilityReference
 
     private final NexusEventBus eventBus;
 
-    private final CapabilityConfiguration configuration;
+    private final ActivationConditionHandler activationHandler;
 
-    private final Conditions conditions;
+    private final ValidityConditionHandler validityHandler;
 
     private final ReentrantReadWriteLock stateLock;
 
@@ -64,23 +59,12 @@ class DefaultCapabilityReference
 
     private boolean enabled;
 
-    private Condition validityCondition;
-
-    private ValidityListener validityListener;
-
-    private NexusActiveListener nexusActiveListener;
-
-    private final ActivationConditionHandler activationListener;
-
     DefaultCapabilityReference( final NexusEventBus eventBus,
                                 final ActivationConditionHandlerFactory activationListenerFactory,
-                                final CapabilityConfiguration configuration,
-                                final Conditions conditions,
+                                final ValidityConditionHandlerFactory validityConditionHandlerFactory,
                                 final Capability capability )
     {
         this.eventBus = checkNotNull( eventBus );
-        this.configuration = checkNotNull( configuration );
-        this.conditions = checkNotNull( conditions );
         this.capability = checkNotNull( capability );
 
         active = false;
@@ -89,7 +73,8 @@ class DefaultCapabilityReference
 
         stateLock = new ReentrantReadWriteLock();
 
-        activationListener = checkNotNull( activationListenerFactory ).create( this );
+        activationHandler = checkNotNull( activationListenerFactory ).create( this );
+        validityHandler = checkNotNull( validityConditionHandlerFactory ).create( this );
     }
 
     @Override
@@ -126,7 +111,7 @@ class DefaultCapabilityReference
             {
                 getLogger().debug( "Enabling capability {} ({})", capability, capability.id() );
                 enabled = true;
-                activationListener.bind();
+                activationHandler.bind();
             }
         }
         finally
@@ -146,7 +131,7 @@ class DefaultCapabilityReference
             if ( isEnabled() )
             {
                 getLogger().debug( "Disabling capability {} ({})", capability, capability.id() );
-                activationListener.release();
+                activationHandler.release();
                 enabled = false;
             }
         }
@@ -182,7 +167,7 @@ class DefaultCapabilityReference
 
             if ( isEnabled() && !isActive() )
             {
-                if ( activationListener.isConditionSatisfied() )
+                if ( activationHandler.isConditionSatisfied() )
                 {
                     getLogger().debug( "Activating capability {} ({})", capability, capability.id() );
                     try
@@ -260,10 +245,7 @@ class DefaultCapabilityReference
                 // TODO
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-            if ( nexusActiveListener == null )
-            {
-                nexusActiveListener = new NexusActiveListener().bind();
-            }
+            validityHandler.bind();
         }
         finally
         {
@@ -288,10 +270,7 @@ class DefaultCapabilityReference
                 // TODO
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
-            if ( nexusActiveListener == null )
-            {
-                nexusActiveListener = new NexusActiveListener().bind();
-            }
+            validityHandler.bind();
         }
         finally
         {
@@ -337,10 +316,7 @@ class DefaultCapabilityReference
             checkValid();
 
             disable();
-            if ( nexusActiveListener != null )
-            {
-                nexusActiveListener.release();
-            }
+            validityHandler.release();
             try
             {
                 capability().remove();
@@ -392,112 +368,6 @@ class DefaultCapabilityReference
             return false;
         }
         return p1.equals( p2 );
-    }
-
-    public class ValidityListener
-    {
-
-        @Subscribe
-        public void handle( final ConditionEvent.Unsatisfied event )
-        {
-            if ( event.getCondition() == validityCondition )
-            {
-                try
-                {
-                    configuration.remove( capability().id() );
-                }
-                catch ( Exception e )
-                {
-                    getLogger().error( "Failed to remove capability with id '{}'", capability().id(), e );
-                }
-            }
-        }
-
-        @Override
-        public String toString()
-        {
-            return String.format(
-                "Watching '%s' condition to validate/invalidate capability '%s (id=%s)'",
-                validityCondition, capability, capability.id()
-            );
-        }
-
-    }
-
-    public class NexusActiveListener
-    {
-
-        private Condition nexusActiveCondition;
-
-        @Subscribe
-        public void handle( final ConditionEvent.Satisfied event )
-        {
-            if ( event.getCondition() == nexusActiveCondition )
-            {
-                validityCondition = capability().validityCondition();
-                if ( validityCondition != null )
-                {
-                    validityCondition.bind();
-                    validityListener = new ValidityListener();
-                    eventBus.register( validityListener );
-                }
-            }
-        }
-
-        @Subscribe
-        public void handle( final ConditionEvent.Unsatisfied event )
-        {
-            if ( event.getCondition() == nexusActiveCondition )
-            {
-                if ( validityListener != null )
-                {
-                    eventBus.unregister( validityListener );
-                    validityListener = null;
-                }
-                if ( validityCondition != null )
-                {
-                    validityCondition.release();
-                    validityCondition = null;
-                }
-                if ( isActive() )
-                {
-                    passivate();
-                }
-            }
-        }
-
-        @Override
-        public String toString()
-        {
-            return String.format(
-                "Watching '%s' condition to trigger validation of capability '%s (id=%s)'",
-                nexusActiveCondition, capability, capability.id()
-            );
-        }
-
-        public NexusActiveListener bind()
-        {
-            if ( nexusActiveCondition == null )
-            {
-                nexusActiveCondition = conditions.nexus().active();
-                eventBus.register( this );
-                if ( nexusActiveCondition.isSatisfied() )
-                {
-                    handle( new ConditionEvent.Satisfied( nexusActiveCondition ) );
-                }
-            }
-            return this;
-        }
-
-        public NexusActiveListener release()
-        {
-            if ( nexusActiveCondition != null )
-            {
-                handle( new ConditionEvent.Unsatisfied( nexusActiveCondition ) );
-                eventBus.unregister( this );
-            }
-            return this;
-        }
     }
 
 }
