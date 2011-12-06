@@ -28,6 +28,7 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.session.mgt.DefaultSessionKey;
 import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.subject.WebSubject;
 
@@ -161,6 +162,48 @@ public class StatelessAndStatefulWebSessionManagerTest
 
         // create a user and login
         WebSubject subject = new WebSubject.Builder( securityManager, request, response ).buildWebSubject();
+        subject.login( new UsernamePasswordToken( "user", "user123" ) );
+
+        // verify 1 active sessions
+        verifySingleSessionStored( subject.getSession().getId() );
+
+        // verify accessing the session does not blow up
+        subject.getSession().getAttributeKeys(); // directly against the subject object
+
+        // force clearing the ehcache
+        sessionDAO.getActiveSessionsCache().clear();
+
+        // now the session should not be found
+        try
+        {
+            subject.getSession().getAttributeKeys(); // directly against the subject object
+            Assert.fail( "expected UnknownSessionException" );
+        }
+        catch ( UnknownSessionException e )
+        {
+            // expected
+        }
+
+        try
+        {
+            sessionManager.getSession(
+                new DefaultSessionKey( subject.getSession().getId() ) ); // again using the sessionManager
+            Assert.fail( "expected UnknownSessionException" );
+        }
+        catch ( UnknownSessionException e )
+        {
+            // expected
+        }
+    }
+
+    /**
+     * Verifies a session IS stored for non web clients
+     */
+    @Test
+    public void testNonWebClient()
+    {
+        // create a user and login
+        Subject subject = new Subject.Builder( securityManager ).buildSubject();
         subject.login( new UsernamePasswordToken( "user", "user123" ) );
 
         // verify 1 active sessions
