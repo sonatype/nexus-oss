@@ -63,12 +63,12 @@ class DefaultCapabilityRegistry
 
     private final ReentrantReadWriteLock lock;
 
-    private final ActivationListenerFactory activationListenerFactory;
+    private final ActivationConditionHandlerFactory activationListenerFactory;
 
     @Inject
     DefaultCapabilityRegistry( final Map<String, CapabilityFactory> factories,
                                final NexusEventBus eventBus,
-                               final ActivationListenerFactory activationListenerFactory,
+                               final ActivationConditionHandlerFactory activationListenerFactory,
                                final CapabilityConfiguration configuration,
                                final Conditions conditions )
     {

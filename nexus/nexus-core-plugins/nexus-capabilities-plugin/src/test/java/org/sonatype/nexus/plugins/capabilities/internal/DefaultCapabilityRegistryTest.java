@@ -86,7 +86,7 @@ public class DefaultCapabilityRegistryTest
 
         final CapabilityConfiguration configuration = mock( CapabilityConfiguration.class );
         final Conditions conditions = mock( Conditions.class );
-        final ActivationListenerFactory activationListenerFactory = mock( ActivationListenerFactory.class );
+        final ActivationConditionHandlerFactory activationListenerFactory = mock( ActivationConditionHandlerFactory.class );
 
         underTest = new DefaultCapabilityRegistry(
             factoryMap, eventBus, activationListenerFactory, configuration, conditions )

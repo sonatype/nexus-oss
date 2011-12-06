@@ -101,15 +101,16 @@ public class DefaultCapabilityReferenceTest
         when( validityCondition.isSatisfied() ).thenReturn( true );
         when( capability.validityCondition() ).thenReturn( validityCondition );
 
-        final ActivationListenerFactory activationListenerFactory = mock( ActivationListenerFactory.class );
+        final ActivationConditionHandlerFactory activationListenerFactory = mock( ActivationConditionHandlerFactory.class );
         when( activationListenerFactory.create( any( DefaultCapabilityReference.class ) ) ).thenAnswer(
-            new Answer<ActivationListener>()
+            new Answer<ActivationConditionHandler>()
             {
                 @Override
-                public ActivationListener answer( final InvocationOnMock invocation )
+                public ActivationConditionHandler answer( final InvocationOnMock invocation )
                     throws Throwable
                 {
-                    return new ActivationListener( eventBus, (CapabilityReference) invocation.getArguments()[0] );
+                    return new ActivationConditionHandler( eventBus,
+                                                           (CapabilityReference) invocation.getArguments()[0] );
                 }
             }
         );
@@ -133,7 +134,7 @@ public class DefaultCapabilityReferenceTest
         underTest.enable();
         assertThat( underTest.isEnabled(), is( true ) );
         verify( activationCondition ).bind();
-        verify( eventBus ).register( isA( ActivationListener.class ) );
+        verify( eventBus ).register( isA( ActivationConditionHandler.class ) );
     }
 
     /**
@@ -149,7 +150,7 @@ public class DefaultCapabilityReferenceTest
         assertThat( underTest.isEnabled(), is( false ) );
 
         verify( activationCondition ).release();
-        verify( eventBus ).unregister( isA( ActivationListener.class ) );
+        verify( eventBus ).unregister( isA( ActivationConditionHandler.class ) );
     }
 
     /**

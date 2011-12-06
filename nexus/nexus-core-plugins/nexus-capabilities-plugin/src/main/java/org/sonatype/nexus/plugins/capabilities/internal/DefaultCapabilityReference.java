@@ -70,10 +70,10 @@ class DefaultCapabilityReference
 
     private NexusActiveListener nexusActiveListener;
 
-    private final ActivationListener activationListener;
+    private final ActivationConditionHandler activationListener;
 
     DefaultCapabilityReference( final NexusEventBus eventBus,
-                                final ActivationListenerFactory activationListenerFactory,
+                                final ActivationConditionHandlerFactory activationListenerFactory,
                                 final CapabilityConfiguration configuration,
                                 final Conditions conditions,
                                 final Capability capability )

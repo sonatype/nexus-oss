@@ -36,7 +36,7 @@ import com.google.inject.assistedinject.Assisted;
  *
  * @since 1.10.0
  */
-public class ActivationListener
+public class ActivationConditionHandler
     extends AbstractLoggingComponent
 {
 
@@ -47,7 +47,7 @@ public class ActivationListener
     private Condition activationCondition;
 
     @Inject
-    ActivationListener( final NexusEventBus eventBus, final @Assisted CapabilityReference reference )
+    ActivationConditionHandler( final NexusEventBus eventBus, final @Assisted CapabilityReference reference )
     {
         this.eventBus = checkNotNull( eventBus );
         this.reference = checkNotNull( reference );
@@ -76,7 +76,7 @@ public class ActivationListener
         }
     }
 
-    ActivationListener bind()
+    ActivationConditionHandler bind()
     {
         if ( activationCondition == null )
         {
@@ -95,7 +95,7 @@ public class ActivationListener
         return this;
     }
 
-    ActivationListener release()
+    ActivationConditionHandler release()
     {
         if ( activationCondition != null )
         {

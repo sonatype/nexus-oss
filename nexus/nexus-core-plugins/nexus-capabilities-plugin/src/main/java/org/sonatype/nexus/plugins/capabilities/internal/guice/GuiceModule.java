@@ -20,7 +20,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.guice;
 
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.capabilities.internal.ActivationListenerFactory;
+import org.sonatype.nexus.plugins.capabilities.internal.ActivationConditionHandlerFactory;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
@@ -37,7 +37,7 @@ public class GuiceModule
     @Override
     protected void configure()
     {
-        install( new FactoryModuleBuilder().build( ActivationListenerFactory.class ) );
+        install( new FactoryModuleBuilder().build( ActivationConditionHandlerFactory.class ) );
     }
 
 }

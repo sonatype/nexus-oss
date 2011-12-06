@@ -21,13 +21,13 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 
 /**
- * Factory of {@link ActivationListener}.
+ * Factory of {@link ActivationConditionHandler}.
  *
  * @since 1.10.0
  */
-public interface ActivationListenerFactory
+public interface ActivationConditionHandlerFactory
 {
 
-    ActivationListener create( final CapabilityReference reference );
+    ActivationConditionHandler create( final CapabilityReference reference );
 
 }
