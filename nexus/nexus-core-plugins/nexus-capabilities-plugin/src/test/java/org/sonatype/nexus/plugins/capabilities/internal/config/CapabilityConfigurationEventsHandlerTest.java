@@ -51,10 +51,11 @@ public class CapabilityConfigurationEventsHandlerTest
     @Test
     public void onAddEnabled()
     {
-        CapabilityReference reference = prepareForCreate( ENABLED );
+        CapabilityReference reference = create( ENABLED );
 
         verify( reference ).create( Matchers.<Map<String, String>>any() );
         verify( reference ).enable();
+        verify( reference ).activate();
     }
 
     /**
@@ -63,7 +64,7 @@ public class CapabilityConfigurationEventsHandlerTest
     @Test
     public void onAddDisabled()
     {
-        CapabilityReference reference = prepareForCreate( DISABLED );
+        CapabilityReference reference = create( DISABLED );
 
         verify( reference ).create( Matchers.<Map<String, String>>any() );
     }
@@ -74,10 +75,11 @@ public class CapabilityConfigurationEventsHandlerTest
     @Test
     public void onLoadEnabled()
     {
-        CapabilityReference reference = prepareForLoad( ENABLED );
+        CapabilityReference reference = load( ENABLED );
 
         verify( reference ).load( Matchers.<Map<String, String>>any() );
         verify( reference ).enable();
+        verify( reference ).activate();
     }
 
     /**
@@ -86,70 +88,84 @@ public class CapabilityConfigurationEventsHandlerTest
     @Test
     public void onLoadDisabled()
     {
-        CapabilityReference reference = prepareForLoad( DISABLED );
+        CapabilityReference reference = load( DISABLED );
 
         verify( reference ).load( Matchers.<Map<String, String>>any() );
     }
 
     /**
-     * If previous configuration was enabled and new configuration is not enabled, disable() is called.
+     * If previous configuration was enabled and new configuration is not enabled, enabled() is not called, disable()
+     * is called.
      */
     @Test
-    public void onUpdate01()
+    public void onUpdateOldEnabledNewDisabled()
     {
-        CapabilityReference reference = prepareForUpdate( ENABLED, DISABLED );
-        doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
+        CapabilityReference reference = update( ENABLED, DISABLED );
 
         verify( reference ).disable();
         verify( reference ).update( Matchers.<Map<String, String>>any(), Matchers.<Map<String, String>>any() );
     }
 
     /**
-     * If previous configuration was not enabled and new configuration is not enabled, enable() is not called.
+     * If previous configuration was not enabled and new configuration is not enabled, enable() is not called, disable()
+     * is not called.
      */
     @Test
-    public void onUpdate02()
+    public void onUpdateOldDisabledNewDisabled()
     {
-        CapabilityReference reference = prepareForUpdate( DISABLED, DISABLED );
-        doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
-        doThrow( new AssertionError( "Disable not expected to be called" ) ).when( reference ).disable();
+        CapabilityReference reference = update( DISABLED, DISABLED );
 
         verify( reference ).update( Matchers.<Map<String, String>>any(), Matchers.<Map<String, String>>any() );
     }
 
     /**
-     * If previous configuration was enabled and new configuration is enabled, enable() is not called.
+     * If previous configuration was enabled and new configuration is enabled, enable() is not called, disable() is not
+     * called.
      */
     @Test
-    public void onUpdate03()
+    public void onUpdateOldEnabledNewEnabled()
     {
-        CapabilityReference reference = prepareForUpdate( ENABLED, DISABLED );
-        doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
-        doThrow( new AssertionError( "Disable not expected to be called" ) ).when( reference ).disable();
+        CapabilityReference reference = update( ENABLED, ENABLED );
 
         verify( reference ).update( Matchers.<Map<String, String>>any(), Matchers.<Map<String, String>>any() );
     }
 
     /**
-     * If previous configuration was not enabled and new configuration is enabled, enable() is called.
+     * If previous configuration was not enabled and new configuration is enabled, enable() is called, disable() is not
+     * called.
      */
     @Test
-    public void onUpdate04()
+    public void onUpdateOldDisabledNewEnabled()
     {
-        CapabilityReference reference = prepareForUpdate( DISABLED, ENABLED );
-        doThrow( new AssertionError( "Disable not expected to be called" ) ).when( reference ).disable();
+        CapabilityReference reference = update( DISABLED, ENABLED );
 
         verify( reference ).enable();
         verify( reference ).update( Matchers.<Map<String, String>>any(), Matchers.<Map<String, String>>any() );
     }
 
-    private CapabilityReference prepareForCreate( final boolean enabled )
+    /**
+     * When an capability configuration is removed, call remove on reference.
+     */
+    @Test
+    public void onRemove()
+    {
+        CapabilityReference reference = remove();
+
+        verify( reference ).remove();
+    }
+
+    private CapabilityReference create( final boolean enabled )
     {
         final Capability capability = mock( Capability.class );
         when( capability.id() ).thenReturn( "test-cc" );
 
         final CapabilityReference reference = mock( CapabilityReference.class );
         when( reference.capability() ).thenReturn( capability );
+        if ( !enabled )
+        {
+            doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
+            doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).activate();
+        }
 
         final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
         when( capabilityRegistry.create( "test-cc", "test" ) ).thenReturn( reference );
@@ -166,24 +182,18 @@ public class CapabilityConfigurationEventsHandlerTest
         return reference;
     }
 
-    /**
-     * When an capability configuration is removed, call remove on reference.
-     */
-    @Test
-    public void onRemove()
-    {
-        CapabilityReference reference = prepareForRemove();
-
-        verify( reference ).remove();
-    }
-
-    private CapabilityReference prepareForLoad( final boolean enabled )
+    private CapabilityReference load( final boolean enabled )
     {
         final Capability capability = mock( Capability.class );
         when( capability.id() ).thenReturn( "test-cc" );
 
         final CapabilityReference reference = mock( CapabilityReference.class );
         when( reference.capability() ).thenReturn( capability );
+        if ( !enabled )
+        {
+            doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
+            doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).activate();
+        }
 
         final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
         when( capabilityRegistry.create( "test-cc", "test" ) ).thenReturn( reference );
@@ -200,7 +210,7 @@ public class CapabilityConfigurationEventsHandlerTest
         return reference;
     }
 
-    private CapabilityReference prepareForUpdate( final boolean oldEnabled, final boolean newEnabled )
+    private CapabilityReference update( final boolean oldEnabled, final boolean newEnabled )
     {
         final Capability capability = mock( Capability.class );
         when( capability.id() ).thenReturn( "test-cc" );
@@ -233,6 +243,15 @@ public class CapabilityConfigurationEventsHandlerTest
             newCapability.getProperties().add( ccp );
         }
 
+        if ( !newEnabled )
+        {
+            doThrow( new AssertionError( "Enable not expected to be called" ) ).when( reference ).enable();
+        }
+        if ( !oldEnabled )
+        {
+            doThrow( new AssertionError( "Disable not expected to be called" ) ).when( reference ).disable();
+        }
+
         new CapabilityConfigurationEventsHandler( capabilityRegistry ).handle(
             new CapabilityConfigurationEvent.Updated( newCapability, oldCapability )
         );
@@ -240,7 +259,7 @@ public class CapabilityConfigurationEventsHandlerTest
         return reference;
     }
 
-    private CapabilityReference prepareForRemove()
+    private CapabilityReference remove()
     {
         final Capability capability = mock( Capability.class );
         when( capability.id() ).thenReturn( "test-cc" );
