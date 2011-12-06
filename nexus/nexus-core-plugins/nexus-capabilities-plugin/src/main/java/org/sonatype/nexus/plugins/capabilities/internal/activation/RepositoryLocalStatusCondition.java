@@ -94,15 +94,15 @@ public class RepositoryLocalStatusCondition
     @Override
     public String explainSatisfied()
     {
-        final String state = localStatus.equals( LocalStatus.OUT_OF_SERVICE ) ? "out if" : "in";
+        final String state = localStatus.equals( LocalStatus.OUT_OF_SERVICE ) ? "out of" : "in";
         try
         {
             final String id = getRepositoryId();
-            return String.format( "repository '%s' %s service", id, state );
+            return String.format( "Repository '%s' is %s service", id, state );
         }
         catch ( Exception ignore )
         {
-            return String.format( "repository '(could not be evaluated)' %s service", state );
+            return String.format( "Repository '(could not be evaluated)' is %s service", state );
         }
     }
 
@@ -113,11 +113,11 @@ public class RepositoryLocalStatusCondition
         try
         {
             final String id = getRepositoryId();
-            return String.format( "repository '%s' %s service", id, state );
+            return String.format( "Repository '%s' is %s service", id, state );
         }
         catch ( Exception ignore )
         {
-            return String.format( "repository '(could not be evaluated)' %s service", state );
+            return String.format( "Repository '(could not be evaluated)' is %s service", state );
         }
     }
 

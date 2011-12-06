@@ -334,7 +334,7 @@ class DefaultCapabilityReference
         @Override
         public String stateDescription()
         {
-            return "undefined";
+            return "Undefined";
         }
 
         @Override
@@ -387,7 +387,7 @@ class DefaultCapabilityReference
         @Override
         public String stateDescription()
         {
-            return "new";
+            return "New";
         }
 
         @Override
@@ -406,7 +406,7 @@ class DefaultCapabilityReference
         public void enable()
         {
             getLogger().debug( "Enabling capability {} ({})", capability, capability.id() );
-            state = new EnabledState( "not yet activated" );
+            state = new EnabledState( "Not yet activated" );
             activationHandler.bind();
         }
 
@@ -462,7 +462,7 @@ class DefaultCapabilityReference
         @Override
         public String stateDescription()
         {
-            return "disabled";
+            return "Disabled";
         }
 
         @Override
@@ -578,7 +578,7 @@ class DefaultCapabilityReference
             getLogger().debug( "Passivating capability {} ({})", capability, capability.id() );
             try
             {
-                state = new EnabledState( "passivated" );
+                state = new EnabledState( "Passivated" );
                 eventBus.post( new CapabilityEvent.BeforePassivated( DefaultCapabilityReference.this ) );
                 capability().passivate();
                 getLogger().debug( "Passivated capability {} ({})", capability, capability.id() );
@@ -637,7 +637,7 @@ class DefaultCapabilityReference
         @Override
         public String stateDescription()
         {
-            return "removed";
+            return "Removed";
         }
 
         @Override

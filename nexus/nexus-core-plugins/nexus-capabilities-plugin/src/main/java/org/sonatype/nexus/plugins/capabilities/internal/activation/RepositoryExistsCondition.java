@@ -80,11 +80,11 @@ public class RepositoryExistsCondition
         try
         {
             final String id = getRepositoryId();
-            return String.format( "repository '%s' exists", id );
+            return String.format( "Repository '%s' exists", id );
         }
         catch ( Exception ignore )
         {
-            return "repository '(could not be evaluated)' exists";
+            return "Repository '(could not be evaluated)' exists";
         }
     }
 
@@ -94,11 +94,11 @@ public class RepositoryExistsCondition
         try
         {
             final String id = getRepositoryId();
-            return String.format( "repository '%s' does not exist", id );
+            return String.format( "Repository '%s' does not exist", id );
         }
         catch ( Exception ignore )
         {
-            return "repository '(could not be evaluated)' does not exist";
+            return "Repository '(could not be evaluated)' does not exist";
         }
     }
 

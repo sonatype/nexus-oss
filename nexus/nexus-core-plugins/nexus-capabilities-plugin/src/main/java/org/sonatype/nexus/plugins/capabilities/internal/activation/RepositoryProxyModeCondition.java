@@ -113,11 +113,11 @@ public class RepositoryProxyModeCondition
         try
         {
             final String id = getRepositoryId();
-            return String.format( "repository '%s' %s", id, mode );
+            return String.format( "Repository '%s' is %s", id, mode );
         }
         catch ( Exception ignore )
         {
-            return String.format( "repository '(could not be evaluated)' %s", mode );
+            return String.format( "Repository '(could not be evaluated)' is %s", mode );
         }
     }
 
@@ -136,11 +136,11 @@ public class RepositoryProxyModeCondition
         try
         {
             final String id = getRepositoryId();
-            return String.format( "repository '%s' %s", id, mode );
+            return String.format( "Repository '%s' is %s", id, mode );
         }
         catch ( Exception ignore )
         {
-            return String.format( "repository '(could not be evaluated)' %s", mode );
+            return String.format( "Repository '(could not be evaluated)' is %s", mode );
         }
     }
 
