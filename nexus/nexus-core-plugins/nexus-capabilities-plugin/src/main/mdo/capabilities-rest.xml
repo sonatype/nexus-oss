@@ -286,7 +286,14 @@
 					<type>String</type>
 					<required>false</required>
 					<description>The type name of the capability.</description>
-				</field>				
+				</field>
+				<field>
+					<name>stateDescription</name>
+					<version>1.0.0+</version>
+					<type>String</type>
+					<required>false</required>
+					<description>The description of current state.</description>
+				</field>
 			</fields>
 		</class>
 

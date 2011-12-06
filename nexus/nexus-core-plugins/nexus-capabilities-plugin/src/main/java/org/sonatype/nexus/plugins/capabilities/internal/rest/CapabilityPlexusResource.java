@@ -293,6 +293,10 @@ public class CapabilityPlexusResource
 
         final CapabilityReference reference = capabilityRegistry.get( capability.getId() );
         item.setActive( reference != null && reference.isActive() );
+        if ( reference != null )
+        {
+            item.setStateDescription( reference.stateDescription() );
+        }
 
         item.setResourceURI( uri );
 
