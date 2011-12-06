@@ -34,6 +34,8 @@ public interface Capability
 
     /**
      * Callback when a new capability is created.
+     * <p/>
+     * If an exception occurs, during invocation of this method, the capability will not be activatable.
      *
      * @param properties capability configuration
      */
@@ -41,6 +43,8 @@ public interface Capability
 
     /**
      * Callback when a capability configuration is loaded from persisted store (configuration file).
+     * <p/>
+     * If an exception occurs, during invocation of this method, the capability will not be activatable.
      *
      * @param properties capability configuration
      */
@@ -48,6 +52,9 @@ public interface Capability
 
     /**
      * Callback when a capability configuration is updated.
+     * <p/>
+     * If an exception occurs, during invocation of this method, the capability will not be activatable and will be
+     * automatically passivated.
      *
      * @param properties capability configuration
      */
@@ -55,23 +62,32 @@ public interface Capability
 
     /**
      * Callback when a capability is removed.
+     * <p/>
+     * If an exception occurs, during invocation of this method, the capability will still be removed.
      */
     void remove();
 
     /**
-     * Callback when capability is activated. Activation is triggered on create/load (if capability is not disabled)
-     * , or when capability is re-enabled.
+     * Callback when capability is activated. Activation is triggered on create/load (if capability is not disabled),
+     * or when capability is re-enabled.
+     * <p/>
+     * If an exception occurs, during invocation of this method, the capability will be put in an non active state
+     * (as when it would not heave been activated).
      */
     void activate();
 
     /**
      * Callback when capability is passivated. Passivation will be triggered before a capability is removed, on
      * Nexus shutdown or when capability is disabled.
+     * <p/>
+     * If an exception occurs, during invocation of this method,, the capability will be put in an non active state.
      */
     void passivate();
 
     /**
      * Returns the condition that should be satisfied in order for this capability to be active.
+     * <p/>
+     * If an exception occurs, during invocation of this method, the capability is considered as not activatable.
      *
      * @return activation condition. If null, it considers that condition is always activatable.
      */
@@ -80,9 +96,11 @@ public interface Capability
     /**
      * Returns the condition that should be satisfied in order for this capability to be valid. When this condition
      * becomes unsatisfied, the capability will be automatically removed.
-     *
+     * <p/>
      * Example of such a condition will be a capability that applies to a repository should be automatically be removed
      * when repository is removed.
+     * <p/>
+     * If an exception occurs, during invocation of this method, the capability is considered as always valid.
      *
      * @return activation condition. If null, it considers that condition is always valid.
      */
