@@ -38,6 +38,11 @@
     <maven>2.0.9</maven>
   </prerequisites>
 
+  <properties>
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
+    <mavenPluginType>maven-plugin</mavenPluginType>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -114,7 +119,7 @@
       <groupId>org.apache.maven.plugins</groupId>
       <artifactId>maven-shade-plugin</artifactId>
       <version>1.2.1</version>
-      <type>maven-plugin</type>
+      <type>${mavenPluginType}</type>
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>
@@ -132,4 +137,15 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
+    <profile>
+      <id>idea</id>
+      <properties>
+        <mavenPluginType>jar</mavenPluginType>
+      </properties>
+    </profile>
+  </profiles>
+
 </project>
