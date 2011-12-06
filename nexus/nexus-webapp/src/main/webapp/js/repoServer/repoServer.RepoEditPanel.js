@@ -36,6 +36,10 @@ Sonatype.repoServer.AbstractRepositoryEditor = function(config) {
           submit : {
             fn : this.submitHandler,
             scope : this
+          },
+          load : {
+              fn : this.loadHandler,
+              scope : this
           }
         }
       });
@@ -528,7 +532,8 @@ Ext.extend(Sonatype.repoServer.HostedRepositoryEditor, Sonatype.repoServer.Abstr
             writePolicyField.setValue('ALLOW_WRITE_ONCE');
           }
         }
-      }
+      },
+      loadHandler : function(form, action, receivedData) {}
     });
 
 Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
@@ -1071,13 +1076,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
                         }]
                   }]
             } // end proxy settings
-        ],
-        listeners : {
-          load : {
-            fn : this.loadHandler,
-            scope : this
-          }
-        }
+        ]
       });
 };
 
@@ -1349,7 +1348,8 @@ Ext.extend(Sonatype.repoServer.VirtualRepositoryEditor, Sonatype.repoServer.Abst
                 return false;
               });
         }
-      }
+      },
+      loadHandler : function(form, action, receivedData) {}
     });
 
 Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
