@@ -92,6 +92,7 @@ class CapabilityConfigurationEventsHandler
             if ( !previousCapabilityConfig.isEnabled() && capabilityConfig.isEnabled() )
             {
                 ref.enable();
+                ref.activate();
             }
         }
     }
