@@ -42,9 +42,9 @@ public class CapabilityOfTypeActiveCondition
     }
 
     @Override
-    boolean shouldEvaluateFor( final CapabilityReference reference )
+    boolean isSatisfiedBy( final CapabilityReference reference )
     {
-        return super.shouldEvaluateFor( reference ) && reference.isActive();
+        return super.isSatisfiedBy( reference ) && reference.isActive();
     }
 
     @Subscribe
