@@ -22,6 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -38,6 +39,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityEvent;
@@ -98,8 +101,21 @@ public class DefaultCapabilityReferenceTest
         when( validityCondition.isSatisfied() ).thenReturn( true );
         when( capability.validityCondition() ).thenReturn( validityCondition );
 
+        final ActivationListenerFactory activationListenerFactory = mock( ActivationListenerFactory.class );
+        when( activationListenerFactory.create( any( DefaultCapabilityReference.class ) ) ).thenAnswer(
+            new Answer<ActivationListener>()
+            {
+                @Override
+                public ActivationListener answer( final InvocationOnMock invocation )
+                    throws Throwable
+                {
+                    return new ActivationListener( eventBus, (CapabilityReference) invocation.getArguments()[0] );
+                }
+            }
+        );
+
         underTest = new DefaultCapabilityReference(
-            eventBus, new ActivationListenerFactory( eventBus ), configuration, conditions, capability
+            eventBus, activationListenerFactory, configuration, conditions, capability
         );
         underTest.create( Collections.<String, String>emptyMap() );
 
@@ -117,7 +133,7 @@ public class DefaultCapabilityReferenceTest
         underTest.enable();
         assertThat( underTest.isEnabled(), is( true ) );
         verify( activationCondition ).bind();
-        verify( eventBus ).register( isA( ActivationListenerFactory.Listener.class ) );
+        verify( eventBus ).register( isA( ActivationListener.class ) );
     }
 
     /**
@@ -133,7 +149,7 @@ public class DefaultCapabilityReferenceTest
         assertThat( underTest.isEnabled(), is( false ) );
 
         verify( activationCondition ).release();
-        verify( eventBus ).unregister( isA( ActivationListenerFactory.Listener.class ) );
+        verify( eventBus ).unregister( isA( ActivationListener.class ) );
     }
 
     /**

@@ -16,18 +16,28 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal;
+package org.sonatype.nexus.plugins.capabilities.internal.guice;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
+import javax.inject.Named;
+
+import org.sonatype.nexus.plugins.capabilities.internal.ActivationListenerFactory;
+import com.google.inject.AbstractModule;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 /**
- * Factory of {@link ActivationListener}.
+ * Capabilities plugin Guice module.
  *
- * @since 1.10.0
+ * @since 1.0
  */
-public interface ActivationListenerFactory
+@Named
+public class GuiceModule
+    extends AbstractModule
 {
 
-    ActivationListener create( final CapabilityReference reference );
+    @Override
+    protected void configure()
+    {
+        install( new FactoryModuleBuilder().build( ActivationListenerFactory.class ) );
+    }
 
 }

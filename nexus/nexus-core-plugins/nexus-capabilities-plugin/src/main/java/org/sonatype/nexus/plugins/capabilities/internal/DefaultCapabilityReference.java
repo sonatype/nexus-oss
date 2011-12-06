@@ -70,7 +70,7 @@ class DefaultCapabilityReference
 
     private NexusActiveListener nexusActiveListener;
 
-    private final ActivationListenerFactory.Listener activationListener;
+    private final ActivationListener activationListener;
 
     DefaultCapabilityReference( final NexusEventBus eventBus,
                                 final ActivationListenerFactory activationListenerFactory,
@@ -89,7 +89,7 @@ class DefaultCapabilityReference
 
         stateLock = new ReentrantReadWriteLock();
 
-        activationListener = checkNotNull( activationListenerFactory ).create(this);
+        activationListener = checkNotNull( activationListenerFactory ).create( this );
     }
 
     @Override
