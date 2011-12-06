@@ -119,23 +119,16 @@ public class AbstractConditionTest
     }
 
     /**
-     * Calling isSatisfied() after release throws exception.
+     * Calling setSatisfied() after release does not send events but sets status.
      */
-    @Test( expected = IllegalStateException.class )
-    public void isSatisfiedThrowsExceptionAfterRelease()
+    @Test
+    public void setSatisfiedAfterRelease()
     {
         underTest.release();
-        underTest.isSatisfied();
-    }
+        underTest.setSatisfied( false );
+        assertThat( underTest.isSatisfied(), is( false ) );
 
-    /**
-     * Calling setSatisfied() after release throws exception.
-     */
-    @Test( expected = IllegalStateException.class )
-    public void setSatisfiedThrowsExceptionAfterRelease()
-    {
-        underTest.release();
-        underTest.setSatisfied( true );
+        verifyNoEventBusEvents();
     }
 
     /**

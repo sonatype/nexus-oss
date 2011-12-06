@@ -21,6 +21,7 @@ package org.sonatype.nexus.plugins.capabilities;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.Matchers.any;
@@ -76,6 +77,11 @@ public class NexusEventBusTestSupport
     protected void verifyEventBusEvents( final Matcher... matchers )
     {
         assertThat( eventBusEvents, contains( matchers ) );
+    }
+
+    protected void verifyNoEventBusEvents( )
+    {
+        assertThat( eventBusEvents, empty() );
     }
 
     protected static Matcher<Object> satisfied( final Condition condition )

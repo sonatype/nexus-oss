@@ -62,7 +62,6 @@ public abstract class AbstractCondition
     @Override
     public boolean isSatisfied()
     {
-        checkState( active, "Condition has already been released or was not bounded" );
         return satisfied;
     }
 
@@ -99,23 +98,25 @@ public abstract class AbstractCondition
     protected abstract void doRelease();
 
     /**
-     * Sets teh satisfied status and notify activation context about thsi condition being satisfied/unsatisfied.
+     * Sets the satisfied status and if active, notify about this condition being satisfied/unsatisfied.
      *
      * @param satisfied true, if condition is satisfied
      */
     protected void setSatisfied( final boolean satisfied )
     {
-        checkState( active, "Condition has already been released or was not bounded" );
         if ( this.satisfied != satisfied )
         {
             this.satisfied = satisfied;
-            if ( this.satisfied )
+            if ( active )
             {
-                eventBus.post( new ConditionEvent.Satisfied( this ) );
-            }
-            else
-            {
-                eventBus.post( new ConditionEvent.Unsatisfied( this ) );
+                if ( this.satisfied )
+                {
+                    eventBus.post( new ConditionEvent.Satisfied( this ) );
+                }
+                else
+                {
+                    eventBus.post( new ConditionEvent.Unsatisfied( this ) );
+                }
             }
         }
     }
