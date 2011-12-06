@@ -78,7 +78,15 @@ public class NexusIsActiveCondition
         return "Nexus is active";
     }
 
+    @Override
+    public String explainSatisfied()
+    {
+        return "Nexus is active";
+    }
 
-
-
+    @Override
+    public String explainUnsatisfied()
+    {
+        return "Nexus is not active";
+    }
 }

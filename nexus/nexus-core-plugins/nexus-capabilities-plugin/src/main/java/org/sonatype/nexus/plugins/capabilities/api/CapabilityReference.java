@@ -104,4 +104,11 @@ public interface CapabilityReference
      */
     void remove();
 
+    /**
+     * Describe current state.
+     *
+     * @return state description
+     */
+    String stateDescription();
+
 }

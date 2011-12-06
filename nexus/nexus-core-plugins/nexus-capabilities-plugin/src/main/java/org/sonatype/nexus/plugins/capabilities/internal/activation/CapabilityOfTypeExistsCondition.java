@@ -135,4 +135,16 @@ public class CapabilityOfTypeExistsCondition
         return type.getSimpleName() + " exists";
     }
 
+    @Override
+    public String explainSatisfied()
+    {
+        return type.getSimpleName() + " exists";
+    }
+
+    @Override
+    public String explainUnsatisfied()
+    {
+        return type.getSimpleName() + " does not exist";
+    }
+
 }

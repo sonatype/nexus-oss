@@ -61,4 +61,17 @@ public class SatisfiedCondition
     {
         return reason;
     }
+
+    @Override
+    public String explainSatisfied()
+    {
+        return reason;
+    }
+
+    @Override
+    public String explainUnsatisfied()
+    {
+        return "not " + reason;
+    }
+
 }

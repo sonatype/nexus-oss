@@ -177,6 +177,7 @@ public class AbstractCompositeConditionTest
             }
             return false;
         }
+
     }
 
 }

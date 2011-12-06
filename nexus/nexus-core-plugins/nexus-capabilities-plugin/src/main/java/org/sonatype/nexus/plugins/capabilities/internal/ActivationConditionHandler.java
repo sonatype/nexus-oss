@@ -134,4 +134,9 @@ public class ActivationConditionHandler
         );
     }
 
+    public String explainWhyNotSatisfied()
+    {
+        return isConditionSatisfied() ? null : activationCondition.explainUnsatisfied();
+    }
+
 }

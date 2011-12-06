@@ -217,6 +217,20 @@ class DefaultCapabilityReference
     }
 
     @Override
+    public String stateDescription()
+    {
+        try
+        {
+            stateLock.readLock().lock();
+            return state.stateDescription();
+        }
+        finally
+        {
+            stateLock.readLock().unlock();
+        }
+    }
+
+    @Override
     public String toString()
     {
         return String.format( "capability %s (enabled=%s, active=%s)", capability, isEnabled(), isActive() );
@@ -318,6 +332,12 @@ class DefaultCapabilityReference
         }
 
         @Override
+        public String stateDescription()
+        {
+            return "undefined";
+        }
+
+        @Override
         public String toString()
         {
             return getClass().getSimpleName();
@@ -365,6 +385,12 @@ class DefaultCapabilityReference
         }
 
         @Override
+        public String stateDescription()
+        {
+            return "new";
+        }
+
+        @Override
         public String toString()
         {
             return "NEW";
@@ -380,7 +406,7 @@ class DefaultCapabilityReference
         public void enable()
         {
             getLogger().debug( "Enabling capability {} ({})", capability, capability.id() );
-            state = new EnabledState();
+            state = new EnabledState( "not yet activated" );
             activationHandler.bind();
         }
 
@@ -434,6 +460,12 @@ class DefaultCapabilityReference
         }
 
         @Override
+        public String stateDescription()
+        {
+            return "disabled";
+        }
+
+        @Override
         public String toString()
         {
             return "VALID";
@@ -444,6 +476,18 @@ class DefaultCapabilityReference
     public class EnabledState
         extends ValidState
     {
+
+        private final String reason;
+
+        EnabledState()
+        {
+            this( "enabled" );
+        }
+
+        EnabledState( final String reason )
+        {
+            this.reason = reason;
+        }
 
         @Override
         public boolean isEnabled()
@@ -499,6 +543,12 @@ class DefaultCapabilityReference
         }
 
         @Override
+        public String stateDescription()
+        {
+            return activationHandler.isConditionSatisfied()?reason:activationHandler.explainWhyNotSatisfied();
+        }
+
+        @Override
         public String toString()
         {
             return "ENABLED";
@@ -528,7 +578,7 @@ class DefaultCapabilityReference
             getLogger().debug( "Passivating capability {} ({})", capability, capability.id() );
             try
             {
-                state = new EnabledState();
+                state = new EnabledState( "passivated" );
                 eventBus.post( new CapabilityEvent.BeforePassivated( DefaultCapabilityReference.this ) );
                 capability().passivate();
                 getLogger().debug( "Passivated capability {} ({})", capability, capability.id() );
@@ -539,6 +589,12 @@ class DefaultCapabilityReference
                     "Could not passivate capability {} ({})", new Object[]{ capability, capability.id(), e }
                 );
             }
+        }
+
+        @Override
+        public String stateDescription()
+        {
+            return "active";
         }
 
         @Override
@@ -561,6 +617,12 @@ class DefaultCapabilityReference
         }
 
         @Override
+        public String stateDescription()
+        {
+            return reason;
+        }
+
+        @Override
         public String toString()
         {
             return "INVALID (" + reason + ")";
@@ -571,6 +633,12 @@ class DefaultCapabilityReference
     public class RemovedState
         extends State
     {
+
+        @Override
+        public String stateDescription()
+        {
+            return "removed";
+        }
 
         @Override
         public String toString()

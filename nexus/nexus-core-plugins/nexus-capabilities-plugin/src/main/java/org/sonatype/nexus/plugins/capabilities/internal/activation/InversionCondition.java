@@ -53,4 +53,15 @@ public class InversionCondition
         return "NOT " + condition;
     }
 
+    @Override
+    public String explainSatisfied()
+    {
+        return condition.explainUnsatisfied();
+    }
+
+    @Override
+    public String explainUnsatisfied()
+    {
+        return condition.explainSatisfied();
+    }
 }

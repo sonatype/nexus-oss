@@ -89,6 +89,8 @@ public class LogicalConditions
         implements Condition
     {
 
+        private Condition lastNotSatisfied;
+
         public ConjunctionCondition( final NexusEventBus eventBus,
                                      final Condition... conditions )
         {
@@ -102,9 +104,11 @@ public class LogicalConditions
             {
                 if ( !condition.isSatisfied() )
                 {
+                    lastNotSatisfied = condition;
                     return false;
                 }
             }
+            lastNotSatisfied = null;
             return true;
         }
 
@@ -123,6 +127,39 @@ public class LogicalConditions
             return sb.toString();
         }
 
+        @Override
+        public String explainSatisfied()
+        {
+            final StringBuilder sb = new StringBuilder();
+            for ( final Condition condition : getConditions() )
+            {
+                if ( sb.length() > 0 )
+                {
+                    sb.append( " AND " );
+                }
+                sb.append( condition.explainSatisfied() );
+            }
+            return sb.toString();
+        }
+
+        @Override
+        public String explainUnsatisfied()
+        {
+            if ( lastNotSatisfied != null )
+            {
+                return lastNotSatisfied.explainUnsatisfied();
+            }
+            final StringBuilder sb = new StringBuilder();
+            for ( final Condition condition : getConditions() )
+            {
+                if ( sb.length() > 0 )
+                {
+                    sb.append( " OR " );
+                }
+                sb.append( condition.explainUnsatisfied() );
+            }
+            return sb.toString();
+        }
     }
 
     /**
@@ -134,6 +171,8 @@ public class LogicalConditions
         extends AbstractCompositeCondition
         implements Condition
     {
+
+        private Condition lastSatisfied;
 
         public DisjunctionCondition( final NexusEventBus eventBus,
                                      final Condition... conditions )
@@ -148,9 +187,11 @@ public class LogicalConditions
             {
                 if ( condition.isSatisfied() )
                 {
+                    lastSatisfied = condition;
                     return true;
                 }
             }
+            lastSatisfied = null;
             return false;
         }
 
@@ -165,6 +206,40 @@ public class LogicalConditions
                     sb.append( " OR " );
                 }
                 sb.append( condition );
+            }
+            return sb.toString();
+        }
+
+        @Override
+        public String explainSatisfied()
+        {
+            if(lastSatisfied !=null)
+            {
+                return lastSatisfied.explainSatisfied();
+            }
+            final StringBuilder sb = new StringBuilder();
+            for ( final Condition condition : getConditions() )
+            {
+                if ( sb.length() > 0 )
+                {
+                    sb.append( " OR " );
+                }
+                sb.append( condition.explainSatisfied() );
+            }
+            return sb.toString();
+        }
+
+        @Override
+        public String explainUnsatisfied()
+        {
+            final StringBuilder sb = new StringBuilder();
+            for ( final Condition condition : getConditions() )
+            {
+                if ( sb.length() > 0 )
+                {
+                    sb.append( " AND " );
+                }
+                sb.append( condition.explainUnsatisfied() );
             }
             return sb.toString();
         }

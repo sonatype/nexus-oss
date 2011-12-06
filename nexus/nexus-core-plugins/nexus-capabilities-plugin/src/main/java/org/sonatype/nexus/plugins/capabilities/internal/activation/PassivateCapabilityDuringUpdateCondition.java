@@ -81,4 +81,15 @@ public class PassivateCapabilityDuringUpdateCondition
         return "Passivate during update of " + capability;
     }
 
+    @Override
+    public String explainSatisfied()
+    {
+        return "capability is currently being updated";
+    }
+
+    @Override
+    public String explainUnsatisfied()
+    {
+        return "capability is not currently being updated";
+    }
 }

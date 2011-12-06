@@ -18,19 +18,11 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.activation;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import org.sonatype.nexus.eventbus.NexusEventBus;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
-import org.sonatype.nexus.plugins.capabilities.support.activation.AbstractCondition;
 import org.sonatype.nexus.plugins.capabilities.support.activation.RepositoryConditions;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.Repository;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -79,6 +71,34 @@ public class RepositoryExistsCondition
         catch ( Exception ignore )
         {
             return "Repository '(could not be evaluated)' exists";
+        }
+    }
+
+    @Override
+    public String explainSatisfied()
+    {
+        try
+        {
+            final String id = getRepositoryId();
+            return String.format( "repository '%s' exists", id );
+        }
+        catch ( Exception ignore )
+        {
+            return "repository '(could not be evaluated)' exists";
+        }
+    }
+
+    @Override
+    public String explainUnsatisfied()
+    {
+        try
+        {
+            final String id = getRepositoryId();
+            return String.format( "repository '%s' does not exist", id );
+        }
+        catch ( Exception ignore )
+        {
+            return "repository '(could not be evaluated)' does not exist";
         }
     }
 

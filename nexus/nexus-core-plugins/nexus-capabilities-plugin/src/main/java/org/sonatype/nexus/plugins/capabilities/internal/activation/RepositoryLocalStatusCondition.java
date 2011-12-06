@@ -91,4 +91,34 @@ public class RepositoryLocalStatusCondition
         }
     }
 
+    @Override
+    public String explainSatisfied()
+    {
+        final String state = localStatus.equals( LocalStatus.OUT_OF_SERVICE ) ? "out if" : "in";
+        try
+        {
+            final String id = getRepositoryId();
+            return String.format( "repository '%s' %s service", id, state );
+        }
+        catch ( Exception ignore )
+        {
+            return String.format( "repository '(could not be evaluated)' %s service", state );
+        }
+    }
+
+    @Override
+    public String explainUnsatisfied()
+    {
+        final String state = localStatus.equals( LocalStatus.OUT_OF_SERVICE ) ? "in" : "out of";
+        try
+        {
+            final String id = getRepositoryId();
+            return String.format( "repository '%s' %s service", id, state );
+        }
+        catch ( Exception ignore )
+        {
+            return String.format( "repository '(could not be evaluated)' %s service", state );
+        }
+    }
+
 }

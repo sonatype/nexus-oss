@@ -19,7 +19,6 @@
 package org.sonatype.nexus.plugins.capabilities.support.activation;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -85,6 +84,18 @@ public abstract class AbstractCondition
             active = false;
         }
         return this;
+    }
+
+    @Override
+    public String explainSatisfied()
+    {
+        return this + " is satisfied";
+    }
+
+    @Override
+    public String explainUnsatisfied()
+    {
+        return this + " is not satisfied";
     }
 
     /**

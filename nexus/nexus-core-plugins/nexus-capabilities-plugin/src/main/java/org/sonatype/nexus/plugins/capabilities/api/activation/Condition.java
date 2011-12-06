@@ -50,4 +50,18 @@ public interface Condition
      */
     Condition release();
 
+    /**
+     * Describe condition in case that it is satisfied.
+     *
+     * @return description
+     */
+    String explainSatisfied();
+
+    /**
+     * Describe condition in case that it is not satisfied.
+     *
+     * @return description
+     */
+    String explainUnsatisfied();
+
 }

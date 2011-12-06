@@ -98,4 +98,50 @@ public class RepositoryProxyModeCondition
         }
     }
 
+    @Override
+    public String explainSatisfied()
+    {
+        String mode = "not blocked";
+        if ( proxyMode.equals( ProxyMode.BLOCKED_MANUAL ) )
+        {
+            mode = "manually blocked";
+        }
+        else if ( proxyMode.equals( ProxyMode.BLOCKED_AUTO ) )
+        {
+            mode = "auto blocked";
+        }
+        try
+        {
+            final String id = getRepositoryId();
+            return String.format( "repository '%s' %s", id, mode );
+        }
+        catch ( Exception ignore )
+        {
+            return String.format( "repository '(could not be evaluated)' %s", mode );
+        }
+    }
+
+    @Override
+    public String explainUnsatisfied()
+    {
+        String mode = "blocked";
+        if ( proxyMode.equals( ProxyMode.BLOCKED_MANUAL ) )
+        {
+            mode = "not manually blocked";
+        }
+        else if ( proxyMode.equals( ProxyMode.BLOCKED_AUTO ) )
+        {
+            mode = "not auto blocked";
+        }
+        try
+        {
+            final String id = getRepositoryId();
+            return String.format( "repository '%s' %s", id, mode );
+        }
+        catch ( Exception ignore )
+        {
+            return String.format( "repository '(could not be evaluated)' %s", mode );
+        }
+    }
+
 }

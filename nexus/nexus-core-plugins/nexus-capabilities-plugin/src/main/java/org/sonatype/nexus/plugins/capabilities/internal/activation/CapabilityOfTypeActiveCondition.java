@@ -70,4 +70,17 @@ public class CapabilityOfTypeActiveCondition
     {
         return "Active " + type.getSimpleName();
     }
+
+    @Override
+    public String explainSatisfied()
+    {
+        return type.getSimpleName() + " is active";
+    }
+
+    @Override
+    public String explainUnsatisfied()
+    {
+        return type.getSimpleName() + " is not active";
+    }
+
 }
