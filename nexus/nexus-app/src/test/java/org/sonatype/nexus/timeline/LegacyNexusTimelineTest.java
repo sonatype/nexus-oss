@@ -21,9 +21,8 @@ package org.sonatype.nexus.timeline;
 import java.io.File;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
-import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.timeline.TimelineRecord;
 
 public class LegacyNexusTimelineTest
@@ -37,7 +36,7 @@ public class LegacyNexusTimelineTest
 
         File legacyTimelineDir = new File( getWorkHomeDir(), "timeline" );
 
-        FileUtils.copyDirectory( legacyDataDir, legacyTimelineDir );
+        FileUtils.copyDirectoryStructure( legacyDataDir, legacyTimelineDir );
 
         NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
 
@@ -58,9 +57,9 @@ public class LegacyNexusTimelineTest
 
         File newTimelineDir = new File( getWorkHomeDir(), "timeline/index" );
 
-        FileUtils.copyDirectory( legacyDataDir, legacyTimelineDir );
+        FileUtils.copyDirectoryStructure( legacyDataDir, legacyTimelineDir );
 
-        FileUtils.copyDirectory( newDataDir, newTimelineDir );
+        FileUtils.copyDirectoryStructure( newDataDir, newTimelineDir );
 
         NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
 

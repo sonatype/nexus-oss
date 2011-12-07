@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs.FileChangeEvent;
 import org.apache.commons.vfs.FileContent;
 import org.apache.commons.vfs.FileListener;
@@ -42,6 +41,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.plexus.appevents.Event;
@@ -206,7 +206,7 @@ public class DefaultScriptStorage
         try
         {
             FileContent content = file.getContent();
-            script = IOUtils.toString( content.getInputStream() );
+            script = IOUtil.toString( content.getInputStream() );
             content.close();
         }
         catch ( IOException e )

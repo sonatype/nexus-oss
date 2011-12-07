@@ -20,7 +20,6 @@ package org.sonatype.nexus.proxy.storage.local.fs.perf;
 
 import java.io.File;
 
-import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -113,7 +112,7 @@ public class DefaultFSLocalRepositoryStoragePerformanceITLRTest
 
         // write a test file
         File testFile = new File( repositoryStorageDir, testFilePath );
-        FileUtils.writeStringToFile( testFile, "CONTENT" );
+        org.codehaus.plexus.util.FileUtils.fileWrite( testFile, "CONTENT" );
 
         // this test expects "old" behaviour:
         ( (DefaultAttributesHandler) repository.getAttributesHandler() ).setLastRequestedResolution( 0 );

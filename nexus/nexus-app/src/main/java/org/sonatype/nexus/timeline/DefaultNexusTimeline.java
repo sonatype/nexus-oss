@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -32,6 +31,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.timeline.Timeline;
@@ -134,7 +134,7 @@ public class DefaultNexusTimeline
 
         for ( File legacyIndexFile : legacyIndexFiles )
         {
-            FileUtils.moveFileToDirectory( legacyIndexFile, newIndexDir, false );
+            FileUtils.rename( legacyIndexFile, new File( newIndexDir, legacyIndexFile.getName() ));
         }
     }
 

@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -107,9 +106,8 @@ public abstract class AttributeStoragePerformanceTestSupport
 
         // write a test file
         File testFile = new File( repoStorageDir, testFilePath );
-        FileUtils.writeStringToFile( testFile, "CONTENT" );
-
-        FileUtils.writeStringToFile( CONTENT_TEST_FILE, "CONTENT" );
+        org.codehaus.plexus.util.FileUtils.fileWrite( testFile, "CONTENT" );
+        org.codehaus.plexus.util.FileUtils.fileWrite( CONTENT_TEST_FILE, "CONTENT" );
 
         // Mocks
         Wastebasket wastebasket = mock( Wastebasket.class );
