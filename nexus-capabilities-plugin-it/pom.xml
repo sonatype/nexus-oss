@@ -23,21 +23,32 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <artifactId>nexus-capabilities-plugin-parent</artifactId>
     <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
+    <artifactId>nexus-capabilities-plugin-parent</artifactId>
     <version>1.10.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-capabilities-plugin-it</artifactId>
+
   <name>Nexus : Core Plugins : Capabilities : ITs</name>
   <description>Nexus Capabilities Plugin ITs</description>
 
   <dependencies>
     <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
       <exclusions>
         <exclusion>
           <artifactId>ant</artifactId>
@@ -56,11 +67,19 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
+      <artifactId>nexus-capabilities-plugin-it-helper</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
       <version>${project.version}</version>
       <type>jar</type>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -69,7 +88,6 @@
       <version>${project.version}</version>
       <type>zip</type>
       <classifier>bundle</classifier>
-      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -125,10 +143,20 @@
               <classifier>bundle</classifier>
               <type>zip</type>
             </plugin>
+            <plugin>
+              <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
+              <artifactId>nexus-capabilities-plugin-it-helper</artifactId>
+              <version>${project.version}</version>
+              <classifier>bundle</classifier>
+              <type>zip</type>
+            </plugin>
           </nexusPluginsArtifacts>
         </configuration>
       </plugin>
 
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+      </plugin>
 
     </plugins>
   </build>

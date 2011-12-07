@@ -20,21 +20,18 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <!-- Parent POM -->
-  <parent>
-    <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>nexus-core-plugins</artifactId>
-    <version>1.10.0-SNAPSHOT</version>
-  </parent>
-
-  <!-- the version of maven's project object model -->
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- a unique name for this project -->
+  <parent>
+    <artifactId>nexus-capabilities-plugin-parent</artifactId>
+    <version>1.10.0-SNAPSHOT</version>
+    <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
+  </parent>
+
+  <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-capabilities-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
 
-  <!-- a short but descriptive name for the project -->
   <name>Nexus : Core Plugins : Capabilities</name>
   <description>Allows Nexus to define and set repository capabilities.</description>
 
@@ -55,15 +52,15 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-        <groupId>org.sonatype.sisu.inject</groupId>
-        <artifactId>guice-assistedinject</artifactId>
-        <version>3.1.0</version>
-        <exclusions>
-            <exclusion>
-                <groupId>org.sonatype.sisu</groupId>
-                <artifactId>sisu-guice</artifactId>
-            </exclusion>
-        </exclusions>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-assistedinject</artifactId>
+      <version>3.1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sonatype.sisu</groupId>
+          <artifactId>sisu-guice</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -85,7 +82,6 @@
 
   <build>
     <plugins>
-      <!-- Needed to make Maven "know" nexus-plugin packaging -->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
