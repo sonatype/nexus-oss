@@ -115,14 +115,14 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-capabilities-plugin</artifactId>
-      <version>${project.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-      <scope>test</scope>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
+      <!--<artifactId>nexus-capabilities-plugin</artifactId>-->
+      <!--<version>${project.version}</version>-->
+      <!--<classifier>bundle</classifier>-->
+      <!--<type>zip</type>-->
+      <!--<scope>test</scope>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
@@ -246,14 +246,14 @@
                   <type>zip</type>
                   <outputDirectory>target/${optional-plugins.directory}</outputDirectory>
                 </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.nexus.plugins</groupId>
-                  <artifactId>nexus-capabilities-plugin</artifactId>
-                  <version>${project.version}</version>
-                  <classifier>bundle</classifier>
-                  <type>zip</type>
-                  <outputDirectory>target/${optional-plugins.directory}</outputDirectory>
-                </artifactItem>
+                <!--<artifactItem>-->
+                  <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
+                  <!--<artifactId>nexus-capabilities-plugin</artifactId>-->
+                  <!--<version>${project.version}</version>-->
+                  <!--<classifier>bundle</classifier>-->
+                  <!--<type>zip</type>-->
+                  <!--<outputDirectory>target/${optional-plugins.directory}</outputDirectory>-->
+                <!--</artifactItem>-->
                 <artifactItem>
                   <groupId>org.sonatype.nexus.plugins</groupId>
                   <artifactId>nexus-maven-bridge-plugin</artifactId>

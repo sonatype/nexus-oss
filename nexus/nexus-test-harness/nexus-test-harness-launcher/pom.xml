@@ -307,11 +307,11 @@
     </dependency>
 
     <!-- CapabilitiesMessageUtil -->
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-capabilities-plugin</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+    <!--<dependency>-->
+      <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
+      <!--<artifactId>nexus-capabilities-plugin</artifactId>-->
+      <!--<version>${project.version}</version>-->
+    <!--</dependency>-->
 
   </dependencies>
 </project>
