@@ -38,10 +38,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.indexer</groupId>
-      <artifactId>indexer-artifact</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>spice-utils</artifactId>
     </dependency>
