@@ -41,9 +41,17 @@
 
   <dependencies>
 
+    <!-- To move away from, it's "legacy" from oldie Plexus times -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <!-- Target to move to -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <scope>compile</scope>
     </dependency>
 
     <!-- Testing -->
