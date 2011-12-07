@@ -31,8 +31,6 @@ public class SnapshotRemovalRequest
 
     private final boolean removeIfReleaseExists;
 
-    private final Set<String> metadataRebuildPaths;
-    
     private final Set<String> processedRepos;
 
     private final boolean deleteImmediately;
@@ -50,7 +48,8 @@ public class SnapshotRemovalRequest
     }
 
     public SnapshotRemovalRequest( String repositoryId, int minCountOfSnapshotsToKeep,
-                                   int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists, boolean deleteImmediately )
+                                   int removeSnapshotsOlderThanDays, boolean removeIfReleaseExists,
+                                   boolean deleteImmediately )
     {
         this.repositoryId = repositoryId;
 
@@ -60,13 +59,10 @@ public class SnapshotRemovalRequest
 
         this.removeIfReleaseExists = removeIfReleaseExists;
 
-        this.metadataRebuildPaths = new HashSet<String>();
-
         this.processedRepos = new HashSet<String>();
 
         this.deleteImmediately = deleteImmediately;
     }
-
 
     public String getRepositoryId()
     {
@@ -88,16 +84,11 @@ public class SnapshotRemovalRequest
         return removeIfReleaseExists;
     }
 
-    public Set<String> getMetadataRebuildPaths()
-    {
-        return metadataRebuildPaths;
-    }
-    
     public void addProcessedRepo( String repoId )
     {
         this.processedRepos.add( repoId );
     }
-    
+
     public boolean isProcessedRepo( String repoId )
     {
         return this.processedRepos.contains( repoId );
