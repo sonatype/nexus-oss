@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -68,10 +69,10 @@
       <type>jar</type>
       <scope>compile</scope>
       <exclusions>
-      	<exclusion>
+        <exclusion>
           <groupId>javax.xml.bind</groupId>
           <artifactId>jaxb-api</artifactId>
-      	</exclusion>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -120,6 +121,19 @@
       <version>1.14</version>
     </dependency>
 
+    <!-- For org.restlet.ext.fileupload, since it depends on commons-fileupload, and that depends on commons-io, but for 
+      some reason, this last dependency is declared as optional -->
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+      <version>1.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>1.4</version>
+    </dependency>
+
     <!-- For our XStream Representation impl -->
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
@@ -129,7 +143,7 @@
       <scope>compile</scope>
     </dependency>
 
-   <!-- Logging -->
+    <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
