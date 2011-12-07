@@ -45,6 +45,7 @@ import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.tests.http.server.fluent.Server;
+import org.sonatype.tests.http.server.fluent.Proxy;
 
 /**
  * Tests for network parts of AbstractRemoteDiscoveryStrategy
@@ -131,7 +132,7 @@ public class AbstractRemoteDiscoveryStrategyTest
     public void testProxy()
         throws Exception
     {
-        server = Server.proxyWithPort( 0 )
+        server = Proxy.withPort( 0 )
             .serve( "/test.properties" ).withBehaviours( content( content ) )
             .start();
 
@@ -170,7 +171,7 @@ public class AbstractRemoteDiscoveryStrategyTest
     public void testProxyFails()
         throws Exception
     {
-        server = Server.proxyWithPort( 0 )
+        server = Proxy.withPort( 0 )
             .serve( "/test.properties" ).withBehaviours( error( 404 ) )
             .start();
 
@@ -210,7 +211,7 @@ public class AbstractRemoteDiscoveryStrategyTest
     public void testProxyRedirect()
         throws Exception
     {
-        server = Server.proxyWithPort( 0 )
+        server = Proxy.withPort( 0 )
             .serve( "/test.properties" ).withBehaviours( redirect( "/redirect/test.properties", 301 ) )
             .serve( "/redirect/test.properties" ).withBehaviours( content( content ) )
             .start();
