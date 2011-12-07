@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -32,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.ConfigurationException;
@@ -105,6 +105,7 @@ public class DefaultLvoPluginConfiguration
             IOException
     {
         getConfiguration().setEnabled( true );
+        save();
     }
 
     public void disable()
@@ -112,6 +113,7 @@ public class DefaultLvoPluginConfiguration
             IOException
     {
         getConfiguration().setEnabled( false );
+        save();
     }
 
     protected Configuration getConfiguration()
@@ -144,8 +146,8 @@ public class DefaultLvoPluginConfiguration
             // This is ok, may not exist first time around
             if ( !configurationFile.exists() )
             {
-                copyFromStreamToFile(
-                    getClass().getResourceAsStream( "/META-INF/nexus-lvo-plugin/lvo-plugin.xml" ),
+                FileUtils.copyURLToFile(
+                    getClass().getResource( "/META-INF/nexus-lvo-plugin/lvo-plugin.xml" ),
                     configurationFile );
 
                 return getConfiguration();
@@ -235,33 +237,6 @@ public class DefaultLvoPluginConfiguration
     protected void clearCache()
     {
         configuration = null;
-    }
-
-    /**
-     * Method copied from nexus-utils 1.3.0-SNAPSHOT. Remove this and use it when there.
-     * 
-     * @param is
-     * @param output
-     * @throws IOException
-     * @deprecated Method copied from nexus-utils 1.3.0-SNAPSHOT. Remove this and use it when there.
-     */
-    public static void copyFromStreamToFile( InputStream is, File output )
-        throws IOException
-    {
-        FileOutputStream fos = null;
-
-        try
-        {
-            fos = new FileOutputStream( output );
-
-            org.codehaus.plexus.util.IOUtil.copy( is, fos );
-        }
-        finally
-        {
-            org.codehaus.plexus.util.IOUtil.close( is );
-
-            org.codehaus.plexus.util.IOUtil.close( fos );
-        }
     }
 
 }
