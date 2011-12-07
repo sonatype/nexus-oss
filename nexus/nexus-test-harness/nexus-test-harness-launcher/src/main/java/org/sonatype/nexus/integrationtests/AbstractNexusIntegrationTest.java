@@ -1274,7 +1274,7 @@ public abstract class AbstractNexusIntegrationTest
                 baseClass.getName().replace( '.', '/' ) + ".xml" );
 
         containerConfiguration.setAutoWiring( true );
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
+        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
 
         customizeContainerConfiguration( containerConfiguration );
 
