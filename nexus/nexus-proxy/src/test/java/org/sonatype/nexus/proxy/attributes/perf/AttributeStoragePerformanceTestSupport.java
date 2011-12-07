@@ -106,7 +106,9 @@ public abstract class AttributeStoragePerformanceTestSupport
 
         // write a test file
         File testFile = new File( repoStorageDir, testFilePath );
+        testFile.getParentFile().mkdirs();
         org.codehaus.plexus.util.FileUtils.fileWrite( testFile, "CONTENT" );
+        CONTENT_TEST_FILE.getParentFile().mkdirs();
         org.codehaus.plexus.util.FileUtils.fileWrite( CONTENT_TEST_FILE, "CONTENT" );
 
         // Mocks

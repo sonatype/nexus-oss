@@ -92,6 +92,7 @@ public class DefaultFSLocalRepositoryStoragePerformanceLRTest
 
         // write a test file
         File testFile = new File( repoStorageDir, testFilePath );
+        testFile.getParentFile().mkdirs();
         org.codehaus.plexus.util.FileUtils.fileWrite( testFile, "CONTENT" );
 
         // Mocks

@@ -112,6 +112,7 @@ public class DefaultFSLocalRepositoryStoragePerformanceITLRTest
 
         // write a test file
         File testFile = new File( repositoryStorageDir, testFilePath );
+        testFile.getParentFile().mkdirs();
         org.codehaus.plexus.util.FileUtils.fileWrite( testFile, "CONTENT" );
 
         // this test expects "old" behaviour:
