@@ -40,7 +40,7 @@
     <module>nexus-rrb-plugin</module>
     <module>nexus-core-documentation-plugin</module>
     <module>nexus-groovy-console-plugin</module>
-    <module>nexus-capabilities-plugin</module>
+    <!--<module>nexus-capabilities-plugin</module>-->
     <module>nexus-archetype-plugin</module>
     <module>nexus-maven-bridge-plugin</module>
     <module>nexus-migration-plugin</module>
