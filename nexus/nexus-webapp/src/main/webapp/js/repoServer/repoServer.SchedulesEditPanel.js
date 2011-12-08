@@ -176,12 +176,25 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
   };
 
   // A record to hold the name and id of a repository
-  this.repositoryRecordConstructor = Ext.data.Record.create([{
-        name : 'id'
-      }, {
-        name : 'name',
-        sortType : Ext.data.SortTypes.asUCString
-      }]);
+  this.repositoryRecordConstructor = Ext.data.Record.create(
+    [
+        {
+            name:'id'
+        },
+        {
+            name:'name',
+            sortType:Ext.data.SortTypes.asUCString
+        },
+        {
+            name:'repoType'
+        },
+        {
+            name:'format'
+        },
+        {
+            name:'repoPolicy'
+        }
+    ]);
 
   // A record to hold the name and id of a repository group
   this.repositoryGroupRecordConstructor = Ext.data.Record.create([{
@@ -267,7 +280,10 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
               this.repositoryDataStore.each(function(item, i, len) {
                     var newRec = new this.repositoryOrGroupRecordConstructor({
                           id : item.data.id,
-                          name : item.data.name + ' (Repo)'
+                          name : item.data.name + ' (Repo)',
+                          repoType : item.data.repoType,
+                          format : item.data.format,
+                          repoPolicy : item.data.repoPolicy
                         }, item.id);
                     this.repoOrGroupDataStore.add([newRec]);
                   }, this);
@@ -1130,7 +1146,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             });
 
         var serviceTypeField = formPanel.find('name', 'typeId')[0];
-        serviceTypeField.on('select', this.serviceTypeSelectHandler, formPanel);
+        serviceTypeField.on('select', this.serviceTypeSelectHandler, {form: formPanel, schedules: this});
 
         var serviceScheduleField = formPanel.find('name', 'schedule')[0];
         serviceScheduleField.on('select', this.serviceScheduleSelectHandler, formPanel);
@@ -1454,6 +1470,11 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
     {
         // NEXUS-4363 disable the south panel after service-type-config-card values are loaded
         var formPanel = action.options.fpanel;
+
+        // NXCM-3549 filter repository list for the selected task type
+        var repoField = formPanel.find( 'name', 'serviceProperties_repositoryId' )[0];
+        this.filterRepositoryGroupField( repoField, action.result.data.typeId);
+
         var readableStatus = formPanel.readableStatus;
         if (!readableStatus || readableStatus == 'Waiting' || readableStatus == '')
         {
@@ -1700,7 +1721,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
       },
 
       serviceTypeSelectHandler : function(combo, record, index) {
-        var serviceTypePanel = this.findById(this.id + '_service-type-config-card-panel');
+        var serviceTypePanel = this.form.findById(this.form.id + '_service-type-config-card-panel');
         // First disable all the items currently on screen, so they wont be
         // validated/submitted etc
         serviceTypePanel.getLayout().activeItem.items.each(function(item) {
@@ -1709,7 +1730,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         // Then find the proper card to activate (based upon id of the
         // serviceType)
         // Then enable the fields in that card
-        var formId = this.id;
+        var formId = this.form.id;
         serviceTypePanel.items.each(function(item, i, len) {
               if (item.id == formId + '_' + record.data.id)
               {
@@ -1719,7 +1740,48 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                     });
               }
             }, serviceTypePanel);
+
+          // NXCM-3549 filter repository list for the selected task type
+          var repoField = this.form.find('name', 'serviceProperties_repositoryId')[0];
+          this.schedules.filterRepositoryGroupField(repoField, record.id);
+
         serviceTypePanel.doLayout();
+      },
+        filterRepositoryGroupField : function(combo, id) {
+
+            // filter out repositories depending on filter contributed by task type
+            var fn =  this.repositoryGroupTaskFilters[id];
+            var store = combo.getStore();
+
+            /* HACK:
+             store.filter will be overwritten by combobox#doQuery on initialization,
+             so we need to filter the store and make believe that the filtered view is
+             the real data ('snapshot' property)
+             */
+            if ( store.realSnapshot )
+            {
+                store.snapshot = store.realSnapshot;
+            }
+
+            store.clearFilter(true);
+            if ( fn ) {
+                store.filterBy( fn );
+            }
+
+            store.realSnapshot = store.snapshot;
+            store.snapshot = store.data;
+        },
+
+      repositoryGroupTaskFilters : {
+          DownloadIndexesTask : function(record, id) { return (!record.data.repoType) || (record.data.repoType == 'proxy' && record.data.format == 'maven2') },
+          OptimizeIndexTask : function(record, id) { return (!record.data.repoType) || (record.data.format == 'maven2') },
+          PublishIndexesTask : function(record, id) { return (!record.data.repoType) || (record.data.format == 'maven2') },
+          EvictUnusedProxiedItemsTask : function(record, id) { return (!record.data.repoType) || record.data.repoType == 'proxy' },
+          RebuildMavenMetadataTask : function(record, id) { return (!record.data.repoType) || (record.data.format == 'maven2') },
+          RepairIndexTask : function(record, id) { return (!record.data.repoType) || (record.data.format == 'maven2') },
+          UpdateIndexTask : function(record, id) { return (!record.data.repoType) || (record.data.format == 'maven2') },
+          SynchronizeShadowsTask : function(record, id) { return (!record.data.repoType) || (record.data.repoType == 'virtual') },
+          SnapshotRemoverTask : function(record, id) { return (!record.data.repoType) || (record.data.format == 'maven2' && record.data.repoPolicy == 'SNAPSHOT') }
       },
 
       serviceScheduleSelectHandler : function(combo, record, index) {
