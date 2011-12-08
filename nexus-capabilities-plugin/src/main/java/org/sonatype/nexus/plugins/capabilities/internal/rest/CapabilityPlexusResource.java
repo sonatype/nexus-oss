@@ -295,6 +295,7 @@ public class CapabilityPlexusResource
         item.setActive( reference != null && reference.isActive() );
         if ( reference != null )
         {
+            item.setStatus( reference.status() );
             item.setStateDescription( reference.stateDescription() );
         }
 

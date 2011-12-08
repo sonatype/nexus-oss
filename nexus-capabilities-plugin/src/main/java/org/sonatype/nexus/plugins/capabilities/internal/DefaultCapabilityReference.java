@@ -158,6 +158,20 @@ class DefaultCapabilityReference
     }
 
     @Override
+    public String status()
+    {
+        try
+        {
+            stateLock.readLock().lock();
+            return state.status();
+        }
+        finally
+        {
+            stateLock.readLock().unlock();
+        }
+    }
+
+    @Override
     public void create( final Map<String, String> properties )
     {
         try
@@ -305,6 +319,12 @@ class DefaultCapabilityReference
         public void passivate()
         {
             throw new IllegalStateException( "State '" + toString() + "' does not permit 'passivate' operation" );
+        }
+
+        @Override
+        public String status()
+        {
+            return null;
         }
 
         @Override
@@ -464,6 +484,22 @@ class DefaultCapabilityReference
                     "Could not remove capability {} ({})", new Object[]{ capability, capability.id(), e }
                 );
             }
+        }
+
+        @Override
+        public String status()
+        {
+            try
+            {
+                return capability().status();
+            }
+            catch ( Exception e )
+            {
+                getLogger().error(
+                    "Could not retrieve status of capability {} ({})", new Object[]{ capability, capability.id(), e }
+                );
+            }
+            return null;
         }
 
         @Override

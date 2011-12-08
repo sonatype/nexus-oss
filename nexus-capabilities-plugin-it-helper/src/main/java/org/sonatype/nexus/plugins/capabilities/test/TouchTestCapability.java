@@ -59,4 +59,10 @@ public class TouchTestCapability
         getLogger().info( "Remove capability with id {}", id() );
     }
 
+    @Override
+    public String status()
+    {
+        return "<h3>I'm well. Thanx!</h3>";
+    }
+
 }

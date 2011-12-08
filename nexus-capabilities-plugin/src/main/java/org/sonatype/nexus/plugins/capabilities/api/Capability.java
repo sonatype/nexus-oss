@@ -33,6 +33,13 @@ public interface Capability
     String id();
 
     /**
+     * Returns status of capability.
+     *
+     * @return status. Can be null. Can be an html chunk.
+     */
+    String status();
+
+    /**
      * Callback when a new capability is created.
      * <p/>
      * If an exception occurs, during invocation of this method,  the exception will be ignored and capability will be

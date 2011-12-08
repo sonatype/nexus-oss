@@ -78,6 +78,13 @@ public interface CapabilityReference
     void passivate();
 
     /**
+     * Returns status of capability.
+     *
+     * @return status. Can be null. Can be an html chunk.
+     */
+    String status();
+
+    /**
      * Callback when a new capability is created.
      *
      * @param properties capability configuration

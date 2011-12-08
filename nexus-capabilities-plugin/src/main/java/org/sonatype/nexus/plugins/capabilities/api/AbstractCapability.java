@@ -44,6 +44,12 @@ public abstract class AbstractCapability
     }
 
     @Override
+    public String status()
+    {
+        return null;
+    }
+
+    @Override
     public void create( final Map<String, String> properties )
         throws Exception
     {

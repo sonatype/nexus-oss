@@ -98,6 +98,8 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
         name : 'typeId'
       }, {
         name : 'stateDescription'
+      }, {
+        name : 'status'
       }]);
 
   // Datastore that will hold both repos and repogroups
@@ -270,6 +272,36 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           autoScroll : false,
           frame : false,
           items : []
+        }, {
+          xtype : 'panel',
+          name : 'status-panel',
+          header : false,
+          layout : 'card',
+          region : 'center',
+          activeItem : 0,
+          bodyStyle : 'padding:15px',
+          deferredRender : false,
+          autoScroll : false,
+          autoHeight : true,
+          frame : false,
+          visible : false,
+          items : [{
+            xtype : 'fieldset',
+            name : 'status-fieldset',
+            autoHeight : true,
+            checkboxToggle : false,
+            title : 'Status',
+            anchor : Sonatype.view.FIELDSET_OFFSET,
+            collapsible : true,
+            layoutConfig : {
+              labelSeparator : ''
+            },
+            items : [{
+              xtype : 'panel',
+              name : 'status',
+              layout : 'fit'
+            }]
+          }]
         }],
     buttons : [{
           id : 'savebutton',
@@ -522,6 +554,9 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         var capabilityTypeField = formPanel.find('name', 'typeId')[0];
         capabilityTypeField.on('select', this.capabilityTypeSelectHandler, formPanel);
 
+        var statusPanel = formPanel.find('name', 'status-panel')[0];
+        statusPanel.hide();
+
         var buttonInfoObj = {
           formPanel : formPanel,
           isNew : true
@@ -673,66 +708,49 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
         if (action.type == 'sonatypeSubmit')
         {
-          var isNew = action.options.isNew;
-          var receivedData = action.handleResponse(action.response).data;
-          if (isNew)
-          {
-            // successful create
-            var sentData = action.output.data;
-            var dataObj = {
-              id : receivedData.id,
-              description : receivedData.description,
-              notes : receivedData.notes,
-              enabled : receivedData.enabled,
-              active : receivedData.active,
-              resourceURI : receivedData.resourceURI,
-              typeId : receivedData.typeId,
-              typeName : receivedData.typeName,
-              stateDescription : receivedData.stateDescription
-            };
+            var isNew = action.options.isNew;
+            var receivedData = action.handleResponse(action.response).data;
+            var rec;
+            if (isNew)
+            {
+                // successful create
+                var dataObj = {
+                    id : receivedData.id,
+                    description : receivedData.description,
+                    notes : receivedData.notes,
+                    enabled : receivedData.enabled,
+                    active : receivedData.active,
+                    resourceURI : receivedData.resourceURI,
+                    typeId : receivedData.typeId,
+                    typeName : receivedData.typeName,
+                    stateDescription : receivedData.stateDescription,
+                    status : receivedData.status
+                };
 
-            var newRec = new this.capabilityRecordConstructor(dataObj, action.options.fpanel.id);
+                rec = new this.capabilityRecordConstructor(dataObj, receivedData.resourceURI);
 
-            this.capabilitiesDataStore.remove(this.capabilitiesDataStore.getById(action.options.fpanel.id)); // remove
-            // old
-            // one
-            this.capabilitiesDataStore.addSorted(newRec);
-            this.capabilitiesGridPanel.getSelectionModel().selectRecords([newRec], false);
+                this.capabilitiesDataStore.remove(this.capabilitiesDataStore.getById(action.options.fpanel.id));
+                this.capabilitiesDataStore.addSorted(rec);
+            }
+            else
+            {
+                var i = this.capabilitiesDataStore.indexOfId(action.options.fpanel.id);
+                rec = this.capabilitiesDataStore.getAt(i);
 
-            // set the hidden id field in the form for subsequent updates
-            action.options.fpanel.find('name', 'id')[0].setValue(receivedData.id);
-            // remove button click listeners
-            action.options.fpanel.buttons[0].purgeListeners();
-            action.options.fpanel.buttons[1].purgeListeners();
+                this.updateCapabilityRecord(rec, receivedData);
+                var sortState = this.capabilitiesDataStore.getSortState();
+                this.capabilitiesDataStore.sort(sortState.field, sortState.direction);
+            }
 
-            var buttonInfoObj = {
-              formPanel : action.options.fpanel,
-              isNew : false,
-              resourceURI : dataObj.resourceURI
-            };
-
-            // save button event handler
-            action.options.fpanel.buttons[0].on('click', this.saveHandler.createDelegate(this, [buttonInfoObj]));
-
-            // cancel button event handler
-            action.options.fpanel.buttons[1].on('click', this.cancelHandler.createDelegate(this, [buttonInfoObj]));
-
-            // disable capability type, only avaiable on add
-            action.options.fpanel.find('name', 'typeId')[0].disable();
-          }
-          else
-          {
-            var sentData = action.output.data;
-
-            var i = this.capabilitiesDataStore.indexOfId(action.options.fpanel.id);
-            var rec = this.capabilitiesDataStore.getAt(i);
-
-            this.updateCapabilityRecord(rec, receivedData);
-
-            var sortState = this.capabilitiesDataStore.getSortState();
-            this.capabilitiesDataStore.sort(sortState.field, sortState.direction);
-          }
           this.capabilitiesDataStore.reload();
+          this.formCards.items.each(function(item, i, len) {
+            if (i > 0)
+            {
+              this.remove(item, true);
+            }
+          }, this.formCards);
+
+          this.capabilitiesGridPanel.getSelectionModel().selectRecords([rec], false);
         }
       },
 
@@ -745,6 +763,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         rec.set('active', receivedData.active);
         rec.set('typeName', receivedData.typeName);
         rec.set('stateDescription', receivedData.stateDescription);
+        rec.set('status', receivedData.status);
         rec.commit();
         rec.endEdit();
       },
@@ -824,6 +843,15 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               });
 
           formPanel.find('name', 'typeId')[0].disable();
+
+          formPanel.find('name', 'status')[0].html = rec.data.status;
+
+          if(rec.data.status) {
+            formPanel.find('name', 'status-panel')[0].show();
+          }
+          else {
+            formPanel.find('name', 'status-panel')[0].hide();
+          }
 
           var buttonInfoObj = {
             formPanel : formPanel,

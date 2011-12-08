@@ -294,6 +294,13 @@
 					<required>false</required>
 					<description>The description of current state.</description>
 				</field>
+        <field>
+          <name>status</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>The status as reported by capability (html chunk/can be null).</description>
+        </field>
 			</fields>
 		</class>
 

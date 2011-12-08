@@ -18,6 +18,11 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3699;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.testng.Assert.assertNotNull;
+
 import java.io.IOException;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -62,21 +67,22 @@ public class Nexus3699CapabilityIT
         cap.addProperty( prop );
 
         CapabilityListItemResource r = CapabilitiesMessageUtil.create( cap );
-        Assert.assertNotNull( r.getId() );
+        assertThat( r.getId(), is(notNullValue()) );
+        assertThat( r.getStatus(), is( "<h3>I'm well. Thanx!</h3>" ) );
 
         // read
         CapabilityResource read = CapabilitiesMessageUtil.read( r.getId() );
-        Assert.assertEquals( r.getId(), read.getId() );
-        Assert.assertEquals( cap.getNotes(), read.getNotes() );
-        Assert.assertEquals( cap.getTypeId(), read.getTypeId() );
-        Assert.assertEquals( cap.getProperties().size(), read.getProperties().size() );
+        assertThat( read.getId(), is( r.getId() ) );
+        assertThat( read.getNotes(), is( cap.getNotes() ) );
+        assertThat( read.getTypeId(), is( cap.getTypeId() ) );
+        assertThat( read.getProperties().size(), is( cap.getProperties().size() ) );
 
         // update
         read.setNotes( "updateCrudTest" );
         CapabilityListItemResource updated = CapabilitiesMessageUtil.update( read );
-        Assert.assertEquals( "updateCrudTest", updated.getNotes() );
+        assertThat( updated.getNotes(), is( "updateCrudTest" ) );
         read = CapabilitiesMessageUtil.read( r.getId() );
-        Assert.assertEquals( "updateCrudTest", read.getNotes() );
+        assertThat( read.getNotes(), is( "updateCrudTest" ) );
 
         // delete
         CapabilitiesMessageUtil.delete( r.getId() );
