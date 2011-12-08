@@ -229,10 +229,19 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           xtype : 'checkbox',
           fieldLabel : 'Enabled',
           labelStyle : 'margin-left: 15px; width: 185px;',
-          helpText : 'This flag determines if the capability is currently active. To disable this capability for a period of time, de-select this checkbox.',
+          helpText : 'This flag determines if the capability is currently enabled. To disable this capability for a period of time, de-select this checkbox.',
           name : 'enabled',
           allowBlank : false,
           checked : true
+        }, {
+          xtype : 'checkbox',
+          fieldLabel : 'Active',
+          labelStyle : 'margin-left: 15px; width: 185px;',
+          helpText : 'Shows if the capability is current active or not. If not active, a text will be displayed explaining why.',
+          name : 'active',
+          allowBlank : false,
+          checked : false,
+          disabled : true
         }, {
           xtype : 'combo',
           fieldLabel : 'Type',
@@ -541,10 +550,11 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         var id = 'new_capability_' + new Date().getTime();
 
         var config = Ext.apply({}, this.formConfig.capability, {
-              id : id
+              id : id,
+              active : false
             });
         config = this.configUniqueIdHelper(id, config);
-        Ext.apply(config.items[4].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
+        Ext.apply(config.items[5].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
         var formPanel = new Ext.FormPanel(config);
 
         formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -820,7 +830,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                 id : id
               });
           config = this.configUniqueIdHelper(id, config);
-          Ext.apply(config.items[4].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
+          Ext.apply(config.items[5].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
           formPanel = new Ext.FormPanel(config);
 
           formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -854,6 +864,10 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
           else {
             formPanel.find('name', 'status-panel')[0].hide();
           }
+
+          var active = formPanel.find('name', 'active')[0];
+          active.checked = rec.data.active;
+          active.afterText = rec.data.active && rec.data.stateDescription ? '' : ' ' + rec.data.stateDescription;
 
           var buttonInfoObj = {
             formPanel : formPanel,
