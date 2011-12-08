@@ -35,6 +35,13 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-capabilities-plugin</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
+    </dependency>
+
+    <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-core</artifactId>
       <scope>compile</scope>
@@ -63,7 +70,7 @@
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>provided</scope>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -72,14 +79,7 @@
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-capabilities-plugin</artifactId>
-      <version>${project.version}</version>
-      <type>jar</type>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -88,6 +88,7 @@
       <version>${project.version}</version>
       <type>zip</type>
       <classifier>bundle</classifier>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
