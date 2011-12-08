@@ -432,12 +432,14 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         this.repositoryDataStore.reload();
         this.repositoryGroupDataStore.reload();
         this.capabilityTypeDataStore.reload();
-        this.formCards.items.each(function(item, i, len) {
-              if (i > 0)
-              {
+        this.formCards.items.each(
+            function(item, i, len) {
+              if (i > 0) {
                 this.remove(item, true);
               }
-            }, this.formCards);
+            },
+            this.formCards
+        );
 
         this.formCards.getLayout().setActiveItem(0);
       },
@@ -708,49 +710,49 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
         if (action.type == 'sonatypeSubmit')
         {
-            var isNew = action.options.isNew;
-            var receivedData = action.handleResponse(action.response).data;
-            var rec;
-            if (isNew)
-            {
-                // successful create
-                var dataObj = {
-                    id : receivedData.id,
-                    description : receivedData.description,
-                    notes : receivedData.notes,
-                    enabled : receivedData.enabled,
-                    active : receivedData.active,
-                    resourceURI : receivedData.resourceURI,
-                    typeId : receivedData.typeId,
-                    typeName : receivedData.typeName,
-                    stateDescription : receivedData.stateDescription,
-                    status : receivedData.status
-                };
+          var isNew = action.options.isNew;
+          var receivedData = action.handleResponse( action.response ).data;
+          var rec;
+          if ( isNew ) {
+            // successful create
+            var dataObj = {
+              id:receivedData.id,
+              description:receivedData.description,
+              notes:receivedData.notes,
+              enabled:receivedData.enabled,
+              active:receivedData.active,
+              resourceURI:receivedData.resourceURI,
+              typeId:receivedData.typeId,
+              typeName:receivedData.typeName,
+              stateDescription:receivedData.stateDescription,
+              status:receivedData.status
+            };
 
-                rec = new this.capabilityRecordConstructor(dataObj, receivedData.resourceURI);
+            rec = new this.capabilityRecordConstructor( dataObj, receivedData.resourceURI );
 
-                this.capabilitiesDataStore.remove(this.capabilitiesDataStore.getById(action.options.fpanel.id));
-                this.capabilitiesDataStore.addSorted(rec);
-            }
-            else
-            {
-                var i = this.capabilitiesDataStore.indexOfId(action.options.fpanel.id);
-                rec = this.capabilitiesDataStore.getAt(i);
+            this.capabilitiesDataStore.remove( this.capabilitiesDataStore.getById( action.options.fpanel.id ) );
+            this.capabilitiesDataStore.addSorted( rec );
+          }
+          else {
+            var i = this.capabilitiesDataStore.indexOfId( action.options.fpanel.id );
+            rec = this.capabilitiesDataStore.getAt( i );
 
-                this.updateCapabilityRecord(rec, receivedData);
-                var sortState = this.capabilitiesDataStore.getSortState();
-                this.capabilitiesDataStore.sort(sortState.field, sortState.direction);
-            }
+            this.updateCapabilityRecord( rec, receivedData );
+            var sortState = this.capabilitiesDataStore.getSortState();
+            this.capabilitiesDataStore.sort( sortState.field, sortState.direction );
+          }
 
           this.capabilitiesDataStore.reload();
-          this.formCards.items.each(function(item, i, len) {
-            if (i > 0)
-            {
-              this.remove(item, true);
-            }
-          }, this.formCards);
+          this.formCards.items.each(
+              function ( item, i, len ) {
+                if ( i > 0 ) {
+                  this.remove( item, true );
+                }
+              },
+              this.formCards
+          );
 
-          this.capabilitiesGridPanel.getSelectionModel().selectRecords([rec], false);
+          this.capabilitiesGridPanel.getSelectionModel().selectRecords( [rec], false );
         }
       },
 
