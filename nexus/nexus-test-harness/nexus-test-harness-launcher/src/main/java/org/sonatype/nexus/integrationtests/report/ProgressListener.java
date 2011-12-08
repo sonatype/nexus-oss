@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.integrationtests.report;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.PrintStream;
 
 import org.testng.ITestContext;
@@ -52,7 +54,7 @@ public class ProgressListener
     {
         super.onTestFailure( tr );
 
-        showResult( tr, "FAILED",  System.out );
+        showResult( tr, "FAILED", System.out );
     }
 
     @Override
@@ -60,7 +62,7 @@ public class ProgressListener
     {
         super.onTestSkipped( tr );
 
-        showResult( tr, "skipped",  System.out );
+        showResult( tr, "skipped", System.out );
     }
 
     @Override
@@ -68,11 +70,15 @@ public class ProgressListener
     {
         super.onTestSuccess( tr );
 
-        showResult( tr, "SUCCESS",  System.out );
+        showResult( tr, "SUCCESS", System.out );
     }
 
     private void showResult( ITestResult result, String status, PrintStream printer )
     {
+        checkNotNull( result );
+        checkNotNull( result.getTestClass() );
+        checkNotNull( printer );
+
         printer.println( "Result: " + result.getTestClass().getName() + "." + result.getName() + "() ===> " + status );
     }
 
