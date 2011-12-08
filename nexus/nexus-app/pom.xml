@@ -99,11 +99,6 @@
       <groupId>org.sonatype.spice</groupId>
       <artifactId>plexus-encryptor</artifactId>
     </dependency>
-    <!-- Needed for version and versionScheme (snap remover) -->
-    <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-util</artifactId>
-    </dependency>
 
     <!-- Testing -->
     <dependency>

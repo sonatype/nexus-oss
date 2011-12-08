@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.aether.artifact.Artifact;
 import org.sonatype.aether.repository.WorkspaceReader;
@@ -30,6 +29,7 @@ import org.sonatype.aether.repository.WorkspaceRepository;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 
 public class NexusWorkspaceReader

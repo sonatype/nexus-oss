@@ -18,8 +18,8 @@
  */
 package org.sonatype.plugin.metadata;
 
-import org.apache.maven.index.artifact.ArtifactPackagingMapper;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
 
 /**
  * Trivial Group:Artifact:Version identifier.

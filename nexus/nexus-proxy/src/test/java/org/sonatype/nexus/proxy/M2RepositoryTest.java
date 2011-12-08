@@ -24,7 +24,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.index.artifact.VersionUtils;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,6 +36,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
@@ -282,10 +282,10 @@ public class M2RepositoryTest
     {
         // M2Repository repository = (M2Repository) getResourceStore();
 
-        assertEquals( false, VersionUtils.isSnapshot( "1.0.0" ) );
-        assertEquals( true, VersionUtils.isSnapshot( "1.0.0-SNAPSHOT" ) );
-        assertEquals( false, VersionUtils.isSnapshot( "1.0-alpha-25" ) );
-        assertEquals( true, VersionUtils.isSnapshot( "1.0-alpha-25-20070518.002146-2" ) );
+        assertEquals( false, Gav.isSnapshot( "1.0.0" ) );
+        assertEquals( true, Gav.isSnapshot( "1.0.0-SNAPSHOT" ) );
+        assertEquals( false, Gav.isSnapshot( "1.0-alpha-25" ) );
+        assertEquals( true, Gav.isSnapshot( "1.0-alpha-25-20070518.002146-2" ) );
     }
 
     @Test

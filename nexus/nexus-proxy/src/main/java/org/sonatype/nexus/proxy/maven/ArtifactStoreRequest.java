@@ -18,8 +18,8 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import org.apache.maven.index.artifact.Gav;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 
 public class ArtifactStoreRequest
     extends ResourceStoreRequest

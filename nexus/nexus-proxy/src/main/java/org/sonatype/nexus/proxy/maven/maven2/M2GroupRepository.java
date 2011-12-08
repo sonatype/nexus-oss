@@ -26,9 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.index.artifact.GavCalculator;
-import org.apache.maven.index.artifact.M2ArtifactRecognizer;
-import org.apache.maven.index.artifact.VersionUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
@@ -53,6 +50,9 @@ import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepositoryMetadataValidationEventFailed;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
+import org.sonatype.nexus.proxy.maven.gav.GavCalculator;
+import org.sonatype.nexus.proxy.maven.gav.M2ArtifactRecognizer;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperand;
@@ -196,7 +196,7 @@ public class M2GroupRepository
         for ( Iterator<String> it = versions.iterator(); it.hasNext(); )
         {
             String version = it.next();
-            if ( allowSnapshot ^ VersionUtils.isSnapshot( version ) )
+            if ( allowSnapshot ^ Gav.isSnapshot( version ) )
             {
                 it.remove();
             }

@@ -27,7 +27,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.apache.maven.index.artifact.ArtifactPackagingMapper;
+import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.PluginMetadata;
 

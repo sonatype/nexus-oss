@@ -22,8 +22,8 @@ import java.io.IOException;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
-import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 
 /**
  * An adapter in charge for doing the IO against the storage, hiding the fact where it runs.

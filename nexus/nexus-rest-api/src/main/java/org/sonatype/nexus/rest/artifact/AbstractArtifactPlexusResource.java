@@ -24,8 +24,6 @@ import java.io.InputStreamReader;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
-import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.VersionUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.shiro.subject.Subject;
@@ -56,6 +54,7 @@ import org.sonatype.nexus.proxy.maven.ArtifactStoreHelper;
 import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
@@ -603,8 +602,8 @@ public abstract class AbstractArtifactPlexusResource
     {
         boolean result = false;
 
-        if ( ( RepositoryPolicy.SNAPSHOT.equals( policy ) && VersionUtils.isSnapshot( version ) )
-            || ( RepositoryPolicy.RELEASE.equals( policy ) && !VersionUtils.isSnapshot( version ) ) )
+        if ( ( RepositoryPolicy.SNAPSHOT.equals( policy ) && Gav.isSnapshot( version ) )
+            || ( RepositoryPolicy.RELEASE.equals( policy ) && !Gav.isSnapshot( version ) ) )
         {
             result = true;
         }

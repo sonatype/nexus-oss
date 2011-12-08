@@ -18,9 +18,9 @@
  */
 package org.sonatype.nexus.plugins.mavenbridge;
 
-import org.apache.maven.index.artifact.Gav;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 
 /**
  * Collection of static utility methods to bridge the "gap" between Aether and Nexus.
@@ -40,7 +40,7 @@ public class Utils
      * @param scope the needed scope, or {@code null}
      * @return
      */
-    public static Dependency createDependencyFromGav( Gav gav, String scope )
+    public static Dependency createDependencyFromGav( final Gav gav, final String scope )
     {
         Dependency dependency =
             new Dependency( new DefaultArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getExtension(),

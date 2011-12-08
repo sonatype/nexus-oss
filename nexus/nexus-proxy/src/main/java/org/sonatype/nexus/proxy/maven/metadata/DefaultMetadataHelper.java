@@ -21,7 +21,6 @@ package org.sonatype.nexus.proxy.maven.metadata;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.maven.index.artifact.GavCalculator;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -33,6 +32,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.gav.GavCalculator;
 import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
 
 /**

@@ -20,11 +20,9 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import java.util.Locale;
 import java.util.TimeZone;
-import javax.inject.Inject;
-import org.apache.maven.index.artifact.Gav;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -33,6 +31,7 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
 import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 
 public class Nexus4423Maven3MetadataTest
     extends AbstractProxyTestEnvironment
