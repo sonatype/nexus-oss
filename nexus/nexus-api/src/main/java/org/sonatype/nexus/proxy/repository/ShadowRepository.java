@@ -20,6 +20,7 @@ package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
@@ -88,4 +89,13 @@ public interface ShadowRepository
      * Triggers syncing with master repository.
      */
     void synchronizeWithMaster();
+
+    /**
+     * Performs some activity if the event is coming from it's master repository. Implementation should filter and take
+     * care what repository is the origin of the event, and simply discard event if not interested in it.
+     * 
+     * @param evt
+     * @since 1.10.0
+     */
+    void onRepositoryItemEvent( RepositoryItemEvent evt );
 }

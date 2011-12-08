@@ -38,7 +38,6 @@ import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * The Class ShadowRepository.
@@ -122,32 +121,25 @@ public abstract class AbstractShadowRepository
     }
 
     @Override
-    public void onEvent( Event<?> evt )
+    public void onRepositoryItemEvent( final RepositoryItemEvent ievt )
     {
-        super.onEvent( evt );
-
-        if ( evt instanceof RepositoryItemEvent )
+        // is this event coming from our master?
+        if ( getMasterRepository() == ievt.getRepository() )
         {
-            RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
-
-            // is this event coming from our master?
-            if ( getMasterRepository() == ievt.getRepository() )
+            try
             {
-                try
+                if ( ievt instanceof RepositoryItemEventStore || ievt instanceof RepositoryItemEventCache )
                 {
-                    if ( ievt instanceof RepositoryItemEventStore || ievt instanceof RepositoryItemEventCache )
-                    {
-                        createLink( ievt.getItem() );
-                    }
-                    else if ( ievt instanceof RepositoryItemEventDelete )
-                    {
-                        deleteLink( ievt.getItem() );
-                    }
+                    createLink( ievt.getItem() );
                 }
-                catch ( Exception e )
+                else if ( ievt instanceof RepositoryItemEventDelete )
                 {
-                    getLogger().warn( "Could not sync shadow repository because of exception", e );
+                    deleteLink( ievt.getItem() );
                 }
+            }
+            catch ( Exception e )
+            {
+                getLogger().warn( "Could not sync shadow repository because of exception", e );
             }
         }
     }
