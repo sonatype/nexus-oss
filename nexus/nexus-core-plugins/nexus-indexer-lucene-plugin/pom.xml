@@ -72,11 +72,6 @@
 
     <!-- Is in core -->
     <dependency>
-      <groupId>org.apache.maven.indexer</groupId>
-      <artifactId>indexer-artifact</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
       <scope>provided</scope>
@@ -165,6 +160,8 @@
                <classpathDependencyExcludes>
                 <classpathDependencyExclude>org.apache.maven.indexer:indexer-core</classpathDependencyExclude>
                 <classpathDependencyExclude>org.apache.lucene:lucene-core</classpathDependencyExclude>
+                <classpathDependencyExclude>org.apache.lucene:lucene-highlighter</classpathDependencyExclude>
+                <classpathDependencyExclude>org.apache.lucene:lucene-memory</classpathDependencyExclude>
               </classpathDependencyExcludes>
             </configuration>
           </execution>
@@ -193,7 +190,7 @@
               <artifactSet>
                 <includes>
                   <include>org.apache.maven.indexer:indexer-core</include>
-                  <include>org.apache.lucene:lucene-core</include>
+                  <include>org.apache.lucene:*</include>
                 </includes>
               </artifactSet>
             </configuration>
