@@ -18,11 +18,39 @@
  */
 package org.sonatype.nexus.plugins.lvo.strategy;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.error.reporting.NexusProxyServerConfigurator;
+import org.sonatype.nexus.logging.Slf4jPlexusLogger;
+import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 
 public abstract class AbstractRemoteDiscoveryStrategy
     extends AbstractDiscoveryStrategy
 {
+
+    @Requirement
+    private NexusConfiguration nexusConfig;
+
+    /**
+     * For plexus injection.
+     */
+    protected AbstractRemoteDiscoveryStrategy()
+    {
+    }
+
+    AbstractRemoteDiscoveryStrategy( final NexusConfiguration nexusConfig )
+    {
+        this.nexusConfig = nexusConfig;
+    }
+
     /**
      * Format's the user agent string for remote discoveries, if needed. TODO: this method is a copy+paste of the one in
      * AbstractRemoteRepositoryStorage, fix this
@@ -38,5 +66,65 @@ public abstract class AbstractRemoteDiscoveryStrategy
                 System.getProperty( "java.version" ) ).append( ") " ).append( "LVOPlugin/1.0" );
 
         return userAgentPlatformInfo.toString();
+    }
+
+    protected HttpGetDiscoveryStrategy.RequestResult handleRequest( String url )
+    {
+        HttpClient client = new HttpClient();
+
+        new NexusProxyServerConfigurator( nexusConfig.getGlobalRemoteStorageContext(), new Slf4jPlexusLogger( getLogger() ) ).applyToClient( client );
+
+        GetMethod method = new GetMethod( url );
+
+        HttpGetDiscoveryStrategy.RequestResult result = null;
+
+        try
+        {
+            int status = client.executeMethod( method );
+
+            if ( HttpStatus.SC_OK == status )
+            {
+                result = new HttpGetDiscoveryStrategy.RequestResult( method );
+            }
+        }
+        catch ( IOException e )
+        {
+            getLogger().debug( "Error retrieving lvo data", e );
+        }
+
+        return result;
+    }
+
+    protected String getRemoteUrl( DiscoveryRequest request )
+    {
+        return request.getLvoKey().getRemoteUrl();
+    }
+
+    protected static final class RequestResult
+    {
+        private InputStream is;
+        private GetMethod method;
+
+        public RequestResult( GetMethod method )
+            throws IOException
+        {
+            this.is = method.getResponseBodyAsStream();
+            this.method = method;
+        }
+
+        public InputStream getInputStream()
+        {
+            return this.is;
+        }
+
+        public void close()
+        {
+            IOUtil.close( is );
+
+            if ( this.method != null )
+            {
+                this.method.releaseConnection();
+            }
+        }
     }
 }

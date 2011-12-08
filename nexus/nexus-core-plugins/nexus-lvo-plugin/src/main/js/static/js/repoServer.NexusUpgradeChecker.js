@@ -16,34 +16,33 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-var checkedNewVersion = false;
 
 Sonatype.Events.addListener( 'nexusStatus', function() {
-  if ( !checkedNewVersion
+  if ( !this.checkedNewVersion
     && Sonatype.lib.Permissions.checkPermission('nexus:status', Sonatype.lib.Permissions.READ)
     && !Ext.isEmpty( Sonatype.utils.editionShort )
-    && !Ext.isEmpty( Sonatype.utils.versionShort )){
+    && !Ext.isEmpty( Sonatype.utils.version)){
     Ext.Ajax.request( {
+      scope: this,
       method: 'GET',
       suppressStatus: [404,401,-1],
       url: Sonatype.config.servicePath + '/lvo/nexus-' +
-        Sonatype.utils.editionShort.substr( 0, 3 ).toLowerCase() + '/' + Sonatype.utils.versionShort,
+        Sonatype.utils.editionShort.substr( 0, 3 ).toLowerCase() + '/' + Sonatype.utils.version,
       success: function( response, options ) {
-        checkedNewVersion = true;
+        this.checkedNewVersion = true;
         var r = Ext.decode( response.responseText );
-        
-        if ( r.response != null && r.response.isSuccessful && r.response.version ) {
-          Sonatype.utils.postWelcomePageAlert(
-            '<span style="color:#000">' +
-            '<b>UPGRADE AVAILABLE:</b> ' +
-            'Nexus ' + Sonatype.utils.edition + ' ' + r.response.version + ' is now available. ' +
-            '<a href="' + r.response.url + '" target="_blank">Download now!</a>' +
-            '</span>' 
-          );
-        }
+
+          // we get 404 if there is no new version, so we always have a valid response here
+        Sonatype.utils.postWelcomePageAlert(
+          '<span style="color:#000">' +
+          '<b>UPGRADE AVAILABLE:</b> ' +
+          'Nexus ' + Sonatype.utils.edition + ' ' + r.response.version + ' is now available. ' +
+          '<a href="' + r.response.url + '" target="_blank">Download now!</a>' +
+          '</span>'
+        );
       },
       failure: function() {
-        checkedNewVersion = true;
+        this.checkedNewVersion = true;
       }
     });
   }

@@ -20,25 +20,18 @@ package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.util.concurrent.Future;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.ahc.AhcProvider;
+import org.restlet.data.ClientInfo;
+import org.restlet.data.Method;
+import org.restlet.data.Request;
+import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-
-import com.ning.http.client.BodyDeferringAsyncHandler;
-import com.ning.http.client.BodyDeferringAsyncHandler.BodyDeferringInputStream;
-import com.ning.http.client.Request;
-import com.ning.http.client.RequestBuilder;
-import com.ning.http.client.Response;
 
 /**
  * This is a "remote" strategy, uses HTTP GET for information fetch from the remoteUrl. Note: this class uses Restlet
@@ -51,24 +44,25 @@ public class HttpGetDiscoveryStrategy
     extends AbstractRemoteDiscoveryStrategy
 {
     @Requirement
-    private AhcProvider ahcProvider;
+    private GlobalRestApiSettings restApiSettings;
 
     public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
-        throws NoSuchRepositoryException, IOException
+        throws NoSuchRepositoryException,
+            IOException
     {
         DiscoveryResponse dr = new DiscoveryResponse( request );
 
         // handle
-        InputStream response = handleRequest( getRemoteUrl( request ) );
+        RequestResult response = handleRequest( getRemoteUrl( request ) );
 
         if ( response != null )
         {
             try
             {
-                BufferedReader reader = new BufferedReader( new InputStreamReader( response ) );
-
+                BufferedReader reader = new BufferedReader( new InputStreamReader( response.getInputStream() ) );
+    
                 dr.setVersion( reader.readLine() );
-
+    
                 dr.setSuccessful( true );
             }
             finally
@@ -80,47 +74,19 @@ public class HttpGetDiscoveryStrategy
         return dr;
     }
 
-    protected InputStream handleRequest( String url )
+    protected Request getRestRequest( String url )
     {
-        Request request = new RequestBuilder().setFollowRedirects( true ).setUrl( url ).build();
+        Request rr = new Request( Method.GET, url );
 
-        try
-        {
-            final PipedOutputStream po = new PipedOutputStream();
+        rr.setReferrerRef( restApiSettings.getBaseUrl() );
 
-            final PipedInputStream pi = new PipedInputStream( po );
+        ClientInfo ci = new ClientInfo();
 
-            final BodyDeferringAsyncHandler bdah = new BodyDeferringAsyncHandler( po );
+        ci.setAgent( formatUserAgent() );
 
-            Future<Response> f = ahcProvider.getAsyncHttpClient().executeRequest( request, bdah );
+        rr.setClientInfo( ci );
 
-            BodyDeferringInputStream result = new BodyDeferringInputStream( f, bdah, pi );
-
-            if ( 200 == result.getAsapResponse().getStatusCode() )
-            {
-                return result;
-            }
-            else
-            {
-                result.close();
-
-                return null;
-            }
-        }
-        catch ( IOException e )
-        {
-            getLogger().debug( "Error retrieving lvo data", e );
-        }
-        catch ( InterruptedException e )
-        {
-            getLogger().debug( "Error retrieving lvo data", e );
-        }
-
-        return null;
+        return rr;
     }
 
-    protected String getRemoteUrl( DiscoveryRequest request )
-    {
-        return request.getLvoKey().getRemoteUrl();
-    }
 }

@@ -82,16 +82,8 @@ public class LvoQueryPlexusResource
             }
             else
             {
-                // TODO: decide which one is appropriate
-
-                // answer a) 404
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Newer than '" + cv + "' version for key='"
-                    + key + "' not found." );
-
-                // answer b) 304
-                // response.setStatus( Status.REDIRECTION_NOT_MODIFIED, "No newer version than '" + cv + "' found." );
-
-                // return null;
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "No version newer than '" + cv + "' for key='"
+                    + key + "' found." );
             }
         }
         catch ( NoSuchKeyException e )

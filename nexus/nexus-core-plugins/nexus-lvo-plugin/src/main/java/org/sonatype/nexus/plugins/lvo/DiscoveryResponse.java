@@ -21,9 +21,8 @@ package org.sonatype.nexus.plugins.lvo;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
-
 import com.thoughtworks.xstream.XStream;
+import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
 
 public class DiscoveryResponse
 {

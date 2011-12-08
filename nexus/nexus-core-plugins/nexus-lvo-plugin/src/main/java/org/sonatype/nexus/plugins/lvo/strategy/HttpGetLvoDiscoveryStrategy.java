@@ -19,17 +19,15 @@
 package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.IOException;
-import java.io.InputStream;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
+import com.thoughtworks.xstream.io.xml.XppDomDriver;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.XStreamException;
-import com.thoughtworks.xstream.io.xml.XppDomDriver;
 
 /**
  * This is a "remote" strategy, uses HTTP GET to get a remote LVO Plugin response. It extends the
@@ -39,7 +37,7 @@ import com.thoughtworks.xstream.io.xml.XppDomDriver;
  */
 @Component( role = DiscoveryStrategy.class, hint = "http-get-lvo" )
 public class HttpGetLvoDiscoveryStrategy
-    extends HttpGetDiscoveryStrategy
+    extends AbstractRemoteDiscoveryStrategy
 {
     private XStream xstream;
 
@@ -56,18 +54,19 @@ public class HttpGetLvoDiscoveryStrategy
     }
 
     public DiscoveryResponse discoverLatestVersion( DiscoveryRequest request )
-        throws NoSuchRepositoryException, IOException
+        throws NoSuchRepositoryException,
+            IOException
     {
         DiscoveryResponse dr = new DiscoveryResponse( request );
 
         // handle
-        InputStream response = handleRequest( getRemoteUrl( request ) );
+        RequestResult response = handleRequest( getRemoteUrl( request ) );
 
         if ( response != null )
         {
             try
             {
-                DiscoveryResponse remoteResponse = (DiscoveryResponse) getXStream().fromXML( response );
+                DiscoveryResponse remoteResponse = (DiscoveryResponse) getXStream().fromXML( response.getInputStream() );
 
                 return remoteResponse;
             }
