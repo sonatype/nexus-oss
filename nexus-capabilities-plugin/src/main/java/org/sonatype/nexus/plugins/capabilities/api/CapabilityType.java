@@ -20,6 +20,11 @@ package org.sonatype.nexus.plugins.capabilities.api;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+/**
+ * Type of a capability.
+ *
+ * @since 1.10.0
+ */
 public class CapabilityType
 {
 
