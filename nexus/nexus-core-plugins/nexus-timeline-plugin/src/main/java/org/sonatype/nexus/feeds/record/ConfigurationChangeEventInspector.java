@@ -18,10 +18,12 @@
  */
 package org.sonatype.nexus.feeds.record;
 
+import java.util.HashSet;
+
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.feeds.record.AbstractFeedRecorderEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
@@ -47,9 +49,6 @@ public class ConfigurationChangeEventInspector
 
     private void inspectForNexus( Event<?> evt )
     {
-        // TODO: This causes cycle!
-        // getNexus().getSystemStatus().setLastConfigChange( new Date() );
-
         ConfigurationChangeEvent event = (ConfigurationChangeEvent) evt;
 
         if ( event.getChanges().isEmpty() )
@@ -59,13 +58,15 @@ public class ConfigurationChangeEventInspector
 
         StringBuffer msg = new StringBuffer();
 
-        msg.append( "Nexus server configuration was changed" );
+        msg.append( "Nexus server configuration was changed: " );
 
-        // TODO: refine _what_ is changed
-        /*
-         * for ( Configurable change : event.getChanges() ) { msg.append( " '" ).append( change.getName() ).append(
-         * "', " ); }
-         */
+        // keep list unique, one component might be reported multiple times
+        final HashSet<String> changes = new HashSet<String>();
+        for ( Configurable changed : event.getChanges() )
+        {
+            changes.add( changed.getName() );
+        }
+        msg.append( changes.toString() );
 
         if ( event.getUserId() != null )
         {
