@@ -21,6 +21,7 @@ package org.sonatype.nexus.plugins.capabilities.support.activation;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -28,7 +29,9 @@ import org.junit.Test;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeActiveCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.PassivateCapabilityDuringUpdateCondition;
@@ -47,8 +50,9 @@ public class CapabilityConditionsTest
     public void setUp()
     {
         final NexusEventBus eventBus = mock( NexusEventBus.class );
+        final CapabilityDescriptorRegistry descriptorRegistry = mock( CapabilityDescriptorRegistry.class );
         final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
-        underTest = new CapabilityConditions( eventBus, capabilityRegistry );
+        underTest = new CapabilityConditions( eventBus, descriptorRegistry, capabilityRegistry );
     }
 
     /**
@@ -58,7 +62,7 @@ public class CapabilityConditionsTest
     public void capabilityOfTypeExists()
     {
         assertThat(
-            underTest.capabilityOfTypeExists( Capability.class ),
+            underTest.capabilityOfTypeExists( capabilityType( "test" ) ),
             is( Matchers.<Condition>instanceOf( CapabilityOfTypeExistsCondition.class ) )
         );
     }
@@ -70,7 +74,7 @@ public class CapabilityConditionsTest
     public void capabilityOfTypeActive()
     {
         assertThat(
-            underTest.capabilityOfTypeActive( Capability.class ),
+            underTest.capabilityOfTypeActive( capabilityType( "test" ) ),
             is( Matchers.<Condition>instanceOf( CapabilityOfTypeActiveCondition.class ) )
         );
     }

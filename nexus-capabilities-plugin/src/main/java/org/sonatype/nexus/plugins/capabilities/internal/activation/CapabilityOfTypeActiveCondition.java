@@ -23,6 +23,8 @@ import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -35,10 +37,11 @@ public class CapabilityOfTypeActiveCondition
 {
 
     public CapabilityOfTypeActiveCondition( final NexusEventBus eventBus,
+                                            final CapabilityDescriptorRegistry descriptorRegistry,
                                             final CapabilityRegistry capabilityRegistry,
-                                            final Class<? extends Capability> type )
+                                            final CapabilityType type )
     {
-        super( eventBus, capabilityRegistry, type );
+        super( eventBus, descriptorRegistry, capabilityRegistry, type );
     }
 
     @Override
@@ -50,7 +53,7 @@ public class CapabilityOfTypeActiveCondition
     @Subscribe
     public void handle( final CapabilityEvent.AfterActivated event )
     {
-        if ( !isSatisfied() && type.isAssignableFrom( event.getReference().capability().getClass() ) )
+        if ( !isSatisfied() && type.equals( event.getReference().capabilityType() ) )
         {
             checkAllCapabilities();
         }
@@ -59,7 +62,7 @@ public class CapabilityOfTypeActiveCondition
     @Subscribe
     public void handle( final CapabilityEvent.BeforePassivated event )
     {
-        if ( isSatisfied() && type.isAssignableFrom( event.getReference().capability().getClass() ) )
+        if ( isSatisfied() && type.equals( event.getReference().capabilityType() ) )
         {
             checkAllCapabilities();
         }
@@ -68,19 +71,19 @@ public class CapabilityOfTypeActiveCondition
     @Override
     public String toString()
     {
-        return "Active " + type.getSimpleName();
+        return "Active " + type;
     }
 
     @Override
     public String explainSatisfied()
     {
-        return type.getSimpleName() + " is active";
+        return typeName + " is active";
     }
 
     @Override
     public String explainUnsatisfied()
     {
-        return type.getSimpleName() + " is not active";
+        return typeName + " is not active";
     }
 
 }

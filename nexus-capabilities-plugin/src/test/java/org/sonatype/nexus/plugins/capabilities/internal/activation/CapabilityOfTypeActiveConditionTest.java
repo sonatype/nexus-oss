@@ -24,6 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity.capabilityIdentity;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,10 +35,12 @@ import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.api.AbstractCapability;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityEvent;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 
 /**
  * {@link CapabilityOfTypeActiveCondition} UTs.
@@ -67,16 +70,27 @@ public class CapabilityOfTypeActiveConditionTest
 
         capabilityRegistry = mock( CapabilityRegistry.class );
 
+        final CapabilityType capabilityType = capabilityType( TestCapability.class.getName() );
+
         final TestCapability testCapability = new TestCapability();
         ref1 = mock( CapabilityReference.class );
+        when( ref1.capabilityType() ).thenReturn( capabilityType );
         when( ref1.capability() ).thenReturn( testCapability );
         ref2 = mock( CapabilityReference.class );
+        when( ref2.capabilityType() ).thenReturn( capabilityType );
         when( ref2.capability() ).thenReturn( testCapability );
         ref3 = mock( CapabilityReference.class );
+        when( ref3.capabilityType() ).thenReturn( capabilityType( Capability.class.getName() ) );
         when( ref3.capability() ).thenReturn( mock( Capability.class ) );
 
+        final CapabilityDescriptorRegistry descriptorRegistry = mock( CapabilityDescriptorRegistry.class );
+        final CapabilityDescriptor descriptor = mock( CapabilityDescriptor.class );
+
+        when( descriptor.name() ).thenReturn( TestCapability.class.getSimpleName() );
+        when( descriptorRegistry.get( capabilityType ) ).thenReturn( descriptor );
+
         underTest = new CapabilityOfTypeActiveCondition(
-            eventBus, capabilityRegistry, TestCapability.class
+            eventBus, descriptorRegistry, capabilityRegistry, capabilityType
         );
         underTest.bind();
 

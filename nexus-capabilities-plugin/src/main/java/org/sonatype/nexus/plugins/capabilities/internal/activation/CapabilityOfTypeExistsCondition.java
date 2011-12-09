@@ -23,10 +23,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
-import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.support.activation.AbstractCondition;
 import com.google.common.eventbus.Subscribe;
 
@@ -43,15 +45,20 @@ public class CapabilityOfTypeExistsCondition
 
     private final ReentrantReadWriteLock bindLock;
 
-    final Class<?> type;
+    final CapabilityType type;
+
+    final String typeName;
 
     public CapabilityOfTypeExistsCondition( final NexusEventBus eventBus,
+                                            final CapabilityDescriptorRegistry descriptorRegistry,
                                             final CapabilityRegistry capabilityRegistry,
-                                            final Class<? extends Capability> type )
+                                            final CapabilityType type )
     {
         super( eventBus );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
-        this.type = type;
+        this.type = checkNotNull( type );
+        final CapabilityDescriptor descriptor = checkNotNull( descriptorRegistry ).get( type );
+        typeName = descriptor == null ? type.toString() : descriptor.name();
         bindLock = new ReentrantReadWriteLock();
     }
 
@@ -82,7 +89,7 @@ public class CapabilityOfTypeExistsCondition
     @Subscribe
     public void handle( final CapabilityRegistryEvent.Created event )
     {
-        if ( !isSatisfied() && type.isAssignableFrom( event.getReference().capability().getClass() ) )
+        if ( !isSatisfied() && type.equals( event.getReference().capabilityType() ) )
         {
             checkAllCapabilities();
         }
@@ -91,7 +98,7 @@ public class CapabilityOfTypeExistsCondition
     @Subscribe
     public void handle( final CapabilityRegistryEvent.Removed event )
     {
-        if ( isSatisfied() && type.isAssignableFrom( event.getReference().capability().getClass() ) )
+        if ( isSatisfied() && type.equals( event.getReference().capabilityType() ) )
         {
             checkAllCapabilities();
         }
@@ -112,7 +119,7 @@ public class CapabilityOfTypeExistsCondition
 
     boolean isSatisfiedBy( final CapabilityReference reference )
     {
-        return type.isAssignableFrom( reference.capability().getClass() );
+        return type.equals( reference.capabilityType() );
     }
 
     @Override
@@ -132,19 +139,19 @@ public class CapabilityOfTypeExistsCondition
     @Override
     public String toString()
     {
-        return type.getSimpleName() + " exists";
+        return type + " exists";
     }
 
     @Override
     public String explainSatisfied()
     {
-        return type.getSimpleName() + " exists";
+        return typeName + " exists";
     }
 
     @Override
     public String explainUnsatisfied()
     {
-        return type.getSimpleName() + " does not exist";
+        return typeName + " does not exist";
     }
 
 }

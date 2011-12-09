@@ -27,7 +27,9 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
+import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeActiveCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.CapabilityOfTypeExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.activation.PassivateCapabilityDuringUpdateCondition;
@@ -46,10 +48,14 @@ public class CapabilityConditions
 
     private final NexusEventBus eventBus;
 
+    private final CapabilityDescriptorRegistry descriptorRegistry;
+
     @Inject
     public CapabilityConditions( final NexusEventBus eventBus,
+                                 final CapabilityDescriptorRegistry descriptorRegistry,
                                  final CapabilityRegistry capabilityRegistry )
     {
+        this.descriptorRegistry = checkNotNull( descriptorRegistry );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.eventBus = checkNotNull( eventBus );
     }
@@ -60,9 +66,9 @@ public class CapabilityConditions
      * @param type class of capability that should exist
      * @return created condition
      */
-    public Condition capabilityOfTypeExists( final Class<? extends Capability> type )
+    public Condition capabilityOfTypeExists( final CapabilityType type )
     {
-        return new CapabilityOfTypeExistsCondition( eventBus, capabilityRegistry, type );
+        return new CapabilityOfTypeExistsCondition( eventBus, descriptorRegistry, capabilityRegistry, type );
     }
 
     /**
@@ -71,9 +77,9 @@ public class CapabilityConditions
      * @param type class of capability that should exist and be active
      * @return created condition
      */
-    public Condition capabilityOfTypeActive( final Class<? extends Capability> type )
+    public Condition capabilityOfTypeActive( final CapabilityType type )
     {
-        return new CapabilityOfTypeActiveCondition( eventBus, capabilityRegistry, type );
+        return new CapabilityOfTypeActiveCondition( eventBus, descriptorRegistry, capabilityRegistry, type );
     }
 
     /**
