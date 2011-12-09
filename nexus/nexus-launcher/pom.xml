@@ -31,9 +31,6 @@
 
   <artifactId>nexus-launcher</artifactId>
 
-  <properties>
-    <aether.version>1.9</aether.version>
-  </properties>
   <packaging>jar</packaging>
 
   <name>Nexus : Launcher</name>
