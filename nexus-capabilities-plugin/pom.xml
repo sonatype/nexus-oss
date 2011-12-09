@@ -35,6 +35,10 @@
   <name>Nexus : Core Plugins : Capabilities</name>
   <description>Allows Nexus to define and set repository capabilities.</description>
 
+  <properties>
+    <debug-js>false</debug-js>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -142,6 +146,7 @@
               <output>${project.build.directory}/classes/static/js/org.sonatype.nexus.plugins.capabilities.imp-all.js</output>
               <nosuffix>true</nosuffix>
               <nomunge>true</nomunge>
+              <nominify>${debug-js}</nominify>
               <jswarn>false</jswarn>
               <insertNewLine>true</insertNewLine>
               <disableOptimizations>true</disableOptimizations>
