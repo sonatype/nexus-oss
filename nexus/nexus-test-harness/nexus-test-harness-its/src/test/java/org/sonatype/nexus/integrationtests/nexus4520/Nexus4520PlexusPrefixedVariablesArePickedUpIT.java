@@ -78,7 +78,11 @@ public class Nexus4520PlexusPrefixedVariablesArePickedUpIT
     public void restoreOut()
         throws Exception
     {
-        System.setOut( actualOut );
+        if ( actualOut != null )
+        {
+            // if null mean @Before did not ran for some reason
+            System.setOut( actualOut );
+        }
     }
 
     @Test
