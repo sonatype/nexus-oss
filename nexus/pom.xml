@@ -155,7 +155,7 @@
     <it.nexus.log.level>INFO</it.nexus.log.level>
 
     <!-- version properties -->
-    <aether.version>1.8.1</aether.version>
+    <aether.version>1.9</aether.version>
     <applifecycle.version>1.4</applifecycle.version>
     <aspectj.version>1.6.11</aspectj.version>
     <commons-beanutils.baseVersion>1.7.0</commons-beanutils.baseVersion>
