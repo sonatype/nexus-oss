@@ -42,6 +42,8 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
+import com.google.inject.Module;
+
 /**
  * A Support PlexusTestCase clone that does not extend JUnit TestCase, thereby allowing us to extend this class like we
  * did with JUnit 3x and use JUnit 4x annotations instead to design our tests.
@@ -121,7 +123,16 @@ public abstract class PlexusTestCaseSupport
 
         try
         {
-            container = new DefaultPlexusContainer( containerConfiguration );
+            final Module[] modules = getTestCustomModules();
+
+            if ( modules == null || modules.length == 0 )
+            {
+                container = new DefaultPlexusContainer( containerConfiguration );
+            }
+            else
+            {
+                container = new DefaultPlexusContainer( containerConfiguration, modules );
+            }
         }
         catch ( final PlexusContainerException e )
         {
@@ -131,8 +142,19 @@ public abstract class PlexusTestCaseSupport
     }
 
     /**
+     * Adds the ability to register custom modules with Plexus Shim. Just override this method and it will be invoked
+     * frok {@link #setupContainer()}.
+     * 
+     * @return
+     */
+    protected Module[] getTestCustomModules()
+    {
+        return null;
+    }
+
+    /**
      * Allow custom test case implementations do augment the default container configuration before executing tests.
-     *
+     * 
      * @param containerConfiguration
      */
     protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
@@ -197,7 +219,7 @@ public abstract class PlexusTestCaseSupport
      * Allow the retrieval of a container configuration that is based on the name of the test class being run. So if you
      * have a test class called org.foo.FunTest, then this will produce a resource name of org/foo/FunTest.xml which
      * would be used to configure the Plexus container before running your test.
-     *
+     * 
      * @param subname
      * @return
      */
@@ -320,9 +342,9 @@ public abstract class PlexusTestCaseSupport
     /**
      * Get a configured {@link LoggerManager}
      * <p>
-     * The LoggerManager returned has its threshold influenced by the system property
-     * {@code 'test.log.level'}. The values of DEBUG, INFO, WARN, ERROR will set the threshold
-     * of the LoggerManager to the corresponding value. See {@link https://issues.sonatype.org/browse/NXCM-3230}.
+     * The LoggerManager returned has its threshold influenced by the system property {@code 'test.log.level'}. The
+     * values of DEBUG, INFO, WARN, ERROR will set the threshold of the LoggerManager to the corresponding value. See
+     * {@link https://issues.sonatype.org/browse/NXCM-3230}.
      * 
      * @return LoggerManager with threshold influenced by system property
      * @throws ComponentLookupException if LoggerManager cannot be looked up
@@ -332,21 +354,22 @@ public abstract class PlexusTestCaseSupport
     {
         LoggerManager loggerManager = getContainer().lookup( LoggerManager.class );
         // system property helps configure logger - see NXCM-3230
-        String testLogLevel = System.getProperty("test.log.level");
-        if(testLogLevel != null){
-            if( testLogLevel.equalsIgnoreCase("DEBUG") )
+        String testLogLevel = System.getProperty( "test.log.level" );
+        if ( testLogLevel != null )
+        {
+            if ( testLogLevel.equalsIgnoreCase( "DEBUG" ) )
             {
                 loggerManager.setThresholds( Logger.LEVEL_DEBUG );
             }
-            else if(testLogLevel.equalsIgnoreCase("INFO"))
+            else if ( testLogLevel.equalsIgnoreCase( "INFO" ) )
             {
-                loggerManager.setThresholds( Logger.LEVEL_INFO);
+                loggerManager.setThresholds( Logger.LEVEL_INFO );
             }
-            else if(testLogLevel.equalsIgnoreCase("WARN"))
+            else if ( testLogLevel.equalsIgnoreCase( "WARN" ) )
             {
                 loggerManager.setThresholds( Logger.LEVEL_WARN );
             }
-            else if(testLogLevel.equalsIgnoreCase("ERROR"))
+            else if ( testLogLevel.equalsIgnoreCase( "ERROR" ) )
             {
                 loggerManager.setThresholds( Logger.LEVEL_ERROR );
             }
@@ -358,7 +381,7 @@ public abstract class PlexusTestCaseSupport
 
     /**
      * Helper to call old JUnit 3x style {@link #setUp()}
-     *
+     * 
      * @throws Exception
      */
     @Before
@@ -370,7 +393,7 @@ public abstract class PlexusTestCaseSupport
 
     /**
      * Helper to call old JUnit 3x style {@link #tearDown()}
-     *
+     * 
      * @throws Exception
      */
     @After

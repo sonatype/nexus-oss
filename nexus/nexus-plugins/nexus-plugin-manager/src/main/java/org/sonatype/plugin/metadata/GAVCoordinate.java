@@ -21,8 +21,11 @@ package org.sonatype.plugin.metadata;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
 
+import com.google.common.base.Preconditions;
+
 /**
- * Trivial Group:Artifact:Version identifier.
+ * GAV coordinate fully describes the coordinates, it's "full detail". Is used as key in plugin descriptor, but also as
+ * coordinates for plugin dependencies.
  */
 public final class GAVCoordinate
 {
@@ -52,9 +55,9 @@ public final class GAVCoordinate
     public GAVCoordinate( final String groupId, final String artifactId, final String version, final String classifier,
                           final String type )
     {
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.version = version;
+        this.groupId = Preconditions.checkNotNull( groupId );
+        this.artifactId = Preconditions.checkNotNull( artifactId );
+        this.version = Preconditions.checkNotNull( version );
         this.classifier = classifier;
         this.type = "jar".equals( type ) ? null : type;
     }
@@ -95,6 +98,12 @@ public final class GAVCoordinate
             buf.append( ".jar" );
         }
         return buf.toString();
+    }
+
+    public boolean matchesByGA( final GAVCoordinate coord )
+    {
+        return StringUtils.equals( getGroupId(), coord.getGroupId() )
+            && StringUtils.equals( getArtifactId(), coord.getArtifactId() );
     }
 
     @Override

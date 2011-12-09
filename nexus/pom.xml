@@ -155,8 +155,10 @@
     <it.nexus.log.level>INFO</it.nexus.log.level>
 
     <!-- version properties -->
+    <applifecycle.version>1.5-SNAPSHOT</applifecycle.version>
+    <sonatype.plugin.version>1.1.0-SNAPSHOT</sonatype.plugin.version>
+
     <aether.version>1.9</aether.version>
-    <applifecycle.version>1.4</applifecycle.version>
     <aspectj.version>1.6.11</aspectj.version>
     <commons-beanutils.baseVersion>1.7.0</commons-beanutils.baseVersion>
     <commons-beanutils.version>${commons-beanutils.baseVersion}-SONATYPE</commons-beanutils.version>
@@ -207,7 +209,7 @@
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
         <artifactId>plugin-api</artifactId>
-        <version>1.0.3</version>
+        <version>${sonatype.plugin.version}</version>
         <exclusions>
           <exclusion>
             <groupId>javax.inject</groupId>
@@ -218,7 +220,7 @@
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
         <artifactId>plugin-host-api</artifactId>
-        <version>1.0.3</version>
+        <version>${sonatype.plugin.version}</version>
         <exclusions>
           <exclusion>
             <groupId>javax.inject</groupId>
@@ -228,8 +230,14 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
-        <artifactId>plugin-gleaner</artifactId>
-        <version>1.0.3</version>
+        <artifactId>plugin-model-api</artifactId>
+        <version>${sonatype.plugin.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>

@@ -18,25 +18,19 @@
  */
 package org.sonatype.nexus;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.JarURLConnection;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
-import org.codehaus.plexus.util.DirectoryScanner;
-import org.codehaus.plexus.util.SelectorUtils;
-import org.sonatype.nexus.util.ClasspathUtils;
-import org.sonatype.plugin.metadata.plexus.PlexusComponentGleaner;
-import org.sonatype.plugin.metadata.plexus.PlexusComponentGleanerRequest;
-import org.sonatype.plugin.metadata.plexus.PlexusComponentGleanerResponse;
+
+import org.codehaus.plexus.DefaultPlexusContainer;
+import org.junit.Assert;
+import org.sonatype.guice.bean.reflect.ClassSpace;
+import org.sonatype.guice.bean.reflect.URLClassSpace;
+import org.sonatype.guice.nexus.binders.NexusAnnotatedBeanModule;
+import org.sonatype.guice.plexus.config.PlexusBeanModule;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 
 /**
  * Base class to be extended by Nexus plugins tests. Beside the standard {@link AbstractNexusTestCase} functionality
@@ -57,170 +51,32 @@ public abstract class AbstractPluginTestCase
 
         try
         {
-            // look through all the main and test classes, and create component descriptors if needed
-            PlexusComponentGleaner plexusComponentGleaner = new PlexusComponentGleaner();
-            List<String> projectClassNames = this.buildProjectClassList();
+            final List<URL> scanList = new ArrayList<URL>();
 
-            // resourceName : the "binary" name of resource/class
-            // className : the "canonical" name of class, or null
-            for ( String resourceName : projectClassNames )
+            final String[] sourceDirs = getSourceDirectories();
+            for ( String sourceDir : sourceDirs )
             {
-                String className = ClasspathUtils.convertClassBinaryNameToCanonicalName( resourceName );
-
-                PlexusComponentGleanerRequest request =
-                    new PlexusComponentGleanerRequest( className, resourceName, ClassLoader.getSystemClassLoader() );
-
-                PlexusComponentGleanerResponse gleanerResponse = plexusComponentGleaner.glean( request );
-
-                if ( gleanerResponse != null && gleanerResponse.getComponentDescriptor() != null )
-                {
-                    ComponentDescriptor<?> componentDescriptor = gleanerResponse.getComponentDescriptor();
-                    // System.out.println( "... ... adding component role=\"" + componentDescriptor.getRole()
-                    // + "\", hint=\"" + componentDescriptor.getRoleHint() + "\"" );
-                    // System.out.println( new XStream().toXML( componentDescriptor ) );
-
-                    this.getContainer().addComponentDescriptor( componentDescriptor );
-                }
+                scanList.add( getTestFile( sourceDir ).toURI().toURL() );
             }
+
+            final List<String> exportedClassNames = new ArrayList<String>();
+            final List<RepositoryTypeDescriptor> repositoryTypes = new ArrayList<RepositoryTypeDescriptor>();
+
+            final ClassSpace annSpace =
+                new URLClassSpace( getContainer().getContainerRealm(), scanList.toArray( new URL[scanList.size()] ) );
+            final NexusAnnotatedBeanModule nexusPluginModule =
+                new NexusAnnotatedBeanModule( annSpace, new HashMap<String, String>(), exportedClassNames,
+                    repositoryTypes );
+            final List<PlexusBeanModule> modules = Arrays.<PlexusBeanModule> asList( nexusPluginModule );
+
+            // register new injector
+            ( (DefaultPlexusContainer) getContainer() ).addPlexusInjector( modules );
         }
         catch ( Exception e )
         {
             e.printStackTrace();
-            fail( "Failed to glean classes" );
+            Assert.fail( "Failed to create plexus container: " + e.getMessage() );
         }
-    }
-
-    private List<String> buildProjectClassList()
-    {
-        List<String> classNames = new ArrayList<String>();
-
-        final String[] sourceDirectories = getSourceDirectories();
-        if ( sourceDirectories != null )
-        {
-            for ( String sourceDir : sourceDirectories )
-            {
-                classNames.addAll( scanDirectory( new File( sourceDir ), "**/*.class" ) );
-            }
-        }
-        final String[] classpathEntries = getClasspathEntries();
-        if ( classpathEntries != null && classpathEntries.length > 0 )
-        {
-            for ( String classpathEntry : classpathEntries )
-            {
-                final String basePath = extractBasePattern( classpathEntry );
-                final String pattern =
-                    classpathEntry.equals( basePath ) ? "**/*.class" : classpathEntry.substring( basePath.length() + 1 );
-
-                try
-                {
-                    final Enumeration<URL> urls = getClassLoader().getResources( basePath );
-                    while ( urls.hasMoreElements() )
-                    {
-                        final URL url = urls.nextElement();
-                        if ( "file".equals( url.getProtocol() ) )
-                        {
-                            final String rootPath = new File( url.toURI() ).getAbsolutePath();
-                            final String root = rootPath.substring( 0, rootPath.lastIndexOf( basePath ) );
-                            classNames.addAll( scanDirectory( new File( root ), basePath + "/" + pattern ) );
-                        }
-                        else if ( "jar".equals( url.getProtocol() ) )
-                        {
-                            classNames.addAll( scanJar( url, pattern ) );
-                        }
-                    }
-                }
-                catch ( IOException ignore )
-                {
-                    // ignore
-                }
-                catch ( URISyntaxException ignore )
-                {
-                    // ignore
-                }
-            }
-        }
-        return classNames;
-    }
-
-    /**
-     * Scans a file system directory for classes matching an ant-style path mapping.
-     * 
-     * @param dir directory to be scanned
-     * @param pattern ant-style pattern
-     * @return list of matching class names
-     */
-    private static List<String> scanDirectory( final File dir, final String pattern )
-    {
-        final List<String> classNames = new ArrayList<String>();
-        DirectoryScanner scanner = new DirectoryScanner();
-        scanner.setBasedir( dir );
-        scanner.addDefaultExcludes();
-        scanner.setIncludes( new String[] { pattern } );
-
-        scanner.scan();
-
-        for ( String fileNameOfClass : scanner.getIncludedFiles() )
-        {
-            classNames.add( fileNameOfClass );
-        }
-        return classNames;
-    }
-
-    /**
-     * Scans a jar file for classes matching an ant-style path mapping.
-     * 
-     * @param jarUrl url of the jar file to be scanned
-     * @param pattern ant-style pattern
-     * @return list of matching class names
-     * @throws IOException - If a serious problem appears while processing teh jar file
-     */
-    // TODO maybe extract thsi as a scanner?
-    private static List<String> scanJar( final URL jarUrl, final String pattern )
-        throws IOException
-    {
-        final List<String> classNames = new ArrayList<String>();
-        final URLConnection connection = jarUrl.openConnection();
-        if ( !( connection instanceof JarURLConnection ) )
-        {
-            return classNames;
-        }
-
-        final JarURLConnection jarConnection = (JarURLConnection) connection;
-        final JarFile jarFile = jarConnection.getJarFile();
-        final String roothPath = jarConnection.getJarEntry().getName();
-
-        for ( Enumeration entries = jarFile.entries(); entries.hasMoreElements(); )
-        {
-            final JarEntry entry = (JarEntry) entries.nextElement();
-            final String entryPath = entry.getName();
-
-            if ( entryPath.startsWith( roothPath ) && entryPath.endsWith( ".class" )
-                && SelectorUtils.matchPath( pattern, entryPath.substring( roothPath.length() + 1 ), true ) )
-            {
-                classNames.add( entryPath );
-            }
-        }
-        return classNames;
-    }
-
-    /**
-     * Extract the starting substring from an ant-style pattern. This is teh part from start of pattern till last "/"
-     * before the first "*" or "?".
-     * 
-     * @param pattern ant-style pattern
-     * @return base pattern
-     */
-    private String extractBasePattern( final String pattern )
-    {
-        final int asterisk = pattern.indexOf( '*' );
-        final int questionMarkIndex = pattern.indexOf( '?' );
-        if ( asterisk == -1 && questionMarkIndex == -1 )
-        {
-            return pattern;
-        }
-        final int wildcardStart = ( asterisk > questionMarkIndex ? asterisk : questionMarkIndex );
-        int baseEndPos = pattern.lastIndexOf( '/', wildcardStart );
-        return ( baseEndPos != -1 ? pattern.substring( 0, baseEndPos ) : "" );
     }
 
     /**

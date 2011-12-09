@@ -98,6 +98,7 @@ public abstract class AbstractFileNexusPluginRepository
         throws NoSuchPluginRepositoryArtifactException
     {
         final File dependenciesFolder = new File( getPluginFolder( plugin.getCoordinate() ), "dependencies" );
+        // TODO (cstamas): gav has baseVersion, we need to be a bit smarter about resolving it against timestamped ones too
         final File artifact = new File( dependenciesFolder, gav.getFinalName( packagingMapper ) );
         if ( !artifact.isFile() )
         {
@@ -123,7 +124,6 @@ public abstract class AbstractFileNexusPluginRepository
         return getNexusPluginsDirectory().listFiles();
     }
 
-    @SuppressWarnings( "unused" )
     protected File getPluginFolder( final GAVCoordinate gav )
         throws NoSuchPluginRepositoryArtifactException
     {
