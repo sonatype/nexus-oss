@@ -77,6 +77,21 @@ FormFieldGenerator = function(panelId, fieldSetName, fieldNamePrefix, typeStore,
                 regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
               };
             }
+            else if (curRec.type == 'text-area')
+            {
+              items[j] = {
+                xtype : 'textarea',
+                fieldLabel : curRec.label,
+                itemCls : curRec.required ? 'required-field' : '',
+                helpText : curRec.helpText,
+                name : fieldNamePrefix + curRec.id,
+                allowBlank : curRec.required ? false : true,
+                disabled : true,
+                anchor : '-20',
+                height : '138',
+                regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
+              };
+            }
             else if (curRec.type == 'checkbox')
             {
               items[j] = {
@@ -236,6 +251,10 @@ FormFieldExporter = function(formPanel, panelIdSuffix, formFieldPrefix, customTy
           // force to a string, as that is what the current api requires
           value = '' + item.getValue();
         }
+        else if (item.xtype == 'textarea')
+        {
+          value = item.getValue();
+        }
         else if (item.xtype == 'checkbox')
         {
           value = '' + item.getValue();
@@ -282,6 +301,10 @@ FormFieldImporter = function(jsonObject, formPanel, formFieldPrefix, customTypes
           else if (formField.xtype == 'numberfield')
           {
             formField.setValue(Number(jsonObject.properties[i].value));
+          }
+          else if (formField.xtype == 'textarea')
+          {
+            formField.setValue(jsonObject.properties[i].value);
           }
           else if (formField.xtype == 'checkbox')
           {
