@@ -140,51 +140,6 @@ public interface Nexus
         throws IOException;
 
     // ----------------------------------------------------------------------------
-    // Feeds
-    // ----------------------------------------------------------------------------
-
-    // creating
-/*
-    @Deprecated
-    void addNexusArtifactEvent( NexusArtifactEvent nae );
-
-    @Deprecated
-    void addSystemEvent( String action, String message );
-
-    @Deprecated
-    void addAuthcAuthzEvent( AuthcAuthzEvent evt );
-
-    @Deprecated
-    SystemProcess systemProcessStarted( String action, String message );
-
-    @Deprecated
-    void systemProcessFinished( SystemProcess prc, String finishMessage );
-
-    @Deprecated
-    void systemProcessBroken( SystemProcess prc, Throwable e );
-
-    // reading
-
-    List<NexusArtifactEvent> getRecentlyStorageChanges( Integer from, Integer count, Set<String> repositoryIds );
-
-    List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts( Integer from, Integer count,
-                                                                   Set<String> repositoryIds );
-
-    List<NexusArtifactEvent> getRecentlyCachedArtifacts( Integer from, Integer count, Set<String> repositoryIds );
-
-    List<NexusArtifactEvent> getRecentlyDeployedArtifacts( Integer from, Integer count, Set<String> repositoryIds );
-
-    List<NexusArtifactEvent> getBrokenArtifacts( Integer from, Integer count, Set<String> repositoryIds );
-
-    List<SystemEvent> getRepositoryStatusChanges( Integer from, Integer count );
-
-    List<SystemEvent> getSystemEvents( Integer from, Integer count );
-
-    List<AuthcAuthzEvent> getAuthcAuthzEvents( Integer from, Integer count );
-
-    List<ErrorWarningEvent> getErrorWarningEvents( Integer from, Integer count );
-*/
-    // ----------------------------------------------------------------------------
     // Repo templates
     // ----------------------------------------------------------------------------
 
