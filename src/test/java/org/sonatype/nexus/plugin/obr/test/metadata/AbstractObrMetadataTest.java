@@ -24,9 +24,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.zip.ZipInputStream;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.context.Context;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -38,34 +35,16 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
+import org.sonatype.nexus.test.NexusTestSupport;
 
 public abstract class AbstractObrMetadataTest
-    extends PlexusTestCaseSupport
+    extends NexusTestSupport
 {
-    @Override
-    protected void customizeContainerConfiguration( final ContainerConfiguration containerConfiguration )
-    {
-        super.customizeContainerConfiguration( containerConfiguration );
-
-        containerConfiguration.setClassPathScanning( PlexusConstants.SCANNING_ON );
-    }
-
     protected ObrMetadataSource obrMetadataSource;
 
     protected Repository testRepository;
 
     protected NexusConfiguration nexusConfig;
-
-    @Override
-    protected void customizeContext( final Context context )
-    {
-        super.customizeContext( context );
-
-        context.put( "nexus-work", getBasedir() + "/target/nexus-work" );
-        context.put( "security-xml-file", getBasedir() + "/target/nexus-work/conf/security.xml" );
-        context.put( "application-conf", getBasedir() + "/target/nexus-work/conf/" );
-    }
 
     @Override
     protected void setUp()
@@ -89,6 +68,9 @@ public abstract class AbstractObrMetadataTest
         clocal.setProvider( "file" );
         crepo.setLocalStorage( clocal );
         testRepository.configure( crepo );
+
+        // initialize attribute cache, otherwise storeItem recurses 
+        testRepository.getRepositoryItemUidAttributeManager().reset();
     }
 
     protected ObrSite openObrSite( final RepositoryItemUid uid )
