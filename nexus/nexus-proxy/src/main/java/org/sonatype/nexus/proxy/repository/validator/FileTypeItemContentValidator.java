@@ -24,7 +24,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryItemValidationEvent;
-import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailed;
+import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedFileType;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -48,8 +48,11 @@ public class FileTypeItemContentValidator
 
         final boolean result = validatorHub.isExpectedFileType( item );
 
-        events.add( new RepositoryItemValidationEventFailed( proxy, item, String.format( "Invalid file type.",
-            item.getRepositoryItemUid().toString() ) ) );
+        if ( !result )
+        {
+            events.add( new RepositoryItemValidationEventFailedFileType( proxy, item, String.format( "Invalid file type.",
+                item.getRepositoryItemUid().toString() ) ) );
+        }
 
         return result;
     }

@@ -18,8 +18,6 @@
  */
 package org.sonatype.nexus.scheduling.events;
 
-import java.util.Date;
-
 import org.sonatype.nexus.scheduling.NexusTask;
 
 /**
@@ -32,8 +30,8 @@ import org.sonatype.nexus.scheduling.NexusTask;
 public class NexusTaskEventStoppedDone<T>
     extends NexusTaskEventStopped<T>
 {
-    public NexusTaskEventStoppedDone( final NexusTask<T> task, final Date started )
+    public NexusTaskEventStoppedDone( final NexusTask<T> task, final NexusTaskEventStarted<T> startedEvent )
     {
-        super( task, started );
+        super( task, startedEvent );
     }
 }

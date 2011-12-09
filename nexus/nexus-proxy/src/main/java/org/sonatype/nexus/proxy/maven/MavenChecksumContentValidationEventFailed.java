@@ -16,29 +16,26 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.scheduling.events;
+package org.sonatype.nexus.proxy.maven;
 
-import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.nexus.proxy.events.RepositoryItemValidationEventFailedChecksum;
+import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * Base class for events fired when a task is stopped, done (whatever the outcome is: finished, cancelled or failed).
+ * Event fired when maven checksum content validation failed.
  * 
  * @author cstamas
  * @since 1.10.0
  */
-public abstract class NexusTaskEventStopped<T>
-    extends NexusTaskEvent<T>
+public class MavenChecksumContentValidationEventFailed
+    extends RepositoryItemValidationEventFailedChecksum
 {
-    private final NexusTaskEventStarted<T> startedEvent;
-    
-    public NexusTaskEventStopped( final NexusTask<T> task, final NexusTaskEventStarted<T> startedEvent )
+
+    public MavenChecksumContentValidationEventFailed( final Repository repository, final StorageItem item,
+                                                 final String message )
     {
-        super( task );
-        this.startedEvent = startedEvent;
+        super( repository, item, message );
     }
 
-    public NexusTaskEventStarted<T> getStartedEvent()
-    {
-        return startedEvent;
-    }
 }

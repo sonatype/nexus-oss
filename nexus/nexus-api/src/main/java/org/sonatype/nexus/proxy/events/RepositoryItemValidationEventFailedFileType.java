@@ -16,29 +16,24 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.scheduling.events;
+package org.sonatype.nexus.proxy.events;
 
-import org.sonatype.nexus.scheduling.NexusTask;
+import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * Base class for events fired when a task is stopped, done (whatever the outcome is: finished, cancelled or failed).
+ * Event fired when a StorageItem file type (the interpretation is left to subclasses, but examples are MIME matching
+ * etc) does not match the "expected" one.
  * 
  * @author cstamas
  * @since 1.10.0
  */
-public abstract class NexusTaskEventStopped<T>
-    extends NexusTaskEvent<T>
+public class RepositoryItemValidationEventFailedFileType
+    extends RepositoryItemValidationEventFailed
 {
-    private final NexusTaskEventStarted<T> startedEvent;
-    
-    public NexusTaskEventStopped( final NexusTask<T> task, final NexusTaskEventStarted<T> startedEvent )
+    public RepositoryItemValidationEventFailedFileType( final Repository repository, final StorageItem item,
+                                                        final String message )
     {
-        super( task );
-        this.startedEvent = startedEvent;
-    }
-
-    public NexusTaskEventStarted<T> getStartedEvent()
-    {
-        return startedEvent;
+        super( repository, item, message );
     }
 }

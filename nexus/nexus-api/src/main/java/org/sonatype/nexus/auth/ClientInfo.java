@@ -19,7 +19,7 @@
 package org.sonatype.nexus.auth;
 
 /**
- * Client info about WHO is being doing something.
+ * Client info about WHO is doing something.
  * 
  * @author cstamas
  */

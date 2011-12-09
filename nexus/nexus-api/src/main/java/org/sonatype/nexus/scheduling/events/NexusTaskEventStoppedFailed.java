@@ -18,8 +18,6 @@
  */
 package org.sonatype.nexus.scheduling.events;
 
-import java.util.Date;
-
 import org.sonatype.nexus.scheduling.NexusTask;
 
 /**
@@ -36,9 +34,9 @@ public class NexusTaskEventStoppedFailed<T>
      */
     private final Throwable throwable;
 
-    public NexusTaskEventStoppedFailed( final NexusTask<T> task, final Date started, final Throwable throwable )
+    public NexusTaskEventStoppedFailed( final NexusTask<T> task, final NexusTaskEventStarted<T> startedEvent, final Throwable throwable )
     {
-        super( task, started );
+        super( task, startedEvent );
         this.throwable = throwable;
     }
 

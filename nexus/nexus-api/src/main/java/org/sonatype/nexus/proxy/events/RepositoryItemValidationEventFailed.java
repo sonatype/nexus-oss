@@ -27,7 +27,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @author cstamas
  * @since 1.10.0
  */
-public class RepositoryItemValidationEventFailed
+public abstract class RepositoryItemValidationEventFailed
     extends RepositoryItemValidationEvent
 {
     private final String message;

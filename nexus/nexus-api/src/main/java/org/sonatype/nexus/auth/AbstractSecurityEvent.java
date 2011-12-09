@@ -20,7 +20,14 @@ package org.sonatype.nexus.auth;
 
 import org.sonatype.plexus.appevents.AbstractEvent;
 
-public class AbstractSecurityEvent
+/**
+ * Abstract helper class for security related events. It carries the "minimal" subset of authc/authz events: the client
+ * information ("who").
+ * 
+ * @author cstamas
+ * @since 1.10.0
+ */
+public abstract class AbstractSecurityEvent
     extends AbstractEvent<Object>
 {
     private final ClientInfo clientInfo;

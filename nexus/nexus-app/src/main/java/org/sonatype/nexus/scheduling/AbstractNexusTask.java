@@ -18,7 +18,6 @@
  */
 package org.sonatype.nexus.scheduling;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -138,7 +137,6 @@ public abstract class AbstractNexusTask<T>
         throws Exception
     {
         final NexusTaskEventStarted<T> startedEvent = new NexusTaskEventStarted<T>( this );
-        final Date startedDate = startedEvent.getEventDate();
         applicationEventMulticaster.notifyEventListeners( startedEvent );
 
         T result = null;
@@ -156,11 +154,11 @@ public abstract class AbstractNexusTask<T>
             if ( TaskUtil.getCurrentProgressListener().isCanceled() )
             {
                 applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedCanceled<T>( this,
-                    startedDate ) );
+                    startedEvent ) );
             }
             else
             {
-                applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedDone<T>( this, startedDate ) );
+                applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedDone<T>( this, startedEvent ) );
             }
 
             afterRun();
@@ -175,7 +173,7 @@ public abstract class AbstractNexusTask<T>
             {
                 // just return, nothing happened just task cancelled
                 applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedCanceled<T>( this,
-                    startedDate ) );
+                    startedEvent ) );
 
                 return null;
             }
@@ -183,7 +181,7 @@ public abstract class AbstractNexusTask<T>
             {
                 // notify that there was a failure
                 applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedFailed<T>( this,
-                    startedDate, e ) );
+                    startedEvent, e ) );
 
                 throw e;
             }

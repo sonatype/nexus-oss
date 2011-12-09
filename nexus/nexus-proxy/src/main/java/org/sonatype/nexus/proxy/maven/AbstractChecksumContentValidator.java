@@ -120,7 +120,7 @@ public abstract class AbstractChecksumContentValidator
 
     private RepositoryItemValidationEvent newChechsumFailureEvent( final ProxyRepository proxy, final AbstractStorageItem item, final String msg )
     {
-        return new ChecksumContentValidationEventFailed( proxy, item, msg );
+        return new MavenChecksumContentValidationEventFailed( proxy, item, msg );
     }
 
 }
