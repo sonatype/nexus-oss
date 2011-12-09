@@ -70,6 +70,7 @@ public class DefaultApplicationConfigurationValidatorTest
     public void setUp()
         throws Exception
     {
+        super.setUp();
         this.underTest = new DefaultApplicationConfigurationValidator();
     }
 
