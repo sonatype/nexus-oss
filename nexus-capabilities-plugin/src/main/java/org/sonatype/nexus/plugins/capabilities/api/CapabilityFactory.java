@@ -24,6 +24,6 @@ import org.sonatype.plugin.ExtensionPoint;
 public interface CapabilityFactory
 {
 
-    Capability create( String id );
+    Capability create( String capabilityId );
 
 }

@@ -19,6 +19,7 @@
 package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
 
 import java.io.IOException;
 import javax.inject.Inject;
@@ -288,7 +289,9 @@ public class CapabilityPlexusResource
         item.setEnabled( capability.isEnabled() );
         item.setTypeId( capability.getTypeId() );
 
-        final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( capability.getTypeId() );
+        final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get(
+            capabilityType( capability.getTypeId() )
+        );
         item.setTypeName( descriptor == null ? "" : descriptor.name() );
 
         final CapabilityReference reference = capabilityRegistry.get( capability.getId() );

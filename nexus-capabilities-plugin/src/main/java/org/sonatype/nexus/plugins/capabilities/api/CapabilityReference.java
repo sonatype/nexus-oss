@@ -37,9 +37,16 @@ public interface CapabilityReference
 {
 
     /**
+     * Returns type of referenced capability.
+     *
+     * @return capability type (never null)
+     */
+    CapabilityType capabilityType();
+
+    /**
      * Returns referenced capability.
      *
-     * @return referenced capability
+     * @return referenced capability (never null)
      */
     Capability capability();
 

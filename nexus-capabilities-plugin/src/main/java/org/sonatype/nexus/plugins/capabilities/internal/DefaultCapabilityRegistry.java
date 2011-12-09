@@ -36,6 +36,7 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import com.google.common.annotations.VisibleForTesting;
 
 /**
@@ -76,7 +77,7 @@ class DefaultCapabilityRegistry
     }
 
     @Override
-    public CapabilityReference create( final String capabilityId, final String capabilityType )
+    public CapabilityReference create( final String capabilityId, final CapabilityType capabilityType )
     {
         assert capabilityId != null : "Capability id cannot be null";
 
@@ -84,7 +85,7 @@ class DefaultCapabilityRegistry
         {
             lock.writeLock().lock();
 
-            final CapabilityFactory factory = capabilityFactories.get( capabilityType );
+            final CapabilityFactory factory = capabilityFactories.get( capabilityType.toString() );
             if ( factory == null )
             {
                 throw new RuntimeException( format( "No factory found for a capability of type %s", capabilityType ) );
@@ -92,7 +93,7 @@ class DefaultCapabilityRegistry
 
             final Capability capability = factory.create( capabilityId );
 
-            final CapabilityReference reference = createReference( capability );
+            final CapabilityReference reference = createReference( capabilityType, capability );
 
             references.put( capabilityId, reference );
 
@@ -160,10 +161,10 @@ class DefaultCapabilityRegistry
     }
 
     @VisibleForTesting
-    CapabilityReference createReference( final Capability capability )
+    CapabilityReference createReference( final CapabilityType type, final Capability capability )
     {
         return new DefaultCapabilityReference(
-            eventBus, activationConditionHandlerFactory, validityConditionHandlerFactory, capability
+            eventBus, activationConditionHandlerFactory, validityConditionHandlerFactory, type, capability
         );
     }
 

@@ -23,7 +23,7 @@ import javax.inject.Named;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
 
-@Named( TouchTestCapability.ID )
+@Named( TouchTestCapability.TYPE )
 public class TouchTestCapabilityFactory
     implements CapabilityFactory
 {

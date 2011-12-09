@@ -22,6 +22,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
 
 import java.util.Map;
 
@@ -168,7 +169,7 @@ public class CapabilityConfigurationEventsHandlerTest
         }
 
         final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
-        when( capabilityRegistry.create( "test-cc", "test" ) ).thenReturn( reference );
+        when( capabilityRegistry.create( "test-cc", capabilityType( "test" ) ) ).thenReturn( reference );
 
         final CCapability cc = new CCapability();
         cc.setId( "test-cc" );
@@ -196,7 +197,7 @@ public class CapabilityConfigurationEventsHandlerTest
         }
 
         final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
-        when( capabilityRegistry.create( "test-cc", "test" ) ).thenReturn( reference );
+        when( capabilityRegistry.create( "test-cc", capabilityType( "test" ) ) ).thenReturn( reference );
 
         final CCapability cc = new CCapability();
         cc.setId( "test-cc" );

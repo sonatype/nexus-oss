@@ -29,6 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
 import static org.sonatype.nexus.plugins.capabilities.internal.DefaultCapabilityReference.sameProperties;
 
 import java.util.Collections;
@@ -139,7 +140,7 @@ public class DefaultCapabilityReferenceTest
             }
         );
 
-        underTest = new DefaultCapabilityReference( eventBus, achf, vchf, capability );
+        underTest = new DefaultCapabilityReference( eventBus, achf, vchf, capabilityType( "test" ), capability );
         underTest.create( Collections.<String, String>emptyMap() );
 
         re = ArgumentCaptor.forClass( CapabilityEvent.class );
@@ -375,7 +376,7 @@ public class DefaultCapabilityReferenceTest
     public void loadIsForwardedToCapability()
         throws Exception
     {
-        underTest = new DefaultCapabilityReference( eventBus, achf, vchf, capability );
+        underTest = new DefaultCapabilityReference( eventBus, achf, vchf, capabilityType( "test" ), capability );
         final HashMap<String, String> properties = new HashMap<String, String>();
         underTest.load( properties );
 

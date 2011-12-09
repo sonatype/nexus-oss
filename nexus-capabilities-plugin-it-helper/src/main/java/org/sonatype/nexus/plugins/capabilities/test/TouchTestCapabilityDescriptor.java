@@ -18,6 +18,9 @@
  */
 package org.sonatype.nexus.plugins.capabilities.test;
 
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
+import static org.sonatype.nexus.plugins.capabilities.test.TouchTestCapability.TYPE;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +30,10 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
 
-@Named( TouchTestCapability.ID )
+@Named
 @Singleton
 public class TouchTestCapabilityDescriptor
     implements CapabilityDescriptor
@@ -45,9 +49,9 @@ public class TouchTestCapabilityDescriptor
     private final StringTextFormField msgField = new StringTextFormField( FIELD_MSG_ID, "Message", "Message help text",
                                                                           FormField.MANDATORY );
 
-    public String id()
+    public CapabilityType type()
     {
-        return TouchTestCapability.ID;
+        return capabilityType( TYPE );
     }
 
     public String name()

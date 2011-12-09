@@ -18,10 +18,12 @@
  */
 package org.sonatype.nexus.plugins.capabilities.api.descriptor;
 
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+
 public interface CapabilityDescriptorRegistry
 {
 
-    CapabilityDescriptor get( String capabilityDescriptorId );
+    CapabilityDescriptor get( CapabilityType capabilityType );
 
     CapabilityDescriptor[] getAll();
 

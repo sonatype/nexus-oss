@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 
@@ -42,11 +43,12 @@ class DefaultCapabilityDescriptorRegistry
         this.descriptors = checkNotNull( descriptors );
     }
 
-    public CapabilityDescriptor get( final String capabilityDescriptorId )
+    @Override
+    public CapabilityDescriptor get( final CapabilityType capabilityType )
     {
         for ( final CapabilityDescriptor descriptor : descriptors )
         {
-            if ( descriptor.id().equals( capabilityDescriptorId ) )
+            if ( descriptor.type().equals( capabilityType ) )
             {
                 return descriptor;
             }
@@ -54,6 +56,7 @@ class DefaultCapabilityDescriptorRegistry
         return null;
     }
 
+    @Override
     public CapabilityDescriptor[] getAll()
     {
         return descriptors.toArray( new CapabilityDescriptor[descriptors.size()] );

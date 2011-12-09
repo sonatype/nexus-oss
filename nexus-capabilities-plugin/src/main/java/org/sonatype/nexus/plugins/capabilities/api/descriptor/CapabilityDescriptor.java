@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.plugin.ExtensionPoint;
 
 /**
@@ -38,7 +39,7 @@ public interface CapabilityDescriptor
      *
      * @return unique identifier of capability
      */
-    String id();
+    CapabilityType type();
 
     /**
      * Returns a user friendly name of capability (to be presented in UI).

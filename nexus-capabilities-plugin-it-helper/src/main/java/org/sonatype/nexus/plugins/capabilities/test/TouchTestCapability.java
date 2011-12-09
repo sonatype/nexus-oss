@@ -28,7 +28,7 @@ public class TouchTestCapability
     implements Capability
 {
 
-    public static final String ID = "TouchTest";
+    public static final String TYPE = "TouchTest";
 
     protected TouchTestCapability( String id )
     {

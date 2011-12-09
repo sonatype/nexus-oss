@@ -19,6 +19,7 @@
 package org.sonatype.nexus.plugins.capabilities.internal.config;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
 import static org.sonatype.nexus.plugins.capabilities.internal.config.DefaultCapabilityConfiguration.asMap;
 
 import javax.inject.Inject;
@@ -54,7 +55,9 @@ class CapabilityConfigurationEventsHandler
     public void handle( final CapabilityConfigurationEvent.Added event )
     {
         final CCapability capabilityConfig = event.getCapability();
-        final CapabilityReference ref = registry.create( capabilityConfig.getId(), capabilityConfig.getTypeId() );
+        final CapabilityReference ref = registry.create(
+            capabilityConfig.getId(), capabilityType( capabilityConfig.getTypeId() )
+        );
         ref.create( asMap( capabilityConfig.getProperties() ) );
         if ( capabilityConfig.isEnabled() )
         {
@@ -67,7 +70,9 @@ class CapabilityConfigurationEventsHandler
     public void handle( final CapabilityConfigurationEvent.Loaded event )
     {
         final CCapability capabilityConfig = event.getCapability();
-        final CapabilityReference ref = registry.create( capabilityConfig.getId(), capabilityConfig.getTypeId() );
+        final CapabilityReference ref = registry.create(
+            capabilityConfig.getId(), capabilityType( capabilityConfig.getTypeId() )
+        );
         ref.load( asMap( capabilityConfig.getProperties() ) );
         if ( capabilityConfig.isEnabled() )
         {

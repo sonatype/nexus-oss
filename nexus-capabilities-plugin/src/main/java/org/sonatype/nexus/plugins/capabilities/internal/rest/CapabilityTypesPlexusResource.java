@@ -19,7 +19,6 @@
 package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
 import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -58,7 +57,7 @@ public class CapabilityTypesPlexusResource
     public CapabilityTypesPlexusResource()
     {
     }
-    
+
     @Inject
     public CapabilityTypesPlexusResource( final CapabilityDescriptorRegistry capabilityDescriptorRegistry )
     {
@@ -92,9 +91,7 @@ public class CapabilityTypesPlexusResource
     public Object get( final Context context, final Request request, final Response response, final Variant variant )
         throws ResourceException
     {
-        final CapabilityTypeResourceResponse result = asCapabilityTypeResourceResponse();
-
-        return result;
+        return asCapabilityTypeResourceResponse();
     }
 
     private CapabilityTypeResourceResponse asCapabilityTypeResourceResponse()
@@ -108,15 +105,16 @@ public class CapabilityTypesPlexusResource
             for ( final CapabilityDescriptor capabilityDescriptor : descriptors )
             {
                 final CapabilityTypeResource capabilityTypeResource = new CapabilityTypeResource();
-                capabilityTypeResource.setId( capabilityDescriptor.id() );
+                capabilityTypeResource.setId( capabilityDescriptor.type().toString() );
                 capabilityTypeResource.setName( capabilityDescriptor.name() );
 
                 response.addData( capabilityTypeResource );
 
                 final List<FormField> formFields = capabilityDescriptor.formFields();
 
-                capabilityTypeResource.setFormFields( (List<CapabilityFormFieldResource>) formFieldToDTO( formFields,
-                                                                                                          CapabilityFormFieldResource.class ) );
+                capabilityTypeResource.setFormFields(
+                    (List<CapabilityFormFieldResource>) formFieldToDTO( formFields, CapabilityFormFieldResource.class )
+                );
 
             }
         }

@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.config;
 
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -57,8 +59,6 @@ import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapa
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.Configuration;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Reader;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Writer;
-import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
-import com.google.common.eventbus.Subscribe;
 
 /**
  * Handles persistence of capabilities configuration.
@@ -242,7 +242,7 @@ public class DefaultCapabilityConfiguration
         {
             final Reader r = new FileReader( configurationFile );
 
-            final Xpp3Dom dom = Xpp3DomBuilder.build( r );
+            Xpp3DomBuilder.build( r );
 
             is = new FileInputStream( configurationFile );
 
@@ -347,7 +347,7 @@ public class DefaultCapabilityConfiguration
 
     private String getDescription( final CCapability capability )
     {
-        final CapabilityDescriptor descriptor = descriptors.get( capability.getTypeId() );
+        final CapabilityDescriptor descriptor = descriptors.get( capabilityType( capability.getTypeId() ) );
         if ( descriptor != null )
         {
             try
@@ -356,7 +356,7 @@ public class DefaultCapabilityConfiguration
             }
             catch ( Exception ignore )
             {
-                getLogger().warn( "Capability descriptor '{}' failed to describe capability", descriptor.id() );
+                getLogger().warn( "Capability descriptor '{}' failed to describe capability", descriptor.type() );
             }
         }
         return capability.getDescription();

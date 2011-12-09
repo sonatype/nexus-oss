@@ -29,6 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,8 +45,7 @@ import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
-import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
-import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 
 /**
  * {@link DefaultCapabilityRegistry} UTs.
@@ -55,7 +55,7 @@ import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
 public class DefaultCapabilityRegistryTest
 {
 
-    static final String CAPABILITY_TYPE = "test";
+    static final CapabilityType CAPABILITY_TYPE = capabilityType( "test" );
 
     private NexusEventBus eventBus;
 
@@ -69,7 +69,7 @@ public class DefaultCapabilityRegistryTest
         final CapabilityFactory factory = mock( CapabilityFactory.class );
         final HashMap<String, CapabilityFactory> factoryMap = new HashMap<String, CapabilityFactory>();
 
-        factoryMap.put( CAPABILITY_TYPE, factory );
+        factoryMap.put( CAPABILITY_TYPE.toString(), factory );
         when( factory.create( Matchers.<String>any() ) ).thenAnswer( new Answer<Capability>()
         {
             @Override
@@ -84,15 +84,13 @@ public class DefaultCapabilityRegistryTest
         } );
         eventBus = mock( NexusEventBus.class );
 
-        final CapabilityConfiguration configuration = mock( CapabilityConfiguration.class );
-        final Conditions conditions = mock( Conditions.class );
         final ActivationConditionHandlerFactory achf = mock( ActivationConditionHandlerFactory.class );
         final ValidityConditionHandlerFactory vchf = mock( ValidityConditionHandlerFactory.class );
 
         underTest = new DefaultCapabilityRegistry( factoryMap, eventBus, achf, vchf )
         {
             @Override
-            CapabilityReference createReference( final Capability capability )
+            CapabilityReference createReference( final CapabilityType type, final Capability capability )
             {
                 return mock( CapabilityReference.class );
             }

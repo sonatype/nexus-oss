@@ -16,33 +16,57 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.config;
+package org.sonatype.nexus.plugins.capabilities.api;
 
-import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.AbstractCapabilityDescriptor;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
-
-/**
- * Test descriptor used by {@link DefaultCapabilityConfigurationTest}.
- *
- * @since 1.10.0
- */
-@Named
-@Singleton
-public class DefaultCapabilityConfigurationTestDescriptor
-    extends AbstractCapabilityDescriptor
-    implements CapabilityDescriptor
+public class CapabilityType
 {
 
-    public static final String TYPE = "DefaultCapabilityConfigurationTest";
+    private final String value;
 
-    public DefaultCapabilityConfigurationTestDescriptor()
+    public CapabilityType( final String value )
     {
-        super( capabilityType( TYPE ), "Default capability configuration test" );
+        this.value = checkNotNull( value, "Capability type value cannot be null" );
+    }
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof CapabilityType ) )
+        {
+            return false;
+        }
+
+        final CapabilityType that = (CapabilityType) o;
+
+        if ( value != null ? !value.equals( that.value ) : that.value != null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return value != null ? value.hashCode() : 0;
+    }
+
+    @Override
+    public String toString()
+    {
+        return value;
+    }
+
+    public static CapabilityType capabilityType( final String value )
+    {
+        return new CapabilityType( value );
     }
 
 }

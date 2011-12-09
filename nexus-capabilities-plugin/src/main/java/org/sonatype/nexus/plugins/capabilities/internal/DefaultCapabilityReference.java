@@ -28,6 +28,7 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 
 /**
  * Default {@link CapabilityReference} implementation.
@@ -38,6 +39,8 @@ class DefaultCapabilityReference
     extends AbstractLoggingComponent
     implements CapabilityReference
 {
+
+    private final CapabilityType capabilityType;
 
     private final Capability capability;
 
@@ -54,17 +57,24 @@ class DefaultCapabilityReference
     DefaultCapabilityReference( final NexusEventBus eventBus,
                                 final ActivationConditionHandlerFactory activationListenerFactory,
                                 final ValidityConditionHandlerFactory validityConditionHandlerFactory,
+                                final CapabilityType capabilityType,
                                 final Capability capability )
     {
         this.eventBus = checkNotNull( eventBus );
+
+        this.capabilityType = checkNotNull( capabilityType );
         this.capability = checkNotNull( capability );
 
+        state = new NewState();
         stateLock = new ReentrantReadWriteLock();
-
         activationHandler = checkNotNull( activationListenerFactory ).create( this );
         validityHandler = checkNotNull( validityConditionHandlerFactory ).create( this );
+    }
 
-        state = new NewState();
+    @Override
+    public CapabilityType capabilityType()
+    {
+        return capabilityType;
     }
 
     @Override
@@ -261,11 +271,7 @@ class DefaultCapabilityReference
         {
             return false;
         }
-        if ( p1.size() != p2.size() )
-        {
-            return false;
-        }
-        return p1.equals( p2 );
+        return p1.size() == p2.size() && p1.equals( p2 );
     }
 
     private class State
@@ -277,6 +283,12 @@ class DefaultCapabilityReference
             getLogger().debug(
                 "Capability {} ({}) state changed to {}", new Object[]{ capability, capability.id(), this }
             );
+        }
+
+        @Override
+        public CapabilityType capabilityType()
+        {
+            return capabilityType;
         }
 
         @Override

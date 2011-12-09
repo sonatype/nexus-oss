@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 
 /**
  * Support class for implementing {@link CapabilityDescriptor}s.
@@ -34,17 +35,17 @@ public abstract class AbstractCapabilityDescriptor
     implements CapabilityDescriptor
 {
 
-    private final String id;
+    private final CapabilityType type;
 
     private final String name;
 
     private final List<FormField> formFields;
 
-    protected AbstractCapabilityDescriptor( final String id,
+    protected AbstractCapabilityDescriptor( final CapabilityType type,
                                             final String name,
                                             final FormField... formFields )
     {
-        this.id = id;
+        this.type = type;
         this.name = name;
         if ( formFields == null )
         {
@@ -57,9 +58,9 @@ public abstract class AbstractCapabilityDescriptor
     }
 
     @Override
-    public String id()
+    public CapabilityType type()
     {
-        return id;
+        return type;
     }
 
     @Override

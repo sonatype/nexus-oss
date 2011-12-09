@@ -35,7 +35,7 @@ public interface CapabilityRegistry
      * @return created capability
      * @since 1.10.0
      */
-    CapabilityReference create( String capabilityId, String capabilityType );
+    CapabilityReference create( String capabilityId, CapabilityType capabilityType );
 
     /**
      * Removed a capability from registry. If there is no capability with specified id in the registry it will pass

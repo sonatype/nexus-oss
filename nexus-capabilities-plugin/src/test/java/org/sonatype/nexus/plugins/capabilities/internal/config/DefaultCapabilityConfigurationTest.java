@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.context.Context;
 import org.junit.Test;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.eventbus.NexusEventBus;
@@ -61,7 +60,7 @@ public class DefaultCapabilityConfigurationTest
         // create
         CCapability cap = new CCapability();
         cap.setNotes( "Configuration Test" );
-        cap.setTypeId( DefaultCapabilityConfigurationTestDescriptor.ID );
+        cap.setTypeId( DefaultCapabilityConfigurationTestDescriptor.TYPE );
         configuration.add( cap );
 
         // make sure it will reload from disk

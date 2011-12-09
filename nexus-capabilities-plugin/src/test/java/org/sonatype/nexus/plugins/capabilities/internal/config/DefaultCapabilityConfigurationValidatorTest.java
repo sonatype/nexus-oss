@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.AbstractNexusTestCase;
-import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfigurationValidator;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.Configuration;
@@ -48,10 +47,9 @@ public class DefaultCapabilityConfigurationValidatorTest
     @Override
     protected void customizeContainerConfiguration( final ContainerConfiguration configuration )
     {
-        super.customizeContainerConfiguration(configuration );
+        super.customizeContainerConfiguration( configuration );
         configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
     }
-
 
     @Test
     public void testPassValidate()
