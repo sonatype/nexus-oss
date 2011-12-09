@@ -28,7 +28,7 @@ public class CompositeCapability
 
     private final Collection<Capability> capabilities;
 
-    public CompositeCapability( final String id )
+    public CompositeCapability( final CapabilityIdentity id )
     {
         super( id );
         capabilities = new ArrayList<Capability>();

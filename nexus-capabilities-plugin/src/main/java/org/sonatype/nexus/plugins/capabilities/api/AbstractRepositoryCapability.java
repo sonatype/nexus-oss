@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.plugins.capabilities.api;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -27,27 +29,29 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public abstract class AbstractRepositoryCapability
     extends AbstractCapability
 {
+
     private final RepositoryRegistry repositoryRegistry;
-    
-    public AbstractRepositoryCapability( final String id, final RepositoryRegistry repositoryRegistry )
+
+    public AbstractRepositoryCapability( final CapabilityIdentity id,
+                                         final RepositoryRegistry repositoryRegistry )
     {
         super( id );
-        this.repositoryRegistry = repositoryRegistry;
+        this.repositoryRegistry = checkNotNull( repositoryRegistry, "Repository registry cannot be null" );
     }
-    
-    protected Repository getRepository( String id, final Map<String, String> properties )
+
+    protected Repository getRepository( final String repositoryId,
+                                        final Map<String, String> properties )
     {
-        String repositoryId = properties.get( id );
+        String property = properties.get( checkNotNull( repositoryId, "Repository id cannot be null" ) );
         try
         {
-            repositoryId = repositoryId.replaceFirst( "repo_", "" );
-            repositoryId = repositoryId.replaceFirst( "group_", "" );
-            final Repository found = repositoryRegistry.getRepository( repositoryId );
-            return found;
+            property = property.replaceFirst( "repo_", "" );
+            property = property.replaceFirst( "group_", "" );
+            return repositoryRegistry.getRepository( property );
         }
         catch ( final NoSuchRepositoryException e )
         {
-            throw new RuntimeException( String.format( "Cannot find repository %s", repositoryId ) );
+            throw new RuntimeException( String.format( "Cannot find repository with id '%s'", property ) );
         }
     }
 }

@@ -29,6 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity.capabilityIdentity;
 import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
 
 import java.util.Collection;
@@ -43,6 +44,7 @@ import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
@@ -57,6 +59,10 @@ public class DefaultCapabilityRegistryTest
 
     static final CapabilityType CAPABILITY_TYPE = capabilityType( "test" );
 
+    static final CapabilityIdentity CAPABILITY_1 = capabilityIdentity( "capability-1" );
+
+    static final CapabilityIdentity CAPABILITY_2 = capabilityIdentity( "capability-2" );
+
     private NexusEventBus eventBus;
 
     private DefaultCapabilityRegistry underTest;
@@ -70,14 +76,14 @@ public class DefaultCapabilityRegistryTest
         final HashMap<String, CapabilityFactory> factoryMap = new HashMap<String, CapabilityFactory>();
 
         factoryMap.put( CAPABILITY_TYPE.toString(), factory );
-        when( factory.create( Matchers.<String>any() ) ).thenAnswer( new Answer<Capability>()
+        when( factory.create( Matchers.<CapabilityIdentity>any() ) ).thenAnswer( new Answer<Capability>()
         {
             @Override
             public Capability answer( final InvocationOnMock invocation )
                 throws Throwable
             {
                 final Capability capability = mock( Capability.class );
-                when( capability.id() ).thenReturn( (String) invocation.getArguments()[0] );
+                when( capability.id() ).thenReturn( (CapabilityIdentity) invocation.getArguments()[0] );
                 return capability;
             }
 
@@ -105,7 +111,7 @@ public class DefaultCapabilityRegistryTest
     @Test
     public void create()
     {
-        final CapabilityReference reference = underTest.create( "capability-1", CAPABILITY_TYPE );
+        final CapabilityReference reference = underTest.create( CAPABILITY_1, CAPABILITY_TYPE );
         assertThat( reference, is( not( nullValue() ) ) );
 
         verify( eventBus ).post( rec.capture() );
@@ -119,8 +125,8 @@ public class DefaultCapabilityRegistryTest
     @Test
     public void remove()
     {
-        final CapabilityReference reference = underTest.create( "capability-1", CAPABILITY_TYPE );
-        final CapabilityReference reference1 = underTest.remove( "capability-1" );
+        final CapabilityReference reference = underTest.create( CAPABILITY_1, CAPABILITY_TYPE );
+        final CapabilityReference reference1 = underTest.remove( CAPABILITY_1 );
 
         assertThat( reference1, is( equalTo( reference ) ) );
 
@@ -137,8 +143,8 @@ public class DefaultCapabilityRegistryTest
     @Test
     public void removeInexistent()
     {
-        underTest.create( "capability-1", CAPABILITY_TYPE );
-        final CapabilityReference reference1 = underTest.remove( "capability-2" );
+        underTest.create( CAPABILITY_1, CAPABILITY_TYPE );
+        final CapabilityReference reference1 = underTest.remove( CAPABILITY_2 );
 
         assertThat( reference1, is( nullValue() ) );
     }
@@ -149,8 +155,8 @@ public class DefaultCapabilityRegistryTest
     @Test
     public void get()
     {
-        underTest.create( "capability-1", CAPABILITY_TYPE );
-        final CapabilityReference reference1 = underTest.get( "capability-1" );
+        underTest.create( CAPABILITY_1, CAPABILITY_TYPE );
+        final CapabilityReference reference1 = underTest.get( CAPABILITY_1 );
 
         assertThat( reference1, is( not( nullValue() ) ) );
     }
@@ -161,8 +167,8 @@ public class DefaultCapabilityRegistryTest
     @Test
     public void getInexistent()
     {
-        underTest.create( "capability-1", CAPABILITY_TYPE );
-        final CapabilityReference reference = underTest.get( "capability-2" );
+        underTest.create( CAPABILITY_1, CAPABILITY_TYPE );
+        final CapabilityReference reference = underTest.get( CAPABILITY_2 );
 
         assertThat( reference, is( nullValue() ) );
     }
@@ -173,8 +179,8 @@ public class DefaultCapabilityRegistryTest
     @Test
     public void getAll()
     {
-        underTest.create( "capability-1", CAPABILITY_TYPE );
-        underTest.create( "capability-2", CAPABILITY_TYPE );
+        underTest.create( CAPABILITY_1, CAPABILITY_TYPE );
+        underTest.create( CAPABILITY_2, CAPABILITY_TYPE );
         final Collection<CapabilityReference> references = underTest.getAll();
 
         assertThat( references, hasSize( 2 ) );

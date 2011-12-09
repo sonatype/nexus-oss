@@ -19,6 +19,7 @@
 package org.sonatype.nexus.plugins.capabilities.internal.config;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity.capabilityIdentity;
 import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
 import static org.sonatype.nexus.plugins.capabilities.internal.config.DefaultCapabilityConfiguration.asMap;
 
@@ -56,7 +57,7 @@ class CapabilityConfigurationEventsHandler
     {
         final CCapability capabilityConfig = event.getCapability();
         final CapabilityReference ref = registry.create(
-            capabilityConfig.getId(), capabilityType( capabilityConfig.getTypeId() )
+            capabilityIdentity( capabilityConfig.getId() ), capabilityType( capabilityConfig.getTypeId() )
         );
         ref.create( asMap( capabilityConfig.getProperties() ) );
         if ( capabilityConfig.isEnabled() )
@@ -71,7 +72,7 @@ class CapabilityConfigurationEventsHandler
     {
         final CCapability capabilityConfig = event.getCapability();
         final CapabilityReference ref = registry.create(
-            capabilityConfig.getId(), capabilityType( capabilityConfig.getTypeId() )
+            capabilityIdentity( capabilityConfig.getId() ), capabilityType( capabilityConfig.getTypeId() )
         );
         ref.load( asMap( capabilityConfig.getProperties() ) );
         if ( capabilityConfig.isEnabled() )
@@ -86,7 +87,7 @@ class CapabilityConfigurationEventsHandler
     {
         final CCapability capabilityConfig = event.getCapability();
         final CCapability previousCapabilityConfig = event.getPreviousCapability();
-        final CapabilityReference ref = registry.get( capabilityConfig.getId() );
+        final CapabilityReference ref = registry.get( capabilityIdentity( capabilityConfig.getId() ) );
         if ( ref != null )
         {
             if ( previousCapabilityConfig.isEnabled() && !capabilityConfig.isEnabled() )
@@ -106,11 +107,11 @@ class CapabilityConfigurationEventsHandler
     public void handle( final CapabilityConfigurationEvent.Removed event )
     {
         final CCapability capabilityConfig = event.getCapability();
-        final CapabilityReference ref = registry.get( capabilityConfig.getId() );
+        final CapabilityReference ref = registry.get( capabilityIdentity( capabilityConfig.getId() ) );
         if ( ref != null )
         {
             ref.remove();
-            registry.remove( capabilityConfig.getId() );
+            registry.remove( capabilityIdentity( capabilityConfig.getId() ) );
         }
     }
 

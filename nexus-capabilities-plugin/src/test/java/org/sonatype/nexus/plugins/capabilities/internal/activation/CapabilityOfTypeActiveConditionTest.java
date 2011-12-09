@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity.capabilityIdentity;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.api.AbstractCapability;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityEvent;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
@@ -240,7 +242,7 @@ public class CapabilityOfTypeActiveConditionTest
 
         protected TestCapability()
         {
-            super( "test-capability" );
+            super( capabilityIdentity( "test-capability" ) );
         }
 
     }

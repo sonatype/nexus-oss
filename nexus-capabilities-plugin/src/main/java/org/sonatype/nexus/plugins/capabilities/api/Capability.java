@@ -30,7 +30,7 @@ public interface Capability
      *
      * @return identifier
      */
-    String id();
+    CapabilityIdentity id();
 
     /**
      * Returns status of capability.

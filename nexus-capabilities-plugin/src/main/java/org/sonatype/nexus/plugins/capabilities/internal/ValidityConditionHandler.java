@@ -92,7 +92,7 @@ public class ValidityConditionHandler
             reference.disable();
             try
             {
-                configurations.remove( reference.capability().id() );
+                configurations.remove( reference.capability().id().toString() );
             }
             catch ( Exception e )
             {

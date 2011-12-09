@@ -30,32 +30,35 @@ public interface CapabilityRegistry
      * Creates a capability given its id/type. if there is no capability available for specified type it will throw an
      * runtime exception.
      *
-     * @param capabilityId   id of capability to be created
-     * @param capabilityType type of capability to be created
+     *
+     * @param id   id of capability to be created
+     * @param type type of capability to be created
      * @return created capability
      * @since 1.10.0
      */
-    CapabilityReference create( String capabilityId, CapabilityType capabilityType );
+    CapabilityReference create( CapabilityIdentity id, CapabilityType type );
 
     /**
      * Removed a capability from registry. If there is no capability with specified id in the registry it will pass
      * silently.
      *
-     * @param capabilityId to remove
+     *
+     * @param id to remove
      * @return removed capability (if any), null otherwise
      * @since 1.10.0
      */
-    CapabilityReference remove( String capabilityId );
+    CapabilityReference remove( CapabilityIdentity id );
 
     /**
      * Retrieves the capability from registry with specified id. If there is no capability with specified id in the
      * registry it will return null.
      *
-     * @param capabilityId to retrieve
+     *
+     * @param id to retrieve
      * @return capability with specified id or null if not found
      * @since 1.10.0
      */
-    CapabilityReference get( String capabilityId );
+    CapabilityReference get( CapabilityIdentity id );
 
     /**
      * Retrieves all capabilities from registry. If no capability exists, result will be empty.

@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.plugins.capabilities.api.AbstractCapability;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 
 public class TouchTestCapability
     extends AbstractCapability
@@ -30,7 +31,7 @@ public class TouchTestCapability
 
     public static final String TYPE = "TouchTest";
 
-    protected TouchTestCapability( String id )
+    protected TouchTestCapability( CapabilityIdentity id )
     {
         super( id );
     }

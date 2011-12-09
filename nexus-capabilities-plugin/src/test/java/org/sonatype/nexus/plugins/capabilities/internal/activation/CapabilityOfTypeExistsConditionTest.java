@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity.capabilityIdentity;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,8 +33,8 @@ import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.api.AbstractCapability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
 
 /**
  * {@link CapabilityOfTypeExistsCondition} UTs.
@@ -41,7 +42,7 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
  * @since 1.10.0
  */
 public class CapabilityOfTypeExistsConditionTest
-        extends NexusEventBusTestSupport
+    extends NexusEventBusTestSupport
 {
 
     private CapabilityReference ref1;
@@ -184,7 +185,7 @@ public class CapabilityOfTypeExistsConditionTest
 
         protected TestCapability()
         {
-            super( "test-capability" );
+            super( capabilityIdentity( "test-capability" ) );
         }
 
     }

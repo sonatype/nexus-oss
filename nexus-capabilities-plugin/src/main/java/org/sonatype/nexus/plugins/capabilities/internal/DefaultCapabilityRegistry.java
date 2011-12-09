@@ -33,6 +33,7 @@ import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
@@ -57,7 +58,7 @@ class DefaultCapabilityRegistry
 
     private final Map<String, CapabilityFactory> capabilityFactories;
 
-    private final Map<String, CapabilityReference> references;
+    private final Map<CapabilityIdentity, CapabilityReference> references;
 
     private final ReentrantReadWriteLock lock;
 
@@ -72,30 +73,30 @@ class DefaultCapabilityRegistry
         this.activationConditionHandlerFactory = checkNotNull( activationConditionHandlerFactory );
         this.validityConditionHandlerFactory = checkNotNull( validityConditionHandlerFactory );
 
-        references = new HashMap<String, CapabilityReference>();
+        references = new HashMap<CapabilityIdentity, CapabilityReference>();
         lock = new ReentrantReadWriteLock();
     }
 
     @Override
-    public CapabilityReference create( final String capabilityId, final CapabilityType capabilityType )
+    public CapabilityReference create( final CapabilityIdentity id, final CapabilityType type )
     {
-        assert capabilityId != null : "Capability id cannot be null";
+        assert id != null : "Capability id cannot be null";
 
         try
         {
             lock.writeLock().lock();
 
-            final CapabilityFactory factory = capabilityFactories.get( capabilityType.toString() );
+            final CapabilityFactory factory = capabilityFactories.get( type.toString() );
             if ( factory == null )
             {
-                throw new RuntimeException( format( "No factory found for a capability of type %s", capabilityType ) );
+                throw new RuntimeException( format( "No factory found for a capability of type %s", type ) );
             }
 
-            final Capability capability = factory.create( capabilityId );
+            final Capability capability = factory.create( id );
 
-            final CapabilityReference reference = createReference( capabilityType, capability );
+            final CapabilityReference reference = createReference( type, capability );
 
-            references.put( capabilityId, reference );
+            references.put( id, reference );
 
             getLogger().debug( "Created capability '{}'", capability );
 
@@ -110,13 +111,13 @@ class DefaultCapabilityRegistry
     }
 
     @Override
-    public CapabilityReference remove( final String capabilityId )
+    public CapabilityReference remove( final CapabilityIdentity id )
     {
         try
         {
             lock.writeLock().lock();
 
-            final CapabilityReference reference = references.remove( capabilityId );
+            final CapabilityReference reference = references.remove( id );
             if ( reference != null )
             {
                 getLogger().debug( "Removed capability '{}'", reference.capability() );
@@ -131,13 +132,13 @@ class DefaultCapabilityRegistry
     }
 
     @Override
-    public CapabilityReference get( final String capabilityId )
+    public CapabilityReference get( final CapabilityIdentity id )
     {
         try
         {
             lock.readLock().lock();
 
-            return references.get( capabilityId );
+            return references.get( id );
         }
         finally
         {

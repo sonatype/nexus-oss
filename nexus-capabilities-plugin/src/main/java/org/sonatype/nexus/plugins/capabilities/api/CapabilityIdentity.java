@@ -16,23 +16,62 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.test;
+package org.sonatype.nexus.plugins.capabilities.api;
 
-import javax.inject.Named;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.nexus.plugins.capabilities.api.Capability;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
-
-@Named( TouchTestCapability.TYPE )
-public class TouchTestCapabilityFactory
-    implements CapabilityFactory
+/**
+ * Indentity of a capability.
+ *
+ * @since 1.10.0
+ */
+public class CapabilityIdentity
 {
 
-    @Override
-    public Capability create( CapabilityIdentity id )
+    private final String value;
+
+    public CapabilityIdentity( final String value )
     {
-        return new TouchTestCapability( id );
+        this.value = checkNotNull( value, "Capability identity value cannot be null" );
+    }
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof CapabilityIdentity ) )
+        {
+            return false;
+        }
+
+        final CapabilityIdentity that = (CapabilityIdentity) o;
+
+        if ( value != null ? !value.equals( that.value ) : that.value != null )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return value != null ? value.hashCode() : 0;
+    }
+
+    @Override
+    public String toString()
+    {
+        return value;
+    }
+
+    public static CapabilityIdentity capabilityIdentity( final String value )
+    {
+        return new CapabilityIdentity( value );
     }
 
 }

@@ -29,6 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity.capabilityIdentity;
 import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
 import static org.sonatype.nexus.plugins.capabilities.internal.DefaultCapabilityReference.sameProperties;
 
@@ -100,7 +101,7 @@ public class DefaultCapabilityReferenceTest
         when( conditions.nexus() ).thenReturn( nexusConditions );
 
         capability = mock( Capability.class );
-        when( capability.id() ).thenReturn( "test-capability" );
+        when( capability.id() ).thenReturn( capabilityIdentity( "test-capability" ) );
 
         activationCondition = mock( Condition.class );
         when( activationCondition.isSatisfied() ).thenReturn( true );
@@ -525,7 +526,7 @@ public class DefaultCapabilityReferenceTest
 
         ( (ValidityConditionHandler) ebc.getValue() ).handle( new ConditionEvent.Unsatisfied( validityCondition ) );
 
-        verify( configurations ).remove( capability.id() );
+        verify( configurations ).remove( capability.id().toString() );
     }
 
     /**

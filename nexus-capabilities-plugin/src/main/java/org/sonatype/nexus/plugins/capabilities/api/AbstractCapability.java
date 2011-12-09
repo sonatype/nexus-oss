@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.plugins.capabilities.api;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Map;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -28,17 +30,15 @@ public abstract class AbstractCapability
     implements Capability
 {
 
-    private final String id;
+    private final CapabilityIdentity id;
 
-    protected AbstractCapability( final String id )
+    protected AbstractCapability( final CapabilityIdentity id )
     {
-        assert id != null : "Capability id cannot be null";
-
-        this.id = id;
+        this.id = checkNotNull( id, "Capability id cannot be null" );
     }
 
     @Override
-    public String id()
+    public CapabilityIdentity id()
     {
         return id;
     }
