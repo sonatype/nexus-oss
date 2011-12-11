@@ -138,6 +138,11 @@ button.st-icon-refresh {
   vertical-align: middle;
 }
 
+.form-label-helpmark-textarea {
+    margin-left: 2px;
+    vertical-align: top;
+}
+
 .form-label-after-field {
   padding-left: 3px;
   vertical-align: -1px;

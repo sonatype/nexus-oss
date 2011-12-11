@@ -83,6 +83,11 @@ Ext.override(Ext.form.Field, {
           wrapDiv = this.getEl().up('div.x-form-check-wrap');
           helpClass = 'form-label-helpmark-check';
         }
+        else if (this.getXType() == 'textarea')
+        {
+          wrapDiv = this.getEl().up('div.x-form-element');
+          helpClass = 'form-label-helpmark-textarea';
+        }
         else
         {
           wrapDiv = this.getEl().up('div.x-form-element');
