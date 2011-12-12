@@ -18,7 +18,6 @@
  */
 package org.sonatype.nexus.proxy.storage.remote.ahc;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -33,7 +32,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -72,42 +70,6 @@ public class AhcRemoteRepositoryStorage
     public String getProviderId()
     {
         return PROVIDER_STRING;
-    }
-
-    @Override
-    public boolean isReachable( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException, RemoteStorageException
-    {
-        boolean result = false;
-
-        try
-        {
-            request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
-
-            try
-            {
-                result = checkRemoteAvailability( 0, repository, request, false );
-            }
-            catch ( RemoteAccessDeniedException e )
-            {
-                // NEXUS-3338: we have to swallow this on S3
-                if ( isRemotePeerAmazonS3Storage( repository ) )
-                {
-                    // this is S3 remote, and we got 403: just say all is well (for now)
-                    return true;
-                }
-                else
-                {
-                    throw e;
-                }
-            }
-        }
-        finally
-        {
-            request.popRequestPath();
-        }
-
-        return result;
     }
 
     @Override
@@ -248,7 +210,7 @@ public class AhcRemoteRepositoryStorage
         throws ItemNotFoundException, RemoteStorageException
     {
         // maintain the S3 flag
-        checkForRemotePeerAmazonS3Storage( repository, response );
+        checkForRemotePeerAmazonS3Storage( repository, response.getHeader( "server" ) );
 
         if ( response.isRedirected() )
         {
@@ -436,65 +398,10 @@ public class AhcRemoteRepositoryStorage
         }
     }
 
-    /**
-     * Returns {@code true} if only and only if we are positive that remote peer (remote URL of passed in
-     * ProxyRepository) points to a remote repository that is hosted by Amazon S3 Storage. This method will return false
-     * as long as we don't make very 1st HTTP request to remote peer. After that 1st request, we retain the status until
-     * ProxyRepository configuration changes. See {@link https://issues.sonatype.org/browse/NEXUS-3338} for more.
-     * 
-     * @param repository that needs to be checked.
-     * @return true only if we know that ProxyRepository in question points to Amazon S3 storage.
-     * @throws RemoteStorageException in case of some error.
-     */
-    public boolean isRemotePeerAmazonS3Storage( ProxyRepository repository )
-        throws RemoteStorageException
+    @Override
+    protected String getS3FlagKey()
     {
-        BooleanFlagHolder flag =
-            (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject( CTX_KEY_S3_FLAG );
-
-        return flag.isFlag();
+        return CTX_KEY_S3_FLAG;
     }
 
-    /**
-     * Checks is remote a S3 server and puts a Boolean into remote storage context, thus preventing any further checks
-     * (we check only once).
-     * 
-     * @param repository
-     * @param response
-     * @throws RemoteStorageException
-     */
-    protected void checkForRemotePeerAmazonS3Storage( ProxyRepository repository, Response response )
-        throws RemoteStorageException
-    {
-        RemoteStorageContext ctx = getRemoteStorageContext( repository );
-
-        // we already know the result, do nothing
-        if ( !( (BooleanFlagHolder) ctx.getContextObject( CTX_KEY_S3_FLAG ) ).isNull() )
-        {
-            return;
-        }
-
-        // for now, we check the HTTP response header "Server: AmazonS3"
-        String hdr = response.getHeader( "server" );
-
-        boolean isAmazonS3 = ( hdr != null ) && ( hdr.toLowerCase().contains( "amazons3" ) );
-
-        BooleanFlagHolder holder = (BooleanFlagHolder) ctx.getContextObject( CTX_KEY_S3_FLAG );
-
-        if ( isAmazonS3 )
-        {
-            holder.setFlag( Boolean.TRUE );
-
-            getLogger().warn(
-                "The proxy repository \""
-                    + repository.getName()
-                    + "\" (ID="
-                    + repository.getId()
-                    + ") is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of your setup (baseUrl of proxy repository)!" );
-        }
-        else
-        {
-            holder.setFlag( Boolean.FALSE );
-        }
-    }
 }

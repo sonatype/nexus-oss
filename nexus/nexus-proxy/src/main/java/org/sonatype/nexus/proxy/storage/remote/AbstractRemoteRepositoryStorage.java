@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.proxy.storage.remote;
 
+import static org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext.BooleanFlagHolder;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -29,6 +31,7 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.mime.MimeSupport;
+import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
@@ -72,6 +75,43 @@ public abstract class AbstractRemoteRepositoryStorage
     }
 
     @Override
+    public boolean isReachable( final ProxyRepository repository, 
+                                final ResourceStoreRequest request )
+        throws RemoteStorageException
+    {
+        boolean result = false;
+
+        try
+        {
+            request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
+
+            try
+            {
+                result = checkRemoteAvailability( 0, repository, request, false );
+            }
+            catch ( RemoteAccessDeniedException e )
+            {
+                // NEXUS-3338: we have to swallow this on S3
+                if ( isRemotePeerAmazonS3Storage( repository ) )
+                {
+                    // this is S3 remote, and we got 403: just say all is well (for now)
+                    return true;
+                }
+                else
+                {
+                    throw e;
+                }
+            }
+        }
+        finally
+        {
+            request.popRequestPath();
+        }
+
+        return result;
+    }    
+
+    @Override
     public void validateStorageUrl( String url )
         throws RemoteStorageException
     {
@@ -98,12 +138,7 @@ public abstract class AbstractRemoteRepositoryStorage
         return checkRemoteAvailability( newerThen, repository, request, true );
     }
 
-    /**
-     * Gets the absolute url from base.
-     * 
-     * @param uid the uid
-     * @return the absolute url from base
-     */
+    @Override
     public URL getAbsoluteUrlFromBase( ProxyRepository repository, ResourceStoreRequest request )
         throws RemoteStorageException
     {
@@ -190,6 +225,69 @@ public abstract class AbstractRemoteRepositoryStorage
     }
 
     /**
+     * Returns {@code true} if only and only if we are positive that remote peer (remote URL of passed in
+     * ProxyRepository) points to a remote repository that is hosted by Amazon S3 Storage. This method will return false
+     * as long as we don't make very 1st HTTP request to remote peer. After that 1st request, we retain the status until
+     * ProxyRepository configuration changes. See NEXUS-3338 for more.
+     *
+     * @param repository that needs to be checked.
+     * @return true only if we know that ProxyRepository in question points to Amazon S3 storage.
+     * @throws RemoteStorageException in case of some error.
+     */
+    public boolean isRemotePeerAmazonS3Storage( final ProxyRepository repository )
+        throws RemoteStorageException
+    {
+        RemoteStorageContext ctx = getRemoteStorageContext( repository );
+
+        // it is S3 if we have CTX_KEY_S3_FLAG set, the flag value is not null, and flag value is true
+        // if flag is False, we know it is not S3
+        // if flag is null, we still did not contact remote, so we were not able to tell yet
+        return ctx.hasContextObject( getS3FlagKey() )
+            && ( (BooleanFlagHolder) ctx.getContextObject( getS3FlagKey() ) ).isFlag();
+    }
+
+    /**
+     * Checks is remote a S3 server and puts a Boolean into remote storage context, thus preventing any further checks
+     * (we check only once).
+      * @param repository to check for
+     * @param httpServerHeaderValue value of "server" http response header
+     * @throws RemoteStorageException re-thrown from {@link #getRemoteStorageContext(ProxyRepository)}
+     */
+    protected void checkForRemotePeerAmazonS3Storage( final ProxyRepository repository,  
+                                                      final String httpServerHeaderValue )
+        throws RemoteStorageException
+    {
+        RemoteStorageContext ctx = getRemoteStorageContext( repository );
+
+        // we already know the result, do nothing
+        if ( ctx.hasContextObject( getS3FlagKey() )
+            && !( (BooleanFlagHolder) ctx.getContextObject( getS3FlagKey() ) ).isNull() )
+        {
+            return;
+        }
+
+        // for now, we check the HTTP response header "Server: AmazonS3"
+
+        boolean isAmazonS3 = ( httpServerHeaderValue != null )
+            && ( httpServerHeaderValue.toLowerCase().contains( "amazons3" ) );
+
+        if ( ctx.hasContextObject( getS3FlagKey() ) )
+        {
+            ( (BooleanFlagHolder) ctx.getContextObject( getS3FlagKey() ) ).setFlag( isAmazonS3 );
+        }
+
+        if ( isAmazonS3 )
+        {
+            getLogger().warn(
+                "The proxy repository \""
+                    + repository.getName()
+                    + "\" (ID="
+                    + repository.getId()
+                    + ") is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of your setup (baseUrl of proxy repository)!" );
+        }
+    }
+
+    /**
      * Initially, this method is here only to share the code for "availability check" and for "contains" check.
      * Unfortunately, the "availability" check cannot be done at RemoteStorage level, since it is completely repository
      * layout unaware and is able to tell only about the existence of remote server and that the URI on it exists. This
@@ -201,5 +299,10 @@ public abstract class AbstractRemoteRepositoryStorage
                                                         ResourceStoreRequest request,
                                                         boolean isStrict )
         throws RemoteStorageException;
+
+    /**
+     * @return the context key for S3 flag
+     */
+    protected abstract String getS3FlagKey();
 
 }

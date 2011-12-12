@@ -18,9 +18,10 @@
  */
 package org.sonatype.nexus.proxy.storage.remote.commonshttpclient;
 
+import static org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext.BooleanFlagHolder;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
@@ -379,7 +380,8 @@ public class CommonsHttpClientRemoteStorage
         {
             resultCode = httpClient.executeMethod( httpConfiguration, method );
 
-            checkForRemotePeerAmazonS3Storage( repository, method );
+            final Header httpServerHeader = method.getResponseHeader( "server" );
+            checkForRemotePeerAmazonS3Storage( repository, httpServerHeader==null?null:httpServerHeader.getValue() );
 
             Header proxyReturnedErrorHeader = method.getResponseHeader( NEXUS_MISSING_ARTIFACT_HEADER );
             boolean proxyReturnedError =
@@ -543,77 +545,10 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
-    /**
-     * Returns {@code true} if only and only if we are positive that remote peer (remote URL of passed in
-     * ProxyRepository) points to a remote repository that is hosted by Amazon S3 Storage. This method will return false
-     * as long as we don't make very 1st HTTP request to remote peer. After that 1st request, we retain the status until
-     * ProxyRepository configuration changes. See {@link https://issues.sonatype.org/browse/NEXUS-3338} for more.
-     * 
-     * @param repository that needs to be checked.
-     * @return true only if we know that ProxyRepository in question points to Amazon S3 storage.
-     * @throws RemoteStorageException in case of some error.
-     */
-    public boolean isRemotePeerAmazonS3Storage( ProxyRepository repository )
-        throws RemoteStorageException
+    @Override
+    protected String getS3FlagKey()
     {
-        RemoteStorageContext ctx = getRemoteStorageContext( repository );
-
-        // it is S3 if we have CTX_KEY_S3_FLAG set, the flag value is not null, and flag value is true
-        // if flag is False, we know it is not S3
-        // if flag is null, we still did not contact remote, so we were not able to tell yet
-        return ctx.hasContextObject( CTX_KEY_S3_FLAG )
-            && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject( CTX_KEY_S3_FLAG ) ).isFlag() != null
-            && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject( CTX_KEY_S3_FLAG ) ).isFlag();
-    }
-
-    protected void checkForRemotePeerAmazonS3Storage( ProxyRepository repository, HttpMethod method )
-        throws RemoteStorageException
-    {
-        RemoteStorageContext ctx = getRemoteStorageContext( repository );
-
-        // we already know the result, do nothing
-        if ( ctx.hasContextObject( CTX_KEY_S3_FLAG )
-            && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject( CTX_KEY_S3_FLAG ) ).isFlag() != null )
-        {
-            return;
-        }
-
-        // for now, we check the HTTP response header "Server: AmazonS3"
-        Header hdr = method.getResponseHeader( "server" );
-
-        boolean isAmazonS3 = ( hdr != null ) && ( hdr.getValue().toLowerCase().contains( "amazons3" ) );
-
-        if ( ctx.hasContextObject( CTX_KEY_S3_FLAG ) )
-        {
-            ( (BooleanFlagHolder) ctx.getContextObject( CTX_KEY_S3_FLAG ) ).setFlag( isAmazonS3 );
-        }
-
-        if ( isAmazonS3 )
-        {
-            getLogger().warn(
-                "The proxy repository \""
-                    + repository.getName()
-                    + "\" (ID="
-                    + repository.getId()
-                    + ") is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of your setup (baseUrl of proxy repository)!" );
-        }
-    }
-
-    // ==
-
-    protected static class BooleanFlagHolder
-    {
-        private Boolean flag = null;
-
-        public Boolean isFlag()
-        {
-            return flag;
-        }
-
-        public void setFlag( Boolean flag )
-        {
-            this.flag = flag;
-        }
+        return CTX_KEY_S3_FLAG;
     }
 
 }
