@@ -25,6 +25,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.commons.httpclient.CustomMultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;
@@ -44,6 +48,8 @@ import org.apache.commons.httpclient.util.DateParseException;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
@@ -60,13 +66,15 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 /**
  * The Class CommonsHttpClientRemoteStorage.
  * 
  * @author cstamas
  */
-@Component( role = RemoteRepositoryStorage.class, hint = CommonsHttpClientRemoteStorage.PROVIDER_STRING )
+@Named( CommonsHttpClientRemoteStorage.PROVIDER_STRING )
+@Singleton
 public class CommonsHttpClientRemoteStorage
     extends AbstractRemoteRepositoryStorage
     implements RemoteRepositoryStorage
@@ -82,6 +90,14 @@ public class CommonsHttpClientRemoteStorage
     public static final String CTX_KEY_S3_FLAG = CTX_KEY + ".remoteIsAmazonS3";
 
     public static final String NEXUS_MISSING_ARTIFACT_HEADER = "x-nexus-missing-artifact";
+
+    @Inject
+    protected CommonsHttpClientRemoteStorage( final UserAgentBuilder userAgentBuilder,
+                                              final ApplicationStatusSource applicationStatusSource,
+                                              final MimeSupport mimeSupport )
+    {
+        super( userAgentBuilder, applicationStatusSource, mimeSupport );
+    }
 
     // ===============================================================================
     // RemoteStorage iface

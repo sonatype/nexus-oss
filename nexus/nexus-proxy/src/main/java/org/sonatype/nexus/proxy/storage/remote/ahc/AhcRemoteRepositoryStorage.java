@@ -18,14 +18,18 @@
  */
 package org.sonatype.nexus.proxy.storage.remote.ahc;
 
-import java.net.URL;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import java.net.URL;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.ahc.AhcProvider;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
-import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -40,7 +44,7 @@ import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext.BooleanFlagHolder;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-
+import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.BodyDeferringAsyncHandler.BodyDeferringInputStream;
@@ -48,13 +52,16 @@ import com.ning.http.client.Response;
 
 /**
  * AsyncHttpClient powered RemoteRepositoryStorage.
- * 
+ *
  * @author cstamas
  */
-@Component( role = RemoteRepositoryStorage.class, hint = AhcRemoteRepositoryStorage.PROVIDER_STRING )
+@Named( AhcRemoteRepositoryStorage.PROVIDER_STRING )
+@Singleton
 public class AhcRemoteRepositoryStorage
     extends AbstractRemoteRepositoryStorage
+    implements RemoteRepositoryStorage
 {
+
     public static final String PROVIDER_STRING = "async-http-client";
 
     private static final String CTX_KEY = PROVIDER_STRING;
@@ -63,8 +70,17 @@ public class AhcRemoteRepositoryStorage
 
     private static final String CTX_KEY_S3_FLAG = CTX_KEY + ".remoteIsAmazonS3";
 
-    @Requirement
-    private AhcProvider ahcProvider;
+    private final AhcProvider ahcProvider;
+
+    @Inject
+    protected AhcRemoteRepositoryStorage( final UserAgentBuilder userAgentBuilder,
+                                          final ApplicationStatusSource applicationStatusSource,
+                                          final MimeSupport mimeSupport,
+                                          final AhcProvider ahcProvider )
+    {
+        super( userAgentBuilder, applicationStatusSource, mimeSupport );
+        this.ahcProvider = checkNotNull( ahcProvider );
+    }
 
     @Override
     public String getProviderId()
@@ -102,7 +118,7 @@ public class AhcRemoteRepositoryStorage
 
             DefaultStorageFileItem result =
                 new DefaultStorageFileItem( repository, request, true /* canRead */, true /* canWrite */,
-                    contentLocator );
+                                            contentLocator );
 
             result.setLength( length );
 
@@ -276,7 +292,8 @@ public class AhcRemoteRepositoryStorage
             oldClient.close();
         }
 
-        final AsyncHttpClientConfig.Builder clientConfigBuilder = ahcProvider.getAsyncHttpClientConfigBuilder( repository, context );
+        final AsyncHttpClientConfig.Builder clientConfigBuilder =
+            ahcProvider.getAsyncHttpClientConfigBuilder( repository, context );
 
         final AsyncHttpClient client = new AsyncHttpClient( clientConfigBuilder.build() );
 
@@ -300,7 +317,7 @@ public class AhcRemoteRepositoryStorage
         {
             getLogger().debug(
                 String.format( "Checking remote availability of proxy repository \"%s\" (id=%s) on URL %s",
-                    repository.getName(), repository.getId(), itemUrl ) );
+                               repository.getName(), repository.getId(), itemUrl ) );
         }
 
         // artifactory hack, it pukes on HEAD so we will try with GET if HEAD fails
@@ -390,9 +407,12 @@ public class AhcRemoteRepositoryStorage
             else
             {
                 throw new RemoteStorageException( "Unexpected response code while executing GET"
-                    + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
-                    + "\", remoteUrl=\"" + itemUrl + "\"]. Expected: \"SUCCESS (200)\". Received: " + response + " : "
-                    + responseObject.getStatusText() );
+                                                      + " method [repositoryId=\"" + repository.getId()
+                                                      + "\", requestPath=\"" + request.getRequestPath()
+                                                      + "\", remoteUrl=\"" + itemUrl
+                                                      + "\"]. Expected: \"SUCCESS (200)\". Received: " + response
+                                                      + " : "
+                                                      + responseObject.getStatusText() );
             }
         }
     }
