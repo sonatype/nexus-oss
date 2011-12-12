@@ -59,7 +59,7 @@ public final class GAVCoordinate
         this.artifactId = Preconditions.checkNotNull( artifactId );
         this.version = Preconditions.checkNotNull( version );
         this.classifier = classifier;
-        this.type = "jar".equals( type ) ? null : type;
+        this.type = type;
     }
 
     // ----------------------------------------------------------------------
@@ -79,6 +79,16 @@ public final class GAVCoordinate
     public String getVersion()
     {
         return version;
+    }
+
+    public String getClassifier()
+    {
+        return classifier;
+    }
+
+    public String getType()
+    {
+        return type;
     }
 
     public String getFinalName( final ArtifactPackagingMapper packagingMapper )
