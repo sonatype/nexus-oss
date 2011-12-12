@@ -40,6 +40,8 @@ public class CoreRepositoryItemUidAttributeSource
         Map<Class<?>, Attribute<?>> attrs = new HashMap<Class<?>, Attribute<?>>( 2 );
 
         attrs.put( IsMetacontentAttribute.class, new IsMetacontentAttribute() );
+        attrs.put( IsTrashMetacontentAttribute.class, new IsTrashMetacontentAttribute() );
+        attrs.put( IsItemAttributeMetacontentAttribute.class, new IsItemAttributeMetacontentAttribute() );
         attrs.put( IsHiddenAttribute.class, new IsHiddenAttribute() );
         attrs.put( IsMetadataMaintainedAttribute.class, new IsMetadataMaintainedAttribute() );
         attrs.put( IsRemotelyAccessibleAttribute.class, new IsRemotelyAccessibleAttribute() );
