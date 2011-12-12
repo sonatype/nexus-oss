@@ -71,6 +71,33 @@ public abstract class AbstractRemoteRepositoryStorage
         return mimeSupport;
     }
 
+    @Override
+    public void validateStorageUrl( String url )
+        throws RemoteStorageException
+    {
+        try
+        {
+            URL u = new URL( url );
+
+            if ( !"http".equals( u.getProtocol().toLowerCase() ) && !"https".equals( u.getProtocol().toLowerCase() ) )
+            {
+                throw new RemoteStorageException( "Unsupported protocol, only HTTP/HTTPS protocols are supported: "
+                                                      + u.getProtocol().toLowerCase() );
+            }
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new RemoteStorageException( "Malformed URL", e );
+        }
+    }
+
+    @Override
+    public boolean containsItem( long newerThen, ProxyRepository repository, ResourceStoreRequest request )
+        throws RemoteAccessException, RemoteStorageException
+    {
+        return checkRemoteAvailability( newerThen, repository, request, true );
+    }
+
     /**
      * Gets the absolute url from base.
      * 
@@ -161,4 +188,18 @@ public abstract class AbstractRemoteRepositoryStorage
     {
         return userAgentBuilder.formatRemoteRepositoryStorageUserAgentString( repository, ctx );
     }
+
+    /**
+     * Initially, this method is here only to share the code for "availability check" and for "contains" check.
+     * Unfortunately, the "availability" check cannot be done at RemoteStorage level, since it is completely repository
+     * layout unaware and is able to tell only about the existence of remote server and that the URI on it exists. This
+     * "availability" check will have to be moved upper into repository, since it is aware of "what it holds".
+     * Ultimately, this method will check is the remote server "present" and is responding or not. But nothing more.
+     */
+    protected abstract boolean checkRemoteAvailability( long newerThen,
+                                                        ProxyRepository repository,
+                                                        ResourceStoreRequest request,
+                                                        boolean isStrict )
+        throws RemoteStorageException;
+
 }
