@@ -133,7 +133,7 @@ public abstract class AbstractRemoteRepositoryStorage
 
     @Override
     public boolean containsItem( long newerThen, ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException, RemoteStorageException
+        throws RemoteStorageException
     {
         return checkRemoteAvailability( newerThen, repository, request, true );
     }
@@ -204,7 +204,7 @@ public abstract class AbstractRemoteRepositoryStorage
     }
 
     public boolean containsItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAuthenticationNeededException, RemoteAccessException, RemoteStorageException
+        throws RemoteStorageException
     {
         return containsItem( 0, repository, request );
     }

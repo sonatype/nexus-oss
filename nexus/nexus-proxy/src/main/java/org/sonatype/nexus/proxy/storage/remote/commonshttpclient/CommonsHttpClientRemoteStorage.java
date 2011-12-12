@@ -93,7 +93,7 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public boolean isReachable( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException, RemoteStorageException
+        throws RemoteStorageException
     {
         boolean result = false;
 
@@ -121,11 +121,11 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
-        throws ItemNotFoundException, RemoteAccessException, RemoteStorageException
+        throws ItemNotFoundException, RemoteStorageException
     {
         URL remoteURL = getAbsoluteUrlFromBase( baseUrl, request.getRequestPath() );
 
-        HttpMethod method = null;
+        HttpMethod method;
 
         method = new GetMethod( remoteURL.toString() );
 
@@ -149,7 +149,7 @@ public class CommonsHttpClientRemoteStorage
 
             GetMethod get = (GetMethod) method;
 
-            InputStream is = null;
+            InputStream is;
 
             try
             {
@@ -160,7 +160,7 @@ public class CommonsHttpClientRemoteStorage
                     is = new GZIPInputStream( is );
                 }
 
-                String mimeType = null;
+                String mimeType;
 
                 if ( method.getResponseHeader( "content-type" ) != null )
                 {
@@ -226,7 +226,7 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public void storeItem( ProxyRepository repository, StorageItem item )
-        throws UnsupportedStorageOperationException, RemoteAccessException, RemoteStorageException
+        throws UnsupportedStorageOperationException, RemoteStorageException
     {
         if ( !( item instanceof StorageFileItem ) )
         {
@@ -270,8 +270,7 @@ public class CommonsHttpClientRemoteStorage
     }
 
     public void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException,
-        RemoteStorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteStorageException
     {
         URL remoteURL = getAbsoluteUrlFromBase( repository, request );
 
@@ -296,11 +295,6 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
-    /**
-     * Gets the http client.
-     * 
-     * @return the http client
-     */
     protected void updateContext( ProxyRepository repository, RemoteStorageContext ctx )
     {
         getLogger().info(
@@ -328,7 +322,7 @@ public class CommonsHttpClientRemoteStorage
      */
     protected int executeMethod( ProxyRepository repository, ResourceStoreRequest request, HttpMethod method,
                                  URL remoteUrl )
-        throws RemoteAccessException, RemoteStorageException
+        throws RemoteStorageException
     {
         URI methodURI = null;
 
@@ -374,7 +368,7 @@ public class CommonsHttpClientRemoteStorage
             method.setQueryString( ctx.getRemoteConnectionSettings().getQueryString() );
         }
 
-        int resultCode = 0;
+        int resultCode;
 
         try
         {

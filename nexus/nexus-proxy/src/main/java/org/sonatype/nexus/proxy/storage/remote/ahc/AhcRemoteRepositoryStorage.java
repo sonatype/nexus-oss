@@ -74,7 +74,7 @@ public class AhcRemoteRepositoryStorage
 
     @Override
     public AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
-        throws ItemNotFoundException, RemoteAccessException, RemoteStorageException
+        throws ItemNotFoundException, RemoteStorageException
     {
         final URL remoteURL = getAbsoluteUrlFromBase( baseUrl, request.getRequestPath() );
 
@@ -132,7 +132,7 @@ public class AhcRemoteRepositoryStorage
 
     @Override
     public void storeItem( ProxyRepository repository, StorageItem item )
-        throws UnsupportedStorageOperationException, RemoteAccessException, RemoteStorageException
+        throws UnsupportedStorageOperationException, RemoteStorageException
     {
         if ( !( item instanceof StorageFileItem ) )
         {
@@ -174,8 +174,7 @@ public class AhcRemoteRepositoryStorage
 
     @Override
     public void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException,
-        RemoteStorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteStorageException
     {
         final URL remoteURL = getAbsoluteUrlFromBase( repository, request );
 
