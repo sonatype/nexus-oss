@@ -96,16 +96,7 @@ public abstract class AbstractRemoteRepositoryStorage
             }
             catch ( RemoteAccessDeniedException e )
             {
-                // NEXUS-3338: we have to swallow this on S3
-                if ( isRemotePeerAmazonS3Storage( repository ) )
-                {
-                    // this is S3 remote, and we got 403: just say all is well (for now)
-                    return true;
-                }
-                else
-                {
-                    throw e;
-                }
+                return true;
             }
         }
         finally
