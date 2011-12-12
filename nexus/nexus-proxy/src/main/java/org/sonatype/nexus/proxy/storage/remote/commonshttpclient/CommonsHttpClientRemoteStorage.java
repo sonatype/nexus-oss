@@ -91,6 +91,7 @@ public class CommonsHttpClientRemoteStorage
         return PROVIDER_STRING;
     }
 
+    @Override
     public AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
         throws ItemNotFoundException, RemoteStorageException
     {
@@ -196,6 +197,7 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
+    @Override
     public void storeItem( ProxyRepository repository, StorageItem item )
         throws UnsupportedStorageOperationException, RemoteStorageException
     {
@@ -240,6 +242,7 @@ public class CommonsHttpClientRemoteStorage
         }
     }
 
+    @Override
     public void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
         throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteStorageException
     {
