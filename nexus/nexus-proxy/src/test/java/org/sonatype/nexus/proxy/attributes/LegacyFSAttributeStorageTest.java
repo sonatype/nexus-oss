@@ -57,7 +57,7 @@ public class LegacyFSAttributeStorageTest
 
         ApplicationEventMulticaster applicationEventMulticaster = Mockito.mock( ApplicationEventMulticaster.class );
         ApplicationConfiguration applicationConfiguration = Mockito.mock( ApplicationConfiguration.class );
-        Mockito.when( applicationConfiguration.getWorkingDirectory( "proxy/attributes" ) ).thenReturn(
+        Mockito.when( applicationConfiguration.getWorkingDirectory( "proxy/attributes", false ) ).thenReturn(
             proxyAttributesDirectory );
 
         attributeStorage = new LegacyFSAttributeStorage( applicationEventMulticaster, applicationConfiguration );

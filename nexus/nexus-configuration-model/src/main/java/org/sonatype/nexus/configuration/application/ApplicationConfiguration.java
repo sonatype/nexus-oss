@@ -46,6 +46,16 @@ public interface ApplicationConfiguration
     File getWorkingDirectory( String key );
 
     /**
+     * Gets the working directory with some subpath. The directory is created if needed.
+     * 
+     * @param key the subpath you want to have access to
+     * @param createIfNeeded set to {@code true} if you want to have it created, {@code false} otherwise. 
+     * @return
+     * @since 1.10.0
+     */
+    File getWorkingDirectory( String key, boolean createIfNeeded );
+
+    /**
      * Returns the configuration directory. It defaults to $NEXUS_WORK/conf.
      * 
      * @return

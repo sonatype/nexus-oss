@@ -26,11 +26,9 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.ConfigurationCommitEvent;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.ConfigurationSaveEvent;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.Configuration;
@@ -89,7 +87,17 @@ public class SimpleApplicationConfiguration
 
     public File getWorkingDirectory( String key )
     {
-        return new File( getWorkingDirectory(), key );
+        return getWorkingDirectory( key, true );
+    }
+
+    public File getWorkingDirectory( String key, boolean create )
+    {
+        final File result = new File( getWorkingDirectory(), key );
+        if ( !result.exists() )
+        {
+            result.mkdirs();
+        }
+        return result;
     }
 
     public File getTemporaryDirectory()
@@ -140,9 +148,8 @@ public class SimpleApplicationConfiguration
         }
         catch ( ContextException e )
         {
-            throw new RuntimeException(
-                "Missing key from plexus context: " + NexusTestSupport.WORK_CONFIGURATION_KEY, e
-            );
+            throw new RuntimeException( "Missing key from plexus context: " + NexusTestSupport.WORK_CONFIGURATION_KEY,
+                e );
         }
     }
 

@@ -50,9 +50,14 @@ public class ApplicationConfigurationAdapter
         return nexusConfiguration.getWorkingDirectory();
     }
 
-    public File getWorkingDirectory( String key )
+    public File getWorkingDirectory( final String key )
     {
         return nexusConfiguration.getWorkingDirectory( key );
+    }
+
+    public File getWorkingDirectory( final String key, final boolean createIfNeeded )
+    {
+        return nexusConfiguration.getWorkingDirectory( key, createIfNeeded );
     }
 
     public File getTemporaryDirectory()

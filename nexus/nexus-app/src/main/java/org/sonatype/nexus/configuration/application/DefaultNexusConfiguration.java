@@ -244,7 +244,8 @@ public class DefaultNexusConfiguration
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
             String userId = null;
-            Subject subject = ThreadContext.getSubject(); // Use ThreadContext directly, SecurityUtils will associate a new Subject with the thread.
+            Subject subject = ThreadContext.getSubject(); // Use ThreadContext directly, SecurityUtils will associate a
+                                                          // new Subject with the thread.
             if ( subject != null && subject.getPrincipal() != null )
             {
                 userId = subject.getPrincipal().toString();
@@ -353,17 +354,27 @@ public class DefaultNexusConfiguration
 
     public File getWorkingDirectory( String key )
     {
+        return getWorkingDirectory( key, true );
+    }
+
+    public File getWorkingDirectory( final String key, final boolean createIfNeeded )
+    {
         File keyedDirectory = new File( getWorkingDirectory(), key );
 
-        if ( !keyedDirectory.isDirectory() && !keyedDirectory.mkdirs() )
+        if ( createIfNeeded )
         {
-            String message =
-                "\r\n******************************************************************************\r\n"
-                    + "* Could not create work directory [ " + keyedDirectory.toString() + "]!!!! *\r\n"
-                    + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
-                    + "******************************************************************************";
+            if ( !keyedDirectory.isDirectory() && !keyedDirectory.mkdirs() )
+            {
+                String message =
+                    "\r\n******************************************************************************\r\n"
+                        + "* Could not create work directory [ "
+                        + keyedDirectory.toString()
+                        + "]!!!! *\r\n"
+                        + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
+                        + "******************************************************************************";
 
-            getLogger().fatalError( message );
+                getLogger().fatalError( message );
+            }
         }
 
         return keyedDirectory;

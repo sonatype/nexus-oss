@@ -65,6 +65,13 @@ public class DummyNexusConfiguration
     }
 
     @Override
+    public File getWorkingDirectory( String key, boolean createIfNeeded )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public File getConfigurationDirectory()
     {
         // TODO Auto-generated method stub

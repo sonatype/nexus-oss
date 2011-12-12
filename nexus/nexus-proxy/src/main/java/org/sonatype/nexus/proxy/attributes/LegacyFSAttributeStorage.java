@@ -94,7 +94,6 @@ public class LegacyFSAttributeStorage
         this.marshaller.alias( "compositeFile", DefaultStorageCompositeFileItem.class );
         this.marshaller.alias( "collection", DefaultStorageCollectionItem.class );
         this.marshaller.alias( "link", DefaultStorageLinkItem.class );
-        getLogger().info( "Legacy FS AttributeStorage in place." );
     }
 
     // == Events to keep config in sync
@@ -123,34 +122,42 @@ public class LegacyFSAttributeStorage
 
     public synchronized File initializeWorkingDirectory()
     {
-        if ( workingDirectory == null )
-        {
-            workingDirectory = applicationConfiguration.getWorkingDirectory( "proxy/attributes" );
+        workingDirectory = applicationConfiguration.getWorkingDirectory( "proxy/attributes", false );
 
-            if ( workingDirectory.exists() )
+        if ( workingDirectory.exists() )
+        {
+            if ( !workingDirectory.isDirectory() )
             {
-                if ( !workingDirectory.isDirectory() )
-                {
-                    throw new IllegalArgumentException( "The attribute storage exists and is not a directory: "
-                        + workingDirectory.getAbsolutePath() );
-                }
+                throw new IllegalArgumentException( "The attribute storage exists and is not a directory: "
+                    + workingDirectory.getAbsolutePath() );
             }
-            else
-            {
-                getLogger().info(
-                    "Legacy Attribute storage directory does not exists, was expecting it here {}, legacy AttributeStorage will not be used.",
-                    workingDirectory );
-            }
+
+            getLogger().info(
+                "Legacy Attribute storage directory does exists here \"{}\", legacy AttributeStorage will be used.",
+                workingDirectory );
+        }
+        else
+        {
+            getLogger().info(
+                "Legacy Attribute storage directory does not exists, was expecting it here \"{}\", legacy AttributeStorage will not be used.",
+                workingDirectory );
+
+            workingDirectory = null;
         }
 
         return workingDirectory;
+    }
+
+    public boolean isLegacyAttributeStorageDiscovered()
+    {
+        return workingDirectory != null;
     }
 
     // == Main iface: AttributeStorage
 
     public boolean deleteAttributes( final RepositoryItemUid uid )
     {
-        if ( workingDirectory == null )
+        if ( !isLegacyAttributeStorageDiscovered() )
         {
             // noop
             return false;
@@ -190,7 +197,7 @@ public class LegacyFSAttributeStorage
 
     public Attributes getAttributes( final RepositoryItemUid uid )
     {
-        if ( workingDirectory == null )
+        if ( !isLegacyAttributeStorageDiscovered() )
         {
             // noop
             return null;
@@ -252,9 +259,9 @@ public class LegacyFSAttributeStorage
 
         File result = null;
 
-        String path = FileUtils.getPath(  uid.getPath() );
+        String path = FileUtils.getPath( uid.getPath() );
 
-        String name = FileUtils.removePath(  uid.getPath() );
+        String name = FileUtils.removePath( uid.getPath() );
 
         result = new File( repoBase, path + "/" + name );
 
