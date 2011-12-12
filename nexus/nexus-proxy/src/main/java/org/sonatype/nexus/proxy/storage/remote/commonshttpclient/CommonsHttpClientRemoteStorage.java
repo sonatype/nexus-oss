@@ -46,7 +46,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
-import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -90,34 +89,6 @@ public class CommonsHttpClientRemoteStorage
     public String getProviderId()
     {
         return PROVIDER_STRING;
-    }
-
-    public boolean isReachable( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteStorageException
-    {
-        boolean result = false;
-
-        try
-        {
-            request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
-
-            try
-            {
-                result = checkRemoteAvailability( 0, repository, request, false );
-            }
-            catch ( RemoteAccessDeniedException e )
-            {
-                // NEXUS-3338: we have to swallow this on S3
-                // NEXUS-4593: 403 is always "ok"
-                result = true;
-            }
-        }
-        finally
-        {
-            request.popRequestPath();
-        }
-
-        return result;
     }
 
     public AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
