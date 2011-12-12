@@ -76,10 +76,71 @@ Ext.extend(Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel,
         }
       },
 
+      /* For plugin contributions:
+
+      contributions added here are valid for hosted and proxy repository editors.
+
+      When a form is build or it's values reset (e.g. load/select provider),
+      contributions are selected according to their conditions:
+      the condition objects's properties will be checked for equality with
+      properties from the data set.
+        e.g. var condition = { provider: 'maven2' }
+      If all keys match,  the 'enter' method will be called with the form data and the form itself.
+
+      The 'leave' method is called only when the provider selection changed (for new repositories).
+      The data given is already changed and does not resemble the data used to select contributions.
+      This method will only be called if the contribution's 'enter' method was called before.
+
+       */
+      contributions : {
+        add : function(condition, enter, leave) {
+          this.list.push(
+            {
+              condition: condition,
+              enter: enter,
+              leave: leave
+            }
+          )
+        },
+        list : new Array(),
+        lastPlugins : new Array()
+      },
+
+      contribute : function( data, action)
+      {
+          if ( action === 'leave' && this.contributions.lastPlugins.length != 0 )
+          {
+              for ( i = 0; i < this.contributions.lastPlugins.length; i++ )
+              {
+                  contrib = this.contributions.lastPlugins[i];
+                  contrib.leave( data, this.form );
+              }
+              this.contributions.lastPlugins = new Array();
+          } else {
+              plugins:
+              for ( i = 0; i < this.contributions.list.length; i++ )
+              {
+                  contrib = this.contributions.list[i];
+                  for ( key in contrib.condition )
+                  {
+                      if ( contrib.condition.hasOwnProperty( key ) && data[key] !== contrib.condition[key] )
+                      {
+                          continue plugins;
+                      }
+                  }
+                  this.contributions.lastPlugins.push(contrib);
+                  contrib[action]( data, this.form );
+              }
+          }
+      },
+
       providerSelectHandler : function(combo, rec, index) {
-        this.form.findField('format').setValue(rec.data.format);
-        this.form.findField('providerRole').setValue(rec.data.providerRole);
-        this.afterProviderSelectHandler(combo, rec, index);
+          this.form.findField( 'format' ).setValue( rec.data.format );
+          this.form.findField( 'providerRole' ).setValue( rec.data.providerRole );
+          this.afterProviderSelectHandler( combo, rec, index );
+
+          // let plugins change UI
+          this.contribute( rec.data, 'enter' )
       },
 
       templateLoadSuccess : function(form, action) {},
@@ -277,6 +338,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel,
         this.updateRepoPolicyField(form, receivedData.format, receivedData.repoPolicy);
         this.updateIndexableCombo(form, receivedData.format);
         this.updateDownloadRemoteIndexCombo(form, receivedData.format);
+        this.contribute( receivedData, 'enter' )
       }
 
     });
@@ -400,6 +462,7 @@ Sonatype.repoServer.HostedRepositoryEditor = function(config) {
               disabled : !this.isNew,
               listeners : {
                 select : this.providerSelectHandler,
+                beforeselect : function(combo, rec, index) { this.contribute(rec.data, 'leave'); return true },
                 scope : this
               }
             }, {
@@ -685,6 +748,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
               disabled : !this.isNew,
               listeners : {
                 select : this.providerSelectHandler,
+                beforeselect : function(combo, rec, index) { this.contribute(rec.data, 'leave'); return true },
                 scope : this
               }
             }, {
@@ -1248,6 +1312,7 @@ Sonatype.repoServer.VirtualRepositoryEditor = function(config) {
               disabled : !this.isNew,
               listeners : {
                 select : this.providerSelectHandler,
+                beforeselect : function(combo, rec, index) { this.contribute(rec.data, 'leave'); return true },
                 scope : this
               }
             }, {
