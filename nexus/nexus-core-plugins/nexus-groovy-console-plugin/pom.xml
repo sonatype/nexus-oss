@@ -92,29 +92,6 @@
         <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
  -->
-
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>yuicompressor-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>aggregate</goal>
-            </goals>
-            <configuration>
-              <output>${project.build.directory}/classes/static/js/nexus-groovy-console-plugin-all.js</output>
-              <nosuffix>true</nosuffix>
-              <nomunge>true</nomunge>
-              <nominify>true</nominify>
-              <jswarn>false</jswarn>
-              <insertNewLine>true</insertNewLine>
-              <excludes>
-                <exclude>editarea_0_8_2/**</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
 

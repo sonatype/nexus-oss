@@ -24,10 +24,9 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.TextAreaFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
-
-import com.sonatype.nexus.plugin.groovyconsole.tasks.descriptors.properties.TextAreaFormField;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "GroovyRunner", description = "Groovy Runner Task" )
 public class GroovyRunnerTaskDescriptor
