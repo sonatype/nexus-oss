@@ -241,6 +241,8 @@ Sonatype.panels.GridViewer = function(config) {
           }
         }
       });
+  
+  this.gridPanel.getSelectionModel().on('rowselect', this.rowSelectHandler, this);
 
   this.refreshButton = new Ext.Button({
         text : 'Refresh',
@@ -684,17 +686,19 @@ Ext.extend(Sonatype.panels.GridViewer, Ext.Panel, {
           var internalColumnIndex = this.getDisplayedColumnByIndex(columnIndex);
           if (internalColumnIndex != -1 && this.columns[internalColumnIndex].clickHandler) {
               this.columns[internalColumnIndex].clickHandler(grid, rowIndex, eventObject);
-          } 
-          
-          if (this.rowClickEvent || this.rowClickHandler) {
-              var rec = grid.getStore().getAt(rowIndex);
-              this.createChildPanel(rec);
- 
-              var bookmark = rec.data[this.dataBookmark];
-              if (bookmark) {
-                  Sonatype.utils.updateHistory(this);
-              }
           }
+      },
+      
+      rowSelectHandler : function(selectionModel, index, rec) {
+        if (this.rowClickEvent || this.rowClickHandler)
+        {
+          this.createChildPanel(rec);
+          
+          var bookmark = rec.data[this.dataBookmark];
+          if (bookmark)          {            
+              Sonatype.utils.updateHistory(this);    
+          }
+        }
       },
       
       //our internal column index contains all data, even for 'columns' not displayed, that
