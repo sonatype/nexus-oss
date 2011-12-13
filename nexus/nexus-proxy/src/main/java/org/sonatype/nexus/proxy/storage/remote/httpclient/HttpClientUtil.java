@@ -51,24 +51,71 @@ import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationS
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
-public class HttpClientUtil
+/**
+ * Utilities related to HTTP client.
+ *
+ * @since 1.10.0
+ */
+class HttpClientUtil
 {
 
+    // ----------------------------------------------------------------------
+    // Constants
+    // ----------------------------------------------------------------------
+
+    /**
+     * Context key of HTTP client.
+     */
     private static final String CTX_KEY_CLIENT = ".client";
 
-    public static final String CTX_KEY_S3_FLAG = ".remoteIsAmazonS3";
+    /**
+     * Context key of a flag present in case that remote server is an Amazon S3.
+     */
+    private static final String CTX_KEY_S3_FLAG = ".remoteIsAmazonS3";
 
+    /**
+     * Context key of a flag present in case that NTLM authentication is configured.
+     */
+    private static final String CTX_KEY_NTLM_IS_IN_USE = ".ntlmIsInUse";
+
+    /**
+     * Key of optional system property for customizing the connection pool size.
+     * If not present HTTP client default is used (20 connections)
+     */
     public static final String CONNECTION_POOL_SIZE_KEY = "httpClient.connectionPoolSize";
 
-    public static final String NTLM_IS_IN_USE_KEY = "httpClient.ntlmIsInUse";
+    /**
+     * Marker used to determine that {@link #CONNECTION_POOL_SIZE_KEY} system property is not set.
+     */
+    private static final int UNDEFINED_POOL_SIZE = -1;
+
+    // ----------------------------------------------------------------------
+    // Implementation fields
+    // ----------------------------------------------------------------------
 
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger( HttpClientUtil.class );
 
-    private static final int UNDEFINED_POOL_SIZE = -1;
+    // ----------------------------------------------------------------------
+    // Public methods
+    // ----------------------------------------------------------------------
 
-    public static void configure( final String ctxPrefix,
-                                  final RemoteStorageContext ctx,
-                                  final Logger logger )
+    /**
+     * Creates and prepares an http client instance by using configuration present in {@link RemoteStorageContext}.
+     * <p/>
+     * This implies:<br/>
+     * * setting up connection pool using number of connections specified by system property
+     * {@link #CONNECTION_POOL_SIZE_KEY}<br/>
+     * * setting timeout as configured for repository<br/>
+     * * (if necessary) configure authentication<br/>
+     * * (if necessary) configure proxy as configured for repository
+     *
+     * @param ctxPrefix context keys prefix
+     * @param ctx       remote repository context
+     * @param logger    logger
+     */
+    static void configure( final String ctxPrefix,
+                           final RemoteStorageContext ctx,
+                           final Logger logger )
     {
         final DefaultHttpClient httpClient = new DefaultHttpClient(
             createConnectionManager(), createHttpParams( ctx )
@@ -76,14 +123,131 @@ public class HttpClientUtil
 
         ctx.putContextObject( ctxPrefix + CTX_KEY_CLIENT, httpClient );
 
-        configureAuthentication( httpClient, ctx, ctx.getRemoteAuthenticationSettings(), logger );
-        configureProxy( httpClient, ctx, logger );
+        configureAuthentication( httpClient, ctxPrefix, ctx, ctx.getRemoteAuthenticationSettings(), logger );
+        configureProxy( httpClient, ctxPrefix, ctx, logger );
 
         // NEXUS-3338: we don't know after config change is remote S3 (url changed maybe)
         ctx.putContextObject( ctxPrefix + CTX_KEY_S3_FLAG, new BooleanFlagHolder() );
     }
 
+    /**
+     * Releases the current HTTP client (if any) and removes context objects.
+     *
+     * @param ctxPrefix context keys prefix
+     * @param ctx       remote repository context
+     */
+    static void release( final String ctxPrefix,
+                         final RemoteStorageContext ctx )
+    {
+        if ( ctx.hasContextObject( ctxPrefix + CTX_KEY_CLIENT ) )
+        {
+            HttpClient httpClient = (HttpClient) ctx.getContextObject( ctxPrefix + CTX_KEY_CLIENT );
+            httpClient.getConnectionManager().shutdown();
+            ctx.removeContextObject( ctxPrefix + CTX_KEY_CLIENT );
+        }
+        ctx.removeContextObject( ctxPrefix + CTX_KEY_S3_FLAG );
+        ctx.putContextObject( ctxPrefix + CTX_KEY_NTLM_IS_IN_USE, Boolean.FALSE );
+    }
+
+    /**
+     * Returns the HTTP client for context.
+     *
+     * @param ctxPrefix context keys prefix
+     * @param ctx       remote repository context
+     * @return HTTP client or {@code null} if not yet configured
+     */
+    static HttpClient getHttpClient( final String ctxPrefix,
+                                     final RemoteStorageContext ctx )
+    {
+        return (HttpClient) ctx.getContextObject( ctxPrefix + CTX_KEY_CLIENT );
+    }
+
+    /**
+     * Whether or not the NTLM authentication is used.
+     *
+     * @param ctxPrefix context keys prefix
+     * @param ctx       remote repository context
+     * @return {@code true} if NTLM authentication is used, {@code false} otherwise
+     */
+    static Boolean isNTLMAuthenticationUsed( final String ctxPrefix,
+                                             final RemoteStorageContext ctx )
+    {
+        final Object ntlmInUse = ctx.getContextObject( ctxPrefix + CTX_KEY_NTLM_IS_IN_USE );
+        return ntlmInUse != null && Boolean.parseBoolean( ntlmInUse.toString() );
+    }
+
+    /**
+     * Exposes the Amazon S3 flag key.
+     *
+     * @param ctxPrefix context keys prefix
+     * @returnAmazon S3 flag key
+     */
+    static String getS3FlagKey( final String ctxPrefix )
+    {
+        return ctxPrefix + CTX_KEY_S3_FLAG;
+    }
+
+    // ----------------------------------------------------------------------
+    // Implementation methods
+    // ----------------------------------------------------------------------
+
+    private static void configureAuthentication( final DefaultHttpClient httpClient,
+                                                 final String ctxPrefix,
+                                                 final RemoteStorageContext ctx,
+                                                 final RemoteAuthenticationSettings ras,
+                                                 final Logger logger )
+    {
+        if ( ras != null )
+        {
+            List<String> authorisationPreference = new ArrayList<String>( 2 );
+            authorisationPreference.add( AuthPolicy.DIGEST );
+            authorisationPreference.add( AuthPolicy.BASIC );
+
+            Credentials credentials = null;
+
+            if ( ras instanceof ClientSSLRemoteAuthenticationSettings )
+            {
+                // ClientSSLRemoteAuthenticationSettings cras = (ClientSSLRemoteAuthenticationSettings) ras;
+
+                // TODO - implement this
+            }
+            else if ( ras instanceof NtlmRemoteAuthenticationSettings )
+            {
+                final NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
+
+                // Using NTLM auth, adding it as first in policies
+                authorisationPreference.add( 0, AuthPolicy.NTLM );
+
+                log( Level.INFO, "... authentication setup for NTLM domain \"" + nras.getNtlmDomain() + "\"", logger );
+
+                credentials = new NTCredentials(
+                    nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras.getNtlmDomain()
+                );
+
+                ctx.putContextObject( ctxPrefix + CTX_KEY_NTLM_IS_IN_USE, Boolean.TRUE );
+            }
+            else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
+            {
+                UsernamePasswordRemoteAuthenticationSettings uras = (UsernamePasswordRemoteAuthenticationSettings) ras;
+
+                // Using Username/Pwd auth, will not add NTLM
+                log( Level.INFO, "... authentication setup for remote storage with username \"" + uras.getUsername()
+                    + "\"", logger );
+
+                credentials = new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() );
+            }
+
+            if ( credentials != null )
+            {
+                httpClient.getCredentialsProvider().setCredentials( AuthScope.ANY, credentials );
+            }
+
+            httpClient.getParams().setParameter( AuthPNames.PROXY_AUTH_PREF, authorisationPreference );
+        }
+    }
+
     private static void configureProxy( final DefaultHttpClient httpClient,
+                                        final String ctxPrefix,
                                         final RemoteStorageContext ctx,
                                         final Logger logger )
     {
@@ -119,7 +283,7 @@ public class HttpClientUtil
 
             }
 
-            configureAuthentication( httpClient, ctx, rps.getProxyAuthentication(), logger );
+            configureAuthentication( httpClient, ctxPrefix, ctx, rps.getProxyAuthentication(), logger );
 
             if ( rps.getProxyAuthentication() != null )
             {
@@ -134,60 +298,6 @@ public class HttpClientUtil
                 }
 
             }
-        }
-    }
-
-    private static void configureAuthentication( final DefaultHttpClient httpClient,
-                                                 final RemoteStorageContext ctx,
-                                                 final RemoteAuthenticationSettings ras,
-                                                 final Logger logger )
-    {
-        if ( ras != null )
-        {
-            List<String> authorisationPreference = new ArrayList<String>( 2 );
-            authorisationPreference.add( AuthPolicy.DIGEST );
-            authorisationPreference.add( AuthPolicy.BASIC );
-
-            Credentials credentials = null;
-
-            if ( ras instanceof ClientSSLRemoteAuthenticationSettings )
-            {
-                // ClientSSLRemoteAuthenticationSettings cras = (ClientSSLRemoteAuthenticationSettings) ras;
-
-                // TODO - implement this
-            }
-            else if ( ras instanceof NtlmRemoteAuthenticationSettings )
-            {
-                final NtlmRemoteAuthenticationSettings nras = (NtlmRemoteAuthenticationSettings) ras;
-
-                // Using NTLM auth, adding it as first in policies
-                authorisationPreference.add( 0, AuthPolicy.NTLM );
-
-                log( Level.INFO, "... authentication setup for NTLM domain \"" + nras.getNtlmDomain() + "\"", logger );
-
-                credentials = new NTCredentials(
-                    nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras.getNtlmDomain()
-                );
-
-                ctx.putContextObject( NTLM_IS_IN_USE_KEY, Boolean.TRUE );
-            }
-            else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
-            {
-                UsernamePasswordRemoteAuthenticationSettings uras = (UsernamePasswordRemoteAuthenticationSettings) ras;
-
-                // Using Username/Pwd auth, will not add NTLM
-                log( Level.INFO, "... authentication setup for remote storage with username \"" + uras.getUsername()
-                    + "\"", logger );
-
-                credentials = new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() );
-            }
-
-            if ( credentials != null )
-            {
-                httpClient.getCredentialsProvider().setCredentials( AuthScope.ANY, credentials );
-            }
-
-            httpClient.getParams().setParameter( AuthPNames.PROXY_AUTH_PREF, authorisationPreference );
         }
     }
 
@@ -222,10 +332,6 @@ public class HttpClientUtil
 
     /**
      * Coding around plexus logger as this class is NOT a component and should not be using this type of logging.
-     *
-     * @param level
-     * @param message
-     * @param logger
      */
     private static void log( Level level, String message, Logger logger )
     {
@@ -268,28 +374,6 @@ public class HttpClientUtil
             }
         }
 
-    }
-
-    public static void release( final String ctxPrefix, final RemoteStorageContext ctx )
-    {
-        if ( ctx.hasContextObject( ctxPrefix + CTX_KEY_CLIENT ) )
-        {
-            HttpClient httpClient = (HttpClient) ctx.getContextObject( ctxPrefix + CTX_KEY_CLIENT );
-            httpClient.getConnectionManager().shutdown();
-            ctx.removeContextObject( ctxPrefix + CTX_KEY_CLIENT );
-        }
-        ctx.removeContextObject( ctxPrefix + CTX_KEY_S3_FLAG );
-        ctx.putContextObject( NTLM_IS_IN_USE_KEY, Boolean.FALSE );
-    }
-
-    public static HttpClient getHttpClient( final String ctxPrefix, final RemoteStorageContext ctx )
-    {
-        return (HttpClient) ctx.getContextObject( ctxPrefix + CTX_KEY_CLIENT );
-    }
-
-    public static String getS3FlagKey( final String ctxPrefix )
-    {
-        return ctxPrefix + CTX_KEY_S3_FLAG;
     }
 
 }

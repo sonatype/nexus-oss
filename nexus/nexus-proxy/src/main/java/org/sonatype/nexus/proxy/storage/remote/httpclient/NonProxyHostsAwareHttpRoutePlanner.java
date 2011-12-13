@@ -26,26 +26,48 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.conn.params.ConnRouteParams;
 import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.impl.conn.DefaultHttpRoutePlanner;
 import org.apache.http.protocol.HttpContext;
+import com.google.common.base.Preconditions;
 
-public class NonProxyHostsAwareHttpRoutePlanner
+/**
+ * An {@link HttpRoutePlanner} that bypasses proxy for specific hosts.
+ *
+ * @since 1.10.0
+ */
+class NonProxyHostsAwareHttpRoutePlanner
     extends DefaultHttpRoutePlanner
 {
 
+    // ----------------------------------------------------------------------
+    // Implementation fields
+    // ----------------------------------------------------------------------
+
+    /**
+     * Set of patterns for matching hosts names against. Never null.
+     */
     private final Set<Pattern> nonProxyHostPatterns;
 
-    public NonProxyHostsAwareHttpRoutePlanner( final SchemeRegistry schemeRegistry,
-                                               final Set<Pattern> nonProxyHostPatterns )
+    // ----------------------------------------------------------------------
+    // Constructors
+    // ----------------------------------------------------------------------
+
+    NonProxyHostsAwareHttpRoutePlanner( final SchemeRegistry schemeRegistry,
+                                        final Set<Pattern> nonProxyHostPatterns )
     {
         super( schemeRegistry );
-        this.nonProxyHostPatterns = nonProxyHostPatterns;
+        this.nonProxyHostPatterns = Preconditions.checkNotNull( nonProxyHostPatterns );
     }
 
-    public HttpRoute determineRoute( HttpHost target,
-                                     HttpRequest request,
-                                     HttpContext context )
+    // ----------------------------------------------------------------------
+    // Public methods
+    // ----------------------------------------------------------------------
+
+    public HttpRoute determineRoute( final HttpHost target,
+                                     final HttpRequest request,
+                                     final HttpContext context )
         throws HttpException
     {
         Object proxy = null;
@@ -69,6 +91,10 @@ public class NonProxyHostsAwareHttpRoutePlanner
             }
         }
     }
+
+    // ----------------------------------------------------------------------
+    // Implementation methods
+    // ----------------------------------------------------------------------
 
     private boolean noProxyFor( final String hostName )
     {

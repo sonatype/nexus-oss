@@ -63,32 +63,63 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 /**
- * Apache HTTP client (4) {@link RemoteRepositoryStorage} implementation
+ * Apache HTTP client (4) {@link RemoteRepositoryStorage} implementation.
+ *
+ * @since 1.10.0
  */
 @Named( HttpClientRemoteStorage.PROVIDER_STRING )
 @Singleton
-public class HttpClientRemoteStorage
+class HttpClientRemoteStorage
     extends AbstractRemoteRepositoryStorage
     implements RemoteRepositoryStorage
 {
 
+    // ----------------------------------------------------------------------
+    // Constants
+    // ----------------------------------------------------------------------
+
+    /**
+     * ID of this provider.
+     */
     public static final String PROVIDER_STRING = "apacheHttpClient4x";
 
+    /**
+     * The namespace prefix to be used to store provider specific keys in {@link RemoteStorageContext}.
+     */
     public static final String CTX_KEY = PROVIDER_STRING;
 
+    /**
+     * HTTP header key sent back by Nexus in case of a missing artifact.
+     */
     public static final String NEXUS_MISSING_ARTIFACT_HEADER = "x-nexus-missing-artifact";
 
+    /**
+     * Created items while retrieving, can be read.
+     */
+    private static final boolean CAN_READ = true;
+
+    /**
+     * Created items while retrieving, can be written.
+     */
+    private static final boolean CAN_WRITE = true;
+
+    // ----------------------------------------------------------------------
+    // Constructors
+    // ----------------------------------------------------------------------
+
     @Inject
-    protected HttpClientRemoteStorage( final UserAgentBuilder userAgentBuilder,
-                                       final ApplicationStatusSource applicationStatusSource,
-                                       final MimeSupport mimeSupport )
+    HttpClientRemoteStorage( final UserAgentBuilder userAgentBuilder,
+                             final ApplicationStatusSource applicationStatusSource,
+                             final MimeSupport mimeSupport )
     {
         super( userAgentBuilder, applicationStatusSource, mimeSupport );
     }
 
-    // ===============================================================================
-    // RemoteStorage iface
+    // ----------------------------------------------------------------------
+    // Public methods
+    // ----------------------------------------------------------------------
 
+    @Override
     public String getProviderId()
     {
         return PROVIDER_STRING;
@@ -100,11 +131,12 @@ public class HttpClientRemoteStorage
                                              final String baseUrl )
         throws ItemNotFoundException, RemoteStorageException
     {
-        URL remoteURL = appendQueryString( getAbsoluteUrlFromBase( baseUrl, request.getRequestPath() ), repository );
+        final URL remoteURL =
+            appendQueryString( getAbsoluteUrlFromBase( baseUrl, request.getRequestPath() ), repository );
 
-        final HttpGet method = new HttpGet( remoteURL.toString() );
+        final HttpGet method = new HttpGet( remoteURL.toExternalForm() );
 
-        final HttpResponse httpResponse = executeMethod( repository, request, method, remoteURL );
+        final HttpResponse httpResponse = executeRequest( repository, request, method );
 
         if ( httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK )
         {
@@ -115,20 +147,18 @@ public class HttpClientRemoteStorage
                 // httpClient will follow redirections, and the getPath()
                 // _should_
                 // give us URL with ending "/"
-
                 release( httpResponse );
                 throw new ItemNotFoundException(
                     "The remoteURL we got to looks like is a collection, and Nexus cannot fetch collections over plain HTTP (remoteUrl=\""
                         + remoteURL.toString() + "\")", request, repository );
             }
 
-            InputStream is = null;
+            InputStream is;
             try
             {
                 is = httpResponse.getEntity().getContent();
 
                 String mimeType = EntityUtils.getContentMimeType( httpResponse.getEntity() );
-
                 if ( mimeType == null )
                 {
                     mimeType = getMimeSupport().guessMimeTypeFromPath(
@@ -137,21 +167,16 @@ public class HttpClientRemoteStorage
                 }
 
                 final DefaultStorageFileItem httpItem = new DefaultStorageFileItem(
-                    repository, request, true, true, new PreparedContentLocator( is, mimeType )
+                    repository, request, CAN_READ, CAN_WRITE, new PreparedContentLocator( is, mimeType )
                 );
 
                 if ( httpResponse.getEntity().getContentLength() != -1 )
                 {
-                    // FILE
                     httpItem.setLength( httpResponse.getEntity().getContentLength() );
                 }
-
                 httpItem.setRemoteUrl( remoteURL.toString() );
-
                 httpItem.setModified( makeDateFromHeader( httpResponse.getFirstHeader( "last-modified" ) ) );
-
                 httpItem.setCreated( httpItem.getModified() );
-
                 httpItem.getItemContext().putAll( request.getRequestContext() );
 
                 return httpItem;
@@ -206,7 +231,7 @@ public class HttpClientRemoteStorage
 
         final URL remoteUrl = appendQueryString( getAbsoluteUrlFromBase( repository, request ), repository );
 
-        final HttpPut method = new HttpPut( remoteUrl.toString() );
+        final HttpPut method = new HttpPut( remoteUrl.toExternalForm() );
 
         final InputStreamEntity entity;
         try
@@ -228,7 +253,7 @@ public class HttpClientRemoteStorage
         entity.setContentType( fileItem.getMimeType() );
         method.setEntity( entity );
 
-        final HttpResponse httpResponse = executeMethodAndRelease( repository, request, method, remoteUrl );
+        final HttpResponse httpResponse = executeRequestAndRelease( repository, request, method );
         final int statusCode = httpResponse.getStatusLine().getStatusCode();
 
         if ( statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_CREATED
@@ -251,12 +276,13 @@ public class HttpClientRemoteStorage
     {
         final URL remoteUrl = appendQueryString( getAbsoluteUrlFromBase( repository, request ), repository );
 
-        final HttpDelete method = new HttpDelete( remoteUrl.toString() );
+        final HttpDelete method = new HttpDelete( remoteUrl.toExternalForm() );
 
-        final HttpResponse httpResponse = executeMethodAndRelease( repository, request, method, remoteUrl );
+        final HttpResponse httpResponse = executeRequestAndRelease( repository, request, method );
         final int statusCode = httpResponse.getStatusLine().getStatusCode();
 
-        if ( statusCode != HttpStatus.SC_OK && statusCode != HttpStatus.SC_NO_CONTENT
+        if ( statusCode != HttpStatus.SC_OK
+            && statusCode != HttpStatus.SC_NO_CONTENT
             && statusCode != HttpStatus.SC_ACCEPTED )
         {
             throw new RemoteStorageException( "The response to HTTP " + method.getMethod()
@@ -285,10 +311,10 @@ public class HttpClientRemoteStorage
         boolean doGet = false;
 
         {
-            method = new HttpHead( remoteUrl.toString() );
+            method = new HttpHead( remoteUrl.toExternalForm() );
             try
             {
-                httpResponse = executeMethodAndRelease( repository, request, method, remoteUrl );
+                httpResponse = executeRequestAndRelease( repository, request, method );
                 statusCode = httpResponse.getStatusLine().getStatusCode();
             }
             catch ( RemoteStorageException e )
@@ -314,10 +340,10 @@ public class HttpClientRemoteStorage
             if ( doGet )
             {
                 // create a GET
-                method = new HttpGet( remoteUrl.toString() );
+                method = new HttpGet( remoteUrl.toExternalForm() );
 
                 // execute it
-                httpResponse = executeMethodAndRelease( repository, request, method, remoteUrl );
+                httpResponse = executeRequestAndRelease( repository, request, method );
                 statusCode = httpResponse.getStatusLine().getStatusCode();
             }
         }
@@ -379,22 +405,33 @@ public class HttpClientRemoteStorage
         return HttpClientUtil.getS3FlagKey( CTX_KEY );
     }
 
+    // ----------------------------------------------------------------------
+    // Implementation methods
+    // ----------------------------------------------------------------------
+
     /**
-     * Execute method. In case of any exception thrown by HttpClient, it will release the connection. In other cases it
+     * Executes the HTTP request.
+     * <p/>
+     * In case of any exception thrown by HttpClient, it will release the connection. In other cases it
      * is the duty of caller to do it, or process the input stream.
+     *
+     * @param repository  to execute the HTTP method fpr
+     * @param request     resource store request that triggered the HTTP request
+     * @param httpRequest HTTP request to be executed
+     * @return response of making the request
+     * @throws RemoteStorageException If an error occurred during execution of HTTP request
      */
-    private HttpResponse executeMethod( final ProxyRepository repository,
-                                        final ResourceStoreRequest request,
-                                        final HttpUriRequest httpRequest,
-                                        final URL remoteUrl )
+    private HttpResponse executeRequest( final ProxyRepository repository,
+                                         final ResourceStoreRequest request,
+                                         final HttpUriRequest httpRequest )
         throws RemoteStorageException
     {
-        URI methodURI = httpRequest.getURI();
+        final URI methodUri = httpRequest.getURI();
 
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                "Invoking HTTP " + httpRequest.getMethod() + " method against remote location " + methodURI
+                "Invoking HTTP " + httpRequest.getMethod() + " method against remote location " + methodUri
             );
         }
 
@@ -409,8 +446,7 @@ public class HttpClientRemoteStorage
         httpRequest.setHeader( "cache-control", "no-cache" );
 
         // HTTP keep alive should not be used, except when NTLM is used
-        Boolean isNtlmUsed = (Boolean) ctx.getContextObject( HttpClientUtil.NTLM_IS_IN_USE_KEY );
-
+        final Boolean isNtlmUsed = HttpClientUtil.isNTLMAuthenticationUsed( CTX_KEY, ctx );
         if ( isNtlmUsed == null || !isNtlmUsed )
         {
             httpRequest.setHeader( "Connection", "close" );
@@ -435,7 +471,7 @@ public class HttpClientRemoteStorage
             if ( statusCode == HttpStatus.SC_FORBIDDEN )
             {
                 throw new RemoteAccessDeniedException(
-                    repository, remoteUrl, httpResponse.getStatusLine().getReasonPhrase()
+                    repository, methodUri.toASCIIString(), httpResponse.getStatusLine().getReasonPhrase()
                 );
             }
             else if ( statusCode == HttpStatus.SC_UNAUTHORIZED )
@@ -464,7 +500,7 @@ public class HttpClientRemoteStorage
             throw new RemoteStorageException( "Protocol error while executing " + httpRequest.getMethod()
                                                   + " method. [repositoryId=\"" + repository.getId()
                                                   + "\", requestPath=\"" + request.getRequestPath()
-                                                  + "\", remoteUrl=\"" + methodURI + "\"]", ex );
+                                                  + "\", remoteUrl=\"" + methodUri.toASCIIString() + "\"]", ex );
         }
         catch ( IOException ex )
         {
@@ -472,17 +508,25 @@ public class HttpClientRemoteStorage
             throw new RemoteStorageException( "Transport error while executing " + httpRequest.getMethod()
                                                   + " method [repositoryId=\"" + repository.getId()
                                                   + "\", requestPath=\"" + request.getRequestPath()
-                                                  + "\", remoteUrl=\"" + methodURI + "\"]", ex );
+                                                  + "\", remoteUrl=\"" + methodUri.toASCIIString() + "\"]", ex );
         }
     }
 
-    private HttpResponse executeMethodAndRelease( final ProxyRepository repository,
-                                                  final ResourceStoreRequest request,
-                                                  final HttpUriRequest httpRequest,
-                                                  final URL remoteUrl )
+    /**
+     * Executes the HTTP request and automatically releases any related resources.
+     *
+     * @param repository  to execute the HTTP method fpr
+     * @param request     resource store request that triggered the HTTP request
+     * @param httpRequest HTTP request to be executed
+     * @return response of making the request
+     * @throws RemoteStorageException If an error occurred during execution of HTTP request
+     */
+    private HttpResponse executeRequestAndRelease( final ProxyRepository repository,
+                                                   final ResourceStoreRequest request,
+                                                   final HttpUriRequest httpRequest )
         throws RemoteStorageException
     {
-        final HttpResponse httpResponse = executeMethod( repository, request, httpRequest, remoteUrl );
+        final HttpResponse httpResponse = executeRequest( repository, request, httpRequest );
         release( httpResponse );
         return httpResponse;
     }
@@ -493,7 +537,7 @@ public class HttpClientRemoteStorage
      * @param date the date
      * @return the long
      */
-    private long makeDateFromHeader( Header date )
+    private long makeDateFromHeader( final Header date )
     {
         long result = System.currentTimeMillis();
         if ( date != null )
@@ -515,7 +559,16 @@ public class HttpClientRemoteStorage
         return result;
     }
 
-    private URL appendQueryString( final URL url, final ProxyRepository repository )
+    /**
+     * Appends repository configured additional query string to provided URL.
+     *
+     * @param url        to append to
+     * @param repository that may contain additional query string
+     * @return URL with appended query string or original URL if repository does not have an configured query string
+     * @throws RemoteStorageException if query string could not be appended (resulted in an Malformed URL exception)
+     */
+    private URL appendQueryString( final URL url,
+                                   final ProxyRepository repository )
         throws RemoteStorageException
     {
         final RemoteStorageContext ctx = getRemoteStorageContext( repository );
@@ -544,6 +597,11 @@ public class HttpClientRemoteStorage
         return url;
     }
 
+    /**
+     * Releases connection resources (back to pool). If an exception appears during releasing, exception is just logged.
+     *
+     * @param httpResponse to be released
+     */
     private void release( final HttpResponse httpResponse )
     {
         if ( httpResponse != null )
