@@ -40,7 +40,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.remote.AbstractHTTPRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext.BooleanFlagHolder;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -58,7 +58,7 @@ import com.ning.http.client.Response;
 @Named( AhcRemoteRepositoryStorage.PROVIDER_STRING )
 @Singleton
 public class AhcRemoteRepositoryStorage
-    extends AbstractRemoteRepositoryStorage
+    extends AbstractHTTPRemoteRepositoryStorage
     implements RemoteRepositoryStorage
 {
 

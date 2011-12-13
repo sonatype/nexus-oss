@@ -57,7 +57,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.remote.AbstractHTTPRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
@@ -70,7 +70,7 @@ import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 @Named( HttpClientRemoteStorage.PROVIDER_STRING )
 @Singleton
 class HttpClientRemoteStorage
-    extends AbstractRemoteRepositoryStorage
+    extends AbstractHTTPRemoteRepositoryStorage
     implements RemoteRepositoryStorage
 {
 

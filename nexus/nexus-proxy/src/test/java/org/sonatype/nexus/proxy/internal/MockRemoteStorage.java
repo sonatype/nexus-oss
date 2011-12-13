@@ -76,21 +76,6 @@ public class MockRemoteStorage
     {
     }
 
-    @Override
-    protected boolean checkRemoteAvailability( final long newerThen, final ProxyRepository repository,
-                                               final ResourceStoreRequest request,
-                                               final boolean isStrict )
-        throws RemoteStorageException
-    {
-        throw new UnsupportedOperationException( "Unexpected to be called!" );
-    }
-
-    @Override
-    protected String getS3FlagKey()
-    {
-        throw new UnsupportedOperationException( "Unexpected to be called!" );
-    }
-
     public boolean containsItem( long newerThen, ProxyRepository repository, ResourceStoreRequest request )
         throws RemoteAccessException, RemoteStorageException
     {

@@ -62,6 +62,7 @@ import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.repository.EvictUnusedItemsWalkerProcessor.EvictUnusedItemsWalkerFilter;
 import org.sonatype.nexus.proxy.repository.threads.ThreadPoolManager;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.storage.remote.AbstractHTTPRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
@@ -482,8 +483,8 @@ public abstract class AbstractProxyRepository
              */
             try
             {
-                if ( remoteStorage instanceof AbstractRemoteRepositoryStorage
-                    && ( (AbstractRemoteRepositoryStorage) remoteStorage ).isRemotePeerAmazonS3Storage( this )
+                if ( remoteStorage instanceof AbstractHTTPRemoteRepositoryStorage
+                    && ( (AbstractHTTPRemoteRepositoryStorage) remoteStorage ).isRemotePeerAmazonS3Storage( this )
                     && cause instanceof RemoteAccessDeniedException )
                 {
                     getLogger().debug(
