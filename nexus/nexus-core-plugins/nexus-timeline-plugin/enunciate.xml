@@ -52,7 +52,7 @@
     <jaxws-client disabled="true" />
   -->
 
-    <docs disabled="false" title="Sonatype Nexus Indexer Lucene REST API" includeExampleXml="true" includeExampleJson="true" >
+    <docs disabled="false" title="Sonatype Nexus Timeline REST API" includeExampleXml="true" includeExampleJson="true" >
       <war docsDir="apidocs" />
     </docs>
 
