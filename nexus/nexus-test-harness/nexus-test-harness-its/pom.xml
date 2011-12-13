@@ -334,6 +334,7 @@
             <configuration>
               <systemPropertyVariables>
                 <nexus.default.http.provider>async-http-client</nexus.default.http.provider>
+                <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
               </systemPropertyVariables>
             </configuration>
           </plugin>
