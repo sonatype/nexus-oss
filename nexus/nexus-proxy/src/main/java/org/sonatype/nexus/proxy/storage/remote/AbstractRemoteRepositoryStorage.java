@@ -26,10 +26,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
@@ -44,10 +43,9 @@ import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
  * @author cstamas
  */
 public abstract class AbstractRemoteRepositoryStorage
+    extends AbstractLoggingComponent
     implements RemoteRepositoryStorage
 {
-
-    private final Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
     private final MimeSupport mimeSupport;
 
@@ -67,11 +65,6 @@ public abstract class AbstractRemoteRepositoryStorage
         this.userAgentBuilder = checkNotNull( userAgentBuilder );
         this.applicationStatusSource = checkNotNull( applicationStatusSource );
         this.mimeSupport = checkNotNull( mimeSupport );
-    }
-
-    protected Logger getLogger()
-    {
-        return logger;
     }
 
     protected MimeSupport getMimeSupport()
@@ -282,7 +275,9 @@ public abstract class AbstractRemoteRepositoryStorage
                     + repository.getName()
                     + "\" (ID="
                     + repository.getId()
-                    + ") is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of your setup (baseUrl of proxy repository)!" );
+                    + ") is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of "
+                    + "your setup (baseUrl of proxy repository)!"
+            );
         }
     }
 

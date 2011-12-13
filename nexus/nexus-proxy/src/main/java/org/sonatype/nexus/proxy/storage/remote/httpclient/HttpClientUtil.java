@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -42,7 +41,8 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
@@ -93,7 +93,7 @@ class HttpClientUtil
     // Implementation fields
     // ----------------------------------------------------------------------
 
-    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger( HttpClientUtil.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( HttpClientUtil.class );
 
     // ----------------------------------------------------------------------
     // Public methods
@@ -123,7 +123,7 @@ class HttpClientUtil
 
         ctx.putContextObject( ctxPrefix + CTX_KEY_CLIENT, httpClient );
 
-        configureAuthentication( httpClient, ctxPrefix, ctx, ctx.getRemoteAuthenticationSettings(), logger );
+        configureAuthentication( httpClient, ctxPrefix, ctx, ctx.getRemoteAuthenticationSettings(), logger, "" );
         configureProxy( httpClient, ctxPrefix, ctx, logger );
 
         // NEXUS-3338: we don't know after config change is remote S3 (url changed maybe)
@@ -195,7 +195,8 @@ class HttpClientUtil
                                                  final String ctxPrefix,
                                                  final RemoteStorageContext ctx,
                                                  final RemoteAuthenticationSettings ras,
-                                                 final Logger logger )
+                                                 final Logger logger,
+                                                 final String authScope )
     {
         if ( ras != null )
         {
@@ -218,7 +219,9 @@ class HttpClientUtil
                 // Using NTLM auth, adding it as first in policies
                 authorisationPreference.add( 0, AuthPolicy.NTLM );
 
-                log( Level.INFO, "... authentication setup for NTLM domain \"" + nras.getNtlmDomain() + "\"", logger );
+                logger( logger ).info(
+                    "... {}authentication setup for NTLM domain '{}'", authScope, nras.getNtlmDomain()
+                );
 
                 credentials = new NTCredentials(
                     nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras.getNtlmDomain()
@@ -231,8 +234,9 @@ class HttpClientUtil
                 UsernamePasswordRemoteAuthenticationSettings uras = (UsernamePasswordRemoteAuthenticationSettings) ras;
 
                 // Using Username/Pwd auth, will not add NTLM
-                log( Level.INFO, "... authentication setup for remote storage with username \"" + uras.getUsername()
-                    + "\"", logger );
+                logger( logger ).info(
+                    "... {}authentication setup for remote storage with username '{}'", authScope, uras.getUsername()
+                );
 
                 credentials = new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() );
             }
@@ -255,7 +259,7 @@ class HttpClientUtil
 
         if ( rps.isEnabled() )
         {
-            log( Level.INFO, "... proxy setup with host \"" + rps.getHostname() + "\"", logger );
+            logger( logger ).info( "... proxy setup with host '{}'", rps.getHostname() );
 
             final HttpHost proxy = new HttpHost( rps.getHostname(), rps.getPort() );
             httpClient.getParams().setParameter( ConnRoutePNames.DEFAULT_PROXY, proxy );
@@ -272,7 +276,7 @@ class HttpClientUtil
                     }
                     catch ( PatternSyntaxException e )
                     {
-                        LOG.warn( "Invalid non proxy host regex: " + nonProxyHostRegex, e );
+                        logger( logger ).warn( "Invalid non proxy host regex: {}", nonProxyHostRegex, e );
                     }
                 }
                 httpClient.setRoutePlanner(
@@ -283,18 +287,20 @@ class HttpClientUtil
 
             }
 
-            configureAuthentication( httpClient, ctxPrefix, ctx, rps.getProxyAuthentication(), logger );
+            configureAuthentication( httpClient, ctxPrefix, ctx, rps.getProxyAuthentication(), logger, "proxy " );
 
             if ( rps.getProxyAuthentication() != null )
             {
                 if ( ctx.getRemoteAuthenticationSettings() != null
                     && ( ctx.getRemoteAuthenticationSettings() instanceof NtlmRemoteAuthenticationSettings ) )
                 {
-                    log( Level.WARNING, "... Apache Commons HttpClient 3.x is unable to use NTLM auth scheme\n"
-                        + " for BOTH server side and proxy side authentication!\n"
-                        + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
-                        + " if you have to use NTLM proxy, otherwise it will not work!\n"
-                        + " *** SERVER SIDE AUTH OVERRIDDEN", logger );
+                    logger( logger ).warn(
+                        "... Apache Commons HttpClient 3.x is unable to use NTLM auth scheme\n"
+                            + " for BOTH server side and proxy side authentication!\n"
+                            + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
+                            + " if you have to use NTLM proxy, otherwise it will not work!\n"
+                            + " *** SERVER SIDE AUTH OVERRIDDEN"
+                    );
                 }
 
             }
@@ -330,50 +336,13 @@ class HttpClientUtil
         return connManager;
     }
 
-    /**
-     * Coding around plexus logger as this class is NOT a component and should not be using this type of logging.
-     */
-    private static void log( Level level, String message, Logger logger )
+    private static Logger logger( final Logger logger )
     {
         if ( logger != null )
         {
-            if ( level.equals( Level.SEVERE ) )
-            {
-                logger.error( message );
-            }
-            else if ( level.equals( Level.WARNING ) )
-            {
-                logger.warn( message );
-            }
-            else if ( level.equals( Level.INFO ) )
-            {
-                logger.info( message );
-            }
-            else
-            {
-                logger.debug( message );
-            }
+            return logger;
         }
-        else
-        {
-            if ( level.equals( Level.SEVERE ) )
-            {
-                LOG.error( message );
-            }
-            else if ( level.equals( Level.WARNING ) )
-            {
-                LOG.warn( message );
-            }
-            else if ( level.equals( Level.INFO ) )
-            {
-                LOG.info( message );
-            }
-            else
-            {
-                LOG.debug( message );
-            }
-        }
-
+        return LOGGER;
     }
 
 }
