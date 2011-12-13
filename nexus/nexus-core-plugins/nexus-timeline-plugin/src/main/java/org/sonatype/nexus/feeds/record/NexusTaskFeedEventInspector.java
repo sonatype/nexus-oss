@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.SystemProcess;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.scheduling.NexusTask;
@@ -34,22 +33,33 @@ import org.sonatype.nexus.scheduling.events.NexusTaskEventStoppedFailed;
 import org.sonatype.plexus.appevents.Event;
 
 /**
- * Event inspector that creates feeds about tasks.
+ * Event inspector that creates feeds about tasks. Note: this EventInspector is
+ * <em>intentionally synchronous EventInspector</em>! Reasoning is mainly to avoid unordered event arrivals (stopped
+ * before started), but also, one can easily see by inspecting where these events are fired (see
+ * {@link AbstractNexusTask}), that those are fired from already pooled thread (task executing thread), and not the main
+ * HTTP request processing ones, hence, this event inspector being synchronous will not steal much CPU cycles from it
+ * (well, will do as much to decide does it "accepts" the event, but that is negligible, and will be fixed once we start
+ * using "event bus" since then it will not even be invoked).
  * 
  * @author cstamas
  */
 @Component( role = EventInspector.class, hint = "NexusTaskFeedEventInspector" )
 public class NexusTaskFeedEventInspector
     extends AbstractFeedRecorderEventInspector
-    implements AsynchronousEventInspector
+    implements EventInspector
 {
     public boolean accepts( final Event<?> evt )
     {
-        return evt instanceof NexusTaskEvent;
+        return evt != null && evt instanceof NexusTaskEvent;
     }
 
     public void inspect( final Event<?> evt )
     {
+        if ( !accepts( evt ) )
+        {
+            return;
+        }
+
         if ( evt instanceof NexusTaskEventStarted<?> )
         {
             final String action = getActionFromTask( ( (NexusTaskEventStarted<?>) evt ).getNexusTask() );
