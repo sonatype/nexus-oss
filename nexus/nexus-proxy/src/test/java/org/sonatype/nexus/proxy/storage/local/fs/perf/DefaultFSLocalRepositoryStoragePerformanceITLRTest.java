@@ -19,6 +19,7 @@
 package org.sonatype.nexus.proxy.storage.local.fs.perf;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.hamcrest.MatcherAssert;
@@ -163,7 +164,7 @@ public class DefaultFSLocalRepositoryStoragePerformanceITLRTest
     @BenchmarkOptions( benchmarkRounds = 10, warmupRounds = 1 )
     @Test
     public void validateRetieveItemWithoutLastAccessUpdate()
-        throws LocalStorageException, ItemNotFoundException
+        throws LocalStorageException, ItemNotFoundException, IOException
     {
         AttributeStorage attributeStorageSpy = Mockito.spy( repository.getAttributesHandler().getAttributeStorage() );
         repository.getAttributesHandler().setAttributeStorage( attributeStorageSpy );
@@ -181,7 +182,7 @@ public class DefaultFSLocalRepositoryStoragePerformanceITLRTest
     @BenchmarkOptions( benchmarkRounds = 10, warmupRounds = 1 )
     @Test
     public void validateRetieveItemWithLastAccessUpdate()
-        throws LocalStorageException, ItemNotFoundException
+        throws LocalStorageException, ItemNotFoundException, IOException
     {
         AttributeStorage attributeStorageSpy = Mockito.spy( repository.getAttributesHandler().getAttributeStorage() );
         repository.getAttributesHandler().setAttributeStorage( attributeStorageSpy );
@@ -203,7 +204,7 @@ public class DefaultFSLocalRepositoryStoragePerformanceITLRTest
     @BenchmarkOptions( benchmarkRounds = 10, warmupRounds = 1 )
     @Test
     public void validateRetieveItemWithOutLastAccessUpdateTimeDelay()
-        throws LocalStorageException, ItemNotFoundException
+        throws LocalStorageException, ItemNotFoundException, IOException
     {
         // do the test, but make sure the _iterations_ will not get out of the "resolution" span!
         // Note: this test is just broken as is, what guarantees it will finish the cycles in given X millis?

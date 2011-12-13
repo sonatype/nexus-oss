@@ -68,6 +68,7 @@ public class DefaultLSAttributeStorage
     }
 
     public boolean deleteAttributes( final RepositoryItemUid uid )
+        throws IOException
     {
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
@@ -99,10 +100,6 @@ public class DefaultLSAttributeStorage
             {
                 // ignore it
             }
-            catch ( IOException e )
-            {
-                getLogger().warn( "Got IOException during delete of UID=" + uid.toString(), e );
-            }
 
             return false;
         }
@@ -113,6 +110,7 @@ public class DefaultLSAttributeStorage
     }
 
     public Attributes getAttributes( final RepositoryItemUid uid )
+        throws IOException
     {
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
@@ -124,16 +122,8 @@ public class DefaultLSAttributeStorage
             {
                 getLogger().debug( "Loading attributes on UID=" + uid.toString() );
             }
-            try
-            {
-                return doGetAttributes( uid );
-            }
-            catch ( IOException ex )
-            {
-                getLogger().error( "Got IOException during reading of UID=" + uid.toString(), ex );
 
-                return null;
-            }
+            return doGetAttributes( uid );
         }
         finally
         {
@@ -141,7 +131,8 @@ public class DefaultLSAttributeStorage
         }
     }
 
-    public void putAttributes( final RepositoryItemUid uid,  Attributes attributes )
+    public void putAttributes( final RepositoryItemUid uid, Attributes attributes )
+        throws IOException
     {
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
@@ -190,10 +181,6 @@ public class DefaultLSAttributeStorage
             {
                 // TODO: what here? Is local storage unsuitable for storing attributes?
                 getLogger().error( "Got UnsupportedStorageOperationException during store of UID=" + uid.toString(), ex );
-            }
-            catch ( IOException ex )
-            {
-                getLogger().error( "Got IOException during store of UID=" + uid.toString(), ex );
             }
         }
         finally

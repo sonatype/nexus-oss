@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -161,6 +162,7 @@ public abstract class AttributeStoragePerformanceTestSupport
     // ////////////
     @Test
     public void test0PrimePutAndGettAttribute()
+        throws IOException
     {
         writeEntryToAttributeStorage( "/prime.txt" );
         getStorageItemFromAttributeStore( "/prime.txt" );
@@ -168,12 +170,14 @@ public abstract class AttributeStoragePerformanceTestSupport
 
     @Test
     public void test1PutAttribute()
+        throws IOException
     {
         writeEntryToAttributeStorage( "/a.txt" );
     }
 
     @Test
     public void test2PutAttributeX100()
+        throws IOException
     {
         for ( int ii = 0; ii < ITERATION_COUNT; ii++ )
         {
@@ -183,6 +187,7 @@ public abstract class AttributeStoragePerformanceTestSupport
 
     @Test
     public void test3GetAttribute()
+        throws IOException
     {
         Attributes storageItem = getStorageItemFromAttributeStore( "/a.txt" );
         assertThat( storageItem.get( SHA1_ATTRIBUTE_KEY ), equalTo( SHA1_ATTRIBUTE_VALUE ) );
@@ -190,6 +195,7 @@ public abstract class AttributeStoragePerformanceTestSupport
 
     @Test
     public void test4GetAttributeX100()
+        throws IOException
     {
         for ( int ii = 0; ii < ITERATION_COUNT; ii++ )
         {
@@ -199,12 +205,14 @@ public abstract class AttributeStoragePerformanceTestSupport
 
     // @Test
     public void test5DeleteAttributes()
+        throws IOException
     {
         deleteStorageItemFromAttributeStore( "/a.txt" );
     }
 
     // @Test
     public void test6DeleteAttributesX100()
+        throws IOException
     {
         for ( int ii = 0; ii < ITERATION_COUNT; ii++ )
         {
@@ -240,6 +248,7 @@ public abstract class AttributeStoragePerformanceTestSupport
     }
 
     protected void writeEntryToAttributeStorage( String path )
+        throws IOException
     {
         StorageFileItem storageFileItem =
             new DefaultStorageFileItem( repository, new ResourceStoreRequest( path ), true, true, getContentLocator() );
@@ -253,6 +262,7 @@ public abstract class AttributeStoragePerformanceTestSupport
     }
 
     protected Attributes getStorageItemFromAttributeStore( String path )
+        throws IOException
     {
         RepositoryItemUid repositoryItemUid = new TestRepositoryItemUid( repositoryItemUidFactory, repository, path );
 
@@ -260,6 +270,7 @@ public abstract class AttributeStoragePerformanceTestSupport
     }
 
     private void deleteStorageItemFromAttributeStore( String path )
+        throws IOException
     {
         RepositoryItemUid repositoryItemUid = new TestRepositoryItemUid( repositoryItemUidFactory, repository, path );
         assertThat( "Attribute was not removed from store.", attributeStorage.deleteAttributes( repositoryItemUid ) );

@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
+import java.io.IOException;
+
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.uid.IsMetadataMaintainedAttribute;
 
@@ -47,6 +49,7 @@ public class DelegatingAttributeStorage
 
     @Override
     public Attributes getAttributes( RepositoryItemUid uid )
+        throws IOException
     {
         if ( isMetadataMaintained( uid ) )
         {
@@ -58,6 +61,7 @@ public class DelegatingAttributeStorage
 
     @Override
     public void putAttributes( RepositoryItemUid uid, Attributes attributes )
+        throws IOException
     {
         if ( isMetadataMaintained( uid ) )
         {
@@ -67,6 +71,7 @@ public class DelegatingAttributeStorage
 
     @Override
     public boolean deleteAttributes( RepositoryItemUid uid )
+        throws IOException
     {
         if ( isMetadataMaintained( uid ) )
         {
