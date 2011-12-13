@@ -91,7 +91,8 @@ public class TransitioningAttributeStorage
                         }
                         catch ( IOException e )
                         {
-                            // ignore
+                            // nag and ignore it
+                            getLogger().debug( "Problem during legacy attribute deletion!", e );
                         }
                     }
                 }
@@ -129,7 +130,8 @@ public class TransitioningAttributeStorage
                 }
                 catch ( IOException e )
                 {
-                    // ignore it
+                    // nag and ignore it
+                    getLogger().debug( "Problem during legacy attribute deletion!", e );
                 }
             }
         }
@@ -160,7 +162,8 @@ public class TransitioningAttributeStorage
             }
             catch ( IOException e )
             {
-                // ignore it
+                // nag and ignore it
+                getLogger().debug( "Problem during legacy attribute deletion!", e );
             }
 
             return mainResult;

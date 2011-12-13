@@ -25,6 +25,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
  * holding data serving the basic purpose of this given repository.
  * 
  * @author cstamas
+ * @since 1.10.0
  */
 public class IsTrashMetacontentAttribute
     implements Attribute<Boolean>
