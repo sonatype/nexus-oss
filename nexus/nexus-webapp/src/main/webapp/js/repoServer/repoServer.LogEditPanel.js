@@ -52,7 +52,7 @@ Sonatype.repoServer.LogEditPanel = function(config) {
               collapsible : true,
               collapsed : false,
               id : formId + '_' + 'logConfig',
-              title : 'Log4j Configuration',
+              title : 'Configuration',
               anchor : Sonatype.view.FIELDSET_OFFSET,
               autoHeight : true,
               layoutConfig : {
