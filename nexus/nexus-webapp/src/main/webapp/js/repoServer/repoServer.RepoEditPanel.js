@@ -326,21 +326,21 @@ Ext.extend(Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel,
           }
         }
       },
+      updateFields : function(form, data) {
+        this.updateIndexableCombo(form, data.format);
+        this.updateRepoPolicyField(form, data.format, data.repoPolicy)
+        this.updateDownloadRemoteIndexCombo(form, data.format);
+        this.contribute(data, 'enter')
+      },
       afterProviderSelectHandler : function(combo, rec, index) {
-        this.updateIndexableCombo(this.form, rec.data.format);
-        this.updateRepoPolicyField(this.form, rec.data.format, rec.data.repoPolicy)
-        this.updateDownloadRemoteIndexCombo(this.form, rec.data.format);
+        this.updateFields(this.form, rec.data);
       },
       showHandler : function() {
         this.updateWritePolicy();
       },
       loadHandler : function(form, action, receivedData) {
-        this.updateRepoPolicyField(form, receivedData.format, receivedData.repoPolicy);
-        this.updateIndexableCombo(form, receivedData.format);
-        this.updateDownloadRemoteIndexCombo(form, receivedData.format);
-        this.contribute( receivedData, 'enter' )
+        this.updateFields(form, receivedData)
       }
-
     });
 
 Sonatype.repoServer.HostedRepositoryEditor = function(config) {
