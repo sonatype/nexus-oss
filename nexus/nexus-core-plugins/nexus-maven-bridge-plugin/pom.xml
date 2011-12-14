@@ -197,10 +197,8 @@
           <sharedDependencies>
             <sharedDependency>org.sonatype.aether:aether-api</sharedDependency>
             <sharedDependency>org.sonatype.aether:aether-util</sharedDependency>
+            <sharedDependency>org.sonatype.sisu:sisu-maven-bridge</sharedDependency>
           </sharedDependencies>
-          <componentDependencies>
-            <componentDependency>org.sonatype.sisu:sisu-maven-bridge</componentDependency>
-          </componentDependencies>
         </configuration>
       </plugin>
     </plugins>
