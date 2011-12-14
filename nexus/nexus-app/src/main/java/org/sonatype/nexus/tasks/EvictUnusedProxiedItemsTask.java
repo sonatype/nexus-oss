@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
@@ -38,6 +37,11 @@ import org.sonatype.scheduling.SchedulerTask;
 public class EvictUnusedProxiedItemsTask
     extends AbstractNexusRepositoriesTask<Collection<String>>
 {
+    /**
+     * System event action: evict unused proxied items
+     */
+    public static final String ACTION = "EVICT_UNUSED_PROXIED_ITEMS";
+
     @Override
     protected String getRepositoryFieldId()
     {
@@ -83,7 +87,7 @@ public class EvictUnusedProxiedItemsTask
     @Override
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_EVICT_UNUSED_PROXIED_ITEMS_ACTION;
+        return ACTION;
     }
 
     @Override

@@ -34,6 +34,7 @@
 
   <modules>
     <module>nexus-indexer-lucene-plugin</module>
+    <module>nexus-timeline-plugin</module>
     <module>nexus-lvo-plugin</module>
     <module>nexus-plugin-console-plugin</module>
     <module>nexus-ldap-plugin-parent</module>

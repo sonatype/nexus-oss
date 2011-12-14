@@ -18,9 +18,6 @@
  */
 package org.sonatype.nexus.proxy.maven.maven1;
 
-import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.GavCalculator;
-import org.apache.maven.index.artifact.M1ArtifactRecognizer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -33,6 +30,9 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
+import org.sonatype.nexus.proxy.maven.gav.GavCalculator;
+import org.sonatype.nexus.proxy.maven.gav.M1ArtifactRecognizer;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 

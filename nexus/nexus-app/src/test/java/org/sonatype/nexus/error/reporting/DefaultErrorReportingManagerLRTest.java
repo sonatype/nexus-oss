@@ -29,15 +29,16 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.swizzle.jira.Issue;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.scheduling.NexusTask;
@@ -122,7 +123,7 @@ public class DefaultErrorReportingManagerLRTest
         // First make sure item doesn't already exist
         List<Issue> issues =
             manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), manager.getValidJIRAUsername(),
-                                    manager.getValidJIRAPassword() );
+                manager.getValidJIRAPassword() );
 
         Assert.assertNull( issues );
 
@@ -130,7 +131,7 @@ public class DefaultErrorReportingManagerLRTest
 
         issues =
             manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), manager.getValidJIRAUsername(),
-                                    manager.getValidJIRAPassword() );
+                manager.getValidJIRAPassword() );
 
         Assert.assertEquals( 1, issues.size() );
 
@@ -138,7 +139,7 @@ public class DefaultErrorReportingManagerLRTest
 
         issues =
             manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), manager.getValidJIRAUsername(),
-                                    manager.getValidJIRAPassword() );
+                manager.getValidJIRAPassword() );
 
         Assert.assertEquals( 1, issues.size() );
     }
@@ -148,8 +149,9 @@ public class DefaultErrorReportingManagerLRTest
         throws Exception
     {
         addBackupFiles( getConfHomeDir() );
-        addDirectory( "test-directory", new String[] {"filename1.file", "filename2.file", "filename3.file"} );
-        addDirectory( "nested-test-directory/more-nested-test-directory", new String[] { "filename1.file", "filename2.file", "filename3.file" } );
+        addDirectory( "test-directory", new String[] { "filename1.file", "filename2.file", "filename3.file" } );
+        addDirectory( "nested-test-directory/more-nested-test-directory", new String[] { "filename1.file",
+            "filename2.file", "filename3.file" } );
 
         Exception exception;
 
@@ -175,8 +177,9 @@ public class DefaultErrorReportingManagerLRTest
 
         assertEquals( "NEXUS", subRequest.getProjectId() );
         assertEquals( "APR: Test exception", subRequest.getSummary() );
-        assertEquals( "The following exception occurred: " + StringDigester.LINE_SEPERATOR
-            + ExceptionUtils.getFullStackTrace( exception ), subRequest.getDescription() );
+        assertEquals(
+            "The following exception occurred: " + StringDigester.LINE_SEPERATOR
+                + ExceptionUtils.getFullStackTrace( exception ), subRequest.getDescription() );
         assertNotNull( subRequest.getProblemReportBundle() );
 
         extractZipFile( subRequest.getProblemReportBundle(), unzipHomeDir );
@@ -186,20 +189,21 @@ public class DefaultErrorReportingManagerLRTest
         File[] files = unzipHomeDir.listFiles();
 
         assertNotNull( files );
-        assertEquals( 6, files.length ); // TODO: was seven with the directory listing, but that was removed, as it OOM'd
+        assertEquals( 6, files.length ); // TODO: was seven with the directory listing, but that was removed, as it
+                                         // OOM'd
 
-        files = unzipHomeDir.listFiles( new FileFilter(){
+        files = unzipHomeDir.listFiles( new FileFilter()
+        {
             public boolean accept( File pathname )
             {
-                if ( pathname.isDirectory()
-                    && pathname.getName().equals( "test-directory" ) )
+                if ( pathname.isDirectory() && pathname.getName().equals( "test-directory" ) )
                 {
                     return true;
                 }
 
                 return false;
             }
-        });
+        } );
 
         assertEquals( 1, files.length );
 
@@ -226,31 +230,31 @@ public class DefaultErrorReportingManagerLRTest
 
         assertTrue( file1found && file2found && file3found );
 
-        files = unzipHomeDir.listFiles( new FileFilter(){
+        files = unzipHomeDir.listFiles( new FileFilter()
+        {
             public boolean accept( File pathname )
             {
-                if ( pathname.isDirectory()
-                    && pathname.getName().equals( "nested-test-directory" ) )
+                if ( pathname.isDirectory() && pathname.getName().equals( "nested-test-directory" ) )
                 {
                     return true;
                 }
 
                 return false;
             }
-        });
+        } );
 
-        files = files[0].listFiles( new FileFilter(){
-           public boolean accept( File pathname )
+        files = files[0].listFiles( new FileFilter()
+        {
+            public boolean accept( File pathname )
             {
-               if ( pathname.isDirectory()
-                   && pathname.getName().equals( "more-nested-test-directory" ) )
-               {
-                   return true;
-               }
+                if ( pathname.isDirectory() && pathname.getName().equals( "more-nested-test-directory" ) )
+                {
+                    return true;
+                }
 
-               return false;
+                return false;
             }
-        });
+        } );
 
         files = files[0].listFiles();
 
@@ -291,7 +295,8 @@ public class DefaultErrorReportingManagerLRTest
         confDir.mkdirs();
         unzipDir.mkdirs();
 
-        for ( String filename : filenames ){
+        for ( String filename : filenames )
+        {
             new File( confDir, filename ).createNewFile();
         }
     }
@@ -346,6 +351,13 @@ public class DefaultErrorReportingManagerLRTest
     public void testTaskFailure()
         throws Exception
     {
+        // since Timeline moved into plugin, we need EventInspectorHost too
+        // That's why we add a "ping" for Nexus component, and it installs the EventInspectorHost too
+        // awake nexus, to awake EventInspector host too
+        lookup( Nexus.class );
+        // we will need this to properly wait the async event inspectors to finish
+        final EventInspectorHost eventInspectorHost = lookup( EventInspectorHost.class );
+
         enableErrorReports( false );
 
         String msg = "Runtime exception " + Long.toHexString( System.currentTimeMillis() );
@@ -355,36 +367,43 @@ public class DefaultErrorReportingManagerLRTest
         // First make sure item doesn't already exist
         List<Issue> issues =
             manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), manager.getValidJIRAUsername(),
-                                    manager.getValidJIRAPassword() );
+                manager.getValidJIRAPassword() );
 
         Assert.assertNull( issues );
 
-        doCall( task );
+        doCall( task, eventInspectorHost );
 
         issues =
             manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), manager.getValidJIRAUsername(),
-                                    manager.getValidJIRAPassword() );
+                manager.getValidJIRAPassword() );
 
         Assert.assertEquals( 1, issues.size() );
 
-        doCall( task );
+        doCall( task, eventInspectorHost );
 
         issues =
             manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), manager.getValidJIRAUsername(),
-                                    manager.getValidJIRAPassword() );
+                manager.getValidJIRAPassword() );
 
         Assert.assertEquals( 1, issues.size() );
     }
 
-    private void doCall( NexusTask<?> task )
+    private void doCall( final NexusTask<?> task, final EventInspectorHost inspectorHost )
+        throws InterruptedException
     {
         try
         {
             task.call();
-            Thread.sleep( 100 );
         }
         catch ( Throwable t )
         {
+        }
+        finally
+        {
+            while ( !inspectorHost.isCalmPeriod() )
+            {
+                Thread.sleep( 100 );
+            }
         }
     }
 

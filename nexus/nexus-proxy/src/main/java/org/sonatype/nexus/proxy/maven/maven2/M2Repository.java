@@ -31,10 +31,6 @@ import java.util.List;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
-import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.GavCalculator;
-import org.apache.maven.index.artifact.M2ArtifactRecognizer;
-import org.apache.maven.index.artifact.VersionUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
@@ -58,6 +54,9 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
+import org.sonatype.nexus.proxy.maven.gav.GavCalculator;
+import org.sonatype.nexus.proxy.maven.gav.M2ArtifactRecognizer;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
@@ -262,8 +261,8 @@ public class M2Repository
         {
             // if we need snapshots and the version is not snapshot, or
             // if we need releases and the version is snapshot
-            if ( ( snapshot && !VersionUtils.isSnapshot( iversion.next() ) )
-                || ( !snapshot && VersionUtils.isSnapshot( iversion.next() ) ) )
+            if ( ( snapshot && !Gav.isSnapshot( iversion.next() ) )
+                || ( !snapshot && Gav.isSnapshot( iversion.next() ) ) )
             {
                 iversion.remove();
             }

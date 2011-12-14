@@ -20,7 +20,7 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
 
-import org.apache.maven.index.artifact.Gav;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 
 public interface MetadataManager
 {

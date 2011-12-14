@@ -74,19 +74,6 @@
       <scope>compile</scope>
     </dependency>
 
-    <!-- TEMPORARY: remove once AbstractPluginTestCase is fixed -->
-    <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-gleaner</artifactId>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!-- Testing -->
     <dependency>
       <groupId>junit</groupId>

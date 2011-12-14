@@ -29,12 +29,11 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.index.artifact.VersionUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 
 /**
@@ -148,7 +147,7 @@ public class DefaultMetadataManager
             {
                 if ( RepositoryPolicy.RELEASE.equals( repository.getRepositoryPolicy() ) )
                 {
-                    if ( !VersionUtils.isSnapshot( versions.get( i ) ) )
+                    if ( !Gav.isSnapshot( versions.get( i ) ) )
                     {
                         latest = versions.get( i );
 
@@ -157,7 +156,7 @@ public class DefaultMetadataManager
                 }
                 else if ( RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )
                 {
-                    if ( VersionUtils.isSnapshot( versions.get( i ) ) )
+                    if ( Gav.isSnapshot( versions.get( i ) ) )
                     {
                         latest = versions.get( i );
 
@@ -225,7 +224,7 @@ public class DefaultMetadataManager
             // iterate over versions for the end, and grab the first snap found
             for ( int i = versions.size() - 1; i >= 0; i-- )
             {
-                if ( !VersionUtils.isSnapshot( versions.get( i ) ) )
+                if ( !Gav.isSnapshot( versions.get( i ) ) )
                 {
                     release = versions.get( i );
 
@@ -310,7 +309,7 @@ public class DefaultMetadataManager
             buildNo = current.getBuildNumber();
         }
 
-        if ( !StringUtils.isEmpty( latest ) && VersionUtils.isSnapshot( latest ) )
+        if ( !StringUtils.isEmpty( latest ) && Gav.isSnapshot( latest ) )
         {
             if ( getLogger().isDebugEnabled() )
             {

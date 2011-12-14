@@ -21,7 +21,6 @@ package org.sonatype.nexus.plugins.mavenbridge;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.maven.index.artifact.Gav;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.aether.collection.DependencyCollectionException;
@@ -32,6 +31,7 @@ import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
 // This is an IT just because it runs longer then 15 seconds

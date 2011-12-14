@@ -18,16 +18,19 @@
  */
 package org.sonatype.nexus.security.filter.authc;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExpiredCredentialsException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.SessionException;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.apache.shiro.web.util.WebUtils;
 import org.codehaus.plexus.PlexusConstants;
@@ -36,18 +39,12 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.auth.AuthenticationItem;
+import org.sonatype.nexus.auth.ClientInfo;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.rest.RemoteIPFinder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 public class NexusHttpAuthenticationFilter
     extends BasicHttpAuthenticationFilter
@@ -230,7 +227,7 @@ public class NexusHttpAuthenticationFilter
 
         UsernamePasswordToken usernamePasswordToken =
             new UsernamePasswordToken( getNexusConfiguration().getAnonymousUsername(),
-                                       getNexusConfiguration().getAnonymousPassword() );
+                getNexusConfiguration().getAnonymousPassword() );
 
         try
         {
@@ -243,7 +240,9 @@ public class NexusHttpAuthenticationFilter
         {
             Session anonSession = subject.getSession( false );
 
-            this.getLogger().debug( "Unknown session exception while logging in anonymous user: '{}' with principal '{}'", new Object[]{ anonSession, subject.getPrincipal(), e} );
+            this.getLogger().debug(
+                "Unknown session exception while logging in anonymous user: '{}' with principal '{}'",
+                new Object[] { anonSession, subject.getPrincipal(), e } );
 
             if ( anonSession != null )
             {
@@ -268,8 +267,9 @@ public class NexusHttpAuthenticationFilter
         }
         catch ( AuthenticationException ae )
         {
-            getLogger().info( "Unable to authenticate user [anonymous] from IP Address " + RemoteIPFinder.findIP(
-                (HttpServletRequest) request ) );
+            getLogger().info(
+                "Unable to authenticate user [anonymous] from IP Address "
+                    + RemoteIPFinder.findIP( (HttpServletRequest) request ) );
 
             getLogger().debug( "Unable to log in subject as anonymous", ae );
         }
@@ -292,13 +292,8 @@ public class NexusHttpAuthenticationFilter
     {
         if ( applicationEventMulticaster != null )
         {
-            applicationEventMulticaster.notifyEventListeners( new NexusAuthenticationEvent( this,
-                                                                                            new AuthenticationItem(
-                                                                                                username,
-                                                                                                RemoteIPFinder.findIP(
-                                                                                                    (HttpServletRequest) request ),
-                                                                                                userAgent,
-                                                                                                success ) ) );
+            applicationEventMulticaster.notifyEventListeners( new NexusAuthenticationEvent( this, new ClientInfo(
+                username, RemoteIPFinder.findIP( (HttpServletRequest) request ), userAgent ), success ) );
         }
     }
 
@@ -366,7 +361,7 @@ public class NexusHttpAuthenticationFilter
 
     /**
      * set http 403 forbidden header for the response
-     *
+     * 
      * @param request
      * @param response
      */
@@ -434,7 +429,7 @@ public class NexusHttpAuthenticationFilter
             return null;
         }
 
-        return new String[]{ parts[0], decoded.substring( parts[0].length() + 1 ) };
+        return new String[] { parts[0], decoded.substring( parts[0].length() + 1 ) };
     }
 
     // ==

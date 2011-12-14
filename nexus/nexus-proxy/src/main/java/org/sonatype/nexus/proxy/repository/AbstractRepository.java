@@ -32,7 +32,6 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.mime.MimeRulesSource;
 import org.sonatype.nexus.mime.MimeSupport;
@@ -136,9 +135,6 @@ public abstract class AbstractRepository
     @Requirement
     private MimeSupport mimeSupport;
 
-    @Requirement
-    private FeedRecorder feedRecorder;
-
     @Requirement( role = ContentGenerator.class )
     private Map<String, ContentGenerator> contentGenerators;
 
@@ -189,11 +185,6 @@ public abstract class AbstractRepository
     public MimeRulesSource getMimeRulesSource()
     {
         return MimeRulesSource.NOOP;
-    }
-
-    protected FeedRecorder getFeedRecorder()
-    {
-        return feedRecorder;
     }
 
     // ==

@@ -50,6 +50,8 @@ public final class PluginDescriptor
 
     private List<GAVCoordinate> importedPlugins = Collections.emptyList();
 
+    private List<GAVCoordinate> resolvedPlugins = Collections.emptyList();
+
     private List<RepositoryTypeDescriptor> repositoryTypes = Collections.emptyList();
 
     private List<StaticResource> staticResources = Collections.emptyList();
@@ -85,6 +87,11 @@ public final class PluginDescriptor
     public List<GAVCoordinate> getImportedPlugins()
     {
         return importedPlugins;
+    }
+
+    public List<GAVCoordinate> getResolvedPlugins()
+    {
+        return resolvedPlugins;
     }
 
     public List<RepositoryTypeDescriptor> getRepositoryTypes()
@@ -135,6 +142,28 @@ public final class PluginDescriptor
             }
         }
 
+        if ( importedPlugins != null )
+        {
+            buf.append( LS );
+            buf.append( "         Imported plugins:" ).append( LS );
+
+            for ( final GAVCoordinate gav : importedPlugins )
+            {
+                buf.append( "         * GAV \"" ).append( gav.toString() ).append( LS );
+            }
+        }
+
+        if ( resolvedPlugins != null )
+        {
+            buf.append( LS );
+            buf.append( "        Resolved plugins:" ).append( LS );
+
+            for ( final GAVCoordinate gav : resolvedPlugins )
+            {
+                buf.append( "         * GAV \"" ).append( gav.toString() ).append( LS );
+            }
+        }
+
         return buf.toString();
     }
 
@@ -155,6 +184,11 @@ public final class PluginDescriptor
     void setImportedPlugins( final List<GAVCoordinate> plugins )
     {
         importedPlugins = Collections.unmodifiableList( new ArrayList<GAVCoordinate>( plugins ) );
+    }
+
+    void setResolvedPlugins( final List<GAVCoordinate> plugins )
+    {
+        resolvedPlugins = Collections.unmodifiableList( new ArrayList<GAVCoordinate>( plugins ) );
     }
 
     void setRepositoryTypes( final List<RepositoryTypeDescriptor> types )

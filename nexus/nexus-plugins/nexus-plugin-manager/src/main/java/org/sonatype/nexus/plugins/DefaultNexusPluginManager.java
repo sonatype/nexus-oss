@@ -43,7 +43,6 @@ import org.sonatype.guice.plexus.binders.PlexusXmlBeanModule;
 import org.sonatype.guice.plexus.config.PlexusBeanModule;
 import org.sonatype.inject.Parameters;
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginRejectedEvent;
 import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactException;
@@ -51,8 +50,13 @@ import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryManager;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
+import org.sonatype.nexus.proxy.maven.version.GenericVersionParser;
+import org.sonatype.nexus.proxy.maven.version.InvalidVersionSpecificationException;
+import org.sonatype.nexus.proxy.maven.version.Version;
+import org.sonatype.nexus.proxy.maven.version.VersionParser;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.util.AlphanumComparator;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plugin.metadata.GAVCoordinate;
@@ -99,6 +103,8 @@ public final class DefaultNexusPluginManager
 
     private final Map<GAVCoordinate, PluginResponse> pluginResponses = new HashMap<GAVCoordinate, PluginResponse>();
 
+    private final VersionParser versionParser = new GenericVersionParser();
+
     // ----------------------------------------------------------------------
     // Public methods
     // ----------------------------------------------------------------------
@@ -121,33 +127,28 @@ public final class DefaultNexusPluginManager
     public Collection<PluginManagerResponse> activateInstalledPlugins()
     {
         final List<PluginManagerResponse> result = new ArrayList<PluginManagerResponse>();
-        for ( final GAVCoordinate gav : repositoryManager.findAvailablePlugins().keySet() )
+
+        // if multiple V's for GAs are found, choose the one with biggest version (and pray that plugins has sane
+        // versioning)
+        Map<GAVCoordinate, PluginMetadata> filteredPlugins =
+            filterInstalledPlugins( repositoryManager.findAvailablePlugins() );
+
+        for ( final GAVCoordinate gav : filteredPlugins.keySet() )
         {
-            result.add( activatePlugin( gav ) );
+            // activate what we found in reposes
+            result.add( activatePlugin( gav, true ) );
         }
         return result;
     }
 
     public boolean isActivatedPlugin( final GAVCoordinate gav )
     {
-        return activePlugins.containsKey( gav );
+        return isActivatedPlugin( gav, true );
     }
 
     public PluginManagerResponse activatePlugin( final GAVCoordinate gav )
     {
-        final PluginManagerResponse response = new PluginManagerResponse( gav, PluginActivationRequest.ACTIVATE );
-        if ( !activePlugins.containsKey( gav ) )
-        {
-            try
-            {
-                activatePlugin( repositoryManager.resolveArtifact( gav ), response );
-            }
-            catch ( final NoSuchPluginRepositoryArtifactException e )
-            {
-                reportMissingPlugin( response, e );
-            }
-        }
-        return response;
+        return activatePlugin( gav, true );
     }
 
     public PluginManagerResponse deactivatePlugin( final GAVCoordinate gav )
@@ -171,6 +172,109 @@ public final class DefaultNexusPluginManager
     // Implementation methods
     // ----------------------------------------------------------------------
 
+    /**
+     * Filters a map of GAVCoordinates by "max" version. Hence, in the result Map, it is guaranteed that only one GA
+     * combination will exists, and if input contained multiple V's for same GA, the one GAV contained in result with
+     * have max V.
+     * 
+     * @param installedPlugins
+     * @return
+     */
+    protected Map<GAVCoordinate, PluginMetadata> filterInstalledPlugins( final Map<GAVCoordinate, PluginMetadata> installedPlugins )
+    {
+        final HashMap<GAVCoordinate, PluginMetadata> result =
+            new HashMap<GAVCoordinate, PluginMetadata>( installedPlugins.size() );
+
+        nextInstalledEntry: for ( Map.Entry<GAVCoordinate, PluginMetadata> installedEntry : installedPlugins.entrySet() )
+        {
+            for ( Map.Entry<GAVCoordinate, PluginMetadata> resultEntry : result.entrySet() )
+            {
+                if ( resultEntry.getKey().matchesByGA( installedEntry.getKey() ) )
+                {
+                    if ( compareVersionStrings( resultEntry.getKey().getVersion(), installedEntry.getKey().getVersion() ) < 0 )
+                    {
+                        // result contains smaller version than installedOne, remove it
+                        result.remove( resultEntry.getKey() );
+                    }
+                    else
+                    {
+                        continue nextInstalledEntry;
+                    }
+                }
+            }
+            result.put( installedEntry.getKey(), installedEntry.getValue() );
+        }
+
+        return result;
+    }
+
+    protected int compareVersionStrings( final String v1str, final String v2str )
+    {
+        try
+        {
+            final Version v1 = versionParser.parseVersion( v1str );
+            final Version v2 = versionParser.parseVersion( v2str );
+
+            return v1.compareTo( v2 );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            // fall back to "sane" human alike sorting of strings
+            return new AlphanumComparator().compare( v1str, v2str );
+        }
+    }
+
+    protected GAVCoordinate getActivatedPluginGav( final GAVCoordinate gav, final boolean strict )
+    {
+        // try exact match 1st
+        if ( activePlugins.containsKey( gav ) )
+        {
+            return gav;
+        }
+
+        // if we are lax, try by GA
+        if ( !strict )
+        {
+            for ( GAVCoordinate coord : activePlugins.keySet() )
+            {
+                if ( coord.matchesByGA( gav ) )
+                {
+                    return coord;
+                }
+            }
+        }
+
+        // sad face here
+        return null;
+    }
+
+    protected boolean isActivatedPlugin( final GAVCoordinate gav, final boolean strict )
+    {
+        return getActivatedPluginGav( gav, strict ) != null;
+    }
+
+    protected PluginManagerResponse activatePlugin( final GAVCoordinate gav, final boolean strict )
+    {
+        final GAVCoordinate activatedGav = getActivatedPluginGav( gav, strict );
+        if ( activatedGav == null )
+        {
+            final PluginManagerResponse response = new PluginManagerResponse( gav, PluginActivationRequest.ACTIVATE );
+            try
+            {
+                activatePlugin( repositoryManager.resolveArtifact( gav ), response );
+            }
+            catch ( final NoSuchPluginRepositoryArtifactException e )
+            {
+                reportMissingPlugin( response, e );
+            }
+            return response;
+        }
+        else
+        {
+            return new PluginManagerResponse( activatedGav, PluginActivationRequest.ACTIVATE );
+        }
+    }
+
     private void activatePlugin( final PluginRepositoryArtifact plugin, final PluginManagerResponse response )
         throws NoSuchPluginRepositoryArtifactException
     {
@@ -186,13 +290,20 @@ public final class DefaultNexusPluginManager
         activePlugins.put( pluginGAV, descriptor );
 
         final List<GAVCoordinate> importList = new ArrayList<GAVCoordinate>();
+        final List<GAVCoordinate> resolvedList = new ArrayList<GAVCoordinate>();
         for ( final PluginDependency pd : metadata.getPluginDependencies() )
         {
+            // here, a plugin might express a need for GAV1, but GAV2 might be already activated
+            // since today we just "play" dependency resolution, we support GA resolution only
+            // so, we say "relax version matching" and rely on luck for now it will work
             final GAVCoordinate gav = new GAVCoordinate( pd.getGroupId(), pd.getArtifactId(), pd.getVersion() );
-            response.addPluginManagerResponse( activatePlugin( gav ) );
+            final PluginManagerResponse dependencyActivationResponse = activatePlugin( gav, false );
+            response.addPluginManagerResponse( dependencyActivationResponse );
             importList.add( gav );
+            resolvedList.add( dependencyActivationResponse.getOriginator() );
         }
         descriptor.setImportedPlugins( importList );
+        descriptor.setResolvedPlugins( resolvedList );
 
         if ( !response.isSuccessful() )
         {
@@ -254,14 +365,14 @@ public final class DefaultNexusPluginManager
             if ( null != url )
             {
                 pluginRealm.addURL( url );
-                if ( d.isHasComponents() )
+                if ( d.isHasComponents() || d.isShared() )
                 {
                     scanList.add( url );
                 }
             }
         }
 
-        for ( final GAVCoordinate gav : descriptor.getImportedPlugins() )
+        for ( final GAVCoordinate gav : descriptor.getResolvedPlugins() )
         {
             final String importId = gav.toString();
             for ( final String classname : activePlugins.get( gav ).getExportedClassnames() )
@@ -320,7 +431,8 @@ public final class DefaultNexusPluginManager
             final String path = getPublishedPath( url );
             if ( path != null )
             {
-                staticResources.add( new PluginStaticResource( url, path, mimeSupport.guessMimeTypeFromPath( url.getPath() ) ) );
+                staticResources.add( new PluginStaticResource( url, path,
+                    mimeSupport.guessMimeTypeFromPath( url.getPath() ) ) );
             }
         }
 

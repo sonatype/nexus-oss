@@ -24,10 +24,8 @@ import java.util.List;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.ITHelperLogUtils;
-import org.sonatype.timeline.TimelineException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;

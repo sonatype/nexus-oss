@@ -59,7 +59,6 @@ import org.apache.maven.index.MatchHighlightMode;
 import org.apache.maven.index.MatchHighlightRequest;
 import org.apache.maven.index.NexusIndexer;
 import org.apache.maven.index.SearchType;
-import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.VersionUtils;
 import org.apache.maven.index.context.ContextMemberProvider;
 import org.apache.maven.index.context.DefaultIndexingContext;
@@ -107,6 +106,7 @@ import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -725,10 +725,13 @@ public class DefaultIndexerManager
             }
 
             ArtifactContext ac = null;
+            
+            // we need to convert Nexus Gav to Indexer Gav
+            org.apache.maven.index.artifact.Gav igav = GavUtils.convert( gav );
 
             try
             {
-                ac = new ArtifactContext( null, null, null, ai, gav );
+                ac = new ArtifactContext( null, null, null, ai, igav );
             }
             catch ( IllegalArgumentException e )
             {

@@ -18,13 +18,11 @@
  */
 package org.sonatype.nexus.plugins.mavenbridge;
 
-import org.apache.maven.index.artifact.Gav;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.aether.graph.Dependency;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 
 public class NexusAetherTest
     extends AbstractMavenRepoContentTests

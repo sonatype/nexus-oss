@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.wastebasket.RepositoryFolderRemover;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
@@ -37,6 +36,11 @@ import org.sonatype.scheduling.SchedulerTask;
 public class DeleteRepositoryFoldersTask
     extends AbstractNexusRepositoriesTask<Object>
 {
+    /**
+     * System event action: remove repository folder
+     */
+    public static final String ACTION = "REMOVE_REPO_FOLDER";
+    
     @Requirement
     private RepositoryFolderRemover repositoryFolderRemover;
 
@@ -88,7 +92,7 @@ public class DeleteRepositoryFoldersTask
     @Override
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_REMOVE_REPO_FOLDER_ACTION;
+        return ACTION;
     }
 
     @Override

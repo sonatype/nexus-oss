@@ -75,10 +75,6 @@
       <artifactId>xstream</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-timeline</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-task-scheduler</artifactId>
     </dependency>
@@ -102,11 +98,6 @@
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>plexus-encryptor</artifactId>
-    </dependency>
-    <!-- Needed for version and versionScheme (snap remover) -->
-    <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-util</artifactId>
     </dependency>
 
     <!-- Testing -->
@@ -143,19 +134,6 @@
       <groupId>com.noelios.restlet</groupId>
       <artifactId>com.noelios.restlet</artifactId>
       <scope>test</scope>
-    </dependency>
-
-    <!-- TEMPORARY: remove once AbstractPluginTestCase is fixed -->
-    <dependency>
-      <groupId>org.sonatype.plugin</groupId>
-      <artifactId>plugin-gleaner</artifactId>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
   </dependencies>

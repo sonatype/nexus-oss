@@ -18,10 +18,10 @@
  */
 package org.sonatype.nexus.proxy.maven.uid;
 
-import org.apache.maven.index.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.uid.Attribute;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.gav.M2ArtifactRecognizer;
 
 /**
  * Boolean Attribute that returns true if UID represents a path in Maven repository, and points to a checksum file.

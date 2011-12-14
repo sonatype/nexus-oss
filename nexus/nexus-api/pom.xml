@@ -67,10 +67,6 @@
       <artifactId>plexus-task-scheduler</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-timeline</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.configuration</groupId>
       <artifactId>base-configuration</artifactId>
     </dependency>
@@ -80,10 +76,6 @@
       <artifactId>sisu-locks</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>rome</groupId>
-      <artifactId>rome</artifactId>
-    </dependency>
     <dependency>
       <groupId>eu.medsea.mimeutil</groupId>
       <artifactId>mime-util</artifactId>

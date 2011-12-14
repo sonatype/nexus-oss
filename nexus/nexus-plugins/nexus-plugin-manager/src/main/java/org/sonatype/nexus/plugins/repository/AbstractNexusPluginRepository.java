@@ -71,7 +71,7 @@ abstract class AbstractNexusPluginRepository
         try
         {
             final Reader reader = new InterpolationFilterReader( ReaderFactory.newXmlReader( in ), variables );
-            return PLUGIN_METADATA_READER.read( reader );
+            return PLUGIN_METADATA_READER.read( reader, false );
         }
         catch ( final XmlPullParserException e )
         {
