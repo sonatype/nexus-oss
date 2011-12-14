@@ -192,7 +192,7 @@ class P2Runtime
         final Properties props = new Properties();
 
         final InputStream is =
-            P2Runtime.class.getResourceAsStream( "/META-INF/maven/org.sonatype.nexus.plugins/nexus-p2-bridge-plugin/pom.properties" );
+            P2Runtime.class.getResourceAsStream( "/nexus-p2-plugin.properties" );
 
         if ( is != null )
         {
