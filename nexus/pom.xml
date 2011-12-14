@@ -166,7 +166,6 @@
     <jetty.version>6.1.19</jetty.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
     <logback.version>0.9.29</logback.version>
-    <maven.indexer.version>4.1.3-SNAPSHOT</maven.indexer.version>
     <maven.version>3.0.1</maven.version>
     <micromailer.version>1.1.1-SNAPSHOT</micromailer.version>
     <nexus.repository.metadata.version>1.2-SNAPSHOT</nexus.repository.metadata.version>
@@ -1009,11 +1008,6 @@
       </dependency>
 
       <!-- The modules -->
-      <dependency>
-        <groupId>org.apache.maven.indexer</groupId>
-        <artifactId>indexer-artifact</artifactId>
-        <version>${maven.indexer.version}</version>
-      </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-repository-metadata-api</artifactId>
