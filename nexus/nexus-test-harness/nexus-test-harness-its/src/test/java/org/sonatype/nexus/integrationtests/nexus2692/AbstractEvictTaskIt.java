@@ -204,7 +204,8 @@ public class AbstractEvictTaskIt
         age.setKey( "evictOlderCacheItemsThen" );
         age.setValue( String.valueOf( days ) );
 
-        TaskScheduleUtil.runTask( EvictUnusedItemsTaskDescriptor.ID, EvictUnusedItemsTaskDescriptor.ID, prop, age );
+        TaskScheduleUtil.runTask( EvictUnusedItemsTaskDescriptor.ID, EvictUnusedItemsTaskDescriptor.ID, 300, true,
+            prop, age );
 
         getEventInspectorsUtil().waitForCalmPeriod();
     }
