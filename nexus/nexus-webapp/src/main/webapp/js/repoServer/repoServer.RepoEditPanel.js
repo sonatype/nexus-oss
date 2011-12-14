@@ -1178,7 +1178,7 @@ Ext.extend(Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.repoServer.Abstra
 
         var repoType = receivedData.repoType;
 
-        if (repoType == 'proxy' && !receivedData.remoteStorage.remoteStorageUrl.match(REPO_REMOTE_STORAGE_REGEXP))
+        if (repoType == 'proxy' && receivedData.remoteStorage && !receivedData.remoteStorage.remoteStorageUrl.match(REPO_REMOTE_STORAGE_REGEXP))
         {
           var rsUrl = this.form.findField('remoteStorage.remoteStorageUrl');
           rsUrl.disable();
