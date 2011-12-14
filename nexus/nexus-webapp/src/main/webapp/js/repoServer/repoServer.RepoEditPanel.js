@@ -43,6 +43,8 @@ Sonatype.repoServer.AbstractRepositoryEditor = function(config) {
           }
         }
       });
+
+  this.on('show', this.showHandler, this);
 };
 
 Ext.extend(Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel, {
@@ -82,7 +84,6 @@ Ext.extend(Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel,
 
       templateLoadSuccess : function(form, action) {},
 
-      afterProviderSelectHandler : function(combo, rec, index) {},
 
       repoPolicySelectHandler : function(combo, rec, index) {
         var repoPolicy = rec.data.value.toLowerCase();
@@ -221,6 +222,61 @@ Ext.extend(Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel,
         }
 
         store.insert(insertIndex, [rec]);
+      },
+      isMavenFormat : function(format) {
+        return format.indexOf('maven') == 0;
+      },
+      updateRepoPolicyField : function(form, format, repoPolicy) {
+        var repoPolicyField = form.findField('repoPolicy');
+        if (this.isMavenFormat(format))
+        {
+          repoPolicyField.enable();
+          repoPolicyField.setValue(Sonatype.utils.upperFirstCharLowerRest(repoPolicy || 'RELEASE'));
+        } else {
+          repoPolicyField.setValue('Mixed');
+          repoPolicyField.disable();
+        }
+      },
+      updateIndexableCombo : function(form, format) {
+        var indexableCombo = form.findField('indexable');
+        if (this.isMavenFormat(format))
+        {
+          indexableCombo.enable();
+        }
+        else
+        {
+          indexableCombo.setValue('False');
+          indexableCombo.disable();
+        }
+      },
+      updateDownloadRemoteIndexCombo : function(form, format) {
+        var downloadRemoteIndexCombo = form.findField('downloadRemoteIndexes');
+
+        if (downloadRemoteIndexCombo)
+        {
+          if (this.isMavenFormat(format))
+          {
+            downloadRemoteIndexCombo.enable();
+          }
+          else
+          {
+            downloadRemoteIndexCombo.setValue('False');
+            downloadRemoteIndexCombo.disable();
+          }
+        }
+      },
+      afterProviderSelectHandler : function(combo, rec, index) {
+        this.updateIndexableCombo(this.form, rec.data.format);
+        this.updateRepoPolicyField(this.form, rec.data.format, rec.data.repoPolicy)
+        this.updateDownloadRemoteIndexCombo(this.form, rec.data.format);
+      },
+      showHandler : function() {
+        this.updateWritePolicy();
+      },
+      loadHandler : function(form, action, receivedData) {
+        this.updateRepoPolicyField(form, receivedData.format, receivedData.repoPolicy);
+        this.updateIndexableCombo(form, receivedData.format);
+        this.updateDownloadRemoteIndexCombo(form, receivedData.format);
       }
 
     });
@@ -473,36 +529,9 @@ Sonatype.repoServer.HostedRepositoryEditor = function(config) {
             }]
       });
 
-  this.on('show', this.showHandler, this);
 };
 
 Ext.extend(Sonatype.repoServer.HostedRepositoryEditor, Sonatype.repoServer.AbstractRepositoryEditor, {
-      afterProviderSelectHandler : function(combo, rec, index) {
-        this.updateIndexableCombo(rec.data.format);
-      },
-
-      showHandler : function(panel) {
-        var formatField = this.form.findField('format');
-        if (formatField)
-        {
-          this.updateIndexableCombo(formatField.getValue());
-        }
-
-        this.updateWritePolicy();
-      },
-
-      updateIndexableCombo : function(repoFormat) {
-        var indexableCombo = this.form.findField('indexable');
-        if (repoFormat == 'maven2')
-        {
-          indexableCombo.enable();
-        }
-        else
-        {
-          indexableCombo.setValue('False');
-          indexableCombo.disable();
-        }
-      },
       updateWritePolicy : function() {
 
         var repoPolicyField = this.find('name', 'repoPolicy')[0];
@@ -532,8 +561,7 @@ Ext.extend(Sonatype.repoServer.HostedRepositoryEditor, Sonatype.repoServer.Abstr
             writePolicyField.setValue('ALLOW_WRITE_ONCE');
           }
         }
-      },
-      loadHandler : function(form, action, receivedData) {}
+      }
     });
 
 Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
@@ -1082,8 +1110,9 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
 
 Ext.extend(Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.repoServer.AbstractRepositoryEditor, {
       loadHandler : function(form, action, receivedData) {
+        Sonatype.repoServer.AbstractRepositoryEditor.prototype.loadHandler.apply(this, arguments);
+
         var repoType = receivedData.repoType;
-        var repoPolicy = receivedData.repoPolicy;
 
         if (repoType == 'proxy' && !receivedData.remoteStorage.remoteStorageUrl.match(REPO_REMOTE_STORAGE_REGEXP))
         {
@@ -1094,44 +1123,6 @@ Ext.extend(Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.repoServer.Abstra
           // Disable the editor - this is a temporary measure,
           // until we find a better solution for procurement repos
           this.buttons[0].disable();
-        }
-
-        var formatField = this.form.findField('format');
-        if (formatField)
-        {
-          this.updateDownloadRemoteIndexCombo(formatField.getValue());
-          this.updateIndexableCombo(formatField.getValue());
-        }
-      },
-
-      afterProviderSelectHandler : function(combo, rec, index) {
-        this.updateDownloadRemoteIndexCombo(rec.data.format);
-        this.updateIndexableCombo(rec.data.format);
-      },
-
-      updateDownloadRemoteIndexCombo : function(repoFormat) {
-        var downloadRemoteIndexCombo = this.form.findField('downloadRemoteIndexes');
-        if (repoFormat == 'maven2')
-        {
-          downloadRemoteIndexCombo.enable();
-        }
-        else
-        {
-          downloadRemoteIndexCombo.setValue('False');
-          downloadRemoteIndexCombo.disable();
-        }
-      },
-
-      updateIndexableCombo : function(repoFormat) {
-        var indexableCombo = this.form.findField('indexable');
-        if (repoFormat == 'maven2')
-        {
-          indexableCombo.enable();
-        }
-        else
-        {
-          indexableCombo.setValue('False');
-          indexableCombo.disable();
         }
       }
 
