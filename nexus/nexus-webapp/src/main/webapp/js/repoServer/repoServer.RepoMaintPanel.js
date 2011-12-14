@@ -215,7 +215,7 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
   }];
   
   //allow plugins to contribute to the columns and toolbar
-  Sonatype.Events.fireEvent('repositoryGridInit', columns, toolbar);
+  Sonatype.Events.fireEvent('repositoryGridInit', this, columns, toolbar);
 
   Sonatype.repoServer.RepositoryPanel.superclass.constructor.call(this, {
         addMenuInitEvent : 'repositoryAddMenuInit',
@@ -228,6 +228,9 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
         tbar : toolbar,
         columns : columns
       });
+  
+  //allow plugins to access the properly built panel object
+  Sonatype.Events.fireEvent('repositoryPanelInit', this);
 
   this.addListener('beforedestroy', function() {
         Ext.TaskMgr.stop(this.repoStatusTask);
