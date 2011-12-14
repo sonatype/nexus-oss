@@ -326,6 +326,12 @@
 
     <profile>
       <id>ahc-provider</id>
+      <activation>
+        <property>
+          <name>rrs</name>
+          <value>async-http-client</value>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>
@@ -344,6 +350,12 @@
 
     <profile>
       <id>apacheHttpClient4x-provider</id>
+      <activation>
+        <property>
+          <name>rrs</name>
+          <value>apacheHttpClient4x</value>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>
