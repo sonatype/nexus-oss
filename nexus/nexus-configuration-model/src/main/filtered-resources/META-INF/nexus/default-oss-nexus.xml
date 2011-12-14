@@ -271,7 +271,7 @@
         <groupId>*</groupId>
         <routeType>inclusive</routeType>
         <routePatterns>
-          <routePattern>.*/(com|org)/somecompany/.*</routePattern>
+          <routePattern>^/(com|org)/somecompany/.*</routePattern>
         </routePatterns>
         <repositories>
           <repository>snapshots</repository>
@@ -283,7 +283,7 @@
         <groupId>*</groupId>
         <routeType>exclusive</routeType>
         <routePatterns>
-          <routePattern>.*/org/some-oss/.*</routePattern>
+          <routePattern>^/org/some-oss/.*</routePattern>
         </routePatterns>
         <repositories>
           <repository>releases</repository>
