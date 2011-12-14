@@ -21,7 +21,6 @@ package org.sonatype.nexus.tasks;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.AbstractIndexTaskDescriptor;
@@ -32,6 +31,10 @@ import org.sonatype.nexus.tasks.descriptors.AbstractIndexTaskDescriptor;
 public abstract class AbstractIndexerTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
+    /**
+     * System event action: reindex
+     */
+    public static final String ACTION = "REINDEX";
 
     @Requirement( role = ReindexTaskHandler.class )
     private List<ReindexTaskHandler> handlers;
@@ -98,7 +101,7 @@ public abstract class AbstractIndexerTask
     @Override
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_REINDEX_ACTION;
+        return ACTION;
     }
 
     @Override

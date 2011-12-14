@@ -21,8 +21,6 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.apache.maven.index.artifact.ArtifactPackagingMapper;
-import org.apache.maven.index.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -30,6 +28,8 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.gav.GavCalculator;
+import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 

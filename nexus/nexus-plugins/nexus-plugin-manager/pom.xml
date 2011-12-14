@@ -50,13 +50,10 @@
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-model-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven.indexer</groupId>
-      <artifactId>indexer-artifact</artifactId>
-    </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration</artifactId>
+      <artifactId>nexus-proxy</artifactId>
     </dependency>
 
     <!-- Testing -->

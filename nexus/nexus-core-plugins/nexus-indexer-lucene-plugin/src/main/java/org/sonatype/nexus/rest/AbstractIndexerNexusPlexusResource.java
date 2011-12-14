@@ -25,12 +25,12 @@ import java.util.List;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.IteratorResultSet;
 import org.apache.maven.index.MatchHighlight;
-import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Request;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 

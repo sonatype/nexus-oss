@@ -21,7 +21,6 @@ package org.sonatype.nexus.tasks;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
@@ -34,6 +33,10 @@ import org.sonatype.scheduling.SchedulerTask;
 public class EmptyTrashTask
     extends AbstractNexusTask<Object>
 {
+    /**
+     * System event action: empty trash
+     */
+    public static final String ACTION = "EMPTY_TRASH";
 
     public static final int DEFAULT_OLDER_THAN_DAYS = -1;
 
@@ -62,7 +65,7 @@ public class EmptyTrashTask
     @Override
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_EMPTY_TRASH_ACTION;
+        return ACTION;
     }
 
     @Override

@@ -21,28 +21,26 @@ package org.sonatype.nexus.plugins.lvo;
 import java.io.IOException;
 import java.util.Map;
 
-import com.google.common.annotations.VisibleForTesting;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.sonatype.aether.util.version.GenericVersionScheme;
-import org.sonatype.aether.version.InvalidVersionSpecificationException;
-import org.sonatype.aether.version.Version;
-import org.sonatype.aether.version.VersionScheme;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.lvo.config.LvoPluginConfiguration;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.maven.version.GenericVersionParser;
+import org.sonatype.nexus.proxy.maven.version.InvalidVersionSpecificationException;
+import org.sonatype.nexus.proxy.maven.version.Version;
+import org.sonatype.nexus.proxy.maven.version.VersionParser;
+
+import com.google.common.annotations.VisibleForTesting;
 
 @Component( role = LvoPlugin.class )
 public class DefaultLvoPlugin
     extends AbstractLoggingComponent
     implements LvoPlugin
 {
-
-    private static final Logger log = LoggerFactory.getLogger( DefaultLvoPlugin.class );
+    private final VersionParser versionScheme = new GenericVersionParser();
 
     @Requirement
     private LvoPluginConfiguration lvoPluginConfiguration;
@@ -80,7 +78,7 @@ public class DefaultLvoPlugin
             if ( StringUtils.isEmpty( strategyId ) )
             {
                 // default value was 'index', not available anymore
-                log.warn( "Misconfigured version check key '{}': strategy ID missing.", key );
+                getLogger().warn( "Misconfigured version check key '{}': strategy ID missing.", key );
                 throw new NoSuchStrategyException( info.getStrategy() );
             }
 
@@ -119,8 +117,6 @@ public class DefaultLvoPlugin
                 return response;
             }
 
-            VersionScheme versionScheme = new GenericVersionScheme();
-
             // compare the two versions
 
             try
@@ -135,7 +131,7 @@ public class DefaultLvoPlugin
             }
             catch ( InvalidVersionSpecificationException e )
             {
-                log.warn( "Could not parse version ({}/{}/{})",
+                getLogger().warn( "Could not parse version ({}/{}/{})",
                           new String[]{ key, v, response.getVersion() } );
                 response.setSuccessful( false );
             }

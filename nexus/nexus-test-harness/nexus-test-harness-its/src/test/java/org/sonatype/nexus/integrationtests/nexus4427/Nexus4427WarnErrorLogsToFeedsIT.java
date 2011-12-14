@@ -23,10 +23,8 @@ import java.util.List;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.ITHelperLogUtils;
-import org.sonatype.timeline.TimelineException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -96,8 +94,8 @@ public class Nexus4427WarnErrorLogsToFeedsIT
         throws Exception
     {
         String message = generateMessage( "org.sonatype.timeline.TimelineException" );
-        ITHelperLogUtils.warn( message, new TimelineException( "warn" ) );
-        ITHelperLogUtils.error( message, new TimelineException( "error" ) );
+        ITHelperLogUtils.warn( message, "org.sonatype.timeline.TimelineException", "warn" );
+        ITHelperLogUtils.error( message, "org.sonatype.timeline.TimelineException" , "error" );
 
         // logging is asynchronous so give it a bit of time
         getEventInspectorsUtil().waitForCalmPeriod();

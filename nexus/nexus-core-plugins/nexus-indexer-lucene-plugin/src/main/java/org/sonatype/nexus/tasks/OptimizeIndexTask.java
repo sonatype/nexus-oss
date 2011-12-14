@@ -20,7 +20,6 @@ package org.sonatype.nexus.tasks;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.OptimizeIndexTaskDescriptor;
@@ -35,6 +34,10 @@ import org.sonatype.scheduling.SchedulerTask;
 public class OptimizeIndexTask
     extends AbstractNexusRepositoriesTask<Object>
 {
+    /**
+     * System event action: optimize index
+     */
+    public static final String ACTION = "OPTIMIZE_INDEX";
 
     @Requirement
     private IndexerManager indexManager;
@@ -64,7 +67,7 @@ public class OptimizeIndexTask
     @Override
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_OPTIMIZE_INDEX_ACTION;
+        return ACTION;
     }
 
     @Override

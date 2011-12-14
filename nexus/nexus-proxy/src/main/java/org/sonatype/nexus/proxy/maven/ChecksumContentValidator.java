@@ -22,9 +22,10 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -46,18 +47,15 @@ public class ChecksumContentValidator
 
     @Override
     protected void cleanup( ProxyRepository proxy, RemoteHashResponse remoteHash, boolean contentValid )
-        throws StorageException
+        throws LocalStorageException
     {
         if ( !contentValid && remoteHash.getHashItem() != null )
         {
             // TODO should we remove bad checksum if policy==WARN?
             try
             {
-                proxy.getLocalStorage().deleteItem(
-                                                    proxy,
-                                                    new ResourceStoreRequest(
-                                                                              remoteHash.getHashItem().getRepositoryItemUid().getPath(),
-                                                                              true ) );
+                proxy.getLocalStorage().deleteItem( proxy,
+                    new ResourceStoreRequest( remoteHash.getHashItem().getRepositoryItemUid().getPath(), true ) );
             }
             catch ( ItemNotFoundException e )
             {
@@ -101,7 +99,7 @@ public class ChecksumContentValidator
 
     @Override
     protected RemoteHashResponse retrieveRemoteHash( AbstractStorageItem item, ProxyRepository proxy, String baseUrl )
-        throws StorageException
+        throws LocalStorageException
     {
         RepositoryItemUid uid = item.getRepositoryItemUid();
 
@@ -114,7 +112,7 @@ public class ChecksumContentValidator
         try
         {
             inspector = DigestCalculatingInspector.DIGEST_SHA1_KEY;
-            
+
             request.pushRequestPath( uid.getPath() + ".sha1" );
 
             hashItem = doRetriveRemoteChecksumItem( proxy, request );
@@ -179,7 +177,7 @@ public class ChecksumContentValidator
         {
             throw new ItemNotFoundException( request, proxy, e );
         }
-        catch ( StorageException e )
+        catch ( RemoteStorageException e )
         {
             throw new ItemNotFoundException( request, proxy, e );
         }

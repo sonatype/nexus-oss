@@ -31,12 +31,9 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
-import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
-import org.sonatype.nexus.proxy.InvalidItemContentException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
@@ -51,6 +48,7 @@ import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeSet;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCacheCreate;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCacheUpdate;
+import org.sonatype.nexus.proxy.events.RepositoryItemValidationEvent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
@@ -63,7 +61,6 @@ import org.sonatype.nexus.proxy.repository.EvictUnusedItemsWalkerProcessor.Evict
 import org.sonatype.nexus.proxy.repository.threads.ThreadPoolManager;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractHTTPRemoteRepositoryStorage;
-import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
@@ -886,14 +883,12 @@ public abstract class AbstractProxyRepository
             if ( Action.create.equals( action ) )
             {
                 getApplicationEventMulticaster().notifyEventListeners(
-                    new RepositoryItemEventCacheCreate( this, result )
-                );
+                    new RepositoryItemEventCacheCreate( this, result ) );
             }
             else
             {
                 getApplicationEventMulticaster().notifyEventListeners(
-                    new RepositoryItemEventCacheUpdate( this, result )
-                );
+                    new RepositoryItemEventCacheUpdate( this, result ) );
             }
         }
         catch ( ItemNotFoundException ex )
@@ -1246,7 +1241,7 @@ public abstract class AbstractProxyRepository
         return item;
     }
 
-    private void sendContentValidationEvents( ResourceStoreRequest request, List<NexusArtifactEvent> events,
+    private void sendContentValidationEvents( ResourceStoreRequest request, List<RepositoryItemValidationEvent> events,
                                               boolean isContentValid )
     {
         if ( getLogger().isDebugEnabled() && !isContentValid )
@@ -1254,14 +1249,14 @@ public abstract class AbstractProxyRepository
             getLogger().debug( "Item " + request.toString() + " failed content integrity validation." );
         }
 
-        for ( NexusArtifactEvent event : events )
+        for ( RepositoryItemValidationEvent event : events )
         {
-            getFeedRecorder().addNexusArtifactEvent( event );
+            getApplicationEventMulticaster().notifyEventListeners( event );
         }
     }
 
     protected void markItemRemotelyChecked( final StorageItem item )
-        throws StorageException, ItemNotFoundException
+        throws LocalStorageException, ItemNotFoundException
     {
         // remote file unchanged, touch the local one to renew it's Age
         getAttributesHandler().touchItemCheckedRemotely( System.currentTimeMillis(), item );
@@ -1275,7 +1270,7 @@ public abstract class AbstractProxyRepository
      * </code>
      */
     protected boolean doValidateRemoteItemContent( ResourceStoreRequest req, String baseUrl, AbstractStorageItem item,
-                                                   List<NexusArtifactEvent> events )
+                                                   List<RepositoryItemValidationEvent> events )
     {
         boolean isValid = true;
 
@@ -1320,7 +1315,7 @@ public abstract class AbstractProxyRepository
      * @throws StorageException
      */
     protected boolean doCheckRemoteItemExistence( StorageItem localItem, ResourceStoreRequest request )
-        throws RemoteAccessException, StorageException
+        throws RemoteAccessException, RemoteStorageException
     {
         if ( localItem != null )
         {
@@ -1345,6 +1340,7 @@ public abstract class AbstractProxyRepository
      * item operation from the url failed with StorageException, AccessDenied or InvalidItemContent error but the item
      * was successfully retrieve from another url.</li> <li>Mirror url will be removed from blacklist after 30 minutes.</li>
      * The following matrix summarises retry/blacklist behaviour
+     * <p/>
      * <p/>
      * <pre>
      * Error condition      Retry?        Blacklist?
@@ -1377,7 +1373,7 @@ public abstract class AbstractProxyRepository
 
             mirrors.add( new Mirror( "default", getRemoteUrl(), getRemoteUrl() ) );
 
-            List<NexusArtifactEvent> events = new ArrayList<NexusArtifactEvent>();
+            List<RepositoryItemValidationEvent> events = new ArrayList<RepositoryItemValidationEvent>();
 
             Exception lastException = null;
 
@@ -1436,13 +1432,6 @@ public abstract class AbstractProxyRepository
                             }
                             else
                             {
-                                // a file was bad, don't block the whole repo
-                                // TODO: we need to break up StorageException into Local and Remote
-                                // a validator could detect that the Remote repo is hosed, i.e. a jar
-                                // gets returned as an html file, which would indicate that the mirror
-                                // is messed up, or a proxy is returning an html page
-                                lastException = new InvalidItemContentException( request, mirror, remoteItem );
-
                                 continue all_urls; // retry with next url
                             }
                         }
@@ -1562,13 +1551,7 @@ public abstract class AbstractProxyRepository
                 getLogger().warn( "Unexpected Exception", e );
             }
 
-            if ( lastException instanceof InvalidItemContentException )
-            {
-                newContentValidationEvent( (InvalidItemContentException) lastException );
-
-                throw new ItemNotFoundException( request, this, lastException );
-            }
-            else if ( lastException instanceof StorageException )
+            if ( lastException instanceof StorageException )
             {
                 throw (StorageException) lastException;
             }
@@ -1584,29 +1567,6 @@ public abstract class AbstractProxyRepository
         {
             itemUidLock.unlock();
         }
-    }
-
-    private void newContentValidationEvent( InvalidItemContentException iice )
-    {
-        NexusItemInfo ai = new NexusItemInfo();
-
-        ai.setPath( iice.getRemoteItem().getPath() );
-
-        ai.setRepositoryId( iice.getRemoteItem().getRepositoryId() );
-
-        ai.setRemoteUrl( iice.getRemoteItem().getRemoteUrl() );
-        String msg =
-            "Error, the artifact " + iice.getRemoteItem().getPath() + " content is invalid in repository "
-                + iice.getRemoteItem().getRepositoryId() + "!";
-
-        NexusArtifactEvent nae =
-            new NexusArtifactEvent( new Date(), NexusArtifactEvent.ACTION_BROKEN_INVALID_CONTENT, msg, ai );
-
-        nae.addEventContext( iice.getRemoteItem().getItemContext() );
-
-        nae.addItemAttributes( iice.getRemoteItem().getRepositoryItemAttributes().asMap() );
-
-        getFeedRecorder().addNexusArtifactEvent( nae );
     }
 
     private void logFailedMirror( Mirror mirror, Exception e )
@@ -1749,10 +1709,10 @@ public abstract class AbstractProxyRepository
             shouldAddToNFC = getProxyMode() == null || getProxyMode().shouldProxy();
             if ( !shouldAddToNFC && getLogger().isDebugEnabled() )
             {
-                getLogger().debug( String.format(
-                    "Proxy repository '%s' is is not allowed to issue remote requests (%s), not adding path '%s' to NFC",
-                    getId(), getProxyMode(), request.getRequestPath()
-                ) );
+                getLogger().debug(
+                    String.format(
+                        "Proxy repository '%s' is is not allowed to issue remote requests (%s), not adding path '%s' to NFC",
+                        getId(), getProxyMode(), request.getRequestPath() ) );
             }
         }
         return shouldAddToNFC;

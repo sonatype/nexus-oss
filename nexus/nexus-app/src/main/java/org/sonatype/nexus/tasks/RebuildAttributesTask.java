@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
@@ -39,6 +38,11 @@ import org.sonatype.scheduling.SchedulerTask;
 public class RebuildAttributesTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
+    /**
+     * System event action: rebuildAttributes
+     */
+    public static final String ACTION = "REBUILDATTRIBUTES";
+
     @Override
     protected String getRepositoryFieldId()
     {
@@ -79,7 +83,7 @@ public class RebuildAttributesTask
     @Override
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_REBUILDATTRIBUTES_ACTION;
+        return ACTION;
     }
 
     @Override

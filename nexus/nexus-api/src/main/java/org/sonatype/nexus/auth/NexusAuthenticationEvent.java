@@ -18,21 +18,24 @@
  */
 package org.sonatype.nexus.auth;
 
-import org.sonatype.plexus.appevents.AbstractEvent;
-
+/**
+ * Event fired when authentication validation is performed (someone tries to log in).
+ * 
+ * @author cstamas
+ */
 public class NexusAuthenticationEvent
-    extends AbstractEvent<Object>
+    extends AbstractSecurityEvent
 {
-    private final AuthenticationItem item;
-    
-    public NexusAuthenticationEvent( Object sender, AuthenticationItem item )
+    private final boolean successful;
+
+    public NexusAuthenticationEvent( final Object sender, final ClientInfo info, final boolean successful )
     {
-        super( sender );
-        this.item = item;
+        super( sender, info );
+        this.successful = successful;
     }
-    
-    public AuthenticationItem getItem()
+
+    public boolean isSuccessful()
     {
-        return item;
+        return successful;
     }
 }

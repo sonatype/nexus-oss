@@ -19,6 +19,7 @@
 package org.sonatype.nexus.plugins.repository;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collections;
@@ -27,7 +28,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.apache.maven.index.artifact.ArtifactPackagingMapper;
+import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
+import org.sonatype.nexus.proxy.maven.packaging.ArtifactPackagingMapper;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.PluginMetadata;
 
@@ -97,13 +100,14 @@ public abstract class AbstractFileNexusPluginRepository
                                                                      final GAVCoordinate gav )
         throws NoSuchPluginRepositoryArtifactException
     {
-        final File dependenciesFolder = new File( getPluginFolder( plugin.getCoordinate() ), "dependencies" );
-        final File artifact = new File( dependenciesFolder, gav.getFinalName( packagingMapper ) );
-        if ( !artifact.isFile() )
+        final File dependencyArtifact = resolveSnapshotOrReleaseDependencyArtifact( plugin, gav );
+
+        if ( dependencyArtifact == null || !dependencyArtifact.isFile() )
         {
             throw new NoSuchPluginRepositoryArtifactException( this, gav );
         }
-        return new PluginRepositoryArtifact( gav, artifact, this );
+
+        return new PluginRepositoryArtifact( gav, dependencyArtifact, this );
     }
 
     public final PluginMetadata getPluginMetadata( final GAVCoordinate gav )
@@ -118,14 +122,70 @@ public abstract class AbstractFileNexusPluginRepository
 
     protected abstract File getNexusPluginsDirectory();
 
+    protected File getPluginDependenciesFolder( final PluginRepositoryArtifact plugin )
+    {
+        return new File( getPluginFolder( plugin.getCoordinate() ), "dependencies" );
+    }
+
+    protected File resolveSnapshotOrReleaseDependencyArtifact( final PluginRepositoryArtifact plugin,
+                                                               final GAVCoordinate gav )
+    {
+        // TODO (cstamas): gav has baseVersion, we need to be a bit smarter about resolving it against timestamped too
+        // try with baseVersion (-SNAPSHOT) will work if bundle was assembled from stuff in local repository
+        // or is part of this same build
+        // Also, this part will work with release ones
+        final File dependenciesFolder = getPluginDependenciesFolder( plugin );
+        File dependencyArtifact = new File( dependenciesFolder, gav.getFinalName( packagingMapper ) );
+        if ( dependencyArtifact.isFile() )
+        {
+            return dependencyArtifact;
+        }
+
+        // for timestamped snapshots, we need another try
+        if ( Gav.isSnapshot( gav.getVersion() ) )
+        {
+            // is a snapshot, but is a a timestamped one, so let's try to find it
+            final StringBuilder buf = new StringBuilder();
+            if ( StringUtils.isNotEmpty( gav.getClassifier() ) )
+            {
+                buf.append( '-' ).append( gav.getClassifier() );
+            }
+            if ( StringUtils.isNotEmpty( gav.getType() ) )
+            {
+                buf.append( '.' ).append( packagingMapper.getExtensionForPackaging( gav.getType() ) );
+            }
+            else
+            {
+                buf.append( ".jar" );
+            }
+
+            final String prefix = gav.getArtifactId() + "-";
+            final String suffix = buf.toString();
+
+            File[] dependencies = dependenciesFolder.listFiles( new FilenameFilter()
+            {
+                @Override
+                public boolean accept( File dir, String name )
+                {
+                    return name.startsWith( prefix ) && name.endsWith( suffix );
+                }
+            } );
+
+            if ( dependencies != null && dependencies.length == 1 && dependencies[0].isFile() )
+            {
+                return dependencies[0];
+            }
+        }
+
+        return null;
+    }
+
     protected File[] getPluginFolders()
     {
         return getNexusPluginsDirectory().listFiles();
     }
 
-    @SuppressWarnings( "unused" )
     protected File getPluginFolder( final GAVCoordinate gav )
-        throws NoSuchPluginRepositoryArtifactException
     {
         return new File( getNexusPluginsDirectory(), gav.getArtifactId() + '-' + gav.getVersion() );
     }

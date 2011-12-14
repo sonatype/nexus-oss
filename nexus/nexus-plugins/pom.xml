@@ -45,10 +45,6 @@
     <module>nexus-plugin-api</module>
   </modules>
 
-  <properties>
-    <sonatype.plugin.version>1.0.3</sonatype.plugin.version>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -64,11 +60,6 @@
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
         <artifactId>plugin-model-api</artifactId>
-        <version>${sonatype.plugin.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.plugin</groupId>
-        <artifactId>plugin-gleaner</artifactId>
         <version>${sonatype.plugin.version}</version>
       </dependency>
     </dependencies>
