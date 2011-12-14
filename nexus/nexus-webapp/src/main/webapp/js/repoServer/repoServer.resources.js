@@ -235,10 +235,10 @@
     },
 
     log : {
-      rootLoggerLevel : 'The root logger level for your log4j configuration.',
-      rootLoggerAppenders : 'The root logger appenders for your log4j configuration.',
-      fileAppenderLocation : 'The file appender location for your log4j configuration.',
-      fileAppenderPattern : 'The file appender pattern for your log4j configuration.'
+      rootLoggerLevel : 'The root logger level for your logging configuration.',
+      rootLoggerAppenders : 'The root logger appenders for your logging configuration.',
+      fileAppenderLocation : 'The file appender location for your logging configuration.',
+      fileAppenderPattern : 'The file appender pattern for your logging configuration.'
     },
 
     repoMirrors : {
