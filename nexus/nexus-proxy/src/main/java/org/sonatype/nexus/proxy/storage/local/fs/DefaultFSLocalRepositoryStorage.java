@@ -237,7 +237,6 @@ public class DefaultFSLocalRepositoryStorage
                 new DefaultStorageCollectionItem( repository, request, target.canRead(), target.canWrite() );
             coll.setModified( target.lastModified() );
             coll.setCreated( target.lastModified() );
-            repository.getAttributesHandler().fetchAttributes( coll );
             result = coll;
 
         }
@@ -382,7 +381,14 @@ public class DefaultFSLocalRepositoryStorage
         final ContentLocator mdis =
             item instanceof StorageFileItem ? ( (StorageFileItem) item ).getContentLocator() : null;
 
-        repository.getAttributesHandler().storeAttributes( item, mdis );
+        try
+        {
+            repository.getAttributesHandler().storeAttributes( item, mdis );
+        }
+        catch ( IOException e )
+        {
+            throw new LocalStorageException( "Cannot store attributes!", e );
+        }
     }
 
     public void shredItem( Repository repository, ResourceStoreRequest request )
@@ -390,7 +396,14 @@ public class DefaultFSLocalRepositoryStorage
     {
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
-        repository.getAttributesHandler().deleteAttributes( uid );
+        try
+        {
+            repository.getAttributesHandler().deleteAttributes( uid );
+        }
+        catch ( IOException e )
+        {
+            throw new LocalStorageException( "Cannot delete attributes!", e );
+        }
 
         File target = getFileFromBase( repository, request );
 
@@ -402,25 +415,37 @@ public class DefaultFSLocalRepositoryStorage
     {
         RepositoryItemUid fromUid = repository.createUid( from.getRequestPath() );
 
-        Attributes fromAttr =
-            repository.getAttributesHandler().getAttributeStorage().getAttributes( fromUid );
-
-        // check does it have attrs at all
-        if ( fromAttr != null )
+        try
         {
-            RepositoryItemUid toUid = repository.createUid( to.getRequestPath() );
-            fromAttr.setRepositoryId( toUid.getRepository().getId() );
-            fromAttr.setPath( toUid.getPath() );
-            repository.getAttributesHandler().getAttributeStorage().putAttributes( toUid, fromAttr );
+            Attributes fromAttr = repository.getAttributesHandler().getAttributeStorage().getAttributes( fromUid );
+
+            // check does it have attrs at all
+            if ( fromAttr != null )
+            {
+                RepositoryItemUid toUid = repository.createUid( to.getRequestPath() );
+                fromAttr.setRepositoryId( toUid.getRepository().getId() );
+                fromAttr.setPath( toUid.getPath() );
+                repository.getAttributesHandler().getAttributeStorage().putAttributes( toUid, fromAttr );
+            }
+
+            File fromTarget = getFileFromBase( repository, from );
+
+            File toTarget = getFileFromBase( repository, to );
+
+            getFSPeer().moveItem( repository, from, fromTarget, to, toTarget );
+
+            repository.getAttributesHandler().getAttributeStorage().deleteAttributes( fromUid );
         }
-
-        File fromTarget = getFileFromBase( repository, from );
-
-        File toTarget = getFileFromBase( repository, to );
-
-        getFSPeer().moveItem( repository, from, fromTarget, to, toTarget );
-
-        repository.getAttributesHandler().getAttributeStorage().deleteAttributes( fromUid );
+        catch ( LocalStorageException e )
+        {
+            // to not wrap these, they are IOEx subclass
+            throw e;
+        }
+        catch ( IOException e )
+        {
+            // cleanup
+            throw new LocalStorageException( "Cannot store attributes!", e );
+        }
     }
 
     public Collection<StorageItem> listItems( Repository repository, ResourceStoreRequest request )

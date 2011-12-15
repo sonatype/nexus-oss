@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
+import java.io.IOException;
+
 import javax.enterprise.inject.Typed;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,7 +35,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
  * "fallback" to some secondary instance. Usable for scenarios where "transitioning" (smooth upgrade for example) is to
  * be used, the "main" attribute storage would be "upgraded" from "legacy" attribute storage as the attributes are
  * requested over the time from this instance.
- *
+ * 
  * @author cstamas
  * @since 1.10.0
  */
@@ -61,6 +63,7 @@ public class TransitioningAttributeStorage
 
     @Override
     public Attributes getAttributes( final RepositoryItemUid uid )
+        throws IOException
     {
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
@@ -81,7 +84,16 @@ public class TransitioningAttributeStorage
                     if ( result != null )
                     {
                         mainAttributeStorage.putAttributes( uid, result );
-                        fallbackAttributeStorage.deleteAttributes( uid );
+
+                        try
+                        {
+                            fallbackAttributeStorage.deleteAttributes( uid );
+                        }
+                        catch ( IOException e )
+                        {
+                            // nag and ignore it
+                            getLogger().debug( "Problem during legacy attribute deletion!", e );
+                        }
                     }
                 }
                 finally
@@ -89,7 +101,7 @@ public class TransitioningAttributeStorage
                     uidLock.unlock();
                 }
             }
-            
+
             return result;
         }
         finally
@@ -100,6 +112,7 @@ public class TransitioningAttributeStorage
 
     @Override
     public void putAttributes( final RepositoryItemUid uid, final Attributes item )
+        throws IOException
     {
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
@@ -111,7 +124,15 @@ public class TransitioningAttributeStorage
 
             if ( fallbackAttributeStorage != null )
             {
-                fallbackAttributeStorage.deleteAttributes( uid );
+                try
+                {
+                    fallbackAttributeStorage.deleteAttributes( uid );
+                }
+                catch ( IOException e )
+                {
+                    // nag and ignore it
+                    getLogger().debug( "Problem during legacy attribute deletion!", e );
+                }
             }
         }
         finally
@@ -122,6 +143,7 @@ public class TransitioningAttributeStorage
 
     @Override
     public boolean deleteAttributes( final RepositoryItemUid uid )
+        throws IOException
     {
         final RepositoryItemUidLock uidLock = uid.getAttributeLock();
 
@@ -129,13 +151,26 @@ public class TransitioningAttributeStorage
 
         try
         {
-            return mainAttributeStorage.deleteAttributes( uid )
-                || ( fallbackAttributeStorage != null && fallbackAttributeStorage.deleteAttributes( uid ) );
+            final boolean mainResult = mainAttributeStorage.deleteAttributes( uid );
+
+            try
+            {
+                final boolean legacyResult =
+                    ( fallbackAttributeStorage != null && fallbackAttributeStorage.deleteAttributes( uid ) );
+
+                return mainResult || legacyResult;
+            }
+            catch ( IOException e )
+            {
+                // nag and ignore it
+                getLogger().debug( "Problem during legacy attribute deletion!", e );
+            }
+
+            return mainResult;
         }
         finally
         {
             uidLock.unlock();
         }
     }
-
 }

@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1103,7 +1104,7 @@ public abstract class AbstractProxyRepository
                             // let the user do proper setup and probably it will try again
                             shouldGetRemote = false;
                         }
-                        catch ( StorageException ex )
+                        catch ( IOException ex )
                         {
                             // do not go remote, but we did not mark it as "remote checked" also.
                             // let the user do proper setup and probably it will try again
@@ -1251,7 +1252,7 @@ public abstract class AbstractProxyRepository
     }
 
     protected void markItemRemotelyChecked( final StorageItem item )
-        throws LocalStorageException, ItemNotFoundException
+        throws IOException, ItemNotFoundException
     {
         // remote file unchanged, touch the local one to renew it's Age
         getAttributesHandler().touchItemCheckedRemotely( System.currentTimeMillis(), item );

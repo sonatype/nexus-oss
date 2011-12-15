@@ -50,11 +50,11 @@ import org.sonatype.nexus.proxy.storage.local.fs.FileContentLocator;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
- * The default implementation of AttributesHandler. Does not have any assumption regarding actual AttributeStorage
- * it uses. It uses {@link StorageItemInspector} and {@link StorageFileItemInspector} components for "expansion"
- * of core (and custom) attributes (those components might come from plugins too). This class also implements some
+ * The default implementation of AttributesHandler. Does not have any assumption regarding actual AttributeStorage it
+ * uses. It uses {@link StorageItemInspector} and {@link StorageFileItemInspector} components for "expansion" of core
+ * (and custom) attributes (those components might come from plugins too). This class also implements some
  * "optimizations" for attribute "lastRequested", by using coarser resolution for it (saving it very n-th hour or so).
- *
+ * 
  * @author cstamas
  */
 @Named
@@ -138,7 +138,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the attribute storage.
-     *
+     * 
      * @return the attribute storage
      */
     public DelegatingAttributeStorage getAttributeStorage()
@@ -148,7 +148,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the attribute storage.
-     *
+     * 
      * @param attributeStorage the new attribute storage
      * @deprecated For UT use only!
      */
@@ -160,7 +160,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the item inspector list.
-     *
+     * 
      * @return the item inspector list
      */
     public List<StorageItemInspector> getItemInspectorList()
@@ -170,7 +170,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the item inspector list.
-     *
+     * 
      * @param itemInspectorList the new item inspector list
      */
     public void setItemInspectorList( List<StorageItemInspector> itemInspectorList )
@@ -180,7 +180,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the file item inspector list.
-     *
+     * 
      * @return the file item inspector list
      */
     public List<StorageFileItemInspector> getFileItemInspectorList()
@@ -190,7 +190,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the file item inspector list.
-     *
+     * 
      * @param fileItemInspectorList the new file item inspector list
      */
     public void setFileItemInspectorList( List<StorageFileItemInspector> fileItemInspectorList )
@@ -203,12 +203,14 @@ public class DefaultAttributesHandler
 
     @Override
     public boolean deleteAttributes( final RepositoryItemUid uid )
+        throws IOException
     {
         return getAttributeStorage().deleteAttributes( uid );
     }
 
     @Override
     public void fetchAttributes( final StorageItem item )
+        throws IOException
     {
         if ( item instanceof StorageCollectionItem )
         {
@@ -242,6 +244,7 @@ public class DefaultAttributesHandler
 
     @Override
     public void storeAttributes( final StorageItem item )
+        throws IOException
     {
         if ( item instanceof StorageCollectionItem )
         {
@@ -254,6 +257,7 @@ public class DefaultAttributesHandler
 
     @Override
     public void storeAttributes( final StorageItem item, final ContentLocator content )
+        throws IOException
     {
         if ( item instanceof StorageCollectionItem )
         {
@@ -285,6 +289,7 @@ public class DefaultAttributesHandler
 
     @Override
     public void touchItemCheckedRemotely( final long timestamp, final StorageItem storageItem )
+        throws IOException
     {
         if ( storageItem instanceof StorageCollectionItem )
         {
@@ -308,6 +313,7 @@ public class DefaultAttributesHandler
 
     @Override
     public void touchItemLastRequested( final long timestamp, final StorageItem storageItem )
+        throws IOException
     {
         if ( storageItem instanceof StorageCollectionItem )
         {
@@ -316,13 +322,14 @@ public class DefaultAttributesHandler
         }
 
         touchItemLastRequested( timestamp, storageItem.getResourceStoreRequest(), storageItem.getRepositoryItemUid(),
-                                storageItem.getRepositoryItemAttributes() );
+            storageItem.getRepositoryItemAttributes() );
     }
 
     // ==
 
     protected void touchItemLastRequested( final long timestamp, final ResourceStoreRequest request,
                                            final RepositoryItemUid uid, final Attributes attributes )
+        throws IOException
     {
         // Touch it only if this is user-originated request (request incoming over HTTP, not a plugin or "internal" one)
         // Currently, we test for IP address presence, since that makes sure it is user request (from REST API) and not
@@ -355,7 +362,8 @@ public class DefaultAttributesHandler
     }
 
     protected boolean isTouchLastRequestedEnabled( final Repository repository )
-    {
+                    throws IOException
+   {
         // the "default"
         boolean doTouch = LAST_REQUEST_ATTRIBUTE_ENABLED;
 
@@ -383,7 +391,7 @@ public class DefaultAttributesHandler
     @Override
     @Deprecated
     public void touchItemRemoteChecked( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, LocalStorageException
+        throws ItemNotFoundException, LocalStorageException, IOException
     {
         touchItemRemoteChecked( System.currentTimeMillis(), repository, request );
     }
@@ -391,7 +399,7 @@ public class DefaultAttributesHandler
     @Override
     @Deprecated
     public void touchItemRemoteChecked( long timestamp, Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, LocalStorageException
+        throws ItemNotFoundException, LocalStorageException, IOException
     {
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
@@ -411,7 +419,7 @@ public class DefaultAttributesHandler
     @Override
     @Deprecated
     public void touchItemLastRequested( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, LocalStorageException
+        throws ItemNotFoundException, LocalStorageException, IOException
     {
         touchItemLastRequested( System.currentTimeMillis(), repository, request );
     }
@@ -419,7 +427,7 @@ public class DefaultAttributesHandler
     @Override
     @Deprecated
     public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, LocalStorageException
+        throws ItemNotFoundException, LocalStorageException, IOException
     {
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
@@ -438,7 +446,7 @@ public class DefaultAttributesHandler
     @Deprecated
     public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request,
                                         StorageItem storageItem )
-        throws ItemNotFoundException, LocalStorageException
+        throws ItemNotFoundException, LocalStorageException, IOException
     {
         if ( storageItem instanceof StorageCollectionItem )
         {
@@ -446,13 +454,13 @@ public class DefaultAttributesHandler
         }
 
         touchItemLastRequested( timestamp, request, storageItem.getRepositoryItemUid(),
-                                storageItem.getRepositoryItemAttributes() );
+            storageItem.getRepositoryItemAttributes() );
     }
 
     @Override
     @Deprecated
     public void updateItemAttributes( Repository repository, ResourceStoreRequest request, StorageItem item )
-        throws ItemNotFoundException, LocalStorageException
+        throws ItemNotFoundException, LocalStorageException, IOException
     {
         storeAttributes( item );
     }
@@ -461,10 +469,10 @@ public class DefaultAttributesHandler
     // Internal
 
     /**
-     * Expand custom item attributes using registered StorageFileItemInspector (for files) or StorageItemInspector
-     * (for everything else) components.
-     *
-     * @param item    the item
+     * Expand custom item attributes using registered StorageFileItemInspector (for files) or StorageItemInspector (for
+     * everything else) components.
+     * 
+     * @param item the item
      * @param content the input stream
      */
     protected void expandCustomItemAttributes( StorageItem item, ContentLocator content )
@@ -513,7 +521,7 @@ public class DefaultAttributesHandler
                         // unpack the file
                         tmpFile =
                             File.createTempFile( "px-" + item.getName(), ".tmp",
-                                                 applicationConfiguration.getTemporaryDirectory() );
+                                applicationConfiguration.getTemporaryDirectory() );
 
                         inputStream = content.getContent();
 
@@ -603,7 +611,7 @@ public class DefaultAttributesHandler
 
     /**
      * For UT access!
-     *
+     * 
      * @return
      */
     public long getLastRequestedResolution()
@@ -613,7 +621,7 @@ public class DefaultAttributesHandler
 
     /**
      * For UT access!
-     *
+     * 
      * @param lastRequestedResolution
      */
     public void setLastRequestedResolution( long lastRequestedResolution )

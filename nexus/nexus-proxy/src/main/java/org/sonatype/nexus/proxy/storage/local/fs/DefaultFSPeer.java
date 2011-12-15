@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -37,13 +40,11 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.uid.IsItemAttributeMetacontentAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.util.ItemPathUtils;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 /**
  * The default FSPeer implementation, directly implementating it. There might be alternate implementations, like doing
@@ -131,6 +132,11 @@ public class DefaultFSPeer
             final RepositoryItemUidLock uidLock = item.getRepositoryItemUid().getLock();
             uidLock.lock( Action.create );
 
+            // if we ARE NOT handling attributes, do proper cleanup in case of IOEx
+            // if we ARE handling attributes, leave backups in case of IOEx
+            final boolean isCleanupNeeded =
+                !item.getRepositoryItemUid().getBooleanAttributeValue( IsItemAttributeMetacontentAttribute.class );
+
             try
             {
                 handleRenameOperation( hiddenTarget, target );
@@ -139,14 +145,23 @@ public class DefaultFSPeer
             }
             catch ( IOException e )
             {
-                if ( target != null )
+                if ( isCleanupNeeded )
                 {
-                    target.delete();
-                }
+                    if ( target != null )
+                    {
+                        target.delete();
+                    }
 
-                if ( hiddenTarget != null )
+                    if ( hiddenTarget != null )
+                    {
+                        hiddenTarget.delete();
+                    }
+                }
+                else
                 {
-                    hiddenTarget.delete();
+                    getLogger().warn(
+                        "No cleanup done for error that happened while trying to save attibutes of item {}, the backup is left as {}!",
+                        item.getRepositoryItemUid().toString(), hiddenTarget.getAbsolutePath() );
                 }
 
                 throw new LocalStorageException( "Got exception during storing on path "

@@ -21,21 +21,25 @@ package org.sonatype.nexus.proxy.item.uid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
 /**
- * Attribute yielding "false" for real repository content, and "true" for all the "meta content", that is actually not
- * holding data serving the basic purpose of this given repository.
+ * Attribute yielding "false" for real repository content, and "true" for all the "item attributes", that is actually
+ * not holding data serving the basic purpose of this given repository.
  * 
  * @author cstamas
+ * @since 1.10.0
  */
-public class IsMetacontentAttribute
+public class IsItemAttributeMetacontentAttribute
     implements Attribute<Boolean>
 {
     public Boolean getValueFor( RepositoryItemUid subject )
     {
-        // stuff not having metadata:
         // /.nexus/attributes
-        // /.nexus/trash
-        // we are specific about these for a good reason (see future)
-        return subject.getBooleanAttributeValue( IsItemAttributeMetacontentAttribute.class )
-            || subject.getBooleanAttributeValue( IsTrashMetacontentAttribute.class );
+        if ( subject.getPath() != null )
+        {
+            return subject.getPath().startsWith( "/.nexus/attributes" );
+        }
+        else
+        {
+            return false;
+        }
     }
 }
