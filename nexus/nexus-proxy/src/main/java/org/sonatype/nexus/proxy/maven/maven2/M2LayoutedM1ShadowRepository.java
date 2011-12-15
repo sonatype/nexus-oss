@@ -70,16 +70,19 @@ public class M2LayoutedM1ShadowRepository
         };
     }
 
+    @Override
     public GavCalculator getGavCalculator()
     {
         return getM2GavCalculator();
     }
 
+    @Override
     public ContentClass getRepositoryContentClass()
     {
         return contentClass;
     }
 
+    @Override
     public ContentClass getMasterRepositoryContentClass()
     {
         return masterContentClass;
@@ -91,19 +94,21 @@ public class M2LayoutedM1ShadowRepository
         return m2LayoutedM1ShadowRepositoryConfigurator;
     }
 
-    protected String transformMaster2Shadow( String path )
+    @Override
+    protected String transformMaster2Shadow( final String path )
     {
         return transformM1toM2( path );
     }
 
-    protected String transformShadow2Master( String path )
+    @Override
+    protected String transformShadow2Master( final String path )
     {
         return transformM2toM1( path );
     }
 
-    public boolean isMavenMetadataPath( String path )
+    @Override
+    public boolean isMavenMetadataPath( final String path )
     {
         return M2ArtifactRecognizer.isMetadata( path );
     }
-
 }

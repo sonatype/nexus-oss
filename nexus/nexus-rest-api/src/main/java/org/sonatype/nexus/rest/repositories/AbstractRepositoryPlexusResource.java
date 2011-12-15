@@ -433,7 +433,7 @@ public abstract class AbstractRepositoryPlexusResource
 
         resource.setFormat( shadow.getRepositoryContentClass().getId() );
 
-        resource.setShadowOf( shadow.getMasterRepositoryId() );
+        resource.setShadowOf( shadow.getMasterRepository().getId() );
 
         resource.setSyncAtStartup( shadow.isSynchronizeAtStartup() );
 

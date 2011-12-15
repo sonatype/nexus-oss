@@ -96,6 +96,7 @@ public abstract class LayoutConverterShadowRepository
      */
     private ArtifactStoreHelper artifactStoreHelper;
 
+    @Override
     public RepositoryKind getRepositoryKind()
     {
         return repositoryKind;
@@ -132,49 +133,60 @@ public abstract class LayoutConverterShadowRepository
         return m2GavCalculator;
     }
 
+    @Override
     public ArtifactPackagingMapper getArtifactPackagingMapper()
     {
         return artifactPackagingMapper;
     }
 
+    @Override
     public RepositoryPolicy getRepositoryPolicy()
     {
         return getMasterRepository().getRepositoryPolicy();
     }
 
+    @Override
     public void setRepositoryPolicy( RepositoryPolicy repositoryPolicy )
     {
         throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
+    @Override
     public boolean isMavenArtifact( StorageItem item )
     {
         return isMavenArtifactPath( item.getPath() );
     }
 
+    @Override
     public boolean isMavenMetadata( StorageItem item )
     {
         return isMavenMetadataPath( item.getPath() );
     }
 
+    @Override
     public boolean isMavenArtifactPath( String path )
     {
         return getGavCalculator().pathToGav( path ) != null;
     }
 
+    @Override
     public abstract boolean isMavenMetadataPath( String path );
 
+    @Override
     public MetadataManager getMetadataManager()
     {
         return metadataManager;
     }
 
-    public boolean recreateMavenMetadata( ResourceStoreRequest request )
+    @Override
+    public boolean recreateMavenMetadata( final ResourceStoreRequest request )
     {
         return false;
     }
 
-    public void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
+    @Override
+    public void storeItemWithChecksums( final ResourceStoreRequest request, final InputStream is,
+                                        final Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
     {
         String originalPath = request.getRequestPath();
@@ -227,7 +239,8 @@ public abstract class LayoutConverterShadowRepository
         }
     }
 
-    public void deleteItemWithChecksums( ResourceStoreRequest request )
+    @Override
+    public void deleteItemWithChecksums( final ResourceStoreRequest request )
         throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
         StorageException, AccessDeniedException
     {
@@ -286,7 +299,8 @@ public abstract class LayoutConverterShadowRepository
         }
     }
 
-    public void storeItemWithChecksums( boolean fromTask, AbstractStorageItem item )
+    @Override
+    public void storeItemWithChecksums( final boolean fromTask, final AbstractStorageItem item )
         throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
     {
         if ( getLogger().isDebugEnabled() )
@@ -335,7 +349,8 @@ public abstract class LayoutConverterShadowRepository
         }
     }
 
-    public void deleteItemWithChecksums( boolean fromTask, ResourceStoreRequest request )
+    @Override
+    public void deleteItemWithChecksums( final boolean fromTask, final ResourceStoreRequest request )
         throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
     {
         if ( getLogger().isDebugEnabled() )
@@ -376,6 +391,7 @@ public abstract class LayoutConverterShadowRepository
         }
     }
 
+    @Override
     public ArtifactStoreHelper getArtifactStoreHelper()
     {
         if ( artifactStoreHelper == null )
@@ -395,9 +411,9 @@ public abstract class LayoutConverterShadowRepository
      * @param path
      * @return
      */
-    protected String transformM1toM2( String path )
+    protected String transformM1toM2( final String path )
     {
-        Gav gav = getM1GavCalculator().pathToGav( path );
+        final Gav gav = getM1GavCalculator().pathToGav( path );
 
         // Unsupported path
         if ( gav == null )
@@ -410,7 +426,7 @@ public abstract class LayoutConverterShadowRepository
         // version
         // files
 
-        StringBuffer sb = new StringBuffer( RepositoryItemUid.PATH_ROOT );
+        StringBuilder sb = new StringBuilder( RepositoryItemUid.PATH_ROOT );
         sb.append( gav.getGroupId().replaceAll( "\\.", "/" ) );
         sb.append( RepositoryItemUid.PATH_SEPARATOR );
         sb.append( gav.getArtifactId() );
@@ -427,9 +443,9 @@ public abstract class LayoutConverterShadowRepository
      * @param path
      * @return
      */
-    protected String transformM2toM1( String path )
+    protected String transformM2toM1( final String path )
     {
-        Gav gav = getM2GavCalculator().pathToGav( path );
+        final Gav gav = getM2GavCalculator().pathToGav( path );
 
         // Unsupported path
         if ( gav == null )
@@ -440,7 +456,7 @@ public abstract class LayoutConverterShadowRepository
         // g.i.d
         // poms/jars/java-sources/licenses
         // files
-        StringBuffer sb = new StringBuffer( RepositoryItemUid.PATH_ROOT );
+        StringBuilder sb = new StringBuilder( RepositoryItemUid.PATH_ROOT );
         sb.append( gav.getGroupId() );
         sb.append( RepositoryItemUid.PATH_SEPARATOR );
         sb.append( gav.getExtension() + "s" );
@@ -450,7 +466,34 @@ public abstract class LayoutConverterShadowRepository
     }
 
     @Override
-    protected void deleteLink( StorageItem item )
+    protected StorageLinkItem createLink( final StorageItem item )
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
+    {
+        String shadowPath = null;
+
+        shadowPath = transformMaster2Shadow( item.getPath() );
+
+        if ( shadowPath != null )
+        {
+            ResourceStoreRequest req = new ResourceStoreRequest( shadowPath );
+
+            req.getRequestContext().putAll( item.getItemContext() );
+
+            DefaultStorageLinkItem link =
+                new DefaultStorageLinkItem( this, req, true, true, item.getRepositoryItemUid() );
+
+            storeItem( false, link );
+
+            return link;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    @Override
+    protected void deleteLink( final StorageItem item )
         throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
     {
         String shadowPath = null;
@@ -517,33 +560,6 @@ public abstract class LayoutConverterShadowRepository
         }
     }
 
-    @Override
-    protected StorageLinkItem createLink( StorageItem item )
-        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
-    {
-        String shadowPath = null;
-
-        shadowPath = transformMaster2Shadow( item.getPath() );
-
-        if ( shadowPath != null )
-        {
-            ResourceStoreRequest req = new ResourceStoreRequest( shadowPath );
-
-            req.getRequestContext().putAll( item.getItemContext() );
-
-            DefaultStorageLinkItem link =
-                new DefaultStorageLinkItem( this, req, true, true, item.getRepositoryItemUid() );
-
-            storeItem( false, link );
-
-            return link;
-        }
-        else
-        {
-            return null;
-        }
-    }
-
     /**
      * Gets the shadow path from master path. If path is not transformable, return null.
      * 
@@ -553,7 +569,7 @@ public abstract class LayoutConverterShadowRepository
     protected abstract String transformMaster2Shadow( String path );
 
     @Override
-    protected StorageItem doRetrieveItem( ResourceStoreRequest request )
+    protected StorageItem doRetrieveItem( final ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         StorageItem result = null;

@@ -19,6 +19,7 @@
 package org.sonatype.nexus.proxy.repository;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -50,6 +51,11 @@ public abstract class AbstractShadowRepository
 {
     @Requirement
     private RepositoryRegistry repositoryRegistry;
+    
+    protected RepositoryRegistry getRepositoryRegistry()
+    {
+        return repositoryRegistry;
+    }
 
     @Override
     protected AbstractShadowRepositoryConfiguration getExternalConfiguration( boolean forModification )
@@ -57,46 +63,52 @@ public abstract class AbstractShadowRepository
         return (AbstractShadowRepositoryConfiguration) super.getExternalConfiguration( forModification );
     }
 
-    public String getMasterRepositoryId()
-    {
-        return getExternalConfiguration( false ).getMasterRepositoryId();
-    }
-
-    public void setMasterRepositoryId( String id )
-        throws NoSuchRepositoryException, IncompatibleMasterRepositoryException
-    {
-        setMasterRepository( repositoryRegistry.getRepository( id ) );
-    }
-
-    public Repository getMasterRepository()
-    {
-        try
-        {
-            return repositoryRegistry.getRepository( getExternalConfiguration( false ).getMasterRepositoryId() );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // erm?
-
-            getLogger().warn(
-                "ShadowRepository ID='" + getId() + "' cannot fetch it's master repository with ID='"
-                    + getMasterRepositoryId() + "'!", e );
-
-            return null;
-        }
-    }
-
+    @Override
     public boolean isSynchronizeAtStartup()
     {
         return getExternalConfiguration( false ).isSynchronizeAtStartup();
     }
 
-    public void setSynchronizeAtStartup( boolean val )
+    @Override
+    public void setSynchronizeAtStartup( final boolean val )
     {
         getExternalConfiguration( true ).setSynchronizeAtStartup( val );
     }
 
-    public void setMasterRepository( Repository masterRepository )
+    @Deprecated
+    @Override
+    public String getMasterRepositoryId()
+    {
+        return getMasterRepository().getId();
+    }
+
+    @Deprecated
+    @Override
+    public void setMasterRepositoryId( final String repositoryId )
+        throws IncompatibleMasterRepositoryException, NoSuchRepositoryException
+    {
+        setMasterRepository( getRepositoryRegistry().getRepository( repositoryId ) );
+    }
+
+    @Override
+    public Repository getMasterRepository()
+    {
+        try
+        {
+            return getRepositoryRegistry().getRepository( getExternalConfiguration( false ).getMasterRepositoryId() );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            getLogger().warn(
+                "ShadowRepository ID='" + getId() + "' cannot fetch it's master repository with ID='"
+                    + getExternalConfiguration( false ).getMasterRepositoryId() + "'!", e );
+
+            return null;
+        }
+    }
+
+    @Override
+    public void setMasterRepository( final Repository masterRepository )
         throws IncompatibleMasterRepositoryException
     {
         if ( getMasterRepositoryContentClass().getId().equals( masterRepository.getRepositoryContentClass().getId() ) )
@@ -110,7 +122,7 @@ public abstract class AbstractShadowRepository
     }
 
     /**
-     * The shadow is delegating it's availability to it's master, but we can still shot down the shadow onlu.
+     * The shadow is delegating it's availability to it's master, but we can still shot down the shadow only.
      */
     @Override
     public LocalStatus getLocalStatus()
@@ -150,7 +162,7 @@ public abstract class AbstractShadowRepository
     protected abstract StorageLinkItem createLink( StorageItem item )
         throws UnsupportedStorageOperationException, IllegalOperationException, StorageException;
 
-    protected void synchronizeLink( StorageItem item )
+    protected void synchronizeLink( final StorageItem item )
         throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
     {
         createLink( item );
@@ -159,6 +171,7 @@ public abstract class AbstractShadowRepository
     /**
      * Synchronize with master.
      */
+    @Override
     public void synchronizeWithMaster()
     {
         if ( !getLocalStatus().shouldServiceRequest() )
@@ -168,11 +181,11 @@ public abstract class AbstractShadowRepository
 
         getLogger().info( "Syncing shadow " + getId() + " with master repository " + getMasterRepository().getId() );
 
-        ResourceStoreRequest root = new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true );
+        final ResourceStoreRequest root = new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true );
 
-        expireCaches( root );
+        expireNotFoundCaches( root );
 
-        AbstractFileWalkerProcessor sw = new AbstractFileWalkerProcessor()
+        final AbstractFileWalkerProcessor sw = new AbstractFileWalkerProcessor()
         {
             @Override
             protected void processFileItem( WalkerContext context, StorageFileItem item )
@@ -182,7 +195,7 @@ public abstract class AbstractShadowRepository
             }
         };
 
-        DefaultWalkerContext ctx = new DefaultWalkerContext( getMasterRepository(), root );
+        final DefaultWalkerContext ctx = new DefaultWalkerContext( getMasterRepository(), root );
 
         ctx.getProcessors().add( sw );
 
@@ -201,10 +214,17 @@ public abstract class AbstractShadowRepository
         }
     }
 
-    protected StorageItem doRetrieveItemFromMaster( ResourceStoreRequest request )
+    protected StorageItem doRetrieveItemFromMaster( final ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
-        return ( (AbstractRepository) getMasterRepository() ).doRetrieveItem( request );
+        try
+        {
+            return getMasterRepository().retrieveItem( request );
+        }
+        catch ( AccessDeniedException e )
+        {
+            // if client has no access to content over shadow, we just hide the fact
+            throw new ItemNotFoundException( request, e );
+        }
     }
-
 }

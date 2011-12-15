@@ -59,7 +59,7 @@ public class ShadowRepositoryEventInspector
 
             for ( ShadowRepository shadow : shadows )
             {
-                if ( shadow.getMasterRepositoryId().equals( ievt.getRepository().getId() ) )
+                if ( shadow.getMasterRepository().getId().equals( ievt.getRepository().getId() ) )
                 {
                     shadow.onRepositoryItemEvent( ievt );
                 }

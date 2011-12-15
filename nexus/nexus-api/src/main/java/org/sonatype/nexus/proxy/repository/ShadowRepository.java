@@ -41,22 +41,6 @@ public interface ShadowRepository
     ContentClass getMasterRepositoryContentClass();
 
     /**
-     * Returns the master repository of this ShadowRepository.
-     * 
-     * @return
-     */
-    String getMasterRepositoryId();
-
-    /**
-     * Sets the master repository of this ShadowRepository.
-     * 
-     * @param masterRepository
-     * @throws IncompatibleMasterRepositoryException
-     */
-    void setMasterRepositoryId( String masterRepositoryId )
-        throws NoSuchRepositoryException, IncompatibleMasterRepositoryException;
-
-    /**
      * Gets sync at startup.
      * 
      * @return
@@ -69,6 +53,27 @@ public interface ShadowRepository
      * @param value
      */
     void setSynchronizeAtStartup( boolean value );
+
+    /**
+     * Returns the master repository of this ShadowRepository.
+     * 
+     * @return
+     * @deprecated Use {@link #getMasterRepository()}.getId() instead.
+     */
+    @Deprecated
+    String getMasterRepositoryId();
+
+    /**
+     * Sets the master repository of this ShadowRepository.
+     * 
+     * @param masterRepository
+     * @throws NoSuchRepositoryException
+     * @throws IncompatibleMasterRepositoryException
+     * @deprecated Use {@link #setMasterRepository(Repository)} instead.
+     */
+    @Deprecated
+    void setMasterRepositoryId( String masterRepositoryId )
+        throws NoSuchRepositoryException, IncompatibleMasterRepositoryException;
 
     /**
      * Returns the master.
