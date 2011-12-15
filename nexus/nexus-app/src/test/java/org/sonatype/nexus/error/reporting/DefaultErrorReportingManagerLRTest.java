@@ -32,19 +32,14 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
-import org.codehaus.plexus.swizzle.jira.authentication.AuthenticationSource;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.swizzle.jira.Issue;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.jira.AttachmentHandler;
 import org.sonatype.jira.mock.MockAttachmentHandler;
 import org.sonatype.jira.mock.StubJira;
@@ -53,14 +48,10 @@ import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
-import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
-import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.scheduling.SchedulerTask;
-import org.sonatype.tests.http.runner.api.SuiteConfigurator;
 import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
-
 
 // This is an IT just because it runs longer then 15 seconds
 public class DefaultErrorReportingManagerLRTest
@@ -79,7 +70,7 @@ public class DefaultErrorReportingManagerLRTest
         throws Exception
     {
         setupJiraMock( "src/test/resources/jira-mock.db" );
-        
+
         super.setUp();
 
         unzipHomeDir = new File( getPlexusHomeDir(), "unzip" );
@@ -95,14 +86,20 @@ public class DefaultErrorReportingManagerLRTest
     {
         StubJira mock = new StubJira();
         FileInputStream in = null;
-        try {
-        in = new FileInputStream(dbPath);
-        mock.setDatabase( IOUtil.toString( in ) );
-        List<AttachmentHandler> handlers = Arrays.<AttachmentHandler>asList( new MockAttachmentHandler( mock ) );
-        provider = new JettyServerProvider();
-        provider.addServlet( new JiraXmlRpcTestServlet( mock, provider.getUrl(), handlers ) );
-        provider.start();
-        } finally {
+        try
+        {
+            in = new FileInputStream( dbPath );
+            mock.setDatabase( IOUtil.toString( in ) );
+
+            MockAttachmentHandler handler = new MockAttachmentHandler();
+            handler.setMock( mock );
+            List<AttachmentHandler> handlers = Arrays.<AttachmentHandler> asList( handler );
+            provider = new JettyServerProvider();
+            provider.addServlet( new JiraXmlRpcTestServlet( mock, provider.getUrl(), handlers ) );
+            provider.start();
+        }
+        finally
+        {
             IOUtil.close( in );
         }
     }
@@ -117,7 +114,7 @@ public class DefaultErrorReportingManagerLRTest
         catch ( MalformedURLException e )
         {
             e.printStackTrace();
-	        ctx.put( "pr.serverUrl", "https://issues.sonatype.org" );
+            ctx.put( "pr.serverUrl", "https://issues.sonatype.org" );
         }
         ctx.put( "pr.auth.login", "sonatype_problem_reporting" );
         ctx.put( "pr.auth.password", "____" );
@@ -151,7 +148,7 @@ public class DefaultErrorReportingManagerLRTest
         manager.setEnabled( true );
         try
         {
-           manager.setJIRAUrl( provider.getUrl().toString() );
+            manager.setJIRAUrl( provider.getUrl().toString() );
         }
         catch ( MalformedURLException e )
         {
@@ -159,24 +156,23 @@ public class DefaultErrorReportingManagerLRTest
             manager.setJIRAUrl( "https://issues.sonatype.org" );
         }
         manager.setJIRAProject( "SBOX" );
-        AuthenticationSource credentials = lookup( AuthenticationSource.class );
-         manager.setJIRAUsername( credentials.getLogin() );
-         manager.setJIRAPassword( credentials.getPassword() );
+        manager.setJIRAUsername( "jira" );
+        manager.setJIRAPassword( "jira" );
         manager.setUseGlobalProxy( useProxy );
 
         nexusConfig.saveConfiguration();
     }
 
-    private void enableProxy()
-        throws ConfigurationException, IOException
-    {
-        RemoteProxySettings proxy = nexusConfig.getGlobalRemoteStorageContext().getRemoteProxySettings();
-        proxy.setHostname( "localhost" );
-        proxy.setPort( 8111 );
-        proxy.setProxyAuthentication( new UsernamePasswordRemoteAuthenticationSettings( "*****", "*****" ) );
-
-        nexusConfig.saveConfiguration();
-    }
+    // private void enableProxy()
+    // throws ConfigurationException, IOException
+    // {
+    // RemoteProxySettings proxy = nexusConfig.getGlobalRemoteStorageContext().getRemoteProxySettings();
+    // proxy.setHostname( "localhost" );
+    // proxy.setPort( 8111 );
+    // proxy.setProxyAuthentication( new UsernamePasswordRemoteAuthenticationSettings( "*****", "*****" ) );
+    //
+    // nexusConfig.saveConfiguration();
+    // }
 
     @Test
     public void testJiraAccess()
