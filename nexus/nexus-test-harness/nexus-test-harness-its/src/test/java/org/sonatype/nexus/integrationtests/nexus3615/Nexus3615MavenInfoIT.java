@@ -117,7 +117,7 @@ public class Nexus3615MavenInfoIT
         throws Exception
     {
         // deploy a non maven path
-        new DeployUtils( this ).deployWithWagon( "http", getRepositoryUrl( getTestRepositoryId() ),
+        getDeployUtils().deployWithWagon( "http", getRepositoryUrl( getTestRepositoryId() ),
             getTestFile( "pom.xml" ), "foo/bar" );
 
         // now get the info for it
@@ -129,7 +129,7 @@ public class Nexus3615MavenInfoIT
     public void deployGav( Gav gav, String repoId )
         throws Exception
     {
-        new DeployUtils( this ).deployWithWagon( "http", getRepositoryUrl( repoId ), getTestFile( "simpleJar.jar" ),
+        getDeployUtils().deployWithWagon( "http", getRepositoryUrl( repoId ), getTestFile( "simpleJar.jar" ),
             getRelitiveArtifactPath( gav ) );
     }
 

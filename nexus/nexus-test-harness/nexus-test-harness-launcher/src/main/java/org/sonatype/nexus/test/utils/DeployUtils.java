@@ -18,11 +18,11 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
-import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.multipart.FilePart;
@@ -31,105 +31,139 @@ import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.wagon.Wagon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.NexusRestClient;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 
 public class DeployUtils
-    extends ITUtil
 {
+
     private static final Logger LOG = LoggerFactory.getLogger( DeployUtils.class );
 
-    public DeployUtils( AbstractNexusIntegrationTest test )
+    private final NexusRestClient nexusRestClient;
+
+    private final WagonDeployer.Factory wagonFactory;
+
+    public DeployUtils( final NexusRestClient nexusRestClient,
+                        final WagonDeployer.Factory wagonFactory )
     {
-        super( test );
+        this.nexusRestClient = checkNotNull( nexusRestClient );
+        this.wagonFactory = wagonFactory;
     }
 
     public void deployWithWagon( String wagonHint, String repositoryUrl, File fileToDeploy, String artifactPath )
         throws Exception
     {
-        TestContext testContext = TestContainer.getInstance().getTestContext();
+        final TestContext testContext = nexusRestClient.getTestContext();
+        final Wagon wagon = wagonFactory.get( wagonHint );
+
+        String username = null;
+        String password = null;
+
         if ( testContext.isSecureTest() )
         {
-            new WagonDeployer( getTest().getITPlexusContainer(), wagonHint, testContext.getUsername(),
-                testContext.getPassword(), repositoryUrl, fileToDeploy, artifactPath ).deploy();
+            username = testContext.getUsername();
+            password = testContext.getPassword();
         }
-        else
-        {
-            new WagonDeployer( getTest().getITPlexusContainer(), wagonHint, null, null, repositoryUrl, fileToDeploy,
-                artifactPath ).deploy();
-        }
-        //
-        // new WagonDeployer( wagonHint, TestContainer.getInstance().getTestContext().getUsername(),
-        // TestContainer.getInstance().getTestContext().getPassword(), repositoryUrl, fileToDeploy,
-        // artifactPath ).deploy();
+
+        new WagonDeployer( wagon, wagonHint, username, password, repositoryUrl, fileToDeploy, artifactPath ).deploy();
     }
 
-    public int deployUsingGavWithRest( String repositoryId, Gav gav, File fileToDeploy )
-        throws HttpException, IOException
+    public int deployUsingGavWithRest( final String repositoryId,
+                                       final Gav gav,
+                                       final File fileToDeploy )
+        throws IOException
     {
-        return deployUsingGavWithRest( AbstractNexusIntegrationTest.nexusBaseUrl
-            + "service/local/artifact/maven/content", repositoryId, gav, fileToDeploy );
+        return deployUsingGavWithRest(
+            nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(),
+            repositoryId,
+            gav,
+            fileToDeploy
+        );
     }
 
-    public int deployUsingGavWithRest( String restServiceURL, String repositoryId, Gav gav, File fileToDeploy )
-        throws HttpException, IOException
+    public int deployUsingGavWithRest( final String restServiceURL,
+                                       final String repositoryId,
+                                       final Gav gav,
+                                       final File fileToDeploy )
+        throws IOException
     {
-
         // the method we are calling
-        PostMethod filePost = new PostMethod( restServiceURL );
+        final PostMethod filePost = new PostMethod( restServiceURL );
         filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
 
-        String extention = gav.getExtension() != null ? gav.getExtension() : "";
-        String classifier = gav.getClassifier() != null ? gav.getClassifier() : "";
+        final String extension = gav.getExtension() != null ? gav.getExtension() : "";
+        final String classifier = gav.getClassifier() != null ? gav.getClassifier() : "";
 
-        Part[] parts =
-            { new StringPart( "r", repositoryId ), new StringPart( "g", gav.getGroupId() ),
-                new StringPart( "a", gav.getArtifactId() ), new StringPart( "v", gav.getVersion() ),
-                new StringPart( "p", extention ), new StringPart( "c", classifier ),
-                new FilePart( fileToDeploy.getName(), fileToDeploy ), };
+        final Part[] parts = {
+            new StringPart( "r", repositoryId ),
+            new StringPart( "g", gav.getGroupId() ),
+            new StringPart( "a", gav.getArtifactId() ),
+            new StringPart( "v", gav.getVersion() ),
+            new StringPart( "p", extension ),
+            new StringPart( "c", classifier ),
+            new FilePart( fileToDeploy.getName(), fileToDeploy )
+        };
 
         filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
 
-        return RequestFacade.executeHTTPClientMethod(filePost ).getStatusCode();
+        return RequestFacade.executeHTTPClientMethod( filePost ).getStatusCode();
 
     }
 
-    public int deployUsingPomWithRest( String repositoryId, File fileToDeploy, File pomFile, String classifier,
-                                       String extention )
-        throws HttpException, IOException
+    public int deployUsingPomWithRest( final String repositoryId,
+                                       final File fileToDeploy,
+                                       final File pomFile,
+                                       final String classifier,
+                                       final String extension )
+        throws IOException
     {
-        return deployUsingPomWithRest( AbstractNexusIntegrationTest.nexusBaseUrl
-            + "service/local/artifact/maven/content", repositoryId, fileToDeploy, pomFile, classifier, extention );
+        return deployUsingPomWithRest(
+            nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(),
+            repositoryId,fileToDeploy,pomFile,classifier,
+            extension
+        );
     }
 
-    public HttpMethod deployUsingPomWithRestReturnResult( String repositoryId, File fileToDeploy, File pomFile,
-                                                          String classifier, String extention )
-        throws HttpException, IOException
+    public HttpMethod deployUsingPomWithRestReturnResult( final String repositoryId,
+                                                          final File fileToDeploy,
+                                                          final File pomFile,
+                                                          final String classifier,
+                                                          final String extension )
+        throws IOException
     {
-        return deployUsingPomWithRestReturnResult( AbstractNexusIntegrationTest.nexusBaseUrl
-            + "service/local/artifact/maven/content", repositoryId, fileToDeploy, pomFile, classifier, extention );
+        return deployUsingPomWithRestReturnResult(
+            nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(),
+            repositoryId, fileToDeploy, pomFile, classifier, extension
+        );
     }
 
-    public HttpMethod deployUsingPomWithRestReturnResult( String restServiceURL, String repositoryId,
-                                                          File fileToDeploy, File pomFile, String classifier,
-                                                          String extention )
-        throws HttpException, IOException
+    public HttpMethod deployUsingPomWithRestReturnResult( final String restServiceURL,
+                                                          final String repositoryId,
+                                                          final File fileToDeploy,
+                                                          final File pomFile,
+                                                          final String classifier,
+                                                          final String extension )
+        throws IOException
     {
         // the method we are calling
-        PostMethod filePost = new PostMethod( restServiceURL );
+        final PostMethod filePost = new PostMethod( restServiceURL );
         filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
 
-        classifier = ( classifier == null ) ? "" : classifier;
-        extention = ( extention == null ) ? "" : extention;
+        final String fixedClassifier = ( classifier == null ) ? "" : classifier;
+        final String fixedExtension = ( extension == null ) ? "" : extension;
 
-        Part[] parts =
-            { new StringPart( "r", repositoryId ), new StringPart( "e", extention ), new StringPart( "c", classifier ),
-                new StringPart( "hasPom", "true" ), new FilePart( pomFile.getName(), pomFile ),
-                new FilePart( fileToDeploy.getName(), fileToDeploy ) };
+        final Part[] parts = {
+            new StringPart( "r", repositoryId ),
+            new StringPart( "e", fixedExtension ),
+            new StringPart( "c", fixedClassifier ),
+            new StringPart( "hasPom", "true" ),
+            new FilePart( pomFile.getName(), pomFile ),
+            new FilePart( fileToDeploy.getName(), fileToDeploy )
+        };
 
         filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
 
@@ -141,38 +175,47 @@ public class DeployUtils
         LOG.debug( "\tpom: " + pomFile );
         LOG.debug( "\tfileToDeploy: " + fileToDeploy );
 
-        return RequestFacade.executeHTTPClientMethod(filePost );
+        return RequestFacade.executeHTTPClientMethod( filePost );
     }
 
-    public int deployUsingPomWithRest( String restServiceURL, String repositoryId, File fileToDeploy, File pomFile,
-                                       String classifier, String extention )
-        throws HttpException, IOException
+    public int deployUsingPomWithRest( final String restServiceURL,
+                                       final String repositoryId,
+                                       final File fileToDeploy,
+                                       final File pomFile,
+                                       final String classifier,
+                                       final String extension )
+        throws IOException
     {
-        return deployUsingPomWithRestReturnResult( restServiceURL, repositoryId, fileToDeploy, pomFile, classifier,
-            extention ).getStatusCode();
+        return deployUsingPomWithRestReturnResult(
+            restServiceURL, repositoryId, fileToDeploy, pomFile, classifier, extension
+        ).getStatusCode();
     }
 
-    public HttpMethod deployPomWithRest( String repositoryId, File pomFile )
-        throws HttpException, IOException
+    public HttpMethod deployPomWithRest( final String repositoryId,
+                                         final File pomFile )
+        throws IOException
     {
-        String restServiceURL = AbstractNexusIntegrationTest.nexusBaseUrl + "service/local/artifact/maven/content";
         // the method we are calling
-        PostMethod filePost = new PostMethod( restServiceURL );
+        final PostMethod filePost = new PostMethod(
+            nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm()
+        );
         filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
 
-        Part[] parts =
-            { new StringPart( "r", repositoryId ), new StringPart( "hasPom", "true" ),
-                new FilePart( pomFile.getName(), pomFile ), };
+        final Part[] parts = {
+            new StringPart( "r", repositoryId ),
+            new StringPart( "hasPom", "true" ),
+            new FilePart( pomFile.getName(), pomFile )
+        };
 
         filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
 
-        LOG.debug( "URL:  " + restServiceURL );
+        LOG.debug( "URL:  " + filePost.getURI() );
         LOG.debug( "Method: Post" );
         LOG.debug( "params: " );
         LOG.debug( "\tr: " + repositoryId );
         LOG.debug( "\thasPom: true" );
         LOG.debug( "\tpom: " + pomFile );
 
-        return RequestFacade.executeHTTPClientMethod(filePost );
+        return RequestFacade.executeHTTPClientMethod( filePost );
     }
 }
