@@ -35,7 +35,6 @@ import org.apache.maven.wagon.Wagon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.NexusRestClient;
-import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContext;
 
 public class DeployUtils
@@ -69,7 +68,10 @@ public class DeployUtils
             password = testContext.getPassword();
         }
 
-        new WagonDeployer( wagon, wagonHint, username, password, repositoryUrl, fileToDeploy, artifactPath ).deploy();
+        new WagonDeployer(
+            wagon, wagonHint, username, password, repositoryUrl, fileToDeploy, artifactPath,
+            nexusRestClient.getTestContext()
+        ).deploy();
     }
 
     public int deployUsingGavWithRest( final String repositoryId,
@@ -110,7 +112,7 @@ public class DeployUtils
 
         filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
 
-        return RequestFacade.executeHTTPClientMethod( filePost ).getStatusCode();
+        return nexusRestClient.executeHTTPClientMethod( filePost ).getStatusCode();
 
     }
 
@@ -123,7 +125,7 @@ public class DeployUtils
     {
         return deployUsingPomWithRest(
             nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(),
-            repositoryId,fileToDeploy,pomFile,classifier,
+            repositoryId, fileToDeploy, pomFile, classifier,
             extension
         );
     }
@@ -175,7 +177,7 @@ public class DeployUtils
         LOG.debug( "\tpom: " + pomFile );
         LOG.debug( "\tfileToDeploy: " + fileToDeploy );
 
-        return RequestFacade.executeHTTPClientMethod( filePost );
+        return nexusRestClient.executeHTTPClientMethod( filePost );
     }
 
     public int deployUsingPomWithRest( final String restServiceURL,
@@ -216,6 +218,6 @@ public class DeployUtils
         LOG.debug( "\thasPom: true" );
         LOG.debug( "\tpom: " + pomFile );
 
-        return RequestFacade.executeHTTPClientMethod( filePost );
+        return nexusRestClient.executeHTTPClientMethod( filePost );
     }
 }

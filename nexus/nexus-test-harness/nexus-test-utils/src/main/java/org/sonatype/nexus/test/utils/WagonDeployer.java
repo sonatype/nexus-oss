@@ -27,6 +27,7 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authentication.AuthenticationException;
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.classworlds.ClassWorld;
@@ -37,7 +38,7 @@ import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.plexus.classworlds.io.ClassworldsConfWriter;
 import org.sonatype.plexus.classworlds.io.ClassworldsIOException;
 import org.sonatype.plexus.classworlds.model.ClassworldsAppConfiguration;
@@ -70,10 +71,18 @@ public class WagonDeployer
 
     private String artifactPath;
 
+    private final TestContext testContext;
+
     private static final Logger LOG = LoggerFactory.getLogger( WagonDeployer.class );
 
-    public WagonDeployer( Wagon wagon, String protocol, String username, String password,
-                          String repositoryUrl, File fileToDeploy, String artifactPath )
+    public WagonDeployer( final Wagon wagon,
+                          final String protocol,
+                          final String username,
+                          final String password,
+                          final String repositoryUrl,
+                          final File fileToDeploy,
+                          final String artifactPath,
+                          final TestContext testContext )
     {
         super();
         this.wagon = wagon;
@@ -83,6 +92,7 @@ public class WagonDeployer
         this.repositoryUrl = repositoryUrl;
         this.fileToDeploy = fileToDeploy;
         this.artifactPath = artifactPath;
+        this.testContext = testContext;
     }
 
     public String getProtocol()
@@ -122,7 +132,7 @@ public class WagonDeployer
         Repository repository = new Repository();
         repository.setUrl( repositoryUrl );
 
-        wagon.connect( repository, RequestFacade.getWagonAuthenticationInfo() );
+        wagon.connect( repository, getWagonAuthenticationInfo() );
         wagon.put( fileToDeploy, artifactPath );
         wagon.disconnect();
 
@@ -274,7 +284,9 @@ public class WagonDeployer
         // {
         try
         {
-            new WagonDeployer( null, args[0], args[1], args[2], args[3], new File( args[4] ), args[5] ).deploy();
+            new WagonDeployer(
+                null, args[0], args[1], args[2], args[3], new File( args[4] ), args[5], new TestContext()
+            ).deploy();
         }
         catch ( ConnectionException e )
         {
@@ -306,6 +318,19 @@ public class WagonDeployer
             e.printStackTrace();
             System.exit( 7 );
         }
+    }
+
+    public AuthenticationInfo getWagonAuthenticationInfo()
+    {
+        AuthenticationInfo authInfo = null;
+        // check the text context to see if this is a secure test
+        if ( testContext.isSecureTest() )
+        {
+            authInfo = new AuthenticationInfo();
+            authInfo.setUserName( testContext.getUsername() );
+            authInfo.setPassword( testContext.getPassword() );
+        }
+        return authInfo;
     }
 
     public static interface Factory

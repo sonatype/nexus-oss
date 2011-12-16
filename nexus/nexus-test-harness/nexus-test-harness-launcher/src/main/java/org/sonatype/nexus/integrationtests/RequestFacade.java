@@ -382,11 +382,6 @@ public class RequestFacade
         return nexusRestClient.executeHTTPClientMethod( method, useTestContext );
     }
 
-    public static AuthenticationInfo getWagonAuthenticationInfo()
-    {
-        return nexusRestClient.getWagonAuthenticationInfo();
-    }
-
     /**
      * Clocks how much time it takes to download a give url
      *

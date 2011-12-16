@@ -21,7 +21,6 @@ package org.sonatype.nexus.integrationtests;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.sonatype.nexus.test.utils.ResponseMatchers.isSuccessful;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -43,9 +42,9 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.data.ChallengeResponse;
@@ -181,7 +180,7 @@ public class NexusRestClient
     public String doGetForText( final String serviceURIpart )
         throws IOException
     {
-        return doGetForText( serviceURIpart, isSuccessful() );
+        return doGetForText( serviceURIpart, ResponseMatchers.isSuccessful() );
     }
 
     public String doGetForText( final String serviceURIpart, final Matcher<Response> responseMatcher )
@@ -351,7 +350,7 @@ public class NexusRestClient
     public String doPutForText( final String serviceURIpart, final Representation representation )
         throws IOException
     {
-        return doPutForText( serviceURIpart, representation, isSuccessful() );
+        return doPutForText( serviceURIpart, representation, ResponseMatchers.isSuccessful() );
     }
 
     public String doPutForText( final String serviceURIpart, final Representation representation,
@@ -381,7 +380,7 @@ public class NexusRestClient
     public String doPostForText( final String serviceURIpart, final Representation representation )
         throws IOException
     {
-        return doPostForText( serviceURIpart, representation, isSuccessful() );
+        return doPostForText( serviceURIpart, representation, ResponseMatchers.isSuccessful() );
     }
 
     public String doPostForText( final String serviceURIpart, final Representation representation,
@@ -427,7 +426,7 @@ public class NexusRestClient
     public void doDelete( final String serviceURIpart )
         throws IOException
     {
-        doDelete( serviceURIpart, isSuccessful() );
+        doDelete( serviceURIpart, ResponseMatchers.isSuccessful() );
     }
 
     public void doDelete( final String serviceURIpart, Matcher<Response> responseMatcher )
@@ -629,20 +628,20 @@ public class NexusRestClient
     }
 
     /**
-     * Execute a HTTPClient method in the context of a test. ie it will use {@link org.sonatype.nexus.integrationtests.TestContainer#getTestContext()} to
+     * Execute a HTTPClient method in the context of a test.
      * make decisions how to execute.
      * <p/>
      * NOTE: Before being returned, {@link org.apache.commons.httpclient.HttpMethod#releaseConnection()} is called on the {@link org.apache.commons.httpclient.HttpMethod} instance,
      * therefore subsequent calls to get response body as string may return nulls.
      */
     public HttpMethod executeHTTPClientMethod( HttpMethod method )
-        throws HttpException, IOException
+        throws IOException
     {
         return executeHTTPClientMethod( method, true );
     }
 
     /**
-     * Execute a HTTPClient method, optionally in the context of a test. ie {@link org.sonatype.nexus.integrationtests.TestContainer#getTestContext()}
+     * Execute a HTTPClient method, optionally in the context of a test.
      * <p/>
      * NOTE: Before being returned, {@link org.apache.commons.httpclient.HttpMethod#releaseConnection()} is called on the {@link org.apache.commons.httpclient.HttpMethod} instance,
      * therefore subsequent calls to get response body as string may return nulls.
@@ -651,12 +650,10 @@ public class NexusRestClient
      * @param useTestContext if true, execute this request in the context of a Test, false means ignore the testContext
      *                       settings
      * @return the HttpMethod instance passed into this method
-     * @throws org.apache.commons.httpclient.HttpException
-     *
      * @throws java.io.IOException
      */
     public HttpMethod executeHTTPClientMethod( final HttpMethod method, final boolean useTestContext )
-        throws HttpException, IOException
+        throws IOException
     {
         HttpClient httpClient = new HttpClient();
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout( 5000 );
@@ -698,19 +695,6 @@ public class NexusRestClient
         }
     }
 
-    public AuthenticationInfo getWagonAuthenticationInfo()
-    {
-        AuthenticationInfo authInfo = null;
-        // check the text context to see if this is a secure test
-        if ( testContext.isSecureTest() )
-        {
-            authInfo = new AuthenticationInfo();
-            authInfo.setUserName( testContext.getUsername() );
-            authInfo.setPassword( testContext.getPassword() );
-        }
-        return authInfo;
-    }
-
     /**
      * Clocks how much time it takes to download a give url
      *
@@ -744,7 +728,7 @@ public class NexusRestClient
             HttpClient client = new HttpClient();
             get = new GetMethod( url.toString() );
             int result = client.executeMethod( get );
-            assertThat( result, ResponseMatchers.isSuccessfulCode() );
+            MatcherAssert.assertThat( result, ResponseMatchers.isSuccessfulCode() );
             in = get.getResponseBodyAsStream();
             byte[] b;
             if ( speedLimit != -1 )

@@ -33,8 +33,9 @@
   <name>Nexus : Test Harness</name>
 
   <modules>
-    <module>nexus-it-helper-plugin</module>
+    <module>nexus-it-helper-plugin</module>   
     <module>nexus-test-environment-maven-plugin</module>
+    <module>nexus-test-utils</module>  
   </modules>
 
   <profiles>
