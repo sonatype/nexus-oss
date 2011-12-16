@@ -53,8 +53,7 @@ import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
 
-// This is an IT just because it runs longer then 15 seconds
-public class DefaultErrorReportingManagerLRTest
+public class DefaultErrorReportingManagerTest
     extends AbstractNexusTestCase
 {
     private DefaultErrorReportingManager manager;
@@ -162,17 +161,6 @@ public class DefaultErrorReportingManagerLRTest
 
         nexusConfig.saveConfiguration();
     }
-
-    // private void enableProxy()
-    // throws ConfigurationException, IOException
-    // {
-    // RemoteProxySettings proxy = nexusConfig.getGlobalRemoteStorageContext().getRemoteProxySettings();
-    // proxy.setHostname( "localhost" );
-    // proxy.setPort( 8111 );
-    // proxy.setProxyAuthentication( new UsernamePasswordRemoteAuthenticationSettings( "*****", "*****" ) );
-    //
-    // nexusConfig.saveConfiguration();
-    // }
 
     @Test
     public void testJiraAccess()
