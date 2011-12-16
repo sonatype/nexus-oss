@@ -72,9 +72,11 @@ import org.sonatype.plugin.nexus.testenvironment.filter.TestScopeFilter;
 import org.sonatype.plugins.portallocator.Port;
 import org.sonatype.plugins.portallocator.PortAllocatorMojo;
 
+import com.google.common.base.Predicate;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.MapConstraints;
+import com.google.common.collect.Sets;
 
 public class AbstractEnvironmentMojo
     extends AbstractMojo
@@ -1203,6 +1205,7 @@ public class AbstractEnvironmentMojo
                     mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
 
                 Set<Artifact> artifacts = pomProject.createArtifacts( artifactFactory, null, null );
+                artifacts = filterOutSystemDependencies( artifacts );
                 ArtifactResolutionResult arr =
                     resolver.resolveTransitively( artifacts, pomArtifact, localRepository, remoteRepositories,
                         artifactMetadataSource, null );
@@ -1230,6 +1233,18 @@ public class AbstractEnvironmentMojo
         }
 
         return deps;
+    }
+
+    private Set<Artifact> filterOutSystemDependencies( Set<Artifact> artifacts )
+    {
+        return Sets.filter( artifacts, new Predicate<Artifact>()
+        {
+            @Override
+            public boolean apply( Artifact a )
+            {
+                return !"system".equals( a.getScope() );
+            }
+        } );
     }
 
     public void contextualize( Context context )
