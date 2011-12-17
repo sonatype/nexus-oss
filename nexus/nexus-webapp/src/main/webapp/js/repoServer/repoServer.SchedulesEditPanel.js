@@ -344,6 +344,9 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
       });
 
   this.COMBO_WIDTH = 300;
+  
+  this.timeZone = new Date().toTimeString();
+  this.timeZone = this.timeZone.substring(this.timeZone.indexOf(" "));
 
   // Build the form
   this.formConfig = {};
@@ -486,6 +489,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
                       xtype : 'timefield',
                       fieldLabel : 'Start Time',
                       itemCls : 'required-field',
+                      afterText : this.timeZone,
                       helpText : ht.startTime,
                       name : 'startTime',
                       width : 75,
@@ -517,6 +521,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
                       xtype : 'timefield',
                       fieldLabel : 'Start Time',
                       itemCls : 'required-field',
+                      afterText : this.timeZone,
                       helpText : ht.startTime,
                       name : 'startTime',
                       width : 75,
@@ -548,6 +553,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
                       xtype : 'timefield',
                       fieldLabel : 'Recurring Time',
                       itemCls : 'required-field',
+                      afterText : this.timeZone,
                       helpText : ht.recurringTime,
                       name : 'recurringTime',
                       width : 75,
@@ -579,6 +585,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
                       xtype : 'timefield',
                       fieldLabel : 'Recurring Time',
                       itemCls : 'required-field',
+                      afterText : this.timeZone,
                       helpText : ht.recurringTime,
                       name : 'recurringTime',
                       width : 75,
@@ -620,6 +627,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
                       xtype : 'timefield',
                       fieldLabel : 'Recurring Time',
                       itemCls : 'required-field',
+                      afterText : this.timeZone,
                       helpText : ht.recurringTime,
                       name : 'recurringTime',
                       width : 75,
