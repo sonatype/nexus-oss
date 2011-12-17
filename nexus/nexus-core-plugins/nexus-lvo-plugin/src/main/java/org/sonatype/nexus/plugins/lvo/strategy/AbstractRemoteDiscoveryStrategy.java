@@ -29,7 +29,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.error.reporting.NexusProxyServerConfigurator;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 
 public abstract class AbstractRemoteDiscoveryStrategy
@@ -72,7 +71,9 @@ public abstract class AbstractRemoteDiscoveryStrategy
     {
         HttpClient client = new HttpClient();
 
-        new NexusProxyServerConfigurator( nexusConfig.getGlobalRemoteStorageContext(), new Slf4jPlexusLogger( getLogger() ) ).applyToClient( client );
+        new NexusProxyServerConfigurator(
+            nexusConfig.getGlobalRemoteStorageContext(), getLogger()
+        ).applyToClient( client );
 
         GetMethod method = new GetMethod( url );
 
@@ -102,7 +103,9 @@ public abstract class AbstractRemoteDiscoveryStrategy
 
     protected static final class RequestResult
     {
+
         private InputStream is;
+
         private GetMethod method;
 
         public RequestResult( GetMethod method )

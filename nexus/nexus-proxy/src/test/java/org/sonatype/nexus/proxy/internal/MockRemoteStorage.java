@@ -24,8 +24,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
@@ -39,10 +43,13 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
-@Component( role = RemoteRepositoryStorage.class, hint = "mock" )
+@Named( "mock" )
+@Singleton
 public class MockRemoteStorage
     extends AbstractRemoteRepositoryStorage
+    implements RemoteRepositoryStorage
 {
 
     private Map<String, String> validUrlContentMap = new HashMap<String, String>();
@@ -54,6 +61,14 @@ public class MockRemoteStorage
     private Set<String> downUrls = new HashSet<String>();
 
     private List<MockRequestRecord> requests = new LinkedList<MockRequestRecord>();
+
+    @Inject
+    protected MockRemoteStorage( final UserAgentBuilder userAgentBuilder,
+                                 final ApplicationStatusSource applicationStatusSource,
+                                 final MimeSupport mimeSupport )
+    {
+        super( userAgentBuilder, applicationStatusSource, mimeSupport );
+    }
 
     @Override
     protected void updateContext( ProxyRepository repository, RemoteStorageContext context )
@@ -69,8 +84,7 @@ public class MockRemoteStorage
     }
 
     public void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException,
-        RemoteStorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteStorageException
     {
         throw new UnsupportedStorageOperationException( "This is a mock, no deleting!" );
     }
@@ -88,7 +102,7 @@ public class MockRemoteStorage
     }
 
     public AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
-        throws ItemNotFoundException, RemoteAccessException, RemoteStorageException
+        throws ItemNotFoundException, RemoteStorageException
     {
         this.requests.add( new MockRequestRecord( repository, request, baseUrl ) );
 
@@ -131,7 +145,7 @@ public class MockRemoteStorage
     }
 
     public void storeItem( ProxyRepository repository, StorageItem item )
-        throws UnsupportedStorageOperationException, RemoteAccessException, RemoteStorageException
+        throws UnsupportedStorageOperationException, RemoteStorageException
     {
         throw new UnsupportedStorageOperationException( "This is a mock, no writing!" );
     }

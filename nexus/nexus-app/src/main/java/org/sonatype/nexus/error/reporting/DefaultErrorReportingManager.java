@@ -38,7 +38,6 @@ import java.util.zip.ZipOutputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
@@ -52,6 +51,8 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.swizzle.jira.Issue;
 import org.codehaus.swizzle.jira.Jira;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
@@ -65,7 +66,6 @@ import org.sonatype.nexus.configuration.model.ConfigurationHelper;
 import org.sonatype.nexus.error.report.ErrorReportBundleContentContributor;
 import org.sonatype.nexus.error.report.ErrorReportBundleEntry;
 import org.sonatype.nexus.error.report.ErrorReportComponent;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.plexus.encryptor.PlexusEncryptor;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
@@ -76,7 +76,7 @@ public class DefaultErrorReportingManager
     extends AbstractConfigurable
     implements ErrorReportingManager
 {
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
     private NexusConfiguration nexusConfig;
@@ -110,7 +110,7 @@ public class DefaultErrorReportingManager
 
     // ==
 
-    protected Logger getLogger()
+    private Logger getLogger()
     {
         return logger;
     }
