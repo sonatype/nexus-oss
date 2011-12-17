@@ -101,7 +101,7 @@ public class Nexus4579OptionalTrashForSnapshotsIT
                                             getTestFile( "deploy/artifact/pom.xml" ), null );
 
         TaskScheduleUtil.waitForAllTasksToStop();
-        new EventInspectorsUtil( this ).waitForCalmPeriod();
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
     @AfterMethod( alwaysRun = true )

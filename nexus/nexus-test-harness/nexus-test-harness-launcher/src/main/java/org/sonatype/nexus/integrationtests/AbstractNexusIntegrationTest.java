@@ -269,7 +269,7 @@ public abstract class AbstractNexusIntegrationTest
     {
         if ( eventInspectorsUtil == null )
         {
-            eventInspectorsUtil = new EventInspectorsUtil( this );
+            eventInspectorsUtil = new EventInspectorsUtil( RequestFacade.getNexusRestClient() );
         }
 
         return eventInspectorsUtil;
@@ -404,7 +404,7 @@ public abstract class AbstractNexusIntegrationTest
         try
         {
             TaskScheduleUtil.waitForAllTasksToStop();
-            new EventInspectorsUtil( null ).waitForCalmPeriod();
+            new EventInspectorsUtil( RequestFacade.getNexusRestClient() ).waitForCalmPeriod();
         }
         catch ( IOException e )
         {

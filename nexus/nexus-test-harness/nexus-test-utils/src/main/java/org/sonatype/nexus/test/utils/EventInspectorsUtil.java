@@ -18,28 +18,30 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 
 import org.restlet.data.Status;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.NexusRestClient;
 
 /**
  * Util class to talk with nexus events
  */
 public class EventInspectorsUtil
-    extends ITUtil
 {
 
-    public EventInspectorsUtil( AbstractNexusIntegrationTest test )
+    private final NexusRestClient nexusRestClient;
+
+    public EventInspectorsUtil( final NexusRestClient nexusRestClient )
     {
-        super( test );
+        this.nexusRestClient = checkNotNull( nexusRestClient );
     }
 
     protected boolean isCalmPeriod()
         throws IOException
     {
-        final Status status = RequestFacade.doGetForStatus( "service/local/eventInspectors/isCalmPeriod" );
+        final Status status = nexusRestClient.doGetForStatus( "service/local/eventInspectors/isCalmPeriod" );
 
         if ( status.isSuccess() )
         {
@@ -67,7 +69,7 @@ public class EventInspectorsUtil
         }
 
         final Status status =
-            RequestFacade.doGetForStatus( "service/local/eventInspectors/isCalmPeriod?waitForCalm=true" );
+            nexusRestClient.doGetForStatus( "service/local/eventInspectors/isCalmPeriod?waitForCalm=true" );
 
         if ( status.getCode() != Status.SUCCESS_OK.getCode() )
         {

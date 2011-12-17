@@ -38,7 +38,7 @@ public abstract class AbstractMigrationPrivilegeTest
         Status status = ImportMessageUtil.commitImport( migrationSummary ).getStatus();
 
         TaskScheduleUtil.waitForAllTasksToStop();
-        new EventInspectorsUtil( this ).waitForCalmPeriod();
+        getEventInspectorsUtil().waitForCalmPeriod();
         TaskScheduleUtil.waitForAllTasksToStop();
 
         return status;
