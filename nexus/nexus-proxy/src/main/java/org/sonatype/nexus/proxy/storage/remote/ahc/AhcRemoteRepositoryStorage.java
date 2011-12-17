@@ -18,31 +18,33 @@
  */
 package org.sonatype.nexus.proxy.storage.remote.ahc;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import java.net.URL;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.ahc.AhcProvider;
+import org.sonatype.nexus.mime.MimeSupport;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
-import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.proxy.storage.remote.AbstractRemoteRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.remote.AbstractHTTPRemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext.BooleanFlagHolder;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-
+import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
 import com.ning.http.client.BodyDeferringAsyncHandler.BodyDeferringInputStream;
@@ -50,13 +52,16 @@ import com.ning.http.client.Response;
 
 /**
  * AsyncHttpClient powered RemoteRepositoryStorage.
- * 
+ *
  * @author cstamas
  */
-@Component( role = RemoteRepositoryStorage.class, hint = AhcRemoteRepositoryStorage.PROVIDER_STRING )
+@Named( AhcRemoteRepositoryStorage.PROVIDER_STRING )
+@Singleton
 public class AhcRemoteRepositoryStorage
-    extends AbstractRemoteRepositoryStorage
+    extends AbstractHTTPRemoteRepositoryStorage
+    implements RemoteRepositoryStorage
 {
+
     public static final String PROVIDER_STRING = "async-http-client";
 
     private static final String CTX_KEY = PROVIDER_STRING;
@@ -65,8 +70,17 @@ public class AhcRemoteRepositoryStorage
 
     private static final String CTX_KEY_S3_FLAG = CTX_KEY + ".remoteIsAmazonS3";
 
-    @Requirement
-    private AhcProvider ahcProvider;
+    private final AhcProvider ahcProvider;
+
+    @Inject
+    protected AhcRemoteRepositoryStorage( final UserAgentBuilder userAgentBuilder,
+                                          final ApplicationStatusSource applicationStatusSource,
+                                          final MimeSupport mimeSupport,
+                                          final AhcProvider ahcProvider )
+    {
+        super( userAgentBuilder, applicationStatusSource, mimeSupport );
+        this.ahcProvider = checkNotNull( ahcProvider );
+    }
 
     @Override
     public String getProviderId()
@@ -75,71 +89,8 @@ public class AhcRemoteRepositoryStorage
     }
 
     @Override
-    public void validateStorageUrl( String url )
-        throws RemoteStorageException
-    {
-        try
-        {
-            URL u = new URL( url );
-
-            if ( !"http".equals( u.getProtocol().toLowerCase() ) && !"https".equals( u.getProtocol().toLowerCase() ) )
-            {
-                throw new RemoteStorageException( "Unsupported protocol, only HTTP/HTTPS protocols are supported: "
-                    + u.getProtocol().toLowerCase() );
-            }
-        }
-        catch ( MalformedURLException e )
-        {
-            throw new RemoteStorageException( "Malformed URL", e );
-        }
-    }
-
-    @Override
-    public boolean isReachable( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException, RemoteStorageException
-    {
-        boolean result = false;
-
-        try
-        {
-            request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
-
-            try
-            {
-                result = checkRemoteAvailability( 0, repository, request, false );
-            }
-            catch ( RemoteAccessDeniedException e )
-            {
-                // NEXUS-3338: we have to swallow this on S3
-                if ( isRemotePeerAmazonS3Storage( repository ) )
-                {
-                    // this is S3 remote, and we got 403: just say all is well (for now)
-                    return true;
-                }
-                else
-                {
-                    throw e;
-                }
-            }
-        }
-        finally
-        {
-            request.popRequestPath();
-        }
-
-        return result;
-    }
-
-    @Override
-    public boolean containsItem( long newerThen, ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAccessException, RemoteStorageException
-    {
-        return checkRemoteAvailability( newerThen, repository, request, true );
-    }
-
-    @Override
     public AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
-        throws ItemNotFoundException, RemoteAccessException, RemoteStorageException
+        throws ItemNotFoundException, RemoteStorageException
     {
         final URL remoteURL = getAbsoluteUrlFromBase( baseUrl, request.getRequestPath() );
 
@@ -167,7 +118,7 @@ public class AhcRemoteRepositoryStorage
 
             DefaultStorageFileItem result =
                 new DefaultStorageFileItem( repository, request, true /* canRead */, true /* canWrite */,
-                    contentLocator );
+                                            contentLocator );
 
             result.setLength( length );
 
@@ -197,7 +148,7 @@ public class AhcRemoteRepositoryStorage
 
     @Override
     public void storeItem( ProxyRepository repository, StorageItem item )
-        throws UnsupportedStorageOperationException, RemoteAccessException, RemoteStorageException
+        throws UnsupportedStorageOperationException, RemoteStorageException
     {
         if ( !( item instanceof StorageFileItem ) )
         {
@@ -239,8 +190,7 @@ public class AhcRemoteRepositoryStorage
 
     @Override
     public void deleteItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteAccessException,
-        RemoteStorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, RemoteStorageException
     {
         final URL remoteURL = getAbsoluteUrlFromBase( repository, request );
 
@@ -275,7 +225,7 @@ public class AhcRemoteRepositoryStorage
         throws ItemNotFoundException, RemoteStorageException
     {
         // maintain the S3 flag
-        checkForRemotePeerAmazonS3Storage( repository, response );
+        checkForRemotePeerAmazonS3Storage( repository, response.getHeader( "server" ) );
 
         if ( response.isRedirected() )
         {
@@ -342,7 +292,8 @@ public class AhcRemoteRepositoryStorage
             oldClient.close();
         }
 
-        final AsyncHttpClientConfig.Builder clientConfigBuilder = ahcProvider.getAsyncHttpClientConfigBuilder( repository, context );
+        final AsyncHttpClientConfig.Builder clientConfigBuilder =
+            ahcProvider.getAsyncHttpClientConfigBuilder( repository, context );
 
         final AsyncHttpClient client = new AsyncHttpClient( clientConfigBuilder.build() );
 
@@ -351,26 +302,10 @@ public class AhcRemoteRepositoryStorage
         context.putContextObject( CTX_KEY_S3_FLAG, new BooleanFlagHolder() );
     }
 
-    /**
-     * Initially, this method is here only to share the code for "availability check" and for "contains" check.
-     * Unfortunately, the "availability" check cannot be done at RemoteStorage level, since it is completely repository
-     * layout unaware and is able to tell only about the existence of remote server and that the URI on it exists. This
-     * "availability" check will have to be moved upper into repository, since it is aware of "what it holds".
-     * Ultimately, this method will check is the remote server "present" and is responding or not. But nothing more.
-     * 
-     * @param newerThen
-     * @param repository
-     * @param context
-     * @param path
-     * @param relaxedCheck
-     * @return
-     * @throws RemoteAuthenticationNeededException
-     * @throws RemoteAccessException
-     * @throws RemoteStorageException
-     */
+    @Override
     protected boolean checkRemoteAvailability( long newerThen, ProxyRepository repository,
                                                ResourceStoreRequest request, boolean isStrict )
-        throws RemoteAuthenticationNeededException, RemoteAccessException, RemoteStorageException
+        throws RemoteStorageException
     {
         final URL remoteURL = getAbsoluteUrlFromBase( repository, request );
 
@@ -382,7 +317,7 @@ public class AhcRemoteRepositoryStorage
         {
             getLogger().debug(
                 String.format( "Checking remote availability of proxy repository \"%s\" (id=%s) on URL %s",
-                    repository.getName(), repository.getId(), itemUrl ) );
+                               repository.getName(), repository.getId(), itemUrl ) );
         }
 
         // artifactory hack, it pukes on HEAD so we will try with GET if HEAD fails
@@ -472,72 +407,20 @@ public class AhcRemoteRepositoryStorage
             else
             {
                 throw new RemoteStorageException( "Unexpected response code while executing GET"
-                    + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
-                    + "\", remoteUrl=\"" + itemUrl + "\"]. Expected: \"SUCCESS (200)\". Received: " + response + " : "
-                    + responseObject.getStatusText() );
+                                                      + " method [repositoryId=\"" + repository.getId()
+                                                      + "\", requestPath=\"" + request.getRequestPath()
+                                                      + "\", remoteUrl=\"" + itemUrl
+                                                      + "\"]. Expected: \"SUCCESS (200)\". Received: " + response
+                                                      + " : "
+                                                      + responseObject.getStatusText() );
             }
         }
     }
 
-    /**
-     * Returns {@code true} if only and only if we are positive that remote peer (remote URL of passed in
-     * ProxyRepository) points to a remote repository that is hosted by Amazon S3 Storage. This method will return false
-     * as long as we don't make very 1st HTTP request to remote peer. After that 1st request, we retain the status until
-     * ProxyRepository configuration changes. See {@link https://issues.sonatype.org/browse/NEXUS-3338} for more.
-     * 
-     * @param repository that needs to be checked.
-     * @return true only if we know that ProxyRepository in question points to Amazon S3 storage.
-     * @throws RemoteStorageException in case of some error.
-     */
-    public boolean isRemotePeerAmazonS3Storage( ProxyRepository repository )
-        throws RemoteStorageException
+    @Override
+    protected String getS3FlagKey()
     {
-        BooleanFlagHolder flag =
-            (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject( CTX_KEY_S3_FLAG );
-
-        return flag.isFlag();
+        return CTX_KEY_S3_FLAG;
     }
 
-    /**
-     * Checks is remote a S3 server and puts a Boolean into remote storage context, thus preventing any further checks
-     * (we check only once).
-     * 
-     * @param repository
-     * @param response
-     * @throws RemoteStorageException
-     */
-    protected void checkForRemotePeerAmazonS3Storage( ProxyRepository repository, Response response )
-        throws RemoteStorageException
-    {
-        RemoteStorageContext ctx = getRemoteStorageContext( repository );
-
-        // we already know the result, do nothing
-        if ( !( (BooleanFlagHolder) ctx.getContextObject( CTX_KEY_S3_FLAG ) ).isNull() )
-        {
-            return;
-        }
-
-        // for now, we check the HTTP response header "Server: AmazonS3"
-        String hdr = response.getHeader( "server" );
-
-        boolean isAmazonS3 = ( hdr != null ) && ( hdr.toLowerCase().contains( "amazons3" ) );
-
-        BooleanFlagHolder holder = (BooleanFlagHolder) ctx.getContextObject( CTX_KEY_S3_FLAG );
-
-        if ( isAmazonS3 )
-        {
-            holder.setFlag( Boolean.TRUE );
-
-            getLogger().warn(
-                "The proxy repository \""
-                    + repository.getName()
-                    + "\" (ID="
-                    + repository.getId()
-                    + ") is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of your setup (baseUrl of proxy repository)!" );
-        }
-        else
-        {
-            holder.setFlag( Boolean.FALSE );
-        }
-    }
 }

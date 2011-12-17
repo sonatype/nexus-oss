@@ -333,6 +333,12 @@
 
     <profile>
       <id>ahc-provider</id>
+      <activation>
+        <property>
+          <name>rrs</name>
+          <value>async-http-client</value>
+        </property>
+      </activation>
       <build>
         <plugins>
           <plugin>
@@ -341,6 +347,31 @@
             <configuration>
               <systemPropertyVariables>
                 <nexus.default.http.provider>async-http-client</nexus.default.http.provider>
+                <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>apacheHttpClient4x-provider</id>
+      <activation>
+        <property>
+          <name>rrs</name>
+          <value>apacheHttpClient4x</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <systemPropertyVariables>
+                <nexus.default.http.provider>apacheHttpClient4x</nexus.default.http.provider>
+                <nexus.default.http.providerForced>true</nexus.default.http.providerForced>
               </systemPropertyVariables>
             </configuration>
           </plugin>

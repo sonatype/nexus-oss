@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -34,7 +33,8 @@ import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
@@ -45,11 +45,12 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 public class HttpClientProxyUtil
 {
+
     public static final String CONNECTION_POOL_SIZE_KEY = "httpClient.connectionPoolSize";
 
     public static final String NTLM_IS_IN_USE_KEY = "httpClient.ntlmIsInUse";
 
-    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger( HttpClientProxyUtil.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( HttpClientProxyUtil.class );
 
     public static void applyProxyToHttpClient( HttpClient httpClient, RemoteStorageContext ctx, Logger logger )
     {
@@ -63,7 +64,7 @@ public class HttpClientProxyUtil
         // properties, but defaulting it to the same we had before (httpClient defaults)
         int connectionPoolSize =
             SystemPropertiesHelper.getInteger( CONNECTION_POOL_SIZE_KEY,
-                MultiThreadedHttpConnectionManager.DEFAULT_MAX_TOTAL_CONNECTIONS );
+                                               MultiThreadedHttpConnectionManager.DEFAULT_MAX_TOTAL_CONNECTIONS );
 
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout( timeout );
         httpClient.getHttpConnectionManager().getParams().setSoTimeout( timeout );
@@ -102,13 +103,16 @@ public class HttpClientProxyUtil
                 // Using NTLM auth, adding it as first in policies
                 authPrefs.add( 0, AuthPolicy.NTLM );
 
-                log( Level.INFO, "... authentication setup for NTLM domain \"" + nras.getNtlmDomain() + "\"", logger );
+                logger( logger ).info(
+                    "... authentication setup for NTLM domain '{}'", nras.getNtlmDomain()
+                );
 
                 httpConfiguration.setHost( nras.getNtlmHost() );
 
                 httpClient.getState().setCredentials(
                     AuthScope.ANY,
-                    new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras.getNtlmDomain() ) );
+                    new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(),
+                                       nras.getNtlmDomain() ) );
 
                 isNtlmUsed = true;
             }
@@ -117,11 +121,13 @@ public class HttpClientProxyUtil
                 UsernamePasswordRemoteAuthenticationSettings uras = (UsernamePasswordRemoteAuthenticationSettings) ras;
 
                 // Using Username/Pwd auth, will not add NTLM
-                log( Level.INFO, "... authentication setup for remote storage with username \"" + uras.getUsername()
-                    + "\"", logger );
+                logger( logger ).info(
+                    "... authentication setup for remote storage with username '{}'", uras.getUsername()
+                );
 
                 httpClient.getState().setCredentials( AuthScope.ANY,
-                    new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() ) );
+                                                      new UsernamePasswordCredentials( uras.getUsername(),
+                                                                                       uras.getPassword() ) );
 
                 isSimpleAuthUsed = true;
             }
@@ -137,7 +143,7 @@ public class HttpClientProxyUtil
         {
             isProxyUsed = true;
 
-            log( Level.INFO, "... proxy setup with host \"" + rps.getHostname() + "\"", logger );
+            logger( logger ).info( "... proxy setup with host '{}'", rps.getHostname() );
 
             httpConfiguration.setProxy( rps.getHostname(), rps.getPort() );
 
@@ -153,7 +159,7 @@ public class HttpClientProxyUtil
                     }
                     catch ( PatternSyntaxException e )
                     {
-                        LOG.warn( "Invalid non proxy host regex: " + nonProxyHostRegex, e );
+                        logger( logger ).warn( "Invalid non proxy host regex: {}", nonProxyHostRegex, e );
                     }
                 }
                 httpConfiguration.getParams().setParameter(
@@ -184,22 +190,25 @@ public class HttpClientProxyUtil
                     if ( ctx.getRemoteAuthenticationSettings() != null
                         && ( ctx.getRemoteAuthenticationSettings() instanceof NtlmRemoteAuthenticationSettings ) )
                     {
-                        log( Level.WARNING, "... Apache Commons HttpClient 3.x is unable to use NTLM auth scheme\n"
-                            + " for BOTH server side and proxy side authentication!\n"
-                            + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
-                            + " if you have to use NTLM proxy, otherwise it will not work!\n"
-                            + " *** SERVER SIDE AUTH OVERRIDDEN", logger );
+                        logger( logger ).warn(
+                            "... Apache Commons HttpClient 3.x is unable to use NTLM auth scheme\n"
+                                + " for BOTH server side and proxy side authentication!\n"
+                                + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
+                                + " if you have to use NTLM proxy, otherwise it will not work!\n"
+                                + " *** SERVER SIDE AUTH OVERRIDDEN"
+                        );
                     }
 
-                    log( Level.WARNING, "... proxy authentication setup for NTLM domain \"" + nras.getNtlmDomain()
-                        + "\"", logger );
+                    logger( logger ).info(
+                        "... proxy authentication setup for NTLM domain '{}'", nras.getNtlmDomain()
+                    );
 
                     httpConfiguration.setHost( nras.getNtlmHost() );
 
                     httpClient.getState().setProxyCredentials(
                         AuthScope.ANY,
                         new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(),
-                            nras.getNtlmDomain() ) );
+                                           nras.getNtlmDomain() ) );
 
                     isNtlmUsed = true;
                 }
@@ -209,12 +218,13 @@ public class HttpClientProxyUtil
                         (UsernamePasswordRemoteAuthenticationSettings) ras;
 
                     // Using Username/Pwd auth, will not add NTLM
-                    log( Level.INFO,
-                        "... proxy authentication setup for remote storage with username \"" + uras.getUsername()
-                            + "\"", logger );
+                    logger( logger ).info(
+                        "... proxy authentication setup for remote storage with username '{}'", uras.getUsername()
+                    );
 
                     httpClient.getState().setProxyCredentials( AuthScope.ANY,
-                        new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() ) );
+                                                               new UsernamePasswordCredentials( uras.getUsername(),
+                                                                                                uras.getPassword() ) );
                 }
 
                 httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
@@ -225,8 +235,11 @@ public class HttpClientProxyUtil
         // no proxy and BASIC auth is used
         if ( isSimpleAuthUsed && !isProxyUsed )
         {
-            log( Level.INFO, "... simple scenario: simple authentication used with no proxy in between target and us, will use preemptive authentication", logger );
-            
+            logger( logger ).info(
+                "... simple scenario: simple authentication used with no proxy in between target and us,"
+                    + " will use preemptive authentication"
+            );
+
             // we have authentication, let's do it preemptive
             httpClient.getParams().setAuthenticationPreemptive( true );
         }
@@ -242,54 +255,13 @@ public class HttpClientProxyUtil
         }
     }
 
-    /**
-     * Coding around plexus logger as this class is NOT a component and should not be using this type of logging.
-     * 
-     * @param level
-     * @param message
-     * @param logger
-     */
-    private static void log( Level level, String message, Logger logger )
+    private static Logger logger( final Logger logger )
     {
         if ( logger != null )
         {
-            if ( level.equals( Level.SEVERE ) )
-            {
-                logger.error( message );
-            }
-            else if ( level.equals( Level.WARNING ) )
-            {
-                logger.warn( message );
-            }
-            else if ( level.equals( Level.INFO ) )
-            {
-                logger.info( message );
-            }
-            else
-            {
-                logger.debug( message );
-            }
+            return logger;
         }
-        else
-        {
-            if ( level.equals( Level.SEVERE ) )
-            {
-                LOG.error( message );
-            }
-            else if ( level.equals( Level.WARNING ) )
-            {
-                LOG.warn( message );
-            }
-            else if ( level.equals( Level.INFO ) )
-            {
-                LOG.info( message );
-            }
-            else
-            {
-                LOG.debug( message );
-            }
-        }
-
+        return LOGGER;
     }
 
 }

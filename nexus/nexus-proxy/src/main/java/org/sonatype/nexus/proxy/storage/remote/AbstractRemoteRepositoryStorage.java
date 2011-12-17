@@ -18,19 +18,17 @@
  */
 package org.sonatype.nexus.proxy.storage.remote;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.mime.MimeSupport;
-import org.sonatype.nexus.proxy.RemoteAccessException;
-import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -38,32 +36,33 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 /**
- * This class is a base abstract class for remot storages.
- * 
+ * This class is a base abstract class for remote storage.
+ *
  * @author cstamas
  */
 public abstract class AbstractRemoteRepositoryStorage
+    extends AbstractLoggingComponent
     implements RemoteRepositoryStorage
 {
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
-    @Requirement
-    private MimeSupport mimeSupport;
+    private final MimeSupport mimeSupport;
 
-    @Requirement
-    private ApplicationStatusSource applicationStatusSource;
+    private final ApplicationStatusSource applicationStatusSource;
 
-    @Requirement
-    private UserAgentBuilder userAgentBuilder;
+    private final UserAgentBuilder userAgentBuilder;
 
     /**
-     * Since storages are shared, we are tracking the last changes from each of them.
+     * Since storage are shared, we are tracking the last changes from each of them.
      */
     private Map<String, Long> repositoryContexts = new HashMap<String, Long>();
 
-    protected Logger getLogger()
+    protected AbstractRemoteRepositoryStorage( final UserAgentBuilder userAgentBuilder,
+                                               final ApplicationStatusSource applicationStatusSource,
+                                               final MimeSupport mimeSupport )
     {
-        return logger;
+        this.userAgentBuilder = checkNotNull( userAgentBuilder );
+        this.applicationStatusSource = checkNotNull( applicationStatusSource );
+        this.mimeSupport = checkNotNull( mimeSupport );
     }
 
     protected MimeSupport getMimeSupport()
@@ -71,22 +70,17 @@ public abstract class AbstractRemoteRepositoryStorage
         return mimeSupport;
     }
 
-    /**
-     * Gets the absolute url from base.
-     * 
-     * @param uid the uid
-     * @return the absolute url from base
-     */
-    public URL getAbsoluteUrlFromBase( ProxyRepository repository, ResourceStoreRequest request )
+    @Override
+    public URL getAbsoluteUrlFromBase( final ProxyRepository repository, final ResourceStoreRequest request )
         throws RemoteStorageException
     {
         return getAbsoluteUrlFromBase( repository.getRemoteUrl(), request.getRequestPath() );
     }
 
-    protected URL getAbsoluteUrlFromBase( String baseUrl, String path )
+    protected URL getAbsoluteUrlFromBase( final String baseUrl, final String path )
         throws RemoteStorageException
     {
-        StringBuffer urlStr = new StringBuffer( baseUrl );
+        final StringBuilder urlStr = new StringBuilder( baseUrl );
 
         if ( !baseUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {
@@ -113,43 +107,34 @@ public abstract class AbstractRemoteRepositoryStorage
 
     }
 
-    /**
-     * Remote storage specific, when the remote connection settings are actually applied.
-     * 
-     * @param context
-     */
-    protected abstract void updateContext( ProxyRepository repository, RemoteStorageContext context )
-        throws RemoteStorageException;
-
     protected synchronized RemoteStorageContext getRemoteStorageContext( ProxyRepository repository )
         throws RemoteStorageException
     {
-        if ( repository.getRemoteStorageContext() != null )
+        final RemoteStorageContext ctx = repository.getRemoteStorageContext();
+        if ( ctx != null )
         {
             // we have repo specific settings
             // if contextContains key and is newer, or does not contain yet
-            if ( ( repositoryContexts.containsKey( repository.getId() ) && repository.getRemoteStorageContext().getLastChanged() > ( repositoryContexts.get( repository.getId() ).longValue() ) )
-                || !repositoryContexts.containsKey( repository.getId() ) )
+            if ( !repositoryContexts.containsKey( repository.getId() )
+                || ctx.getLastChanged() > repositoryContexts.get( repository.getId() ) )
             {
-                updateContext( repository, repository.getRemoteStorageContext() );
-
-                repositoryContexts.put( repository.getId(),
-                    Long.valueOf( repository.getRemoteStorageContext().getLastChanged() ) );
+                updateContext( repository, ctx );
+                repositoryContexts.put( repository.getId(), ctx.getLastChanged() );
             }
         }
-
-        return repository.getRemoteStorageContext();
+        return ctx;
     }
 
+    @Override
     public boolean containsItem( ProxyRepository repository, ResourceStoreRequest request )
-        throws RemoteAuthenticationNeededException, RemoteAccessException, RemoteStorageException
+        throws RemoteStorageException
     {
         return containsItem( 0, repository, request );
     }
 
     public String getVersion()
     {
-        SystemStatus status = applicationStatusSource.getSystemStatus();
+        final SystemStatus status = applicationStatusSource.getSystemStatus();
 
         return status.getVersion();
     }
@@ -161,4 +146,15 @@ public abstract class AbstractRemoteRepositoryStorage
     {
         return userAgentBuilder.formatRemoteRepositoryStorageUserAgentString( repository, ctx );
     }
+
+    /**
+     * Remote storage specific, when the remote connection settings are actually applied.
+     *
+     * @param repository to update context for
+     * @param context    remote repository context
+     * @throws RemoteStorageException If context could not be updated
+     */
+    protected abstract void updateContext( ProxyRepository repository, RemoteStorageContext context )
+        throws RemoteStorageException;
+
 }

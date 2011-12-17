@@ -23,30 +23,37 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.util.ExceptionUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.swizzle.jira.Issue;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.jira.AttachmentHandler;
+import org.sonatype.jira.mock.MockAttachmentHandler;
+import org.sonatype.jira.mock.StubJira;
+import org.sonatype.jira.test.JiraXmlRpcTestServlet;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
-import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
-import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.scheduling.SchedulerTask;
+import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
 
-// This is an IT just because it runs longer then 15 seconds
-public class DefaultErrorReportingManagerLRTest
+public class DefaultErrorReportingManagerTest
     extends AbstractNexusTestCase
 {
     private DefaultErrorReportingManager manager;
@@ -55,10 +62,14 @@ public class DefaultErrorReportingManagerLRTest
 
     private File unzipHomeDir = null;
 
+    private JettyServerProvider provider;
+
     @Override
     protected void setUp()
         throws Exception
     {
+        setupJiraMock( "src/test/resources/jira-mock.db" );
+
         super.setUp();
 
         unzipHomeDir = new File( getPlexusHomeDir(), "unzip" );
@@ -69,6 +80,57 @@ public class DefaultErrorReportingManagerLRTest
         manager = (DefaultErrorReportingManager) lookup( ErrorReportingManager.class );
     }
 
+    private void setupJiraMock( String dbPath )
+        throws FileNotFoundException, IOException, Exception, MalformedURLException
+    {
+        StubJira mock = new StubJira();
+        FileInputStream in = null;
+        try
+        {
+            in = new FileInputStream( dbPath );
+            mock.setDatabase( IOUtil.toString( in ) );
+
+            MockAttachmentHandler handler = new MockAttachmentHandler();
+            handler.setMock( mock );
+            List<AttachmentHandler> handlers = Arrays.<AttachmentHandler> asList( handler );
+            provider = new JettyServerProvider();
+            provider.addServlet( new JiraXmlRpcTestServlet( mock, provider.getUrl(), handlers ) );
+            provider.start();
+        }
+        finally
+        {
+            IOUtil.close( in );
+        }
+    }
+
+    @Override
+    protected void customizeContext( final Context ctx )
+    {
+        try
+        {
+            ctx.put( "pr.serverUrl", provider.getUrl().toString() );
+        }
+        catch ( MalformedURLException e )
+        {
+            e.printStackTrace();
+            ctx.put( "pr.serverUrl", "https://issues.sonatype.org" );
+        }
+        ctx.put( "pr.auth.login", "sonatype_problem_reporting" );
+        ctx.put( "pr.auth.password", "____" );
+        ctx.put( "pr.project", "SBOX" );
+        ctx.put( "pr.component", "Nexus" );
+        ctx.put( "pr.issuetype.default", "1" );
+        super.customizeContext( ctx );
+    }
+
+    @Override
+    protected void customizeContainerConfiguration( final ContainerConfiguration configuration )
+    {
+        super.customizeContainerConfiguration( configuration );
+        configuration.setClassPathScanning( "ON" );
+        configuration.setAutoWiring( true );
+    }
+
     @Override
     protected void tearDown()
         throws Exception
@@ -76,28 +138,26 @@ public class DefaultErrorReportingManagerLRTest
         super.tearDown();
 
         cleanDir( unzipHomeDir );
+        provider.stop();
     }
 
     private void enableErrorReports( boolean useProxy )
-        throws ConfigurationException, IOException
+        throws Exception
     {
         manager.setEnabled( true );
-        manager.setJIRAUrl( "https://issues.sonatype.org" );
+        try
+        {
+            manager.setJIRAUrl( provider.getUrl().toString() );
+        }
+        catch ( MalformedURLException e )
+        {
+            e.printStackTrace();
+            manager.setJIRAUrl( "https://issues.sonatype.org" );
+        }
         manager.setJIRAProject( "SBOX" );
-        // manager.setJIRAUsername( "********" );
-        // manager.setJIRAPassword( "********" );
+        manager.setJIRAUsername( "jira" );
+        manager.setJIRAPassword( "jira" );
         manager.setUseGlobalProxy( useProxy );
-
-        nexusConfig.saveConfiguration();
-    }
-
-    private void enableProxy()
-        throws ConfigurationException, IOException
-    {
-        RemoteProxySettings proxy = nexusConfig.getGlobalRemoteStorageContext().getRemoteProxySettings();
-        proxy.setHostname( "localhost" );
-        proxy.setPort( 8111 );
-        proxy.setProxyAuthentication( new UsernamePasswordRemoteAuthenticationSettings( "*****", "*****" ) );
 
         nexusConfig.saveConfiguration();
     }
