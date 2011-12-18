@@ -566,6 +566,9 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         var capabilityTypeField = formPanel.find('name', 'typeId')[0];
         capabilityTypeField.on('select', this.capabilityTypeSelectHandler, formPanel);
 
+        var settingsPanel = formPanel.findById(formPanel.id + '_settings-panel');
+        settingsPanel.hide();
+
         var statusPanel = formPanel.find('name', 'status-panel')[0];
         statusPanel.hide();
 
@@ -840,12 +843,12 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               });
 
           // enable capability type panel fields
-          var capabilityTypePanel = formPanel.findById(formPanel.id + '_settings-panel');
+          var settingsPanel = formPanel.findById(formPanel.id + '_settings-panel');
           var emptySettings = true;
-          capabilityTypePanel.items.each(function(item, i, len) {
+          settingsPanel.items.each(function(item, i, len) {
                 if (item.id == id + '_' + rec.data.typeId)
                 {
-                  capabilityTypePanel.activeItem = i;
+                  settingsPanel.activeItem = i;
                   if (item.items)
                   {
                     item.items.each(function(item) {
@@ -857,10 +860,10 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               });
 
           if(emptySettings) {
-            capabilityTypePanel.hide();
+            settingsPanel.hide();
           }
           else {
-            capabilityTypePanel.show();
+            settingsPanel.show();
           }
 
           formPanel.find('name', 'typeId')[0].disable();
@@ -940,10 +943,10 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       capabilityTypeSelectHandler : function(combo, record, index) {
-        var capabilityTypePanel = this.findById(this.id + '_settings-panel');
+        var settingsPanel = this.findById(this.id + '_settings-panel');
         // First disable all the items currently on screen, so they wont be
         // validated/submitted etc
-        capabilityTypePanel.getLayout().activeItem.items.each(function(item) {
+        settingsPanel.getLayout().activeItem.items.each(function(item) {
           item.disable();
         });
         // Then find the proper card to activate (based upon id of the
@@ -951,27 +954,27 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         // Then enable the fields in that card
         var formId = this.id;
         var emptySettings = true;
-        capabilityTypePanel.items.each(function(item, i, len) {
+        settingsPanel.items.each(function(item, i, len) {
               if (item.id == formId + '_' + record.data.id)
               {
-                capabilityTypePanel.getLayout().setActiveItem(item);
-                if(item.items) {
+                settingsPanel.getLayout().setActiveItem(item);
+                if(item.items && item.items.length > 0) {
                   item.items.each(function(item) {
                     item.enable();
                   });
                   emptySettings = false;
                 }
               }
-            }, capabilityTypePanel);
+            }, settingsPanel);
 
         if(emptySettings) {
-          capabilityTypePanel.hide();
+          settingsPanel.hide();
         }
         else {
-          capabilityTypePanel.show();
+          settingsPanel.show();
         }
 
-        capabilityTypePanel.doLayout();
+        settingsPanel.doLayout();
       },
 
       // creates a unique config object with specific IDs on the two grid item
