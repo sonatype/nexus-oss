@@ -271,12 +271,12 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           allowBlank : true
         }, {
           xtype : 'panel',
-          id : 'capability-type-config-card-panel',
+          id : 'capability-type-config-card-panel', // aka. settings panel
           header : false,
           layout : 'card',
           region : 'center',
           activeItem : 0,
-          bodyStyle : 'padding:15px',
+          bodyStyle : 'padding:10px 15px 0px 15px',
           deferredRender : false,
           autoScroll : false,
           frame : false,
@@ -288,7 +288,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           layout : 'card',
           region : 'center',
           activeItem : 0,
-          bodyStyle : 'padding:15px',
+          bodyStyle : 'padding:0px 15px 0px 15px',
           deferredRender : false,
           autoScroll : false,
           autoHeight : true,
@@ -301,7 +301,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
             checkboxToggle : false,
             title : 'Status',
             anchor : Sonatype.view.FIELDSET_OFFSET,
-            collapsible : true,
+            collapsible : false,
             layoutConfig : {
               labelSeparator : ''
             },
