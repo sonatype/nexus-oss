@@ -26,9 +26,7 @@ import java.util.List;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.NexusRestClient;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilitiesPlexusResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
@@ -37,14 +35,15 @@ import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResou
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import com.google.common.base.Preconditions;
 import com.thoughtworks.xstream.XStream;
 
 public class CapabilitiesMessageUtil
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( TaskScheduleUtil.class );
-
     private static XStream xstream;
+
+    private final NexusRestClient nexusRestClient;
 
     static
     {
@@ -52,10 +51,16 @@ public class CapabilitiesMessageUtil
         new CapabilitiesPlexusResource().configureXStream( xstream );
     }
 
-    public static List<CapabilityListItemResource> list()
+    public CapabilitiesMessageUtil( final NexusRestClient nexusRestClient )
+    {
+
+        this.nexusRestClient = Preconditions.checkNotNull( nexusRestClient );
+    }
+
+    public List<CapabilityListItemResource> list()
         throws IOException
     {
-        String entityText = RequestFacade.doGetForText( "service/local/capabilities", not( inError() ) );
+        String entityText = nexusRestClient.doGetForText( "service/local/capabilities", not( inError() ) );
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, entityText, MediaType.APPLICATION_XML );
         CapabilitiesListResponseResource scheduleResponse =
@@ -63,7 +68,7 @@ public class CapabilitiesMessageUtil
         return scheduleResponse.getData();
     }
 
-    public static CapabilityListItemResource create( final CapabilityResource capability )
+    public CapabilityListItemResource create( final CapabilityResource capability )
         throws IOException
     {
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
@@ -72,18 +77,18 @@ public class CapabilitiesMessageUtil
         representation.setPayload( envelope );
 
         final String entityText =
-            RequestFacade.doPostForText( "service/local/capabilities", representation, not( inError() ) );
+            nexusRestClient.doPostForText( "service/local/capabilities", representation, not( inError() ) );
         representation = new XStreamRepresentation( xstream, entityText, MediaType.APPLICATION_XML );
         CapabilityStatusResponseResource scheduleResponse =
             (CapabilityStatusResponseResource) representation.getPayload( new CapabilityStatusResponseResource() );
         return scheduleResponse.getData();
     }
 
-    public static CapabilityResource read( String id )
+    public CapabilityResource read( String id )
         throws IOException
     {
         String uriPart = "service/local/capabilities/" + id;
-        String entityText = RequestFacade.doGetForText( uriPart, not( inError() ) );
+        String entityText = nexusRestClient.doGetForText( uriPart, not( inError() ) );
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, entityText, MediaType.APPLICATION_XML );
 
@@ -93,7 +98,7 @@ public class CapabilitiesMessageUtil
         return scheduleResponse.getData();
     }
 
-    public static CapabilityListItemResource update( CapabilityResource resource )
+    public CapabilityListItemResource update( CapabilityResource resource )
         throws IOException
     {
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
@@ -102,8 +107,8 @@ public class CapabilitiesMessageUtil
         representation.setPayload( envelope );
 
         String uriPart = "service/local/capabilities/" + resource.getId();
-        String text = RequestFacade.doPutForText( uriPart, representation, not( inError() ) );
-        RequestFacade.sendMessage( "service/local/capabilities/" + resource.getId(), Method.PUT, representation );
+        String text = nexusRestClient.doPutForText( uriPart, representation, not( inError() ) );
+        nexusRestClient.sendMessage( "service/local/capabilities/" + resource.getId(), Method.PUT, representation );
 
         representation = new XStreamRepresentation( xstream, text, MediaType.APPLICATION_XML );
 
@@ -113,9 +118,9 @@ public class CapabilitiesMessageUtil
         return scheduleResponse.getData();
     }
 
-    public static void delete( String id )
+    public void delete( String id )
         throws IOException
     {
-        RequestFacade.doDelete( "service/local/capabilities/" + id, not( inError() ) );
+        nexusRestClient.doDelete( "service/local/capabilities/" + id, not( inError() ) );
     }
 }

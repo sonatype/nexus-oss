@@ -54,12 +54,40 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-harness-launcher</artifactId>
+      <artifactId>nexus-test-utils</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-launcher</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-launcher</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.ning</groupId>
+      <artifactId>async-http-client</artifactId>
+      <version>1.4.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.sisu.litmus</groupId>
+      <artifactId>litmus-testsupport</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>test</scope>
       <exclusions>
         <exclusion>
-          <artifactId>ant</artifactId>
-          <groupId>ant</groupId>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-all</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -93,6 +121,22 @@
   </dependencies>
 
   <build>
+    <testResources>
+      <testResource>
+        <directory>${project.basedir}/src/test/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>${project.basedir}/src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+    </testResources>
     <plugins>
 
       <!-- Needed to make Maven "know" nexus-plugin packaging -->
@@ -109,54 +153,24 @@
       </plugin>
 
       <plugin>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>setup-environment</goal>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <nexusBundleArtifact>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-oss-webapp</artifactId>
-            <version>${project.version}</version>
-            <type>zip</type>
-            <classifier>bundle</classifier>
-          </nexusBundleArtifact>
-
-          <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
-
-          <nexusVersion>${project.version}</nexusVersion>
-          <nexusPluginsArtifacts>
-            <plugin>
-              <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-it-helper-plugin</artifactId>
-              <version>${project.version}</version>
-              <classifier>cp</classifier>
-            </plugin>
-            <plugin>
-              <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-it-helper-plugin</artifactId>
-              <classifier>bundle</classifier>
-              <type>zip</type>
-            </plugin>
-            <plugin>
-              <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
-              <artifactId>nexus-capabilities-plugin-it-helper</artifactId>
-              <version>${project.version}</version>
-              <classifier>bundle</classifier>
-              <type>zip</type>
-            </plugin>
-          </nexusPluginsArtifacts>
-        </configuration>
-      </plugin>
-
-      <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <excludes combine.children="append">
+            <exclude>**/Abstract*</exclude>
+          </excludes>
+          <properties>
+            <property>
+              <name>usedefaultlisteners</name>
+              <value>true</value>
+            </property>
+          </properties>
+          <systemPropertyVariables>
+            <!-- logging configuration properties, see logback*.xml files -->
+            <test.log.level>${test.log.level}</test.log.level>
+            <it.test.log.level>${it.test.log.level}</it.test.log.level>
+            <it.nexus.log.level>${it.nexus.log.level}</it.nexus.log.level>
+          </systemPropertyVariables>
+        </configuration>
       </plugin>
 
     </plugins>

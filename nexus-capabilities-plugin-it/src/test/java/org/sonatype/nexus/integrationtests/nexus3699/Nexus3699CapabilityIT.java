@@ -21,32 +21,56 @@ package org.sonatype.nexus.integrationtests.nexus3699;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.testng.Assert.assertNotNull;
 
-import java.io.IOException;
+import javax.inject.Inject;
+import javax.inject.Named;
 
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.junit.Before;
+import org.junit.Test;
+import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
+import org.sonatype.nexus.bundle.launcher.NexusRunningITSupport;
+import org.sonatype.nexus.integrationtests.NexusRestClient;
+import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
 import org.sonatype.nexus.test.utils.CapabilitiesMessageUtil;
-import org.testng.Assert;
-import org.testng.annotations.Test;
 
 public class Nexus3699CapabilityIT
-    extends AbstractNexusIntegrationTest
+    extends NexusRunningITSupport
 {
 
+    @Inject
+    @Named( "${NexusITSupport.capabilitiesPluginCoordinates}" )
+    private String capabilitiesPluginCoordinates;
+
+    @Inject
+    @Named( "${NexusITSupport.capabilitiesPluginITHelperCoordinates}" )
+    private String capabilitiesPluginITHelperCoordinates;
+
+    private static final String TEST_REPOSITORY = "releases";
+
+    private CapabilitiesMessageUtil capabilities;
+
     @Override
-    protected void copyConfigFiles()
-        throws IOException
+    protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
     {
-        super.copyConfigFiles();
+        return configuration.addPlugins(
+            resolveArtifact( capabilitiesPluginCoordinates ),
+            resolveArtifact( capabilitiesPluginITHelperCoordinates )
+        );
+    }
 
-        this.copyConfigFile( "capabilities.xml", WORK_CONF_DIR );
-
-        // also need to move the plugin from optional to used
-        installOptionalPlugin( "nexus-capabilities-plugin" );
+    @Before
+    @Override
+    public void setUp()
+    {
+        super.setUp();
+        capabilities = new CapabilitiesMessageUtil( new NexusRestClient(
+            new TestContext()
+                .setNexusUrl( nexus().getUrl() + "/" )
+                .setSecureTest( true )
+        ) );
     }
 
     @Test
@@ -59,19 +83,19 @@ public class Nexus3699CapabilityIT
         cap.setTypeId( "TouchTest" );
         CapabilityPropertyResource prop = new CapabilityPropertyResource();
         prop.setKey( "repoOrGroupId" );
-        prop.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
+        prop.setValue( "repo_" + TEST_REPOSITORY );
         cap.addProperty( prop );
         prop = new CapabilityPropertyResource();
         prop.setKey( "message" );
         prop.setValue( "Testing CRUD" );
         cap.addProperty( prop );
 
-        CapabilityListItemResource r = CapabilitiesMessageUtil.create( cap );
-        assertThat( r.getId(), is(notNullValue()) );
+        CapabilityListItemResource r = capabilities.create( cap );
+        assertThat( r.getId(), is( notNullValue() ) );
         assertThat( r.getStatus(), is( "<h3>I'm well. Thanx!</h3>" ) );
 
         // read
-        CapabilityResource read = CapabilitiesMessageUtil.read( r.getId() );
+        CapabilityResource read = capabilities.read( r.getId() );
         assertThat( read.getId(), is( r.getId() ) );
         assertThat( read.getNotes(), is( cap.getNotes() ) );
         assertThat( read.getTypeId(), is( cap.getTypeId() ) );
@@ -79,13 +103,13 @@ public class Nexus3699CapabilityIT
 
         // update
         read.setNotes( "updateCrudTest" );
-        CapabilityListItemResource updated = CapabilitiesMessageUtil.update( read );
+        CapabilityListItemResource updated = capabilities.update( read );
         assertThat( updated.getNotes(), is( "updateCrudTest" ) );
-        read = CapabilitiesMessageUtil.read( r.getId() );
+        read = capabilities.read( r.getId() );
         assertThat( read.getNotes(), is( "updateCrudTest" ) );
 
         // delete
-        CapabilitiesMessageUtil.delete( r.getId() );
+        capabilities.delete( r.getId() );
     }
 
 }
