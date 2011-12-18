@@ -263,7 +263,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
         }, {
           xtype : 'textfield',
           fieldLabel : 'Notes',
-          labelStyle : 'margin-left: 15px; width: 185px;',
+          labelStyle : 'margin-left: 15px; width: 185px; margin-bottom:10px',
           itemCls : '',
           helpText : "Optional notes about configured capability",
           name : 'notes',
@@ -271,12 +271,12 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           allowBlank : true
         }, {
           xtype : 'panel',
-          id : 'capability-type-config-card-panel', // aka. settings panel
+          id : 'settings-panel',
           header : false,
           layout : 'card',
           region : 'center',
           activeItem : 0,
-          bodyStyle : 'padding:10px 15px 0px 15px',
+          bodyStyle : 'padding:0px 15px 0px 15px',
           deferredRender : false,
           autoScroll : false,
           frame : false,
@@ -840,7 +840,8 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               });
 
           // enable capability type panel fields
-          var capabilityTypePanel = formPanel.findById(formPanel.id + '_capability-type-config-card-panel');
+          var capabilityTypePanel = formPanel.findById(formPanel.id + '_settings-panel');
+          var emptySettings = true;
           capabilityTypePanel.items.each(function(item, i, len) {
                 if (item.id == id + '_' + rec.data.typeId)
                 {
@@ -848,11 +849,19 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                   if (item.items)
                   {
                     item.items.each(function(item) {
-                          item.disabled = false;
-                        });
+                      item.disabled = false;
+                    });
+                    emptySettings = false;
                   }
                 }
               });
+
+          if(emptySettings) {
+            capabilityTypePanel.hide();
+          }
+          else {
+            capabilityTypePanel.show();
+          }
 
           formPanel.find('name', 'typeId')[0].disable();
 
@@ -931,25 +940,37 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       capabilityTypeSelectHandler : function(combo, record, index) {
-        var capabilityTypePanel = this.findById(this.id + '_capability-type-config-card-panel');
+        var capabilityTypePanel = this.findById(this.id + '_settings-panel');
         // First disable all the items currently on screen, so they wont be
         // validated/submitted etc
         capabilityTypePanel.getLayout().activeItem.items.each(function(item) {
-              item.disable();
-            });
+          item.disable();
+        });
         // Then find the proper card to activate (based upon id of the
         // capabilityType)
         // Then enable the fields in that card
         var formId = this.id;
+        var emptySettings = true;
         capabilityTypePanel.items.each(function(item, i, len) {
               if (item.id == formId + '_' + record.data.id)
               {
                 capabilityTypePanel.getLayout().setActiveItem(item);
-                item.items.each(function(item) {
-                      item.enable();
-                    });
+                if(item.items) {
+                  item.items.each(function(item) {
+                    item.enable();
+                  });
+                  emptySettings = false;
+                }
               }
             }, capabilityTypePanel);
+
+        if(emptySettings) {
+          capabilityTypePanel.hide();
+        }
+        else {
+          capabilityTypePanel.show();
+        }
+
         capabilityTypePanel.doLayout();
       },
 
@@ -984,7 +1005,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       exportCapabilityPropertiesHelper : function(val, fpanel) {
-        return FormFieldExporter(fpanel, '_capability-type-config-card-panel', 'capabilityProperties_');
+        return FormFieldExporter(fpanel, '_settings-panel', 'capabilityProperties_');
       },
 
       importCapabilityPropertiesHelper : function(val, srcObj, fpanel) {
