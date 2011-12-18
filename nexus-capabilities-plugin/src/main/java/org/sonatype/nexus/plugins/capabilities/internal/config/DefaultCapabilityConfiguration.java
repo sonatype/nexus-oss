@@ -76,8 +76,6 @@ public class DefaultCapabilityConfiguration
 
     private final ConfigurationIdGenerator idGenerator;
 
-    private final CapabilityDescriptorRegistry descriptors;
-
     private final File configurationFile;
 
     private final ReentrantLock lock = new ReentrantLock();
@@ -88,13 +86,11 @@ public class DefaultCapabilityConfiguration
     public DefaultCapabilityConfiguration( final ApplicationConfiguration applicationConfiguration,
                                            final NexusEventBus eventBus,
                                            final CapabilityConfigurationValidator validator,
-                                           final ConfigurationIdGenerator idGenerator,
-                                           final CapabilityDescriptorRegistry descriptors )
+                                           final ConfigurationIdGenerator idGenerator )
     {
         this.eventBus = eventBus;
         this.validator = validator;
         this.idGenerator = idGenerator;
-        this.descriptors = descriptors;
 
         configurationFile = new File( applicationConfiguration.getWorkingDirectory(), "conf/capabilities.xml" );
     }
@@ -116,7 +112,6 @@ public class DefaultCapabilityConfiguration
             final String generatedId = idGenerator.generateId();
 
             capability.setId( generatedId );
-            capability.setDescription( getDescription( capability ) );
             getConfiguration().addCapability( capability );
 
             save();
@@ -155,7 +150,6 @@ public class DefaultCapabilityConfiguration
             if ( stored != null )
             {
                 getConfiguration().removeCapability( stored );
-                capability.setDescription( getDescription( capability ) );
                 getConfiguration().addCapability( capability );
                 save();
 
@@ -343,23 +337,6 @@ public class DefaultCapabilityConfiguration
     public void clearCache()
     {
         configuration = null;
-    }
-
-    private String getDescription( final CCapability capability )
-    {
-        final CapabilityDescriptor descriptor = descriptors.get( capabilityType( capability.getTypeId() ) );
-        if ( descriptor != null )
-        {
-            try
-            {
-                return descriptor.describe( asMap( capability.getProperties() ) );
-            }
-            catch ( Exception ignore )
-            {
-                getLogger().warn( "Capability descriptor '{}' failed to describe capability", descriptor.type() );
-            }
-        }
-        return capability.getDescription();
     }
 
     static Map<String, String> asMap( final List<CCapabilityProperty> properties )

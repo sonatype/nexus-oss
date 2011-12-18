@@ -241,6 +241,20 @@ class DefaultCapabilityReference
     }
 
     @Override
+    public String description()
+    {
+        try
+        {
+            stateLock.readLock().lock();
+            return state.description();
+        }
+        finally
+        {
+            stateLock.readLock().unlock();
+        }
+    }
+
+    @Override
     public String stateDescription()
     {
         try
@@ -331,6 +345,12 @@ class DefaultCapabilityReference
         public void passivate()
         {
             throw new IllegalStateException( "State '" + toString() + "' does not permit 'passivate' operation" );
+        }
+
+        @Override
+        public String description()
+        {
+            return null;
         }
 
         @Override
@@ -509,6 +529,23 @@ class DefaultCapabilityReference
             {
                 getLogger().error(
                     "Could not retrieve status of capability {} ({})", new Object[]{ capability, capability.id(), e }
+                );
+            }
+            return null;
+        }
+
+        @Override
+        public String description()
+        {
+            try
+            {
+                return capability().description();
+            }
+            catch ( Exception e )
+            {
+                getLogger().error(
+                    "Could not retrieve description of capability {} ({})",
+                    new Object[]{ capability, capability.id(), e }
                 );
             }
             return null;

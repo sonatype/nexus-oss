@@ -24,7 +24,6 @@
   <capabilities>
     <capability>
       <id>4fde59a80f4</id>
-      <description>test-capability</description>
       <typeId>TouchTest</typeId>
       <properties>
         <property>

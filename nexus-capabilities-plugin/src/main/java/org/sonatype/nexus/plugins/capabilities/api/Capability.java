@@ -33,6 +33,13 @@ public interface Capability
     CapabilityIdentity id();
 
     /**
+     * Returns description of capability.
+     *
+     * @return description. Can be null.
+     */
+    String description();
+
+    /**
      * Returns status of capability.
      *
      * @return status. Can be null. Can be an html chunk.

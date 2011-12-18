@@ -99,13 +99,6 @@
           <description>The id of the capability</description>
         </field>
         <field>
-          <name>description</name>
-          <type>String</type>
-          <version>1.0.0+</version>
-          <required>true</required>
-          <description>The description of the capability (generated)</description>
-        </field>
-        <field>
           <name>notes</name>
           <type>String</type>
           <version>1.0.0+</version>
