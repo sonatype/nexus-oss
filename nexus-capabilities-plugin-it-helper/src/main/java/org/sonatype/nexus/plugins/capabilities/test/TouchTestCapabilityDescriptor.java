@@ -72,10 +72,4 @@ public class TouchTestCapabilityDescriptor
         return true;
     }
 
-    @Override
-    public String describe( final Map<String, String> properties )
-    {
-        return "test";
-    }
-
 }

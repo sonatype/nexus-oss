@@ -86,13 +86,4 @@ public abstract class AbstractCapabilityDescriptor
         return true;
     }
 
-    /**
-     * Describes the capability via all its properties.
-     */
-    @Override
-    public String describe( final Map<String, String> properties )
-    {
-        return properties == null ? null : properties.toString();
-    }
-
 }
