@@ -63,4 +63,11 @@ public interface CapabilityDescriptor
      */
     boolean isExposed();
 
+    /**
+     * Returns a detailed description of capability type (to be presented in UI).
+     *
+     * @return capability type description.
+     */
+    String about();
+
 }

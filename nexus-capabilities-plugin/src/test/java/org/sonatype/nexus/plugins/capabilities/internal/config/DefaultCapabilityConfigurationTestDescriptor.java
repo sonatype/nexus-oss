@@ -42,7 +42,7 @@ public class DefaultCapabilityConfigurationTestDescriptor
 
     public DefaultCapabilityConfigurationTestDescriptor()
     {
-        super( capabilityType( TYPE ), "Default capability configuration test" );
+        super( capabilityType( TYPE ), "Default capability configuration test", "What about?" );
     }
 
 }

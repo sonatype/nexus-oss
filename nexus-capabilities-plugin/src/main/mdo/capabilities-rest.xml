@@ -355,6 +355,13 @@
 					<required>true</required>
 					<description>The name of capability type.</description>
 				</field>
+        <field>
+          <name>about</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The description of capability type.</description>
+        </field>
 				<field>
 					<name>formFields</name>
 					<version>1.0.0+</version>

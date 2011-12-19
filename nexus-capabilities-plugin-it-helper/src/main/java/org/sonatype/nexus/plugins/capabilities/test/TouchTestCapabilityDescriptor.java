@@ -72,4 +72,10 @@ public class TouchTestCapabilityDescriptor
         return true;
     }
 
+    @Override
+    public String about()
+    {
+        return "What about me?";
+    }
+
 }

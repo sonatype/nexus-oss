@@ -74,6 +74,8 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
       }, {
         name : 'name'
       }, {
+        name : 'about'
+      }, {
         name : 'formFields'
       }]);
 
@@ -226,49 +228,66 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           xtype : 'hidden',
           name : 'id'
         }, {
-          xtype : 'checkbox',
-          fieldLabel : 'Enabled',
-          labelStyle : 'margin-left: 15px; width: 185px;',
-          helpText : 'This flag determines if the capability is currently enabled. To disable this capability for a period of time, de-select this checkbox.',
-          name : 'enabled',
-          allowBlank : false,
-          checked : true
-        }, {
-          xtype : 'checkbox',
-          fieldLabel : 'Active',
-          labelStyle : 'margin-left: 15px; width: 185px;',
-          helpText : 'Shows if the capability is current active or not. If not active, a text will be displayed explaining why.',
-          name : 'active',
-          allowBlank : false,
-          checked : false,
-          disabled : true
-        }, {
-          xtype : 'combo',
-          fieldLabel : 'Type',
-          labelStyle : 'margin-left: 15px; width: 185px;',
-          itemCls : 'required-field',
-          helpText : "Type of configured capability",
-          name : 'typeId',
-          store : this.capabilityTypeDataStore,
-          displayField : 'name',
-          valueField : 'id',
-          editable : false,
-          forceSelection : true,
-          mode : 'local',
-          triggerAction : 'all',
-          emptyText : 'Select...',
-          selectOnFocus : true,
-          allowBlank : false,
-          width : this.COMBO_WIDTH
-        }, {
-          xtype : 'textfield',
-          fieldLabel : 'Notes',
-          labelStyle : 'margin-left: 15px; width: 185px; margin-bottom:10px',
-          itemCls : '',
-          helpText : "Optional notes about configured capability",
-          name : 'notes',
-          width : this.COMBO_WIDTH,
-          allowBlank : true
+           layout: 'column',
+           items : [ {
+               xtype: 'fieldset',
+               autoHeight : true,
+               border : false,
+               items : [{
+                   xtype : 'checkbox',
+                   fieldLabel : 'Enabled',
+                   labelStyle : 'margin-left: 15px; width: 185px;',
+                   helpText : 'This flag determines if the capability is currently enabled. To disable this capability for a period of time, de-select this checkbox.',
+                   name : 'enabled',
+                   allowBlank : false,
+                   checked : true
+                 }, {
+                   xtype : 'checkbox',
+                   fieldLabel : 'Active',
+                   labelStyle : 'margin-left: 15px; width: 185px;',
+                   helpText : 'Shows if the capability is current active or not. If not active, a text will be displayed explaining why.',
+                   name : 'active',
+                   allowBlank : false,
+                   checked : false,
+                   disabled : true
+                 }, {
+                   xtype : 'combo',
+                   fieldLabel : 'Type',
+                   labelStyle : 'margin-left: 15px; width: 185px;',
+                   itemCls : 'required-field',
+                   helpText : "Type of configured capability",
+                   name : 'typeId',
+                   store : this.capabilityTypeDataStore,
+                   displayField : 'name',
+                   valueField : 'id',
+                   editable : false,
+                   forceSelection : true,
+                   mode : 'local',
+                   triggerAction : 'all',
+                   emptyText : 'Select...',
+                   selectOnFocus : true,
+                   allowBlank : false,
+                   width : this.COMBO_WIDTH
+                 }, {
+                   xtype : 'textfield',
+                   fieldLabel : 'Notes',
+                   labelStyle : 'margin-left: 15px; width: 185px; margin-bottom:10px',
+                   itemCls : '',
+                   helpText : "Optional notes about configured capability",
+                   name : 'notes',
+                   width : this.COMBO_WIDTH,
+                   allowBlank : true
+                 }
+               ]
+             }, {
+               xtype : 'panel',
+               autoHeight : true,
+               name : 'about',
+               layout : 'fit',
+               html : '',
+               bodyStyle : 'padding:0px 15px 0px 15px'
+             }
+           ]
         }, {
           xtype : 'panel',
           id : 'settings-panel',
@@ -554,7 +573,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               active : false
             });
         config = this.configUniqueIdHelper(id, config);
-        Ext.apply(config.items[5].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
+        Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
         var formPanel = new Ext.FormPanel(config);
 
         formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -833,7 +852,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                 id : id
               });
           config = this.configUniqueIdHelper(id, config);
-          Ext.apply(config.items[5].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
+          Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
           formPanel = new Ext.FormPanel(config);
 
           formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -869,13 +888,15 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
           formPanel.find('name', 'typeId')[0].disable();
 
           formPanel.find('name', 'status')[0].html = rec.data.status;
-
           if(rec.data.status) {
             formPanel.find('name', 'status-panel')[0].show();
           }
           else {
             formPanel.find('name', 'status-panel')[0].hide();
           }
+
+          var capabilityType = this.capabilityTypeDataStore.getById(rec.data.typeId);
+          formPanel.find('name', 'about')[0].html = capabilityType.data.about;
 
           var active = formPanel.find('name', 'active')[0];
           active.checked = rec.data.active;
@@ -973,6 +994,9 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         else {
           settingsPanel.show();
         }
+
+        var about = this.find('name', 'about')[0];
+        about.body.update(record.data.about);
 
         settingsPanel.doLayout();
       },
