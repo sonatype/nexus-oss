@@ -619,6 +619,9 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         var statusPanel = formPanel.find('name', 'status-panel')[0];
         statusPanel.hide();
 
+        var aboutPanel = formPanel.find('name', 'about-panel')[0];
+        aboutPanel.hide();
+
         var buttonInfoObj = {
           formPanel : formPanel,
           isNew : true
@@ -924,7 +927,15 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
           }
 
           var capabilityType = this.capabilityTypeDataStore.getById(rec.data.typeId);
-          formPanel.find('name', 'about')[0].html = capabilityType.data.about;
+          formPanel.find('name', 'about')[0].html = capabilityType.data.about?capabilityType.data.about:'';
+
+          var aboutPanel = formPanel.find('name', 'about-panel')[0];
+          if(capabilityType.data.about) {
+            aboutPanel.show();
+          }
+          else {
+            aboutPanel.hide();
+          }
 
           var active = formPanel.find('name', 'active')[0];
           active.checked = rec.data.active;
@@ -1024,7 +1035,15 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         }
 
         var about = this.find('name', 'about')[0];
-        about.body.update(record.data.about);
+        about.body.update(record.data.about?record.data.about:'');
+
+        var aboutPanel = this.find('name', 'about-panel')[0];
+        if(record.data.about) {
+          aboutPanel.show();
+        }
+        else {
+          aboutPanel.hide();
+        }
 
         settingsPanel.doLayout();
       },
