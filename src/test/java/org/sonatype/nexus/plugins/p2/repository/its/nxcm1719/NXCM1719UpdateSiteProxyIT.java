@@ -23,8 +23,6 @@ import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.integrationtests.RequestFacade.doGetRequest;
 import static org.sonatype.nexus.test.utils.TaskScheduleUtil.waitForAllTasksToStop;
 
-import java.io.File;
-
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;

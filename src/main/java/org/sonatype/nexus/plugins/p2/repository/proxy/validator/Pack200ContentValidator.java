@@ -26,11 +26,11 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyMetadataSource;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.events.RepositoryItemValidationEvent;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -47,8 +47,8 @@ public class Pack200ContentValidator
     @Override
     public boolean isRemoteItemContentValid( final ProxyRepository proxy, final ResourceStoreRequest request,
                                              final String baseUrl, final AbstractStorageItem item,
-                                             final List<NexusArtifactEvent> events )
-        throws StorageException
+                                             final List<RepositoryItemValidationEvent> events )
+        throws LocalStorageException
     {
         final RepositoryItemUid uid = item.getRepositoryItemUid();
         if ( P2ProxyMetadataSource.isP2MetadataItem( uid.getPath() ) )

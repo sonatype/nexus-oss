@@ -19,13 +19,12 @@
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm0794;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+import static org.testng.Assert.fail;
 
 import java.net.URL;
 
-import org.hamcrest.Matchers;
 import org.sonatype.jettytestsuite.ProxyServer;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.test.utils.TestProperties;
@@ -55,8 +54,15 @@ public class NXCM0794WebProxiedP2IT
     public void startWebProxy()
         throws Exception
     {
-        webProxyServer = (ProxyServer) lookup( ProxyServer.ROLE );
-        webProxyServer.start();
+        try
+        {
+            webProxyServer = (ProxyServer) lookup( ProxyServer.ROLE );
+            webProxyServer.start();
+        }
+        catch ( Exception e )
+        {
+            fail( "Current properties:\n" + TestProperties.getAll(), e );
+        }
 
         // ensuring the proxy is working!!!
         assertThat(
