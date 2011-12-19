@@ -283,13 +283,13 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
                ]
              }, {
                xtype : 'panel',
-               columnWidth : .99,
+               columnWidth : 1,
                name : 'about-panel',
                header : false,
                layout : 'card',
                region : 'center',
                activeItem : 0,
-               bodyStyle : 'padding:0px 0px 0px 15px',
+               bodyStyle : 'padding:0px 15px 0px 15px',
                deferredRender : false,
                frame : false,
                autoHeight : true,
@@ -313,7 +313,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
                  }]
                }]
              }, {
-               columnWidth : .01
+               width : '0px'
              }
            ]
         }, {
