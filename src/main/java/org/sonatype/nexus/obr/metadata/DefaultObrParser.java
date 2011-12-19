@@ -27,7 +27,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.osgi.impl.bundle.obr.resource.RepositoryImpl;
 import org.osgi.impl.bundle.obr.resource.ResourceImpl;
 import org.osgi.service.obr.Resource;
-import org.sonatype.nexus.proxy.InvalidItemContentException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 
 public class DefaultObrParser
     extends MXParser
@@ -76,7 +76,7 @@ public class DefaultObrParser
         }
         catch ( final XmlPullParserException e )
         {
-            throw new InvalidItemContentException( "Error parsing OBR resource", e );
+            throw new LocalStorageException( "Error parsing OBR resource", e );
         }
     }
 

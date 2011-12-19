@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.obr.metadata.ObrMetadataSource;
 import org.sonatype.nexus.obr.util.ObrUtils;
 import org.sonatype.nexus.proxy.StorageException;
@@ -37,6 +36,12 @@ import org.sonatype.scheduling.SchedulerTask;
 public class PublishObrDescriptorTask
     extends AbstractNexusRepositoriesTask<Object>
 {
+
+    /**
+     * System event action: publish indexes
+     */
+    public static final String ACTION = "PUBLISHINDEX";
+
     public static final String REPO_OR_GROUP_FIELD_ID = "repositoryId";
 
     @Requirement( hint = "obr-bindex" )
@@ -105,7 +110,7 @@ public class PublishObrDescriptorTask
     @Override
     protected String getAction()
     {
-        return FeedRecorder.SYSTEM_PUBLISHINDEX_ACTION;
+        return ACTION;
     }
 
     @Override

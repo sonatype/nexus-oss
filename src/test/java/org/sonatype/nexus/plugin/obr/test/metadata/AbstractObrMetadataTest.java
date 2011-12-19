@@ -40,6 +40,7 @@ import org.sonatype.nexus.test.NexusTestSupport;
 public abstract class AbstractObrMetadataTest
     extends NexusTestSupport
 {
+
     protected ObrMetadataSource obrMetadataSource;
 
     protected Repository testRepository;
@@ -69,7 +70,7 @@ public abstract class AbstractObrMetadataTest
         crepo.setLocalStorage( clocal );
         testRepository.configure( crepo );
 
-        // initialize attribute cache, otherwise storeItem recurses 
+        // initialize attribute cache, otherwise storeItem recurses
         testRepository.getRepositoryItemUidAttributeManager().reset();
     }
 
