@@ -283,12 +283,35 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
                ]
              }, {
                xtype : 'panel',
+               columnWidth : .99,
+               name : 'about-panel',
+               header : false,
+               layout : 'card',
+               region : 'center',
+               activeItem : 0,
+               bodyStyle : 'padding:0px 0px 0px 15px',
+               deferredRender : false,
+               frame : false,
                autoHeight : true,
-               name : 'about',
-               html : '',
-               bodyStyle : 'padding:0px 0px 0px 15px; white-space:normal !important',
-               autoScroll : false,
-               columnWidth : .99
+               items : [{
+                 xtype : 'fieldset',
+                 name : 'about-fieldset',
+                 checkboxToggle : false,
+                 title : 'About',
+                 collapsible : false,
+                 autoHeight : true,
+                 layoutConfig : {
+                   labelSeparator : ''
+                 },
+                 items : [{
+                   xtype : 'panel',
+                   name : 'about',
+                   html : '',
+                   layout : 'fit',
+                   autoScroll : true,
+                   height : 63
+                 }]
+               }]
              }, {
                columnWidth : .01
              }
