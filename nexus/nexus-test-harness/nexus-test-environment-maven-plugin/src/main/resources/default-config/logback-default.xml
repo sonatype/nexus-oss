@@ -48,10 +48,12 @@
     <appender-ref ref="console"/>
   </logger>
   <logger name="org.apache.http" level="WARN"/>
-  <logger name="org.restlet" level="WARN">
+  <logger name="org.restlet" level="${it.nexus.log.level:-WARN}">
     <appender-ref ref="console"/>
+    <appender-ref ref="logfile" />
   </logger>
   <logger name="org.apache.commons" level="WARN"/>
+  <logger name="eu.medsea.mimeutil" level="WARN"/>
 
   <root level="${it.nexus.log.level:-INFO}">
     <appender-ref ref="logfile"/>

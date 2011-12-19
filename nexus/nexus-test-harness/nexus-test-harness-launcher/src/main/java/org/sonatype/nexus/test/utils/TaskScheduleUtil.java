@@ -121,7 +121,7 @@ public class TaskScheduleUtil
         catch ( AssertionError e )
         {
             // unsuccessful GET
-            LOG.error( e.getMessage() , e );
+            LOG.error( e.getMessage(), e );
             return Collections.emptyList();
         }
 
@@ -156,7 +156,7 @@ public class TaskScheduleUtil
 
     /**
      * Holds execution until all tasks of a given type stop running
-     *
+     * 
      * @param taskType task type
      */
     public static void waitForAllTasksToStop( String taskType )
@@ -167,7 +167,7 @@ public class TaskScheduleUtil
 
     /**
      * Holds execution until all tasks of a given type stop running
-     *
+     * 
      * @param maxAttempts how many times check for tasks being stopped
      */
     public static void waitForAllTasksToStop( int maxAttempts )
@@ -178,7 +178,7 @@ public class TaskScheduleUtil
 
     /**
      * Holds execution until all tasks of a given type stop running
-     *
+     * 
      * @param taskClass task type
      */
     public static void waitForAllTasksToStop( Class<? extends NexusTask<?>> taskClass )
@@ -189,7 +189,7 @@ public class TaskScheduleUtil
 
     /**
      * Holds execution until all tasks of a given type stop running
-     *
+     * 
      * @param taskType task type
      * @param maxAttempts how many times check for tasks being stopped
      */
@@ -213,12 +213,18 @@ public class TaskScheduleUtil
 
     /**
      * Blocks while waiting for a task to finish.
-     *
+     * 
      * @param name
      * @return
      * @throws Exception
      */
     public static void waitForTask( String name, int maxAttempts )
+        throws Exception
+    {
+        waitForTask( name, maxAttempts, false );
+    }
+
+    public static void waitForTask( String name, int maxAttempts, boolean failIfNotFinished )
         throws Exception
     {
 
@@ -236,10 +242,21 @@ public class TaskScheduleUtil
 
         final Status status = RequestFacade.doGetForStatus( uri );
 
-        if ( !status.isSuccess() )
+        if ( failIfNotFinished )
         {
-            throw new IOException( "The taskhelper REST resource reported an error (" + status.toString()
-                + "), bailing out!" );
+            if ( Status.SUCCESS_NO_CONTENT.equals( status ) )
+            {
+                throw new IOException( "The taskhelper REST resource reported that task named '" + name
+                    + "' still running after '" + maxAttempts + "' cycles! This may indicate a performance issue." );
+            }
+        }
+        else
+        {
+            if ( !status.isSuccess() )
+            {
+                throw new IOException( "The taskhelper REST resource reported an error (" + status.toString()
+                    + "), bailing out!" );
+            }
         }
 
     }
@@ -295,6 +312,13 @@ public class TaskScheduleUtil
                                 ScheduledServicePropertyResource... properties )
         throws Exception
     {
+        runTask( taskName, typeId, maxAttempts, false, properties );
+    }
+
+    public static void runTask( String taskName, String typeId, int maxAttempts, boolean failIfNotFinished,
+                                ScheduledServicePropertyResource... properties )
+        throws Exception
+    {
         ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();
         scheduledTask.setEnabled( true );
         scheduledTask.setId( null );
@@ -314,7 +338,7 @@ public class TaskScheduleUtil
         status = TaskScheduleUtil.run( taskId );
         Assert.assertTrue( status.isSuccess(), "Unable to run task:" + scheduledTask.getTypeId() );
 
-        waitForTask( taskName, maxAttempts );
+        waitForTask( taskName, maxAttempts, failIfNotFinished );
     }
 
     public static ScheduledServicePropertyResource newProperty( String name, String value )
