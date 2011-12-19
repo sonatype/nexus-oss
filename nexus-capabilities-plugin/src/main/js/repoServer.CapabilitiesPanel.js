@@ -219,7 +219,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
     frame : true,
     collapsible : false,
     collapsed : false,
-    labelWidth : 200,
+    labelWidth : 75,
     layoutConfig : {
       labelSeparator : ''
     },
@@ -229,14 +229,16 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           name : 'id'
         }, {
            layout: 'column',
+           monitorResize: true,
            items : [ {
                xtype: 'fieldset',
                autoHeight : true,
                border : false,
+               width : '400px',
                items : [{
                    xtype : 'checkbox',
                    fieldLabel : 'Enabled',
-                   labelStyle : 'margin-left: 15px; width: 185px;',
+                   labelStyle : 'margin-left: 15px; width: 60px',
                    helpText : 'This flag determines if the capability is currently enabled. To disable this capability for a period of time, de-select this checkbox.',
                    name : 'enabled',
                    allowBlank : false,
@@ -244,7 +246,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
                  }, {
                    xtype : 'checkbox',
                    fieldLabel : 'Active',
-                   labelStyle : 'margin-left: 15px; width: 185px;',
+                   labelStyle : 'margin-left: 15px; width: 60px',
                    helpText : 'Shows if the capability is current active or not. If not active, a text will be displayed explaining why.',
                    name : 'active',
                    allowBlank : false,
@@ -253,7 +255,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
                  }, {
                    xtype : 'combo',
                    fieldLabel : 'Type',
-                   labelStyle : 'margin-left: 15px; width: 185px;',
+                   labelStyle : 'margin-left: 15px; width: 60px',
                    itemCls : 'required-field',
                    helpText : "Type of configured capability",
                    name : 'typeId',
@@ -271,7 +273,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
                  }, {
                    xtype : 'textfield',
                    fieldLabel : 'Notes',
-                   labelStyle : 'margin-left: 15px; width: 185px; margin-bottom:10px',
+                   labelStyle : 'margin-left: 15px; width: 60px; margin-bottom:10px',
                    itemCls : '',
                    helpText : "Optional notes about configured capability",
                    name : 'notes',
@@ -283,9 +285,12 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
                xtype : 'panel',
                autoHeight : true,
                name : 'about',
-               layout : 'fit',
                html : '',
-               bodyStyle : 'padding:0px 15px 0px 15px'
+               bodyStyle : 'padding:0px 0px 0px 15px; white-space:normal !important',
+               autoScroll : false,
+               columnWidth : .99
+             }, {
+               columnWidth : .01
              }
            ]
         }, {
