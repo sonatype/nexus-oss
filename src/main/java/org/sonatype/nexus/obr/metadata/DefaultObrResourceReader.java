@@ -30,7 +30,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.osgi.service.obr.Resource;
 import org.sonatype.nexus.obr.util.ObrUtils;
-import org.sonatype.nexus.proxy.InvalidItemContentException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 
 /**
  * Default {@link ObrResourceReader} that can handle OBR referrals.
@@ -84,7 +84,7 @@ public class DefaultObrResourceReader
             }
             catch ( final XmlPullParserException e )
             {
-                throw new InvalidItemContentException( "Error parsing OBR header", e );
+                throw new LocalStorageException( "Error parsing OBR header", e );
             }
         }
     }
@@ -187,7 +187,7 @@ public class DefaultObrResourceReader
         }
         catch ( final XmlPullParserException e )
         {
-            throw new InvalidItemContentException( "Error parsing OBR resource", e );
+            throw new LocalStorageException( "Error parsing OBR resource", e );
         }
     }
 
@@ -216,7 +216,7 @@ public class DefaultObrResourceReader
         }
         catch ( final XmlPullParserException e )
         {
-            throw new InvalidItemContentException( "Error parsing OBR referral", e );
+            throw new LocalStorageException( "Error parsing OBR referral", e );
         }
     }
 
@@ -249,7 +249,7 @@ public class DefaultObrResourceReader
         }
         catch ( final XmlPullParserException e )
         {
-            throw new InvalidItemContentException( "Error parsing XML token", e );
+            throw new LocalStorageException( "Error parsing XML token", e );
         }
 
         final int n = cb.length();
