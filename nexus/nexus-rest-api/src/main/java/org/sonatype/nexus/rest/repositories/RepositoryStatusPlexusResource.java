@@ -200,7 +200,7 @@ public class RepositoryStatusPlexusResource
                     for ( ShadowRepository shadow : getRepositoryRegistry().getRepositoriesWithFacet(
                                                                                                       ShadowRepository.class ) )
                     {
-                        if ( repository.getId().equals( shadow.getMasterRepositoryId() ) )
+                        if ( repository.getId().equals( shadow.getMasterRepository().getId() ) )
                         {
                             shadow.setLocalStatus( localStatus );
                         }
@@ -213,7 +213,7 @@ public class RepositoryStatusPlexusResource
                     for ( ShadowRepository shadow : getRepositoryRegistry().getRepositoriesWithFacet(
                                                                                                       ShadowRepository.class ) )
                     {
-                        if ( repository.getId().equals( shadow.getMasterRepositoryId() ) )
+                        if ( repository.getId().equals( shadow.getMasterRepository().getId() ) )
                         {
                             RepositoryDependentStatusResource dependent = new RepositoryDependentStatusResource();
 

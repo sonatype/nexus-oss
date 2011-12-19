@@ -23,7 +23,6 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -31,14 +30,17 @@ import org.sonatype.plexus.appevents.Event;
 
 /**
  * A "relaying" event inspector that is made asynchronous and is used to relay the repository content change related
- * events to ShadowRepository instances present in system.
+ * events to ShadowRepository instances present in system. Note: this event inspector should be async to not slow down
+ * the request-processing cycle of it's master, but strange cases might happen then, like "delete" event flies in before
+ * "create" event. That is not "deadly", but might leave shadow too easily in inconsistent state. So, leave this
+ * inspector as sync until we come up with some better solution.
  * 
  * @author cstamas
  */
 @Component( role = EventInspector.class, hint = "ShadowRepositoryEventInspector" )
 public class ShadowRepositoryEventInspector
     extends AbstractEventInspector
-    implements EventInspector, AsynchronousEventInspector
+    implements EventInspector
 {
     @Requirement
     private RepositoryRegistry repositoryRegistry;
@@ -59,7 +61,7 @@ public class ShadowRepositoryEventInspector
 
             for ( ShadowRepository shadow : shadows )
             {
-                if ( shadow.getMasterRepositoryId().equals( ievt.getRepository().getId() ) )
+                if ( shadow.getMasterRepository().getId().equals( ievt.getRepository().getId() ) )
                 {
                     shadow.onRepositoryItemEvent( ievt );
                 }

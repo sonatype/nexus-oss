@@ -47,7 +47,7 @@ public abstract class AbstractShadowRepositoryConfigurator
 
         try
         {
-            shadowRepository.setMasterRepositoryId( extConf.getMasterRepositoryId() );
+            shadowRepository.setMasterRepository( getRepositoryRegistry().getRepository( extConf.getMasterRepositoryId() ) );
         }
         catch ( IncompatibleMasterRepositoryException e )
         {

@@ -45,7 +45,6 @@ import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
@@ -150,8 +149,8 @@ public class RepositoryPlexusResource
                         shadow.setName( model.getName() );
 
                         shadow.setExposed( resource.isExposed() );
-
-                        shadow.setMasterRepositoryId( model.getShadowOf() );
+                        
+                        shadow.setMasterRepository( getRepositoryRegistry().getRepository( model.getShadowOf() ) );
 
                         shadow.setSynchronizeAtStartup( model.isSyncAtStartup() );
 
