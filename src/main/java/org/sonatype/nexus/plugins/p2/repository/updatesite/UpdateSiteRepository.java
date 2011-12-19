@@ -759,7 +759,7 @@ public class UpdateSiteRepository
                 new XmlPlexusConfiguration( Xpp3DomBuilder.build( new InputStreamReader( siteItem.getInputStream() ) ) );
 
             overwriteRemoteUrl = plexusConfig.getAttribute( "url" );
-            getLogger().info( "Remote update site does overwrite the remote url " + overwriteRemoteUrl );
+            getLogger().debug( "Remote update site does overwrite the remote url " + overwriteRemoteUrl );
         }
         catch ( final Exception e )
         {

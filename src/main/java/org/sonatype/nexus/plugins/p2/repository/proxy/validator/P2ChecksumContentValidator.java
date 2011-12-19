@@ -27,6 +27,7 @@ import org.sonatype.nexus.plugins.p2.repository.mappings.ArtifactPath;
 import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyMetadataSource;
 import org.sonatype.nexus.plugins.p2.repository.proxy.P2ProxyRepository;
 import org.sonatype.nexus.proxy.IllegalOperationException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
@@ -51,7 +52,7 @@ public class P2ChecksumContentValidator
 
     @Override
     protected ChecksumPolicy getChecksumPolicy( final ProxyRepository proxy, final AbstractStorageItem item )
-        throws StorageException
+        throws LocalStorageException
     {
         if ( P2ProxyMetadataSource.isP2MetadataItem( item.getRepositoryItemUid().getPath() ) )
         {
@@ -93,7 +94,7 @@ public class P2ChecksumContentValidator
 
     @Override
     protected void cleanup( final ProxyRepository proxy, final RemoteHashResponse remoteHash, final boolean contentValid )
-        throws StorageException
+        throws LocalStorageException
     {
         // no know cleanup for p2 repos
     }
@@ -101,7 +102,7 @@ public class P2ChecksumContentValidator
     @Override
     protected RemoteHashResponse retrieveRemoteHash( final AbstractStorageItem item, final ProxyRepository proxy,
                                                      final String baseUrl )
-        throws StorageException
+        throws LocalStorageException
     {
         final P2ProxyRepository p2repo = proxy.adaptToFacet( P2ProxyRepository.class );
 
@@ -115,6 +116,10 @@ public class P2ChecksumContentValidator
                 return null;
             }
             paths = artifactMapping.getArtifactsPath();
+        }
+        catch ( StorageException e )
+        {
+            throw new LocalStorageException( e );
         }
         catch ( final IllegalOperationException e )
         {
