@@ -18,15 +18,18 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
+import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapability.TYPE_ID;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 
-@Named( P2RepositoryAggregatorCapability.ID )
+@Named( TYPE_ID )
 @Singleton
 public class P2RepositoryAggregatorCapabilityFactory
     implements CapabilityFactory
@@ -41,10 +44,9 @@ public class P2RepositoryAggregatorCapabilityFactory
     }
 
     @Override
-    public Capability create( final String id )
+    public Capability create( final CapabilityIdentity id )
     {
-        final P2RepositoryAggregatorCapability capability = new P2RepositoryAggregatorCapability( id, service );
-        return capability;
+        return new P2RepositoryAggregatorCapability( id, service );
     }
 
 }

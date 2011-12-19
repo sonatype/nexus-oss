@@ -21,6 +21,7 @@ package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 import java.util.Map;
 
 import org.sonatype.nexus.plugins.capabilities.api.AbstractCapability;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
 
@@ -28,13 +29,13 @@ public class P2RepositoryAggregatorCapability
     extends AbstractCapability
 {
 
-    public static final String ID = "p2RepositoryAggregatorCapability";
+    public static final String TYPE_ID = "p2.repository.aggregator";
 
     private final P2RepositoryAggregator service;
 
     private P2RepositoryAggregatorConfiguration configuration;
 
-    public P2RepositoryAggregatorCapability( final String id, final P2RepositoryAggregator service )
+    public P2RepositoryAggregatorCapability( final CapabilityIdentity id, final P2RepositoryAggregator service )
     {
         super( id );
         this.service = service;

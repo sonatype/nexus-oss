@@ -18,15 +18,18 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
+import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2MetadataGeneratorCapability.TYPE_ID;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 
-@Named( P2MetadataGeneratorCapability.ID )
+@Named( TYPE_ID )
 @Singleton
 public class P2MetadataGeneratorCapabilityFactory
     implements CapabilityFactory
@@ -41,10 +44,9 @@ public class P2MetadataGeneratorCapabilityFactory
     }
 
     @Override
-    public Capability create( final String id )
+    public Capability create( final CapabilityIdentity id )
     {
-        final P2MetadataGeneratorCapability capability = new P2MetadataGeneratorCapability( id, service );
-        return capability;
+        return new P2MetadataGeneratorCapability( id, service );
     }
 
 }

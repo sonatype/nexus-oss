@@ -18,29 +18,34 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
+import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapability.TYPE_ID;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.AbstractCapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
 
 @Singleton
-@Named( P2RepositoryAggregatorCapability.ID )
+@Named( TYPE_ID )
 public class P2RepositoryAggregatorCapabilityDescriptor
     extends AbstractCapabilityDescriptor
     implements CapabilityDescriptor
 {
 
-    public static final String ID = P2RepositoryAggregatorCapability.ID;
+    private static final CapabilityType TYPE = capabilityType( TYPE_ID );
 
     public P2RepositoryAggregatorCapabilityDescriptor()
     {
         super(
-            ID,
+            TYPE,
             "P2 Repository Aggregator capability",
+            "Aggregates P2 metadata/artifacts of all OSGi bundles from selected repository",
             new RepoOrGroupComboFormField( P2RepositoryAggregatorConfiguration.REPO_OR_GROUP_ID, FormField.MANDATORY )
         );
     }

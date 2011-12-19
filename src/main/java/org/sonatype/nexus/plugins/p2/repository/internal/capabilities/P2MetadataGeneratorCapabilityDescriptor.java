@@ -18,29 +18,34 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
+import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2MetadataGeneratorCapability.TYPE_ID;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.AbstractCapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
 
 @Singleton
-@Named( P2MetadataGeneratorCapability.ID )
+@Named( TYPE_ID )
 public class P2MetadataGeneratorCapabilityDescriptor
     extends AbstractCapabilityDescriptor
     implements CapabilityDescriptor
 {
 
-    public static final String ID = P2MetadataGeneratorCapability.ID;
+    private static final CapabilityType TYPE = capabilityType( TYPE_ID );
 
     public P2MetadataGeneratorCapabilityDescriptor()
     {
         super(
-            ID,
+            TYPE,
             "P2 Metadata Generator capability",
+            "Automatically generates P2 metadata for OSGi bundles deployed to selected repository",
             new RepoOrGroupComboFormField( P2MetadataGeneratorConfiguration.REPO_OR_GROUP_ID, FormField.MANDATORY )
         );
     }
