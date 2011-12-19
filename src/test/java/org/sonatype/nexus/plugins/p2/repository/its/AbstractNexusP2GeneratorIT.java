@@ -51,7 +51,7 @@ public abstract class AbstractNexusP2GeneratorIT
     {
         final CapabilityResource capability = new CapabilityResource();
         capability.setNotes( P2MetadataGenerator.class.getName() );
-        capability.setTypeId( P2MetadataGeneratorCapability.ID );
+        capability.setTypeId( P2MetadataGeneratorCapability.TYPE_ID );
 
         final CapabilityPropertyResource repoProp = new CapabilityPropertyResource();
         repoProp.setKey( P2MetadataGeneratorConfiguration.REPO_OR_GROUP_ID );
@@ -67,7 +67,7 @@ public abstract class AbstractNexusP2GeneratorIT
     {
         final CapabilityResource capability = new CapabilityResource();
         capability.setNotes( P2RepositoryAggregator.class.getName() );
-        capability.setTypeId( P2RepositoryAggregatorCapability.ID );
+        capability.setTypeId( P2RepositoryAggregatorCapability.TYPE_ID );
 
         final CapabilityPropertyResource repoProp = new CapabilityPropertyResource();
         repoProp.setKey( P2RepositoryAggregatorConfiguration.REPO_OR_GROUP_ID );
