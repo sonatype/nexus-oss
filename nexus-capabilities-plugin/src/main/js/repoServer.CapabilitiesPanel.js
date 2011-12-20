@@ -461,7 +461,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
         items : [this.capabilitiesGridPanel, {
               xtype : 'panel',
               id : 'capability-config-forms',
-              title : 'Capabilities Configuration',
+              title : 'Capability Configuration',
               layout : 'card',
               region : 'center',
               activeItem : 0,
