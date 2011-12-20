@@ -57,13 +57,11 @@ public class RepositoryGroupContentPlexusResource
     }
 
     @Override
-    protected ResourceStore getResourceStore( Request request )
-        throws NoSuchRepositoryException,
-            ResourceException
+    protected ResourceStore getResourceStore( final Request request )
+        throws NoSuchRepositoryException, ResourceException
     {
-        String groupId = request.getAttributes().get( GROUP_ID_KEY ).toString();
-
-        return getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
+        return getRepositoryRegistry().getRepositoryWithFacet( request.getAttributes().get( GROUP_ID_KEY ).toString(),
+            GroupRepository.class );
     }
 
 }
