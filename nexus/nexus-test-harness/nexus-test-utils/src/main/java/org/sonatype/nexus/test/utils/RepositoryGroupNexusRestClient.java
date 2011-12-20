@@ -43,10 +43,6 @@ public class RepositoryGroupNexusRestClient
 
     private final NexusRestClient nexusRestClient;
 
-    private final NexusTasksRestClient taskNRC;
-
-    private final EventInspectorsUtil eventNRC;
-
     private final XStream xstream;
 
     private final MediaType mediaType;
@@ -55,19 +51,14 @@ public class RepositoryGroupNexusRestClient
                                            final NexusTasksRestClient taskNRC,
                                            final EventInspectorsUtil eventNRC )
     {
-        this( nexusRestClient, taskNRC, eventNRC, XStreamFactory.getJsonXStream(), MediaType.APPLICATION_JSON );
+        this( nexusRestClient, XStreamFactory.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     public RepositoryGroupNexusRestClient( final NexusRestClient nexusRestClient,
-                                           final NexusTasksRestClient taskNRC,
-                                           final EventInspectorsUtil eventNRC,
                                            final XStream xstream,
                                            final MediaType mediaType )
     {
         this.nexusRestClient = checkNotNull( nexusRestClient );
-        this.taskNRC = checkNotNull( taskNRC );
-        this.eventNRC = checkNotNull( eventNRC );
-
         this.xstream = checkNotNull( xstream );
         this.mediaType = checkNotNull( mediaType );
     }
