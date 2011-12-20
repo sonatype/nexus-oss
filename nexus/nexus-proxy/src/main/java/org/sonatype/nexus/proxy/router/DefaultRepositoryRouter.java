@@ -759,6 +759,13 @@ public class DefaultRepositoryRouter
         catch ( ItemNotFoundException e )
         {
             // ignore it, do nothing
+            
+            // cstamas says: above is untrue. It means that user should get 404, but there is no 
+            // proper solution to do it from this method! The culprit is that "view privilege" piggybacks
+            // on the getRequestRouteForRequest() method that is not meant for this, it does it's job
+            // well for routing....
+            // So, we still have a bug here (NXCM-3600), and I am leaving it intact, since repo-level
+            // security will catch any non authorized ones as well.
         }
 
         return this.itemAuthorizer.authorizePath( matched, action );
