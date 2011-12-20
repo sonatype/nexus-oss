@@ -59,6 +59,8 @@ import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapa
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.Configuration;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Reader;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Writer;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 /**
  * Handles persistence of capabilities configuration.
@@ -216,6 +218,14 @@ public class DefaultCapabilityConfiguration
         throws InvalidConfigurationException, IOException
     {
         return Collections.unmodifiableList( getConfiguration().getCapabilities() );
+    }
+
+    @Override
+    public Collection<CCapability> get( final Predicate<CCapability> filter )
+        throws InvalidConfigurationException, IOException
+    {
+        final Collection<CCapability> capabilities = getAll();
+        return Collections2.filter( capabilities, filter );
     }
 
     private Configuration getConfiguration()

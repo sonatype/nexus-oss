@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
+import com.google.common.base.Predicate;
 
 public interface CapabilityConfiguration
 {
@@ -40,6 +41,9 @@ public interface CapabilityConfiguration
         throws InvalidConfigurationException, IOException;
 
     public Collection<CCapability> getAll()
+        throws InvalidConfigurationException, IOException;
+
+    public Collection<CCapability> get( Predicate<CCapability> filter )
         throws InvalidConfigurationException, IOException;
 
     public void load()
