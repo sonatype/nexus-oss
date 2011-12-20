@@ -115,7 +115,7 @@
       </build>
     </profile>
     <profile>
-      <id>skipTests</id>
+      <id>withTests</id>
       <activation>
         <property>
           <name>!quick</name>
