@@ -103,7 +103,7 @@ public class CapabilitiesPlexusResource
         xstream.processAnnotations( CapabilityStatusResponseResource.class );
 
         xstream.registerLocalConverter( CapabilityResource.class, "properties", new AliasingListConverter(
-            CapabilityPropertyResource.class, "featurre-property" ) );
+            CapabilityPropertyResource.class, "feature-property" ) );
     }
 
     @Override
