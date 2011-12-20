@@ -234,9 +234,14 @@ Sonatype.panels.GridViewer = function(config) {
           mouseover : {
             fn : this.mouseOverGridHandler,
             scope : this
+          },
+          cellclick : {
+            fn : this.cellClickHandler,
+            scope : this
           }
         }
       });
+  
   this.gridPanel.getSelectionModel().on('rowselect', this.rowSelectHandler, this);
 
   this.refreshButton = new Ext.Button({
@@ -676,6 +681,40 @@ Ext.extend(Sonatype.panels.GridViewer, Ext.Panel, {
           Sonatype.Events.fireEvent(this.mouseOverEvent, e, t);
         }
       },
+      
+      cellClickHandler : function(grid, rowIndex, columnIndex, eventObject) {
+          var internalColumnIndex = this.getDisplayedColumnByIndex(columnIndex);
+          if (internalColumnIndex != -1 && this.columns[internalColumnIndex].clickHandler) {
+              this.columns[internalColumnIndex].clickHandler(grid, rowIndex, eventObject);
+          }
+      },
+      
+      rowSelectHandler : function(selectionModel, index, rec) {
+        if (this.rowClickEvent || this.rowClickHandler)
+        {
+          this.createChildPanel(rec);
+          
+          var bookmark = rec.data[this.dataBookmark];
+          if (bookmark)          {            
+              Sonatype.utils.updateHistory(this);    
+          }
+        }
+      },
+      
+      //our internal column index contains all data, even for 'columns' not displayed, that
+      //may just be mapped to a store, this will weed those out and retrieve the needed index
+      getDisplayedColumnByIndex : function(index) {
+          for ( var i = 0, j = 0 ; i < this.columns.length ; i++ ) {
+              if ( this.columns[i].header ) {
+                  if ( index == j ) {
+                      return i;
+                  } else {
+                      j++;
+                  }
+              }
+          }
+          return -1;
+      },
 
       rowContextMenuHandler : function(grid, index, e) {
         if (e.target.nodeName == 'A')
@@ -716,19 +755,6 @@ Ext.extend(Sonatype.panels.GridViewer, Ext.Panel, {
 
           e.stopEvent();
           menu.showAt(e.getXY());
-        }
-      },
-
-      rowSelectHandler : function(selectionModel, index, rec) {
-        if (this.rowClickEvent || this.rowClickHandler)
-        {
-          this.createChildPanel(rec);
-
-          var bookmark = rec.data[this.dataBookmark];
-          if (bookmark)
-          {
-            Sonatype.utils.updateHistory(this);
-          }
         }
       },
 

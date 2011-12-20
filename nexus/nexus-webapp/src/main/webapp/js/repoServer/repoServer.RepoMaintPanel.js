@@ -165,6 +165,57 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
   toolbar.push(this.browseTypeButton);
 
   Sonatype.Events.addListener('nexusRepositoryStatus', this.statusStart, this);
+  
+  var columns = [{
+      name : 'resourceURI'
+  }, {
+    name : 'remoteUri'
+  }, {
+    name : 'id'
+  }, {
+    name : 'exposed'
+  }, {
+    name : 'userManaged'
+  }, {
+    name : 'status'
+  }, {
+    name : 'name',
+    sortType : Ext.data.SortTypes.asUCString,
+    header : 'Repository',
+    width : 175,
+    renderer : function(value, metadata, record, rowIndex, colIndex, store) {
+      return record.get('repoType') == 'group' ? ('<b>' + value + '</b>') : value;
+    }
+  }, {
+    name : 'repoType',
+    header : 'Type',
+    width : 50
+  }, {
+    name : 'format',
+    header : 'Format',
+    width : 70
+  }, {
+    name : 'repoPolicy',
+    header : 'Policy',
+    width : 70,
+    convert : Sonatype.utils.upperFirstCharLowerRest
+  }, {
+    name : 'displayStatus',
+    header : 'Repository Status',
+    mapping : 'status',
+    convert : Sonatype.repoServer.DefaultRepoHandler.statusConverter,
+    width : 200
+  }, {
+    name : 'contentResourceURI',
+    header : 'Repository Path',
+    autoExpand : true,
+    renderer : function(s) {
+      return '<a href="' + s + ((s != null && (s.charAt(s.length)) == '/') ? '' : '/') + '" target="_blank">' + s + '</a>';
+    }
+  }];
+  
+  //allow plugins to contribute to the columns and toolbar
+  Sonatype.Events.fireEvent('repositoryGridInit', this, columns, toolbar);
 
   Sonatype.repoServer.RepositoryPanel.superclass.constructor.call(this, {
         addMenuInitEvent : 'repositoryAddMenuInit',
@@ -175,54 +226,11 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
         dataAutoLoad : false,
         tabbedChildren : true,
         tbar : toolbar,
-        columns : [{
-              name : 'resourceURI'
-            }, {
-              name : 'remoteUri'
-            }, {
-              name : 'id'
-            }, {
-              name : 'exposed'
-            }, {
-              name : 'userManaged'
-            }, {
-              name : 'status'
-            }, {
-              name : 'name',
-              sortType : Ext.data.SortTypes.asUCString,
-              header : 'Repository',
-              width : 175,
-              renderer : function(value, metadata, record, rowIndex, colIndex, store) {
-                return record.get('repoType') == 'group' ? ('<b>' + value + '</b>') : value;
-              }
-            }, {
-              name : 'repoType',
-              header : 'Type',
-              width : 50
-            }, {
-              name : 'format',
-              header : 'Format',
-              width : 70
-            }, {
-              name : 'repoPolicy',
-              header : 'Policy',
-              width : 70,
-              convert : Sonatype.utils.upperFirstCharLowerRest
-            }, {
-              name : 'displayStatus',
-              header : 'Repository Status',
-              mapping : 'status',
-              convert : Sonatype.repoServer.DefaultRepoHandler.statusConverter,
-              width : 200
-            }, {
-              name : 'contentResourceURI',
-              header : 'Repository Path',
-              autoExpand : true,
-              renderer : function(s) {
-                return '<a href="' + s + ((s != null && (s.charAt(s.length)) == '/') ? '' : '/') + '" target="_blank">' + s + '</a>';
-              }
-            }]
+        columns : columns
       });
+  
+  //allow plugins to access the properly built panel object
+  Sonatype.Events.fireEvent('repositoryPanelInit', this);
 
   this.addListener('beforedestroy', function() {
         Ext.TaskMgr.stop(this.repoStatusTask);
