@@ -297,7 +297,9 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
                  xtype : 'fieldset',
                  name : 'about-fieldset',
                  checkboxToggle : false,
-                 title : 'About',
+                 // NOTE: Disabling title for now, since the space for this content is so small, a title takes away precious space
+                 // NOTE: ... content should be enough to explain this context is "about"
+                 //title : 'About',
                  collapsible : false,
                  autoHeight : true,
                  layoutConfig : {
@@ -309,7 +311,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
                    html : '',
                    layout : 'fit',
                    autoScroll : true,
-                   height : 63
+                   height : 80
                  }]
                }]
              }, {
