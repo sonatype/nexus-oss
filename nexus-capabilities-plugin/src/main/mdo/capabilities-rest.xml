@@ -225,7 +225,8 @@
 			<version>1.0.0+</version>
 			<description>Capabilities list item details.</description>
 			<annotations>
-				<annotation>@javax.xml.bind.annotation.XmlType( name = "capabilities-list-resource" )</annotation>
+                                <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "capabilities-list-item" )</annotation>
+                                <annotation>@javax.xml.bind.annotation.XmlType( name = "capabilities-list-item" )</annotation>
 				<annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
 			</annotations>
 			<fields>
