@@ -61,8 +61,6 @@ public class GroupMessageUtil
         super( test );
         groupNRC = new RepositoryGroupNexusRestClient(
             RequestFacade.getNexusRestClient(),
-            new NexusTasksRestClient( RequestFacade.getNexusRestClient() ),
-            test.getEventInspectorsUtil(),
             xstream,
             mediaType
         );

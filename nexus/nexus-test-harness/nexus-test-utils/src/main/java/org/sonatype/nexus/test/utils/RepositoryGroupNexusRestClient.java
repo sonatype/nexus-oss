@@ -19,8 +19,6 @@
 package org.sonatype.nexus.test.utils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 import java.io.IOException;
@@ -47,9 +45,7 @@ public class RepositoryGroupNexusRestClient
 
     private final MediaType mediaType;
 
-    public RepositoryGroupNexusRestClient( final NexusRestClient nexusRestClient,
-                                           final NexusTasksRestClient taskNRC,
-                                           final EventInspectorsUtil eventNRC )
+    public RepositoryGroupNexusRestClient( final NexusRestClient nexusRestClient)
     {
         this( nexusRestClient, XStreamFactory.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
@@ -78,7 +74,8 @@ public class RepositoryGroupNexusRestClient
     {
         XStreamRepresentation representation = request( group );
 
-        String payload = nexusRestClient.doPutForText( SERVICE_PART + "/" + group.getId(), representation, isSuccessful() );
+        String payload = nexusRestClient.doPutForText( SERVICE_PART + "/" + group.getId(), representation,
+                                                       isSuccessful() );
 
         return response( payload );
     }
