@@ -20,6 +20,7 @@ package org.sonatype.nexus.integrationtests;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -27,7 +28,9 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.restlet.data.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
+import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
@@ -127,6 +130,55 @@ public abstract class AbstractPrivilegeTest
         testUser.getRoles().clear();
         testUser.addRole( "anonymous" );
         this.userUtil.updateUser( testUser );
+    }
+
+    /**
+     * Enables the "private repository" feature as described in Nexus FAQ, without disabling anonymous access.
+     * <p>
+     * See https://docs.sonatype.com/display/SPRTNXOSS/Nexus+FAQ#NexusFAQ-Q.
+     * CanImakearepositoryprivatewithoutdisablinganonymousaccess%3F
+     * 
+     * Written by toby (https://gist.github.com/799810a9780100296977)
+     * 
+     * @param userId
+     * @param repositoryId
+     * @throws IOException
+     */
+    protected void enablePrivateRepository( final String userId, final String repositoryId )
+        throws IOException
+    {
+        // remove repo access from anon user
+        // this should remove all target related permissions
+        overwriteUserRole( "anonymous", "anonymous", "1", "54", "57","58","70","74"  );
+
+        // look at setup your priv
+        RepositoryTargetResource target = new RepositoryTargetResource();
+        target.setContentClass( "maven2" );
+        target.setName( repositoryId + "-target" );
+        target.addPattern( "/some-pattern" );
+
+        // create the target
+        target = targetUtil.createTarget( target );
+
+        // now add some privs
+        PrivilegeResource privReq = new PrivilegeResource();
+        privReq.setDescription( repositoryId + "-target repo-target privilege" );
+        privReq.setMethod( Arrays.asList( "create", "read", "update", "delete" ) ); // pick and choose
+        privReq.setName( repositoryId + "-priv" );
+        privReq.setRepositoryTargetId( target.getId() );
+        privReq.setType( TargetPrivilegeDescriptor.TYPE );
+
+        // create them
+        List<PrivilegeStatusResource> privs = privUtil.createPrivileges( privReq );
+
+        // grant these to your user
+        for ( PrivilegeStatusResource priv : privs )
+        {
+            giveUserPrivilege( userId, priv.getId() );
+        }
+
+        // grant a test user access to repository
+        giveUserPrivilege( userId, "repository-" + repositoryId ); // view priv (not really needed for ITs)
     }
 
     protected void printUserPrivs( String userId )
@@ -247,7 +299,7 @@ public abstract class AbstractPrivilegeTest
     }
 
     protected void overwriteUserRole( String userId, String newRoleName, String... permissions )
-        throws Exception
+        throws IOException
     {
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
