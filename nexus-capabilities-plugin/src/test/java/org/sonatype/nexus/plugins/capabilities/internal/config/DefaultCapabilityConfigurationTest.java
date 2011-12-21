@@ -67,7 +67,7 @@ public class DefaultCapabilityConfigurationTest
         configuration.clearCache();
 
         // read
-        assertNull( configuration.get( null ) );
+        assertNull( configuration.get( (String) null ) );
         assertNull( configuration.get( "invalidId" ) );
 
         CCapability read = configuration.get( cap.getId() );
