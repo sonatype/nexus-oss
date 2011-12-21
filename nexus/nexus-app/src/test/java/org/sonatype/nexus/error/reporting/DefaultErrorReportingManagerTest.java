@@ -460,10 +460,11 @@ public class DefaultErrorReportingManagerTest
         }
         finally
         {
-            while ( !inspectorHost.isCalmPeriod() )
+            do
             {
                 Thread.sleep( 100 );
             }
+            while ( !inspectorHost.isCalmPeriod() );
         }
     }
 
