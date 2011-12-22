@@ -198,6 +198,7 @@
             <sharedDependency>org.sonatype.aether:aether-api</sharedDependency>
             <sharedDependency>org.sonatype.aether:aether-util</sharedDependency>
             <sharedDependency>org.sonatype.sisu:sisu-maven-bridge</sharedDependency>
+            <sharedDependency>org.apache.maven:maven-model-builder</sharedDependency>
           </sharedDependencies>
         </configuration>
       </plugin>
