@@ -59,6 +59,7 @@ import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageCompositeItem;
@@ -67,7 +68,9 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.item.uid.IsRemotelyAccessibleAttribute;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.rest.model.ContentListDescribeRequestResource;
 import org.sonatype.nexus.rest.model.ContentListDescribeResource;
 import org.sonatype.nexus.rest.model.ContentListDescribeResourceResponse;
@@ -136,7 +139,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
         try
         {
-            ResourceStore store = getResourceStore( request );
+            ResourceStore store = getResourceStore( request, Action.read );
 
             try
             {
@@ -189,7 +192,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             for ( FileItem fileItem : files )
             {
-                getResourceStore( request ).storeItem( req, fileItem.getInputStream(), null );
+                getResourceStore( request, Action.create ).storeItem( req, fileItem.getInputStream(), null );
             }
         }
         catch ( Exception t )
@@ -205,7 +208,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     {
         try
         {
-            ResourceStore store = getResourceStore( request );
+            ResourceStore store = getResourceStore( request, Action.delete );
 
             ResourceStoreRequest req = getResourceStoreRequest( request );
 
@@ -252,7 +255,35 @@ public abstract class AbstractResourceStoreContentPlexusResource
      * @throws NoSuchRepositoryGroupException
      * @throws NoSuchRepositoryRouterException
      */
-    protected abstract ResourceStore getResourceStore( Request request )
+    protected ResourceStore getResourceStore( final Request request, final Action action )
+        throws NoSuchResourceStoreException, ResourceException
+    {
+        // this will throw NoSuchResourceStoreEx if request addresses nonexistent repository
+        final ResourceStore resourceStore = getResourceStore( request );
+
+        // NXCM-3600: if this is not a readOnly action, and we deal with a Repository instance
+        // that is not exposed, we forbid access to it. And read operation will be handled by
+        // Repository level security anyway.
+        if ( !action.isReadAction() && resourceStore instanceof Repository )
+        {
+            if ( !( (Repository) resourceStore ).isExposed() )
+            {
+                throw new NoSuchRepositoryException( ( (Repository) resourceStore ).getId() );
+            }
+        }
+
+        return resourceStore;
+    }
+
+    /**
+     * A strategy to get ResourceStore implementor. To be implemented by subclass.
+     * 
+     * @return
+     * @throws NoSuchRepositoryException
+     * @throws NoSuchRepositoryGroupException
+     * @throws NoSuchRepositoryRouterException
+     */
+    protected abstract ResourceStore getResourceStore( final Request request )
         throws NoSuchResourceStoreException, ResourceException;
 
     /**
@@ -383,7 +414,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 Tag tag = req.getConditions().getNoneMatch().get( 0 );
 
                 // this is a conditional get using ETag
-                if ( !file.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ).equals( tag.getName() ) )
+                if ( !file.getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ).equals(
+                    tag.getName() ) )
                 {
                     result = new StorageFileItemRepresentation( file );
                 }

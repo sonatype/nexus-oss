@@ -151,7 +151,7 @@ public class Nexus537RepoTargetsIT
 
     @Override
     protected void overwriteUserRole( String userId, String newRoleName, String... permissions )
-        throws Exception
+        throws IOException
     {
         super.overwriteUserRole( userId, newRoleName, permissions );
         this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );

@@ -1242,10 +1242,11 @@ public abstract class AbstractRepository
         // check the write policy
         enforceWritePolicy( request, action );
 
-        if ( isExposed() )
-        {
-            getAccessManager().decide( this, request, action );
-        }
+        // NXCM-3600: this if was an old remnant, is not needed
+        // if ( isExposed() )
+        // {
+        getAccessManager().decide( this, request, action );
+        // }
 
         return checkRequestProcessors( request, action );
     }

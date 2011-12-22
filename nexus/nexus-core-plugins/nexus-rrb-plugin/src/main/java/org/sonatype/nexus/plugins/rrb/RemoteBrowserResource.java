@@ -211,8 +211,16 @@ public class RemoteBrowserResource
     //
     // }
 
+    /**
+     * DUMMY IMPLEMENTATION, just to satisfy superclass (but why is this class expanding it at all?)
+     * 
+     * @param request
+     * @return
+     * @throws NoSuchResourceStoreException
+     * @throws ResourceException
+     */
     @Override
-    protected ResourceStore getResourceStore( Request request )
+    protected ResourceStore getResourceStore( final Request request )
         throws NoSuchResourceStoreException, ResourceException
     {
         return getUnprotectedRepositoryRegistry().getRepository(
