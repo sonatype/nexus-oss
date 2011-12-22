@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.attributes.Attributes;
-import org.sonatype.nexus.proxy.item.StorageItem;
 
 import com.google.common.base.Preconditions;
 
@@ -160,7 +159,7 @@ public class DefaultAttributes
 
     protected String getKeyForAttribute( final String attributeName )
     {
-        return String.format( "%s-%s", StorageItem.class.getName(), Preconditions.checkNotNull( attributeName ) );
+        return String.format( "%s-%s", "storageItem", Preconditions.checkNotNull( attributeName ) );
     }
 
     // ==
