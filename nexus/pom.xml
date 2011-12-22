@@ -157,6 +157,10 @@
     <!-- version properties -->
     <applifecycle.version>1.5-SNAPSHOT</applifecycle.version>
     <sonatype.plugin.version>1.1.0-SNAPSHOT</sonatype.plugin.version>
+    
+    <!-- Logging -->
+    <slf4j.version>1.6.4</slf4j.version>
+    <logback.version>1.0.0</logback.version>
 
     <aether.version>1.9</aether.version>
     <aspectj.version>1.6.11</aspectj.version>
@@ -165,7 +169,6 @@
     <enunciate.version>1.20</enunciate.version>
     <jetty.version>6.1.19</jetty.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
-    <logback.version>0.9.29</logback.version>
     <maven.version>3.0.1</maven.version>
     <micromailer.version>1.1.1-SNAPSHOT</micromailer.version>
     <nexus.repository.metadata.version>1.2-SNAPSHOT</nexus.repository.metadata.version>
@@ -185,7 +188,6 @@
     <plexus-velocity.version>1.1.7</plexus-velocity.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
     <shiro.version>1.1.0</shiro.version>
-    <slf4j.version>1.6.2</slf4j.version>
     <spice-timeline.version>2.1-SNAPSHOT</spice-timeline.version>
     <spice-utils.version>1.0.0</spice-utils.version>
     <surefire.version>2.10</surefire.version>
