@@ -45,6 +45,7 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.wagon.Wagon;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -74,13 +75,14 @@ import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.sonatype.nexus.test.utils.WagonDeployer;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
-
+import com.google.common.base.Throwables;
 import com.google.common.io.Closeables;
 import com.thoughtworks.xstream.XStream;
 
@@ -92,6 +94,7 @@ import com.thoughtworks.xstream.XStream;
 // @RunWith(ConsoleLoggingRunner.class)
 public abstract class AbstractNexusIntegrationTest
 {
+
     public static final String REPO_NEXUS_TEST_HARNESS_RELEASE_GROUP = "nexus-test-harness-release-group";
 
     public static final String REPO_TEST_HARNESS_REPO = "nexus-test-harness-repo";
@@ -109,7 +112,7 @@ public abstract class AbstractNexusIntegrationTest
     protected static boolean NEEDS_INIT = false;
 
     public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
-    
+
     /**
      * relative path from {@link #nexusBaseDir} to plugin-repository
      */
@@ -174,6 +177,8 @@ public abstract class AbstractNexusIntegrationTest
         nexusBaseUrl = TestProperties.getString( "nexus.base.url" );
         baseNexusUrl = nexusBaseUrl;
 
+        TestContainer.getInstance().getTestContext().setNexusUrl( nexusBaseUrl );
+
         // configure the logging
         SLF4JBridgeHandler.install();
     }
@@ -223,7 +228,24 @@ public abstract class AbstractNexusIntegrationTest
     {
         if ( deployUtils == null )
         {
-            deployUtils = new DeployUtils( this );
+            deployUtils = new DeployUtils(
+                RequestFacade.getNexusRestClient(),
+                new WagonDeployer.Factory()
+                {
+                    @Override
+                    public Wagon get( final String protocol )
+                    {
+                        try
+                        {
+                            return (Wagon) getITPlexusContainer().lookup( Wagon.ROLE, protocol );
+                        }
+                        catch ( ComponentLookupException e )
+                        {
+                            throw Throwables.propagate( e );
+                        }
+                    }
+                }
+            );
         }
 
         return deployUtils;
@@ -247,7 +269,7 @@ public abstract class AbstractNexusIntegrationTest
     {
         if ( eventInspectorsUtil == null )
         {
-            eventInspectorsUtil = new EventInspectorsUtil( this );
+            eventInspectorsUtil = new EventInspectorsUtil( RequestFacade.getNexusRestClient() );
         }
 
         return eventInspectorsUtil;
@@ -301,7 +323,7 @@ public abstract class AbstractNexusIntegrationTest
      * static, so we don't have access to the package name of the running tests. We are going to use the package name to
      * find resources for additional setup. NOTE: With this setup running multiple Test at the same time is not
      * possible.
-     * 
+     *
      * @throws Exception
      */
     @BeforeMethod( alwaysRun = true )
@@ -368,7 +390,7 @@ public abstract class AbstractNexusIntegrationTest
         // reset this for each test
         TestContainer.getInstance().getTestContext().useAdminForRequests();
     }
-    
+
     @AfterClass( alwaysRun = true )
     public void afterClassTearDown()
     {
@@ -382,7 +404,7 @@ public abstract class AbstractNexusIntegrationTest
         try
         {
             TaskScheduleUtil.waitForAllTasksToStop();
-            new EventInspectorsUtil( null ).waitForCalmPeriod();
+            new EventInspectorsUtil( RequestFacade.getNexusRestClient() ).waitForCalmPeriod();
         }
         catch ( IOException e )
         {
@@ -531,7 +553,7 @@ public abstract class AbstractNexusIntegrationTest
 
     /**
      * Deploys all the provided files needed before IT actually starts.
-     * 
+     *
      * @throws Exception
      */
     protected void deployArtifacts()
@@ -547,7 +569,7 @@ public abstract class AbstractNexusIntegrationTest
      * This is a "switchboard" to detech HOW to deploy. For now, just using the protocol from POM's
      * DistributionManagement section and invoking the getWagonHintForDeployProtocol(String protocol) to get the wagon
      * hint.
-     * 
+     *
      * @throws Exception
      */
     protected void deployArtifacts( final File projectsDir )
@@ -598,7 +620,8 @@ public abstract class AbstractNexusIntegrationTest
                 if ( model.getDistributionManagement() == null
                     || model.getDistributionManagement().getRepository() == null )
                 {
-                    Assert.fail( "The test artifact is either missing or has an invalid Distribution Management section." );
+                    Assert.fail(
+                        "The test artifact is either missing or has an invalid Distribution Management section." );
                 }
 
                 // get the URL to deploy
@@ -618,7 +641,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Does "protocol to wagon hint" converion: the default is just return the same, but maybe some test wants to
      * override this.
-     * 
+     *
      * @param deployProtocol
      * @return
      */
@@ -630,7 +653,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Deploys with given Wagon (hint is provided), to deployUrl. It is caller matter to adjust those two (ie. deployUrl
      * with file: protocol to be deployed with file wagon would be error). Model is supplied since it is read before.
-     * 
+     *
      * @param wagonHint
      * @param deployUrl
      * @param model
@@ -640,7 +663,7 @@ public abstract class AbstractNexusIntegrationTest
         throws Exception
     {
         log.info( "Deploying project \"" + project.getAbsolutePath() + "\" using Wagon:" + wagonHint + " to URL=\""
-            + deployUrl + "\"." );
+                      + deployUrl + "\"." );
 
         // we already check if the pom.xml was in here.
         File pom = new File( project, "pom.xml" );
@@ -653,8 +676,8 @@ public abstract class AbstractNexusIntegrationTest
 
         final Gav gav =
             new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null,
-                FileUtils.getExtension( artifactFile.getName() ), null, null, artifactFile.getName(), false, null,
-                false, null );
+                     FileUtils.getExtension( artifactFile.getName() ), null, null, artifactFile.getName(), false, null,
+                     false, null );
 
         // the Restlet Client does not support multipart forms:
         // http://restlet.tigris.org/issues/show_bug.cgi?id=71
@@ -679,37 +702,39 @@ public abstract class AbstractNexusIntegrationTest
             if ( artifactSha1.exists() )
             {
                 getDeployUtils().deployWithWagon( wagonHint, deployUrl, artifactSha1,
-                    this.getRelitiveArtifactPath( gav ) + ".sha1" );
+                                                  this.getRelitiveArtifactPath( gav ) + ".sha1" );
             }
             if ( artifactMd5.exists() )
             {
                 getDeployUtils().deployWithWagon( wagonHint, deployUrl, artifactMd5,
-                    this.getRelitiveArtifactPath( gav ) + ".md5" );
+                                                  this.getRelitiveArtifactPath( gav ) + ".md5" );
             }
             if ( artifactAsc.exists() )
             {
                 getDeployUtils().deployWithWagon( wagonHint, deployUrl, artifactAsc,
-                    this.getRelitiveArtifactPath( gav ) + ".asc" );
+                                                  this.getRelitiveArtifactPath( gav ) + ".asc" );
             }
 
             if ( artifactFile.exists() )
             {
                 getDeployUtils().deployWithWagon( wagonHint, deployUrl, artifactFile,
-                    this.getRelitiveArtifactPath( gav ) );
+                                                  this.getRelitiveArtifactPath( gav ) );
             }
 
             if ( pomSha1.exists() )
             {
                 getDeployUtils().deployWithWagon( wagonHint, deployUrl, pomSha1,
-                    this.getRelitivePomPath( gav ) + ".sha1" );
+                                                  this.getRelitivePomPath( gav ) + ".sha1" );
             }
             if ( pomMd5.exists() )
             {
-                getDeployUtils().deployWithWagon( wagonHint, deployUrl, pomMd5, this.getRelitivePomPath( gav ) + ".md5" );
+                getDeployUtils().deployWithWagon( wagonHint, deployUrl, pomMd5,
+                                                  this.getRelitivePomPath( gav ) + ".md5" );
             }
             if ( pomAsc.exists() )
             {
-                getDeployUtils().deployWithWagon( wagonHint, deployUrl, pomAsc, this.getRelitivePomPath( gav ) + ".asc" );
+                getDeployUtils().deployWithWagon( wagonHint, deployUrl, pomAsc,
+                                                  this.getRelitivePomPath( gav ) + ".asc" );
             }
 
             getDeployUtils().deployWithWagon( wagonHint, deployUrl, pom, this.getRelitivePomPath( gav ) );
@@ -816,7 +841,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     * 
+     *
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -835,7 +860,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     * 
+     *
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -984,7 +1009,8 @@ public abstract class AbstractNexusIntegrationTest
 
             assertThat(
                 response,
-                allOf( isRedirecting(), respondsWithStatusCode( 301 ), redirectLocation( notNullValue( String.class ) ) ) );
+                allOf( isRedirecting(), respondsWithStatusCode( 301 ),
+                       redirectLocation( notNullValue( String.class ) ) ) );
 
             serviceURI = response.getLocationRef().toString();
         }
@@ -1040,7 +1066,7 @@ public abstract class AbstractNexusIntegrationTest
         throws IOException
     {
         return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
-            gav.getClassifier(), targetDirectory );
+                                      gav.getClassifier(), targetDirectory );
     }
 
     protected File downloadArtifact( String groupId, String artifact, String version, String type, String classifier,
@@ -1048,23 +1074,25 @@ public abstract class AbstractNexusIntegrationTest
         throws IOException
     {
         return this.downloadArtifact( this.getNexusTestRepoUrl(), groupId, artifact, version, type, classifier,
-            targetDirectory );
+                                      targetDirectory );
     }
 
     protected File downloadArtifactFromRepository( String repoId, Gav gav, String targetDirectory )
         throws IOException
     {
         return this.downloadArtifact( AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + repoId
-            + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
-            targetDirectory );
+                                          + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
+                                      gav.getExtension(), gav.getClassifier(),
+                                      targetDirectory );
     }
 
     protected File downloadArtifactFromGroup( String groupId, Gav gav, String targetDirectory )
         throws IOException
     {
         return this.downloadArtifact( AbstractNexusIntegrationTest.nexusBaseUrl + GROUP_REPOSITORY_RELATIVE_URL
-            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
-            gav.getClassifier(), targetDirectory );
+                                          + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
+                                      gav.getExtension(),
+                                      gav.getClassifier(), targetDirectory );
     }
 
     protected File downloadArtifact( String baseUrl, String groupId, String artifact, String version, String type,
@@ -1177,7 +1205,8 @@ public abstract class AbstractNexusIntegrationTest
         this.verifyNexusConfigBeforeStart = verifyNexusConfigBeforeStart;
     }
 
-    protected boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz, String... tests )
+    protected boolean printKnownErrorButDoNotFail( Class<? extends AbstractNexusIntegrationTest> clazz,
+                                                   String... tests )
     {
         StringBuilder error =
             new StringBuilder( "*********************************************************************************" );

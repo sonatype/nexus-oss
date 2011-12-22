@@ -27,19 +27,18 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authentication.AuthenticationException;
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.classworlds.ClassWorld;
 import org.codehaus.classworlds.Launcher;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.Commandline;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.plexus.classworlds.io.ClassworldsConfWriter;
 import org.sonatype.plexus.classworlds.io.ClassworldsIOException;
 import org.sonatype.plexus.classworlds.model.ClassworldsAppConfiguration;
@@ -57,7 +56,8 @@ import org.sonatype.plexus.classworlds.validator.ClassworldsValidationResult;
  */
 public class WagonDeployer
 {
-    private PlexusContainer plexusContainer;
+
+    private Wagon wagon;
 
     private String protocol = "http";
 
@@ -71,28 +71,28 @@ public class WagonDeployer
 
     private String artifactPath;
 
+    private final TestContext testContext;
+
     private static final Logger LOG = LoggerFactory.getLogger( WagonDeployer.class );
 
-    public WagonDeployer( PlexusContainer plexusContainer, String protocol, String username, String password,
-                          String repositoryUrl, File fileToDeploy, String artifactPath )
+    public WagonDeployer( final Wagon wagon,
+                          final String protocol,
+                          final String username,
+                          final String password,
+                          final String repositoryUrl,
+                          final File fileToDeploy,
+                          final String artifactPath,
+                          final TestContext testContext )
     {
-        super( );
-        this.plexusContainer = plexusContainer;
+        super();
+        this.wagon = wagon;
         this.protocol = protocol;
         this.username = username;
         this.password = password;
         this.repositoryUrl = repositoryUrl;
         this.fileToDeploy = fileToDeploy;
         this.artifactPath = artifactPath;
-
-        // so the RequestFacade will still work
-        if ( StringUtils.isNotBlank( username ) )
-        {
-            // FIXME
-            TestContainer.getInstance().getTestContext().setSecureTest( true );
-            TestContainer.getInstance().getTestContext().setUsername( this.username );
-            TestContainer.getInstance().getTestContext().setPassword( this.password );
-        }
+        this.testContext = testContext;
     }
 
     public String getProtocol()
@@ -129,21 +129,10 @@ public class WagonDeployer
         throws ComponentLookupException, ConnectionException, AuthenticationException, TransferFailedException,
         ResourceDoesNotExistException, AuthorizationException
     {
-
-        Wagon wagon;
-        try
-        {
-            wagon = (Wagon) plexusContainer.lookup( Wagon.ROLE, protocol );
-        }
-        catch ( Exception e )
-        {
-            throw new ComponentLookupException( e.getMessage(), Wagon.ROLE, protocol );
-        }
-
         Repository repository = new Repository();
         repository.setUrl( repositoryUrl );
 
-        wagon.connect( repository, RequestFacade.getWagonAuthenticationInfo() );
+        wagon.connect( repository, getWagonAuthenticationInfo() );
         wagon.put( fileToDeploy, artifactPath );
         wagon.disconnect();
 
@@ -208,26 +197,33 @@ public class WagonDeployer
             switch ( status )
             {
                 case 1:
-                    throw new CommandLineException( "Process exit status was: " + status + "Process output:\n"
-                        + consoleOutput );
+                    throw new CommandLineException(
+                        "Process exit status was: " + status + "Process output:\n" + consoleOutput
+                    );
                 case 2:
-                    throw new ConnectionException( "Process exit status was: " + status + "Process output:\n"
-                        + consoleOutput );
+                    throw new ConnectionException(
+                        "Process exit status was: " + status + "Process output:\n" + consoleOutput
+                    );
                 case 3:
-                    throw new AuthenticationException( "Process exit status was: " + status + "Process output:\n"
-                        + consoleOutput );
+                    throw new AuthenticationException(
+                        "Process exit status was: " + status + "Process output:\n" + consoleOutput
+                    );
                 case 4:
-                    throw new TransferFailedException( "Process exit status was: " + status + "Process output:\n"
-                        + consoleOutput );
+                    throw new TransferFailedException(
+                        "Process exit status was: " + status + "Process output:\n" + consoleOutput
+                    );
                 case 5:
-                    throw new ResourceDoesNotExistException( "Process exit status was: " + status + "Process output:\n"
-                        + consoleOutput );
+                    throw new ResourceDoesNotExistException(
+                        "Process exit status was: " + status + "Process output:\n" + consoleOutput
+                    );
                 case 6:
-                    throw new AuthorizationException( "Process exit status was: " + status + "Process output:\n"
-                        + consoleOutput );
+                    throw new AuthorizationException(
+                        "Process exit status was: " + status + "Process output:\n" + consoleOutput
+                    );
                 case 7:
-                    throw new ComponentLookupException( "Process exit status was: " + status + "Process output:\n"
-                        + consoleOutput, Wagon.ROLE, protocol );
+                    throw new ComponentLookupException(
+                        "Process exit status was: " + status + "Process output:\n" + consoleOutput, Wagon.ROLE, protocol
+                    );
                 default:
                     break;
             }
@@ -253,17 +249,17 @@ public class WagonDeployer
             throw new RuntimeException( vr.render() );
         }
 
-        File classworldsConf = new File( "target/wagonDeploy/", "classworlds.conf" );
-        classworldsConf.getParentFile().mkdirs();
+        File classWorldsConfig = new File( "target/wagonDeploy/", "classworlds.conf" );
+        classWorldsConfig.getParentFile().mkdirs();
         try
         {
-            new ClassworldsConfWriter().write( classworldsConf, config );
+            new ClassworldsConfWriter().write( classWorldsConfig, config );
         }
         catch ( ClassworldsIOException e )
         {
             throw new RuntimeException( e.getMessage(), e );
         }
-        return classworldsConf;
+        return classWorldsConfig;
     }
 
     public static void main( String[] args, ClassWorld world )
@@ -277,8 +273,10 @@ public class WagonDeployer
 
         if ( args == null || args.length != 6 )
         {
-            LOG.debug( "Usage: java " + WagonDeployer.class.getName()
-                + " <protocol> <username> <password> <repositoryUrl> <fileToDeploy> <artifactPath>" );
+            LOG.debug(
+                "Usage: java " + WagonDeployer.class.getName()
+                    + " <protocol> <username> <password> <repositoryUrl> <fileToDeploy> <artifactPath>"
+            );
             System.exit( 1 );
         }
 
@@ -286,7 +284,9 @@ public class WagonDeployer
         // {
         try
         {
-            new WagonDeployer( null, args[0], args[1], args[2], args[3], new File( args[4] ), args[5] ).deploy();
+            new WagonDeployer(
+                null, args[0], args[1], args[2], args[3], new File( args[4] ), args[5], new TestContext()
+            ).deploy();
         }
         catch ( ConnectionException e )
         {
@@ -319,4 +319,25 @@ public class WagonDeployer
             System.exit( 7 );
         }
     }
+
+    public AuthenticationInfo getWagonAuthenticationInfo()
+    {
+        AuthenticationInfo authInfo = null;
+        // check the text context to see if this is a secure test
+        if ( testContext.isSecureTest() )
+        {
+            authInfo = new AuthenticationInfo();
+            authInfo.setUserName( testContext.getUsername() );
+            authInfo.setPassword( testContext.getPassword() );
+        }
+        return authInfo;
+    }
+
+    public static interface Factory
+    {
+
+        Wagon get( String protocol );
+
+    }
+
 }

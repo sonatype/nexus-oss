@@ -66,7 +66,7 @@ public class Nexus538SystemFeedsIT
         repoUtil.updateRepo( repo );
 
         TaskScheduleUtil.waitForAllTasksToStop();
-        new EventInspectorsUtil( this ).waitForCalmPeriod();
+        getEventInspectorsUtil().waitForCalmPeriod();
 
         final SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
         this.validateLinksInFeeds( feed );
@@ -87,7 +87,7 @@ public class Nexus538SystemFeedsIT
         repoUtil.updateStatus( repo );
 
         TaskScheduleUtil.waitForAllTasksToStop();
-        new EventInspectorsUtil( this ).waitForCalmPeriod();
+        getEventInspectorsUtil().waitForCalmPeriod();
 
         SyndFeed systemFeed = FeedUtil.getFeed( "systemChanges" );
         this.validateLinksInFeeds( systemFeed );

@@ -34,6 +34,12 @@
 
   <dependencies>
 
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-utils</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- All of Nexus needed on classpath -->
      <dependency>
       <groupId>org.sonatype.nexus</groupId>

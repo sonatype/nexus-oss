@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.integrationtests;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.HashMap;
 
 public class TestContext
@@ -28,12 +30,14 @@ public class TestContext
     private String username = "admin";
 
     private String password = "admin123";
-    
+
     private String adminUsername = "admin";
 
     private String adminPassword = "admin123";
-    
+
     private boolean useAdminForRequests = true;
+    
+    private String nexusUrl;
 
     private HashMap<String, Object> map = new HashMap<String, Object>();
 
@@ -62,9 +66,10 @@ public class TestContext
         return secureTest;
     }
 
-    public void setSecureTest( boolean secureTest )
+    public TestContext setSecureTest( boolean secureTest )
     {
         this.secureTest = secureTest;
+        return this;
     }
 
     public String getUsername()
@@ -72,9 +77,10 @@ public class TestContext
         return username;
     }
 
-    public void setUsername( String username )
+    public TestContext setUsername( String username )
     {
         this.username = username;
+        return this;
     }
 
     public String getPassword()
@@ -82,9 +88,10 @@ public class TestContext
         return password;
     }
 
-    public void setPassword( String password )
+    public TestContext setPassword( String password )
     {
         this.password = password;
+        return this;
     }
 
     public String getAdminUsername()
@@ -92,9 +99,10 @@ public class TestContext
         return adminUsername;
     }
 
-    public void setAdminUsername( String adminUsername )
+    public TestContext setAdminUsername( String adminUsername )
     {
         this.adminUsername = adminUsername;
+        return this;
     }
 
     public String getAdminPassword()
@@ -102,18 +110,28 @@ public class TestContext
         return adminPassword;
     }
 
-    public void setAdminPassword( String adminPassword )
+    public TestContext setAdminPassword( String adminPassword )
     {
         this.adminPassword = adminPassword;
+        return this;
     }
 
-
-    public void useAdminForRequests()
+    public TestContext useAdminForRequests()
     {
         this.username = this.adminUsername;
         this.password = this.adminPassword;
+        return this;
     }
-    
-    
 
+    public String getNexusUrl()
+    {
+        checkState( nexusUrl != null, "Nexus URL not set" );
+        return nexusUrl;
+    }
+
+    public TestContext setNexusUrl( final String nexusUrl )
+    {
+        this.nexusUrl = nexusUrl;
+        return this;
+    }
 }
