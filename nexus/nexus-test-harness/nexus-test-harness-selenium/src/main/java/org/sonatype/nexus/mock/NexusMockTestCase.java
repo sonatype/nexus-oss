@@ -32,6 +32,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.wagon.ConnectionException;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
+import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.codehaus.plexus.PlexusContainer;
@@ -42,6 +43,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
 import org.sonatype.nexus.test.utils.EventInspectorsUtil;
@@ -268,7 +270,8 @@ public abstract class NexusMockTestCase
         throws ConnectionException, AuthenticationException, TransferFailedException, ResourceDoesNotExistException,
         AuthorizationException, ComponentLookupException
     {
-        new WagonDeployer( container, wagonHint, "admin", "admin123", deployUrl, fileToDeploy, artifactPath ).deploy();
+        new WagonDeployer( container.lookup( Wagon.class, wagonHint ), wagonHint, "admin", "admin123", deployUrl,
+            fileToDeploy, artifactPath, new TestContext() ).deploy();
     }
 
     @BeforeMethod
