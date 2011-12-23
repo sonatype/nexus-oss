@@ -293,6 +293,7 @@ public class DefaultCapabilityConfiguration
             );
             eventBus.post( new CapabilityConfigurationEvent.Loaded( capability ) );
         }
+        eventBus.post( new CapabilitiesConfigurationEvent.AfterLoad( this ) );
     }
 
     public void save()
