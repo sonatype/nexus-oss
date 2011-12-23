@@ -70,7 +70,6 @@ import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.item.uid.IsRemotelyAccessibleAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.rest.model.ContentListDescribeRequestResource;
 import org.sonatype.nexus.rest.model.ContentListDescribeResource;
 import org.sonatype.nexus.rest.model.ContentListDescribeResourceResponse;
