@@ -34,7 +34,7 @@ import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
-import org.sonatype.nexus.test.utils.CapabilitiesMessageUtil;
+import org.sonatype.nexus.test.utils.CapabilitiesRestClient;
 
 public class Nexus3699CapabilityIT
     extends NexusRunningITSupport
@@ -50,7 +50,7 @@ public class Nexus3699CapabilityIT
 
     private static final String TEST_REPOSITORY = "releases";
 
-    private CapabilitiesMessageUtil capabilities;
+    private CapabilitiesRestClient capabilities;
 
     @Override
     protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
@@ -66,7 +66,7 @@ public class Nexus3699CapabilityIT
     public void setUp()
     {
         super.setUp();
-        capabilities = new CapabilitiesMessageUtil( new NexusRestClient(
+        capabilities = new CapabilitiesRestClient( new NexusRestClient(
             new TestContext()
                 .setNexusUrl( nexus().getUrl() + "/" )
                 .setSecureTest( true )
