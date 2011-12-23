@@ -21,7 +21,6 @@ package org.sonatype.nexus.plugins.capabilities.api.descriptor;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
@@ -39,14 +38,18 @@ public abstract class AbstractCapabilityDescriptor
 
     private final String name;
 
+    private final String about;
+
     private final List<FormField> formFields;
 
     protected AbstractCapabilityDescriptor( final CapabilityType type,
                                             final String name,
+                                            final String about,
                                             final FormField... formFields )
     {
         this.type = type;
         this.name = name;
+        this.about = about;
         if ( formFields == null )
         {
             this.formFields = Collections.emptyList();
@@ -70,6 +73,12 @@ public abstract class AbstractCapabilityDescriptor
     }
 
     @Override
+    public String about()
+    {
+        return about;
+    }
+
+    @Override
     public List<FormField> formFields()
     {
         return formFields;
@@ -84,15 +93,6 @@ public abstract class AbstractCapabilityDescriptor
     public boolean isExposed()
     {
         return true;
-    }
-
-    /**
-     * Describes the capability via all its properties.
-     */
-    @Override
-    public String describe( final Map<String, String> properties )
-    {
-        return properties == null ? null : properties.toString();
     }
 
 }

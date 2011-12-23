@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -42,15 +43,14 @@ public class NexusEventsForwarderEventInspector
 
     private final NexusEventBus eventBus;
 
+    private final List<NexusEventBus.LoadOnStart> handlers;
+
     @Inject
     public NexusEventsForwarderEventInspector( final NexusEventBus eventBus,
                                                final List<NexusEventBus.LoadOnStart> handlers )
     {
         this.eventBus = checkNotNull( eventBus );
-        for ( final NexusEventBus.LoadOnStart handler : checkNotNull( handlers ) )
-        {
-            eventBus.register( handler );
-        }
+        this.handlers = checkNotNull( handlers );
     }
 
     public boolean accepts( final Event<?> evt )
@@ -63,6 +63,13 @@ public class NexusEventsForwarderEventInspector
         if ( !accepts( evt ) )
         {
             return;
+        }
+        if ( evt instanceof NexusInitializedEvent )
+        {
+            for ( final NexusEventBus.LoadOnStart handler : checkNotNull( handlers ) )
+            {
+                eventBus.register( handler );
+            }
         }
         eventBus.post( evt );
     }

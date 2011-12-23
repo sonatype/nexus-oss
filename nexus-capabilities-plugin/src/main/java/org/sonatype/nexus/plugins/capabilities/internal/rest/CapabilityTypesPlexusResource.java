@@ -107,6 +107,7 @@ public class CapabilityTypesPlexusResource
                 final CapabilityTypeResource capabilityTypeResource = new CapabilityTypeResource();
                 capabilityTypeResource.setId( capabilityDescriptor.type().toString() );
                 capabilityTypeResource.setName( capabilityDescriptor.name() );
+                capabilityTypeResource.setAbout( capabilityDescriptor.about() );
 
                 response.addData( capabilityTypeResource );
 

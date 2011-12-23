@@ -74,6 +74,8 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
       }, {
         name : 'name'
       }, {
+        name : 'about'
+      }, {
         name : 'formFields'
       }]);
 
@@ -217,7 +219,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
     frame : true,
     collapsible : false,
     collapsed : false,
-    labelWidth : 200,
+    labelWidth : 75,
     layoutConfig : {
       labelSeparator : ''
     },
@@ -226,57 +228,104 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           xtype : 'hidden',
           name : 'id'
         }, {
-          xtype : 'checkbox',
-          fieldLabel : 'Enabled',
-          labelStyle : 'margin-left: 15px; width: 185px;',
-          helpText : 'This flag determines if the capability is currently enabled. To disable this capability for a period of time, de-select this checkbox.',
-          name : 'enabled',
-          allowBlank : false,
-          checked : true
-        }, {
-          xtype : 'checkbox',
-          fieldLabel : 'Active',
-          labelStyle : 'margin-left: 15px; width: 185px;',
-          helpText : 'Shows if the capability is current active or not. If not active, a text will be displayed explaining why.',
-          name : 'active',
-          allowBlank : false,
-          checked : false,
-          disabled : true
-        }, {
-          xtype : 'combo',
-          fieldLabel : 'Type',
-          labelStyle : 'margin-left: 15px; width: 185px;',
-          itemCls : 'required-field',
-          helpText : "Type of configured capability",
-          name : 'typeId',
-          store : this.capabilityTypeDataStore,
-          displayField : 'name',
-          valueField : 'id',
-          editable : false,
-          forceSelection : true,
-          mode : 'local',
-          triggerAction : 'all',
-          emptyText : 'Select...',
-          selectOnFocus : true,
-          allowBlank : false,
-          width : this.COMBO_WIDTH
-        }, {
-          xtype : 'textfield',
-          fieldLabel : 'Notes',
-          labelStyle : 'margin-left: 15px; width: 185px;',
-          itemCls : '',
-          helpText : "Optional notes about configured capability",
-          name : 'notes',
-          width : this.COMBO_WIDTH,
-          allowBlank : true
+           layout: 'column',
+           monitorResize: true,
+           items : [ {
+               xtype: 'fieldset',
+               autoHeight : true,
+               border : false,
+               width : '400px',
+               items : [{
+                   xtype : 'checkbox',
+                   fieldLabel : 'Enabled',
+                   labelStyle : 'margin-left: 15px; width: 60px',
+                   helpText : 'This flag determines if the capability is currently enabled. To disable this capability for a period of time, de-select this checkbox.',
+                   name : 'enabled',
+                   allowBlank : false,
+                   checked : true
+                 }, {
+                   xtype : 'checkbox',
+                   fieldLabel : 'Active',
+                   labelStyle : 'margin-left: 15px; width: 60px',
+                   helpText : 'Shows if the capability is current active or not. If not active, a text will be displayed explaining why.',
+                   name : 'active',
+                   allowBlank : false,
+                   checked : false,
+                   disabled : true
+                 }, {
+                   xtype : 'combo',
+                   fieldLabel : 'Type',
+                   labelStyle : 'margin-left: 15px; width: 60px',
+                   itemCls : 'required-field',
+                   helpText : "Type of configured capability",
+                   name : 'typeId',
+                   store : this.capabilityTypeDataStore,
+                   displayField : 'name',
+                   valueField : 'id',
+                   editable : false,
+                   forceSelection : true,
+                   mode : 'local',
+                   triggerAction : 'all',
+                   emptyText : 'Select...',
+                   selectOnFocus : true,
+                   allowBlank : false,
+                   width : this.COMBO_WIDTH
+                 }, {
+                   xtype : 'textfield',
+                   fieldLabel : 'Notes',
+                   labelStyle : 'margin-left: 15px; width: 60px; margin-bottom:10px',
+                   itemCls : '',
+                   helpText : "Optional notes about configured capability",
+                   name : 'notes',
+                   width : this.COMBO_WIDTH,
+                   allowBlank : true
+                 }
+               ]
+             }, {
+               xtype : 'panel',
+               columnWidth : 1,
+               name : 'about-panel',
+               header : false,
+               layout : 'card',
+               region : 'center',
+               activeItem : 0,
+               bodyStyle : 'padding:0px 15px 0px 15px',
+               deferredRender : false,
+               frame : false,
+               autoHeight : true,
+               items : [{
+                 xtype : 'fieldset',
+                 name : 'about-fieldset',
+                 checkboxToggle : false,
+                 // NOTE: Disabling title for now, since the space for this content is so small, a title takes away precious space
+                 // NOTE: ... content should be enough to explain this context is "about"
+                 //title : 'About',
+                 collapsible : false,
+                 autoHeight : true,
+                 layoutConfig : {
+                   labelSeparator : ''
+                 },
+                 items : [{
+                   xtype : 'panel',
+                   name : 'about',
+                   html : '',
+                   layout : 'fit',
+                   autoScroll : true,
+                   height : 80
+                 }]
+               }]
+             }, {
+               width : '0px'
+             }
+           ]
         }, {
           xtype : 'panel',
-          id : 'capability-type-config-card-panel',
+          id : 'settings-panel',
           header : false,
           layout : 'card',
           region : 'center',
           activeItem : 0,
-          bodyStyle : 'padding:15px',
+          bodyStyle : 'padding:0px 15px 0px 15px',
           deferredRender : false,
           autoScroll : false,
           frame : false,
@@ -288,7 +337,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           layout : 'card',
           region : 'center',
           activeItem : 0,
-          bodyStyle : 'padding:15px',
+          bodyStyle : 'padding:0px 15px 0px 15px',
           deferredRender : false,
           autoScroll : false,
           autoHeight : true,
@@ -301,7 +350,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
             checkboxToggle : false,
             title : 'Status',
             anchor : Sonatype.view.FIELDSET_OFFSET,
-            collapsible : true,
+            collapsible : false,
             layoutConfig : {
               labelSeparator : ''
             },
@@ -414,7 +463,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
         items : [this.capabilitiesGridPanel, {
               xtype : 'panel',
               id : 'capability-config-forms',
-              title : 'Capabilities Configuration',
+              title : 'Capability Configuration',
               layout : 'card',
               region : 'center',
               activeItem : 0,
@@ -554,7 +603,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               active : false
             });
         config = this.configUniqueIdHelper(id, config);
-        Ext.apply(config.items[5].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
+        Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
         var formPanel = new Ext.FormPanel(config);
 
         formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -566,8 +615,14 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         var capabilityTypeField = formPanel.find('name', 'typeId')[0];
         capabilityTypeField.on('select', this.capabilityTypeSelectHandler, formPanel);
 
+        var settingsPanel = formPanel.findById(formPanel.id + '_settings-panel');
+        settingsPanel.hide();
+
         var statusPanel = formPanel.find('name', 'status-panel')[0];
         statusPanel.hide();
+
+        var aboutPanel = formPanel.find('name', 'about-panel')[0];
+        aboutPanel.hide();
 
         var buttonInfoObj = {
           formPanel : formPanel,
@@ -830,7 +885,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                 id : id
               });
           config = this.configUniqueIdHelper(id, config);
-          Ext.apply(config.items[5].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
+          Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
           formPanel = new Ext.FormPanel(config);
 
           formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -840,29 +895,48 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               });
 
           // enable capability type panel fields
-          var capabilityTypePanel = formPanel.findById(formPanel.id + '_capability-type-config-card-panel');
-          capabilityTypePanel.items.each(function(item, i, len) {
+          var settingsPanel = formPanel.findById(formPanel.id + '_settings-panel');
+          var emptySettings = true;
+          settingsPanel.items.each(function(item, i, len) {
                 if (item.id == id + '_' + rec.data.typeId)
                 {
-                  capabilityTypePanel.activeItem = i;
+                  settingsPanel.activeItem = i;
                   if (item.items)
                   {
                     item.items.each(function(item) {
-                          item.disabled = false;
-                        });
+                      item.disabled = false;
+                    });
+                    emptySettings = false;
                   }
                 }
               });
 
+          if(emptySettings) {
+            settingsPanel.hide();
+          }
+          else {
+            settingsPanel.show();
+          }
+
           formPanel.find('name', 'typeId')[0].disable();
 
           formPanel.find('name', 'status')[0].html = rec.data.status;
-
           if(rec.data.status) {
             formPanel.find('name', 'status-panel')[0].show();
           }
           else {
             formPanel.find('name', 'status-panel')[0].hide();
+          }
+
+          var capabilityType = this.capabilityTypeDataStore.getById(rec.data.typeId);
+          formPanel.find('name', 'about')[0].html = capabilityType.data.about?capabilityType.data.about:'';
+
+          var aboutPanel = formPanel.find('name', 'about-panel')[0];
+          if(capabilityType.data.about) {
+            aboutPanel.show();
+          }
+          else {
+            aboutPanel.hide();
           }
 
           var active = formPanel.find('name', 'active')[0];
@@ -931,26 +1005,49 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       capabilityTypeSelectHandler : function(combo, record, index) {
-        var capabilityTypePanel = this.findById(this.id + '_capability-type-config-card-panel');
+        var settingsPanel = this.findById(this.id + '_settings-panel');
         // First disable all the items currently on screen, so they wont be
         // validated/submitted etc
-        capabilityTypePanel.getLayout().activeItem.items.each(function(item) {
-              item.disable();
-            });
+        settingsPanel.getLayout().activeItem.items.each(function(item) {
+          item.disable();
+        });
         // Then find the proper card to activate (based upon id of the
         // capabilityType)
         // Then enable the fields in that card
         var formId = this.id;
-        capabilityTypePanel.items.each(function(item, i, len) {
+        var emptySettings = true;
+        settingsPanel.items.each(function(item, i, len) {
               if (item.id == formId + '_' + record.data.id)
               {
-                capabilityTypePanel.getLayout().setActiveItem(item);
-                item.items.each(function(item) {
-                      item.enable();
-                    });
+                settingsPanel.getLayout().setActiveItem(item);
+                if(item.items && item.items.length > 0) {
+                  item.items.each(function(item) {
+                    item.enable();
+                  });
+                  emptySettings = false;
+                }
               }
-            }, capabilityTypePanel);
-        capabilityTypePanel.doLayout();
+            }, settingsPanel);
+
+        if(emptySettings) {
+          settingsPanel.hide();
+        }
+        else {
+          settingsPanel.show();
+        }
+
+        var about = this.find('name', 'about')[0];
+        about.body.update(record.data.about?record.data.about:'');
+
+        var aboutPanel = this.find('name', 'about-panel')[0];
+        if(record.data.about) {
+          aboutPanel.show();
+        }
+        else {
+          aboutPanel.hide();
+        }
+
+        settingsPanel.doLayout();
       },
 
       // creates a unique config object with specific IDs on the two grid item
@@ -984,7 +1081,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       exportCapabilityPropertiesHelper : function(val, fpanel) {
-        return FormFieldExporter(fpanel, '_capability-type-config-card-panel', 'capabilityProperties_');
+        return FormFieldExporter(fpanel, '_settings-panel', 'capabilityProperties_');
       },
 
       importCapabilityPropertiesHelper : function(val, srcObj, fpanel) {

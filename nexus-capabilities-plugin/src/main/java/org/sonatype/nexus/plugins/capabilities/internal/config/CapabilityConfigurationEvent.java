@@ -45,8 +45,8 @@ public class CapabilityConfigurationEvent
     {
         final CCapability capability = getCapability();
         return String.format(
-            "capability configuration {id='%s', type='%s', enabled='%s', description='%s'}",
-            capability.getId(), capability.getTypeId(), capability.isEnabled(), capability.getDescription()
+            "capability configuration {id='%s', type='%s', enabled='%s''}",
+            capability.getId(), capability.getTypeId(), capability.isEnabled()
         );
     }
 

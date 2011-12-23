@@ -73,9 +73,9 @@ public class TouchTestCapabilityDescriptor
     }
 
     @Override
-    public String describe( final Map<String, String> properties )
+    public String about()
     {
-        return "test";
+        return "What about me?";
     }
 
 }

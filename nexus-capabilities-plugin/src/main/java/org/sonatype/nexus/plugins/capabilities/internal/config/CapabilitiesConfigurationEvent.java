@@ -18,40 +18,42 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.config;
 
-import java.io.IOException;
-import java.util.Collection;
+import org.sonatype.plexus.appevents.AbstractEvent;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
-import com.google.common.base.Predicate;
-
-public interface CapabilityConfiguration
+/**
+ * Capabilities configuration (persistent storage) related events.
+ *
+ * @since 1.10.0
+ */
+public class CapabilitiesConfigurationEvent
+    extends AbstractEvent<CapabilityConfiguration>
 {
 
-    public String add( final CCapability capability )
-        throws InvalidConfigurationException, IOException;
+    public CapabilitiesConfigurationEvent( final CapabilityConfiguration source )
+    {
+        super( source );
+    }
 
-    public void update( final CCapability capability )
-        throws InvalidConfigurationException, IOException;
+    /**
+     * Event fired after capability ware loaded from persistence store.
+     *
+     * @since 1.10.0
+     */
+    public static class AfterLoad
+        extends CapabilitiesConfigurationEvent
+    {
 
-    public void remove( final String capabilityId )
-        throws InvalidConfigurationException, IOException;
+        public AfterLoad( final CapabilityConfiguration source )
+        {
+            super( source );
+        }
 
-    public CCapability get( final String capabilityId )
-        throws InvalidConfigurationException, IOException;
+        @Override
+        public String toString()
+        {
+            return "After capabilities loaded";
+        }
 
-    public Collection<CCapability> getAll()
-        throws InvalidConfigurationException, IOException;
-
-    public Collection<CCapability> get( Predicate<CCapability> filter )
-        throws InvalidConfigurationException, IOException;
-
-    public void load()
-        throws InvalidConfigurationException, IOException;
-
-    void save()
-        throws IOException;
-
-    void clearCache();
+    }
 
 }

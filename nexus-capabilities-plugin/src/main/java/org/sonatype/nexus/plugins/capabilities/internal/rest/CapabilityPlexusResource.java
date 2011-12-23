@@ -285,7 +285,6 @@ public class CapabilityPlexusResource
 
         final CapabilityListItemResource item = new CapabilityListItemResource();
         item.setId( capability.getId() );
-        item.setDescription( capability.getDescription() );
         item.setNotes( capability.getNotes() );
         item.setEnabled( capability.isEnabled() );
         item.setTypeId( capability.getTypeId() );
@@ -299,6 +298,7 @@ public class CapabilityPlexusResource
         item.setActive( reference != null && reference.isActive() );
         if ( reference != null )
         {
+            item.setDescription( reference.description() );
             item.setStatus( reference.status() );
             item.setStateDescription( reference.stateDescription() );
         }

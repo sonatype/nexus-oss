@@ -64,13 +64,10 @@ public interface CapabilityDescriptor
     boolean isExposed();
 
     /**
-     * Describes the capability based on capability configuration properties. The method is called in case that
-     * capability name on creation/update of capability.
+     * Returns a detailed description of capability type (to be presented in UI).
      *
-     * @param properties capability configuration properties
-     * @return capability description
-     * @since 1.10.0
+     * @return capability type description.
      */
-    String describe( Map<String, String> properties );
+    String about();
 
 }

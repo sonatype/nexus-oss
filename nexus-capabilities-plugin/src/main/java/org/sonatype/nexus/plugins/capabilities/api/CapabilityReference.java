@@ -92,6 +92,14 @@ public interface CapabilityReference
     String status();
 
     /**
+     * Returns description of capability.
+     *
+     * @return description. Can be null.
+     */
+    String description();
+
+
+    /**
      * Callback when a new capability is created.
      *
      * @param properties capability configuration

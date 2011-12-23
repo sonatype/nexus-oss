@@ -44,6 +44,12 @@ public abstract class AbstractCapability
     }
 
     @Override
+    public String description()
+    {
+        return null;
+    }
+
+    @Override
     public String status()
     {
         return null;

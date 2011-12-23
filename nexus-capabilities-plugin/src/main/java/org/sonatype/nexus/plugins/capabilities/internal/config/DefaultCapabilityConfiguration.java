@@ -18,7 +18,7 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.config;
 
-import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
+import static java.util.Collections.unmodifiableCollection;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,7 +31,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +41,6 @@ import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -52,13 +50,14 @@ import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.Configuration;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Reader;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xpp3.NexusCapabilitiesConfigurationXpp3Writer;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 
 /**
  * Handles persistence of capabilities configuration.
@@ -76,8 +75,6 @@ public class DefaultCapabilityConfiguration
 
     private final ConfigurationIdGenerator idGenerator;
 
-    private final CapabilityDescriptorRegistry descriptors;
-
     private final File configurationFile;
 
     private final ReentrantLock lock = new ReentrantLock();
@@ -88,13 +85,11 @@ public class DefaultCapabilityConfiguration
     public DefaultCapabilityConfiguration( final ApplicationConfiguration applicationConfiguration,
                                            final NexusEventBus eventBus,
                                            final CapabilityConfigurationValidator validator,
-                                           final ConfigurationIdGenerator idGenerator,
-                                           final CapabilityDescriptorRegistry descriptors )
+                                           final ConfigurationIdGenerator idGenerator )
     {
         this.eventBus = eventBus;
         this.validator = validator;
         this.idGenerator = idGenerator;
-        this.descriptors = descriptors;
 
         configurationFile = new File( applicationConfiguration.getWorkingDirectory(), "conf/capabilities.xml" );
     }
@@ -116,7 +111,6 @@ public class DefaultCapabilityConfiguration
             final String generatedId = idGenerator.generateId();
 
             capability.setId( generatedId );
-            capability.setDescription( getDescription( capability ) );
             getConfiguration().addCapability( capability );
 
             save();
@@ -150,12 +144,11 @@ public class DefaultCapabilityConfiguration
                 throw new InvalidConfigurationException( vr );
             }
 
-            final CCapability stored = get( capability.getId() );
+            final CCapability stored = getInternal( capability.getId() );
 
             if ( stored != null )
             {
                 getConfiguration().removeCapability( stored );
-                capability.setDescription( getDescription( capability ) );
                 getConfiguration().addCapability( capability );
                 save();
 
@@ -180,7 +173,7 @@ public class DefaultCapabilityConfiguration
 
         try
         {
-            final CCapability stored = get( capabilityId );
+            final CCapability stored = getInternal( capabilityId );
             if ( stored != null )
             {
                 getConfiguration().removeCapability( stored );
@@ -202,26 +195,25 @@ public class DefaultCapabilityConfiguration
     public CCapability get( final String capabilityId )
         throws InvalidConfigurationException, IOException
     {
-        if ( StringUtils.isEmpty( capabilityId ) )
+        final CCapability capability = getInternal( capabilityId );
+        if ( capability != null )
         {
-            return null;
+            return capability.clone();
         }
-
-        for ( final CCapability capability : getConfiguration().getCapabilities() )
-        {
-            if ( capabilityId.equals( capability.getId() ) )
-            {
-                return capability;
-            }
-        }
-
         return null;
     }
 
     public Collection<CCapability> getAll()
         throws InvalidConfigurationException, IOException
     {
-        return Collections.unmodifiableList( getConfiguration().getCapabilities() );
+        return unmodifiableCollection( clone( getConfiguration().getCapabilities() ) );
+    }
+
+    @Override
+    public Collection<CCapability> get( final Predicate<CCapability> filter )
+        throws InvalidConfigurationException, IOException
+    {
+        return unmodifiableCollection( clone( Collections2.filter( getAll(), filter ) ) );
     }
 
     private Configuration getConfiguration()
@@ -301,6 +293,7 @@ public class DefaultCapabilityConfiguration
             );
             eventBus.post( new CapabilityConfigurationEvent.Loaded( capability ) );
         }
+        eventBus.post( new CapabilitiesConfigurationEvent.AfterLoad( this ) );
     }
 
     public void save()
@@ -345,23 +338,6 @@ public class DefaultCapabilityConfiguration
         configuration = null;
     }
 
-    private String getDescription( final CCapability capability )
-    {
-        final CapabilityDescriptor descriptor = descriptors.get( capabilityType( capability.getTypeId() ) );
-        if ( descriptor != null )
-        {
-            try
-            {
-                return descriptor.describe( asMap( capability.getProperties() ) );
-            }
-            catch ( Exception ignore )
-            {
-                getLogger().warn( "Capability descriptor '{}' failed to describe capability", descriptor.type() );
-            }
-        }
-        return capability.getDescription();
-    }
-
     static Map<String, String> asMap( final List<CCapabilityProperty> properties )
     {
         final Map<String, String> map = new HashMap<String, String>();
@@ -373,6 +349,39 @@ public class DefaultCapabilityConfiguration
             }
         }
         return map;
+    }
+
+    public CCapability getInternal( final String capabilityId )
+        throws InvalidConfigurationException, IOException
+    {
+        if ( StringUtils.isEmpty( capabilityId ) )
+        {
+            return null;
+        }
+
+        for ( final CCapability capability : getConfiguration().getCapabilities() )
+        {
+            if ( capabilityId.equals( capability.getId() ) )
+            {
+                return capability;
+            }
+        }
+
+        return null;
+    }
+
+    private Collection<CCapability> clone( final Collection<CCapability> capabilities )
+    {
+        if ( capabilities == null )
+        {
+            return null;
+        }
+        final List<CCapability> clones = Lists.newArrayList();
+        for ( final CCapability capability : capabilities )
+        {
+            clones.add( capability.clone() );
+        }
+        return clones;
     }
 
 }

@@ -67,12 +67,11 @@ public class DefaultCapabilityConfigurationTest
         configuration.clearCache();
 
         // read
-        assertNull( configuration.get( null ) );
+        assertNull( configuration.get( (String) null ) );
         assertNull( configuration.get( "invalidId" ) );
 
         CCapability read = configuration.get( cap.getId() );
         assertEquals( read.getId(), cap.getId() );
-        assertEquals( read.getDescription(), cap.getDescription() );
         assertEquals( read.getNotes(), cap.getNotes() );
         assertEquals( read.getTypeId(), cap.getTypeId() );
         assertEquals( read.getProperties().size(), cap.getProperties().size() );
@@ -82,7 +81,6 @@ public class DefaultCapabilityConfigurationTest
         configuration.update( cap );
         configuration.clearCache();
         read = configuration.get( cap.getId() );
-        assertEquals( read.getDescription(), cap.getDescription() );
         assertEquals( read.getNotes(), cap.getNotes() );
 
         // load eventing
