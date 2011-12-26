@@ -51,26 +51,26 @@ public class RepositoryMessageUtil
     extends ITUtil
 {
 
-    public static final String ALL_SERVICE_PART = RepositoryNexusRestClient.ALL_SERVICE_PART;
+    public static final String ALL_SERVICE_PART = RepositoriesNexusRestClient.ALL_SERVICE_PART;
 
-    public static final String SERVICE_PART = RepositoryNexusRestClient.SERVICE_PART;
+    public static final String SERVICE_PART = RepositoriesNexusRestClient.SERVICE_PART;
 
     private static final Logger LOG = LoggerFactory.getLogger( RepositoryMessageUtil.class );
 
-    private static final RepositoryNexusRestClient REPOSITORY_NRC = new RepositoryNexusRestClient(
+    private static final RepositoriesNexusRestClient REPOSITORY_NRC = new RepositoriesNexusRestClient(
         RequestFacade.getNexusRestClient(),
-        new NexusTasksRestClient( RequestFacade.getNexusRestClient() ),
+        new TasksNexusRestClient( RequestFacade.getNexusRestClient() ),
         new EventInspectorsUtil( RequestFacade.getNexusRestClient() )
     );
 
-    private final RepositoryNexusRestClient repositoryNRC;
+    private final RepositoriesNexusRestClient repositoryNRC;
 
     public RepositoryMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {
         super( test );
-        repositoryNRC = new RepositoryNexusRestClient(
+        repositoryNRC = new RepositoriesNexusRestClient(
             RequestFacade.getNexusRestClient(),
-            new NexusTasksRestClient( RequestFacade.getNexusRestClient() ),
+            new TasksNexusRestClient( RequestFacade.getNexusRestClient() ),
             test.getEventInspectorsUtil(),
             xstream,
             mediaType

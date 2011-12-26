@@ -19,6 +19,7 @@
 package org.sonatype.nexus.test.utils;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,16 +47,24 @@ public class DeployUtils
 
     private final WagonDeployer.Factory wagonFactory;
 
+    public DeployUtils( final NexusRestClient nexusRestClient )
+    {
+        this.nexusRestClient = checkNotNull( nexusRestClient );
+        this.wagonFactory = null;
+    }
+
     public DeployUtils( final NexusRestClient nexusRestClient,
                         final WagonDeployer.Factory wagonFactory )
     {
         this.nexusRestClient = checkNotNull( nexusRestClient );
-        this.wagonFactory = wagonFactory;
+        this.wagonFactory = checkNotNull( wagonFactory );
     }
 
     public void deployWithWagon( String wagonHint, String repositoryUrl, File fileToDeploy, String artifactPath )
         throws Exception
     {
+        checkState( wagonFactory != null, "Wagon factory must be provided to be able to deploy" );
+
         final TestContext testContext = nexusRestClient.getTestContext();
         final Wagon wagon = wagonFactory.get( wagonHint );
 
@@ -220,4 +229,56 @@ public class DeployUtils
 
         return nexusRestClient.executeHTTPClientMethod( filePost );
     }
+
+    public int deployWithRest( final String repositoryId,
+                               final String groupId,
+                               final String artifactId,
+                               final String version,
+                               final String classifier,
+                               final String extension,
+                               final File fileToDeploy )
+        throws IOException
+    {
+        return deployWithRest(
+            nexusRestClient.toNexusURL( "service/local/artifact/maven/content" ).toExternalForm(),
+            repositoryId,
+            groupId,
+            artifactId,
+            version,
+            classifier,
+            extension,
+            fileToDeploy
+        );
+    }
+
+    public int deployWithRest( final String restServiceURL,
+                               final String repositoryId,
+                               final String groupId,
+                               final String artifactId,
+                               final String version,
+                               final String classifier,
+                               final String extension,
+                               final File fileToDeploy )
+        throws IOException
+    {
+        // the method we are calling
+        final PostMethod filePost = new PostMethod( restServiceURL );
+        filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
+
+        final Part[] parts = {
+            new StringPart( "r", repositoryId ),
+            new StringPart( "g", groupId ),
+            new StringPart( "a", artifactId ),
+            new StringPart( "v", version ),
+            new StringPart( "p", extension == null ? "" : extension ),
+            new StringPart( "c", classifier == null ? "" : classifier ),
+            new FilePart( fileToDeploy.getName(), fileToDeploy )
+        };
+
+        filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
+
+        return nexusRestClient.executeHTTPClientMethod( filePost ).getStatusCode();
+
+    }
+
 }

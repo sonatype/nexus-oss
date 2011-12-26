@@ -35,26 +35,31 @@ import org.restlet.data.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.NexusRestClient;
+import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
+import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import com.thoughtworks.xstream.XStream;
 
-public class RepositoryNexusRestClient
+public class RepositoriesNexusRestClient
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( RepositoryNexusRestClient.class );
+    private static final Logger LOG = LoggerFactory.getLogger( RepositoriesNexusRestClient.class );
 
     public static final String ALL_SERVICE_PART = NexusRestClient.SERVICE_LOCAL + "all_repositories";
 
@@ -62,7 +67,7 @@ public class RepositoryNexusRestClient
 
     private final NexusRestClient nexusRestClient;
 
-    private final NexusTasksRestClient taskNRC;
+    private final TasksNexusRestClient taskNRC;
 
     private final EventInspectorsUtil eventNRC;
 
@@ -70,18 +75,18 @@ public class RepositoryNexusRestClient
 
     private final MediaType mediaType;
 
-    public RepositoryNexusRestClient( final NexusRestClient nexusRestClient,
-                                      final NexusTasksRestClient taskNRC,
-                                      final EventInspectorsUtil eventNRC )
+    public RepositoriesNexusRestClient( final NexusRestClient nexusRestClient,
+                                        final TasksNexusRestClient taskNRC,
+                                        final EventInspectorsUtil eventNRC )
     {
         this( nexusRestClient, taskNRC, eventNRC, XStreamFactory.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
-    public RepositoryNexusRestClient( final NexusRestClient nexusRestClient,
-                                      final NexusTasksRestClient taskNRC,
-                                      final EventInspectorsUtil eventNRC,
-                                      final XStream xstream,
-                                      final MediaType mediaType )
+    public RepositoriesNexusRestClient( final NexusRestClient nexusRestClient,
+                                        final TasksNexusRestClient taskNRC,
+                                        final EventInspectorsUtil eventNRC,
+                                        final XStream xstream,
+                                        final MediaType mediaType )
     {
         this.nexusRestClient = checkNotNull( nexusRestClient );
         this.taskNRC = checkNotNull( taskNRC );
@@ -487,6 +492,74 @@ public class RepositoryNexusRestClient
 
         Response response = nexusRestClient.sendMessage( serviceURI, Method.PUT, representation );
         return response;
+    }
+
+    public void createMavenHostedReleaseRepository( final String id )
+        throws IOException
+    {
+        createMavenHostedRepository( id, RepositoryPolicy.RELEASE );
+    }
+
+    public void createMavenHostedSnapshotRepository( final String id )
+        throws IOException
+    {
+        createMavenHostedRepository( id, RepositoryPolicy.SNAPSHOT );
+    }
+
+    public void createMavenHostedRepository( final String id, final RepositoryPolicy repositoryPolicy )
+        throws IOException
+    {
+        final RepositoryResource repository = new RepositoryResource();
+
+        repository.setId( id );
+        repository.setRepoType( "hosted" );
+        repository.setName( id );
+        repository.setProvider( "maven2" );
+        repository.setFormat( "maven2" );
+        repository.setRepoPolicy( repositoryPolicy.name() );
+        repository.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );
+        repository.setBrowseable( true );
+        repository.setIndexable( true );
+        repository.setExposed( true );
+
+        createRepository( repository );
+    }
+
+    public void createMavenProxyReleaseRepository( final String id, final String url )
+        throws IOException
+    {
+        createMavenProxyRepository( id, url, RepositoryPolicy.RELEASE );
+    }
+
+    public void createMavenProxySnapshotRepository( final String id, final String url )
+        throws IOException
+    {
+        createMavenProxyRepository( id, url, RepositoryPolicy.SNAPSHOT );
+    }
+
+    public void createMavenProxyRepository( final String id, final String url, final RepositoryPolicy repositoryPolicy )
+        throws IOException
+    {
+        final RepositoryProxyResource repository = new RepositoryProxyResource();
+
+        repository.setId( id );
+        repository.setRepoType( "proxy" );
+        repository.setName( id );
+        repository.setProvider( "maven2" );
+        repository.setFormat( "maven2" );
+        repository.setRepoPolicy( repositoryPolicy.name() );
+        repository.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
+        repository.setDownloadRemoteIndexes( true );
+        repository.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );
+        repository.setBrowseable( true );
+        repository.setIndexable( true );
+        repository.setExposed( true );
+
+        RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
+        remoteStorage.setRemoteStorageUrl( url );
+        repository.setRemoteStorage( remoteStorage );
+
+        createRepository( repository );
     }
 
 }

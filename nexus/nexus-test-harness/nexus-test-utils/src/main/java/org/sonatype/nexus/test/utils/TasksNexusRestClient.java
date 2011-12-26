@@ -47,10 +47,10 @@ import com.thoughtworks.xstream.XStream;
 /**
  * Util class to talk with nexus tasks
  */
-public class NexusTasksRestClient
+public class TasksNexusRestClient
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( NexusTasksRestClient.class );
+    private static final Logger LOG = LoggerFactory.getLogger( TasksNexusRestClient.class );
 
     private static XStream xstream;
 
@@ -61,7 +61,7 @@ public class NexusTasksRestClient
         xstream = XStreamFactory.getXmlXStream();
     }
 
-    public NexusTasksRestClient( final NexusRestClient nexusRestClient )
+    public TasksNexusRestClient( final NexusRestClient nexusRestClient )
     {
         this.nexusRestClient = checkNotNull( nexusRestClient );
     }

@@ -27,9 +27,9 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 public class RepositoryStatusMessageUtil
 {
 
-    private static final RepositoryNexusRestClient REPOSITORY_NRC = new RepositoryNexusRestClient(
+    private static final RepositoriesNexusRestClient REPOSITORY_NRC = new RepositoriesNexusRestClient(
         RequestFacade.getNexusRestClient(),
-        new NexusTasksRestClient( RequestFacade.getNexusRestClient() ),
+        new TasksNexusRestClient( RequestFacade.getNexusRestClient() ),
         new EventInspectorsUtil( RequestFacade.getNexusRestClient() )
     );
 

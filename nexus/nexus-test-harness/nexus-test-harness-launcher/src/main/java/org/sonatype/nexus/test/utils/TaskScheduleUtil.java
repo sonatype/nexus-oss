@@ -36,11 +36,11 @@ import org.sonatype.nexus.scheduling.NexusTask;
 public class TaskScheduleUtil
 {
 
-    private static final NexusTasksRestClient nexusTasksRestClient;
+    private static final TasksNexusRestClient nexusTasksRestClient;
 
     static
     {
-        nexusTasksRestClient = new NexusTasksRestClient( RequestFacade.getNexusRestClient() );
+        nexusTasksRestClient = new TasksNexusRestClient( RequestFacade.getNexusRestClient() );
     }
 
     public static Status create( ScheduledServiceBaseResource task, Matcher<Response>... matchers )
@@ -210,6 +210,6 @@ public class TaskScheduleUtil
 
     public static ScheduledServicePropertyResource newProperty( String name, String value )
     {
-        return NexusTasksRestClient.newProperty( name, value );
+        return TasksNexusRestClient.newProperty( name, value );
     }
 }
