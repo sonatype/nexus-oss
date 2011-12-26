@@ -217,7 +217,7 @@ public abstract class NexusITSupport
      * @param path path to be appended to test method specific directory
      * @return directory specific to running test method + provided path
      */
-    private File methodSpecificDirectory( String path )
+    protected File methodSpecificDirectory( String path )
     {
         return
             new File(
