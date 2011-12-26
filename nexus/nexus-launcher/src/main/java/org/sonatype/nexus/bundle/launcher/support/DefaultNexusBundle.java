@@ -317,4 +317,10 @@ public class DefaultNexusBundle
         }
     }
 
+    @Override
+    public File getWorkDirectory()
+    {
+        return new File( getConfiguration().getTargetDirectory(), "sonatype-work/nexus" );
+    }
+
 }

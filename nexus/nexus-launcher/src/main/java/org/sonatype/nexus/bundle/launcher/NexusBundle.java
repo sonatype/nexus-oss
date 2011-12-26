@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.bundle.launcher;
 
+import java.io.File;
+
 import org.sonatype.sisu.bl.WebBundle;
 
 /**
@@ -28,5 +30,7 @@ import org.sonatype.sisu.bl.WebBundle;
 public interface NexusBundle
     extends WebBundle<NexusBundle, NexusBundleConfiguration>
 {
+
+    File getWorkDirectory();
 
 }
