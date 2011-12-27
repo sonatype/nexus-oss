@@ -71,6 +71,22 @@
       <artifactId>sisu-inject-plexus</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-restlet-bridge</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-servlet</artifactId>
+    </dependency>    
 
     <!-- Testing -->
     <dependency>
