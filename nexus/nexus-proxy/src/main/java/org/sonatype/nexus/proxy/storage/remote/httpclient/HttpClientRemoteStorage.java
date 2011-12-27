@@ -442,7 +442,7 @@ class HttpClientRemoteStorage
         httpRequest.setHeader( "user-agent", formatUserAgentString( ctx, repository ) );
         httpRequest.setHeader( "accept", "*/*" );
         httpRequest.setHeader( "accept-language", "en-us" );
-        httpRequest.setHeader( "accept-encoding", "gzip, identity" );
+        httpRequest.setHeader( "accept-encoding", "gzip,deflate,identity" );
         httpRequest.setHeader( "cache-control", "no-cache" );
 
         // HTTP keep alive should not be used, except when NTLM is used
