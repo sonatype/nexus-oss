@@ -47,6 +47,13 @@
   </properties>
 
   <dependencies>
+  
+    <!-- This is here to prevent it coming into WAR -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
@@ -409,7 +416,6 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>sisu-maven-plugin</artifactId>
-        <version>1.1</version>
         <executions>
           <execution>
             <id>index-war</id>
