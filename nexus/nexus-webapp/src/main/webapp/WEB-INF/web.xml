@@ -35,12 +35,15 @@
     <listener-class>org.sonatype.nexus.web.PlexusContainerContextListener</listener-class>
   </listener>
   <listener>
+    <listener-class>org.sonatype.nexus.web.NexusGuiceContextListener</listener-class>
+  </listener>
+  <listener>
     <listener-class>org.sonatype.nexus.web.LogConfigListener</listener-class>
   </listener>
   <listener>
     <listener-class>org.sonatype.nexus.web.NexusBooterListener</listener-class>
   </listener>
-
+  
   <!-- Security filter -->
   <filter>
     <filter-name>nexusFilter</filter-name>
@@ -87,7 +90,12 @@
       </param-value>
     </init-param>
   </filter>
-
+  
+  <filter>
+    <filter-name>guiceFilter</filter-name>
+    <filter-class>org.sonatype.nexus.web.NexusGuiceFilter</filter-class>
+  </filter>  
+  
   <filter-mapping>
     <filter-name>nexusFilter</filter-name>
     <url-pattern>/service/*</url-pattern>
@@ -96,46 +104,10 @@
     <filter-name>nexusFilter</filter-name>
     <url-pattern>/content/*</url-pattern>
   </filter-mapping>
-
-  <!-- Nexus REST Application -->
-  <servlet>
-    <servlet-name>nexus</servlet-name>
-    <servlet-class>org.sonatype.plexus.rest.PlexusServerServlet</servlet-class>
-    <init-param>
-      <!--
-        A stupid hack to avoid OneServletServerPerWebapp limitation, see
-        PlexusServerServlet#getInitParameter
-      -->
-      <param-name>nexus.role</param-name>
-      <param-value>org.restlet.Application</param-value>
-    </init-param>
-    <init-param>
-      <!--
-        A stupid hack to avoid OneServletServerPerWebapp limitation, see
-        PlexusServerServlet#getInitParameter
-      -->
-      <param-name>nexus.roleHint</param-name>
-      <param-value>nexus</param-value>
-    </init-param>
-    <init-param>
-      <!--
-        A stupid hack to avoid OneServletServerPerWebapp limitation, see
-        PlexusServerServlet#getInitParameter
-      -->
-      <param-name>nexus.org.restlet.clients</param-name>
-      <param-value>FILE CLAP</param-value>
-    </init-param>
-    <init-param>
-      <param-name>plexus.discoverResources</param-name>
-      <param-value>true</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>nexus</servlet-name>
+  <filter-mapping>
+    <filter-name>guiceFilter</filter-name>
     <url-pattern>/*</url-pattern>
-  </servlet-mapping>
+  </filter-mapping>  
 
   <!-- Welcome File -->
   <welcome-file-list>
