@@ -18,6 +18,19 @@
  */
 package org.sonatype.nexus.bundle.launcher.support;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
+import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
+import static org.sonatype.sisu.filetasks.builder.FileRef.file;
+import static org.sonatype.sisu.filetasks.builder.FileRef.path;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.sonatype.nexus.bundle.launcher.NexusBundle;
 import org.sonatype.nexus.bundle.launcher.NexusBundleConfiguration;
 import org.sonatype.sisu.bl.support.DefaultWebBundle;
@@ -29,17 +42,6 @@ import org.sonatype.sisu.jsw.monitor.CommandMonitorTalker;
 import org.sonatype.sisu.jsw.monitor.KeepAliveThread;
 import org.sonatype.sisu.jsw.monitor.internal.log.Slf4jLogProxy;
 import org.sonatype.sisu.jsw.util.JSWConfig;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.sisu.filetasks.FileTaskRunner.onDirectory;
-import static org.sonatype.sisu.filetasks.builder.FileRef.file;
-import static org.sonatype.sisu.filetasks.builder.FileRef.path;
 
 /**
  * Default Nexus bundle implementation.
@@ -196,7 +198,7 @@ public class DefaultNexusBundle
         {
             if ( keepAliveThread != null )
             {
-                    keepAliveThread.stopRunning();
+                keepAliveThread.stopRunning();
             }
         }
     }
@@ -306,6 +308,18 @@ public class DefaultNexusBundle
                                               "-Xrunjdwp:transport=dt_socket,server=y,suspend="
                                                   + ( config.isSuspendOnStart() ? "y" : "n" )
                                                   + ",address=" + config.getDebugPort() );
+            }
+
+            final Map<String, String> systemProperties = config.getSystemProperties();
+            if ( !systemProperties.isEmpty() )
+            {
+                for ( final Map.Entry<String, String> entry : systemProperties.entrySet() )
+                {
+                    jswConfig.addIndexedProperty(
+                        "wrapper.java.additional",
+                        format( "-D%s=%s", entry.getKey(), entry.getValue() == null ? "true" : entry.getValue() )
+                    );
+                }
             }
 
             jswConfig.save();
