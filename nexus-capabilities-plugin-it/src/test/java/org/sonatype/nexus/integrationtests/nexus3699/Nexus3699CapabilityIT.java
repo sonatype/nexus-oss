@@ -68,7 +68,7 @@ public class Nexus3699CapabilityIT
         super.setUp();
         capabilities = new CapabilitiesRestClient( new NexusRestClient(
             new TestContext()
-                .setNexusUrl( nexus().getUrl() + "/" )
+                .setNexusUrl( nexus().getUrl().toExternalForm() )
                 .setSecureTest( true )
         ) );
     }
