@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
 
 /**
  * subsequent start of same instance<br>
- * http://goo.gl/dxQbh
+ * https://issues.sonatype.org/browse/NEXUS-4635
  * 
  * <pre>
  * <firstStart>false</firstStart>

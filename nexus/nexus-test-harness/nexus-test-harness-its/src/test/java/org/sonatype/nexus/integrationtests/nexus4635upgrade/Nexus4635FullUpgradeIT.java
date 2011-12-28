@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
 
 /**
  * placing old config to force upgrade and firing up Nexus.<BR>
- * http://goo.gl/dxQbh
+ * https://issues.sonatype.org/browse/NEXUS-4635
  * 
  * <pre>
  * <firstStart>false</firstStart>
@@ -41,9 +41,10 @@ public class Nexus4635FullUpgradeIT
 {
 
     @BeforeClass
-    public void setSecureTest()
+    public void doNotVerifyConfig()
     {
-        this.setVerifyNexusConfigBeforeStart( false );
+        // no verification, since it would upgrade and hence, modify it
+        setVerifyNexusConfigBeforeStart( false );
     }
 
     @Test

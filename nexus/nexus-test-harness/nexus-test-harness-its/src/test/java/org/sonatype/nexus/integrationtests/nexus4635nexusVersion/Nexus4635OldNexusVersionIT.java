@@ -29,7 +29,7 @@ import org.testng.annotations.Test;
 
 /**
  * tampering the nexusVersion to 1.9.3<BR>
- * http://goo.gl/dxQbh
+ * https://issues.sonatype.org/browse/NEXUS-4635
  * 
  * <pre>
  * <firstStart>false</firstStart>

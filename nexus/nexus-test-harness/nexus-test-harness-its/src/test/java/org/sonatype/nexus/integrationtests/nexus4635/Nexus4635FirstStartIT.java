@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
 
 /**
  * 1st start of "virgin" Nexus<BR>
- * http://goo.gl/dxQbh
+ * https://issues.sonatype.org/browse/NEXUS-4635
  * 
  * <pre>
  * <firstStart>true</firstStart>
@@ -58,9 +58,10 @@ public class Nexus4635FirstStartIT
     }
 
     @BeforeClass
-    public void setSecureTest()
+    public void doNotVerifyConfig()
     {
-        this.setVerifyNexusConfigBeforeStart( false );
+        // no verification, since it would upgrade and hence, modify it
+        setVerifyNexusConfigBeforeStart( false );
     }
 
     @Test
