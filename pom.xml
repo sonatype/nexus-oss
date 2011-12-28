@@ -36,6 +36,8 @@
 
   <name>Nexus :: Plugin :: P2 Bridge</name>
 
+  <description>Bridge between Nexus and P2 Eclipse Runtime</description>
+
   <scm>
     <connection>scm:git:git@github.com/sonatype/nexus-p2-bridge-plugin.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-p2-bridge-plugin.git</developerConnection>
