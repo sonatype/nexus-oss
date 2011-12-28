@@ -24,7 +24,7 @@
 
   <groupId>org.sonatype.sisu</groupId>
   <artifactId>sisu-locks</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
 
   <name>Sisu - Locks</name>
 
