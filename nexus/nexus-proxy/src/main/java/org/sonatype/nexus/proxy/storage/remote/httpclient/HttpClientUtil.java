@@ -35,12 +35,14 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.params.AuthPolicy;
+import org.apache.http.client.protocol.ResponseContentEncoding;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.BasicHttpProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
@@ -119,7 +121,16 @@ class HttpClientUtil
     {
         final DefaultHttpClient httpClient = new DefaultHttpClient(
             createConnectionManager(), createHttpParams( ctx )
-        );
+        )
+        {
+            @Override
+            protected BasicHttpProcessor createHttpProcessor()
+            {
+                final BasicHttpProcessor result = super.createHttpProcessor();
+                result.addResponseInterceptor( new ResponseContentEncoding() );
+                return result;
+            }
+        };
 
         ctx.putContextObject( ctxPrefix + CTX_KEY_CLIENT, httpClient );
 
