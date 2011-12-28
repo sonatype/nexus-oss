@@ -34,7 +34,7 @@
   <description>Adds search capablities for repository content.</description>
 
   <properties>
-    <maven.indexer.version>4.1.3-SNAPSHOT</maven.indexer.version>
+    <maven.indexer.version>4.1.3-SONATYPE</maven.indexer.version>
     <truezip.version>7.0-rc1</truezip.version>
   </properties>
 
