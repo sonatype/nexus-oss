@@ -38,7 +38,7 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import com.google.common.base.Preconditions;
 import com.thoughtworks.xstream.XStream;
 
-public class CapabilitiesRestClient
+public class CapabilitiesNexusRestClient
 {
 
     private static XStream xstream;
@@ -51,7 +51,7 @@ public class CapabilitiesRestClient
         new CapabilitiesPlexusResource().configureXStream( xstream );
     }
 
-    public CapabilitiesRestClient( final NexusRestClient nexusRestClient )
+    public CapabilitiesNexusRestClient( final NexusRestClient nexusRestClient )
     {
 
         this.nexusRestClient = Preconditions.checkNotNull( nexusRestClient );

@@ -34,7 +34,7 @@ import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
-import org.sonatype.nexus.test.utils.CapabilitiesRestClient;
+import org.sonatype.nexus.test.utils.CapabilitiesNexusRestClient;
 
 public class Nexus3699CapabilityIT
     extends NexusRunningITSupport
@@ -50,7 +50,7 @@ public class Nexus3699CapabilityIT
 
     private static final String TEST_REPOSITORY = "releases";
 
-    private CapabilitiesRestClient capabilities;
+    private CapabilitiesNexusRestClient capabilitiesNRC;
 
     @Override
     protected NexusBundleConfiguration configureNexus( final NexusBundleConfiguration configuration )
@@ -66,7 +66,7 @@ public class Nexus3699CapabilityIT
     public void setUp()
     {
         super.setUp();
-        capabilities = new CapabilitiesRestClient( new NexusRestClient(
+        capabilitiesNRC = new CapabilitiesNexusRestClient( new NexusRestClient(
             new TestContext()
                 .setNexusUrl( nexus().getUrl().toExternalForm() )
                 .setSecureTest( true )
@@ -90,12 +90,12 @@ public class Nexus3699CapabilityIT
         prop.setValue( "Testing CRUD" );
         cap.addProperty( prop );
 
-        CapabilityListItemResource r = capabilities.create( cap );
+        CapabilityListItemResource r = capabilitiesNRC.create( cap );
         assertThat( r.getId(), is( notNullValue() ) );
         assertThat( r.getStatus(), is( "<h3>I'm well. Thanx!</h3>" ) );
 
         // read
-        CapabilityResource read = capabilities.read( r.getId() );
+        CapabilityResource read = capabilitiesNRC.read( r.getId() );
         assertThat( read.getId(), is( r.getId() ) );
         assertThat( read.getNotes(), is( cap.getNotes() ) );
         assertThat( read.getTypeId(), is( cap.getTypeId() ) );
@@ -103,13 +103,13 @@ public class Nexus3699CapabilityIT
 
         // update
         read.setNotes( "updateCrudTest" );
-        CapabilityListItemResource updated = capabilities.update( read );
+        CapabilityListItemResource updated = capabilitiesNRC.update( read );
         assertThat( updated.getNotes(), is( "updateCrudTest" ) );
-        read = capabilities.read( r.getId() );
+        read = capabilitiesNRC.read( r.getId() );
         assertThat( read.getNotes(), is( "updateCrudTest" ) );
 
         // delete
-        capabilities.delete( r.getId() );
+        capabilitiesNRC.delete( r.getId() );
     }
 
 }
