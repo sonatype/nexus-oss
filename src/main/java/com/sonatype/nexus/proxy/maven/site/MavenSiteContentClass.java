@@ -21,10 +21,17 @@ public class MavenSiteContentClass
     extends AbstractIdContentClass
 {
     public static final String ID = "maven-site";
+    public static final String NAME = "Maven Site";
 
     public String getId()
     {
         return ID;
+    }
+
+    @Override
+    public String getName()
+    {
+        return NAME;
     }
 
     public boolean isCompatible( ContentClass contentClass )
