@@ -1017,7 +1017,7 @@
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>server-provider</artifactId>
-        <version>0.4.3</version>
+        <version>0.4.3-SNAPSHOT</version>
         <scope>test</scope>
       </dependency>
 
