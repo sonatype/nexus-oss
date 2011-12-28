@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.jar.Manifest;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -43,12 +42,21 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.plugins.repository.NoSuchPluginRepositoryArtifactException;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryArtifact;
 import org.sonatype.nexus.plugins.repository.PluginRepositoryManager;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 
 @Named
 @Singleton
 class P2Runtime
 {
+
+    /**
+     * Flag to completely enable/disable Eclipse logging (equinox).
+     */
+    private static final boolean LOGGING_ENABLED = SystemPropertiesHelper.getBoolean(
+        P2Runtime.class.getName() + ".logging.enabled", false
+    );
+
     private EclipseInstance eclipse;
 
     private final EclipseLocationFactory eclipseLocationFactory;
@@ -97,7 +105,8 @@ class P2Runtime
                 // TODO is this really necessary?
                 final File secureStorage =
                     new File( applicationConfiguration.getConfigurationDirectory(), "eclipse.secure_storage" );
-                EclipseEnvironmentInfo.setAppArgs( new String[] { "-eclipse.keyring", secureStorage.getAbsolutePath() } );
+                EclipseEnvironmentInfo.setAppArgs(
+                    new String[]{ "-eclipse.keyring", secureStorage.getAbsolutePath() } );
             }
             eclipse.start( initParams( pluginDir ) );
             final File[] bundles = new File( pluginDir, "p2-runtime/bundles" ).listFiles( new FilenameFilter()
@@ -129,7 +138,10 @@ class P2Runtime
         {
             initParams.put( "org.osgi.framework.system.packages.extra", bridgedPackages );
         }
-        initParams.put( "osgi.debug", new File( pluginDir, "p2-runtime/eclipse/.options" ).getAbsolutePath() );
+        if ( LOGGING_ENABLED )
+        {
+            initParams.put( "osgi.debug", new File( pluginDir, "p2-runtime/eclipse/.options" ).getAbsolutePath() );
+        }
         return initParams;
     }
 
