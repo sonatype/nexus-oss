@@ -29,7 +29,7 @@ public class P2ContentClass
 
     public static final String ID = "p2";
 
-    public static final String NAME = "Eclipse P2";
+    public static final String NAME = "P2";
 
     @Override
     public String getId()
