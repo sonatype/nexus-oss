@@ -78,12 +78,12 @@
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-bundle-launcher</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-jsw-utils</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>commons-httpclient</groupId>
@@ -98,7 +98,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>

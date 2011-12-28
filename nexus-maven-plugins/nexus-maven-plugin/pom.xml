@@ -121,7 +121,7 @@
     <!--dependency>
       <groupId>org.sonatype.maven</groupId>
       <artifactId>mojo-commons</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>0.0.1</version>
     </dependency-->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
