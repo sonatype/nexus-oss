@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.plugins.mavenbridge;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,9 +34,10 @@ import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.tests.http.server.fluent.Behaviours;
+import org.sonatype.tests.http.server.fluent.Server;
 
-// This is an IT just because it runs longer then 15 seconds
-public class ResolvingLRTest
+public class ResolvingTest
     extends AbstractMavenRepoContentTests
 {
     protected NexusAether nexusAether;
@@ -43,6 +45,8 @@ public class ResolvingLRTest
     protected NexusMavenBridge mavenBridge;
 
     protected RepositoryRegistry repositoryRegistry;
+
+    private Server server;
 
     @Override
     protected void setUp()
@@ -55,8 +59,29 @@ public class ResolvingLRTest
         mavenBridge = lookup( NexusMavenBridge.class );
 
         repositoryRegistry = lookup( RepositoryRegistry.class );
-
+        
         shutDownSecurity();
+
+        server = Server.withPort( 0 ).serve( "/*" ).withBehaviours( Behaviours.get(
+            new File( getBasedir(), "src/test/resources/test-repo" ) ) ).start();
+
+        for ( MavenProxyRepository repo : repositoryRegistry.getRepositoriesWithFacet( MavenProxyRepository.class ) )
+        {
+            repo.setRemoteUrl( server.getUrl().toExternalForm() );
+            repo.commitChanges();
+        }
+    }
+
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        super.tearDown();
+
+        if ( server != null )
+        {
+            server.stop();
+        }
     }
 
     @Test
