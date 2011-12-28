@@ -97,11 +97,11 @@ public class NexusViewSecurityResource
         CRole view = new CRole();
         view.setId( content + "-all-" + method );
 
-        content = StringUtils.capitalizeFirstLetter( content );
-        view.setDescription( "Gives access to " + method + " ALL " + content + " Repositories in Nexus." );
+        String contentClassName = entry.getValue().getName();
+        view.setDescription( "Gives access to " + method + " ALL " + contentClassName + " Repositories in Nexus." );
 
         method = StringUtils.capitalizeFirstLetter( method );
-        view.setName( "Repo: All Eclipse " + content + " Repositories (" + method + ")" );
+        view.setName( "Repo: All " + contentClassName + " Repositories (" + method + ")" );
         view.setSessionTimeout( 60 );
 
         List<? extends Repository> repos = getRepositoriesWithContentClass( entry.getValue() );
