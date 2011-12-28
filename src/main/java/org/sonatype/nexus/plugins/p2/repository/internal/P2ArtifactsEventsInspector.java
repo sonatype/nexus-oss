@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.isHidden;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -50,7 +52,8 @@ public class P2ArtifactsEventsInspector
     {
         if ( evt == null
             || !( evt instanceof RepositoryItemEvent )
-            || !( evt instanceof RepositoryItemEventStore || evt instanceof RepositoryItemEventCache || evt instanceof RepositoryItemEventDelete ) )
+            || !( evt instanceof RepositoryItemEventStore || evt instanceof RepositoryItemEventCache
+            || evt instanceof RepositoryItemEventDelete ) )
         {
             return false;
         }
@@ -96,7 +99,7 @@ public class P2ArtifactsEventsInspector
         {
             return false;
         }
-        return isP2ArtifactsXML( item.getPath() );
+        return !isHidden( item.getPath() ) && isP2ArtifactsXML( item.getPath() );
     }
 
     static boolean isP2ArtifactsXML( final String path )

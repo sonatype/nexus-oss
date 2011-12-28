@@ -21,6 +21,7 @@ package org.sonatype.nexus.plugins.p2.repository.internal;
 import static org.sonatype.nexus.plugins.p2.repository.internal.DefaultP2RepositoryAggregator.createTemporaryP2Repository;
 import static org.sonatype.nexus.plugins.p2.repository.internal.JarsEventsInspector.isABundle;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.getRelativePath;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.isHidden;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.localStorageOfRepositoryAsFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveItem;
@@ -36,7 +37,6 @@ import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -66,6 +66,7 @@ import org.sonatype.sisu.resource.scanner.scanners.SerialScanner;
 public class DefaultP2MetadataGenerator
     implements P2MetadataGenerator
 {
+
     private static final String GENERATED_AT_ATTRIBUTE = "p2Repository.generated.timestamp";
 
     @Inject
@@ -136,7 +137,7 @@ public class DefaultP2MetadataGenerator
 
             // get part before first semicolon
             // bug fix NEXUS-4552 & NEXUS-4567
-            final String bsn = mainAttributes.getValue( "Bundle-SymbolicName" ).split(";")[0].trim();
+            final String bsn = mainAttributes.getValue( "Bundle-SymbolicName" ).split( ";" )[0].trim();
             if ( bsn == null )
             {
                 logger.debug( "[{}:{}] is not an OSGi bundle. Bailing out.", item.getRepositoryId(), item.getPath() );
@@ -156,7 +157,7 @@ public class DefaultP2MetadataGenerator
 
             final Collection<InstallableUnit> ius =
                 publisher.generateIUs( true /* generateCapabilities */, true /* generateRequirements */,
-                    true /* generateManifest */, bundle );
+                                       true /* generateManifest */, bundle );
 
             for ( final InstallableUnit iu : ius )
             {
@@ -182,7 +183,7 @@ public class DefaultP2MetadataGenerator
                 tempP2Repository = createTemporaryP2Repository();
 
                 artifactRepository.write( tempP2Repository.toURI(), artifacts, bsn, null /** repository properties */
-                , new String[][] { { "(classifier=osgi.bundle)", "${repoUrl}/" + item.getPath() + "}" } } );
+                    , new String[][]{ { "(classifier=osgi.bundle)", "${repoUrl}/" + item.getPath() + "}" } } );
 
                 final String p2ArtifactsPath =
                     item.getPath().substring( 0, item.getPath().length() - extension.length() - 1 )
@@ -207,7 +208,7 @@ public class DefaultP2MetadataGenerator
         {
             logger.warn(
                 String.format( "Could not generate p2 metadata of [%s:%s] due to %s. Bailing out.",
-                    item.getRepositoryId(), item.getPath(), e.getMessage() ), e );
+                               item.getRepositoryId(), item.getPath(), e.getMessage() ), e );
             return;
         }
     }
@@ -254,9 +255,9 @@ public class DefaultP2MetadataGenerator
                 @Override
                 public void onFile( final File file )
                 {
-                    if ( isABundle( file ) )
+                    final String path = getRelativePath( localStorage, file );
+                    if ( !isHidden( path ) && isABundle( file ) )
                     {
-                        final String path = getRelativePath( localStorage, file );
                         try
                         {
                             final StorageItem bundle = retrieveItem( repository, path );
@@ -266,7 +267,7 @@ public class DefaultP2MetadataGenerator
                         {
                             logger.warn(
                                 String.format( "P2 metadata for bundle [%s] not created due to [%s]", path,
-                                    e.getMessage() ), e );
+                                               e.getMessage() ), e );
                         }
                     }
                 }
@@ -302,7 +303,8 @@ public class DefaultP2MetadataGenerator
 
             final ResourceStoreRequest request = new ResourceStoreRequest( path );
 
-            NexusUtils.storeItem( repository, request, in, mimeUtil.getMimeType( request.getRequestPath() ), attributes );
+            NexusUtils.storeItem( repository, request, in, mimeUtil.getMimeType( request.getRequestPath() ),
+                                  attributes );
         }
         finally
         {

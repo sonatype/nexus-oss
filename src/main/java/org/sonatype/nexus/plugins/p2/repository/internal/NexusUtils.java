@@ -38,6 +38,8 @@ import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage
 class NexusUtils
 {
 
+    private static final String DOT = ".";
+
     private NexusUtils()
     {
     }
@@ -119,12 +121,13 @@ class NexusUtils
         {
             final File baseDir =
                 ( (DefaultFSLocalRepositoryStorage) repository.getLocalStorage() ).getBaseDir( repository,
-                    new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
+                                                                                               new ResourceStoreRequest(
+                                                                                                   RepositoryItemUid.PATH_ROOT ) );
             return baseDir;
         }
 
         throw new LocalStorageException( String.format( "Repository [%s] does not have an local storage",
-            repository.getId() ) );
+                                                        repository.getId() ) );
     }
 
     static String getRelativePath( final File fromFile, final File toFile )
@@ -143,12 +146,12 @@ class NexusUtils
             j--;
         }
 
-        for ( ; i >= 0; i-- )
+        for (; i >= 0; i-- )
         {
             relativePath += ".." + File.separator;
         }
 
-        for ( ; j >= 1; j-- )
+        for (; j >= 1; j-- )
         {
             relativePath += toSegments[j] + File.separator;
         }
@@ -156,6 +159,15 @@ class NexusUtils
         relativePath += toSegments[j];
 
         return relativePath;
+    }
+
+    static boolean isHidden( final String path )
+    {
+        if ( path == null )
+        {
+            return false;
+        }
+        return path.startsWith( DOT ) || path.startsWith( "/" + DOT ) || path.startsWith( File.separator + DOT );
     }
 
     private static String[] getReversePathSegments( final File file )

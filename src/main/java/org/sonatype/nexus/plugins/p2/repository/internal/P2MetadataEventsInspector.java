@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal;
 
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.isHidden;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -96,7 +98,7 @@ public class P2MetadataEventsInspector
         {
             return false;
         }
-        return isP2ContentXML( item.getPath() );
+        return !isHidden( item.getPath() ) && isP2ContentXML( item.getPath() );
     }
 
     static boolean isP2ContentXML( final String path )

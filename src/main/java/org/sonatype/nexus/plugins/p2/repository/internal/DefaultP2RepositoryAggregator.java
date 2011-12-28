@@ -21,6 +21,8 @@ package org.sonatype.nexus.plugins.p2.repository.internal;
 import static org.codehaus.plexus.util.FileUtils.deleteDirectory;
 import static org.sonatype.nexus.plugins.p2.repository.P2Constants.P2_REPOSITORY_ROOT_PATH;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.createLink;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.getRelativePath;
+import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.isHidden;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.localStorageOfRepositoryAsFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveFile;
 import static org.sonatype.nexus.plugins.p2.repository.internal.NexusUtils.retrieveItem;
@@ -38,7 +40,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -157,7 +158,7 @@ public class DefaultP2RepositoryAggregator
         catch ( final Exception e )
         {
             logger.warn( String.format( "Could not delete P2 repository [%s:%s] due to [%s]",
-                configuration.repositoryId(), P2_REPOSITORY_ROOT_PATH, e.getMessage() ), e );
+                                        configuration.repositoryId(), P2_REPOSITORY_ROOT_PATH, e.getMessage() ), e );
         }
     }
 
@@ -200,7 +201,8 @@ public class DefaultP2RepositoryAggregator
         {
             logger.warn(
                 String.format( "Could not update P2 repository [%s:%s] with [%s] due to [%s]",
-                    configuration.repositoryId(), P2_REPOSITORY_ROOT_PATH, item.getPath(), e.getMessage() ), e );
+                               configuration.repositoryId(), P2_REPOSITORY_ROOT_PATH, item.getPath(), e.getMessage() ),
+                e );
         }
     }
 
@@ -232,7 +234,7 @@ public class DefaultP2RepositoryAggregator
                 // copy item artifacts to a temp location
                 sourceP2Repository = createTemporaryP2Repository();
                 FileUtils.copyFile( retrieveFile( repository, item.getPath() ), new File( sourceP2Repository,
-                    "artifacts.xml" ) );
+                                                                                          "artifacts.xml" ) );
 
                 artifactRepository.remove( sourceP2Repository.toURI(), destinationP2Repository.toURI() );
 
@@ -250,7 +252,8 @@ public class DefaultP2RepositoryAggregator
         {
             logger.warn(
                 String.format( "Could not update P2 repository [%s:%s] with [%s] due to [%s]",
-                    configuration.repositoryId(), P2_REPOSITORY_ROOT_PATH, item.getPath(), e.getMessage() ), e );
+                               configuration.repositoryId(), P2_REPOSITORY_ROOT_PATH, item.getPath(), e.getMessage() ),
+                e );
         }
     }
 
@@ -293,7 +296,8 @@ public class DefaultP2RepositoryAggregator
         {
             logger.warn(
                 String.format( "Could not update P2 repository [%s:%s] with [%s] due to [%s]",
-                    configuration.repositoryId(), P2_REPOSITORY_ROOT_PATH, item.getPath(), e.getMessage() ), e );
+                               configuration.repositoryId(), P2_REPOSITORY_ROOT_PATH, item.getPath(), e.getMessage() ),
+                e );
         }
     }
 
@@ -325,7 +329,7 @@ public class DefaultP2RepositoryAggregator
                 // copy item content to a temp location
                 sourceP2Repository = createTemporaryP2Repository();
                 FileUtils.copyFile( retrieveFile( repository, item.getPath() ), new File( sourceP2Repository,
-                    "content.xml" ) );
+                                                                                          "content.xml" ) );
 
                 metadataRepository.remove( sourceP2Repository.toURI(), destinationP2Repository.toURI() );
 
@@ -343,7 +347,8 @@ public class DefaultP2RepositoryAggregator
         {
             logger.warn(
                 String.format( "Could not update P2 repository [%s:%s] with [%s] due to [%s]",
-                    configuration.repositoryId(), P2_REPOSITORY_ROOT_PATH, item.getPath(), e.getMessage() ), e );
+                               configuration.repositoryId(), P2_REPOSITORY_ROOT_PATH, item.getPath(), e.getMessage() ),
+                e );
         }
     }
 
@@ -389,13 +394,16 @@ public class DefaultP2RepositoryAggregator
                     {
                         try
                         {
-                            if ( isP2ArtifactsXML( file.getPath() ) )
+                            if ( !isHidden( getRelativePath( scanPath, file ) ) )
                             {
-                                updateP2Artifacts( repository, file, destinationP2Repository );
-                            }
-                            else if ( isP2ContentXML( file.getPath() ) )
-                            {
-                                updateP2Metadata( repository, file, destinationP2Repository );
+                                if ( isP2ArtifactsXML( file.getPath() ) )
+                                {
+                                    updateP2Artifacts( repository, file, destinationP2Repository );
+                                }
+                                else if ( isP2ContentXML( file.getPath() ) )
+                                {
+                                    updateP2Metadata( repository, file, destinationP2Repository );
+                                }
                             }
                         }
                         catch ( final Exception e )
@@ -496,7 +504,8 @@ public class DefaultP2RepositoryAggregator
 
             final ResourceStoreRequest request = new ResourceStoreRequest( path );
 
-            storeItem( repository, request, in, mimeUtil.getMimeType( request.getRequestPath() ), null /* attributes */);
+            storeItem( repository, request, in, mimeUtil.getMimeType( request.getRequestPath() ), null
+                       /* attributes */ );
         }
         finally
         {
@@ -540,16 +549,16 @@ public class DefaultP2RepositoryAggregator
         {
             tempP2Repository = createTemporaryP2Repository();
 
-            artifactRepository.write( tempP2Repository.toURI(), Collections.<InstallableArtifact> emptyList(),
-                repository.getId(), null /** repository properties */
-                , null /* mappings */);
+            artifactRepository.write( tempP2Repository.toURI(), Collections.<InstallableArtifact>emptyList(),
+                                      repository.getId(), null /** repository properties */
+                , null /* mappings */ );
 
             final String p2ArtifactsPath = P2_REPOSITORY_ROOT_PATH + P2Constants.ARTIFACTS_XML;
 
             storeItemFromFile( p2ArtifactsPath, new File( tempP2Repository, "artifacts.xml" ), repository );
 
-            metadataRepository.write( tempP2Repository.toURI(), Collections.<InstallableUnit> emptyList(),
-                repository.getId(), null /** repository properties */
+            metadataRepository.write( tempP2Repository.toURI(), Collections.<InstallableUnit>emptyList(),
+                                      repository.getId(), null /** repository properties */
             );
 
             final String p2ContentPath = P2_REPOSITORY_ROOT_PATH + "/" + P2Constants.CONTENT_XML;
