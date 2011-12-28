@@ -175,11 +175,11 @@
   </developers>
 
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/spice/trunk/nexus-repository-metadata</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/nexus-repository-metadata</developerConnection>
-    <url>https://sventon.sonatype.org/repos/spice/list/trunk/nexus-repository-metadata/?revision=HEAD</url>
+    <connection>scm:git:git://github.com/sonatype/nexus-repository-metadata.git</connection>
+    <developerConnection>scm:git:git@github.com:sonatype/nexus-repository-metadata.git</developerConnection>
+    <url>https://github.com/sonatype/nexus-repository-metadata</url>
   </scm>
-  
+ 
   <distributionManagement>
     <site>
       <id>forge-sites</id>
