@@ -173,7 +173,7 @@
             <!--<arguments>-Prelease</arguments>-->
             <!-- Use a quick build to verify the tag, and a full build with ITs for the deploy -->
             <arguments></arguments>
-            <preparationGoals>clean validate</preparationGoals> 
+            <preparationGoals>clean</preparationGoals> 
             <releaseProfiles>release</releaseProfiles>
           </configuration>
         </plugin>
