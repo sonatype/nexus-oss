@@ -25,7 +25,7 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-aggregator</artifactId>
-  <version>1.10.0-SNAPSHOT</version>
+  <version>2.0-M1</version>
 
   <packaging>pom</packaging>
   <name>Nexus : Aggregator</name>
@@ -172,8 +172,8 @@
             <goals>deploy</goals>
             <!--<arguments>-Prelease</arguments>-->
             <!-- Use a quick build to verify the tag, and a full build with ITs for the deploy -->
-            <arguments></arguments>
-            <preparationGoals></preparationGoals> 
+            <arguments />
+            <preparationGoals /> 
             <releaseProfiles>release</releaseProfiles>
             <tagNameFormat>nexus-@{version}</tagNameFormat>
           </configuration>
