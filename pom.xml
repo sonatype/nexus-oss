@@ -173,8 +173,9 @@
             <!--<arguments>-Prelease</arguments>-->
             <!-- Use a quick build to verify the tag, and a full build with ITs for the deploy -->
             <arguments></arguments>
-            <preparationGoals>clean</preparationGoals> 
+            <preparationGoals></preparationGoals> 
             <releaseProfiles>release</releaseProfiles>
+            <tagNameFormat>nexus-@{version}</tagNameFormat>
           </configuration>
         </plugin>
         <!-- do not deploy aggregator POM -->
