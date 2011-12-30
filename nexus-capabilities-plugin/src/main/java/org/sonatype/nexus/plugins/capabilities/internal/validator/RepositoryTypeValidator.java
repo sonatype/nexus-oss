@@ -75,9 +75,7 @@ public class RepositoryTypeValidator
                 final Repository repository = repositoryRegistry.getRepository( repositoryId );
                 if ( !repository.getRepositoryKind().isFacetAvailable( facet ) )
                 {
-                    return new DefaultValidationResult().add(
-                        capabilityType(), propertyKey, buildMessage( repository )
-                    );
+                    return new DefaultValidationResult().add( buildMessage( repository ) );
                 }
             }
             catch ( NoSuchRepositoryException ignore )
@@ -88,11 +86,29 @@ public class RepositoryTypeValidator
         return ValidationResult.VALID;
     }
 
+    @Override
+    public String explainValid()
+    {
+        final StringBuilder message = new StringBuilder();
+        message.append( propertyName( propertyKey ) ).append( " is a " ).append( facetName() ).append( " repository" );
+        return message.toString();
+    }
+
+    @Override
+    public String explainInvalid()
+    {
+        final StringBuilder message = new StringBuilder();
+        message.append( propertyName( propertyKey ) ).append( " is not a " ).append( facetName() )
+            .append( " repository" );
+        return message.toString();
+
+    }
+
     private String buildMessage( final Repository repository )
     {
         final StringBuilder message = new StringBuilder();
         message.append( "Selected " ).append( propertyName( propertyKey ).toLowerCase() )
-            .append( "'" ).append( repository.getName() )
+            .append( " '" ).append( repository.getName() )
             .append( "' must be a " ).append( facetName() ).append( " repository" );
         return message.toString();
     }

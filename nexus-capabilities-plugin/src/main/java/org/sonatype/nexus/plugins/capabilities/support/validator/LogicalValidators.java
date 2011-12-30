@@ -18,68 +18,55 @@
  */
 package org.sonatype.nexus.plugins.capabilities.support.validator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.api.Validator;
+import org.sonatype.nexus.plugins.capabilities.internal.validator.ConjunctionValidator;
+import org.sonatype.nexus.plugins.capabilities.internal.validator.DisjunctionValidator;
+import org.sonatype.nexus.plugins.capabilities.internal.validator.InversionValidator;
 
 /**
- * Central access point for built-in {@link Validator}s.
+ * Factory of logical {@link Validator}s combinations.
  *
  * @since 1.10.0
  */
 @Named
 @Singleton
-public class Validators
+public class LogicalValidators
 {
 
-    private final CapabilityValidators capabilityValidators;
-
-    private final LogicalValidators logicalValidators;
-
-    private final RepositoryValidators repositoryValidators;
-
-    @Inject
-    Validators( final CapabilityValidators capabilityValidators,
-                final LogicalValidators logicalValidators,
-                final RepositoryValidators repositoryValidators )
+    /**
+     * Creates a new validator that is satisfied when all validators are not failing(logical AND).
+     *
+     * @param validators to be AND-ed
+     * @return created validator
+     */
+    public Validator and( final Validator... validators )
     {
-        this.capabilityValidators = checkNotNull( capabilityValidators );
-        this.logicalValidators = checkNotNull( logicalValidators );
-        this.repositoryValidators = checkNotNull( repositoryValidators );
+        return new ConjunctionValidator( validators );
     }
 
     /**
-     * Access to capability specific validators.
+     * Creates a new validator that is satisfied when at least one validation is not failing (logical OR).
      *
-     * @return capability specific validators factory
+     * @param validators to be OR-ed
+     * @return created validator
      */
-    public CapabilityValidators capability()
+    public Validator or( final Validator... validators )
     {
-        return capabilityValidators;
+        return new DisjunctionValidator( validators );
     }
 
     /**
-     * Access to logical validators.
+     * Creates a new validator that is satisfied when another validator is not failing (logical NOT).
      *
-     * @return logical validators factory
+     * @param validator negated validator
+     * @return created validator
      */
-    public LogicalValidators logical()
+    public Validator not( final Validator validator )
     {
-        return logicalValidators;
-    }
-
-    /**
-     * Access to repository specific validators.
-     *
-     * @return repository specific validators factory
-     */
-    public RepositoryValidators repository()
-    {
-        return repositoryValidators;
+        return new InversionValidator( validator );
     }
 
 }

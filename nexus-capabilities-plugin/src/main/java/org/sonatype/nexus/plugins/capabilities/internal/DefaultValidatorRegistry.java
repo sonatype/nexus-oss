@@ -34,7 +34,6 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityValidator;
-import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
 import org.sonatype.nexus.plugins.capabilities.api.Validator;
 import org.sonatype.nexus.plugins.capabilities.api.ValidatorRegistry;
 import com.google.common.collect.Sets;
@@ -75,18 +74,14 @@ class DefaultValidatorRegistry
             validators.add( (Validator) factory );
         }
 
-        final CapabilityValidator validator = capabilityValidators.get( type.toString() );
-        if ( validator != null )
+        final CapabilityValidator capabilityValidator = capabilityValidators.get( type.toString() );
+        if ( capabilityValidator != null )
         {
-            validators.add( new Validator() {
-
-                @Override
-                public ValidationResult validate( final Map<String, String> properties )
-                {
-                    return validator.validate( properties );
-                }
-
-            });
+            final Validator validator = capabilityValidator.validator();
+            if ( validator != null )
+            {
+                validators.add( validator );
+            }
         }
 
         return validators;
@@ -103,20 +98,17 @@ class DefaultValidatorRegistry
             validators.add( (Validator) reference.capability() );
         }
 
-        if ( reference!=null )
+        if ( reference != null )
         {
-            final CapabilityValidator validator = capabilityValidators.get( reference.capabilityType().toString() );
-            if ( validator != null )
+            final CapabilityValidator capabilityValidator =
+                capabilityValidators.get( reference.capabilityType().toString() );
+            if ( capabilityValidator != null )
             {
-                validators.add( new Validator() {
-
-                    @Override
-                    public ValidationResult validate( final Map<String, String> properties )
-                    {
-                        return validator.validate( id, properties );
-                    }
-
-                });
+                final Validator validator = capabilityValidator.validator( id );
+                if ( validator != null )
+                {
+                    validators.add( validator );
+                }
             }
         }
 

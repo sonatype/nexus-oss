@@ -20,8 +20,6 @@ package org.sonatype.nexus.plugins.capabilities.support.validator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
 
 /**
@@ -33,76 +31,17 @@ public class DefaultViolation
     implements ValidationResult.Violation
 {
 
-    private final CapabilityType type;
-
     private final String message;
 
-    private final CapabilityIdentity id;
-
-    private final String property;
-
-    public DefaultViolation( final CapabilityType type,
-                             final String message )
+    public DefaultViolation( final String message )
     {
-        this.type = checkNotNull( type );
-        this.id = null;
-        this.property = null;
         this.message = checkNotNull( message );
-    }
-
-    public DefaultViolation( final CapabilityType type,
-                             final String property,
-                             final String message )
-    {
-        this.type = checkNotNull( type );
-        this.id = null;
-        this.property = checkNotNull( property );
-        this.message = checkNotNull( message );
-    }
-
-    public DefaultViolation( final CapabilityType type,
-                             final CapabilityIdentity id,
-                             final String message )
-    {
-        this.type = checkNotNull( type );
-        this.id = checkNotNull( id );
-        this.property = null;
-        this.message = checkNotNull( message );
-    }
-
-    public DefaultViolation( final CapabilityType type,
-                             final CapabilityIdentity id,
-                             final String property,
-                             final String message )
-    {
-        this.type = checkNotNull( type );
-        this.id = checkNotNull( id );
-        this.property = checkNotNull( property );
-        this.message = checkNotNull( message );
-    }
-
-    @Override
-    public CapabilityType type()
-    {
-        return type;
-    }
-
-    @Override
-    public CapabilityIdentity id()
-    {
-        return id;
     }
 
     @Override
     public String message()
     {
         return message;
-    }
-
-    @Override
-    public String property()
-    {
-        return property;
     }
 
     @Override
@@ -119,19 +58,7 @@ public class DefaultViolation
 
         final DefaultViolation that = (DefaultViolation) o;
 
-        if ( id != null ? !id.equals( that.id ) : that.id != null )
-        {
-            return false;
-        }
         if ( !message.equals( that.message ) )
-        {
-            return false;
-        }
-        if ( property != null ? !property.equals( that.property ) : that.property != null )
-        {
-            return false;
-        }
-        if ( !type.equals( that.type ) )
         {
             return false;
         }
@@ -142,10 +69,6 @@ public class DefaultViolation
     @Override
     public int hashCode()
     {
-        int result = type.hashCode();
-        result = 31 * result + message.hashCode();
-        result = 31 * result + ( id != null ? id.hashCode() : 0 );
-        result = 31 * result + ( property != null ? property.hashCode() : 0 );
-        return result;
+        return message.hashCode();
     }
 }

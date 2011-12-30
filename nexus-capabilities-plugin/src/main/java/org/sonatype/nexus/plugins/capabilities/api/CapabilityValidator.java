@@ -18,8 +18,6 @@
  */
 package org.sonatype.nexus.plugins.capabilities.api;
 
-import java.util.Map;
-
 /**
  * Validates capability properties.
  *
@@ -29,20 +27,18 @@ public interface CapabilityValidator
 {
 
     /**
-     * Validates capability properties before a capability is created.
+     * Validator to be used to validate capability properties before a capability is created.
      *
-     * @param properties capability properties that will be applied to capability
-     * @return set of validation results. When null or empty the validation process is considered successful
+     * @return validator or null if no validation is required
      */
-    ValidationResult validate( Map<String, String> properties );
+    Validator validator();
 
     /**
-     * Validates capability properties before a capability is updated.
+     * Validator to be used to validate capability properties before a capability is updated.
      *
-     * @param id         identity of capability that will be updated
-     * @param properties capability properties that will be applied to capability
-     * @return set of validation results. When null or empty the validation process is considered successful
+     * @param id identity of capability that will be updated
+     * @return validator or null if no validation is required
      */
-    ValidationResult validate( CapabilityIdentity id, Map<String, String> properties );
+    Validator validator( CapabilityIdentity id );
 
 }

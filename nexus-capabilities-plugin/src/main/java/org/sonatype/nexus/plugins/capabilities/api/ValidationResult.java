@@ -49,13 +49,7 @@ public interface ValidationResult
     interface Violation
     {
 
-        CapabilityType type();
-
-        CapabilityIdentity id();
-
         String message();
-
-        String property();
 
     }
 

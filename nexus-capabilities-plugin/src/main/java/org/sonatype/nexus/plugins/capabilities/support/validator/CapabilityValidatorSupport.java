@@ -8,11 +8,9 @@
 
 package org.sonatype.nexus.plugins.capabilities.support.validator;
 
-import java.util.Map;
-
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityValidator;
-import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
+import org.sonatype.nexus.plugins.capabilities.api.Validator;
 
 /**
  * {@link CapabilityValidator} support.
@@ -23,16 +21,18 @@ public class CapabilityValidatorSupport
     implements CapabilityValidator
 {
 
+    static final Validator NO_VALIDATOR = null;
+
     @Override
-    public ValidationResult validate( final Map<String, String> properties )
+    public Validator validator()
     {
-        return ValidationResult.VALID;
+        return NO_VALIDATOR;
     }
 
     @Override
-    public ValidationResult validate( final CapabilityIdentity id, final Map<String, String> properties )
+    public Validator validator( final CapabilityIdentity id )
     {
-        return ValidationResult.VALID;
+        return NO_VALIDATOR;
     }
 
 }

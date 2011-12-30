@@ -16,56 +16,55 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.support.validator;
+package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
-import java.util.Set;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.Map;
+import javax.inject.Inject;
 
 import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
-import com.google.common.collect.Sets;
+import org.sonatype.nexus.plugins.capabilities.api.Validator;
+import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidationResult;
 
 /**
- * Default {@link ValidationResult} implementation.
+ * Logical NOT ona a {@link Validator}.
  *
  * @since 1.10.0
  */
-public class DefaultValidationResult
-    implements ValidationResult
+public class InversionValidator
+    implements Validator
 {
 
-    private Set<Violation> violations;
+    private final Validator validator;
 
-    public DefaultValidationResult()
+    @Inject
+    public InversionValidator( final Validator validator )
     {
-        violations = Sets.newHashSet();
+        this.validator = checkNotNull( validator );
     }
 
     @Override
-    public boolean isValid()
+    public ValidationResult validate( final Map<String, String> properties )
     {
-        return violations.isEmpty();
+        final ValidationResult validationResult = validator.validate( properties );
+        if ( !validationResult.isValid() )
+        {
+            return ValidationResult.VALID;
+        }
+        return new DefaultValidationResult().add( explainInvalid() );
     }
 
     @Override
-    public Set<Violation> violations()
+    public String explainValid()
     {
-        return violations;
+        return validator.explainInvalid();
     }
 
-    public DefaultValidationResult add( final Violation violation )
+    @Override
+    public String explainInvalid()
     {
-        violations().add( violation );
-
-        return this;
-    }
-
-    public void add( final Set<Violation> violations )
-    {
-        violations().addAll( violations );
-    }
-
-    public DefaultValidationResult add( final String message )
-    {
-        return add( new DefaultViolation( message ) );
+        return validator.explainValid();
     }
 
 }

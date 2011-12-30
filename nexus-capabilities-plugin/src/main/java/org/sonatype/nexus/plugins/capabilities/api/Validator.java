@@ -39,4 +39,18 @@ public interface Validator
      */
     ValidationResult validate( Map<String, String> properties );
 
+    /**
+     * Describe when validation will pass.
+     *
+     * @return description
+     */
+    String explainValid();
+
+    /**
+     * Describe when validation will fail.
+     *
+     * @return description
+     */
+    String explainInvalid();
+
 }

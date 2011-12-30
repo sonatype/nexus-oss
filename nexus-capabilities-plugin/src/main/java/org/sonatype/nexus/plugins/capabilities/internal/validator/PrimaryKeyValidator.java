@@ -32,7 +32,6 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
 import org.sonatype.nexus.plugins.capabilities.api.Validator;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder;
 import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidationResult;
@@ -90,12 +89,47 @@ public class PrimaryKeyValidator
         {
             return ValidationResult.VALID;
         }
-        return new DefaultValidationResult().add( capabilityType(), buildMessage( properties ) );
+        return new DefaultValidationResult().add( buildMessage( properties ) );
+    }
+
+    @Override
+    public String explainValid()
+    {
+        final StringBuilder message = new StringBuilder()
+            .append( "Only one capability with type '" ).append( typeName() ).append( "'" );
+
+        if ( propertyKeys != null )
+        {
+            for ( final String key : propertyKeys )
+            {
+                message.append( ", same " ).append( propertyName( key ).toLowerCase() );
+            }
+        }
+        message.append( " exists" );
+
+        return message.toString();
+    }
+
+    @Override
+    public String explainInvalid()
+    {
+        final StringBuilder message = new StringBuilder()
+            .append( "More then one capability with type '" ).append( typeName() ).append( "'" );
+
+        if ( propertyKeys != null )
+        {
+            for ( final String key : propertyKeys )
+            {
+                message.append( ", same " ).append( propertyName( key ).toLowerCase() );
+            }
+        }
+        message.append( " exists" );
+
+        return message.toString();
     }
 
     private String buildMessage( final Map<String, String> properties )
     {
-        final CapabilityDescriptor descriptor = capabilityDescriptor();
         final StringBuilder message = new StringBuilder()
             .append( "Only one capability of type '" ).append( typeName() ).append( "'" );
 

@@ -163,7 +163,7 @@ public class DefaultCapabilityConfiguration
                     for ( final ValidationResult.Violation violation : validationResult.violations() )
                     {
                         vr.addValidationError( new ValidationMessage(
-                            violation.property() == null ? "*" : violation.property(),
+                            "*",
                             violation.message()
                         ) );
                     }
