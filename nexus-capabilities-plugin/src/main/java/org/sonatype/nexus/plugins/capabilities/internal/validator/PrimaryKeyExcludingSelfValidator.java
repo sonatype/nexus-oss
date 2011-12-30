@@ -43,11 +43,11 @@ public class PrimaryKeyExcludingSelfValidator
     @Inject
     PrimaryKeyExcludingSelfValidator( final CapabilityRegistry capabilityRegistry,
                                       final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
-                                      final @Assisted CapabilityType type,
                                       final @Assisted CapabilityIdentity selfId,
+                                      final @Assisted CapabilityType type,
                                       final @Assisted String... propertyKeys )
     {
-        super( capabilityRegistry, capabilityDescriptorRegistry, type, selfId, propertyKeys );
+        super( capabilityRegistry, capabilityDescriptorRegistry, selfId, type, propertyKeys );
     }
 
 }

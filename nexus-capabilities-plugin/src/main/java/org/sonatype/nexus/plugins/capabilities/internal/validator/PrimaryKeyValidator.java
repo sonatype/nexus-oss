@@ -70,8 +70,8 @@ public class PrimaryKeyValidator
 
     PrimaryKeyValidator( final CapabilityRegistry capabilityRegistry,
                          final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
-                         final CapabilityType type,
                          final CapabilityIdentity excludeId,
+                         final CapabilityType type,
                          final String... propertyKeys )
     {
         super( capabilityDescriptorRegistry, type );

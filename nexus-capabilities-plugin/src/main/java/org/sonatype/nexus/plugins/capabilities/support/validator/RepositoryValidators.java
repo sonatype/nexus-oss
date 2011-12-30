@@ -49,9 +49,14 @@ public class RepositoryValidators
     /**
      * Creates a new validator that checks that a repository referenced by specified property key is of specified type.
      *
+     * @param type        capability type
+     * @param propertyKey key of property that contains teh repository id
+     * @param facet       type of repository
      * @return created validator
      */
-    public Validator repositoryOfType( CapabilityType type, String propertyKey, Class<?> facet )
+    public Validator repositoryOfType( final CapabilityType type,
+                                       final String propertyKey,
+                                       final Class<?> facet )
     {
         return validatorFactory.repositoryOfType( type, propertyKey, facet );
     }

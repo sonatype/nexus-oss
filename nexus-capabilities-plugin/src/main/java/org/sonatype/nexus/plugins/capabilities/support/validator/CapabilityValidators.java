@@ -48,25 +48,33 @@ public class CapabilityValidators
     }
 
     /**
-     * Creates a new validator that checks that only one capability of specified type and set of properties can be 
+     * Creates a new validator that checks that only one capability of specified type and set of properties can be
      * created.
      *
+     * @param type         capability type
+     * @param propertyKeys optional keys to be included in unique check
      * @return created validator
      */
-    public Validator oneOf( CapabilityType type, String... propertyKeys )
+    public Validator uniquePer( final CapabilityType type,
+                                final String... propertyKeys )
     {
-        return validatorFactory.oneOf( type, propertyKeys );
+        return validatorFactory.uniquePer( type, propertyKeys );
     }
 
     /**
      * Creates a new validator that checks that only one capability of specified type and set of properties can be
      * created, excluding specified capability (by id).
      *
+     * @param excludeId    id of capability to be excluded from unique check
+     * @param type         capability type
+     * @param propertyKeys optional keys to be included in unique check
      * @return created validator
      */
-    public Validator oneOf( CapabilityType type, CapabilityIdentity id, String... propertyKeys )
+    public Validator uniquePerExcluding( final CapabilityIdentity excludeId,
+                                         final CapabilityType type,
+                                         final String... propertyKeys )
     {
-        return validatorFactory.oneOf( type, id, propertyKeys );
+        return validatorFactory.uniquePerExcluding( excludeId, type, propertyKeys );
     }
 
 }

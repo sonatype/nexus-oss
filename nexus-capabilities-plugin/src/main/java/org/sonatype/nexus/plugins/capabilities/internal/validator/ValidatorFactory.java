@@ -30,9 +30,10 @@ import org.sonatype.nexus.plugins.capabilities.api.Validator;
 public interface ValidatorFactory
 {
 
-    PrimaryKeyValidator oneOf( CapabilityType type, String... propertyKeys );
+    PrimaryKeyValidator uniquePer( CapabilityType type, String... propertyKeys );
 
-    PrimaryKeyExcludingSelfValidator oneOf( CapabilityType type, CapabilityIdentity id, String... propertyKeys );
+    PrimaryKeyExcludingSelfValidator uniquePerExcluding(  CapabilityIdentity excludeId, CapabilityType type,
+                                                         String... propertyKeys );
 
     RepositoryTypeValidator repositoryOfType( CapabilityType type, String propertyKey, Class<?> facet );
 
