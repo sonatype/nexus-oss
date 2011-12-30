@@ -18,10 +18,7 @@
  */
 package org.sonatype.nexus.plugins.capabilities.api;
 
-import static org.sonatype.nexus.plugins.capabilities.api.Validator.Violation;
-
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Validates capability properties.
@@ -37,7 +34,7 @@ public interface CapabilityValidator
      * @param properties capability properties that will be applied to capability
      * @return set of validation results. When null or empty the validation process is considered successful
      */
-    Set<Violation> validate( Map<String, String> properties );
+    ValidationResult validate( Map<String, String> properties );
 
     /**
      * Validates capability properties before a capability is updated.
@@ -46,6 +43,6 @@ public interface CapabilityValidator
      * @param properties capability properties that will be applied to capability
      * @return set of validation results. When null or empty the validation process is considered successful
      */
-    Set<Violation> validate( CapabilityIdentity id, Map<String, String> properties );
+    ValidationResult validate( CapabilityIdentity id, Map<String, String> properties );
 
 }

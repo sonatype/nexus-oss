@@ -22,24 +22,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder.capabilities;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
 import org.sonatype.nexus.plugins.capabilities.api.Validator;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 
 /**
@@ -50,14 +46,11 @@ import com.google.inject.assistedinject.Assisted;
  */
 @Named
 public class PrimaryKeyValidator
+    extends ValidatorSupport
     implements Validator
 {
 
     private final CapabilityRegistry capabilityRegistry;
-
-    private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
-
-    private final CapabilityType type;
 
     private final CapabilityIdentity excludeId;
 
@@ -69,9 +62,8 @@ public class PrimaryKeyValidator
                          final @Assisted CapabilityType type,
                          final @Assisted String... propertyKeys )
     {
+        super( capabilityDescriptorRegistry, type );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
-        this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
-        this.type = checkNotNull( type );
         this.excludeId = null;
         this.propertyKeys = propertyKeys;
     }
@@ -82,52 +74,38 @@ public class PrimaryKeyValidator
                          final CapabilityIdentity excludeId,
                          final String... propertyKeys )
     {
+        super( capabilityDescriptorRegistry, type );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
-        this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
-        this.type = checkNotNull( type );
         this.excludeId = checkNotNull( excludeId );
         this.propertyKeys = propertyKeys;
     }
 
     @Override
-    public Set<Violation> validate( final Map<String, String> properties )
+    public ValidationResult validate( final Map<String, String> properties )
     {
         final Collection<CapabilityReference> references = capabilityRegistry.get( buildFilter( properties ) );
         if ( references == null
             || references.isEmpty()
             || ( references.size() == 1 && references.iterator().next().capability().id().equals( excludeId ) ) )
         {
-            return null;
+            return ValidationResult.VALID;
         }
-        return Sets.<Violation>newHashSet( new DefaultViolation( type, buildMessage( properties ) ) );
+        return new DefaultValidationResult().add( capabilityType(), buildMessage( properties ) );
     }
 
     private String buildMessage( final Map<String, String> properties )
     {
-        final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( type );
+        final CapabilityDescriptor descriptor = capabilityDescriptor();
         final StringBuilder message = new StringBuilder()
-            .append( "Only one capability of type '" ).append( descriptor.name() ).append( "'" );
+            .append( "Only one capability of type '" ).append( typeName() ).append( "'" );
 
         if ( properties != null )
         {
-            final Map<String, String> keyToName = extractNames( descriptor );
             for ( final String key : propertyKeys )
             {
-                String name = keyToName.get( key );
-                if ( name == null )
-                {
-                    name = key;
-                }
-                String value = properties.get( key );
-                if ( value.startsWith( "repo_" ) )
-                {
-                    value = value.replaceFirst( "repo_", "" );
-                }
-                else if ( value.startsWith( "group_" ) )
-                {
-                    value = value.replaceFirst( "group_", "" );
-                }
-                message.append( ", " ).append( name.toLowerCase() ).append( " '" ).append( value ).append( "'" );
+                String value = fixRepositoryValue( properties.get( key ) );
+                message.append( ", " ).append( propertyName( key ).toLowerCase() ).append( " '" ).append( value )
+                    .append( "'" );
             }
         }
         message.append( " can be created" );
@@ -138,7 +116,7 @@ public class PrimaryKeyValidator
     private Predicate<CapabilityReference> buildFilter( final Map<String, String> properties )
     {
         final CapabilityReferenceFilterBuilder.CapabilityReferenceFilter filter = capabilities().withType(
-            type
+            capabilityType()
         );
         if ( propertyKeys != null )
         {
@@ -148,20 +126,6 @@ public class PrimaryKeyValidator
             }
         }
         return filter;
-    }
-
-    private Map<String, String> extractNames( final CapabilityDescriptor descriptor )
-    {
-        final Map<String, String> keyToName = Maps.newHashMap();
-        final List<FormField> formFields = descriptor.formFields();
-        if ( formFields != null )
-        {
-            for ( final FormField formField : formFields )
-            {
-                keyToName.put( formField.getId(), formField.getLabel() );
-            }
-        }
-        return keyToName;
     }
 
 }

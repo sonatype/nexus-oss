@@ -16,23 +16,47 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.support.validator;
+package org.sonatype.nexus.plugins.capabilities.api;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import java.util.Set;
+
+import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidationResult;
 
 /**
- * {@link org.sonatype.nexus.plugins.capabilities.api.Validator} factory.
+ * Validates result.
  *
  * @since 1.10.0
  */
-public interface CapabilityValidators
+public interface ValidationResult
 {
 
-    PrimaryKeyValidator oneOf( CapabilityType type, String... propertyKeys );
+    static final ValidationResult VALID = new DefaultValidationResult();
 
-    PrimaryKeyExcludingSelfValidator oneOf( CapabilityType type, CapabilityIdentity identity, String... propertyKeys );
+    /**
+     * Whether or not the validation was successful.
+     *
+     * @return true if there were no violations
+     */
+    boolean isValid();
 
-    RepositoryTypeValidator repositoryOfType( CapabilityType type, String propertyKey, Class<?> facet );
+    Set<Violation> violations();
+
+    /**
+     * Describes a violation.
+     *
+     * @since 1.10.0
+     */
+    interface Violation
+    {
+
+        CapabilityType type();
+
+        CapabilityIdentity id();
+
+        String message();
+
+        String property();
+
+    }
 
 }

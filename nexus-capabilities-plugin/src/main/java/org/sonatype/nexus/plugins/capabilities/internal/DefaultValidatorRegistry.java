@@ -34,6 +34,7 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityValidator;
+import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
 import org.sonatype.nexus.plugins.capabilities.api.Validator;
 import org.sonatype.nexus.plugins.capabilities.api.ValidatorRegistry;
 import com.google.common.collect.Sets;
@@ -80,7 +81,7 @@ class DefaultValidatorRegistry
             validators.add( new Validator() {
 
                 @Override
-                public Set<Violation> validate( final Map<String, String> properties )
+                public ValidationResult validate( final Map<String, String> properties )
                 {
                     return validator.validate( properties );
                 }
@@ -110,7 +111,7 @@ class DefaultValidatorRegistry
                 validators.add( new Validator() {
 
                     @Override
-                    public Set<Violation> validate( final Map<String, String> properties )
+                    public ValidationResult validate( final Map<String, String> properties )
                     {
                         return validator.validate( id, properties );
                     }

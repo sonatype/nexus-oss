@@ -18,21 +18,58 @@
  */
 package org.sonatype.nexus.plugins.capabilities.support.validator;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
+import java.util.Set;
+
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
+import com.google.common.collect.Sets;
 
 /**
- * {@link org.sonatype.nexus.plugins.capabilities.api.Validator} factory.
+ * Default {@link ValidationResult} implementation.
  *
  * @since 1.10.0
  */
-public interface CapabilityValidators
+public class DefaultValidationResult
+    implements ValidationResult
 {
 
-    PrimaryKeyValidator oneOf( CapabilityType type, String... propertyKeys );
+    private Set<Violation> violations;
 
-    PrimaryKeyExcludingSelfValidator oneOf( CapabilityType type, CapabilityIdentity identity, String... propertyKeys );
+    public DefaultValidationResult()
+    {
+        violations = Sets.newHashSet();
+    }
 
-    RepositoryTypeValidator repositoryOfType( CapabilityType type, String propertyKey, Class<?> facet );
+    @Override
+    public boolean isValid()
+    {
+        return violations.isEmpty();
+    }
+
+    @Override
+    public Set<Violation> violations()
+    {
+        return violations;
+    }
+
+    public DefaultValidationResult add( final Violation violation )
+    {
+        violations().add( violation );
+
+        return this;
+    }
+
+    public DefaultValidationResult add( final CapabilityType type,
+                                        final String message )
+    {
+        return add( new DefaultViolation( type, message ) );
+    }
+
+    public DefaultValidationResult add( final CapabilityType type,
+                                        final String property,
+                                        final String message )
+    {
+        return add( new DefaultViolation( type, property, message ) );
+    }
 
 }

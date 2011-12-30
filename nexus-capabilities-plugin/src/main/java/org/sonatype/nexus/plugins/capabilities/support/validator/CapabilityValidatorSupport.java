@@ -8,18 +8,11 @@
 
 package org.sonatype.nexus.plugins.capabilities.support.validator;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.plugins.capabilities.api.Validator.Violation;
-
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityValidator;
+import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
 
 /**
  * {@link CapabilityValidator} support.
@@ -29,19 +22,17 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityValidator;
 public class CapabilityValidatorSupport
     implements CapabilityValidator
 {
-    
-    private static final Set<Violation> ALWAYS_VALID = Collections.emptySet();
 
     @Override
-    public Set<Violation> validate( final Map<String, String> properties )
+    public ValidationResult validate( final Map<String, String> properties )
     {
-        return ALWAYS_VALID;
+        return ValidationResult.VALID;
     }
 
     @Override
-    public Set<Violation> validate( final CapabilityIdentity id, final Map<String, String> properties )
+    public ValidationResult validate( final CapabilityIdentity id, final Map<String, String> properties )
     {
-        return ALWAYS_VALID;
+        return ValidationResult.VALID;
     }
 
 }

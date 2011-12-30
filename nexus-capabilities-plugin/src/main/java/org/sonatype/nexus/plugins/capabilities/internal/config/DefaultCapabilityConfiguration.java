@@ -37,7 +37,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -55,6 +54,7 @@ import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
 import org.sonatype.nexus.plugins.capabilities.api.Validator;
 import org.sonatype.nexus.plugins.capabilities.api.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
@@ -151,16 +151,16 @@ public class DefaultCapabilityConfiguration
     private void validate( final Collection<Validator> validators, final Map<String, String> properties )
         throws InvalidConfigurationException
     {
-        if ( validators != null && !validators.isEmpty())
+        if ( validators != null && !validators.isEmpty() )
         {
             final ValidationResponse vr = new ValidationResponse();
 
             for ( final Validator validator : validators )
             {
-                final Set<Validator.Violation> violations = validator.validate( properties );
-                if ( violations != null && !violations.isEmpty() )
+                final ValidationResult validationResult = validator.validate( properties );
+                if ( !validationResult.isValid() )
                 {
-                    for ( final Validator.Violation violation : violations )
+                    for ( final ValidationResult.Violation violation : validationResult.violations() )
                     {
                         vr.addValidationError( new ValidationMessage(
                             violation.property() == null ? "*" : violation.property(),

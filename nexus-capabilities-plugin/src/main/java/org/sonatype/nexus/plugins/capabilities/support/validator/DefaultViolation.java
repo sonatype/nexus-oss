@@ -22,15 +22,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.api.Validator;
+import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
 
 /**
- * Default {@link org.sonatype.nexus.plugins.capabilities.api.Validator.Violation} implementation.
+ * Default {@link ValidationResult.Violation} implementation.
  *
  * @since 1.10.0
  */
 public class DefaultViolation
-    implements Validator.Violation
+    implements ValidationResult.Violation
 {
 
     private final CapabilityType type;
@@ -47,6 +47,16 @@ public class DefaultViolation
         this.type = checkNotNull( type );
         this.id = null;
         this.property = null;
+        this.message = checkNotNull( message );
+    }
+
+    public DefaultViolation( final CapabilityType type,
+                             final String property,
+                             final String message )
+    {
+        this.type = checkNotNull( type );
+        this.id = null;
+        this.property = checkNotNull( property );
         this.message = checkNotNull( message );
     }
 
@@ -95,4 +105,47 @@ public class DefaultViolation
         return property;
     }
 
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( !( o instanceof DefaultViolation ) )
+        {
+            return false;
+        }
+
+        final DefaultViolation that = (DefaultViolation) o;
+
+        if ( id != null ? !id.equals( that.id ) : that.id != null )
+        {
+            return false;
+        }
+        if ( !message.equals( that.message ) )
+        {
+            return false;
+        }
+        if ( property != null ? !property.equals( that.property ) : that.property != null )
+        {
+            return false;
+        }
+        if ( !type.equals( that.type ) )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = type.hashCode();
+        result = 31 * result + message.hashCode();
+        result = 31 * result + ( id != null ? id.hashCode() : 0 );
+        result = 31 * result + ( property != null ? property.hashCode() : 0 );
+        return result;
+    }
 }

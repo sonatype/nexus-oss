@@ -35,26 +35,8 @@ public interface Validator
      * Validates capability properties before a capability is created/updated.
      *
      * @param properties capability properties that will be applied to capability
-     * @return set of validation results. When null or empty the validation process is considered successful
+     * @return validation result
      */
-    Set<Violation> validate( Map<String, String> properties );
-
-    /**
-     * Describes a violation.
-     *
-     * @since 1.10.0
-     */
-    interface Violation
-    {
-
-        CapabilityType type();
-
-        CapabilityIdentity id();
-
-        String message();
-
-        String property();
-
-    }
+    ValidationResult validate( Map<String, String> properties );
 
 }
