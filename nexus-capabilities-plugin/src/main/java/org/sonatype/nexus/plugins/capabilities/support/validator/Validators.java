@@ -36,13 +36,26 @@ import org.sonatype.nexus.plugins.capabilities.api.Validator;
 public class Validators
 {
 
+    private final CapabilityValidators capabilityValidators;
+
     private final RepositoryValidators repositoryValidators;
 
     @Inject
-    Validators( final RepositoryValidators repositoryValidators )
+    Validators( final CapabilityValidators capabilityValidators,
+                final RepositoryValidators repositoryValidators )
     {
-
+        this.capabilityValidators = checkNotNull( capabilityValidators );
         this.repositoryValidators = checkNotNull( repositoryValidators );
+    }
+
+    /**
+     * Access to capability specific validators.
+     *
+     * @return capability specific validators factory
+     */
+    public CapabilityValidators capability()
+    {
+        return capabilityValidators;
     }
 
     /**
