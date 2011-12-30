@@ -53,7 +53,6 @@ public class CapabilitiesNexusRestClient
 
     public CapabilitiesNexusRestClient( final NexusRestClient nexusRestClient )
     {
-
         this.nexusRestClient = Preconditions.checkNotNull( nexusRestClient );
     }
 

@@ -18,7 +18,10 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.config;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.Collections.unmodifiableCollection;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity.capabilityIdentity;
+import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,6 +37,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -44,12 +48,15 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.plugins.capabilities.api.Validator;
+import org.sonatype.nexus.plugins.capabilities.api.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.Configuration;
@@ -75,6 +82,8 @@ public class DefaultCapabilityConfiguration
 
     private final ConfigurationIdGenerator idGenerator;
 
+    private final ValidatorRegistry validatorRegistry;
+
     private final File configurationFile;
 
     private final ReentrantLock lock = new ReentrantLock();
@@ -85,11 +94,13 @@ public class DefaultCapabilityConfiguration
     public DefaultCapabilityConfiguration( final ApplicationConfiguration applicationConfiguration,
                                            final NexusEventBus eventBus,
                                            final CapabilityConfigurationValidator validator,
-                                           final ConfigurationIdGenerator idGenerator )
+                                           final ConfigurationIdGenerator idGenerator,
+                                           final ValidatorRegistry validatorRegistry )
     {
         this.eventBus = eventBus;
         this.validator = validator;
         this.idGenerator = idGenerator;
+        this.validatorRegistry = checkNotNull( validatorRegistry );
 
         configurationFile = new File( applicationConfiguration.getWorkingDirectory(), "conf/capabilities.xml" );
     }
@@ -101,12 +112,19 @@ public class DefaultCapabilityConfiguration
 
         try
         {
-            final ValidationResponse vr = validator.validate( capability, true );
-
-            if ( vr.getValidationErrors().size() > 0 )
             {
-                throw new InvalidConfigurationException( vr );
+                final ValidationResponse vr = validator.validate( capability, true );
+
+                if ( vr.getValidationErrors().size() > 0 )
+                {
+                    throw new InvalidConfigurationException( vr );
+                }
             }
+
+            validate(
+                validatorRegistry.get( capabilityType( capability.getTypeId() ) ),
+                asMap( capability.getProperties() )
+            );
 
             final String generatedId = idGenerator.generateId();
 
@@ -130,6 +148,35 @@ public class DefaultCapabilityConfiguration
         }
     }
 
+    private void validate( final Collection<Validator> validators, final Map<String, String> properties )
+        throws InvalidConfigurationException
+    {
+        if ( validators != null && !validators.isEmpty())
+        {
+            final ValidationResponse vr = new ValidationResponse();
+
+            for ( final Validator validator : validators )
+            {
+                final Set<Validator.Violation> violations = validator.validate( properties );
+                if ( violations != null && !violations.isEmpty() )
+                {
+                    for ( final Validator.Violation violation : violations )
+                    {
+                        vr.addValidationError( new ValidationMessage(
+                            violation.property() == null ? "*" : violation.property(),
+                            violation.message()
+                        ) );
+                    }
+                }
+            }
+
+            if ( vr.getValidationErrors().size() > 0 )
+            {
+                throw new InvalidConfigurationException( vr );
+            }
+        }
+    }
+
     public void update( final CCapability capability )
         throws InvalidConfigurationException, IOException
     {
@@ -143,6 +190,11 @@ public class DefaultCapabilityConfiguration
             {
                 throw new InvalidConfigurationException( vr );
             }
+
+            validate(
+                validatorRegistry.get( capabilityIdentity( capability.getId() ) ),
+                asMap( capability.getProperties() )
+            );
 
             final CCapability stored = getInternal( capability.getId() );
 

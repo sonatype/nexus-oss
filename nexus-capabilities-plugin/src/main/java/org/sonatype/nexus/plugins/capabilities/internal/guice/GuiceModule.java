@@ -22,6 +22,7 @@ import javax.inject.Named;
 
 import org.sonatype.nexus.plugins.capabilities.internal.ActivationConditionHandlerFactory;
 import org.sonatype.nexus.plugins.capabilities.internal.ValidityConditionHandlerFactory;
+import org.sonatype.nexus.plugins.capabilities.support.validator.CapabilityValidators;
 import com.google.inject.AbstractModule;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 
@@ -40,6 +41,7 @@ public class GuiceModule
     {
         install( new FactoryModuleBuilder().build( ActivationConditionHandlerFactory.class ) );
         install( new FactoryModuleBuilder().build( ValidityConditionHandlerFactory.class ) );
+        install( new FactoryModuleBuilder().build( CapabilityValidators.class ) );
     }
 
 }

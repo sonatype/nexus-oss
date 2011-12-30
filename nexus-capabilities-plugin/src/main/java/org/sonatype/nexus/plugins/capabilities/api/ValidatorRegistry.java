@@ -16,53 +16,32 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.api.descriptor;
+package org.sonatype.nexus.plugins.capabilities.api;
 
-import java.util.List;
-
-import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import java.util.Collection;
 
 /**
- * Describes a capability (its type).
+ * Registry of capability validators.
+ *
+ * @since 1.10
  */
-public interface CapabilityDescriptor
+public interface ValidatorRegistry
 {
 
     /**
-     * Returns the capability type.
+     * Returns the validators that applies to specified capability type.
      *
-     * @return unique identifier of capability type
+     * @param type capability type to get validators for
+     * @return validators or an empty collection if no validators applies to specified type
      */
-    CapabilityType type();
+    Collection<Validator> get( CapabilityType type );
 
     /**
-     * Returns a user friendly name of capability (to be presented in UI).
+     * Returns the validators that applies to specified capability instance.
      *
-     * @return capability type name.
+     * @param id id of capability to get validators for
+     * @return validators or an empty collection if no validators applies to specified instance
      */
-    String name();
-
-    /**
-     * Returns capability form fields (properties).
-     *
-     * @return capability form fields (properties).
-     */
-    List<FormField> formFields();
-
-    /**
-     * Whether or not this capability is user facing = user should be able to configure it or it is a capability that
-     * will be created via other means (e.g. created by some other Nexus functionality)
-     *
-     * @return if capability is user facing.
-     */
-    boolean isExposed();
-
-    /**
-     * Returns a detailed description of capability type (to be presented in UI).
-     *
-     * @return capability type description.
-     */
-    String about();
+    Collection<Validator> get( CapabilityIdentity id );
 
 }

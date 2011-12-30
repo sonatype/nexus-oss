@@ -16,53 +16,45 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.api.descriptor;
+package org.sonatype.nexus.plugins.capabilities.api;
 
-import java.util.List;
-
-import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Describes a capability (its type).
+ * Validates capability properties. If validator is implemented by a {@link CapabilityFactory}, validator will be used
+ * before creating the capability. If validator is implemented by a {@link Capability}, validator wil be used before
+ * updating the capability.
+ *
+ * @since 1.10.0
  */
-public interface CapabilityDescriptor
+public interface Validator
 {
 
     /**
-     * Returns the capability type.
+     * Validates capability properties before a capability is created/updated.
      *
-     * @return unique identifier of capability type
+     * @param properties capability properties that will be applied to capability
+     * @return set of validation results. When null or empty the validation process is considered successful
      */
-    CapabilityType type();
+    Set<Violation> validate( Map<String, String> properties );
 
     /**
-     * Returns a user friendly name of capability (to be presented in UI).
+     * Describes a violation.
      *
-     * @return capability type name.
+     * @since 1.10.0
      */
-    String name();
+    interface Violation
+    {
 
-    /**
-     * Returns capability form fields (properties).
-     *
-     * @return capability form fields (properties).
-     */
-    List<FormField> formFields();
+        CapabilityType type();
 
-    /**
-     * Whether or not this capability is user facing = user should be able to configure it or it is a capability that
-     * will be created via other means (e.g. created by some other Nexus functionality)
-     *
-     * @return if capability is user facing.
-     */
-    boolean isExposed();
+        CapabilityIdentity id();
 
-    /**
-     * Returns a detailed description of capability type (to be presented in UI).
-     *
-     * @return capability type description.
-     */
-    String about();
+        String message();
+
+        String property();
+
+    }
 
 }

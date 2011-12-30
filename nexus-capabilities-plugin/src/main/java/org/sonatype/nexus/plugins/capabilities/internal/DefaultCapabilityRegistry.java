@@ -19,6 +19,7 @@
 package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static java.lang.String.format;
+import static java.util.Collections.unmodifiableCollection;
 import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 
 import java.util.Collection;
@@ -33,12 +34,15 @@ import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 /**
  * Default {@link CapabilityRegistry} implementation.
@@ -56,20 +60,20 @@ class DefaultCapabilityRegistry
 
     private final ValidityConditionHandlerFactory validityConditionHandlerFactory;
 
-    private final Map<String, CapabilityFactory> capabilityFactories;
+    private final CapabilityFactoryRegistry capabilityFactoryRegistry;
 
     private final Map<CapabilityIdentity, CapabilityReference> references;
 
     private final ReentrantReadWriteLock lock;
 
     @Inject
-    DefaultCapabilityRegistry( final Map<String, CapabilityFactory> capabilityFactories,
+    DefaultCapabilityRegistry( final CapabilityFactoryRegistry capabilityFactoryRegistry,
                                final NexusEventBus eventBus,
                                final ActivationConditionHandlerFactory activationConditionHandlerFactory,
                                final ValidityConditionHandlerFactory validityConditionHandlerFactory )
     {
         this.eventBus = checkNotNull( eventBus );
-        this.capabilityFactories = checkNotNull( capabilityFactories );
+        this.capabilityFactoryRegistry = checkNotNull( capabilityFactoryRegistry );
         this.activationConditionHandlerFactory = checkNotNull( activationConditionHandlerFactory );
         this.validityConditionHandlerFactory = checkNotNull( validityConditionHandlerFactory );
 
@@ -86,7 +90,7 @@ class DefaultCapabilityRegistry
         {
             lock.writeLock().lock();
 
-            final CapabilityFactory factory = capabilityFactories.get( type.toString() );
+            final CapabilityFactory factory = capabilityFactoryRegistry.get( type );
             if ( factory == null )
             {
                 throw new RuntimeException( format( "No factory found for a capability of type %s", type ) );
@@ -144,6 +148,12 @@ class DefaultCapabilityRegistry
         {
             lock.readLock().unlock();
         }
+    }
+
+    @Override
+    public Collection<CapabilityReference> get( final Predicate<CapabilityReference> filter )
+    {
+        return unmodifiableCollection( Collections2.filter( getAll(), filter ) );
     }
 
     @Override

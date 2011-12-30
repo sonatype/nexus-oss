@@ -33,7 +33,6 @@ import static org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity.cap
 import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
 
 import java.util.Collection;
-import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +43,7 @@ import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistryEvent;
@@ -73,9 +73,6 @@ public class DefaultCapabilityRegistryTest
     public void setUp()
     {
         final CapabilityFactory factory = mock( CapabilityFactory.class );
-        final HashMap<String, CapabilityFactory> factoryMap = new HashMap<String, CapabilityFactory>();
-
-        factoryMap.put( CAPABILITY_TYPE.toString(), factory );
         when( factory.create( Matchers.<CapabilityIdentity>any() ) ).thenAnswer( new Answer<Capability>()
         {
             @Override
@@ -88,12 +85,16 @@ public class DefaultCapabilityRegistryTest
             }
 
         } );
+
+        final CapabilityFactoryRegistry capabilityFactoryRegistry = mock( CapabilityFactoryRegistry.class );
+        when( capabilityFactoryRegistry.get( CAPABILITY_TYPE ) ).thenReturn( factory );
+
         eventBus = mock( NexusEventBus.class );
 
         final ActivationConditionHandlerFactory achf = mock( ActivationConditionHandlerFactory.class );
         final ValidityConditionHandlerFactory vchf = mock( ValidityConditionHandlerFactory.class );
 
-        underTest = new DefaultCapabilityRegistry( factoryMap, eventBus, achf, vchf )
+        underTest = new DefaultCapabilityRegistry( capabilityFactoryRegistry, eventBus, achf, vchf )
         {
             @Override
             CapabilityReference createReference( final CapabilityType type, final Capability capability )

@@ -18,12 +18,20 @@
  */
 package org.sonatype.nexus.plugins.capabilities.api;
 
-import org.sonatype.plugin.ExtensionPoint;
-
-@ExtensionPoint
+/**
+ * Creates instances of capabilities for a specific type.
+ *
+ * @since 1.10.0
+ */
 public interface CapabilityFactory
 {
 
+    /**
+     * Creates  capability instance with specified id.
+     *
+     * @param id if of capability to be created
+     * @return created capability. Must not be null.
+     */
     Capability create( CapabilityIdentity id );
 
 }

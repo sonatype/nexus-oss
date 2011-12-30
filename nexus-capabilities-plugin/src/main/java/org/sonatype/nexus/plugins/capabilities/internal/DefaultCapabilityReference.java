@@ -19,7 +19,10 @@
 package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.Maps.newHashMap;
+import static java.util.Collections.unmodifiableMap;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -40,6 +43,8 @@ class DefaultCapabilityReference
     implements CapabilityReference
 {
 
+    private static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
+
     private final CapabilityType capabilityType;
 
     private final Capability capability;
@@ -53,6 +58,8 @@ class DefaultCapabilityReference
     private final ReentrantReadWriteLock stateLock;
 
     private State state;
+
+    private Map<String, String> capabilityProperties;
 
     DefaultCapabilityReference( final NexusEventBus eventBus,
                                 final ActivationConditionHandlerFactory activationListenerFactory,
@@ -255,6 +262,20 @@ class DefaultCapabilityReference
     }
 
     @Override
+    public Map<String, String> properties()
+    {
+        try
+        {
+            stateLock.readLock().lock();
+            return state.properties();
+        }
+        finally
+        {
+            stateLock.readLock().unlock();
+        }
+    }
+
+    @Override
     public String stateDescription()
     {
         try
@@ -354,6 +375,12 @@ class DefaultCapabilityReference
         }
 
         @Override
+        public Map<String, String> properties()
+        {
+            return EMPTY_MAP;
+        }
+
+        @Override
         public String status()
         {
             return null;
@@ -411,6 +438,7 @@ class DefaultCapabilityReference
         {
             try
             {
+                capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap( newHashMap( properties ) );
                 capability().create( properties );
                 validityHandler.bind();
                 state = new ValidState();
@@ -429,6 +457,7 @@ class DefaultCapabilityReference
         {
             try
             {
+                capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap( newHashMap( properties ) );
                 capability().load( properties );
                 validityHandler.bind();
                 state = new ValidState();
@@ -486,6 +515,7 @@ class DefaultCapabilityReference
             try
             {
                 eventBus.post( new CapabilityEvent.BeforeUpdate( DefaultCapabilityReference.this ) );
+                capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap( newHashMap( properties ) );
                 capability().update( properties );
                 eventBus.post( new CapabilityEvent.AfterUpdate( DefaultCapabilityReference.this ) );
             }
@@ -516,6 +546,12 @@ class DefaultCapabilityReference
                     "Could not remove capability {} ({})", new Object[]{ capability, capability.id(), e }
                 );
             }
+        }
+
+        @Override
+        public Map<String, String> properties()
+        {
+            return capabilityProperties;
         }
 
         @Override

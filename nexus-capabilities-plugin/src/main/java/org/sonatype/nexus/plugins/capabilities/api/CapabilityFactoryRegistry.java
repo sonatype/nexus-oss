@@ -16,53 +16,41 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.api.descriptor;
-
-import java.util.List;
-
-import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+package org.sonatype.nexus.plugins.capabilities.api;
 
 /**
- * Describes a capability (its type).
+ * Registry of capability factories.
+ *
+ * @since 1.10.0
  */
-public interface CapabilityDescriptor
+public interface CapabilityFactoryRegistry
 {
 
     /**
-     * Returns the capability type.
+     * Registers a factory.
      *
-     * @return unique identifier of capability type
+     * @param type    type of capabilities created by factory
+     * @param factory to be added
+     * @return itself, for fluent api usage
+     * @throws IllegalArgumentException if another factory for same type was already registered
      */
-    CapabilityType type();
+    CapabilityFactoryRegistry register( CapabilityType type, CapabilityFactory factory );
 
     /**
-     * Returns a user friendly name of capability (to be presented in UI).
+     * Unregisters factory with specified type. If a factory with specified type was not registered before it returns
+     * silently.
      *
-     * @return capability type name.
+     * @param type of factory to be removed
+     * @return itself, for fluent api usage
      */
-    String name();
+    CapabilityFactoryRegistry unregister( CapabilityType type );
 
     /**
-     * Returns capability form fields (properties).
+     * Returns the factory bounded to specified type.
      *
-     * @return capability form fields (properties).
+     * @param type of factory
+     * @return bounded factory or null if none was bounded to specified type
      */
-    List<FormField> formFields();
-
-    /**
-     * Whether or not this capability is user facing = user should be able to configure it or it is a capability that
-     * will be created via other means (e.g. created by some other Nexus functionality)
-     *
-     * @return if capability is user facing.
-     */
-    boolean isExposed();
-
-    /**
-     * Returns a detailed description of capability type (to be presented in UI).
-     *
-     * @return capability type description.
-     */
-    String about();
+    CapabilityFactory get( CapabilityType type );
 
 }

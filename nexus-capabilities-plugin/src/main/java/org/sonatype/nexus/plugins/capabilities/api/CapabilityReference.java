@@ -98,6 +98,12 @@ public interface CapabilityReference
      */
     String description();
 
+    /**
+     * Current capability properties.
+     *
+     * @return properties.
+     */
+    Map<String, String> properties();
 
     /**
      * Callback when a new capability is created.

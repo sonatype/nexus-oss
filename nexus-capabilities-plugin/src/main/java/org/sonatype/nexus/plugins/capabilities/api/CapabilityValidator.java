@@ -16,53 +16,36 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.api.descriptor;
+package org.sonatype.nexus.plugins.capabilities.api;
 
-import java.util.List;
+import static org.sonatype.nexus.plugins.capabilities.api.Validator.Violation;
 
-import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import java.util.Map;
+import java.util.Set;
 
 /**
- * Describes a capability (its type).
+ * Validates capability properties.
+ *
+ * @since 1.10.0
  */
-public interface CapabilityDescriptor
+public interface CapabilityValidator
 {
 
     /**
-     * Returns the capability type.
+     * Validates capability properties before a capability is created.
      *
-     * @return unique identifier of capability type
+     * @param properties capability properties that will be applied to capability
+     * @return set of validation results. When null or empty the validation process is considered successful
      */
-    CapabilityType type();
+    Set<Violation> validate( Map<String, String> properties );
 
     /**
-     * Returns a user friendly name of capability (to be presented in UI).
+     * Validates capability properties before a capability is updated.
      *
-     * @return capability type name.
+     * @param id         identity of capability that will be updated
+     * @param properties capability properties that will be applied to capability
+     * @return set of validation results. When null or empty the validation process is considered successful
      */
-    String name();
-
-    /**
-     * Returns capability form fields (properties).
-     *
-     * @return capability form fields (properties).
-     */
-    List<FormField> formFields();
-
-    /**
-     * Whether or not this capability is user facing = user should be able to configure it or it is a capability that
-     * will be created via other means (e.g. created by some other Nexus functionality)
-     *
-     * @return if capability is user facing.
-     */
-    boolean isExposed();
-
-    /**
-     * Returns a detailed description of capability type (to be presented in UI).
-     *
-     * @return capability type description.
-     */
-    String about();
+    Set<Violation> validate( CapabilityIdentity id, Map<String, String> properties );
 
 }
