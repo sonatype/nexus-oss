@@ -18,36 +18,42 @@
  */
 package org.sonatype.nexus.plugins.capabilities.support.validator;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.api.Validator;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
-import com.google.inject.assistedinject.Assisted;
+import org.sonatype.nexus.plugins.capabilities.internal.validator.ValidatorFactory;
 
 /**
- * A {@link Validator} that ensures that only one capability of specified type and set of properties can be
- * created, excluding itself.
+ * Factory of {@link Validator}s related to repositories.
  *
  * @since 1.10.0
  */
 @Named
-public class PrimaryKeyExcludingSelfValidator
-    extends PrimaryKeyValidator
-    implements Validator
+@Singleton
+public class RepositoryValidators
 {
 
+    private final ValidatorFactory validatorFactory;
+
     @Inject
-    PrimaryKeyExcludingSelfValidator( final CapabilityRegistry capabilityRegistry,
-                                      final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
-                                      final @Assisted CapabilityType type,
-                                      final @Assisted CapabilityIdentity selfId,
-                                      final @Assisted String... propertyKeys )
+    public RepositoryValidators( final ValidatorFactory validatorFactory )
     {
-        super( capabilityRegistry, capabilityDescriptorRegistry, type, selfId, propertyKeys );
+        this.validatorFactory = checkNotNull( validatorFactory );
+    }
+
+    /**
+     * Creates a new validator that checks that a repository referenced by specified property key is of specified type.
+     *
+     * @return created validator
+     */
+    public Validator repositoryOfType( CapabilityType type, String propertyKey, Class<?> facet )
+    {
+        return validatorFactory.repositoryOfType( type, propertyKey, facet );
     }
 
 }

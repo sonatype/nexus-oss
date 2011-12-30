@@ -16,33 +16,43 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.guice;
+package org.sonatype.nexus.plugins.capabilities.support.validator;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.internal.ActivationConditionHandlerFactory;
-import org.sonatype.nexus.plugins.capabilities.internal.ValidityConditionHandlerFactory;
-import org.sonatype.nexus.plugins.capabilities.internal.validator.ValidatorFactory;
-import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
-import com.google.inject.AbstractModule;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
+import org.sonatype.nexus.plugins.capabilities.api.Validator;
 
 /**
- * Capabilities plugin Guice module.
+ * Central access point for built-in {@link Validator}s.
  *
- * @since 1.0
+ * @since 1.10.0
  */
 @Named
-public class GuiceModule
-    extends AbstractModule
+@Singleton
+public class Validators
 {
 
-    @Override
-    protected void configure()
+    private final RepositoryValidators repositoryValidators;
+
+    @Inject
+    Validators( final RepositoryValidators repositoryValidators )
     {
-        install( new FactoryModuleBuilder().build( ActivationConditionHandlerFactory.class ) );
-        install( new FactoryModuleBuilder().build( ValidityConditionHandlerFactory.class ) );
-        install( new FactoryModuleBuilder().build( ValidatorFactory.class ) );
+
+        this.repositoryValidators = checkNotNull( repositoryValidators );
+    }
+
+    /**
+     * Access to repository specific validators.
+     *
+     * @return repository specific validators factory
+     */
+    public RepositoryValidators repository()
+    {
+        return repositoryValidators;
     }
 
 }

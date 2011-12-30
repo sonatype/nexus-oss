@@ -16,33 +16,24 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.guice;
+package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
-import javax.inject.Named;
-
-import org.sonatype.nexus.plugins.capabilities.internal.ActivationConditionHandlerFactory;
-import org.sonatype.nexus.plugins.capabilities.internal.ValidityConditionHandlerFactory;
-import org.sonatype.nexus.plugins.capabilities.internal.validator.ValidatorFactory;
-import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
-import com.google.inject.AbstractModule;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.api.Validator;
 
 /**
- * Capabilities plugin Guice module.
+ * {@link Validator} factory.
  *
- * @since 1.0
+ * @since 1.10.0
  */
-@Named
-public class GuiceModule
-    extends AbstractModule
+public interface ValidatorFactory
 {
 
-    @Override
-    protected void configure()
-    {
-        install( new FactoryModuleBuilder().build( ActivationConditionHandlerFactory.class ) );
-        install( new FactoryModuleBuilder().build( ValidityConditionHandlerFactory.class ) );
-        install( new FactoryModuleBuilder().build( ValidatorFactory.class ) );
-    }
+    PrimaryKeyValidator oneOf( CapabilityType type, String... propertyKeys );
+
+    PrimaryKeyExcludingSelfValidator oneOf( CapabilityType type, CapabilityIdentity id, String... propertyKeys );
+
+    RepositoryTypeValidator repositoryOfType( CapabilityType type, String propertyKey, Class<?> facet );
 
 }

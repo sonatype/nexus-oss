@@ -16,57 +16,38 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.support.validator;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.api.Validator;
-import org.sonatype.nexus.plugins.capabilities.internal.validator.ValidatorFactory;
+import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
+import com.google.inject.assistedinject.Assisted;
 
 /**
- * Factory of {@link Validator}s related to capabilities.
+ * A {@link Validator} that ensures that only one capability of specified type and set of properties can be created,
+ * excluding itself.
  *
  * @since 1.10.0
  */
 @Named
-@Singleton
-public class CapabilityValidators
+public class PrimaryKeyExcludingSelfValidator
+    extends PrimaryKeyValidator
+    implements Validator
 {
 
-    private final ValidatorFactory validatorFactory;
-
     @Inject
-    public CapabilityValidators( final ValidatorFactory validatorFactory )
+    PrimaryKeyExcludingSelfValidator( final CapabilityRegistry capabilityRegistry,
+                                      final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+                                      final @Assisted CapabilityType type,
+                                      final @Assisted CapabilityIdentity selfId,
+                                      final @Assisted String... propertyKeys )
     {
-        this.validatorFactory = checkNotNull( validatorFactory );
-    }
-
-    /**
-     * Creates a new validator that checks that only one capability of specified type and set of properties can be 
-     * created.
-     *
-     * @return created validator
-     */
-    public Validator oneOf( CapabilityType type, String... propertyKeys )
-    {
-        return validatorFactory.oneOf( type, propertyKeys );
-    }
-
-    /**
-     * Creates a new validator that checks that only one capability of specified type and set of properties can be
-     * created, excluding specified capability (by id).
-     *
-     * @return created validator
-     */
-    public Validator oneOf( CapabilityType type, CapabilityIdentity id, String... propertyKeys )
-    {
-        return validatorFactory.oneOf( type, id, propertyKeys );
+        super( capabilityRegistry, capabilityDescriptorRegistry, type, selfId, propertyKeys );
     }
 
 }
