@@ -229,7 +229,7 @@ public class CapabilityPlexusResource
         return capability;
     }
 
-    private static CapabilityResponseResource asCapabilityResponseResource( final CCapability capability )
+    static CapabilityResponseResource asCapabilityResponseResource( final CCapability capability )
     {
         assert capability != null : "Capability cannot be null";
 
@@ -308,7 +308,7 @@ public class CapabilityPlexusResource
         return item;
     }
 
-    private String getCapabilityId( final Request request )
+    static String getCapabilityId( final Request request )
     {
         return request.getAttributes().get( CAPABILITIES_ID_KEY ).toString();
     }

@@ -37,6 +37,16 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           scope : this,
           handler : this.reloadAll
         }),
+    doEnable : {
+      text : 'Enable',
+      scope : this,
+      handler : this.enableHandler
+    },
+    doDisable : {
+      text : 'Disable',
+      scope : this,
+      handler : this.disableHandler
+    },
     doDelete : new Ext.Action({
           text : 'Delete',
           scope : this,
@@ -645,7 +655,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
         // add place holder to grid
         var newRec = new this.capabilityRecordConstructor({
-              name : 'New Capability',
+              description : 'New Capability',
               resourceURI : 'new'
             }, id); // use "new_capability_" id instead of resourceURI like the
         // reader does
@@ -971,7 +981,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       contextClick : function(grid, index, e) {
         this.contextHide();
 
-        if (e.target.nodeName == 'A')
+        if (e.target.nodeName == 'A' || this.capabilitiesGridPanel.store.getAt(index).data.resourceURI == 'new')
           return; // no menu on links
 
         this.ctxRow = this.capabilitiesGridPanel.view.getRow(index);
@@ -987,6 +997,14 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
         if (this.sp.checkPermission('nexus:capabilities', this.sp.DELETE))
         {
+          menu.add('-');
+          if(this.ctxRecord.data.enabled){
+            menu.add(this.actions.doDisable);
+          }
+          else {
+            menu.add(this.actions.doEnable);
+          }
+          menu.add('-');
           menu.add(this.actions.doDelete);
         }
 
@@ -1093,8 +1111,74 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
         // get data
         var data = record.data;
+        if(data.stateDescription){
+          // return markup
+          return '<div qtip="' + data.stateDescription +'">' + val + '</div>';
+        }
+        return val;
+      },
 
-        // return markup
-        return '<div qtip="' + data.stateDescription +'">' + val + '</div>';
+      enableHandler : function(rec) {
+        if (this.ctxRecord || this.capabilitiesGridPanel.getSelectionModel().hasSelection())
+        {
+          var rec = this.ctxRecord ? this.ctxRecord : this.capabilitiesGridPanel.getSelectionModel().getSelected();
+          Ext.Ajax.request({
+            url : rec.data.resourceURI + '/status',
+            jsonData : {
+              data : {
+                id : rec.data.id,
+                enabled : true
+              }
+            },
+            callback : this.statusCallback,
+            statusAction : 'enable',
+            statusRecord : rec,
+            scope : this,
+            method : 'PUT'
+          });
+        }
+      },
+
+      disableHandler : function() {
+        if (this.ctxRecord || this.capabilitiesGridPanel.getSelectionModel().hasSelection())
+        {
+          var rec = this.ctxRecord ? this.ctxRecord : this.capabilitiesGridPanel.getSelectionModel().getSelected();
+          Ext.Ajax.request({
+            url : rec.data.resourceURI + '/status',
+            jsonData : {
+              data : {
+                id : rec.data.id,
+                enabled : false
+              }
+            },
+            callback : this.statusCallback,
+            statusAction : 'disable',
+            statusRecord : rec,
+            scope : this,
+            method : 'PUT'
+          });
+        }
+      },
+
+      statusCallback : function(options, isSuccess, response) {
+        if (isSuccess)
+        {
+          this.capabilitiesDataStore.reload();
+          this.formCards.items.each(
+              function ( item, i, len ) {
+                if ( i > 0 ) {
+                  this.remove( item, true );
+                }
+              },
+              this.formCards
+          );
+
+          this.capabilitiesGridPanel.getSelectionModel().selectRecords( [options.statusRecord], false );
+        }
+        else
+        {
+          Sonatype.utils.connectionError(response, 'The server could not ' + options.statusAction + " selected capability.");
+        }
       }
+
     });
