@@ -1122,6 +1122,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         if (this.ctxRecord || this.capabilitiesGridPanel.getSelectionModel().hasSelection())
         {
           var rec = this.ctxRecord ? this.ctxRecord : this.capabilitiesGridPanel.getSelectionModel().getSelected();
+          var waitBox = Ext.MessageBox.wait('Enabling capability...','Please Wait...');
           Ext.Ajax.request({
             url : rec.data.resourceURI + '/status',
             jsonData : {
@@ -1133,6 +1134,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             callback : this.statusCallback,
             statusAction : 'enable',
             statusRecord : rec,
+            statusWaitBox : waitBox,
             scope : this,
             method : 'PUT'
           });
@@ -1143,8 +1145,10 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         if (this.ctxRecord || this.capabilitiesGridPanel.getSelectionModel().hasSelection())
         {
           var rec = this.ctxRecord ? this.ctxRecord : this.capabilitiesGridPanel.getSelectionModel().getSelected();
+          var waitBox = Ext.MessageBox.wait('Disabling capability...','Please Wait...');
           Ext.Ajax.request({
             url : rec.data.resourceURI + '/status',
+            waitMsg : 'Disabling capability...',
             jsonData : {
               data : {
                 id : rec.data.id,
@@ -1154,6 +1158,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             callback : this.statusCallback,
             statusAction : 'disable',
             statusRecord : rec,
+            statusWaitBox : waitBox,
             scope : this,
             method : 'PUT'
           });
@@ -1161,6 +1166,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       statusCallback : function(options, isSuccess, response) {
+        options.statusWaitBox.hide();
         if (isSuccess)
         {
           this.capabilitiesDataStore.reload();
