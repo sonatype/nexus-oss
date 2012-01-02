@@ -26,7 +26,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>10</version>
+    <version>11</version>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
@@ -47,15 +47,13 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-    <nexus.version>1.10.0-SNAPSHOT</nexus.version>
-    <sisu.assembler.tags>nexus,nexus-plugins</sisu.assembler.tags>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-bean</artifactId>
+      <version>2.3.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -78,13 +76,13 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-api</artifactId>
-      <version>${nexus.version}</version>
+      <version>2.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-manager</artifactId>
-      <version>${nexus.version}</version>
+      <version>2.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
@@ -92,13 +90,6 @@
 
   <dependencyManagement>
     <dependencies>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-runtime-platform</artifactId>
-        <version>${nexus.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
@@ -225,7 +216,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.4</version>
+        <version>1.5</version>
         <extensions>true</extensions>
         <configuration>
           <assemblyDescriptor>src/main/assemble/bundle.xml</assemblyDescriptor>
@@ -234,7 +225,7 @@
           <dependency>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.4</version>
+            <version>1.5</version>
           </dependency>
         </dependencies>
       </plugin>
