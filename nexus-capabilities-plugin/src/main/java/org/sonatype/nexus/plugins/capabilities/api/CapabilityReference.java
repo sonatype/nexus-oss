@@ -31,7 +31,7 @@ import java.util.Map;
  * <p/>
  * Whenever the active state changes {@link Capability#activate()} / {@link Capability#passivate()} is called.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public interface CapabilityReference
 {

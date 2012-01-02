@@ -36,7 +36,7 @@ import com.google.common.collect.Maps;
 /**
  * Default {@link CapabilityFactoryRegistry} implementation.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named
 @Singleton

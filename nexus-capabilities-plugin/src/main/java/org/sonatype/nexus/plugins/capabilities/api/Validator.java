@@ -26,7 +26,7 @@ import java.util.Set;
  * before creating the capability. If validator is implemented by a {@link Capability}, validator wil be used before
  * updating the capability.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public interface Validator
 {

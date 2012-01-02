@@ -23,7 +23,7 @@ import org.sonatype.plexus.appevents.AbstractEvent;
 /**
  * {@link Capability} related events.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class CapabilityEvent
     extends AbstractEvent<CapabilityReference>
@@ -48,7 +48,7 @@ public class CapabilityEvent
     /**
      * Event fired after a capability was activated.
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     public static class AfterActivated
         extends CapabilityEvent
@@ -70,7 +70,7 @@ public class CapabilityEvent
     /**
      * Event fired before a capability is passivated.
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     public static class BeforePassivated
         extends CapabilityEvent
@@ -92,7 +92,7 @@ public class CapabilityEvent
     /**
      * Event fired before a capability is updated.
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     public static class BeforeUpdate
         extends CapabilityEvent
@@ -114,7 +114,7 @@ public class CapabilityEvent
     /**
      * Event fired after a capability was updated.
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     public static class AfterUpdate
         extends CapabilityEvent

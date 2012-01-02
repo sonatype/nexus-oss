@@ -25,7 +25,7 @@ import org.sonatype.nexus.plugins.capabilities.support.activation.AbstractCompos
 /**
  * A condition that applies a logical NOT on another condition.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class InversionCondition
     extends AbstractCompositeCondition

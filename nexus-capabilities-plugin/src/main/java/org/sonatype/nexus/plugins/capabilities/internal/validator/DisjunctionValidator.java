@@ -31,7 +31,7 @@ import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidati
 /**
  * Logical OR between {@link Validator}s.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class DisjunctionValidator
     implements Validator

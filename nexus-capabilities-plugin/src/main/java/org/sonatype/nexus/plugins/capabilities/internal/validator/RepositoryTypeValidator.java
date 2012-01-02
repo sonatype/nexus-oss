@@ -37,7 +37,7 @@ import com.google.inject.assistedinject.Assisted;
 /**
  * A {@link Validator} that ensures that capability repository property references a repository of specified kind(s).
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named
 public class RepositoryTypeValidator

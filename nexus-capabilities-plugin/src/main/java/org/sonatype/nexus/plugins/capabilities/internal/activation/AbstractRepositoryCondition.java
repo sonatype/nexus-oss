@@ -32,7 +32,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 /**
  * Support class for repository conditions.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public abstract class AbstractRepositoryCondition
     extends AbstractCondition

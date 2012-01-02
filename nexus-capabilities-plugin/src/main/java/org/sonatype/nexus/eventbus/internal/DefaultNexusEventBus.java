@@ -35,7 +35,7 @@ import com.google.common.collect.Lists;
  * It differs from guava event bus by dispatching events as they appear (is re-entrant). Guava will queue up all event
  * and dispatch them in the order they were posted, without re-entrance.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named
 @Singleton

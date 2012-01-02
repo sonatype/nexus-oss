@@ -31,7 +31,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.activation.InversionCond
 /**
  * Factory of logical {@link Condition}s.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named
 @Singleton
@@ -82,7 +82,7 @@ public class LogicalConditions
     /**
      * A condition that applies a logical AND between conditions.
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     private static class ConjunctionCondition
         extends AbstractCompositeCondition
@@ -165,7 +165,7 @@ public class LogicalConditions
     /**
      * A condition that applies a logical OR between conditions.
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     private static class DisjunctionCondition
         extends AbstractCompositeCondition

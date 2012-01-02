@@ -23,7 +23,7 @@ import org.sonatype.plexus.appevents.AbstractEvent;
 /**
  * {@link CapabilityRegistry} related events.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class CapabilityRegistryEvent
     extends AbstractEvent<CapabilityReference>
@@ -50,7 +50,7 @@ public class CapabilityRegistryEvent
      *
      * Called before {@link Capability#create(java.util.Map)} / {@link Capability#load(java.util.Map)} are called.
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     public static class Created
         extends CapabilityRegistryEvent
@@ -74,7 +74,7 @@ public class CapabilityRegistryEvent
      *
      * Called before {@link Capability#remove()} is called.
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     public static class Removed
         extends CapabilityRegistryEvent

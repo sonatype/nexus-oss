@@ -23,7 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Indentity of a capability.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class CapabilityIdentity
 {

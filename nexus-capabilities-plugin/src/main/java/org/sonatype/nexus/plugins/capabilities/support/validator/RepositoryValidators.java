@@ -31,7 +31,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.validator.ValidatorFacto
 /**
  * Factory of {@link Validator}s related to repositories.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named
 @Singleton

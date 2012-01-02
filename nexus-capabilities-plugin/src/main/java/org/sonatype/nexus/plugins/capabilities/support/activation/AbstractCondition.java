@@ -28,7 +28,7 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
 /**
  * {@link Condition} implementation support.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public abstract class AbstractCondition
     extends AbstractLoggingComponent

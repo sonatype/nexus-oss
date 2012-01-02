@@ -30,7 +30,7 @@ import com.google.common.eventbus.Subscribe;
  * A condition that is becoming unsatisfied before an capability is updated and becomes satisfied after capability was
  * updated.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class PassivateCapabilityDuringUpdateCondition
     extends AbstractCondition

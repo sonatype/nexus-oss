@@ -40,7 +40,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapa
 /**
  * {@link CapabilityConfigurationEventsHandler} UTs.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class CapabilityConfigurationEventsHandlerTest
 {

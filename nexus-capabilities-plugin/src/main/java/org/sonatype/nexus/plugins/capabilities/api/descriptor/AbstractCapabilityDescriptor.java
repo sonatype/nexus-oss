@@ -28,7 +28,7 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 /**
  * Support class for implementing {@link CapabilityDescriptor}s.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public abstract class AbstractCapabilityDescriptor
     implements CapabilityDescriptor

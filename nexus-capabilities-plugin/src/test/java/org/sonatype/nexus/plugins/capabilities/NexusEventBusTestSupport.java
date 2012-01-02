@@ -45,7 +45,7 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
 /**
  * Support for tests using event bus.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class NexusEventBusTestSupport
 {

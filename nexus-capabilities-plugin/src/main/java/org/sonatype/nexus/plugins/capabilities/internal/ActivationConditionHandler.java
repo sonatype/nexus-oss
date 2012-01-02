@@ -36,7 +36,7 @@ import com.google.inject.assistedinject.Assisted;
 /**
  * Handles capability activation by reacting capability activation condition being satisfied/unsatisfied.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class ActivationConditionHandler
     extends AbstractLoggingComponent

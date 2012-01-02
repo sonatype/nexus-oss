@@ -23,7 +23,7 @@ import org.sonatype.plexus.appevents.AbstractEvent;
 /**
  * {@link Condition} related events.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class ConditionEvent
     extends AbstractEvent<Condition>
@@ -48,7 +48,7 @@ public class ConditionEvent
     /**
      * Event fired when a condition becomes satisfied.
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     public static class Satisfied
         extends ConditionEvent
@@ -70,7 +70,7 @@ public class ConditionEvent
     /**
      * Event fired when a condition becomes unsatisfied.
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     public static class Unsatisfied
         extends ConditionEvent

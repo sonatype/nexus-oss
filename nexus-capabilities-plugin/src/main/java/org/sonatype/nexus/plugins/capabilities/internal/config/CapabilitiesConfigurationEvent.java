@@ -23,7 +23,7 @@ import org.sonatype.plexus.appevents.AbstractEvent;
 /**
  * Capabilities configuration (persistent storage) related events.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class CapabilitiesConfigurationEvent
     extends AbstractEvent<CapabilityConfiguration>
@@ -37,7 +37,7 @@ public class CapabilitiesConfigurationEvent
     /**
      * Event fired after capability ware loaded from persistence store.
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     public static class AfterLoad
         extends CapabilitiesConfigurationEvent

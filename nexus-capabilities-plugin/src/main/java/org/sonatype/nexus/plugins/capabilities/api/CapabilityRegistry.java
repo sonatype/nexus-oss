@@ -35,7 +35,7 @@ public interface CapabilityRegistry
      * @param id   id of capability to be created
      * @param type type of capability to be created
      * @return created capability
-     * @since 1.10.0
+     * @since 2.0
      */
     CapabilityReference create( CapabilityIdentity id, CapabilityType type );
 
@@ -45,7 +45,7 @@ public interface CapabilityRegistry
      *
      * @param id to remove
      * @return removed capability (if any), null otherwise
-     * @since 1.10.0
+     * @since 2.0
      */
     CapabilityReference remove( CapabilityIdentity id );
 
@@ -55,7 +55,7 @@ public interface CapabilityRegistry
      *
      * @param id to retrieve
      * @return capability with specified id or null if not found
-     * @since 1.10.0
+     * @since 2.0
      */
     CapabilityReference get( CapabilityIdentity id );
 
@@ -65,7 +65,7 @@ public interface CapabilityRegistry
      *
      * @param filter capability reference filter
      * @return collection of capabilities, never null
-     * @since 1.10.0
+     * @since 2.0
      */
     public Collection<CapabilityReference> get( Predicate<CapabilityReference> filter );
 
@@ -73,7 +73,7 @@ public interface CapabilityRegistry
      * Retrieves all capabilities from registry. If no capability exists, result will be empty.
      *
      * @return collection of capabilities, never null
-     * @since 1.10.0
+     * @since 2.0
      */
     Collection<CapabilityReference> getAll();
 

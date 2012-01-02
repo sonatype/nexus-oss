@@ -52,7 +52,7 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 /**
  * {@link DefaultCapabilityRegistry} UTs.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class DefaultCapabilityRegistryTest
 {

@@ -38,7 +38,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 /**
  * {@link RepositoryLocalStatusCondition} UTs.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class RepositoryLocalStatusConditionTest
     extends NexusEventBusTestSupport

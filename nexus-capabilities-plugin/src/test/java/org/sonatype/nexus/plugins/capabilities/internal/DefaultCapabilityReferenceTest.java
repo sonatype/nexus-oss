@@ -57,7 +57,7 @@ import org.sonatype.nexus.plugins.capabilities.support.activation.NexusCondition
 /**
  * {@link DefaultCapabilityReference} UTs.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class DefaultCapabilityReferenceTest
 {

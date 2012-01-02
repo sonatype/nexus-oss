@@ -36,7 +36,7 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 /**
  * Default {@link CapabilityReference} implementation.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 class DefaultCapabilityReference
     extends AbstractLoggingComponent

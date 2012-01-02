@@ -37,7 +37,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.activation.PassivateCapa
 /**
  * Factory of {@link Condition}s related to capabilities.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named
 @Singleton

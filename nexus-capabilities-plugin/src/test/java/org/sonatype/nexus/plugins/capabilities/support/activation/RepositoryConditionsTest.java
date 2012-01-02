@@ -35,7 +35,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 /**
  * {@link RepositoryConditions} UTs.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class RepositoryConditionsTest
 {

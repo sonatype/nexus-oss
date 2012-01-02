@@ -30,7 +30,7 @@ import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 /**
  * {@link AbstractCondition} UTs.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class AbstractConditionTest
     extends NexusEventBusTestSupport

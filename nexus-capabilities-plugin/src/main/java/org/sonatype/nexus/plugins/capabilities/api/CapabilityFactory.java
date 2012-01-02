@@ -21,7 +21,7 @@ package org.sonatype.nexus.plugins.capabilities.api;
 /**
  * Creates instances of capabilities for a specific type.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public interface CapabilityFactory
 {

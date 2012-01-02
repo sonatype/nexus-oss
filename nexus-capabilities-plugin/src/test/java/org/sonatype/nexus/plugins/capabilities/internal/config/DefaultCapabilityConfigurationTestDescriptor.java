@@ -29,7 +29,7 @@ import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescript
 /**
  * Test descriptor used by {@link DefaultCapabilityConfigurationTest}.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named
 @Singleton

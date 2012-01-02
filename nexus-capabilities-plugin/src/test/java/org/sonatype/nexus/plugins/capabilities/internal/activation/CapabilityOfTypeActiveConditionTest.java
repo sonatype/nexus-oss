@@ -45,7 +45,7 @@ import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescript
 /**
  * {@link CapabilityOfTypeActiveCondition} UTs.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class CapabilityOfTypeActiveConditionTest
     extends NexusEventBusTestSupport

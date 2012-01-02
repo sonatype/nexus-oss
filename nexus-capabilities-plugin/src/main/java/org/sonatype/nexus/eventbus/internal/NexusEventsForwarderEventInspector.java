@@ -34,7 +34,7 @@ import org.sonatype.plexus.appevents.Event;
  * <p/>
  * It also registers all {@link NexusEventBus.LoadOnStart} marked handlers.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Singleton
 public class NexusEventsForwarderEventInspector

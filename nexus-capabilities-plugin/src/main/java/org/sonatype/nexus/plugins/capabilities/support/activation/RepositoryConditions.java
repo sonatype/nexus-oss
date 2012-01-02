@@ -36,7 +36,7 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 /**
  * Factory of {@link Condition}s related to repositories.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named
 @Singleton

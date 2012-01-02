@@ -30,7 +30,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.activation.NexusIsActive
 /**
  * Factory of {@link Condition}s related to Nexus.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named
 @Singleton

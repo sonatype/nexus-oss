@@ -23,7 +23,7 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 /**
  * A condition that is never satisfied.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class UnsatisfiedCondition
     implements Condition

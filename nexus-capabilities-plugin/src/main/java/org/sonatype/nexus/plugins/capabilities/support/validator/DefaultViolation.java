@@ -25,7 +25,7 @@ import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
 /**
  * Default {@link ValidationResult.Violation} implementation.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class DefaultViolation
     implements ValidationResult.Violation

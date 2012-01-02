@@ -33,7 +33,7 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
 /**
  * {@link InversionCondition} UTs.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class InversionConditionTest
         extends NexusEventBusTestSupport

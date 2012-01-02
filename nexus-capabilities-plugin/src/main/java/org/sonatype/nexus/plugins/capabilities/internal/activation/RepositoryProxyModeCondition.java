@@ -33,7 +33,7 @@ import com.google.common.eventbus.Subscribe;
 /**
  * A condition that is satisfied when a repository has a specified proxy mode.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class RepositoryProxyModeCondition
     extends AbstractRepositoryCondition

@@ -36,7 +36,7 @@ import com.google.inject.assistedinject.Assisted;
 /**
  * Handles capability automatic removing by reacting to capability validity condition being satisfied/unsatisfied.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class ValidityConditionHandler
     extends AbstractLoggingComponent

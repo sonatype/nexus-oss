@@ -30,7 +30,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.activation.NexusIsActive
 /**
  * {@link NexusConditions} UTs.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class NexusConditionsTest
 {

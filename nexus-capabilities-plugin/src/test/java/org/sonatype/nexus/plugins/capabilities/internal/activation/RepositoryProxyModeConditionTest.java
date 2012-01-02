@@ -39,7 +39,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
 /**
  * {@link RepositoryProxyModeCondition} UTs.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class RepositoryProxyModeConditionTest
     extends NexusEventBusTestSupport

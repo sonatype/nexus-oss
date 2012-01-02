@@ -23,7 +23,7 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 /**
  * Factory of {@link ValidityConditionHandler}.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public interface ValidityConditionHandlerFactory
 {

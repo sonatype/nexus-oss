@@ -29,7 +29,7 @@ import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
 /**
  * Central access point for built in {@link Condition}s.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named
 @Singleton

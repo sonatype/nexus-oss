@@ -31,7 +31,7 @@ import com.google.common.eventbus.Subscribe;
 /**
  * Loads configuration when Nexus is initialized.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named
 @Singleton
