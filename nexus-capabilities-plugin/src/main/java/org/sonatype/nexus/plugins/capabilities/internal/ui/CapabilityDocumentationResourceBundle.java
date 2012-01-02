@@ -30,7 +30,7 @@ public class CapabilityDocumentationResourceBundle
     @Override
     public String getPluginId()
     {
-        return "org.sonatype.nexus.plugins.capabilities.imp";
+        return "org.sonatype.nexus.plugins.capabilities";
     }
 
     @Override
