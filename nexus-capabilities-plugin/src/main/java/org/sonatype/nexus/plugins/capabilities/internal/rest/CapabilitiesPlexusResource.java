@@ -31,7 +31,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -129,7 +128,6 @@ public class CapabilitiesPlexusResource
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = CapabilitiesListResponseResource.class )
     public Object get( final Context context, final Request request, final Response response, final Variant variant )
         throws ResourceException
     {
@@ -168,7 +166,6 @@ public class CapabilitiesPlexusResource
      */
     @Override
     @POST
-    @ResourceMethodSignature( input = CapabilityRequestResource.class, output = CapabilityStatusResponseResource.class )
     public Object post( final Context context, final Request request, final Response response, final Object payload )
         throws ResourceException
     {

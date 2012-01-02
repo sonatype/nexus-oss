@@ -19,9 +19,6 @@
 package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity.capabilityIdentity;
-import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
-import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPlexusResource.asCapabilityResponseResource;
 import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPlexusResource.asCapabilityStatusResponseResource;
 import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPlexusResource.getCapabilityId;
 
@@ -29,34 +26,20 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
-import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.Variant;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
-import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusRequestResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
@@ -121,8 +104,6 @@ public class CapabilityStatusPlexusResource
      */
     @Override
     @PUT
-    @ResourceMethodSignature( pathParams = { @PathParam( CapabilityStatusPlexusResource.CAPABILITIES_ID_KEY ) },
-                              input = CapabilityStatusRequestResource.class, output = CapabilityStatusResponseResource.class )
     public Object put( final Context context, final Request request, final Response response, final Object payload )
         throws ResourceException
     {

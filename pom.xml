@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     Copyright (c) 2008-2011 Sonatype, Inc.
@@ -23,9 +24,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus.plugins</groupId>
-    <artifactId>nexus-core-plugins</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>10</version>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
@@ -34,24 +35,105 @@
 
   <packaging>pom</packaging>
 
-  <name>Nexus : Core Plugins : Capabilities : Aggregator</name>
+  <name>Nexus : Plugins : Capabilities : Aggregator</name>
+
+  <scm>
+    <connection>scm:git:git@github.com/sonatype/nexus-capabilities-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-capabilities-plugin.git</developerConnection>
+    <url>http://github.com/sonatype/nexus-capabilities-plugin</url>
+  </scm>
 
   <modules>
     <module>nexus-capabilities-plugin</module>
+    <module>nexus-capabilities-plugin-it</module>
+    <module>nexus-capabilities-plugin-it-helper</module>
   </modules>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+    <nexus.version>2.0-SNAPSHOT</nexus.version>
+    <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
+  </properties>
+
+  <build>
+    <testResources>
+      <testResource>
+        <directory>${project.basedir}/src/test/resources</directory>
+        <filtering>false</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+      <testResource>
+        <directory>${project.basedir}/src/test/filtered-resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*</include>
+        </includes>
+      </testResource>
+    </testResources>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.10</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+                <goal>verify</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <profiles>
     <profile>
-      <id>with-tests</id>
-      <activation>
-        <property>
-          <name>!quick</name>
-        </property>
-      </activation>
-      <modules>
-        <module>nexus-capabilities-plugin-it</module>
-        <module>nexus-capabilities-plugin-it-helper</module>
-      </modules>
+      <id>quick</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
+    <profile>
+      <id>idea</id>
+      <properties>
+        <nexus.plugin.type>jar</nexus.plugin.type>
+      </properties>
     </profile>
   </profiles>
 
