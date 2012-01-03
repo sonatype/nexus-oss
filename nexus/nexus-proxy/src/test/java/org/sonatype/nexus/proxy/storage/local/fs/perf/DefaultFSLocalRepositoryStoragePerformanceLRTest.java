@@ -53,7 +53,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSPeer;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
 import com.carrotsearch.junitbenchmarks.BenchmarkRule;
@@ -114,7 +113,7 @@ public class DefaultFSLocalRepositoryStoragePerformanceLRTest
 
         // set the AttributeStorage on the Attribute Handler
         DefaultAttributesHandler attributesHandler =
-            new DefaultAttributesHandler( applicationConfiguration, getAttributeStorage(), itemInspectorList,
+            new DefaultAttributesHandler( applicationConfiguration, getAttributeStorage(), null, itemInspectorList,
                 fileItemInspectorList );
 
         // Need to use the MockRepository
@@ -141,10 +140,8 @@ public class DefaultFSLocalRepositoryStoragePerformanceLRTest
     private AttributeStorage getAttributeStorage()
     {
         // Mock out the events
-        ApplicationEventMulticaster applicationEventMulticaster = mock( ApplicationEventMulticaster.class );
-
         DefaultFSAttributeStorage attributeStorage =
-            new DefaultFSAttributeStorage( applicationEventMulticaster, applicationConfiguration,
+            new DefaultFSAttributeStorage( applicationConfiguration,
                 new XStreamMarshaller() );
         attributeStorage.initializeWorkingDirectory();
 

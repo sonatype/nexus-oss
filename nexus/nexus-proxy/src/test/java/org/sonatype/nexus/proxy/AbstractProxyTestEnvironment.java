@@ -36,7 +36,6 @@ import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
-import org.sonatype.nexus.proxy.attributes.DefaultFSAttributeStorage;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -223,12 +222,6 @@ public abstract class AbstractProxyTestEnvironment
         applicationEventMulticaster.addEventListener( testEventListener );
 
         attributesHandler = lookup( AttributesHandler.class );
-
-        if ( attributesHandler.getAttributeStorage() instanceof DefaultFSAttributeStorage )
-        {
-            ( (DefaultFSAttributeStorage) attributesHandler.getAttributeStorage() ).setWorkingDirectory( getApplicationConfiguration().getWorkingDirectory(
-                "proxy/attributes" ) );
-        }
 
         localRepositoryStorage = lookup( LocalRepositoryStorage.class, "file" );
 

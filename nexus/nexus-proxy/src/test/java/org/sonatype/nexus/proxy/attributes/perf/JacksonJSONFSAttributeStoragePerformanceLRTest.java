@@ -18,14 +18,11 @@
  */
 package org.sonatype.nexus.proxy.attributes.perf;
 
-import static org.mockito.Mockito.mock;
-
 import org.junit.runner.RunWith;
 import org.sonatype.nexus.proxy.attributes.AttributeStorage;
 import org.sonatype.nexus.proxy.attributes.DefaultFSAttributeStorage;
 import org.sonatype.nexus.proxy.attributes.JacksonJSONMarshaller;
 import org.sonatype.nexus.proxy.attributes.perf.internal.OrderedRunner;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
@@ -47,10 +44,8 @@ public class JacksonJSONFSAttributeStoragePerformanceLRTest
     
     public AttributeStorage getAttributeStorage()
     {
-        ApplicationEventMulticaster applicationEventMulticaster = mock( ApplicationEventMulticaster.class );
-
         DefaultFSAttributeStorage attributeStorage =
-            new DefaultFSAttributeStorage( applicationEventMulticaster, applicationConfiguration,
+            new DefaultFSAttributeStorage( applicationConfiguration,
                 new JacksonJSONMarshaller() );
         attributeStorage.initializeWorkingDirectory();
         return attributeStorage;

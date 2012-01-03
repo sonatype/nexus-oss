@@ -28,17 +28,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
 
 import com.google.common.io.Closeables;
 
@@ -53,10 +47,8 @@ import com.google.common.io.Closeables;
 @Singleton
 public class DefaultFSAttributeStorage
     extends AbstractAttributeStorage
-    implements AttributeStorage, EventListener, Initializable, Disposable
+    implements AttributeStorage
 {
-    private final ApplicationEventMulticaster applicationEventMulticaster;
-
     private final ApplicationConfiguration applicationConfiguration;
 
     private final Marshaller marshaller;
@@ -64,7 +56,7 @@ public class DefaultFSAttributeStorage
     /**
      * The base dir.
      */
-    private volatile File workingDirectory;
+    private final File workingDirectory;
 
     /**
      * Instantiates a new FSX stream attribute storage.
@@ -73,39 +65,43 @@ public class DefaultFSAttributeStorage
      * @param applicationConfiguration
      */
     @Inject
-    public DefaultFSAttributeStorage( final ApplicationEventMulticaster applicationEventMulticaster,
-                                      final ApplicationConfiguration applicationConfiguration,
+    public DefaultFSAttributeStorage( final ApplicationConfiguration applicationConfiguration,
                                       @Named( "xstream-xml" ) final Marshaller marshaller )
     {
         this.applicationConfiguration = applicationConfiguration;
-        this.applicationEventMulticaster = applicationEventMulticaster;
         this.marshaller = marshaller;
+        this.workingDirectory = initializeWorkingDirectory();
         getLogger().info( "Default FS AttributeStorage in place." );
     }
 
-    // == Events to keep config in sync
-
-    public void initialize()
+    public synchronized File initializeWorkingDirectory()
     {
-        applicationEventMulticaster.addEventListener( this );
+        final File workingDirectory = applicationConfiguration.getWorkingDirectory( "proxy/attributes-ng" );
 
-        initializeWorkingDirectory();
-    }
-
-    public void dispose()
-    {
-        applicationEventMulticaster.removeEventListener( this );
-    }
-
-    public void onEvent( final Event<?> evt )
-    {
-        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
+        if ( workingDirectory.exists() )
         {
-            initializeWorkingDirectory();
+            if ( !workingDirectory.isDirectory() )
+            {
+                throw new IllegalArgumentException( "The attribute storage exists and is not a directory: "
+                    + workingDirectory.getAbsolutePath() );
+            }
         }
-    }
+        else
+        {
+            getLogger().info( "Attribute storage directory does not exists, creating it here: " + workingDirectory );
 
-    // == Config
+            if ( !workingDirectory.mkdirs() )
+            {
+                if ( !workingDirectory.isDirectory() )
+                {
+                    throw new IllegalArgumentException( "Could not create the attribute storage directory on path "
+                        + workingDirectory.getAbsolutePath() );
+                }
+            }
+        }
+
+        return workingDirectory;
+    }
 
     /**
      * Gets the base dir.
@@ -116,43 +112,6 @@ public class DefaultFSAttributeStorage
         throws IOException
     {
         return workingDirectory;
-    }
-
-    public synchronized File initializeWorkingDirectory()
-    {
-        if ( workingDirectory == null )
-        {
-            workingDirectory = applicationConfiguration.getWorkingDirectory( "proxy/attributes-ng" );
-
-            if ( workingDirectory.exists() )
-            {
-                if ( !workingDirectory.isDirectory() )
-                {
-                    throw new IllegalArgumentException( "The attribute storage exists and is not a directory: "
-                        + workingDirectory.getAbsolutePath() );
-                }
-            }
-            else
-            {
-                getLogger().info( "Attribute storage directory does not exists, creating it here: " + workingDirectory );
-
-                if ( !workingDirectory.mkdirs() )
-                {
-                    if ( !workingDirectory.isDirectory() )
-                    {
-                        throw new IllegalArgumentException( "Could not create the attribute storage directory on path "
-                            + workingDirectory.getAbsolutePath() );
-                    }
-                }
-            }
-        }
-
-        return workingDirectory;
-    }
-
-    public synchronized void setWorkingDirectory( final File baseDir )
-    {
-        this.workingDirectory = baseDir;
     }
 
     // == Main iface: AttributeStorage

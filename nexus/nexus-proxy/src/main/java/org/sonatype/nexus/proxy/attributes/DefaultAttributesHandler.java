@@ -124,12 +124,29 @@ public class DefaultAttributesHandler
 
     @Inject
     public DefaultAttributesHandler( ApplicationConfiguration applicationConfiguration,
-                                     @Named( "transitioning" ) AttributeStorage attributeStorage,
+                                     @Named( "ls" ) AttributeStorage attributeStorage,
+                                     @Named( "legacy" ) AttributeStorage legacyAttributeStorage,
                                      List<StorageItemInspector> itemInspectorList,
                                      List<StorageFileItemInspector> fileItemInspectorList )
     {
         this.applicationConfiguration = applicationConfiguration;
-        this.attributeStorage = new DelegatingAttributeStorage( attributeStorage );
+
+        // do we need to waste CPU cycles at "transitioning" at all? Should not, ie, for new instances
+        if ( legacyAttributeStorage != null
+            && ( (LegacyFSAttributeStorage) legacyAttributeStorage ).isLegacyAttributeStorageDiscovered() )
+        {
+            this.attributeStorage =
+                new DelegatingAttributeStorage( new TransitioningAttributeStorage( attributeStorage,
+                    legacyAttributeStorage ) );
+
+            getLogger().info(
+                "Legacy AttributeStorage directory exists here \"{}\", transitioning them on-the-fly as they are used to repository storage.",
+                ( (LegacyFSAttributeStorage) legacyAttributeStorage ).getWorkingDirectory() );
+        }
+        else
+        {
+            this.attributeStorage = new DelegatingAttributeStorage( attributeStorage );
+        }
         this.itemInspectorList = itemInspectorList;
         this.fileItemInspectorList = fileItemInspectorList;
     }
@@ -362,8 +379,8 @@ public class DefaultAttributesHandler
     }
 
     protected boolean isTouchLastRequestedEnabled( final Repository repository )
-                    throws IOException
-   {
+        throws IOException
+    {
         // the "default"
         boolean doTouch = LAST_REQUEST_ATTRIBUTE_ENABLED;
 
