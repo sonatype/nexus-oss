@@ -70,7 +70,7 @@ public class ProgressListener
     {
         super.onTestSuccess( tr );
 
-        showResult( tr, "SUCCESS", System.out );
+        showResult( tr, "SUCCESS", System.out  );
     }
 
     private void showResult( ITestResult result, String status, PrintStream printer )
@@ -78,8 +78,10 @@ public class ProgressListener
         checkNotNull( result );
         checkNotNull( result.getTestClass() );
         checkNotNull( printer );
+        long duration = result.getEndMillis() - result.getStartMillis();
 
-        printer.println( "Result: " + result.getTestClass().getName() + "." + result.getName() + "() ===> " + status );
+        printer.println( String.format( "Result: %s.%s() ===> %s (duration %s ms)", result.getTestClass().getName(),
+            result.getName(), status, duration ) );
     }
 
 }

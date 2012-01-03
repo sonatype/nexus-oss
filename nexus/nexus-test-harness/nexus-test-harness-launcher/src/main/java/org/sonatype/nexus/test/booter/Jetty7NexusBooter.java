@@ -409,7 +409,8 @@ public class Jetty7NexusBooter
         // But, we have to make it carefully, since we might be re-created during multi-forked ITs but the test-env
         // plugin unzips the nexus bundle only once
         // at the start of the build. So, we have to check and do it only once.
-        tamperJarsForSharedClasspath( basedir, sharedLibs, "lucene-*.jar" );
+        // cstamas: Lucene is no more in core, not needed to do this anymore!
+        // tamperJarsForSharedClasspath( basedir, sharedLibs, "lucene-*.jar" );
 
         // LDAP does not unregister it? Like SISU container does not invoke Disposable.dispose() to make patch for
         // Provider unregistration happen? NO: the cause is if someone creates HTTPS connection while BC is registered,

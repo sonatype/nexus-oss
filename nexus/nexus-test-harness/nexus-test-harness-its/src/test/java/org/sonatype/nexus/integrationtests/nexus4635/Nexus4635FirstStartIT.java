@@ -24,6 +24,7 @@ import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -41,6 +42,11 @@ import org.testng.annotations.Test;
 public class Nexus4635FirstStartIT
     extends AbstractNexusIntegrationTest
 {
+    @BeforeClass
+    protected void disableSecurity()
+    {
+        TestContainer.getInstance().getTestContext().setSecureTest( false );
+    }
 
     @Override
     protected void copyConfigFiles()
@@ -55,13 +61,6 @@ public class Nexus4635FirstStartIT
         {
             throw new IOException( e );
         }
-    }
-
-    @BeforeClass
-    public void doNotVerifyConfig()
-    {
-        // no verification, since it would upgrade and hence, modify it
-        setVerifyNexusConfigBeforeStart( false );
     }
 
     @Test

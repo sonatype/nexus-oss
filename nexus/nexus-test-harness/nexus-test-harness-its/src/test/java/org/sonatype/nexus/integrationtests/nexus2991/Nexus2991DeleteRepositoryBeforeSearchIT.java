@@ -43,7 +43,7 @@ public class Nexus2991DeleteRepositoryBeforeSearchIT
     private NexusClient getConnectedNexusClient()
         throws Exception
     {
-        NexusClient client = (NexusClient) lookup( NexusClient.ROLE );
+        NexusClient client = lookup( NexusClient.class );
         TestContext context = TestContainer.getInstance().getTestContext();
         client.connect( AbstractNexusIntegrationTest.nexusBaseUrl, context.getAdminUsername(), context
             .getAdminPassword() );

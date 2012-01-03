@@ -62,7 +62,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
     public void start()
         throws Exception
     {
-        server = (ControlledServer) lookup( ControlledServer.ROLE );
+        server = lookup( ControlledServer.class );
         repoUtil = new RepositoryMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
     }
 
