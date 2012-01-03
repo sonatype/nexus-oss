@@ -37,6 +37,13 @@ import org.testng.annotations.Test;
  * <instanceUpgraded>true</instanceUpgraded>
  * <configurationUpgraded>false</configurationUpgraded>
  * </pre>
+ * 
+ * cstamas: this test was disabled since it does not quite makes sense. It would test following scenario: nexus.xml does
+ * not need upgrade, but the nexusVersion field contains old nexus version. To properly test this, you'd need a Nexus
+ * version (CURRENT), and a (CURRENT-1) that has previous constrants: nexus.xml model version did not change, but the
+ * obviously versions did change. Due how security is molded in this play, this is impossible to test without having
+ * those two true. By blindly upgrading and "just setting" the field this will never work, since security NPEs for
+ * mysterious reasons.
  */
 public class Nexus4635OldNexusVersionIT
     extends AbstractNexusIntegrationTest
@@ -47,7 +54,7 @@ public class Nexus4635OldNexusVersionIT
         TestContainer.getInstance().getTestContext().setSecureTest( false );
     }
 
-    @Test
+    @Test( enabled = false )
     public void checkState()
         throws Exception
     {
