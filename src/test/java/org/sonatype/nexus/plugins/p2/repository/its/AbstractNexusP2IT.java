@@ -72,10 +72,10 @@ public abstract class AbstractNexusP2IT
 
         final Verifier verifier = new Verifier( basedir.getAbsolutePath() );
         verifier.setLogFileName( getTestId() + "-maven-output.log" );
+        verifier.addCliOption( "-X" );
         verifier.executeGoals( Arrays.asList( "verify" ), env );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
-        verifier.addCliOption( "-X" );
     }
 
     protected void installAndVerifyP2Feature()
