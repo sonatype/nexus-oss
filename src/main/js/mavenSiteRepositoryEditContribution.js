@@ -5,22 +5,24 @@
  * Sonatype and Sonatype Nexus are trademarks of Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation.
  * M2Eclipse is a trademark of the Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-
 (function() {
-var hostedHandler = Sonatype.repoServer.HostedRepositoryEditor.prototype.afterProviderSelectHandler;
-Ext.override( Sonatype.repoServer.HostedRepositoryEditor, {
-  afterProviderSelectHandler:function ( combo, rec, index ) {
-    hostedHandler.apply(this, arguments);
 
-    if ( rec.data.provider == 'maven-site' ) {
-      this.find( 'name', 'writePolicy' )[0].setValue( 'ALLOW_WRITE' );
-    }
-    else {
-      this.find( 'name', 'writePolicy' )[0].setValue( 'ALLOW_WRITE_ONCE' );
-    }
-  }
-} );
-})();
+var hostedHandler = Sonatype.repoServer.HostedRepositoryEditor.prototype.afterProviderSelectHandler;
+
+Ext.override(Sonatype.repoServer.HostedRepositoryEditor, {
+      afterProviderSelectHandler : function(combo, rec, index) {
+        hostedHandler.apply(this, arguments);
+
+        if (rec.data.provider == 'maven-site')
+        {
+          this.find('name', 'writePolicy')[0].setValue('ALLOW_WRITE');
+        }
+        else
+        {
+          this.find('name', 'writePolicy')[0].setValue('ALLOW_WRITE_ONCE');
+        }
+      }
+});
 
 Ext.override( Sonatype.repoServer.HostedRepositorySummaryPanel, {
   populateFields:function ( arr, srcObj, fpanel ) {
@@ -46,3 +48,4 @@ Ext.override( Sonatype.repoServer.HostedRepositorySummaryPanel, {
     this.find( 'name', 'distMgmtField' )[0].setRawValue( distMgmtString );
   }
 } );
+})();
