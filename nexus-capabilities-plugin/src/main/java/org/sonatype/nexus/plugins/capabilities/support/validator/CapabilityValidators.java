@@ -48,6 +48,16 @@ public class CapabilityValidators
     }
 
     /**
+     * Creates a new validator that is always valid.
+     *
+     * @return created validator
+     */
+    public Validator alwaysValid()
+    {
+        return validatorFactory.alwaysValid();
+    }
+
+    /**
      * Creates a new validator that checks that only one capability of specified type and set of properties can be
      * created.
      *
@@ -75,6 +85,45 @@ public class CapabilityValidators
                                          final String... propertyKeys )
     {
         return validatorFactory.uniquePerExcluding( excludeId, type, propertyKeys );
+    }
+
+    /**
+     * Creates a new validator that checks that a specified property (by key) is present (not null or empty).
+     *
+     * @param type        capability type
+     * @param propertyKey key of required property
+     * @return created validator
+     */
+    public Validator required( final CapabilityType type,
+                               final String propertyKey )
+    {
+        return validatorFactory.required( type, propertyKey );
+    }
+
+    /**
+     * Creates a new validator that checks that a specified property (by key) matches a regexp expression.
+     *
+     * @param type        capability type
+     * @param propertyKey key of property to be matching
+     * @param regexp      to match
+     * @return created validator
+     */
+    public Validator matches( final CapabilityType type,
+                              final String propertyKey,
+                              final String regexp )
+    {
+        return validatorFactory.matches( type, propertyKey, regexp );
+    }
+
+    /**
+     * Creates a new validator that checks constraints expressed by descriptor fields are satisfied.
+     *
+     * @param type capability type
+     * @return created validator
+     */
+    public Validator constraintsOf( final CapabilityType type )
+    {
+        return validatorFactory.constraintsOf( type );
     }
 
 }

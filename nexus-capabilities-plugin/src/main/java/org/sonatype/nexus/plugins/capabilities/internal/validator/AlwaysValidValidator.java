@@ -18,33 +18,38 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import java.util.Map;
+import javax.inject.Named;
+
+import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
 import org.sonatype.nexus.plugins.capabilities.api.Validator;
-import com.google.inject.assistedinject.Assisted;
 
 /**
- * {@link Validator} factory.
+ * A {@link Validator} that is always valid.
  *
  * @since 2.0
  */
-public interface ValidatorFactory
+@Named
+public class AlwaysValidValidator
+    implements Validator
 {
 
-    PrimaryKeyValidator uniquePer( CapabilityType type, String... propertyKeys );
+    @Override
+    public ValidationResult validate( final Map<String, String> properties )
+    {
+        return ValidationResult.VALID;
+    }
 
-    PrimaryKeyExcludingSelfValidator uniquePerExcluding( CapabilityIdentity excludeId, CapabilityType type,
-                                                         String... propertyKeys );
+    @Override
+    public String explainValid()
+    {
+        return "Always valid";
+    }
 
-    RepositoryTypeValidator repositoryOfType( CapabilityType type, String propertyKey, Class<?> facet );
+    @Override
+    public String explainInvalid()
+    {
+        return "Always invalid";
+    }
 
-    DescriptorConstraintsValidator constraintsOf( CapabilityType type );
-
-    AlwaysValidValidator alwaysValid();
-
-    RequiredFieldValidator required( CapabilityType type, String propertyKey );
-
-    RegexpFieldValidator matches( CapabilityType type,
-                                  @Assisted( "key" ) String propertyKey,
-                                  @Assisted( "regexp" ) String regexp );
 }

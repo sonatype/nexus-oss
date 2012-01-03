@@ -36,6 +36,7 @@ import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityValidator;
 import org.sonatype.nexus.plugins.capabilities.api.Validator;
 import org.sonatype.nexus.plugins.capabilities.api.ValidatorRegistry;
+import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 import com.google.common.collect.Sets;
 
 /**
@@ -51,27 +52,35 @@ class DefaultValidatorRegistry
 
     private final CapabilityFactoryRegistry capabilityFactoryRegistry;
 
+    private final Validators validators;
+
     private final Map<String, CapabilityValidator> capabilityValidators;
 
     @Inject
     DefaultValidatorRegistry( final CapabilityFactoryRegistry capabilityFactoryRegistry,
                               final CapabilityRegistry capabilityRegistry,
+                              final Validators validators,
                               final Map<String, CapabilityValidator> capabilityValidators )
     {
         this.capabilityFactoryRegistry = checkNotNull( capabilityFactoryRegistry );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
+        this.validators = checkNotNull( validators );
         this.capabilityValidators = checkNotNull( capabilityValidators );
     }
 
     @Override
     public Collection<Validator> get( final CapabilityType type )
     {
-        final Set<Validator> validators = Sets.newHashSet();
+        final Set<Validator> typeValidators = Sets.newHashSet();
 
         final CapabilityFactory factory = capabilityFactoryRegistry.get( type );
-        if ( factory != null && factory instanceof Validator )
+        if ( factory != null )
         {
-            validators.add( (Validator) factory );
+            typeValidators.add( validators.capability().constraintsOf( type ) );
+            if ( factory instanceof Validator )
+            {
+                typeValidators.add( (Validator) factory );
+            }
         }
 
         final CapabilityValidator capabilityValidator = capabilityValidators.get( type.toString() );
@@ -80,22 +89,26 @@ class DefaultValidatorRegistry
             final Validator validator = capabilityValidator.validator();
             if ( validator != null )
             {
-                validators.add( validator );
+                typeValidators.add( validator );
             }
         }
 
-        return validators;
+        return typeValidators;
     }
 
     @Override
     public Collection<Validator> get( final CapabilityIdentity id )
     {
-        final Set<Validator> validators = Sets.newHashSet();
+        final Set<Validator> instanceValidators = Sets.newHashSet();
 
         final CapabilityReference reference = capabilityRegistry.get( id );
-        if ( reference != null && reference.capability() instanceof Validator )
+        if ( reference != null )
         {
-            validators.add( (Validator) reference.capability() );
+            instanceValidators.add( validators.capability().constraintsOf( reference.capabilityType() ) );
+            if ( reference.capability() instanceof Validator )
+            {
+                instanceValidators.add( (Validator) reference.capability() );
+            }
         }
 
         if ( reference != null )
@@ -107,12 +120,12 @@ class DefaultValidatorRegistry
                 final Validator validator = capabilityValidator.validator( id );
                 if ( validator != null )
                 {
-                    validators.add( validator );
+                    instanceValidators.add( validator );
                 }
             }
         }
 
-        return validators;
+        return instanceValidators;
     }
 
 }
