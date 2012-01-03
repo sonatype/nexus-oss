@@ -32,10 +32,10 @@ import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
-public class RepositoryGroupNexusRestClient
+public class RepositoryGroupsNexusRestClient
 {
 
-    private static final Logger LOG = LoggerFactory.getLogger( RepositoryGroupNexusRestClient.class );
+    private static final Logger LOG = LoggerFactory.getLogger( RepositoryGroupsNexusRestClient.class );
 
     public static final String SERVICE_PART = NexusRestClient.SERVICE_LOCAL + "repo_groups";
 
@@ -45,14 +45,14 @@ public class RepositoryGroupNexusRestClient
 
     private final MediaType mediaType;
 
-    public RepositoryGroupNexusRestClient( final NexusRestClient nexusRestClient)
+    public RepositoryGroupsNexusRestClient( final NexusRestClient nexusRestClient )
     {
         this( nexusRestClient, XStreamFactory.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
-    public RepositoryGroupNexusRestClient( final NexusRestClient nexusRestClient,
-                                           final XStream xstream,
-                                           final MediaType mediaType )
+    public RepositoryGroupsNexusRestClient( final NexusRestClient nexusRestClient,
+                                            final XStream xstream,
+                                            final MediaType mediaType )
     {
         this.nexusRestClient = checkNotNull( nexusRestClient );
         this.xstream = checkNotNull( xstream );

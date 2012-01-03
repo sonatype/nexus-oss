@@ -18,9 +18,6 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,12 +51,12 @@ public class GroupMessageUtil
 
     private static final Logger LOG = LoggerFactory.getLogger( GroupMessageUtil.class );
 
-    private final RepositoryGroupNexusRestClient groupNRC;
+    private final RepositoryGroupsNexusRestClient groupNRC;
 
     public GroupMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {
         super( test );
-        groupNRC = new RepositoryGroupNexusRestClient(
+        groupNRC = new RepositoryGroupsNexusRestClient(
             RequestFacade.getNexusRestClient(),
             xstream,
             mediaType
