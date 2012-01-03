@@ -75,6 +75,7 @@ public abstract class AbstractNexusP2IT
         verifier.executeGoals( Arrays.asList( "verify" ), env );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
+        verifier.addCliOption( "-X" );
     }
 
     protected void installAndVerifyP2Feature()
