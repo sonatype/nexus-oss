@@ -34,7 +34,7 @@
   <properties>
     <!-- Below is the "product", the subject of the ITs -->
     <product-groupId>org.sonatype.nexus</product-groupId>
-    <product-artifactId>nexus-oss-webapp</product-artifactId>
+    <product-artifactId>nexus-core-oss-webapp</product-artifactId>
     <product-version>${project.version}</product-version>
     <product-classifier>bundle</product-classifier>
     <product-type>zip</product-type>
@@ -136,7 +136,7 @@
             <classifier>${product-classifier}</classifier>
             <type>${product-type}</type>
           </nexusBundleArtifact>
-          <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
+          <nexusBundleName>nexus-core-oss-webapp-${project.version}</nexusBundleName>
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
@@ -480,7 +480,7 @@
         </dependency>
         <dependency>
           <groupId>org.sonatype.nexus</groupId>
-          <artifactId>nexus-webapp</artifactId>
+          <artifactId>nexus-core-webapp</artifactId>
           <version>${project.version}</version>
           <type>war</type>
         </dependency>

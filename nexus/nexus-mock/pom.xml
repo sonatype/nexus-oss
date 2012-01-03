@@ -35,7 +35,7 @@
   <name>Nexus : Mock Application Frontend</name>
 
   <properties>
-    <nexus.bundlebase>nexus-oss-webapp</nexus.bundlebase>
+    <nexus.bundlebase>nexus-core-oss-webapp</nexus.bundlebase>
   </properties>
 
   <build>
@@ -60,13 +60,13 @@
               <goal>unpack</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>nexus-oss-webapp</includeArtifactIds>
+              <includeArtifactIds>nexus-core-oss-webapp</includeArtifactIds>
               <outputDirectory>target/nexus-ui</outputDirectory>
               <!-- The bundle we test -->
               <artifactItems>
                 <artifactItem>
                   <groupId>org.sonatype.nexus</groupId>
-                  <artifactId>nexus-oss-webapp</artifactId>
+                  <artifactId>nexus-core-oss-webapp</artifactId>
                   <version>${project.version}</version>
                   <type>zip</type>
                   <classifier>bundle</classifier>
@@ -184,7 +184,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-oss-webapp</artifactId>
+      <artifactId>nexus-core-oss-webapp</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
       <classifier>bundle</classifier>

@@ -31,7 +31,7 @@
   </parent>
 
   <!-- a unique name for this project -->
-  <artifactId>nexus-webapp</artifactId>
+  <artifactId>nexus-core-webapp</artifactId>
   <!--we don't need this to be a jar except that the app assembler crashes if it's not -->
   <packaging>war</packaging>
   <!-- a short but descriptive name for the project -->
