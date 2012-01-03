@@ -60,13 +60,13 @@ public class NXCM2093CheckSumValidationIT
 
         try
         {
-            final Map<String, String> env = new HashMap<String, String>();
-            env.put( "eclipse.p2.MD5Check", "false" );
+            final Map<String, String> sysProps = new HashMap<String, String>();
+            sysProps.put( "eclipse.p2.MD5Check", "false" );
 
             installUsingP2(
                 getNexusTestRepoUrl(),
                 "com.sonatype.nexus.p2.its.feature.feature.group",
-                installDir.getCanonicalPath(), env
+                installDir.getCanonicalPath(), sysProps
             );
             Assert.fail();
         }

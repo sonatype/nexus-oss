@@ -50,30 +50,33 @@ public abstract class AbstractNexusP2IT
     }
 
     protected void installUsingP2( final String repositoryURL, final String installIU, final String destination,
-                                   final Map<String, String> extraEnv )
+                                   final Map<String, String> sysProps )
         throws Exception
     {
         FileUtils.deleteDirectory( destination );
 
         final File basedir = ResourceExtractor.simpleExtractResources( getClass(), "/run-p2" );
 
-        final Map<String, String> env = new HashMap<String, String>();
-        env.put( "org.eclipse.ecf.provider.filetransfer.retrieve.readTimeout", "30000" );
-        env.put( "p2.installIU", installIU );
-        env.put( "p2.destination", destination );
-        env.put( "p2.metadataRepository", repositoryURL );
-        env.put( "p2.artifactRepository", repositoryURL );
-        env.put( "p2.profile", getTestId() );
+        final Verifier verifier = new Verifier( basedir.getAbsolutePath() );
 
-        if ( extraEnv != null )
+        verifier.setSystemProperty( "org.eclipse.ecf.provider.filetransfer.retrieve.readTimeout", "30000" );
+        verifier.setSystemProperty( "p2.installIU", installIU );
+        verifier.setSystemProperty( "p2.destination", destination );
+        verifier.setSystemProperty( "p2.metadataRepository", repositoryURL );
+        verifier.setSystemProperty( "p2.artifactRepository", repositoryURL );
+        verifier.setSystemProperty( "p2.profile", getTestId() );
+
+        if ( sysProps != null )
         {
-            env.putAll( extraEnv );
+            for ( Map.Entry<String, String> entry : sysProps.entrySet() )
+            {
+                verifier.setSystemProperty( entry.getKey(), entry.getValue() );
+            }
         }
 
-        final Verifier verifier = new Verifier( basedir.getAbsolutePath() );
         verifier.setLogFileName( getTestId() + "-maven-output.log" );
         verifier.addCliOption( "-X" );
-        verifier.executeGoals( Arrays.asList( "verify" ), env );
+        verifier.executeGoals( Arrays.asList( "verify" ) );
         verifier.verifyErrorFreeLog();
         verifier.resetStreams();
     }
