@@ -20,7 +20,7 @@ package org.sonatype.nexus.plugins.capabilities.support.validator;
 
 import java.util.Set;
 
-import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
+import org.sonatype.nexus.plugins.capabilities.ValidationResult;
 import com.google.common.collect.Sets;
 
 /**

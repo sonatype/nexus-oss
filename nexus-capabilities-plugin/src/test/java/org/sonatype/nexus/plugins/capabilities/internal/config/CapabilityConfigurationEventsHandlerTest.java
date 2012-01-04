@@ -22,18 +22,18 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity.capabilityIdentity;
-import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
+import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
+import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 import java.util.Map;
 
 import org.junit.Test;
 import org.mockito.Matchers;
-import org.sonatype.nexus.plugins.capabilities.api.Capability;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 

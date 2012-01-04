@@ -28,6 +28,7 @@ public class CapabilitySecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
+
     @Override
     public String getResourcePath()
     {

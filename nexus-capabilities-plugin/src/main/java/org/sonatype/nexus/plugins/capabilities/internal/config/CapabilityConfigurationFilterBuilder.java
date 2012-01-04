@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 import com.google.common.base.Predicate;

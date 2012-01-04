@@ -24,10 +24,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.api.Validator;
-
 /**
- * Central access point for built-in {@link Validator}s.
+ * Central access point for built-in {@link org.sonatype.nexus.plugins.capabilities.Validator}s.
  *
  * @since 2.0
  */

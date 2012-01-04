@@ -19,7 +19,6 @@
 package org.sonatype.nexus.plugins.capabilities.internal.ui;
 
 import java.util.Map;
-
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.rest.AbstractNexusIndexHtmlCustomizer;
@@ -35,7 +34,8 @@ public class CapabilityNexusIndexHtmlCustomizer
     public String getPostHeadContribution( final Map<String, Object> ctx )
     {
         final String version =
-            getVersionFromJarFile( "/META-INF/maven/org.sonatype.nexus.plugins/nexus-capabilities-plugin/pom.properties" );
+            getVersionFromJarFile(
+                "/META-INF/maven/org.sonatype.nexus.plugins/nexus-capabilities-plugin/pom.properties" );
 
         if ( System.getProperty( "useOriginalJS" ) == null )
         {

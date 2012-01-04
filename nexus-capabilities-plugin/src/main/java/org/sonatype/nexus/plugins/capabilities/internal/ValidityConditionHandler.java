@@ -24,12 +24,12 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
-import org.sonatype.nexus.plugins.capabilities.internal.activation.SatisfiedCondition;
+import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
+import org.sonatype.nexus.plugins.capabilities.internal.condition.SatisfiedCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
-import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
+import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 

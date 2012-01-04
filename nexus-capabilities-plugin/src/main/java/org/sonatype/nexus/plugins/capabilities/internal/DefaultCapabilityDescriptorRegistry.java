@@ -25,9 +25,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 
 @Named
 @Singleton

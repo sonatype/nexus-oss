@@ -18,13 +18,12 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.api.Validator;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import com.google.inject.assistedinject.Assisted;
 
 /**
- * {@link Validator} factory.
+ * {@link org.sonatype.nexus.plugins.capabilities.Validator} factory.
  *
  * @since 2.0
  */

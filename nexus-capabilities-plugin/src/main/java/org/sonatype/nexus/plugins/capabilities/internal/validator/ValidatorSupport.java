@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import com.google.common.collect.Maps;
 
 /**
@@ -120,6 +120,5 @@ class ValidatorSupport
         }
         return value;
     }
-
 
 }

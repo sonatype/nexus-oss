@@ -29,8 +29,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity.capabilityIdentity;
-import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
+import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
+import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 import static org.sonatype.nexus.plugins.capabilities.internal.DefaultCapabilityReference.sameProperties;
 
 import java.util.Collections;
@@ -44,15 +44,15 @@ import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.eventbus.NexusEventBus;
-import org.sonatype.nexus.plugins.capabilities.api.Capability;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityEvent;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
-import org.sonatype.nexus.plugins.capabilities.internal.activation.NexusIsActiveCondition;
+import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
+import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.Condition;
+import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
+import org.sonatype.nexus.plugins.capabilities.internal.condition.NexusIsActiveCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
-import org.sonatype.nexus.plugins.capabilities.support.activation.Conditions;
-import org.sonatype.nexus.plugins.capabilities.support.activation.NexusConditions;
+import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
+import org.sonatype.nexus.plugins.capabilities.support.condition.NexusConditions;
 
 /**
  * {@link DefaultCapabilityReference} UTs.

@@ -21,11 +21,11 @@ package org.sonatype.nexus.plugins.capabilities.internal.validator;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.api.Validator;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.Validator;
 import com.google.inject.assistedinject.Assisted;
 
 /**

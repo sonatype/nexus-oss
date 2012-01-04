@@ -22,25 +22,19 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.hamcrest.Matcher;
-import org.hamcrest.MatcherAssert;
 import org.mockito.ArgumentMatcher;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.eventbus.NexusEventBus;
-import org.sonatype.nexus.plugins.capabilities.api.activation.Condition;
-import org.sonatype.nexus.plugins.capabilities.api.activation.ConditionEvent;
 
 /**
  * Support for tests using event bus.
@@ -79,7 +73,7 @@ public class NexusEventBusTestSupport
         assertThat( eventBusEvents, contains( matchers ) );
     }
 
-    protected void verifyNoEventBusEvents( )
+    protected void verifyNoEventBusEvents()
     {
         assertThat( eventBusEvents, empty() );
     }

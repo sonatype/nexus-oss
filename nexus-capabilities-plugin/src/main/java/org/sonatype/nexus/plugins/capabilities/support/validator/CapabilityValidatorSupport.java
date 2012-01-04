@@ -8,9 +8,9 @@
 
 package org.sonatype.nexus.plugins.capabilities.support.validator;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityValidator;
-import org.sonatype.nexus.plugins.capabilities.api.Validator;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityValidator;
+import org.sonatype.nexus.plugins.capabilities.Validator;
 
 /**
  * {@link CapabilityValidator} support.

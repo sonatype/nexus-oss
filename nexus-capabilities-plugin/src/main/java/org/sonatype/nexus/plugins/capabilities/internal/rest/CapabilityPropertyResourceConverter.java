@@ -19,7 +19,6 @@
 package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
-
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.converters.reflection.AbstractReflectionConverter;
 import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
@@ -29,6 +28,7 @@ import com.thoughtworks.xstream.mapper.Mapper;
 public class CapabilityPropertyResourceConverter
     extends AbstractReflectionConverter
 {
+
     public CapabilityPropertyResourceConverter( final Mapper mapper, final ReflectionProvider reflectionProvider )
     {
         super( mapper, reflectionProvider );

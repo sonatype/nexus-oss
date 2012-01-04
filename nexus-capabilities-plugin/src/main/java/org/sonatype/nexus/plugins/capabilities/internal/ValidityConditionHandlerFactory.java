@@ -18,7 +18,7 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 
 /**
  * Factory of {@link ValidityConditionHandler}.

@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import com.google.common.base.Predicate;
 
 public class CapabilityReferenceFilterBuilder

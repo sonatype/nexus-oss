@@ -24,10 +24,10 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
-import org.sonatype.nexus.plugins.capabilities.api.Validator;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.ValidationResult;
+import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidationResult;
 import com.google.inject.assistedinject.Assisted;
 

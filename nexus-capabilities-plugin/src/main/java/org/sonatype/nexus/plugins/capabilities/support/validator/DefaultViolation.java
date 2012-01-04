@@ -20,7 +20,7 @@ package org.sonatype.nexus.plugins.capabilities.support.validator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
+import org.sonatype.nexus.plugins.capabilities.ValidationResult;
 
 /**
  * Default {@link ValidationResult.Violation} implementation.

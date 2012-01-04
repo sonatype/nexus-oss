@@ -21,8 +21,8 @@ package org.sonatype.nexus.plugins.capabilities.internal.validator;
 import java.util.Map;
 import javax.inject.Named;
 
-import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
-import org.sonatype.nexus.plugins.capabilities.api.Validator;
+import org.sonatype.nexus.plugins.capabilities.ValidationResult;
+import org.sonatype.nexus.plugins.capabilities.Validator;
 
 /**
  * A {@link Validator} that is always valid.

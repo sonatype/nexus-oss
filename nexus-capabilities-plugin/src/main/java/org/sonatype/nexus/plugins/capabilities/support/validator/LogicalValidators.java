@@ -21,7 +21,7 @@ package org.sonatype.nexus.plugins.capabilities.support.validator;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.api.Validator;
+import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.internal.validator.ConjunctionValidator;
 import org.sonatype.nexus.plugins.capabilities.internal.validator.DisjunctionValidator;
 import org.sonatype.nexus.plugins.capabilities.internal.validator.InversionValidator;

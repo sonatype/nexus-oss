@@ -27,15 +27,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactoryRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityValidator;
-import org.sonatype.nexus.plugins.capabilities.api.Validator;
-import org.sonatype.nexus.plugins.capabilities.api.ValidatorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
+import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.CapabilityValidator;
+import org.sonatype.nexus.plugins.capabilities.Validator;
+import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
 import com.google.common.collect.Sets;
 

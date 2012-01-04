@@ -24,8 +24,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Map;
 import javax.inject.Inject;
 
-import org.sonatype.nexus.plugins.capabilities.api.ValidationResult;
-import org.sonatype.nexus.plugins.capabilities.api.Validator;
+import org.sonatype.nexus.plugins.capabilities.ValidationResult;
+import org.sonatype.nexus.plugins.capabilities.Validator;
 
 /**
  * Logical AND between {@link Validator}s.
@@ -94,6 +94,5 @@ public class ConjunctionValidator
         }
         return sb.toString();
     }
-
 
 }

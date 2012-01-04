@@ -20,7 +20,7 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
-import static org.sonatype.nexus.plugins.capabilities.api.CapabilityType.capabilityType;
+import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 import java.util.Map;
 import javax.inject.Inject;
@@ -28,9 +28,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactoryRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
+import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import com.google.common.collect.Maps;
 
 /**
