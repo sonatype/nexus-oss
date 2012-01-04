@@ -89,11 +89,17 @@ public class DefaultThreadPoolManager
     {
         // nop for now
     }
+    
+    public synchronized void shutdown()
+    {
+        terminatePool( groupRepositoryThreadPool );
+        terminatePool( proxyRepositoryThreadPool );
+    }
 
     @Override
     public void dispose()
     {
-        terminatePool( groupRepositoryThreadPool );
+        shutdown();
     }
 
     // ==

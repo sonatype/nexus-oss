@@ -27,6 +27,11 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.plexus.appevents.Event;
 
+/**
+ * Maintains the ThreadPoolManager based on Nexus events.
+ * 
+ * @author cstamas
+ */
 @Component( role = EventInspector.class, hint = "ThreadPoolManagerEventInspector" )
 public class ThreadPoolManagerEventInspector
     extends AbstractEventInspector
@@ -37,12 +42,18 @@ public class ThreadPoolManagerEventInspector
     @Override
     public boolean accepts( Event<?> evt )
     {
-        return evt instanceof RepositoryRegistryRepositoryEvent;
+        return evt != null && evt instanceof RepositoryRegistryRepositoryEvent;
+        // return evt != null && ( evt instanceof RepositoryRegistryRepositoryEvent || evt instanceof NexusStoppedEvent );
     }
 
     @Override
     public void inspect( Event<?> evt )
     {
+        if ( !accepts( evt ) )
+        {
+            return;
+        }
+
         if ( evt instanceof RepositoryRegistryEventAdd )
         {
             poolManager.createPool( ( (RepositoryRegistryEventAdd) evt ).getRepository() );
@@ -52,5 +63,9 @@ public class ThreadPoolManagerEventInspector
         {
             poolManager.removePool( ( (RepositoryRegistryEventRemove) evt ).getRepository() );
         }
+        // else if ( evt instanceof NexusStoppedEvent )
+        // {
+        // poolManager.shutdown();
+        // }
     }
 }
