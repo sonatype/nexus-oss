@@ -52,7 +52,7 @@ public class CapabilityOfTypeActiveCondition
     @Subscribe
     public void handle( final CapabilityEvent.AfterActivated event )
     {
-        if ( !isSatisfied() && type.equals( event.getReference().capabilityType() ) )
+        if ( !isSatisfied() && type.equals( event.getReference().type() ) )
         {
             checkAllCapabilities();
         }
@@ -61,7 +61,7 @@ public class CapabilityOfTypeActiveCondition
     @Subscribe
     public void handle( final CapabilityEvent.BeforePassivated event )
     {
-        if ( isSatisfied() && type.equals( event.getReference().capabilityType() ) )
+        if ( isSatisfied() && type.equals( event.getReference().type() ) )
         {
             checkAllCapabilities();
         }

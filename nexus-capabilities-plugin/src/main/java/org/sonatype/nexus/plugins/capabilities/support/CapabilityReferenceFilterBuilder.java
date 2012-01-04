@@ -77,7 +77,7 @@ public class CapabilityReferenceFilterBuilder
             {
                 return false;
             }
-            if ( typeId != null && !typeId.equals( input.capabilityType().toString() ) )
+            if ( typeId != null && !typeId.equals( input.type().toString() ) )
             {
                 return false;
             }

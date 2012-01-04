@@ -104,7 +104,7 @@ class DefaultValidatorRegistry
         final CapabilityReference reference = capabilityRegistry.get( id );
         if ( reference != null )
         {
-            instanceValidators.add( validators.capability().constraintsOf( reference.capabilityType() ) );
+            instanceValidators.add( validators.capability().constraintsOf( reference.type() ) );
             if ( reference.capability() instanceof Validator )
             {
                 instanceValidators.add( (Validator) reference.capability() );
@@ -114,7 +114,7 @@ class DefaultValidatorRegistry
         if ( reference != null )
         {
             final CapabilityValidator capabilityValidator =
-                capabilityValidators.get( reference.capabilityType().toString() );
+                capabilityValidators.get( reference.type().toString() );
             if ( capabilityValidator != null )
             {
                 final Validator validator = capabilityValidator.validator( id );

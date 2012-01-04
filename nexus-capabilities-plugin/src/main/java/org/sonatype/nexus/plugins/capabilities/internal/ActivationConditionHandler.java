@@ -24,7 +24,6 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.SatisfiedCondition;
@@ -44,7 +43,7 @@ public class ActivationConditionHandler
 
     private final NexusEventBus eventBus;
 
-    private final CapabilityReference reference;
+    private final DefaultCapabilityReference reference;
 
     private final Conditions conditions;
 
@@ -55,7 +54,7 @@ public class ActivationConditionHandler
     @Inject
     ActivationConditionHandler( final NexusEventBus eventBus,
                                 final Conditions conditions,
-                                final @Assisted CapabilityReference reference )
+                                final @Assisted DefaultCapabilityReference reference )
     {
         this.eventBus = checkNotNull( eventBus );
         this.conditions = checkNotNull( conditions );

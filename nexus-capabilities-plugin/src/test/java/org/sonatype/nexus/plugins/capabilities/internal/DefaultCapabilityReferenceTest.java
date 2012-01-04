@@ -120,7 +120,7 @@ public class DefaultCapabilityReferenceTest
                     throws Throwable
                 {
                     return new ActivationConditionHandler(
-                        eventBus, conditions, (CapabilityReference) invocation.getArguments()[0]
+                        eventBus, conditions, (DefaultCapabilityReference) invocation.getArguments()[0]
                     );
                 }
             }
@@ -135,7 +135,7 @@ public class DefaultCapabilityReferenceTest
                     throws Throwable
                 {
                     return new ValidityConditionHandler(
-                        eventBus, configurations, conditions, (CapabilityReference) invocation.getArguments()[0]
+                        eventBus, configurations, conditions, (DefaultCapabilityReference) invocation.getArguments()[0]
                     );
                 }
             }

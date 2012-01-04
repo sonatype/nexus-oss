@@ -31,9 +31,9 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.internal.DefaultCapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.internal.DefaultCapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 
@@ -59,7 +59,7 @@ public class CapabilityConfigurationEventsHandlerTest
     @Test
     public void onAddEnabled()
     {
-        CapabilityReference reference = create( ENABLED );
+        DefaultCapabilityReference reference = create( ENABLED );
 
         verify( reference ).create( Matchers.<Map<String, String>>any() );
         verify( reference ).enable();
@@ -72,7 +72,7 @@ public class CapabilityConfigurationEventsHandlerTest
     @Test
     public void onAddDisabled()
     {
-        CapabilityReference reference = create( DISABLED );
+        DefaultCapabilityReference reference = create( DISABLED );
 
         verify( reference ).create( Matchers.<Map<String, String>>any() );
     }
@@ -83,7 +83,7 @@ public class CapabilityConfigurationEventsHandlerTest
     @Test
     public void onLoadEnabled()
     {
-        CapabilityReference reference = load( ENABLED );
+        DefaultCapabilityReference reference = load( ENABLED );
 
         verify( reference ).load( Matchers.<Map<String, String>>any() );
         verify( reference ).enable();
@@ -96,7 +96,7 @@ public class CapabilityConfigurationEventsHandlerTest
     @Test
     public void onLoadDisabled()
     {
-        CapabilityReference reference = load( DISABLED );
+        DefaultCapabilityReference reference = load( DISABLED );
 
         verify( reference ).load( Matchers.<Map<String, String>>any() );
     }
@@ -108,7 +108,7 @@ public class CapabilityConfigurationEventsHandlerTest
     @Test
     public void onUpdateOldEnabledNewDisabled()
     {
-        CapabilityReference reference = update( ENABLED, DISABLED );
+        DefaultCapabilityReference reference = update( ENABLED, DISABLED );
 
         verify( reference ).disable();
         verify( reference ).update( Matchers.<Map<String, String>>any(), Matchers.<Map<String, String>>any() );
@@ -121,7 +121,7 @@ public class CapabilityConfigurationEventsHandlerTest
     @Test
     public void onUpdateOldDisabledNewDisabled()
     {
-        CapabilityReference reference = update( DISABLED, DISABLED );
+        DefaultCapabilityReference reference = update( DISABLED, DISABLED );
 
         verify( reference ).update( Matchers.<Map<String, String>>any(), Matchers.<Map<String, String>>any() );
     }
@@ -133,7 +133,7 @@ public class CapabilityConfigurationEventsHandlerTest
     @Test
     public void onUpdateOldEnabledNewEnabled()
     {
-        CapabilityReference reference = update( ENABLED, ENABLED );
+        DefaultCapabilityReference reference = update( ENABLED, ENABLED );
 
         verify( reference ).update( Matchers.<Map<String, String>>any(), Matchers.<Map<String, String>>any() );
     }
@@ -145,7 +145,7 @@ public class CapabilityConfigurationEventsHandlerTest
     @Test
     public void onUpdateOldDisabledNewEnabled()
     {
-        CapabilityReference reference = update( DISABLED, ENABLED );
+        DefaultCapabilityReference reference = update( DISABLED, ENABLED );
 
         verify( reference ).enable();
         verify( reference ).update( Matchers.<Map<String, String>>any(), Matchers.<Map<String, String>>any() );
@@ -157,17 +157,17 @@ public class CapabilityConfigurationEventsHandlerTest
     @Test
     public void onRemove()
     {
-        CapabilityReference reference = remove();
+        DefaultCapabilityReference reference = remove();
 
         verify( reference ).remove();
     }
 
-    private CapabilityReference create( final boolean enabled )
+    private DefaultCapabilityReference create( final boolean enabled )
     {
         final Capability capability = mock( Capability.class );
         when( capability.id() ).thenReturn( TEST_IDENTITY );
 
-        final CapabilityReference reference = mock( CapabilityReference.class );
+        final DefaultCapabilityReference reference = mock( DefaultCapabilityReference.class );
         when( reference.capability() ).thenReturn( capability );
         if ( !enabled )
         {
@@ -175,7 +175,7 @@ public class CapabilityConfigurationEventsHandlerTest
             doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).activate();
         }
 
-        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        final DefaultCapabilityRegistry capabilityRegistry = mock( DefaultCapabilityRegistry.class );
         when( capabilityRegistry.create( TEST_IDENTITY, TEST_TYPE ) ).thenReturn( reference );
 
         final CCapability cc = new CCapability();
@@ -190,12 +190,12 @@ public class CapabilityConfigurationEventsHandlerTest
         return reference;
     }
 
-    private CapabilityReference load( final boolean enabled )
+    private DefaultCapabilityReference load( final boolean enabled )
     {
         final Capability capability = mock( Capability.class );
         when( capability.id() ).thenReturn( TEST_IDENTITY );
 
-        final CapabilityReference reference = mock( CapabilityReference.class );
+        final DefaultCapabilityReference reference = mock( DefaultCapabilityReference.class );
         when( reference.capability() ).thenReturn( capability );
         if ( !enabled )
         {
@@ -203,7 +203,7 @@ public class CapabilityConfigurationEventsHandlerTest
             doThrow( new AssertionError( "Activate not expected to be called" ) ).when( reference ).activate();
         }
 
-        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        final DefaultCapabilityRegistry capabilityRegistry = mock( DefaultCapabilityRegistry.class );
         when( capabilityRegistry.create( TEST_IDENTITY, TEST_TYPE ) ).thenReturn(
             reference );
 
@@ -219,16 +219,16 @@ public class CapabilityConfigurationEventsHandlerTest
         return reference;
     }
 
-    private CapabilityReference update( final boolean oldEnabled, final boolean newEnabled )
+    private DefaultCapabilityReference update( final boolean oldEnabled, final boolean newEnabled )
     {
         final Capability capability = mock( Capability.class );
         when( capability.id() ).thenReturn( TEST_IDENTITY );
 
-        final CapabilityReference reference = mock( CapabilityReference.class );
+        final DefaultCapabilityReference reference = mock( DefaultCapabilityReference.class );
         when( reference.capability() ).thenReturn( capability );
         when( reference.isActive() ).thenReturn( oldEnabled );
 
-        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        final DefaultCapabilityRegistry capabilityRegistry = mock( DefaultCapabilityRegistry.class );
         when( capabilityRegistry.get( TEST_IDENTITY ) ).thenReturn( reference );
 
         final CCapability oldCapability = new CCapability();
@@ -268,15 +268,15 @@ public class CapabilityConfigurationEventsHandlerTest
         return reference;
     }
 
-    private CapabilityReference remove()
+    private DefaultCapabilityReference remove()
     {
         final Capability capability = mock( Capability.class );
         when( capability.id() ).thenReturn( TEST_IDENTITY );
 
-        final CapabilityReference reference = mock( CapabilityReference.class );
+        final DefaultCapabilityReference reference = mock( DefaultCapabilityReference.class );
         when( reference.capability() ).thenReturn( capability );
 
-        final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
+        final DefaultCapabilityRegistry capabilityRegistry = mock( DefaultCapabilityRegistry.class );
         when( capabilityRegistry.get( TEST_IDENTITY ) ).thenReturn( reference );
 
         final CCapability cc = new CCapability();

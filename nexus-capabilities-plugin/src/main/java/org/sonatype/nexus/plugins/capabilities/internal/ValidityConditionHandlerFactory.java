@@ -28,6 +28,6 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 public interface ValidityConditionHandlerFactory
 {
 
-    ValidityConditionHandler create( final CapabilityReference reference );
+    ValidityConditionHandler create( final DefaultCapabilityReference reference );
 
 }

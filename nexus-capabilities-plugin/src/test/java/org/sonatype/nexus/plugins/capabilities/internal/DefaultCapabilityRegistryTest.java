@@ -74,7 +74,7 @@ public class DefaultCapabilityRegistryTest
     public void setUp()
     {
         final CapabilityFactory factory = mock( CapabilityFactory.class );
-        when( factory.create( Matchers.<CapabilityIdentity>any(),  Matchers.<CapabilityContext>any() ) )
+        when( factory.create( Matchers.<CapabilityIdentity>any(), Matchers.<CapabilityContext>any() ) )
             .thenAnswer( new Answer<Capability>()
             {
                 @Override
@@ -99,11 +99,11 @@ public class DefaultCapabilityRegistryTest
         underTest = new DefaultCapabilityRegistry( capabilityFactoryRegistry, eventBus, achf, vchf )
         {
             @Override
-            CapabilityReference createReference( final CapabilityType type,
-                                                 final Capability capability,
-                                                 final CapabilityContextProxy capabilityContextProxy )
+            DefaultCapabilityReference createReference( final CapabilityType type,
+                                                        final Capability capability,
+                                                        final CapabilityContextProxy capabilityContextProxy )
             {
-                return mock( CapabilityReference.class );
+                return mock( DefaultCapabilityReference.class );
             }
         };
 
@@ -186,7 +186,7 @@ public class DefaultCapabilityRegistryTest
     {
         underTest.create( CAPABILITY_1, CAPABILITY_TYPE );
         underTest.create( CAPABILITY_2, CAPABILITY_TYPE );
-        final Collection<CapabilityReference> references = underTest.getAll();
+        final Collection<? extends CapabilityReference> references = underTest.getAll();
 
         assertThat( references, hasSize( 2 ) );
     }

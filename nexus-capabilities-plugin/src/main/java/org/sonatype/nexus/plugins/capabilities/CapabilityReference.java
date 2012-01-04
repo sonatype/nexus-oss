@@ -22,14 +22,6 @@ import java.util.Map;
 
 /**
  * Reference to a capability and its state.
- * <p/>
- * A capability can be enabled/disabled, usually at user request and can be active in case that:<br/>
- * * is enabled<br/>
- * * capability did not fail activation<br/>
- * * activation condition is satisfied.<br/>
- * In above is not fulfilled capability is inactive.
- * <p/>
- * Whenever the active state changes {@link Capability#activate()} / {@link Capability#passivate()} is called.
  *
  * @since 2.0
  */
@@ -41,7 +33,7 @@ public interface CapabilityReference
      *
      * @return capability type (never null)
      */
-    CapabilityType capabilityType();
+    CapabilityType type();
 
     /**
      * Returns referenced capability.
@@ -58,31 +50,11 @@ public interface CapabilityReference
     boolean isEnabled();
 
     /**
-     * Enables the referenced capability.
-     */
-    void enable();
-
-    /**
-     * Disables the referenced capability.
-     */
-    void disable();
-
-    /**
      * Whether the referenced capability is active.
      *
      * @return true, if capability was activated and not yet passivated
      */
     boolean isActive();
-
-    /**
-     * Activates the referenced capability.
-     */
-    void activate();
-
-    /**
-     * Passivate the referenced capability.
-     */
-    void passivate();
 
     /**
      * Returns status of capability.
@@ -104,33 +76,6 @@ public interface CapabilityReference
      * @return properties.
      */
     Map<String, String> properties();
-
-    /**
-     * Callback when a new capability is created.
-     *
-     * @param properties capability configuration
-     */
-    void create( Map<String, String> properties );
-
-    /**
-     * Callback when a capability configuration is loaded from persisted store (configuration file).
-     *
-     * @param properties capability configuration
-     */
-    void load( Map<String, String> properties );
-
-    /**
-     * Callback when a capability configuration is updated.
-     *
-     * @param properties         capability configuration
-     * @param previousProperties previous capability configuration
-     */
-    void update( Map<String, String> properties, final Map<String, String> previousProperties );
-
-    /**
-     * Callback when a capability configuration is removed.
-     */
-    void remove();
 
     /**
      * Describe current state.

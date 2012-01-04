@@ -28,6 +28,6 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 public interface ActivationConditionHandlerFactory
 {
 
-    ActivationConditionHandler create( final CapabilityReference reference );
+    ActivationConditionHandler create( final DefaultCapabilityReference reference );
 
 }

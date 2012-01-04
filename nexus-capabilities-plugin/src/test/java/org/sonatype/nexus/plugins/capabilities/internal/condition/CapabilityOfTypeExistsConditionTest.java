@@ -20,6 +20,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -33,11 +34,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
-import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
+import org.sonatype.nexus.plugins.capabilities.internal.DefaultCapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 
 /**
@@ -49,9 +50,9 @@ public class CapabilityOfTypeExistsConditionTest
     extends NexusEventBusTestSupport
 {
 
-    private CapabilityReference ref1;
+    private DefaultCapabilityReference ref1;
 
-    private CapabilityReference ref2;
+    private DefaultCapabilityReference ref2;
 
     private CapabilityRegistry capabilityRegistry;
 
@@ -69,12 +70,12 @@ public class CapabilityOfTypeExistsConditionTest
         final CapabilityType capabilityType = capabilityType( TestCapability.class.getName() );
 
         final TestCapability testCapability = new TestCapability();
-        ref1 = mock( CapabilityReference.class );
-        when( ref1.capabilityType() ).thenReturn( capabilityType );
+        ref1 = mock( DefaultCapabilityReference.class );
+        when( ref1.type() ).thenReturn( capabilityType );
         when( ref1.capability() ).thenReturn( testCapability );
-        ref2 = mock( CapabilityReference.class );
+        ref2 = mock( DefaultCapabilityReference.class );
         when( ref2.capability() ).thenReturn( testCapability );
-        when( ref2.capabilityType() ).thenReturn( capabilityType );
+        when( ref2.type() ).thenReturn( capabilityType );
 
         final CapabilityDescriptorRegistry descriptorRegistry = mock( CapabilityDescriptorRegistry.class );
         final CapabilityDescriptor descriptor = mock( CapabilityDescriptor.class );
@@ -105,7 +106,7 @@ public class CapabilityOfTypeExistsConditionTest
     @Test
     public void capabilityOfTypeExists01()
     {
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
+        doReturn( Arrays.asList( ref1 ) ).when( capabilityRegistry ).getAll();
         when( ref1.isActive() ).thenReturn( true );
         underTest.handle( new CapabilityRegistryEvent.Created( ref1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
@@ -119,7 +120,7 @@ public class CapabilityOfTypeExistsConditionTest
     @Test
     public void capabilityOfTypeExists02()
     {
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
+        doReturn( Arrays.asList( ref1 ) ).when( capabilityRegistry ).getAll();
         when( ref1.isActive() ).thenReturn( false );
         underTest.handle( new CapabilityRegistryEvent.Created( ref1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
@@ -133,11 +134,11 @@ public class CapabilityOfTypeExistsConditionTest
     @Test
     public void capabilityOfTypeExists03()
     {
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
+        doReturn( Arrays.asList( ref1 ) ).when( capabilityRegistry ).getAll();
         underTest.handle( new CapabilityRegistryEvent.Created( ref1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1, ref2 ) );
+        doReturn( Arrays.asList( ref1, ref2 ) ).when( capabilityRegistry ).getAll();
         underTest.handle( new CapabilityRegistryEvent.Created( ref2 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
@@ -150,15 +151,15 @@ public class CapabilityOfTypeExistsConditionTest
     @Test
     public void capabilityOfTypeExists04()
     {
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
+        doReturn( Arrays.asList( ref1 ) ).when( capabilityRegistry ).getAll();
         underTest.handle( new CapabilityRegistryEvent.Created( ref1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1, ref2 ) );
+        doReturn( Arrays.asList( ref1, ref2 ) ).when( capabilityRegistry ).getAll();
         underTest.handle( new CapabilityRegistryEvent.Created( ref2 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref2 ) );
+        doReturn( Arrays.asList( ref2 ) ).when( capabilityRegistry ).getAll();
         underTest.handle( new CapabilityRegistryEvent.Removed( ref1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
@@ -171,11 +172,11 @@ public class CapabilityOfTypeExistsConditionTest
     @Test
     public void capabilityOfTypeExists05()
     {
-        when( capabilityRegistry.getAll() ).thenReturn( Arrays.asList( ref1 ) );
+        doReturn( Arrays.asList( ref1 ) ).when( capabilityRegistry ).getAll();
         underTest.handle( new CapabilityRegistryEvent.Created( ref1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
-        when( capabilityRegistry.getAll() ).thenReturn( Collections.<CapabilityReference>emptyList() );
+        doReturn( Collections.emptyList() ).when( capabilityRegistry ).getAll();
         underTest.handle( new CapabilityRegistryEvent.Removed( ref1 ) );
         assertThat( underTest.isSatisfied(), is( false ) );
 

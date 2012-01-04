@@ -44,7 +44,7 @@ public class ValidityConditionHandler
 
     private final NexusEventBus eventBus;
 
-    private final CapabilityReference reference;
+    private final DefaultCapabilityReference reference;
 
     private final CapabilityConfiguration configurations;
 
@@ -58,7 +58,7 @@ public class ValidityConditionHandler
     ValidityConditionHandler( final NexusEventBus eventBus,
                               final CapabilityConfiguration configurations,
                               final Conditions conditions,
-                              final @Assisted CapabilityReference reference )
+                              final @Assisted DefaultCapabilityReference reference )
     {
         this.eventBus = checkNotNull( eventBus );
         this.configurations = checkNotNull( configurations );

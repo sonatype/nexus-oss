@@ -29,27 +29,6 @@ public interface CapabilityRegistry
 {
 
     /**
-     * Creates a capability given its id/type. if there is no capability available for specified type it will throw an
-     * runtime exception.
-     *
-     * @param id   id of capability to be created
-     * @param type type of capability to be created
-     * @return created capability
-     * @since 2.0
-     */
-    CapabilityReference create( CapabilityIdentity id, CapabilityType type );
-
-    /**
-     * Removed a capability from registry. If there is no capability with specified id in the registry it will pass
-     * silently.
-     *
-     * @param id to remove
-     * @return removed capability (if any), null otherwise
-     * @since 2.0
-     */
-    CapabilityReference remove( CapabilityIdentity id );
-
-    /**
      * Retrieves the capability from registry with specified id. If there is no capability with specified id in the
      * registry it will return null.
      *
@@ -67,7 +46,7 @@ public interface CapabilityRegistry
      * @return collection of capabilities, never null
      * @since 2.0
      */
-    public Collection<CapabilityReference> get( Predicate<CapabilityReference> filter );
+    public Collection<? extends CapabilityReference> get( Predicate<CapabilityReference> filter );
 
     /**
      * Retrieves all capabilities from registry. If no capability exists, result will be empty.
@@ -75,6 +54,6 @@ public interface CapabilityRegistry
      * @return collection of capabilities, never null
      * @since 2.0
      */
-    Collection<CapabilityReference> getAll();
+    Collection<? extends CapabilityReference> getAll();
 
 }

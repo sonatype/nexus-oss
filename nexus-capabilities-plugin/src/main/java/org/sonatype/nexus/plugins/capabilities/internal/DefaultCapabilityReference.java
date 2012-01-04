@@ -39,7 +39,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityType;
  *
  * @since 2.0
  */
-class DefaultCapabilityReference
+public class DefaultCapabilityReference
     extends AbstractLoggingComponent
     implements CapabilityReference, CapabilityContext
 {
@@ -85,7 +85,7 @@ class DefaultCapabilityReference
     }
 
     @Override
-    public CapabilityType capabilityType()
+    public CapabilityType type()
     {
         return capabilityType;
     }
@@ -110,7 +110,9 @@ class DefaultCapabilityReference
         }
     }
 
-    @Override
+    /**
+     * Enables the referenced capability.
+     */
     public void enable()
     {
         try
@@ -124,7 +126,9 @@ class DefaultCapabilityReference
         }
     }
 
-    @Override
+    /**
+     * Disables the referenced capability.
+     */
     public void disable()
     {
         try
@@ -172,7 +176,9 @@ class DefaultCapabilityReference
         }
     }
 
-    @Override
+    /**
+     * Activates the referenced capability.
+     */
     public void activate()
     {
         try
@@ -186,7 +192,9 @@ class DefaultCapabilityReference
         }
     }
 
-    @Override
+    /**
+     * Passivate the referenced capability.
+     */
     public void passivate()
     {
         try
@@ -214,7 +222,11 @@ class DefaultCapabilityReference
         }
     }
 
-    @Override
+    /**
+     * Callback when a new capability is created.
+     *
+     * @param properties capability configuration
+     */
     public void create( final Map<String, String> properties )
     {
         try
@@ -228,7 +240,11 @@ class DefaultCapabilityReference
         }
     }
 
-    @Override
+    /**
+     * Callback when a capability configuration is loaded from persisted store (configuration file).
+     *
+     * @param properties capability configuration
+     */
     public void load( final Map<String, String> properties )
     {
         try
@@ -242,7 +258,12 @@ class DefaultCapabilityReference
         }
     }
 
-    @Override
+    /**
+     * Callback when a capability configuration is updated.
+     *
+     * @param properties         capability configuration
+     * @param previousProperties previous capability configuration
+     */
     public void update( final Map<String, String> properties, final Map<String, String> previousProperties )
     {
         if ( !sameProperties( previousProperties, properties ) )
@@ -259,7 +280,9 @@ class DefaultCapabilityReference
         }
     }
 
-    @Override
+    /**
+     * Callback when a capability configuration is removed.
+     */
     public void remove()
     {
         try
@@ -357,7 +380,7 @@ class DefaultCapabilityReference
         }
 
         @Override
-        public CapabilityType capabilityType()
+        public CapabilityType type()
         {
             return capabilityType;
         }
@@ -374,13 +397,11 @@ class DefaultCapabilityReference
             return false;
         }
 
-        @Override
         public void enable()
         {
             throw new IllegalStateException( "State '" + toString() + "' does not permit 'enable' operation" );
         }
 
-        @Override
         public void disable()
         {
             throw new IllegalStateException( "State '" + toString() + "' does not permit 'disable' operation" );
@@ -392,13 +413,11 @@ class DefaultCapabilityReference
             return false;
         }
 
-        @Override
         public void activate()
         {
             throw new IllegalStateException( "State '" + toString() + "' does not permit 'activate' operation" );
         }
 
-        @Override
         public void passivate()
         {
             throw new IllegalStateException( "State '" + toString() + "' does not permit 'passivate' operation" );
@@ -422,25 +441,21 @@ class DefaultCapabilityReference
             return null;
         }
 
-        @Override
         public void create( final Map<String, String> properties )
         {
             throw new IllegalStateException( "State '" + toString() + "' does not permit 'create' operation" );
         }
 
-        @Override
         public void load( final Map<String, String> properties )
         {
             throw new IllegalStateException( "State '" + toString() + "' does not permit 'load' operation" );
         }
 
-        @Override
         public void update( final Map<String, String> properties, final Map<String, String> previousProperties )
         {
             throw new IllegalStateException( "State '" + toString() + "' does not permit 'update' operation" );
         }
 
-        @Override
         public void remove()
         {
             throw new IllegalStateException( "State '" + toString() + "' does not permit 'remove' operation" );

@@ -89,7 +89,7 @@ public class CapabilityOfTypeExistsCondition
     @Subscribe
     public void handle( final CapabilityRegistryEvent.Created event )
     {
-        if ( !isSatisfied() && type.equals( event.getReference().capabilityType() ) )
+        if ( !isSatisfied() && type.equals( event.getReference().type() ) )
         {
             checkAllCapabilities();
         }
@@ -98,7 +98,7 @@ public class CapabilityOfTypeExistsCondition
     @Subscribe
     public void handle( final CapabilityRegistryEvent.Removed event )
     {
-        if ( isSatisfied() && type.equals( event.getReference().capabilityType() ) )
+        if ( isSatisfied() && type.equals( event.getReference().type() ) )
         {
             checkAllCapabilities();
         }
@@ -119,7 +119,7 @@ public class CapabilityOfTypeExistsCondition
 
     boolean isSatisfiedBy( final CapabilityReference reference )
     {
-        return type.equals( reference.capabilityType() );
+        return type.equals( reference.type() );
     }
 
     @Override

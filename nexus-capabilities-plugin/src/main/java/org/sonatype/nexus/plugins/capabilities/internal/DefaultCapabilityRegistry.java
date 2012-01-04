@@ -49,7 +49,7 @@ import com.google.common.collect.Collections2;
  */
 @Singleton
 @Named
-class DefaultCapabilityRegistry
+public class DefaultCapabilityRegistry
     extends AbstractLoggingComponent
     implements CapabilityRegistry
 {
@@ -62,7 +62,7 @@ class DefaultCapabilityRegistry
 
     private final CapabilityFactoryRegistry capabilityFactoryRegistry;
 
-    private final Map<CapabilityIdentity, CapabilityReference> references;
+    private final Map<CapabilityIdentity, DefaultCapabilityReference> references;
 
     private final ReentrantReadWriteLock lock;
 
@@ -77,12 +77,20 @@ class DefaultCapabilityRegistry
         this.activationConditionHandlerFactory = checkNotNull( activationConditionHandlerFactory );
         this.validityConditionHandlerFactory = checkNotNull( validityConditionHandlerFactory );
 
-        references = new HashMap<CapabilityIdentity, CapabilityReference>();
+        references = new HashMap<CapabilityIdentity, DefaultCapabilityReference>();
         lock = new ReentrantReadWriteLock();
     }
 
-    @Override
-    public CapabilityReference create( final CapabilityIdentity id, final CapabilityType type )
+    /**
+     * Creates a capability given its id/type. if there is no capability available for specified type it will throw an
+     * runtime exception.
+     *
+     * @param id   id of capability to be created
+     * @param type type of capability to be created
+     * @return created capability
+     * @since 2.0
+     */
+    public DefaultCapabilityReference create( final CapabilityIdentity id, final CapabilityType type )
     {
         assert id != null : "Capability id cannot be null";
 
@@ -101,7 +109,7 @@ class DefaultCapabilityRegistry
             );
             final Capability capability = factory.create( id, capabilityContextProxy );
 
-            final CapabilityReference reference = createReference( type, capability, capabilityContextProxy );
+            final DefaultCapabilityReference reference = createReference( type, capability, capabilityContextProxy );
 
             references.put( id, reference );
 
@@ -117,7 +125,14 @@ class DefaultCapabilityRegistry
         }
     }
 
-    @Override
+    /**
+     * Removed a capability from registry. If there is no capability with specified id in the registry it will pass
+     * silently.
+     *
+     * @param id to remove
+     * @return removed capability (if any), null otherwise
+     * @since 2.0
+     */
     public CapabilityReference remove( final CapabilityIdentity id )
     {
         try
@@ -139,7 +154,7 @@ class DefaultCapabilityRegistry
     }
 
     @Override
-    public CapabilityReference get( final CapabilityIdentity id )
+    public DefaultCapabilityReference get( final CapabilityIdentity id )
     {
         try
         {
@@ -154,13 +169,13 @@ class DefaultCapabilityRegistry
     }
 
     @Override
-    public Collection<CapabilityReference> get( final Predicate<CapabilityReference> filter )
+    public Collection<DefaultCapabilityReference> get( final Predicate<CapabilityReference> filter )
     {
         return unmodifiableCollection( Collections2.filter( getAll(), filter ) );
     }
 
     @Override
-    public Collection<CapabilityReference> getAll()
+    public Collection<DefaultCapabilityReference> getAll()
     {
         try
         {
@@ -175,8 +190,9 @@ class DefaultCapabilityRegistry
     }
 
     @VisibleForTesting
-    CapabilityReference createReference( final CapabilityType type, final Capability capability,
-                                         final CapabilityContextProxy capabilityContextProxy )
+    DefaultCapabilityReference createReference( final CapabilityType type,
+                                                final Capability capability,
+                                                final CapabilityContextProxy capabilityContextProxy )
     {
         return new DefaultCapabilityReference(
             eventBus,

@@ -29,7 +29,8 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
+import org.sonatype.nexus.plugins.capabilities.internal.DefaultCapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.internal.DefaultCapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import com.google.common.eventbus.Subscribe;
 
@@ -44,19 +45,19 @@ class CapabilityConfigurationEventsHandler
     implements NexusEventBus.LoadOnStart
 {
 
-    private final CapabilityRegistry registry;
+    private final DefaultCapabilityRegistry capabilityRegistry;
 
     @Inject
-    CapabilityConfigurationEventsHandler( final CapabilityRegistry registry )
+    CapabilityConfigurationEventsHandler( final DefaultCapabilityRegistry capabilityRegistry )
     {
-        this.registry = checkNotNull( registry );
+        this.capabilityRegistry = checkNotNull( capabilityRegistry );
     }
 
     @Subscribe
     public void handle( final CapabilityConfigurationEvent.Added event )
     {
         final CCapability capabilityConfig = event.getCapability();
-        final CapabilityReference ref = registry.create(
+        final DefaultCapabilityReference ref = capabilityRegistry.create(
             capabilityIdentity( capabilityConfig.getId() ), capabilityType( capabilityConfig.getTypeId() )
         );
         ref.create( asMap( capabilityConfig.getProperties() ) );
@@ -71,7 +72,7 @@ class CapabilityConfigurationEventsHandler
     public void handle( final CapabilityConfigurationEvent.Loaded event )
     {
         final CCapability capabilityConfig = event.getCapability();
-        final CapabilityReference ref = registry.create(
+        final DefaultCapabilityReference ref = capabilityRegistry.create(
             capabilityIdentity( capabilityConfig.getId() ), capabilityType( capabilityConfig.getTypeId() )
         );
         ref.load( asMap( capabilityConfig.getProperties() ) );
@@ -87,7 +88,7 @@ class CapabilityConfigurationEventsHandler
     {
         final CCapability capabilityConfig = event.getCapability();
         final CCapability previousCapabilityConfig = event.getPreviousCapability();
-        final CapabilityReference ref = registry.get( capabilityIdentity( capabilityConfig.getId() ) );
+        final DefaultCapabilityReference ref = capabilityRegistry.get( capabilityIdentity( capabilityConfig.getId() ) );
         if ( ref != null )
         {
             if ( previousCapabilityConfig.isEnabled() && !capabilityConfig.isEnabled() )
@@ -107,11 +108,11 @@ class CapabilityConfigurationEventsHandler
     public void handle( final CapabilityConfigurationEvent.Removed event )
     {
         final CCapability capabilityConfig = event.getCapability();
-        final CapabilityReference ref = registry.get( capabilityIdentity( capabilityConfig.getId() ) );
+        final DefaultCapabilityReference ref = capabilityRegistry.get( capabilityIdentity( capabilityConfig.getId() ) );
         if ( ref != null )
         {
             ref.remove();
-            registry.remove( capabilityIdentity( capabilityConfig.getId() ) );
+            capabilityRegistry.remove( capabilityIdentity( capabilityConfig.getId() ) );
         }
     }
 

@@ -82,7 +82,9 @@ public class PrimaryKeyValidator
     @Override
     public ValidationResult validate( final Map<String, String> properties )
     {
-        final Collection<CapabilityReference> references = capabilityRegistry.get( buildFilter( properties ) );
+        final Collection<? extends CapabilityReference> references = capabilityRegistry.get(
+            buildFilter( properties )
+        );
         if ( references == null
             || references.isEmpty()
             || ( references.size() == 1 && references.iterator().next().capability().id().equals( excludeId ) ) )
