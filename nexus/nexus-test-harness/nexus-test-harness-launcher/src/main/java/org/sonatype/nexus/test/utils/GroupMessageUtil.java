@@ -18,9 +18,6 @@
  */
 package org.sonatype.nexus.test.utils;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,28 +51,24 @@ public class GroupMessageUtil
 
     private static final Logger LOG = LoggerFactory.getLogger( GroupMessageUtil.class );
 
+    private final RepositoryGroupsNexusRestClient groupNRC;
+
     public GroupMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {
         super( test );
-        this.xstream = xstream;
-        this.mediaType = mediaType;
+        groupNRC = new RepositoryGroupsNexusRestClient(
+            RequestFacade.getNexusRestClient(),
+            xstream,
+            mediaType
+        );
     }
 
     public RepositoryGroupResource createGroup( RepositoryGroupResource group )
         throws IOException
     {
+        RepositoryGroupResource responseResource = groupNRC.createGroup( group );
 
-        Response response = this.sendMessage( Method.POST, group );
-
-        if ( !response.getStatus().isSuccess() )
-        {
-            String responseText = response.getEntity().getText();
-            Assert.fail( "Could not create Repository: " + response.getStatus() + ":\n" + responseText );
-        }
-
-        RepositoryGroupResource responseResource = this.getResourceFromResponse( response );
-
-        this.validateResourceResponse( group, responseResource );
+        validateResourceResponse( group, responseResource );
 
         return responseResource;
     }
@@ -166,15 +159,8 @@ public class GroupMessageUtil
     public RepositoryGroupResource updateGroup( RepositoryGroupResource group )
         throws IOException
     {
-        Response response = null;
-        RepositoryGroupResource responseResource;
-        try {
-            response = this.sendMessage( Method.PUT, group );
-            responseResource = this.getResourceFromResponse( response );
-            assertThat(response, isSuccessful());
-        } finally {
-            RequestFacade.releaseResponse(response);
-        }
+        RepositoryGroupResource responseResource = groupNRC.updateGroup( group );
+
         this.validateResourceResponse( group, responseResource );
 
         return responseResource;
@@ -195,7 +181,6 @@ public class GroupMessageUtil
     public Response sendMessage( Method method, RepositoryGroupResource resource, String id )
         throws IOException
     {
-
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
         String idPart = ( method == Method.POST ) ? "" : "/" + id;
