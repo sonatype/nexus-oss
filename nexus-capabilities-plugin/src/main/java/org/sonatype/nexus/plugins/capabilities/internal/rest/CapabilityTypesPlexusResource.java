@@ -102,18 +102,23 @@ public class CapabilityTypesPlexusResource
         {
             for ( final CapabilityDescriptor capabilityDescriptor : descriptors )
             {
-                final CapabilityTypeResource capabilityTypeResource = new CapabilityTypeResource();
-                capabilityTypeResource.setId( capabilityDescriptor.type().toString() );
-                capabilityTypeResource.setName( capabilityDescriptor.name() );
-                capabilityTypeResource.setAbout( capabilityDescriptor.about() );
+                if ( capabilityDescriptor.isExposed() )
+                {
+                    final CapabilityTypeResource capabilityTypeResource = new CapabilityTypeResource();
+                    capabilityTypeResource.setId( capabilityDescriptor.type().toString() );
+                    capabilityTypeResource.setName( capabilityDescriptor.name() );
+                    capabilityTypeResource.setAbout( capabilityDescriptor.about() );
 
-                response.addData( capabilityTypeResource );
+                    response.addData( capabilityTypeResource );
 
-                final List<FormField> formFields = capabilityDescriptor.formFields();
+                    final List<FormField> formFields = capabilityDescriptor.formFields();
 
-                capabilityTypeResource.setFormFields(
-                    (List<CapabilityFormFieldResource>) formFieldToDTO( formFields, CapabilityFormFieldResource.class )
-                );
+                    capabilityTypeResource.setFormFields(
+                        (List<CapabilityFormFieldResource>) formFieldToDTO(
+                            formFields, CapabilityFormFieldResource.class
+                        )
+                    );
+                }
 
             }
         }

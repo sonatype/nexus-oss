@@ -50,10 +50,10 @@ public interface CapabilityDescriptor
     List<FormField> formFields();
 
     /**
-     * Whether or not this capability is user facing = user should be able to configure it or it is a capability that
-     * will be created via other means (e.g. created by some other Nexus functionality)
+     * Whether or not capabilities of this type are user facing = user should be able create it via UI (select it from
+     * capability type drop down).
      *
-     * @return if capability is user facing.
+     * @return true if is user facing
      */
     boolean isExposed();
 
