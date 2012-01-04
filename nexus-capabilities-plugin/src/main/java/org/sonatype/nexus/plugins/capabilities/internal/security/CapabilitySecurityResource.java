@@ -32,7 +32,7 @@ public class CapabilitySecurityResource
     @Override
     public String getResourcePath()
     {
-        return "/META-INF/org.sonatype.nexus.plugins.capability.imp-security.xml";
+        return "/META-INF/org.sonatype.nexus.plugins.capability-security.xml";
     }
 
 }
