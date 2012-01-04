@@ -27,6 +27,7 @@ import java.io.IOException;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResource;
+import org.sonatype.nexus.plugins.capabilities.test.CapabilitiesNexusRestClient;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
@@ -34,7 +35,6 @@ import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
 import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2MetadataGeneratorCapability;
 import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapability;
-import org.sonatype.nexus.test.utils.CapabilitiesNexusRestClient;
 
 public abstract class AbstractNexusP2GeneratorIT
     extends AbstractNexusP2IT

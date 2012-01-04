@@ -20,8 +20,8 @@ package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
 import java.util.Map;
 
-import org.sonatype.nexus.plugins.capabilities.api.AbstractCapability;
-import org.sonatype.nexus.plugins.capabilities.api.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.support.AbstractCapability;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
 
