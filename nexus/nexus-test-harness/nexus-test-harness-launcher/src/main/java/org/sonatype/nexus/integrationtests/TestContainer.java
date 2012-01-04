@@ -77,13 +77,26 @@ public class TestContainer
         return testContext;
     }
 
-    public synchronized PlexusContainer getPlexusContainer()
+    public PlexusContainer getPlexusContainer()
+    {
+        return plexusContainer;
+    }
+
+    public synchronized void startPlexusContainer()
     {
         if ( plexusContainer == null )
         {
             plexusContainer = setupContainer( getClass() );
         }
-        return plexusContainer;
+    }
+
+    public synchronized void stopPlexusContainer()
+    {
+        if ( plexusContainer != null )
+        {
+            plexusContainer.dispose();
+            plexusContainer = null;
+        }
     }
 
     public void reset()

@@ -78,10 +78,9 @@ public class ProgressListener
         checkNotNull( result );
         checkNotNull( result.getTestClass() );
         checkNotNull( printer );
-        long duration = result.getEndMillis() - result.getStartMillis();
 
-        printer.println( String.format( "Result: %s.%s() ===> %s (duration %s ms)", result.getTestClass().getName(),
-            result.getName(), status, duration ) );
+        printer.println( String.format( "Result: %s.%s() ===> %s", result.getTestClass().getName(),
+            result.getName(), status ) );
     }
 
 }
