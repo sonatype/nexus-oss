@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -59,11 +60,11 @@ public abstract class AbstractLdapIntegrationIT
         super.copyConfigFiles();
 
         this.copyConfigFile( "test.ldif", LDIF_DIR );
-        
+
         // copy ldap.xml to work dir
         Map<String, String> interpolationMap = new HashMap<String, String>();
         interpolationMap.put( "port", Integer.toString( this.getLdapPort() ) );
-        
+
         this.copyConfigFile( "ldap.xml", interpolationMap, WORK_CONF_DIR );
 
     }
@@ -77,10 +78,10 @@ public abstract class AbstractLdapIntegrationIT
         }
         return true;
     }
-    
+
     protected int getLdapPort()
     {
-        if( this.ldapServer == null )
+        if ( this.ldapServer == null )
         {
             try
             {
@@ -89,7 +90,7 @@ public abstract class AbstractLdapIntegrationIT
             catch ( Exception e )
             {
                 e.printStackTrace();
-                Assert.fail( "Failed to initilize ldap server: "+ e.getMessage() );
+                Assert.fail( "Failed to initilize ldap server: " + e.getMessage() );
             }
         }
         return this.ldapServer.getPort();
@@ -99,16 +100,21 @@ public abstract class AbstractLdapIntegrationIT
     public void beforeLdapTests()
         throws Exception
     {
-        if( this.ldapServer == null )
+        if ( this.ldapServer == null )
         {
-            this.ldapServer = (LdapServer) this.lookup( LdapServer.ROLE );
+            this.ldapServer = lookupLdapServer();
         }
-        
+
         if ( !this.ldapServer.isStarted() )
         {
             this.ldapServer.start();
         }
+    }
 
+    protected LdapServer lookupLdapServer()
+        throws ComponentLookupException
+    {
+        return lookup( LdapServer.class );
     }
 
     @AfterMethod
