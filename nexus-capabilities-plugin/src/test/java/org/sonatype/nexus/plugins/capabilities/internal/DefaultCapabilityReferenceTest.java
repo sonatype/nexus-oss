@@ -141,7 +141,8 @@ public class DefaultCapabilityReferenceTest
             }
         );
 
-        underTest = new DefaultCapabilityReference( eventBus, achf, vchf, capabilityType( "test" ), capability );
+        underTest = new DefaultCapabilityReference( eventBus, achf, vchf, capabilityType( "test" ), capability,
+                                                    mock( CapabilityContextProxy.class ) );
         underTest.create( Collections.<String, String>emptyMap() );
 
         re = ArgumentCaptor.forClass( CapabilityEvent.class );
@@ -275,6 +276,7 @@ public class DefaultCapabilityReferenceTest
         underTest.activate();
         assertThat( underTest.isEnabled(), is( true ) );
         assertThat( underTest.isActive(), is( false ) );
+        assertThat( underTest.hasFailure(), is( true ) );
         verify( capability ).activate();
 
         doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).passivate();
@@ -301,6 +303,7 @@ public class DefaultCapabilityReferenceTest
         verify( capability ).passivate();
         assertThat( underTest.isEnabled(), is( true ) );
         assertThat( underTest.isActive(), is( false ) );
+        assertThat( underTest.hasFailure(), is( true ) );
     }
 
     /**
@@ -377,7 +380,8 @@ public class DefaultCapabilityReferenceTest
     public void loadIsForwardedToCapability()
         throws Exception
     {
-        underTest = new DefaultCapabilityReference( eventBus, achf, vchf, capabilityType( "test" ), capability );
+        underTest = new DefaultCapabilityReference( eventBus, achf, vchf, capabilityType( "test" ), capability,
+                                                    mock( CapabilityContextProxy.class ) );
         final HashMap<String, String> properties = new HashMap<String, String>();
         underTest.load( properties );
 

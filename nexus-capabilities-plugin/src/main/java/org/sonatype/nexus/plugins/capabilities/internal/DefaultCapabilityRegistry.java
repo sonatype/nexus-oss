@@ -96,9 +96,12 @@ class DefaultCapabilityRegistry
                 throw new RuntimeException( format( "No factory found for a capability of type %s", type ) );
             }
 
-            final Capability capability = factory.create( id );
+            final CapabilityContextProxy capabilityContextProxy = new CapabilityContextProxy(
+                UninitializedCapabilityContext.INSTANCE
+            );
+            final Capability capability = factory.create( id, capabilityContextProxy );
 
-            final CapabilityReference reference = createReference( type, capability );
+            final CapabilityReference reference = createReference( type, capability, capabilityContextProxy );
 
             references.put( id, reference );
 
@@ -172,10 +175,16 @@ class DefaultCapabilityRegistry
     }
 
     @VisibleForTesting
-    CapabilityReference createReference( final CapabilityType type, final Capability capability )
+    CapabilityReference createReference( final CapabilityType type, final Capability capability,
+                                         final CapabilityContextProxy capabilityContextProxy )
     {
         return new DefaultCapabilityReference(
-            eventBus, activationConditionHandlerFactory, validityConditionHandlerFactory, type, capability
+            eventBus,
+            activationConditionHandlerFactory,
+            validityConditionHandlerFactory,
+            type,
+            capability,
+            capabilityContextProxy
         );
     }
 

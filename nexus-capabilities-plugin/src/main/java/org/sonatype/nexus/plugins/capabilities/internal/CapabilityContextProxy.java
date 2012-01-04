@@ -16,23 +16,61 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities;
+package org.sonatype.nexus.plugins.capabilities.internal;
+
+import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
+
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 
 /**
- * Creates instances of capabilities for a specific type.
+ * A {@link CapabilityContext} that delegates to another mutable context.
  *
  * @since 2.0
  */
-public interface CapabilityFactory
+class CapabilityContextProxy
+    implements CapabilityContext
 {
 
-    /**
-     * Creates  capability instance with specified id.
-     *
-     * @param id      if of capability to be created
-     * @param context context of capability to be created
-     * @return created capability. Must not be null.
-     */
-    Capability create( CapabilityIdentity id, CapabilityContext context );
+    private CapabilityContext delegate;
+
+    CapabilityContextProxy( final CapabilityContext delegate )
+    {
+        this.delegate = checkNotNull( delegate );
+    }
+
+    public void setCapabilityContext( final CapabilityContext delegate )
+    {
+        this.delegate = checkNotNull( delegate );
+    }
+
+    @Override
+    public boolean isEnabled()
+    {
+        return delegate.isEnabled();
+    }
+
+    @Override
+    public boolean isActive()
+    {
+        return delegate.isActive();
+    }
+
+    @Override
+    public boolean hasFailure()
+    {
+        return delegate.hasFailure();
+    }
+
+    @Override
+    public Exception failure()
+    {
+        return delegate.failure();
+    }
+
+    @Override
+    public String toString()
+    {
+        return delegate.toString();
+    }
 
 }

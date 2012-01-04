@@ -19,20 +19,38 @@
 package org.sonatype.nexus.plugins.capabilities;
 
 /**
- * Creates instances of capabilities for a specific type.
+ * Provides access to capability context.
  *
  * @since 2.0
  */
-public interface CapabilityFactory
+public interface CapabilityContext
 {
 
     /**
-     * Creates  capability instance with specified id.
+     * Whether the capability is enabled.
      *
-     * @param id      if of capability to be created
-     * @param context context of capability to be created
-     * @return created capability. Must not be null.
+     * @return true, if capability is enabled
      */
-    Capability create( CapabilityIdentity id, CapabilityContext context );
+    boolean isEnabled();
+
+    /**
+     * Whether the referenced capability is active.
+     *
+     * @return true, if capability was activated and not yet passivated
+     */
+    boolean isActive();
+
+    /**
+     * Whether the capability had failed a lifecycle callback method (create/load/update/activate/passivate).
+     *
+     * @return true, if capability had failed a callback method
+     */
+    boolean hasFailure();
+
+    /**
+     * Last exception thrown during a lifecycle callback method (create/load/update/activate/passivate).
+     * @return last exception thrown during a lifecycle callback method or null if it not failed
+     */
+    Exception failure();
 
 }

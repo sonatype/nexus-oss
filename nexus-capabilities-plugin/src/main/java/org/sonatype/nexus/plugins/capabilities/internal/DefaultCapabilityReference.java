@@ -29,6 +29,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
@@ -40,7 +41,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityType;
  */
 class DefaultCapabilityReference
     extends AbstractLoggingComponent
-    implements CapabilityReference
+    implements CapabilityReference, CapabilityContext
 {
 
     private static final Map<String, String> EMPTY_MAP = Collections.emptyMap();
@@ -57,15 +58,18 @@ class DefaultCapabilityReference
 
     private final ReentrantReadWriteLock stateLock;
 
+    private Map<String, String> capabilityProperties;
+
     private State state;
 
-    private Map<String, String> capabilityProperties;
+    private Exception lastException;
 
     DefaultCapabilityReference( final NexusEventBus eventBus,
                                 final ActivationConditionHandlerFactory activationListenerFactory,
                                 final ValidityConditionHandlerFactory validityConditionHandlerFactory,
                                 final CapabilityType capabilityType,
-                                final Capability capability )
+                                final Capability capability,
+                                final CapabilityContextProxy capabilityContextProxy )
     {
         this.eventBus = checkNotNull( eventBus );
 
@@ -76,6 +80,8 @@ class DefaultCapabilityReference
         stateLock = new ReentrantReadWriteLock();
         activationHandler = checkNotNull( activationListenerFactory ).create( this );
         validityHandler = checkNotNull( validityConditionHandlerFactory ).create( this );
+
+        capabilityContextProxy.setCapabilityContext( this );
     }
 
     @Override
@@ -139,6 +145,26 @@ class DefaultCapabilityReference
         {
             stateLock.readLock().lock();
             return state.isActive();
+        }
+        finally
+        {
+            stateLock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public boolean hasFailure()
+    {
+        return failure() != null;
+    }
+
+    @Override
+    public Exception failure()
+    {
+        try
+        {
+            stateLock.readLock().lock();
+            return lastException;
         }
         finally
         {
@@ -309,6 +335,16 @@ class DefaultCapabilityReference
         return p1.size() == p2.size() && p1.equals( p2 );
     }
 
+    private void resetLastException()
+    {
+        setLastException( null );
+    }
+
+    private void setLastException( final Exception e )
+    {
+        lastException = e;
+    }
+
     private class State
         implements CapabilityReference
     {
@@ -429,7 +465,7 @@ class DefaultCapabilityReference
 
     }
 
-    public class NewState
+    private class NewState
         extends State
     {
 
@@ -440,12 +476,14 @@ class DefaultCapabilityReference
             {
                 capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap( newHashMap( properties ) );
                 capability().create( properties );
+                resetLastException();
                 validityHandler.bind();
                 state = new ValidState();
             }
             catch ( Exception e )
             {
-                state = new InvalidState( "Failed to load: " + e.getMessage() );
+                setLastException( e );
+                state = new InvalidState( "Failed to create: " + e.getMessage() );
                 getLogger().error(
                     "Could not create capability {} ({})", new Object[]{ capability, capability.id(), e }
                 );
@@ -459,11 +497,13 @@ class DefaultCapabilityReference
             {
                 capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap( newHashMap( properties ) );
                 capability().load( properties );
+                resetLastException();
                 validityHandler.bind();
                 state = new ValidState();
             }
             catch ( Exception e )
             {
+                setLastException( e );
                 state = new InvalidState( "Failed to load: " + e.getMessage() );
                 getLogger().error(
                     "Could not load capability {} ({})", new Object[]{ capability, capability.id(), e }
@@ -485,7 +525,7 @@ class DefaultCapabilityReference
 
     }
 
-    public class ValidState
+    private class ValidState
         extends State
     {
 
@@ -517,10 +557,12 @@ class DefaultCapabilityReference
                 eventBus.post( new CapabilityEvent.BeforeUpdate( DefaultCapabilityReference.this ) );
                 capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap( newHashMap( properties ) );
                 capability().update( properties );
+                resetLastException();
                 eventBus.post( new CapabilityEvent.AfterUpdate( DefaultCapabilityReference.this ) );
             }
             catch ( Exception e )
             {
+                setLastException( e );
                 getLogger().error(
                     "Could not update capability {} ({}).", new Object[]{ capability, capability.id(), e }
                 );
@@ -537,10 +579,12 @@ class DefaultCapabilityReference
                 DefaultCapabilityReference.this.disable();
                 validityHandler.release();
                 capability().remove();
+                resetLastException();
                 state = new RemovedState();
             }
             catch ( Exception e )
             {
+                setLastException( e );
                 state = new InvalidState( "Failed to remove: " + e.getMessage() );
                 getLogger().error(
                     "Could not remove capability {} ({})", new Object[]{ capability, capability.id(), e }
@@ -601,7 +645,7 @@ class DefaultCapabilityReference
 
     }
 
-    public class EnabledState
+    private class EnabledState
         extends ValidState
     {
 
@@ -647,12 +691,14 @@ class DefaultCapabilityReference
                 try
                 {
                     capability().activate();
+                    resetLastException();
                     getLogger().debug( "Activated capability {} ({})", capability, capability.id() );
                     state = new ActiveState();
                     eventBus.post( new CapabilityEvent.AfterActivated( DefaultCapabilityReference.this ) );
                 }
                 catch ( Exception e )
                 {
+                    setLastException( e );
                     getLogger().error(
                         "Could not activate capability {} ({})", new Object[]{ capability, capability.id(), e }
                     );
@@ -690,7 +736,7 @@ class DefaultCapabilityReference
         }
     }
 
-    public class ActiveState
+    private class ActiveState
         extends EnabledState
     {
 
@@ -715,10 +761,12 @@ class DefaultCapabilityReference
                 state = new EnabledState( "Passivated" );
                 eventBus.post( new CapabilityEvent.BeforePassivated( DefaultCapabilityReference.this ) );
                 capability().passivate();
+                resetLastException();
                 getLogger().debug( "Passivated capability {} ({})", capability, capability.id() );
             }
             catch ( Exception e )
             {
+                setLastException( e );
                 getLogger().error(
                     "Could not passivate capability {} ({})", new Object[]{ capability, capability.id(), e }
                 );
@@ -740,7 +788,7 @@ class DefaultCapabilityReference
 
     }
 
-    public class InvalidState
+    private class InvalidState
         extends State
     {
 

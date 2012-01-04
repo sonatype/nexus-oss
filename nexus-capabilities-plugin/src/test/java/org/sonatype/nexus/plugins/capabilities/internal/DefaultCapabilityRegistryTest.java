@@ -42,6 +42,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
@@ -73,18 +74,19 @@ public class DefaultCapabilityRegistryTest
     public void setUp()
     {
         final CapabilityFactory factory = mock( CapabilityFactory.class );
-        when( factory.create( Matchers.<CapabilityIdentity>any() ) ).thenAnswer( new Answer<Capability>()
-        {
-            @Override
-            public Capability answer( final InvocationOnMock invocation )
-                throws Throwable
+        when( factory.create( Matchers.<CapabilityIdentity>any(),  Matchers.<CapabilityContext>any() ) )
+            .thenAnswer( new Answer<Capability>()
             {
-                final Capability capability = mock( Capability.class );
-                when( capability.id() ).thenReturn( (CapabilityIdentity) invocation.getArguments()[0] );
-                return capability;
-            }
+                @Override
+                public Capability answer( final InvocationOnMock invocation )
+                    throws Throwable
+                {
+                    final Capability capability = mock( Capability.class );
+                    when( capability.id() ).thenReturn( (CapabilityIdentity) invocation.getArguments()[0] );
+                    return capability;
+                }
 
-        } );
+            } );
 
         final CapabilityFactoryRegistry capabilityFactoryRegistry = mock( CapabilityFactoryRegistry.class );
         when( capabilityFactoryRegistry.get( CAPABILITY_TYPE ) ).thenReturn( factory );
@@ -97,7 +99,9 @@ public class DefaultCapabilityRegistryTest
         underTest = new DefaultCapabilityRegistry( capabilityFactoryRegistry, eventBus, achf, vchf )
         {
             @Override
-            CapabilityReference createReference( final CapabilityType type, final Capability capability )
+            CapabilityReference createReference( final CapabilityType type,
+                                                 final Capability capability,
+                                                 final CapabilityContextProxy capabilityContextProxy )
             {
                 return mock( CapabilityReference.class );
             }
