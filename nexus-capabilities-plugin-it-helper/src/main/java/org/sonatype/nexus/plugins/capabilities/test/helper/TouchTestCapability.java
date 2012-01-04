@@ -22,10 +22,10 @@ import java.util.Map;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.support.AbstractCapability;
+import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 
 public class TouchTestCapability
-    extends AbstractCapability
+    extends CapabilitySupport
     implements Capability
 {
 

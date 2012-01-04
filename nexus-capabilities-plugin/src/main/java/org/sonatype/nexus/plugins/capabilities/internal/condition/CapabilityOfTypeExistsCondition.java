@@ -29,7 +29,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.support.condition.AbstractCondition;
+import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -38,7 +38,7 @@ import com.google.common.eventbus.Subscribe;
  * @since 2.0
  */
 public class CapabilityOfTypeExistsCondition
-    extends AbstractCondition
+    extends ConditionSupport
 {
 
     private final CapabilityRegistry capabilityRegistry;

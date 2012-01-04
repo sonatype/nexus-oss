@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.support.condition.AbstractCondition;
+import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import com.google.common.eventbus.Subscribe;
@@ -37,7 +37,7 @@ import com.google.common.eventbus.Subscribe;
 @Named
 @Singleton
 public class NexusIsActiveCondition
-    extends AbstractCondition
+    extends ConditionSupport
     implements Condition, NexusEventBus.LoadOnStart
 {
 

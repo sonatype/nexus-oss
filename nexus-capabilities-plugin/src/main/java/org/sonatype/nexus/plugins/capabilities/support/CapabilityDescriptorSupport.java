@@ -31,7 +31,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityType;
  *
  * @since 2.0
  */
-public abstract class AbstractCapabilityDescriptor
+public abstract class CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
 
@@ -43,10 +43,10 @@ public abstract class AbstractCapabilityDescriptor
 
     private final List<FormField> formFields;
 
-    protected AbstractCapabilityDescriptor( final CapabilityType type,
-                                            final String name,
-                                            final String about,
-                                            final FormField... formFields )
+    protected CapabilityDescriptorSupport( final CapabilityType type,
+                                           final String name,
+                                           final String about,
+                                           final FormField... formFields )
     {
         this.type = type;
         this.name = name;

@@ -31,22 +31,22 @@ import com.google.common.eventbus.Subscribe;
  *
  * @since 2.0
  */
-public abstract class AbstractCompositeCondition
-    extends AbstractCondition
+public abstract class CompositeConditionSupport
+    extends ConditionSupport
 {
 
     private final Condition[] conditions;
 
-    public AbstractCompositeCondition( final NexusEventBus eventBus,
-                                       final Condition... conditions )
+    public CompositeConditionSupport( final NexusEventBus eventBus,
+                                      final Condition... conditions )
     {
         super( eventBus, false );
         this.conditions = checkNotNull( conditions );
         checkArgument( conditions.length > 1, "A composite mush have at least 2 conditions" );
     }
 
-    public AbstractCompositeCondition( final NexusEventBus eventBus,
-                                       final Condition condition )
+    public CompositeConditionSupport( final NexusEventBus eventBus,
+                                      final Condition condition )
     {
         super( eventBus, false );
         this.conditions = new Condition[]{ checkNotNull( condition ) };
@@ -94,7 +94,7 @@ public abstract class AbstractCompositeCondition
     @Override
     public String toString()
     {
-        return "Re-evaluate " + AbstractCompositeCondition.this;
+        return "Re-evaluate " + CompositeConditionSupport.this;
     }
 
     /**

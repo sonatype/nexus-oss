@@ -24,7 +24,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
-import org.sonatype.nexus.plugins.capabilities.support.AbstractCapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 
 /**
  * Test descriptor used by {@link DefaultCapabilityConfigurationTest}.
@@ -34,7 +34,7 @@ import org.sonatype.nexus.plugins.capabilities.support.AbstractCapabilityDescrip
 @Named
 @Singleton
 public class DefaultCapabilityConfigurationTestDescriptor
-    extends AbstractCapabilityDescriptor
+    extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
 

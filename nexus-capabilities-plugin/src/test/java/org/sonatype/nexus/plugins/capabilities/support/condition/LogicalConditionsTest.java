@@ -60,7 +60,7 @@ public class LogicalConditionsTest
         right = mock( Condition.class );
     }
 
-    public Condition prepare( final AbstractCompositeCondition condition, boolean leftSatisfied,
+    public Condition prepare( final CompositeConditionSupport condition, boolean leftSatisfied,
                               boolean rightSatisfied )
     {
         condition.bind();
@@ -98,7 +98,7 @@ public class LogicalConditionsTest
     public void and01()
     {
         final Condition and =
-            prepare( (AbstractCompositeCondition) underTest.and( left, right ), UNSATISFIED, UNSATISFIED );
+            prepare( (CompositeConditionSupport) underTest.and( left, right ), UNSATISFIED, UNSATISFIED );
         assertThat( and.isSatisfied(), is( false ) );
     }
 
@@ -111,7 +111,7 @@ public class LogicalConditionsTest
     public void and02()
     {
         final Condition and =
-            prepare( (AbstractCompositeCondition) underTest.and( left, right ), UNSATISFIED, SATISFIED );
+            prepare( (CompositeConditionSupport) underTest.and( left, right ), UNSATISFIED, SATISFIED );
         assertThat( and.isSatisfied(), is( false ) );
     }
 
@@ -124,7 +124,7 @@ public class LogicalConditionsTest
     public void and03()
     {
         final Condition and =
-            prepare( (AbstractCompositeCondition) underTest.and( left, right ), SATISFIED, UNSATISFIED );
+            prepare( (CompositeConditionSupport) underTest.and( left, right ), SATISFIED, UNSATISFIED );
         assertThat( and.isSatisfied(), is( false ) );
     }
 
@@ -137,7 +137,7 @@ public class LogicalConditionsTest
     public void and04()
     {
         final Condition and =
-            prepare( (AbstractCompositeCondition) underTest.and( left, right ), SATISFIED, SATISFIED );
+            prepare( (CompositeConditionSupport) underTest.and( left, right ), SATISFIED, SATISFIED );
         assertThat( and.isSatisfied(), is( true ) );
     }
 
@@ -150,7 +150,7 @@ public class LogicalConditionsTest
     public void or01()
     {
         final Condition or =
-            prepare( (AbstractCompositeCondition) underTest.or( left, right ), UNSATISFIED, UNSATISFIED );
+            prepare( (CompositeConditionSupport) underTest.or( left, right ), UNSATISFIED, UNSATISFIED );
         assertThat( or.isSatisfied(), is( false ) );
     }
 
@@ -163,7 +163,7 @@ public class LogicalConditionsTest
     public void or02()
     {
         final Condition or =
-            prepare( (AbstractCompositeCondition) underTest.or( left, right ), UNSATISFIED, SATISFIED );
+            prepare( (CompositeConditionSupport) underTest.or( left, right ), UNSATISFIED, SATISFIED );
         assertThat( or.isSatisfied(), is( true ) );
     }
 
@@ -176,7 +176,7 @@ public class LogicalConditionsTest
     public void or03()
     {
         final Condition or =
-            prepare( (AbstractCompositeCondition) underTest.or( left, right ), SATISFIED, UNSATISFIED );
+            prepare( (CompositeConditionSupport) underTest.or( left, right ), SATISFIED, UNSATISFIED );
         assertThat( or.isSatisfied(), is( true ) );
     }
 
@@ -188,7 +188,7 @@ public class LogicalConditionsTest
     @Test
     public void or04()
     {
-        final Condition or = prepare( (AbstractCompositeCondition) underTest.or( left, right ), SATISFIED, SATISFIED );
+        final Condition or = prepare( (CompositeConditionSupport) underTest.or( left, right ), SATISFIED, SATISFIED );
         assertThat( or.isSatisfied(), is( true ) );
     }
 

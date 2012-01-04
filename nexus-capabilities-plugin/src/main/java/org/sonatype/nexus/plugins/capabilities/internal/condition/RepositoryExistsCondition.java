@@ -31,7 +31,7 @@ import com.google.common.eventbus.Subscribe;
  * @since 2.0
  */
 public class RepositoryExistsCondition
-    extends AbstractRepositoryCondition
+    extends RepositoryConditionSupport
 {
 
     public RepositoryExistsCondition( final NexusEventBus eventBus,

@@ -36,7 +36,7 @@ import com.google.common.eventbus.Subscribe;
  * @since 2.0
  */
 public class RepositoryProxyModeCondition
-    extends AbstractRepositoryCondition
+    extends RepositoryConditionSupport
 {
 
     private final ProxyMode proxyMode;

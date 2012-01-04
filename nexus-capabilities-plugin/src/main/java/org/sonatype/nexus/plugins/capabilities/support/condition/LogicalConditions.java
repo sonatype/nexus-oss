@@ -85,7 +85,7 @@ public class LogicalConditions
      * @since 2.0
      */
     private static class ConjunctionCondition
-        extends AbstractCompositeCondition
+        extends CompositeConditionSupport
         implements Condition
     {
 
@@ -168,7 +168,7 @@ public class LogicalConditions
      * @since 2.0
      */
     private static class DisjunctionCondition
-        extends AbstractCompositeCondition
+        extends CompositeConditionSupport
         implements Condition
     {
 

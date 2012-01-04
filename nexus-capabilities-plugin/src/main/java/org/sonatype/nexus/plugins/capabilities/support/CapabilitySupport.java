@@ -27,14 +27,14 @@ import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 
-public abstract class AbstractCapability
+public abstract class CapabilitySupport
     extends AbstractLoggingComponent
     implements Capability
 {
 
     private final CapabilityIdentity id;
 
-    protected AbstractCapability( final CapabilityIdentity id )
+    protected CapabilitySupport( final CapabilityIdentity id )
     {
         this.id = checkNotNull( id, "Capability id cannot be null" );
     }

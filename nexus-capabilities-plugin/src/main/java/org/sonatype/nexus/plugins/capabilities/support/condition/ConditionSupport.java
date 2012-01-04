@@ -30,7 +30,7 @@ import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
  *
  * @since 2.0
  */
-public abstract class AbstractCondition
+public abstract class ConditionSupport
     extends AbstractLoggingComponent
     implements Condition
 {
@@ -41,12 +41,12 @@ public abstract class AbstractCondition
 
     private boolean active;
 
-    protected AbstractCondition( final NexusEventBus eventBus )
+    protected ConditionSupport( final NexusEventBus eventBus )
     {
         this( eventBus, false );
     }
 
-    protected AbstractCondition( final NexusEventBus eventBus, final boolean satisfied )
+    protected ConditionSupport( final NexusEventBus eventBus, final boolean satisfied )
     {
         this.eventBus = checkNotNull( eventBus );
         this.satisfied = satisfied;

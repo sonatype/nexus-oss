@@ -27,14 +27,14 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-public abstract class AbstractRepositoryCapability
-    extends AbstractCapability
+public abstract class RepositoryCapabilitySupport
+    extends CapabilitySupport
 {
 
     private final RepositoryRegistry repositoryRegistry;
 
-    public AbstractRepositoryCapability( final CapabilityIdentity id,
-                                         final RepositoryRegistry repositoryRegistry )
+    public RepositoryCapabilitySupport( final CapabilityIdentity id,
+                                        final RepositoryRegistry repositoryRegistry )
     {
         super( id );
         this.repositoryRegistry = checkNotNull( repositoryRegistry, "Repository registry cannot be null" );

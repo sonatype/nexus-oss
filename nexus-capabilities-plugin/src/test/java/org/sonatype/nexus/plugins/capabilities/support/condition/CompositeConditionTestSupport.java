@@ -32,11 +32,11 @@ import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 
 /**
- * {@link AbstractCompositeCondition} UTs.
+ * {@link CompositeConditionSupport} UTs.
  *
  * @since 2.0
  */
-public class AbstractCompositeConditionTest
+public class CompositeConditionTestSupport
     extends NexusEventBusTestSupport
 {
 
@@ -156,7 +156,7 @@ public class AbstractCompositeConditionTest
     }
 
     private static class TestCondition
-        extends AbstractCompositeCondition
+        extends CompositeConditionSupport
     {
 
         public TestCondition( final NexusEventBus eventBus,

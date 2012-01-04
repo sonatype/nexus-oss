@@ -20,7 +20,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.Condition;
-import org.sonatype.nexus.plugins.capabilities.support.condition.AbstractCompositeCondition;
+import org.sonatype.nexus.plugins.capabilities.support.condition.CompositeConditionSupport;
 
 /**
  * A condition that applies a logical NOT on another condition.
@@ -28,7 +28,7 @@ import org.sonatype.nexus.plugins.capabilities.support.condition.AbstractComposi
  * @since 2.0
  */
 public class InversionCondition
-    extends AbstractCompositeCondition
+    extends CompositeConditionSupport
     implements Condition
 {
 

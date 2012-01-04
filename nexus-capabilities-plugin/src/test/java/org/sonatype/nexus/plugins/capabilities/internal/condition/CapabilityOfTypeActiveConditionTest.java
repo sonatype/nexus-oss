@@ -40,7 +40,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
-import org.sonatype.nexus.plugins.capabilities.support.AbstractCapability;
+import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 
 /**
  * {@link CapabilityOfTypeActiveCondition} UTs.
@@ -251,7 +251,7 @@ public class CapabilityOfTypeActiveConditionTest
     }
 
     private static class TestCapability
-        extends AbstractCapability
+        extends CapabilitySupport
     {
 
         protected TestCapability()

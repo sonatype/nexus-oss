@@ -23,7 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
-import org.sonatype.nexus.plugins.capabilities.support.condition.AbstractCondition;
+import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -34,8 +34,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
  *
  * @since 2.0
  */
-public abstract class AbstractRepositoryCondition
-    extends AbstractCondition
+public abstract class RepositoryConditionSupport
+    extends ConditionSupport
 {
 
     private final RepositoryRegistry repositoryRegistry;
@@ -44,9 +44,9 @@ public abstract class AbstractRepositoryCondition
 
     private final ReentrantReadWriteLock bindLock;
 
-    public AbstractRepositoryCondition( final NexusEventBus eventBus,
-                                        final RepositoryRegistry repositoryRegistry,
-                                        final RepositoryConditions.RepositoryId repositoryId )
+    public RepositoryConditionSupport( final NexusEventBus eventBus,
+                                       final RepositoryRegistry repositoryRegistry,
+                                       final RepositoryConditions.RepositoryId repositoryId )
     {
         super( eventBus, false );
         this.repositoryRegistry = checkNotNull( repositoryRegistry );

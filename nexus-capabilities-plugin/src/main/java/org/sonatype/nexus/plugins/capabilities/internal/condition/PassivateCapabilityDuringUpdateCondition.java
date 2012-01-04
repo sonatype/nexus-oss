@@ -23,7 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
-import org.sonatype.nexus.plugins.capabilities.support.condition.AbstractCondition;
+import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
 import com.google.common.eventbus.Subscribe;
 
 /**
@@ -33,7 +33,7 @@ import com.google.common.eventbus.Subscribe;
  * @since 2.0
  */
 public class PassivateCapabilityDuringUpdateCondition
-    extends AbstractCondition
+    extends ConditionSupport
 {
 
     private final Capability capability;

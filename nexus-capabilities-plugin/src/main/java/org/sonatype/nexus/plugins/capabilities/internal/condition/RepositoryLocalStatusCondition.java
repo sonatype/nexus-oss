@@ -35,7 +35,7 @@ import com.google.common.eventbus.Subscribe;
  * @since 2.0
  */
 public class RepositoryLocalStatusCondition
-    extends AbstractRepositoryCondition
+    extends RepositoryConditionSupport
 {
 
     private final LocalStatus localStatus;

@@ -24,10 +24,9 @@ import java.util.Map;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.support.AbstractCapability;
 
 public class CompositeCapability
-    extends AbstractCapability
+    extends CapabilitySupport
 {
 
     private final Collection<Capability> capabilities;
