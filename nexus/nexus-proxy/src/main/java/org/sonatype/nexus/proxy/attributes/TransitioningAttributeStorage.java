@@ -20,12 +20,6 @@ package org.sonatype.nexus.proxy.attributes;
 
 import java.io.IOException;
 
-import javax.enterprise.inject.Typed;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
@@ -34,31 +28,25 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
  * AttributeStorage that actually delegates the work to other instance of AttributeStorage, and having an option of
  * "fallback" to some secondary instance. Usable for scenarios where "transitioning" (smooth upgrade for example) is to
  * be used, the "main" attribute storage would be "upgraded" from "legacy" attribute storage as the attributes are
- * requested over the time from this instance.
+ * requested over the time from this instance. This class is not a component, but is used by AttributesHandler when
+ * "transitioning" is needed.
  * 
  * @author cstamas
  * @since 1.10.0
  */
-@Typed( AttributeStorage.class )
-@Named( "transitioning" )
-@Singleton
 public class TransitioningAttributeStorage
-    extends AbstractLoggingComponent
     implements AttributeStorage
 {
-
     private final AttributeStorage mainAttributeStorage;
 
     private final AttributeStorage fallbackAttributeStorage;
 
-    @Inject
-    public TransitioningAttributeStorage( @Named( "ls" ) final AttributeStorage mainAttributeStorage,
-                                          @Named( "legacy" ) final AttributeStorage fallbackAttributeStorage )
+    public TransitioningAttributeStorage( final AttributeStorage mainAttributeStorage,
+                                          final AttributeStorage fallbackAttributeStorage )
     {
         super();
         this.mainAttributeStorage = mainAttributeStorage;
         this.fallbackAttributeStorage = fallbackAttributeStorage;
-        getLogger().info( "Transitioning AttributeStorage in place." );
     }
 
     @Override
@@ -91,8 +79,7 @@ public class TransitioningAttributeStorage
                         }
                         catch ( IOException e )
                         {
-                            // nag and ignore it
-                            getLogger().debug( "Problem during legacy attribute deletion!", e );
+                            // legacy swallows them, this is needed only to satisfy it's signature
                         }
                     }
                 }
@@ -130,8 +117,7 @@ public class TransitioningAttributeStorage
                 }
                 catch ( IOException e )
                 {
-                    // nag and ignore it
-                    getLogger().debug( "Problem during legacy attribute deletion!", e );
+                    // legacy swallows them, this is needed only to satisfy it's signature
                 }
             }
         }
@@ -162,8 +148,7 @@ public class TransitioningAttributeStorage
             }
             catch ( IOException e )
             {
-                // nag and ignore it
-                getLogger().debug( "Problem during legacy attribute deletion!", e );
+                // legacy swallows them, this is needed only to satisfy it's signature
             }
 
             return mainResult;
