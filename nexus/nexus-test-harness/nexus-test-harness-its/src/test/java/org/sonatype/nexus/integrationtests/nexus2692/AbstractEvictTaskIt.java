@@ -36,7 +36,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.codehaus.plexus.util.DirectoryScanner;
@@ -52,6 +51,7 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
 import com.thoughtworks.xstream.XStream;
@@ -68,10 +68,25 @@ public class AbstractEvictTaskIt
 
     private File storageWorkDir;
 
+    @BeforeClass( alwaysRun = true )
+    public void trickNexusToUseLegacyAttributes()
+        throws Exception
+    {
+        final File legacyAttributes = new File(new File( nexusWorkDir ), "proxy/attributes" );
+
+        // the presence of this dir will trick nexus to use "transitioning"
+        legacyAttributes.mkdirs();
+        
+        // to not spawn the thread that might interfere with assertions here
+        System.setProperty( "org.sonatype.nexus.proxy.attributes.upgrade.AttributesUpgradeEventInspector.upgrade", Boolean.FALSE.toString() );
+    }
+
     @BeforeMethod
     public void setupStorageAndAttributes()
         throws Exception
     {
+        stopNexus();
+        
         File workDir = new File( AbstractNexusIntegrationTest.nexusWorkDir );
 
         this.storageWorkDir = new File( workDir, "storage" );
@@ -156,6 +171,8 @@ public class AbstractEvictTaskIt
             IOUtil.close( fis );
             IOUtil.close( reader );
         }
+        
+        startNexus();
     }
 
     protected void copyAttributes()
@@ -165,30 +182,19 @@ public class AbstractEvictTaskIt
 
         // old location
         FileUtils.copyDirectoryStructure( srcDir, new File( new File( nexusWorkDir ), "proxy/attributes" ) );
-        
+
         // new location will need path mangling, see getAttributeFile()
     }
 
     protected File getAttributeFile( String filePart )
     {
-        return new File(new File( new File( nexusWorkDir ), "proxy/attributes" ), filePart);
-        /* This is NEW layout!
-        String[] parts = filePart.split( "/" );
-
-        // repoId
-        StringBuilder sb = new StringBuilder( parts[0] );
-
-        // "sneak in" the ".nexus/attributes"
-        sb.append( "/.nexus/attributes" );
-
-        // the rest
-        for ( int i = 1; i < parts.length; i++ )
-        {
-            sb.append( "/" ).append( parts[i] );
-        }
-
-        return new File( storageWorkDir, sb.toString() );
-        */
+        return new File( new File( new File( nexusWorkDir ), "proxy/attributes" ), filePart );
+        /*
+         * This is NEW layout! String[] parts = filePart.split( "/" ); // repoId StringBuilder sb = new StringBuilder(
+         * parts[0] ); // "sneak in" the ".nexus/attributes" sb.append( "/.nexus/attributes" ); // the rest for ( int i
+         * = 1; i < parts.length; i++ ) { sb.append( "/" ).append( parts[i] ); } return new File( storageWorkDir,
+         * sb.toString() );
+         */
     }
 
     protected void runTask( int days, String repoId )
