@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -127,6 +128,8 @@ public abstract class AbstractFileNexusPluginRepository
         return new File( getPluginFolder( plugin.getCoordinate() ), "dependencies" );
     }
 
+    private static final String SNAPSHOT_TIMESTAMP_FILE_PATTERN = "([0-9]{8}.[0-9]{6})-([0-9]+)";
+
     protected File resolveSnapshotOrReleaseDependencyArtifact( final PluginRepositoryArtifact plugin,
                                                                final GAVCoordinate gav )
     {
@@ -159,15 +162,18 @@ public abstract class AbstractFileNexusPluginRepository
                 buf.append( ".jar" );
             }
 
-            final String prefix = gav.getArtifactId() + "-";
-            final String suffix = buf.toString();
+            final String versionBaseline =
+                gav.getVersion().substring( 0, gav.getVersion().length() - "SNAPSHOT".length() );
+            final Pattern pattern =
+                Pattern.compile( "^" + Pattern.quote( gav.getArtifactId() ) + "-" + Pattern.quote( versionBaseline )
+                    + SNAPSHOT_TIMESTAMP_FILE_PATTERN + Pattern.quote( buf.toString() ) + "$" );
 
             File[] dependencies = dependenciesFolder.listFiles( new FilenameFilter()
             {
                 @Override
                 public boolean accept( File dir, String name )
                 {
-                    return name.startsWith( prefix ) && name.endsWith( suffix );
+                    return pattern.matcher( name ).matches();
                 }
             } );
 
