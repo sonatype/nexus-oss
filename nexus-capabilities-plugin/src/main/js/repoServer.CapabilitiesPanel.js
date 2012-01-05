@@ -419,6 +419,21 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
               scope : this,
               handler : this.deleteHandler,
               disabled : !this.sp.checkPermission('nexus:capabilities', this.sp.DELETE)
+            }, {
+              id : 'capability-show-all',
+              xtype : 'checkbox',
+              checked : false,
+              boxLabel : 'Show all',
+              listeners : {
+                'check' : {
+                  fn : function(checkbox, checked) {
+                    this.capabilitiesDataStore.proxy.conn.url = CAPABILITIES_SERVICE_PATH + '?includeHidden=' + checked;
+                    this.capabilityTypeDataStore.proxy.conn.url = CAPABILITY_TYPES_SERVICE_PATH + '?includeHidden=' + checked;
+                    this.reloadAll();
+                  },
+                scope : this
+                }
+              }
             }],
 
         // grid view options

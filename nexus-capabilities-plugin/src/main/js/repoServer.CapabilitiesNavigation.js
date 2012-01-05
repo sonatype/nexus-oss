@@ -23,7 +23,7 @@
 Sonatype.Events.addListener('nexusNavigationInit', function(nexusPanel) {
   if(Sonatype.lib.Permissions.checkPermission('nexus:capabilities', Sonatype.lib.Permissions.READ)) {
   Ext.Ajax.request({
-      url : CAPABILITY_TYPES_SERVICE_PATH,
+      url : CAPABILITY_TYPES_SERVICE_PATH + "?includeHidden=true",
       callback : function(options, isSuccess, response) {
         if (isSuccess) {
           var decoded = Ext.decode(response.responseText);

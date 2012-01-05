@@ -19,6 +19,7 @@
 package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPlexusResource.asCapabilityListItemResource;
 import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPlexusResource.asCapabilityStatusResponseResource;
 
@@ -38,6 +39,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
@@ -131,20 +133,33 @@ public class CapabilitiesPlexusResource
     public Object get( final Context context, final Request request, final Response response, final Variant variant )
         throws ResourceException
     {
+        final boolean includeHidden = Boolean.parseBoolean(
+            request.getResourceRef().getQueryAsForm().getFirstValue( "includeHidden", true, "false" )
+        );
         final CapabilitiesListResponseResource result = new CapabilitiesListResponseResource();
 
         try
         {
             for ( final CCapability capability : capabilitiesConfiguration.getAll() )
             {
-                result.addData(
-                    asCapabilityListItemResource(
-                        capability,
-                        createChildReference( request, this, capability.getId() ).toString(),
-                        capabilityDescriptorRegistry,
-                        capabilityRegistry
-                    )
-                );
+                CapabilityDescriptor descriptor = null;
+                if ( !includeHidden )
+                {
+                    descriptor = capabilityDescriptorRegistry.get(
+                        capabilityType( capability.getTypeId() )
+                    );
+                }
+                if ( includeHidden || ( descriptor != null && !descriptor.isHidden() ) )
+                {
+                    result.addData(
+                        asCapabilityListItemResource(
+                            capability,
+                            createChildReference( request, this, capability.getId() ).toString(),
+                            capabilityDescriptorRegistry,
+                            capabilityRegistry
+                        )
+                    );
+                }
             }
         }
         catch ( final InvalidConfigurationException e )

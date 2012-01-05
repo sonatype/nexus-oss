@@ -51,11 +51,22 @@ public interface CapabilityDescriptor
 
     /**
      * Whether or not capabilities of this type are user facing = user should be able create it via UI (select it from
-     * capability type drop down).
+     * capability type drop down). Usually not exposed capabilities are building blocks for some other capabilities and
+     * should not be directly be created.
      *
      * @return true if is user facing
      */
     boolean isExposed();
+
+    /**
+     * Whether or not capabilities of this type should be hidden by default. Usually hidden capabilities are managed
+     * (CRUD) by some other means like for example a custom made UI.
+     *
+     * User will be able to see them only when turning on hidden capabilities (in UI).
+     *
+     * @return true if is hidden
+     */
+    boolean isHidden();
 
     /**
      * Returns a detailed description of capability type (to be presented in UI).

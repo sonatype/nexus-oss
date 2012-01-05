@@ -89,29 +89,27 @@ public class CapabilityTypesPlexusResource
     public Object get( final Context context, final Request request, final Response response, final Variant variant )
         throws ResourceException
     {
-        return asCapabilityTypeResourceResponse();
-    }
-
-    private CapabilityTypeResourceResponse asCapabilityTypeResourceResponse()
-    {
-        final CapabilityTypeResourceResponse response = new CapabilityTypeResourceResponse();
+        final boolean includeHidden = Boolean.parseBoolean(
+            request.getResourceRef().getQueryAsForm().getFirstValue( "includeHidden", true, "false" )
+        );
+        final CapabilityTypeResourceResponse envelope = new CapabilityTypeResourceResponse();
 
         final CapabilityDescriptor[] descriptors = capabilityDescriptorRegistry.getAll();
 
         if ( descriptors != null )
         {
-            for ( final CapabilityDescriptor capabilityDescriptor : descriptors )
+            for ( final CapabilityDescriptor descriptor : descriptors )
             {
-                if ( capabilityDescriptor.isExposed() )
+                if ( descriptor.isExposed() && ( includeHidden || !descriptor.isHidden() ) )
                 {
                     final CapabilityTypeResource capabilityTypeResource = new CapabilityTypeResource();
-                    capabilityTypeResource.setId( capabilityDescriptor.type().toString() );
-                    capabilityTypeResource.setName( capabilityDescriptor.name() );
-                    capabilityTypeResource.setAbout( capabilityDescriptor.about() );
+                    capabilityTypeResource.setId( descriptor.type().toString() );
+                    capabilityTypeResource.setName( descriptor.name() );
+                    capabilityTypeResource.setAbout( descriptor.about() );
 
-                    response.addData( capabilityTypeResource );
+                    envelope.addData( capabilityTypeResource );
 
-                    final List<FormField> formFields = capabilityDescriptor.formFields();
+                    final List<FormField> formFields = descriptor.formFields();
 
                     capabilityTypeResource.setFormFields(
                         (List<CapabilityFormFieldResource>) formFieldToDTO(
@@ -123,6 +121,7 @@ public class CapabilityTypesPlexusResource
             }
         }
 
-        return response;
+        return envelope;
     }
+
 }

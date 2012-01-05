@@ -96,4 +96,15 @@ public abstract class CapabilityDescriptorSupport
         return true;
     }
 
+    /**
+     * Not hidden.
+     *
+     * @return false
+     */
+    @Override
+    public boolean isHidden()
+    {
+        return false;
+    }
+
 }

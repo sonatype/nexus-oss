@@ -42,22 +42,27 @@ public class TouchTestCapabilityDescriptor
 
     public static final String FIELD_MSG_ID = "message";
 
-    private final RepoOrGroupComboFormField repoField =
-        new RepoOrGroupComboFormField( FIELD_REPO_OR_GROUP_ID, FormField.MANDATORY );
+    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField(
+        FIELD_REPO_OR_GROUP_ID, FormField.MANDATORY
+    );
 
-    private final StringTextFormField msgField = new StringTextFormField( FIELD_MSG_ID, "Message", "Message help text",
-                                                                          FormField.MANDATORY );
+    private final StringTextFormField msgField = new StringTextFormField(
+        FIELD_MSG_ID, "Message", "Message help text", FormField.MANDATORY
+    );
 
+    @Override
     public CapabilityType type()
     {
         return capabilityType( TYPE );
     }
 
+    @Override
     public String name()
     {
         return "Touch Test Capability";
     }
 
+    @Override
     public List<FormField> formFields()
     {
         List<FormField> fields = new ArrayList<FormField>();
@@ -66,9 +71,16 @@ public class TouchTestCapabilityDescriptor
         return fields;
     }
 
+    @Override
     public boolean isExposed()
     {
         return true;
+    }
+
+    @Override
+    public boolean isHidden()
+    {
+        return false;
     }
 
     @Override
