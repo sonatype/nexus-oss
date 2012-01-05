@@ -21,8 +21,10 @@ package org.sonatype.nexus.integrationtests.nexus4635;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.StatusResource;
@@ -52,15 +54,20 @@ public class Nexus4635FirstStartIT
     protected void copyConfigFiles()
         throws IOException
     {
-        // prevent IT from creating nexus.xml
-        try
-        {
-            cleanWorkDir();
-        }
-        catch ( Exception e )
-        {
-            throw new IOException( e );
-        }
+        super.copyConfigFiles();
+
+        // after we copied, we
+        // selectively delete config files to make nexus believe this is 1st start, but leave stuff like logback config
+        // in place!
+        // FileUtils.forceDelete fits nice, since it will throw IOEx if unable to delete (will not be dumb like
+        // File.delete() is)
+        final File nexusXml = new File( new File( WORK_CONF_DIR ), "nexus.xml" );
+        final File securityXml = new File( new File( WORK_CONF_DIR ), "security.xml" );
+        final File securityConfigurationXml = new File( new File( WORK_CONF_DIR ), "security-configuration.xml" );
+
+        FileUtils.forceDelete( nexusXml );
+        FileUtils.forceDelete( securityXml );
+        FileUtils.forceDelete( securityConfigurationXml );
     }
 
     @Test
