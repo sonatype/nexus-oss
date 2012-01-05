@@ -162,9 +162,11 @@ public abstract class AbstractFileNexusPluginRepository
                 buf.append( ".jar" );
             }
 
-            final String versionBaseline = gav.getVersion().substring( 0, gav.getVersion().length() - "SNAPSHOT".length() );
+            final String versionBaseline =
+                gav.getVersion().substring( 0, gav.getVersion().length() - "SNAPSHOT".length() );
             final Pattern pattern =
-                Pattern.compile( "^" + gav.getArtifactId() + "-" + versionBaseline + SNAPSHOT_TIMESTAMP_FILE_PATTERN + buf.toString() + "$" );
+                Pattern.compile( "^" + Pattern.quote( gav.getArtifactId() ) + "-" + Pattern.quote( versionBaseline )
+                    + SNAPSHOT_TIMESTAMP_FILE_PATTERN + Pattern.quote( buf.toString() ) + "$" );
 
             File[] dependencies = dependenciesFolder.listFiles( new FilenameFilter()
             {
