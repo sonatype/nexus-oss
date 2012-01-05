@@ -32,9 +32,16 @@ public class Maven2ContentClass
     extends AbstractIdContentClass
 {
     public static final String ID = "maven2";
+    public static final String NAME = "Maven2";
 
     public String getId()
     {
         return ID;
+    }
+
+    @Override
+    public String getName()
+    {
+        return NAME;
     }
 }
