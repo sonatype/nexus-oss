@@ -34,7 +34,6 @@ import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
-import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
 
@@ -44,10 +43,6 @@ public class GroupMessageUtil
     extends ITUtil
 {
     public static final String SERVICE_PART = "service/local/repo_groups";
-
-    private XStream xstream;
-
-    private MediaType mediaType;
 
     private static final Logger LOG = LoggerFactory.getLogger( GroupMessageUtil.class );
 
@@ -139,23 +134,6 @@ public class GroupMessageUtil
         return repoIdList;
     }
 
-    public RepositoryGroupResource getGroup( String groupId )
-        throws IOException
-    {
-
-        String responseText = RequestFacade.doGetForText( SERVICE_PART + "/" + groupId );
-        LOG.debug( "responseText: \n" + responseText );
-
-        // this should use call to: getResourceFromResponse
-        XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
-
-        RepositoryGroupResourceResponse resourceResponse =
-            (RepositoryGroupResourceResponse) representation.getPayload( new RepositoryGroupResourceResponse() );
-
-        return resourceResponse.getData();
-    }
-
     public RepositoryGroupResource updateGroup( RepositoryGroupResource group )
         throws IOException
     {
@@ -166,71 +144,25 @@ public class GroupMessageUtil
         return responseResource;
     }
 
+    public List<RepositoryGroupListResource> getList()
+        throws IOException
+    {
+        return groupNRC.getList();
+    }
+
+    public Response sendMessage( final Method method, final RepositoryGroupResource resource, final String id )
+        throws IOException
+    {
+        return groupNRC.sendMessage( method, resource, id );
+    }
+
     /**
      * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
      */
     public Response sendMessage( Method method, RepositoryGroupResource resource )
         throws IOException
     {
-        return this.sendMessage( method, resource, resource.getId() );
-    }
-
-    /**
-     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
-     */
-    public Response sendMessage( Method method, RepositoryGroupResource resource, String id )
-        throws IOException
-    {
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
-
-        String idPart = ( method == Method.POST ) ? "" : "/" + id;
-        String serviceURI = SERVICE_PART + idPart;
-
-        RepositoryGroupResourceResponse repoResponseRequest = new RepositoryGroupResourceResponse();
-        repoResponseRequest.setData( resource );
-
-        // now set the payload
-        representation.setPayload( repoResponseRequest );
-
-        LOG.debug( "sendMessage: " + representation.getText() );
-
-        return RequestFacade.sendMessage( serviceURI, method, representation );
-    }
-
-    /**
-     * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     *
-     * @return
-     * @throws IOException
-     */
-    public List<RepositoryGroupListResource> getList()
-        throws IOException
-    {
-
-        String responseText = RequestFacade.doGetForText( SERVICE_PART);
-        LOG.debug( "responseText: \n" + responseText );
-
-        XStreamRepresentation representation =
-            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
-
-        RepositoryGroupListResourceResponse resourceResponse =
-            (RepositoryGroupListResourceResponse) representation.getPayload( new RepositoryGroupListResourceResponse() );
-
-        return resourceResponse.getData();
-
-    }
-
-    public RepositoryGroupResource getResourceFromResponse( Response response )
-        throws IOException
-    {
-        String responseString = response.getEntity().getText();
-        LOG.debug( " getResourceFromResponse: " + responseString );
-
-        XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
-        RepositoryGroupResourceResponse resourceResponse =
-            (RepositoryGroupResourceResponse) representation.getPayload( new RepositoryGroupResourceResponse() );
-
-        return resourceResponse.getData();
+        return groupNRC.sendMessage( method, resource, resource.getId() );
     }
 
     private void validateRepoInNexusConfig( RepositoryGroupResource group )
@@ -247,4 +179,9 @@ public class GroupMessageUtil
         this.validateRepoLists( expectedRepos, actualRepos );
     }
 
+    public RepositoryGroupResource getGroup( final String groupId )
+        throws IOException
+    {
+        return groupNRC.getGroup( groupId );
+    }
 }
