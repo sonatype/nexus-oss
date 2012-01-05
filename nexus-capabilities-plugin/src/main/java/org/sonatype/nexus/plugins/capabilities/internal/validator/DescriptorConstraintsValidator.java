@@ -71,7 +71,7 @@ public class DescriptorConstraintsValidator
                     fieldValidators.add( validators.capability().matches( type, formField.getId(), regexp ) );
                 }
             }
-            if ( fieldValidators != null )
+            if ( !fieldValidators.isEmpty() )
             {
                 descriptorValidator = validators.logical().and(
                     fieldValidators.toArray( new Validator[fieldValidators.size()] )
