@@ -326,7 +326,7 @@ public abstract class AbstractNexusIntegrationTest
             if ( NEEDS_INIT )
             {
                 // start per-IT plexus container
-                TestContainer.getInstance().startPlexusContainer();
+                TestContainer.getInstance().startPlexusContainer( getClass() );
 
                 // tell the console what we are doing, now that there is no output its
                 String logMessage = "Running Test: " + getTestId() + " - Class: " + this.getClass().getSimpleName();

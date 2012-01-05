@@ -82,11 +82,11 @@ public class TestContainer
         return plexusContainer;
     }
 
-    public synchronized void startPlexusContainer()
+    public synchronized void startPlexusContainer( final Class<?> clazz )
     {
         if ( plexusContainer == null )
         {
-            plexusContainer = setupContainer( getClass() );
+            plexusContainer = setupContainer( clazz );
         }
     }
 
