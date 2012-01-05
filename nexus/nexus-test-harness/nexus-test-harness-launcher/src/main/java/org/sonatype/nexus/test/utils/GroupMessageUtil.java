@@ -46,7 +46,7 @@ public class GroupMessageUtil
 
     private static final Logger LOG = LoggerFactory.getLogger( GroupMessageUtil.class );
 
-    public final RepositoryGroupsNexusRestClient groupNRC;
+    private final RepositoryGroupsNexusRestClient groupNRC;
 
     public GroupMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {
