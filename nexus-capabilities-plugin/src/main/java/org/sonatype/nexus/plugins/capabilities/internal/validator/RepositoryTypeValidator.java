@@ -75,7 +75,7 @@ public class RepositoryTypeValidator
                 final Repository repository = repositoryRegistry.getRepository( repositoryId );
                 if ( !repository.getRepositoryKind().isFacetAvailable( facet ) )
                 {
-                    return new DefaultValidationResult().add( buildMessage( repository ) );
+                    return new DefaultValidationResult().add( propertyKey, buildMessage( repository ) );
                 }
             }
             catch ( NoSuchRepositoryException ignore )

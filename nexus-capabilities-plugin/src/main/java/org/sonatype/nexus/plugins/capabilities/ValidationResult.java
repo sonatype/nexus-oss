@@ -30,6 +30,9 @@ import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidati
 public interface ValidationResult
 {
 
+    /**
+     * A validation result for the case when there are no validation failures.
+     */
     static final ValidationResult VALID = new DefaultValidationResult();
 
     /**
@@ -49,6 +52,18 @@ public interface ValidationResult
     interface Violation
     {
 
+        /**
+         * The key of property that is invalid or "*" when the violation applies to capability as a whole.
+         *
+         * @return key or "*"
+         */
+        String key();
+
+        /**
+         * A description of violation.
+         *
+         * @return violation description
+         */
         String message();
 
     }

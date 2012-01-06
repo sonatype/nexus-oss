@@ -22,6 +22,7 @@
 
 var CAPABILITIES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilities';
 var CAPABILITY_TYPES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilityTypes';
+var CAPABILITY_SETTINGS_PREFIX = '';
 
 Sonatype.repoServer.CapabilitiesPanel = function(config) {
   var config = config || {};
@@ -628,7 +629,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               active : false
             });
         config = this.configUniqueIdHelper(id, config);
-        Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
+        Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', CAPABILITY_SETTINGS_PREFIX, this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
         var formPanel = new Ext.FormPanel(config);
 
         formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -910,7 +911,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                 id : id
               });
           config = this.configUniqueIdHelper(id, config);
-          Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
+          Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', CAPABILITY_SETTINGS_PREFIX, this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
           formPanel = new Ext.FormPanel(config);
 
           formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -1114,11 +1115,11 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       exportCapabilityPropertiesHelper : function(val, fpanel) {
-        return FormFieldExporter(fpanel, '_settings-panel', 'capabilityProperties_');
+        return FormFieldExporter(fpanel, '_settings-panel', CAPABILITY_SETTINGS_PREFIX);
       },
 
       importCapabilityPropertiesHelper : function(val, srcObj, fpanel) {
-        FormFieldImporter(srcObj, fpanel, 'capabilityProperties_');
+        FormFieldImporter(srcObj, fpanel, CAPABILITY_SETTINGS_PREFIX);
         return val;
       },
 

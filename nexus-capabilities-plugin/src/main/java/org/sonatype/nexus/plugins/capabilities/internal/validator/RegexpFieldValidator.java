@@ -69,7 +69,7 @@ public class RegexpFieldValidator
             final String value = properties.get( key );
             if ( value != null && pattern.matcher( value ).matches() )
             {
-                return new DefaultValidationResult().add( label + " does not match '" + pattern.pattern() + "'" );
+                return new DefaultValidationResult().add( key, label + " does not match '" + pattern.pattern() + "'" );
             }
         }
         return ValidationResult.VALID;

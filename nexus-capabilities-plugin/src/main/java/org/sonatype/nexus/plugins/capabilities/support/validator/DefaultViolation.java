@@ -31,11 +31,26 @@ public class DefaultViolation
     implements ValidationResult.Violation
 {
 
+    private final String key;
+
     private final String message;
 
     public DefaultViolation( final String message )
     {
+        this.key = "*";
         this.message = checkNotNull( message );
+    }
+
+    public DefaultViolation( final String key, final String message )
+    {
+        this.key = checkNotNull( key );
+        this.message = checkNotNull( message );
+    }
+
+    @Override
+    public String key()
+    {
+        return key;
     }
 
     @Override
@@ -58,6 +73,10 @@ public class DefaultViolation
 
         final DefaultViolation that = (DefaultViolation) o;
 
+        if ( !key.equals( that.key ) )
+        {
+            return false;
+        }
         if ( !message.equals( that.message ) )
         {
             return false;
@@ -69,6 +88,8 @@ public class DefaultViolation
     @Override
     public int hashCode()
     {
-        return message.hashCode();
+        int result = key.hashCode();
+        result = 31 * result + message.hashCode();
+        return result;
     }
 }

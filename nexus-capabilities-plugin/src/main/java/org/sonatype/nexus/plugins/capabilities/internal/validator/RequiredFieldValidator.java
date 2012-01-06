@@ -64,7 +64,7 @@ public class RequiredFieldValidator
             final String value = properties.get( key );
             if ( value == null || value.trim().length() == 0 )
             {
-                return new DefaultValidationResult().add( label + " is required" );
+                return new DefaultValidationResult().add( key, label + " is required" );
             }
         }
         return ValidationResult.VALID;

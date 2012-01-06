@@ -63,6 +63,11 @@ public class DefaultValidationResult
         violations().addAll( violations );
     }
 
+    public DefaultValidationResult add( final String key, final String message )
+    {
+        return add( new DefaultViolation( key, message ) );
+    }
+
     public DefaultValidationResult add( final String message )
     {
         return add( new DefaultViolation( message ) );
