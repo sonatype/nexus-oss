@@ -306,6 +306,13 @@ public abstract class AbstractNexusIntegrationTest
         // hacky state machine
         NEEDS_INIT = true;
     }
+    
+    @BeforeClass( alwaysRun = true )
+    public void startITPlexusContainer()
+    {
+        // start per-IT plexus container
+        TestContainer.getInstance().startPlexusContainer( getClass() );
+    }
 
     /**
      * To me this seems like a bad hack around this problem. I don't have any other thoughts though. <BR/>
@@ -325,9 +332,6 @@ public abstract class AbstractNexusIntegrationTest
         {
             if ( NEEDS_INIT )
             {
-                // start per-IT plexus container
-                TestContainer.getInstance().startPlexusContainer( getClass() );
-
                 // tell the console what we are doing, now that there is no output its
                 String logMessage = "Running Test: " + getTestId() + " - Class: " + this.getClass().getSimpleName();
                 staticLog.info( String.format( "%1$-" + logMessage.length() + "s", " " ).replaceAll( " ", "*" ) );
