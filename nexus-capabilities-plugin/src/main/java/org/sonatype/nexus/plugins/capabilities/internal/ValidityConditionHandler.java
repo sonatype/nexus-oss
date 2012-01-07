@@ -24,11 +24,10 @@ import javax.inject.Inject;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.SatisfiedCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
@@ -46,7 +45,7 @@ public class ValidityConditionHandler
 
     private final DefaultCapabilityReference reference;
 
-    private final CapabilityConfiguration configurations;
+    private final CapabilityRegistry capabilityRegistry;
 
     private final Conditions conditions;
 
@@ -56,12 +55,12 @@ public class ValidityConditionHandler
 
     @Inject
     ValidityConditionHandler( final NexusEventBus eventBus,
-                              final CapabilityConfiguration configurations,
+                              final CapabilityRegistry capabilityRegistry,
                               final Conditions conditions,
                               final @Assisted DefaultCapabilityReference reference )
     {
         this.eventBus = checkNotNull( eventBus );
-        this.configurations = checkNotNull( configurations );
+        this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.conditions = checkNotNull( conditions );
         this.reference = checkNotNull( reference );
     }
@@ -92,11 +91,11 @@ public class ValidityConditionHandler
             reference.disable();
             try
             {
-                configurations.remove( reference.capability().id().toString() );
+                capabilityRegistry.remove( reference.context().id() );
             }
             catch ( Exception e )
             {
-                getLogger().error( "Failed to remove capability with id '{}'", reference.capability().id(), e );
+                getLogger().error( "Failed to remove capability with id '{}'", reference.context().id(), e );
             }
         }
     }
@@ -142,7 +141,7 @@ public class ValidityConditionHandler
                 );
                 getLogger().error(
                     "Could not get validation condition from capability {} ({}). Considering it as always valid",
-                    new Object[]{ reference.capability(), reference.capability().id(), e }
+                    new Object[]{ reference.capability(), reference.context().id(), e }
                 );
             }
             if ( validityCondition == null )
@@ -174,7 +173,7 @@ public class ValidityConditionHandler
         }
         return String.format(
             "Watching '%s' condition to validate/invalidate capability '%s (id=%s)'",
-            condition, reference.capability(), reference.capability().id()
+            condition, reference.capability(), reference.context().id()
         );
     }
 

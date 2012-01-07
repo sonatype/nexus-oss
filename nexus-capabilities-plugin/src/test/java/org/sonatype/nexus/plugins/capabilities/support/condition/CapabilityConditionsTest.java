@@ -21,13 +21,13 @@ package org.sonatype.nexus.plugins.capabilities.support.condition;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
+import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.eventbus.NexusEventBus;
-import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.Condition;
@@ -84,10 +84,8 @@ public class CapabilityConditionsTest
     @Test
     public void reactivateCapabilityOnUpdate()
     {
-        final Capability capability = mock( Capability.class );
-
         assertThat(
-            underTest.passivateCapabilityDuringUpdate( capability ),
+            underTest.passivateCapabilityDuringUpdate( capabilityIdentity( "foo" ) ),
             is( Matchers.<Condition>instanceOf( PassivateCapabilityDuringUpdateCondition.class ) )
         );
     }

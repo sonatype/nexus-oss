@@ -21,12 +21,15 @@ package org.sonatype.nexus.plugins.capabilities.internal.condition;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 
 /**
@@ -42,6 +45,8 @@ public class PassivateCapabilityDuringUpdateConditionTest
 
     private PassivateCapabilityDuringUpdateCondition underTest;
 
+    private CapabilityRegistry capabilityRegistry;
+
     @Override
     @Before
     public void setUp()
@@ -49,11 +54,17 @@ public class PassivateCapabilityDuringUpdateConditionTest
     {
         super.setUp();
 
-        final Capability capability = mock( Capability.class );
-        this.reference = mock( CapabilityReference.class );
-        when( this.reference.capability() ).thenReturn( capability );
+        final CapabilityIdentity id = capabilityIdentity( "test" );
 
-        underTest = new PassivateCapabilityDuringUpdateCondition( eventBus, capability );
+        capabilityRegistry = mock( CapabilityRegistry.class );
+        reference = mock( CapabilityReference.class );
+
+        final CapabilityContext context = mock( CapabilityContext.class );
+        when( context.id() ).thenReturn( id );
+
+        when( reference.context() ).thenReturn( context );
+
+        underTest = new PassivateCapabilityDuringUpdateCondition( eventBus, id );
         underTest.bind();
 
         verify( eventBus ).register( underTest );
@@ -65,8 +76,8 @@ public class PassivateCapabilityDuringUpdateConditionTest
     @Test
     public void passivateDuringUpdate()
     {
-        underTest.handle( new CapabilityEvent.BeforeUpdate( reference ) );
-        underTest.handle( new CapabilityEvent.AfterUpdate( reference ) );
+        underTest.handle( new CapabilityEvent.BeforeUpdate( capabilityRegistry, reference ) );
+        underTest.handle( new CapabilityEvent.AfterUpdate( capabilityRegistry, reference ) );
 
         verifyEventBusEvents( unsatisfied( underTest ), satisfied( underTest ) );
     }

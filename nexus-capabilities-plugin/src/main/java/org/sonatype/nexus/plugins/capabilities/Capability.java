@@ -24,13 +24,6 @@ public interface Capability
 {
 
     /**
-     * Returns an unique capability identifier.
-     *
-     * @return identifier
-     */
-    CapabilityIdentity id();
-
-    /**
      * Returns description of capability.
      *
      * @return description. Can be null.

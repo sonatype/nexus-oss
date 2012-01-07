@@ -21,7 +21,7 @@ package org.sonatype.nexus.plugins.capabilities.test.helper;
 import java.util.Map;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 
 public class TouchTestCapability
@@ -31,33 +31,33 @@ public class TouchTestCapability
 
     public static final String TYPE = "TouchTest";
 
-    protected TouchTestCapability( CapabilityIdentity id )
+    protected TouchTestCapability( final CapabilityContext context )
     {
-        super( id );
+        super( context );
     }
 
     @Override
     public void create( Map<String, String> properties )
     {
-        getLogger().info( "Create capability with id {} and properties {}", id(), properties );
+        getLogger().info( "Create capability with id {} and properties {}", context().id(), properties );
     }
 
     @Override
     public void update( Map<String, String> properties )
     {
-        getLogger().info( "Update capability with id {} and properties {}", id(), properties );
+        getLogger().info( "Update capability with id {} and properties {}", context().id(), properties );
     }
 
     @Override
     public void load( Map<String, String> properties )
     {
-        getLogger().info( "Load capability with id {} and properties {}", id(), properties );
+        getLogger().info( "Load capability with id {} and properties {}", context().id(), properties );
     }
 
     @Override
     public void remove()
     {
-        getLogger().info( "Remove capability with id {}", id() );
+        getLogger().info( "Remove capability with id {}", context().id() );
     }
 
     @Override

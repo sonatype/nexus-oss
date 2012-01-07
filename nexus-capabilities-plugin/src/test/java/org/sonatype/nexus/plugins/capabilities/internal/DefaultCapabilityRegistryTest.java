@@ -33,22 +33,29 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabil
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 import java.util.Collection;
+import javax.inject.Provider;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sonatype.nexus.configuration.DefaultConfigurationIdGenerator;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
+import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
 
 /**
  * {@link DefaultCapabilityRegistry} UTs.
@@ -60,30 +67,29 @@ public class DefaultCapabilityRegistryTest
 
     static final CapabilityType CAPABILITY_TYPE = capabilityType( "test" );
 
-    static final CapabilityIdentity CAPABILITY_1 = capabilityIdentity( "capability-1" );
-
-    static final CapabilityIdentity CAPABILITY_2 = capabilityIdentity( "capability-2" );
-
     private NexusEventBus eventBus;
 
     private DefaultCapabilityRegistry underTest;
 
-    private ArgumentCaptor<CapabilityRegistryEvent> rec;
+    private ArgumentCaptor<CapabilityEvent> rec;
 
     @Before
     public void setUp()
     {
+        final CapabilityStorage capabilityStorage = mock( CapabilityStorage.class );
+        final ValidatorRegistryProvider validatorRegistryProvider = mock( ValidatorRegistryProvider.class );
+        final ValidatorRegistry validatorRegistry = mock( ValidatorRegistry.class );
+        when( validatorRegistryProvider.get() ).thenReturn( validatorRegistry );
+
         final CapabilityFactory factory = mock( CapabilityFactory.class );
-        when( factory.create( Matchers.<CapabilityIdentity>any(), Matchers.<CapabilityContext>any() ) )
+        when( factory.create( Matchers.<CapabilityContext>any() ) )
             .thenAnswer( new Answer<Capability>()
             {
                 @Override
                 public Capability answer( final InvocationOnMock invocation )
                     throws Throwable
                 {
-                    final Capability capability = mock( Capability.class );
-                    when( capability.id() ).thenReturn( (CapabilityIdentity) invocation.getArguments()[0] );
-                    return capability;
+                    return mock( Capability.class );
                 }
 
             } );
@@ -91,104 +97,137 @@ public class DefaultCapabilityRegistryTest
         final CapabilityFactoryRegistry capabilityFactoryRegistry = mock( CapabilityFactoryRegistry.class );
         when( capabilityFactoryRegistry.get( CAPABILITY_TYPE ) ).thenReturn( factory );
 
+        final CapabilityDescriptorRegistry capabilityDescriptorRegistry = mock( CapabilityDescriptorRegistry.class );
+        when( capabilityDescriptorRegistry.get( CAPABILITY_TYPE ) ).thenReturn( mock( CapabilityDescriptor.class ) );
+
         eventBus = mock( NexusEventBus.class );
 
         final ActivationConditionHandlerFactory achf = mock( ActivationConditionHandlerFactory.class );
+        when( achf.create( Mockito.<DefaultCapabilityReference>any() ) ).thenReturn(
+            mock( ActivationConditionHandler.class )
+        );
         final ValidityConditionHandlerFactory vchf = mock( ValidityConditionHandlerFactory.class );
+        when( vchf.create( Mockito.<DefaultCapabilityReference>any() ) ).thenReturn(
+            mock( ValidityConditionHandler.class )
+        );
 
-        underTest = new DefaultCapabilityRegistry( capabilityFactoryRegistry, eventBus, achf, vchf )
-        {
-            @Override
-            DefaultCapabilityReference createReference( final CapabilityType type,
-                                                        final Capability capability,
-                                                        final CapabilityContextProxy capabilityContextProxy )
-            {
-                return mock( DefaultCapabilityReference.class );
-            }
-        };
+        underTest = new DefaultCapabilityRegistry(
+            capabilityStorage,
+            new DefaultConfigurationIdGenerator(),
+            validatorRegistryProvider,
+            capabilityFactoryRegistry,
+            capabilityDescriptorRegistry,
+            eventBus,
+            achf,
+            vchf
+        );
 
-        rec = ArgumentCaptor.forClass( CapabilityRegistryEvent.class );
+        rec = ArgumentCaptor.forClass( CapabilityEvent.class );
     }
 
     /**
      * Create capability creates a non null reference and posts create event.
+     *
+     * @throws Exception unexpected
      */
     @Test
     public void create()
+        throws Exception
     {
-        final CapabilityReference reference = underTest.create( CAPABILITY_1, CAPABILITY_TYPE );
+        final CapabilityReference reference = underTest.add( CAPABILITY_TYPE, true, null, null );
         assertThat( reference, is( not( nullValue() ) ) );
 
         verify( eventBus ).post( rec.capture() );
-        assertThat( rec.getValue(), is( instanceOf( CapabilityRegistryEvent.Created.class ) ) );
+        assertThat( rec.getValue(), is( instanceOf( CapabilityEvent.Created.class ) ) );
         assertThat( rec.getValue().getReference(), is( equalTo( reference ) ) );
     }
 
     /**
      * Remove an existent capability posts remove event.
+     *
+     * @throws Exception unexpected
      */
     @Test
     public void remove()
+        throws Exception
     {
-        final CapabilityReference reference = underTest.create( CAPABILITY_1, CAPABILITY_TYPE );
-        final CapabilityReference reference1 = underTest.remove( CAPABILITY_1 );
+        final CapabilityReference reference = underTest.add( CAPABILITY_TYPE, true, null, null );
+        final CapabilityReference reference1 = underTest.remove( reference.context().id() );
 
         assertThat( reference1, is( equalTo( reference ) ) );
 
         verify( eventBus, times( 2 ) ).post( rec.capture() );
-        assertThat( rec.getAllValues().get( 0 ), is( instanceOf( CapabilityRegistryEvent.Created.class ) ) );
+        assertThat( rec.getAllValues().get( 0 ), is( instanceOf( CapabilityEvent.Created.class ) ) );
         assertThat( rec.getAllValues().get( 0 ).getReference(), is( equalTo( reference1 ) ) );
-        assertThat( rec.getAllValues().get( 1 ), is( instanceOf( CapabilityRegistryEvent.Removed.class ) ) );
+        assertThat( rec.getAllValues().get( 1 ), is( instanceOf( CapabilityEvent.AfterRemove.class ) ) );
         assertThat( rec.getAllValues().get( 1 ).getReference(), is( equalTo( reference1 ) ) );
     }
 
     /**
      * Remove an inexistent capability does nothing and does not post remove event.
+     *
+     * @throws Exception unexpected
      */
     @Test
     public void removeInexistent()
+        throws Exception
     {
-        underTest.create( CAPABILITY_1, CAPABILITY_TYPE );
-        final CapabilityReference reference1 = underTest.remove( CAPABILITY_2 );
+        underTest.add( CAPABILITY_TYPE, true, null, null );
+        final CapabilityReference reference1 = underTest.remove( capabilityIdentity( "foo" ) );
 
         assertThat( reference1, is( nullValue() ) );
     }
 
     /**
      * Get a created capability.
+     *
+     * @throws Exception unexpected
      */
     @Test
     public void get()
+        throws Exception
     {
-        underTest.create( CAPABILITY_1, CAPABILITY_TYPE );
-        final CapabilityReference reference1 = underTest.get( CAPABILITY_1 );
+        final CapabilityReference reference = underTest.add( CAPABILITY_TYPE, true, null, null );
+        final CapabilityReference reference1 = underTest.get( reference.context().id() );
 
         assertThat( reference1, is( not( nullValue() ) ) );
     }
 
     /**
      * Get an inexistent capability.
+     *
+     * @throws Exception unexpected
      */
     @Test
     public void getInexistent()
+        throws Exception
     {
-        underTest.create( CAPABILITY_1, CAPABILITY_TYPE );
-        final CapabilityReference reference = underTest.get( CAPABILITY_2 );
+        underTest.add( CAPABILITY_TYPE, true, null, null );
+        final CapabilityReference reference = underTest.get( capabilityIdentity( "foo" ) );
 
         assertThat( reference, is( nullValue() ) );
     }
 
     /**
      * Get all created capabilities.
+     *
+     * @throws Exception unexpected
      */
     @Test
     public void getAll()
+        throws Exception
     {
-        underTest.create( CAPABILITY_1, CAPABILITY_TYPE );
-        underTest.create( CAPABILITY_2, CAPABILITY_TYPE );
+        underTest.add( CAPABILITY_TYPE, true, null, null );
+        underTest.add( CAPABILITY_TYPE, true, null, null );
         final Collection<? extends CapabilityReference> references = underTest.getAll();
 
         assertThat( references, hasSize( 2 ) );
+    }
+
+    private interface ValidatorRegistryProvider
+        extends Provider<ValidatorRegistry>
+    {
+
     }
 
 }

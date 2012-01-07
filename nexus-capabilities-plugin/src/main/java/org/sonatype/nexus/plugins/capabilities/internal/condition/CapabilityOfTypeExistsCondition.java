@@ -25,9 +25,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
 import com.google.common.eventbus.Subscribe;
@@ -70,7 +70,7 @@ public class CapabilityOfTypeExistsCondition
             bindLock.writeLock().lock();
             for ( final CapabilityReference reference : capabilityRegistry.getAll() )
             {
-                handle( new CapabilityRegistryEvent.Created( reference ) );
+                handle( new CapabilityEvent.Created( capabilityRegistry, reference ) );
             }
         }
         finally
@@ -87,18 +87,18 @@ public class CapabilityOfTypeExistsCondition
     }
 
     @Subscribe
-    public void handle( final CapabilityRegistryEvent.Created event )
+    public void handle( final CapabilityEvent.Created event )
     {
-        if ( !isSatisfied() && type.equals( event.getReference().type() ) )
+        if ( !isSatisfied() && type.equals( event.getReference().context().type() ) )
         {
             checkAllCapabilities();
         }
     }
 
     @Subscribe
-    public void handle( final CapabilityRegistryEvent.Removed event )
+    public void handle( final CapabilityEvent.AfterRemove event )
     {
-        if ( isSatisfied() && type.equals( event.getReference().type() ) )
+        if ( isSatisfied() && type.equals( event.getReference().context().type() ) )
         {
             checkAllCapabilities();
         }
@@ -119,7 +119,7 @@ public class CapabilityOfTypeExistsCondition
 
     boolean isSatisfiedBy( final CapabilityReference reference )
     {
-        return type.equals( reference.type() );
+        return type.equals( reference.context().type() );
     }
 
     @Override

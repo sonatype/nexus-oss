@@ -77,13 +77,13 @@ public class CapabilityReferenceFilterBuilder
             {
                 return false;
             }
-            if ( typeId != null && !typeId.equals( input.type().toString() ) )
+            if ( typeId != null && !typeId.equals( input.context().type().toString() ) )
             {
                 return false;
             }
             if ( properties != null && !properties.isEmpty() )
             {
-                final Map<String, String> inputPropertiesMap = input.properties();
+                final Map<String, String> inputPropertiesMap = input.context().properties();
                 if ( inputPropertiesMap == null || inputPropertiesMap.isEmpty() )
                 {
                     return false;

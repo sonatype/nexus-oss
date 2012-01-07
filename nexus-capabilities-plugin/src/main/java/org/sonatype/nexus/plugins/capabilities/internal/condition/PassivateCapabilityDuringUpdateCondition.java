@@ -21,8 +21,8 @@ package org.sonatype.nexus.plugins.capabilities.internal.condition;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
-import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
 import com.google.common.eventbus.Subscribe;
 
@@ -36,13 +36,13 @@ public class PassivateCapabilityDuringUpdateCondition
     extends ConditionSupport
 {
 
-    private final Capability capability;
+    private final CapabilityIdentity id;
 
     public PassivateCapabilityDuringUpdateCondition( final NexusEventBus eventBus,
-                                                     final Capability capability )
+                                                     final CapabilityIdentity id )
     {
         super( eventBus, true );
-        this.capability = checkNotNull( capability );
+        this.id = checkNotNull( id );
     }
 
     @Override
@@ -60,7 +60,7 @@ public class PassivateCapabilityDuringUpdateCondition
     @Subscribe
     public void handle( final CapabilityEvent.BeforeUpdate event )
     {
-        if ( event.getReference().capability() == capability )
+        if ( event.getReference().context().id().equals( id ) )
         {
             setSatisfied( false );
         }
@@ -69,7 +69,7 @@ public class PassivateCapabilityDuringUpdateCondition
     @Subscribe
     public void handle( final CapabilityEvent.AfterUpdate event )
     {
-        if ( event.getReference().capability() == capability )
+        if ( event.getReference().context().id().equals( id ) )
         {
             setSatisfied( true );
         }
@@ -78,7 +78,7 @@ public class PassivateCapabilityDuringUpdateCondition
     @Override
     public String toString()
     {
-        return "Passivate during update of " + capability;
+        return "Passivate during update of " + id;
     }
 
     @Override

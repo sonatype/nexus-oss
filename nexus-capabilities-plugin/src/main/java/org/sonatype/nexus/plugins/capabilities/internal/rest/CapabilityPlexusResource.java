@@ -20,9 +20,10 @@ package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
-import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
@@ -39,13 +40,9 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
-import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
-import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapabilityProperty;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityListItemResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
@@ -55,6 +52,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatu
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import com.google.common.collect.Maps;
 
 @Singleton
 @Path( CapabilityPlexusResource.RESOURCE_URI )
@@ -69,24 +67,11 @@ public class CapabilityPlexusResource
 
     public static final String RESOURCE_URI = "/capabilities/{" + CAPABILITIES_ID_KEY + "}";
 
-    private CapabilityConfiguration capabilitiesConfiguration;
-
-    private CapabilityDescriptorRegistry capabilityDescriptorRegistry;
-
-    private CapabilityRegistry capabilityRegistry;
-
-    // TODO get rid of this constructor as it is here because enunciate plugin fails without a default constructor
-    public CapabilityPlexusResource()
-    {
-    }
+    private final CapabilityRegistry capabilityRegistry;
 
     @Inject
-    public CapabilityPlexusResource( final CapabilityConfiguration capabilitiesConfiguration,
-                                     final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
-                                     final CapabilityRegistry capabilityRegistry )
+    public CapabilityPlexusResource( final CapabilityRegistry capabilityRegistry )
     {
-        this.capabilitiesConfiguration = checkNotNull( capabilitiesConfiguration );
-        this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.setModifiable( true );
     }
@@ -119,16 +104,15 @@ public class CapabilityPlexusResource
     {
         try
         {
-            final String capabilityId = getCapabilityId( request );
-            final CCapability capability = capabilitiesConfiguration.get( capabilityId );
-            if ( capability == null )
+            final CapabilityIdentity capabilityId = getCapabilityIdentity( request );
+            final CapabilityReference reference = capabilityRegistry.get( capabilityId );
+            if ( reference == null )
             {
                 throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, String.format(
                     "Cannot find a capability with specified if of %s", capabilityId ) );
             }
 
-            final CapabilityResponseResource result = asCapabilityResponseResource( capability );
-            return result;
+            return asCapabilityResponseResource( reference );
         }
         catch ( final Exception e )
         {
@@ -145,20 +129,20 @@ public class CapabilityPlexusResource
     public Object put( final Context context, final Request request, final Response response, final Object payload )
         throws ResourceException
     {
+        final CapabilityIdentity capabilityId = getCapabilityIdentity( request );
         final CapabilityRequestResource envelope = (CapabilityRequestResource) payload;
-        final CCapability capability = asCCapability( envelope.getData() );
         try
         {
-            capabilitiesConfiguration.update( capability );
-            capabilitiesConfiguration.save();
-
-            final CapabilityStatusResponseResource result = asCapabilityStatusResponseResource(
-                capability,
-                createChildReference( request, this, capability.getId() ).toString(),
-                capabilityDescriptorRegistry,
-                capabilityRegistry
+            final CapabilityReference reference = capabilityRegistry.update(
+                capabilityId,
+                envelope.getData().isEnabled(),
+                envelope.getData().getNotes(),
+                asMap( envelope.getData().getProperties() )
             );
-            return result;
+            return asCapabilityStatusResponseResource(
+                reference,
+                createChildReference( request, this, capabilityId.toString() ).toString()
+            );
         }
         catch ( final InvalidConfigurationException e )
         {
@@ -182,12 +166,8 @@ public class CapabilityPlexusResource
     {
         try
         {
-            capabilitiesConfiguration.remove( getCapabilityId( request ) );
+            capabilityRegistry.remove( getCapabilityIdentity( request ) );
             response.setStatus( Status.SUCCESS_NO_CONTENT );
-        }
-        catch ( final InvalidConfigurationException e )
-        {
-            handleConfigurationException( e );
         }
         catch ( final IOException e )
         {
@@ -196,50 +176,39 @@ public class CapabilityPlexusResource
         }
     }
 
-    static CCapability asCCapability( final CapabilityResource resource )
+    static Map<String, String> asMap( final List<CapabilityPropertyResource> properties )
     {
-        assert resource != null : "Resource cannot be null";
+        final Map<String, String> map = Maps.newHashMap();
 
-        final CCapability capability = new CCapability();
-
-        capability.setId( resource.getId() );
-        capability.setNotes( resource.getNotes() );
-        capability.setEnabled( resource.isEnabled() );
-        capability.setTypeId( resource.getTypeId() );
-
-        if ( resource.getProperties() != null )
+        if ( properties != null )
         {
-            for ( final CapabilityPropertyResource propery : resource.getProperties() )
+            for ( final CapabilityPropertyResource property : properties )
             {
-                final CCapabilityProperty capabilityProp = new CCapabilityProperty();
-                capabilityProp.setKey( propery.getKey() );
-                capabilityProp.setValue( propery.getValue() );
-
-                capability.addProperty( capabilityProp );
+                map.put( property.getKey(), property.getValue() );
             }
         }
 
-        return capability;
+        return map;
     }
 
-    static CapabilityResponseResource asCapabilityResponseResource( final CCapability capability )
+    static CapabilityResponseResource asCapabilityResponseResource( final CapabilityReference reference )
     {
-        assert capability != null : "Capability cannot be null";
+        checkNotNull( reference );
 
         final CapabilityResource resource = new CapabilityResource();
 
-        resource.setId( capability.getId() );
-        resource.setNotes( capability.getNotes() );
-        resource.setEnabled( capability.isEnabled() );
-        resource.setTypeId( capability.getTypeId() );
+        resource.setId( reference.context().id().toString() );
+        resource.setNotes( reference.context().notes() );
+        resource.setEnabled( reference.context().isEnabled() );
+        resource.setTypeId( reference.context().type().toString() );
 
-        if ( capability.getProperties() != null )
+        if ( reference.context().properties() != null )
         {
-            for ( final CCapabilityProperty propery : capability.getProperties() )
+            for ( final Map.Entry<String, String> entry : reference.context().properties().entrySet() )
             {
                 final CapabilityPropertyResource resourceProp = new CapabilityPropertyResource();
-                resourceProp.setKey( propery.getKey() );
-                resourceProp.setValue( propery.getValue() );
+                resourceProp.setKey( entry.getKey() );
+                resourceProp.setValue( entry.getValue() );
 
                 resource.addProperty( resourceProp );
             }
@@ -251,59 +220,56 @@ public class CapabilityPlexusResource
         return response;
     }
 
-    static CapabilityStatusResponseResource asCapabilityStatusResponseResource(
-        final CCapability capability,
-        final String uri,
-        final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
-        final CapabilityRegistry capabilityRegistry )
+    static CapabilityStatusResponseResource asCapabilityStatusResponseResource( final CapabilityReference reference,
+                                                                                final String uri )
     {
-        assert capability != null : "Capability cannot be null";
+        checkNotNull( reference );
 
         final CapabilityStatusResponseResource status = new CapabilityStatusResponseResource();
 
-        status.setData( asCapabilityListItemResource(
-            capability, uri, capabilityDescriptorRegistry, capabilityRegistry )
-        );
+        status.setData( asCapabilityListItemResource( reference, uri ) );
 
         return status;
     }
 
-    static CapabilityListItemResource asCapabilityListItemResource(
-        final CCapability capability,
-        final String uri,
-        final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
-        final CapabilityRegistry capabilityRegistry )
+    static CapabilityListItemResource asCapabilityListItemResource( final CapabilityReference reference,
+                                                                    final String uri )
     {
-        assert capability != null : "Capability cannot be null";
+        checkNotNull( reference );
 
         final CapabilityListItemResource item = new CapabilityListItemResource();
-        item.setId( capability.getId() );
-        item.setNotes( capability.getNotes() );
-        item.setEnabled( capability.isEnabled() );
-        item.setTypeId( capability.getTypeId() );
-
-        final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get(
-            capabilityType( capability.getTypeId() )
-        );
-        item.setTypeName( descriptor == null ? "" : descriptor.name() );
-
-        final CapabilityReference reference = capabilityRegistry.get( capabilityIdentity( capability.getId() ) );
-        item.setActive( reference != null && reference.isActive() );
-        if ( reference != null )
+        item.setId( reference.context().id().toString() );
+        item.setNotes( reference.context().notes() );
+        item.setEnabled( reference.context().isEnabled() );
+        item.setTypeId( reference.context().type().toString() );
+        item.setTypeName( reference.context().descriptor().name() );
+        item.setActive( reference.context().isActive() );
+        try
         {
-            item.setDescription( reference.description() );
-            item.setStatus( reference.status() );
-            item.setStateDescription( reference.stateDescription() );
+            item.setDescription( reference.capability().description() );
         }
+        catch ( Exception ignore )
+        {
+            item.setDescription( null );
+        }
+        try
+        {
+            item.setStatus( reference.capability().status() );
+        }
+        catch ( Exception ignore )
+        {
+            item.setStatus( null );
+        }
+        item.setStateDescription( reference.context().stateDescription() );
 
         item.setResourceURI( uri );
 
         return item;
     }
 
-    static String getCapabilityId( final Request request )
+    static CapabilityIdentity getCapabilityIdentity( final Request request )
     {
-        return request.getAttributes().get( CAPABILITIES_ID_KEY ).toString();
+        return capabilityIdentity( request.getAttributes().get( CAPABILITIES_ID_KEY ).toString() );
     }
 
 }

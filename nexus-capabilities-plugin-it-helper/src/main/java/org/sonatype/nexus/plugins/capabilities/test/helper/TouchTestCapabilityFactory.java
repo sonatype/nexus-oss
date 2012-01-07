@@ -31,9 +31,9 @@ public class TouchTestCapabilityFactory
 {
 
     @Override
-    public Capability create( final CapabilityIdentity id, final CapabilityContext context )
+    public Capability create( final CapabilityContext context )
     {
-        return new TouchTestCapability( id );
+        return new TouchTestCapability( context );
     }
 
 }

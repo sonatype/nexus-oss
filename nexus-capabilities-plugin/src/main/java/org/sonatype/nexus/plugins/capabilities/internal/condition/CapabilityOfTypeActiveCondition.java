@@ -46,13 +46,13 @@ public class CapabilityOfTypeActiveCondition
     @Override
     boolean isSatisfiedBy( final CapabilityReference reference )
     {
-        return super.isSatisfiedBy( reference ) && reference.isActive();
+        return super.isSatisfiedBy( reference ) && reference.context().isActive();
     }
 
     @Subscribe
     public void handle( final CapabilityEvent.AfterActivated event )
     {
-        if ( !isSatisfied() && type.equals( event.getReference().type() ) )
+        if ( !isSatisfied() && type.equals( event.getReference().context().type() ) )
         {
             checkAllCapabilities();
         }
@@ -61,7 +61,7 @@ public class CapabilityOfTypeActiveCondition
     @Subscribe
     public void handle( final CapabilityEvent.BeforePassivated event )
     {
-        if ( isSatisfied() && type.equals( event.getReference().type() ) )
+        if ( isSatisfied() && type.equals( event.getReference().context().type() ) )
         {
             checkAllCapabilities();
         }

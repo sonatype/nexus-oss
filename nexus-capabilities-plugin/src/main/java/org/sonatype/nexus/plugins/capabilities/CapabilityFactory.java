@@ -29,10 +29,9 @@ public interface CapabilityFactory
     /**
      * Creates  capability instance with specified id.
      *
-     * @param id      if of capability to be created
      * @param context context of capability to be created
      * @return created capability. Must not be null.
      */
-    Capability create( CapabilityIdentity id, CapabilityContext context );
+    Capability create( CapabilityContext context );
 
 }

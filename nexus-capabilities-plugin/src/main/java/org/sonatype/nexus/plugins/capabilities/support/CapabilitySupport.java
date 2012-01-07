@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 
 public abstract class CapabilitySupport
@@ -32,17 +32,11 @@ public abstract class CapabilitySupport
     implements Capability
 {
 
-    private final CapabilityIdentity id;
+    private final CapabilityContext context;
 
-    protected CapabilitySupport( final CapabilityIdentity id )
+    protected CapabilitySupport( final CapabilityContext context )
     {
-        this.id = checkNotNull( id, "Capability id cannot be null" );
-    }
-
-    @Override
-    public CapabilityIdentity id()
-    {
-        return id;
+        this.context = checkNotNull( context, "Capability context cannot be null" );
     }
 
     @Override
@@ -119,5 +113,15 @@ public abstract class CapabilitySupport
     public Condition validityCondition()
     {
         return null;
+    }
+
+    /**
+     * Returns capability context.
+     *
+     * @return capability context
+     */
+    protected CapabilityContext context()
+    {
+        return context;
     }
 }

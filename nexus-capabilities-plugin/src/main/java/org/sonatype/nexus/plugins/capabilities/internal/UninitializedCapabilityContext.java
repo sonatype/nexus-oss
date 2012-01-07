@@ -18,7 +18,14 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.Map;
+
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 
 /**
  * A {@link CapabilityContext} that is not yet initialized.
@@ -29,34 +36,79 @@ class UninitializedCapabilityContext
     implements CapabilityContext
 {
 
-    static final UninitializedCapabilityContext INSTANCE = new UninitializedCapabilityContext();
+    private final CapabilityIdentity id;
 
-    private UninitializedCapabilityContext()
+    private final CapabilityType type;
+
+    private final CapabilityDescriptor descriptor;
+
+    UninitializedCapabilityContext( final CapabilityIdentity id,
+                                    final CapabilityType type,
+                                    final CapabilityDescriptor descriptor )
     {
+        this.id = checkNotNull( id );
+        this.type = checkNotNull( type );
+        this.descriptor = checkNotNull( descriptor );
+    }
+
+    @Override
+    public CapabilityIdentity id()
+    {
+        return id;
+    }
+
+    @Override
+    public CapabilityType type()
+    {
+        return type;
+    }
+
+    @Override
+    public CapabilityDescriptor descriptor()
+    {
+        return descriptor;
+    }
+
+    @Override
+    public String notes()
+    {
+        throw new IllegalStateException( "Capability context is not yet initialized" );
+    }
+
+    @Override
+    public Map<String, String> properties()
+    {
+        throw new IllegalStateException( "Capability context is not yet initialized" );
     }
 
     @Override
     public boolean isEnabled()
     {
-        return false;
+        throw new IllegalStateException( "Capability context is not yet initialized" );
     }
 
     @Override
     public boolean isActive()
     {
-        return false;
+        throw new IllegalStateException( "Capability context is not yet initialized" );
     }
 
     @Override
     public boolean hasFailure()
     {
-        return false;
+        throw new IllegalStateException( "Capability context is not yet initialized" );
     }
 
     @Override
     public Exception failure()
     {
-        return null;
+        throw new IllegalStateException( "Capability context is not yet initialized" );
+    }
+
+    @Override
+    public String stateDescription()
+    {
+        throw new IllegalStateException( "Capability context is not yet initialized" );
     }
 
     @Override

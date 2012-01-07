@@ -20,7 +20,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPlexusResource.asCapabilityStatusResponseResource;
-import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPlexusResource.getCapabilityId;
+import static org.sonatype.nexus.plugins.capabilities.internal.rest.CapabilityPlexusResource.getCapabilityIdentity;
 
 import java.io.IOException;
 import javax.inject.Inject;
@@ -36,12 +36,10 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
-import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusRequestResource;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -59,24 +57,11 @@ public class CapabilityStatusPlexusResource
 
     public static final String RESOURCE_URI = "/capabilities/{" + CAPABILITIES_ID_KEY + "}/status";
 
-    private CapabilityConfiguration capabilitiesConfiguration;
-
-    private CapabilityDescriptorRegistry capabilityDescriptorRegistry;
-
-    private CapabilityRegistry capabilityRegistry;
-
-    // TODO get rid of this constructor as it is here because enunciate plugin fails without a default constructor
-    public CapabilityStatusPlexusResource()
-    {
-    }
+    private final CapabilityRegistry capabilityRegistry;
 
     @Inject
-    public CapabilityStatusPlexusResource( final CapabilityConfiguration capabilitiesConfiguration,
-                                           final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
-                                           final CapabilityRegistry capabilityRegistry )
+    public CapabilityStatusPlexusResource( final CapabilityRegistry capabilityRegistry )
     {
-        this.capabilitiesConfiguration = checkNotNull( capabilitiesConfiguration );
-        this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.setModifiable( true );
     }
@@ -107,27 +92,29 @@ public class CapabilityStatusPlexusResource
     public Object put( final Context context, final Request request, final Response response, final Object payload )
         throws ResourceException
     {
+        final CapabilityIdentity capabilityId = getCapabilityIdentity( request );
         final CapabilityStatusRequestResource envelope = (CapabilityStatusRequestResource) payload;
-        final String capabilityId = getCapabilityId( request );
         try
         {
-            final CCapability capability = capabilitiesConfiguration.get( capabilityId );
-            if ( capability == null )
+            final CapabilityReference reference = capabilityRegistry.get( capabilityId );
+            if ( reference == null )
             {
                 throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, String.format(
                     "Cannot find a capability with specified if of %s", capabilityId ) );
             }
-            capability.setEnabled( envelope.getData().isEnabled() );
-            capabilitiesConfiguration.update( capability );
-            capabilitiesConfiguration.save();
+            if ( envelope.getData().isEnabled() )
+            {
+                capabilityRegistry.enable( capabilityId );
+            }
+            else
+            {
+                capabilityRegistry.disable( capabilityId );
+            }
 
-            final CapabilityStatusResponseResource result = asCapabilityStatusResponseResource(
-                capability,
-                request.getResourceRef().toString(),
-                capabilityDescriptorRegistry,
-                capabilityRegistry
+            return asCapabilityStatusResponseResource(
+                reference,
+                request.getResourceRef().toString()
             );
-            return result;
         }
         catch ( final InvalidConfigurationException e )
         {

@@ -25,8 +25,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
-import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.Condition;
@@ -86,12 +86,12 @@ public class CapabilityConditions
      * Creates a new condition that is becoming unsatisfied before an capability is updated and becomes satisfied after
      * capability was updated.
      *
-     * @param capability capability that should be passivated during update updated
+     * @param id id of capability that should be passivated during update updated
      * @return created condition
      */
-    public Condition passivateCapabilityDuringUpdate( final Capability capability )
+    public Condition passivateCapabilityDuringUpdate( final CapabilityIdentity id )
     {
-        return new PassivateCapabilityDuringUpdateCondition( eventBus, capability );
+        return new PassivateCapabilityDuringUpdateCondition( eventBus, id );
     }
 
 }

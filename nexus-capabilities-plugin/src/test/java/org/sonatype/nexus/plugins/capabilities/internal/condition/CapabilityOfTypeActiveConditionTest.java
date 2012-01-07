@@ -24,7 +24,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 import java.util.Arrays;
@@ -33,15 +32,14 @@ import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
-import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 
 /**
  * {@link CapabilityOfTypeActiveCondition} UTs.
@@ -71,23 +69,24 @@ public class CapabilityOfTypeActiveConditionTest
 
         capabilityRegistry = mock( CapabilityRegistry.class );
 
-        final CapabilityType capabilityType = capabilityType( TestCapability.class.getName() );
+        final CapabilityType capabilityType = capabilityType( this.getClass().getName() );
 
-        final TestCapability testCapability = new TestCapability();
         ref1 = mock( CapabilityReference.class );
-        when( ref1.type() ).thenReturn( capabilityType );
-        when( ref1.capability() ).thenReturn( testCapability );
+        when( ref1.context() ).thenReturn( mock( CapabilityContext.class ) );
+        when( ref1.context().type() ).thenReturn( capabilityType );
+
         ref2 = mock( CapabilityReference.class );
-        when( ref2.type() ).thenReturn( capabilityType );
-        when( ref2.capability() ).thenReturn( testCapability );
+        when( ref2.context() ).thenReturn( mock( CapabilityContext.class ) );
+        when( ref2.context().type() ).thenReturn( capabilityType );
+
         ref3 = mock( CapabilityReference.class );
-        when( ref3.type() ).thenReturn( capabilityType( Capability.class.getName() ) );
-        when( ref3.capability() ).thenReturn( mock( Capability.class ) );
+        when( ref3.context() ).thenReturn( mock( CapabilityContext.class ) );
+        when( ref3.context().type() ).thenReturn( capabilityType( Capability.class.getName() ) );
 
         final CapabilityDescriptorRegistry descriptorRegistry = mock( CapabilityDescriptorRegistry.class );
         final CapabilityDescriptor descriptor = mock( CapabilityDescriptor.class );
 
-        when( descriptor.name() ).thenReturn( TestCapability.class.getSimpleName() );
+        when( descriptor.name() ).thenReturn( this.getClass().getSimpleName() );
         when( descriptorRegistry.get( capabilityType ) ).thenReturn( descriptor );
 
         underTest = new CapabilityOfTypeActiveCondition(
@@ -114,8 +113,8 @@ public class CapabilityOfTypeActiveConditionTest
     public void capabilityOfTypeActive01()
     {
         doReturn( Arrays.asList( ref1 ) ).when( capabilityRegistry ).getAll();
-        when( ref1.isActive() ).thenReturn( false );
-        underTest.handle( new CapabilityRegistryEvent.Created( ref1 ) );
+        when( ref1.context().isActive() ).thenReturn( false );
+        underTest.handle( new CapabilityEvent.Created( capabilityRegistry, ref1 ) );
         assertThat( underTest.isSatisfied(), is( false ) );
     }
 
@@ -126,8 +125,8 @@ public class CapabilityOfTypeActiveConditionTest
     public void capabilityOfTypeActive02()
     {
         doReturn( Arrays.asList( ref1 ) ).when( capabilityRegistry ).getAll();
-        when( ref1.isActive() ).thenReturn( true );
-        underTest.handle( new CapabilityRegistryEvent.Created( ref1 ) );
+        when( ref1.context().isActive() ).thenReturn( true );
+        underTest.handle( new CapabilityEvent.Created( capabilityRegistry, ref1 ) );
 
         verifyEventBusEvents( satisfied( underTest ) );
     }
@@ -139,13 +138,13 @@ public class CapabilityOfTypeActiveConditionTest
     public void capabilityOfTypeActive03()
     {
         doReturn( Arrays.asList( ref1 ) ).when( capabilityRegistry ).getAll();
-        when( ref1.isActive() ).thenReturn( true );
-        underTest.handle( new CapabilityRegistryEvent.Created( ref1 ) );
+        when( ref1.context().isActive() ).thenReturn( true );
+        underTest.handle( new CapabilityEvent.Created( capabilityRegistry, ref1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
         doReturn( Arrays.asList( ref1, ref2 ) ).when( capabilityRegistry ).getAll();
-        when( ref2.isActive() ).thenReturn( true );
-        underTest.handle( new CapabilityRegistryEvent.Created( ref2 ) );
+        when( ref2.context().isActive() ).thenReturn( true );
+        underTest.handle( new CapabilityEvent.Created( capabilityRegistry, ref2 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
         verifyEventBusEvents( satisfied( underTest ) );
@@ -158,17 +157,17 @@ public class CapabilityOfTypeActiveConditionTest
     public void capabilityOfTypeActive04()
     {
         doReturn( Arrays.asList( ref1 ) ).when( capabilityRegistry ).getAll();
-        when( ref1.isActive() ).thenReturn( true );
-        underTest.handle( new CapabilityRegistryEvent.Created( ref1 ) );
+        when( ref1.context().isActive() ).thenReturn( true );
+        underTest.handle( new CapabilityEvent.Created( capabilityRegistry, ref1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
         doReturn( Arrays.asList( ref1, ref2 ) ).when( capabilityRegistry ).getAll();
-        when( ref2.isActive() ).thenReturn( true );
-        underTest.handle( new CapabilityRegistryEvent.Created( ref2 ) );
+        when( ref2.context().isActive() ).thenReturn( true );
+        underTest.handle( new CapabilityEvent.Created( capabilityRegistry, ref2 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
         doReturn( Arrays.asList( ref2 ) ).when( capabilityRegistry ).getAll();
-        underTest.handle( new CapabilityRegistryEvent.Removed( ref1 ) );
+        underTest.handle( new CapabilityEvent.AfterRemove( capabilityRegistry, ref1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
         verifyEventBusEvents( satisfied( underTest ) );
@@ -181,18 +180,18 @@ public class CapabilityOfTypeActiveConditionTest
     public void capabilityOfTypeActive05()
     {
         doReturn( Arrays.asList( ref1 ) ).when( capabilityRegistry ).getAll();
-        when( ref1.isActive() ).thenReturn( true );
-        underTest.handle( new CapabilityRegistryEvent.Created( ref1 ) );
+        when( ref1.context().isActive() ).thenReturn( true );
+        underTest.handle( new CapabilityEvent.Created( capabilityRegistry, ref1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
         doReturn( Arrays.asList( ref1, ref2 ) ).when( capabilityRegistry ).getAll();
-        when( ref2.isActive() ).thenReturn( true );
-        underTest.handle( new CapabilityRegistryEvent.Created( ref2 ) );
+        when( ref2.context().isActive() ).thenReturn( true );
+        underTest.handle( new CapabilityEvent.Created( capabilityRegistry, ref2 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
         doReturn( Arrays.asList( ref1, ref2 ) ).when( capabilityRegistry ).getAll();
-        when( ref1.isActive() ).thenReturn( true );
-        underTest.handle( new CapabilityEvent.BeforePassivated( ref1 ) );
+        when( ref1.context().isActive() ).thenReturn( true );
+        underTest.handle( new CapabilityEvent.BeforePassivated( capabilityRegistry, ref1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
         verifyEventBusEvents( satisfied( underTest ) );
@@ -205,12 +204,12 @@ public class CapabilityOfTypeActiveConditionTest
     public void capabilityOfTypeActive06()
     {
         doReturn( Arrays.asList( ref1 ) ).when( capabilityRegistry ).getAll();
-        when( ref1.isActive() ).thenReturn( true );
-        underTest.handle( new CapabilityRegistryEvent.Created( ref1 ) );
+        when( ref1.context().isActive() ).thenReturn( true );
+        underTest.handle( new CapabilityEvent.Created( capabilityRegistry, ref1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
         doReturn( Collections.emptyList() ).when( capabilityRegistry ).getAll();
-        underTest.handle( new CapabilityRegistryEvent.Removed( ref1 ) );
+        underTest.handle( new CapabilityEvent.AfterRemove( capabilityRegistry, ref1 ) );
         assertThat( underTest.isSatisfied(), is( false ) );
 
         verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
@@ -223,18 +222,18 @@ public class CapabilityOfTypeActiveConditionTest
     public void capabilityOfTypeActive07()
     {
         doReturn( Arrays.asList( ref1 ) ).when( capabilityRegistry ).getAll();
-        when( ref1.isActive() ).thenReturn( true );
-        underTest.handle( new CapabilityRegistryEvent.Created( ref1 ) );
+        when( ref1.context().isActive() ).thenReturn( true );
+        underTest.handle( new CapabilityEvent.Created( capabilityRegistry, ref1 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
         doReturn( Arrays.asList( ref1, ref3 ) ).when( capabilityRegistry ).getAll();
-        when( ref3.isActive() ).thenReturn( true );
-        underTest.handle( new CapabilityRegistryEvent.Created( ref3 ) );
+        when( ref3.context().isActive() ).thenReturn( true );
+        underTest.handle( new CapabilityEvent.Created( capabilityRegistry, ref3 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
         doReturn( Arrays.asList( ref1, ref3 ) ).when( capabilityRegistry ).getAll();
-        when( ref3.isActive() ).thenReturn( false );
-        underTest.handle( new CapabilityEvent.BeforePassivated( ref3 ) );
+        when( ref3.context().isActive() ).thenReturn( false );
+        underTest.handle( new CapabilityEvent.BeforePassivated( capabilityRegistry, ref3 ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
         verifyEventBusEvents( satisfied( underTest ) );
@@ -249,17 +248,6 @@ public class CapabilityOfTypeActiveConditionTest
         underTest.release();
 
         verify( eventBus ).unregister( underTest );
-    }
-
-    private static class TestCapability
-        extends CapabilitySupport
-    {
-
-        protected TestCapability()
-        {
-            super( capabilityIdentity( "test-capability" ) );
-        }
-
     }
 
 }

@@ -87,7 +87,7 @@ public class PrimaryKeyValidator
         );
         if ( references == null
             || references.isEmpty()
-            || ( references.size() == 1 && references.iterator().next().capability().id().equals( excludeId ) ) )
+            || ( references.size() == 1 && references.iterator().next().context().id().equals( excludeId ) ) )
         {
             return ValidationResult.VALID;
         }

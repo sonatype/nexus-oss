@@ -16,7 +16,7 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.config;
+package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -35,16 +35,16 @@ import com.google.common.eventbus.Subscribe;
  */
 @Named
 @Singleton
-public class CapabilityConfigurationBooter
+public class CapabilityRegistryBooter
     implements NexusEventBus.LoadOnStart
 {
 
-    private final CapabilityConfiguration capabilitiesConfiguration;
+    private final DefaultCapabilityRegistry capabilityRegistry;
 
     @Inject
-    public CapabilityConfigurationBooter( final CapabilityConfiguration capabilitiesConfiguration )
+    public CapabilityRegistryBooter( final DefaultCapabilityRegistry capabilityRegistry )
     {
-        this.capabilitiesConfiguration = checkNotNull( capabilitiesConfiguration );
+        this.capabilityRegistry = checkNotNull( capabilityRegistry );
     }
 
     @Subscribe
@@ -52,7 +52,7 @@ public class CapabilityConfigurationBooter
     {
         try
         {
-            capabilitiesConfiguration.load();
+            capabilityRegistry.load();
         }
         catch ( final Exception e )
         {

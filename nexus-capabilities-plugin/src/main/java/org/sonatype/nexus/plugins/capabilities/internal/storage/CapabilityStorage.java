@@ -16,42 +16,26 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.plugins.capabilities.internal.config;
+package org.sonatype.nexus.plugins.capabilities.internal.storage;
 
 import java.io.IOException;
 import java.util.Collection;
 
-import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapability;
-import com.google.common.base.Predicate;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 
-public interface CapabilityConfiguration
+public interface CapabilityStorage
 {
 
-    public String add( final CCapability capability )
-        throws InvalidConfigurationException, IOException;
-
-    public void update( final CCapability capability )
-        throws InvalidConfigurationException, IOException;
-
-    public void remove( final String capabilityId )
-        throws InvalidConfigurationException, IOException;
-
-    public CCapability get( final String capabilityId )
-        throws InvalidConfigurationException, IOException;
-
-    public Collection<CCapability> getAll()
-        throws InvalidConfigurationException, IOException;
-
-    public Collection<CCapability> get( Predicate<CCapability> filter )
-        throws InvalidConfigurationException, IOException;
-
-    public void load()
-        throws InvalidConfigurationException, IOException;
-
-    void save()
+    public void add( CapabilityStorageItem item )
         throws IOException;
 
-    void clearCache();
+    public void update( CapabilityStorageItem item )
+        throws IOException;
+
+    public void remove( CapabilityIdentity id )
+        throws IOException;
+
+    public Collection<CapabilityStorageItem> getAll()
+        throws IOException;
 
 }

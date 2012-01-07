@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -33,10 +33,10 @@ public abstract class RepositoryCapabilitySupport
 
     private final RepositoryRegistry repositoryRegistry;
 
-    public RepositoryCapabilitySupport( final CapabilityIdentity id,
+    public RepositoryCapabilitySupport( final CapabilityContext context,
                                         final RepositoryRegistry repositoryRegistry )
     {
-        super( id );
+        super( context );
         this.repositoryRegistry = checkNotNull( repositoryRegistry, "Repository registry cannot be null" );
     }
 

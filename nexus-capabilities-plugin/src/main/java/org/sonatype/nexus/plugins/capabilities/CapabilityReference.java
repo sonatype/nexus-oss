@@ -18,8 +18,6 @@
  */
 package org.sonatype.nexus.plugins.capabilities;
 
-import java.util.Map;
-
 /**
  * Reference to a capability and its state.
  *
@@ -29,59 +27,17 @@ public interface CapabilityReference
 {
 
     /**
-     * Returns type of referenced capability.
+     * Returns capability context.
      *
-     * @return capability type (never null)
+     * @return capability context (never null)
      */
-    CapabilityType type();
+    CapabilityContext context();
 
     /**
-     * Returns referenced capability.
+     * Returns the referenced capability.
      *
-     * @return referenced capability (never null)
+     * @return referenced capability
      */
     Capability capability();
-
-    /**
-     * Whether the referenced capability is enabled.
-     *
-     * @return true, if capability is enabled
-     */
-    boolean isEnabled();
-
-    /**
-     * Whether the referenced capability is active.
-     *
-     * @return true, if capability was activated and not yet passivated
-     */
-    boolean isActive();
-
-    /**
-     * Returns status of capability.
-     *
-     * @return status. Can be null. Can be an html chunk.
-     */
-    String status();
-
-    /**
-     * Returns description of capability.
-     *
-     * @return description. Can be null.
-     */
-    String description();
-
-    /**
-     * Current capability properties.
-     *
-     * @return properties.
-     */
-    Map<String, String> properties();
-
-    /**
-     * Describe current state.
-     *
-     * @return state description
-     */
-    String stateDescription();
 
 }

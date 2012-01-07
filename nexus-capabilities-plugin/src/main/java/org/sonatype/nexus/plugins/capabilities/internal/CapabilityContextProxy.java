@@ -20,7 +20,12 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 
+import java.util.Map;
+
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 
 /**
  * A {@link CapabilityContext} that delegates to another mutable context.
@@ -41,6 +46,36 @@ class CapabilityContextProxy
     public void setCapabilityContext( final CapabilityContext delegate )
     {
         this.delegate = checkNotNull( delegate );
+    }
+
+    @Override
+    public CapabilityIdentity id()
+    {
+        return delegate.id();
+    }
+
+    @Override
+    public CapabilityType type()
+    {
+        return delegate.type();
+    }
+
+    @Override
+    public CapabilityDescriptor descriptor()
+    {
+        return delegate.descriptor();
+    }
+
+    @Override
+    public String notes()
+    {
+        return delegate.notes();
+    }
+
+    @Override
+    public Map<String, String> properties()
+    {
+        return delegate.properties();
     }
 
     @Override
@@ -65,6 +100,12 @@ class CapabilityContextProxy
     public Exception failure()
     {
         return delegate.failure();
+    }
+
+    @Override
+    public String stateDescription()
+    {
+        return delegate.stateDescription();
     }
 
     @Override

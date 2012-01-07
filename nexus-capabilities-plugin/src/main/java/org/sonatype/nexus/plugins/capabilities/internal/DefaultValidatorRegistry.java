@@ -30,8 +30,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
-import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
-import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.CapabilityValidator;
 import org.sonatype.nexus.plugins.capabilities.Validator;
@@ -48,7 +46,7 @@ class DefaultValidatorRegistry
     implements ValidatorRegistry
 {
 
-    private final CapabilityRegistry capabilityRegistry;
+    private final DefaultCapabilityRegistry capabilityRegistry;
 
     private final CapabilityFactoryRegistry capabilityFactoryRegistry;
 
@@ -58,7 +56,7 @@ class DefaultValidatorRegistry
 
     @Inject
     DefaultValidatorRegistry( final CapabilityFactoryRegistry capabilityFactoryRegistry,
-                              final CapabilityRegistry capabilityRegistry,
+                              final DefaultCapabilityRegistry capabilityRegistry,
                               final Validators validators,
                               final Map<String, CapabilityValidator> capabilityValidators )
     {
@@ -101,10 +99,10 @@ class DefaultValidatorRegistry
     {
         final Set<Validator> instanceValidators = Sets.newHashSet();
 
-        final CapabilityReference reference = capabilityRegistry.get( id );
+        final DefaultCapabilityReference reference = capabilityRegistry.get( id );
         if ( reference != null )
         {
-            instanceValidators.add( validators.capability().constraintsOf( reference.type() ) );
+            instanceValidators.add( validators.capability().constraintsOf( reference.context().type() ) );
             if ( reference.capability() instanceof Validator )
             {
                 instanceValidators.add( (Validator) reference.capability() );

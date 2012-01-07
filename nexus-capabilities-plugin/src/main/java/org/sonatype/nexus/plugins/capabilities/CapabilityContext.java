@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.plugins.capabilities;
 
+import java.util.Map;
+
 /**
  * Provides access to capability context.
  *
@@ -27,6 +29,41 @@ public interface CapabilityContext
 {
 
     /**
+     * Returns an unique capability identifier.
+     *
+     * @return identifier
+     */
+    CapabilityIdentity id();
+
+    /**
+     * Returns type of capability.
+     *
+     * @return capability type (never null)
+     */
+    CapabilityType type();
+
+    /**
+     * Returns descriptor of capability.
+     *
+     * @return capability descriptor (never null)
+     */
+    CapabilityDescriptor descriptor();
+
+    /**
+     * Returns capability notes.
+     *
+     * @return capability notes (can be null)
+     */
+    String notes();
+
+    /**
+     * Current capability properties.
+     *
+     * @return properties.
+     */
+    Map<String, String> properties();
+
+    /**
      * Whether the capability is enabled.
      *
      * @return true, if capability is enabled
@@ -34,7 +71,7 @@ public interface CapabilityContext
     boolean isEnabled();
 
     /**
-     * Whether the referenced capability is active.
+     * Whether the capability is active.
      *
      * @return true, if capability was activated and not yet passivated
      */
@@ -49,8 +86,16 @@ public interface CapabilityContext
 
     /**
      * Last exception thrown during a lifecycle callback method (create/load/update/activate/passivate).
+     *
      * @return last exception thrown during a lifecycle callback method or null if it not failed
      */
     Exception failure();
+
+    /**
+     * Describe current state.
+     *
+     * @return state description
+     */
+    String stateDescription();
 
 }

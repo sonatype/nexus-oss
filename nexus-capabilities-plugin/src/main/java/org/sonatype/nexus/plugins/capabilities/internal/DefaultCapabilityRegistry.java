@@ -21,18 +21,28 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableCollection;
 import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
+import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationMessage;
+import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
+import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
@@ -40,6 +50,11 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistryEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.ValidationResult;
+import org.sonatype.nexus.plugins.capabilities.Validator;
+import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
+import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
+import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageItem;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -54,26 +69,42 @@ public class DefaultCapabilityRegistry
     implements CapabilityRegistry
 {
 
+    private final CapabilityStorage capabilityStorage;
+
+    private final ConfigurationIdGenerator idGenerator;
+
+    private final Provider<ValidatorRegistry> validatorRegistryProvider;
+
+    private final CapabilityFactoryRegistry capabilityFactoryRegistry;
+
+    private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
+
     private final NexusEventBus eventBus;
 
     private final ActivationConditionHandlerFactory activationConditionHandlerFactory;
 
     private final ValidityConditionHandlerFactory validityConditionHandlerFactory;
 
-    private final CapabilityFactoryRegistry capabilityFactoryRegistry;
-
     private final Map<CapabilityIdentity, DefaultCapabilityReference> references;
 
     private final ReentrantReadWriteLock lock;
 
     @Inject
-    DefaultCapabilityRegistry( final CapabilityFactoryRegistry capabilityFactoryRegistry,
+    DefaultCapabilityRegistry( final CapabilityStorage capabilityStorage,
+                               final ConfigurationIdGenerator idGenerator,
+                               final Provider<ValidatorRegistry> validatorRegistryProvider,
+                               final CapabilityFactoryRegistry capabilityFactoryRegistry,
+                               final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
                                final NexusEventBus eventBus,
                                final ActivationConditionHandlerFactory activationConditionHandlerFactory,
                                final ValidityConditionHandlerFactory validityConditionHandlerFactory )
     {
-        this.eventBus = checkNotNull( eventBus );
+        this.capabilityStorage = checkNotNull( capabilityStorage );
+        this.idGenerator = checkNotNull( idGenerator );
+        this.validatorRegistryProvider = checkNotNull( validatorRegistryProvider );
         this.capabilityFactoryRegistry = checkNotNull( capabilityFactoryRegistry );
+        this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
+        this.eventBus = checkNotNull( eventBus );
         this.activationConditionHandlerFactory = checkNotNull( activationConditionHandlerFactory );
         this.validityConditionHandlerFactory = checkNotNull( validityConditionHandlerFactory );
 
@@ -81,41 +112,39 @@ public class DefaultCapabilityRegistry
         lock = new ReentrantReadWriteLock();
     }
 
-    /**
-     * Creates a capability given its id/type. if there is no capability available for specified type it will throw an
-     * runtime exception.
-     *
-     * @param id   id of capability to be created
-     * @param type type of capability to be created
-     * @return created capability
-     * @since 2.0
-     */
-    public DefaultCapabilityReference create( final CapabilityIdentity id, final CapabilityType type )
+    @Override
+    public CapabilityReference add( final CapabilityType type,
+                                    final boolean enabled,
+                                    final String notes,
+                                    final Map<String, String> properties )
+        throws InvalidConfigurationException, IOException
     {
-        assert id != null : "Capability id cannot be null";
-
         try
         {
             lock.writeLock().lock();
 
-            final CapabilityFactory factory = capabilityFactoryRegistry.get( type );
-            if ( factory == null )
-            {
-                throw new RuntimeException( format( "No factory found for a capability of type %s", type ) );
-            }
+            validateType( type );
 
-            final CapabilityContextProxy capabilityContextProxy = new CapabilityContextProxy(
-                UninitializedCapabilityContext.INSTANCE
+            validate( checkNotNull( validatorRegistryProvider.get() ).get( type ), properties );
+
+            final CapabilityIdentity generatedId = capabilityIdentity( idGenerator.generateId() );
+
+            capabilityStorage.add( new CapabilityStorageItem( generatedId, type, enabled, notes, properties ) );
+
+            getLogger().debug(
+                "Added capability '{}' of type '{}' with properties '{}'",
+                new Object[]{ generatedId, type, properties }
             );
-            final Capability capability = factory.create( id, capabilityContextProxy );
 
-            final DefaultCapabilityReference reference = createReference( type, capability, capabilityContextProxy );
+            final DefaultCapabilityReference reference = create( generatedId, type );
 
-            references.put( id, reference );
-
-            getLogger().debug( "Created capability '{}'", capability );
-
-            eventBus.post( new CapabilityRegistryEvent.Created( reference ) );
+            reference.setNotes( notes );
+            reference.create( properties );
+            if ( enabled )
+            {
+                reference.enable();
+                reference.activate();
+            }
 
             return reference;
         }
@@ -125,27 +154,106 @@ public class DefaultCapabilityRegistry
         }
     }
 
-    /**
-     * Removed a capability from registry. If there is no capability with specified id in the registry it will pass
-     * silently.
-     *
-     * @param id to remove
-     * @return removed capability (if any), null otherwise
-     * @since 2.0
-     */
-    public CapabilityReference remove( final CapabilityIdentity id )
+    @Override
+    public CapabilityReference update( final CapabilityIdentity id,
+                                       final boolean enabled,
+                                       final String notes,
+                                       final Map<String, String> properties )
+        throws InvalidConfigurationException, IOException
     {
         try
         {
             lock.writeLock().lock();
 
-            final CapabilityReference reference = references.remove( id );
+            validateId( id );
+
+            validate( checkNotNull( validatorRegistryProvider.get() ).get( id ), properties );
+
+            final DefaultCapabilityReference reference = get( id );
+
+            capabilityStorage.update( new CapabilityStorageItem( id, reference.type(), enabled, notes, properties ) );
+
+            getLogger().debug(
+                "Updated capability '{}' of type '{}' with properties '{}'",
+                new Object[]{ id, reference.type(), properties }
+            );
+            if ( reference.isEnabled() && !enabled )
+            {
+                reference.disable();
+            }
+            reference.setNotes( notes );
+            reference.update( properties, reference.properties() );
+            if ( !reference.isEnabled() && enabled )
+            {
+                reference.enable();
+                reference.activate();
+            }
+
+            return reference;
+        }
+        finally
+        {
+            lock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public CapabilityReference remove( final CapabilityIdentity id )
+        throws IOException
+    {
+        try
+        {
+            lock.writeLock().lock();
+
+            capabilityStorage.remove( id );
+            getLogger().debug( "Removed capability with '{}'", id );
+
+            final DefaultCapabilityReference reference = references.remove( id );
             if ( reference != null )
             {
-                getLogger().debug( "Removed capability '{}'", reference.capability() );
-                eventBus.post( new CapabilityRegistryEvent.Removed( reference ) );
+                reference.remove();
             }
             return reference;
+        }
+        finally
+        {
+            lock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public CapabilityReference enable( final CapabilityIdentity id )
+        throws InvalidConfigurationException, IOException
+    {
+        try
+        {
+            lock.writeLock().lock();
+
+            validateId( id );
+
+            final DefaultCapabilityReference reference = get( id );
+
+            return update( reference.context().id(), true, reference.notes(), reference.properties() );
+        }
+        finally
+        {
+            lock.writeLock().unlock();
+        }
+    }
+
+    @Override
+    public CapabilityReference disable( final CapabilityIdentity id )
+        throws InvalidConfigurationException, IOException
+    {
+        try
+        {
+            lock.writeLock().lock();
+
+            validateId( id );
+
+            final DefaultCapabilityReference reference = get( id );
+
+            return update( reference.context().id(), false, reference.notes(), reference.properties() );
         }
         finally
         {
@@ -189,19 +297,149 @@ public class DefaultCapabilityRegistry
         }
     }
 
+    public void load()
+        throws IOException
+    {
+        final Collection<CapabilityStorageItem> items = capabilityStorage.getAll();
+        for ( final CapabilityStorageItem item : items )
+        {
+            getLogger().debug(
+                "Loading capability '{}' of type '{}' with properties '{}'",
+                new Object[]{ item.id(), item.type(), item.properties() }
+            );
+
+            final DefaultCapabilityReference reference = create( item.id(), item.type() );
+
+            reference.setNotes( item.notes() );
+            reference.load( item.properties() );
+            if ( item.isEnabled() )
+            {
+                reference.enable();
+                reference.activate();
+            }
+        }
+        eventBus.post( new CapabilityRegistryEvent.AfterLoad( this ) );
+    }
+
+    /**
+     * Creates a capability given its id/type. if there is no capability available for specified type it will throw an
+     * runtime exception.
+     *
+     * @param id   id of capability to be created
+     * @param type type of capability to be created
+     * @return created capability
+     * @since 2.0
+     */
+    private DefaultCapabilityReference create( final CapabilityIdentity id, final CapabilityType type )
+    {
+        final CapabilityFactory factory = capabilityFactoryRegistry.get( type );
+        if ( factory == null )
+        {
+            throw new RuntimeException( format( "No factory found for a capability of type %s", type ) );
+        }
+        final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( type );
+        if ( descriptor == null )
+        {
+            throw new RuntimeException( format( "No descriptor found for a capability of type %s", type ) );
+        }
+
+        final CapabilityContextProxy capabilityContextProxy = new CapabilityContextProxy(
+            new UninitializedCapabilityContext( id, type, descriptor )
+        );
+        final Capability capability = factory.create( capabilityContextProxy );
+
+        final DefaultCapabilityReference reference = createReference(
+            id, type, descriptor, capability, capabilityContextProxy
+        );
+
+        references.put( id, reference );
+
+        getLogger().debug( "Created capability '{}'", capability );
+
+        eventBus.post( new CapabilityEvent.Created( this, reference ) );
+
+        return reference;
+    }
+
     @VisibleForTesting
-    DefaultCapabilityReference createReference( final CapabilityType type,
+    DefaultCapabilityReference createReference( final CapabilityIdentity id,
+                                                final CapabilityType type,
+                                                final CapabilityDescriptor descriptor,
                                                 final Capability capability,
                                                 final CapabilityContextProxy capabilityContextProxy )
     {
         return new DefaultCapabilityReference(
+            this,
             eventBus,
             activationConditionHandlerFactory,
             validityConditionHandlerFactory,
+            id,
             type,
+            descriptor,
             capability,
             capabilityContextProxy
         );
+    }
+
+    private void validateType( final CapabilityType type )
+        throws InvalidConfigurationException
+    {
+        final ValidationResponse vr = new ValidationResponse();
+
+        if ( capabilityFactoryRegistry.get( type ) == null )
+        {
+            vr.addValidationError( new ValidationMessage( "typeId", "Type '" + type + "' is not supported" ) );
+        }
+
+        if ( vr.getValidationErrors().size() > 0 )
+        {
+            throw new InvalidConfigurationException( vr );
+        }
+    }
+
+    private void validateId( final CapabilityIdentity id )
+        throws InvalidConfigurationException
+    {
+        final ValidationResponse vr = new ValidationResponse();
+
+        if ( get( id ) == null )
+        {
+            vr.addValidationError( new ValidationMessage( "*", "Capability with id '" + id + "' does not exist" ) );
+        }
+
+        if ( vr.getValidationErrors().size() > 0 )
+        {
+            throw new InvalidConfigurationException( vr );
+        }
+    }
+
+    private void validate( final Collection<Validator> validators, final Map<String, String> properties )
+        throws InvalidConfigurationException
+    {
+        if ( validators != null && !validators.isEmpty() )
+        {
+            final ValidationResponse vr = new ValidationResponse();
+
+            for ( final Validator validator : validators )
+            {
+                final ValidationResult validationResult = validator.validate( properties );
+                if ( !validationResult.isValid() )
+                {
+                    for ( final ValidationResult.Violation violation : validationResult.violations() )
+                    {
+                        vr.addValidationError( new ValidationMessage(
+                            violation.key(),
+                            violation.message()
+                        ) );
+                    }
+                }
+            }
+
+            if ( vr.getValidationErrors().size() > 0 )
+            {
+                throw new InvalidConfigurationException( vr );
+            }
+        }
     }
 
 }

@@ -45,12 +45,13 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
+import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.NexusIsActiveCondition;
-import org.sonatype.nexus.plugins.capabilities.internal.config.CapabilityConfiguration;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.capabilities.support.condition.NexusConditions;
 
@@ -72,8 +73,6 @@ public class DefaultCapabilityReferenceTest
 
     private Condition activationCondition;
 
-    private CapabilityConfiguration configurations;
-
     private Condition validityCondition;
 
     private ArgumentCaptor<CapabilityEvent> re;
@@ -86,11 +85,13 @@ public class DefaultCapabilityReferenceTest
 
     private NexusIsActiveCondition nexusIsActiveCondition;
 
+    private CapabilityRegistry capabilityRegistry;
+
     @Before
     public void setUp()
     {
         eventBus = mock( NexusEventBus.class );
-        configurations = mock( CapabilityConfiguration.class );
+        capabilityRegistry = mock( CapabilityRegistry.class );
 
         final Conditions conditions = mock( Conditions.class );
         final NexusConditions nexusConditions = mock( NexusConditions.class );
@@ -101,7 +102,6 @@ public class DefaultCapabilityReferenceTest
         when( conditions.nexus() ).thenReturn( nexusConditions );
 
         capability = mock( Capability.class );
-        when( capability.id() ).thenReturn( capabilityIdentity( "test-capability" ) );
 
         activationCondition = mock( Condition.class );
         when( activationCondition.isSatisfied() ).thenReturn( true );
@@ -135,14 +135,25 @@ public class DefaultCapabilityReferenceTest
                     throws Throwable
                 {
                     return new ValidityConditionHandler(
-                        eventBus, configurations, conditions, (DefaultCapabilityReference) invocation.getArguments()[0]
+                        eventBus, capabilityRegistry, conditions,
+                        (DefaultCapabilityReference) invocation.getArguments()[0]
                     );
                 }
             }
         );
 
-        underTest = new DefaultCapabilityReference( eventBus, achf, vchf, capabilityType( "test" ), capability,
-                                                    mock( CapabilityContextProxy.class ) );
+        underTest = new DefaultCapabilityReference(
+            capabilityRegistry,
+            eventBus,
+            achf,
+            vchf,
+            capabilityIdentity( "test" ),
+            capabilityType( "TEST" ),
+            mock( CapabilityDescriptor.class ),
+            capability,
+            mock( CapabilityContextProxy.class )
+        );
+
         underTest.create( Collections.<String, String>emptyMap() );
 
         re = ArgumentCaptor.forClass( CapabilityEvent.class );
@@ -380,8 +391,17 @@ public class DefaultCapabilityReferenceTest
     public void loadIsForwardedToCapability()
         throws Exception
     {
-        underTest = new DefaultCapabilityReference( eventBus, achf, vchf, capabilityType( "test" ), capability,
-                                                    mock( CapabilityContextProxy.class ) );
+        underTest = new DefaultCapabilityReference(
+            capabilityRegistry,
+            eventBus,
+            achf,
+            vchf,
+            capabilityIdentity( "test" ),
+            capabilityType( "TEST" ),
+            mock( CapabilityDescriptor.class ),
+            capability,
+            mock( CapabilityContextProxy.class )
+        );
         final HashMap<String, String> properties = new HashMap<String, String>();
         underTest.load( properties );
 
@@ -530,7 +550,7 @@ public class DefaultCapabilityReferenceTest
 
         ( (ValidityConditionHandler) ebc.getValue() ).handle( new ConditionEvent.Unsatisfied( validityCondition ) );
 
-        verify( configurations ).remove( capability.id().toString() );
+        verify( capabilityRegistry ).remove( underTest.context().id() );
     }
 
     /**

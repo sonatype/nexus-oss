@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 
 public class CompositeCapability
     extends CapabilitySupport
@@ -31,9 +31,9 @@ public class CompositeCapability
 
     private final Collection<Capability> capabilities;
 
-    public CompositeCapability( final CapabilityIdentity id )
+    public CompositeCapability( final CapabilityContext context )
     {
-        super( id );
+        super( context );
         capabilities = new ArrayList<Capability>();
     }
 

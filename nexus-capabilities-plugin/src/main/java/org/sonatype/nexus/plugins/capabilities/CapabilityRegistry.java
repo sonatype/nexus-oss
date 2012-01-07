@@ -18,8 +18,11 @@
  */
 package org.sonatype.nexus.plugins.capabilities;
 
+import java.io.IOException;
 import java.util.Collection;
+import java.util.Map;
 
+import org.sonatype.configuration.validation.InvalidConfigurationException;
 import com.google.common.base.Predicate;
 
 /**
@@ -27,6 +30,72 @@ import com.google.common.base.Predicate;
  */
 public interface CapabilityRegistry
 {
+
+    /**
+     * Creates a new capability.
+     *
+     * @param type       type of capability to be created
+     * @param enabled    whether or not created capability should be enabled
+     * @param notes      optional capability notes (can be null)
+     * @param properties optional capability properties (can be null)
+     * @return reference to created capability
+     * @throws InvalidConfigurationException If validation failed
+     * @throws IOException                   If capabilities could not be stored
+     */
+    CapabilityReference add( CapabilityType type,
+                             boolean enabled,
+                             String notes,
+                             Map<String, String> properties )
+        throws InvalidConfigurationException, IOException;
+
+    /**
+     * Updates a capability.
+     *
+     * @param id         of capability to be updated
+     * @param enabled    whether or not updated capability should be enabled
+     * @param notes      optional capability notes (can be null)
+     * @param properties optional capability properties (can be null)
+     * @return reference to updated capability
+     * @throws InvalidConfigurationException If validation failed
+     * @throws IOException                   If capabilities could not be stored
+     */
+    CapabilityReference update( CapabilityIdentity id,
+                                boolean enabled,
+                                String notes,
+                                Map<String, String> properties )
+        throws InvalidConfigurationException, IOException;
+
+    /**
+     * Removes a capability.
+     *
+     * @param id of capability to be removed
+     * @return reference of removed capability
+     * @throws IOException If capabilities could not be stored
+     */
+    CapabilityReference remove( CapabilityIdentity id )
+        throws IOException;
+
+    /**
+     * Enables a capability.
+     *
+     * @param id of capability to be enabled
+     * @return reference to enabled capability
+     * @throws InvalidConfigurationException If validation failed
+     * @throws IOException                   If capabilities could not be stored
+     */
+    CapabilityReference enable( CapabilityIdentity id )
+        throws InvalidConfigurationException, IOException;
+
+    /**
+     * Disables a capability.
+     *
+     * @param id of capability to be disabled
+     * @return reference to disabled capability
+     * @throws InvalidConfigurationException If validation failed
+     * @throws IOException                   If capabilities could not be stored
+     */
+    CapabilityReference disable( CapabilityIdentity id )
+        throws InvalidConfigurationException, IOException;
 
     /**
      * Retrieves the capability from registry with specified id. If there is no capability with specified id in the

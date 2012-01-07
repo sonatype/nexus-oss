@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.plugins.capabilities;
 
+import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
+
 import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
@@ -26,17 +28,21 @@ import org.sonatype.plexus.appevents.AbstractEvent;
  * @since 2.0
  */
 public class CapabilityEvent
-    extends AbstractEvent<CapabilityReference>
+    extends AbstractEvent<CapabilityRegistry>
 {
 
-    public CapabilityEvent( final CapabilityReference reference )
+    private final CapabilityReference reference;
+
+    public CapabilityEvent( final CapabilityRegistry capabilityRegistry,
+                            final CapabilityReference reference )
     {
-        super( reference );
+        super( checkNotNull( capabilityRegistry ) );
+        this.reference = checkNotNull( reference );
     }
 
     public CapabilityReference getReference()
     {
-        return getEventSender();
+        return reference;
     }
 
     @Override
@@ -54,9 +60,10 @@ public class CapabilityEvent
         extends CapabilityEvent
     {
 
-        public AfterActivated( final CapabilityReference reference )
+        public AfterActivated( final CapabilityRegistry capabilityRegistry,
+                               final CapabilityReference reference )
         {
-            super( reference );
+            super( capabilityRegistry, reference );
         }
 
         @Override
@@ -76,9 +83,10 @@ public class CapabilityEvent
         extends CapabilityEvent
     {
 
-        public BeforePassivated( final CapabilityReference reference )
+        public BeforePassivated( final CapabilityRegistry capabilityRegistry,
+                                 final CapabilityReference reference )
         {
-            super( reference );
+            super( capabilityRegistry, reference );
         }
 
         @Override
@@ -98,9 +106,10 @@ public class CapabilityEvent
         extends CapabilityEvent
     {
 
-        public BeforeUpdate( final CapabilityReference reference )
+        public BeforeUpdate( final CapabilityRegistry capabilityRegistry,
+                             final CapabilityReference reference )
         {
-            super( reference );
+            super( capabilityRegistry, reference );
         }
 
         @Override
@@ -120,9 +129,10 @@ public class CapabilityEvent
         extends CapabilityEvent
     {
 
-        public AfterUpdate( final CapabilityReference reference )
+        public AfterUpdate( final CapabilityRegistry capabilityRegistry,
+                            final CapabilityReference reference )
         {
-            super( reference );
+            super( capabilityRegistry, reference );
         }
 
         @Override
@@ -132,4 +142,55 @@ public class CapabilityEvent
         }
 
     }
+
+    /**
+     * Event fired when a capability is created (added to registry).
+     * <p/>
+     * Called before {@link Capability#create(java.util.Map)} / {@link Capability#load(java.util.Map)} are called.
+     *
+     * @since 2.0
+     */
+    public static class Created
+        extends CapabilityEvent
+    {
+
+        public Created( final CapabilityRegistry capabilityRegistry,
+                        final CapabilityReference reference )
+        {
+            super( capabilityRegistry, reference );
+        }
+
+        @Override
+        public String toString()
+        {
+            return "Created " + super.toString();
+        }
+
+    }
+
+    /**
+     * Event fired when a capability is removed from registry.
+     * <p/>
+     * Called after {@link Capability#remove()} is called.
+     *
+     * @since 2.0
+     */
+    public static class AfterRemove
+        extends CapabilityEvent
+    {
+
+        public AfterRemove( final CapabilityRegistry capabilityRegistry,
+                            final CapabilityReference reference )
+        {
+            super( capabilityRegistry, reference );
+        }
+
+        @Override
+        public String toString()
+        {
+            return "After remove of " + super.toString();
+        }
+
+    }
+
 }

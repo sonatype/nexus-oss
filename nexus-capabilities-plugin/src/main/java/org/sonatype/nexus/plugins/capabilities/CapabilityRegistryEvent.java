@@ -26,69 +26,38 @@ import org.sonatype.plexus.appevents.AbstractEvent;
  * @since 2.0
  */
 public class CapabilityRegistryEvent
-    extends AbstractEvent<CapabilityReference>
+    extends AbstractEvent<CapabilityRegistry>
 {
 
-    public CapabilityRegistryEvent( final CapabilityReference reference )
+    public CapabilityRegistryEvent( final CapabilityRegistry capabilityRegistry )
     {
-        super( reference );
-    }
-
-    public CapabilityReference getReference()
-    {
-        return getEventSender();
+        super( capabilityRegistry );
     }
 
     @Override
     public String toString()
     {
-        return getReference().toString();
+        return getEventSender().toString();
     }
 
     /**
-     * Event fired when a capability is created (added to registry).
-     * <p/>
-     * Called before {@link Capability#create(java.util.Map)} / {@link Capability#load(java.util.Map)} are called.
+     * Event fired after capabilities were loaded loaded from persistence store.
      *
      * @since 2.0
      */
-    public static class Created
+    public static class AfterLoad
         extends CapabilityRegistryEvent
     {
 
-        public Created( final CapabilityReference reference )
+        public AfterLoad( final CapabilityRegistry capabilityRegistry )
         {
-            super( reference );
+            super( capabilityRegistry );
         }
 
         @Override
         public String toString()
         {
-            return "Added " + super.toString();
-        }
-
-    }
-
-    /**
-     * Event fired when a capability is removed from registry.
-     * <p/>
-     * Called before {@link Capability#remove()} is called.
-     *
-     * @since 2.0
-     */
-    public static class Removed
-        extends CapabilityRegistryEvent
-    {
-
-        public Removed( final CapabilityReference reference )
-        {
-            super( reference );
-        }
-
-        @Override
-        public String toString()
-        {
-            return "Removed " + super.toString();
+            return "Loaded " + super.toString();
         }
 
     }

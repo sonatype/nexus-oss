@@ -98,7 +98,7 @@ public class ActivationConditionHandler
                 activationCondition = new UnsatisfiedCondition( "Failed to determine activation condition" );
                 getLogger().error(
                     "Could not get activation condition from capability {} ({}). Considering it as non activatable",
-                    new Object[]{ reference.capability(), reference.capability().id(), e }
+                    new Object[]{ reference.capability(), reference.context().id(), e }
                 );
             }
             if ( activationCondition == null )
@@ -129,7 +129,7 @@ public class ActivationConditionHandler
     {
         return String.format(
             "Watching '%s' condition to activate/passivate capability '%s (id=%s)'",
-            activationCondition, reference.capability(), reference.capability().id()
+            activationCondition, reference.capability(), reference.context().id()
         );
     }
 
