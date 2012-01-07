@@ -201,7 +201,7 @@ public class DefaultCapabilityReferenceTest
         underTest.enable();
         underTest.activate();
         assertThat( underTest.isActive(), is( true ) );
-        verify( capability ).activate();
+        verify( capability ).onActivate();
         verify( eventBus ).post( re.capture() );
         assertThat( re.getValue(), is( instanceOf( CapabilityEvent.AfterActivated.class ) ) );
         assertThat( re.getValue().getReference(), is( equalTo( (CapabilityReference) underTest ) ) );
@@ -219,9 +219,9 @@ public class DefaultCapabilityReferenceTest
         underTest.enable();
         underTest.activate();
         assertThat( underTest.isActive(), is( true ) );
-        verify( capability ).activate();
+        verify( capability ).onActivate();
 
-        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( capability ).activate();
+        doThrow( new AssertionError( "Activate not expected to be called" ) ).when( capability ).onActivate();
         underTest.activate();
         assertThat( underTest.isActive(), is( true ) );
     }
@@ -240,7 +240,7 @@ public class DefaultCapabilityReferenceTest
         underTest.passivate();
         assertThat( underTest.isActive(), is( false ) );
 
-        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).passivate();
+        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).onPassivate();
         underTest.passivate();
     }
 
@@ -259,7 +259,7 @@ public class DefaultCapabilityReferenceTest
 
         underTest.passivate();
         assertThat( underTest.isActive(), is( false ) );
-        verify( capability ).passivate();
+        verify( capability ).onPassivate();
 
         verify( eventBus, times( 2 ) ).post( re.capture() );
         assertThat( re.getAllValues().get( 0 ), is( instanceOf( CapabilityEvent.AfterActivated.class ) ) );
@@ -278,7 +278,7 @@ public class DefaultCapabilityReferenceTest
     public void activateProblem()
         throws Exception
     {
-        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).activate();
+        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).onActivate();
 
         underTest.enable();
         assertThat( underTest.isEnabled(), is( true ) );
@@ -288,9 +288,9 @@ public class DefaultCapabilityReferenceTest
         assertThat( underTest.isEnabled(), is( true ) );
         assertThat( underTest.isActive(), is( false ) );
         assertThat( underTest.hasFailure(), is( true ) );
-        verify( capability ).activate();
+        verify( capability ).onActivate();
 
-        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).passivate();
+        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).onPassivate();
         underTest.passivate();
     }
 
@@ -303,7 +303,7 @@ public class DefaultCapabilityReferenceTest
     public void passivateProblem()
         throws Exception
     {
-        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).passivate();
+        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).onPassivate();
 
         underTest.enable();
         underTest.activate();
@@ -311,7 +311,7 @@ public class DefaultCapabilityReferenceTest
         assertThat( underTest.isActive(), is( true ) );
 
         underTest.passivate();
-        verify( capability ).passivate();
+        verify( capability ).onPassivate();
         assertThat( underTest.isEnabled(), is( true ) );
         assertThat( underTest.isActive(), is( false ) );
         assertThat( underTest.hasFailure(), is( true ) );
@@ -331,7 +331,7 @@ public class DefaultCapabilityReferenceTest
         properties.put( "p", "p" );
         final HashMap<String, String> previousProperties = new HashMap<String, String>();
         doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).onUpdate( properties );
-        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).passivate();
+        doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).onPassivate();
 
         underTest.enable();
         assertThat( underTest.isEnabled(), is( true ) );
@@ -366,7 +366,7 @@ public class DefaultCapabilityReferenceTest
         verify( capability ).onUpdate( properties );
         assertThat( underTest.isEnabled(), is( true ) );
         assertThat( underTest.isActive(), is( false ) );
-        verify( capability ).passivate();
+        verify( capability ).onPassivate();
     }
 
     /**
@@ -572,7 +572,7 @@ public class DefaultCapabilityReferenceTest
             new ConditionEvent.Unsatisfied( nexusIsActiveCondition )
         );
 
-        verify( capability ).passivate();
+        verify( capability ).onPassivate();
     }
 
 }

@@ -88,22 +88,22 @@ public class CompositeCapability
     }
 
     @Override
-    public void activate()
+    public void onActivate()
         throws Exception
     {
         for ( final Capability capability : capabilities )
         {
-            capability.activate();
+            capability.onActivate();
         }
     }
 
     @Override
-    public void passivate()
+    public void onPassivate()
         throws Exception
     {
         for ( final Capability capability : capabilities )
         {
-            capability.passivate();
+            capability.onPassivate();
         }
     }
 

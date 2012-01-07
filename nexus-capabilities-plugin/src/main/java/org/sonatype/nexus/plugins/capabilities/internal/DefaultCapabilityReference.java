@@ -667,7 +667,7 @@ public class DefaultCapabilityReference
                 getLogger().debug( "Activating capability {} ({})", capability, id );
                 try
                 {
-                    capability.activate();
+                    capability.onActivate();
                     resetLastException();
                     getLogger().debug( "Activated capability {} ({})", capability, id );
                     state = new ActiveState();
@@ -741,7 +741,7 @@ public class DefaultCapabilityReference
                 eventBus.post(
                     new CapabilityEvent.BeforePassivated( capabilityRegistry, DefaultCapabilityReference.this )
                 );
-                capability.passivate();
+                capability.onPassivate();
                 resetLastException();
                 getLogger().debug( "Passivated capability {} ({})", capability, id );
             }

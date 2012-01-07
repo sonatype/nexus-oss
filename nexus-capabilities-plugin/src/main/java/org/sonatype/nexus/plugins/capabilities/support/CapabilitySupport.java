@@ -80,14 +80,14 @@ public abstract class CapabilitySupport
     }
 
     @Override
-    public void activate()
+    public void onActivate()
         throws Exception
     {
         // do nothing
     }
 
     @Override
-    public void passivate()
+    public void onPassivate()
         throws Exception
     {
         // do nothing
