@@ -330,7 +330,7 @@ public class DefaultCapabilityReferenceTest
         final HashMap<String, String> properties = new HashMap<String, String>();
         properties.put( "p", "p" );
         final HashMap<String, String> previousProperties = new HashMap<String, String>();
-        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).update( properties );
+        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).onUpdate( properties );
         doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).passivate();
 
         underTest.enable();
@@ -338,7 +338,7 @@ public class DefaultCapabilityReferenceTest
         assertThat( underTest.isActive(), is( false ) );
 
         underTest.update( properties, previousProperties );
-        verify( capability ).update( properties );
+        verify( capability ).onUpdate( properties );
         assertThat( underTest.isEnabled(), is( true ) );
         assertThat( underTest.isActive(), is( false ) );
     }
@@ -355,7 +355,7 @@ public class DefaultCapabilityReferenceTest
         final HashMap<String, String> properties = new HashMap<String, String>();
         properties.put( "p", "p" );
         final HashMap<String, String> previousProperties = new HashMap<String, String>();
-        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).update( properties );
+        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).onUpdate( properties );
 
         underTest.enable();
         underTest.activate();
@@ -363,7 +363,7 @@ public class DefaultCapabilityReferenceTest
         assertThat( underTest.isActive(), is( true ) );
 
         underTest.update( properties, previousProperties );
-        verify( capability ).update( properties );
+        verify( capability ).onUpdate( properties );
         assertThat( underTest.isEnabled(), is( true ) );
         assertThat( underTest.isActive(), is( false ) );
         verify( capability ).passivate();
@@ -379,7 +379,7 @@ public class DefaultCapabilityReferenceTest
 
         throws Exception
     {
-        verify( capability ).create( Matchers.<Map<String, String>>any() );
+        verify( capability ).onCreate( Matchers.<Map<String, String>>any() );
     }
 
     /**
@@ -405,7 +405,7 @@ public class DefaultCapabilityReferenceTest
         final HashMap<String, String> properties = new HashMap<String, String>();
         underTest.load( properties );
 
-        verify( capability ).load( properties );
+        verify( capability ).onLoad( properties );
     }
 
     /**
@@ -421,7 +421,7 @@ public class DefaultCapabilityReferenceTest
         properties.put( "p", "p" );
         final HashMap<String, String> previousProperties = new HashMap<String, String>();
         underTest.update( properties, previousProperties );
-        verify( capability ).update( properties );
+        verify( capability ).onUpdate( properties );
 
         verify( eventBus, times( 2 ) ).post( re.capture() );
         assertThat( re.getAllValues().get( 0 ), is( instanceOf( CapabilityEvent.BeforeUpdate.class ) ) );
@@ -441,7 +441,7 @@ public class DefaultCapabilityReferenceTest
     {
         final HashMap<String, String> properties = new HashMap<String, String>();
         final HashMap<String, String> previousProperties = new HashMap<String, String>();
-        doThrow( new AssertionError( "Update not expected to be called" ) ).when( capability ).update(
+        doThrow( new AssertionError( "Update not expected to be called" ) ).when( capability ).onUpdate(
             Matchers.<Map<String, String>>any()
         );
         underTest.update( properties, previousProperties );
@@ -458,7 +458,7 @@ public class DefaultCapabilityReferenceTest
     {
         underTest.enable();
         underTest.remove();
-        verify( capability ).remove();
+        verify( capability ).onRemove();
         verify( eventBus, times( 2 ) ).unregister( ebc.capture() );
     }
 

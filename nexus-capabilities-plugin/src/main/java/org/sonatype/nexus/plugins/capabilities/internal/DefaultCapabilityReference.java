@@ -478,7 +478,7 @@ public class DefaultCapabilityReference
             try
             {
                 capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap( newHashMap( properties ) );
-                capability.create( properties );
+                capability.onCreate( properties );
                 resetLastException();
                 validityHandler.bind();
                 state = new ValidState();
@@ -499,7 +499,7 @@ public class DefaultCapabilityReference
             try
             {
                 capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap( newHashMap( properties ) );
-                capability.load( properties );
+                capability.onLoad( properties );
                 resetLastException();
                 validityHandler.bind();
                 state = new ValidState();
@@ -561,7 +561,7 @@ public class DefaultCapabilityReference
                     new CapabilityEvent.BeforeUpdate( capabilityRegistry, DefaultCapabilityReference.this )
                 );
                 capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap( newHashMap( properties ) );
-                capability.update( properties );
+                capability.onUpdate( properties );
                 resetLastException();
                 eventBus.post(
                     new CapabilityEvent.AfterUpdate( capabilityRegistry, DefaultCapabilityReference.this )
@@ -585,7 +585,7 @@ public class DefaultCapabilityReference
             {
                 DefaultCapabilityReference.this.disable();
                 validityHandler.release();
-                capability.remove();
+                capability.onRemove();
                 resetLastException();
                 state = new RemovedState();
                 eventBus.post(

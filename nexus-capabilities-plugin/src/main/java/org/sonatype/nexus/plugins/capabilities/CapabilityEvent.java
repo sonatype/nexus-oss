@@ -146,7 +146,7 @@ public class CapabilityEvent
     /**
      * Event fired when a capability is created (added to registry).
      * <p/>
-     * Called before {@link Capability#create(java.util.Map)} / {@link Capability#load(java.util.Map)} are called.
+     * Called before {@link Capability#onCreate(java.util.Map)} / {@link Capability#onLoad(java.util.Map)} are called.
      *
      * @since 2.0
      */
@@ -171,7 +171,7 @@ public class CapabilityEvent
     /**
      * Event fired when a capability is removed from registry.
      * <p/>
-     * Called after {@link Capability#remove()} is called.
+     * Called after {@link Capability#onRemove()} is called.
      *
      * @since 2.0
      */

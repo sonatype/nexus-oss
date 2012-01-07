@@ -37,25 +37,25 @@ public class TouchTestCapability
     }
 
     @Override
-    public void create( Map<String, String> properties )
+    public void onCreate( Map<String, String> properties )
     {
         getLogger().info( "Create capability with id {} and properties {}", context().id(), properties );
     }
 
     @Override
-    public void update( Map<String, String> properties )
+    public void onUpdate( Map<String, String> properties )
     {
         getLogger().info( "Update capability with id {} and properties {}", context().id(), properties );
     }
 
     @Override
-    public void load( Map<String, String> properties )
+    public void onLoad( Map<String, String> properties )
     {
         getLogger().info( "Load capability with id {} and properties {}", context().id(), properties );
     }
 
     @Override
-    public void remove()
+    public void onRemove()
     {
         getLogger().info( "Remove capability with id {}", context().id() );
     }

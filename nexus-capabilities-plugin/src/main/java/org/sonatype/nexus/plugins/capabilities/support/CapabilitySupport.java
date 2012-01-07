@@ -52,28 +52,28 @@ public abstract class CapabilitySupport
     }
 
     @Override
-    public void create( final Map<String, String> properties )
+    public void onCreate( final Map<String, String> properties )
         throws Exception
     {
         // do nothing
     }
 
     @Override
-    public void load( final Map<String, String> properties )
+    public void onLoad( final Map<String, String> properties )
         throws Exception
     {
         // do nothing
     }
 
     @Override
-    public void update( final Map<String, String> properties )
+    public void onUpdate( final Map<String, String> properties )
         throws Exception
     {
         // do nothing
     }
 
     @Override
-    public void remove()
+    public void onRemove()
         throws Exception
     {
         // do nothing

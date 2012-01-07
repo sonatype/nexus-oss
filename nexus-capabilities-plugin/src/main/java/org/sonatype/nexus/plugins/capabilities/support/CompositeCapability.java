@@ -48,42 +48,42 @@ public class CompositeCapability
     }
 
     @Override
-    public void create( final Map<String, String> properties )
+    public void onCreate( final Map<String, String> properties )
         throws Exception
     {
         for ( final Capability capability : capabilities )
         {
-            capability.create( properties );
+            capability.onCreate( properties );
         }
     }
 
     @Override
-    public void load( final Map<String, String> properties )
+    public void onLoad( final Map<String, String> properties )
         throws Exception
     {
         for ( final Capability capability : capabilities )
         {
-            capability.load( properties );
+            capability.onLoad( properties );
         }
     }
 
     @Override
-    public void update( final Map<String, String> properties )
+    public void onUpdate( final Map<String, String> properties )
         throws Exception
     {
         for ( final Capability capability : capabilities )
         {
-            capability.update( properties );
+            capability.onUpdate( properties );
         }
     }
 
     @Override
-    public void remove()
+    public void onRemove()
         throws Exception
     {
         for ( final Capability capability : capabilities )
         {
-            capability.remove();
+            capability.onRemove();
         }
     }
 

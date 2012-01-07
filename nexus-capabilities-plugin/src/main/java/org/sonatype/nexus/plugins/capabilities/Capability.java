@@ -47,7 +47,7 @@ public interface Capability
      * @param properties capability configuration
      * @throws Exception If capability cannot be create
      */
-    void create( Map<String, String> properties )
+    void onCreate( Map<String, String> properties )
         throws Exception;
 
     /**
@@ -60,7 +60,7 @@ public interface Capability
      * @param properties capability configuration
      * @throws Exception If capability cannot be loaded
      */
-    void load( Map<String, String> properties )
+    void onLoad( Map<String, String> properties )
         throws Exception;
 
     /**
@@ -72,7 +72,7 @@ public interface Capability
      * @param properties capability configuration
      * @throws Exception If capability cannot be updated
      */
-    void update( Map<String, String> properties )
+    void onUpdate( Map<String, String> properties )
         throws Exception;
 
     /**
@@ -83,7 +83,7 @@ public interface Capability
      *
      * @throws Exception If capability cannot be removed
      */
-    void remove()
+    void onRemove()
         throws Exception;
 
     /**
@@ -95,7 +95,7 @@ public interface Capability
      *
      * @throws Exception If capability cannot be activated
      */
-    void activate()
+    void onActivate()
         throws Exception;
 
     /**
@@ -106,7 +106,7 @@ public interface Capability
      *
      * @throws Exception If capability cannot be passivated
      */
-    void passivate()
+    void onPassivate()
         throws Exception;
 
     /**
