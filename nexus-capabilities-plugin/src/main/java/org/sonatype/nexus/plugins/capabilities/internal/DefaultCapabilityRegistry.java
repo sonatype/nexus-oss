@@ -58,6 +58,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorag
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Maps;
 
 /**
  * Default {@link CapabilityRegistry} implementation.
@@ -123,23 +124,25 @@ public class DefaultCapabilityRegistry
         {
             lock.writeLock().lock();
 
+            final Map<String, String> props = properties == null ? Maps.<String, String>newHashMap() : properties;
+
             validateType( type );
 
-            validate( checkNotNull( validatorRegistryProvider.get() ).get( type ), properties );
+            validate( checkNotNull( validatorRegistryProvider.get() ).get( type ), props );
 
             final CapabilityIdentity generatedId = capabilityIdentity( idGenerator.generateId() );
 
-            capabilityStorage.add( new CapabilityStorageItem( generatedId, type, enabled, notes, properties ) );
+            capabilityStorage.add( new CapabilityStorageItem( generatedId, type, enabled, notes, props ) );
 
             getLogger().debug(
                 "Added capability '{}' of type '{}' with properties '{}'",
-                new Object[]{ generatedId, type, properties }
+                new Object[]{ generatedId, type, props }
             );
 
             final DefaultCapabilityReference reference = create( generatedId, type );
 
             reference.setNotes( notes );
-            reference.create( properties );
+            reference.create( props );
             if ( enabled )
             {
                 reference.enable();
@@ -165,24 +168,26 @@ public class DefaultCapabilityRegistry
         {
             lock.writeLock().lock();
 
+            final Map<String, String> props = properties == null ? Maps.<String, String>newHashMap() : properties;
+
             validateId( id );
 
-            validate( checkNotNull( validatorRegistryProvider.get() ).get( id ), properties );
+            validate( checkNotNull( validatorRegistryProvider.get() ).get( id ), props );
 
             final DefaultCapabilityReference reference = get( id );
 
-            capabilityStorage.update( new CapabilityStorageItem( id, reference.type(), enabled, notes, properties ) );
+            capabilityStorage.update( new CapabilityStorageItem( id, reference.type(), enabled, notes, props ) );
 
             getLogger().debug(
                 "Updated capability '{}' of type '{}' with properties '{}'",
-                new Object[]{ id, reference.type(), properties }
+                new Object[]{ id, reference.type(), props }
             );
             if ( reference.isEnabled() && !enabled )
             {
                 reference.disable();
             }
             reference.setNotes( notes );
-            reference.update( properties, reference.properties() );
+            reference.update( props, reference.properties() );
             if ( !reference.isEnabled() && enabled )
             {
                 reference.enable();
@@ -385,6 +390,11 @@ public class DefaultCapabilityRegistry
         throws InvalidConfigurationException
     {
         final ValidationResponse vr = new ValidationResponse();
+
+        if ( capabilityFactoryRegistry.get( type ) == null )
+        {
+            vr.addValidationError( new ValidationMessage( "typeId", "Type must be provided" ) );
+        }
 
         if ( capabilityFactoryRegistry.get( type ) == null )
         {
