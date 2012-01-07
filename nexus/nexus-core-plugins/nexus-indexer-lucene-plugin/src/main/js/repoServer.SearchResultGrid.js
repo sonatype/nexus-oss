@@ -121,30 +121,26 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       });
 
   this.store = this.defaultStore;
-
-  this.defaultColumnModel = new Ext.grid.ColumnModel({
-        columns : [{
-              header : 'Group',
-              dataIndex : 'groupId',
-              sortable : true
-            }, {
-              header : 'Artifact',
-              dataIndex : 'artifactId',
-              sortable : true
-            }, {
-              header : 'Version',
-              dataIndex : 'version',
-              sortable : true,
-              renderer : this.formatVersionLink
-            }, {
-              id : 'search-result-download',
-              header : 'Download',
-              sortable : true,
-              renderer : this.formatDownloadLinks
-            }]
-      });
-
-  this.colModel = this.defaultColumnModel;
+  
+  this.columns =  [{
+      header : 'Group',
+      dataIndex : 'groupId',
+      sortable : true
+    }, {
+      header : 'Artifact',
+      dataIndex : 'artifactId',
+      sortable : true
+    }, {
+      header : 'Version',
+      dataIndex : 'version',
+      sortable : true,
+      renderer : this.formatVersionLink
+    }, {
+      id : 'search-result-download',
+      header : 'Download',
+      sortable : true,
+      renderer : this.formatDownloadLinks
+    }];
 
   this.clearButton = new Ext.Button({
         text : 'Clear Results',
@@ -195,6 +191,15 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
               text : 'Javadoc artifact'
             }]
       });
+  
+  Sonatype.Events.fireEvent('searchResultGridInit', this);
+
+  //note we create the model object after the event, so plugins can contribute column data
+  this.defaultColumnModel = new Ext.grid.ColumnModel({
+        columns : this.columns
+      });
+
+  this.colModel = this.defaultColumnModel;
 
   Sonatype.repoServer.SearchResultGrid.superclass.constructor.call(this, {
         region : 'center',
