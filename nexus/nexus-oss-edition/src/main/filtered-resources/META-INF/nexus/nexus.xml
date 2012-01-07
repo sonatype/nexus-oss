@@ -41,7 +41,7 @@
   <repositories>
     <repository>
       <id>central</id>
-      <name>Maven Central</name>
+      <name>Central</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
