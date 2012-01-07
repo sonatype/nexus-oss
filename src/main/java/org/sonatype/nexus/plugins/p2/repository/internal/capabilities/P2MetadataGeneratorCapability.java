@@ -20,7 +20,7 @@ package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
 import java.util.Map;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
@@ -35,9 +35,10 @@ public class P2MetadataGeneratorCapability
 
     private P2MetadataGeneratorConfiguration configuration;
 
-    public P2MetadataGeneratorCapability( final CapabilityIdentity id, final P2MetadataGenerator service )
+    public P2MetadataGeneratorCapability( final CapabilityContext context,
+                                          final P2MetadataGenerator service )
     {
-        super( id );
+        super( context );
         this.service = service;
     }
 

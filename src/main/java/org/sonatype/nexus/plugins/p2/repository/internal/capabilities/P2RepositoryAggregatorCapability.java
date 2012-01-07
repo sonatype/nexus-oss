@@ -20,7 +20,7 @@ package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
 import java.util.Map;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
@@ -35,9 +35,10 @@ public class P2RepositoryAggregatorCapability
 
     private P2RepositoryAggregatorConfiguration configuration;
 
-    public P2RepositoryAggregatorCapability( final CapabilityIdentity id, final P2RepositoryAggregator service )
+    public P2RepositoryAggregatorCapability( final CapabilityContext context,
+                                             final P2RepositoryAggregator service )
     {
-        super( id );
+        super( context );
         this.service = service;
     }
 

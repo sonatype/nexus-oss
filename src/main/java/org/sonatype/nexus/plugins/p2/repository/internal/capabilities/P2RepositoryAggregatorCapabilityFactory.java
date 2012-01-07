@@ -27,7 +27,6 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
-import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 
 @Named( TYPE_ID )
@@ -45,9 +44,9 @@ public class P2RepositoryAggregatorCapabilityFactory
     }
 
     @Override
-    public Capability create( final CapabilityIdentity id, final CapabilityContext context )
+    public Capability create( final CapabilityContext context )
     {
-        return new P2RepositoryAggregatorCapability( id, service );
+        return new P2RepositoryAggregatorCapability( context, service );
     }
 
 }
