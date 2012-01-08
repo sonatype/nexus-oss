@@ -26,7 +26,9 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
+import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 
@@ -34,7 +36,7 @@ import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSuppo
 @Singleton
 public class TouchTestCapabilityDescriptor
     extends CapabilityDescriptorSupport
-    implements CapabilityDescriptor
+    implements CapabilityDescriptor, CapabilityFactory
 {
 
     public static final String TYPE_ID = "TouchTest";
@@ -56,6 +58,12 @@ public class TouchTestCapabilityDescriptor
     protected TouchTestCapabilityDescriptor()
     {
         super( TYPE, "Touch Test Capability", "What about me?", repoField, msgField );
+    }
+
+    @Override
+    public Capability create()
+    {
+        return new TouchTestCapability();
     }
 
 }
