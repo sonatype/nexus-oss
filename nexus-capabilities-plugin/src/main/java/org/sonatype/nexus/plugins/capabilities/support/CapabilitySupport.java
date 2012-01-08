@@ -19,6 +19,7 @@
 package org.sonatype.nexus.plugins.capabilities.support;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
@@ -31,6 +32,17 @@ public abstract class CapabilitySupport
 {
 
     private CapabilityContext context;
+
+    /**
+     * Returns capability context.
+     *
+     * @return capability context
+     */
+    protected CapabilityContext context()
+    {
+        checkState( context != null, "Capability was not yet initialized" );
+        return context;
+    }
 
     @Override
     public void init( final CapabilityContext context )
@@ -114,13 +126,4 @@ public abstract class CapabilitySupport
         return null;
     }
 
-    /**
-     * Returns capability context.
-     *
-     * @return capability context
-     */
-    protected CapabilityContext context()
-    {
-        return context;
-    }
 }
