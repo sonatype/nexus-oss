@@ -109,7 +109,7 @@ class DefaultValidatorRegistry
             final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( reference.context().type() );
             if ( descriptor != null )
             {
-                final Validator validator = descriptor.validator();
+                final Validator validator = descriptor.validator( id );
                 if ( validator != null )
                 {
                     instanceValidators.add( validator );
