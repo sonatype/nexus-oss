@@ -20,6 +20,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.validator;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
@@ -42,12 +43,12 @@ public class PrimaryKeyExcludingSelfValidator
 
     @Inject
     PrimaryKeyExcludingSelfValidator( final CapabilityRegistry capabilityRegistry,
-                                      final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+                                      final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
                                       final @Assisted CapabilityIdentity selfId,
                                       final @Assisted CapabilityType type,
                                       final @Assisted String... propertyKeys )
     {
-        super( capabilityRegistry, capabilityDescriptorRegistry, selfId, type, propertyKeys );
+        super( capabilityRegistry, capabilityDescriptorRegistryProvider, selfId, type, propertyKeys );
     }
 
 }

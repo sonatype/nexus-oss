@@ -22,6 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
 import java.util.Map;
+import javax.inject.Provider;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
@@ -37,26 +38,20 @@ import com.google.common.collect.Maps;
 class ValidatorSupport
 {
 
-    private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
+    private final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider;
 
     private final CapabilityType type;
 
-    private final CapabilityDescriptor descriptor;
-
-    private final Map<String, String> keyToName;
-
-    ValidatorSupport( final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+    ValidatorSupport( final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
                       final CapabilityType type )
     {
-        this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
+        this.capabilityDescriptorRegistryProvider = checkNotNull( capabilityDescriptorRegistryProvider );
         this.type = checkNotNull( type );
-        this.descriptor = capabilityDescriptorRegistry.get( capabilityType() );
-        this.keyToName = extractNames( descriptor );
     }
 
     CapabilityDescriptorRegistry capabilityDescriptorRegistry()
     {
-        return capabilityDescriptorRegistry;
+        return capabilityDescriptorRegistryProvider.get();
     }
 
     CapabilityType capabilityType()
@@ -66,7 +61,7 @@ class ValidatorSupport
 
     CapabilityDescriptor capabilityDescriptor()
     {
-        return descriptor;
+        return capabilityDescriptorRegistry().get( type );
     }
 
     String typeName()
@@ -81,7 +76,7 @@ class ValidatorSupport
 
     String propertyName( final String propertyKey )
     {
-        String name = keyToName.get( propertyKey );
+        String name = extractNames().get( propertyKey );
         if ( name == null )
         {
             name = propertyKey;
@@ -89,10 +84,10 @@ class ValidatorSupport
         return name;
     }
 
-    private Map<String, String> extractNames( final CapabilityDescriptor descriptor )
+    private Map<String, String> extractNames()
     {
         final Map<String, String> keyToName = Maps.newHashMap();
-        final List<FormField> formFields = descriptor.formFields();
+        final List<FormField> formFields = capabilityDescriptor().formFields();
         if ( formFields != null )
         {
             for ( final FormField formField : formFields )

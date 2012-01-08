@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
@@ -36,6 +37,7 @@ import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityReferenceFilterBuilder;
 import org.sonatype.nexus.plugins.capabilities.support.validator.DefaultValidationResult;
 import com.google.common.base.Predicate;
+import com.google.inject.ProvidedBy;
 import com.google.inject.assistedinject.Assisted;
 
 /**
@@ -57,23 +59,23 @@ public class PrimaryKeyValidator
 
     @Inject
     PrimaryKeyValidator( final CapabilityRegistry capabilityRegistry,
-                         final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+                         final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
                          final @Assisted CapabilityType type,
                          final @Assisted String... propertyKeys )
     {
-        super( capabilityDescriptorRegistry, type );
+        super( capabilityDescriptorRegistryProvider, type );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.excludeId = null;
         this.propertyKeys = propertyKeys;
     }
 
     PrimaryKeyValidator( final CapabilityRegistry capabilityRegistry,
-                         final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+                         final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
                          final CapabilityIdentity excludeId,
                          final CapabilityType type,
                          final String... propertyKeys )
     {
-        super( capabilityDescriptorRegistry, type );
+        super( capabilityDescriptorRegistryProvider, type );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.excludeId = checkNotNull( excludeId );
         this.propertyKeys = propertyKeys;

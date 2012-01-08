@@ -21,17 +21,17 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.CapabilityValidator;
 import org.sonatype.nexus.plugins.capabilities.Validator;
 import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.support.validator.Validators;
@@ -50,20 +50,20 @@ class DefaultValidatorRegistry
 
     private final CapabilityFactoryRegistry capabilityFactoryRegistry;
 
+    private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
+
     private final Validators validators;
 
-    private final Map<String, CapabilityValidator> capabilityValidators;
-
     @Inject
-    DefaultValidatorRegistry( final CapabilityFactoryRegistry capabilityFactoryRegistry,
+    DefaultValidatorRegistry( final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+                              final CapabilityFactoryRegistry capabilityFactoryRegistry,
                               final DefaultCapabilityRegistry capabilityRegistry,
-                              final Validators validators,
-                              final Map<String, CapabilityValidator> capabilityValidators )
+                              final Validators validators )
     {
+        this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
         this.capabilityFactoryRegistry = checkNotNull( capabilityFactoryRegistry );
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.validators = checkNotNull( validators );
-        this.capabilityValidators = checkNotNull( capabilityValidators );
     }
 
     @Override
@@ -71,24 +71,26 @@ class DefaultValidatorRegistry
     {
         final Set<Validator> typeValidators = Sets.newHashSet();
 
-        final CapabilityFactory factory = capabilityFactoryRegistry.get( type );
-        if ( factory != null )
+        final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( type );
+        if ( descriptor != null )
         {
             typeValidators.add( validators.capability().constraintsOf( type ) );
-            if ( factory instanceof Validator )
-            {
-                typeValidators.add( (Validator) factory );
-            }
-        }
 
-        final CapabilityValidator capabilityValidator = capabilityValidators.get( type.toString() );
-        if ( capabilityValidator != null )
-        {
-            final Validator validator = capabilityValidator.validator();
+            final Validator validator = descriptor.validator();
             if ( validator != null )
             {
                 typeValidators.add( validator );
             }
+
+            final CapabilityFactory factory = capabilityFactoryRegistry.get( type );
+            if ( factory != null )
+            {
+                if ( factory instanceof Validator )
+                {
+                    typeValidators.add( (Validator) factory );
+                }
+            }
+
         }
 
         return typeValidators;
@@ -103,23 +105,20 @@ class DefaultValidatorRegistry
         if ( reference != null )
         {
             instanceValidators.add( validators.capability().constraintsOf( reference.context().type() ) );
-            if ( reference.capability() instanceof Validator )
-            {
-                instanceValidators.add( (Validator) reference.capability() );
-            }
-        }
 
-        if ( reference != null )
-        {
-            final CapabilityValidator capabilityValidator =
-                capabilityValidators.get( reference.type().toString() );
-            if ( capabilityValidator != null )
+            final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( reference.context().type() );
+            if ( descriptor != null )
             {
-                final Validator validator = capabilityValidator.validator( id );
+                final Validator validator = descriptor.validator();
                 if ( validator != null )
                 {
                     instanceValidators.add( validator );
                 }
+            }
+
+            if ( reference.capability() instanceof Validator )
+            {
+                instanceValidators.add( (Validator) reference.capability() );
             }
         }
 

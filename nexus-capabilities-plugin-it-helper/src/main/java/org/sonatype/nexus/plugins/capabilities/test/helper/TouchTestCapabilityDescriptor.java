@@ -21,9 +21,6 @@ package org.sonatype.nexus.plugins.capabilities.test.helper;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 import static org.sonatype.nexus.plugins.capabilities.test.helper.TouchTestCapability.TYPE;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -31,11 +28,12 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
-import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 
 @Named
 @Singleton
 public class TouchTestCapabilityDescriptor
+    extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
 
@@ -43,63 +41,17 @@ public class TouchTestCapabilityDescriptor
 
     public static final String FIELD_MSG_ID = "message";
 
-    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField(
+    private static final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField(
         FIELD_REPO_OR_GROUP_ID, FormField.MANDATORY
     );
 
-    private final StringTextFormField msgField = new StringTextFormField(
+    private static final StringTextFormField msgField = new StringTextFormField(
         FIELD_MSG_ID, "Message", "Message help text", FormField.MANDATORY
     );
 
-    @Override
-    public CapabilityType type()
+    protected TouchTestCapabilityDescriptor()
     {
-        return capabilityType( TYPE );
-    }
-
-    @Override
-    public String name()
-    {
-        return "Touch Test Capability";
-    }
-
-    @Override
-    public List<FormField> formFields()
-    {
-        List<FormField> fields = new ArrayList<FormField>();
-        fields.add( repoField );
-        fields.add( msgField );
-        return fields;
-    }
-
-    @Override
-    public boolean isExposed()
-    {
-        return true;
-    }
-
-    @Override
-    public boolean isHidden()
-    {
-        return false;
-    }
-
-    @Override
-    public String about()
-    {
-        return "What about me?";
-    }
-
-    @Override
-    public int version()
-    {
-        return 1;
-    }
-
-    @Override
-    public Map<String, String> convert( final Map<String, String> properties, final int fromVersion )
-    {
-        return properties;
+        super( capabilityType( TYPE ), "Touch Test Capability", "What about me?", repoField, msgField );
     }
 
 }

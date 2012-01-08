@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
@@ -47,11 +48,11 @@ public class RequiredFieldValidator
     private final String label;
 
     @Inject
-    RequiredFieldValidator( final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+    RequiredFieldValidator( final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
                             final @Assisted CapabilityType type,
                             final @Assisted String key )
     {
-        super( capabilityDescriptorRegistry, type );
+        super( capabilityDescriptorRegistryProvider, type );
         this.key = checkNotNull( key );
         label = propertyName( key );
     }

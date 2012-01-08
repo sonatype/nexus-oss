@@ -21,9 +21,18 @@ package org.sonatype.nexus.plugins.capabilities;
 import java.util.Map;
 
 /**
- * Validates capability properties. If validator is implemented by a {@link CapabilityFactory}, validator will be used
- * before creating the capability. If validator is implemented by a {@link Capability}, validator wil be used before
- * updating the capability.
+ * Validates capability properties.
+ * 
+ * The validators to be used are extracted as follows:<b/>
+ * On create:<b/>
+ * * Automatically created validators for all mandatory fields and fields supporting regexp validation<b/>
+ * * Validators returned by {@link CapabilityDescriptor#validator()} method<b/>
+ * * {@link CapabilityFactory}, if it implements {@link Validator}
+ *
+ * On update:<b/>
+ * * Automatically created validators for all mandatory fields and fields supporting regexp validation<b/>
+ * * Validators returned by {@link CapabilityDescriptor#validator(CapabilityIdentity)} method<b/>
+ * * {@link Capability}, if it implements {@link Validator}
  *
  * @since 2.0
  */

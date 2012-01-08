@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
@@ -53,12 +54,12 @@ public class RepositoryTypeValidator
 
     @Inject
     RepositoryTypeValidator( final RepositoryRegistry repositoryRegistry,
-                             final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+                             final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
                              final @Assisted CapabilityType type,
                              final @Assisted String propertyKey,
                              final @Assisted Class<?> facet )
     {
-        super( capabilityDescriptorRegistry, type );
+        super( capabilityDescriptorRegistryProvider, type );
         this.repositoryRegistry = checkNotNull( repositoryRegistry );
         this.propertyKey = checkNotNull( propertyKey );
         this.facet = checkNotNull( facet );

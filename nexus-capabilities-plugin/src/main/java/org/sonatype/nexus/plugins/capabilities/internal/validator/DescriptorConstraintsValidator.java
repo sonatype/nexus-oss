@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
@@ -49,10 +50,10 @@ public class DescriptorConstraintsValidator
 
     @Inject
     DescriptorConstraintsValidator( final Validators validators,
-                                    final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+                                    final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
                                     final @Assisted CapabilityType type )
     {
-        super( capabilityDescriptorRegistry, type );
+        super( capabilityDescriptorRegistryProvider, type );
         checkNotNull( validators );
         Validator descriptorValidator = validators.capability().alwaysValid();
         final List<FormField> formFields = capabilityDescriptor().formFields();

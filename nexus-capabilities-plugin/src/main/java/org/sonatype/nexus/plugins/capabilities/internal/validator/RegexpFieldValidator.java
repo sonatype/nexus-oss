@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
@@ -50,12 +51,12 @@ public class RegexpFieldValidator
     private final String label;
 
     @Inject
-    RegexpFieldValidator( final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+    RegexpFieldValidator( final Provider<CapabilityDescriptorRegistry> capabilityDescriptorRegistryProvider,
                           final @Assisted CapabilityType type,
                           final @Assisted( "key" ) String key,
                           final @Assisted( "regexp" ) String regexp )
     {
-        super( capabilityDescriptorRegistry, type );
+        super( capabilityDescriptorRegistryProvider, type );
         this.key = checkNotNull( key );
         this.pattern = Pattern.compile( checkNotNull( regexp ) );
         label = propertyName( key );

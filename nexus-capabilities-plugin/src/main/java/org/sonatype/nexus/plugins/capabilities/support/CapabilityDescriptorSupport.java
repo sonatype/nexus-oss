@@ -25,7 +25,9 @@ import java.util.Map;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
+import org.sonatype.nexus.plugins.capabilities.Validator;
 
 /**
  * Support class for implementing {@link org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor}s.
@@ -35,6 +37,8 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 public abstract class CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
+
+    static final Validator NO_VALIDATOR = null;
 
     private final CapabilityType type;
 
@@ -106,6 +110,28 @@ public abstract class CapabilityDescriptorSupport
     public boolean isHidden()
     {
         return false;
+    }
+
+    /**
+     * No validator.
+     *
+     * @return null
+     */
+    @Override
+    public Validator validator()
+    {
+        return NO_VALIDATOR;
+    }
+
+    /**
+     * No validator.
+     *
+     * @return null
+     */
+    @Override
+    public Validator validator( final CapabilityIdentity id )
+    {
+        return NO_VALIDATOR;
     }
 
     /**
