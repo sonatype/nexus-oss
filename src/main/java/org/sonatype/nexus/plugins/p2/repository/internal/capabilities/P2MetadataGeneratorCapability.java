@@ -22,7 +22,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
@@ -41,11 +40,9 @@ public class P2MetadataGeneratorCapability
 
     private P2MetadataGeneratorConfiguration configuration;
 
-    public P2MetadataGeneratorCapability( final CapabilityContext context,
-                                          final P2MetadataGenerator service,
+    public P2MetadataGeneratorCapability( final P2MetadataGenerator service,
                                           final Conditions conditions )
     {
-        super( context );
         this.service = checkNotNull( service );
         this.conditions = checkNotNull( conditions );
     }
@@ -53,6 +50,7 @@ public class P2MetadataGeneratorCapability
     @Override
     public void onActivate()
     {
+        configuration = createConfiguration( context().properties() );
         service.addConfiguration( configuration );
     }
 

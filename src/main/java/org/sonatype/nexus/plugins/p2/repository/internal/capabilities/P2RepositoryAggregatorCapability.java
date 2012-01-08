@@ -22,7 +22,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
 
-import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
@@ -41,11 +40,9 @@ public class P2RepositoryAggregatorCapability
 
     private P2RepositoryAggregatorConfiguration configuration;
 
-    public P2RepositoryAggregatorCapability( final CapabilityContext context,
-                                             final P2RepositoryAggregator service,
+    public P2RepositoryAggregatorCapability( final P2RepositoryAggregator service,
                                              final Conditions conditions )
     {
-        super( context );
         this.service = checkNotNull( service );
         this.conditions = checkNotNull( conditions );
     }

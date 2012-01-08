@@ -26,7 +26,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
@@ -50,9 +49,9 @@ public class P2MetadataGeneratorCapabilityFactory
     }
 
     @Override
-    public Capability create( CapabilityContext context )
+    public Capability create()
     {
-        return new P2MetadataGeneratorCapability( context, service, conditions );
+        return new P2MetadataGeneratorCapability( service, conditions );
     }
 
 }
