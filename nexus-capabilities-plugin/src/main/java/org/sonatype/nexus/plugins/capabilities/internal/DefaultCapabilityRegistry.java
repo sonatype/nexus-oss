@@ -25,6 +25,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabil
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -130,16 +131,20 @@ public class DefaultCapabilityRegistry
 
             validate( checkNotNull( validatorRegistryProvider.get() ).get( type ), props );
 
+            final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( type );
+
             final CapabilityIdentity generatedId = capabilityIdentity( idGenerator.generateId() );
 
-            capabilityStorage.add( new CapabilityStorageItem( generatedId, type, enabled, notes, props ) );
+            capabilityStorage.add( new CapabilityStorageItem(
+                descriptor.version(), generatedId, type, enabled, notes, props
+            ) );
 
             getLogger().debug(
                 "Added capability '{}' of type '{}' with properties '{}'",
                 new Object[]{ generatedId, type, props }
             );
 
-            final DefaultCapabilityReference reference = create( generatedId, type );
+            final DefaultCapabilityReference reference = create( generatedId, type, descriptor );
 
             reference.setNotes( notes );
             reference.create( props );
@@ -176,7 +181,9 @@ public class DefaultCapabilityRegistry
 
             final DefaultCapabilityReference reference = get( id );
 
-            capabilityStorage.update( new CapabilityStorageItem( id, reference.type(), enabled, notes, props ) );
+            capabilityStorage.update( new CapabilityStorageItem(
+                reference.descriptor().version(), id, reference.type(), enabled, notes, props )
+            );
 
             getLogger().debug(
                 "Updated capability '{}' of type '{}' with properties '{}'",
@@ -313,10 +320,46 @@ public class DefaultCapabilityRegistry
                 new Object[]{ item.id(), item.type(), item.properties() }
             );
 
-            final DefaultCapabilityReference reference = create( item.id(), item.type() );
+            final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( item.type() );
+
+            Map<String, String> properties = item.properties();
+            if ( descriptor.version() != item.version() )
+            {
+                getLogger().debug(
+                    "Converting capability '{}' properties from version '{}' to version '{}'",
+                    new Object[]{ item.id(), item.version(), descriptor.version() }
+                );
+                try
+                {
+                    properties = descriptor.convert( properties, item.version() );
+                    if ( properties == null )
+                    {
+                        properties = Collections.emptyMap();
+                    }
+                    getLogger().debug(
+                        "Converted capability '{}' properties '{}' (version '{}') to '{}' (version '{}')",
+                        new Object[]{ item.id(), item.properties(), item.version(), properties, descriptor.version() }
+                    );
+                }
+                catch ( Exception e )
+                {
+                    getLogger().error(
+                        "Failed converting capability '{}' properties '{}' from version '{}' to version '{}'."
+                            + " Capability will not be loaded",
+                        new Object[]{ item.id(), item.properties(), item.version(), descriptor.version() },
+                        e
+                    );
+                    continue;
+                }
+                capabilityStorage.update( new CapabilityStorageItem(
+                    descriptor.version(), item.id(), item.type(), item.isEnabled(), item.notes(), properties )
+                );
+            }
+
+            final DefaultCapabilityReference reference = create( item.id(), item.type(), descriptor );
 
             reference.setNotes( item.notes() );
-            reference.load( item.properties() );
+            reference.load( properties );
             if ( item.isEnabled() )
             {
                 reference.enable();
@@ -326,26 +369,14 @@ public class DefaultCapabilityRegistry
         eventBus.post( new CapabilityRegistryEvent.AfterLoad( this ) );
     }
 
-    /**
-     * Creates a capability given its id/type. if there is no capability available for specified type it will throw an
-     * runtime exception.
-     *
-     * @param id   id of capability to be created
-     * @param type type of capability to be created
-     * @return created capability
-     * @since 2.0
-     */
-    private DefaultCapabilityReference create( final CapabilityIdentity id, final CapabilityType type )
+    private DefaultCapabilityReference create( final CapabilityIdentity id,
+                                               final CapabilityType type,
+                                               final CapabilityDescriptor descriptor )
     {
         final CapabilityFactory factory = capabilityFactoryRegistry.get( type );
         if ( factory == null )
         {
             throw new RuntimeException( format( "No factory found for a capability of type %s", type ) );
-        }
-        final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( type );
-        if ( descriptor == null )
-        {
-            throw new RuntimeException( format( "No descriptor found for a capability of type %s", type ) );
         }
 
         final Capability capability = factory.create();
@@ -389,7 +420,7 @@ public class DefaultCapabilityRegistry
             vr.addValidationError( new ValidationMessage( "typeId", "Type must be provided" ) );
         }
 
-        if ( capabilityFactoryRegistry.get( type ) == null )
+        if ( capabilityFactoryRegistry.get( type ) == null || capabilityDescriptorRegistry.get( type ) == null )
         {
             vr.addValidationError( new ValidationMessage( "typeId", "Type '" + type + "' is not supported" ) );
         }

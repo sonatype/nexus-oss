@@ -27,6 +27,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 
 public class CapabilityStorageItem
 {
+    private final int version;
 
     private final CapabilityIdentity id;
 
@@ -38,17 +39,24 @@ public class CapabilityStorageItem
 
     private final Map<String, String> properties;
 
-    public CapabilityStorageItem( final CapabilityIdentity id,
+    public CapabilityStorageItem( final int version,
+                                  final CapabilityIdentity id,
                                   final CapabilityType type,
                                   final boolean enabled,
                                   final String notes,
                                   final Map<String, String> properties )
     {
+        this.version = version;
         this.id = checkNotNull( id );
         this.type = checkNotNull( type );
         this.enabled = enabled;
         this.notes = notes;
         this.properties = properties;
+    }
+
+    public int version()
+    {
+        return version;
     }
 
     public CapabilityIdentity id()
@@ -75,4 +83,5 @@ public class CapabilityStorageItem
     {
         return properties;
     }
+
 }

@@ -92,6 +92,13 @@
       <version>1.0.0+</version>
       <fields>
         <field>
+          <name>version</name>
+          <type>int</type>
+          <version>1.0.0+</version>
+          <required>true</required>
+          <description>The version of capability properties</description>
+        </field>
+        <field>
           <name>id</name>
           <type>String</type>
           <version>1.0.0+</version>

@@ -24,15 +24,20 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityIdentity.capabilityIdentity;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import javax.inject.Provider;
 
 import org.junit.Before;
@@ -53,6 +58,8 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
 import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorage;
+import org.sonatype.nexus.plugins.capabilities.internal.storage.CapabilityStorageItem;
+import com.google.common.collect.Maps;
 
 /**
  * {@link DefaultCapabilityRegistry} UTs.
@@ -70,10 +77,15 @@ public class DefaultCapabilityRegistryTest
 
     private ArgumentCaptor<CapabilityEvent> rec;
 
+    private CapabilityStorage capabilityStorage;
+
+    private CapabilityDescriptorRegistry capabilityDescriptorRegistry;
+
     @Before
     public void setUp()
     {
-        final CapabilityStorage capabilityStorage = mock( CapabilityStorage.class );
+        capabilityStorage = mock( CapabilityStorage.class );
+
         final ValidatorRegistryProvider validatorRegistryProvider = mock( ValidatorRegistryProvider.class );
         final ValidatorRegistry validatorRegistry = mock( ValidatorRegistry.class );
         when( validatorRegistryProvider.get() ).thenReturn( validatorRegistry );
@@ -93,7 +105,7 @@ public class DefaultCapabilityRegistryTest
         final CapabilityFactoryRegistry capabilityFactoryRegistry = mock( CapabilityFactoryRegistry.class );
         when( capabilityFactoryRegistry.get( CAPABILITY_TYPE ) ).thenReturn( factory );
 
-        final CapabilityDescriptorRegistry capabilityDescriptorRegistry = mock( CapabilityDescriptorRegistry.class );
+        capabilityDescriptorRegistry = mock( CapabilityDescriptorRegistry.class );
         when( capabilityDescriptorRegistry.get( CAPABILITY_TYPE ) ).thenReturn( mock( CapabilityDescriptor.class ) );
 
         eventBus = mock( NexusEventBus.class );
@@ -224,6 +236,109 @@ public class DefaultCapabilityRegistryTest
         extends Provider<ValidatorRegistry>
     {
 
+    }
+
+    /**
+     * On load if version did not change conversion should not be performed.
+     *
+     * @throws Exception unexpected
+     */
+    @Test
+    public void load()
+        throws Exception
+    {
+        final Map<String, String> oldProps = Maps.newHashMap();
+        oldProps.put( "p1", "v1" );
+        oldProps.put( "p2", "v2" );
+
+        final CapabilityStorageItem item = new CapabilityStorageItem(
+            0, capabilityIdentity( "foo" ), CAPABILITY_TYPE, true, null, oldProps
+        );
+        when( capabilityStorage.getAll() ).thenReturn( Arrays.asList( item ) );
+
+        final CapabilityDescriptor descriptor = mock( CapabilityDescriptor.class );
+        when( capabilityDescriptorRegistry.get( CAPABILITY_TYPE ) ).thenReturn( descriptor );
+        when( descriptor.version() ).thenReturn( 0 );
+
+        underTest.load();
+
+        verify( capabilityStorage ).getAll();
+        verify( descriptor ).version();
+        verifyNoMoreInteractions( descriptor, capabilityStorage );
+    }
+
+    /**
+     * On load if version changed conversion should be performed and new properties stored.
+     *
+     * @throws Exception unexpected
+     */
+    @Test
+    public void loadWhenVersionChanged()
+        throws Exception
+    {
+        final Map<String, String> oldProps = Maps.newHashMap();
+        oldProps.put( "p1", "v1" );
+        oldProps.put( "p2", "v2" );
+
+        final CapabilityStorageItem item = new CapabilityStorageItem(
+            0, capabilityIdentity( "foo" ), CAPABILITY_TYPE, true, null, oldProps
+        );
+        when( capabilityStorage.getAll() ).thenReturn( Arrays.asList( item ) );
+
+        final CapabilityDescriptor descriptor = mock( CapabilityDescriptor.class );
+        when( capabilityDescriptorRegistry.get( CAPABILITY_TYPE ) ).thenReturn( descriptor );
+        when( descriptor.version() ).thenReturn( 1 );
+
+        final Map<String, String> newProps = Maps.newHashMap();
+        oldProps.put( "p1", "v1-converted" );
+        oldProps.put( "p3", "v3" );
+
+        when( descriptor.convert( oldProps, 0 ) ).thenReturn( newProps );
+
+        underTest.load();
+
+        verify( capabilityStorage ).getAll();
+        verify( descriptor, atLeastOnce() ).version();
+        verify( descriptor ).convert( oldProps, 0 );
+        final ArgumentCaptor<CapabilityStorageItem> captor = ArgumentCaptor.forClass( CapabilityStorageItem.class );
+        verify( capabilityStorage ).update( captor.capture() );
+        assertThat( captor.getValue(), is( notNullValue() ) );
+
+        final Map<String, String> actualNewProps = captor.getValue().properties();
+        assertThat( newProps, is( equalTo( actualNewProps ) ) );
+    }
+
+    /**
+     * On load if version changed conversion should be performed if conversion fails load is skipped.
+     *
+     * @throws Exception unexpected
+     */
+    @Test
+    public void loadWhenVersionChangedAndConversionFails()
+        throws Exception
+    {
+        final Map<String, String> oldProps = Maps.newHashMap();
+        oldProps.put( "p1", "v1" );
+        oldProps.put( "p2", "v2" );
+
+        final CapabilityStorageItem item = new CapabilityStorageItem(
+            0, capabilityIdentity( "foo" ), CAPABILITY_TYPE, true, null, oldProps
+        );
+        when( capabilityStorage.getAll() ).thenReturn( Arrays.asList( item ) );
+
+        final CapabilityDescriptor descriptor = mock( CapabilityDescriptor.class );
+        when( capabilityDescriptorRegistry.get( CAPABILITY_TYPE ) ).thenReturn( descriptor );
+        when( descriptor.version() ).thenReturn( 1 );
+
+        when( descriptor.convert( oldProps, 0 ) ).thenThrow( new RuntimeException( "expected" ) );
+
+        underTest.load();
+
+        verify( capabilityStorage ).getAll();
+        verify( descriptor, atLeastOnce() ).version();
+        verify( descriptor ).convert( oldProps, 0 );
+
+        verifyNoMoreInteractions( descriptor, capabilityStorage );
     }
 
 }

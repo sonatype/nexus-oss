@@ -19,6 +19,7 @@
 package org.sonatype.nexus.plugins.capabilities;
 
 import java.util.List;
+import java.util.Map;
 
 import org.sonatype.nexus.formfields.FormField;
 
@@ -45,7 +46,7 @@ public interface CapabilityDescriptor
     /**
      * Returns capability form fields (properties).
      *
-     * @return capability form fields (properties).
+     * @return capability form fields (properties)
      */
     List<FormField> formFields();
 
@@ -61,7 +62,7 @@ public interface CapabilityDescriptor
     /**
      * Whether or not capabilities of this type should be hidden by default. Usually hidden capabilities are managed
      * (CRUD) by some other means like for example a custom made UI.
-     *
+     * <p/>
      * User will be able to see them only when turning on hidden capabilities (in UI).
      *
      * @return true if is hidden
@@ -71,8 +72,26 @@ public interface CapabilityDescriptor
     /**
      * Returns a detailed description of capability type (to be presented in UI).
      *
-     * @return capability type description.
+     * @return capability type description
      */
     String about();
+
+    /**
+     * Returns the version of descriptor. The version should change when the descriptor fields change, case when the
+     * {@link #convert} method will be called upon loading of persisted capability configuration.
+     *
+     * @return version
+     */
+    int version();
+
+    /**
+     * Converts capability properties from one version to another. The method is called upon loading of capability, in
+     * case that the persisted version differ from {@link #version}.
+     *
+     * @param properties  to be converted
+     * @param fromVersion version of capability properties to be converted
+     * @return converted
+     */
+    Map<String, String> convert( Map<String, String> properties, int fromVersion );
 
 }

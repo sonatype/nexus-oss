@@ -278,6 +278,7 @@ public class DefaultCapabilityStorage
         }
 
         return new CapabilityStorageItem(
+            capability.getVersion(),
             capabilityIdentity( capability.getId() ),
             capabilityType( capability.getTypeId() ),
             capability.isEnabled(),
@@ -289,6 +290,7 @@ public class DefaultCapabilityStorage
     private CCapability asCCapability( final CapabilityStorageItem item )
     {
         final CCapability capability = new CCapability();
+        capability.setVersion( item.version() );
         capability.setId( item.id().toString() );
         capability.setTypeId( item.type().toString() );
         capability.setEnabled( item.isEnabled() );

@@ -23,6 +23,7 @@ import static org.sonatype.nexus.plugins.capabilities.test.helper.TouchTestCapab
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -87,6 +88,18 @@ public class TouchTestCapabilityDescriptor
     public String about()
     {
         return "What about me?";
+    }
+
+    @Override
+    public int version()
+    {
+        return 1;
+    }
+
+    @Override
+    public Map<String, String> convert( final Map<String, String> properties, final int fromVersion )
+    {
+        return properties;
     }
 
 }
