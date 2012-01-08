@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
+import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 
 public class CompositeCapability
     extends CapabilitySupport
@@ -42,6 +43,16 @@ public class CompositeCapability
     public void remove( final Capability capability )
     {
         capabilities.remove( capability );
+    }
+
+    @Override
+    public void init( final CapabilityContext context )
+    {
+        super.init( context );
+        for ( final Capability capability : capabilities )
+        {
+            capability.init( context );
+        }
     }
 
     @Override
