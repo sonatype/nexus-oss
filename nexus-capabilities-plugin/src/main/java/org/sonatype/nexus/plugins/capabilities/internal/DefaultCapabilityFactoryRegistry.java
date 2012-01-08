@@ -28,6 +28,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
@@ -47,9 +49,13 @@ class DefaultCapabilityFactoryRegistry
 
     private final Map<CapabilityType, CapabilityFactory> factories;
 
+    private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
+
     @Inject
-    DefaultCapabilityFactoryRegistry( final Map<String, CapabilityFactory> factories )
+    DefaultCapabilityFactoryRegistry( final Map<String, CapabilityFactory> factories,
+                                      final CapabilityDescriptorRegistry capabilityDescriptorRegistry )
     {
+        this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
         this.factories = Maps.newHashMap();
         if ( factories != null )
         {
@@ -87,7 +93,16 @@ class DefaultCapabilityFactoryRegistry
     @Override
     public CapabilityFactory get( final CapabilityType type )
     {
-        return factories.get( type );
+        CapabilityFactory factory = factories.get( type );
+        if ( factory == null )
+        {
+            final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( type );
+            if ( descriptor != null && descriptor instanceof CapabilityFactory )
+            {
+                factory = (CapabilityFactory) descriptor;
+            }
+        }
+        return factory;
     }
 
 }
