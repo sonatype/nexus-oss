@@ -18,8 +18,6 @@
  */
 package org.sonatype.nexus.plugins.capabilities;
 
-import java.util.Map;
-
 public interface Capability
 {
 
@@ -44,10 +42,9 @@ public interface Capability
      * in an invalid state.
      * Any further interaction with this capability will result in an {@link IllegalStateException}.
      *
-     * @param properties capability configuration
      * @throws Exception If capability cannot be create
      */
-    void onCreate( Map<String, String> properties )
+    void onCreate()
         throws Exception;
 
     /**
@@ -57,10 +54,9 @@ public interface Capability
      * in an invalid state.
      * Any further interaction with this capability will result in an {@link IllegalStateException}.
      *
-     * @param properties capability configuration
      * @throws Exception If capability cannot be loaded
      */
-    void onLoad( Map<String, String> properties )
+    void onLoad()
         throws Exception;
 
     /**
@@ -69,10 +65,9 @@ public interface Capability
      * If an exception occurs, during invocation of this method, the exception will be ignored and capability, if
      * active, will be automatically passivated.
      *
-     * @param properties capability configuration
      * @throws Exception If capability cannot be updated
      */
-    void onUpdate( Map<String, String> properties )
+    void onUpdate()
         throws Exception;
 
     /**

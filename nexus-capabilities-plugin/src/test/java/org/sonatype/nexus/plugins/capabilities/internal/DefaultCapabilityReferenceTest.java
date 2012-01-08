@@ -40,7 +40,6 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.eventbus.NexusEventBus;
@@ -330,7 +329,7 @@ public class DefaultCapabilityReferenceTest
         final HashMap<String, String> properties = new HashMap<String, String>();
         properties.put( "p", "p" );
         final HashMap<String, String> previousProperties = new HashMap<String, String>();
-        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).onUpdate( properties );
+        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).onUpdate();
         doThrow( new AssertionError( "Passivate not expected to be called" ) ).when( capability ).onPassivate();
 
         underTest.enable();
@@ -338,7 +337,7 @@ public class DefaultCapabilityReferenceTest
         assertThat( underTest.isActive(), is( false ) );
 
         underTest.update( properties, previousProperties );
-        verify( capability ).onUpdate( properties );
+        verify( capability ).onUpdate();
         assertThat( underTest.isEnabled(), is( true ) );
         assertThat( underTest.isActive(), is( false ) );
     }
@@ -355,7 +354,7 @@ public class DefaultCapabilityReferenceTest
         final HashMap<String, String> properties = new HashMap<String, String>();
         properties.put( "p", "p" );
         final HashMap<String, String> previousProperties = new HashMap<String, String>();
-        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).onUpdate( properties );
+        doThrow( new UnsupportedOperationException( "Expected" ) ).when( capability ).onUpdate();
 
         underTest.enable();
         underTest.activate();
@@ -363,7 +362,7 @@ public class DefaultCapabilityReferenceTest
         assertThat( underTest.isActive(), is( true ) );
 
         underTest.update( properties, previousProperties );
-        verify( capability ).onUpdate( properties );
+        verify( capability ).onUpdate();
         assertThat( underTest.isEnabled(), is( true ) );
         assertThat( underTest.isActive(), is( false ) );
         verify( capability ).onPassivate();
@@ -379,7 +378,7 @@ public class DefaultCapabilityReferenceTest
 
         throws Exception
     {
-        verify( capability ).onCreate( Matchers.<Map<String, String>>any() );
+        verify( capability ).onCreate();
     }
 
     /**
@@ -405,7 +404,7 @@ public class DefaultCapabilityReferenceTest
         final HashMap<String, String> properties = new HashMap<String, String>();
         underTest.load( properties );
 
-        verify( capability ).onLoad( properties );
+        verify( capability ).onLoad();
     }
 
     /**
@@ -421,7 +420,7 @@ public class DefaultCapabilityReferenceTest
         properties.put( "p", "p" );
         final HashMap<String, String> previousProperties = new HashMap<String, String>();
         underTest.update( properties, previousProperties );
-        verify( capability ).onUpdate( properties );
+        verify( capability ).onUpdate();
 
         verify( eventBus, times( 2 ) ).post( re.capture() );
         assertThat( re.getAllValues().get( 0 ), is( instanceOf( CapabilityEvent.BeforeUpdate.class ) ) );
@@ -441,9 +440,7 @@ public class DefaultCapabilityReferenceTest
     {
         final HashMap<String, String> properties = new HashMap<String, String>();
         final HashMap<String, String> previousProperties = new HashMap<String, String>();
-        doThrow( new AssertionError( "Update not expected to be called" ) ).when( capability ).onUpdate(
-            Matchers.<Map<String, String>>any()
-        );
+        doThrow( new AssertionError( "Update not expected to be called" ) ).when( capability ).onUpdate();
         underTest.update( properties, previousProperties );
     }
 

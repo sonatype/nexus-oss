@@ -92,6 +92,7 @@ public class DefaultCapabilityReference
         this.type = checkNotNull( type );
         this.descriptor = checkNotNull( descriptor );
         this.capability = checkNotNull( capability );
+        capabilityProperties = EMPTY_MAP;
 
         state = new NewState();
         stateLock = new ReentrantReadWriteLock();
@@ -333,7 +334,7 @@ public class DefaultCapabilityReference
         try
         {
             stateLock.readLock().lock();
-            return state.properties();
+            return capabilityProperties;
         }
         finally
         {
@@ -425,11 +426,6 @@ public class DefaultCapabilityReference
             throw new IllegalStateException( "State '" + toString() + "' does not permit 'passivate' operation" );
         }
 
-        public Map<String, String> properties()
-        {
-            return EMPTY_MAP;
-        }
-
         public void create( final Map<String, String> properties )
         {
             throw new IllegalStateException( "State '" + toString() + "' does not permit 'create' operation" );
@@ -478,7 +474,7 @@ public class DefaultCapabilityReference
             try
             {
                 capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap( newHashMap( properties ) );
-                capability.onCreate( properties );
+                capability.onCreate();
                 resetLastException();
                 validityHandler.bind();
                 state = new ValidState();
@@ -499,7 +495,7 @@ public class DefaultCapabilityReference
             try
             {
                 capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap( newHashMap( properties ) );
-                capability.onLoad( properties );
+                capability.onLoad();
                 resetLastException();
                 validityHandler.bind();
                 state = new ValidState();
@@ -561,7 +557,7 @@ public class DefaultCapabilityReference
                     new CapabilityEvent.BeforeUpdate( capabilityRegistry, DefaultCapabilityReference.this )
                 );
                 capabilityProperties = properties == null ? EMPTY_MAP : unmodifiableMap( newHashMap( properties ) );
-                capability.onUpdate( properties );
+                capability.onUpdate();
                 resetLastException();
                 eventBus.post(
                     new CapabilityEvent.AfterUpdate( capabilityRegistry, DefaultCapabilityReference.this )
@@ -600,12 +596,6 @@ public class DefaultCapabilityReference
                     "Could not remove capability {} ({})", new Object[]{ capability, id, e }
                 );
             }
-        }
-
-        @Override
-        public Map<String, String> properties()
-        {
-            return capabilityProperties;
         }
 
         @Override

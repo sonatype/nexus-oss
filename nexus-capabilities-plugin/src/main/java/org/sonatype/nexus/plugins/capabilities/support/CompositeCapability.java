@@ -20,7 +20,6 @@ package org.sonatype.nexus.plugins.capabilities.support;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
@@ -48,32 +47,32 @@ public class CompositeCapability
     }
 
     @Override
-    public void onCreate( final Map<String, String> properties )
+    public void onCreate()
         throws Exception
     {
         for ( final Capability capability : capabilities )
         {
-            capability.onCreate( properties );
+            capability.onCreate();
         }
     }
 
     @Override
-    public void onLoad( final Map<String, String> properties )
+    public void onLoad()
         throws Exception
     {
         for ( final Capability capability : capabilities )
         {
-            capability.onLoad( properties );
+            capability.onLoad();
         }
     }
 
     @Override
-    public void onUpdate( final Map<String, String> properties )
+    public void onUpdate()
         throws Exception
     {
         for ( final Capability capability : capabilities )
         {
-            capability.onUpdate( properties );
+            capability.onUpdate();
         }
     }
 

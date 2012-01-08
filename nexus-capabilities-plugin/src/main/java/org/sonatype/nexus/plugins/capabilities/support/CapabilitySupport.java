@@ -20,8 +20,6 @@ package org.sonatype.nexus.plugins.capabilities.support;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Map;
-
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
@@ -52,21 +50,21 @@ public abstract class CapabilitySupport
     }
 
     @Override
-    public void onCreate( final Map<String, String> properties )
+    public void onCreate()
         throws Exception
     {
         // do nothing
     }
 
     @Override
-    public void onLoad( final Map<String, String> properties )
+    public void onLoad()
         throws Exception
     {
         // do nothing
     }
 
     @Override
-    public void onUpdate( final Map<String, String> properties )
+    public void onUpdate()
         throws Exception
     {
         // do nothing
