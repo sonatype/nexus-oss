@@ -21,6 +21,7 @@ package org.sonatype.nexus.plugins.capabilities.support;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
@@ -105,6 +106,30 @@ public abstract class CapabilityDescriptorSupport
     public boolean isHidden()
     {
         return false;
+    }
+
+    /**
+     * Return 1.
+     *
+     * @return 1
+     */
+    @Override
+    public int version()
+    {
+        return 1;
+    }
+
+    /**
+     * No conversion.
+     *
+     * @param properties  to be converted
+     * @param fromVersion version of capability properties to be converted
+     * @return same properties as passed in
+     */
+    @Override
+    public Map<String, String> convert( final Map<String, String> properties, final int fromVersion )
+    {
+        return properties;
     }
 
 }
