@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2MetadataGeneratorCapability.TYPE_ID;
 
 import javax.inject.Inject;
@@ -27,6 +28,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
+import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 
 @Named( TYPE_ID )
@@ -37,16 +39,20 @@ public class P2MetadataGeneratorCapabilityFactory
 
     private final P2MetadataGenerator service;
 
+    private final Conditions conditions;
+
     @Inject
-    P2MetadataGeneratorCapabilityFactory( final P2MetadataGenerator service )
+    P2MetadataGeneratorCapabilityFactory( final P2MetadataGenerator service,
+                                          final Conditions conditions )
     {
         this.service = service;
+        this.conditions = checkNotNull( conditions );
     }
 
     @Override
     public Capability create( CapabilityContext context )
     {
-        return new P2MetadataGeneratorCapability( context, service );
+        return new P2MetadataGeneratorCapability( context, service, conditions );
     }
 
 }

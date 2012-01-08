@@ -18,10 +18,14 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Map;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
+import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
+import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
 
@@ -33,49 +37,35 @@ public class P2MetadataGeneratorCapability
 
     private final P2MetadataGenerator service;
 
+    private final Conditions conditions;
+
     private P2MetadataGeneratorConfiguration configuration;
 
     public P2MetadataGeneratorCapability( final CapabilityContext context,
-                                          final P2MetadataGenerator service )
+                                          final P2MetadataGenerator service,
+                                          final Conditions conditions )
     {
         super( context );
-        this.service = service;
+        this.service = checkNotNull( service );
+        this.conditions = checkNotNull( conditions );
     }
 
     @Override
-    public void create( final Map<String, String> properties )
-    {
-        configuration = createConfiguration( properties );
-    }
-
-    @Override
-    public void load( final Map<String, String> properties )
-    {
-        create( properties );
-    }
-
-    @Override
-    public void update( final Map<String, String> properties )
-    {
-        final P2MetadataGeneratorConfiguration newConfiguration = createConfiguration( properties );
-        if ( !configuration.equals( newConfiguration ) )
-        {
-            passivate();
-            configuration = newConfiguration;
-            activate();
-        }
-    }
-
-    @Override
-    public void activate()
+    public void onActivate()
     {
         service.addConfiguration( configuration );
     }
 
     @Override
-    public void passivate()
+    public void onPassivate()
     {
         service.removeConfiguration( configuration );
+    }
+
+    @Override
+    public Condition activationCondition()
+    {
+        return conditions.capabilities().passivateCapabilityDuringUpdate( context().id() );
     }
 
     private P2MetadataGeneratorConfiguration createConfiguration( final Map<String, String> properties )

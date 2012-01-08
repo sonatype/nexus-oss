@@ -18,10 +18,14 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Map;
 
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
+import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
+import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
 
@@ -33,49 +37,36 @@ public class P2RepositoryAggregatorCapability
 
     private final P2RepositoryAggregator service;
 
+    private final Conditions conditions;
+
     private P2RepositoryAggregatorConfiguration configuration;
 
     public P2RepositoryAggregatorCapability( final CapabilityContext context,
-                                             final P2RepositoryAggregator service )
+                                             final P2RepositoryAggregator service,
+                                             final Conditions conditions )
     {
         super( context );
-        this.service = service;
+        this.service = checkNotNull( service );
+        this.conditions = checkNotNull( conditions );
     }
 
     @Override
-    public void create( final Map<String, String> properties )
+    public void onActivate()
     {
-        configuration = createConfiguration( properties );
-    }
-
-    @Override
-    public void load( final Map<String, String> properties )
-    {
-        create( properties );
-    }
-
-    @Override
-    public void update( final Map<String, String> properties )
-    {
-        final P2RepositoryAggregatorConfiguration newConfiguration = createConfiguration( properties );
-        if ( !configuration.equals( newConfiguration ) )
-        {
-            passivate();
-            configuration = newConfiguration;
-            activate();
-        }
-    }
-
-    @Override
-    public void activate()
-    {
+        configuration = createConfiguration( context().properties() );
         service.addConfiguration( configuration );
     }
 
     @Override
-    public void passivate()
+    public void onPassivate()
     {
         service.removeConfiguration( configuration );
+    }
+
+    @Override
+    public Condition activationCondition()
+    {
+        return conditions.capabilities().passivateCapabilityDuringUpdate( context().id() );
     }
 
     private P2RepositoryAggregatorConfiguration createConfiguration( final Map<String, String> properties )

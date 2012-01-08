@@ -18,6 +18,7 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapability.TYPE_ID;
 
 import javax.inject.Inject;
@@ -27,6 +28,7 @@ import javax.inject.Singleton;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
+import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 
 @Named( TYPE_ID )
@@ -37,16 +39,20 @@ public class P2RepositoryAggregatorCapabilityFactory
 
     private final P2RepositoryAggregator service;
 
+    private final Conditions conditions;
+
     @Inject
-    P2RepositoryAggregatorCapabilityFactory( final P2RepositoryAggregator service )
+    P2RepositoryAggregatorCapabilityFactory( final P2RepositoryAggregator service,
+                                             final Conditions conditions )
     {
-        this.service = service;
+        this.service = checkNotNull( service );
+        this.conditions = checkNotNull( conditions );
     }
 
     @Override
     public Capability create( final CapabilityContext context )
     {
-        return new P2RepositoryAggregatorCapability( context, service );
+        return new P2RepositoryAggregatorCapability( context, service, conditions );
     }
 
 }
