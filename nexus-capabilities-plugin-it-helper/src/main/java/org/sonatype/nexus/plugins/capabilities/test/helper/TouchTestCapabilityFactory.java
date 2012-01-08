@@ -21,9 +21,7 @@ package org.sonatype.nexus.plugins.capabilities.test.helper;
 import javax.inject.Named;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
-import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 
 @Named( TouchTestCapability.TYPE )
 public class TouchTestCapabilityFactory
@@ -31,9 +29,9 @@ public class TouchTestCapabilityFactory
 {
 
     @Override
-    public Capability create( final CapabilityContext context )
+    public Capability create()
     {
-        return new TouchTestCapability( context );
+        return new TouchTestCapability();
     }
 
 }

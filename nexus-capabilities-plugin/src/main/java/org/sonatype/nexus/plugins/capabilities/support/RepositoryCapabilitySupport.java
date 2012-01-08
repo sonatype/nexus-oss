@@ -36,7 +36,6 @@ public abstract class RepositoryCapabilitySupport
     public RepositoryCapabilitySupport( final CapabilityContext context,
                                         final RepositoryRegistry repositoryRegistry )
     {
-        super( context );
         this.repositoryRegistry = checkNotNull( repositoryRegistry, "Repository registry cannot be null" );
     }
 

@@ -149,8 +149,7 @@ public class DefaultCapabilityReferenceTest
             capabilityIdentity( "test" ),
             capabilityType( "TEST" ),
             mock( CapabilityDescriptor.class ),
-            capability,
-            mock( CapabilityContextProxy.class )
+            capability
         );
 
         underTest.create( Collections.<String, String>emptyMap() );
@@ -398,8 +397,7 @@ public class DefaultCapabilityReferenceTest
             capabilityIdentity( "test" ),
             capabilityType( "TEST" ),
             mock( CapabilityDescriptor.class ),
-            capability,
-            mock( CapabilityContextProxy.class )
+            capability
         );
         final HashMap<String, String> properties = new HashMap<String, String>();
         underTest.load( properties );

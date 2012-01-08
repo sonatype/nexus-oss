@@ -82,8 +82,7 @@ public class DefaultCapabilityReference
                                 final CapabilityIdentity id,
                                 final CapabilityType type,
                                 final CapabilityDescriptor descriptor,
-                                final Capability capability,
-                                final CapabilityContextProxy capabilityContextProxy )
+                                final Capability capability )
     {
         this.capabilityRegistry = checkNotNull( capabilityRegistry );
         this.eventBus = checkNotNull( eventBus );
@@ -99,7 +98,7 @@ public class DefaultCapabilityReference
         activationHandler = checkNotNull( activationListenerFactory ).create( this );
         validityHandler = checkNotNull( validityConditionHandlerFactory ).create( this );
 
-        capabilityContextProxy.setCapabilityContext( this );
+        capability.init( this );
     }
 
     public Capability capability()

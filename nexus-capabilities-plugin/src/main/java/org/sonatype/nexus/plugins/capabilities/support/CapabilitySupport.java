@@ -30,11 +30,12 @@ public abstract class CapabilitySupport
     implements Capability
 {
 
-    private final CapabilityContext context;
+    private CapabilityContext context;
 
-    protected CapabilitySupport( final CapabilityContext context )
+    @Override
+    public void init( final CapabilityContext context )
     {
-        this.context = checkNotNull( context, "Capability context cannot be null" );
+        this.context = checkNotNull( context );
     }
 
     @Override

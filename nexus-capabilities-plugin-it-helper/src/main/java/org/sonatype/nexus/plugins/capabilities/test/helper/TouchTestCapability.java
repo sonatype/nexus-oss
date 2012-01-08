@@ -29,11 +29,6 @@ public class TouchTestCapability
 
     public static final String TYPE = "TouchTest";
 
-    protected TouchTestCapability( final CapabilityContext context )
-    {
-        super( context );
-    }
-
     @Override
     public void onCreate()
     {

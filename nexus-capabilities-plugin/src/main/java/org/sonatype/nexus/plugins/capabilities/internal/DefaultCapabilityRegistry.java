@@ -348,14 +348,9 @@ public class DefaultCapabilityRegistry
             throw new RuntimeException( format( "No descriptor found for a capability of type %s", type ) );
         }
 
-        final CapabilityContextProxy capabilityContextProxy = new CapabilityContextProxy(
-            new UninitializedCapabilityContext( id, type, descriptor )
-        );
-        final Capability capability = factory.create( capabilityContextProxy );
+        final Capability capability = factory.create();
 
-        final DefaultCapabilityReference reference = createReference(
-            id, type, descriptor, capability, capabilityContextProxy
-        );
+        final DefaultCapabilityReference reference = createReference( id, type, descriptor, capability );
 
         references.put( id, reference );
 
@@ -370,8 +365,7 @@ public class DefaultCapabilityRegistry
     DefaultCapabilityReference createReference( final CapabilityIdentity id,
                                                 final CapabilityType type,
                                                 final CapabilityDescriptor descriptor,
-                                                final Capability capability,
-                                                final CapabilityContextProxy capabilityContextProxy )
+                                                final Capability capability )
     {
         return new DefaultCapabilityReference(
             this,
@@ -381,8 +375,7 @@ public class DefaultCapabilityRegistry
             id,
             type,
             descriptor,
-            capability,
-            capabilityContextProxy
+            capability
         );
     }
 

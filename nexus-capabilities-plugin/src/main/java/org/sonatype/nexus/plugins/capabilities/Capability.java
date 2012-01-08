@@ -22,6 +22,13 @@ public interface Capability
 {
 
     /**
+     * Initializes the capability after it has been created by factory.
+     *
+     * @param context capability context
+     */
+    void init( CapabilityContext context );
+
+    /**
      * Returns description of capability.
      *
      * @return description. Can be null.

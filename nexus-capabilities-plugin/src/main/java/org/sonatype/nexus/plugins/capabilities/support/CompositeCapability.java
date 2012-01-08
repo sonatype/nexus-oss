@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 
 public class CompositeCapability
     extends CapabilitySupport
@@ -30,9 +29,8 @@ public class CompositeCapability
 
     private final Collection<Capability> capabilities;
 
-    public CompositeCapability( final CapabilityContext context )
+    public CompositeCapability()
     {
-        super( context );
         capabilities = new ArrayList<Capability>();
     }
 

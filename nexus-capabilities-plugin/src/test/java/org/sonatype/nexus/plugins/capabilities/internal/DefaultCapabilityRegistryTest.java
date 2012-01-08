@@ -38,20 +38,17 @@ import javax.inject.Provider;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.configuration.DefaultConfigurationIdGenerator;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
-import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.ValidatorRegistry;
@@ -82,17 +79,16 @@ public class DefaultCapabilityRegistryTest
         when( validatorRegistryProvider.get() ).thenReturn( validatorRegistry );
 
         final CapabilityFactory factory = mock( CapabilityFactory.class );
-        when( factory.create( Matchers.<CapabilityContext>any() ) )
-            .thenAnswer( new Answer<Capability>()
+        when( factory.create() ).thenAnswer( new Answer<Capability>()
+        {
+            @Override
+            public Capability answer( final InvocationOnMock invocation )
+                throws Throwable
             {
-                @Override
-                public Capability answer( final InvocationOnMock invocation )
-                    throws Throwable
-                {
-                    return mock( Capability.class );
-                }
+                return mock( Capability.class );
+            }
 
-            } );
+        } );
 
         final CapabilityFactoryRegistry capabilityFactoryRegistry = mock( CapabilityFactoryRegistry.class );
         when( capabilityFactoryRegistry.get( CAPABILITY_TYPE ) ).thenReturn( factory );
