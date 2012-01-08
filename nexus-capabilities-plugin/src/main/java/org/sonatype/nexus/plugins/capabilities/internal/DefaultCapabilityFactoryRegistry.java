@@ -21,7 +21,6 @@ package org.sonatype.nexus.plugins.capabilities.internal;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.inject.name.Names.named;
 import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
-import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
 import java.util.Map;
 import javax.inject.Inject;
@@ -35,7 +34,6 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
-import com.google.common.collect.Maps;
 import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -53,7 +51,7 @@ class DefaultCapabilityFactoryRegistry
     implements CapabilityFactoryRegistry
 {
 
-    private final Map<CapabilityType, CapabilityFactory> factories;
+    private final Map<String, CapabilityFactory> factories;
 
     private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
 
@@ -66,14 +64,7 @@ class DefaultCapabilityFactoryRegistry
     {
         this.injector = checkNotNull( injector );
         this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
-        this.factories = Maps.newHashMap();
-        if ( factories != null )
-        {
-            for ( final Map.Entry<String, CapabilityFactory> entry : factories.entrySet() )
-            {
-                register( capabilityType( entry.getKey() ), entry.getValue() );
-            }
-        }
+        this.factories = checkNotNull( factories );
     }
 
     @Override
@@ -82,7 +73,7 @@ class DefaultCapabilityFactoryRegistry
         checkNotNull( factory );
         checkArgument( !factories.containsKey( type ), "Factory already registered for %s", type );
 
-        factories.put( type, factory );
+        factories.put( type.toString(), factory );
         getLogger().debug( "Added {} -> {}", type, factory );
 
         return this;
@@ -103,7 +94,7 @@ class DefaultCapabilityFactoryRegistry
     @Override
     public CapabilityFactory get( final CapabilityType type )
     {
-        CapabilityFactory factory = factories.get( type );
+        CapabilityFactory factory = factories.get( checkNotNull( type ).toString() );
         if ( factory == null )
         {
             final CapabilityDescriptor descriptor = capabilityDescriptorRegistry.get( type );
@@ -118,7 +109,7 @@ class DefaultCapabilityFactoryRegistry
                     final Provider<Capability> provider = injector.getProvider(
                         Key.get( Capability.class, named( type.toString() ) )
                     );
-                    if(provider!=null)
+                    if ( provider != null )
                     {
                         factory = new CapabilityFactory()
                         {
