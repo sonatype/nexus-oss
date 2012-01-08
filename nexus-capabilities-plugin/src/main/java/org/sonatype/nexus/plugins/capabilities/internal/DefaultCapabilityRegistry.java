@@ -415,14 +415,16 @@ public class DefaultCapabilityRegistry
     {
         final ValidationResponse vr = new ValidationResponse();
 
-        if ( capabilityFactoryRegistry.get( type ) == null )
+        if ( type == null )
         {
             vr.addValidationError( new ValidationMessage( "typeId", "Type must be provided" ) );
         }
-
-        if ( capabilityFactoryRegistry.get( type ) == null || capabilityDescriptorRegistry.get( type ) == null )
+        else
         {
-            vr.addValidationError( new ValidationMessage( "typeId", "Type '" + type + "' is not supported" ) );
+            if ( capabilityFactoryRegistry.get( type ) == null || capabilityDescriptorRegistry.get( type ) == null )
+            {
+                vr.addValidationError( new ValidationMessage( "typeId", "Type '" + type + "' is not supported" ) );
+            }
         }
 
         if ( vr.getValidationErrors().size() > 0 )

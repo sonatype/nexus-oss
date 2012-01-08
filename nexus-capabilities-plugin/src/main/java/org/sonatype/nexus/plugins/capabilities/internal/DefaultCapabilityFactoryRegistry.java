@@ -19,6 +19,7 @@
 package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.inject.name.Names.named;
 import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
 
@@ -28,12 +29,17 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import com.google.common.collect.Maps;
+import com.google.inject.ConfigurationException;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.Provider;
 
 /**
  * Default {@link CapabilityFactoryRegistry} implementation.
@@ -51,10 +57,14 @@ class DefaultCapabilityFactoryRegistry
 
     private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
 
+    private final Injector injector;
+
     @Inject
     DefaultCapabilityFactoryRegistry( final Map<String, CapabilityFactory> factories,
-                                      final CapabilityDescriptorRegistry capabilityDescriptorRegistry )
+                                      final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
+                                      final Injector injector )
     {
+        this.injector = checkNotNull( injector );
         this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
         this.factories = Maps.newHashMap();
         if ( factories != null )
@@ -100,6 +110,30 @@ class DefaultCapabilityFactoryRegistry
             if ( descriptor != null && descriptor instanceof CapabilityFactory )
             {
                 factory = (CapabilityFactory) descriptor;
+            }
+            if ( factory == null )
+            {
+                try
+                {
+                    final Provider<Capability> provider = injector.getProvider(
+                        Key.get( Capability.class, named( type.toString() ) )
+                    );
+                    if(provider!=null)
+                    {
+                        factory = new CapabilityFactory()
+                        {
+                            @Override
+                            public Capability create()
+                            {
+                                return provider.get();
+                            }
+                        };
+                    }
+                }
+                catch ( ConfigurationException ignore )
+                {
+                    // ignore
+                }
             }
         }
         return factory;

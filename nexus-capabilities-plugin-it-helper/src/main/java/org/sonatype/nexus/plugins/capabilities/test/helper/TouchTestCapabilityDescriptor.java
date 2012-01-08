@@ -19,7 +19,6 @@
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
-import static org.sonatype.nexus.plugins.capabilities.test.helper.TouchTestCapability.TYPE;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -28,14 +27,19 @@ import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
+import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilityDescriptorSupport;
 
-@Named
+@Named( TouchTestCapabilityDescriptor.TYPE_ID )
 @Singleton
 public class TouchTestCapabilityDescriptor
     extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
+
+    public static final String TYPE_ID = "TouchTest";
+
+    public static final CapabilityType TYPE = capabilityType( TYPE_ID );
 
     public static final String FIELD_REPO_OR_GROUP_ID = "repoOrGroupId";
 
@@ -51,7 +55,7 @@ public class TouchTestCapabilityDescriptor
 
     protected TouchTestCapabilityDescriptor()
     {
-        super( capabilityType( TYPE ), "Touch Test Capability", "What about me?", repoField, msgField );
+        super( TYPE, "Touch Test Capability", "What about me?", repoField, msgField );
     }
 
 }

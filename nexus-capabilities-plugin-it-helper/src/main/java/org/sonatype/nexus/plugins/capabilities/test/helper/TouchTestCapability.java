@@ -18,16 +18,16 @@
  */
 package org.sonatype.nexus.plugins.capabilities.test.helper;
 
+import javax.inject.Named;
+
 import org.sonatype.nexus.plugins.capabilities.Capability;
-import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 
+@Named( TouchTestCapabilityDescriptor.TYPE_ID )
 public class TouchTestCapability
     extends CapabilitySupport
     implements Capability
 {
-
-    public static final String TYPE = "TouchTest";
 
     @Override
     public void onCreate()
