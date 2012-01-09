@@ -536,13 +536,17 @@ public class UpdateSiteRepository
             }
 
             // update the uid
-            item.setRepositoryItemUid( createUid( localRequest.getRequestPath() ) );
+            final RepositoryItemUid newUid = createUid( localRequest.getRequestPath() );
+            if ( !newUid.equals( item.getRepositoryItemUid() ) )
+            {
+                item.setRepositoryItemUid( newUid );
 
-            // update the resource store request
-            item.setResourceStoreRequest( localRequest );
+                // update the resource store request
+                item.setResourceStoreRequest( localRequest );
 
-            // cache locally
-            doCacheItem( item );
+                // cache locally
+                doCacheItem( item );
+            }
         }
     }
 
@@ -586,14 +590,18 @@ public class UpdateSiteRepository
             }
 
             // update the uid
-            item.setRepositoryItemUid( createUid( localStoreRequest.getRequestPath() ) );
+            final RepositoryItemUid newUid = createUid( localStoreRequest.getRequestPath() );
+            if ( !newUid.equals( item.getRepositoryItemUid() ) )
+            {
+                item.setRepositoryItemUid( newUid );
 
-            // update the resource store request
-            item.setResourceStoreRequest( localStoreRequest );
+                // update the resource store request
+                item.setResourceStoreRequest( localStoreRequest );
+
+                // cache locally
+                doCacheItem( item );
+            }
         }
-
-        // cache locally
-        doCacheItem( item );
 
         return getLocalStorage().getFileFromBase( this, localStoreRequest );
     }
