@@ -19,8 +19,11 @@
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2MetadataGeneratorCapabilityDescriptor.TYPE_ID;
 
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
@@ -28,11 +31,10 @@ import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
 
+@Named( TYPE_ID )
 public class P2MetadataGeneratorCapability
     extends CapabilitySupport
 {
-
-    public static final String TYPE_ID = "p2.repository.metadata.generator";
 
     private final P2MetadataGenerator service;
 
@@ -40,6 +42,7 @@ public class P2MetadataGeneratorCapability
 
     private P2MetadataGeneratorConfiguration configuration;
 
+    @Inject
     public P2MetadataGeneratorCapability( final P2MetadataGenerator service,
                                           final Conditions conditions )
     {

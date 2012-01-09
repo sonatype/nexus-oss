@@ -19,7 +19,7 @@
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
 import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityType;
-import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapability.TYPE_ID;
+import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapabilityDescriptor.TYPE_ID;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -37,6 +37,8 @@ public class P2RepositoryAggregatorCapabilityDescriptor
     extends CapabilityDescriptorSupport
     implements CapabilityDescriptor
 {
+
+    public static final String TYPE_ID = "p2.repository.aggregator";
 
     private static final CapabilityType TYPE = capabilityType( TYPE_ID );
 

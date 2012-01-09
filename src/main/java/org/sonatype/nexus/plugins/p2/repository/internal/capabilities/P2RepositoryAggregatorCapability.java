@@ -19,8 +19,11 @@
 package org.sonatype.nexus.plugins.p2.repository.internal.capabilities;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapabilityDescriptor.TYPE_ID;
 
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
@@ -28,11 +31,10 @@ import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
 
+@Named( TYPE_ID )
 public class P2RepositoryAggregatorCapability
     extends CapabilitySupport
 {
-
-    public static final String TYPE_ID = "p2.repository.aggregator";
 
     private final P2RepositoryAggregator service;
 
@@ -40,6 +42,7 @@ public class P2RepositoryAggregatorCapability
 
     private P2RepositoryAggregatorConfiguration configuration;
 
+    @Inject
     public P2RepositoryAggregatorCapability( final P2RepositoryAggregator service,
                                              final Conditions conditions )
     {

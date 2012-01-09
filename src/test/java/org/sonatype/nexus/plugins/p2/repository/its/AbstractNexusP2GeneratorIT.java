@@ -33,8 +33,8 @@ import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregator;
 import org.sonatype.nexus.plugins.p2.repository.P2RepositoryAggregatorConfiguration;
-import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2MetadataGeneratorCapability;
-import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapability;
+import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2MetadataGeneratorCapabilityDescriptor;
+import org.sonatype.nexus.plugins.p2.repository.internal.capabilities.P2RepositoryAggregatorCapabilityDescriptor;
 
 public abstract class AbstractNexusP2GeneratorIT
     extends AbstractNexusP2IT
@@ -66,7 +66,7 @@ public abstract class AbstractNexusP2GeneratorIT
     {
         final CapabilityResource capability = new CapabilityResource();
         capability.setNotes( P2MetadataGenerator.class.getName() );
-        capability.setTypeId( P2MetadataGeneratorCapability.TYPE_ID );
+        capability.setTypeId( P2MetadataGeneratorCapabilityDescriptor.TYPE_ID );
 
         final CapabilityPropertyResource repoProp = new CapabilityPropertyResource();
         repoProp.setKey( P2MetadataGeneratorConfiguration.REPO_OR_GROUP_ID );
@@ -82,7 +82,7 @@ public abstract class AbstractNexusP2GeneratorIT
     {
         final CapabilityResource capability = new CapabilityResource();
         capability.setNotes( P2RepositoryAggregator.class.getName() );
-        capability.setTypeId( P2RepositoryAggregatorCapability.TYPE_ID );
+        capability.setTypeId( P2RepositoryAggregatorCapabilityDescriptor.TYPE_ID );
 
         final CapabilityPropertyResource repoProp = new CapabilityPropertyResource();
         repoProp.setKey( P2RepositoryAggregatorConfiguration.REPO_OR_GROUP_ID );
