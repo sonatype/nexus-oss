@@ -424,7 +424,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
               id : 'capability-show-all',
               xtype : 'checkbox',
               checked : false,
-              boxLabel : 'Show all',
+              boxLabel : 'Show advanced',
               listeners : {
                 'check' : {
                   fn : function(checkbox, checked) {
