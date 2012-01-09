@@ -22,11 +22,14 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.inject.name.Names.named;
 import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 
+import java.lang.annotation.Annotation;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.sonatype.guice.bean.locators.BeanLocator;
+import org.sonatype.inject.BeanEntry;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
@@ -35,9 +38,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityFactory;
 import org.sonatype.nexus.plugins.capabilities.CapabilityFactoryRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
 import com.google.inject.ConfigurationException;
-import com.google.inject.Injector;
 import com.google.inject.Key;
-import com.google.inject.Provider;
 
 /**
  * Default {@link CapabilityFactoryRegistry} implementation.
@@ -55,14 +56,14 @@ class DefaultCapabilityFactoryRegistry
 
     private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
 
-    private final Injector injector;
+    private final BeanLocator beanLocator;
 
     @Inject
     DefaultCapabilityFactoryRegistry( final Map<String, CapabilityFactory> factories,
                                       final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
-                                      final Injector injector )
+                                      final BeanLocator beanLocator )
     {
-        this.injector = checkNotNull( injector );
+        this.beanLocator = checkNotNull( beanLocator );
         this.capabilityDescriptorRegistry = checkNotNull( capabilityDescriptorRegistry );
         this.factories = checkNotNull( factories );
     }
@@ -106,17 +107,17 @@ class DefaultCapabilityFactoryRegistry
             {
                 try
                 {
-                    final Provider<Capability> provider = injector.getProvider(
+                    final Iterable<BeanEntry<Annotation, Capability>> entries = beanLocator.locate(
                         Key.get( Capability.class, named( type.toString() ) )
                     );
-                    if ( provider != null )
+                    if ( entries != null && entries.iterator().hasNext() )
                     {
                         factory = new CapabilityFactory()
                         {
                             @Override
                             public Capability create()
                             {
-                                return provider.get();
+                                return entries.iterator().next().getValue();
                             }
                         };
                     }
