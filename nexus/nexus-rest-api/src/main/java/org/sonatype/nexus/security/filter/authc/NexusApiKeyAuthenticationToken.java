@@ -31,7 +31,7 @@ import com.google.common.collect.ImmutableMap;
 public class NexusApiKeyAuthenticationToken
     implements HostAuthenticationToken
 {
-    private static final long serialVersionUID = 1L;
+    private Object principal;
 
     private final Map<String, char[]> keys;
 
@@ -39,28 +39,41 @@ public class NexusApiKeyAuthenticationToken
 
     public NexusApiKeyAuthenticationToken( final Map<String, char[]> keys, final String host )
     {
+        // take first key as temporary principal
+        principal = keys.keySet().iterator().next();
         this.keys = ImmutableMap.copyOf( keys );
         this.host = host;
     }
 
     public Object getPrincipal()
     {
-        return keys.keySet();
+        return principal;
     }
 
     public Object getCredentials()
     {
-        return keys.values();
-    }
-
-    public char[] getApiKey( final String hint )
-    {
-        return keys.get( hint );
+        return keys;
     }
 
     public String getHost()
     {
         return host;
+    }
+
+    /**
+     * Assigns a new account identity to the current authentication token.
+     */
+    public void setPrincipal( final Object principal )
+    {
+        this.principal = principal;
+    }
+
+    /**
+     * Returns the specific credentials submitted under the named API-Key.
+     */
+    public char[] getCredentials( final String name )
+    {
+        return keys.get( name );
     }
 
     @Override
