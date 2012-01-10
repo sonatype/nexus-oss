@@ -36,22 +36,34 @@ body {
 }
 
 #header {
-  font-family: "Trebuchet MS",verdana,lucida,arial,helvetica,sans-serif;
-  background-color: #F0F0F0;
+  font-family: verdana,"Trebuchet MS",lucida,arial,helvetica,sans-serif;
+  background-color: black;
+  background-image: url("../images/header_bg.gif");
+  background-repeat: repeat-x;
+  height: 60px; /* needs to match the height of the background image */
 }
 
 #logo {
-  color: black;
-  font-size: 10px;
+  color: white;
+  font-size: 9px;
   padding-top: 1px;
   text-align: right;
 }
 
+#logo a, a:link, a:visited, a:hover, a:active {
+     color: #336699;
+}
+
 #header div.right-side {
-  font-size: 14px;
+  font-size: 13px;
   display:block;
   text-align: right;
-  background-color: #F0F0F0;
+  color: white; /* login name color */
+  padding: 5px;
+}
+
+#head-link-r {
+     color: #FAC500;
 }
 
 #header div.left-side {
@@ -61,6 +73,11 @@ body {
 
 #config-text, #log-text {
   font-family: "Trebuchet MS",verdana,lucida,arial,helvetica,sans-serif;
+}
+
+/* background color */
+.x-border-layout-ct {
+    background: black;
 }
 
 .little-padding {
@@ -310,7 +327,7 @@ button.st-icon-refresh {
 .disable-cell {
   background-color: lightgrey !important;
 }
-
+.x-layout-split { background-color: #ECECEC;}
 .x-layout-split-north .x-layout-mini{left:48%;height:5px;width:35px;background-image:url(../images/icons/mini-top.gif);}
 .x-layout-split-south .x-layout-mini{left:48%;height:5px;width:35px;background-image:url(../images/icons/mini-bottom.gif);}
 .x-layout-split-west .x-layout-mini{top:48%;background-image:url(../images/icons/mini-left.gif);}
