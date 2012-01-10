@@ -19,8 +19,6 @@
 package org.sonatype.nexus.security.filter.authc;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -32,37 +30,33 @@ import org.apache.shiro.web.util.WebUtils;
 import org.sonatype.nexus.rest.RemoteIPFinder;
 
 /**
- * {@link AuthenticatingFilter} that looks for credentials in {@link NexusApiKey} HTTP headers.
+ * {@link AuthenticatingFilter} that looks for credentials in known {@link NexusApiKey} HTTP headers.
  */
 public class NexusApiKeyAuthenticationFilter
     extends NexusSecureHttpAuthenticationFilter
 {
-    private Collection<String> keys;
+    private Collection<String> apiKeys;
 
     @Override
     protected void onFilterConfigSet()
         throws Exception
     {
         super.onFilterConfigSet();
-        try
+        if ( null == apiKeys )
         {
-            keys = getPlexusContainer().lookupMap( NexusApiKey.class ).keySet();
-        }
-        catch ( final Exception ignore )
-        {
-            // ignore...
+            apiKeys = getPlexusContainer().lookupMap( NexusApiKey.class ).keySet();
         }
     }
 
     @Override
     protected boolean isLoginAttempt( ServletRequest request, ServletResponse response )
     {
-        if ( null != keys )
+        if ( null != apiKeys )
         {
             final HttpServletRequest http = WebUtils.toHttp( request );
-            for ( final String k : keys )
+            for ( final String key : apiKeys )
             {
-                if ( null != http.getHeader( k ) )
+                if ( null != http.getHeader( key ) )
                 {
                     return true;
                 }
@@ -74,21 +68,16 @@ public class NexusApiKeyAuthenticationFilter
     @Override
     protected AuthenticationToken createToken( final ServletRequest request, final ServletResponse response )
     {
-        if ( null != keys )
+        if ( null != apiKeys )
         {
             final HttpServletRequest http = WebUtils.toHttp( request );
-            final Map<String, char[]> credentials = new HashMap<String, char[]>();
-            for ( final String k : keys )
+            for ( final String key : apiKeys )
             {
-                final String guid = http.getHeader( k );
-                if ( null != guid )
+                final String token = http.getHeader( key );
+                if ( null != token )
                 {
-                    credentials.put( k, guid.toCharArray() );
+                    return new NexusApiKeyAuthenticationToken( key, token.toCharArray(), RemoteIPFinder.findIP( http ) );
                 }
-            }
-            if ( !credentials.isEmpty() )
-            {
-                return new NexusApiKeyAuthenticationToken( credentials, RemoteIPFinder.findIP( http ) );
             }
         }
         return super.createToken( request, response );

@@ -18,30 +18,25 @@
  */
 package org.sonatype.nexus.security.filter.authc;
 
-import java.util.Map;
-
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.HostAuthenticationToken;
 
-import com.google.common.collect.ImmutableMap;
-
 /**
- * {@link AuthenticationToken} that contains credentials from one or more API-Keys.
+ * {@link AuthenticationToken} that contains credentials from a known API-Key.
  */
 public class NexusApiKeyAuthenticationToken
     implements HostAuthenticationToken
 {
     private Object principal;
 
-    private final Map<String, char[]> credentials;
+    private final char[] credentials;
 
     private final String host;
 
-    public NexusApiKeyAuthenticationToken( final Map<String, char[]> credentials, final String host )
+    public NexusApiKeyAuthenticationToken( final Object principal, final char[] credentials, final String host )
     {
-        // take first key as temporary principal
-        principal = credentials.keySet().iterator().next();
-        this.credentials = ImmutableMap.copyOf( credentials );
+        this.principal = principal;
+        this.credentials = credentials;
         this.host = host;
     }
 
@@ -66,14 +61,6 @@ public class NexusApiKeyAuthenticationToken
     public void setPrincipal( final Object principal )
     {
         this.principal = principal;
-    }
-
-    /**
-     * Returns the specific credentials submitted under the named API-Key.
-     */
-    public char[] getCredentials( final String name )
-    {
-        return credentials.get( name );
     }
 
     @Override
