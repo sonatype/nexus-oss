@@ -54,7 +54,7 @@ public class Nexus725InitialRestClientIT
         throws Exception
     {
 
-        NexusClient client = (NexusClient) lookup( NexusClient.ROLE );
+        NexusClient client = lookup( NexusClient.class );
         TestContext context = TestContainer.getInstance().getTestContext();
         client.connect( AbstractNexusIntegrationTest.nexusBaseUrl, context.getAdminUsername(),
                         context.getAdminPassword() );
@@ -259,7 +259,7 @@ public class Nexus725InitialRestClientIT
         throws Exception
     {
 
-        NexusClient client = (NexusClient) lookup( NexusClient.ROLE );
+        NexusClient client = lookup( NexusClient.class );
         try
         {
             client.connect( "http://nexus.invalid.url/nexus", "", "" );
@@ -278,7 +278,7 @@ public class Nexus725InitialRestClientIT
     public void invalidPassword()
         throws Exception
     {
-        NexusClient client = (NexusClient) lookup( NexusClient.ROLE );
+        NexusClient client = lookup( NexusClient.class );
 
         try
         {

@@ -30,10 +30,7 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.sonatype.tests.http.server.api.ServerProvider;
 import org.sonatype.tests.http.server.fluent.Server;
-import org.sonatype.tests.http.server.jetty.behaviour.ErrorBehaviour;
-import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -57,7 +54,7 @@ public class Nexus1111ProxyRemote500ErrorIT
         downloadArtifact( "nexus1111", "artifact", "1.0", "jar", null, "target/downloads" );
 
         // stop the healthy server
-        ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE );
+        ServletServer server = lookup( ServletServer.class );
         server.stop();
 
         int port = server.getPort();

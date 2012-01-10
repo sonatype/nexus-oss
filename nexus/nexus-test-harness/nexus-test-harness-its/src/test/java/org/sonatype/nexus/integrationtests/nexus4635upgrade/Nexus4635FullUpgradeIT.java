@@ -22,13 +22,14 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
  * placing old config to force upgrade and firing up Nexus.<BR>
- * http://goo.gl/dxQbh
+ * https://issues.sonatype.org/browse/NEXUS-4635
  * 
  * <pre>
  * <firstStart>false</firstStart>
@@ -39,11 +40,10 @@ import org.testng.annotations.Test;
 public class Nexus4635FullUpgradeIT
     extends AbstractNexusIntegrationTest
 {
-
     @BeforeClass
-    public void setSecureTest()
+    protected void disableSecurity()
     {
-        this.setVerifyNexusConfigBeforeStart( false );
+        TestContainer.getInstance().getTestContext().setSecureTest( false );
     }
 
     @Test

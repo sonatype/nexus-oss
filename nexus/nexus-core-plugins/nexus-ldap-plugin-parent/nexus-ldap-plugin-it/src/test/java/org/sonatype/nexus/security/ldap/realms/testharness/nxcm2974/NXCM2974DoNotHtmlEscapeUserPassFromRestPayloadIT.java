@@ -25,8 +25,10 @@ import static org.sonatype.nexus.test.utils.ResponseMatchers.*;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
+import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
@@ -40,6 +42,16 @@ import org.testng.annotations.Test;
 public class NXCM2974DoNotHtmlEscapeUserPassFromRestPayloadIT
     extends AbstractLdapIntegrationIT
 {
+
+    /**
+     * We need a special instance of it!
+     */
+    @Override
+    protected LdapServer lookupLdapServer()
+        throws ComponentLookupException
+    {
+        return lookup( LdapServer.class, getClass().getName() );
+    }
 
     @Test
     public void testSave()

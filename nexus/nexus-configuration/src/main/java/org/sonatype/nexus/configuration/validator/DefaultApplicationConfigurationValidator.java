@@ -23,12 +23,7 @@ import java.util.Random;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationRequest;
@@ -50,10 +45,7 @@ import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
 /**
  * The default configuration validator provider. It checks the model for semantical validity.
@@ -63,7 +55,6 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
  */
 @Component( role = ApplicationConfigurationValidator.class )
 public class DefaultApplicationConfigurationValidator
-    extends AbstractLoggingComponent
     implements ApplicationConfigurationValidator
 {
     private final Random rand = new Random( System.currentTimeMillis() );
@@ -192,42 +183,6 @@ public class DefaultApplicationConfigurationValidator
         }
 
         response.append( validateSmtpConfiguration( context, model.getSmtpConfiguration() ) );
-
-        // summary
-        if ( response.getValidationErrors().size() > 0 || response.getValidationWarnings().size() > 0 )
-        {
-            getLogger().error( "* * * * * * * * * * * * * * * * * * * * * * * * * *" );
-
-            getLogger().error( "Nexus configuration has validation errors/warnings" );
-
-            getLogger().error( "* * * * * * * * * * * * * * * * * * * * * * * * * *" );
-
-            if ( response.getValidationErrors().size() > 0 )
-            {
-                getLogger().error( "The ERRORS:" );
-
-                for ( ValidationMessage msg : response.getValidationErrors() )
-                {
-                    getLogger().error( msg.toString() );
-                }
-            }
-
-            if ( response.getValidationWarnings().size() > 0 )
-            {
-                getLogger().error( "The WARNINGS:" );
-
-                for ( ValidationMessage msg : response.getValidationWarnings() )
-                {
-                    getLogger().error( msg.toString() );
-                }
-            }
-
-            getLogger().error( "* * * * * * * * * * * * * * * * * * * * *" );
-        }
-        else
-        {
-            getLogger().info( "Nexus configuration validated succesfully." );
-        }
 
         return response;
     }

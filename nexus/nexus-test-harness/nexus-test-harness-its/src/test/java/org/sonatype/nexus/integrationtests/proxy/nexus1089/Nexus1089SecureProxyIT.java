@@ -39,7 +39,7 @@ public class Nexus1089SecureProxyIT
     public void startProxy()
         throws Exception
     {
-        ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE, "secure" );
+        ServletServer server = lookup( ServletServer.class, "secure" );
         server.start();
     }
 
@@ -48,7 +48,7 @@ public class Nexus1089SecureProxyIT
     public void stopProxy()
         throws Exception
     {
-        ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE, "secure" );
+        ServletServer server = lookup( ServletServer.class, "secure" );
         server.stop();
     }
 

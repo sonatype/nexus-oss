@@ -160,6 +160,7 @@
     <!-- Logging -->
     <slf4j.version>1.6.4</slf4j.version>
     <logback.version>1.0.0</logback.version>
+    <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
 
     <aether.version>1.9</aether.version>
     <aspectj.version>1.6.11</aspectj.version>
@@ -651,7 +652,20 @@
         <type>jar</type>
         <scope>runtime</scope>
       </dependency>
-
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-slf4j-logging</artifactId>
+        <version>${plexus-slf4j-logging.version}</version>
+        <type>jar</type>
+        <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+	
       <!-- Maven -->
       <dependency>
         <groupId>org.apache.maven</groupId>

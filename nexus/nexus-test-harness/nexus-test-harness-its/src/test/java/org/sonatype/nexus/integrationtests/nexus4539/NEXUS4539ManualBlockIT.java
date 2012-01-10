@@ -42,7 +42,7 @@ public class NEXUS4539ManualBlockIT
         throws Exception
     {
         // initial status, timing out
-        waitFor( RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_AUTO );
+        waitFor( RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_AUTO, false );
 
         // set manual block
         repoUtil.setBlockProxy( REPO, true );

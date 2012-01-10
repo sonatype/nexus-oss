@@ -19,11 +19,14 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -33,14 +36,28 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
+import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
-import org.sonatype.security.SecuritySystem;
-import org.testng.Assert;
+import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
 
+import com.google.common.io.Closeables;
+import com.google.common.io.Flushables;
+
+/**
+ * This class tampers with nexus configuration files, not on the instance! It is meaningful to use it BEFORE nexus is
+ * booted (to set it up), or AFTER test is done (to verify config changes did happen), but during test the changes done
+ * by this class will be lost! (since nexus keeps config copy in memory, and on next save will simply overwrite it with
+ * own copy, or not be aware of the changes at all)
+ * 
+ * @author cstamas
+ */
 public class NexusConfigUtil
     extends ITUtil
 {
@@ -51,28 +68,127 @@ public class NexusConfigUtil
 
     private static Logger log = LoggerFactory.getLogger( NexusConfigUtil.class );
 
+    /**
+     * Loads (and upgrades) nexus.xml on the fly. Warning: this method brings up a LOT of Nexus internals! Use it
+     * sparingly!
+     * 
+     * @return
+     */
+    public Configuration loadAndUpgradeNexusConfiguration()
+        throws IOException
+    {
+        try
+        {
+            NexusConfiguration nexusConfiguration;
+            nexusConfiguration = getTest().getITPlexusContainer().lookup( NexusConfiguration.class );
+            nexusConfiguration.loadConfiguration( true );
+            return nexusConfiguration.getConfigurationModel();
+        }
+        catch ( Exception e )
+        {
+            throw new IOException( e );
+        }
+    }
+
+    @Deprecated
     public Configuration getNexusConfig()
         throws IOException
     {
-        // TestContainer.getInstance().getContainer().addContextValue( "nexus-work",
-        // AbstractNexusIntegrationTest.nexusWorkDir );
-        NexusConfiguration config;
+        return loadNexusConfig();
+    }
+
+    public Configuration loadNexusConfig()
+        throws IOException
+    {
+        final File nexusConfigFile = getNexusConfigurationFile();
+        final NexusConfigurationXpp3Reader reader = new NexusConfigurationXpp3Reader();
+
+        FileInputStream in = new FileInputStream( nexusConfigFile );
         try
         {
-            config = getTest().getITPlexusContainer().lookup( NexusConfiguration.class );
-            config.loadConfiguration( true );
+            return reader.read( in, false );
         }
-        catch ( Exception e )
+        catch ( XmlPullParserException e )
         {
             log.error( e.getMessage(), e );
             throw new RuntimeException( e );
         }
-        return config.getConfigurationModel();
+        finally
+        {
+            Closeables.closeQuietly( in );
+        }
     }
 
+    public void saveNexusConfig( final Configuration config )
+        throws IOException
+    {
+        // save it
+        final FileWriter fos = new FileWriter( getSecurityConfigurationFile() );
+        final NexusConfigurationXpp3Writer writer = new NexusConfigurationXpp3Writer();
+        try
+        {
+            writer.write( fos, config );
+        }
+        finally
+        {
+            Flushables.flushQuietly( fos );
+            Closeables.closeQuietly( fos );
+        }
+    }
+
+    public SecurityConfiguration loadSecurityConfig()
+        throws IOException
+    {
+        final File configFile = getSecurityConfigurationFile();
+        final SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
+
+        FileInputStream in = new FileInputStream( configFile );
+        try
+        {
+            return reader.read( in, false );
+        }
+        catch ( XmlPullParserException e )
+        {
+            log.error( e.getMessage(), e );
+            throw new RuntimeException( e );
+        }
+        finally
+        {
+            Closeables.closeQuietly( in );
+        }
+    }
+
+    public void saveSecurityConfig( final SecurityConfiguration config )
+        throws IOException
+    {
+        // save it
+        final FileWriter fos = new FileWriter( getSecurityConfigurationFile() );
+        final SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
+        try
+        {
+            writer.write( fos, config );
+        }
+        finally
+        {
+            Flushables.flushQuietly( fos );
+            Closeables.closeQuietly( fos );
+        }
+    }
+
+    @Deprecated
     public static File getNexusFile()
     {
+        return getNexusConfigurationFile();
+    }
+
+    public static File getNexusConfigurationFile()
+    {
         return new File( AbstractNexusIntegrationTest.WORK_CONF_DIR, "nexus.xml" );
+    }
+
+    public static File getSecurityConfigurationFile()
+    {
+        return new File( AbstractNexusIntegrationTest.WORK_CONF_DIR, "security-configuration.xml" );
     }
 
     public CPathMappingItem getRoute( String id )
@@ -94,9 +210,15 @@ public class NexusConfigUtil
     }
 
     public void enableSecurity( boolean enabled )
-        throws Exception
+        throws IOException
     {
-        getTest().getITPlexusContainer().lookup( SecuritySystem.class ).setSecurityEnabled( enabled );
+        SecurityConfiguration config = loadSecurityConfig();
+
+        if ( enabled != config.isEnabled() )
+        {
+            config.setEnabled( enabled );
+            saveSecurityConfig( config );
+        }
     }
 
     public CRepository getRepo( String repoId )
