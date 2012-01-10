@@ -90,6 +90,7 @@
               <exclude>**/ext-2.3/**</exclude>
               <exclude>**/js/filetree/**</exclude>
               <exclude>**/editarea_0_8_2/**</exclude>
+              <exclude>**/org/sonatype/security/ldap/dao/password/hash/MD5Crypt.java</exclude>
               <!-- FIXME is this really a good idea excluding all test resources? -->
               <exclude>**/src/test/resources/**</exclude>
               <exclude>**/nexus/nexus-test-harness/nexus-test-harness-its/resources/**</exclude>
