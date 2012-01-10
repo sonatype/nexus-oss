@@ -1,15 +1,18 @@
 package de.is24.nexus.yum.service.impl;
 
 import static java.lang.String.format;
+
 import java.io.File;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.scheduling.ScheduledTask;
+
 import de.is24.nexus.yum.plugin.impl.MavenRepositoryInfo;
 import de.is24.nexus.yum.repository.RepositoryRpmGenerator;
 import de.is24.nexus.yum.repository.YumRepository;
@@ -90,6 +93,9 @@ public class DefaultRepositoryRpmManager implements RepositoryRpmManager {
       log.info("Generating RPM for repository '{}' and version '{}'", repositoryId, version);
       new RepositoryRpmGenerator(restApiSettings.getBaseUrl(), repositoryId, version, getRpmCacheDir())
       .generateReleaseRpm();
+    } catch (ArrayIndexOutOfBoundsException e) {
+      log.warn("Could not create RPM repository, because repositoryId and version were too long. Were {}, message : {} ", repositoryId
+          + "-" + version, e.getMessage());
     } catch (Exception e) {
       log.error("Could not create RPM for repository '" + repositoryId + "' and version '" + version + "'.", e);
     }

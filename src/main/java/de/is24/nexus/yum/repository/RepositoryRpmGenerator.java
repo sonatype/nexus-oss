@@ -2,16 +2,18 @@ package de.is24.nexus.yum.repository;
 
 import static java.io.File.createTempFile;
 import static java.lang.String.format;
+import static java.net.InetAddress.getLocalHost;
 import static org.freecompany.redline.header.Architecture.NOARCH;
 import static org.freecompany.redline.header.Os.LINUX;
 import static org.freecompany.redline.header.RpmType.BINARY;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
+
 import org.apache.commons.io.IOUtils;
 import org.freecompany.redline.Builder;
 import org.slf4j.Logger;
@@ -50,7 +52,7 @@ public class RepositoryRpmGenerator {
     rpmBuilder.setSummary(format(SUMMARY_TEMPLATE, repositoryId, version));
     rpmBuilder.setDescription(format(DESCRIPTION_TEMPLATE, repositoryId, version));
     try {
-      rpmBuilder.setBuildHost(InetAddress.getLocalHost().getHostName());
+      rpmBuilder.setBuildHost(getLocalHost().getHostName());
     } catch (UnknownHostException e) {
       throw new RuntimeException("Could not determine hostname.", e);
     }
