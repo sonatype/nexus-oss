@@ -62,8 +62,7 @@ Sonatype.view = {
     Sonatype.view.headerPanel = new Ext.Panel({
           contentEl : 'header',
           region : 'north',
-          margins : '5 5 5 5',
-          bodyStyle : 'background-color: #F0F0F0;',
+          margins : '0 0 0 0',
           border : false,
           autoHeight : true
         });

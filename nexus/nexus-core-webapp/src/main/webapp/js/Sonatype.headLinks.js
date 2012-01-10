@@ -58,7 +58,6 @@ Ext.apply(Sonatype.headLinks.prototype, {
         linkEl.update('Log Out');
         this.setClickLink(linkEl);
         linkEl.setStyle({
-              'color' : '#15428B',
               'cursor' : 'pointer',
               'text-align' : 'right'
             });
@@ -75,7 +74,6 @@ Ext.apply(Sonatype.headLinks.prototype, {
         linkEl.update('Log In');
         this.setClickLink(linkEl);
         linkEl.setStyle({
-              'color' : '#15428B',
               'cursor' : 'pointer',
               'text-align' : 'right'
             });
