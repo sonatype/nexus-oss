@@ -50,12 +50,16 @@ body {
   text-align: right;
 }
 
+#logo a, a:link, a:visited, a:hover, a:active {
+     color: #336699;
+}
+
 #header div.right-side {
-  font-size: 14px;
+  font-size: 13px;
   display:block;
   text-align: right;
   color: white; /* login name color */
-  padding: 10px;
+  padding: 5px;
 }
 
 #head-link-r {
