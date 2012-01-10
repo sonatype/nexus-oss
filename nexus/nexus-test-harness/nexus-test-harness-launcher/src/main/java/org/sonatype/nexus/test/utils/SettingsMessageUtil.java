@@ -31,6 +31,7 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.google.common.base.Preconditions;
 import com.thoughtworks.xstream.XStream;
+
 public class SettingsMessageUtil
 {
     private static XStream xstream;
@@ -43,55 +44,57 @@ public class SettingsMessageUtil
     public static GlobalConfigurationResource getCurrentSettings()
         throws IOException
     {
-        return getData(new GlobalConfigurationResourceResponse());
+        return getData( new GlobalConfigurationResourceResponse() );
     }
 
-    public static GlobalConfigurationResource getData(final GlobalConfigurationResourceResponse wrapper)
+    public static GlobalConfigurationResource getData( final GlobalConfigurationResourceResponse wrapper )
         throws IOException
     {
-        Preconditions.checkNotNull(wrapper);
+        Preconditions.checkNotNull( wrapper );
         String responseText = RequestFacade.doGetForText( "service/local/global_settings/current" );
-        final XStreamRepresentation rep = new XStreamRepresentation(xstream, responseText, MediaType.APPLICATION_XML);
-        final GlobalConfigurationResourceResponse configResponse = (GlobalConfigurationResourceResponse) rep.getPayload( wrapper );
+        final XStreamRepresentation rep = new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
+        final GlobalConfigurationResourceResponse configResponse =
+            (GlobalConfigurationResourceResponse) rep.getPayload( wrapper );
         return configResponse.getData();
     }
 
     public static Status save( final GlobalConfigurationResource globalConfig )
         throws IOException
     {
-        Preconditions.checkNotNull(globalConfig);
-        final GlobalConfigurationResourceResponse configResponse = wrapData(globalConfig);
+        Preconditions.checkNotNull( globalConfig );
+        final GlobalConfigurationResourceResponse configResponse = wrapData( globalConfig );
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
         representation.setPayload( configResponse );
-        return RequestFacade.doPutForStatus("service/local/global_settings/current", representation, null);
+        return RequestFacade.doPutForStatus( "service/local/global_settings/current", representation, null );
     }
 
-    public static Status save( final SmtpSettingsResource smtpSettings)
+    public static Status save( final SmtpSettingsResource smtpSettings )
         throws IOException
     {
         String serviceURI = "service/local/check_smtp_settings/";
-        SmtpSettingsResourceRequest configResponse = wrapData(smtpSettings);
+        SmtpSettingsResourceRequest configResponse = wrapData( smtpSettings );
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
         representation.setPayload( configResponse );
-        return RequestFacade.doPutForStatus("service/local/check_smtp_settings/", representation, null);
+        return RequestFacade.doPutForStatus( "service/local/check_smtp_settings/", representation, null );
     }
 
     /**
      * Wrap a {@link GlobalConfigurationResource} in a {@link GlobalConfigurationResourceResponse} and return it.
+     * 
      * @param resource the resource to wrap
      * @return a wrapper containing the resource
      */
-    public static GlobalConfigurationResourceResponse wrapData( final GlobalConfigurationResource resource)
+    public static GlobalConfigurationResourceResponse wrapData( final GlobalConfigurationResource resource )
     {
-        Preconditions.checkNotNull(resource);
+        Preconditions.checkNotNull( resource );
         final GlobalConfigurationResourceResponse wrapper = new GlobalConfigurationResourceResponse();
         wrapper.setData( resource );
         return wrapper;
     }
 
-    public static SmtpSettingsResourceRequest wrapData( final SmtpSettingsResource resource)
+    public static SmtpSettingsResourceRequest wrapData( final SmtpSettingsResource resource )
     {
-        Preconditions.checkNotNull(resource);
+        Preconditions.checkNotNull( resource );
         final SmtpSettingsResourceRequest wrapper = new SmtpSettingsResourceRequest();
         wrapper.setData( resource );
         return wrapper;

@@ -49,7 +49,7 @@ public class Nexus3638IndexProxiedMavenPluginIT
     public void start()
         throws Exception
     {
-        server = (ControlledServer) lookup( ControlledServer.ROLE );
+        server = lookup( ControlledServer.class );
         server.addServer( "nexus3638", getTestFile( "repo" ), 10 );
         server.start();
     }

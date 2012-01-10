@@ -24,29 +24,44 @@ import java.util.HashMap;
 
 public class TestContext
 {
+    private boolean secureTest;
 
-    private boolean secureTest = false;
+    private String username;
 
-    private String username = "admin";
+    private String password;
 
-    private String password = "admin123";
+    private String adminUsername;
 
-    private String adminUsername = "admin";
+    private String adminPassword;
 
-    private String adminPassword = "admin123";
-
-    private boolean useAdminForRequests = true;
-    
     private String nexusUrl;
 
-    private HashMap<String, Object> map = new HashMap<String, Object>();
+    private final HashMap<String, Object> map;
 
-    public Object getObject( String key )
+    public TestContext()
+    {
+        map = new HashMap<String, Object>();
+        // nexusUrl is set only once, it does not change (for now)
+        nexusUrl = null;
+        reset();
+    }
+
+    public void reset()
+    {
+        secureTest = false;
+        adminUsername = "admin";
+        adminPassword = "admin123";
+        username = adminUsername;
+        password = adminPassword;
+        map.clear();
+    }
+
+    public Object getObject( final String key )
     {
         return map.get( key );
     }
 
-    public boolean getBoolean( String key )
+    public boolean getBoolean( final String key )
     {
         if ( map.containsKey( key ) )
         {
@@ -56,7 +71,7 @@ public class TestContext
         return false;
     }
 
-    public void put( String key, Object value )
+    public void put( final String key, final Object value )
     {
         this.map.put( key, value );
     }
@@ -66,7 +81,7 @@ public class TestContext
         return secureTest;
     }
 
-    public TestContext setSecureTest( boolean secureTest )
+    public TestContext setSecureTest( final boolean secureTest )
     {
         this.secureTest = secureTest;
         return this;
@@ -77,7 +92,7 @@ public class TestContext
         return username;
     }
 
-    public TestContext setUsername( String username )
+    public TestContext setUsername( final String username )
     {
         this.username = username;
         return this;
@@ -88,7 +103,7 @@ public class TestContext
         return password;
     }
 
-    public TestContext setPassword( String password )
+    public TestContext setPassword( final String password )
     {
         this.password = password;
         return this;
@@ -99,7 +114,7 @@ public class TestContext
         return adminUsername;
     }
 
-    public TestContext setAdminUsername( String adminUsername )
+    public TestContext setAdminUsername( final String adminUsername )
     {
         this.adminUsername = adminUsername;
         return this;
@@ -110,7 +125,7 @@ public class TestContext
         return adminPassword;
     }
 
-    public TestContext setAdminPassword( String adminPassword )
+    public TestContext setAdminPassword( final String adminPassword )
     {
         this.adminPassword = adminPassword;
         return this;

@@ -42,7 +42,6 @@ public class Nexus652Beta5To10UpgradeIT
     @BeforeClass
     public void setSecureTest()
     {
-        this.setVerifyNexusConfigBeforeStart( false );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -55,7 +54,8 @@ public class Nexus652Beta5To10UpgradeIT
         SecurityConfigurationSource securitySource = lookup( SecurityConfigurationSource.class, "file" );
         SecurityConfiguration securityConfig = securitySource.loadConfiguration();
 
-        Configuration nexusConfig = getNexusConfigUtil().getNexusConfig();
+        // we need this to have access to uncrypted password (see assertion below)
+        Configuration nexusConfig = getNexusConfigUtil().loadAndUpgradeNexusConfiguration();
 
         Assert.assertEquals( nexusConfig.getSmtpConfiguration().getHostname(), "foo.org", "Smtp host:" );
         Assert.assertEquals( nexusConfig.getSmtpConfiguration().getPassword(), "now", "Smtp password:" );
