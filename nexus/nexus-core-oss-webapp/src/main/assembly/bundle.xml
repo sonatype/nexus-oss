@@ -83,7 +83,7 @@
   <dependencySets>
     <dependencySet>
       <includes>
-        <include>*:nexus-webapp:war</include>
+        <include>*:nexus-core-webapp:war</include>
       </includes>
       <useProjectArtifact>false</useProjectArtifact>
       <unpack>true</unpack>
