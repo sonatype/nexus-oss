@@ -19,7 +19,7 @@
 package org.sonatype.nexus.proxy.events;
 
 /**
- * The event that is occured when nexus has been stopped (fired as first step of shotdown process).
+ * The event that is occured when nexus has been stopped (fired as first step of shutdown process).
  * 
  * @author cstamas
  */

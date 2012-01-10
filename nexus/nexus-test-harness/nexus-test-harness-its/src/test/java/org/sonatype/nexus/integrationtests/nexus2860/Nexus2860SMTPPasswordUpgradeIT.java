@@ -30,7 +30,8 @@ public class Nexus2860SMTPPasswordUpgradeIT
     public void upgradeSmtp()
         throws Exception
     {
-        String pw = getNexusConfigUtil().getNexusConfig().getSmtpConfiguration().getPassword();
+        // we need this to have access to uncrypted password (see assertion below)
+        String pw = getNexusConfigUtil().loadAndUpgradeNexusConfiguration().getSmtpConfiguration().getPassword();
         // ensuring it wasn't encrypted twice
         Assert.assertEquals( "IT-password", pw );
     }

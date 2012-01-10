@@ -41,7 +41,7 @@ public abstract class AbstractNexusWebProxyIntegrationTest
     public void startWebProxy()
         throws Exception
     {
-        server = (ProxyServer) lookup( ProxyServer.ROLE );
+        server = lookup( ProxyServer.class );
         server.start();
     }
 
