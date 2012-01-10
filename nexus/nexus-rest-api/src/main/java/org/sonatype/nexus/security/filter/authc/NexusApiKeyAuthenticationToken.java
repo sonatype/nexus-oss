@@ -33,15 +33,15 @@ public class NexusApiKeyAuthenticationToken
 {
     private Object principal;
 
-    private final Map<String, char[]> keys;
+    private final Map<String, char[]> credentials;
 
     private final String host;
 
-    public NexusApiKeyAuthenticationToken( final Map<String, char[]> keys, final String host )
+    public NexusApiKeyAuthenticationToken( final Map<String, char[]> credentials, final String host )
     {
         // take first key as temporary principal
-        principal = keys.keySet().iterator().next();
-        this.keys = ImmutableMap.copyOf( keys );
+        principal = credentials.keySet().iterator().next();
+        this.credentials = ImmutableMap.copyOf( credentials );
         this.host = host;
     }
 
@@ -52,7 +52,7 @@ public class NexusApiKeyAuthenticationToken
 
     public Object getCredentials()
     {
-        return keys;
+        return credentials;
     }
 
     public String getHost()
@@ -73,7 +73,7 @@ public class NexusApiKeyAuthenticationToken
      */
     public char[] getCredentials( final String name )
     {
-        return keys.get( name );
+        return credentials.get( name );
     }
 
     @Override

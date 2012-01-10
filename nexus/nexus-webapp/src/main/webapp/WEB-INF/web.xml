@@ -89,6 +89,8 @@
         contentTperms.pathReplacement = @1
 
         authcApiKey = org.sonatype.nexus.security.filter.authc.NexusApiKeyAuthenticationFilter
+        authcApiKey.applicationName = Sonatype Nexus Repository Manager API (X-...-ApiKey auth)
+        authcApiKey.fakeAuthScheme = false
       </param-value>
     </init-param>
   </filter>

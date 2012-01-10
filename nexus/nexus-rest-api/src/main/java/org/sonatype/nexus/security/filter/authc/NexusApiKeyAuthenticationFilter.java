@@ -26,34 +26,18 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.HostAuthenticationToken;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
 import org.apache.shiro.web.util.WebUtils;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.PlexusContainer;
-import org.sonatype.nexus.auth.ClientInfo;
-import org.sonatype.nexus.auth.NexusAuthenticationEvent;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.rest.RemoteIPFinder;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 /**
  * {@link AuthenticatingFilter} that looks for credentials in {@link NexusApiKey} HTTP headers.
  */
 public class NexusApiKeyAuthenticationFilter
-    extends AuthenticatingFilter
+    extends NexusSecureHttpAuthenticationFilter
 {
-    private PlexusContainer container;
-
-    private ApplicationEventMulticaster multicaster;
-
-    private NexusConfiguration configuration;
-
-    private Collection<String> keyHints;
+    private Collection<String> keys;
 
     @Override
     protected void onFilterConfigSet()
@@ -62,10 +46,7 @@ public class NexusApiKeyAuthenticationFilter
         super.onFilterConfigSet();
         try
         {
-            container = (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
-            multicaster = container.lookup( ApplicationEventMulticaster.class );
-            configuration = container.lookup( NexusConfiguration.class );
-            keyHints = container.lookupMap( NexusApiKey.class ).keySet();
+            keys = getPlexusContainer().lookupMap( NexusApiKey.class ).keySet();
         }
         catch ( final Exception ignore )
         {
@@ -74,86 +55,42 @@ public class NexusApiKeyAuthenticationFilter
     }
 
     @Override
-    protected boolean onAccessDenied( final ServletRequest request, final ServletResponse response )
-        throws Exception
+    protected boolean isLoginAttempt( ServletRequest request, ServletResponse response )
     {
-        try
+        if ( null != keys )
         {
-            return executeLogin( request, response );
+            final HttpServletRequest http = WebUtils.toHttp( request );
+            for ( final String k : keys )
+            {
+                if ( null != http.getHeader( k ) )
+                {
+                    return true;
+                }
+            }
         }
-        catch ( final Exception ignore )
-        {
-            return false;
-        }
+        return super.isLoginAttempt( request, response );
     }
 
     @Override
     protected AuthenticationToken createToken( final ServletRequest request, final ServletResponse response )
-        throws Exception
     {
-        final HttpServletRequest http = WebUtils.toHttp( request );
-        final Map<String, char[]> keys = new HashMap<String, char[]>();
-        final String host = RemoteIPFinder.findIP( http );
-        if ( null != keyHints )
+        if ( null != keys )
         {
-            for ( final String h : keyHints )
+            final HttpServletRequest http = WebUtils.toHttp( request );
+            final Map<String, char[]> credentials = new HashMap<String, char[]>();
+            for ( final String k : keys )
             {
-                final String token = http.getHeader( h );
-                if ( null != token && token.length() > 0 )
+                final String guid = http.getHeader( k );
+                if ( null != guid )
                 {
-                    keys.put( h, token.toCharArray() );
+                    credentials.put( k, guid.toCharArray() );
                 }
             }
-        }
-        if ( keys.size() > 0 )
-        {
-            return new NexusApiKeyAuthenticationToken( keys, host );
-        }
-        if ( null != configuration && configuration.isAnonymousAccessEnabled() )
-        {
-            return new UsernamePasswordToken( configuration.getAnonymousUsername(),
-                                              configuration.getAnonymousPassword(), host );
-        }
-        return null;
-    }
-
-    @Override
-    protected boolean onLoginSuccess( final AuthenticationToken token, final Subject subject,
-                                      final ServletRequest request, final ServletResponse response )
-    {
-        return postAuthcEvent( token, WebUtils.toHttp( request ), true );
-    }
-
-    @Override
-    protected boolean onLoginFailure( final AuthenticationToken token, final AuthenticationException e,
-                                      final ServletRequest request, final ServletResponse response )
-    {
-        return postAuthcEvent( token, WebUtils.toHttp( request ), false );
-    }
-
-    private Object getAttribute( final String key )
-    {
-        return getFilterConfig().getServletContext().getAttribute( key );
-    }
-
-    private boolean postAuthcEvent( final AuthenticationToken token, final HttpServletRequest request,
-                                    final boolean success )
-    {
-        if ( null != multicaster )
-        {
-            final String host;
-            if ( token instanceof HostAuthenticationToken )
+            if ( !credentials.isEmpty() )
             {
-                host = ( (HostAuthenticationToken) token ).getHost();
+                return new NexusApiKeyAuthenticationToken( credentials, RemoteIPFinder.findIP( http ) );
             }
-            else
-            {
-                host = RemoteIPFinder.findIP( request );
-            }
-            final String agent = request.getHeader( "User-Agent" );
-            final ClientInfo info = new ClientInfo( String.valueOf( token.getPrincipal() ), host, agent );
-            multicaster.notifyEventListeners( new NexusAuthenticationEvent( this, info, success ) );
         }
-        return success;
+        return super.createToken( request, response );
     }
 }
