@@ -26,8 +26,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
@@ -62,7 +60,6 @@ public class DefaultEventInspectorHost
     @Requirement( role = EventInspector.class )
     private Map<String, EventInspector> eventInspectors;
 
-    @Inject
     public DefaultEventInspectorHost()
     {
         // direct hand-off used! Host pool will use caller thread to execute async inspectors when pool full!
