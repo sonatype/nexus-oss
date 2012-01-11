@@ -44,7 +44,7 @@ public class DefaultWastebasket
 {
     private static final String TRASH_PATH_PREFIX = "/.nexus/trash";
 
-    private static final long ALL = -1L;
+    static final long ALL = -1L;
 
     private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
@@ -161,24 +161,8 @@ public class DefaultWastebasket
     {
         ResourceStoreRequest req = new ResourceStoreRequest( getTrashPath( repository, RepositoryItemUid.PATH_ROOT ) );
 
-        if ( age == ALL )
-        {
-            // simple and fast way, no need for walker
-            try
-            {
-                repository.getLocalStorage().shredItem( repository, req );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // silent
-            }
-            catch ( UnsupportedStorageOperationException e )
-            {
-                // silent?
-            }
-        }
-        else
-        {
+        // NEXUS-4642 shall not delete the directory, since causes a problem if this has been symlinked to another
+        // directory.
             // walker and walk and changes for age
             if ( repository.getLocalStorage().containsItem( repository, req ) )
             {
@@ -193,7 +177,6 @@ public class DefaultWastebasket
 
                 getWalker().walk( ctx );
             }
-        }
     }
 
     @Override

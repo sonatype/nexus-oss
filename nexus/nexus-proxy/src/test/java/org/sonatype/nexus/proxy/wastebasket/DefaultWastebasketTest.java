@@ -105,7 +105,8 @@ public class DefaultWastebasketTest
         wastebasket.purgeAll( 1L );
 
         // NEXUS-4468 check if directories were deleted
-        assertThat( new File( repoLocation, ".nexus/trash" ), not( FileMatchers.isDirectory() ) );
+        assertThat( new File( repoLocation, ".nexus/trash" ), FileMatchers.isDirectory() );
+        assertThat( new File( repoLocation, ".nexus/trash" ), FileMatchers.isEmpty() );
     }
 
 }

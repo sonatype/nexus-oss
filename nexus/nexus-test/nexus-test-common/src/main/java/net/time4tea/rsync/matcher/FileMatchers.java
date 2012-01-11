@@ -220,4 +220,24 @@ public class FileMatchers
             }
         };
     }
+
+    public static Matcher<? super File> isEmpty()
+    {
+        return new TypeSafeMatcher<File>()
+        {
+            String[] files;
+
+            public boolean matchesSafely( File item )
+            {
+                files = item.list();
+                return files.length == 0;
+            }
+
+            public void describeTo( Description description )
+            {
+                description.appendText( " files found " );
+                description.appendValue( files );
+            }
+        };
+    }
 }
