@@ -38,7 +38,7 @@ Sonatype.Events.addListener('nexusNavigationInit', function(nexusPanel) {
         }
       },
       scope : this,
-      method : 'GET',
+      method : 'GET'
     });
   }
 });
