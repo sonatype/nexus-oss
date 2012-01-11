@@ -40,11 +40,51 @@ public class CapabilityReferenceFilterBuilder
 
         private String typeId;
 
+        private Boolean enabled;
+
+        private Boolean active;
+
         private Map<String, String> properties = new HashMap<String, String>();
 
         public CapabilityReferenceFilter withType( final CapabilityType type )
         {
             typeId = type.toString();
+            return this;
+        }
+
+        public CapabilityReferenceFilter enabled( boolean enabled )
+        {
+            this.enabled = enabled;
+            return this;
+        }
+
+        public CapabilityReferenceFilter enabled()
+        {
+            enabled = true;
+            return this;
+        }
+
+        public CapabilityReferenceFilter disabled()
+        {
+            enabled = false;
+            return this;
+        }
+
+        public CapabilityReferenceFilter active( boolean active )
+        {
+            this.active = active;
+            return this;
+        }
+
+        public CapabilityReferenceFilter active()
+        {
+            active = true;
+            return this;
+        }
+
+        public CapabilityReferenceFilter passive()
+        {
+            active = false;
             return this;
         }
 
@@ -78,6 +118,14 @@ public class CapabilityReferenceFilterBuilder
                 return false;
             }
             if ( typeId != null && !typeId.equals( input.context().type().toString() ) )
+            {
+                return false;
+            }
+            if ( enabled != null && !enabled.equals( input.context().isEnabled() ) )
+            {
+                return false;
+            }
+            if ( active != null && !active.equals( input.context().isActive() ) )
             {
                 return false;
             }
