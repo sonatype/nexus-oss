@@ -82,8 +82,8 @@ public class DefaultWastebasketTest
     }
 
     /**
-     * Tests that that empting the trash does NOT fail for an out-of-service repository.</BR> Verifies fix for:
-     * NEXUS-4554 - Out of service proxy repo appears to cause Empty Trash task to abort as BROKEN
+     * Tests that that empting the trash does NOT fail for an out-of-service repository.<BR>
+     * Verifies fix for: NEXUS-4554 - Out of service proxy repo appears to cause Empty Trash task to abort as BROKEN
      * 
      * @throws Exception
      */
