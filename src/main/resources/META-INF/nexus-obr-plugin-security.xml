@@ -24,8 +24,8 @@
   <roles>
     <role>
       <id>obr-all-read</id>
-      <name>Repo: All OBRs (Read)</name>
-      <description>Gives access to read ALL content of ALL OBRs in Nexus.</description>
+      <name>Repo: All OBR Repositories (Read)</name>
+      <description>Gives access to read ALL content of ALL OBR Repositories in Nexus.</description>
       <sessionTimeout>60</sessionTimeout>
       <privileges>
         <privilege>obr-read</privilege>
@@ -37,7 +37,7 @@
     <role>
       <id>obr-all-full</id>
       <name>Repo: All OBRs (Full Control)</name>
-      <description>Gives access to create/read/update/delete ALL content of ALL OBRs in Nexus.</description>
+      <description>Gives access to create/read/update/delete ALL content of ALL OBR Repositories in Nexus.</description>
       <sessionTimeout>60</sessionTimeout>
       <privileges>
         <privilege>obr-create</privilege>
@@ -53,7 +53,7 @@
   <privileges>
     <privilege>
       <id>obr-create</id>
-      <name>All OBRs - (create)</name>
+      <name>All OBR Repositories - (create)</name>
       <description>Give permission to create any content in any OBR.</description>
       <type>target</type>
       <properties>
@@ -77,7 +77,7 @@
     </privilege>
     <privilege>
       <id>obr-read</id>
-      <name>All OBRs - (read)</name>
+      <name>All OBR Repositories - (read)</name>
       <description>Give permission to read any content in any OBR.</description>
       <type>target</type>
       <properties>
@@ -101,7 +101,7 @@
     </privilege>
     <privilege>
       <id>obr-update</id>
-      <name>All OBRs - (update)</name>
+      <name>All OBR Repositories - (update)</name>
       <description>Give permission to update any content in any OBR.</description>
       <type>target</type>
       <properties>
@@ -125,7 +125,7 @@
     </privilege>
     <privilege>
       <id>obr-delete</id>
-      <name>All OBRs - (delete)</name>
+      <name>All OBR Repositories - (delete)</name>
       <description>Give permission to delete any content in any OBR.</description>
       <type>target</type>
       <properties>
