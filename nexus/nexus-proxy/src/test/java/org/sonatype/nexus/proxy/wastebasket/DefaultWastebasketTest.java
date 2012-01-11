@@ -19,6 +19,11 @@
 
 package org.sonatype.nexus.proxy.wastebasket;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+
+import net.time4tea.rsync.matcher.FileMatchers;
+
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -43,7 +48,7 @@ public class DefaultWastebasketTest
     extends AbstractNexusTestEnvironment
 {
 
-    private void addRepository( String id )
+    private File addRepository( String id )
         throws Exception
     {
         // ading one hosted only
@@ -57,8 +62,9 @@ public class DefaultWastebasketTest
 
         repoConf.setLocalStorage( new CLocalStorage() );
         repoConf.getLocalStorage().setProvider( "file" );
-        repoConf.getLocalStorage().setUrl(
-            new File( getBasedir(), "target/test-classes/" + id ).toURI().toURL().toString() );
+
+        final File repoLocation = new File( getBasedir(), "target/test-classes/" + id );
+        repoConf.getLocalStorage().setUrl( repoLocation.toURI().toURL().toString() );
 
         Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
         repoConf.setExternalConfiguration( exRepo );
@@ -71,11 +77,14 @@ public class DefaultWastebasketTest
         lookup( ApplicationConfiguration.class ).getConfigurationModel().addRepository( repoConf );
 
         lookup( RepositoryRegistry.class ).addRepository( repo );
+
+        return repoLocation;
     }
 
     /**
-     * Tests that that empting the trash does NOT fail for an out-of-service repository.</BR>
-     * Verifies fix for: NEXUS-4554 - Out of service proxy repo appears to cause Empty Trash task to abort as BROKEN
+     * Tests that that empting the trash does NOT fail for an out-of-service repository.</BR> Verifies fix for:
+     * NEXUS-4554 - Out of service proxy repo appears to cause Empty Trash task to abort as BROKEN
+     * 
      * @throws Exception
      */
     @Test
@@ -84,7 +93,8 @@ public class DefaultWastebasketTest
     {
 
         this.addRepository( "out-of-service-repo" );
-        this.addRepository( "active-repo" );
+        File repoLocation = this.addRepository( "active-repo" );
+        assertThat( new File( repoLocation, ".nexus/trash" ), FileMatchers.isDirectory() );
 
         M2Repository outOfServiceRepo =
             (M2Repository) this.lookup( RepositoryRegistry.class ).getRepository( "out-of-service-repo" );
@@ -93,6 +103,9 @@ public class DefaultWastebasketTest
 
         Wastebasket wastebasket = this.lookup( Wastebasket.class );
         wastebasket.purgeAll( 1L );
+
+        // NEXUS-4468 check if directories were deleted
+        assertThat( new File( repoLocation, ".nexus/trash" ), not( FileMatchers.isDirectory() ) );
     }
 
 }
