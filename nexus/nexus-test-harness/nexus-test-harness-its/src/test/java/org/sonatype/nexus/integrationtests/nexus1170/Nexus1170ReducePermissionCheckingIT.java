@@ -62,7 +62,15 @@ public class Nexus1170ReducePermissionCheckingIT
 
         for ( ClientPermission clientPermission : permissions )
         {
-            Assert.assertEquals( 15, clientPermission.getValue() );
+            if ( "apikey:access".equals( clientPermission.getId() ) )
+            {
+                // admin user should NOT have API-key access by default
+                Assert.assertEquals( 0, clientPermission.getValue() );
+            }
+            else
+            {
+                Assert.assertEquals( 15, clientPermission.getValue() );
+            }
         }
     }
 

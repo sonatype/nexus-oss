@@ -101,7 +101,7 @@ public class Nexus652Beta5To10UpgradeIT
         {
             roleIds.add( role.getId() );
         }
-        Assert.assertEquals( secConfig.getRoles().size(), 28, "Roles Count differs, expected: 28, found: " + roleIds );
+        Assert.assertEquals( secConfig.getRoles().size(), 29, "Roles Count differs, expected: 29, found: " + roleIds );
 
         // again, everything should have been upgraded.
     }
