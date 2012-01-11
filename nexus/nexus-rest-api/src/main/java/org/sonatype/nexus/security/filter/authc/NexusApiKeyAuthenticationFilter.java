@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
 import org.apache.shiro.web.util.WebUtils;
-import org.sonatype.nexus.rest.RemoteIPFinder;
 
 /**
  * {@link AuthenticatingFilter} that looks for credentials in known {@link NexusApiKey} HTTP headers.
@@ -76,7 +75,7 @@ public class NexusApiKeyAuthenticationFilter
                 final String token = http.getHeader( key );
                 if ( null != token )
                 {
-                    return new NexusApiKeyAuthenticationToken( key, token.toCharArray(), RemoteIPFinder.findIP( http ) );
+                    return new NexusApiKeyAuthenticationToken( key, token.toCharArray(), request.getRemoteHost() );
                 }
             }
         }
