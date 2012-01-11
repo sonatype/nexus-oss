@@ -20,6 +20,7 @@ package org.sonatype.nexus.proxy.attributes;
 
 import java.io.File;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Test;
@@ -32,7 +33,6 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 /**
  * AttributeStorage implementation driven by XStream.
@@ -53,14 +53,16 @@ public class LegacyFSAttributeStorageTest
     {
         super.setUp();
 
-        proxyAttributesDirectory = getTestFile( "target/test-classes/nexus4660" );
+        // copying files directly, need to make sure the test is clean each time when we run the tests against multiple providers
+        File sourceAttributeDirectory = getTestFile( "src/test/resources/nexus4660" );
+        proxyAttributesDirectory = getTestFile( "target/nexus4660-" + System.currentTimeMillis() );
+        FileUtils.copyDirectoryStructure( sourceAttributeDirectory, proxyAttributesDirectory );
 
-        ApplicationEventMulticaster applicationEventMulticaster = Mockito.mock( ApplicationEventMulticaster.class );
         ApplicationConfiguration applicationConfiguration = Mockito.mock( ApplicationConfiguration.class );
         Mockito.when( applicationConfiguration.getWorkingDirectory( "proxy/attributes", false ) ).thenReturn(
             proxyAttributesDirectory );
 
-        attributeStorage = new LegacyFSAttributeStorage( applicationEventMulticaster, applicationConfiguration );
+        attributeStorage = new LegacyFSAttributeStorage( applicationConfiguration );
 
         attributeStorage.initializeWorkingDirectory();
     }

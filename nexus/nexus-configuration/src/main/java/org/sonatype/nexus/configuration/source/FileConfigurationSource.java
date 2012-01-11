@@ -32,6 +32,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.ApplicationStatusSource;
@@ -195,6 +196,8 @@ public class FileConfigurationSource
 
         ValidationResponse vResponse =
             getConfigurationValidator().validateModel( new ValidationRequest( getConfiguration() ) );
+        
+        dumpValidationErrors( vResponse );
 
         setValidationResponse( vResponse );
 
@@ -212,6 +215,45 @@ public class FileConfigurationSource
         else
         {
             throw new InvalidConfigurationException( vResponse );
+        }
+    }
+
+    protected void dumpValidationErrors( final ValidationResponse response )
+    {
+        // summary
+        if ( response.getValidationErrors().size() > 0 || response.getValidationWarnings().size() > 0 )
+        {
+            getLogger().error( "* * * * * * * * * * * * * * * * * * * * * * * * * *" );
+
+            getLogger().error( "Nexus configuration has validation errors/warnings" );
+
+            getLogger().error( "* * * * * * * * * * * * * * * * * * * * * * * * * *" );
+
+            if ( response.getValidationErrors().size() > 0 )
+            {
+                getLogger().error( "The ERRORS:" );
+
+                for ( ValidationMessage msg : response.getValidationErrors() )
+                {
+                    getLogger().error( msg.toString() );
+                }
+            }
+
+            if ( response.getValidationWarnings().size() > 0 )
+            {
+                getLogger().error( "The WARNINGS:" );
+
+                for ( ValidationMessage msg : response.getValidationWarnings() )
+                {
+                    getLogger().error( msg.toString() );
+                }
+            }
+
+            getLogger().error( "* * * * * * * * * * * * * * * * * * * * *" );
+        }
+        else
+        {
+            getLogger().info( "Nexus configuration validated succesfully." );
         }
     }
 

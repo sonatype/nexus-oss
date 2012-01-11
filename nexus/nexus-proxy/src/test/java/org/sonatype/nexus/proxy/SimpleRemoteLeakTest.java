@@ -136,6 +136,17 @@ public class SimpleRemoteLeakTest
         ProxyRepository repo1 = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );
         ProxyRepository repo2 = getRepositoryRegistry().getRepositoryWithFacet( "repo2", ProxyRepository.class );
 
+        // this test is CommonsHttpclient3x dependent, it uses it's internals in assertions!
+        // So run it only when that RRS is in use
+        if ( !( repo1.getRemoteStorage() instanceof CommonsHttpClientRemoteStorage ) )
+        {
+            System.out.println( "Test disabled, RRS implementation is not of class "
+                                    + CommonsHttpClientRemoteStorage.class.getName() + " but "
+                                    + repo1.getRemoteStorage().getClass().getName() );
+
+            return;
+        }
+
         // loop until we have some "sensible" result (not unknown, since this is async op)
         // first unforced request will trigger the check, and wait until we have result
         RemoteStatus rs1 = RemoteStatus.UNKNOWN;

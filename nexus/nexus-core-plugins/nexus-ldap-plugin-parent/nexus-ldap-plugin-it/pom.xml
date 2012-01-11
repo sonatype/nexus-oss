@@ -140,7 +140,7 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-oss-webapp</artifactId>
+      <artifactId>nexus-core-oss-webapp</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
       <classifier>bundle</classifier>
@@ -178,13 +178,13 @@
         <configuration>
           <nexusBundleArtifact>
             <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-oss-webapp</artifactId>
+            <artifactId>nexus-core-oss-webapp</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
             <classifier>bundle</classifier>
           </nexusBundleArtifact>
 
-          <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
+          <nexusBundleName>nexus-core-oss-webapp-${project.version}</nexusBundleName>
 
           <nexusVersion>${project.version}</nexusVersion>
           <nexusPluginsArtifacts>

@@ -53,7 +53,7 @@ public abstract class AbstractMirrorIT
     public void start()
         throws Exception
     {
-        server = (ControlledServer) lookup( ControlledServer.ROLE );
+        server = lookup( ControlledServer.class );
     }
 
     @AfterMethod

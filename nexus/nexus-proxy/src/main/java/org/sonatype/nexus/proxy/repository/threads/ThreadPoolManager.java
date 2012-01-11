@@ -29,4 +29,6 @@ public interface ThreadPoolManager
     void createPool( Repository repository );
 
     void removePool( Repository repository );
+    
+    // void shutdown();
 }

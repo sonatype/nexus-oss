@@ -21,118 +21,118 @@ package org.sonatype.nexus.events;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
+import java.util.concurrent.TimeUnit;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.slf4j.Logger;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.threads.NexusThreadFactory;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
 
 /**
  * A default implementation of EventInspectorHost, a component simply collecting all EventInspectors and re-emitting
- * events towards them in they wants to receive it. TODO: count inspector exceptions, and stop using them after some
- * threshold (like 3 exceptions).
+ * events towards them in they wants to receive it. For ones implementing {@link AsynchronousEventInspector} a cached
+ * thread pool is used to execute them in a separate thread. In case of pool saturation, the caller thread will execute
+ * the async inspector (as if it would be non-async one). Host cannot assume and does not know which inspector is
+ * "less important" (could be dropped without having data loss in case of excessive load for example), hence it applies
+ * same rules to all inspectors.
  * 
  * @author cstamas
  */
 @Component( role = EventInspectorHost.class )
 public class DefaultEventInspectorHost
-    implements EventInspectorHost, Startable
+    extends AbstractLoggingComponent
+    implements EventInspectorHost, Disposable
 {
-    @Requirement
-    private Logger logger;
+    private final int HOST_THREAD_POOL_SIZE = SystemPropertiesHelper.getInteger(
+        "org.sonatype.nexus.events.DefaultEventInspectorHost.poolSize", 500 );
+
+    private final ThreadPoolExecutor hostThreadPool;
 
     @Requirement( role = EventInspector.class )
     private Map<String, EventInspector> eventInspectors;
 
-    private ExecutorService executor;
-
-    protected Logger getLogger()
+    public DefaultEventInspectorHost()
     {
-        return logger;
+        // direct hand-off used! Host pool will use caller thread to execute async inspectors when pool full!
+        this.hostThreadPool =
+            new ThreadPoolExecutor( 0, HOST_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
+                new NexusThreadFactory( "nxevthost", "Event Inspector Host" ), new CallerRunsPolicy() );
     }
+
+    // == Disposable iface, to manage ExecutorService lifecycle
+
+    public void dispose()
+    {
+        shutdown();
+    }
+
+    // == EventInspectorHost iface
+
+    public void shutdown()
+    {
+        // we need clean shutdown, wait all background event inspectors to finish to have consistent state
+        hostThreadPool.shutdown();
+    }
+
+    public boolean isCalmPeriod()
+    {
+        // "calm period" is when we have no queued nor active threads
+        return hostThreadPool.getQueue().isEmpty() && hostThreadPool.getActiveCount() == 0;
+    }
+
+    // == EventListener iface
+
+    public void onEvent( final Event<?> evt )
+    {
+        processEvent( evt );
+    }
+
+    // ==
 
     protected Set<EventInspector> getEventInspectors()
     {
         return new HashSet<EventInspector>( eventInspectors.values() );
     }
 
-    // == Startable iface, to manage ExecutorService lifecycle
-
-    public void start()
-        throws StartingException
-    {
-        // set up executor
-        executor = Executors.newCachedThreadPool( new NexusThreadFactory( "nxevthost", "Event Inspector Host" ) );
-    }
-
-    public void stop()
-        throws StoppingException
-    {
-        shutdown();
-    }
-
-    // ==
-
-    public void shutdown()
-    {
-        // we need clean shutdown, wait all bg event inspectors to finish to have consistent state
-        executor.shutdown();
-    }
-
-    public boolean isCalmPeriod()
-    {
-        final ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
-
-        // "calm period" is when we have no queued nor active threads
-        return tpe.getQueue().isEmpty() && tpe.getActiveCount() == 0;
-    }
-
-    // ==
-
-    public void processEvent( final Event<?> evt )
+    protected void processEvent( final Event<?> evt )
     {
         final Set<EventInspector> inspectors = getEventInspectors();
 
         for ( EventInspector ei : inspectors )
         {
-            EventInspectorHandler handler = new EventInspectorHandler( getLogger(), ei, evt );
-
-            if ( handler.accepts() )
+            try
             {
-                if ( ei instanceof AsynchronousEventInspector && executor != null && !executor.isShutdown() )
+                if ( ei.accepts( evt ) )
                 {
-                    try
+                    final EventInspectorHandler handler = new EventInspectorHandler( getLogger(), ei, evt );
+
+                    if ( ei instanceof AsynchronousEventInspector && hostThreadPool != null
+                        && !hostThreadPool.isShutdown() )
                     {
-                        executor.execute( handler );
+                        hostThreadPool.execute( handler );
                     }
-                    catch ( RejectedExecutionException e )
+                    else
                     {
-                        // execute it in sync mode, executor is either full or shutdown (?)
-                        // in case executor is full, this "slowdown" will make it able consume and build up
                         handler.run();
                     }
                 }
-                else
-                {
-                    handler.run();
-                }
+            }
+            catch ( Exception e )
+            {
+                getLogger().warn(
+                    "EventInspector implementation='" + ei.getClass().getName() + "' had problem accepting an event='"
+                        + evt.getClass() + "'", e );
             }
         }
-    }
-
-    public void onEvent( final Event<?> evt )
-    {
-        processEvent( evt );
     }
 
     // ==
@@ -146,40 +146,18 @@ public class DefaultEventInspectorHost
 
         private final Event<?> evt;
 
-        private boolean accepts;
-
         public EventInspectorHandler( final Logger logger, final EventInspector ei, final Event<?> evt )
         {
             this.logger = logger;
             this.ei = ei;
             this.evt = evt;
-
-            try
-            {
-                this.accepts = this.ei.accepts( this.evt );
-            }
-            catch ( Exception e )
-            {
-                logger.warn( "EventInspector implementation='" + ei.getClass().getName()
-                    + "' had problem accepting an event='" + evt.getClass() + "'", e );
-
-                this.accepts = false;
-            }
-        }
-
-        public boolean accepts()
-        {
-            return accepts;
         }
 
         public void run()
         {
             try
             {
-                if ( accepts() )
-                {
-                    ei.inspect( evt );
-                }
+                ei.inspect( evt );
             }
             catch ( Exception e )
             {

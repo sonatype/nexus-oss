@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.proxy.registry.RootContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
@@ -97,11 +98,17 @@ public class NexusViewSecurityResource
         CRole view = new CRole();
         view.setId( content + "-all-" + method );
 
-        content = StringUtils.capitalizeFirstLetter( content );
-        view.setDescription( "Gives access to " + method + " ALL " + content + " Repositories in Nexus." );
+        String contentClassName = entry.getValue().getName();
+        if ( entry.getValue() instanceof RootContentClass )
+        {
+            // NXCM-3544 set name to empty string to generate 'All Repositories' role name/description
+            contentClassName = "";
+        }
+
+        view.setDescription( "Gives access to " + method + " ALL " + contentClassName + " Repositories in Nexus." );
 
         method = StringUtils.capitalizeFirstLetter( method );
-        view.setName( "Repo: All Eclipse " + content + " Repositories (" + method + ")" );
+        view.setName( "Repo: All " + contentClassName + " Repositories (" + method + ")" );
         view.setSessionTimeout( 60 );
 
         List<? extends Repository> repos = getRepositoriesWithContentClass( entry.getValue() );

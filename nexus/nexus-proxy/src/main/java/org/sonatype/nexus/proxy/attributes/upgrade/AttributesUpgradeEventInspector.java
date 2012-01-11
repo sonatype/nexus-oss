@@ -38,6 +38,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -52,6 +53,11 @@ public class AttributesUpgradeEventInspector
     extends AbstractEventInspector
     implements EventInspector, AsynchronousEventInspector
 {
+    /**
+     * The "switch" for performing upgrade (by bg thread), default is true (upgrade will happen).
+     */
+    private final boolean UPGRADE = SystemPropertiesHelper.getBoolean( getClass().getName() + ".upgrade", true );
+
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
@@ -85,7 +91,15 @@ public class AttributesUpgradeEventInspector
             }
             else
             {
-                new UpgraderThread( legacyAttributesDirectory, repositoryRegistry ).start();
+                if ( UPGRADE )
+                {
+                    new UpgraderThread( legacyAttributesDirectory, repositoryRegistry ).start();
+                }
+                else
+                {
+                    getLogger().info(
+                        "Legacy attribute directory present, but upgrade prevented by system property. Not upgrading it." );
+                }
             }
         }
     }

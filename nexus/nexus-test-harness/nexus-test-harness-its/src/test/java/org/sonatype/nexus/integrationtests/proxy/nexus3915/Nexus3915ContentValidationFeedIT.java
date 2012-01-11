@@ -80,6 +80,9 @@ public class Nexus3915ContentValidationFeedIT
 
         Assert.assertTrue( msg.contains( "404" ), msg );
 
+        // brokenFiles feed is a asynchronous event, so need to wait async event to finish running
+        getEventInspectorsUtil().waitForCalmPeriod();
+
         SyndFeed feed = FeedUtil.getFeed( "brokenFiles" );
 
         @SuppressWarnings( "unchecked" )

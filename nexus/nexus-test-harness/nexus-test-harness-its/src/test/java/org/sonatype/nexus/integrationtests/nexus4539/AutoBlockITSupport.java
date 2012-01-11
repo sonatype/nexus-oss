@@ -132,19 +132,20 @@ public abstract class AutoBlockITSupport
      * 
      * @param mode
      */
-    protected RepositoryStatusResource waitFor( RemoteStatus status, ProxyMode mode )
+    protected RepositoryStatusResource waitFor( RemoteStatus status, ProxyMode mode, boolean force )
         throws Exception
     {
+        repoUtil.getStatus( REPO, force );
         RepositoryStatusResource s = null;
         for ( int i = 0; i < 1000; i++ )
         {
-            s = this.repoUtil.getStatus( REPO );
+            s = repoUtil.getStatus( REPO, false );
             log.debug( "Waiting for: " + status + "," + mode + " - " + getJsonXStream().toXML( s ) );
             if ( status.name().equals( s.getRemoteStatus() ) && mode.name().equals( s.getProxyMode() ) )
             {
                 return s;
             }
-            Thread.sleep( 500 );
+            Thread.sleep( 1500 );
         }
 
         assertRepositoryStatus( s, status, mode );
@@ -187,7 +188,7 @@ public abstract class AutoBlockITSupport
         // let's stall the response
         sleepTime = 100;
         shakeNexus();
-        waitFor( RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_AUTO );
+        waitFor( RemoteStatus.UNAVAILABLE, ProxyMode.BLOCKED_AUTO, false );
         // ensure nexus did touch server
         assertThat( pathsTouched, not( Matchers.<String>empty() ) );
         pathsTouched.clear();
@@ -202,7 +203,7 @@ public abstract class AutoBlockITSupport
         throws Exception
     {
         sleepTime = -1;
-        waitFor( RemoteStatus.AVAILABLE, ProxyMode.ALLOW );
+        waitFor( RemoteStatus.AVAILABLE, ProxyMode.ALLOW, true );
         // ensure nexus did touch server
         assertThat( pathsTouched, not( Matchers.<String>empty() ) );
         pathsTouched.clear();

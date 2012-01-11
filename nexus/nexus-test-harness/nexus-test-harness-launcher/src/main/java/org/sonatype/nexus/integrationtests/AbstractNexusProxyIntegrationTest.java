@@ -64,7 +64,7 @@ public abstract class AbstractNexusProxyIntegrationTest
     public void startProxy()
         throws Exception
     {
-        this.proxyServer = (ServletServer) this.lookup( ServletServer.ROLE );
+        this.proxyServer = lookup( ServletServer.class );
         this.proxyServer.start();
     }
 

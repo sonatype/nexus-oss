@@ -132,7 +132,7 @@ public abstract class AttributeStoragePerformanceTestSupport
         // set the AttributeStorage on the Attribute Handler
         attributeStorage = getAttributeStorage();
         DefaultAttributesHandler attributesHandler =
-            new DefaultAttributesHandler( applicationConfiguration, attributeStorage, itemInspectorList,
+            new DefaultAttributesHandler( applicationConfiguration, attributeStorage, null, itemInspectorList,
                 fileItemInspectorList );
         // this test assumes attributes are ALWAYS written
         attributesHandler.setLastRequestedResolution( 0 );

@@ -54,7 +54,7 @@ public class XStreamMarshaller
     public void marshal( final Attributes item, final OutputStream outputStream )
         throws IOException
     {
-        final Map<String, String> attrs = new HashMap( item.asMap() );
+        final Map<String, String> attrs = new HashMap<String, String>( item.asMap() );
         xstream.toXML( attrs, outputStream );
         outputStream.flush();
     }

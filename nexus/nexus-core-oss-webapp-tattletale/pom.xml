@@ -29,10 +29,10 @@
     <version>2.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-oss-webapp-tattletale</artifactId>
+  <artifactId>nexus-core-oss-webapp-tattletale</artifactId>
   <packaging>pom</packaging>
 
-  <name>Nexus : Distros : Nexus OSS Bundle Tattletale</name>
+  <name>Nexus : Distros : Nexus Core OSS Bundle Tattletale</name>
 
   <profiles>
     <profile>
@@ -41,7 +41,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <tattletale-source>${project.build.directory}/dependency/nexus-oss-webapp/nexus-oss-webapp-${project.version}/nexus/WEB-INF/lib</tattletale-source>
+        <tattletale-source>${project.build.directory}/dependency/nexus-core-oss-webapp/webapp-${project.version}/nexus/WEB-INF/lib</tattletale-source>
         <tattletale-destination-directory>${project.build.directory}/tattletale</tattletale-destination-directory>
       </properties>
       <build>
@@ -50,7 +50,7 @@
             <artifactId>maven-dependency-plugin</artifactId>
             <executions>
               <execution>
-                <id>unpack-nexus-oss-webapp</id>
+                <id>unpack-nexus-core-oss-webapp</id>
                 <phase>package</phase>
                 <goals>
                   <goal>unpack</goal>
@@ -59,11 +59,11 @@
                   <artifactItems>
                     <artifactItem>
                       <groupId>org.sonatype.nexus</groupId>
-                      <artifactId>nexus-oss-webapp</artifactId>
+                      <artifactId>nexus-core-oss-webapp</artifactId>
                       <version>${project.version}</version>
                       <classifier>bundle</classifier>
                       <type>zip</type>
-                      <outputDirectory>${project.build.directory}/dependency/nexus-oss-webapp</outputDirectory>
+                      <outputDirectory>${project.build.directory}/dependency/nexus-core-oss-webapp</outputDirectory>
                     </artifactItem>
                   </artifactItems>
                 </configuration>

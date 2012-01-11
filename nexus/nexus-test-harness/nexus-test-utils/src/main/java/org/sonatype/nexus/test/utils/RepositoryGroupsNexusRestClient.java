@@ -22,12 +22,17 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccessful;
 
 import java.io.IOException;
+import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
 import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.NexusRestClient;
+import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
+import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
@@ -107,4 +112,57 @@ public class RepositoryGroupsNexusRestClient
         return new XStreamRepresentation( xstream, "", mediaType );
     }
 
+    public RepositoryGroupResource getGroup( String groupId )
+        throws IOException
+    {
+        String responseText = nexusRestClient.doGetForText( SERVICE_PART + "/" + groupId );
+        LOG.debug( "responseText: \n" + responseText );
+
+        // this should use call to: getResourceFromResponse
+        XStreamRepresentation representation =
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+
+        RepositoryGroupResourceResponse resourceResponse =
+            (RepositoryGroupResourceResponse) representation.getPayload( new RepositoryGroupResourceResponse() );
+
+        return resourceResponse.getData();
+    }
+
+    /**
+     * IMPORTANT: Make sure to release the Response in a finally block when you are done with it.
+     */
+    public Response sendMessage( Method method, RepositoryGroupResource resource, String id )
+        throws IOException
+    {
+        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
+
+        String idPart = ( method == Method.POST ) ? "" : "/" + id;
+        String serviceURI = SERVICE_PART + idPart;
+
+        RepositoryGroupResourceResponse repoResponseRequest = new RepositoryGroupResourceResponse();
+        repoResponseRequest.setData( resource );
+
+        // now set the payload
+        representation.setPayload( repoResponseRequest );
+
+        LOG.debug( "sendMessage: " + representation.getText() );
+
+        return nexusRestClient.sendMessage( serviceURI, method, representation );
+    }
+
+    public List<RepositoryGroupListResource> getList()
+        throws IOException
+    {
+        String responseText = nexusRestClient.doGetForText( SERVICE_PART );
+        LOG.debug( "responseText: \n" + responseText );
+
+        XStreamRepresentation representation =
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+
+        RepositoryGroupListResourceResponse resourceResponse =
+            (RepositoryGroupListResourceResponse) representation.getPayload( new RepositoryGroupListResourceResponse() );
+
+        return resourceResponse.getData();
+
+    }
 }

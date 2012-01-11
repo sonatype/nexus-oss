@@ -29,6 +29,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
+import org.sonatype.nexus.configuration.model.CErrorReporting;
+import org.sonatype.nexus.configuration.model.CNotification;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.v1_10_0.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfiguration;
@@ -102,6 +104,18 @@ public class Upgrade146to1100
         };
 
         org.sonatype.nexus.configuration.model.Configuration newc = versionConverter.upgradeConfiguration( oldc );
+        
+        // this should go into much "older" upgrader, this was a mistake!
+        if (newc.getErrorReporting() == null) {
+            CErrorReporting errorReporting = new CErrorReporting();
+            errorReporting.setEnabled( false );
+            newc.setErrorReporting( errorReporting );
+        }
+        if (newc.getNotification() == null) {
+            CNotification notification = new CNotification();
+            notification.setEnabled( false );
+            newc.setNotification( notification );
+        }
 
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );

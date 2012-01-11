@@ -53,7 +53,7 @@ public class JacksonXMLMarshaller
     public void marshal( final Attributes item, final OutputStream outputStream )
         throws IOException
     {
-        final Map<String, String> attrs = new HashMap( item.asMap() );
+        final Map<String, String> attrs = new HashMap<String, String>( item.asMap() );
         objectMapper.writeValue( outputStream, attrs );
         outputStream.flush();
     }
