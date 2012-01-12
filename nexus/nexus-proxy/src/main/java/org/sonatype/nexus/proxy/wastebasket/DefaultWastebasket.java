@@ -44,7 +44,9 @@ import org.sonatype.sisu.resource.scanner.Scanner;
 public class DefaultWastebasket
     implements SmartWastebasket
 {
-    private static final String TRASH_PATH_PREFIX = "/.nexus/trash";
+    static final String TRASH = "trash";
+
+    private static final String TRASH_PATH_PREFIX = "/.nexus/" + TRASH;
 
     static final long ALL = -1L;
 
@@ -160,7 +162,7 @@ public class DefaultWastebasket
                 @Override
                 public void onExitDirectory( File directory )
                 {
-                    if ( !"trash".equals( directory.getName() ) && directory.list().length == 0 )
+                    if ( !TRASH.equals( directory.getName() ) && directory.list().length == 0 )
                     {
                         directory.delete();
                     }

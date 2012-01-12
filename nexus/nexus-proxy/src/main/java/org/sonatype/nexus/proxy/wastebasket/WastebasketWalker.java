@@ -75,7 +75,7 @@ public class WastebasketWalker
     public void onCollectionExit( WalkerContext ctx, StorageCollectionItem item )
         throws Exception
     {
-        if ( "trash".equals( item.getName() ) )
+        if ( DefaultWastebasket.TRASH.equals( item.getName() ) )
         {
             // NEXUS-4642 do not delete the trash
             return;
