@@ -510,12 +510,11 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
 Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       // Dump the currently stored data and requery for everything
       reloadAll : function() {
-        this.capabilitiesDataStore.removeAll();
         this.capabilitiesDataStore.reload();
-        this.repoOrGroupDataStore.removeAll();
         this.repositoryDataStore.reload();
         this.repositoryGroupDataStore.reload();
         this.capabilityTypeDataStore.reload();
+
         this.formCards.items.each(
             function(item, i, len) {
               if (i > 0) {
@@ -1194,8 +1193,6 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               },
               this.formCards
           );
-
-          this.capabilitiesGridPanel.getSelectionModel().selectRecords( [options.statusRecord], false );
         }
         else
         {
