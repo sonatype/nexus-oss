@@ -44,9 +44,8 @@ import org.sonatype.sisu.resource.scanner.Scanner;
 public class DefaultWastebasket
     implements SmartWastebasket
 {
-    static final String TRASH = "trash";
 
-    private static final String TRASH_PATH_PREFIX = "/.nexus/" + TRASH;
+    private static final String TRASH_PATH_PREFIX = "/.nexus/trash";
 
     static final long ALL = -1L;
 
@@ -140,7 +139,7 @@ public class DefaultWastebasket
 
         // NEXUS-4078: deleting "legacy" trash too for now
         // NEXUS-4468 legacy was not being cleaned up
-        File basketFile =
+        final File basketFile =
             getApplicationConfiguration().getWorkingDirectory( AbstractRepositoryFolderCleaner.GLOBAL_TRASH_KEY );
 
         // check for existence, is this needed at all?
@@ -162,7 +161,7 @@ public class DefaultWastebasket
                 @Override
                 public void onExitDirectory( File directory )
                 {
-                    if ( !TRASH.equals( directory.getName() ) && directory.list().length == 0 )
+                    if ( !basketFile.equals( directory ) && directory.list().length == 0 )
                     {
                         directory.delete();
                     }
