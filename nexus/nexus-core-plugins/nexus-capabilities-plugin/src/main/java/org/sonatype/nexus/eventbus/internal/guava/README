@@ -1,6 +1,0 @@
-The classes in guava package are copied over from com.google.common.eventbus 1.10.1 in order to make then extensible.
-The annotations are not copied so handlers will not have to change if we later are able to drop this classes and
-extend the original.
-
-The changes done are:
-    * make some classes protected/public

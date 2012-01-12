@@ -272,13 +272,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- NEXUS-3699 -->
-    <!--<dependency>-->
-      <!--<groupId>org.sonatype.nexus.plugins</groupId>-->
-      <!--<artifactId>nexus-capabilities-plugin</artifactId>-->
-      <!--<version>${project.version}</version>-->
-    <!--</dependency>-->
-
     <!-- NEXUS-3947 ArchetypeCatalog -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
