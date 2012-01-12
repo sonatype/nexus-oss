@@ -390,7 +390,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
 
         region : 'north',
         layout : 'fit',
-        collapsible : true,
+        collapsible : false,
         split : true,
         height : 200,
         minHeight : 150,
