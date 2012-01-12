@@ -20,10 +20,12 @@
 package org.sonatype.nexus.proxy.wastebasket;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.not;
+
+import java.io.File;
 
 import net.time4tea.rsync.matcher.FileMatchers;
 
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -38,8 +40,6 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
-
-import java.io.File;
 
 /**
  * Tests the {@link DefaultWastebasket} class.
@@ -107,6 +107,34 @@ public class DefaultWastebasketTest
         // NEXUS-4468 check if directories were deleted
         assertThat( new File( repoLocation, ".nexus/trash" ), FileMatchers.isDirectory() );
         assertThat( new File( repoLocation, ".nexus/trash" ), FileMatchers.isEmpty() );
+    }
+
+    @Test
+    public void testPurgeAllLegacyTrash()
+        throws Exception
+    {
+
+        this.addRepository( "out-of-service-repo" );
+        this.addRepository( "active-repo" );
+
+        ApplicationConfiguration applicationConfiguration = lookup( ApplicationConfiguration.class );
+        File basketDir =
+            applicationConfiguration.getWorkingDirectory( AbstractRepositoryFolderCleaner.GLOBAL_TRASH_KEY );
+
+        basketDir.mkdirs();
+        File trashContent = new File( "src/test/resources/active-repo/.nexus/trash" );
+        FileUtils.copyDirectoryStructure( trashContent, basketDir );
+
+        M2Repository outOfServiceRepo =
+            (M2Repository) this.lookup( RepositoryRegistry.class ).getRepository( "out-of-service-repo" );
+        outOfServiceRepo.setLocalStatus( LocalStatus.OUT_OF_SERVICE );
+        outOfServiceRepo.commitChanges();
+
+        Wastebasket wastebasket = this.lookup( Wastebasket.class );
+        wastebasket.purgeAll( 1L );
+
+        assertThat( basketDir, FileMatchers.isDirectory() );
+        assertThat( basketDir, FileMatchers.isEmpty() );
     }
 
 }

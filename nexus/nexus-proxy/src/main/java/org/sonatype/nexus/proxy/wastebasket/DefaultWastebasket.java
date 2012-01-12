@@ -37,6 +37,8 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.walker.AffirmativeStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
+import org.sonatype.sisu.resource.scanner.Listener;
+import org.sonatype.sisu.resource.scanner.Scanner;
 
 @Component( role = Wastebasket.class )
 public class DefaultWastebasket
@@ -67,6 +69,9 @@ public class DefaultWastebasket
 
     @Requirement
     private Walker walker;
+
+    @Requirement( hint = "serial" )
+    private Scanner scanner;
 
     protected Walker getWalker()
     {
@@ -131,17 +136,40 @@ public class DefaultWastebasket
             purge( repository, age );
         }
 
-        if ( age == ALL )
-        {
-            // NEXUS-4078: deleting "legacy" trash too for now
-            File basketFile =
-                getApplicationConfiguration().getWorkingDirectory( AbstractRepositoryFolderCleaner.GLOBAL_TRASH_KEY );
+        // NEXUS-4078: deleting "legacy" trash too for now
+        // NEXUS-4468 legacy was not being cleaned up
+        File basketFile =
+            getApplicationConfiguration().getWorkingDirectory( AbstractRepositoryFolderCleaner.GLOBAL_TRASH_KEY );
 
-            // check for existence, is this needed at all?
-            if ( basketFile.isDirectory() )
+        // check for existence, is this needed at all?
+        if ( basketFile.isDirectory() )
+        {
+            final long limitDate = System.currentTimeMillis() - age;
+
+            scanner.scan( basketFile, new Listener()
             {
-                AbstractRepositoryFolderCleaner.deleteFilesRecursively( basketFile );
-            }
+                @Override
+                public void onFile( File file )
+                {
+                    if ( age == ALL || file.lastModified() < limitDate )
+                    {
+                        file.delete();
+                    }
+                }
+
+                @Override
+                public void onExitDirectory( File directory )
+                {
+                    if ( !"trash".equals( directory.getName() ) && directory.list().length == 0 )
+                    {
+                        directory.delete();
+                    }
+                }
+
+                public void onEnterDirectory( File directory ) {}
+                public void onEnd() {}
+                public void onBegin() {}
+            } );
         }
     }
 
