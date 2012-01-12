@@ -304,6 +304,15 @@
                 <privilege>64</privilege>
             </privileges>
         </role>
+        <role>
+            <id>nx-apikey-access</id>
+            <name>Nexus API-Key Access</name>
+            <description>API-Key Access role for Nexus.</description>
+            <sessionTimeout>60</sessionTimeout>
+            <privileges>
+                <privilege>83</privilege>
+            </privileges>
+        </role>
     </roles>
     
     <privileges>
@@ -1472,6 +1481,22 @@
             <property>
               <key>permission</key>
               <value>nexus:repositorymirrorsstatus</value>
+            </property>
+          </properties>
+        </privilege>
+        <privilege>
+          <id>83</id>
+          <type>method</type>
+          <name>API-Key Access</name>
+          <description>Give permission to use an API-Key to access the server.</description>
+          <properties>
+            <property>
+              <key>method</key>
+              <value>*</value>
+            </property>
+            <property>
+              <key>permission</key>
+              <value>apikey:access</value>
             </property>
           </properties>
         </privilege>
