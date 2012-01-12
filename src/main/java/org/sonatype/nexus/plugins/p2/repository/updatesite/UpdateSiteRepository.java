@@ -231,7 +231,7 @@ public class UpdateSiteRepository
 
                 if ( item instanceof StorageFileItem && !mirrored.contains( item.getPath().substring( 1 ) ) )
                 {
-                    doDeleteItem( new ResourceStoreRequest( item.getPath() ) );
+                    deleteItem( false, new ResourceStoreRequest( item.getPath() ) );
                 }
             }
         } );
