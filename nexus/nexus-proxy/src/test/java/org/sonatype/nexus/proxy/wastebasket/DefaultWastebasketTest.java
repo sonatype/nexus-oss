@@ -104,11 +104,14 @@ public class DefaultWastebasketTest
         Wastebasket wastebasket = this.lookup( Wastebasket.class );
         wastebasket.purgeAll( 1L );
 
-        // NEXUS-4468 check if directories were deleted
+        // NEXUS-4642 check if directories were deleted
         assertThat( new File( repoLocation, ".nexus/trash" ), FileMatchers.isDirectory() );
         assertThat( new File( repoLocation, ".nexus/trash" ), FileMatchers.isEmpty() );
     }
 
+    /**
+     * NEXUS-4468 Check if nexus is cleaning up legacy trash properly (deleting content w/o deleting the directory)
+     */
     @Test
     public void testPurgeAllLegacyTrash()
         throws Exception
@@ -121,6 +124,7 @@ public class DefaultWastebasketTest
         File basketDir =
             applicationConfiguration.getWorkingDirectory( AbstractRepositoryFolderCleaner.GLOBAL_TRASH_KEY );
 
+        // fill legacy trash
         basketDir.mkdirs();
         File trashContent = new File( "src/test/resources/active-repo/.nexus/trash" );
         FileUtils.copyDirectoryStructure( trashContent, basketDir );
