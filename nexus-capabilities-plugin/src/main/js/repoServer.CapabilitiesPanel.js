@@ -430,6 +430,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
                   fn : function(checkbox, checked) {
                     this.capabilitiesDataStore.proxy.conn.url = CAPABILITIES_SERVICE_PATH + '?includeHidden=' + checked;
                     this.capabilityTypeDataStore.proxy.conn.url = CAPABILITY_TYPES_SERVICE_PATH + '?includeHidden=' + checked;
+                    this.capabilitiesDataStore.removeAll();
                     this.reloadAll();
                   },
                 scope : this
