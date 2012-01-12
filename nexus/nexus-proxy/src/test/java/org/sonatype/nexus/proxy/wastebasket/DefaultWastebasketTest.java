@@ -23,8 +23,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
 
-import net.time4tea.rsync.matcher.FileMatchers;
-
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Test;
@@ -40,6 +38,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 
 /**
  * Tests the {@link DefaultWastebasket} class.
