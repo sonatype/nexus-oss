@@ -35,13 +35,6 @@ public abstract class AbstractNexusProxyP2IT
     extends AbstractNexusP2IT
 {
 
-    @Override
-    protected void customizeContainerConfiguration( final ContainerConfiguration configuration )
-    {
-        super.customizeContainerConfiguration( configuration );
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
-    }
-
     protected static ServletServer proxyServer;
 
     protected static final String localStorageDir;

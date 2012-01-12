@@ -128,7 +128,10 @@ public class P2GroupMetadataSource
 
         for ( final Repository repo : getMemberRepositories( repository ) )
         {
-            doms.add( parseItem( repo, jarName, xmlName, context ) );
+            if ( repo.getLocalStatus().shouldServiceRequest() )
+            {
+                doms.add( parseItem( repo, jarName, xmlName, context ) );
+            }
         }
 
         return doms;
@@ -250,20 +253,23 @@ public class P2GroupMetadataSource
         final ArrayList<StorageItem> items = new ArrayList<StorageItem>();
         for ( final Repository repo : getMemberRepositories( repository ) )
         {
-            try
-            {
-                items.add( doRetrieveRemoteItem( repo, jar, context ) );
-            }
-            catch ( final ItemNotFoundException e )
+            if ( repo.getLocalStatus().shouldServiceRequest() )
             {
                 try
                 {
-                    items.add( doRetrieveRemoteItem( repo, xml, context ) );
+                    items.add( doRetrieveRemoteItem( repo, jar, context ) );
                 }
-                catch ( final ItemNotFoundException e1 )
+                catch ( final ItemNotFoundException e )
                 {
-                    throw new StorageException( "Could not retrieve neither " + jar + " nor " + xml + " from "
-                        + repo.getId() );
+                    try
+                    {
+                        items.add( doRetrieveRemoteItem( repo, xml, context ) );
+                    }
+                    catch ( final ItemNotFoundException e1 )
+                    {
+                        throw new StorageException( "Could not retrieve neither " + jar + " nor " + xml + " from "
+                            + repo.getId() );
+                    }
                 }
             }
         }
