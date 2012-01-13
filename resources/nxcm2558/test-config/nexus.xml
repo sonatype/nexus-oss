@@ -52,38 +52,63 @@
         <url>${proxy-repo-base-url}nxcm2558</url>
       </remoteStorage>
     </repository>
+    <repository>
+      <id>nxcm3654-1</id>
+      <name>nxcm3654-1</name>
+      <type>eclipse-update-site</type>
+      <remoteStorage>
+        <url>${proxy-repo-base-url}nxcm2558</url>
+      </remoteStorage>
+    </repository>
+    <repository>
+      <id>nxcm3654-2</id>
+      <name>nxcm3654-2</name>
+      <type>eclipse-update-site</type>
+      <remoteStorage>
+        <url>${proxy-repo-base-url}nxcm2558</url>
+      </remoteStorage>
+    </repository>
+    <repository>
+      <id>all-1</id>
+      <name>all-1</name>
+      <type>eclipse-update-site</type>
+      <remoteStorage>
+        <url>${proxy-repo-base-url}nxcm2558</url>
+      </remoteStorage>
+    </repository>
   </repositories>
 
   <repositoryShadows>
   </repositoryShadows>
 
   <repositoryGrouping>
+    <repositoryGroups>
+      <repositoryGroup>
+	    <groupId>nxcm3654</groupId>
+        <type>p2</type>
+	    <name>nxcm3654</name>
+        <repositories>
+          <repository>nxcm3654-1</repository>
+          <repository>nxcm3654-2</repository>
+        </repositories>
+      </repositoryGroup>
+      <repositoryGroup>
+	    <groupId>all-repos</groupId>
+        <type>p2</type>
+	    <name>all-repos</name>
+        <repositories>
+          <repository>all-1</repository>
+          <repository>nxcm3654</repository>
+          <repository>nxcm2558</repository>
+        </repositories>
+      </repositoryGroup>
+    </repositoryGroups>
   </repositoryGrouping>
 
   <repositoryTargets>
   </repositoryTargets>
 
   <tasks>
-    <task>
-      <id>1</id>
-      <name>UpdateSiteMirrorTask</name>
-      <enabled>true</enabled>
-      <type>UpdateSiteMirrorTask</type>
-      <status>SUBMITTED</status>
-      <schedule>
-        <type>manual</type>
-      </schedule>
-      <properties>
-        <property>
-          <key>ForceMirror</key>
-          <value>true</value>
-        </property>
-        <property>
-          <key>repositoryOrGroupId</key>
-          <value>repo_nxcm2558</value>
-        </property>
-      </properties>
-    </task>
   </tasks>
 
 </nexusConfiguration>

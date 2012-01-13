@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.plugins.p2.repository.updatesite;
 
+import java.util.List;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -26,6 +28,8 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.scheduling.SchedulerTask;
+
+import com.google.common.collect.Lists;
 
 @Component( role = SchedulerTask.class, hint = UpdateSiteMirrorTask.ROLE_HINT, instantiationStrategy = "per-lookup" )
 public class UpdateSiteMirrorTask
@@ -46,84 +50,58 @@ public class UpdateSiteMirrorTask
     protected Object doRun()
         throws Exception
     {
-        final String repositoryId = getRepositoryId();
-        final String groupId = getRepositoryGroupId();
-
-        if ( repositoryId != null )
+        List<UpdateSiteRepository> repos = getRepositories();
+        for ( UpdateSiteRepository updateSite : repos )
         {
-            final UpdateSiteRepository repository = getRepository( repositoryId );
-
-            if ( repository == null )
-            {
-                throw new IllegalStateException( ROLE_HINT + " only applicable to Eclipse Update Sites" );
-            }
-
-            repository.doMirror( getForce() );
-        }
-        else if ( groupId != null )
-        {
-            final GroupRepository group = registry.getRepository( groupId ).adaptToFacet( GroupRepository.class );
-
-            if ( group == null )
-            {
-                throw new IllegalStateException( "groupId is not a GroupRepository!" );
-            }
-
-            for ( final Repository repository : group.getMemberRepositories() )
-            {
-                final UpdateSiteRepository updateSite = getRepository( repository );
-
-                if ( updateSite != null )
-                {
-                    updateSite.doMirror( getForce() );
-                }
-            }
-        }
-        else
-        {
-            for ( final Repository repository : registry.getRepositories() )
-            {
-                final UpdateSiteRepository updateSite = getRepository( repository );
-
-                if ( updateSite != null )
-                {
-                    updateSite.doMirror( getForce() );
-                }
-            }
+            updateSite.doMirror( getForce() );
         }
 
         return null;
     }
 
-    private UpdateSiteRepository getRepository( final String repositoryId )
+    private List<UpdateSiteRepository> getRepositories()
+        throws NoSuchRepositoryException
     {
-        // bad id, no repo
-        if ( repositoryId == null )
+        if ( getRepositoryId() != null )
         {
-            return null;
+            Repository repo = registry.getRepository( getRepositoryId() );
+            if ( repo.getRepositoryKind().isFacetAvailable( UpdateSiteRepository.class ) )
+            {
+                return Lists.newArrayList( repo.adaptToFacet( UpdateSiteRepository.class ) );
+            }
+            else if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            {
+                return updateSites( repo.adaptToFacet( GroupRepository.class ) );
+            }
+            else
+            {
+                throw new IllegalStateException( ROLE_HINT + " only applicable to Eclipse Update Sites" );
+            }
         }
 
-        try
-        {
-            return getRepository( registry.getRepository( repositoryId ) );
-        }
-        // no repo
-        catch ( final NoSuchRepositoryException e )
-        {
-            return null;
-        }
+        return registry.getRepositoriesWithFacet( UpdateSiteRepository.class );
     }
 
-    private UpdateSiteRepository getRepository( final Repository repository )
+    private List<UpdateSiteRepository> updateSites( GroupRepository group )
     {
-        // no object, no repo
-        if ( repository == null )
+        List<UpdateSiteRepository> us = Lists.newArrayList();
+
+        for ( Repository repo : group.getMemberRepositories() )
         {
-            return null;
+            if ( repo.getRepositoryKind().isFacetAvailable( UpdateSiteRepository.class ) )
+            {
+                us.add( repo.adaptToFacet( UpdateSiteRepository.class ) );
+            }
         }
 
-        // will return null if not an update site repo
-        return repository.adaptToFacet( UpdateSiteRepository.class );
+        if ( us.isEmpty() )
+        {
+            getLogger().warn(
+                "Group '" + group.getId() + "' has no UpdateSite repositories members. " + ROLE_HINT
+                    + " will be silent skipped!" );
+        }
+
+        return us;
     }
 
     @Override
@@ -135,21 +113,26 @@ public class UpdateSiteMirrorTask
     @Override
     protected String getMessage()
     {
-        String repo = getRepositoryId();
-
-        if ( repo == null )
+        if ( getRepositoryId() == null )
         {
-            repo = getRepositoryGroupId();
-
-            if ( repo == null )
-            {
-                return "Mirroring content of All Eclipse Update Sites.";
-            }
-
-            return "Mirroring content of All Eclipse Update Sites in group ID='" + repo + "'.";
+            return "Mirroring content of All Eclipse Update Sites.";
+        }
+        Repository repo;
+        try
+        {
+            repo = registry.getRepository( getRepositoryId() );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            return "Repository not found";
         }
 
-        return "Mirroring content of Eclipse Update Site ID='" + repo + "'.";
+        if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        {
+            return "Mirroring content of All Eclipse Update Sites in group ID='" + repo.getId() + "'.";
+        }
+
+        return "Mirroring content of Eclipse Update Site ID='" + repo.getId() + "'.";
     }
 
     @Override

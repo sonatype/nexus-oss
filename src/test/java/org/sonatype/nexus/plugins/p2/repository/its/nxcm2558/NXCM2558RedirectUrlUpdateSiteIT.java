@@ -19,54 +19,75 @@
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm2558;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.test.utils.TaskScheduleUtil.runTask;
 import static org.sonatype.nexus.test.utils.TaskScheduleUtil.waitForAllTasksToStop;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isDirectory;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readable;
 
-import java.io.File;
-
+import org.hamcrest.Matcher;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
 import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteMirrorTask;
 import org.sonatype.nexus.plugins.p2.repository.updatesite.UpdateSiteMirrorTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.sonatype.nexus.test.utils.ResponseMatchers;
 import org.testng.annotations.Test;
 
 public class NXCM2558RedirectUrlUpdateSiteIT
     extends AbstractNexusProxyP2IT
 {
 
-    public NXCM2558RedirectUrlUpdateSiteIT()
+    private void doTest( String repoId, Matcher<Response> matcher, boolean setRepo, boolean install )
+        throws Exception
     {
-        super( "nxcm2558" );
+        if ( setRepo )
+        {
+            final ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
+            repo.setKey( UpdateSiteMirrorTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
+            repo.setValue( repoId );
+
+            runTask( UpdateSiteMirrorTask.ROLE_HINT + System.nanoTime(), UpdateSiteMirrorTask.ROLE_HINT, repo );
+        }
+        else
+        {
+            runTask( UpdateSiteMirrorTask.ROLE_HINT + System.nanoTime(), UpdateSiteMirrorTask.ROLE_HINT );
+        }
+        waitForAllTasksToStop();
+
+        final Response response = RequestFacade.doGetRequest( "content/repositories/" + repoId + "/features/" );
+        assertThat( response, matcher );
+
+        if ( install )
+        {
+            installAndVerifyP2Feature( repoId );
+        }
     }
 
     @Test
-    public void test()
+    public void repository()
         throws Exception
     {
-        final String nexusTestRepoUrl = getNexusTestRepoUrl();
+        doTest( "nxcm2558", ResponseMatchers.isSuccessful(), true, true );
+    }
 
-        final File installDir = new File( "target/eclipse/nxcm2558" );
+    @Test
+    public void group()
+        throws Exception
+    {
+        doTest( "nxcm3654", ResponseMatchers.isSuccessful(), true, false );
+    }
 
-        final ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setKey( UpdateSiteMirrorTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
-        repo.setValue( getTestRepositoryId() );
+    @Test
+    public void all()
+        throws Exception
+    {
+        doTest( "all-repos", ResponseMatchers.isSuccessful(), false, false );
+    }
 
-        runTask( UpdateSiteMirrorTask.ROLE_HINT, repo );
-        waitForAllTasksToStop();
-
-        final Response response = RequestFacade.doGetRequest(
-            "content/repositories/" + getTestRepositoryId() + "/features/"
-        );
-        assertThat( response.getStatus().isSuccess(), is( true ) );
-
-        installAndVerifyP2Feature();
+    @Test
+    public void invalid()
+        throws Exception
+    {
+        doTest( "invalid", ResponseMatchers.inError(), true, false );
     }
 
 }
