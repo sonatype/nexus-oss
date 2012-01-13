@@ -22,8 +22,8 @@
 <model xmlns="http://modello.codehaus.org/MODELLO/1.4.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.0 http://modello.codehaus.org/xsd/modello-1.4.0.xsd"
-       xsd.namespace="http://www.sonatype.com/xsd/nexus-capabilities-rest-1.0.0"
-       xsd.targetNamespace="http://www.sonatype.com/xsd/nexus-capabilities-rest-1.0.0">
+       xsd.namespace="http://www.sonatype.com/xsd/nexus-capabilities-rest-2.0.0"
+       xsd.targetNamespace="http://www.sonatype.com/xsd/nexus-capabilities-rest-2.0.0">
 
   <id>capabilities-rest</id>
   <name>NexusCapabilitiesREST</name>
@@ -106,7 +106,7 @@
         </field>
         <field>
           <name>notes</name>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <type>String</type>
           <required>false</required>
           <description>Optional (user) notes about capability.</description>
@@ -114,7 +114,7 @@
         <field>
           <name>enabled</name>
           <type>boolean</type>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <required>true</required>
           <defaultValue>true</defaultValue>
           <description>The flag determining if the capability is enabled</description>
@@ -261,7 +261,7 @@
         <field>
           <name>enabled</name>
           <type>boolean</type>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <required>true</required>
           <defaultValue>true</defaultValue>
           <description>The flag determining if the capability is enabled</description>
@@ -269,7 +269,7 @@
         <field>
           <name>active</name>
           <type>boolean</type>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <required>true</required>
           <defaultValue>true</defaultValue>
           <description>The flag determining if the capability is active</description>
@@ -290,14 +290,14 @@
         </field>
         <field>
           <name>stateDescription</name>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <type>String</type>
           <required>false</required>
           <description>The description of current state.</description>
         </field>
         <field>
           <name>status</name>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <type>String</type>
           <required>false</required>
           <description>The status as reported by capability (html chunk/can be null).</description>
@@ -358,7 +358,7 @@
         </field>
         <field>
           <name>about</name>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <type>String</type>
           <required>true</required>
           <description>The description of capability type.</description>
@@ -388,7 +388,7 @@
 
     <class>
       <name>CapabilityStatusRequestResource</name>
-      <version>1.0.0+</version>
+      <version>2.0.0+</version>
       <superClass>org.sonatype.nexus.rest.model.NexusResponse</superClass>
       <description>REST Request object for a capability status change operation (enable/disable), contains the typical 'data' parameter, which is the capability status.</description>
       <annotations>
@@ -399,7 +399,7 @@
       <fields>
         <field>
           <name>data</name>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <association>
             <type>CapabilityStatusResource</type>
           </association>
@@ -411,7 +411,7 @@
 
     <class>
       <name>CapabilityStatusResource</name>
-      <version>1.0.0+</version>
+      <version>2.0.0+</version>
       <description>The capability configuration.</description>
       <annotations>
         <annotation>@javax.xml.bind.annotation.XmlType( name = "capability-status-resource" )</annotation>
@@ -420,7 +420,7 @@
       <fields>
         <field>
           <name>id</name>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <type>String</type>
           <required>true</required>
           <description>The id of the capability.</description>
@@ -428,7 +428,7 @@
         <field>
           <name>enabled</name>
           <type>boolean</type>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <required>true</required>
           <defaultValue>true</defaultValue>
           <description>The flag determining if the capability is enabled</description>

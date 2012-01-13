@@ -22,8 +22,8 @@
 <model xmlns="http://modello.codehaus.org/MODELLO/1.4.0"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.0 http://modello.codehaus.org/xsd/modello-1.4.0.xsd"
-       xsd.namespace="http://www.sonatype.com/xsd/nexus-capabilities-configuration-1.0.0"
-       xsd.targetNamespace="http://www.sonatype.com/xsd/nexus-capabilities-configuration-1.0.0">
+       xsd.namespace="http://www.sonatype.com/xsd/nexus-capabilities-configuration-2.0.0"
+       xsd.targetNamespace="http://www.sonatype.com/xsd/nexus-capabilities-configuration-2.0.0">
 
   <id>capabilities-configuration</id>
   <name>NexusCapabilitiesConfiguration</name>
@@ -83,6 +83,12 @@
     public static final String MODEL_VERSION = "1.0.0";
 ]]></code>
         </codeSegment>
+        <codeSegment>
+          <version>2.0.0</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "2.0.0";
+]]></code>
+        </codeSegment>
       </codeSegments>
     </class>
 
@@ -94,7 +100,7 @@
         <field>
           <name>version</name>
           <type>int</type>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <required>true</required>
           <description>The version of capability properties</description>
         </field>
@@ -108,14 +114,14 @@
         <field>
           <name>notes</name>
           <type>String</type>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <required>true</required>
           <description>Optional (user) notes about capability</description>
         </field>
         <field>
           <name>enabled</name>
           <type>boolean</type>
-          <version>1.0.0+</version>
+          <version>2.0.0+</version>
           <required>true</required>
           <defaultValue>true</defaultValue>
           <description>The flag determining if the capability is enabled</description>
