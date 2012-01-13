@@ -1123,12 +1123,12 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-core-webapp</artifactId>
+        <artifactId>nexus-webapp</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-core-webapp</artifactId>
+        <artifactId>nexus-webapp</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
@@ -1706,11 +1706,11 @@
     <module>nexus-rest-api</module>
     <module>nexus-migration-tool</module>
     <module>nexus-core-plugins</module>
-    <module>nexus-core-webapp</module>
+    <module>nexus-webapp</module>
     <module>nexus-launcher</module>
     <module>nexus-clients</module>
-    <module>nexus-core-oss-webapp</module>
-    <module>nexus-core-oss-webapp-tattletale</module>
+    <module>nexus-oss-webapp</module>
+    <module>nexus-oss-webapp-tattletale</module>
     <module>nexus-stories</module>
     <module>nexus-test</module>
     <module>nexus-test-harness</module>
