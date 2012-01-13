@@ -21,6 +21,8 @@ package org.sonatype.security.ldap.dao.password;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.security.ldap.dao.password.hash.MD5Crypt;
 
+import java.security.NoSuchAlgorithmException;
+
 
 /**
  * @author cstamas
@@ -29,6 +31,7 @@ import org.sonatype.security.ldap.dao.password.hash.MD5Crypt;
 public class MD5CryptPasswordEncoder
     implements PasswordEncoder
 {
+    final private MD5Crypt md5Crypt = new MD5Crypt();
 
     public String getMethod()
     {
@@ -37,23 +40,37 @@ public class MD5CryptPasswordEncoder
 
     public String encodePassword( String password, Object salt )
     {
-        return "{CRYPT}" + MD5Crypt.unixMD5( password );
+        try
+        {
+            return "{CRYPT}" + md5Crypt.crypt( password );
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
+            throw new RuntimeException( "No MD5 Algorithm", e );
+        }
     }
 
     public boolean isPasswordValid( String encPassword, String inputPassword, Object salt )
     {
-        String encryptedPassword = encPassword;
-        if ( encryptedPassword.startsWith( "{crypt}" ) || encryptedPassword.startsWith( "{CRYPT}" ) )
+        try
         {
-            encryptedPassword = encryptedPassword.substring( "{crypt}".length() );
+            String encryptedPassword = encPassword;
+            if ( encryptedPassword.startsWith( "{crypt}" ) || encryptedPassword.startsWith( "{CRYPT}" ) )
+            {
+                encryptedPassword = encryptedPassword.substring( "{crypt}".length() );
+            }
+
+            int lastDollar = encryptedPassword.lastIndexOf( '$' );
+            String realSalt = encryptedPassword.substring( "$1$".length(), lastDollar );
+
+            String check = md5Crypt.crypt( inputPassword, realSalt );
+
+            return check.equals( encryptedPassword );
         }
-
-        int lastDollar = encryptedPassword.lastIndexOf( '$' );
-        String realSalt = encryptedPassword.substring( "$1$".length(), lastDollar );
-
-        String check = MD5Crypt.unixMD5( inputPassword, realSalt );
-
-        return check.equals( encryptedPassword );
+        catch ( NoSuchAlgorithmException e )
+        {
+            throw new RuntimeException( "No MD5 Algorithm", e );
+        }
     }
 
 }

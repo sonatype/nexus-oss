@@ -43,7 +43,7 @@ public class MD5CryptPasswordEncoderTest
 
         String salt = crypted.substring( firstIdx + "$1$".length(), lastIdx );
 
-        String check = "{CRYPT}" + MD5Crypt.unixMD5( "test", salt );
+        String check = "{CRYPT}" + new MD5Crypt().crypt( "test", salt );
 
         // System.out.println( "Check value: \'" + check + "\'" );
 
@@ -51,5 +51,4 @@ public class MD5CryptPasswordEncoderTest
 
         Assert.assertTrue( encoder.isPasswordValid( crypted, "test", null ) );
     }
-
 }
