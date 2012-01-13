@@ -385,9 +385,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
   this.sp = Sonatype.lib.Permissions;
 
   this.capabilitiesGridPanel = new Ext.grid.GridPanel({
-        title : 'Capabilities',
         id : 'st-capabilities-grid',
-
         region : 'north',
         layout : 'fit',
         collapsible : false,
