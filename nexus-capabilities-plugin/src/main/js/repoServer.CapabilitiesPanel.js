@@ -488,7 +488,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
         items : [this.capabilitiesGridPanel, {
               xtype : 'panel',
               id : 'capability-config-forms',
-              title : 'Capability Configuration',
+              title : 'Configuration',
               layout : 'card',
               region : 'center',
               activeItem : 0,
@@ -609,6 +609,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
         {
           formLayout.setActiveItem(0);
           gridSelectModel.clearSelections();
+          this.formCards.setTitle('Configuration');
         }
 
         // delete row from grid if canceling a new repo form
@@ -722,7 +723,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
             Sonatype.MessageBox.show({
                   animEl : this.capabilitiesGridPanel.getEl(),
-                  title : 'Delete Capability configuration?',
+                  title : 'Delete Capability?',
                   msg : 'Delete the "' + rec.get('description') + '" capability?',
                   buttons : Sonatype.MessageBox.YESNO,
                   scope : this,
@@ -897,6 +898,8 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       rowSelect : function(selectionModel, index, rec) {
+        this.formCards.setTitle((rec.data.typeName?rec.data.typeName+' - ':'') + rec.data.description);
+
         var id = rec.id; // note: rec.id is unique for new resources and equal
         // to resourceURI for existing ones
         var formPanel = this.formCards.findById(id);
