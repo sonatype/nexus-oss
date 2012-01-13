@@ -37,9 +37,6 @@ public class UpdateSiteMirrorTask
 {
     public static final String ROLE_HINT = "UpdateSiteMirrorTask";
 
-    @Requirement
-    private RepositoryRegistry registry;
-
     @Override
     protected String getRepositoryFieldId()
     {
@@ -64,7 +61,7 @@ public class UpdateSiteMirrorTask
     {
         if ( getRepositoryId() != null )
         {
-            Repository repo = registry.getRepository( getRepositoryId() );
+            Repository repo = getRepositoryRegistry().getRepository( getRepositoryId() );
             if ( repo.getRepositoryKind().isFacetAvailable( UpdateSiteRepository.class ) )
             {
                 return Lists.newArrayList( repo.adaptToFacet( UpdateSiteRepository.class ) );
@@ -79,7 +76,7 @@ public class UpdateSiteMirrorTask
             }
         }
 
-        return registry.getRepositoriesWithFacet( UpdateSiteRepository.class );
+        return getRepositoryRegistry().getRepositoriesWithFacet( UpdateSiteRepository.class );
     }
 
     private List<UpdateSiteRepository> updateSites( GroupRepository group )
@@ -120,7 +117,7 @@ public class UpdateSiteMirrorTask
         Repository repo;
         try
         {
-            repo = registry.getRepository( getRepositoryId() );
+            repo = getRepositoryRegistry().getRepository( getRepositoryId() );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -140,7 +137,7 @@ public class UpdateSiteMirrorTask
     {
         try
         {
-            registry.getRepository( repositoryId );
+            getRepositoryRegistry().getRepository( repositoryId );
         }
         catch ( final NoSuchRepositoryException e )
         {
