@@ -490,7 +490,8 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
         autoExpandColumn : 'capabilities-notes-col',
         disableSelection : false,
         viewConfig : {
-          emptyText : 'Click "Add" to configure a capability.'
+          emptyText : 'Click "Add" to configure a capability.',
+          deferEmptyText: false
         }
       });
   this.capabilitiesGridPanel.getSelectionModel().on('rowselect', this.rowSelect, this);
