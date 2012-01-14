@@ -198,7 +198,21 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           field : 'id',
           direction : 'ASC'
         },
-        autoLoad : true
+        autoLoad : true,
+        listeners : {
+          'load' : {
+            fn : function() {
+              var addBtn = Ext.getCmp('capability-add-btn');
+              if(addBtn.hasPermission && this.data.items.length > 0) {
+                addBtn.enable();
+              }
+              else {
+                addBtn.disable();
+              }
+            }
+            },
+            scope : this
+          }
       });
 
   // Reader and datastore that queries the server for the list of currently
@@ -409,7 +423,8 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.addResourceHandler,
-              disabled : !this.sp.checkPermission('nexus:capabilities', this.sp.CREATE)
+              hasPermission : this.sp.checkPermission('nexus:capabilities', this.sp.CREATE),
+              disabled : true
             }, {
               id : 'capability-delete-btn',
               text : 'Delete',
@@ -428,6 +443,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
                   fn : function(checkbox, checked) {
                     this.capabilitiesDataStore.proxy.conn.url = CAPABILITIES_SERVICE_PATH + '?includeHidden=' + checked;
                     this.capabilityTypeDataStore.proxy.conn.url = CAPABILITY_TYPES_SERVICE_PATH + '?includeHidden=' + checked;
+                    this.capabilitiesDataStore.removeAll();
                     this.capabilitiesDataStore.removeAll();
                     this.reloadAll();
                   },
@@ -509,6 +525,8 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
 Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       // Dump the currently stored data and requery for everything
       reloadAll : function() {
+        Ext.getCmp('capability-add-btn').disable();
+
         this.capabilitiesDataStore.reload();
         this.repositoryDataStore.reload();
         this.repositoryGroupDataStore.reload();
