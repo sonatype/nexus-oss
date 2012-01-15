@@ -38,7 +38,7 @@
 
   <properties>
     <sisu-inject.version>2.3.0</sisu-inject.version>
-    <sisu-guice.version>3.1.0</sisu-guice.version>
+    <sisu-guice.version>3.1.1</sisu-guice.version>
   </properties>
 
   <dependencyManagement>
