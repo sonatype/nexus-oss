@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusConstants;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.test.utils.TestProperties;
@@ -53,7 +54,7 @@ public abstract class AbstractNexusProxyP2IT
     public void startProxy()
         throws Exception
     {
-        proxyServer = (ServletServer) lookup( ServletServer.ROLE );
+        proxyServer = lookupProxyServer();
         proxyServer.start();
     }
 
@@ -66,6 +67,12 @@ public abstract class AbstractNexusProxyP2IT
             proxyServer.stop();
             proxyServer = null;
         }
+    }
+
+    protected ServletServer lookupProxyServer()
+        throws ComponentLookupException
+    {
+        return (ServletServer) lookup( ServletServer.ROLE );
     }
 
     protected void replaceInFile( final String filename, final String target, final String replacement )
