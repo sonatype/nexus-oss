@@ -476,7 +476,7 @@ public abstract class AbstractNexusIntegrationTest
         this.copyConfigFile( "security-configuration.xml", testProperties, WORK_CONF_DIR );
 
         this.copyConfigFile( "logback.properties", testProperties, WORK_CONF_DIR );
-        this.copyConfigFile( "logback-default.xml", testProperties, WORK_CONF_DIR );
+        this.copyConfigFile( "logback-nexus.xml", testProperties, WORK_CONF_DIR );
     }
 
     protected void findReplaceInFile( File file, String findString, String replaceString )
