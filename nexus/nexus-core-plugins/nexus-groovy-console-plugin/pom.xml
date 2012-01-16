@@ -73,12 +73,12 @@
         <configuration>
           <nexusBundleArtifact>
             <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-core-oss-webapp</artifactId>
+            <artifactId>nexus-oss-webapp</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
             <classifier>bundle</classifier>
           </nexusBundleArtifact>
-          <nexusBundleName>nexus-core-oss-webapp-${project.version}</nexusBundleName>
+          <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
           <nexusVersion>${project.version}</nexusVersion>
           <nexusPluginsArtifacts>
             <plugin>
