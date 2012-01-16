@@ -35,48 +35,51 @@ import com.google.inject.servlet.GuiceFilter;
 
 public final class NexusGuiceFilter
     extends GuiceFilter
-    implements FilterPipeline
 {
     @Inject
     static List<FilterPipeline> pipelines = Collections.emptyList();
 
-    @Override
-    public void doFilter( final ServletRequest request, final ServletResponse response, final FilterChain chain )
-        throws IOException, ServletException
+    public NexusGuiceFilter()
     {
-        setInjectedPipeline( this );
-
-        super.doFilter( request, response, chain );
+        super( new MultiFilterPipeline() );
     }
 
-    public void initPipeline( ServletContext context )
+    static final class MultiFilterPipeline
+        implements FilterPipeline
     {
+        public void initPipeline( ServletContext context )
+        {
+            // pipelines support lazy initialization
+        }
+
+        public void dispatch( ServletRequest request, ServletResponse response, FilterChain chain )
+            throws IOException, ServletException
+        {
+            new MultiFilterChain( chain ).doFilter( request, response );
+        }
+
+        public void destroyPipeline()
+        {
+            for ( final FilterPipeline p : pipelines )
+            {
+                p.destroyPipeline();
+            }
+        }
     }
 
-    public void dispatch( ServletRequest request, ServletResponse response, FilterChain chain )
-        throws IOException, ServletException
-    {
-        new IteratingFilterChain( chain ).doFilter( request, response );
-    }
-
-    public void destroyPipeline()
-    {
-    }
-
-    final class IteratingFilterChain
+    static final class MultiFilterChain
         implements FilterChain
     {
         private final Iterator<FilterPipeline> itr;
 
         private final FilterChain defaultChain;
 
-        IteratingFilterChain( final FilterChain chain )
+        MultiFilterChain( final FilterChain chain )
         {
             itr = pipelines.iterator();
             defaultChain = chain;
         }
 
-        @Override
         public void doFilter( final ServletRequest request, final ServletResponse response )
             throws IOException, ServletException
         {
