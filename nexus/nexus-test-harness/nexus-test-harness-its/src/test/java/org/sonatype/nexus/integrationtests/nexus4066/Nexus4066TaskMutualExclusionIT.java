@@ -36,10 +36,17 @@ import org.testng.annotations.Test;
 
 import com.google.common.collect.Lists;
 
+/**
+ * Check for tasks mutual exclusion (like two reindex tasks for same repository will run serialized, one will "win" and
+ * run, one will "loose" and wait for winner to finish).
+ */
 public class Nexus4066TaskMutualExclusionIT
     extends AbstractNexusIntegrationTest
 {
 
+    /*
+     * When last argument is false mean task should run in parallel. When it is true task should run serialized.
+     */
     @DataProvider( name = "data", parallel = false )
     public Object[][] createData()
     {
