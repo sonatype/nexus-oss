@@ -138,7 +138,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
         try
         {
-            ResourceStore store = getResourceStore( request, Action.read );
+            ResourceStore store = getResourceStore( request );
 
             try
             {
@@ -191,7 +191,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             for ( FileItem fileItem : files )
             {
-                getResourceStore( request, Action.create ).storeItem( req, fileItem.getInputStream(), null );
+                getResourceStore( request ).storeItem( req, fileItem.getInputStream(), null );
             }
         }
         catch ( Exception t )
@@ -207,7 +207,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     {
         try
         {
-            ResourceStore store = getResourceStore( request, Action.delete );
+            ResourceStore store = getResourceStore( request );
 
             ResourceStoreRequest req = getResourceStoreRequest( request );
 
@@ -244,34 +244,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
 
         return parsedPath;
-    }
-
-    /**
-     * A strategy to get ResourceStore implementor. To be implemented by subclass.
-     * 
-     * @return
-     * @throws NoSuchRepositoryException
-     * @throws NoSuchRepositoryGroupException
-     * @throws NoSuchRepositoryRouterException
-     */
-    protected ResourceStore getResourceStore( final Request request, final Action action )
-        throws NoSuchResourceStoreException, ResourceException
-    {
-        // this will throw NoSuchResourceStoreEx if request addresses nonexistent repository
-        final ResourceStore resourceStore = getResourceStore( request );
-
-        // NXCM-3600: if this is not a readOnly action, and we deal with a Repository instance
-        // that is not exposed, we forbid access to it. And read operation will be handled by
-        // Repository level security anyway.
-        if ( !action.isReadAction() && resourceStore instanceof Repository )
-        {
-            if ( !( (Repository) resourceStore ).isExposed() )
-            {
-                throw new NoSuchRepositoryException( ( (Repository) resourceStore ).getId() );
-            }
-        }
-
-        return resourceStore;
     }
 
     /**
