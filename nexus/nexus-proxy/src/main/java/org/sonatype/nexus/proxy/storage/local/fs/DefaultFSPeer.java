@@ -87,7 +87,7 @@ public class DefaultFSPeer
         if ( cl != null )
         {
             // we have _content_ (content or link), hence we store a file
-            File hiddenTarget = getHiddenTarget( target );
+            final File hiddenTarget = getHiddenTarget( target, item );
 
             // NEXUS-4550: Part One, saving to "hidden" (temp) file
             // In case of error cleaning up only what needed
@@ -319,11 +319,17 @@ public class DefaultFSPeer
 
     // ==
 
-    protected File getHiddenTarget( File target )
+    protected File getHiddenTarget( final File target, final StorageItem item )
+        throws LocalStorageException
     {
-        File hiddenTarget = new File( target.getParentFile(), target.getName() + HIDDEN_TARGET_SUFFIX );
-
-        return hiddenTarget;
+        try
+        {
+            return File.createTempFile( target.getName(), HIDDEN_TARGET_SUFFIX, target.getParentFile() );
+        }
+        catch ( IOException e )
+        {
+            throw new LocalStorageException( e.getMessage(), e );
+        }
     }
 
     protected void mkParentDirs( Repository repository, File target )
