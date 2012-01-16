@@ -559,6 +559,10 @@ public abstract class AbstractArtifactPlexusResource
         else if ( t instanceof AccessDeniedException )
         {
             AbstractResourceStoreContentPlexusResource.challengeIfNeeded( request, res, (AccessDeniedException) t );
+            if(Status.CLIENT_ERROR_FORBIDDEN.equals( res.getStatus() ))
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, t.getMessage() );
+            }
         }
         else if ( t instanceof XmlPullParserException )
         {
