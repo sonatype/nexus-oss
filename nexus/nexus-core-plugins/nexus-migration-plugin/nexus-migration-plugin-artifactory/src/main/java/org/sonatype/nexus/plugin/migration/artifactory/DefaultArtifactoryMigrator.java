@@ -90,7 +90,7 @@ import org.sonatype.scheduling.ScheduledTask;
 @Component( role = ArtifactoryMigrator.class )
 public class DefaultArtifactoryMigrator
     extends AbstractLogEnabled
-    implements ArtifactoryMigrator, Initializable
+    implements ArtifactoryMigrator
 {
     private static final String MAVEN2 = "maven2";
 
@@ -119,9 +119,6 @@ public class DefaultArtifactoryMigrator
 
     @Requirement
     private Nexus nexus;
-
-    @Requirement
-    private LogManager logManager;
 
     @Requirement
     private RepositoryRegistry repositoryRegistry;
@@ -1036,12 +1033,6 @@ public class DefaultArtifactoryMigrator
         zipUnArchiver.extract();
 
         return artifactoryBackup;
-    }
-
-    public void initialize()
-        throws InitializationException
-    {
-        logManager.configure();
     }
 
 }
