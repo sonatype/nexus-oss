@@ -81,7 +81,7 @@
       <plugins>
         <!--
           To perform a release run separately
-          mvn release:prepare -Darugments="-Pquick"
+          mvn release:prepare -Darguments="-Pquick"
           mvn release:perform
         -->
         <plugin>
