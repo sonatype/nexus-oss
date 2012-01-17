@@ -55,6 +55,8 @@
 
     <nexus.version>2.0-M3</nexus.version>
     <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
+    
+    <arguments /> 
   </properties>
 
   <build>
@@ -127,24 +129,11 @@
   <profiles>
     <profile>
       <id>quick</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
+      <properties>
+        <test>void</test>
+        <it.test>void</it.test>
+        <failIfNoTests>false</failIfNoTests>
+      </properties>
     </profile>
 
     <!-- HACK: Workaround for issue with IDEA loading nexus-plugin artifacts -->
