@@ -77,6 +77,25 @@
 
     <pluginManagement>
       <plugins>
+        <!--
+          To perform a release run separately
+          mvn release:prepare -Darugments="-Pquick"
+          mvn release:perform
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-release-plugin</artifactId>
+          <version>2.2.1</version>
+          <configuration>
+            <autoVersionSubmodules>true</autoVersionSubmodules>
+            <useReleaseProfile>false</useReleaseProfile>
+            <goals>deploy</goals>
+            <!-- Use a quick build to verify the tag, and a full build with ITs for the deploy -->
+            <arguments>${arguments}</arguments>
+            <releaseProfiles>release</releaseProfiles>
+            <tagNameFormat>nexus-capabilities-plugin-@{version}</tagNameFormat>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-failsafe-plugin</artifactId>
