@@ -422,6 +422,7 @@ public abstract class AbstractRepository
         this.accessManager = accessManager;
     }
 
+    @Deprecated
     public void expireCaches( ResourceStoreRequest request )
     {
         if ( !getLocalStatus().shouldServiceRequest() )

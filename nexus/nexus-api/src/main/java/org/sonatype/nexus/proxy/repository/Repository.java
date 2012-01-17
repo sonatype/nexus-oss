@@ -173,7 +173,7 @@ public interface Repository
      * @return
      * @throws StorageException when some storage (IO) problem happens.
      */
-    Action getResultingActionOnWrite( ResourceStoreRequest rsr ) 
+    Action getResultingActionOnWrite( ResourceStoreRequest rsr )
         throws LocalStorageException;
 
     /**
@@ -464,6 +464,9 @@ public interface Repository
      * Purges the caches (NFC and expires files) from path and below.
      * 
      * @param path a path from to start descending. If null, it is taken as "root".
+     * @deprecated This method is here for historical purposes, it's invocation is equal to subsequent invocations of
+     *             {@link ProxyRepository#expireProxyCaches(ResourceStoreRequest)} and then
+     *             {@link #expireNotFoundCaches(ResourceStoreRequest)}.
      */
     void expireCaches( ResourceStoreRequest request );
 

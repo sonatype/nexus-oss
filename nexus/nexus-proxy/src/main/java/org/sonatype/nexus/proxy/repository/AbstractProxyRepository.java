@@ -200,7 +200,7 @@ public abstract class AbstractProxyRepository
     }
 
     @Override
-    public void expireCaches( ResourceStoreRequest request )
+    public void expireProxyCaches( final ResourceStoreRequest request )
     {
         if ( !getLocalStatus().shouldServiceRequest() )
         {
@@ -218,7 +218,7 @@ public abstract class AbstractProxyRepository
             }
             request.setRequestLocalOnly( true );
             getLogger().info(
-                "Expiring local cache in repository ID='" + getId() + "' from path='" + request.getRequestPath() + "'" );
+                "Expiring proxy cache in repository ID='" + getId() + "' from path='" + request.getRequestPath() + "'" );
 
             // 1st, expire all the files below path
             final DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
@@ -242,7 +242,17 @@ public abstract class AbstractProxyRepository
             getApplicationEventMulticaster().notifyEventListeners(
                 new RepositoryEventExpireProxyCaches( this, request.getRequestPath() ) );
         }
+    }
+    
+    @Override
+    public void expireCaches( final ResourceStoreRequest request )
+    {
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return;
+        }
 
+        expireProxyCaches( request );
         // do the stuff we inherited
         super.expireCaches( request );
     }
