@@ -26,7 +26,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>10</version>
+    <version>11</version>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
@@ -53,7 +53,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <nexus.version>2.0-SNAPSHOT</nexus.version>
+    <nexus.version>2.0-M3</nexus.version>
     <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
   </properties>
 
