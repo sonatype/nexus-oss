@@ -21,28 +21,41 @@ package org.sonatype.nexus.proxy.events;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
- * The event that is occurred within a Repository, such as content changes or other maintenance stuff.
+ * The event fired on Expiring the Not Found cache of the repository.
+ * <p>
+ * Note: this class subclasses {@link RepositoryEventExpireCaches} only to keep it type-equal in case of legacy code
+ * doing {@code instanceof} checks against this instance when fired. In the future, the superclass will be removed and
+ * this class will directly extend {@link RepositoryMaintenanceEvent}. Also, even today, it does not share any of the
+ * state and member variables with it's (artificially kept for backward compatibility) parent class.
  * 
  * @author cstamas
+ * @since 2.0
  */
-public abstract class RepositoryEvent
-    extends AbstractEvent<Repository>
+public class RepositoryEventExpireNotFoundCaches
+    extends RepositoryEventExpireCaches
 {
-    public RepositoryEvent( final Repository repository )
+    /** From where it happened */
+    private final String path;
+
+    private final boolean cacheAltered;
+
+    public RepositoryEventExpireNotFoundCaches( final Repository repository, final String path,
+                                                final boolean cacheAltered )
     {
-        super( checkNotNull( repository ) );
+        super( checkNotNull( repository ), checkNotNull( path ) );
+        this.path = checkNotNull( path );
+        this.cacheAltered = cacheAltered;
     }
 
-    /**
-     * Gets the repository.
-     * 
-     * @return the repository
-     */
-    public Repository getRepository()
+    public String getPath()
     {
-        return getEventSender();
+        return path;
+    }
+
+    public boolean isCacheAltered()
+    {
+        return cacheAltered;
     }
 }

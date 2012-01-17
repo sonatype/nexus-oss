@@ -16,34 +16,39 @@
  * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
  * All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.proxy.cache;
+package org.sonatype.nexus.proxy.events;
 
-import java.util.Collection;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * Cache that stores paths.
+ * The event fired on Expiring Proxy Caches (proxy repository's local storage is actually proxy-cache). This event is
+ * fired only when {@link Repository#expireCaches(org.sonatype.nexus.proxy.ResourceStoreRequest)} method is invoked on a
+ * {@link ProxyRepository} repository that has proxy facet available (is proxy).
  * 
  * @author cstamas
+ * @since 2.0
  */
-public interface PathCache
+public class RepositoryEventExpireProxyCaches
+    extends RepositoryMaintenanceEvent
 {
-    boolean contains( String path );
+    /** From where it happened */
+    private final String path;
 
-    boolean isExpired( String path );
+    public RepositoryEventExpireProxyCaches( final ProxyRepository repository, final String path )
+    {
+        super( repository );
+        this.path = path;
+    }
 
-    boolean remove( String path );
+    @Override
+    public ProxyRepository getRepository()
+    {
+        return (ProxyRepository) super.getRepository();
+    }
 
-    boolean removeWithParents( String path );
-
-    boolean removeWithChildren( String path );
-
-    boolean purge();
-
-    void put( String path, Object element );
-
-    void put( String path, Object element, int expirationSeconds );
-
-    CacheStatistics getStatistics();
-    
-    Collection<String> listKeysInCache();
+    public String getPath()
+    {
+        return path;
+    }
 }
