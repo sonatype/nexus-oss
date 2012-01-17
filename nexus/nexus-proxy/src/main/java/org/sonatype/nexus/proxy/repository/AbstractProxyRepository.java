@@ -222,7 +222,8 @@ public abstract class AbstractProxyRepository
 
             // 1st, expire all the files below path
             final DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
-            ctx.getProcessors().add( new ExpireCacheWalker( this ) );
+            final ExpireCacheWalker expireCacheWalkerProcessor = new ExpireCacheWalker( this );
+            ctx.getProcessors().add( expireCacheWalkerProcessor );
 
             try
             {
@@ -240,10 +241,11 @@ public abstract class AbstractProxyRepository
 
             // fire off the new event if crawling did end, so we did flip all the bits
             getApplicationEventMulticaster().notifyEventListeners(
-                new RepositoryEventExpireProxyCaches( this, request.getRequestPath(), request.getRequestContext().flatten() ) );
+                new RepositoryEventExpireProxyCaches( this, request.getRequestPath(),
+                    request.getRequestContext().flatten(), expireCacheWalkerProcessor.isCacheAltered() ) );
         }
     }
-    
+
     @Override
     public void expireCaches( final ResourceStoreRequest request )
     {

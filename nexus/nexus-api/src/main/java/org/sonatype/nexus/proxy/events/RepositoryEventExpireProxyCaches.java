@@ -42,12 +42,16 @@ public class RepositoryEventExpireProxyCaches
     /** Request initiating it */
     private final Map<String, Object> requestContext;
 
+    /** Flag marking was actually some entries removed or not */
+    private final boolean cacheAltered;
+
     public RepositoryEventExpireProxyCaches( final ProxyRepository repository, final String path,
-                                             final Map<String, Object> requestContext )
+                                             final Map<String, Object> requestContext, final boolean cacheAltered )
     {
         super( repository );
         this.path = checkNotNull( path );
         this.requestContext = checkNotNull( requestContext );
+        this.cacheAltered = cacheAltered;
     }
 
     @Override
@@ -74,5 +78,15 @@ public class RepositoryEventExpireProxyCaches
     public Map<String, Object> getRequestContext()
     {
         return requestContext;
+    }
+
+    /**
+     * Returns true if expire proxy caches actually did expired entries from the cache (cache alteration happened).
+     * 
+     * @return
+     */
+    public boolean isCacheAltered()
+    {
+        return cacheAltered;
     }
 }

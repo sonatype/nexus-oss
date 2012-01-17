@@ -25,12 +25,14 @@ import org.sonatype.nexus.proxy.walker.WalkerContext;
 public class ExpireCacheWalker
     extends AbstractFileWalkerProcessor
 {
-
     private final Repository repository;
+
+    private int alteredItemCount;
 
     public ExpireCacheWalker( Repository repository )
     {
         this.repository = repository;
+        this.alteredItemCount = 0;
     }
 
     public Repository getRepository()
@@ -42,12 +44,25 @@ public class ExpireCacheWalker
     protected void processFileItem( WalkerContext context, StorageFileItem item )
         throws Exception
     {
-        // expiring found files
-        // expire it
-        item.setExpired( true );
+        if ( !item.isExpired() )
+        {
+            // expiring found files
+            item.setExpired( true );
 
-        // store it
-        getRepository().getAttributesHandler().storeAttributes( item );
+            // store it
+            getRepository().getAttributesHandler().storeAttributes( item );
+
+            alteredItemCount++;
+        }
     }
 
+    public boolean isCacheAltered()
+    {
+        return alteredItemCount > 0;
+    }
+
+    public int getAlteredItemCount()
+    {
+        return alteredItemCount;
+    }
 }
