@@ -50,9 +50,7 @@ import org.sonatype.nexus.log.DefaultLogConfiguration;
 import org.sonatype.nexus.log.LogConfiguration;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 import org.sonatype.nexus.log.LogManager;
-
 import com.google.inject.Injector;
-
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -63,6 +61,7 @@ import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.util.StatusPrinter;
 
 //TODO configuration operations should be locking
+
 /**
  * @author cstamas
  * @author juven
@@ -198,7 +197,7 @@ public class LogbackLogManager
     /**
      * Retrieves a stream to the requested log file. This method ensures that the file is rooted in the log folder to
      * prevent browsing of the file system.
-     * 
+     *
      * @param logFile path of the file to retrieve
      * @returns InputStream to the file or null if the file is not allowed or doesn't exist.
      */
@@ -320,7 +319,7 @@ public class LogbackLogManager
             catch ( IOException e )
             {
                 throw new IllegalStateException( "Could not create logback.properties as "
-                    + logConfigPropsFile.getAbsolutePath() );
+                                                     + logConfigPropsFile.getAbsolutePath() );
             }
         }
 
@@ -342,7 +341,7 @@ public class LogbackLogManager
                     catch ( IOException e )
                     {
                         throw new IllegalStateException( String.format( "Could not create %s as %s", name,
-                            logConfigFile.getAbsolutePath() ), e );
+                                                                        logConfigFile.getAbsolutePath() ), e );
                     }
                     finally
                     {
@@ -358,13 +357,19 @@ public class LogbackLogManager
             out = new PrintWriter( logConfigFile );
 
             out.println( "<?xml version='1.0' encoding='UTF-8'?>" );
+            out.println();
+            out.println( "<!--" );
+            out.println( "    DO NOT EDIT – This file aggregates log configuration from Nexus and its plugins, and is automatically generated." );
+            out.println( "-->" );
+            out.println();
             out.println( "<configuration scan='true'>" );
             out.println( "  <property file='${nexus.log-config-dir}/logback.properties'/>" );
             if ( logConfigurationParticipants != null )
             {
                 for ( LogConfigurationParticipant participant : logConfigurationParticipants )
                 {
-                    out.println( String.format( "  <include file='${nexus.log-config-dir}/%s'/>", participant.getName() ) );
+                    out.println(
+                        String.format( "  <include file='${nexus.log-config-dir}/%s'/>", participant.getName() ) );
                 }
             }
             out.write( "</configuration>" );

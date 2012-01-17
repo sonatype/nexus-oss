@@ -19,6 +19,11 @@
     All other trademarks are the property of their respective owners.
 
 -->
+
+<!--
+    DO NOT EDIT – This log appender is used by Nexus to populate the "Error and warning events" system feed.
+-->
+
 <included>
 
   <appender name="events" class="org.sonatype.nexus.log.internal.NexusEventSystemAppender">
