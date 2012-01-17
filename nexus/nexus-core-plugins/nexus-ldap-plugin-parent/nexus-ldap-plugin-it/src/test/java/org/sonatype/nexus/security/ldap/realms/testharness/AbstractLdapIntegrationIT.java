@@ -130,12 +130,12 @@ public abstract class AbstractLdapIntegrationIT
     @Override
     public XStream getXMLXStream()
     {
-        return new XStreamInitalizer().initXStream( super.getXMLXStream() );
+        return XStreamInitalizer.initXStream( super.getXMLXStream() );
     }
 
     @Override
     public XStream getJsonXStream()
     {
-        return new XStreamInitalizer().initXStream( super.getJsonXStream() );
+        return XStreamInitalizer.initXStream( super.getJsonXStream() );
     }
 }

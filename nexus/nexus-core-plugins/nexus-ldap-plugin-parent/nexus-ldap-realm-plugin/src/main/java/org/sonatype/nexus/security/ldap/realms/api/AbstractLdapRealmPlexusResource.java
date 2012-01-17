@@ -208,7 +208,7 @@ public abstract class AbstractLdapRealmPlexusResource
     public void configureXStream( XStream xstream )
     {
         super.configureXStream( xstream );
-        new XStreamInitalizer().initXStream( xstream );
+        XStreamInitalizer.initXStream( xstream );
     }
 
     protected DefaultLdapContextFactory buildDefaultLdapContextFactory( CConnectionInfo connectionInfo ) throws MalformedURLException

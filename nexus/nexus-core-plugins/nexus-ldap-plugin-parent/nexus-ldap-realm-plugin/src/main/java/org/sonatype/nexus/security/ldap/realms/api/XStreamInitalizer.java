@@ -29,12 +29,13 @@ import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserListResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserResponseDTO;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapAuthenticationTestRequest;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequest;
+import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequestDTO;
 import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 
 public class XStreamInitalizer
 {
 
-    public XStream initXStream( XStream xstream )
+    public static XStream initXStream( XStream xstream )
     {
         
         xstream.processAnnotations( LdapConnectionInfoResponse.class );
@@ -59,6 +60,11 @@ public class XStreamInitalizer
         xstream.registerLocalConverter( LdapConnectionInfoDTO.class, "searchBase", converter );
         xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "groupBaseDn", converter );
         xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "userBaseDn", converter );
+        xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "groupMemberFormat", converter );
+
+        xstream.registerLocalConverter( LdapUserAndGroupConfigTestRequestDTO.class, "systemUsername", converter );
+        xstream.registerLocalConverter( LdapUserAndGroupConfigTestRequestDTO.class, "systemPassword", converter );
+        xstream.registerLocalConverter( LdapUserAndGroupConfigTestRequestDTO.class, "searchBase", converter );
 
         xstream.registerLocalConverter( LdapUserListResponse.class, "data", new AliasingListConverter(
           LdapUserResponseDTO.class, "user" ) );

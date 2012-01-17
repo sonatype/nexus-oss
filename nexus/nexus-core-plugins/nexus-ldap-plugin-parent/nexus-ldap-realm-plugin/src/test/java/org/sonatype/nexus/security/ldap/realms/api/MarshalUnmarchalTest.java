@@ -21,9 +21,11 @@ package org.sonatype.nexus.security.ldap.realms.api;
 import java.text.SimpleDateFormat;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.sonatype.nexus.rest.model.XStreamConfigurator;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
@@ -51,10 +53,11 @@ public class MarshalUnmarchalTest
         throws Exception
     {
         xstreamXML = new XStream( new LookAheadXppDriver() );
-        new XStreamInitalizer().initXStream( xstreamXML );
+        XStreamConfigurator.configureXStream( xstreamXML );
+        XStreamInitalizer.initXStream( xstreamXML );
 
 //        xstreamJSON = napp.doConfigureXstream( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
-//        new XStreamInitalizer().initXStream( xstreamJSON );
+//        XStreamInitalizer.initXStream( xstreamJSON );
     }
 
     @Test
@@ -166,6 +169,68 @@ public class MarshalUnmarchalTest
     }
 
     @Test
+    public void testLdapUserAndGroupConfigTestRequestWithEscape() throws Exception
+    {
+        LdapUserAndGroupConfigTestRequest resource = new LdapUserAndGroupConfigTestRequest();
+        LdapUserAndGroupConfigTestRequestDTO dto = new LdapUserAndGroupConfigTestRequestDTO();
+
+        resource.setData( dto );
+
+        dto.setAuthScheme( "authScheme&" );
+        dto.setHost( "host&" );
+        dto.setPort( 123 );
+        dto.setProtocol( "protocol&" );
+        dto.setRealm( "realm&" );
+        dto.setSearchBase( "searchBase&" );
+        dto.setSystemPassword( "systemPassword&" );
+        dto.setSystemUsername( "systemUsername&" );
+        dto.setUserMemberOfAttribute( "userMemberOfAttribute&" );
+        dto.setEmailAddressAttribute( "emailAddressAttribute&" );
+        dto.setGroupBaseDn( "groupBaseDn&" );
+        dto.setGroupIdAttribute( "groupIdAttribute&" );
+        dto.setGroupMemberFormat( "groupMemberFormat&" );
+        dto.setGroupMemberAttribute( "groupMemberAttribute&" );
+        dto.setGroupMemberFormat( "groupMemberFormat&" );
+        dto.setGroupObjectClass( "groupObjectClass&" );
+        dto.setUserBaseDn( "userBaseDn&" );
+        dto.setUserIdAttribute( "userIdAttribute&" );
+        dto.setUserObjectClass( "userObjectClass&" );
+        dto.setUserPasswordAttribute( "userPasswordAttribute&" );
+        dto.setUserRealNameAttribute( "userRealNameAttribute&" );
+        dto.setUserSubtree( true );
+
+        validateXmlHasNoPackageNames( resource );
+
+        String xml = this.xstreamXML.toXML( resource );
+        LdapUserAndGroupConfigTestRequestDTO result = ((LdapUserAndGroupConfigTestRequest) this.xstreamXML.fromXML( xml )).getData();
+
+
+        Assert.assertEquals( result.getSearchBase(), "searchBase&" );
+        Assert.assertEquals( result.getSystemPassword(), "systemPassword&" );
+        Assert.assertEquals( result.getSystemUsername(), "systemUsername&" );
+        Assert.assertEquals( result.getGroupMemberFormat(), "groupMemberFormat&" );
+        Assert.assertEquals( result.getGroupBaseDn(), "groupBaseDn&" );
+        Assert.assertEquals( result.getUserBaseDn(), "userBaseDn&" );
+
+        Assert.assertEquals( result.getAuthScheme(), "authScheme&amp;" );
+        Assert.assertEquals( result.getHost(), "host&amp;" );
+        Assert.assertEquals( result.getPort(), 123 );
+        Assert.assertEquals( result.getProtocol(), "protocol&amp;" );
+        Assert.assertEquals( result.getRealm(), "realm&amp;" );
+        Assert.assertEquals( result.getUserMemberOfAttribute(), "userMemberOfAttribute&amp;" );
+        Assert.assertEquals( result.getEmailAddressAttribute(), "emailAddressAttribute&amp;" );
+        Assert.assertEquals( result.getGroupIdAttribute(), "groupIdAttribute&amp;" );
+        Assert.assertEquals( result.getGroupMemberAttribute(), "groupMemberAttribute&amp;" );
+        Assert.assertEquals( result.getGroupObjectClass(), "groupObjectClass&amp;" );
+        Assert.assertEquals( result.getUserIdAttribute(), "userIdAttribute&amp;" );
+        Assert.assertEquals( result.getUserObjectClass(), "userObjectClass&amp;" );
+        Assert.assertEquals( result.getUserPasswordAttribute(), "userPasswordAttribute&amp;" );
+        Assert.assertEquals( result.getUserRealNameAttribute(), "userRealNameAttribute&amp;" );
+        Assert.assertEquals( result.isUserSubtree(), true );
+
+    }
+
+    @Test
     public void testLdapAuthenticationTestRequest() throws Exception
     {
         LdapAuthenticationTestRequest resource = new LdapAuthenticationTestRequest();
@@ -200,8 +265,8 @@ public class MarshalUnmarchalTest
         Assert.assertFalse( "Found package name in XML:\n" + xml, totalCount > 0 );
 
         // // print out each type of method, so i can rafb it
-        // System.out.println( "\n\nClass: "+ obj.getClass() +"\n" );
-        // System.out.println( xml+"\n" );
+        System.out.println( "\n\nClass: "+ obj.getClass() +"\n" );
+        System.out.println( xml+"\n" );
         //
         // Assert.assertFalse( "Found <string> XML: " + obj.getClass() + "\n" + xml, xml.contains( "<string>" ) );
 
