@@ -18,6 +18,10 @@
  */
 package org.sonatype.nexus.proxy.events;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.util.Map;
+
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -35,10 +39,15 @@ public class RepositoryEventExpireProxyCaches
     /** From where it happened */
     private final String path;
 
-    public RepositoryEventExpireProxyCaches( final ProxyRepository repository, final String path )
+    /** Request initiating it */
+    private final Map<String, Object> requestContext;
+
+    public RepositoryEventExpireProxyCaches( final ProxyRepository repository, final String path,
+                                             final Map<String, Object> requestContext )
     {
         super( repository );
-        this.path = path;
+        this.path = checkNotNull( path );
+        this.requestContext = checkNotNull( requestContext );
     }
 
     @Override
@@ -47,8 +56,23 @@ public class RepositoryEventExpireProxyCaches
         return (ProxyRepository) super.getRepository();
     }
 
+    /**
+     * Returns the repository path against which expire proxy caches was invoked.
+     * 
+     * @return
+     */
     public String getPath()
     {
         return path;
+    }
+
+    /**
+     * Returns the copy of the request context in the moment expire proxy caches was invoked.
+     * 
+     * @return
+     */
+    public Map<String, Object> getRequestContext()
+    {
+        return requestContext;
     }
 }

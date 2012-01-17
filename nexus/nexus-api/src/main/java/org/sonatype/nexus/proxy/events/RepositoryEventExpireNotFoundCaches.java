@@ -20,6 +20,8 @@ package org.sonatype.nexus.proxy.events;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Map;
+
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -39,21 +41,47 @@ public class RepositoryEventExpireNotFoundCaches
     /** From where it happened */
     private final String path;
 
+    /** Request initiating it */
+    private final Map<String, Object> requestContext;
+
+    /** Flag marking was actually some entries removed or not */
     private final boolean cacheAltered;
 
     public RepositoryEventExpireNotFoundCaches( final Repository repository, final String path,
-                                                final boolean cacheAltered )
+                                                final Map<String, Object> requestContext, final boolean cacheAltered )
     {
         super( checkNotNull( repository ), checkNotNull( path ) );
         this.path = checkNotNull( path );
+        this.requestContext = checkNotNull( requestContext );
         this.cacheAltered = cacheAltered;
     }
 
+    /**
+     * Returns the repository path against which expire proxy caches was invoked.
+     * 
+     * @return
+     */
+    @Override
     public String getPath()
     {
         return path;
     }
 
+    /**
+     * Returns the copy of the request context in the moment expire proxy caches was invoked.
+     * 
+     * @return
+     */
+    public Map<String, Object> getRequestContext()
+    {
+        return requestContext;
+    }
+
+    /**
+     * Returns true if expire not found caches actually did remove entries from the cache (cache alteration happened).
+     * 
+     * @return
+     */
     public boolean isCacheAltered()
     {
         return cacheAltered;

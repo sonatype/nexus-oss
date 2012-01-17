@@ -240,7 +240,7 @@ public abstract class AbstractProxyRepository
 
             // fire off the new event if crawling did end, so we did flip all the bits
             getApplicationEventMulticaster().notifyEventListeners(
-                new RepositoryEventExpireProxyCaches( this, request.getRequestPath() ) );
+                new RepositoryEventExpireProxyCaches( this, request.getRequestPath(), request.getRequestContext().flatten() ) );
         }
     }
     

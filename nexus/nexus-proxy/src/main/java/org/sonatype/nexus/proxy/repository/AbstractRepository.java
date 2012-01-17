@@ -50,7 +50,6 @@ import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
-import org.sonatype.nexus.proxy.events.RepositoryEventExpireCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireNotFoundCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
@@ -475,7 +474,7 @@ public abstract class AbstractRepository
         }
 
         getApplicationEventMulticaster().notifyEventListeners(
-            new RepositoryEventExpireNotFoundCaches( this, request.getRequestPath(), cacheAltered ) );
+            new RepositoryEventExpireNotFoundCaches( this, request.getRequestPath(), request.getRequestContext().flatten(), cacheAltered ) );
     }
 
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
