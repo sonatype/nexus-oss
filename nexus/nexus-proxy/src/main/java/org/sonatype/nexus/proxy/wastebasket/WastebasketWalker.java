@@ -18,8 +18,11 @@
  */
 package org.sonatype.nexus.proxy.wastebasket;
 
+import java.util.Collection;
+
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -46,7 +49,8 @@ public class WastebasketWalker
         long now = System.currentTimeMillis();
         long limitDate = now - age;
 
-        if ( item instanceof StorageFileItem && item.getModified() < limitDate )
+        if ( item instanceof StorageFileItem && //
+            ( age == DefaultWastebasket.ALL || item.getModified() < limitDate ) )
         {
             try
             {
@@ -67,4 +71,21 @@ public class WastebasketWalker
         }
     }
 
+    @Override
+    public void onCollectionExit( WalkerContext ctx, StorageCollectionItem item )
+        throws Exception
+    {
+        if ( ctx.getResourceStoreRequest().getRequestPath().equals( item.getPath() ) )
+        {
+            // NEXUS-4642 do not delete the trash
+            return;
+        }
+
+        // item is now gone, let's check if this is empty and if so delete it as well
+        Collection<StorageItem> items = item.list();
+        if ( items.isEmpty() )
+        {
+            ctx.getRepository().getLocalStorage().shredItem( ctx.getRepository(), item.getResourceStoreRequest() );
+        }
+    }
 }

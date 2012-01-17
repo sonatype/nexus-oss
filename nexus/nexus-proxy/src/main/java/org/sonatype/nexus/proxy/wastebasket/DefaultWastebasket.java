@@ -37,14 +37,17 @@ import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.walker.AffirmativeStoreWalkerFilter;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.Walker;
+import org.sonatype.sisu.resource.scanner.Listener;
+import org.sonatype.sisu.resource.scanner.Scanner;
 
 @Component( role = Wastebasket.class )
 public class DefaultWastebasket
     implements SmartWastebasket
 {
+
     private static final String TRASH_PATH_PREFIX = "/.nexus/trash";
 
-    private static final long ALL = -1L;
+    static final long ALL = -1L;
 
     private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
 
@@ -67,6 +70,9 @@ public class DefaultWastebasket
 
     @Requirement
     private Walker walker;
+
+    @Requirement( hint = "serial" )
+    private Scanner scanner;
 
     protected Walker getWalker()
     {
@@ -131,17 +137,40 @@ public class DefaultWastebasket
             purge( repository, age );
         }
 
-        if ( age == ALL )
-        {
-            // NEXUS-4078: deleting "legacy" trash too for now
-            File basketFile =
-                getApplicationConfiguration().getWorkingDirectory( AbstractRepositoryFolderCleaner.GLOBAL_TRASH_KEY );
+        // NEXUS-4078: deleting "legacy" trash too for now
+        // NEXUS-4468 legacy was not being cleaned up
+        final File basketFile =
+            getApplicationConfiguration().getWorkingDirectory( AbstractRepositoryFolderCleaner.GLOBAL_TRASH_KEY );
 
-            // check for existence, is this needed at all?
-            if ( basketFile.isDirectory() )
+        // check for existence, is this needed at all?
+        if ( basketFile.isDirectory() )
+        {
+            final long limitDate = System.currentTimeMillis() - age;
+
+            scanner.scan( basketFile, new Listener()
             {
-                AbstractRepositoryFolderCleaner.deleteFilesRecursively( basketFile );
-            }
+                @Override
+                public void onFile( File file )
+                {
+                    if ( age == ALL || file.lastModified() < limitDate )
+                    {
+                        file.delete();
+                    }
+                }
+
+                @Override
+                public void onExitDirectory( File directory )
+                {
+                    if ( !basketFile.equals( directory ) && directory.list().length == 0 )
+                    {
+                        directory.delete();
+                    }
+                }
+
+                public void onEnterDirectory( File directory ) {}
+                public void onEnd() {}
+                public void onBegin() {}
+            } );
         }
     }
 
@@ -161,24 +190,8 @@ public class DefaultWastebasket
     {
         ResourceStoreRequest req = new ResourceStoreRequest( getTrashPath( repository, RepositoryItemUid.PATH_ROOT ) );
 
-        if ( age == ALL )
-        {
-            // simple and fast way, no need for walker
-            try
-            {
-                repository.getLocalStorage().shredItem( repository, req );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // silent
-            }
-            catch ( UnsupportedStorageOperationException e )
-            {
-                // silent?
-            }
-        }
-        else
-        {
+        // NEXUS-4642 shall not delete the directory, since causes a problem if this has been symlinked to another
+        // directory.
             // walker and walk and changes for age
             if ( repository.getLocalStorage().containsItem( repository, req ) )
             {
@@ -193,7 +206,6 @@ public class DefaultWastebasket
 
                 getWalker().walk( ctx );
             }
-        }
     }
 
     @Override
