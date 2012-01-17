@@ -228,6 +228,8 @@ public class DefaultScheduledTask<T>
             {
                 // manualRun would be reset on transition to RUNNING, so we need to do that here as well
                 manualRun = false;
+                // NEXUS-4681 set last run to identify we tried to run this
+                setLastRun( new Date() );
 
                 // remove one-shots
                 if ( getScheduleIterator().isFinished() )
