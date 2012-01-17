@@ -114,7 +114,7 @@ public class EhCachePathCache
         {
             if ( key.startsWith( keyToRemove ) )
             {
-                removed = removed || getEHCache().remove( key );
+                removed = getEHCache().remove( key ) || removed;
             }
         }
         return removed;
