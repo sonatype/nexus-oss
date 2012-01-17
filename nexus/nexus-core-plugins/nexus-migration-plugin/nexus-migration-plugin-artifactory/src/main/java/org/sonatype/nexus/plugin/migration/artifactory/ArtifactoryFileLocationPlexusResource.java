@@ -63,7 +63,6 @@ import org.sonatype.security.usermanagement.User;
 @Component( role = PlexusResource.class, hint = "artifactoryFileLocation" )
 public class ArtifactoryFileLocationPlexusResource
     extends AbstractArtifactoryMigrationPlexusResource
-    implements Initializable
 {
 
     @Requirement
@@ -71,9 +70,6 @@ public class ArtifactoryFileLocationPlexusResource
 
     @Requirement
     private RepositoryRegistry repositoryRegistry;
-
-    @Requirement
-    private LogManager logManager;
 
     public ArtifactoryFileLocationPlexusResource()
     {
@@ -362,12 +358,6 @@ public class ArtifactoryFileLocationPlexusResource
             }
         }
         return null;
-    }
-
-    public void initialize()
-        throws InitializationException
-    {
-        logManager.configure();
     }
 
 }
