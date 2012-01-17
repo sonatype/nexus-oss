@@ -24,21 +24,29 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus</artifactId>
-    <version>1.9.2.3</version>
+    <groupId>org.sonatype.forge</groupId>
+    <artifactId>forge-parent</artifactId>
+    <version>11</version>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-obr-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
-  <version>1.10.0-SNAPSHOT</version>
+  <version>2.0-SNAPSHOT</version>
 
   <name>Nexus Plugin :: OBR</name>
   <description>Adds a repository type for OBR repositories.</description>
+  
+  <scm>
+    <connection>scm:git:git@github.com/sonatype/nexus-obr-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/sonatype/nexus-obr-plugin.git</developerConnection>
+    <url>http://github.com/sonatype/nexus-obr-plugin</url>
+  </scm>
 
   <properties>
     <felix.home>${project.build.directory}/felix</felix.home>
+    <nexus.version>2.0-M3</nexus.version>
+    <applifecycle.version>1.5</applifecycle.version>
   </properties>
 
   <dependencies>
@@ -54,6 +62,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
+      <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -68,17 +77,23 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
+      <version>${nexus.version}</version>
       <classifier>tests</classifier>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-proxy</artifactId>
+      <version>${nexus.version}</version>
       <classifier>tests</classifier>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
+      <version>${nexus.version}</version>
       <classifier>tests</classifier>
+      <scope>test</scope>
     </dependency>
 
     <!-- AllInOne for ITs -->
@@ -150,6 +165,7 @@
         <plugin>
           <groupId>org.sonatype.nexus.plugins</groupId>
           <artifactId>nexus-test-environment-maven-plugin</artifactId>
+          <version>${nexus.version}</version>
           <executions>
             <execution>
               <goals>
@@ -172,11 +188,13 @@
               <plugin>
                 <groupId>org.sonatype.nexus</groupId>
                 <artifactId>nexus-it-helper-plugin</artifactId>
+                <version>${nexus.version}</version>
                 <classifier>cp</classifier>
               </plugin>
               <plugin>
                 <groupId>org.sonatype.nexus</groupId>
                 <artifactId>nexus-it-helper-plugin</artifactId>
+                <version>${nexus.version}</version>
                 <classifier>bundle</classifier>
                 <type>zip</type>
               </plugin>
