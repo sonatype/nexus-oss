@@ -126,13 +126,6 @@ public class Nxcm3600IntegrationCase1IT
                 RequestFacade.toNexusURL( "content/repositories/" + REPO_TEST_HARNESS_RELEASE_REPO
                     + "/nxcm3600/artifact/1.0.0/artifact-1.0.0.jar" ), Method.DELETE );
         MatcherAssert.assertThat( responseStatus.getCode(), equalTo( 404 ) );
-        // try and verify authenticated /service/local DELETE access gives 404
-        responseStatus =
-            sendMessage(
-                true,
-                RequestFacade.toNexusURL( "service/local/repositories/" + REPO_TEST_HARNESS_RELEASE_REPO
-                    + "/content/nxcm3600/artifact/1.0.0/artifact-1.0.0.jar" ), Method.DELETE );
-        MatcherAssert.assertThat( responseStatus.getCode(), equalTo( 404 ) );
         // try and verify anon /content DELETE access gives 401
         responseStatus =
             sendMessage(
@@ -147,5 +140,12 @@ public class Nxcm3600IntegrationCase1IT
                 RequestFacade.toNexusURL( "service/local/repositories/" + REPO_TEST_HARNESS_RELEASE_REPO
                     + "/content/nxcm3600/artifact/1.0.0/artifact-1.0.0.jar" ), Method.DELETE );
         MatcherAssert.assertThat( responseStatus.getCode(), equalTo( 401 ) );
+        // try and verify authenticated /service/local DELETE access gives 204
+        responseStatus =
+            sendMessage(
+                true,
+                RequestFacade.toNexusURL( "service/local/repositories/" + REPO_TEST_HARNESS_RELEASE_REPO
+                    + "/content/nxcm3600/artifact/1.0.0/artifact-1.0.0.jar" ), Method.DELETE );
+        MatcherAssert.assertThat( responseStatus.getCode(), equalTo( 204 ) );
     }
 }

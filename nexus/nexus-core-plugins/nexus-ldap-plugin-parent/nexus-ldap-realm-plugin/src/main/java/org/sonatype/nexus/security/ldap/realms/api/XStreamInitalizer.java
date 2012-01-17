@@ -18,22 +18,24 @@
  */
 package org.sonatype.nexus.security.ldap.realms.api;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.basic.StringConverter;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoResponse;
+import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserListResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserResponseDTO;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapAuthenticationTestRequest;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequest;
+import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequestDTO;
 import org.sonatype.plexus.rest.xstream.AliasingListConverter;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.basic.StringConverter;
 
 public class XStreamInitalizer
 {
 
-    public XStream initXStream( XStream xstream )
+    public static XStream initXStream( XStream xstream )
     {
         
         xstream.processAnnotations( LdapConnectionInfoResponse.class );
@@ -44,19 +46,30 @@ public class XStreamInitalizer
 
         // NXCM-2974 unescape html entities like "o=org&amp;org", they get escaped by nexus-rest-api json->DTO
         // conversion
-        xstream.registerConverter( new StringConverter()
+        final StringConverter converter = new StringConverter()
         {
             @Override
             public Object fromString( String str )
             {
                 return StringEscapeUtils.unescapeHtml( str );
             }
-        } );
+        };
 
-      xstream.registerLocalConverter( LdapUserListResponse.class, "data", new AliasingListConverter(
+        xstream.registerLocalConverter( LdapConnectionInfoDTO.class, "systemUsername", converter );
+        xstream.registerLocalConverter( LdapConnectionInfoDTO.class, "systemPassword", converter );
+        xstream.registerLocalConverter( LdapConnectionInfoDTO.class, "searchBase", converter );
+        xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "groupBaseDn", converter );
+        xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "userBaseDn", converter );
+        xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "groupMemberFormat", converter );
+
+        xstream.registerLocalConverter( LdapUserAndGroupConfigTestRequestDTO.class, "systemUsername", converter );
+        xstream.registerLocalConverter( LdapUserAndGroupConfigTestRequestDTO.class, "systemPassword", converter );
+        xstream.registerLocalConverter( LdapUserAndGroupConfigTestRequestDTO.class, "searchBase", converter );
+
+        xstream.registerLocalConverter( LdapUserListResponse.class, "data", new AliasingListConverter(
           LdapUserResponseDTO.class, "user" ) );
 
         return xstream;
     }
-    
+
 }

@@ -23,7 +23,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.scheduling.SchedulerTask;
 
-
 @Component( role = SchedulerTask.class, hint = "SleepRepositoryTask", instantiationStrategy = "per-lookup" )
 public class SleepRepositoryTask
     extends AbstractNexusRepositoriesTask<Object>
@@ -36,10 +35,20 @@ public class SleepRepositoryTask
         getLogger().debug( getMessage() );
 
         final int time = getTime();
-        Thread.sleep( time * 1000 / 2 );
+        sleep( time );
         getRepositoryRegistry().getRepository( getRepositoryId() );
-        Thread.sleep( time * 1000 / 2 );
+        sleep( time );
         return null;
+    }
+
+    protected void sleep( final int time )
+        throws InterruptedException
+    {
+        for ( int i = 0; i < time; i++ )
+        {
+            Thread.sleep( 1000 / 2 );
+            checkInterruption();
+        }
     }
 
     private int getTime()

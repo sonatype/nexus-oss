@@ -184,7 +184,7 @@
     <plexus.restlet.bridge.version>1.18</plexus.restlet.bridge.version>
     <plexus-security.version>2.4</plexus-security.version>
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
-    <plexus-task-scheduler.version>1.4.2</plexus-task-scheduler.version>
+    <plexus-task-scheduler.version>1.4.3-SNAPSHOT</plexus-task-scheduler.version>
     <plexus-velocity.version>1.1.7</plexus-velocity.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
     <shiro.version>1.1.0</shiro.version>
@@ -1123,12 +1123,12 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-core-webapp</artifactId>
+        <artifactId>nexus-webapp</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-core-webapp</artifactId>
+        <artifactId>nexus-webapp</artifactId>
         <version>${project.version}</version>
         <type>war</type>
       </dependency>
@@ -1706,11 +1706,11 @@
     <module>nexus-rest-api</module>
     <module>nexus-migration-tool</module>
     <module>nexus-core-plugins</module>
-    <module>nexus-core-webapp</module>
+    <module>nexus-webapp</module>
     <module>nexus-launcher</module>
     <module>nexus-clients</module>
-    <module>nexus-core-oss-webapp</module>
-    <module>nexus-core-oss-webapp-tattletale</module>
+    <module>nexus-oss-webapp</module>
+    <module>nexus-oss-webapp-tattletale</module>
     <module>nexus-stories</module>
     <module>nexus-test</module>
     <module>nexus-test-harness</module>
