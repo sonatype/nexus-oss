@@ -31,7 +31,7 @@
 
   <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-p2-repository-plugin</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>2.0-SNAPSHOT</version>
   <packaging>nexus-plugin</packaging>
 
   <name>Nexus :: Plugin :: P2 Repository</name>
@@ -47,7 +47,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
+    <nexus.version>2.0-M3</nexus.version>
+    <capabilities-plugin.version>2.0-M3</capabilities-plugin.version>
     <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
   </properties>
 
@@ -68,13 +69,13 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-api</artifactId>
-      <version>2.0-SNAPSHOT</version>
+      <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
-      <version>2.0-SNAPSHOT</version>
+      <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -92,14 +93,14 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-p2-bridge-plugin</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>2.0-M3</version>
       <type>${nexus.plugin.type}</type>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.p2.bridge</groupId>
       <artifactId>org.sonatype.p2.bridge.api</artifactId>
-      <version>1.0.8-SNAPSHOT</version>
+      <version>1.0.8</version>
       <scope>provided</scope>
     </dependency>
 
@@ -139,14 +140,14 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-proxy</artifactId>
-      <version>2.0-SNAPSHOT</version>
+      <version>${nexus.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
-      <version>2.0-SNAPSHOT</version>
+      <version>${nexus.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
@@ -167,13 +168,13 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
-      <version>2.0-SNAPSHOT</version>
+      <version>${nexus.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
-      <version>2.0-SNAPSHOT</version>
+      <version>${nexus.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -185,7 +186,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
-      <version>2.0-SNAPSHOT</version>
+      <version>${capabilities-plugin.version}</version>
       <type>${nexus.plugin.type}</type>
       <scope>provided</scope>
     </dependency>
@@ -193,7 +194,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins.capabilities</groupId>
       <artifactId>nexus-capabilities-plugin-it</artifactId>
-      <version>2.0-SNAPSHOT</version>
+      <version>${capabilities-plugin.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -207,7 +208,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.litmus</groupId>
       <artifactId>litmus-testsupport</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -256,7 +257,7 @@
       <plugin>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>2.0-SNAPSHOT</version>
+        <version>${nexus.version}</version>
         <executions>
           <execution>
             <goals>
@@ -269,31 +270,31 @@
           <nexusBundleArtifact>
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-oss-webapp</artifactId>
-            <version>2.0-SNAPSHOT</version>
+            <version>${nexus.version}</version>
             <type>zip</type>
             <classifier>bundle</classifier>
           </nexusBundleArtifact>
-          <nexusBundleName>nexus-oss-webapp-2.0-SNAPSHOT</nexusBundleName>
-          <nexusVersion>2.0-SNAPSHOT</nexusVersion>
+          <nexusBundleName>nexus-oss-webapp-${nexus.version}</nexusBundleName>
+          <nexusVersion>${nexus.version}</nexusVersion>
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>org.sonatype.nexus.plugins</groupId>
               <artifactId>nexus-capabilities-plugin</artifactId>
-              <version>2.0-SNAPSHOT</version>
+              <version>${capabilities-plugin.version}</version>
               <classifier>bundle</classifier>
               <type>zip</type>
             </plugin>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-it-helper-plugin</artifactId>
-              <version>2.0-SNAPSHOT</version>
+              <version>${nexus.version}</version>
               <classifier>cp</classifier>
               <type>jar</type>
             </plugin>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-it-helper-plugin</artifactId>
-              <version>2.0-SNAPSHOT</version>
+              <version>${nexus.version}</version>
               <classifier>bundle</classifier>
               <type>zip</type>
             </plugin>
