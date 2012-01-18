@@ -39,7 +39,9 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
@@ -250,7 +252,7 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
             lock.unlock();
 
             getLogger().debug( "Repository " + repository.getId() + ": retrieve item: " + request.getRequestPath()
-                + ": took " + ( System.currentTimeMillis() - start ) + " ms." );
+                                   + ": took " + ( System.currentTimeMillis() - start ) + " ms." );
         }
     }
 
@@ -337,15 +339,15 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
         }
         catch ( final RemoteAccessException e )
         {
-            throw new StorageException( e );
+            throw new RemoteStorageException( e.getMessage(), e );
         }
         catch ( final IOException e )
         {
-            throw new StorageException( e );
+            throw new LocalStorageException( e.getMessage(), e );
         }
         catch ( final XmlPullParserException e )
         {
-            throw new StorageException( e );
+            throw new LocalStorageException( e.getMessage(), e );
         }
 
     }
@@ -385,7 +387,7 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
 
                     if ( ze == null )
                     {
-                        throw new StorageException( "Corrupted P2 metadata jar " + jarPath );
+                        throw new LocalStorageException( "Corrupted P2 metadata jar " + jarPath );
                     }
 
                     final InputStream zis = z.getInputStream( ze );
@@ -424,7 +426,7 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
         }
         catch ( final IOException e )
         {
-            throw new StorageException( e );
+            throw new LocalStorageException( e.getMessage(), e );
         }
     }
 
@@ -443,7 +445,7 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
         }
         catch ( final IOException e )
         {
-            throw new StorageException( e );
+            throw new LocalStorageException( e.getMessage(), e );
         }
     }
 
