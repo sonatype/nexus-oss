@@ -101,6 +101,10 @@ public abstract class AbstractGroupRepository
                     true ).getMemberRepositoryIds().size() || !getExternalConfiguration( false ).getMemberRepositoryIds().containsAll(
                     getExternalConfiguration( true ).getMemberRepositoryIds() ) );
 
+        // we have to "remember" these before commit happens in super.onEvent
+        final List<String> currentMemberIds = getExternalConfiguration( false ).getMemberRepositoryIds();
+        final List<String> newMemberIds = getExternalConfiguration( true ).getMemberRepositoryIds();
+
         super.onEvent( evt );
 
         // act automatically on repo removal. Remove it from myself if member.
@@ -116,7 +120,8 @@ public abstract class AbstractGroupRepository
         else if ( evt instanceof ConfigurationPrepareForSaveEvent && membersChanged )
         {
             // fire another event
-            getApplicationEventMulticaster().notifyEventListeners( new RepositoryGroupMembersChangedEvent( this ) );
+            getApplicationEventMulticaster().notifyEventListeners(
+                new RepositoryGroupMembersChangedEvent( this, currentMemberIds, newMemberIds ) );
         }
     }
 
