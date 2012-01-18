@@ -25,13 +25,13 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.log.LogConfigurationParticipant;
 
 /**
- * Contributes "logback-default" to logback configuration.
+ * Contributes "logback-nexus" to logback configuration.
  * 
  * @author adreghiciu@gmail.com
  */
 
-@Component( role = LogConfigurationParticipant.class, hint = "logback-default" )
-public class LogbackDefaultLogConfigurationParticipant
+@Component( role = LogConfigurationParticipant.class, hint = "logback-nexus" )
+public class LogbackNexusLogConfigurationParticipant
     implements LogConfigurationParticipant
 {
 
@@ -41,7 +41,7 @@ public class LogbackDefaultLogConfigurationParticipant
     @Override
     public String getName()
     {
-        return "logback-default.xml";
+        return "logback-nexus.xml";
     }
 
     /**
@@ -52,11 +52,11 @@ public class LogbackDefaultLogConfigurationParticipant
     {
         try
         {
-            return this.getClass().getResource( "/META-INF/log/logback-default.xml" ).openStream();
+            return this.getClass().getResource( "/META-INF/log/logback-nexus.xml" ).openStream();
         }
         catch ( IOException e )
         {
-            throw new IllegalStateException( "Could not access logback-default.xml", e );
+            throw new IllegalStateException( "Could not access logback-nexus.xml", e );
         }
     }
 

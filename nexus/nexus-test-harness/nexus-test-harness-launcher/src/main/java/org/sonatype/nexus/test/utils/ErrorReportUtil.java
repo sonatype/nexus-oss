@@ -148,7 +148,7 @@ public class ErrorReportUtil
         boolean foundContextList = false;
         boolean foundLogbackProperties = false;
         boolean foundLogbackXml = false;
-        boolean foundLogbackDefaultXml = false;
+        boolean foundLogbackNexusXml = false;
         boolean foundNexusXml = false;
         boolean foundSecurityXml = false;
         boolean foundSecurityConfigXml = false;
@@ -183,9 +183,9 @@ public class ErrorReportUtil
             {
                 foundLogbackXml = true;
             }
-            else if ( entry.getName().equals( "logback-default.xml" ) )
+            else if ( entry.getName().equals( "logback-nexus.xml" ) )
             {
-                foundLogbackDefaultXml = true;
+                foundLogbackNexusXml = true;
             }
             else if ( entry.getName().equals( "nexus.xml" ) )
             {
@@ -216,7 +216,7 @@ public class ErrorReportUtil
         Assert.assertTrue( foundContextList );
         Assert.assertTrue( foundLogbackProperties );
         Assert.assertTrue( foundLogbackXml );
-        Assert.assertTrue( foundLogbackDefaultXml );
+        Assert.assertTrue( foundLogbackNexusXml );
         Assert.assertTrue( foundNexusXml );
         Assert.assertTrue( foundSecurityXml );
         Assert.assertTrue( foundSecurityConfigXml );
