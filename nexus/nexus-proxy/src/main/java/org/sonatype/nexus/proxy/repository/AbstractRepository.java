@@ -50,7 +50,7 @@ import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
-import org.sonatype.nexus.proxy.events.RepositoryEventExpireCaches;
+import org.sonatype.nexus.proxy.events.RepositoryEventExpireNotFoundCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
@@ -421,41 +421,17 @@ public abstract class AbstractRepository
         this.accessManager = accessManager;
     }
 
+    @Deprecated
     public void expireCaches( ResourceStoreRequest request )
     {
         if ( !getLocalStatus().shouldServiceRequest() )
         {
             return;
         }
-
-        if ( StringUtils.isEmpty( request.getRequestPath() ) )
-        {
-            request.setRequestPath( RepositoryItemUid.PATH_ROOT );
-        }
-
-        request.setRequestLocalOnly( true );
-
-        getLogger().info(
-            "Expiring local cache in repository ID='" + getId() + "' from path='" + request.getRequestPath() + "'" );
-
-        // 1st, expire all the files below path
-        DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
-
-        ctx.getProcessors().add( new ExpireCacheWalker( this ) );
-
-        try
-        {
-            getWalker().walk( ctx );
-        }
-        catch ( WalkerException e )
-        {
-            if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
-            {
-                // everything that is not ItemNotFound should be reported,
-                // otherwise just neglect it
-                throw e;
-            }
-        }
+        
+        // at this level (we are not proxy) expireCaches() actually boils down to "expire NFC" only
+        // we are NOT crawling local storage content to flip the isExpired flags to true on a hosted
+        // repo, since those attributes in case of hosted (or any other non-proxy) repositories does not have any meaning
 
         // 2nd, remove the items from NFC
         expireNotFoundCaches( request );
@@ -476,13 +452,14 @@ public abstract class AbstractRepository
         getLogger().info(
             "Clearing NFC cache in repository ID='" + getId() + "' from path='" + request.getRequestPath() + "'" );
 
+        boolean cacheAltered = false;
         // remove the items from NFC
         if ( RepositoryItemUid.PATH_ROOT.equals( request.getRequestPath() ) )
         {
             // purge all
             if ( getNotFoundCache() != null )
             {
-                getNotFoundCache().purge();
+                cacheAltered = getNotFoundCache().purge();
             }
         }
         else
@@ -490,14 +467,14 @@ public abstract class AbstractRepository
             // purge below and above path only
             if ( getNotFoundCache() != null )
             {
-                getNotFoundCache().removeWithParents( request.getRequestPath() );
-
-                getNotFoundCache().removeWithChildren( request.getRequestPath() );
+                boolean altered1 = getNotFoundCache().removeWithParents( request.getRequestPath() );
+                boolean altered2 = getNotFoundCache().removeWithChildren( request.getRequestPath() );
+                cacheAltered = altered1 || altered2;
             }
         }
 
         getApplicationEventMulticaster().notifyEventListeners(
-            new RepositoryEventExpireCaches( this, request.getRequestPath() ) );
+            new RepositoryEventExpireNotFoundCaches( this, request.getRequestPath(), request.getRequestContext().flatten(), cacheAltered ) );
     }
 
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )

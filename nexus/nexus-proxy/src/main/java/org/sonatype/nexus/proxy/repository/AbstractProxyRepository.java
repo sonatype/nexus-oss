@@ -45,6 +45,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
+import org.sonatype.nexus.proxy.events.RepositoryEventExpireProxyCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeSet;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCacheCreate;
@@ -78,7 +79,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
  * So, this implementation is used in both "simple" repository cases: hosted and proxy, but in 1st case there is no
  * remote storage.
- *
+ * 
  * @author cstamas
  */
 public abstract class AbstractProxyRepository
@@ -199,6 +200,66 @@ public abstract class AbstractProxyRepository
     }
 
     @Override
+    public void expireProxyCaches( final ResourceStoreRequest request )
+    {
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return;
+        }
+
+        // do this only if we ARE a proxy
+        // crawl the local storage (which is in this case proxy cache)
+        // and flip the isExpired attribute bits to true
+        if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        {
+            if ( StringUtils.isEmpty( request.getRequestPath() ) )
+            {
+                request.setRequestPath( RepositoryItemUid.PATH_ROOT );
+            }
+            request.setRequestLocalOnly( true );
+            getLogger().info(
+                "Expiring proxy cache in repository ID='" + getId() + "' from path='" + request.getRequestPath() + "'" );
+
+            // 1st, expire all the files below path
+            final DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
+            final ExpireCacheWalker expireCacheWalkerProcessor = new ExpireCacheWalker( this );
+            ctx.getProcessors().add( expireCacheWalkerProcessor );
+
+            try
+            {
+                getWalker().walk( ctx );
+            }
+            catch ( WalkerException e )
+            {
+                if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
+                {
+                    // everything that is not ItemNotFound should be reported,
+                    // otherwise just neglect it
+                    throw e;
+                }
+            }
+
+            // fire off the new event if crawling did end, so we did flip all the bits
+            getApplicationEventMulticaster().notifyEventListeners(
+                new RepositoryEventExpireProxyCaches( this, request.getRequestPath(),
+                    request.getRequestContext().flatten(), expireCacheWalkerProcessor.isCacheAltered() ) );
+        }
+    }
+
+    @Override
+    public void expireCaches( final ResourceStoreRequest request )
+    {
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return;
+        }
+
+        expireProxyCaches( request );
+        // do the stuff we inherited
+        super.expireCaches( request );
+    }
+
+    @Override
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
     {
         if ( !getLocalStatus().shouldServiceRequest() )
@@ -210,7 +271,7 @@ public abstract class AbstractProxyRepository
         {
             Collection<String> result =
                 doEvictUnusedItems( request, timestamp, new EvictUnusedItemsWalkerProcessor( timestamp ),
-                                    new EvictUnusedItemsWalkerFilter() );
+                    new EvictUnusedItemsWalkerFilter() );
 
             getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventEvictUnusedItems( this ) );
 
@@ -351,7 +412,7 @@ public abstract class AbstractProxyRepository
     /**
      * ProxyMode is a persisted configuration property, hence it modifies configuration! It is the caller responsibility
      * to save configuration.
-     *
+     * 
      * @param proxyMode
      * @param sendNotification
      * @param cause
@@ -460,7 +521,7 @@ public abstract class AbstractProxyRepository
      * This method should be called by AbstractProxyRepository and it's descendants only. Since this method modifies the
      * ProxyMode property of this repository, and this property is part of configuration, this call will result in
      * configuration flush too (potentially saving any other unsaved changes)!
-     *
+     * 
      * @param cause
      */
     protected void autoBlockProxying( Throwable cause )
@@ -509,7 +570,7 @@ public abstract class AbstractProxyRepository
             StringBuilder sb = new StringBuilder();
 
             sb.append( "Remote peer of proxy repository \"" + getName() + "\" (id=" + getId() + ") threw a "
-                           + cause.getClass().getName() + " exception." );
+                + cause.getClass().getName() + " exception." );
 
             if ( cause instanceof RemoteAccessException )
             {
@@ -517,16 +578,14 @@ public abstract class AbstractProxyRepository
             }
             else if ( cause instanceof StorageException )
             {
-                sb.append(
-                    " Connection/transport problems occured while connecting to remote peer of the repository." );
+                sb.append( " Connection/transport problems occured while connecting to remote peer of the repository." );
             }
 
             // nag about autoblock if needed
             if ( autoBlockActive )
             {
-                sb.append(
-                    " Auto-blocking this repository to prevent further connection-leaks and known-to-fail outbound"
-                        + " connections until administrator fixes the problems, or Nexus detects remote repository as healthy." );
+                sb.append( " Auto-blocking this repository to prevent further connection-leaks and known-to-fail outbound"
+                    + " connections until administrator fixes the problems, or Nexus detects remote repository as healthy." );
             }
 
             // log the event
@@ -660,13 +719,13 @@ public abstract class AbstractProxyRepository
         else
         {
             throw new RemoteStorageException( "No remote storage set on repository \"" + getName() + "\" (ID=\""
-                                                  + getId() + "\"), cannot set remoteUrl!" );
+                + getId() + "\"), cannot set remoteUrl!" );
         }
     }
 
     /**
      * Gets the item max age in (in minutes).
-     *
+     * 
      * @return the item max age in (in minutes)
      */
     public int getItemMaxAge()
@@ -676,7 +735,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Sets the item max age in (in minutes).
-     *
+     * 
      * @param itemMaxAge the new item max age in (in minutes).
      */
     public void setItemMaxAge( int itemMaxAge )
@@ -1077,8 +1136,7 @@ public abstract class AbstractProxyRepository
                                 if ( getLogger().isDebugEnabled() )
                                 {
                                     getLogger().debug(
-                                        "No newer version of item " + request.toString()
-                                            + " found on remote storage." );
+                                        "No newer version of item " + request.toString() + " found on remote storage." );
                                 }
                             }
                             else
@@ -1086,8 +1144,7 @@ public abstract class AbstractProxyRepository
                                 if ( getLogger().isDebugEnabled() )
                                 {
                                     getLogger().debug(
-                                        "Newer version of item " + request.toString()
-                                            + " is found on remote storage." );
+                                        "Newer version of item " + request.toString() + " is found on remote storage." );
                                 }
                             }
 
@@ -1136,7 +1193,7 @@ public abstract class AbstractProxyRepository
                         catch ( StorageException ex )
                         {
                             if ( ex instanceof RemoteStorageException
-                                // NEXUS-4593 HTTP status 403 should not lead to autoblock
+                            // NEXUS-4593 HTTP status 403 should not lead to autoblock
                                 && !( ex instanceof RemoteAccessDeniedException ) )
                             {
                                 autoBlockProxying( ex );
@@ -1220,8 +1277,7 @@ public abstract class AbstractProxyRepository
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug(
-                        "Item " + request.toString()
-                            + " does exist locally and cannot go remote, returning local one." );
+                        "Item " + request.toString() + " does exist locally and cannot go remote, returning local one." );
                 }
 
                 item = localItem;
@@ -1308,7 +1364,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks for remote existence of local item.
-     *
+     * 
      * @param localItem
      * @param request
      * @return
@@ -1343,9 +1399,10 @@ public abstract class AbstractProxyRepository
      * The following matrix summarises retry/blacklist behaviour
      * <p/>
      * <p/>
+     * 
      * <pre>
      * Error condition      Retry?        Blacklist?
-     *
+     * 
      * InetNotFound         no            no
      * AccessDedied         no            yes
      * InvalidContent       no            no
@@ -1380,8 +1437,7 @@ public abstract class AbstractProxyRepository
 
             try
             {
-                all_urls:
-                for ( Mirror mirror : mirrors )
+                all_urls: for ( Mirror mirror : mirrors )
                 {
                     int retryCount = 1;
 
@@ -1581,7 +1637,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks if item is old with "default" maxAge.
-     *
+     * 
      * @param item the item
      * @return true, if it is old
      */
@@ -1592,7 +1648,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Checks if item is old with given maxAge.
-     *
+     * 
      * @param maxAge
      * @param item
      * @return
@@ -1698,7 +1754,7 @@ public abstract class AbstractProxyRepository
 
     /**
      * Beside original behavior, only add to NFC when we are not in BLOCKED mode.
-     *
+     * 
      * @since 1.10.0
      */
     @Override

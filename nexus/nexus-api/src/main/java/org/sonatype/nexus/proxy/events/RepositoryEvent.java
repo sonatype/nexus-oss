@@ -18,11 +18,13 @@
  */
 package org.sonatype.nexus.proxy.events;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.plexus.appevents.AbstractEvent;
 
 /**
- * The event that is occured within a Repository, such as content changes or other maintenance stuff.
+ * The event that is occurred within a Repository, such as content changes or other maintenance stuff.
  * 
  * @author cstamas
  */
@@ -31,7 +33,7 @@ public abstract class RepositoryEvent
 {
     public RepositoryEvent( final Repository repository )
     {
-        super( repository );
+        super( checkNotNull( repository ) );
     }
 
     /**

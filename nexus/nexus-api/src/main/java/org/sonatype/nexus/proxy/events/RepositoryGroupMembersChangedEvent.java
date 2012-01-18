@@ -28,7 +28,7 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 public class RepositoryGroupMembersChangedEvent
     extends RepositoryEvent
 {
-    public RepositoryGroupMembersChangedEvent( GroupRepository repository )
+    public RepositoryGroupMembersChangedEvent( final GroupRepository repository )
     {
         super( repository );
     }

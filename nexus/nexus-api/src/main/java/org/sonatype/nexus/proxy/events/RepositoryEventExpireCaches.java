@@ -18,24 +18,36 @@
  */
 package org.sonatype.nexus.proxy.events;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The event fired on Expiring cache.
+ * The event fired on Expiring Not Found cache.
+ * <p>
+ * Deprecation note: for historical reasons, before Nexus 1.4, there was only one method {@code expireCaches()}. After
+ * Nexus 1.4 we separated out the "purge NFC" part of it into a new method {@code expireNotFoundCaches()}, but the
+ * actual event being fired on those two were never split. Today, we are adding new event but also providing all the
+ * needed bits to keep backward compatible code in place. See newly added {@link RepositoryEventExpireNotFoundCaches}
+ * and {@link RepositoryEventExpireProxyCaches}.
+ * <p>
+ * Related change: https://github.com/sonatype/nexus/commit/decd41b64c6515a8822b248dc970c3bcb204faaf
  * 
  * @author cstamas
+ * @deprecated This event is superseded by {@link RepositoryEventExpireNotFoundCaches}. For now, this class is kept, but
+ *             is made abstract. The new event does {@link RepositoryEventExpireNotFoundCaches} extends this class and
+ *             in future will be removed.
  */
-public class RepositoryEventExpireCaches
+public abstract class RepositoryEventExpireCaches
     extends RepositoryMaintenanceEvent
 {
     /** From where it happened */
     private final String path;
 
-    public RepositoryEventExpireCaches( final Repository repository, String path )
+    protected RepositoryEventExpireCaches( final Repository repository, final String path )
     {
         super( repository );
-
-        this.path = path;
+        this.path = checkNotNull( path );
     }
 
     public String getPath()

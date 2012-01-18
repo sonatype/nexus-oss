@@ -50,18 +50,60 @@ public class EhCacheCacheManagerTest
         c.put( "/com/sonatype", Boolean.TRUE );
         c.put( "/com/sonatype/nexus", Boolean.TRUE );
 
-        c.removeWithParents( "/com/sonatype" );
+        boolean removed = c.removeWithParents( "/com/sonatype" );
 
+        assertEquals(true, removed);
         assertTrue( c.contains( "/com/sonatype/nexus" ) );
         assertFalse( c.contains( "/com/sonatype" ) );
         assertFalse( c.contains( "/com" ) );
 
-        c.removeWithParents( "/com/sonatype/nexus" );
+        removed = c.removeWithParents( "/com/sonatype/nexus" );
 
+        assertEquals(true, removed);
         assertFalse( c.contains( "/com/sonatype/nexus" ) );
         assertFalse( c.contains( "/com/sonatype" ) );
         assertFalse( c.contains( "/com" ) );
 
+        removed = c.removeWithParents( "/com/sonatype/nexus" );
+        assertEquals(false, removed);
+    }
+    
+    @Test
+    public void testRemoveWithChildren()
+        throws Exception
+    {
+        CacheManager cm = lookup( CacheManager.class );
+
+        PathCache c = cm.getPathCache( "test" );
+
+        c.put( "/com", Boolean.TRUE );
+        c.put( "/com/sonatype", Boolean.TRUE );
+        c.put( "/com/sonatype/nexus", Boolean.TRUE );
+        c.put( "/org", Boolean.TRUE );
+        c.put( "/org/sonatype", Boolean.TRUE );
+        c.put( "/org/sonatype/nexus", Boolean.TRUE );
+        
+        boolean removed = c.removeWithChildren( "/com" );
+
+        assertTrue( removed ); // this should have removed stuff
+        assertFalse( c.contains( "/com/sonatype/nexus" ) );
+        assertFalse( c.contains( "/com/sonatype" ) );
+        assertFalse( c.contains( "/com" ) );
+        assertTrue( c.contains( "/org/sonatype/nexus" ) );
+        assertTrue( c.contains( "/org/sonatype" ) );
+        assertTrue( c.contains( "/org" ) );
+
+        removed = c.removeWithChildren( "/com" );
+
+        assertFalse( removed ); // this should have removed nothing
+
+        removed = c.removeWithChildren( "/" );
+
+        assertTrue( removed ); // this should have removed everything
+
+        assertFalse( c.contains( "/org/sonatype/nexus" ) );
+        assertFalse( c.contains( "/org/sonatype" ) );
+        assertFalse( c.contains( "/org" ) );
     }
 
     @Test

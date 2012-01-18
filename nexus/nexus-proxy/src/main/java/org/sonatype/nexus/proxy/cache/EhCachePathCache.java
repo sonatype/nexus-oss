@@ -109,24 +109,25 @@ public class EhCachePathCache
 
         String keyToRemove = makeKeyFromPath( path );
 
+        boolean removed = false;
         for ( String key : keys )
         {
             if ( key.startsWith( keyToRemove ) )
             {
-                getEHCache().remove( key );
+                removed = getEHCache().remove( key ) || removed;
             }
         }
-        return true;
+        return removed;
     }
 
-    public void doPurge()
+    public boolean doPurge()
     {
         // getEHCache().removeAll();
         // getEHCache().flush();
 
         // this above is not true anymore, since the "shared-cache" implementor forgot about the fact that using purge()
         // will purge _all_ caches (it purges the one shared!), not just this repo's cache 
-        removeWithChildren( RepositoryItemUid.PATH_ROOT );
+        return removeWithChildren( RepositoryItemUid.PATH_ROOT );
     }
 
     public CacheStatistics getStatistics()

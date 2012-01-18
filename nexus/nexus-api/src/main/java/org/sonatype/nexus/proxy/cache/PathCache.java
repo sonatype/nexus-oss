@@ -37,7 +37,7 @@ public interface PathCache
 
     boolean removeWithChildren( String path );
 
-    void purge();
+    boolean purge();
 
     void put( String path, Object element );
 

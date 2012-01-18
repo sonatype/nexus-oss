@@ -37,6 +37,14 @@ public interface ProxyRepository
     extends Repository
 {
     /**
+     * Marks the proxy cache items as expired.
+     * 
+     * @param path a path from to start descending. If null, it is taken as "root".
+     * @since 2.0
+     */
+    void expireProxyCaches( ResourceStoreRequest request );
+    
+    /**
      * Gets remote status.
      */
     RemoteStatus getRemoteStatus( ResourceStoreRequest request, boolean forceCheck );

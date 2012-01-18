@@ -72,9 +72,9 @@ public abstract class AbstractPathCache
 
     public abstract boolean removeWithChildren( String path );
 
-    public final void purge()
+    public final boolean purge()
     {
-        doPurge();
+        return doPurge();
     }
 
     // ==
@@ -102,5 +102,5 @@ public abstract class AbstractPathCache
 
     protected abstract boolean doRemove( String key );
 
-    protected abstract void doPurge();
+    protected abstract boolean doPurge();
 }
