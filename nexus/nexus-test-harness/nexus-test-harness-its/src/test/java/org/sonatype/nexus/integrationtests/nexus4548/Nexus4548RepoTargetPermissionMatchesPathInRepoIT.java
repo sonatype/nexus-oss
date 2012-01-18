@@ -18,6 +18,14 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4548;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.respondsWithStatusCode;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.hamcrest.Matchers;
@@ -29,12 +37,6 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.sonatype.nexus.test.utils.NexusRequestMatchers.respondsWithStatusCode;
 
 /**
  * IT testing the pattern matching of repository targets for security permissions.
@@ -81,20 +83,26 @@ public class Nexus4548RepoTargetPermissionMatchesPathInRepoIT
                              respondsWithStatusCode( code ) );
     }
 
-    private void put( final String gavPath, final int code )
+    private HttpMethod put( final String gavPath, final int code )
         throws Exception
     {
         PutMethod putMethod = new PutMethod( getNexusTestRepoUrl() + gavPath );
         putMethod.setRequestEntity( new FileRequestEntity( getTestFile( "pom-a.pom" ), "text/xml" ) );
 
-        assertThat( RequestFacade.executeHTTPClientMethod( putMethod ).getStatusCode(), Matchers.is( code ) );
+        final HttpMethod httpMethod = RequestFacade.executeHTTPClientMethod( putMethod );
+        assertThat( httpMethod.getStatusCode(), Matchers.is( code ) );
+
+        return httpMethod;
     }
 
-    private void putRest( final String artifactId, final int code )
+    private HttpMethod putRest( final String artifactId, final int code )
         throws IOException
     {
         File testFile = getTestFile( String.format( "pom-%s.pom", artifactId ) );
-        assertThat( getDeployUtils().deployPomWithRest( "releases", testFile ).getStatusCode(), Matchers.is( code ) );
+        final HttpMethod httpMethod = getDeployUtils().deployPomWithRest( "releases", testFile );
+        assertThat( httpMethod.getStatusCode(), Matchers.is( code ) );
+
+        return httpMethod;
     }
 
     @Test
@@ -111,7 +119,11 @@ public class Nexus4548RepoTargetPermissionMatchesPathInRepoIT
         throws Exception
     {
         get( "g/b/v/b-v.pom", 403 );
+
         put( "g/b/v/b-v-deploy.pom", 403 );
-        putRest( "b", 403 );
+
+        final HttpMethod httpMethod = putRest( "b", 403 );
+        final String responseBody = httpMethod.getResponseBodyAsString();
+        assertThat( responseBody, containsString( "<error>" ) );
     }
 }
