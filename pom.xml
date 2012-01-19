@@ -69,7 +69,7 @@
           <artifactId>maven-license-plugin</artifactId>
           <version>1.9.0</version>
           <configuration>
-            <header>header-agplv3.txt</header>
+            <header>header-eplv1.txt</header>
             <encoding>UTF-8</encoding>
             <strictCheck>true</strictCheck>
             <useDefaultExcludes>false</useDefaultExcludes>
@@ -121,45 +121,14 @@
               <aj>JAVADOC_STYLE</aj>
             </mapping>
             <properties>
-              <year>2011</year>
+              <year>2012</year>
             </properties>
             <!-- this is important for multi-module project -->
             <aggregate>true</aggregate>
           </configuration>
-          <executions>
-            <execution>
-              <id>license-check-agplv2</id>
-              <goals>
-                <goal>check</goal>
-              </goals>
-              <phase>validate</phase>
-            </execution>
-            <execution>
-              <id>license-check-alv2</id>
-              <goals>
-                <goal>check</goal>
-              </goals>
-              <phase>validate</phase>
-              <configuration>
-                <header>header-alv2.txt</header>
-                <includes>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.java</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.vm</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.xml</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.groovy</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.aj</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.css</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.html</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.js</include>
-                </includes>
-                <excludes>
-                  <exclude>**/target/**</exclude>
-                  <!-- eclipse makes this directory -->
-                  <exclude>**/.settings/**</exclude>
-                </excludes>
-              </configuration>
-            </execution>
-          </executions>
+          <goals>
+            <goal>check</goal>
+          </goals>
         </plugin>
 
         <plugin>

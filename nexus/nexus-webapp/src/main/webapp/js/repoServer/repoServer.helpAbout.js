@@ -38,29 +38,16 @@ Sonatype.repoServer.HelpAboutPanel = function(config) {
 Ext.extend(Sonatype.repoServer.HelpAboutPanel, Ext.Panel, {
   getHelpText : function() {
     return '<div class="little-padding">'
-        + 'Sonatype Nexus&trade; '
-        + Sonatype.utils.edition
-        + ' Version'
-        + '<br/>Copyright &copy; 2008-2011 Sonatype, Inc.'
-		+ '<br/>All rights reserved. Includes the third-party code listed at <a href="'
-        + Sonatype.utils.attributionsURL
-        + '" target="_new">'
-        + Sonatype.utils.attributionsURL
-        + '</a>.'
+        + 'Sonatype Nexus&trade; ' + Sonatype.utils.edition + ' Version'
+        + '<br/>Copyright &copy; 2008-2012 Sonatype, Inc.'
+		+ '<br/>All rights reserved. Includes the third-party code listed at <a href="' + Sonatype.utils.attributionsURL + '" target="_new">' + Sonatype.utils.attributionsURL + '</a>.'
 		+ '<br/>'
-		+ '<br/>This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General'
-		+ '<br/>Public License Version 3 as published by the Free Software Foundation.'
+		+ '<br/>This program and the accompanying materials are made available under the terms of the Eclipse Public License Version 1.0,'
+		+ '<br/>which accompanies this distribution and is available at <a href="http://www.eclipse.org/legal/epl-v10.html" target="_new">http://www.eclipse.org/legal/epl-v10.html</a>.'
 		+ '<br/>'
-		+ '<br/>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied'
-		+ '<br/>warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3'
-		+ '<br/>for more details.'
-		+ '<br/>'
-		+ '<br/>You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see'
-		+ '<br/><a href="http://www.gnu.org/licenses" target="_new">http://www.gnu.org/licenses</a>.'
-		+ '<br/>'
-		+ '<br/>Sonatype Nexus&trade; '+ Sonatype.utils.edition +' Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of'
-		+ '<br/>Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.'
-		+ '<br/>All other trademarks are the property of their respective owners.'
-		+ '</div>';
+		+ '<br/>Sonatype Nexus&trade; Professional Version is available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks'
+		+ '<br/>of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the'
+		+ '<br/>Eclipse Foundation. All other trademarks are the property of their respective owners.'
+  		+ '</div>';
   }
 });
