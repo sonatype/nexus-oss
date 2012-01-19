@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
+import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -60,11 +61,11 @@ public class RepositoryLocalStatusCondition
     }
 
     @Subscribe
-    public void handle( final RepositoryConfigurationUpdatedEvent event )
+    public void handle( final RepositoryEventLocalStatusChanged event )
     {
         if ( sameRepositoryAs( event.getRepository().getId() ) )
         {
-            setSatisfied( localStatus.equals( event.getRepository().getLocalStatus() ) );
+            setSatisfied( localStatus.equals( event.getNewLocalStatus() ) );
         }
     }
 
