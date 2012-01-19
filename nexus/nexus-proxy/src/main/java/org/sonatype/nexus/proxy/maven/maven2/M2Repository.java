@@ -304,99 +304,119 @@ public class M2Repository
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
-        String userAgent = (String) request.getRequestContext().get( AccessManager.REQUEST_AGENT );
+        // we do all this mockery (NEXUS-4218 and NEXUS-4243) ONLY when we are sure
+        // that we deal with REMOTE REQUEST INITIATED BY OLD 2.x MAVEN and nothing else. 
+        // Before this fix, the code was executed whenever
+        // "!ModelVersionUtility.LATEST_MODEL_VERSION.equals( userSupportedVersion ) )" was true
+        // and it was true even for userSupportedVersion being null (ie. not user agent string supplied!)!!!
+        final boolean remoteCall = request.getRequestContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS );
+        final String userAgent = (String) request.getRequestContext().get( AccessManager.REQUEST_AGENT );
 
-        if ( M2ArtifactRecognizer.isMetadata( request.getRequestPath() )
-            && !ModelVersionUtility.LATEST_MODEL_VERSION.equals( getClientSupportedVersion( userAgent ) ) )
+        if ( remoteCall && null != userAgent )
         {
-            // metadata checksum files are calculated and cached as side-effect
-            // of doRetrieveMetadata.
-            final StorageFileItem mdItem;
-            if ( M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
+            final Version userSupportedVersion = getClientSupportedVersion( userAgent );
+
+            // we still can make up our mind here, we do this only if we know: this request is about metadata,
+            // the client's metadata version is known and it is not the latest one
+            if ( M2ArtifactRecognizer.isMetadata( request.getRequestPath() ) && userSupportedVersion != null
+                && !ModelVersionUtility.LATEST_MODEL_VERSION.equals( userSupportedVersion ) )
             {
-                String path = request.getRequestPath();
-                if ( request.getRequestPath().endsWith( ".md5" ) )
-                {
-                    path = path.substring( 0, path.length() - 4 );
-                }
-                else if ( request.getRequestPath().endsWith( ".sha1" ) )
-                {
-                    path = path.substring( 0, path.length() - 5 );
-                }
-                ResourceStoreRequest mdRequest = new ResourceStoreRequest( path );
-                mdRequest.getRequestContext().setParentContext( request.getRequestContext() );
-
-                mdItem = (StorageFileItem) super.doRetrieveItem( mdRequest );
-            }
-            else
-            {
-                mdItem = (StorageFileItem) super.doRetrieveItem( request );
-            }
-
-            InputStream inputStream = null;
-            try
-            {
-                inputStream = mdItem.getInputStream();
-
-                Metadata metadata = MetadataBuilder.read( inputStream );
-                Version requiredVersion = getClientSupportedVersion( userAgent );
-                Version metadataVersion = ModelVersionUtility.getModelVersion( metadata );
-
-                if ( requiredVersion == null || requiredVersion.equals( metadataVersion ) )
-                {
-                    return super.doRetrieveItem( request );
-                }
-
-                ModelVersionUtility.setModelVersion( metadata, requiredVersion );
-
-                ByteArrayOutputStream mdOutput = new ByteArrayOutputStream();
-
-                MetadataBuilder.write( metadata, mdOutput );
-
-                final byte[] content;
+                // metadata checksum files are calculated and cached as side-effect
+                // of doRetrieveMetadata.
+                final StorageFileItem mdItem;
                 if ( M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
                 {
-                    String digest;
+                    String path = request.getRequestPath();
                     if ( request.getRequestPath().endsWith( ".md5" ) )
                     {
-                        digest = DigesterUtils.getMd5Digest( mdOutput.toByteArray() );
+                        path = path.substring( 0, path.length() - 4 );
+                    }
+                    else if ( request.getRequestPath().endsWith( ".sha1" ) )
+                    {
+                        path = path.substring( 0, path.length() - 5 );
+                    }
+                    // we have to keep original reqest's flags: localOnly and remoteOnly are strange ones, so
+                    // we do a hack here
+                    // second, since we initiate a request for different path within a context of this request,
+                    // we need to be careful about it
+                    ResourceStoreRequest mdRequest =
+                        new ResourceStoreRequest( path, request.isRequestLocalOnly(), request.isRequestRemoteOnly() );
+                    mdRequest.getRequestContext().setParentContext( request.getRequestContext() );
+
+                    mdItem = (StorageFileItem) super.retrieveItem( false, mdRequest );
+                }
+                else
+                {
+                    mdItem = (StorageFileItem) super.doRetrieveItem( request );
+                }
+
+                InputStream inputStream = null;
+                try
+                {
+                    inputStream = mdItem.getInputStream();
+
+                    Metadata metadata = MetadataBuilder.read( inputStream );
+                    Version requiredVersion = getClientSupportedVersion( userAgent );
+                    Version metadataVersion = ModelVersionUtility.getModelVersion( metadata );
+
+                    if ( requiredVersion == null || requiredVersion.equals( metadataVersion ) )
+                    {
+                        return super.doRetrieveItem( request );
+                    }
+
+                    ModelVersionUtility.setModelVersion( metadata, requiredVersion );
+
+                    ByteArrayOutputStream mdOutput = new ByteArrayOutputStream();
+
+                    MetadataBuilder.write( metadata, mdOutput );
+
+                    final byte[] content;
+                    if ( M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
+                    {
+                        String digest;
+                        if ( request.getRequestPath().endsWith( ".md5" ) )
+                        {
+                            digest = DigesterUtils.getMd5Digest( mdOutput.toByteArray() );
+                        }
+                        else
+                        {
+                            digest = DigesterUtils.getSha1Digest( mdOutput.toByteArray() );
+                        }
+                        content = ( digest + '\n' ).getBytes( "UTF-8" );
                     }
                     else
                     {
-                        digest = DigesterUtils.getSha1Digest( mdOutput.toByteArray() );
+                        content = mdOutput.toByteArray();
                     }
-                    content = ( digest + '\n' ).getBytes( "UTF-8" );
-                }
-                else
-                {
-                    content = mdOutput.toByteArray();
-                }
 
-                String mimeType = getMimeSupport().guessMimeTypeFromPath( getMimeRulesSource(), request.getRequestPath() );
-                ContentLocator contentLocator = new ByteArrayContentLocator( content, mimeType );
+                    String mimeType =
+                        getMimeSupport().guessMimeTypeFromPath( getMimeRulesSource(), request.getRequestPath() );
+                    ContentLocator contentLocator = new ByteArrayContentLocator( content, mimeType );
 
-                DefaultStorageFileItem result = new DefaultStorageFileItem( this, request, true, false, contentLocator );
-                result.setLength( content.length );
-                result.setCreated( mdItem.getCreated() );
-                result.setModified( System.currentTimeMillis() );
-                return result;
-            }
-            catch ( IOException e )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().error( "Error parsing metadata, serving as retrieved", e );
+                    DefaultStorageFileItem result =
+                        new DefaultStorageFileItem( this, request, true, false, contentLocator );
+                    result.setLength( content.length );
+                    result.setCreated( mdItem.getCreated() );
+                    result.setModified( System.currentTimeMillis() );
+                    return result;
                 }
-                else
+                catch ( IOException e )
                 {
-                    getLogger().error( "Error parsing metadata, serving as retrieved: " + e.getMessage() );
-                }
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().error( "Error parsing metadata, serving as retrieved", e );
+                    }
+                    else
+                    {
+                        getLogger().error( "Error parsing metadata, serving as retrieved: " + e.getMessage() );
+                    }
 
-                return super.doRetrieveItem( request );
-            }
-            finally
-            {
-                IOUtil.close( inputStream );
+                    return super.doRetrieveItem( request );
+                }
+                finally
+                {
+                    IOUtil.close( inputStream );
+                }
             }
         }
 
