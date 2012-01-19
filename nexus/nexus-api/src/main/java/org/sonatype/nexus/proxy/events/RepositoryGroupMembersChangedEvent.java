@@ -156,6 +156,7 @@ public class RepositoryGroupMembersChangedEvent
      * Returns the set of enums describing the changes happened against group repository.
      * 
      * @return
+     * @since 2.0
      */
     public Set<MemberChange> getMemberChangeSet()
     {
@@ -166,6 +167,7 @@ public class RepositoryGroupMembersChangedEvent
      * Returns the list of member repository IDs as it was set before the configuration change.
      * 
      * @return
+     * @since 2.0
      */
     public List<String> getOldRepositoryMemberIds()
     {
@@ -176,6 +178,7 @@ public class RepositoryGroupMembersChangedEvent
      * Returns the list of member repository IDs as it was set after the configuration change.
      * 
      * @return
+     * @since 2.0
      */
     public List<String> getNewRepositoryMemberIds()
     {
@@ -186,6 +189,7 @@ public class RepositoryGroupMembersChangedEvent
      * Returns the list of repository IDs that were removed from the group by the configuration change.
      * 
      * @return
+     * @since 2.0
      */
     public List<String> getRemovedRepositoryIds()
     {
@@ -196,6 +200,7 @@ public class RepositoryGroupMembersChangedEvent
      * Returns the list of repository IDs that were added to the group by the configuration change.
      * 
      * @return
+     * @since 2.0
      */
     public List<String> getAddedRepositoryIds()
     {
@@ -206,6 +211,7 @@ public class RepositoryGroupMembersChangedEvent
      * Returns the list of repository IDs that were reordered within the group by the configuration change.
      * 
      * @return
+     * @since 2.0
      */
     public List<String> getReorderedRepositoryIds()
     {
