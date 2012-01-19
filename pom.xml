@@ -48,7 +48,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <nexus.version>2.0-M3</nexus.version>
-    <p2-bridge.version>1.0.8</p2-bridge.version>
+    <p2-bridge.version>1.0.9-SNAPSHOT</p2-bridge.version>
   </properties>
 
   <dependencies>
