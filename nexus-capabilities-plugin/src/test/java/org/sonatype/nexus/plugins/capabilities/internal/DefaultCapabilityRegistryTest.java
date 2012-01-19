@@ -341,4 +341,27 @@ public class DefaultCapabilityRegistryTest
         verifyNoMoreInteractions( descriptor, capabilityStorage );
     }
 
+    /**
+     * On load, if type is unknown (no descriptor for that type), the entry is skipped.
+     *
+     * @throws Exception unexpected
+     */
+    @Test
+    public void loadWhenTypeIsUnknown()
+        throws Exception
+    {
+        final CapabilityStorageItem item = new CapabilityStorageItem(
+            0, capabilityIdentity( "foo" ), CAPABILITY_TYPE, true, null, null
+        );
+        when( capabilityStorage.getAll() ).thenReturn( Arrays.asList( item ) );
+
+        when( capabilityDescriptorRegistry.get( CAPABILITY_TYPE ) ).thenReturn( null );
+
+        underTest.load();
+
+        verify( capabilityStorage ).getAll();
+        final Collection<DefaultCapabilityReference> references = underTest.getAll();
+        assertThat( references.size(), is( 0 ) );
+    }
+
 }
