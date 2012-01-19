@@ -96,10 +96,14 @@ public class NexusMojoTestSupport
         secDispatcher = (SecDispatcher) container.lookup( SecDispatcher.class.getName(), "maven" );
 
         this.port = 0;
-        ServerSocket ss = new ServerSocket( 0 );
-        port = ss.getLocalPort();
-        ss.close();
-        assertThat( port, not( equalTo( 0 ) ) );
+        // non admin can't open port bellow 1024 on linux
+        while ( port < 1024 )
+        {
+            ServerSocket ss = new ServerSocket( 0 );
+            port = ss.getLocalPort();
+            ss.close();
+            assertThat( port, not( equalTo( 0 ) ) );
+        }
 
         proxyServer = new ProxyServer();
         proxyServer.setPort( port );
