@@ -101,9 +101,19 @@ public abstract class AbstractGroupRepository
                     true ).getMemberRepositoryIds().size() || !getExternalConfiguration( false ).getMemberRepositoryIds().containsAll(
                     getExternalConfiguration( true ).getMemberRepositoryIds() ) );
 
+        List<String> currentMemberIds = Collections.emptyList();
+        List<String> newMemberIds = Collections.emptyList();
         // we have to "remember" these before commit happens in super.onEvent
-        final List<String> currentMemberIds = getExternalConfiguration( false ).getMemberRepositoryIds();
-        final List<String> newMemberIds = getExternalConfiguration( true ).getMemberRepositoryIds();
+        // but ONLY if we are dirty and we do have "member changes" (see membersChanged above)
+        // this same boolean drives the firing of the event too, for which we are actually collecting these lists
+        // if no event to be fired, these lines should also not execute, since they are "dirtying" the config
+        // if membersChange is true, config is already dirty, and we DO KNOW there is member change to happen
+        // and we will fire the event too
+        if ( membersChanged )
+        {
+            currentMemberIds = getExternalConfiguration( false ).getMemberRepositoryIds();
+            newMemberIds = getExternalConfiguration( true ).getMemberRepositoryIds();
+        }
 
         super.onEvent( evt );
 
