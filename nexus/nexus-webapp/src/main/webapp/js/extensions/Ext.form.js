@@ -976,3 +976,30 @@ Ext.form.ByteDisplayField = Ext.extend(Ext.form.DisplayField, {
     });
 
 Ext.reg('byteDisplayField', Ext.form.ByteDisplayField);
+
+Ext.override(Ext.form.TextField, {
+  /**
+   * @cfg {Boolean} htmlDecode
+   * <tt>true</tt> to decode html entities in the value given to
+   * Ext.form.ByteDisplayField.setValue and Ext.form.ByteDisplayField.setRawValue
+   * before setting the actual value.
+   */
+  htmlDecode : false,
+
+  setRawValue : function(value) {
+    if ( this.htmlDecode )
+    {
+      value = Ext.util.Format.htmlDecode(value);
+    }
+    Ext.form.TextField.superclass.setRawValue.call(this, value);
+  },
+  setValue : function(value) {
+    if ( this.htmlDecode )
+    {
+      value = Ext.util.Format.htmlDecode(value);
+    }
+    Ext.form.TextField.superclass.setValue.call(this, value);
+  }
+});
+
+
