@@ -61,6 +61,7 @@ public abstract class AbstractStagingMojo
         ProxyConfig proxyConfig = null;
         if ( getProxyHost() != null )
         {
+            getLog().info( "Proxying nexus through: " + getProxyHost() + ":" + getProxyPort() );
             proxyConfig = new ProxyConfig( getProxyHost(), getProxyPort(), getProxyUsername(), getProxyPassword() );
         }
 
