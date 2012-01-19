@@ -359,7 +359,7 @@ public class LogbackLogManager
             out.println( "<?xml version='1.0' encoding='UTF-8'?>" );
             out.println();
             out.println( "<!--" );
-            out.println( "    DO NOT EDIT – This file aggregates log configuration from Nexus and its plugins, and is automatically generated." );
+            out.println( "    DO NOT EDIT - This file aggregates log configuration from Nexus and its plugins, and is automatically generated." );
             out.println( "-->" );
             out.println();
             out.println( "<configuration scan='true'>" );
