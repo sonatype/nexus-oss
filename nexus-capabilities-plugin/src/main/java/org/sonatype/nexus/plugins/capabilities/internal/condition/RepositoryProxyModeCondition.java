@@ -22,7 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.sonatype.nexus.eventbus.NexusEventBus;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
-import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
+import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -64,14 +64,11 @@ public class RepositoryProxyModeCondition
     }
 
     @Subscribe
-    public void handle( final RepositoryConfigurationUpdatedEvent event )
+    public void handle( final RepositoryEventProxyModeChanged event )
     {
-        if ( sameRepositoryAs( event.getRepository().getId() )
-            && event.getRepository().getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        if ( sameRepositoryAs( event.getRepository().getId() ) )
         {
-            setSatisfied( proxyMode.equals(
-                event.getRepository().adaptToFacet( ProxyRepository.class ).getProxyMode() )
-            );
+            setSatisfied( proxyMode.equals( event.getNewProxyMode() ) );
         }
     }
 

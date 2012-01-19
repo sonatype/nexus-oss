@@ -28,7 +28,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
-import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
+import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -95,7 +95,9 @@ public class RepositoryProxyModeConditionTest
         assertThat( underTest.isSatisfied(), is( true ) );
 
         when( repository.getProxyMode() ).thenReturn( ProxyMode.BLOCKED_AUTO );
-        underTest.handle( new RepositoryConfigurationUpdatedEvent( repository ) );
+        underTest.handle( new RepositoryEventProxyModeChanged(
+            repository, ProxyMode.ALLOW, ProxyMode.BLOCKED_AUTO, null
+        ) );
         assertThat( underTest.isSatisfied(), is( false ) );
 
         verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
@@ -110,7 +112,9 @@ public class RepositoryProxyModeConditionTest
         assertThat( underTest.isSatisfied(), is( true ) );
 
         when( repository.getProxyMode() ).thenReturn( ProxyMode.BLOCKED_MANUAL );
-        underTest.handle( new RepositoryConfigurationUpdatedEvent( repository ) );
+        underTest.handle( new RepositoryEventProxyModeChanged(
+            repository, ProxyMode.ALLOW, ProxyMode.BLOCKED_MANUAL, null
+        ) );
         assertThat( underTest.isSatisfied(), is( false ) );
 
         verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ) );
@@ -125,10 +129,14 @@ public class RepositoryProxyModeConditionTest
         assertThat( underTest.isSatisfied(), is( true ) );
 
         when( repository.getProxyMode() ).thenReturn( ProxyMode.BLOCKED_AUTO );
-        underTest.handle( new RepositoryConfigurationUpdatedEvent( repository ) );
+        underTest.handle( new RepositoryEventProxyModeChanged(
+            repository, ProxyMode.ALLOW, ProxyMode.BLOCKED_AUTO, null
+        ) );
 
         when( repository.getProxyMode() ).thenReturn( ProxyMode.ALLOW );
-        underTest.handle( new RepositoryConfigurationUpdatedEvent( repository ) );
+        underTest.handle( new RepositoryEventProxyModeChanged(
+            repository, ProxyMode.BLOCKED_AUTO, ProxyMode.ALLOW, null
+        ) );
         assertThat( underTest.isSatisfied(), is( true ) );
 
         verifyEventBusEvents( satisfied( underTest ), unsatisfied( underTest ), satisfied( underTest ) );
