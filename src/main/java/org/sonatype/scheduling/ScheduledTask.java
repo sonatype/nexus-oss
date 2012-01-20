@@ -210,4 +210,8 @@ public interface ScheduledTask<T>
     void setSchedule( Schedule schedule );
 
     Map<String, String> getTaskParams();
+    
+    void setPreEmptiveScheduling( boolean preEmptiveScheduling );
+    
+    boolean isPreEmptiveScheduling();
 }

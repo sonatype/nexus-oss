@@ -68,6 +68,8 @@ public class DefaultScheduledTask<T>
     private TaskState lastStatus;
 
     private boolean toBeRemoved = false;
+    
+    private boolean preEmptiveScheduling = true;
 
     public DefaultScheduledTask( String id, String name, String type, DefaultScheduler scheduler, Callable<T> callable,
                                  Schedule schedule )
@@ -430,13 +432,20 @@ public class DefaultScheduledTask<T>
                         manualRun = false;
                     }
                     // Otherwise, grab the next one
-                    else
+                    else if ( preEmptiveScheduling )
                     {
                         nextFuture = reschedule();
                     }
 
                     setLastRun( startDate );
                     result = getCallable().call();
+                    
+                    //we didnt calculate next future before task ran
+                    //so we calculate it now
+                    if ( !preEmptiveScheduling )
+                    {
+                        nextFuture = reschedule();
+                    }
 
                     if ( result != null )
                     {
@@ -452,6 +461,12 @@ public class DefaultScheduledTask<T>
 
                     setLastStatus( TaskState.BROKEN );
                     setTaskState( TaskState.BROKEN );
+
+                    //grab a future if available, since we didn't get it preemptively
+                    if ( !preEmptiveScheduling && nextFuture == null )
+                    {
+                        nextFuture = reschedule();
+                    }
 
                     if ( !isManualRunScheduled() && nextFuture == null && isEnabled() )
                     {
@@ -622,4 +637,13 @@ public class DefaultScheduledTask<T>
         this.toBeRemoved = toBeRemoved;
     }
 
+    public boolean isPreEmptiveScheduling()
+    {
+        return preEmptiveScheduling;
+    }
+    
+    public void setPreEmptiveScheduling( boolean preEmptiveScheduling )
+    {
+        this.preEmptiveScheduling = preEmptiveScheduling;
+    }
 }
