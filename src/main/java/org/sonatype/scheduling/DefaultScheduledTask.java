@@ -430,7 +430,13 @@ public class DefaultScheduledTask<T>
                         //if not preemptive scheduling, cancel the existing future, let task run and reschedule as expected
                         if ( !preEmptiveScheduling )
                         {
-                            getFuture().cancel( true );
+                            Future<T> f = getFuture();
+                            
+                            //just in case there is no future...doht!
+                            if ( f != null )
+                            {
+                                f.cancel( true );
+                            }
                         }
                         //otherwise just reuse existing future
                         else
