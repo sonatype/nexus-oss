@@ -743,7 +743,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             Sonatype.MessageBox.show({
                   animEl : this.capabilitiesGridPanel.getEl(),
                   title : 'Delete Capability?',
-                  msg : 'Delete the "' + rec.get('description') + '" capability?',
+                  msg : 'Delete the "' + rec.get('typeName') + ' - ' + rec.get('description') + '" capability?',
                   buttons : Sonatype.MessageBox.YESNO,
                   scope : this,
                   icon : Sonatype.MessageBox.QUESTION,
