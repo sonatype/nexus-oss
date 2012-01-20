@@ -427,7 +427,16 @@ public class DefaultScheduledTask<T>
                     // If manually running, just grab the previous future and use that or create a new one
                     if ( manualRun )
                     {
-                        nextFuture = getFuture();
+                        //if not preemptive scheduling, cancel the existing future, let task run and reschedule as expected
+                        if ( !preEmptiveScheduling )
+                        {
+                            getFuture().cancel( true );
+                        }
+                        //otherwise just reuse existing future
+                        else
+                        {
+                            nextFuture = getFuture();   
+                        }
 
                         manualRun = false;
                     }
@@ -443,6 +452,19 @@ public class DefaultScheduledTask<T>
                     //we didnt calculate next future before task ran
                     //so we calculate it now
                     if ( !preEmptiveScheduling )
+                    {
+                        //This covers case where the flag was true before task, but set to false since
+                        //so there will be a future that we now need to cancel and reschedule
+                        if ( nextFuture != null )
+                        {
+                            nextFuture.cancel( true );
+                        }
+                        
+                        nextFuture = reschedule();
+                    }
+                    //This covers case where the flag was false beforehand, but set to true since
+                    //because if set to true beforehand, nextFuture will be set
+                    else if ( nextFuture == null )
                     {
                         nextFuture = reschedule();
                     }
