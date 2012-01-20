@@ -19,6 +19,7 @@
 package org.sonatype.nexus.integrationtests.nexus3670;
 
 import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
+import static org.testng.Assert.fail;
 
 import java.util.Collections;
 import java.util.Set;
@@ -29,7 +30,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNode;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
-import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -48,7 +48,7 @@ public class Nexus3670IndexTreeViewIT
 
         // just making sure all tasks are finished
         TaskScheduleUtil.waitForAllTasksToStop();
-        
+
         getEventInspectorsUtil().waitForCalmPeriod();
 
         // this is just a "preflight", that all is there what we want, not a real test
@@ -58,10 +58,13 @@ public class Nexus3670IndexTreeViewIT
         Assert.assertEquals( 7, results.getData().size() );
         // repoId
         Assert.assertEquals( results.getData().get( 0 ).getArtifactHits().get( 0 ).getRepositoryId(),
-                             REPO_TEST_HARNESS_REPO, "Where got it deployed?" );
+            REPO_TEST_HARNESS_REPO, "Where got it deployed?" );
     }
 
-    @Test(groups = INDEX)
+    /**
+     * try to browser the tree, like UI does.
+     */
+    @Test( groups = INDEX )
     public void testTreeWithoutHint()
         throws Exception
     {
@@ -81,13 +84,13 @@ public class Nexus3670IndexTreeViewIT
         response = getSearchMessageUtil().indexBrowserTreeView( REPO_TEST_HARNESS_REPO, node.getPath() );
 
         Assert.assertEquals( response.getData().getChildren().size(), 4,
-                             "There are four \"nexus3670\" artifacts in a group!" );
+            "There are four \"nexus3670\" artifacts in a group!" );
 
         // this is group node
-        node = (IndexBrowserTreeNode) response.getData().getChildren().get( 0 );
+        node = getNode( response, "known-artifact-a" );
 
         Assert.assertEquals( node.getChildren().size(), 3,
-                             "There is three versions of \"nexus3670:known-artifact-a\" artifact!" );
+            "There is three versions of \"nexus3670:known-artifact-a\" artifact!" );
 
         // get one child (V)
         node = (IndexBrowserTreeNode) node.getChildren().get( 0 );
@@ -96,7 +99,25 @@ public class Nexus3670IndexTreeViewIT
         Assert.assertEquals( node.getType(), TreeNode.Type.V, "The path should be V node" );
     }
 
-    @Test(groups = INDEX)
+    private IndexBrowserTreeNode getNode( IndexBrowserTreeViewResponseDTO response, String artifactId )
+    {
+        for ( TreeNode node : response.getData().getChildren() )
+        {
+            final IndexBrowserTreeNode child = (IndexBrowserTreeNode) node;
+            if ( artifactId.equals( child.getArtifactId() ) )
+            {
+                return child;
+            }
+        }
+
+        fail( "Failed to find artifact " + artifactId );
+        return null;
+    }
+
+    /**
+     * open a tree knowing groupId and artifactId
+     */
+    @Test( groups = INDEX )
     public void testTreeWithHint()
         throws Exception
     {
