@@ -35,9 +35,12 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
+import org.sonatype.nexus.proxy.maven.gav.M2ArtifactRecognizer;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
+import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -136,8 +139,8 @@ public class M2RepositoryTest
         try
         {
             item =
-                new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true,
-                                            new StringContentLocator( SPOOF_SNAPSHOT ) );
+                new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
+                    SPOOF_SNAPSHOT ) );
 
             repository.storeItem( false, item );
 
@@ -156,16 +159,16 @@ public class M2RepositoryTest
         repository.getCurrentCoreConfiguration().commitChanges();
 
         item =
-            new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true,
-                                        new StringContentLocator( SPOOF_SNAPSHOT ) );
+            new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
+                SPOOF_SNAPSHOT ) );
 
         repository.storeItem( false, item );
 
         try
         {
             item =
-                new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true,
-                                            new StringContentLocator( SPOOF_RELEASE ) );
+                new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true, new StringContentLocator(
+                    SPOOF_RELEASE ) );
 
             repository.storeItem( false, item );
 
@@ -455,8 +458,8 @@ public class M2RepositoryTest
 
         // check the shadow attributes
         Attributes shadowStorageItem =
-            repository.getAttributesHandler().getAttributeStorage()
-                      .getAttributes( repository.createUid( request.getRequestPath() ) );
+            repository.getAttributesHandler().getAttributeStorage().getAttributes(
+                repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
 
@@ -469,13 +472,8 @@ public class M2RepositoryTest
         M2Repository repository = (M2Repository) this.getRepositoryRegistry().getRepository( "inhouse" );
         File inhouseLocalStorageDir =
             new File(
-                      new URL(
-                               ( (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration() )
-                                                                                                          .getConfiguration(
-                                                                                                                             false )
-                                                                                                          .getLocalStorage()
-                                                                                                          .getUrl() )
-                                                                                                                     .getFile() );
+                new URL( ( (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration() ).getConfiguration(
+                    false ).getLocalStorage().getUrl() ).getFile() );
 
         File artifactFile = new File( inhouseLocalStorageDir, itemPath );
         artifactFile.getParentFile().mkdirs();
@@ -495,10 +493,218 @@ public class M2RepositoryTest
 
         // check the shadow attributes
         Attributes shadowStorageItem =
-            repository.getAttributesHandler().getAttributeStorage()
-                      .getAttributes( repository.createUid( request.getRequestPath() ) );
+            repository.getAttributesHandler().getAttributeStorage().getAttributes(
+                repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
+
+    // NEXUS-4218 BEGIN
+
+    @Test
+    public void testNEXUS4218HowWeSpottedItMetadataChecksum()
+        throws Exception
+    {
+        // here, we use path that does conform to M2 layout, but is maven metadata checksum, and there is no UA neither
+        // remote address
+        // this is the actual case made us realize the existence of the bug
+        final String path = "/org/slf4j/slf4j-api/1.4.3/maven-metadata.xml.sha1";
+
+        doTestNEXUS4218( path, null, null );
+    }
+
+    @Test
+    public void testNEXUS4218HowWeSpottedItMetadata()
+        throws Exception
+    {
+        // here, we use path that does conform to M2 layout, but is maven metadata, and there is no UA neither remote
+        // address
+        final String path = "/org/slf4j/slf4j-api/1.4.3/maven-metadata.xml";
+
+        doTestNEXUS4218( path, null, null );
+    }
+
+    @Test
+    public void testNEXUS4218JustAnArtifactChecksum()
+        throws Exception
+    {
+        // here, we use path that does conform to M2 layout, but is maven artifact checksum, and there is no UA neither
+        // remote address
+        final String path = "/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar.sha1";
+
+        doTestNEXUS4218( path, null, null );
+    }
+
+    @Test
+    public void testNEXUS4218JustAnArtifact()
+        throws Exception
+    {
+        // here, we use path that does conform to M2 layout, but is maven metadata, and there is no UA neither remote
+        // address
+        final String path = "/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar";
+
+        doTestNEXUS4218( path, null, null );
+    }
+
+    @Test
+    public void testNEXUS4218HowWeSpottedItMetadataChecksumWithNotTriggeringUAAndIP()
+        throws Exception
+    {
+        // here, we use path that does conform to M2 layout, but is maven metadata checksum, and there is no UA neither
+        // remote address
+        // this case made us realize the existince of the bug
+        final String path = "/org/slf4j/slf4j-api/1.4.3/maven-metadata.xml.sha1";
+
+        doTestNEXUS4218( path, "Apache-Maven/3", "127.0.0.1" );
+    }
+
+    @Test
+    public void testNEXUS4218HowWeSpottedItMetadataWithNotTriggeringUAAndIP()
+        throws Exception
+    {
+        // here, we use path that does conform to M2 layout, but is maven metadata, and there is no UA neither remote
+        // address
+        final String path = "/org/slf4j/slf4j-api/1.4.3/maven-metadata.xml";
+
+        doTestNEXUS4218( path, "Apache-Maven/3", "127.0.0.1" );
+    }
+
+    @Test
+    public void testNEXUS4218JustAnArtifactChecksumWithNotTriggeringUAAndIP()
+        throws Exception
+    {
+        // here, we use path that does conform to M2 layout, but is maven artifact checksum, and there is no UA neither
+        // remote address
+        final String path = "/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar.sha1";
+
+        doTestNEXUS4218( path, "Apache-Maven/3", "127.0.0.1" );
+    }
+
+    @Test
+    public void testNEXUS4218JustAnArtifactWithNotTriggeringUAAndIP()
+        throws Exception
+    {
+        // here, we use path that does conform to M2 layout, but is maven metadata, and there is no UA neither remote
+        // address
+        final String path = "/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar";
+
+        doTestNEXUS4218( path, "Apache-Maven/3", "127.0.0.1" );
+    }
+
+    @Test
+    public void testNEXUS4218HowWeSpottedItMetadataChecksumWithTriggeringUAAndIP()
+        throws Exception
+    {
+        // here, we use path that does conform to M2 layout, but is maven metadata checksum, and there is no UA neither
+        // remote address
+        // this case made us realize the existince of the bug
+        final String path = "/org/slf4j/slf4j-api/1.4.3/maven-metadata.xml.sha1";
+
+        doTestNEXUS4218( path, "Apache-Maven/2", "127.0.0.1" );
+    }
+
+    @Test
+    public void testNEXUS4218HowWeSpottedItMetadataWithTriggeringUAAndIP()
+        throws Exception
+    {
+        // here, we use path that does conform to M2 layout, but is maven metadata, and there is no UA neither remote
+        // address
+        final String path = "/org/slf4j/slf4j-api/1.4.3/maven-metadata.xml";
+
+        doTestNEXUS4218( path, "Apache-Maven/2", "127.0.0.1" );
+    }
+
+    @Test
+    public void testNEXUS4218JustAnArtifactChecksumWithTriggeringUAAndIP()
+        throws Exception
+    {
+        // here, we use path that does conform to M2 layout, but is maven artifact checksum, and there is no UA neither
+        // remote address
+        final String path = "/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar.sha1";
+
+        doTestNEXUS4218( path, "Apache-Maven/2", "127.0.0.1" );
+    }
+
+    @Test
+    public void testNEXUS4218JustAnArtifactWithTriggeringUAAndIP()
+        throws Exception
+    {
+        // here, we use path that does conform to M2 layout, but is maven metadata, and there is no UA neither remote
+        // address
+        final String path = "/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar";
+
+        doTestNEXUS4218( path, "Apache-Maven/2", "127.0.0.1" );
+    }
+
+    public void doTestNEXUS4218( final String path, final String userAgent, final String remoteAddress )
+        throws Exception
+    {
+        final M2Repository repository = (M2Repository) getResourceStore();
+        // we check our expectation agains repository: it has to be Maven2 proxy repository
+        Assert.assertTrue( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) );
+        Assert.assertTrue( Maven2ContentClass.ID.equals( repository.getRepositoryContentClass().getId() ) );
+        File repositoryLocalStorageDir =
+            new File(
+                new URL( ( (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration() ).getConfiguration(
+                    false ).getLocalStorage().getUrl() ).getFile() );
+
+        // create a request and equip it as needed
+        final ResourceStoreRequest request = new ResourceStoreRequest( path );
+        if ( userAgent != null )
+        {
+            request.getRequestContext().put( AccessManager.REQUEST_AGENT, userAgent );
+        }
+        if ( remoteAddress != null )
+        {
+            request.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, remoteAddress );
+        }
+
+        // invoke expire caches
+        repository.expireCaches( request );
+
+        // NO file should be pulled down
+        {
+            File artifactFile = new File( repositoryLocalStorageDir, path.substring( 1 ) );
+            Assert.assertFalse( artifactFile.exists() );
+
+            if ( M2ArtifactRecognizer.isChecksum( path ) )
+            {
+                File artifactMainFile =
+                    new File( repositoryLocalStorageDir, path.substring( 1, path.length() - ".sha1".length() ) );
+                Assert.assertFalse( artifactMainFile.exists() );
+            }
+        }
+
+        // create a request and equip it as needed (requests should NOT be reused!)
+        final ResourceStoreRequest retrieveRequest = new ResourceStoreRequest( path );
+        if ( userAgent != null )
+        {
+            retrieveRequest.getRequestContext().put( AccessManager.REQUEST_AGENT, userAgent );
+        }
+        if ( remoteAddress != null )
+        {
+            retrieveRequest.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, remoteAddress );
+        }
+
+        // now do a fetch
+        // this verifies that an assertion ("path in question does not exists in proxy cache but does exists on remote")
+        // also verifies that cstamas did not mistype the paths in @Test method ;)
+        repository.retrieveItem( retrieveRequest );
+
+        // files SHOULD be pulled down
+        {
+            File artifactFile = new File( repositoryLocalStorageDir, path.substring( 1 ) );
+            Assert.assertTrue( artifactFile.exists() );
+
+            if ( !M2ArtifactRecognizer.isChecksum( path ) )
+            {
+                File artifactMainFile =
+                    new File( repositoryLocalStorageDir, path.substring( 1, path.length() ) +".sha1" );
+                Assert.assertTrue( artifactMainFile.exists() );
+            }
+        }
+    }
+
+    // NEXUS-4218 END
 
     // ==
 
@@ -520,11 +726,8 @@ public class M2RepositoryTest
         public void onEvent( Event<?> evt )
         {
             if ( evt instanceof RepositoryItemEventCache
-                && ( ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith( "maven-metadata.xml" ) || ( (RepositoryItemEventCache) evt )
-                                                                                                                                                  .getItem()
-                                                                                                                                                  .getPath()
-                                                                                                                                                  .endsWith(
-                                                                                                                                                             "spoof-1.0.txt" ) ) )
+                && ( ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith( "maven-metadata.xml" ) || ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith(
+                    "spoof-1.0.txt" ) ) )
             {
                 requestCount = requestCount + 1;
             }
