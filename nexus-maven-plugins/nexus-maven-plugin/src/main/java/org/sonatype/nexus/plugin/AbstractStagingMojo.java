@@ -59,9 +59,12 @@ public abstract class AbstractStagingMojo
         getLog().info( "User: " + getUsername() );
 
         ProxyConfig proxyConfig = null;
-        if ( getProxyHost() != null )
+        final String proxyHost = getProxyHost();
+        if ( proxyHost != null )
         {
-            proxyConfig = new ProxyConfig( getProxyHost(), getProxyPort(), getProxyUsername(), getProxyPassword() );
+            final int proxyPort = getProxyPort();
+            getLog().info( "Proxying nexus through: " + proxyHost + ":" + proxyPort );
+            proxyConfig = new ProxyConfig( proxyHost, proxyPort, getProxyUsername(), getProxyPassword() );
         }
 
         client = new StageClient( url, getUsername(), getPassword(), proxyConfig );

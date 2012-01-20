@@ -19,10 +19,12 @@
 package org.sonatype.nexus.plugin;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -43,7 +45,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.mortbay.jetty.Server;
 import org.sonatype.jettytestsuite.ProxyServer;
 import org.sonatype.nexus.restlight.testharness.AbstractRESTTest;
 import org.sonatype.nexus.restlight.testharness.ConversationalFixture;
@@ -71,9 +72,12 @@ public class NexusMojoTestSupport
 
     protected ProxyServer proxyServer;
 
+    private int port;
+
     @Before
     public void beforeEach()
-        throws ComponentLookupException, PlexusContainerException, StartingException, InitializationException
+        throws ComponentLookupException, PlexusContainerException, StartingException, InitializationException,
+        IOException
     {
         log = new SystemStreamLog()
         {
@@ -91,7 +95,18 @@ public class NexusMojoTestSupport
         container = new DefaultPlexusContainer();
         secDispatcher = (SecDispatcher) container.lookup( SecDispatcher.class.getName(), "maven" );
 
+        this.port = 0;
+        // non admin can't open port bellow 1024 on linux
+        while ( port < 1024 )
+        {
+            ServerSocket ss = new ServerSocket( 0 );
+            port = ss.getLocalPort();
+            ss.close();
+            assertThat( port, not( equalTo( 0 ) ) );
+        }
+
         proxyServer = new ProxyServer();
+        proxyServer.setPort( port );
         proxyServer.initialize();
     }
 
@@ -216,8 +231,7 @@ public class NexusMojoTestSupport
      */
     protected final int getProxyServerPort()
     {
-        Server server = proxyServer.getServer();
-        return server.getConnectors()[0].getLocalPort();
+        return this.port;
     }
 
     /**
