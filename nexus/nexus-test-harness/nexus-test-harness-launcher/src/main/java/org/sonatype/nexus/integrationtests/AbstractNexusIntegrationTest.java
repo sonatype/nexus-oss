@@ -39,7 +39,9 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.Callable;
+import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
@@ -51,6 +53,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
@@ -150,6 +153,8 @@ public abstract class AbstractNexusIntegrationTest
     protected Logger log = LoggerFactory.getLogger( getClass() );
 
     protected static Logger staticLog = LoggerFactory.getLogger( AbstractNexusIntegrationTest.class );
+
+    private Properties systemPropertiesBackup;
 
     static
     {
@@ -332,6 +337,21 @@ public abstract class AbstractNexusIntegrationTest
         {
             if ( NEEDS_INIT )
             {
+                systemPropertiesBackup = System.getProperties();
+
+                final String useDebugFor = System.getProperty( "it.nexus.log.level.use.debug" );
+                if( !StringUtils.isEmpty( useDebugFor ) )
+                {
+                    final String[] segments = useDebugFor.split( "," );
+                    for ( final String segment : segments )
+                    {
+                        if(getClass().getSimpleName().matches( segment.replace( ".", "\\." ).replace( "*", ".*" ) ))
+                        {
+                            System.setProperty( "it.nexus.log.level", "DEBUG" );
+                        }
+                    }
+                }
+
                 // tell the console what we are doing, now that there is no output its
                 String logMessage = "Running Test: " + getTestId() + " - Class: " + this.getClass().getSimpleName();
                 staticLog.info( String.format( "%1$-" + logMessage.length() + "s", " " ).replaceAll( " ", "*" ) );
@@ -391,6 +411,7 @@ public abstract class AbstractNexusIntegrationTest
     @AfterClass( alwaysRun = true )
     public void afterClassTearDown()
     {
+        System.setProperties( systemPropertiesBackup );
         Nullificator.nullifyMembers( this );
     }
 
