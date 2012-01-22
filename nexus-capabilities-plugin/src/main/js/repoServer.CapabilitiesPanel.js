@@ -297,6 +297,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
                    width : this.COMBO_WIDTH
                  }, {
                    xtype : 'textfield',
+                   htmlDecode : true,
                    fieldLabel : 'Notes',
                    labelStyle : 'margin-left: 15px; width: 60px; margin-bottom:10px',
                    itemCls : '',
