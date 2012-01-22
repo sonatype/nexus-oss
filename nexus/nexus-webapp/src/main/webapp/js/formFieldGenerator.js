@@ -53,6 +53,7 @@ FormFieldGenerator = function(panelId, fieldSetName, fieldNamePrefix, typeStore,
             {
               items[j] = {
                 xtype : 'textfield',
+                htmlDecode : true,
                 fieldLabel : curRec.label,
                 itemCls : curRec.required ? 'required-field' : '',
                 helpText : curRec.helpText,
@@ -81,6 +82,7 @@ FormFieldGenerator = function(panelId, fieldSetName, fieldNamePrefix, typeStore,
             {
               items[j] = {
                 xtype : 'textarea',
+                htmlDecode : true,
                 fieldLabel : curRec.label,
                 itemCls : curRec.required ? 'required-field' : '',
                 helpText : curRec.helpText,

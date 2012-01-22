@@ -684,7 +684,8 @@ public class DefaultErrorReportingManager
         {
             public boolean accept( File pathname )
             {
-                return !pathname.getName().endsWith( ".bak" ) && !pathname.getName().endsWith( "nexus.xml" )
+                return !pathname.getName().endsWith( ".bak" )
+                    && !pathname.getName().equals( "nexus.xml" )
                     && !pathname.getName().endsWith( "security.xml" )
                     && !pathname.getName().endsWith( "security-configuration.xml" );
             }
