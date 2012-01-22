@@ -432,6 +432,7 @@ Sonatype.repoServer.HostedRepositoryEditor = function(config) {
               helpText : ht.name,
               name : 'name',
               width : 200,
+              htmlDecode : true,
               allowBlank : false
             }, {
               xtype : 'textfield',
