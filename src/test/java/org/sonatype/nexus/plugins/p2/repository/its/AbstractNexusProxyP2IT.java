@@ -23,8 +23,6 @@ import static org.sonatype.nexus.test.utils.FileTestingUtils.interpolationDirect
 import java.io.File;
 import java.io.IOException;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.jettytestsuite.ServletServer;
@@ -45,11 +43,17 @@ public abstract class AbstractNexusProxyP2IT
         localStorageDir = TestProperties.getString( "proxy.repo.base.dir" );
     }
 
+    protected AbstractNexusProxyP2IT()
+    {
+        super();
+    }
+
     protected AbstractNexusProxyP2IT( final String testRepositoryId )
     {
         super( testRepositoryId );
     }
 
+    @SuppressWarnings( "deprecation" )
     @BeforeClass( alwaysRun = true )
     public void startProxy()
         throws Exception
