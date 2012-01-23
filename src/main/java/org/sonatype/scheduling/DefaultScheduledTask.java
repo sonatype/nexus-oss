@@ -68,6 +68,8 @@ public class DefaultScheduledTask<T>
     private TaskState lastStatus;
 
     private boolean toBeRemoved = false;
+    
+    private boolean preEmptiveScheduling = true;
 
     public DefaultScheduledTask( String id, String name, String type, DefaultScheduler scheduler, Callable<T> callable,
                                  Schedule schedule )
@@ -425,18 +427,53 @@ public class DefaultScheduledTask<T>
                     // If manually running, just grab the previous future and use that or create a new one
                     if ( manualRun )
                     {
-                        nextFuture = getFuture();
+                        //if not preemptive scheduling, cancel the existing future, let task run and reschedule as expected
+                        if ( !preEmptiveScheduling )
+                        {
+                            Future<T> f = getFuture();
+                            
+                            //just in case there is no future...doht!
+                            if ( f != null )
+                            {
+                                f.cancel( true );
+                            }
+                        }
+                        //otherwise just reuse existing future
+                        else
+                        {
+                            nextFuture = getFuture();   
+                        }
 
                         manualRun = false;
                     }
                     // Otherwise, grab the next one
-                    else
+                    else if ( preEmptiveScheduling )
                     {
                         nextFuture = reschedule();
                     }
 
                     setLastRun( startDate );
                     result = getCallable().call();
+                    
+                    //we didnt calculate next future before task ran
+                    //so we calculate it now
+                    if ( !preEmptiveScheduling )
+                    {
+                        //This covers case where the flag was true before task, but set to false since
+                        //so there will be a future that we now need to cancel and reschedule
+                        if ( nextFuture != null )
+                        {
+                            nextFuture.cancel( true );
+                        }
+                        
+                        nextFuture = reschedule();
+                    }
+                    //This covers case where the flag was false beforehand, but set to true since
+                    //because if set to true beforehand, nextFuture will be set
+                    else if ( nextFuture == null )
+                    {
+                        nextFuture = reschedule();
+                    }
 
                     if ( result != null )
                     {
@@ -452,6 +489,12 @@ public class DefaultScheduledTask<T>
 
                     setLastStatus( TaskState.BROKEN );
                     setTaskState( TaskState.BROKEN );
+
+                    //grab a future if available, since we didn't get it preemptively
+                    if ( !preEmptiveScheduling && nextFuture == null )
+                    {
+                        nextFuture = reschedule();
+                    }
 
                     if ( !isManualRunScheduled() && nextFuture == null && isEnabled() )
                     {
@@ -622,4 +665,13 @@ public class DefaultScheduledTask<T>
         this.toBeRemoved = toBeRemoved;
     }
 
+    public boolean isPreEmptiveScheduling()
+    {
+        return preEmptiveScheduling;
+    }
+    
+    public void setPreEmptiveScheduling( boolean preEmptiveScheduling )
+    {
+        this.preEmptiveScheduling = preEmptiveScheduling;
+    }
 }

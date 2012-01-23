@@ -16,10 +16,13 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
+import junit.framework.Assert;
+
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.scheduling.iterators.DailySchedulerIterator;
 import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.DailySchedule;
+import org.sonatype.scheduling.schedules.HourlySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 
@@ -241,7 +244,7 @@ public class DefaultSchedulerTest
 
         assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
-    
+
     public void testBrokenCallable()
         throws Exception
     {
@@ -262,6 +265,75 @@ public class DefaultSchedulerTest
         assertEquals( 0, defaultScheduler.getAllTasks().size() );
 
         // assertEquals( TaskState.BROKEN, task.getTaskState() );
+    }
+
+    /**
+     * Validate that non-preEmptiveCallback properly sets next schedule time
+     * @throws Exception
+     */
+    public void testNonPreEmptiveCallable()
+        throws Exception
+    {
+        TestNonPreEmptiveCallable callable = new TestNonPreEmptiveCallable();
+
+        long nearFuture = System.currentTimeMillis() + 500;
+
+        Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 2400 ) );
+
+        ScheduledTask<Integer> task = defaultScheduler.schedule( "default", callable, schedule );
+        task.setPreEmptiveScheduling( false );
+
+        callable.setTask( task );
+
+        // save some time and loop until we see time is set properly
+        for ( int i = 0 ; i < 11 && callable.getRunCount() < 1 ; i++ )
+        {
+            if ( i == 11 )
+            {
+                Assert.fail( "Waited too long for callable to have run count greater than 2 it is " + callable.getRunCount() );
+            }
+            Thread.sleep( 500 );
+        }
+
+        // if the next run we set, and the next run of task are the same, its proof that we
+        // have broken the cycle and introduced new schedule
+        Assert.assertEquals( callable.getNextRun(), task.getNextRun() );
+
+        task.cancel( true );
+    }
+
+    /**
+     * Validate that preEmptiveCallback cannot set next schedule time during run
+     * @throws Exception
+     */
+    public void testPreEmptiveCallable()
+        throws Exception
+    {
+        TestNonPreEmptiveCallable callable = new TestNonPreEmptiveCallable();
+
+        long nearFuture = System.currentTimeMillis() + 500;
+
+        Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 2400 ) );
+
+        ScheduledTask<Integer> task = defaultScheduler.schedule( "default", callable, schedule );
+        // leave as default to validate test
+        // task.setPreEmptiveScheduling( false );
+
+        callable.setTask( task );
+
+        // just loop until there is more than 1 run count, which means we should have a new scheduled time
+        for ( int i = 0 ; i < 11 && callable.getRunCount() < 2 ; i++ )
+        {
+            if ( i == 11 )
+            {
+                Assert.fail( "Waited too long for callable to have run count greater than 2 it is " + callable.getRunCount() );
+            }
+            Thread.sleep( 500 );
+        }
+
+        Assert.assertFalse( callable.getNextRun().equals( task.getNextRun() ) );
+
+        task.cancel( true );
     }
 
     protected Schedule getEverySecondSchedule( Date start, Date stop )
@@ -333,7 +405,7 @@ public class DefaultSchedulerTest
             return runCount;
         }
     }
-    
+
     public class BrokenTestCallable
         implements Callable<Integer>
     {
@@ -344,4 +416,39 @@ public class DefaultSchedulerTest
         }
     }
 
+    public class TestNonPreEmptiveCallable
+        implements Callable<Integer>
+    {
+        private int runCount = 0;
+
+        private ScheduledTask<?> task;
+
+        private Date futureRun;
+
+        public Integer call()
+            throws Exception
+        {
+            futureRun = new Date( System.currentTimeMillis() + 200000 );
+
+            // by doing this, we should see the next scheduled time 200 seconds in future
+            task.setSchedule( new HourlySchedule( futureRun, null ) );
+
+            return runCount++;
+        }
+
+        public int getRunCount()
+        {
+            return runCount;
+        }
+
+        public void setTask( ScheduledTask<?> task )
+        {
+            this.task = task;
+        }
+
+        public Date getNextRun()
+        {
+            return futureRun;
+        }
+    }
 }
