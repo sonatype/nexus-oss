@@ -49,10 +49,10 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class P2GroupMetadataSource
     extends AbstractP2MetadataSource<P2GroupRepository>
 {
+
     private static final String ATTR_HASH_PREFIX = "original";
 
-    protected List<Repository> getMemberRepositories( final P2GroupRepository repository )
-        throws StorageException
+    private List<Repository> getMemberRepositories( final P2GroupRepository repository )
     {
         return repository.getMemberRepositories();
     }
@@ -61,8 +61,9 @@ public class P2GroupMetadataSource
     protected Xpp3Dom doRetrieveArtifactsDom( final Map<String, Object> context, final P2GroupRepository repository )
         throws StorageException, ItemNotFoundException
     {
-        final ArrayList<Xpp3Dom> doms =
-            parseItemContent( P2Constants.ARTIFACTS_XML, P2Constants.ARTIFACTS_JAR, context, repository );
+        final ArrayList<Xpp3Dom> doms = parseItemContent(
+            P2Constants.ARTIFACTS_XML, P2Constants.ARTIFACTS_JAR, context, repository
+        );
 
         final ArrayList<Artifacts> artifacts = new ArrayList<Artifacts>();
         for ( final Xpp3Dom dom : doms )
@@ -93,8 +94,9 @@ public class P2GroupMetadataSource
     protected Xpp3Dom doRetrieveContentDom( final Map<String, Object> context, final P2GroupRepository repository )
         throws StorageException, ItemNotFoundException
     {
-        final ArrayList<Xpp3Dom> doms =
-            parseItemContent( P2Constants.CONTENT_XML, P2Constants.CONTENT_JAR, context, repository );
+        final ArrayList<Xpp3Dom> doms = parseItemContent(
+            P2Constants.CONTENT_XML, P2Constants.CONTENT_JAR, context, repository
+        );
 
         final ArrayList<Content> artifacts = new ArrayList<Content>();
         for ( final Xpp3Dom dom : doms )
@@ -120,17 +122,25 @@ public class P2GroupMetadataSource
         }
     }
 
-    private ArrayList<Xpp3Dom> parseItemContent( final String xmlName, final String jarName,
-                                                 final Map<String, Object> context, final P2GroupRepository repository )
-        throws StorageException, ItemNotFoundException
+    private ArrayList<Xpp3Dom> parseItemContent( final String xmlName,
+                                                 final String jarName,
+                                                 final Map<String, Object> context,
+                                                 final P2GroupRepository repository )
     {
         final ArrayList<Xpp3Dom> doms = new ArrayList<Xpp3Dom>();
 
         for ( final Repository repo : getMemberRepositories( repository ) )
         {
-            if ( repo.getLocalStatus().shouldServiceRequest() )
+            try
             {
                 doms.add( parseItem( repo, jarName, xmlName, context ) );
+            }
+            catch ( Exception e )
+            {
+                getLogger().warn(
+                    "Could not retrieve {} nor {} from {} due to {}. Skipping it from aggregation into {}",
+                    new Object[]{ xmlName, jarName, repo.getId(), e.getMessage(), repository.getId() }
+                );
             }
         }
 
@@ -151,7 +161,7 @@ public class P2GroupMetadataSource
         }
         catch ( final IllegalOperationException e )
         {
-            throw new StorageException( e );
+            throw new StorageException( e.getMessage(), e );
         }
         catch ( final AccessDeniedException e )
         {
@@ -215,32 +225,32 @@ public class P2GroupMetadataSource
     }
 
     private TreeMap<String, String> getMemberHash( final String jar, final String xml,
-                                                   final Map<String, Object> context, final P2GroupRepository repository )
+                                                   final Map<String, Object> context,
+                                                   final P2GroupRepository repository )
     {
         final TreeMap<String, String> memberHash = new TreeMap<String, String>();
 
         int count = 0;
 
+        List<StorageItem> storageItems;
         try
         {
-            for ( final StorageItem original : retrieveItems( jar, xml, context, repository ) )
+             storageItems = retrieveItems( jar, xml, context, repository );
+        }
+        catch ( final Exception e )
+        {
+            // assume it has changed, so return an empty map
+            return memberHash;
+        }
+
+        for ( final StorageItem storageItem : storageItems )
+        {
+            final String hash = storageItem.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+            if ( hash != null )
             {
-                final String hash = original.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
-                if ( hash == null )
-                {
-                    // assume it has changed
-                    return null;
-                }
-
-                memberHash.put( ATTR_HASH_PREFIX + count + "." + original.getRepositoryItemUid().toString(), hash );
-
+                memberHash.put( ATTR_HASH_PREFIX + count + "." + storageItem.getRepositoryItemUid().toString(), hash );
                 count++;
             }
-        }
-        catch ( final StorageException e )
-        {
-            // assume it has changed
-            return null;
         }
 
         return memberHash;
@@ -248,28 +258,31 @@ public class P2GroupMetadataSource
 
     private List<StorageItem> retrieveItems( final String jar, final String xml, final Map<String, Object> context,
                                              final P2GroupRepository repository )
-        throws StorageException
+        throws StorageException, ItemNotFoundException
     {
         final ArrayList<StorageItem> items = new ArrayList<StorageItem>();
         for ( final Repository repo : getMemberRepositories( repository ) )
         {
-            if ( repo.getLocalStatus().shouldServiceRequest() )
+            try
             {
+                items.add( doRetrieveRemoteItem( repo, jar, context ) );
+            }
+            catch ( final ItemNotFoundException e )
+            {
+                getLogger().debug(
+                    "Could not retrieve {} from {} ({}). Trying {}",
+                    new Object[]{ jar, repo.getId(), e.getMessage(), xml }
+                );
                 try
                 {
-                    items.add( doRetrieveRemoteItem( repo, jar, context ) );
+                    items.add( doRetrieveRemoteItem( repo, xml, context ) );
                 }
-                catch ( final ItemNotFoundException e )
+                catch ( ItemNotFoundException e1 )
                 {
-                    try
-                    {
-                        items.add( doRetrieveRemoteItem( repo, xml, context ) );
-                    }
-                    catch ( final ItemNotFoundException e1 )
-                    {
-                        throw new StorageException( "Could not retrieve neither " + jar + " nor " + xml + " from "
-                            + repo.getId() );
-                    }
+                    getLogger().debug(
+                        "Could not retrieve {} from {} ({})", new Object[]{ xml, repo.getId(), e.getMessage() }
+                    );
+                    throw e1;
                 }
             }
         }

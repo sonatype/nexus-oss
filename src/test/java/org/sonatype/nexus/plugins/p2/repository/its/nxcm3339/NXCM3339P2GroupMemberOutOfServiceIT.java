@@ -19,19 +19,14 @@
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm3339;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isDirectory;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.readable;
 
 import java.io.File;
 
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
-import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.annotations.Test;
 
 public class NXCM3339P2GroupMemberOutOfServiceIT
@@ -46,48 +41,29 @@ public class NXCM3339P2GroupMemberOutOfServiceIT
         repositoryMessageUtil = new RepositoryMessageUtil( this, getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
+    /**
+     * When one of member repositories is out of service the group repository should not fail and just use the valid
+     * repositories.
+     *
+     * @throws Exception not expected
+     */
     @Test
-    public void putOutAndInService()
+    public void outOfService()
         throws Exception
     {
-        {
-            repositoryMessageUtil.setOutOfServiceProxy( "nxcm3339-2", true );
+        repositoryMessageUtil.setOutOfServiceProxy( "nxcm3339-2", true );
 
-            final File installDir = new File( "target/eclipse/nxcm3339" );
+        final File installDir = new File( "target/eclipse/nxcm3339" );
 
-            installUsingP2(
-                getGroupUrl( getTestRepositoryId() ),
-                "com.sonatype.nexus.p2.its.feature.feature.group",
-                installDir.getCanonicalPath()
-            );
+        installUsingP2(
+            getGroupUrl( getTestRepositoryId() ),
+            "com.sonatype.nexus.p2.its.feature.feature.group",
+            installDir.getCanonicalPath()
+        );
 
-            final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
-            assertThat( feature, exists() );
-            assertThat( feature, isDirectory() );
-        }
-
-        {
-            repositoryMessageUtil.setOutOfServiceProxy( "nxcm3339-2", false );
-
-            final File installDir = new File( "target/eclipse/nxcm3339-2" );
-
-            installUsingP2(
-                getGroupUrl( getTestRepositoryId() ),
-                "com.sonatype.nexus.p2.its.feature2.feature.group",
-                installDir.getCanonicalPath()
-            );
-
-            final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
-            assertThat( feature, exists() );
-            assertThat( feature, isDirectory() );
-
-            final File feature2 = new File( installDir, "features/com.sonatype.nexus.p2.its.feature2_1.0.0" );
-            assertThat( feature2, exists() );
-            assertThat( feature2, isDirectory() );
-
-            final File bundle = new File( installDir, "plugins/com.sonatype.nexus.p2.its.bundle_1.0.0.jar" );
-            assertThat( bundle, is( readable() ) );
-        }
+        final File feature = new File( installDir, "features/com.sonatype.nexus.p2.its.feature_1.0.0" );
+        assertThat( feature, exists() );
+        assertThat( feature, isDirectory() );
     }
 
 }

@@ -29,8 +29,6 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
@@ -38,9 +36,12 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.MXSerializer;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
@@ -57,6 +58,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
 public abstract class AbstractP2MetadataSource<E extends Repository>
+    extends AbstractLoggingComponent
     implements P2MetadataSource<E>
 {
 
@@ -64,9 +66,6 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
         P2Constants.CONTENT_XML, P2Constants.ARTIFACTS_JAR, P2Constants.ARTIFACTS_XML,
         P2Constants.COMPOSITE_CONTENT_XML, P2Constants.COMPOSITE_CONTENT_JAR, P2Constants.COMPOSITE_ARTIFACTS_XML,
         P2Constants.COMPOSITE_ARTIFACTS_JAR );
-
-    @Requirement
-    private Logger logger;
 
     protected LocalRepositoryStorage getLocalStorage( final E repository )
     {
@@ -82,12 +81,12 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
                                               final Map<String, Object> context, final E repository )
         throws IOException
     {
-        logger.debug( "Repository " + repository.getId() + ": Creating metadata item " + path );
+        getLogger().debug( "Repository " + repository.getId() + ": Creating metadata item " + path );
         final DefaultStorageFileItem result = createMetadataItem( repository, path, metadata, hack, context );
 
         setItemAttributes( result, context, repository );
 
-        logger.debug( "Repository " + repository.getId() + ": Created metadata item " + path );
+        getLogger().debug( "Repository " + repository.getId() + ": Created metadata item " + path );
         return doCacheItem( result, repository );
     }
 
@@ -252,8 +251,8 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
         {
             lock.unlock();
 
-            logger.debug( "Repository " + repository.getId() + ": retrieve item: " + request.getRequestPath()
-                + ": took " + ( System.currentTimeMillis() - start ) + " ms." );
+            getLogger().debug( "Repository " + repository.getId() + ": retrieve item: " + request.getRequestPath()
+                                   + ": took " + ( System.currentTimeMillis() - start ) + " ms." );
         }
     }
 
@@ -283,13 +282,13 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
 
     private void deleteP2Metadata( final Repository repository )
     {
-        logger.debug( "Repository " + repository.getId() + ": Deleting p2 metadata items." );
+        getLogger().debug( "Repository " + repository.getId() + ": Deleting p2 metadata items." );
         deleteItemSilently( repository, new ResourceStoreRequest( P2Constants.ARTIFACTS_JAR ) );
         deleteItemSilently( repository, new ResourceStoreRequest( P2Constants.ARTIFACTS_XML ) );
         deleteItemSilently( repository, new ResourceStoreRequest( P2Constants.CONTENT_JAR ) );
         deleteItemSilently( repository, new ResourceStoreRequest( P2Constants.CONTENT_XML ) );
         deleteItemSilently( repository, new ResourceStoreRequest( P2Constants.PRIVATE_ROOT ) );
-        logger.debug( "Repository " + repository.getId() + ": Deleted p2 metadata items." );
+        getLogger().debug( "Repository " + repository.getId() + ": Deleted p2 metadata items." );
     }
 
     private static void deleteItemSilently( final Repository repository, final ResourceStoreRequest request )
@@ -340,15 +339,15 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
         }
         catch ( final RemoteAccessException e )
         {
-            throw new StorageException( e );
+            throw new RemoteStorageException( e.getMessage(), e );
         }
         catch ( final IOException e )
         {
-            throw new StorageException( e );
+            throw new LocalStorageException( e.getMessage(), e );
         }
         catch ( final XmlPullParserException e )
         {
-            throw new StorageException( e );
+            throw new LocalStorageException( e.getMessage(), e );
         }
 
     }
@@ -388,7 +387,7 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
 
                     if ( ze == null )
                     {
-                        throw new StorageException( "Corrupted P2 metadata jar " + jarPath );
+                        throw new LocalStorageException( "Corrupted P2 metadata jar " + jarPath );
                     }
 
                     final InputStream zis = z.getInputStream( ze );
@@ -417,17 +416,17 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
         final Xpp3Dom dom = doRetrieveArtifactsDom( context, repository );
         try
         {
-            logger.debug( "Repository " + repository.getId() + ": Deleting p2 artifacts metadata items." );
+            getLogger().debug( "Repository " + repository.getId() + ": Deleting p2 artifacts metadata items." );
             deleteItemSilently( repository, new ResourceStoreRequest( P2Constants.ARTIFACTS_JAR ) );
             deleteItemSilently( repository, new ResourceStoreRequest( P2Constants.ARTIFACTS_XML ) );
-            logger.debug( "Repository " + repository.getId() + ": Deleted p2 artifacts metadata items." );
+            getLogger().debug( "Repository " + repository.getId() + ": Deleted p2 artifacts metadata items." );
 
             return createMetadataItem( P2Constants.ARTIFACTS_PATH, dom, P2Constants.XMLPI_ARTIFACTS, context,
                 repository );
         }
         catch ( final IOException e )
         {
-            throw new StorageException( e );
+            throw new LocalStorageException( e.getMessage(), e );
         }
     }
 
@@ -437,16 +436,16 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
         final Xpp3Dom dom = doRetrieveContentDom( context, repository );
         try
         {
-            logger.debug( "Repository " + repository.getId() + ": Deleting p2 content metadata items." );
+            getLogger().debug( "Repository " + repository.getId() + ": Deleting p2 content metadata items." );
             deleteItemSilently( repository, new ResourceStoreRequest( P2Constants.CONTENT_JAR ) );
             deleteItemSilently( repository, new ResourceStoreRequest( P2Constants.CONTENT_XML ) );
-            logger.debug( "Repository " + repository.getId() + ": Deleted p2 content metadata items." );
+            getLogger().debug( "Repository " + repository.getId() + ": Deleted p2 content metadata items." );
 
             return createMetadataItem( P2Constants.CONTENT_PATH, dom, P2Constants.XMLPI_CONTENT, context, repository );
         }
         catch ( final IOException e )
         {
-            throw new StorageException( e );
+            throw new LocalStorageException( e.getMessage(), e );
         }
     }
 

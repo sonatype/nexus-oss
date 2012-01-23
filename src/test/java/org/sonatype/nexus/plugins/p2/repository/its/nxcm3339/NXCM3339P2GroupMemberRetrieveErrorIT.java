@@ -19,6 +19,7 @@
 package org.sonatype.nexus.plugins.p2.repository.its.nxcm3339;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.TaskScheduleUtil.waitForAllTasksToStop;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.isDirectory;
 
@@ -26,32 +27,40 @@ import java.io.File;
 
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.plugins.p2.repository.its.AbstractNexusProxyP2IT;
+import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.testng.annotations.Test;
 
-public class NXCM3339P2GroupMemberBlockedIT
+public class NXCM3339P2GroupMemberRetrieveErrorIT
     extends AbstractNexusProxyP2IT
 {
 
     private RepositoryMessageUtil repositoryMessageUtil;
 
-    public NXCM3339P2GroupMemberBlockedIT()
+    public NXCM3339P2GroupMemberRetrieveErrorIT()
     {
         super( "nxcm3339" );
         repositoryMessageUtil = new RepositoryMessageUtil( this, getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     /**
-     * When one of member repositories is blocked the group repository should not fail and just use the valid
-     * repositories.
+     * When one of member repositories has a wrong url (so cannot download p2 metadata) the group repository should not
+     * fail and just use the valid repositories.
      *
      * @throws Exception not expected
      */
     @Test
-    public void blocked()
+    public void wrongRemoteUrl()
         throws Exception
     {
-        repositoryMessageUtil.setBlockProxy( "nxcm3339-2", true );
+
+        final RepositoryProxyResource resource = (RepositoryProxyResource) repositoryMessageUtil.getRepository(
+            "nxcm3339-2"
+        );
+        resource.getRemoteStorage().setRemoteStorageUrl( "http://fake.url/" );
+        repositoryMessageUtil.updateRepo( resource );
+
+        waitForAllTasksToStop();
 
         final File installDir = new File( "target/eclipse/nxcm3339" );
 
