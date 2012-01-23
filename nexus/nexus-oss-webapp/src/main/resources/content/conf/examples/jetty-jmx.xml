@@ -120,14 +120,12 @@
          port 1099. The argument below can be changed in order to comply
          with the firewall requirements.
     -->
-    <!--
     <Call name="createRegistry" class="java.rmi.registry.LocateRegistry">
         <Arg type="java.lang.Integer">1099</Arg>
         <Call name="sleep" class="java.lang.Thread">
             <Arg type="java.lang.Integer">1000</Arg>
         </Call>
     </Call>
-    -->
 
     <!-- Optionally add a remote JMX connector. The parameters of the constructor
          below specify the JMX service URL, and the object name string for the
@@ -138,7 +136,6 @@
          the RMI registry hostname and port number, that may need to be modified
          in order to comply with the firewall requirements.
     -->
-    <!--
     <New id="ConnectorServer" class="org.eclipse.jetty.jmx.ConnectorServer">
         <Arg>
             <New class="javax.management.remote.JMXServiceURL">
@@ -151,6 +148,5 @@
         <Arg>org.eclipse.jetty:name=rmiconnectorserver</Arg>
         <Call name="start"/>
     </New>
-    -->
 
 </Configure>
