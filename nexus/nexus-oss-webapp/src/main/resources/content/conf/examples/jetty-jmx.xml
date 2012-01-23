@@ -145,7 +145,7 @@
                 <Arg type="java.lang.String">rmi</Arg>
                 <Arg type="java.lang.String"/>
                 <Arg type="java.lang.Integer">0</Arg>
-                <Arg type="java.lang.String">/jndi/rmi://localhost:1099/jettyjmx</Arg>
+                <Arg type="java.lang.String">/jndi/rmi://localhost:1099/jmxrmi</Arg>
             </New>
         </Arg>
         <Arg>org.eclipse.jetty:name=rmiconnectorserver</Arg>
