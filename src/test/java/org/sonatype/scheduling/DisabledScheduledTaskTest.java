@@ -4,6 +4,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
+import junit.framework.Assert;
+
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.Schedule;
@@ -32,12 +34,16 @@ public class DisabledScheduledTaskTest
         task.runNow();
 
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
-        while ( task.getLastRun() == null )
+        
+        // just loop until there is more than 1 run count, which means we should have a new scheduled time
+        for ( int i = 0 ; i < 11 && !TaskState.WAITING.equals( task.getTaskState() ) ; i++ )
         {
-            Thread.sleep( 300 );
+            if ( i == 11 )
+            {
+                Assert.fail( "Waited too long for task to be in waiting state" );
+            }
+            Thread.sleep( 500 );
         }
-
-        assertEquals( TaskState.WAITING, task.getTaskState() ); // if task is disabled
 
         assertEquals( 1, task.getResults().get( 0 ).intValue() );
 
