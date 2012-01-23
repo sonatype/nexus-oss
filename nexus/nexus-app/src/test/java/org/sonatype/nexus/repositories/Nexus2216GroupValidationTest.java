@@ -78,8 +78,8 @@ public class Nexus2216GroupValidationTest
                 Matchers.equalTo( publicGroup.getMemberRepositoryIds() ) );
 
             MatcherAssert.assertThat(
-                "The config should be 5 reposes, but ids found are: " + publicGroup.getMemberRepositoryIds(),
-                publicGroup.getMemberRepositories().size(), Matchers.equalTo( 5 ) );
+                "The config should be 4 reposes, but ids found are: " + publicGroup.getMemberRepositoryIds(),
+                publicGroup.getMemberRepositories().size(), Matchers.equalTo( 4 ) );
         }
         catch ( Exception e )
         {

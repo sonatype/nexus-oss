@@ -68,34 +68,6 @@
       </externalConfiguration>
     </repository>
     <repository>
-      <id>google</id>
-      <name>Google Code</name>
-      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
-      <providerHint>maven2</providerHint>
-      <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
-      <notFoundCacheTTL>1440</notFoundCacheTTL>
-      <userManaged>true</userManaged>
-      <exposed>true</exposed>
-      <browseable>true</browseable>
-      <writePolicy>READ_ONLY</writePolicy>
-      <indexable>true</indexable>
-      <searchable>true</searchable>
-      <remoteStorage>
-        <provider>apacheHttpClient3x</provider>
-        <url>http://google-maven-repository.googlecode.com/svn/repository/</url>
-      </remoteStorage>
-      <externalConfiguration>
-        <proxyMode>ALLOW</proxyMode>
-        <artifactMaxAge>-1</artifactMaxAge>
-        <itemMaxAge>1440</itemMaxAge>
-        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
-        <downloadRemoteIndex>false</downloadRemoteIndex>
-        <checksumPolicy>WARN</checksumPolicy>
-        <repositoryPolicy>RELEASE</repositoryPolicy>
-      </externalConfiguration>
-    </repository>
-    <repository>
       <id>apache-snapshots</id>
       <name>Apache Snapshots</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
@@ -259,7 +231,6 @@
           <memberRepository>snapshots</memberRepository>
           <memberRepository>thirdparty</memberRepository>
           <memberRepository>central</memberRepository>
-          <memberRepository>google</memberRepository>
         </memberRepositories>
       </externalConfiguration>
     </repository>
