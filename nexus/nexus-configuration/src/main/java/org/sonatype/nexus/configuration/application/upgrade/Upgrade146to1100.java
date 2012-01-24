@@ -98,17 +98,27 @@ public class Upgrade146to1100
         };
 
         org.sonatype.nexus.configuration.model.Configuration newc = versionConverter.upgradeConfiguration( oldc );
-        
+
         // this should go into much "older" upgrader, this was a mistake!
-        if (newc.getErrorReporting() == null) {
+        if ( newc.getErrorReporting() == null )
+        {
             CErrorReporting errorReporting = new CErrorReporting();
             errorReporting.setEnabled( false );
             newc.setErrorReporting( errorReporting );
         }
-        if (newc.getNotification() == null) {
+        if ( newc.getNotification() == null )
+        {
             CNotification notification = new CNotification();
             notification.setEnabled( false );
             newc.setNotification( notification );
+        }
+
+        // conservatively shut down NFC on any non-proxy repository
+        for ( CRepository repository : newc.getRepositories() )
+        {
+            final boolean isProxyRepository =
+                repository.getRemoteStorage() != null && repository.getRemoteStorage().getUrl() != null;
+            repository.setNotFoundCacheActive( isProxyRepository );
         }
 
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
