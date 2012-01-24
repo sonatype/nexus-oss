@@ -211,8 +211,10 @@ public abstract class AbstractProxyRepository
                 request.setRequestPath( RepositoryItemUid.PATH_ROOT );
             }
             request.setRequestLocalOnly( true );
+
             getLogger().info(
-                "Expiring proxy cache in repository ID='" + getId() + "' from path='" + request.getRequestPath() + "'" );
+                String.format( "Expiring proxy cache in repository %s from path=\"%s\"",
+                    RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
 
             // 1st, expire all the files below path
             final DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
@@ -248,6 +250,7 @@ public abstract class AbstractProxyRepository
             return;
         }
 
+        // expire proxy cache
         expireProxyCaches( request );
         // do the stuff we inherited
         super.expireCaches( request );
@@ -281,8 +284,8 @@ public abstract class AbstractProxyRepository
                                                      EvictUnusedItemsWalkerProcessor processor, WalkerFilter filter )
     {
         getLogger().info(
-            "Evicting unused items from proxy repository \"" + getName() + "\" (id=\"" + getId() + "\") from path "
-                + request.getRequestPath() );
+            String.format( "Evicting unused items from proxy repository %s from path=\"%s\"",
+                RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
 
         request.setRequestLocalOnly( true );
 
@@ -349,11 +352,9 @@ public abstract class AbstractProxyRepository
         if ( !val && ProxyMode.BLOCKED_AUTO.equals( getProxyMode() ) )
         {
             getLogger().warn(
-                "Repository \""
-                    + getName()
-                    + "\" (id="
-                    + getId()
-                    + ") was auto-blocked, but user disabled this feature. Unblocking repository, but this MAY cause Nexus to leak connections (if remote repository is still down)!" );
+                String.format(
+                    "Proxy Repository %s was auto-blocked, but user disabled this feature. Unblocking repository, but this MAY cause Nexus to leak connections (if remote repository is still down)!",
+                    RepositoryStringUtils.getHumanizedNameString( this ) ) );
 
             setProxyMode( ProxyMode.ALLOW );
         }
@@ -563,8 +564,8 @@ public abstract class AbstractProxyRepository
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.append( "Remote peer of proxy repository \"" + getName() + "\" (id=" + getId() + ") threw a "
-                + cause.getClass().getName() + " exception." );
+            sb.append( "Remote peer of proxy repository " + RepositoryStringUtils.getHumanizedNameString( this )
+                + " threw a " + cause.getClass().getName() + " exception." );
 
             if ( cause instanceof RemoteAccessException )
             {
@@ -645,9 +646,10 @@ public abstract class AbstractProxyRepository
         if ( oldProxyMode.shouldAutoUnblock() )
         {
             // log the event
-            getLogger().info(
-                "Remote peer of proxy repository \"" + getName() + "\" (id=" + getId()
-                    + ") detected as healthy, un-blocking the proxy repository (it was AutoBlocked by Nexus)." );
+            getLogger().warn(
+                String.format(
+                    "Remote peer of proxy repository %s detected as healthy, un-blocking the proxy repository (it was AutoBlocked by Nexus).",
+                    RepositoryStringUtils.getHumanizedNameString( this ) ) );
 
             setProxyMode( ProxyMode.ALLOW, true, null );
         }
@@ -948,7 +950,9 @@ public abstract class AbstractProxyRepository
         catch ( ItemNotFoundException ex )
         {
             getLogger().warn(
-                "Nexus BUG, ItemNotFoundException during cache! Please report this issue along with the stack trace below!",
+                "Nexus BUG in "
+                    + RepositoryStringUtils.getHumanizedNameString( this )
+                    + ", ItemNotFoundException during cache! Please report this issue along with the stack trace below!",
                 ex );
 
             // this is a nonsense, we just stored it!
@@ -956,7 +960,9 @@ public abstract class AbstractProxyRepository
         }
         catch ( UnsupportedStorageOperationException ex )
         {
-            getLogger().warn( "LocalStorage does not handle STORE operation, not caching remote fetched item.", ex );
+            getLogger().warn(
+                "LocalStorage or repository " + RepositoryStringUtils.getHumanizedNameString( this )
+                    + " does not handle STORE operation, not caching remote fetched item.", ex );
 
             result = item;
         }
@@ -1599,7 +1605,7 @@ public abstract class AbstractProxyRepository
             }
             catch ( UnsupportedStorageOperationException e )
             {
-                getLogger().warn( "Unexpected Exception", e );
+                getLogger().warn( "Unexpected Exception in " + RepositoryStringUtils.getHumanizedNameString( this ), e );
             }
 
             if ( lastException instanceof StorageException )

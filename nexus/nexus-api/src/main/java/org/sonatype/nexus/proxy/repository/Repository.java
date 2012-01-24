@@ -455,12 +455,15 @@ public interface Repository
     // Maintenance
 
     /**
-     * Purges the caches (NFC and expires files) from path and below.
+     * Expires all the caches used by this repository implementation from path and below. What kind of caches are
+     * tackled depends on the actual implementation behind this interface (NFC, proxy cache or something third). To gain
+     * more control, you can call corresponding methods manually too. Currently, this method equals to a single call to
+     * {@link #expireNotFoundCaches(ResourceStoreRequest)} on hosted repositories, and on a sequential calls of
+     * {@link ProxyRepository#expireProxyCaches(ResourceStoreRequest)} and
+     * {@link #expireNotFoundCaches(ResourceStoreRequest)} on proxy repositories. Moreover, on group repositories, this
+     * call is propagated to it's member repositories!
      * 
      * @param path a path from to start descending. If null, it is taken as "root".
-     * @deprecated This method is here for historical purposes, it's invocation is equal to subsequent invocations of
-     *             {@link ProxyRepository#expireProxyCaches(ResourceStoreRequest)} and then
-     *             {@link #expireNotFoundCaches(ResourceStoreRequest)}.
      */
     void expireCaches( ResourceStoreRequest request );
 

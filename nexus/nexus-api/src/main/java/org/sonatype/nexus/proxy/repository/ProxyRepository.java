@@ -31,13 +31,16 @@ public interface ProxyRepository
     extends Repository
 {
     /**
-     * Marks the proxy cache items as expired.
+     * Marks the proxy cache items as expired (items stored in Local Storage that is actually proxy cache in case of
+     * Proxy repository). This expiration is explicit, and puts a flag in item attribute, that is overriding the aging
+     * algorithm too! Meaning, even if your maxAge is "never", but item is flagged as expired, remote check will happen.
+     * Also, consider that proxy cache might be huge, this method might be a long runner.
      * 
      * @param path a path from to start descending. If null, it is taken as "root".
      * @since 2.0
      */
     void expireProxyCaches( ResourceStoreRequest request );
-    
+
     /**
      * Gets remote status.
      */
@@ -45,8 +48,8 @@ public interface ProxyRepository
 
     Thread getRepositoryStatusCheckerThread();
 
-    void setRepositoryStatusCheckerThread(Thread thread);
-    
+    void setRepositoryStatusCheckerThread( Thread thread );
+
     /**
      * Returns the current remote status retain time. Does not change or step it's value.
      * 
@@ -92,16 +95,18 @@ public interface ProxyRepository
 
     /**
      * Gets the content validation setting.
+     * 
      * @return
      */
     public boolean isFileTypeValidation();
 
     /**
      * Sets the content validation setting.
+     * 
      * @param doValidate
      */
     public void setFileTypeValidation( boolean doValidate );
-    
+
     /**
      * Gets the RepositoryStatusCheckMode.
      * 
