@@ -53,9 +53,10 @@ public class DefaultWalker
         }
 
         // cannot walk out of service repos
-        if( LocalStatus.OUT_OF_SERVICE == context.getRepository().getLocalStatus() )
+        if ( LocalStatus.OUT_OF_SERVICE == context.getRepository().getLocalStatus() )
         {
-            getLogger().info( "Cannot walk, repository: '"+ context.getRepository().getId() + "' is out of service." );
+            getLogger().info( "Cannot walk, repository {} is out of service.",
+                RepositoryStringUtils.getHumanizedNameString( context.getRepository() ) );
         }
         else
         {
@@ -63,8 +64,8 @@ public class DefaultWalker
 
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug(
-                    "Start walking on ResourceStore " + context.getRepository().getId() + " from path '" + fromPath + "'." );
+                getLogger().debug( "Start walking on ResourceStore {} from path \"{}\".",
+                    RepositoryStringUtils.getHumanizedNameString( context.getRepository() ), fromPath );
             }
 
             try
@@ -72,43 +73,35 @@ public class DefaultWalker
                 // user may call stop()
                 beforeWalk( context );
 
-                if ( context.isStopped() )
-                {
-                    reportWalkEnd( context, fromPath );
-
-                    return;
-                }
-
-                StorageItem item = null;
-
-                item = context.getRepository().retrieveItem( true, context.getResourceStoreRequest() );
-
-                int collCount = 0;
-
-                if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
-                {
-                    try
-                    {
-                        WalkerFilter filter =
-                            context.getFilter() != null ? context.getFilter() : new DefaultStoreWalkerFilter();
-
-                        collCount = walkRecursive( 0, context, filter, (StorageCollectionItem) item );
-
-                        context.getContext().put( WALKER_WALKED_COLLECTION_COUNT, collCount );
-                    }
-                    catch ( Exception e )
-                    {
-                        context.stop( e );
-
-                        reportWalkEnd( context, fromPath );
-
-                        return;
-                    }
-                }
-
                 if ( !context.isStopped() )
                 {
-                    afterWalk( context );
+                    StorageItem item = null;
+
+                    item = context.getRepository().retrieveItem( true, context.getResourceStoreRequest() );
+
+                    int collCount = 0;
+
+                    if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
+                    {
+                        try
+                        {
+                            WalkerFilter filter =
+                                context.getFilter() != null ? context.getFilter() : new DefaultStoreWalkerFilter();
+
+                            collCount = walkRecursive( 0, context, filter, (StorageCollectionItem) item );
+
+                            context.getContext().put( WALKER_WALKED_COLLECTION_COUNT, collCount );
+                        }
+                        catch ( Exception e )
+                        {
+                            context.stop( e );
+                        }
+                    }
+
+                    if ( !context.isStopped() )
+                    {
+                        afterWalk( context );
+                    }
                 }
             }
             catch ( ItemNotFoundException ex )
@@ -127,6 +120,7 @@ public class DefaultWalker
                 context.stop( ex );
             }
         }
+
         reportWalkEnd( context, fromPath );
     }
 
@@ -137,29 +131,25 @@ public class DefaultWalker
         {
             if ( context.getStopCause() == null )
             {
-                getLogger().debug( "Walker was stopped programatically, not because of error." );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Walker was stopped programatically, not because of error." );
+                }
             }
             else if ( context.getStopCause() instanceof TaskInterruptedException )
             {
                 getLogger().info(
-                    RepositoryStringUtils.getFormattedMessage( "Canceled walking on repository %s from path=\""
-                        + fromPath + "\", cause: " + context.getStopCause().getMessage(), context.getRepository() ) );
+                    "Canceled walking on repository {} from path \"{}\", cause: {}",
+                    new Object[] { RepositoryStringUtils.getHumanizedNameString( context.getRepository() ), fromPath,
+                        context.getStopCause().getMessage() } );
             }
             else
             {
                 // we have a cause, report any non-ItemNotFounds with stack trace
-                if ( context.getStopCause() instanceof ItemNotFoundException )
-                {
-                    getLogger().info(
-                        "Aborted walking on repository ID='" + context.getRepository().getId() + "' from path='"
-                            + fromPath + "', cause: " + context.getStopCause().getMessage() );
-                }
-                else
-                {
-                    getLogger().info(
-                        "Aborted walking on repository ID='" + context.getRepository().getId() + "' from path='"
-                            + fromPath + "', cause:", context.getStopCause() );
-                }
+                getLogger().info(
+                    "Aborted walking on repository {} from path \"{}\", cause: {}",
+                    new Object[] { RepositoryStringUtils.getHumanizedNameString( context.getRepository() ), fromPath,
+                        context.getStopCause().getMessage() } );
 
                 throw new WalkerException( context, "Aborted walking on repository ID='"
                     + context.getRepository().getId() + "' from path='" + fromPath + "'." );
