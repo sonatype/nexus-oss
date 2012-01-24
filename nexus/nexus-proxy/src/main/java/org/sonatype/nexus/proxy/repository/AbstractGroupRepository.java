@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
@@ -136,6 +137,18 @@ public abstract class AbstractGroupRepository
     }
 
     @Override
+    public void expireCaches( ResourceStoreRequest request )
+    {
+        final List<Repository> members = getMemberRepositories();
+        for ( Repository member : members )
+        {
+            member.expireCaches( request );
+        }
+
+        super.expireCaches( request );
+    }
+
+    @Override
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
     {
         if ( !getLocalStatus().shouldServiceRequest() )
@@ -144,13 +157,14 @@ public abstract class AbstractGroupRepository
         }
 
         getLogger().info(
-            "Evicting unused items from group repository \"" + getName() + "\" (id=\"" + getId() + "\") from path "
-                + request.getRequestPath() );
+            String.format( "Evicting unused items from group repository %s from path \"%s\"",
+                RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
 
         HashSet<String> result = new HashSet<String>();
 
         // here, we just iterate over members and call evict
-        for ( Repository repository : getMemberRepositories() )
+        final List<Repository> members = getMemberRepositories();
+        for ( Repository repository : members )
         {
             result.addAll( repository.evictUnusedItems( request, timestamp ) );
         }
@@ -159,6 +173,8 @@ public abstract class AbstractGroupRepository
 
         return result;
     }
+    
+    // ==
 
     @Override
     protected Collection<StorageItem> doListItems( ResourceStoreRequest request )
@@ -358,12 +374,10 @@ public abstract class AbstractGroupRepository
                         else
                         {
                             getLogger().info(
-                                "Repository ID='"
-                                    + repo.getId()
-                                    + "' in group ID='"
-                                    + this.getId()
-                                    + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                    + request.toString() );
+                                String.format(
+                                    "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
+                                    RepositoryStringUtils.getHumanizedNameString( repo ),
+                                    RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
                         }
                     }
                 }
@@ -615,18 +629,6 @@ public abstract class AbstractGroupRepository
         {
             // ignore it
         }
-    }
-
-    @Override
-    public void expireCaches( ResourceStoreRequest request )
-    {
-        List<Repository> members = getMemberRepositories();
-        for ( Repository member : members )
-        {
-            member.expireCaches( request );
-        }
-
-        super.expireCaches( request );
     }
 
     @Override
