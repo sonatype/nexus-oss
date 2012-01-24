@@ -247,6 +247,8 @@ public class RepositoryListPlexusResource
                 appModel.getLocalStorage().setUrl( repoResource.getOverrideLocalStorageUrl() );
 
                 appModel.getLocalStorage().setProvider( "file" );
+                
+                appModel.setNotFoundCacheActive( true );
             }
             else
             {
