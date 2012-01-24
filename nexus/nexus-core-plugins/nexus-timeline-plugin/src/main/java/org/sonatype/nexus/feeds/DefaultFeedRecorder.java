@@ -469,7 +469,7 @@ public class DefaultFeedRecorder
 
         addToTimeline( prc );
 
-        getLogger().info( prc.getMessage() );
+        getLogger().debug( prc.getMessage() );
 
         return prc;
     }
@@ -480,7 +480,7 @@ public class DefaultFeedRecorder
 
         addToTimeline( prc );
 
-        getLogger().info( prc.getMessage() );
+        getLogger().debug( prc.getMessage() );
     }
 
     public void systemProcessCanceled( SystemProcess prc, String cancelMessage )
@@ -489,7 +489,7 @@ public class DefaultFeedRecorder
 
         addToTimeline( prc );
 
-        getLogger().info( prc.getMessage() );
+        getLogger().debug( prc.getMessage() );
     }
 
     public void systemProcessBroken( SystemProcess prc, Throwable e )
@@ -498,7 +498,7 @@ public class DefaultFeedRecorder
 
         addToTimeline( prc );
 
-        getLogger().info( prc.getMessage(), e );
+        getLogger().debug( prc.getMessage(), e );
     }
 
     protected void addToTimeline( SystemEvent se )

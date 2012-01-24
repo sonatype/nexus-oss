@@ -15,6 +15,8 @@ package org.sonatype.nexus.scheduling;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -130,6 +132,10 @@ public abstract class AbstractNexusTask<T>
     public final T call()
         throws Exception
     {
+        getLogger().info( getLoggedMessage( "started" ) );
+        final long started = System.currentTimeMillis();
+
+        // fire event
         final NexusTaskEventStarted<T> startedEvent = new NexusTaskEventStarted<T>( this );
         applicationEventMulticaster.notifyEventListeners( startedEvent );
 
@@ -147,11 +153,15 @@ public abstract class AbstractNexusTask<T>
 
             if ( TaskUtil.getCurrentProgressListener().isCanceled() )
             {
+                getLogger().info( getLoggedMessage( "canceled", started ) );
+
                 applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedCanceled<T>( this,
                     startedEvent ) );
             }
             else
             {
+                getLogger().info( getLoggedMessage( "finished", started ) );
+
                 applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedDone<T>( this, startedEvent ) );
             }
 
@@ -165,6 +175,8 @@ public abstract class AbstractNexusTask<T>
             // and let it propagate.
             if ( e instanceof TaskInterruptedException )
             {
+                getLogger().info( getLoggedMessage( "canceled", started ) );
+
                 // just return, nothing happened just task cancelled
                 applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedCanceled<T>( this,
                     startedEvent ) );
@@ -173,6 +185,8 @@ public abstract class AbstractNexusTask<T>
             }
             else
             {
+                getLogger().info( getLoggedMessage( "failed", started ), e );
+
                 // notify that there was a failure
                 applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedFailed<T>( this,
                     startedEvent, e ) );
@@ -184,6 +198,19 @@ public abstract class AbstractNexusTask<T>
         {
             subject.logout();
         }
+    }
+
+    protected String getLoggedMessage( final String action )
+    {
+        return String.format( "Scheduled task (%s) %s :: %s", getName(), action, getMessage() );
+    }
+
+    protected String getLoggedMessage( final String action, final long started )
+    {
+        final String startedStr = DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format( started );
+        final String durationStr = DurationFormatUtils.formatDurationHMS( System.currentTimeMillis() - started );
+
+        return String.format( "%s (started %s, runtime %s)", getLoggedMessage( action ), startedStr, durationStr );
     }
 
     protected void beforeRun()
