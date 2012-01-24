@@ -99,7 +99,17 @@ public class DefaultEventInspectorHost
 
     protected void processEvent( final Event<?> evt )
     {
-        final Set<EventInspector> inspectors = getEventInspectors();
+        Set<EventInspector> inspectors;
+        try
+        {
+            inspectors = getEventInspectors();
+        }
+        catch ( IllegalStateException e )
+        {
+            // NEXUS-4775 guice exception trying to resolve circular dependencies too early
+            getLogger().trace( "Event inspectors are not fully initialized, skipping handling of {}", evt, e );
+            return;
+        }
 
         for ( EventInspector ei : inspectors )
         {
