@@ -30,14 +30,6 @@
     <description>Sonatype Nexus GWT User Inteface</description>
     <inceptionYear>2008</inceptionYear>
     <mailingLists />
-
-    <licenses>
-        <license>
-            <name>GNU Affero General Public License</name>
-            <url>http://www.gnu.org/licenses/agpl.txt</url>
-        </license>
-    </licenses>
-
     <developers />
 
     <contributors />
