@@ -125,9 +125,10 @@ public class JarsEventsInspector
         {
             return false;
         }
+        JarFile jarFile = null;
         try
         {
-            final JarFile jarFile = new JarFile( file );
+            jarFile = new JarFile( file );
             final Manifest manifest = jarFile.getManifest();
             final Attributes mainAttributes = manifest.getMainAttributes();
             return mainAttributes.getValue( "Bundle-SymbolicName" ) != null;
@@ -135,6 +136,20 @@ public class JarsEventsInspector
         catch ( final Exception e )
         {
             return false;
+        }
+        finally
+        {
+            if ( jarFile != null )
+            {
+                try
+                {
+                    jarFile.close();
+                }
+                catch ( final Exception ignored )
+                {
+                    // safe to ignore...
+                }
+            }
         }
     }
 
