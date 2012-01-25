@@ -31,18 +31,21 @@
         <exclude>**/.placeholder</exclude>
         <exclude>**/nexus</exclude>
         <exclude>**/*.bat</exclude>
-        <exclude>**/wrapper</exclude>
+        <exclude>**/wrapper*</exclude>
       </excludes>
       <outputDirectory>${project.build.finalName}</outputDirectory>
+      <fileMode>0644</fileMode>
+      <directoryMode>0755</directoryMode>
     </fileSet>
 
     <fileSet>
       <directory>src/main/resources/content</directory>
       <includes>
-        <include>**/wrapper</include>
+        <include>**/wrapper*</include>
       </includes>
       <outputDirectory>${project.build.finalName}</outputDirectory>
       <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
     </fileSet>
 
     <fileSet>
@@ -52,6 +55,7 @@
       </includes>
       <outputDirectory>${project.build.finalName}</outputDirectory>
       <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
       <lineEnding>unix</lineEnding>
     </fileSet>
 
@@ -62,6 +66,7 @@
       </includes>
       <outputDirectory>${project.build.finalName}</outputDirectory>
       <fileMode>0755</fileMode>
+      <directoryMode>0755</directoryMode>
       <lineEnding>dos</lineEnding>
     </fileSet>
 
@@ -71,6 +76,7 @@
         <exclude>**/.placeholder</exclude>
       </excludes>
       <outputDirectory>sonatype-work</outputDirectory>
+      <directoryMode>0755</directoryMode>
     </fileSet>
   </fileSets>
 
