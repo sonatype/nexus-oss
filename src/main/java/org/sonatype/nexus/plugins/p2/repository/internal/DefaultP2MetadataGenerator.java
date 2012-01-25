@@ -127,11 +127,12 @@ public class DefaultP2MetadataGenerator
 
         // TODO only regenerate if jar is newer
 
+        JarFile jarFile = null;
         try
         {
             final Repository repository = repositories.getRepository( item.getRepositoryId() );
             final File bundle = retrieveFile( repository, item.getPath() );
-            final JarFile jarFile = new JarFile( bundle );
+            jarFile = new JarFile( bundle );
             final Manifest manifest = jarFile.getManifest();
             final Attributes mainAttributes = manifest.getMainAttributes();
 
@@ -210,6 +211,20 @@ public class DefaultP2MetadataGenerator
                 String.format( "Could not generate p2 metadata of [%s:%s] due to %s. Bailing out.",
                                item.getRepositoryId(), item.getPath(), e.getMessage() ), e );
             return;
+        }
+        finally
+        {
+            if ( jarFile != null )
+            {
+                try
+                {
+                    jarFile.close();
+                }
+                catch ( final Exception ignored )
+                {
+                    // safe to ignore...
+                }
+            }
         }
     }
 
