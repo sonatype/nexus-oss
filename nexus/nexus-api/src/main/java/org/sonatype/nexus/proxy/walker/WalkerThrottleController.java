@@ -25,11 +25,36 @@ public interface WalkerThrottleController
         }
 
         @Override
-        public long throttleTime( long processItemSpentMillis )
+        public long throttleTime( final ThrottleInfo info )
         {
             return -1;
         }
     };
+
+    public interface ThrottleInfo
+    {
+        /**
+         * The total time spent in processItem() method. This time is "contained" in the {@link #getTotalTimeWalking()}.
+         * 
+         * @return
+         */
+        long getTotalProcessItemSpentMillis();
+
+        /**
+         * The total invocation count of processItem() method ("How many items were processed so far?").
+         * 
+         * @return
+         */
+        long getTotalProcessItemInvocationCount();
+
+        /**
+         * The total time (in milliseconds) since walking begun. The returned time always reflects the truly actual
+         * spent time in walking, counting time even spent with throttle calculations ("gross time" spent).
+         * 
+         * @return
+         */
+        long getTotalTimeWalking();
+    }
 
     /**
      * Returns true if the controllers wants to use "throttled walker" execution. Throttling in this case would mean
@@ -44,10 +69,9 @@ public interface WalkerThrottleController
      * Returns the next desired sleep time this context wants to have applied. It might be in some relation to the time
      * spent in processItem() methods of registered WalkerProcessors, but does not have to be.
      * 
-     * @param processItemSpentMillis time in millis WalkerProcessors spent in their
-     *            {@link WalkerProcessor#processItem(WalkerContext, org.sonatype.nexus.proxy.item.StorageItem)} method.
+     * @param info The info object holding some (probably) used informations to calculate next desired sleep time.
      * @return any value bigger than zero means "sleep as many millis to throttle". Any values less or equal to zero are
      *         neglected (will not invoke sleep).
      */
-    long throttleTime( long processItemSpentMillis );
+    long throttleTime( ThrottleInfo info );
 }

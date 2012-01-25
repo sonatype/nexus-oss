@@ -41,10 +41,11 @@ public class DefaultWalker
 
     public static final String WALKER_WALKED_FROM_PATH = Walker.class.getSimpleName() + ".fromPath";
 
+    public static final String WALKER_THROTTLE_INFO = Walker.class.getSimpleName() + ".throttleInfo";
+
     public void walk( WalkerContext context )
         throws WalkerException
     {
-
         String fromPath = context.getResourceStoreRequest().getRequestPath();
 
         if ( fromPath == null )
@@ -61,6 +62,7 @@ public class DefaultWalker
         else
         {
             context.getContext().put( WALKER_WALKED_FROM_PATH, fromPath );
+            context.getContext().put( WALKER_THROTTLE_INFO, new DefaultThrottleInfo() );
 
             if ( getLogger().isDebugEnabled() )
             {
@@ -303,7 +305,9 @@ public class DefaultWalker
     {
         try
         {
-            final long processItemEnter = System.currentTimeMillis();
+            final DefaultThrottleInfo info = (DefaultThrottleInfo) context.getContext().get( WALKER_THROTTLE_INFO );
+
+            info.enterProcessItem();
 
             for ( WalkerProcessor processor : context.getProcessors() )
             {
@@ -318,10 +322,11 @@ public class DefaultWalker
                 }
             }
 
+            info.exitProcessItem();
+
             if ( !context.isStopped() && context.getThrottleController().isThrottled() )
             {
-                final long throttleTime =
-                    context.getThrottleController().throttleTime( System.currentTimeMillis() - processItemEnter );
+                final long throttleTime = context.getThrottleController().throttleTime( info );
 
                 if ( throttleTime > 0 )
                 {

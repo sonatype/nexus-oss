@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.util;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -74,6 +75,33 @@ public class NumberSequenceTest
         for ( int f : fibonacciNumbers )
         {
             Assert.assertEquals( f, fs.next() );
+        }
+    }
+
+    @Test
+    public void testFibonacciSequenceBackAndForth()
+    {
+        int[] fibonacciNumbers = new int[] { 10, 10, 20, 30, 50, 80, 130, 210, 340, 550, 890, 1440, 2330 };
+
+        FibonacciNumberSequence fs = new FibonacciNumberSequence( 10 );
+
+        for ( int f : fibonacciNumbers )
+        {
+            Assert.assertEquals( f, fs.next() );
+        }
+
+        fs.reset();
+
+        for ( int f : fibonacciNumbers )
+        {
+            Assert.assertEquals( f, fs.next() );
+        }
+
+        ArrayUtils.reverse( fibonacciNumbers );
+
+        for ( int f : fibonacciNumbers )
+        {
+            Assert.assertEquals( f, fs.prev() );
         }
     }
 }

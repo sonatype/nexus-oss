@@ -23,7 +23,9 @@ package org.sonatype.nexus.util;
 public class FibonacciNumberSequence
     implements NumberSequence
 {
-    private final long start;
+    private final long startA;
+
+    private final long startB;
 
     private long a;
 
@@ -36,20 +38,36 @@ public class FibonacciNumberSequence
 
     public FibonacciNumberSequence( long start )
     {
-        this.start = start;
+        this( start, start );
+    }
 
+    public FibonacciNumberSequence( long startA, long startB )
+    {
+        this.startA = startA;
+        this.startB = startB;
         reset();
     }
 
     public long next()
     {
         long res = a;
-        
+
         a = b;
 
         b = res + b;
 
         return res;
+    }
+
+    public long prev()
+    {
+        long tmp = b;
+
+        b = a;
+
+        a = tmp - b;
+
+        return a;
     }
 
     public long peek()
@@ -59,9 +77,8 @@ public class FibonacciNumberSequence
 
     public void reset()
     {
-        a = start;
-
-        b = start;
+        a = startA;
+        b = startB;
     }
 
 }
