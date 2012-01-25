@@ -443,7 +443,7 @@ public abstract class AbstractRepository
             request.setRequestPath( RepositoryItemUid.PATH_ROOT );
         }
 
-        getLogger().info(
+        getLogger().debug(
             String.format( "Clearing NFC cache in repository %s from path=\"%s\"",
                 RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
 
@@ -465,6 +465,22 @@ public abstract class AbstractRepository
                 boolean altered1 = getNotFoundCache().removeWithParents( request.getRequestPath() );
                 boolean altered2 = getNotFoundCache().removeWithChildren( request.getRequestPath() );
                 cacheAltered = altered1 || altered2;
+            }
+        }
+
+        if( getLogger().isDebugEnabled() )
+        {
+            if( cacheAltered )
+            {
+                getLogger().info(
+                    String.format( "NFC for repository %s from path=\"%s\" was cleared.",
+                        RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
+            }
+            else
+            {
+                getLogger().debug(
+                    String.format( "Clear NFC for repository %s from path=\"%s\" did not alter cache.",
+                        RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
             }
         }
 

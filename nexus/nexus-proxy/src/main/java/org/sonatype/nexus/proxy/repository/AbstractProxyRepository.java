@@ -212,7 +212,7 @@ public abstract class AbstractProxyRepository
             }
             request.setRequestLocalOnly( true );
 
-            getLogger().info(
+            getLogger().debug(
                 String.format( "Expiring proxy cache in repository %s from path=\"%s\"",
                     RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
 
@@ -232,6 +232,22 @@ public abstract class AbstractProxyRepository
                     // everything that is not ItemNotFound should be reported,
                     // otherwise just neglect it
                     throw e;
+                }
+            }
+            
+            if( getLogger().isDebugEnabled() )
+            {
+                if( expireCacheWalkerProcessor.isCacheAltered() )
+                {
+                    getLogger().info(
+                        String.format( "Proxy cache was expired for repository %s from path=\"%s\"",
+                            RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
+                }
+                else
+                {
+                    getLogger().debug(
+                        String.format( "Proxy cache not altered for repository %s from path=\"%s\"",
+                            RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
                 }
             }
 

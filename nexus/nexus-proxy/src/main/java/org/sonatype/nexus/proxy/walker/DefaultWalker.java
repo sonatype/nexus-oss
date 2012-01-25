@@ -146,11 +146,22 @@ public class DefaultWalker
             else
             {
                 // we have a cause, report any non-ItemNotFounds with stack trace
-                getLogger().info(
-                    "Aborted walking on repository {} from path \"{}\", cause: {}",
-                    new Object[] { RepositoryStringUtils.getHumanizedNameString( context.getRepository() ), fromPath,
-                        context.getStopCause().getMessage() } );
 
+                if ( context.getStopCause() instanceof ItemNotFoundException )
+                {
+                    getLogger().debug(
+                        "Aborted walking on repository {} from path \"{}\", cause: {}",
+                        new Object[] { RepositoryStringUtils.getHumanizedNameString( context.getRepository() ), fromPath,
+                            context.getStopCause().getMessage() } );
+                }
+                else
+                {
+                    getLogger().info(
+                        "Aborted walking on repository {} from path \"{}\", cause: {}",
+                        new Object[] { RepositoryStringUtils.getHumanizedNameString( context.getRepository() ), fromPath,
+                            context.getStopCause().getMessage() } );
+                }
+                
                 throw new WalkerException( context, "Aborted walking on repository ID='"
                     + context.getRepository().getId() + "' from path='" + fromPath + "'." );
             }
