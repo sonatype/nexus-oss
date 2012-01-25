@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
@@ -25,6 +26,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
+import org.sonatype.nexus.proxy.maven.MUtils;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.gav.GavCalculator;
 import org.sonatype.nexus.proxy.wastebasket.DeleteOperation;
@@ -53,7 +55,6 @@ public class DefaultMetadataHelper
         this.repository = repository;
         this.operation = operation;
     }
-
 
     @Override
     public void store( String content, String path )
@@ -114,6 +115,23 @@ public class DefaultMetadataHelper
             return false;
         }
 
+        try
+        {
+            // use SHA1 only to drive decision, assume: if it differs, MD5 will differ too
+            // get the .sha1 file checksum string
+            final String checksumFileContent =
+                MUtils.readDigestFromStream( ( (StorageFileItem) getStorageItem( path + SHA1_SUFFIX, true ) ).getInputStream() );
+            // get the SHA1 checksum from Nexus (see buildSh1() imple)
+            final String originalFileChecksum = buildSh1( path );
+
+            // rebuild checksum ONLY if they differ
+            return !StringUtils.equals( checksumFileContent, originalFileChecksum );
+        }
+        catch ( IOException e )
+        {
+            // we tried, use defaults
+        }
+
         return true;
     }
 
@@ -121,14 +139,16 @@ public class DefaultMetadataHelper
     public String buildMd5( String path )
         throws IOException
     {
-        return getStorageItem( path, true ).getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY );
+        return getStorageItem( path, true ).getRepositoryItemAttributes().get(
+            DigestCalculatingInspector.DIGEST_MD5_KEY );
     }
 
     @Override
     public String buildSh1( String path )
         throws IOException
     {
-        return getStorageItem( path, true ).getRepositoryItemAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+        return getStorageItem( path, true ).getRepositoryItemAttributes().get(
+            DigestCalculatingInspector.DIGEST_SHA1_KEY );
     }
 
     private AbstractStorageItem getStorageItem( final String path, final boolean localOnly )
