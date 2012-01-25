@@ -156,7 +156,7 @@ public class DefaultWalker
                 }
                 else
                 {
-                    getLogger().debug(
+                    getLogger().info(
                         "Aborted walking on repository {} from path \"{}\", cause: {}",
                         new Object[] { RepositoryStringUtils.getHumanizedNameString( context.getRepository() ), fromPath,
                             context.getStopCause().getMessage() } );
