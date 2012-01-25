@@ -57,30 +57,7 @@ public class TransitioningAttributeStorage
 
             if ( result == null && fallbackAttributeStorage != null )
             {
-                uidLock.lock( Action.create );
-
-                try
-                {
-                    result = fallbackAttributeStorage.getAttributes( uid );
-
-                    if ( result != null )
-                    {
-                        mainAttributeStorage.putAttributes( uid, result );
-
-                        try
-                        {
-                            fallbackAttributeStorage.deleteAttributes( uid );
-                        }
-                        catch ( IOException e )
-                        {
-                            // legacy swallows them, this is needed only to satisfy it's signature
-                        }
-                    }
-                }
-                finally
-                {
-                    uidLock.unlock();
-                }
+                result = fallbackAttributeStorage.getAttributes( uid );
             }
 
             return result;
@@ -133,16 +110,16 @@ public class TransitioningAttributeStorage
         {
             final boolean mainResult = mainAttributeStorage.deleteAttributes( uid );
 
-            try
+            if ( fallbackAttributeStorage != null )
             {
-                final boolean legacyResult =
-                    ( fallbackAttributeStorage != null && fallbackAttributeStorage.deleteAttributes( uid ) );
-
-                return mainResult || legacyResult;
-            }
-            catch ( IOException e )
-            {
-                // legacy swallows them, this is needed only to satisfy it's signature
+                try
+                {
+                    return fallbackAttributeStorage.deleteAttributes( uid ) || mainResult;
+                }
+                catch ( IOException e )
+                {
+                    // legacy swallows them, this is needed only to satisfy it's signature
+                }
             }
 
             return mainResult;
