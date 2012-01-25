@@ -32,6 +32,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.proxy.walker.WalkerThrottleController;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
 
@@ -51,6 +52,13 @@ public class AttributesUpgradeEventInspector
      * The "switch" for performing upgrade (by bg thread), default is true (upgrade will happen).
      */
     private final boolean UPGRADE = SystemPropertiesHelper.getBoolean( getClass().getName() + ".upgrade", true );
+
+    /**
+     * The "switch" to enable "upgrade throttling" if needed (is critical to lessen IO bound problem with attributes).
+     * Default is to NOT use throttling.
+     */
+    private final long UPGRADE_THROTTLE_MILLIS = SystemPropertiesHelper.getLong( getClass().getName()
+        + ".throttleMillis", -1 );
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -87,7 +95,7 @@ public class AttributesUpgradeEventInspector
             {
                 if ( UPGRADE )
                 {
-                    new UpgraderThread( legacyAttributesDirectory, repositoryRegistry ).start();
+                    new UpgraderThread( legacyAttributesDirectory, repositoryRegistry, UPGRADE_THROTTLE_MILLIS ).start();
                 }
                 else
                 {
@@ -160,10 +168,14 @@ public class AttributesUpgradeEventInspector
 
         private final RepositoryRegistry repositoryRegistry;
 
-        public UpgraderThread( final File legacyAttributesDirectory, final RepositoryRegistry repositoryRegistry )
+        private final long throttleMillis;
+
+        public UpgraderThread( final File legacyAttributesDirectory, final RepositoryRegistry repositoryRegistry,
+                               long throttleMillis )
         {
             this.legacyAttributesDirectory = legacyAttributesDirectory;
             this.repositoryRegistry = repositoryRegistry;
+            this.throttleMillis = throttleMillis;
             // to have it clearly in thread dumps
             setName( "LegacyAttributesUpgrader" );
             // to not prevent sudden reboots (by user, if upgrading, and rebooting)
@@ -178,7 +190,12 @@ public class AttributesUpgradeEventInspector
             if ( !isUpgradeDone( legacyAttributesDirectory, null ) )
             {
                 logger.info( "Legacy attribute directory present, and upgrade needed. Upgrading it in background thread." );
-                ResourceStoreRequest req = new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT );
+                if ( throttleMillis > 0 )
+                {
+                    logger.info(
+                        "Legacy attribute upgrade is throttled by {} millis (system property override present).",
+                        throttleMillis );
+                }
                 List<Repository> reposes = repositoryRegistry.getRepositories();
                 for ( Repository repo : reposes )
                 {
@@ -186,6 +203,32 @@ public class AttributesUpgradeEventInspector
                     {
                         logger.info( "Upgrading legacy attributes of repository {}.",
                             RepositoryStringUtils.getHumanizedNameString( repo ) );
+                        ResourceStoreRequest req = new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT );
+                        if ( throttleMillis > 0 )
+                        {
+                            req.getRequestContext().put( WalkerThrottleController.CONTEXT_KEY,
+                                new WalkerThrottleController()
+                                {
+                                    @Override
+                                    public boolean isThrottled()
+                                    {
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public long throttleTime( long processItemSpentMillis )
+                                    {
+                                        if ( processItemSpentMillis < throttleMillis )
+                                        {
+                                            return throttleMillis;
+                                        }
+                                        else
+                                        {
+                                            return -1;
+                                        }
+                                    }
+                                } );
+                        }
                         repo.recreateAttributes( req, null );
                         markUpgradeDone( legacyAttributesDirectory, repo.getId() );
                     }

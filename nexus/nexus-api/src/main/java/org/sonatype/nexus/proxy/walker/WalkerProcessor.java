@@ -24,7 +24,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 public interface WalkerProcessor
 {
     boolean isActive();
-
+    
     void beforeWalk( WalkerContext context )
         throws Exception;
 

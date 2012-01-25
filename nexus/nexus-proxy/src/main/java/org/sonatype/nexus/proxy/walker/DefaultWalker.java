@@ -303,6 +303,8 @@ public class DefaultWalker
     {
         try
         {
+            final long processItemEnter = System.currentTimeMillis();
+
             for ( WalkerProcessor processor : context.getProcessors() )
             {
                 if ( processor.isActive() )
@@ -313,6 +315,17 @@ public class DefaultWalker
                     {
                         break;
                     }
+                }
+            }
+
+            if ( !context.isStopped() && context.getThrottleController().isThrottled() )
+            {
+                final long throttleTime =
+                    context.getThrottleController().throttleTime( System.currentTimeMillis() - processItemEnter );
+
+                if ( throttleTime > 0 )
+                {
+                    Thread.sleep( throttleTime );
                 }
             }
         }
