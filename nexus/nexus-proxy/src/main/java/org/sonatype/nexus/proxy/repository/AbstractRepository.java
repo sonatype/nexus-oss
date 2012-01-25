@@ -444,7 +444,7 @@ public abstract class AbstractRepository
         }
 
         getLogger().debug(
-            String.format( "Attempting to clear NFC cache in repository %s from path=\"%s\"",
+            String.format( "Clearing NFC cache in repository %s from path=\"%s\"",
                 RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
 
         boolean cacheAltered = false;
@@ -472,14 +472,14 @@ public abstract class AbstractRepository
         {
             if( cacheAltered )
             {
-                getLogger().debug(
-                    String.format( "Cleared NFC cache for repository %s from path=\"%s\"",
+                getLogger().info(
+                    String.format( "NFC for repository %s from path=\"%s\" was cleared.",
                         RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
             }
             else
             {
                 getLogger().debug(
-                    String.format( "Expire NFC for repository %s from path=\"%s\" did not alter cache.",
+                    String.format( "Clear NFC for repository %s from path=\"%s\" did not alter cache.",
                         RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
             }
         }

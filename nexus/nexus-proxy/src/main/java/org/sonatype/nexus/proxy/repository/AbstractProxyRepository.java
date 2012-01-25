@@ -213,7 +213,7 @@ public abstract class AbstractProxyRepository
             request.setRequestLocalOnly( true );
 
             getLogger().debug(
-                String.format( "Attempting to expire proxy cache in repository %s from path=\"%s\"",
+                String.format( "Expiring proxy cache in repository %s from path=\"%s\"",
                     RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
 
             // 1st, expire all the files below path
@@ -239,7 +239,7 @@ public abstract class AbstractProxyRepository
             {
                 if( expireCacheWalkerProcessor.isCacheAltered() )
                 {
-                    getLogger().debug(
+                    getLogger().info(
                         String.format( "Proxy cache was expired for repository %s from path=\"%s\"",
                             RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
                 }
