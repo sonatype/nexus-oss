@@ -43,15 +43,15 @@ public class DefaultAttributeUpgrader
 
     /**
      * The "switch" to enable "upgrade throttling" if needed (is critical to lessen IO bound problem with attributes).
-     * Default is to 100 UPS to for use throttling. The "measure" is "UPS": item Upgrades Per Second. Reasoning is:
+     * Default is to 200 UPS to for use throttling. The "measure" is "UPS": item Upgrades Per Second. Reasoning is:
      * Central repository is currently 300k of artifacts, this would mean in "nexus world" 6x300k items (pom, jar,
      * maven-metadata and sha1/md5 hashes for those) if all of Central would be proxied by Nexus, which is not
-     * plausible, so assume 50% of Central is present in cache (still is OVER-estimation!). Crawling 900k at 100 UPS
-     * would take exactly 2.5 hour to upgrade it. Note: this is only the value used for unnattended upgrade! This is the
+     * plausible, so assume 50% of Central is present in cache (still is OVER-estimation!). Crawling 900k at 200 UPS
+     * would take exactly 1.25 hour to upgrade it. Note: this is only the value used for unattended upgrade! This is the
      * starting value, that is still possible to "tune" (increase, decrease) over JMX!
      */
     private final int UPGRADE_THROTTLE_UPS = SystemPropertiesHelper.getInteger( getClass().getName() + ".throttleUps",
-        50 );
+        200 );
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
