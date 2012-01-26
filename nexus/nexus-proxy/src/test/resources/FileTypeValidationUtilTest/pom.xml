@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.sonatype.spice</groupId>
+    <artifactId>spice-aggregator</artifactId>
+    <version>1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Sonatype Spice Aggregator</name>
+
+    <modules>
+	  <module>spice-utils</module>
+      <module>appbooter</module>
+      <module>digest-applet</module>
+      <module>jsw-binaries</module>
+      <module>maven-assembly-helpers</module>
+      <module>micromailer</module>
+      <!--module>model-builder</module-->
       <module>plexus-bundle-publisher</module>
       <module>plexus-cipher</module>
       <module>plexus-ehcache</module>
