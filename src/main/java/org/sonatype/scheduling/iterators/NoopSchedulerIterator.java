@@ -5,7 +5,6 @@ import java.util.Date;
 /**
  * NOOP impl that will be used when no schedule is available, to save some null checks
  * 
- * @author dbradicich
  * @since 1.4.3
  *
  */
