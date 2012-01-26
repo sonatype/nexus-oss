@@ -14,6 +14,10 @@ package org.sonatype.nexus.proxy.attributes.upgrade;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
+
+import javax.management.MBeanServer;
+import javax.management.ObjectName;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -36,6 +40,8 @@ public class DefaultAttributeUpgrader
     extends AbstractLoggingComponent
     implements AttributeUpgrader
 {
+    private static final String JMX_DOMAIN = "org.sonatype.nexus.proxy.attributes.upgrade";
+
     /**
      * The "switch" for performing upgrade (by bg thread), default is true (upgrade will happen).
      */
@@ -47,8 +53,10 @@ public class DefaultAttributeUpgrader
      * Central repository is currently 300k of artifacts, this would mean in "nexus world" 6x300k items (pom, jar,
      * maven-metadata and sha1/md5 hashes for those) if all of Central would be proxied by Nexus, which is not
      * plausible, so assume 50% of Central is present in cache (still is OVER-estimation!). Crawling 900k at 200 UPS
-     * would take exactly 1.25 hour to upgrade it. Note: this is only the value used for unattended upgrade! This is the
-     * starting value, that is still possible to "tune" (increase, decrease) over JMX!
+     * would take exactly 1.25 hour to upgrade it. Note: this is only the value used for unattended upgrade! This is
+     * only the initial value, that is still possible to "tune" (increase, decrease) over JMX! Possible values: -1 means
+     * no throttling, will bash up to the Hardware limits, any other positive integer would mean a limit of UPS to not
+     * reach over.
      */
     private final int UPGRADE_THROTTLE_UPS = SystemPropertiesHelper.getInteger( getClass().getName() + ".throttleUps",
         200 );
@@ -59,7 +67,43 @@ public class DefaultAttributeUpgrader
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
+    private ObjectName jmxName;
+
+    private int upgradeThrottleUps;
+
     private volatile UpgraderThread upgraderThread;
+
+    public DefaultAttributeUpgrader()
+    {
+        this.upgradeThrottleUps = UPGRADE_THROTTLE_UPS;
+
+        try
+        {
+            jmxName = ObjectName.getInstance( JMX_DOMAIN, "name", AttributeUpgrader.class.getSimpleName() );
+            final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+            server.registerMBean( new DefaultAttributeUpgraderMBean( this ), jmxName );
+        }
+        catch ( Exception e )
+        {
+            jmxName = null;
+            getLogger().warn( "Problem registering MBean for: " + getClass().getName(), e );
+        }
+    }
+
+    public void shutdown()
+    {
+        if ( null != jmxName )
+        {
+            try
+            {
+                ManagementFactory.getPlatformMBeanServer().unregisterMBean( jmxName );
+            }
+            catch ( final Exception e )
+            {
+                getLogger().warn( "Problem unregistering MBean for: " + getClass().getName(), e );
+            }
+        }
+    }
 
     protected File getLegacyAttributesDirectory()
     {
@@ -104,6 +148,19 @@ public class DefaultAttributeUpgrader
     }
 
     @Override
+    public int getMaximumUps()
+    {
+        if ( upgraderThread != null )
+        {
+            return upgraderThread.getMaximumUps();
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    @Override
     public int getLimiterUps()
     {
         if ( isUpgradeRunning() )
@@ -112,7 +169,7 @@ public class DefaultAttributeUpgrader
         }
         else
         {
-            return -1;
+            return upgradeThrottleUps;
         }
     }
 
@@ -123,11 +180,26 @@ public class DefaultAttributeUpgrader
         {
             upgraderThread.setLimiterUps( limit );
         }
+        else
+        {
+            upgradeThrottleUps = limit;
+        }
     }
 
     @Override
-    public synchronized void upgrade()
+    public void upgradeAttributes()
     {
+        upgradeAttributes( false );
+    }
+
+    @Override
+    public synchronized void upgradeAttributes( final boolean force )
+    {
+        if ( isUpgradeRunning() )
+        {
+            return;
+        }
+
         if ( !isLegacyAttributesDirectoryPresent() )
         {
             // file not found or not a directory, stay put to not create noise in logs (new or tidied up nexus
@@ -145,12 +217,20 @@ public class DefaultAttributeUpgrader
             }
             else
             {
-                if ( UPGRADE )
+                if ( force || UPGRADE )
                 {
-                    getLogger().info(
-                        "Legacy attribute directory present, and upgrade is needed. Starting background upgrade." );
+                    if ( force )
+                    {
+                        getLogger().info(
+                            "Legacy attribute directory present, and upgrade is needed and if forced. Starting background upgrade." );
+                    }
+                    else
+                    {
+                        getLogger().info(
+                            "Legacy attribute directory present, and upgrade is needed. Starting background upgrade." );
+                    }
                     this.upgraderThread =
-                        new UpgraderThread( getLegacyAttributesDirectory(), repositoryRegistry, UPGRADE_THROTTLE_UPS );
+                        new UpgraderThread( getLegacyAttributesDirectory(), repositoryRegistry, upgradeThrottleUps );
                     this.upgraderThread.start();
                 }
                 else

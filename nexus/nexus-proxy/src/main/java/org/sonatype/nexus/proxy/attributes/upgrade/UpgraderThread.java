@@ -40,6 +40,8 @@ public class UpgraderThread
 
     private int actualUps;
 
+    private int maximumUps;
+
     private int limiterUps;
 
     private FibonacciNumberSequence currentSleepTime;
@@ -55,6 +57,8 @@ public class UpgraderThread
         // start with sleep time of 100ms
         this.currentSleepTime = new FibonacciNumberSequence( 100 );
         this.lastAdjustment = 0;
+        this.actualUps = 0;
+        this.maximumUps = 0;
         // to have it clearly in thread dumps
         setName( "LegacyAttributesUpgrader" );
         // to not prevent sudden reboots (by user, if upgrading, and rebooting)
@@ -66,6 +70,11 @@ public class UpgraderThread
     public int getActualUps()
     {
         return actualUps;
+    }
+
+    public int getMaximumUps()
+    {
+        return maximumUps;
     }
 
     public int getLimiterUps()
@@ -88,6 +97,7 @@ public class UpgraderThread
         }
         catch ( InterruptedException e )
         {
+            // thread will die off
             return;
         }
         // ping the "lastAdjustment" at very point where thread starts
@@ -140,6 +150,7 @@ public class UpgraderThread
         if ( adjustmentNeeded() )
         {
             actualUps = (int) ( info.getTotalProcessItemInvocationCount() / ( info.getTotalTimeWalking() / 1000 ) );
+            maximumUps = Math.max( actualUps, maximumUps );
 
             if ( actualUps > limiterUps )
             {
@@ -187,5 +198,4 @@ public class UpgraderThread
             return false;
         }
     }
-
 }

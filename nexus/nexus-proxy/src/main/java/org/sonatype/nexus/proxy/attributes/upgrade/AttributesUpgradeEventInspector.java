@@ -44,7 +44,7 @@ public class AttributesUpgradeEventInspector
     {
         if ( accepts( evt ) )
         {
-            attributeUpgrader.upgrade();
+            attributeUpgrader.upgradeAttributes();
         }
     }
 }
