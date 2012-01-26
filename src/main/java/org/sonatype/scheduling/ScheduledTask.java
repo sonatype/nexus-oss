@@ -210,20 +210,4 @@ public interface ScheduledTask<T>
     void setSchedule( Schedule schedule );
 
     Map<String, String> getTaskParams();
-    
-    /**
-     * True to enable pre-emptive scheduling (default), next run time will be decided before task runs False to disable
-     * pre-emptive scheduling, next run time will be decided after the task runs, giving the task the ability to decide
-     * when it should run next
-     * 
-     * @param preEmptiveScheduling
-     */
-    void setPreEmptiveScheduling( boolean preEmptiveScheduling );
-
-    /**
-     * Determine if pre-emptive scheduling is enabled
-     * 
-     * @return
-     */
-    boolean isPreEmptiveScheduling();
 }
