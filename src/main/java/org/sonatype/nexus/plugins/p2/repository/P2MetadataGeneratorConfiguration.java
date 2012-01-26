@@ -17,13 +17,13 @@ import java.util.Map;
 public class P2MetadataGeneratorConfiguration
 {
 
-    public static final String REPO_OR_GROUP_ID = "repoOrGroup";
+    public static final String REPOSITORY = "repositoryId";
 
     private final String repositoryId;
 
     public P2MetadataGeneratorConfiguration( final Map<String, String> properties )
     {
-        repositoryId = repository( properties );
+        repositoryId = properties.get( REPOSITORY );
     }
 
     public String repositoryId()
@@ -82,14 +82,6 @@ public class P2MetadataGeneratorConfiguration
         }
         builder.append( "]" );
         return builder.toString();
-    }
-
-    private static String repository( final Map<String, String> properties )
-    {
-        String repositoryId = properties.get( REPO_OR_GROUP_ID );
-        repositoryId = repositoryId.replaceFirst( "repo_", "" );
-        repositoryId = repositoryId.replaceFirst( "group_", "" );
-        return repositoryId;
     }
 
 }

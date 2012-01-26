@@ -42,7 +42,7 @@ public class P2MetadataGeneratorCapabilityDescriptor
             TYPE,
             "P2 Metadata Generator capability",
             "Automatically generates P2 metadata for OSGi bundles deployed to selected repository",
-            new RepoOrGroupComboFormField( P2MetadataGeneratorConfiguration.REPO_OR_GROUP_ID, FormField.MANDATORY )
+            new RepoOrGroupComboFormField( P2MetadataGeneratorConfiguration.REPOSITORY, FormField.MANDATORY )
         );
     }
 

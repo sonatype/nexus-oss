@@ -42,7 +42,7 @@ public class P2RepositoryAggregatorCapabilityDescriptor
             TYPE,
             "P2 Repository Aggregator capability",
             "Aggregates P2 metadata/artifacts of all OSGi bundles from selected repository",
-            new RepoOrGroupComboFormField( P2RepositoryAggregatorConfiguration.REPO_OR_GROUP_ID, FormField.MANDATORY )
+            new RepoOrGroupComboFormField( P2RepositoryAggregatorConfiguration.REPOSITORY, FormField.MANDATORY )
         );
     }
 
