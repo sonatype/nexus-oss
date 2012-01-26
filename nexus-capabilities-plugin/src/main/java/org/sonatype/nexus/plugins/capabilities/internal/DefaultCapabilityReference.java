@@ -100,6 +100,13 @@ public class DefaultCapabilityReference
         return capability;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends Capability> T capability( final Class<T> type )
+    {
+        return (T)capability;
+    }
+
     @Override
     public CapabilityIdentity id()
     {
