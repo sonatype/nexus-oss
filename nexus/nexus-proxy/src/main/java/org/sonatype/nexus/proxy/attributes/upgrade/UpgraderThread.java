@@ -162,7 +162,7 @@ public class UpgraderThread
                 }
             }
 
-            logger.info( "Actual speed {} UPS (limited to {} UPS), current sleepTime {}ms.", new Object[] { actualUps,
+            logger.info( "Actual speed {} upgrades/sec (limited to {} upgrades/sec), current sleepTime {}ms.", new Object[] { actualUps,
                 limiterUps, currentSleepTime.peek() } );
         }
 
@@ -180,7 +180,6 @@ public class UpgraderThread
         if ( ( System.currentTimeMillis() - lastAdjustment ) > 5000 )
         {
             this.lastAdjustment = System.currentTimeMillis();
-
             return true;
         }
         else
