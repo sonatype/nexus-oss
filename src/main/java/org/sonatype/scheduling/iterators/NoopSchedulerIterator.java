@@ -2,6 +2,13 @@ package org.sonatype.scheduling.iterators;
 
 import java.util.Date;
 
+/**
+ * NOOP impl that will be used when no schedule is available, to save some null checks
+ * 
+ * @author dbradicich
+ * @since 1.4.3
+ *
+ */
 public class NoopSchedulerIterator
     extends AbstractSchedulerIterator
 {
@@ -12,21 +19,16 @@ public class NoopSchedulerIterator
 
     public void resetFrom( Date from )
     {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     protected Date doPeekNext()
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     protected void stepNext()
     {
-        // TODO Auto-generated method stub
-
     }
 }
