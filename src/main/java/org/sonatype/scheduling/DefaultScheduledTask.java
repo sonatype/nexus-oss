@@ -68,8 +68,6 @@ public class DefaultScheduledTask<T>
     private TaskState lastStatus;
 
     private boolean toBeRemoved = false;
-    
-    private boolean preEmptiveScheduling = true;
 
     public DefaultScheduledTask( String id, String name, String type, DefaultScheduler scheduler, Callable<T> callable,
                                  Schedule schedule )
@@ -351,7 +349,8 @@ public class DefaultScheduledTask<T>
                 getScheduler().taskRescheduled( this );
 
                 return getScheduler().getScheduledExecutorService().schedule( this,
-                    nextTime - System.currentTimeMillis(), TimeUnit.MILLISECONDS );
+                                                                              nextTime - System.currentTimeMillis(),
+                                                                              TimeUnit.MILLISECONDS );
             }
             else
             {
@@ -402,7 +401,7 @@ public class DefaultScheduledTask<T>
                     }
 
                     setFuture( getScheduler().getScheduledExecutorService().schedule( this, 10000,
-                        TimeUnit.MILLISECONDS ) );
+                                                                                      TimeUnit.MILLISECONDS ) );
 
                     setTaskState( TaskState.SLEEPING );
 
@@ -411,6 +410,8 @@ public class DefaultScheduledTask<T>
             }
 
             Future<T> nextFuture = null;
+            Date peekBefore = null;
+            Date peekAfter = null;
 
             if ( ( isEnabled() || manualRun ) && getTaskState().isRunnable() )
             {
@@ -427,53 +428,22 @@ public class DefaultScheduledTask<T>
                     // If manually running, just grab the previous future and use that or create a new one
                     if ( manualRun )
                     {
-                        //if not preemptive scheduling, cancel the existing future, let task run and reschedule as expected
-                        if ( !preEmptiveScheduling )
-                        {
-                            Future<T> f = getFuture();
-                            
-                            //just in case there is no future...doht!
-                            if ( f != null )
-                            {
-                                f.cancel( true );
-                            }
-                        }
-                        //otherwise just reuse existing future
-                        else
-                        {
-                            nextFuture = getFuture();   
-                        }
+                        nextFuture = getFuture();
 
                         manualRun = false;
                     }
                     // Otherwise, grab the next one
-                    else if ( preEmptiveScheduling )
+                    else
                     {
                         nextFuture = reschedule();
                     }
 
                     setLastRun( startDate );
+
+                    // keep track of the next run times so that if they change during schedule run, will get proper one
+                    peekBefore = getScheduleIterator().peekNext();
                     result = getCallable().call();
-                    
-                    //we didnt calculate next future before task ran
-                    //so we calculate it now
-                    if ( !preEmptiveScheduling )
-                    {
-                        //This covers case where the flag was true before task, but set to false since
-                        //so there will be a future that we now need to cancel and reschedule
-                        if ( nextFuture != null )
-                        {
-                            nextFuture.cancel( true );
-                        }
-                        
-                        nextFuture = reschedule();
-                    }
-                    //This covers case where the flag was false beforehand, but set to true since
-                    //because if set to true beforehand, nextFuture will be set
-                    else if ( nextFuture == null )
-                    {
-                        nextFuture = reschedule();
-                    }
+                    peekAfter = getScheduleIterator().peekNext();
 
                     if ( result != null )
                     {
@@ -483,18 +453,17 @@ public class DefaultScheduledTask<T>
                 }
                 catch ( Throwable e )
                 {
+                    if ( peekAfter == null )
+                    {
+                        peekAfter = getScheduleIterator().peekNext();
+                    }
+                    
                     manualRun = false;
 
                     setBrokenCause( e );
 
                     setLastStatus( TaskState.BROKEN );
                     setTaskState( TaskState.BROKEN );
-
-                    //grab a future if available, since we didn't get it preemptively
-                    if ( !preEmptiveScheduling && nextFuture == null )
-                    {
-                        nextFuture = reschedule();
-                    }
 
                     if ( !isManualRunScheduled() && nextFuture == null && isEnabled() )
                     {
@@ -514,6 +483,18 @@ public class DefaultScheduledTask<T>
                 }
                 finally
                 {
+                    // next run is set, but has changed from before run
+                    if ( ( peekBefore == null && peekAfter != null )
+                        || ( peekBefore != null && !peekBefore.equals( peekAfter ) ) )
+                    {
+                        if ( nextFuture != null )
+                        {
+                            nextFuture.cancel( true );
+                        }
+
+                        nextFuture = reschedule();
+                    }
+                    
                     setDuration( new Date().getTime() - startDate.getTime() );
                 }
             }
@@ -663,15 +644,5 @@ public class DefaultScheduledTask<T>
     public void setToBeRemoved( boolean toBeRemoved )
     {
         this.toBeRemoved = toBeRemoved;
-    }
-
-    public boolean isPreEmptiveScheduling()
-    {
-        return preEmptiveScheduling;
-    }
-    
-    public void setPreEmptiveScheduling( boolean preEmptiveScheduling )
-    {
-        this.preEmptiveScheduling = preEmptiveScheduling;
     }
 }
