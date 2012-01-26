@@ -83,7 +83,7 @@ public class Nexus3699CapabilityIT
         cap.setTypeId( "TouchTest" );
         CapabilityPropertyResource prop = new CapabilityPropertyResource();
         prop.setKey( "repoOrGroupId" );
-        prop.setValue( "repo_" + TEST_REPOSITORY );
+        prop.setValue( TEST_REPOSITORY );
         cap.addProperty( prop );
         prop = new CapabilityPropertyResource();
         prop.setKey( "message" );

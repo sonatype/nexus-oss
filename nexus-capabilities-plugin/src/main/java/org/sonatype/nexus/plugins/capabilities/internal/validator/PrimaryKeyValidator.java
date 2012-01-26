@@ -141,9 +141,8 @@ public class PrimaryKeyValidator
         {
             for ( final String key : propertyKeys )
             {
-                String value = fixRepositoryValue( properties.get( key ) );
-                message.append( ", " ).append( propertyName( key ).toLowerCase() ).append( " '" ).append( value )
-                    .append( "'" );
+                message.append( ", " ).append( propertyName( key ).toLowerCase() ).append( " '" )
+                    .append( properties.get( key ) ).append( "'" );
             }
         }
         message.append( " can be created" );
