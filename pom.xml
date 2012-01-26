@@ -108,6 +108,7 @@
               <exclude>**/.idea/**</exclude>
               <!-- The classes in guava package are copied over from com.google.common.eventbus in order to make then extensible (they are package protected) -->
               <exclude>**/org/sonatype/nexus/eventbus/internal/guava/**</exclude>
+              <exclude>**/sandbox/**</exclude>
             </excludes>
             <mapping>
               <vm>XML_STYLE</vm>

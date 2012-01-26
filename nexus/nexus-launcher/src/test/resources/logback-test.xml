@@ -1,12 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Sonatype Overlord (TM)
-    Copyright (C) 2011 Sonatype, Inc. All rights reserved.
-    Includes the third-party code listed at http://www.sonatype.com/products/overlord/attributions/.
-    "Sonatype" and "Sonatype Overlord" are trademarks of Sonatype, Inc.
-
--->
 <configuration>
 
   <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
