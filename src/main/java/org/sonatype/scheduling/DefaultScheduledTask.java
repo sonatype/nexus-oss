@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.sonatype.scheduling.iterators.NoopSchedulerIterator;
 import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
@@ -611,6 +612,12 @@ public class DefaultScheduledTask<T>
         if ( scheduleIterator == null && getSchedule() != null )
         {
             scheduleIterator = getSchedule().getIterator();
+        }
+        
+        //this noop iterator will never return a next run time, but will cover users from having to check for null
+        if ( scheduleIterator == null )
+        {
+            return new NoopSchedulerIterator();
         }
 
         return scheduleIterator;
