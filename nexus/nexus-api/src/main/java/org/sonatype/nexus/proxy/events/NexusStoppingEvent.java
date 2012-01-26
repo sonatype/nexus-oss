@@ -18,6 +18,8 @@ package org.sonatype.nexus.proxy.events;
  *
  * This event is emitted just prior to {@link NexusStoppedEvent} and should be used only
  * for an early hint that shutdown is going to occur, to stop network connections, etc.
+ *
+ * @since 2.0
  */
 public class NexusStoppingEvent
     extends NexusStateChangeEvent
