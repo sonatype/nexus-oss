@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.scheduling.schedules.DailySchedule;
@@ -165,6 +166,31 @@ public class TaskStopTest
 
         Utils.awaitZeroTaskCount( defaultScheduler, 1000 );
         assertTrue( "task was killed immediately", callable.isAllDone() );
+    }
+
+    public void testCancelledRunningTaskWithPeriodicScheduleWhichFailsIsRemovedLater()
+        throws Exception
+    {
+        FailUponCancelCallable callable = new FailUponCancelCallable();
+
+        ScheduledTask<?> task = defaultScheduler.schedule( "Test Task", callable, new FewSecondSchedule() );
+
+        assertFalse( callable.done.getCount() == 0 );
+
+        assertEquals( 1, defaultScheduler.getAllTasks().size() );
+
+        callable.started.await();
+
+        assertEquals( TaskState.RUNNING, task.getTaskState() );
+
+        task.cancel();
+
+        assertEquals( TaskState.CANCELLING, task.getTaskState() );
+
+        callable.done.await();
+
+        Utils.awaitZeroTaskCount( defaultScheduler, 1000 );
+        assertEquals( TaskState.CANCELLED, task.getTaskState() );
     }
 
     public void testCancelRemovesBlockedOneShotTasks()
@@ -546,6 +572,42 @@ public class TaskStopTest
         public Map<String, String> getParameters()
         {
             return null;
+        }
+
+    }
+
+    public static class FailUponCancelCallable
+        implements Callable<Object>
+    {
+
+        public final CountDownLatch started = new CountDownLatch( 1 );
+
+        public final CountDownLatch done = new CountDownLatch( 1 );
+
+        public Object call()
+            throws Exception
+        {
+            try
+            {
+                started.countDown();
+                while ( !TaskUtil.getCurrentProgressListener().isCanceled() )
+                {
+                    try
+                    {
+                        Thread.sleep( 100 );
+                    }
+                    catch ( InterruptedException e )
+                    {
+                        // ignored
+                    }
+                }
+                Thread.sleep( 200 );
+                throw new Exception( "Cancelled, erroring out" );
+            }
+            finally
+            {
+                done.countDown();
+            }
         }
 
     }

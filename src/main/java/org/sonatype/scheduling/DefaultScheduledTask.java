@@ -216,7 +216,7 @@ public class DefaultScheduledTask<T>
 
             if ( progressListener != null )
             {
-                getProgressListener().cancel();
+                progressListener.cancel();
             }
 
             // to prevent starting it if not yet started
@@ -263,7 +263,7 @@ public class DefaultScheduledTask<T>
 
         if ( progressListener != null )
         {
-            getProgressListener().cancel();
+            progressListener.cancel();
         }
 
         // to prevent starting it if not yet started
@@ -464,9 +464,16 @@ public class DefaultScheduledTask<T>
                     setBrokenCause( e );
 
                     setLastStatus( TaskState.BROKEN );
-                    setTaskState( TaskState.BROKEN );
+                    if ( isToBeRemoved() )
+                    {
+                        setTaskState( TaskState.CANCELLED );
+                    }
+                    else
+                    {
+                        setTaskState( TaskState.BROKEN );
+                    }
 
-                    if ( !isManualRunScheduled() && nextFuture == null && isEnabled() )
+                    if ( ( !isManualRunScheduled() && nextFuture == null && isEnabled() ) || isToBeRemoved() )
                     {
                         getScheduler().removeFromTasksMap( this );
                     }
@@ -496,7 +503,7 @@ public class DefaultScheduledTask<T>
                         nextFuture = reschedule();
                     }
                     
-                    setDuration( new Date().getTime() - startDate.getTime() );
+                    setDuration( System.currentTimeMillis() - startDate.getTime() );
                 }
             }
 
