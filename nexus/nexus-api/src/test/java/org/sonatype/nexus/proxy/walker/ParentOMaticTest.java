@@ -65,7 +65,7 @@ public class ParentOMaticTest
             final String callerName = getCallerMethodName();
             final String actualClasspathName = getClass().getSimpleName() + "-" + callerName + ".txt";
             final InputStream actualInputStream = getClass().getResourceAsStream( actualClasspathName );
-            final String actual = IOUtil.toString( actualInputStream );
+            final String actual = IOUtil.toString( actualInputStream ).replace( "\r\n", "\n" );
 
             assertThat( actual, Matchers.equalTo( stringBuilder.toString() ) );
         }
