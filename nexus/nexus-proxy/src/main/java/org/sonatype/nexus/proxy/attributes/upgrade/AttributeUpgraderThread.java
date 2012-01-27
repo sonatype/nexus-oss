@@ -22,15 +22,17 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.RecreateAttributesWalker;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.FixedRateWalkerThrottleController;
+import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.walker.WalkerThrottleController;
 import org.sonatype.nexus.proxy.walker.FixedRateWalkerThrottleController.FixedRateWalkerThrottleControllerCallback;
 import org.sonatype.nexus.util.FibonacciNumberSequence;
 
-public class UpgraderThread
+public class AttributeUpgraderThread
     extends Thread
     implements FixedRateWalkerThrottleControllerCallback
 {
@@ -42,8 +44,8 @@ public class UpgraderThread
 
     private final FixedRateWalkerThrottleController throttleController;
 
-    public UpgraderThread( final File legacyAttributesDirectory, final RepositoryRegistry repositoryRegistry,
-                           final int limiterTps )
+    public AttributeUpgraderThread( final File legacyAttributesDirectory, final RepositoryRegistry repositoryRegistry,
+                                    final int limiterTps )
     {
         this.legacyAttributesDirectory = legacyAttributesDirectory;
         this.repositoryRegistry = repositoryRegistry;
@@ -93,35 +95,68 @@ public class UpgraderThread
         }
         if ( !DefaultAttributeUpgrader.isUpgradeDone( legacyAttributesDirectory, null ) )
         {
+            boolean weHadSkippedRepositories = false;
             List<Repository> reposes = repositoryRegistry.getRepositories();
             for ( Repository repo : reposes )
             {
                 if ( !repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
                 {
-                    if ( !DefaultAttributeUpgrader.isUpgradeDone( legacyAttributesDirectory, repo.getId() ) )
+                    if ( LocalStatus.IN_SERVICE.equals( repo.getLocalStatus() ) )
                     {
-                        logger.info( "Upgrading legacy attributes of repository {}.",
-                            RepositoryStringUtils.getHumanizedNameString( repo ) );
-                        ResourceStoreRequest req = new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT );
-                        req.getRequestContext().put( WalkerThrottleController.CONTEXT_KEY, throttleController );
-                        req.getRequestContext().put( RecreateAttributesWalker.FORCE_ATTRIBUTE_RECREATION, Boolean.FALSE );
-                        req.getRequestContext().put( RecreateAttributesWalker.LEGACY_ATTRIBUTES_ONLY, Boolean.TRUE );
-                        repo.recreateAttributes( req, null );
-                        DefaultAttributeUpgrader.markUpgradeDone( legacyAttributesDirectory, repo.getId() );
-                        logger.info( "Upgrade of legacy attributes of repository {} done.",
-                            RepositoryStringUtils.getHumanizedNameString( repo ) );
+                        if ( !DefaultAttributeUpgrader.isUpgradeDone( legacyAttributesDirectory, repo.getId() ) )
+                        {
+                            try
+                            {
+                                logger.info( "Upgrading legacy attributes of repository {}.",
+                                    RepositoryStringUtils.getHumanizedNameString( repo ) );
+
+                                ResourceStoreRequest req = new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT );
+                                req.getRequestContext().put( WalkerThrottleController.CONTEXT_KEY, throttleController );
+                                req.getRequestContext().put( RecreateAttributesWalker.FORCE_ATTRIBUTE_RECREATION,
+                                    Boolean.FALSE );
+                                req.getRequestContext().put( RecreateAttributesWalker.LEGACY_ATTRIBUTES_ONLY,
+                                    Boolean.TRUE );
+                                repo.recreateAttributes( req, null );
+                                DefaultAttributeUpgrader.markUpgradeDone( legacyAttributesDirectory, repo.getId() );
+                                logger.info( "Upgrade of legacy attributes of repository {} done.",
+                                    RepositoryStringUtils.getHumanizedNameString( repo ) );
+                            }
+                            catch ( WalkerException e )
+                            {
+                                weHadSkippedRepositories = true;
+                                logger.warn(
+                                    "Problems during legacy attribute upgrade of repository {}, skipping it and will retry later.",
+                                    RepositoryStringUtils.getHumanizedNameString( repo ), e );
+                            }
+                        }
+                        else
+                        {
+                            logger.debug( "Skipping legacy attributes of repository {}, already marked as upgraded.",
+                                RepositoryStringUtils.getHumanizedNameString( repo ) );
+                        }
                     }
                     else
                     {
-                        logger.info( "Skipping legacy attributes of repository {}, already marked as upgraded.",
+                        weHadSkippedRepositories = true;
+                        logger.warn(
+                            "Cannot upgrade legacy attributes of repository {}, is out of service, skipping it. Repository has to be put \"in service\"!.",
                             RepositoryStringUtils.getHumanizedNameString( repo ) );
                     }
                 }
             }
-            DefaultAttributeUpgrader.markUpgradeDone( legacyAttributesDirectory, null );
-            logger.info(
-                "Legacy attribute directory upgrade finished. Please delete, move or rename the \"{}\" folder.",
-                legacyAttributesDirectory.getAbsolutePath() );
+
+            if ( !weHadSkippedRepositories )
+            {
+                // mark instance as upgraded
+                DefaultAttributeUpgrader.markUpgradeDone( legacyAttributesDirectory, null );
+                logger.info(
+                    "Legacy attribute directory upgrade finished without any errors. Please delete, move or rename the \"{}\" folder.",
+                    legacyAttributesDirectory.getAbsolutePath() );
+            }
+            else
+            {
+                logger.info( "Legacy attribute directory upgrade PARTIALLY finished. Please fix the problems and retry the upgrade." );
+            }
         }
     }
 

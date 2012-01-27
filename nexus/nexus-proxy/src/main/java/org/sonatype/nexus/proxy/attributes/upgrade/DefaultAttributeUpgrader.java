@@ -71,7 +71,7 @@ public class DefaultAttributeUpgrader
 
     private int upgradeThrottleUps;
 
-    private volatile UpgraderThread upgraderThread;
+    private volatile AttributeUpgraderThread upgraderThread;
 
     public DefaultAttributeUpgrader()
     {
@@ -230,7 +230,7 @@ public class DefaultAttributeUpgrader
                             "Legacy attribute directory present, and upgrade is needed. Starting background upgrade." );
                     }
                     this.upgraderThread =
-                        new UpgraderThread( getLegacyAttributesDirectory(), repositoryRegistry, upgradeThrottleUps );
+                        new AttributeUpgraderThread( getLegacyAttributesDirectory(), repositoryRegistry, upgradeThrottleUps );
                     this.upgraderThread.start();
                 }
                 else
