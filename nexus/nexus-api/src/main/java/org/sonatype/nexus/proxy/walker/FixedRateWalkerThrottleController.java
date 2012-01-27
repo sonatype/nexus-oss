@@ -102,26 +102,39 @@ public class FixedRateWalkerThrottleController
     private long sliceSize;
 
     /**
-     * Creates a new instance of fixed rate throttle controller with some defaults (adjustment slice size is 2 seconds).
+     * Creates a new instance of fixed rate throttle controller without callback and some defaults (adjustment slice
+     * size is 2 seconds).
      * 
      * @param limiterTps
      * @param numberSequence
+     * @throws IllegalArgumentException If passed in numberSequence is not having needed characteristics.
      */
     public FixedRateWalkerThrottleController( final int limiterTps, final NumberSequence numberSequence )
+        throws IllegalArgumentException
     {
         this( limiterTps, numberSequence, null );
     }
 
     /**
-     * Creates a new instance of fixed rate throttle controller with some defaults (adjustment slice size is 2 seconds).
+     * Creates a new instance of fixed rate throttle controller with callback and some sensible defaults (adjustment
+     * slice size is 2 seconds).
      * 
-     * @param limiterTps
-     * @param numberSequence
+     * @param limiterTps the TPS limit you want to enforce, values -1 means do not limit (you can tune the value on
+     *            runtime too), 0 means "freeze" (walk will effectively sleep only, will not advance), and any positive
+     *            number means the maximum wanted TPS.
+     * @param numberSequence The numberSequence must be non-null, and will be reset, and it's initial state have to be a
+     *            non-negative number, otherwise IllegalArgumentException is thrown.
+     * @callback the callback
+     * @throws IllegalArgumentException If passed in numberSequence is not having needed characteristics.
      */
     public FixedRateWalkerThrottleController( final int limiterTps, final NumberSequence numberSequence,
                                               final FixedRateWalkerThrottleControllerCallback callback )
+        throws IllegalArgumentException
     {
         this.limiterTps = limiterTps;
+        numberSequence.reset();
+        Preconditions.checkArgument( numberSequence.peek() >= 0,
+            "Passed in NumberSequence in reset state must have a non-negative peek() return value!" );
         this.currentSleepTime = numberSequence;
         this.callback = callback;
         this.sliceSize = TimeUnit.SECONDS.toMillis( 2 );
@@ -188,7 +201,7 @@ public class FixedRateWalkerThrottleController
     @Override
     public boolean isThrottled()
     {
-        return limiterTps > 0;
+        return limiterTps > -1;
     }
 
     @Override
@@ -201,7 +214,7 @@ public class FixedRateWalkerThrottleController
             if ( lastSliceTps > limiterTps )
             {
                 // hold down the horses, increase sleepTime
-                if ( currentSleepTime.peek() <= 0 )
+                if ( currentSleepTime.peek() < 0 )
                 {
                     currentSleepTime.reset();
                 }
