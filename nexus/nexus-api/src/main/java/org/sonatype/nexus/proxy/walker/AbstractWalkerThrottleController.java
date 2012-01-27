@@ -12,31 +12,36 @@
  */
 package org.sonatype.nexus.proxy.walker;
 
-import org.sonatype.nexus.proxy.item.StorageCollectionItem;
-import org.sonatype.nexus.proxy.item.StorageItem;
-
 /**
- * A walker processors are units that are "attachable" to a single storage walk, hence the result will be combined but
- * having only one walk. If in any method and exception is thrown, the walker will stop.
+ * Handy abstract class to create new throttle controllers. Just override method you need.
  * 
  * @author cstamas
+ * @since 2.0
  */
-public interface WalkerProcessor
+public abstract class AbstractWalkerThrottleController
+    implements WalkerThrottleController
 {
-    boolean isActive();
-    
-    void beforeWalk( WalkerContext context )
-        throws Exception;
+    @Override
+    public void walkStarted( final WalkerContext context )
+    {
+        // nop
+    }
 
-    void onCollectionEnter( WalkerContext context, StorageCollectionItem coll )
-        throws Exception;
+    @Override
+    public void walkEnded( final WalkerContext context, final ThrottleInfo info )
+    {
+        // nop
+    }
 
-    void processItem( WalkerContext context, StorageItem item )
-        throws Exception;
+    @Override
+    public boolean isThrottled()
+    {
+        return false;
+    }
 
-    void onCollectionExit( WalkerContext context, StorageCollectionItem coll )
-        throws Exception;
-
-    void afterWalk( WalkerContext context )
-        throws Exception;
+    @Override
+    public long throttleTime( final ThrottleInfo info )
+    {
+        return -1;
+    }
 }

@@ -28,6 +28,13 @@ public interface NumberSequence
     long next();
 
     /**
+     * Returns the previous number in sequence and digresses the sequence.
+     * 
+     * @return
+     */
+    long prev();
+
+    /**
      * Returns the next number in sequence without advancing the sequence. This method will return always the same
      * number unless method {@code next()} is called.
      * 

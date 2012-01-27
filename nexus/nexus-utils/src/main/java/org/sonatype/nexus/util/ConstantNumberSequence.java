@@ -32,6 +32,11 @@ public class ConstantNumberSequence
         return peek();
     }
 
+    public long prev()
+    {
+        return peek();
+    }
+
     public long peek()
     {
         return val;

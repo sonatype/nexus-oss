@@ -101,4 +101,11 @@ public interface WalkerContext
      * @return
      */
     Repository getRepository();
+
+    /**
+     * Returns the "throttle control" of this context.
+     * 
+     * @return
+     */
+    WalkerThrottleController getThrottleController();
 }

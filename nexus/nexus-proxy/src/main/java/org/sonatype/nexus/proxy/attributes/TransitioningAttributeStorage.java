@@ -31,6 +31,11 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 public class TransitioningAttributeStorage
     implements AttributeStorage
 {
+    /**
+     * All attributes "leaving" fallback storage are marked (by presence) of this key.
+     */
+    public static final String FALLBACK_MARKER_KEY = LegacyFSAttributeStorage.class.getName();
+
     private final AttributeStorage mainAttributeStorage;
 
     private final AttributeStorage fallbackAttributeStorage;
@@ -57,29 +62,11 @@ public class TransitioningAttributeStorage
 
             if ( result == null && fallbackAttributeStorage != null )
             {
-                uidLock.lock( Action.create );
-
-                try
+                result = fallbackAttributeStorage.getAttributes( uid );
+                if ( result != null )
                 {
-                    result = fallbackAttributeStorage.getAttributes( uid );
-
-                    if ( result != null )
-                    {
-                        mainAttributeStorage.putAttributes( uid, result );
-
-                        try
-                        {
-                            fallbackAttributeStorage.deleteAttributes( uid );
-                        }
-                        catch ( IOException e )
-                        {
-                            // legacy swallows them, this is needed only to satisfy it's signature
-                        }
-                    }
-                }
-                finally
-                {
-                    uidLock.unlock();
+                    // mark it as legacy
+                    result.put( FALLBACK_MARKER_KEY, Boolean.TRUE.toString() );
                 }
             }
 
@@ -101,6 +88,12 @@ public class TransitioningAttributeStorage
 
         try
         {
+            if ( fallbackAttributeStorage != null )
+            {
+                // shave the legacy marker if any
+                item.remove( FALLBACK_MARKER_KEY );
+            }
+
             mainAttributeStorage.putAttributes( uid, item );
 
             if ( fallbackAttributeStorage != null )
@@ -133,16 +126,16 @@ public class TransitioningAttributeStorage
         {
             final boolean mainResult = mainAttributeStorage.deleteAttributes( uid );
 
-            try
+            if ( fallbackAttributeStorage != null )
             {
-                final boolean legacyResult =
-                    ( fallbackAttributeStorage != null && fallbackAttributeStorage.deleteAttributes( uid ) );
-
-                return mainResult || legacyResult;
-            }
-            catch ( IOException e )
-            {
-                // legacy swallows them, this is needed only to satisfy it's signature
+                try
+                {
+                    return fallbackAttributeStorage.deleteAttributes( uid ) || mainResult;
+                }
+                catch ( IOException e )
+                {
+                    // legacy swallows them, this is needed only to satisfy it's signature
+                }
             }
 
             return mainResult;

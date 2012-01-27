@@ -33,6 +33,8 @@ public class DefaultWalkerContext
 
     private final ResourceStoreRequest request;
 
+    private final WalkerThrottleController throttleController;
+
     private Map<String, Object> context;
 
     private List<WalkerProcessor> processors;
@@ -65,18 +67,31 @@ public class DefaultWalkerContext
         this.collectionsOnly = collectionsOnly;
 
         this.running = true;
+
+        if ( request.getRequestContext().containsKey( WalkerThrottleController.CONTEXT_KEY, false ) )
+        {
+            this.throttleController =
+                (WalkerThrottleController) request.getRequestContext().get( WalkerThrottleController.CONTEXT_KEY, false );
+        }
+        else
+        {
+            this.throttleController = WalkerThrottleController.NO_THROTTLING;
+        }
     }
 
+    @Override
     public boolean isLocalOnly()
     {
         return request.isRequestLocalOnly();
     }
 
+    @Override
     public boolean isCollectionsOnly()
     {
         return collectionsOnly;
     }
 
+    @Override
     public Map<String, Object> getContext()
     {
         if ( context == null )
@@ -86,6 +101,7 @@ public class DefaultWalkerContext
         return context;
     }
 
+    @Override
     public List<WalkerProcessor> getProcessors()
     {
         if ( processors == null )
@@ -96,26 +112,31 @@ public class DefaultWalkerContext
         return processors;
     }
 
+    @Override
     public void setProcessors( List<WalkerProcessor> processors )
     {
         this.processors = processors;
     }
 
+    @Override
     public WalkerFilter getFilter()
     {
         return walkerFilter;
     }
 
+    @Override
     public Repository getRepository()
     {
         return resourceStore;
     }
 
+    @Override
     public ResourceStoreRequest getResourceStoreRequest()
     {
         return request;
     }
 
+    @Override
     public boolean isStopped()
     {
         try
@@ -135,11 +156,13 @@ public class DefaultWalkerContext
         return !running;
     }
 
+    @Override
     public Throwable getStopCause()
     {
         return stopCause;
     }
 
+    @Override
     public void stop( Throwable cause )
     {
         running = false;
@@ -147,4 +170,9 @@ public class DefaultWalkerContext
         stopCause = cause;
     }
 
+    @Override
+    public WalkerThrottleController getThrottleController()
+    {
+        return this.throttleController;
+    }
 }

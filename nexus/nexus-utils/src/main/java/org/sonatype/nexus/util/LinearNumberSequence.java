@@ -13,72 +13,54 @@
 package org.sonatype.nexus.util;
 
 /**
- * Class that calculates "fibonacci-like" sequence. For those uninformed, there is only one Fibonacci sequence out
- * there, all others are just alike. Fibonacci sequence per-definition starts with 0, 1, 1... It does not start with 10.
- * Or, the sequence that starts with 10 is NOT a Fibonacci sequence. This implementation avoids the "artificial" leading
- * 0 in the sequence.
+ * A simple linear number sequence (linear equation).
  * 
  * @author cstamas
  */
-public class FibonacciNumberSequence
+public class LinearNumberSequence
     implements NumberSequence
 {
-    private final long startA;
+    private final long start;
 
-    private final long startB;
+    private final long step;
 
-    private long a;
+    private final long multiplier;
 
-    private long b;
+    private final long shift;
 
-    public FibonacciNumberSequence()
+    private long current;
+
+    public LinearNumberSequence( final long start, final long step, final long multiplier, final long shift )
     {
-        this( 1 );
+        this.start = start;
+        this.step = step;
+        this.multiplier = multiplier;
+        this.shift = shift;
     }
 
-    public FibonacciNumberSequence( long start )
-    {
-        this( start, start );
-    }
-
-    public FibonacciNumberSequence( long startA, long startB )
-    {
-        this.startA = startA;
-        this.startB = startB;
-        reset();
-    }
-
+    @Override
     public long next()
     {
-        long res = a;
-
-        a = b;
-
-        b = res + b;
-
-        return res;
+        current = current + step;
+        return peek();
     }
 
+    @Override
     public long prev()
     {
-        long tmp = b;
-
-        b = a;
-
-        a = tmp - b;
-
-        return a;
+        current = current - step;
+        return peek();
     }
 
+    @Override
     public long peek()
     {
-        return a;
+        return ( current * multiplier ) + shift;
     }
 
+    @Override
     public void reset()
     {
-        a = startA;
-        b = startB;
+        this.current = start;
     }
-
 }
