@@ -273,22 +273,8 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
           
         _fSorter = function(obj1, obj2) {
            var fieldName = "sortable_title";
-           var aValue = obj1[fieldName].toLowerCase();
-           var bValue = obj2[fieldName].toLowerCase();
-
-           if( aValue > bValue )
-           {
-             return 1;
-           }
-           else if( aValue < bValue )
-           {
-             return -1
-           }
-           else
-           {
-             return 0;
-           }
-        }
+           return Sonatype.utils.sortFn(obj1[fieldName], obj2[fieldName])
+        };
         this.items.sort(asOrder || 'ASC', _fSorter);
       }
     });

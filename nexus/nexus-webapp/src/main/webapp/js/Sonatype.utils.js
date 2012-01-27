@@ -96,6 +96,11 @@
       }
     },
 
+    sortFn : function(r1, r2) {
+        var v1 = Sonatype.utils.lowercase(r1), v2 = Sonatype.utils.lowercase(r2);
+        return v1 > v2 ? 1 : (v1 < v2 ? -1 : 0);
+    },
+
     convert : {
       stringContextToBool : function(str) {
         return (str.toLowerCase() === 'true');
