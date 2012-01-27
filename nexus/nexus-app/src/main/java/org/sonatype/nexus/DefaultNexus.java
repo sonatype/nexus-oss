@@ -50,6 +50,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppingEvent;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -520,6 +521,9 @@ public class DefaultNexus
         throws Exception
     {
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPING );
+
+        // Due to no dependency mechanism in NX for components, we need to fire off a hint about shutdown first
+        applicationEventMulticaster.notifyEventListeners( new NexusStoppingEvent( this ) );
 
         applicationEventMulticaster.notifyEventListeners( new NexusStoppedEvent( this ) );
 
