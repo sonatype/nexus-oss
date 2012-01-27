@@ -39,6 +39,65 @@ public class NumberSequenceTest
     }
 
     @Test
+    public void testLinearSequence()
+    {
+        long startValue = 0;
+
+        // step=1, multiplier=1, shift=0
+        // f(x) = 1*x+0 = x; x starts at 1
+        LinearNumberSequence ls = new LinearNumberSequence( startValue, 1, 1, 0 );
+
+        for ( int i = 1; i < 20; i++ )
+        {
+            Assert.assertEquals( i, ls.next() );
+        }
+
+        ls.reset();
+
+        // forth and back
+        for ( int i = 1; i < 20; i++ )
+        {
+            Assert.assertEquals( i, ls.next() );
+        }
+        for ( int i = 18; i >= 1; i-- )
+        {
+            Assert.assertEquals( i, ls.prev() );
+        }
+    }
+
+    @Test
+    public void testLinearSequenceBitMore()
+    {
+        long startValue = 0;
+
+        // step=10, multiplier=2, shift=10
+        // f(x) = 1*x+0 = x; x starts at 1
+        LinearNumberSequence ls = new LinearNumberSequence( startValue, 10, 2, 10 );
+
+        long f = 0;
+
+        for ( int i = 1; i < 20; i++ )
+        {
+            f = 2 * ( i * 10 ) + 10;
+            Assert.assertEquals( f, ls.next() );
+        }
+
+        ls.reset();
+
+        // forth and back
+        for ( int i = 1; i < 20; i++ )
+        {
+            f = 2 * ( i * 10 ) + 10;
+            Assert.assertEquals( f, ls.next() );
+        }
+        for ( int i = 18; i >= 1; i-- )
+        {
+            f = 2 * ( i * 10 ) + 10;
+            Assert.assertEquals( f, ls.prev() );
+        }
+    }
+
+    @Test
     public void testFibonacciSequence()
     {
         int[] fibonacciNumbers = new int[] { 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233 };
