@@ -93,7 +93,8 @@ Ext.extend(Sonatype.navigation.NavigationPanel, Ext.Panel, {
           var panel = this.findById(c.sectionId);
           if (panel)
           {
-            return panel.add(c);
+            panel.add(c);
+            panel.sort();
           }
           else
           {
@@ -112,6 +113,7 @@ Ext.extend(Sonatype.navigation.NavigationPanel, Ext.Panel, {
         {
           panel.add(this.delayedItems[panel.id]);
           this.delayedItems[panel.id] = null;
+          panel.sort();
         }
         return panel;
       }
@@ -121,6 +123,7 @@ Sonatype.navigation.Section = function(config) {
   var config = config || {};
   var defaultConfig = {
     collapsible : true,
+    titleCollapse: true,
     collapsed : false
   };
 
@@ -180,6 +183,7 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
           {
             // regular external link
             return {
+              sortable_title : c.title,
               autoHeight : true,
               html : '<ul class="group-links"><li><a href="' + c.href + '" target="' + c.href + '">' + c.title + '</a></li></ul>'
             }
@@ -193,6 +197,7 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
             }
             // panel open action
             return c.enabled == false ? null : {
+              sortable_title : c.title,
               autoHeight : true,
               id : 'navigation-' + c.tabId,
               initialConfigNavigation : c,
@@ -258,6 +263,19 @@ Ext.extend(Sonatype.navigation.Section, Ext.Panel, {
           this.show();
         }
         return Sonatype.navigation.Section.superclass.add.call(this, c);
+      },
+
+      sort : function(asOrder) {
+        if(!this.items)
+        {
+            return;
+        }
+          
+        _fSorter = function(obj1, obj2) {
+           var fieldName = "sortable_title";
+           return Sonatype.utils.sortFn(obj1[fieldName], obj2[fieldName])
+        };
+        this.items.sort(asOrder || 'ASC', _fSorter);
       }
     });
 
