@@ -17,6 +17,7 @@ import java.util.Map;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * The event fired in case of some content changes in Nexus related to an item/file.
@@ -69,6 +70,13 @@ public abstract class RepositoryItemEvent
     public StorageItem getItem()
     {
         return item;
+    }
+    
+    // ==
+    
+    public String toString()
+    {
+        return String.format( "%s(sender=%s, %s)", getClass().getSimpleName(), RepositoryStringUtils.getHumanizedNameString( getRepository() ), getItem().getRepositoryItemUid().toString() );
     }
 
 }

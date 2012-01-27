@@ -105,7 +105,7 @@ abstract public class AbstractMetadataHelper
     public void processFile( String path )
         throws IOException
     {
-        // remove rotten checksum
+        // remove checksums that does not have corresponding "main" file (those without .sha1 ext)
         if ( isObsoleteChecksum( path ) )
         {
             remove( path );
