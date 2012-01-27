@@ -257,6 +257,8 @@ public class DefaultWalker
 
     protected void beforeWalk( WalkerContext context )
     {
+        context.getThrottleController().walkStarted( context );
+
         try
         {
             for ( WalkerProcessor processor : context.getProcessors() )
@@ -361,6 +363,8 @@ public class DefaultWalker
         {
             context.stop( e );
         }
+
+        context.getThrottleController().walkEnded( context );
     }
 
     protected void afterWalk( WalkerContext context )

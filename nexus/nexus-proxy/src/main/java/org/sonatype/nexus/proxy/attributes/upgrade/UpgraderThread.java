@@ -25,12 +25,14 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.RecreateAttributesWalker;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
+import org.sonatype.nexus.proxy.walker.FixedRateWalkerThrottleController;
 import org.sonatype.nexus.proxy.walker.WalkerThrottleController;
+import org.sonatype.nexus.proxy.walker.FixedRateWalkerThrottleController.FixedRateWalkerThrottleControllerCallback;
 import org.sonatype.nexus.util.FibonacciNumberSequence;
 
 public class UpgraderThread
     extends Thread
-    implements WalkerThrottleController
+    implements FixedRateWalkerThrottleControllerCallback
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
@@ -38,27 +40,16 @@ public class UpgraderThread
 
     private final RepositoryRegistry repositoryRegistry;
 
-    private int actualUps;
-
-    private int maximumUps;
-
-    private int limiterUps;
-
-    private FibonacciNumberSequence currentSleepTime;
-
-    private long lastAdjustment;
+    private final FixedRateWalkerThrottleController throttleController;
 
     public UpgraderThread( final File legacyAttributesDirectory, final RepositoryRegistry repositoryRegistry,
-                           final int limiterUps )
+                           final int limiterTps )
     {
         this.legacyAttributesDirectory = legacyAttributesDirectory;
         this.repositoryRegistry = repositoryRegistry;
-        this.limiterUps = limiterUps;
-        // start with sleep time of 100ms
-        this.currentSleepTime = new FibonacciNumberSequence( 100 );
-        this.lastAdjustment = 0;
-        this.actualUps = 0;
-        this.maximumUps = 0;
+        // set throttle controller
+        this.throttleController =
+            new FixedRateWalkerThrottleController( limiterTps, new FibonacciNumberSequence( 5 ), this );
         // to have it clearly in thread dumps
         setName( "LegacyAttributesUpgrader" );
         // to not prevent sudden reboots (by user, if upgrading, and rebooting)
@@ -69,28 +60,28 @@ public class UpgraderThread
 
     public int getActualUps()
     {
-        return actualUps;
+        return throttleController.getLastAdjustmentTps();
     }
 
     public int getMaximumUps()
     {
-        return maximumUps;
+        return throttleController.getGlobalMaximumTps();
     }
 
     public int getLimiterUps()
     {
-        return limiterUps;
+        return throttleController.getLimiterTps();
     }
 
-    public void setLimiterUps( int limiterUps )
+    public void setLimiterUps( final int limiterTps )
     {
-        this.limiterUps = limiterUps;
+        throttleController.setLimiterTps( limiterTps );
     }
 
     @Override
     public void run()
     {
-        // sleep a bit to not start prematurely (ie. nexus startup not done yet)
+        // defer actual start a bit to not start prematurely (ie. nexus boot not done yet, let it "calm down")
         try
         {
             TimeUnit.SECONDS.sleep( 5 );
@@ -100,9 +91,6 @@ public class UpgraderThread
             // thread will die off
             return;
         }
-        // ping the "lastAdjustment" at very point where thread starts
-        this.lastAdjustment = System.currentTimeMillis();
-
         if ( !DefaultAttributeUpgrader.isUpgradeDone( legacyAttributesDirectory, null ) )
         {
             List<Repository> reposes = repositoryRegistry.getRepositories();
@@ -115,7 +103,7 @@ public class UpgraderThread
                         logger.info( "Upgrading legacy attributes of repository {}.",
                             RepositoryStringUtils.getHumanizedNameString( repo ) );
                         ResourceStoreRequest req = new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT );
-                        req.getRequestContext().put( WalkerThrottleController.CONTEXT_KEY, this );
+                        req.getRequestContext().put( WalkerThrottleController.CONTEXT_KEY, throttleController );
                         req.getRequestContext().put( RecreateAttributesWalker.FORCE_ATTRIBUTE_RECREATION, Boolean.FALSE );
                         repo.recreateAttributes( req, null );
                         DefaultAttributeUpgrader.markUpgradeDone( legacyAttributesDirectory, repo.getId() );
@@ -136,66 +124,12 @@ public class UpgraderThread
         }
     }
 
-    // == WalkerThrottleController
-
     @Override
-    public boolean isThrottled()
+    public void onAdjustment( final FixedRateWalkerThrottleController controller )
     {
-        return limiterUps > 0;
-    }
-
-    @Override
-    public long throttleTime( final ThrottleInfo info )
-    {
-        if ( adjustmentNeeded() )
-        {
-            actualUps = (int) ( info.getTotalProcessItemInvocationCount() / ( info.getTotalTimeWalking() / 1000 ) );
-            maximumUps = Math.max( actualUps, maximumUps );
-
-            if ( actualUps > limiterUps )
-            {
-                // hold down the horses, increase sleepTime
-                if ( currentSleepTime.peek() <= 0 )
-                {
-                    currentSleepTime.reset();
-                }
-                else
-                {
-                    currentSleepTime.next();
-                }
-            }
-            else
-            {
-                // lessen the sleep time
-                if ( currentSleepTime.peek() > 0 )
-                {
-                    currentSleepTime.prev();
-                }
-            }
-
-            logger.info( "Actual speed {} upgrades/sec (limited to {} upgrades/sec), current sleepTime {}ms.", new Object[] { actualUps,
-                limiterUps, currentSleepTime.peek() } );
-        }
-
-        return currentSleepTime.peek();
-    }
-
-    /**
-     * To prevent "oscillation" we do adjustments only once in 5 seconds (or override if needed).
-     * 
-     * @return
-     */
-    protected boolean adjustmentNeeded()
-    {
-        // adjust every 5 second for now
-        if ( ( System.currentTimeMillis() - lastAdjustment ) > 5000 )
-        {
-            this.lastAdjustment = System.currentTimeMillis();
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        logger.info(
+            "Actual speed {} upgrades/sec, with average {} upgrade/sec (is limited to {} upgrades/sec), current sleepTime {}ms.",
+            new Object[] { controller.getLastAdjustmentTps(), controller.getGlobalAverageTps(),
+                controller.getLimiterTps(), controller.getCurrentSleepTime() } );
     }
 }

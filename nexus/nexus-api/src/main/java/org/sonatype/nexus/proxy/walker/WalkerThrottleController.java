@@ -26,21 +26,11 @@ public interface WalkerThrottleController
     String CONTEXT_KEY = WalkerThrottleController.class.getName();
 
     /**
-     * WalkerThrottleController that does not emply walk throttling.
+     * WalkerThrottleController that does not do walk throttling. Used when no user supplied throttle control found in
+     * walker context.
      */
-    WalkerThrottleController NO_THROTTLING = new WalkerThrottleController()
+    WalkerThrottleController NO_THROTTLING = new AbstractWalkerThrottleController()
     {
-        @Override
-        public boolean isThrottled()
-        {
-            return false;
-        }
-
-        @Override
-        public long throttleTime( final ThrottleInfo info )
-        {
-            return -1;
-        }
     };
 
     /**
@@ -72,6 +62,20 @@ public interface WalkerThrottleController
          */
         long getTotalTimeWalking();
     }
+
+    /**
+     * Invoked at walk start.
+     * 
+     * @param context
+     */
+    void walkStarted( WalkerContext context );
+
+    /**
+     * Invoked at walk end.
+     * 
+     * @param context
+     */
+    void walkEnded( WalkerContext context );
 
     /**
      * Returns true if the controllers wants to use "throttled walker" execution. Throttling in this case would mean
