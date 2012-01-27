@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.rest;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -50,10 +51,18 @@ public class ContentPlexusResource
 
     public List<Variant> getVariants()
     {
+        // TODO: A repository can contain any type of file, so this method needs to be more generic
+        // it is likely that a site repository, would contain javascript, flash, etc
+        // a maven repo would contain jars application/java-archive, etc
         List<Variant> result = super.getVariants();
 
         // default this presentation to HTML to enable user browsing
         result.add( 0, new Variant( MediaType.TEXT_HTML ) );
+
+        // css and javascript can be stored inside of a repository
+        result.add( new Variant( MediaType.TEXT_CSS ) );
+        result.add( new Variant( MediaType.TEXT_JAVASCRIPT ) );
+        result.add( new Variant( MediaType.APPLICATION_JAVASCRIPT ) );
 
         // also support plain text content inside Nexus repositories
         result.add( new Variant( MediaType.TEXT_PLAIN ) );
