@@ -247,8 +247,6 @@ public class RepositoryListPlexusResource
                 appModel.getLocalStorage().setUrl( repoResource.getOverrideLocalStorageUrl() );
 
                 appModel.getLocalStorage().setProvider( "file" );
-                
-                appModel.setNotFoundCacheActive( true );
             }
             else
             {
@@ -258,6 +256,8 @@ public class RepositoryListPlexusResource
             RepositoryResourceRemoteStorage remoteStorage = repoResource.getRemoteStorage();
             if ( remoteStorage != null )
             {
+                appModel.setNotFoundCacheActive( true );
+                
                 appModel.setRemoteStorage( new CRemoteStorage() );
 
                 appModel.getRemoteStorage().setUrl( remoteStorage.getRemoteStorageUrl() );
