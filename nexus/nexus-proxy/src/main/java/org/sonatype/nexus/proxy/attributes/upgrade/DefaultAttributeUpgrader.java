@@ -266,13 +266,27 @@ public class DefaultAttributeUpgrader
     {
         if ( StringUtils.isBlank( repoId ) )
         {
-            return StringUtils.equals( MARKER_TEXT,
-                FileUtils.fileRead( new File( attributesDirectory, MARKER_FILENAME ) ) );
+            final File markerFile = new File( attributesDirectory, MARKER_FILENAME );
+            if ( markerFile.exists() )
+            {
+                return StringUtils.equals( MARKER_TEXT, FileUtils.fileRead( markerFile ) );
+            }
+            else
+            {
+                return false;
+            }
         }
         else
         {
-            return StringUtils.equals( MARKER_TEXT,
-                FileUtils.fileRead( new File( new File( attributesDirectory, repoId ), MARKER_FILENAME ) ) );
+            final File markerFile = new File( new File( attributesDirectory, repoId ), MARKER_FILENAME );
+            if ( markerFile.exists() )
+            {
+                return StringUtils.equals( MARKER_TEXT, FileUtils.fileRead( markerFile ) );
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 
