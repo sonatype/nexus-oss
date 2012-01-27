@@ -24,26 +24,40 @@ public class CapabilityNexusIndexHtmlCustomizer
     implements NexusIndexHtmlCustomizer
 {
 
+    private String getVersion()
+    {
+        return getVersionFromJarFile( "/META-INF/maven/org.sonatype.nexus.plugins/nexus-capabilities-plugin/pom.properties" );
+    }
+    
+    private String getSuffixParameters()
+    {
+        String version = getVersion();
+        if ( version == null ) {
+            return "";
+        }
+        else if ( version.endsWith( "SNAPSHOT" ) ) { //NON-NLS
+            return String.format( "?v=%s&t=%s", version, System.currentTimeMillis() ); //NON-NLS
+        }
+        else {
+            return "?v=" + version; //NON-NLS
+        }
+    }
+
     @Override
     public String getPostHeadContribution( final Map<String, Object> ctx )
     {
-        final String version =
-            getVersionFromJarFile(
-                "/META-INF/maven/org.sonatype.nexus.plugins/nexus-capabilities-plugin/pom.properties" );
+        String suffixParameters = getSuffixParameters();
 
         if ( System.getProperty( "useOriginalJS" ) == null )
         {
-            return "<script src=\"static/js/org.sonatype.nexus.plugins.capabilities-all.js"
-                + ( version == null ? "" : "?" + version )
+            return "<script src=\"static/js/org.sonatype.nexus.plugins.capabilities-all.js" + suffixParameters
                 + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
         }
         else
         {
-            return "<script src=\"js/repoServer/repoServer.CapabilitiesNavigation.js"
-                + ( version == null ? "" : "?" + version )
+            return "<script src=\"js/repoServer/repoServer.CapabilitiesNavigation.js" + suffixParameters
                 + "\" type=\"text/javascript\" charset=\"utf-8\"></script>"
-                + "<script src=\"js/repoServer/repoServer.CapabilitiesPanel.js"
-                + ( version == null ? "" : "?" + version )
+                + "<script src=\"js/repoServer/repoServer.CapabilitiesPanel.js" + suffixParameters
                 + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
         }
     }
