@@ -131,7 +131,17 @@ public class DefaultAttributeUpgrader
     @Override
     public boolean isUpgradeFinished()
     {
-        return isUpgradeDone( getLegacyAttributesDirectory(), null );
+        try
+        {
+            return isUpgradeDone( getLegacyAttributesDirectory(), null );
+        }
+        catch ( IOException e )
+        {
+            // return true to prevent advancing in any aspect, but the error log will make a day for sysadmin
+            getLogger().error( "Unable to perform file read from legacy attributes directory: {}",
+                getLegacyAttributesDirectory(), e );
+            return true;
+        }
     }
 
     @Override
@@ -208,7 +218,7 @@ public class DefaultAttributeUpgrader
         }
         else
         {
-            if ( isUpgradeDone( getLegacyAttributesDirectory(), null ) )
+            if ( isUpgradeFinished() )
             {
                 // nag the user to remove the directory
                 getLogger().info(
@@ -230,7 +240,8 @@ public class DefaultAttributeUpgrader
                             "Legacy attribute directory present, and upgrade is needed. Starting background upgrade." );
                     }
                     this.upgraderThread =
-                        new AttributeUpgraderThread( getLegacyAttributesDirectory(), repositoryRegistry, upgradeThrottleUps );
+                        new AttributeUpgraderThread( getLegacyAttributesDirectory(), repositoryRegistry,
+                            upgradeThrottleUps );
                     this.upgraderThread.start();
                 }
                 else
@@ -251,46 +262,34 @@ public class DefaultAttributeUpgrader
         "Migration of legacy attributes finished.\nPlease delete, remove or rename this directory!";
 
     protected static boolean isUpgradeDone( final File attributesDirectory, final String repoId )
+        throws IOException
     {
-        try
+        if ( StringUtils.isBlank( repoId ) )
         {
-            if ( StringUtils.isBlank( repoId ) )
-            {
-                return StringUtils.equals( MARKER_TEXT,
-                    FileUtils.fileRead( new File( attributesDirectory, MARKER_FILENAME ) ) );
-            }
-            else
-            {
-                return StringUtils.equals( MARKER_TEXT,
-                    FileUtils.fileRead( new File( new File( attributesDirectory, repoId ), MARKER_FILENAME ) ) );
-            }
+            return StringUtils.equals( MARKER_TEXT,
+                FileUtils.fileRead( new File( attributesDirectory, MARKER_FILENAME ) ) );
         }
-        catch ( IOException e )
+        else
         {
-            return false;
+            return StringUtils.equals( MARKER_TEXT,
+                FileUtils.fileRead( new File( new File( attributesDirectory, repoId ), MARKER_FILENAME ) ) );
         }
     }
 
     protected static void markUpgradeDone( final File attributesDirectory, final String repoId )
+        throws IOException
     {
-        try
+        if ( StringUtils.isBlank( repoId ) )
         {
-            if ( StringUtils.isBlank( repoId ) )
-            {
-                FileUtils.fileWrite( new File( attributesDirectory, MARKER_FILENAME ), MARKER_TEXT );
-            }
-            else
-            {
-                final File target = new File( new File( attributesDirectory, repoId ), MARKER_FILENAME );
-                // this step is needed if new repo added while upgrade not done: it will NOT have legacy attributes
-                // as other reposes, that were present in old/upgraded instance
-                target.getParentFile().mkdirs();
-                FileUtils.fileWrite( target, MARKER_TEXT );
-            }
+            FileUtils.fileWrite( new File( attributesDirectory, MARKER_FILENAME ), MARKER_TEXT );
         }
-        catch ( IOException e )
+        else
         {
-            // hum?
+            final File target = new File( new File( attributesDirectory, repoId ), MARKER_FILENAME );
+            // this step is needed if new repo added while upgrade not done: it will NOT have legacy attributes
+            // as other reposes, that were present in old/upgraded instance
+            target.getParentFile().mkdirs();
+            FileUtils.fileWrite( target, MARKER_TEXT );
         }
     }
 }
