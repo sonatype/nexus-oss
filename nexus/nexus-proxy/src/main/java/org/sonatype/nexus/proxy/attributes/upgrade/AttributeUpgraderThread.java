@@ -52,7 +52,7 @@ public class AttributeUpgraderThread
         this.repositoryRegistry = repositoryRegistry;
         // set throttle controller
         this.throttleController =
-            new FixedRateWalkerThrottleController( limiterTps, new FibonacciNumberSequence( 5 ), this );
+            new FixedRateWalkerThrottleController( limiterTps, new FibonacciNumberSequence( 0, 5 ), this );
         // to have it clearly in thread dumps
         setName( "LegacyAttributesUpgrader" );
         // to not prevent sudden reboots (by user, if upgrading, and rebooting)
