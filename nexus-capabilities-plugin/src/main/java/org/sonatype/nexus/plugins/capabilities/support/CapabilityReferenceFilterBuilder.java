@@ -96,12 +96,7 @@ public class CapabilityReferenceFilterBuilder
 
         public CapabilityReferenceFilter onRepository( final String key, final String repositoryId )
         {
-            return withProperty( key, "repo_" + repositoryId );
-        }
-
-        public CapabilityReferenceFilter onGroup( final String key, final String groupId )
-        {
-            return withProperty( key, "group_" + groupId );
+            return withProperty( key, repositoryId );
         }
 
         @Override

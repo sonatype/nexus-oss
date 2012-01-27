@@ -92,22 +92,4 @@ class ValidatorSupport
         return keyToName;
     }
 
-    String fixRepositoryValue( final String repositoryId )
-    {
-        if ( repositoryId == null )
-        {
-            return null;
-        }
-        String value = repositoryId;
-        if ( value.startsWith( "repo_" ) )
-        {
-            value = value.replaceFirst( "repo_", "" );
-        }
-        else if ( value.startsWith( "group_" ) )
-        {
-            value = value.replaceFirst( "group_", "" );
-        }
-        return value;
-    }
-
 }

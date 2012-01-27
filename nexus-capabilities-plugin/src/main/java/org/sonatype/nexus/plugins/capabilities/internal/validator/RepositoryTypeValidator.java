@@ -62,7 +62,7 @@ public class RepositoryTypeValidator
     @Override
     public ValidationResult validate( final Map<String, String> properties )
     {
-        String repositoryId = fixRepositoryValue( properties.get( propertyKey ) );
+        String repositoryId = properties.get( propertyKey );
         if ( repositoryId != null )
         {
             try
