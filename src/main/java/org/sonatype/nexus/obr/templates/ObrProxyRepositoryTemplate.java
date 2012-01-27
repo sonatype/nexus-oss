@@ -65,6 +65,7 @@ public class ObrProxyRepositoryTemplate
         repo.externalConfigurationImple = exConf;
 
         repo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
+        repo.setNotFoundCacheActive( true );
         repo.setNotFoundCacheTTL( 1440 );
 
         final CRepositoryCoreConfiguration result =
