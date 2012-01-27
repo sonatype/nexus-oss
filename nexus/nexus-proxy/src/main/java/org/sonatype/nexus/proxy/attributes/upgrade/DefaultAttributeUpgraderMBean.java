@@ -14,6 +14,12 @@ package org.sonatype.nexus.proxy.attributes.upgrade;
 
 import javax.management.StandardMBean;
 
+/**
+ * Simple exposure of AttributeUpgrader to JMX.
+ * 
+ * @author cstamas
+ * @since 2.0
+ */
 public class DefaultAttributeUpgraderMBean
     extends StandardMBean
     implements AttributeUpgraderMBean

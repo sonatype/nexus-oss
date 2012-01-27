@@ -33,6 +33,12 @@ import org.sonatype.nexus.proxy.walker.WalkerThrottleController;
 import org.sonatype.nexus.proxy.walker.FixedRateWalkerThrottleController.FixedRateWalkerThrottleControllerCallback;
 import org.sonatype.nexus.util.FibonacciNumberSequence;
 
+/**
+ * The background thread doing the actual attribute upgrades (moving them from legacy to LS attribute storage).
+ * 
+ * @author cstamas
+ * @since 2.0
+ */
 public class AttributeUpgraderThread
     extends Thread
     implements FixedRateWalkerThrottleControllerCallback

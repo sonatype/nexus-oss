@@ -33,7 +33,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
  * rebuild attributes background task if needed. Finally, it leaves "marker" file to mark the fact upgrade did happen,
  * to not kick in on any subsequent reboot.
  * 
- * @since 1.10.0
+ * @since 2.0
  */
 @Component( role = AttributeUpgrader.class )
 public class DefaultAttributeUpgrader
@@ -222,7 +222,7 @@ public class DefaultAttributeUpgrader
             {
                 // nag the user to remove the directory
                 getLogger().info(
-                    "Legacy attribute directory present, but is marked already as upgraded. Please delete, move or rename the \"{}\" folder.",
+                    "Legacy attribute directory present, but is marked already as upgraded. Please delete, move or rename the \"{}\" directory.",
                     getLegacyAttributesDirectory().getAbsolutePath() );
             }
             else
