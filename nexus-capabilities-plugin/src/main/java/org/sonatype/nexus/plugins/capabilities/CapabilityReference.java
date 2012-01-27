@@ -40,6 +40,6 @@ public interface CapabilityReference
      * @param type Capability class type
      * @return referenced capability
      */
-    <T extends Capability> T capability(Class<T> type);
+    <T extends Capability> T capabilityAs(Class<T> type);
 
 }

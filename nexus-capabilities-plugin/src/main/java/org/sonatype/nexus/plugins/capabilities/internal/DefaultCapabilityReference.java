@@ -102,7 +102,7 @@ public class DefaultCapabilityReference
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Capability> T capability( final Class<T> type )
+    public <T extends Capability> T capabilityAs( final Class<T> type )
     {
         return (T)capability;
     }
