@@ -180,9 +180,9 @@ public class FixedRateWalkerThrottleController
     }
 
     @Override
-    public void walkEnded( final WalkerContext context )
+    public void walkEnded( final WalkerContext context, final ThrottleInfo info )
     {
-        // nop
+        calculateStats( info );
     }
 
     @Override
@@ -196,15 +196,7 @@ public class FixedRateWalkerThrottleController
     {
         if ( adjustmentNeeded() )
         {
-            // global average TPS since walk started
-            globalAverageTps =
-                (int) ( info.getTotalProcessItemInvocationCount() / ( info.getTotalTimeWalking() / 1000 ) );
-            // local TPS achieved in current "adjustment" slice
-            lastSliceTps =
-                (int) ( ( info.getTotalProcessItemInvocationCount() - lastAdjustmentProcessItemInvocationCount ) / ( lastSliceSize / 1000 ) );
-            lastAdjustmentProcessItemInvocationCount = info.getTotalProcessItemInvocationCount();
-            // the maximum TPS since the walk started
-            globalMaximumTps = Math.max( lastSliceTps, globalMaximumTps );
+            calculateStats( info );
 
             if ( lastSliceTps > limiterTps )
             {
@@ -238,7 +230,20 @@ public class FixedRateWalkerThrottleController
 
     // ==
 
-    protected boolean adjustmentNeeded( )
+    protected void calculateStats( final ThrottleInfo info )
+    {
+        // global average TPS since walk started
+        globalAverageTps = calculateCPS( info.getTotalProcessItemInvocationCount(), info.getTotalTimeWalking() );
+        // local TPS achieved in current "adjustment" slice
+        lastSliceTps =
+            calculateCPS( info.getTotalProcessItemInvocationCount() - lastAdjustmentProcessItemInvocationCount,
+                lastSliceSize );
+        lastAdjustmentProcessItemInvocationCount = info.getTotalProcessItemInvocationCount();
+        // the maximum TPS since the walk started
+        globalMaximumTps = Math.max( lastSliceTps, globalMaximumTps );
+    }
+
+    protected boolean adjustmentNeeded()
     {
         final long now = System.currentTimeMillis();
         lastSliceSize = now - lastAdjustmentTimestamp;
@@ -251,5 +256,22 @@ public class FixedRateWalkerThrottleController
         {
             return false;
         }
+    }
+
+    protected int calculateCPS( final long count, final long millis )
+    {
+        if ( count == 0 )
+        {
+            return 0;
+        }
+
+        if ( millis == 0 )
+        {
+            return -1; // um, would be division by zero, but since we deal with a measure that might be positive only
+                       // (count-per-seconds), returning -1 is good for now
+        }
+
+        return (int) ( ( (double) count / (double) millis ) * 1000.0d ); // we do this to make measure in seconds, but
+                                                                         // to retain as much precision as possible
     }
 }

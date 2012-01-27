@@ -364,7 +364,7 @@ public class DefaultWalker
             context.stop( e );
         }
 
-        context.getThrottleController().walkEnded( context );
+        context.getThrottleController().walkEnded( context, (DefaultThrottleInfo) context.getContext().get( WALKER_THROTTLE_INFO ) );
     }
 
     protected void afterWalk( WalkerContext context )

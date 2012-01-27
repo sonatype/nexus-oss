@@ -30,7 +30,7 @@ public class AdaptiveRenicingWalkerThrottleController
     }
 
     @Override
-    public void walkEnded( final WalkerContext context )
+    public void walkEnded( final WalkerContext context, final ThrottleInfo info )
     {
         // nop
     }

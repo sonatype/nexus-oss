@@ -74,8 +74,9 @@ public interface WalkerThrottleController
      * Invoked at walk end.
      * 
      * @param context
+     * @param info
      */
-    void walkEnded( WalkerContext context );
+    void walkEnded( WalkerContext context, ThrottleInfo info );
 
     /**
      * Returns true if the controllers wants to use "throttled walker" execution. Throttling in this case would mean

@@ -16,7 +16,7 @@ public abstract class AbstractWalkerThrottleController
     }
 
     @Override
-    public void walkEnded( final WalkerContext context )
+    public void walkEnded( final WalkerContext context, final ThrottleInfo info )
     {
         // nop
     }
