@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.RequestContext;
+import org.sonatype.nexus.proxy.attributes.TransitioningAttributeStorage;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
@@ -26,9 +27,16 @@ public class RecreateAttributesWalker
     public static final String FORCE_ATTRIBUTE_RECREATION = RecreateAttributesWalker.class.getName()
         + ".forceAttributeRecreation";
 
+    public static final String LEGACY_ATTRIBUTES_ONLY = RecreateAttributesWalker.class.getName()
+        + ".forceAttributeRecreation";
+
     private final Repository repository;
 
     private final Map<String, String> initialData;
+
+    private boolean forceAttributeRecreation;
+
+    private boolean legacyAtributesOnly;
 
     public RecreateAttributesWalker( final Repository repository, final Map<String, String> initialData )
     {
@@ -37,15 +45,32 @@ public class RecreateAttributesWalker
     }
 
     @Override
+    public void beforeWalk( WalkerContext context )
+        throws Exception
+    {
+        forceAttributeRecreation = isForceAttributeRecreation( context );
+        legacyAtributesOnly = isLegacyAttributesOnly( context );
+    }
+
+    @Override
     protected void processFileItem( final WalkerContext ctx, final StorageFileItem item )
         throws IOException
     {
+        if ( legacyAtributesOnly )
+        {
+            if ( !item.getRepositoryItemAttributes().containsKey( TransitioningAttributeStorage.FALLBACK_MARKER_KEY ) )
+            {
+                // if legacyAtributesOnly and current item attributes does not carry the marker, throw it away
+                return;
+            }
+        }
+
         if ( getInitialData() != null )
         {
             item.getRepositoryItemAttributes().putAll( initialData );
         }
 
-        if ( isForceAttributeRecreation( ctx ) )
+        if ( forceAttributeRecreation )
         {
             getRepository().getAttributesHandler().storeAttributes( item, item.getContentLocator() );
         }
@@ -77,6 +102,21 @@ public class RecreateAttributesWalker
         {
             // fallback to default behavior: do force it
             return true;
+        }
+    }
+
+    protected boolean isLegacyAttributesOnly( final WalkerContext ctx )
+    {
+        final RequestContext reqestContext = ctx.getResourceStoreRequest().getRequestContext();
+        if ( reqestContext.containsKey( LEGACY_ATTRIBUTES_ONLY, false ) )
+        {
+            // obey the "hint"
+            return Boolean.parseBoolean( String.valueOf( reqestContext.get( LEGACY_ATTRIBUTES_ONLY, false ) ) );
+        }
+        else
+        {
+            // fallback to default behavior: all of them
+            return false;
         }
     }
 }

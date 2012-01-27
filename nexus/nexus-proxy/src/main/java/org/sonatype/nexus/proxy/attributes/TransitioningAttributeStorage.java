@@ -31,6 +31,11 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 public class TransitioningAttributeStorage
     implements AttributeStorage
 {
+    /**
+     * All attributes "leaving" fallback storage are marked (by presence) of this key.
+     */
+    public static final String FALLBACK_MARKER_KEY = LegacyFSAttributeStorage.class.getName();
+
     private final AttributeStorage mainAttributeStorage;
 
     private final AttributeStorage fallbackAttributeStorage;
@@ -58,6 +63,11 @@ public class TransitioningAttributeStorage
             if ( result == null && fallbackAttributeStorage != null )
             {
                 result = fallbackAttributeStorage.getAttributes( uid );
+                if ( result != null )
+                {
+                    // mark it as legacy
+                    result.put( FALLBACK_MARKER_KEY, Boolean.TRUE.toString() );
+                }
             }
 
             return result;
@@ -78,6 +88,12 @@ public class TransitioningAttributeStorage
 
         try
         {
+            if ( fallbackAttributeStorage != null )
+            {
+                // shave the legacy marker if any
+                item.remove( FALLBACK_MARKER_KEY );
+            }
+
             mainAttributeStorage.putAttributes( uid, item );
 
             if ( fallbackAttributeStorage != null )

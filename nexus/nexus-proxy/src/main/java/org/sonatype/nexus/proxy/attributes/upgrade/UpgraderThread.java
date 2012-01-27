@@ -105,6 +105,7 @@ public class UpgraderThread
                         ResourceStoreRequest req = new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT );
                         req.getRequestContext().put( WalkerThrottleController.CONTEXT_KEY, throttleController );
                         req.getRequestContext().put( RecreateAttributesWalker.FORCE_ATTRIBUTE_RECREATION, Boolean.FALSE );
+                        req.getRequestContext().put( RecreateAttributesWalker.LEGACY_ATTRIBUTES_ONLY, Boolean.TRUE );
                         repo.recreateAttributes( req, null );
                         DefaultAttributeUpgrader.markUpgradeDone( legacyAttributesDirectory, repo.getId() );
                         logger.info( "Upgrade of legacy attributes of repository {} done.",
