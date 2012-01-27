@@ -41,7 +41,12 @@ public class P2RepositoryAggregatorCapabilityDescriptor
         super(
             TYPE,
             "P2 Repository Aggregator capability",
-            "Aggregates P2 metadata/artifacts of all OSGi bundles from selected repository",
+            "Aggregates P2 metadata/artifacts of all OSGi bundles from selected repository\n"
+                + "<br/>\n"
+                + "<br/>\n"
+                + "<span style=\"font-weight: bold;\">EXPERIMENTAL</span>\n"
+                + "<br/>"
+                + "This is an experimental, unsupported feature.",
             new RepoOrGroupComboFormField( P2RepositoryAggregatorConfiguration.REPOSITORY, FormField.MANDATORY )
         );
     }

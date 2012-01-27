@@ -41,7 +41,12 @@ public class P2MetadataGeneratorCapabilityDescriptor
         super(
             TYPE,
             "P2 Metadata Generator capability",
-            "Automatically generates P2 metadata for OSGi bundles deployed to selected repository",
+            "Automatically generates P2 metadata for OSGi bundles deployed to selected repository\n"
+                + "<br/>\n"
+                + "<br/>\n"
+                + "<span style=\"font-weight: bold;\">EXPERIMENTAL</span>\n"
+                + "<br/>"
+                + "This is an experimental, unsupported feature.",
             new RepoOrGroupComboFormField( P2MetadataGeneratorConfiguration.REPOSITORY, FormField.MANDATORY )
         );
     }
