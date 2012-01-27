@@ -76,10 +76,7 @@ public class TaskStopTest
 
         callable.blockForDone();
 
-        // let state machine catch up
-        Thread.sleep( 100 );
-
-        assertEquals( TaskState.CANCELLED, task.getTaskState() );
+        Utils.awaitTaskState( task, 1000, TaskState.CANCELLED );
 
         assertTrue( "task was not done", callable.isAllDone() );
         assertTrue( "task not removed", defaultScheduler.getAllTasks().isEmpty() );
@@ -111,10 +108,7 @@ public class TaskStopTest
 
         callable.blockForDone();
 
-        // let state machine catch up
-        Thread.sleep( 100 );
-
-        assertEquals( TaskState.CANCELLED, task.getTaskState() );
+        Utils.awaitTaskState( task, 1000, TaskState.CANCELLED );
 
         assertTrue( "task was not done", callable.isAllDone() );
         assertTrue( "task not removed", defaultScheduler.getAllTasks().isEmpty() );
@@ -167,17 +161,10 @@ public class TaskStopTest
 
         callable.blockForDone();
 
-        // let state machine catch up
-        Thread.sleep( 100 );
+        Utils.awaitTaskState( task, 1000, TaskState.CANCELLED );
 
-        assertEquals( TaskState.CANCELLED, task.getTaskState() );
-
-        // let task finish call()
-        Thread.sleep( 500 );
-
-        assertTrue( "task was not removed", defaultScheduler.getAllTasks().isEmpty() );
+        Utils.awaitZeroTaskCount( defaultScheduler, 1000 );
         assertTrue( "task was killed immediately", callable.isAllDone() );
-
     }
 
     public void testCancelRemovesBlockedOneShotTasks()
@@ -195,10 +182,7 @@ public class TaskStopTest
         ScheduledTask<Integer> blockedTask =
             defaultScheduler.schedule( "Blocked Task", blockedCallable, new RunNowSchedule() );
 
-        // let scheduler catch up
-        Thread.sleep( 600 );
-
-        assertEquals( TaskState.SLEEPING, blockedTask.getTaskState() );
+        Utils.awaitTaskState( blockedTask, 1000, TaskState.SLEEPING );
 
         assertEquals( 1, defaultScheduler.getAllTasks().size() );
         assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
@@ -211,8 +195,7 @@ public class TaskStopTest
 
         task.cancel( true );
         callable.blockForDone();
-        Thread.sleep( 50 );
-        assertEquals( 0, defaultScheduler.getAllTasks().size() );
+        Utils.awaitZeroTaskCount( defaultScheduler, 1000 );
     }
 
     public void testCancelReschedulesBlockedTasks()
@@ -224,21 +207,15 @@ public class TaskStopTest
 
         ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", callable, new RunNowSchedule() );
 
-        // let scheduler catch up
-        Thread.sleep( 500 );
-
         RunForeverTask blockedCallable = new RunForeverTask( 3000 );
-        Calendar cal = Calendar.getInstance();
-        cal.add( Calendar.WEEK_OF_YEAR, 1 );
         ScheduledTask<Integer> blockedTask =
-            defaultScheduler.schedule( "Blocked Task", blockedCallable, new DailySchedule( new Date(), cal.getTime() ) );
+            defaultScheduler.schedule( "Blocked Task", blockedCallable,
+                                       new DailySchedule( new Date( System.currentTimeMillis() + 5000 ), null ) );
 
+        callable.blockForStart();
         blockedTask.runNow();
 
-        // let scheduler catch up
-        Thread.sleep( 500 );
-
-        assertEquals( TaskState.SLEEPING, blockedTask.getTaskState() );
+        Utils.awaitTaskState( blockedTask, 1000, TaskState.SLEEPING );
 
         assertEquals( 1, defaultScheduler.getAllTasks().size() );
         assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
@@ -258,8 +235,7 @@ public class TaskStopTest
         assertEquals( 1, defaultScheduler.getAllTasks().get( task.getType() ).size() );
 
         blockedTask.cancel();
-        Thread.sleep( 50 );
-        assertEquals( 0, defaultScheduler.getAllTasks().size() );
+        Utils.awaitZeroTaskCount( defaultScheduler, 1000 );
     }
 
     public void testCancellingStateBlocksTasks()
@@ -281,11 +257,8 @@ public class TaskStopTest
         ScheduledTask<Integer> blockedTask =
             defaultScheduler.schedule( "Blocked Task", blockedCallable, new RunNowSchedule() );
 
-        // let scheduler catch up
-        Thread.sleep( 600 );
-
+        Utils.awaitTaskState( blockedTask, 1000, TaskState.SLEEPING );
         assertFalse( blockedCallable.isStarted() );
-        assertEquals( TaskState.SLEEPING, blockedTask.getTaskState() );
 
         assertEquals( 1, defaultScheduler.getAllTasks().size() );
         assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
@@ -326,21 +299,10 @@ public class TaskStopTest
 
             public void run()
             {
-
                 blockedTask.runNow();
 
-                // let scheduler catch up
-                try
-                {
-                    Thread.sleep( 600 );
-                }
-                catch ( InterruptedException e )
-                {
-                    throw new IllegalStateException( e );
-                }
-
+                Utils.awaitTaskState( blockedTask, 1000, TaskState.SLEEPING );
                 assertFalse( blockedCallable.isStarted() );
-                assertEquals( TaskState.SLEEPING, blockedTask.getTaskState() );
 
                 assertEquals( 1, defaultScheduler.getAllTasks().size() );
                 assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
@@ -439,10 +401,8 @@ public class TaskStopTest
 
         blockedTask.runNow();
 
-        Thread.sleep( 600 );
-
+        Utils.awaitTaskState( blockedTask, 1000, TaskState.SLEEPING );
         assertFalse( blockedCallable.isStarted() );
-        assertEquals( TaskState.SLEEPING, blockedTask.getTaskState() );
 
         assertEquals( 1, defaultScheduler.getAllTasks().size() );
         assertEquals( 2, defaultScheduler.getAllTasks().get( task.getType() ).size() );
@@ -460,7 +420,7 @@ public class TaskStopTest
         task.cancelOnly();
         callable.blockForDone();
 
-        assertEquals( TaskState.SUBMITTED, task.getTaskState() );
+        Utils.awaitTaskState( task, 1000, TaskState.SUBMITTED );
 
         task.cancel();
 
@@ -470,9 +430,9 @@ public class TaskStopTest
     public class RunForeverCallable
         implements Callable<Integer>
     {
-        private boolean allDone = false;
+        private volatile boolean allDone = false;
 
-        private int runTicks;
+        private final int runTicks;
 
         public RunForeverCallable()
         {
@@ -484,7 +444,7 @@ public class TaskStopTest
             this.runTicks = ticks;
         }
 
-        private boolean started = false;
+        private volatile boolean started = false;
 
         public Integer call()
             throws Exception
