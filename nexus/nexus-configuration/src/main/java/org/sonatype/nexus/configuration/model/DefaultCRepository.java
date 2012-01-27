@@ -28,7 +28,7 @@ public class DefaultCRepository
         // providerHint
         setPathPrefix( null );
         setLocalStatus( LocalStatus.IN_SERVICE.toString() );
-        setNotFoundCacheActive( true );
+        setNotFoundCacheActive( false );
         setNotFoundCacheTTL( 15 );
         setUserManaged( true );
         setExposed( true );

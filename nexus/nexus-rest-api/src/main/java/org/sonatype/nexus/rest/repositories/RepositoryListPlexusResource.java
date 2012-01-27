@@ -256,6 +256,8 @@ public class RepositoryListPlexusResource
             RepositoryResourceRemoteStorage remoteStorage = repoResource.getRemoteStorage();
             if ( remoteStorage != null )
             {
+                appModel.setNotFoundCacheActive( true );
+                
                 appModel.setRemoteStorage( new CRemoteStorage() );
 
                 appModel.getRemoteStorage().setUrl( remoteStorage.getRemoteStorageUrl() );

@@ -69,6 +69,7 @@ public class Maven2ProxyRepositoryTemplate
         repo.externalConfigurationImple = exConf;
 
         repo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
+        repo.setNotFoundCacheActive( true );
         repo.setNotFoundCacheTTL( 1440 );
 
         if ( exConf.getRepositoryPolicy() != null && exConf.getRepositoryPolicy() == RepositoryPolicy.SNAPSHOT )
