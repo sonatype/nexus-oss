@@ -24,6 +24,9 @@ import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 @Named( TYPE_ID )
 public class P2MetadataGeneratorCapability
@@ -34,14 +37,36 @@ public class P2MetadataGeneratorCapability
 
     private final Conditions conditions;
 
+    private final RepositoryRegistry repositoryRegistry;
+
     private P2MetadataGeneratorConfiguration configuration;
 
     @Inject
     public P2MetadataGeneratorCapability( final P2MetadataGenerator service,
-                                          final Conditions conditions )
+                                          final Conditions conditions,
+                                          final RepositoryRegistry repositoryRegistry )
     {
         this.service = checkNotNull( service );
         this.conditions = checkNotNull( conditions );
+        this.repositoryRegistry = checkNotNull( repositoryRegistry );
+    }
+
+    @Override
+    public String description()
+    {
+        P2MetadataGeneratorConfiguration cfg = configuration;
+        if ( cfg == null )
+        {
+            cfg = createConfiguration( context().properties() );
+        }
+        try
+        {
+            return repositoryRegistry.getRepository( cfg.repositoryId() ).getName();
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            return cfg.repositoryId();
+        }
     }
 
     @Override
