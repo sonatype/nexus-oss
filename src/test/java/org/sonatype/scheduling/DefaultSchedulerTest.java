@@ -12,16 +12,12 @@
  */
 package org.sonatype.scheduling;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.Callable;
 
 import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.scheduling.iterators.DailySchedulerIterator;
-import org.sonatype.scheduling.iterators.SchedulerIterator;
-import org.sonatype.scheduling.schedules.DailySchedule;
 import org.sonatype.scheduling.schedules.HourlySchedule;
 import org.sonatype.scheduling.schedules.ManualRunSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
@@ -305,40 +301,10 @@ public class DefaultSchedulerTest
 
     protected Schedule getEverySecondSchedule( Date start, Date stop )
     {
-        return new SecondScheduler( start, stop );
+        return new FewSecondSchedule( start, stop, 1 );
     }
 
     // Helper classes
-
-    public class SecondScheduler
-        extends DailySchedule
-    {
-        public SecondScheduler( Date startDate, Date endDate )
-        {
-            super( startDate, endDate );
-        }
-
-        @Override
-        protected SchedulerIterator createIterator()
-        {
-            return new SecondSchedulerIterator( getStartDate(), getEndDate() );
-        }
-    }
-
-    public class SecondSchedulerIterator
-        extends DailySchedulerIterator
-    {
-        public SecondSchedulerIterator( Date startingDate, Date endingDate )
-        {
-            super( startingDate, endingDate );
-        }
-
-        @Override
-        public void stepNext()
-        {
-            getCalendar().add( Calendar.SECOND, 1 );
-        }
-    }
 
     public class TestRunnable
         implements Runnable
