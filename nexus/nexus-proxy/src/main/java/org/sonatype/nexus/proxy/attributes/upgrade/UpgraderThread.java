@@ -60,7 +60,7 @@ public class UpgraderThread
 
     public int getActualUps()
     {
-        return throttleController.getLastAdjustmentTps();
+        return throttleController.getLastSliceTps();
     }
 
     public int getMaximumUps()
@@ -128,8 +128,8 @@ public class UpgraderThread
     public void onAdjustment( final FixedRateWalkerThrottleController controller )
     {
         logger.info(
-            "Actual speed {} upgrades/sec, with average {} upgrade/sec (is limited to {} upgrades/sec), current sleepTime {}ms.",
-            new Object[] { controller.getLastAdjustmentTps(), controller.getGlobalAverageTps(),
-                controller.getLimiterTps(), controller.getCurrentSleepTime() } );
+            "Current speed {} upgrades/sec, with average {} upgrade/sec (is limited to {} upgrades/sec), currently sleeping {}ms per upgrade.",
+            new Object[] { controller.getLastSliceTps(), controller.getGlobalAverageTps(), controller.getLimiterTps(),
+                controller.getCurrentSleepTime() } );
     }
 }

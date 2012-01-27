@@ -82,7 +82,7 @@ public class FixedRateWalkerThrottleController
     /**
      * Internally maintained slice size (in milliseconds), milliseconds betwen two subsequent adjustments.
      */
-    private long lastAdjustmentSliceSize;
+    private long lastSliceSize;
 
     /**
      * Internally maintained processItem invocation count when last adjustment was made.
@@ -92,14 +92,14 @@ public class FixedRateWalkerThrottleController
     /**
      * The TPS measured in last adjustment "slice".
      */
-    private int lastAdjustmentTps;
+    private int lastSliceTps;
 
     /**
      * How often (in milliseconds) should adjustment to throttling be made. To small value might cause unneded overhead
      * and "oscillation", to big value might cause that throttling becomes not effective (ie. walk will spend too much
      * time in "overspeed" before adjustment kicks in).
      */
-    private long adjustmentFrequency;
+    private long sliceSize;
 
     /**
      * Creates a new instance of fixed rate throttle controller with some defaults (adjustment slice size is 2 seconds).
@@ -124,7 +124,7 @@ public class FixedRateWalkerThrottleController
         this.limiterTps = limiterTps;
         this.currentSleepTime = numberSequence;
         this.callback = callback;
-        this.adjustmentFrequency = TimeUnit.SECONDS.toMillis( 2 );
+        this.sliceSize = TimeUnit.SECONDS.toMillis( 2 );
     }
 
     public int getGlobalAverageTps()
@@ -137,9 +137,9 @@ public class FixedRateWalkerThrottleController
         return globalMaximumTps;
     }
 
-    public int getLastAdjustmentTps()
+    public int getLastSliceTps()
     {
-        return lastAdjustmentTps;
+        return lastSliceTps;
     }
 
     public long getCurrentSleepTime()
@@ -157,15 +157,15 @@ public class FixedRateWalkerThrottleController
         this.limiterTps = limiterTps;
     }
 
-    public long getAdjustmentFrequency()
+    public long getSliceSize()
     {
-        return adjustmentFrequency;
+        return sliceSize;
     }
 
-    public void setAdjustmentFrequency( final long adjustmentFrequency )
+    public void setSliceSize( final long sliceSize )
     {
-        Preconditions.checkArgument( adjustmentFrequency > 0 );
-        this.adjustmentFrequency = adjustmentFrequency;
+        Preconditions.checkArgument( sliceSize > 0 );
+        this.sliceSize = sliceSize;
     }
 
     // == WalkerThrottleController iface
@@ -174,7 +174,7 @@ public class FixedRateWalkerThrottleController
     {
         globalAverageTps = 0;
         globalMaximumTps = 0;
-        lastAdjustmentTps = 0;
+        lastSliceTps = 0;
         lastAdjustmentTimestamp = System.currentTimeMillis();
         lastAdjustmentProcessItemInvocationCount = 0;
     }
@@ -200,13 +200,13 @@ public class FixedRateWalkerThrottleController
             globalAverageTps =
                 (int) ( info.getTotalProcessItemInvocationCount() / ( info.getTotalTimeWalking() / 1000 ) );
             // local TPS achieved in current "adjustment" slice
-            lastAdjustmentTps =
-                (int) ( ( info.getTotalProcessItemInvocationCount() - lastAdjustmentProcessItemInvocationCount ) / ( lastAdjustmentSliceSize / 1000 ) );
+            lastSliceTps =
+                (int) ( ( info.getTotalProcessItemInvocationCount() - lastAdjustmentProcessItemInvocationCount ) / ( lastSliceSize / 1000 ) );
             lastAdjustmentProcessItemInvocationCount = info.getTotalProcessItemInvocationCount();
             // the maximum TPS since the walk started
-            globalMaximumTps = Math.max( lastAdjustmentTps, globalMaximumTps );
+            globalMaximumTps = Math.max( lastSliceTps, globalMaximumTps );
 
-            if ( lastAdjustmentTps > limiterTps )
+            if ( lastSliceTps > limiterTps )
             {
                 // hold down the horses, increase sleepTime
                 if ( currentSleepTime.peek() <= 0 )
@@ -241,9 +241,8 @@ public class FixedRateWalkerThrottleController
     protected boolean adjustmentNeeded( )
     {
         final long now = System.currentTimeMillis();
-        lastAdjustmentSliceSize = now - lastAdjustmentTimestamp;
-        // adjust every 5 second for now
-        if ( ( lastAdjustmentSliceSize ) > adjustmentFrequency )
+        lastSliceSize = now - lastAdjustmentTimestamp;
+        if ( ( lastSliceSize ) > sliceSize )
         {
             this.lastAdjustmentTimestamp = now;
             return true;
