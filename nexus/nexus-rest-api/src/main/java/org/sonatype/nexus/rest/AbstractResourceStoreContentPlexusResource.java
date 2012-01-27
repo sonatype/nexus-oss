@@ -873,7 +873,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 + "\": ";
 
         // NEXUS-4417: logging of 'repository not found' should be debug level
-        if ( t instanceof NoSuchRepositoryException )
+        // NEXUS-4788 log remote 'Forbidden' response only on debug
+        if ( t instanceof NoSuchRepositoryException || t instanceof AccessDeniedException )
         {
             getLogger().debug( message, t );
         }
