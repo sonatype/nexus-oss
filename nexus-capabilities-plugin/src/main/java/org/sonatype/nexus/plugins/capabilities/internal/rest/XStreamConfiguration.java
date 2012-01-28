@@ -12,6 +12,9 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.basic.StringConverter;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilitiesListResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityPropertyResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityRequestResource;
@@ -19,21 +22,26 @@ import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResou
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityResponseResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityStatusResponseResource;
 import org.sonatype.plexus.rest.xstream.AliasingListConverter;
-import com.thoughtworks.xstream.XStream;
 
 public class XStreamConfiguration
 {
 
     public static XStream applyTo( final XStream xstream )
     {
-        xstream.registerConverter( new CapabilityPropertyResourceConverter(
-            xstream.getMapper(),
-            xstream.getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
-
         xstream.processAnnotations( CapabilityRequestResource.class );
         xstream.processAnnotations( CapabilityResponseResource.class );
         xstream.processAnnotations( CapabilitiesListResponseResource.class );
         xstream.processAnnotations( CapabilityStatusResponseResource.class );
+        xstream.processAnnotations( CapabilityPropertyResource.class );
+
+        xstream.registerLocalConverter( CapabilityPropertyResource.class, "value", new StringConverter()
+        {
+            @Override
+            public Object fromString( final String str )
+            {
+                return StringEscapeUtils.unescapeHtml( str );
+            }
+        } );
 
         xstream.registerLocalConverter( CapabilityResource.class, "properties", new AliasingListConverter(
             CapabilityPropertyResource.class, "feature-property" ) );
