@@ -118,7 +118,7 @@
 
 <div id="header">
   <div id="branding" class="left-side">
-    <image src="images/branding.png"/>
+    <image src="images/header_branding.png"/>
   </div>
   <div class="right-side">
     <div><span id="head-link-l"></span><span id="head-link-m"></span><span id="head-link-r"></span></div>
