@@ -111,30 +111,53 @@ public class DefaultEventInspectorHost
             return;
         }
 
+        // 1st pass: sync ones (without handler)
         for ( EventInspector ei : inspectors )
         {
-            try
+            if ( !( ei instanceof AsynchronousEventInspector ) )
             {
-                if ( ei.accepts( evt ) )
+                try
                 {
-                    final EventInspectorHandler handler = new EventInspectorHandler( getLogger(), ei, evt );
-
-                    if ( ei instanceof AsynchronousEventInspector && hostThreadPool != null
-                        && !hostThreadPool.isShutdown() )
+                    if ( ei.accepts( evt ) )
                     {
-                        hostThreadPool.execute( handler );
-                    }
-                    else
-                    {
-                        handler.run();
+                        ei.inspect( evt );
                     }
                 }
+                catch ( Exception e )
+                {
+                    getLogger().warn( "EventInspector implementation={} had problem accepting an event={}",
+                        new Object[] { ei.getClass().getName(), evt.getClass(), e } );
+                }
             }
-            catch ( Exception e )
+        }
+
+        // 2nd pass: async ones
+        for ( EventInspector ei : inspectors )
+        {
+            if ( ei instanceof AsynchronousEventInspector )
             {
-                getLogger().warn(
-                    "EventInspector implementation='" + ei.getClass().getName() + "' had problem accepting an event='"
-                        + evt.getClass() + "'", e );
+                try
+                {
+                    if ( ei.accepts( evt ) )
+                    {
+                        final EventInspectorHandler handler = new EventInspectorHandler( getLogger(), ei, evt );
+
+                        if ( hostThreadPool != null && !hostThreadPool.isShutdown() )
+                        {
+                            hostThreadPool.execute( handler );
+                        }
+                        else
+                        {
+                            handler.run();
+                        }
+                    }
+                }
+                catch ( Exception e )
+                {
+                    getLogger().warn(
+                        "Async EventInspector implementation='" + ei.getClass().getName()
+                            + "' had problem accepting an event='" + evt.getClass() + "'", e );
+                }
             }
         }
     }
@@ -165,8 +188,8 @@ public class DefaultEventInspectorHost
             }
             catch ( Exception e )
             {
-                logger.warn( "EventInspector implementation='" + ei.getClass().getName()
-                    + "' had problem inspecting an event='" + evt.getClass() + "'", e );
+                logger.warn( "EventInspector implementation={} had problem accepting an event={}", new Object[] {
+                    ei.getClass().getName(), evt.getClass(), e } );
             }
         }
     }
