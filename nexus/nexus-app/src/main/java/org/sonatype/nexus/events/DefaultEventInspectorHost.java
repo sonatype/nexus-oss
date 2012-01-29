@@ -30,7 +30,8 @@ import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
-import org.sonatype.sisu.goodies.common.TestAccessible;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * A default implementation of EventInspectorHost, a component simply collecting all EventInspectors and re-emitting
@@ -63,7 +64,7 @@ public class DefaultEventInspectorHost
                 new NexusThreadFactory( "nxevthost", "Event Inspector Host" ), new CallerRunsPolicy() );
     }
 
-    @TestAccessible
+    @VisibleForTesting 
     public DefaultEventInspectorHost( final Map<String, EventInspector> eventInspectors )
     {
         this();
