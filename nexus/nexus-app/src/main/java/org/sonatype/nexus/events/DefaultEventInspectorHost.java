@@ -95,7 +95,15 @@ public class DefaultEventInspectorHost
 
     public void onEvent( final Event<?> evt )
     {
-        processEvent( evt );
+        try
+        {
+            processEvent( evt, getEventInspectors() );
+        }
+        catch ( IllegalStateException e )
+        {
+            // NEXUS-4775 guice exception trying to resolve circular dependencies too early
+            getLogger().trace( "Event inspectors are not fully initialized, skipping handling of {}", evt, e );
+        }
     }
 
     // ==
@@ -105,20 +113,8 @@ public class DefaultEventInspectorHost
         return new HashSet<EventInspector>( eventInspectors.values() );
     }
 
-    protected void processEvent( final Event<?> evt )
+    protected void processEvent( final Event<?> evt, final Set<EventInspector> inspectors )
     {
-        Set<EventInspector> inspectors;
-        try
-        {
-            inspectors = getEventInspectors();
-        }
-        catch ( IllegalStateException e )
-        {
-            // NEXUS-4775 guice exception trying to resolve circular dependencies too early
-            getLogger().trace( "Event inspectors are not fully initialized, skipping handling of {}", evt, e );
-            return;
-        }
-
         // 1st pass: sync ones (without handler)
         for ( EventInspector ei : inspectors )
         {
@@ -150,14 +146,7 @@ public class DefaultEventInspectorHost
                     {
                         final EventInspectorHandler handler = new EventInspectorHandler( getLogger(), ei, evt );
 
-                        if ( hostThreadPool != null && !hostThreadPool.isShutdown() )
-                        {
-                            hostThreadPool.execute( handler );
-                        }
-                        else
-                        {
-                            handler.run();
-                        }
+                        hostThreadPool.execute( handler );
                     }
                 }
                 catch ( Exception e )
