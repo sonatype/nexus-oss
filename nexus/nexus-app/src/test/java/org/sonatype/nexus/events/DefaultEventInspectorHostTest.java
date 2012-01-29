@@ -72,15 +72,18 @@ public class DefaultEventInspectorHostTest
         @Override
         public void inspect( Event<?> evt )
         {
-            countDownLatch.countDown();
-            this.inspectInvoked = System.currentTimeMillis();
             try
             {
+                this.inspectInvoked = System.currentTimeMillis();
                 Thread.sleep( 100 );
             }
             catch ( InterruptedException e )
             {
                 // nothing
+            }
+            finally
+            {
+                countDownLatch.countDown();
             }
         }
     }
