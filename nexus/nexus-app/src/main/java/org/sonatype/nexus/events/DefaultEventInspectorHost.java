@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
+import org.sonatype.sisu.goodies.common.TestAccessible;
 
 /**
  * A default implementation of EventInspectorHost, a component simply collecting all EventInspectors and re-emitting
@@ -60,6 +61,13 @@ public class DefaultEventInspectorHost
         this.hostThreadPool =
             new ThreadPoolExecutor( 0, HOST_THREAD_POOL_SIZE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(),
                 new NexusThreadFactory( "nxevthost", "Event Inspector Host" ), new CallerRunsPolicy() );
+    }
+
+    @TestAccessible
+    public DefaultEventInspectorHost( final Map<String, EventInspector> eventInspectors )
+    {
+        this();
+        this.eventInspectors = eventInspectors;
     }
 
     // == Disposable iface, to manage ExecutorService lifecycle
@@ -154,9 +162,8 @@ public class DefaultEventInspectorHost
                 }
                 catch ( Exception e )
                 {
-                    getLogger().warn(
-                        "Async EventInspector implementation='" + ei.getClass().getName()
-                            + "' had problem accepting an event='" + evt.getClass() + "'", e );
+                    getLogger().warn( "Async EventInspector implementation={} had problem accepting an event={}",
+                        new Object[] { ei.getClass().getName(), evt.getClass(), e } );
                 }
             }
         }
