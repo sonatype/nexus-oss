@@ -85,7 +85,16 @@ public class DefaultScheduler
         {
             for ( ScheduledTask<?> task : entry.getValue() )
             {
-                maxId = Math.max( maxId, Integer.parseInt( task.getId() ) );
+                try
+                {
+                    maxId = Math.max( maxId, Integer.parseInt( task.getId() ) );
+                }
+                catch ( NumberFormatException e )
+                {
+                    // be forgiving about non number IDs
+                    // hint1: sadly, some Nexus ITs does have them
+                    // hint2: they will not clash with numbers anyway
+                }
             }
         }
         idGen.set( maxId );
@@ -94,7 +103,7 @@ public class DefaultScheduler
     public void shutdown()
     {
         getLogger().info( "Shutting down Scheduler..." );
-        
+
         getScheduledExecutorService().shutdown();
         getScheduledExecutorService().setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
         getScheduledExecutorService().setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
