@@ -20,7 +20,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * Event fired when Maven2 repository metadata is unparseable or broken is some other means.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public class MavenRepositoryMetadataValidationEventFailed
     extends RepositoryItemValidationEventFailed

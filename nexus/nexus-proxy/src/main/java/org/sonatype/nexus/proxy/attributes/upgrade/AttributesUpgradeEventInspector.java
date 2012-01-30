@@ -23,7 +23,7 @@ import org.sonatype.plexus.appevents.Event;
 /**
  * EventInspector that fires upgrade call to upgrader component, does it blindly.
  * 
- * @since 1.10.0
+ * @since 2.0
  */
 @Component( role = EventInspector.class, hint = "AttributesUpgradeEventInspector" )
 public class AttributesUpgradeEventInspector

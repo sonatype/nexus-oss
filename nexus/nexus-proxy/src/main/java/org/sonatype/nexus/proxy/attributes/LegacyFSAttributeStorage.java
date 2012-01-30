@@ -45,7 +45,7 @@ import com.thoughtworks.xstream.XStreamException;
  * is not present (ie. new install), this component remains dormant.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 @Typed( AttributeStorage.class )
 @Named( "legacy" )

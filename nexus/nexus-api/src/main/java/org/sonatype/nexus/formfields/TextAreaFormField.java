@@ -15,7 +15,7 @@ package org.sonatype.nexus.formfields;
 /**
  * A text area form field allowing input for large amount of texts in a multi-line fashion.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class TextAreaFormField
     extends AbstractFormField

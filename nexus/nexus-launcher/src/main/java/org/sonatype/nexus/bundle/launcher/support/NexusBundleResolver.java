@@ -22,7 +22,7 @@ import javax.inject.Named;
 /**
  * Default Nexus bundle configuration.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named
 @NexusSpecific
@@ -41,7 +41,7 @@ public class NexusBundleResolver
      * @param bundleCoordinates Maven artifact coordinates of bundle to be resolved. If injected will use the
      *                          coordinates bounded to {@link #BUNDLE_COORDINATES}
      * @param artifactResolver  artifact resolver to be used to resolve the bundle
-     * @since 1.10.0
+     * @since 2.0
      */
     @Inject
     public NexusBundleResolver( final @Nullable @Named( "${" + BUNDLE_COORDINATES + "}" ) String bundleCoordinates,

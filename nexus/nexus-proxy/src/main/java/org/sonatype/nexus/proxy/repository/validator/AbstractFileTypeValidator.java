@@ -18,7 +18,7 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
  * Helper base class for implementing {@link FileTypeValidator} components.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public abstract class AbstractFileTypeValidator
     extends AbstractLoggingComponent

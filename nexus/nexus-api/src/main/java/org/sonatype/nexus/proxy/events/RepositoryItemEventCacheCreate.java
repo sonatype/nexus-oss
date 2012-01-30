@@ -20,7 +20,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * (create).
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public class RepositoryItemEventCacheCreate
     extends RepositoryItemEventCache

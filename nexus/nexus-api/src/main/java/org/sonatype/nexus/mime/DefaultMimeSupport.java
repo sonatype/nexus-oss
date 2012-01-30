@@ -34,7 +34,7 @@ import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
  * Default implementation of {@link MimeSupport} component using MimeUtil2 library.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 @Component( role = MimeSupport.class )
 public class DefaultMimeSupport

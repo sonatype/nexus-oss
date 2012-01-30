@@ -18,7 +18,7 @@ import org.sonatype.nexus.scheduling.NexusTask;
  * Event fired when a task failed with some error.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public class NexusTaskEventStoppedFailed<T>
     extends NexusTaskEventStopped<T>

@@ -18,7 +18,7 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
  * Abstract superclass for AttributeStorage implementations.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public abstract class AbstractAttributeStorage
     extends AbstractLoggingComponent

@@ -16,7 +16,7 @@ package org.sonatype.nexus.timeline;
  * Iterable of Timeline Entries.
  *
  * @author: cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public interface Entries
     extends Iterable<Entry>

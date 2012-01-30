@@ -1335,7 +1335,7 @@ public abstract class AbstractRepository
      * 
      * @param request resource store request
      * @return true if requested path should be added to NFC
-     * @since 1.10.0
+     * @since 2.0
      */
     protected boolean shouldAddToNotFoundCache( final ResourceStoreRequest request )
     {

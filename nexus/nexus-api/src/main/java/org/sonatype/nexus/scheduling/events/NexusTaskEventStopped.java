@@ -18,7 +18,7 @@ import org.sonatype.nexus.scheduling.NexusTask;
  * Base class for events fired when a task is stopped, done (whatever the outcome is: finished, cancelled or failed).
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public abstract class NexusTaskEventStopped<T>
     extends NexusTaskEvent<T>

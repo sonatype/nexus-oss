@@ -40,7 +40,7 @@ import org.sonatype.sisu.jsw.util.JSWConfig;
 /**
  * Default Nexus bundle implementation.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named
 public class DefaultNexusBundle
@@ -91,7 +91,7 @@ public class DefaultNexusBundle
      * Constructor.
      *
      * @param jswExecFactory JSW executor factory.
-     * @since 1.10.0
+     * @since 2.0
      */
     @Inject
     public DefaultNexusBundle( final JSWExecFactory jswExecFactory,
@@ -114,7 +114,7 @@ public class DefaultNexusBundle
      * <p/>
      * {@inheritDoc}
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     @Override
     protected void configure()
@@ -156,7 +156,7 @@ public class DefaultNexusBundle
      * <p/>
      * {@inheritDoc}
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     @Override
     protected void startApplication()
@@ -179,7 +179,7 @@ public class DefaultNexusBundle
      * <p/>
      * {@inheritDoc}
      *
-     * @since 1.10.0
+     * @since 2.0
      */
     @Override
     protected void stopApplication()
@@ -201,7 +201,7 @@ public class DefaultNexusBundle
      * Checks if Nexus is alive by using REST status service.
      *
      * @return true if Nexus is alive
-     * @since 1.10.0
+     * @since 2.0
      */
     @Override
     protected boolean applicationAlive()

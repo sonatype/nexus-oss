@@ -19,7 +19,7 @@ import org.sonatype.plexus.appevents.AbstractEvent;
  * Abstract super class for task related events.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public abstract class NexusTaskEvent<T>
     extends AbstractEvent<NexusTask<T>>

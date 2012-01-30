@@ -23,7 +23,7 @@ import org.sonatype.nexus.proxy.item.ContentLocator;
  * supersedes the {@link MimeUtil} one that is completely deprecated and should be avoided.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public interface MimeSupport
 {

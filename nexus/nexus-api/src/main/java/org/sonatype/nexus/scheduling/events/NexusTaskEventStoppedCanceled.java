@@ -19,7 +19,7 @@ import org.sonatype.nexus.scheduling.NexusTask;
  * canceled and gives up the work).
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public class NexusTaskEventStoppedCanceled<T>
     extends NexusTaskEventStopped<T>

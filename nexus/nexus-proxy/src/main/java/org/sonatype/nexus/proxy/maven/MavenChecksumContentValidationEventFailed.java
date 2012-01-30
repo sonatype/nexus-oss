@@ -20,7 +20,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * Event fired when maven checksum content validation failed.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public class MavenChecksumContentValidationEventFailed
     extends RepositoryItemValidationEventFailedChecksum
