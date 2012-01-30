@@ -27,6 +27,11 @@ public interface Scheduler
     void initializeTasks();
 
     /**
+     * Shuts down the scheduler cleanly.
+     */
+    void shutdown();
+
+    /**
      * Initialize a task on bootup.
      * 
      * @param id

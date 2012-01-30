@@ -14,12 +14,13 @@ package org.sonatype.scheduling;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -28,11 +29,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
 import org.sonatype.scheduling.schedules.Schedule;
 
@@ -43,54 +42,82 @@ import org.sonatype.scheduling.schedules.Schedule;
  */
 @Component( role = Scheduler.class )
 public class DefaultScheduler
-    extends AbstractLogEnabled
-    implements Scheduler, Startable
+    implements Scheduler
 {
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
+
     @Requirement
     private TaskConfigManager taskConfig;
 
-    private PlexusThreadFactory plexusThreadFactory;
+    private final AtomicInteger idGen;
 
-    private ScheduledThreadPoolExecutor scheduledExecutorService;
+    private final ScheduledThreadPoolExecutor scheduledExecutorService;
 
-    private Map<String, List<ScheduledTask<?>>> tasksMap;
+    private final ConcurrentHashMap<String, List<ScheduledTask<?>>> tasksMap;
 
-    private AtomicInteger idGen = new AtomicInteger( 0 );
-
-    private int threadPriority = Thread.MIN_PRIORITY;
-
-    public void start()
-        throws StartingException
+    public DefaultScheduler()
     {
-        tasksMap = new HashMap<String, List<ScheduledTask<?>>>();
-
-        plexusThreadFactory = new PlexusThreadFactory( threadPriority );
-
+        idGen = new AtomicInteger( 0 );
+        tasksMap = new ConcurrentHashMap<String, List<ScheduledTask<?>>>();
         scheduledExecutorService =
-            (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, plexusThreadFactory );
+            (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, new PlexusThreadFactory(
+                Thread.MIN_PRIORITY ) );
+        scheduledExecutorService.setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
+        scheduledExecutorService.setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
     }
 
-    public void stop()
-        throws StoppingException
+    protected Logger getLogger()
     {
+        return logger;
+    }
+
+    // ==
+
+    public void initializeTasks()
+    {
+        getLogger().info( "Initializing Scheduler..." );
+
+        // this call delegates to task config manager that loads up the persisted tasks (if any)
+        // and performs a series of callbacks to this to make them "alive"
+        taskConfig.initializeTasks( this );
+
+        // wind up the "idGen" source, to the max ID we got loaded up from config (the generated IDs are persisted)
+        int maxId = 0;
+        for ( Map.Entry<String, List<ScheduledTask<?>>> entry : getAllTasks().entrySet() )
+        {
+            for ( ScheduledTask<?> task : entry.getValue() )
+            {
+                try
+                {
+                    maxId = Math.max( maxId, Integer.parseInt( task.getId() ) );
+                }
+                catch ( NumberFormatException e )
+                {
+                    // be forgiving about non number IDs
+                    // hint1: sadly, some Nexus ITs does have them
+                    // hint2: they will not clash with numbers anyway
+                }
+            }
+        }
+        idGen.set( maxId );
+    }
+
+    public void shutdown()
+    {
+        getLogger().info( "Shutting down Scheduler..." );
+
         getScheduledExecutorService().shutdown();
-
-        getScheduledExecutorService().setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
-
-        getScheduledExecutorService().setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
-
         try
         {
             boolean stopped = getScheduledExecutorService().awaitTermination( 1, TimeUnit.SECONDS );
 
             if ( !stopped )
             {
-                Map<String, List<ScheduledTask<?>>> runningTasks = getRunningTasks();
+                final Map<String, List<ScheduledTask<?>>> runningTasks = getRunningTasks();
 
-                if ( runningTasks.size() > 0 )
+                if ( !runningTasks.isEmpty() )
                 {
                     getScheduledExecutorService().shutdownNow();
-
                     getLogger().warn( "Scheduler shut down forcedly with tasks running." );
                 }
                 else
@@ -103,11 +130,6 @@ public class DefaultScheduler
         {
             getLogger().info( "Termination interrupted", e );
         }
-    }
-
-    public void initializeTasks()
-    {
-        taskConfig.initializeTasks( this );
     }
 
     @Deprecated
@@ -123,11 +145,6 @@ public class DefaultScheduler
         return taskConfig.createTaskInstance( taskType );
     }
 
-    public PlexusThreadFactory getPlexusThreadFactory()
-    {
-        return plexusThreadFactory;
-    }
-
     public ScheduledThreadPoolExecutor getScheduledExecutorService()
     {
         return scheduledExecutorService;
@@ -135,25 +152,10 @@ public class DefaultScheduler
 
     protected <T> void addToTasksMap( ScheduledTask<T> task, boolean store )
     {
-        synchronized ( tasksMap )
-        {
-            if ( !tasksMap.containsKey( task.getType() ) )
-            {
-                tasksMap.put( task.getType(), new ArrayList<ScheduledTask<?>>() );
-            }
+        tasksMap.putIfAbsent( task.getType(), new CopyOnWriteArrayList<ScheduledTask<?>>() );
+        tasksMap.get( task.getType() ).add( task );
 
-            tasksMap.get( task.getType() ).add( task );
-
-            if ( store )
-            {
-                taskConfig.addTask( task );
-            }
-        }
-    }
-
-    protected void taskRescheduled( ScheduledTask<?> task )
-    {
-        synchronized ( tasksMap )
+        if ( store )
         {
             taskConfig.addTask( task );
         }
@@ -161,56 +163,32 @@ public class DefaultScheduler
 
     protected <T> void removeFromTasksMap( ScheduledTask<T> task )
     {
-        synchronized ( tasksMap )
+        final List<ScheduledTask<?>> tasks = tasksMap.get( task.getType() );
+
+        if ( tasks != null )
         {
-            if ( tasksMap.containsKey( task.getType() ) )
-            {
-                tasksMap.get( task.getType() ).remove( task );
+            tasks.remove( task );
 
-                if ( tasksMap.get( task.getType() ).size() == 0 )
-                {
-                    tasksMap.remove( task.getType() );
-                }
-            }
-
-            taskConfig.removeTask( task );
+            // this is potentially problematic, might _remove_ concurrently added new task
+            // but, this is only here to keep map keys small, but the keys (task types) are actually
+            // rather small, so I see no point of pruning map for keys
+            // if ( tasks.size() == 0 )
+            // {
+            // tasksMap.remove( task.getType() );
+            // }
         }
+
+        taskConfig.removeTask( task );
+    }
+
+    protected void taskRescheduled( ScheduledTask<?> task )
+    {
+        taskConfig.addTask( task );
     }
 
     protected String generateId()
     {
-        synchronized ( tasksMap )
-        {
-            String id;
-
-            if ( idGen.get() == 0 )
-            {
-                ArrayList<Integer> list = new ArrayList<Integer>();
-
-                for ( List<ScheduledTask<?>> l : tasksMap.values() )
-                {
-                    for ( ScheduledTask<?> s : l )
-                    {
-                        list.add( Integer.parseInt( s.getId() ) );
-                    }
-                }
-
-                Collections.sort( list );
-
-                if ( list.size() > 0 )
-                {
-                    idGen.set( list.get( list.size() - 1 ) );
-                }
-
-                id = String.valueOf( idGen.incrementAndGet() );
-            }
-            else
-            {
-                id = String.valueOf( idGen.incrementAndGet() );
-            }
-
-            return id;
-        }
+        return String.valueOf( idGen.incrementAndGet() );
     }
 
     public <T> ScheduledTask<T> initialize( String id, String name, String type, Callable<T> callable,
@@ -249,13 +227,9 @@ public class DefaultScheduler
                                              Schedule schedule, boolean enabled, boolean store )
     {
         DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>( id, name, type, this, callable, schedule );
-
         dct.setEnabled( enabled );
-
         addToTasksMap( dct, store );
-
         dct.start();
-
         return dct;
     }
 
@@ -270,8 +244,48 @@ public class DefaultScheduler
     {
         // Simply add the task to config, will find existing by id, remove, then store new
         taskConfig.addTask( task );
-
         return task;
+    }
+
+    // ==
+
+    public Map<String, List<ScheduledTask<?>>> getAllTasks()
+    {
+        Map<String, List<ScheduledTask<?>>> result = new HashMap<String, List<ScheduledTask<?>>>( tasksMap.size() );
+
+        for ( Map.Entry<String, List<ScheduledTask<?>>> entry : tasksMap.entrySet() )
+        {
+            if ( !entry.getValue().isEmpty() )
+            {
+                result.put( entry.getKey(), new ArrayList<ScheduledTask<?>>( entry.getValue() ) );
+            }
+        }
+
+        return result;
+    }
+
+    public ScheduledTask<?> getTaskById( String id )
+        throws NoSuchTaskException
+    {
+        if ( StringUtils.isEmpty( id ) )
+        {
+            throw new IllegalArgumentException( "The Tasks cannot have null IDs!" );
+        }
+
+        final Collection<List<ScheduledTask<?>>> activeTasks = getAllTasks().values();
+
+        for ( List<ScheduledTask<?>> tasks : activeTasks )
+        {
+            for ( ScheduledTask<?> task : tasks )
+            {
+                if ( task.getId().equals( id ) )
+                {
+                    return task;
+                }
+            }
+        }
+
+        throw new NoSuchTaskException( id );
     }
 
     public Map<String, List<ScheduledTask<?>>> getActiveTasks()
@@ -284,7 +298,6 @@ public class DefaultScheduler
         for ( Iterator<String> c = result.keySet().iterator(); c.hasNext(); )
         {
             String cls = c.next();
-
             tasks = result.get( cls );
 
             for ( Iterator<ScheduledTask<?>> i = tasks.iterator(); i.hasNext(); )
@@ -309,14 +322,12 @@ public class DefaultScheduler
     public Map<String, List<ScheduledTask<?>>> getRunningTasks()
     {
         Map<String, List<ScheduledTask<?>>> result = getAllTasks();
-
         List<ScheduledTask<?>> tasks = null;
 
         // filter for RUNNING
         for ( Iterator<String> c = result.keySet().iterator(); c.hasNext(); )
         {
             String cls = c.next();
-
             tasks = result.get( cls );
 
             for ( Iterator<ScheduledTask<?>> i = tasks.iterator(); i.hasNext(); )
@@ -337,58 +348,4 @@ public class DefaultScheduler
 
         return result;
     }
-
-    public Map<String, List<ScheduledTask<?>>> getAllTasks()
-    {
-        Map<String, List<ScheduledTask<?>>> result = null;
-
-        // create a "snapshots" of active tasks
-        synchronized ( tasksMap )
-        {
-            result = new HashMap<String, List<ScheduledTask<?>>>( tasksMap.size() );
-
-            List<ScheduledTask<?>> tasks = null;
-
-            for ( String cls : tasksMap.keySet() )
-            {
-                tasks = new ArrayList<ScheduledTask<?>>();
-
-                for ( ScheduledTask<?> task : tasksMap.get( cls ) )
-                {
-                    tasks.add( task );
-                }
-
-                if ( tasks.size() > 0 )
-                {
-                    result.put( cls, tasks );
-                }
-            }
-        }
-        return result;
-    }
-
-    public ScheduledTask<?> getTaskById( String id )
-        throws NoSuchTaskException
-    {
-        if ( StringUtils.isEmpty( id ) )
-        {
-            throw new IllegalArgumentException( "The Tasks cannot have null IDs!" );
-        }
-
-        Collection<List<ScheduledTask<?>>> activeTasks = getAllTasks().values();
-
-        for ( List<ScheduledTask<?>> tasks : activeTasks )
-        {
-            for ( ScheduledTask<?> task : tasks )
-            {
-                if ( task.getId().equals( id ) )
-                {
-                    return task;
-                }
-            }
-        }
-
-        throw new NoSuchTaskException( id );
-    }
-
 }
