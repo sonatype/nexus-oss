@@ -27,26 +27,29 @@ import org.testng.annotations.Test;
 public class Nexus1089SecureProxyIT
     extends AbstractNexusProxyIntegrationTest
 {
+    protected ServletServer secureProxyServer = null;
 
     @Override
-    @BeforeMethod(alwaysRun = true)
+    @BeforeMethod( alwaysRun = true )
     public void startProxy()
         throws Exception
     {
-        ServletServer server = lookup( ServletServer.class, "secure" );
-        server.start();
+        secureProxyServer = lookup( ServletServer.class, "secure" );
+        secureProxyServer.start();
     }
 
     @Override
-    @AfterMethod(alwaysRun = true)
+    @AfterMethod( alwaysRun = true )
     public void stopProxy()
         throws Exception
     {
-        ServletServer server = lookup( ServletServer.class, "secure" );
-        server.stop();
+        if ( secureProxyServer != null )
+        {
+            secureProxyServer.stop();
+        }
     }
 
-    @Test(groups = PROXY)
+    @Test( groups = PROXY )
     public void downloadArtifact()
         throws Exception
     {
