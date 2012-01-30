@@ -524,6 +524,8 @@ public class DefaultNexus
 
         // Due to no dependency mechanism in NX for components, we need to fire off a hint about shutdown first
         applicationEventMulticaster.notifyEventListeners( new NexusStoppingEvent( this ) );
+        
+        nexusScheduler.shutdown();
 
         applicationEventMulticaster.notifyEventListeners( new NexusStoppedEvent( this ) );
 

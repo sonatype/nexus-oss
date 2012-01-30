@@ -20,10 +20,24 @@ import org.sonatype.scheduling.NoSuchTaskException;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.schedules.Schedule;
 
+/**
+ * Scheduler component of Nexus, responsible for task management (their schedule, running, and configuration
+ * persistence).
+ * 
+ * @author cstamas
+ */
 public interface NexusScheduler
 {
+    /**
+     * Initializes Nexus scheduler, but loading up tasks from persisted configuration and instantiating them.
+     */
     void initializeTasks();
-    
+
+    /**
+     * Performs a clean shutdown of the Nexus Scheduler.
+     */
+    void shutdown();
+
     /**
      * Issue a NexusTask for immediate execution, but have a control over it.
      * 
@@ -32,8 +46,7 @@ public interface NexusScheduler
      * @return
      */
     <T> ScheduledTask<T> submit( String name, NexusTask<T> nexusTask )
-        throws RejectedExecutionException,
-            NullPointerException;
+        throws RejectedExecutionException, NullPointerException;
 
     /**
      * Issue a NexusTask for scheduled execution.
@@ -44,8 +57,7 @@ public interface NexusScheduler
      * @return
      */
     <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
-        throws RejectedExecutionException,
-            NullPointerException;
+        throws RejectedExecutionException, NullPointerException;
 
     /**
      * Update parameters of a scheduled task
@@ -54,8 +66,7 @@ public interface NexusScheduler
      * @return
      */
     <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
-        throws RejectedExecutionException,
-            NullPointerException;
+        throws RejectedExecutionException, NullPointerException;
 
     /**
      * Returns the map of currently active tasks. The resturned collection is an unmodifiable snapshot. It may differ
@@ -90,6 +101,7 @@ public interface NexusScheduler
      * @throws IllegalArgumentException
      * @deprecated prefer the createTaskInstance(Class<T> type) method instead.
      */
+    @Deprecated
     NexusTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException;
 

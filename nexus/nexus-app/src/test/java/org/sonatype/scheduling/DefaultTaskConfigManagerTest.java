@@ -22,7 +22,7 @@ import java.util.concurrent.Callable;
 
 import org.junit.Test;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
@@ -38,7 +38,7 @@ public class DefaultTaskConfigManagerTest
 
     private DefaultTaskConfigManager defaultManager;
 
-    private ApplicationConfiguration applicationConfiguration;
+    private NexusConfiguration applicationConfiguration;
 
     private static final String PROPERTY_KEY_START_DATE = "startDate";
 
@@ -78,10 +78,9 @@ public class DefaultTaskConfigManagerTest
         super.setUp();
 
         defaultScheduler = (DefaultScheduler) lookup( Scheduler.class.getName() );
-
         defaultManager = (DefaultTaskConfigManager) lookup( TaskConfigManager.class.getName() );
-
-        applicationConfiguration = (ApplicationConfiguration) lookup( ApplicationConfiguration.class );
+        applicationConfiguration = lookup( NexusConfiguration.class );
+        applicationConfiguration.loadConfiguration();
     }
 
     @Test
