@@ -16,6 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -112,6 +113,23 @@ public abstract class AbstractRemoteRepositoryStorage
             if ( !repositoryContexts.containsKey( repository.getId() )
                 || ctx.getLastChanged() > repositoryContexts.get( repository.getId() ) )
             {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    if ( !repositoryContexts.containsKey( repository.getId() ) )
+                    {
+                        getLogger().debug( "Remote context {} is about to be initialized", ctx );
+                    }
+                    else
+                    {
+                        getLogger().debug( "Remote context {} has been changed at {}. Previous change {}",
+                                           new Object[]{
+                                               ctx,
+                                               new Date( ctx.getLastChanged() ),
+                                               new Date( repositoryContexts.get( repository.getId() ) )
+                                           }
+                        );
+                    }
+                }
                 updateContext( repository, ctx );
                 repositoryContexts.put( repository.getId(), ctx.getLastChanged() );
             }
