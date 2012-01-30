@@ -62,6 +62,8 @@ public class DefaultScheduler
         scheduledExecutorService =
             (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool( 20, new PlexusThreadFactory(
                 Thread.MIN_PRIORITY ) );
+        scheduledExecutorService.setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
+        scheduledExecutorService.setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
     }
 
     protected Logger getLogger()
@@ -105,16 +107,13 @@ public class DefaultScheduler
         getLogger().info( "Shutting down Scheduler..." );
 
         getScheduledExecutorService().shutdown();
-        getScheduledExecutorService().setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
-        getScheduledExecutorService().setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
-
         try
         {
             boolean stopped = getScheduledExecutorService().awaitTermination( 1, TimeUnit.SECONDS );
 
             if ( !stopped )
             {
-                Map<String, List<ScheduledTask<?>>> runningTasks = getRunningTasks();
+                final Map<String, List<ScheduledTask<?>>> runningTasks = getRunningTasks();
 
                 if ( !runningTasks.isEmpty() )
                 {
