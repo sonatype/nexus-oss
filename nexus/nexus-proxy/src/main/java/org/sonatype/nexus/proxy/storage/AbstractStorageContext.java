@@ -14,12 +14,15 @@ package org.sonatype.nexus.proxy.storage;
 
 import java.util.HashMap;
 
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
+
 /**
  * The abstract storage context.
  * 
  * @author cstamas
  */
 public abstract class AbstractStorageContext
+    extends AbstractLoggingComponent
     implements StorageContext
 {
     private final HashMap<String, Object> context = new HashMap<String, Object>();
@@ -83,20 +86,29 @@ public abstract class AbstractStorageContext
 
     public void putContextObject( String key, Object value )
     {
-        context.put( key, value );
+        final Object previous = context.put( key, value );
 
         setLastChanged( System.currentTimeMillis() );
+        getLogger().debug( "Context entry '{}' updated: {} -> {}", new Object[]{ key, previous, value } );
     }
 
     public void removeContextObject( String key )
     {
-        context.remove( key );
+        final Object removed = context.remove( key );
 
         setLastChanged( System.currentTimeMillis() );
+        getLogger().debug( "Context entry '{}' removed. Existent value: ", key, removed );
     }
 
     public boolean hasContextObject( String key )
     {
         return context.containsKey( key );
     }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getName() + "{lastChanged=" + lastChanged + ", parent=" + parent + "}";
+    }
+
 }
