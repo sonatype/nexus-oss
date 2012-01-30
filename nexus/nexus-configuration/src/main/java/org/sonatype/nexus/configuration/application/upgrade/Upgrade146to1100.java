@@ -84,6 +84,14 @@ public class Upgrade146to1100
             public CRepository upgradeCRepository( org.sonatype.nexus.configuration.model.v1_4_6.CRepository cRepository )
             {
                 CRepository newRepo = super.upgradeCRepository( cRepository );
+
+                // shut down NFC on any non-proxy repository
+                final boolean isProxyRepository =
+                    cRepository.isNotFoundCacheActive() &&
+                    newRepo.getRemoteStorage() != null &&
+                    newRepo.getRemoteStorage().getUrl() != null;
+                newRepo.setNotFoundCacheActive( isProxyRepository );
+
                 Xpp3Dom dom = (Xpp3Dom) cRepository.getExternalConfiguration();
                 if ( cRepository.getRemoteStorage() != null && dom != null )
                 {
@@ -113,17 +121,10 @@ public class Upgrade146to1100
             newc.setNotification( notification );
         }
 
-        // conservatively shut down NFC on any non-proxy repository
-        for ( CRepository repository : newc.getRepositories() )
-        {
-            final boolean isProxyRepository =
-                repository.getRemoteStorage() != null && repository.getRemoteStorage().getUrl() != null;
-            repository.setNotFoundCacheActive( isProxyRepository );
-        }
+
 
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
-
 }
