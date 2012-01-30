@@ -10,7 +10,7 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.eventbus.internal;
+package org.sonatype.nexus.plugins.capabilities.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -18,15 +18,15 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import org.sonatype.plexus.appevents.Event;
 
 /**
- * Listens to Nexus events and forwards them to {@link NexusEventBus}.
+ * Listens to Nexus events and forwards them to {@link EventBus}.
  * <p/>
- * It also registers all {@link NexusEventBus.LoadOnStart} marked handlers.
+ * It also registers all {@link EventBus.LoadOnStart} marked handlers.
  *
  * @since 2.0
  */
@@ -35,13 +35,13 @@ public class NexusEventsForwarderEventInspector
     implements EventInspector
 {
 
-    private final NexusEventBus eventBus;
+    private final EventBus eventBus;
 
-    private final List<NexusEventBus.LoadOnStart> handlers;
+    private final List<EventBus.LoadOnStart> handlers;
 
     @Inject
-    public NexusEventsForwarderEventInspector( final NexusEventBus eventBus,
-                                               final List<NexusEventBus.LoadOnStart> handlers )
+    public NexusEventsForwarderEventInspector( final EventBus eventBus,
+                                               final List<EventBus.LoadOnStart> handlers )
     {
         this.eventBus = checkNotNull( eventBus );
         this.handlers = checkNotNull( handlers );
@@ -60,7 +60,7 @@ public class NexusEventsForwarderEventInspector
         }
         if ( evt instanceof NexusInitializedEvent )
         {
-            for ( final NexusEventBus.LoadOnStart handler : checkNotNull( handlers ) )
+            for ( final EventBus.LoadOnStart handler : checkNotNull( handlers ) )
             {
                 eventBus.register( handler );
             }

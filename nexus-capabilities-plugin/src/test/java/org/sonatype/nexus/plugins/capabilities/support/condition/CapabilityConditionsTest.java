@@ -21,7 +21,7 @@ import static org.sonatype.nexus.plugins.capabilities.CapabilityType.capabilityT
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.Condition;
@@ -42,7 +42,7 @@ public class CapabilityConditionsTest
     @Before
     public void setUp()
     {
-        final NexusEventBus eventBus = mock( NexusEventBus.class );
+        final EventBus eventBus = mock( EventBus.class );
         final CapabilityDescriptorRegistry descriptorRegistry = mock( CapabilityDescriptorRegistry.class );
         final CapabilityRegistry capabilityRegistry = mock( CapabilityRegistry.class );
         underTest = new CapabilityConditions( eventBus, descriptorRegistry, capabilityRegistry );

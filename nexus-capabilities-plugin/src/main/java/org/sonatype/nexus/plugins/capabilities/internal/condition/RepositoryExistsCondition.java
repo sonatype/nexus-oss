@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
@@ -28,7 +28,7 @@ public class RepositoryExistsCondition
     extends RepositoryConditionSupport
 {
 
-    public RepositoryExistsCondition( final NexusEventBus eventBus,
+    public RepositoryExistsCondition( final EventBus eventBus,
                                       final RepositoryRegistry repositoryRegistry,
                                       final RepositoryConditions.RepositoryId repositoryId )
     {

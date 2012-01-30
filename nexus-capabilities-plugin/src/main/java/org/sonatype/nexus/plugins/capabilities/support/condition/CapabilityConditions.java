@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
@@ -40,12 +40,12 @@ public class CapabilityConditions
 
     private final CapabilityRegistry capabilityRegistry;
 
-    private final NexusEventBus eventBus;
+    private final EventBus eventBus;
 
     private final CapabilityDescriptorRegistry descriptorRegistry;
 
     @Inject
-    public CapabilityConditions( final NexusEventBus eventBus,
+    public CapabilityConditions( final EventBus eventBus,
                                  final CapabilityDescriptorRegistry descriptorRegistry,
                                  final CapabilityRegistry capabilityRegistry )
     {

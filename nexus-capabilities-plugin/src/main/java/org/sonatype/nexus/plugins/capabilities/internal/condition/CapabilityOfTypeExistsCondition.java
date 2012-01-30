@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
@@ -43,7 +43,7 @@ public class CapabilityOfTypeExistsCondition
 
     final String typeName;
 
-    public CapabilityOfTypeExistsCondition( final NexusEventBus eventBus,
+    public CapabilityOfTypeExistsCondition( final EventBus eventBus,
                                             final CapabilityDescriptorRegistry descriptorRegistry,
                                             final CapabilityRegistry capabilityRegistry,
                                             final CapabilityType type )

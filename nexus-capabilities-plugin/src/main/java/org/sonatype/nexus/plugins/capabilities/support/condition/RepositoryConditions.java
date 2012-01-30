@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.RepositoryExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.RepositoryLocalStatusCondition;
@@ -37,12 +37,12 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 public class RepositoryConditions
 {
 
-    private final NexusEventBus eventBus;
+    private final EventBus eventBus;
 
     private final RepositoryRegistry repositoryRegistry;
 
     @Inject
-    public RepositoryConditions( final NexusEventBus eventBus,
+    public RepositoryConditions( final EventBus eventBus,
                                  final RepositoryRegistry repositoryRegistry )
     {
         this.eventBus = checkNotNull( eventBus );

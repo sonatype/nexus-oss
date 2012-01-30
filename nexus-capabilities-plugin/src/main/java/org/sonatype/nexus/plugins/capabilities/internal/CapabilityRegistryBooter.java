@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.proxy.events.NexusInitializedEvent;
 import com.google.common.eventbus.Subscribe;
 
@@ -30,7 +30,7 @@ import com.google.common.eventbus.Subscribe;
 @Named
 @Singleton
 public class CapabilityRegistryBooter
-    implements NexusEventBus.LoadOnStart
+    implements EventBus.LoadOnStart
 {
 
     private final DefaultCapabilityRegistry capabilityRegistry;

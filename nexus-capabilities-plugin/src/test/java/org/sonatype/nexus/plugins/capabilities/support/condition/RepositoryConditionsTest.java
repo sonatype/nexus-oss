@@ -19,7 +19,7 @@ import static org.mockito.Mockito.mock;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.RepositoryExistsCondition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.RepositoryLocalStatusCondition;
@@ -39,7 +39,7 @@ public class RepositoryConditionsTest
     @Before
     public void setUp()
     {
-        final NexusEventBus eventBus = mock( NexusEventBus.class );
+        final EventBus eventBus = mock( EventBus.class );
         underTest = new RepositoryConditions( eventBus, mock( RepositoryRegistry.class ) );
     }
 

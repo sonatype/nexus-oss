@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -38,7 +38,7 @@ public abstract class RepositoryConditionSupport
 
     private final ReentrantReadWriteLock bindLock;
 
-    public RepositoryConditionSupport( final NexusEventBus eventBus,
+    public RepositoryConditionSupport( final EventBus eventBus,
                                        final RepositoryRegistry repositoryRegistry,
                                        final RepositoryConditions.RepositoryId repositoryId )
     {

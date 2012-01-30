@@ -18,8 +18,8 @@ import static org.hamcrest.Matchers.is;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.eventbus.NexusEventBus;
-import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
+import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 
 /**
  * {@link ConditionSupport} UTs.
@@ -27,7 +27,7 @@ import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
  * @since 2.0
  */
 public class ConditionTestSupport
-    extends NexusEventBusTestSupport
+    extends EventBusTestSupport
 {
 
     private TestCondition underTest;
@@ -138,7 +138,7 @@ public class ConditionTestSupport
         extends ConditionSupport
     {
 
-        public TestCondition( final NexusEventBus eventBus )
+        public TestCondition( final EventBus eventBus )
         {
             super( eventBus );
         }

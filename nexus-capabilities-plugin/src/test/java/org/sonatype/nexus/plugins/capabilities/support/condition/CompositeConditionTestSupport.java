@@ -20,10 +20,10 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
-import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
+import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 
 /**
  * {@link CompositeConditionSupport} UTs.
@@ -31,7 +31,7 @@ import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
  * @since 2.0
  */
 public class CompositeConditionTestSupport
-    extends NexusEventBusTestSupport
+    extends EventBusTestSupport
 {
 
     private Condition c1;
@@ -153,7 +153,7 @@ public class CompositeConditionTestSupport
         extends CompositeConditionSupport
     {
 
-        public TestCondition( final NexusEventBus eventBus,
+        public TestCondition( final EventBus eventBus,
                               final Condition... conditions )
         {
             super( eventBus, conditions );

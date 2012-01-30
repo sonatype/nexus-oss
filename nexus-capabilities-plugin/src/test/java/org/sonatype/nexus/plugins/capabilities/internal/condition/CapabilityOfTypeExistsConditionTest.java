@@ -32,7 +32,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityType;
-import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
+import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.internal.DefaultCapabilityReference;
 
 /**
@@ -41,7 +41,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.DefaultCapabilityReferen
  * @since 2.0
  */
 public class CapabilityOfTypeExistsConditionTest
-    extends NexusEventBusTestSupport
+    extends EventBusTestSupport
 {
 
     private CapabilityReference ref1;

@@ -28,24 +28,24 @@ import org.hamcrest.Matcher;
 import org.mockito.ArgumentMatcher;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 
 /**
  * Support for tests using event bus.
  *
  * @since 2.0
  */
-public class NexusEventBusTestSupport
+public class EventBusTestSupport
 {
 
-    protected NexusEventBus eventBus;
+    protected EventBus eventBus;
 
     protected List<Object> eventBusEvents;
 
     public void setUp()
         throws Exception
     {
-        eventBus = mock( NexusEventBus.class );
+        eventBus = mock( EventBus.class );
         eventBusEvents = new ArrayList<Object>();
 
         doAnswer( new Answer<Object>()

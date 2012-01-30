@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityContext;
@@ -55,7 +55,7 @@ public class DefaultCapabilityReference
 
     private final CapabilityRegistry capabilityRegistry;
 
-    private final NexusEventBus eventBus;
+    private final EventBus eventBus;
 
     private final ActivationConditionHandler activationHandler;
 
@@ -70,7 +70,7 @@ public class DefaultCapabilityReference
     private Exception lastException;
 
     DefaultCapabilityReference( final CapabilityRegistry capabilityRegistry,
-                                final NexusEventBus eventBus,
+                                final EventBus eventBus,
                                 final ActivationConditionHandlerFactory activationListenerFactory,
                                 final ValidityConditionHandlerFactory validityConditionHandlerFactory,
                                 final CapabilityIdentity id,

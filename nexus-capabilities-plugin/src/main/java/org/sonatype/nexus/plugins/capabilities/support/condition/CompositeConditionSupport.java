@@ -15,7 +15,7 @@ package org.sonatype.nexus.plugins.capabilities.support.condition;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
 import com.google.common.eventbus.Subscribe;
@@ -31,7 +31,7 @@ public abstract class CompositeConditionSupport
 
     private final Condition[] conditions;
 
-    public CompositeConditionSupport( final NexusEventBus eventBus,
+    public CompositeConditionSupport( final EventBus eventBus,
                                       final Condition... conditions )
     {
         super( eventBus, false );
@@ -39,7 +39,7 @@ public abstract class CompositeConditionSupport
         checkArgument( conditions.length > 1, "A composite mush have at least 2 conditions" );
     }
 
-    public CompositeConditionSupport( final NexusEventBus eventBus,
+    public CompositeConditionSupport( final EventBus eventBus,
                                       final Condition condition )
     {
         super( eventBus, false );

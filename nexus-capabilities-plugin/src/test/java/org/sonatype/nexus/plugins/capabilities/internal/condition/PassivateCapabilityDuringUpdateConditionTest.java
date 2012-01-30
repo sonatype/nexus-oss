@@ -24,7 +24,7 @@ import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
-import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
+import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 
 /**
  * {@link PassivateCapabilityDuringUpdateCondition} UTs.
@@ -32,7 +32,7 @@ import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
  * @since 2.0
  */
 public class PassivateCapabilityDuringUpdateConditionTest
-    extends NexusEventBusTestSupport
+    extends EventBusTestSupport
 {
 
     private CapabilityReference reference;

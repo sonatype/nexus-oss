@@ -14,7 +14,7 @@ package org.sonatype.nexus.plugins.capabilities.support.condition;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
@@ -29,25 +29,25 @@ public abstract class ConditionSupport
     implements Condition
 {
 
-    private final NexusEventBus eventBus;
+    private final EventBus eventBus;
 
     private boolean satisfied;
 
     private boolean active;
 
-    protected ConditionSupport( final NexusEventBus eventBus )
+    protected ConditionSupport( final EventBus eventBus )
     {
         this( eventBus, false );
     }
 
-    protected ConditionSupport( final NexusEventBus eventBus, final boolean satisfied )
+    protected ConditionSupport( final EventBus eventBus, final boolean satisfied )
     {
         this.eventBus = checkNotNull( eventBus );
         this.satisfied = satisfied;
         active = false;
     }
 
-    public NexusEventBus getEventBus()
+    public EventBus getEventBus()
     {
         return eventBus;
     }

@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.ConditionEvent;
-import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
+import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 
 /**
  * {@link LogicalConditions} UTs.
@@ -29,7 +29,7 @@ import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
  * @since 2.0
  */
 public class LogicalConditionsTest
-    extends NexusEventBusTestSupport
+    extends EventBusTestSupport
 {
 
     static final boolean UNSATISFIED = false;

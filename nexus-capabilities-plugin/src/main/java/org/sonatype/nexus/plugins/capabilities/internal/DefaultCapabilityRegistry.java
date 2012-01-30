@@ -32,7 +32,7 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.ConfigurationIdGenerator;
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
@@ -75,7 +75,7 @@ public class DefaultCapabilityRegistry
 
     private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
 
-    private final NexusEventBus eventBus;
+    private final EventBus eventBus;
 
     private final ActivationConditionHandlerFactory activationConditionHandlerFactory;
 
@@ -91,7 +91,7 @@ public class DefaultCapabilityRegistry
                                final Provider<ValidatorRegistry> validatorRegistryProvider,
                                final CapabilityFactoryRegistry capabilityFactoryRegistry,
                                final CapabilityDescriptorRegistry capabilityDescriptorRegistry,
-                               final NexusEventBus eventBus,
+                               final EventBus eventBus,
                                final ActivationConditionHandlerFactory activationConditionHandlerFactory,
                                final ValidityConditionHandlerFactory validityConditionHandlerFactory )
     {

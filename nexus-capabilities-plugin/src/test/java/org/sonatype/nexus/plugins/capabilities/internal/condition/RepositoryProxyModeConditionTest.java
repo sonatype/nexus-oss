@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
+import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -36,7 +36,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryKind;
  * @since 2.0
  */
 public class RepositoryProxyModeConditionTest
-    extends NexusEventBusTestSupport
+    extends EventBusTestSupport
 {
 
     static final String TEST_REPOSITORY = "test-repository";

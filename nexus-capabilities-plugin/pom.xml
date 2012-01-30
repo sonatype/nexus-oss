@@ -72,6 +72,11 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu.goodies</groupId>
+      <artifactId>goodies-eventbus</artifactId>
+      <version>1.2-SNAPSHOT</version>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -134,6 +139,11 @@
             <version>1.5</version>
           </dependency>
         </dependencies>
+        <configuration>
+          <componentDependencies>
+            <componentDependency>org.sonatype.sisu.goodies:goodies-eventbus</componentDependency>
+          </componentDependencies>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.modello</groupId>

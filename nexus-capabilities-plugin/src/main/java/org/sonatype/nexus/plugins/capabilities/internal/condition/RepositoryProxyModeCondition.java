@@ -14,7 +14,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -35,7 +35,7 @@ public class RepositoryProxyModeCondition
 
     private final ProxyMode proxyMode;
 
-    public RepositoryProxyModeCondition( final NexusEventBus eventBus,
+    public RepositoryProxyModeCondition( final EventBus eventBus,
                                          final RepositoryRegistry repositoryRegistry,
                                          final ProxyMode proxyMode,
                                          final RepositoryConditions.RepositoryId repositoryId )

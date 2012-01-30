@@ -14,7 +14,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityIdentity;
 import org.sonatype.nexus.plugins.capabilities.support.condition.ConditionSupport;
@@ -32,7 +32,7 @@ public class PassivateCapabilityDuringUpdateCondition
 
     private final CapabilityIdentity id;
 
-    public PassivateCapabilityDuringUpdateCondition( final NexusEventBus eventBus,
+    public PassivateCapabilityDuringUpdateCondition( final EventBus eventBus,
                                                      final CapabilityIdentity id )
     {
         super( eventBus, true );

@@ -14,7 +14,7 @@ package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
@@ -35,7 +35,7 @@ public class RepositoryLocalStatusCondition
 
     private final LocalStatus localStatus;
 
-    public RepositoryLocalStatusCondition( final NexusEventBus eventBus,
+    public RepositoryLocalStatusCondition( final EventBus eventBus,
                                            final RepositoryRegistry repositoryRegistry,
                                            final LocalStatus localStatus,
                                            final RepositoryConditions.RepositoryId repositoryId )

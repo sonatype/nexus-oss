@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.condition.CompositeConditionSupport;
 
@@ -28,7 +28,7 @@ public class InversionCondition
 
     private final Condition condition;
 
-    public InversionCondition( final NexusEventBus eventBus,
+    public InversionCondition( final EventBus eventBus,
                                final Condition condition )
     {
         super( eventBus, condition );

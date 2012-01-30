@@ -41,7 +41,7 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonatype.nexus.configuration.DefaultConfigurationIdGenerator;
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
@@ -65,7 +65,7 @@ public class DefaultCapabilityRegistryTest
 
     static final CapabilityType CAPABILITY_TYPE = capabilityType( "test" );
 
-    private NexusEventBus eventBus;
+    private EventBus eventBus;
 
     private DefaultCapabilityRegistry underTest;
 
@@ -102,7 +102,7 @@ public class DefaultCapabilityRegistryTest
         capabilityDescriptorRegistry = mock( CapabilityDescriptorRegistry.class );
         when( capabilityDescriptorRegistry.get( CAPABILITY_TYPE ) ).thenReturn( mock( CapabilityDescriptor.class ) );
 
-        eventBus = mock( NexusEventBus.class );
+        eventBus = mock( EventBus.class );
 
         final ActivationConditionHandlerFactory achf = mock( ActivationConditionHandlerFactory.class );
         when( achf.create( Mockito.<DefaultCapabilityReference>any() ) ).thenReturn(

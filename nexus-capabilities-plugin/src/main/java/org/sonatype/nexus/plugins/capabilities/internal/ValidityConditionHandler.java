@@ -16,7 +16,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.inject.Inject;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityRegistry;
 import org.sonatype.nexus.plugins.capabilities.Condition;
@@ -35,7 +35,7 @@ public class ValidityConditionHandler
     extends AbstractLoggingComponent
 {
 
-    private final NexusEventBus eventBus;
+    private final EventBus eventBus;
 
     private final DefaultCapabilityReference reference;
 
@@ -48,7 +48,7 @@ public class ValidityConditionHandler
     private Condition validityCondition;
 
     @Inject
-    ValidityConditionHandler( final NexusEventBus eventBus,
+    ValidityConditionHandler( final EventBus eventBus,
                               final CapabilityRegistry capabilityRegistry,
                               final Conditions conditions,
                               final @Assisted DefaultCapabilityReference reference )

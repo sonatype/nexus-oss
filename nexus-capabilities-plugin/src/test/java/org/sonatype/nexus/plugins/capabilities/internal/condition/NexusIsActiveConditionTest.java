@@ -18,7 +18,7 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sonatype.nexus.plugins.capabilities.NexusEventBusTestSupport;
+import org.sonatype.nexus.plugins.capabilities.EventBusTestSupport;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 
@@ -28,7 +28,7 @@ import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
  * @since 2.0
  */
 public class NexusIsActiveConditionTest
-    extends NexusEventBusTestSupport
+    extends EventBusTestSupport
 {
 
     private NexusIsActiveCondition underTest;

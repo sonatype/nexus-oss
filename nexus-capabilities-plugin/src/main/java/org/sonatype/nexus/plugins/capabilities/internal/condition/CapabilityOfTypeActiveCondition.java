@@ -12,7 +12,7 @@
  */
 package org.sonatype.nexus.plugins.capabilities.internal.condition;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptorRegistry;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
 import org.sonatype.nexus.plugins.capabilities.CapabilityReference;
@@ -29,7 +29,7 @@ public class CapabilityOfTypeActiveCondition
     extends CapabilityOfTypeExistsCondition
 {
 
-    public CapabilityOfTypeActiveCondition( final NexusEventBus eventBus,
+    public CapabilityOfTypeActiveCondition( final EventBus eventBus,
                                             final CapabilityDescriptorRegistry descriptorRegistry,
                                             final CapabilityRegistry capabilityRegistry,
                                             final CapabilityType type )

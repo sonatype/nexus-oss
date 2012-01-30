@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.internal.condition.InversionCondition;
 
@@ -32,10 +32,10 @@ import org.sonatype.nexus.plugins.capabilities.internal.condition.InversionCondi
 public class LogicalConditions
 {
 
-    private final NexusEventBus eventBus;
+    private final EventBus eventBus;
 
     @Inject
-    public LogicalConditions( final NexusEventBus eventBus )
+    public LogicalConditions( final EventBus eventBus )
     {
         this.eventBus = checkNotNull( eventBus );
     }
@@ -85,7 +85,7 @@ public class LogicalConditions
 
         private Condition lastNotSatisfied;
 
-        public ConjunctionCondition( final NexusEventBus eventBus,
+        public ConjunctionCondition( final EventBus eventBus,
                                      final Condition... conditions )
         {
             super( eventBus, conditions );
@@ -168,7 +168,7 @@ public class LogicalConditions
 
         private Condition lastSatisfied;
 
-        public DisjunctionCondition( final NexusEventBus eventBus,
+        public DisjunctionCondition( final EventBus eventBus,
                                      final Condition... conditions )
         {
             super( eventBus, conditions );

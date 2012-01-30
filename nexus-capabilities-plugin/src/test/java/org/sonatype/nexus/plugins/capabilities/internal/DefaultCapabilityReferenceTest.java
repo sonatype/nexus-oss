@@ -36,7 +36,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.sonatype.nexus.eventbus.NexusEventBus;
+import org.sonatype.sisu.goodies.eventbus.EventBus;
 import org.sonatype.nexus.plugins.capabilities.Capability;
 import org.sonatype.nexus.plugins.capabilities.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.CapabilityEvent;
@@ -62,7 +62,7 @@ public class DefaultCapabilityReferenceTest
 
     private DefaultCapabilityReference underTest;
 
-    private NexusEventBus eventBus;
+    private EventBus eventBus;
 
     private Condition activationCondition;
 
@@ -83,7 +83,7 @@ public class DefaultCapabilityReferenceTest
     @Before
     public void setUp()
     {
-        eventBus = mock( NexusEventBus.class );
+        eventBus = mock( EventBus.class );
         capabilityRegistry = mock( CapabilityRegistry.class );
 
         final Conditions conditions = mock( Conditions.class );
