@@ -1771,7 +1771,7 @@ public abstract class AbstractProxyRepository
     /**
      * Beside original behavior, only add to NFC when we are not in BLOCKED mode.
      * 
-     * @since 1.10.0
+     * @since 2.0
      */
     @Override
     protected boolean shouldAddToNotFoundCache( final ResourceStoreRequest request )

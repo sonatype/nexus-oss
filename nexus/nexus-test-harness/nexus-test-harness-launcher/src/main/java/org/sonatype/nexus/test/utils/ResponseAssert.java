@@ -23,7 +23,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
  * @see Response
  * @see NexusRequestMatchers
  * @see ResponseMatchers
- * @since 1.10.0
+ * @since 2.0
  *
  */
 public class ResponseAssert

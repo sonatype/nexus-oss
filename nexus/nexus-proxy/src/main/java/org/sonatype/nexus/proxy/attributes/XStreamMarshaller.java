@@ -29,7 +29,7 @@ import com.thoughtworks.xstream.converters.collections.MapConverter;
  * The Nexus default marshaller: uses XStream to marshall complete StorageItem instances as XML.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 @Singleton
 @Named( "xstream-xml" )

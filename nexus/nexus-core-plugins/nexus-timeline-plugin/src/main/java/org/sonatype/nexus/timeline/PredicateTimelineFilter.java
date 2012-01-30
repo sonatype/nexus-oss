@@ -21,7 +21,7 @@ import com.google.common.base.Predicate;
  * Wrapping predicate into TimelineFilter.
  *
  * @author: cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public class PredicateTimelineFilter
     implements TimelineFilter

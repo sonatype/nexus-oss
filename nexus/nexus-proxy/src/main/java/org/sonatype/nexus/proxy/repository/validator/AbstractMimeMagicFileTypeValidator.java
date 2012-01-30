@@ -27,7 +27,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
  * item and the set of "expectations". If the set has intersection, file is claimed valid, otherwise invalid.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public abstract class AbstractMimeMagicFileTypeValidator
     extends AbstractFileTypeValidator

@@ -50,7 +50,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 /**
  * Utilities related to HTTP client.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 class HttpClientUtil
 {

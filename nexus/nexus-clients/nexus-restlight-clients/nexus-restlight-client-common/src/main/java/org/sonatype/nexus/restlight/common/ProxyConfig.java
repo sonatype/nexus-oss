@@ -18,7 +18,7 @@ package org.sonatype.nexus.restlight.common;
  * A port value of -1 is equivalent to an unspecified port.
  *
  * @since 1.9.2.3
- * @since 1.10.0
+ * @since 2.0
  */
 public class ProxyConfig {
     private final String host;

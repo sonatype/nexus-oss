@@ -19,7 +19,7 @@ import org.sonatype.plexus.appevents.AbstractEvent;
  * information ("who").
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public abstract class AbstractSecurityEvent
     extends AbstractEvent<Object>

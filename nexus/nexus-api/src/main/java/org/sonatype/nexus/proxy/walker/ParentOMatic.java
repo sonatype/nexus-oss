@@ -48,7 +48,7 @@ import com.google.common.collect.Lists;
  * This class makes use of {@link Node} to implement the tree hierarchy.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public class ParentOMatic
 {

@@ -20,7 +20,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * got differs, Maven uses .sha1 files but alternatives are possible too).
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public class RepositoryItemValidationEventFailedChecksum
     extends RepositoryItemValidationEventFailed

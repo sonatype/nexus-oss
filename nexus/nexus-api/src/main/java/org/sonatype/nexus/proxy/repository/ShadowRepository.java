@@ -94,7 +94,7 @@ public interface ShadowRepository
      * care what repository is the origin of the event, and simply discard event if not interested in it.
      * 
      * @param evt
-     * @since 1.10.0
+     * @since 2.0
      */
     void onRepositoryItemEvent( RepositoryItemEvent evt );
 }

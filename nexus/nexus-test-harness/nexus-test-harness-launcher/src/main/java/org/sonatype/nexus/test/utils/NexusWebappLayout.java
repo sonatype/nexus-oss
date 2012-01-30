@@ -24,7 +24,7 @@ import org.codehaus.plexus.util.FileUtils;
  * Static members representing paths should not begin with slash. All path separators in String paths are
  * forward-slashes.
  *
- * @since 1.10.0
+ * @since 2.0
  * @author plynch
  */
 public class NexusWebappLayout

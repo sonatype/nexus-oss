@@ -38,7 +38,7 @@ import com.google.common.base.Predicate;
  * many important and key dependencies in core too, and making Nexus Core literally a hostage of it.
  *
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 @Component( role = NexusTimeline.class )
 public class DefaultNexusTimeline

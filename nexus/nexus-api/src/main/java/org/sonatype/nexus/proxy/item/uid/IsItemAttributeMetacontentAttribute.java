@@ -19,7 +19,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
  * not holding data serving the basic purpose of this given repository.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public class IsItemAttributeMetacontentAttribute
     implements Attribute<Boolean>

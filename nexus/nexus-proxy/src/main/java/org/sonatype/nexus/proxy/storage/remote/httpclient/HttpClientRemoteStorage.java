@@ -59,7 +59,7 @@ import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 /**
  * Apache HTTP client (4) {@link RemoteRepositoryStorage} implementation.
  *
- * @since 1.10.0
+ * @since 2.0
  */
 @Named( HttpClientRemoteStorage.PROVIDER_STRING )
 @Singleton

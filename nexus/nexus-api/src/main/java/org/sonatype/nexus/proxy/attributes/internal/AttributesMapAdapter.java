@@ -28,7 +28,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  * methods will fail.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public class AttributesMapAdapter
     implements Map<String, String>

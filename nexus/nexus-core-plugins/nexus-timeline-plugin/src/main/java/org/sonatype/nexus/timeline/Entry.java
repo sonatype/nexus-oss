@@ -18,7 +18,7 @@ import java.util.Map;
  * Timeline entry.
  *
  * @author: cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public interface Entry
 {

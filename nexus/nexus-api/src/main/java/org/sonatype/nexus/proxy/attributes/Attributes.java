@@ -19,7 +19,7 @@ import java.util.Map;
  * core.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public interface Attributes
 {

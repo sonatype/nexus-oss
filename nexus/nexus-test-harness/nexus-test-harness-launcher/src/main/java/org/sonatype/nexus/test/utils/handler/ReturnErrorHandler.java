@@ -24,7 +24,7 @@ import org.restlet.data.Method;
 /**
  * Utility handler for tests needing a misbehaving proxy.
  * 
- * @since 1.10.0
+ * @since 2.0
  */
 public class ReturnErrorHandler
         extends AbstractHandler

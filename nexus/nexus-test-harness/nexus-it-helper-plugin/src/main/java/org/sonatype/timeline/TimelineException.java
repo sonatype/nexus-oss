@@ -21,7 +21,7 @@ import org.sonatype.nexus.plugins.ithelper.log.LogHelperPlexusResource;
  * string, but due to how this helper works, it will try to instantiate the exception.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  * @see See {@link LogHelperPlexusResource} and {@link Nexus4427WarnErrorLogsToFeedsIT} IT class for how is it used.
  * @deprecated This class has nothing to do with "real" Timeline exception. It is here only to serve the need of one IT:
  *             Nexus4427WarnErrorLogsToFeedsIT

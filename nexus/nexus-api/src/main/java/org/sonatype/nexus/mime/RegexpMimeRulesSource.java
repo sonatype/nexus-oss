@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
  * just leave them to "global MIME type handling" if enough).
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public class RegexpMimeRulesSource
     implements MimeRulesSource

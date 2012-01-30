@@ -47,7 +47,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * <li> https://issues.sonatype.org/browse/NEXUS-4616 </li>
  * </ul>
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class Nexus3996ScheduledTasksTimezoneDifferentDayValidationIT
     extends AbstractNexusIntegrationTest

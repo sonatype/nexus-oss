@@ -19,7 +19,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * Event fired when a StorageItem is validated and it failed validation (is invalid).
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public abstract class RepositoryItemValidationEventFailed
     extends RepositoryItemValidationEvent

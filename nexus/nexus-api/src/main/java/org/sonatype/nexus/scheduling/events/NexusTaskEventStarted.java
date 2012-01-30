@@ -18,7 +18,7 @@ import org.sonatype.nexus.scheduling.NexusTask;
  * Event fired when a task is started (might be running or sleeping if blocked).
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public class NexusTaskEventStarted<T>
     extends NexusTaskEvent<T>

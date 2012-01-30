@@ -45,7 +45,7 @@ public interface ApplicationConfiguration
      * @param key the subpath you want to have access to
      * @param createIfNeeded set to {@code true} if you want to have it created, {@code false} otherwise. 
      * @return
-     * @since 1.10.0
+     * @since 2.0
      */
     File getWorkingDirectory( String key, boolean createIfNeeded );
 

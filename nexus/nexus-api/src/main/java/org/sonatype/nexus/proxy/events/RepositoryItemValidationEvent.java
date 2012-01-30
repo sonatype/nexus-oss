@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * Abstract super class for validation related events.
  * 
  * @author cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public abstract class RepositoryItemValidationEvent
     extends RepositoryEvent

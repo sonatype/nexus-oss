@@ -42,7 +42,7 @@ import org.testng.annotations.Test;
  * the test methods depend on the state of the repository left from the previous method.
  * (using testng's dependOnMethod here)
  *
- * @since 1.10.0
+ * @since 2.0
  */
 public class Nexus4593NoAutoblockFor403IT
     extends AbstractNexusProxyIntegrationTest

@@ -26,7 +26,7 @@ import com.google.common.collect.ImmutableList;
  * 
  * @author cstamas
  * @param <P>
- * @since 1.10.0
+ * @since 2.0
  */
 public class Node<P>
 {

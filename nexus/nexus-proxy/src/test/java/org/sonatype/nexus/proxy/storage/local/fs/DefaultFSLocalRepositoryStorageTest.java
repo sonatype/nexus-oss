@@ -49,7 +49,7 @@ import com.google.common.collect.Maps;
 
 /**
  * Tests {@link DefaultFSLocalRepositoryStorage}
- * @since 1.10.0
+ * @since 2.0
  */
 public class DefaultFSLocalRepositoryStorageTest extends PlexusTestCaseSupport
 {

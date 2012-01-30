@@ -25,7 +25,7 @@ import com.google.common.collect.Iterators;
  * Wrapping TimelineResult into Entries.
  *
  * @author: cstamas
- * @since 1.10.0
+ * @since 2.0
  */
 public class TimelineResultWrapper
     implements Entries
