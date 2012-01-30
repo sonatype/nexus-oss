@@ -15,6 +15,7 @@ package org.sonatype.nexus.events;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
+import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventPostRemove;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -30,6 +31,7 @@ import org.sonatype.plexus.appevents.Event;
 @Component( role = EventInspector.class, hint = "DeleteRepositoryFoldersEventInspector" )
 public class DeleteRepositoryFoldersEventInspector
     extends AbstractEventInspector
+    implements AsynchronousEventInspector
 {
     @Requirement
     private NexusScheduler nexusScheduler;

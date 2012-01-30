@@ -31,6 +31,8 @@ import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 import org.sonatype.plexus.appevents.Event;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * A default implementation of EventInspectorHost, a component simply collecting all EventInspectors and re-emitting
  * events towards them in they wants to receive it. For ones implementing {@link AsynchronousEventInspector} a cached
@@ -62,6 +64,13 @@ public class DefaultEventInspectorHost
                 new NexusThreadFactory( "nxevthost", "Event Inspector Host" ), new CallerRunsPolicy() );
     }
 
+    @VisibleForTesting 
+    public DefaultEventInspectorHost( final Map<String, EventInspector> eventInspectors )
+    {
+        this();
+        this.eventInspectors = eventInspectors;
+    }
+
     // == Disposable iface, to manage ExecutorService lifecycle
 
     public void dispose()
@@ -87,7 +96,15 @@ public class DefaultEventInspectorHost
 
     public void onEvent( final Event<?> evt )
     {
-        processEvent( evt );
+        try
+        {
+            processEvent( evt, getEventInspectors() );
+        }
+        catch ( IllegalStateException e )
+        {
+            // NEXUS-4775 guice exception trying to resolve circular dependencies too early
+            getLogger().trace( "Event inspectors are not fully initialized, skipping handling of {}", evt, e );
+        }
     }
 
     // ==
@@ -97,44 +114,47 @@ public class DefaultEventInspectorHost
         return new HashSet<EventInspector>( eventInspectors.values() );
     }
 
-    protected void processEvent( final Event<?> evt )
+    protected void processEvent( final Event<?> evt, final Set<EventInspector> inspectors )
     {
-        Set<EventInspector> inspectors;
-        try
-        {
-            inspectors = getEventInspectors();
-        }
-        catch ( IllegalStateException e )
-        {
-            // NEXUS-4775 guice exception trying to resolve circular dependencies too early
-            getLogger().trace( "Event inspectors are not fully initialized, skipping handling of {}", evt, e );
-            return;
-        }
-
+        // 1st pass: sync ones (without handler)
         for ( EventInspector ei : inspectors )
         {
-            try
+            if ( !( ei instanceof AsynchronousEventInspector ) )
             {
-                if ( ei.accepts( evt ) )
+                try
                 {
-                    final EventInspectorHandler handler = new EventInspectorHandler( getLogger(), ei, evt );
-
-                    if ( ei instanceof AsynchronousEventInspector && hostThreadPool != null
-                        && !hostThreadPool.isShutdown() )
+                    if ( ei.accepts( evt ) )
                     {
-                        hostThreadPool.execute( handler );
-                    }
-                    else
-                    {
-                        handler.run();
+                        ei.inspect( evt );
                     }
                 }
+                catch ( Exception e )
+                {
+                    getLogger().warn( "EventInspector implementation={} had problem accepting an event={}",
+                        new Object[] { ei.getClass().getName(), evt.getClass(), e } );
+                }
             }
-            catch ( Exception e )
+        }
+
+        // 2nd pass: async ones
+        for ( EventInspector ei : inspectors )
+        {
+            if ( ei instanceof AsynchronousEventInspector )
             {
-                getLogger().warn(
-                    "EventInspector implementation='" + ei.getClass().getName() + "' had problem accepting an event='"
-                        + evt.getClass() + "'", e );
+                try
+                {
+                    if ( ei.accepts( evt ) )
+                    {
+                        final EventInspectorHandler handler = new EventInspectorHandler( getLogger(), ei, evt );
+
+                        hostThreadPool.execute( handler );
+                    }
+                }
+                catch ( Exception e )
+                {
+                    getLogger().warn( "Async EventInspector implementation={} had problem accepting an event={}",
+                        new Object[] { ei.getClass().getName(), evt.getClass(), e } );
+                }
             }
         }
     }
@@ -165,8 +185,8 @@ public class DefaultEventInspectorHost
             }
             catch ( Exception e )
             {
-                logger.warn( "EventInspector implementation='" + ei.getClass().getName()
-                    + "' had problem inspecting an event='" + evt.getClass() + "'", e );
+                logger.warn( "EventInspector implementation={} had problem accepting an event={}", new Object[] {
+                    ei.getClass().getName(), evt.getClass(), e } );
             }
         }
     }
