@@ -519,6 +519,8 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
 };
 
 Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
+      customFieldTypes : {},
+
       // Dump the currently stored data and requery for everything
       reloadAll : function() {
         Ext.getCmp('capability-add-btn').disable();
@@ -642,7 +644,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               active : false
             });
         config = this.configUniqueIdHelper(id, config);
-        Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', CAPABILITY_SETTINGS_PREFIX, this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
+        Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', CAPABILITY_SETTINGS_PREFIX, this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, this.customFieldTypes, this.COMBO_WIDTH));
         var formPanel = new Ext.FormPanel(config);
 
         formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -926,7 +928,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                 id : id
               });
           config = this.configUniqueIdHelper(id, config);
-          Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', CAPABILITY_SETTINGS_PREFIX, this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
+          Ext.apply(config.items[2].items, FormFieldGenerator(id, 'Settings', CAPABILITY_SETTINGS_PREFIX, this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, this.customFieldTypes));
           formPanel = new Ext.FormPanel(config);
 
           formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -1130,11 +1132,11 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       exportCapabilityPropertiesHelper : function(val, fpanel) {
-        return FormFieldExporter(fpanel, '_settings-panel', CAPABILITY_SETTINGS_PREFIX);
+        return FormFieldExporter(fpanel, '_settings-panel', CAPABILITY_SETTINGS_PREFIX, this.customFieldTypes);
       },
 
       importCapabilityPropertiesHelper : function(val, srcObj, fpanel) {
-        FormFieldImporter(srcObj, fpanel, CAPABILITY_SETTINGS_PREFIX);
+        FormFieldImporter(srcObj, fpanel, CAPABILITY_SETTINGS_PREFIX, this.customFieldTypes);
         return val;
       },
 
@@ -1217,3 +1219,28 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       }
 
     });
+
+/*
+A custom type is a js object with the following functions defined:
+{
+  createItem : function(curRec, fieldNamePrefix, width) {
+    // return the item to be embedded into the form panel here
+  },
+  retrieveValue : function(item) {
+    // return the value to be sent with the form
+  },
+  setValue : function(item, value) {
+    // set the value received by the capabilities plugin
+  }
+}
+
+Event listeners just add the type id as key to the first argument, e.g.
+
+ Sonatype.Events.addListener('capabilitiesCustomTypeInit', function(types) {
+ types['custom-type'] = { createItem : ... }
+ }
+
+A capability descriptor form field with an ID of 'custom-type' will then be mapped to the added type.
+*/
+Sonatype.Events.fireEvent('capabilitiesCustomTypeInit', Sonatype.repoServer.CapabilitiesPanel.prototype.customFieldTypes);
+
