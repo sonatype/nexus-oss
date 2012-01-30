@@ -46,11 +46,19 @@ public class DefaultNexusScheduler
         return plexusContainer;
     }
 
+    @Override
     public void initializeTasks()
     {
         scheduler.initializeTasks();
     }
 
+    @Override
+    public void shutdown()
+    {
+        scheduler.shutdown();
+    }
+    
+    @Override
     public <T> ScheduledTask<T> submit( String name, NexusTask<T> nexusTask )
         throws RejectedExecutionException, NullPointerException
     {
@@ -64,6 +72,7 @@ public class DefaultNexusScheduler
         }
     }
 
+    @Override
     public <T> ScheduledTask<T> schedule( String name, NexusTask<T> nexusTask, Schedule schedule )
         throws RejectedExecutionException, NullPointerException
     {
@@ -77,6 +86,7 @@ public class DefaultNexusScheduler
         }
     }
 
+    @Override
     public <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )
         throws RejectedExecutionException, NullPointerException
     {
@@ -88,22 +98,27 @@ public class DefaultNexusScheduler
         return task;
     }
 
+    @Override
     public Map<String, List<ScheduledTask<?>>> getAllTasks()
     {
         return scheduler.getAllTasks();
     }
 
+    @Override
     public Map<String, List<ScheduledTask<?>>> getActiveTasks()
     {
         return scheduler.getActiveTasks();
     }
 
+    @Override
     public ScheduledTask<?> getTaskById( String id )
         throws NoSuchTaskException
     {
         return scheduler.getTaskById( id );
     }
 
+    @Override
+    @Deprecated
     @SuppressWarnings( "unchecked" )
     public NexusTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException
@@ -111,6 +126,7 @@ public class DefaultNexusScheduler
         return (NexusTask) scheduler.createTaskInstance( taskType );
     }
 
+    @Override
     public <T> T createTaskInstance( Class<T> taskType )
         throws IllegalArgumentException
     {

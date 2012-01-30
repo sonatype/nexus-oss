@@ -24,6 +24,8 @@ public interface NexusScheduler
 {
     void initializeTasks();
     
+    void shutdown();
+    
     /**
      * Issue a NexusTask for immediate execution, but have a control over it.
      * 
@@ -90,6 +92,7 @@ public interface NexusScheduler
      * @throws IllegalArgumentException
      * @deprecated prefer the createTaskInstance(Class<T> type) method instead.
      */
+    @Deprecated
     NexusTask<?> createTaskInstance( String taskType )
         throws IllegalArgumentException;
 

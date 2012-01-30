@@ -16,7 +16,6 @@ import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeManager;
-import org.sonatype.scheduling.Scheduler;
 import org.sonatype.security.SecuritySystem;
 
 public abstract class AbstractNexusTestEnvironment
@@ -24,8 +23,6 @@ public abstract class AbstractNexusTestEnvironment
 {
     /** The cache manager. */
     private CacheManager cacheManager;
-
-    private Scheduler scheduler;
 
     private RepositoryItemUidFactory repositoryItemUidFactory;
 
@@ -35,8 +32,6 @@ public abstract class AbstractNexusTestEnvironment
         throws Exception
     {
         super.setUp();
-
-        scheduler = lookup( Scheduler.class );
 
         cacheManager = lookup( CacheManager.class );
 
@@ -58,11 +53,6 @@ public abstract class AbstractNexusTestEnvironment
     protected CacheManager getCacheManager()
     {
         return cacheManager;
-    }
-
-    protected Scheduler getScheduler()
-    {
-        return scheduler;
     }
 
     protected RepositoryItemUidFactory getRepositoryItemUidFactory()
