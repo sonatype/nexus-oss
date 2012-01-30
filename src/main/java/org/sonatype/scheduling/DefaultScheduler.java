@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -72,6 +73,8 @@ public class DefaultScheduler
 
     public void initializeTasks()
     {
+        getLogger().info( "Initializing Scheduler..." );
+
         // this call delegates to task config manager that loads up the persisted tasks (if any)
         // and performs a series of callbacks to this to make them "alive"
         taskConfig.initializeTasks( this );
@@ -90,6 +93,8 @@ public class DefaultScheduler
 
     public void shutdown()
     {
+        getLogger().info( "Shutting down Scheduler..." );
+        
         getScheduledExecutorService().shutdown();
         getScheduledExecutorService().setExecuteExistingDelayedTasksAfterShutdownPolicy( false );
         getScheduledExecutorService().setContinueExistingPeriodicTasksAfterShutdownPolicy( false );
@@ -102,7 +107,7 @@ public class DefaultScheduler
             {
                 Map<String, List<ScheduledTask<?>>> runningTasks = getRunningTasks();
 
-                if ( runningTasks.size() > 0 )
+                if ( !runningTasks.isEmpty() )
                 {
                     getScheduledExecutorService().shutdownNow();
                     getLogger().warn( "Scheduler shut down forcedly with tasks running." );
@@ -139,7 +144,7 @@ public class DefaultScheduler
 
     protected <T> void addToTasksMap( ScheduledTask<T> task, boolean store )
     {
-        tasksMap.putIfAbsent( task.getType(), new ArrayList<ScheduledTask<?>>() );
+        tasksMap.putIfAbsent( task.getType(), new CopyOnWriteArrayList<ScheduledTask<?>>() );
         tasksMap.get( task.getType() ).add( task );
 
         if ( store )
@@ -242,7 +247,7 @@ public class DefaultScheduler
 
         for ( Map.Entry<String, List<ScheduledTask<?>>> entry : tasksMap.entrySet() )
         {
-            if ( entry.getValue().size() > 0 )
+            if ( !entry.getValue().isEmpty() )
             {
                 result.put( entry.getKey(), new ArrayList<ScheduledTask<?>>( entry.getValue() ) );
             }
