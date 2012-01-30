@@ -654,6 +654,8 @@ public class SearchMessageUtil
 
         // let s w8 a few time for indexes
         TaskScheduleUtil.waitForAllTasksToStop();
+        // be safe and wait for async events as well
+        new EventInspectorsUtil( RequestFacade.getNexusRestClient() ).waitForCalmPeriod();
     }
 
     /**
