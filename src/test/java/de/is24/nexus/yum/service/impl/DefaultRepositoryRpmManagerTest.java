@@ -50,7 +50,7 @@ public class DefaultRepositoryRpmManagerTest extends AbstractRepositoryTester {
   }
 
   @Test(expected = IllegalStateException.class)
-  public void shouldThrowExceptionIfDeactivated() throws Exception {
+  public void shouldThrowExceptionIfRepoDeactivated() throws Exception {
     configHandler.setRepositoryOfRepositoryVersionsActive(false);
     rpmManager.updateRepository("dummy-repo", "any-version");
     Assert.fail("should throw an exeption before this line.");
