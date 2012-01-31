@@ -5,11 +5,15 @@ import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.assertRepos
 import static de.is24.test.hamcrest.FileMatchers.exists;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+
 import java.io.File;
+
 import javax.inject.Inject;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
 import de.is24.nexus.yum.AbstractRepositoryTester;
 import de.is24.nexus.yum.service.RepositoryRpmManager;
 import de.is24.nexus.yum.service.YumConfiguration;
@@ -46,7 +50,7 @@ public class DefaultRepositoryRpmManagerTest extends AbstractRepositoryTester {
   }
 
   @Test(expected = IllegalStateException.class)
-  public void shouldThrowExceptionIfDeactivated() throws Exception {
+  public void shouldThrowExceptionIfRepositoryDeactivated() throws Exception {
     configHandler.setRepositoryOfRepositoryVersionsActive(false);
     rpmManager.updateRepository("dummy-repo", "any-version");
     Assert.fail("should throw an exeption before this line.");
