@@ -12,9 +12,9 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4341;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isClientError;
 
 import java.io.IOException;
@@ -97,7 +97,7 @@ public class Nexus4341RunningTaskNotEditableIT
         String actualState;
         while ( !( actualState = task.getStatus() ).equals( state ) )
         {
-            log.info( String.format( "Seeing state '%s' for task '%s', waiting for '%s'", actualState, name, state ) );
+            log.info( "Seeing state '{}' for task '{}', waiting for '{}'", new String[] { actualState, name, state } );
             if ( System.currentTimeMillis() - start > 15000 )
             {
                 throw new IllegalStateException(
