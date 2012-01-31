@@ -160,6 +160,6 @@ public class NexusTargetMappingAuthorizationFilter
             return false;
         }
 
-        return this.getRepositoryRouter().authorizePath( getResourceStoreRequest( request, false ), action );
+        return getNexus().getRootRouter().authorizePath( getResourceStoreRequest( request, false ), action );
     }
 }
