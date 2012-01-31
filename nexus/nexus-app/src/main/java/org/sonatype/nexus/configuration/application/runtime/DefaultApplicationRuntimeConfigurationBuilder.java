@@ -15,6 +15,7 @@ package org.sonatype.nexus.configuration.application.runtime;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -22,6 +23,7 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * The Class DefaultRuntimeConfigurationBuilder. Todo: all the bad thing is now concentrated in this class. We are
@@ -37,7 +39,8 @@ public class DefaultApplicationRuntimeConfigurationBuilder
     @Requirement
     private PlexusContainer plexusContainer;
 
-    public Repository createRepositoryFromModel( Configuration configuration, CRepository repoConf )
+    @Override
+    public Repository createRepositoryFromModel( final Configuration configuration, final CRepository repoConf )
         throws ConfigurationException
     {
         Repository repository = createRepository( repoConf.getProviderRole(), repoConf.getProviderHint() );
@@ -47,10 +50,27 @@ public class DefaultApplicationRuntimeConfigurationBuilder
         return repository;
     }
 
+    @Override
+    public void releaseRepository( final Repository repository, final Configuration configuration,
+                                   final CRepository repoConf )
+        throws ConfigurationException
+    {
+        try
+        {
+            plexusContainer.release( repository );
+        }
+        catch ( ComponentLifecycleException e )
+        {
+            getLogger().warn(
+                "Problem while unregistering repository {} from Nexus! This will not affect configuration but might occupy memory, that will be released after next reboot.",
+                RepositoryStringUtils.getHumanizedNameString( repository ), e );
+        }
+    }
+
     // ----------------------------------------
     // private stuff
 
-    private Repository createRepository( String role, String hint )
+    private Repository createRepository( final String role, final String hint )
         throws InvalidConfigurationException
     {
         try

@@ -27,4 +27,7 @@ public interface ApplicationRuntimeConfigurationBuilder
 {
     Repository createRepositoryFromModel( Configuration configuration, CRepository repoConf )
         throws ConfigurationException;
+
+    void releaseRepository( Repository repository, Configuration configuration, CRepository repoConf )
+        throws ConfigurationException;
 }
