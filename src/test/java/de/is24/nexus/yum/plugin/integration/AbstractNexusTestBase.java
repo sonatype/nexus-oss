@@ -1,7 +1,10 @@
 package de.is24.nexus.yum.plugin.integration;
 
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.createDummyRpm;
+import static java.lang.String.format;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.apache.http.util.EntityUtils.consume;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
@@ -25,6 +28,7 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -36,6 +40,12 @@ import org.sonatype.nexus.test.utils.DeployUtils;
 public class AbstractNexusTestBase {
   protected static final String NEXUS_BASE_URL = "http://localhost:8080/nexus";
   protected static final String SERVICE_BASE_URL = NEXUS_BASE_URL + "/service/local";
+  private static final String REPO_XML = "<repository>" + "<data>" + "<contentResourceURI>%s/repositories/%s</contentResourceURI>"
+      + "<id>%s</id>" + "<name>%s</name>" + "<provider>maven2</provider>"
+      + "<providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>" + "<format>maven2</format>"
+      + "<repoType>hosted</repoType>" + "<exposed>true</exposed>" + "<writePolicy>ALLOW_WRITE</writePolicy>"
+      + "<browseable>true</browseable>" + "<indexable>true</indexable>" + "<notFoundCacheTTL>1440</notFoundCacheTTL>"
+      + "<repoPolicy>RELEASE</repoPolicy>" + "</data>" + "</repository>";
 
   protected HttpClient client = new DefaultHttpClient();
 
@@ -111,6 +121,19 @@ public class AbstractNexusTestBase {
   protected int deployRpm(String artifactId, String groupId, String version, String repositoryId)
     throws NoSuchAlgorithmException, IOException {
     return deployRpm(createDummyRpm(artifactId, version), artifactId, groupId, version, repositoryId);
+  }
+
+  protected void givenTestRepository(String repositoryId) throws Exception {
+    HttpResponse response = executeDeleteWithResponse("/repositories/" + repositoryId);
+    consume(response.getEntity());
+    response = executePost("/repositories", createRepositoryXml(repositoryId));
+    assertEquals(content(response), SC_CREATED, statusCode(response));
+  }
+
+  private StringEntity createRepositoryXml(String repositoryId) throws UnsupportedEncodingException {
+    StringEntity entity = new StringEntity(format(REPO_XML, SERVICE_BASE_URL, repositoryId, repositoryId, repositoryId));
+    entity.setContentType("application/xml");
+    return entity;
   }
 
 }

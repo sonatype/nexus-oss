@@ -1,14 +1,8 @@
 package de.is24.nexus.yum.plugin.integration;
 
-import static java.lang.String.format;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
-import static org.apache.http.util.EntityUtils.consume;
 import static org.junit.Assert.assertEquals;
 
-import java.io.UnsupportedEncodingException;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.StringEntity;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.TestContainer;
 
@@ -19,13 +13,6 @@ public class CreateNewRpmRepositoryIT extends AbstractNexusTestBase {
   private static final String ARTIFACT_VERSION_1 = "1.0";
   private static final String ARTIFACT_VERSION_2 = "2.0";
   private static final String NEW_REPO_ID = "next-try";
-  private static final String REPO_XML = "<repository>" + "<data>" +
-    "<contentResourceURI>%s/repositories/%s</contentResourceURI>" +
-    "<id>%s</id>" + "<name>%s</name>" + "<provider>maven2</provider>" +
-    "<providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>" + "<format>maven2</format>" +
-    "<repoType>hosted</repoType>" + "<exposed>true</exposed>" + "<writePolicy>ALLOW_WRITE</writePolicy>" +
-    "<browseable>true</browseable>" + "<indexable>true</indexable>" + "<notFoundCacheTTL>1440</notFoundCacheTTL>" +
-    "<repoPolicy>RELEASE</repoPolicy>" + "</data>" + "</repository>";
 
   static {
     TestContainer.getInstance().getTestContext().setSecureTest(true);
@@ -33,7 +20,7 @@ public class CreateNewRpmRepositoryIT extends AbstractNexusTestBase {
 
   @Test
   public void shouldCreateRepoRpmsForNewRpmsInNewRepository() throws Exception {
-    givenTestRepository();
+    givenTestRepository(NEW_REPO_ID);
 
     Thread.sleep(5000);
 
@@ -45,19 +32,5 @@ public class CreateNewRpmRepositoryIT extends AbstractNexusTestBase {
     // is24-rel-next-try-1.0-repo-1-1.noarch.rpm
     executeGet("/yum/repo/is24-rel-" + NEW_REPO_ID + "-" + ARTIFACT_VERSION_1 + "-repo-1-1.noarch.rpm");
     executeGet("/yum/repo/is24-rel-" + NEW_REPO_ID + "-" + ARTIFACT_VERSION_2 + "-repo-1-1.noarch.rpm");
-  }
-
-	private void givenTestRepository() throws Exception {
-		HttpResponse response = executeDeleteWithResponse("/repositories/" + NEW_REPO_ID);
-		consume(response.getEntity());
-		response = executePost("/repositories", createRepositoryXml(NEW_REPO_ID));
-		assertEquals(content(response), SC_CREATED, statusCode(response));
-  }
-
-  private StringEntity createRepositoryXml(String repositoryId) throws UnsupportedEncodingException {
-    StringEntity entity = new StringEntity(format(REPO_XML, SERVICE_BASE_URL, repositoryId, repositoryId,
-        repositoryId));
-    entity.setContentType("application/xml");
-    return entity;
   }
 }
