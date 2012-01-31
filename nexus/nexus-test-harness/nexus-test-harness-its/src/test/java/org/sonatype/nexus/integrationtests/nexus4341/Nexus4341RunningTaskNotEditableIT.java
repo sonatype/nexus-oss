@@ -14,6 +14,7 @@ package org.sonatype.nexus.integrationtests.nexus4341;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.sonatype.appcontext.internal.Preconditions.checkNotNull;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isClientError;
 
 import java.io.IOException;
@@ -38,7 +39,10 @@ public class Nexus4341RunningTaskNotEditableIT
                                   TaskScheduleUtil.newProperty( "repositoryId", getTestRepositoryId() ),
                                   TaskScheduleUtil.newProperty( "time", String.valueOf( 10 ) ) );
 
-        return TaskScheduleUtil.getTask( taskName );
+        final ScheduledServiceListResource task = TaskScheduleUtil.getTask( taskName );
+        checkNotNull( task, "Task not created!" );
+
+        return task;
     }
 
     private void verifyNoUpdate( ScheduledServiceListResource resource )
@@ -88,18 +92,24 @@ public class Nexus4341RunningTaskNotEditableIT
         throws Exception
     {
         final long start = System.currentTimeMillis();
+        final String name = task.getName();
+
         String actualState;
-        while ( !( actualState = TaskScheduleUtil.getTask( task.getName() ).getStatus() ).equals( state ) )
+        while ( !( actualState = task.getStatus() ).equals( state ) )
         {
-            log.info( String.format("Seeing state '%s' for task '%s', waiting for '%s'", actualState, task.getName(), state ) );
+            log.info( String.format( "Seeing state '%s' for task '%s', waiting for '%s'", actualState, name, state ) );
             if ( System.currentTimeMillis() - start > 15000 )
             {
                 throw new IllegalStateException(
-                    String.format( "Task '%s' was not in expected state '%s' after waiting for 15s (actual state: '%s')",
-                                   task.getName(), state, actualState) );
+                    String.format(
+                        "Task '%s' was not in expected state '%s' after waiting for 15s (actual state: '%s')",
+                        name, state, actualState ) );
             }
 
             Time.millis( 500 ).sleep();
+
+            task = TaskScheduleUtil.getTask( name );
+            checkNotNull( task, "Task not found!" );
         }
     }
 }
