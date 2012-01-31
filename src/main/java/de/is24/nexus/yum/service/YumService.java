@@ -2,8 +2,10 @@ package de.is24.nexus.yum.service;
 
 import java.io.File;
 import java.net.URL;
+
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.ScheduledTask;
+
 import de.is24.nexus.yum.repository.YumRepository;
 
 
@@ -31,4 +33,6 @@ public interface YumService {
   ScheduledTask<YumRepository> addToYumRepository(Repository repository, String path);
 
   boolean isActive();
+
+  void removeFromRepository(Repository repository, String path);
 }

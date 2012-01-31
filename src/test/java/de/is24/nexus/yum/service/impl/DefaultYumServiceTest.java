@@ -4,13 +4,18 @@ import static junit.framework.Assert.assertNotSame;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+
 import java.io.File;
 import java.net.URL;
+
 import javax.inject.Inject;
+
 import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+
 import de.is24.nexus.yum.AbstractYumNexusTestCase;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.repository.YumRepository;

@@ -112,18 +112,9 @@ public class DefaultYumService implements YumService {
     return yumRepository;
   }
 
-  private YumMetadataGenerationTask createTask(YumGeneratorConfigurationBuilder config) {
-		YumMetadataGenerationTask task = nexusScheduler.createTaskInstance(YumMetadataGenerationTask.class);
-    task.setConfiguration(config.toConfig());
-    return task;
-  }
-
-  private File createRepositoryTempDir(Repository repository, String version) {
-    return new File(getBaseTempDir(), repository.getId() + File.separator + version);
-  }
-
-  private File createCacheDir(String id) {
-    return new File(getBaseTempDir(), CACHE_DIR_PREFIX + id);
+  @Override
+  public void removeFromRepository(Repository repository, String path) {
+    createYumRepository(repository);
   }
 
   @Override
@@ -168,5 +159,19 @@ public class DefaultYumService implements YumService {
   @Override
   public boolean isActive() {
 		return YumMetadataGenerationTask.isActive();
+  }
+
+  private YumMetadataGenerationTask createTask(YumGeneratorConfigurationBuilder config) {
+    YumMetadataGenerationTask task = nexusScheduler.createTaskInstance(YumMetadataGenerationTask.class);
+    task.setConfiguration(config.toConfig());
+    return task;
+  }
+
+  private File createRepositoryTempDir(Repository repository, String version) {
+    return new File(getBaseTempDir(), repository.getId() + File.separator + version);
+  }
+
+  private File createCacheDir(String id) {
+    return new File(getBaseTempDir(), CACHE_DIR_PREFIX + id);
   }
 }

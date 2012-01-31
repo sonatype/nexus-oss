@@ -106,6 +106,7 @@ public class RpmListWriter {
   }
 
   private void writeRpmFileList(Collection<String> files) throws IOException {
+    LOG.info("Wrote {} rpm packages to rpm list file {} .", files.size(), rpmListFile);
     writeRpmFileList(files, rpmListFile);
   }
 

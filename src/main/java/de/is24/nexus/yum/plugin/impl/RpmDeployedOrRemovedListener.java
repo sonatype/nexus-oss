@@ -6,6 +6,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.guice.plexus.config.Strategies;
+import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -47,7 +48,10 @@ public class RpmDeployedOrRemovedListener extends AbstractEventListener {
   }
 
   private void processRepositoryItemDelete(RepositoryItemEventDelete itemEvent) {
-
+    if (isRpmItemEvent(itemEvent)) {
+      LOG.info("ItemDeleteEvent : {}", itemEvent.getItem().getPath());
+      yumService.removeFromRepository(itemEvent.getRepository(), itemEvent.getItem().getPath());
+    }
   }
 
   private void processRepository(Repository repository) {
@@ -57,12 +61,16 @@ public class RpmDeployedOrRemovedListener extends AbstractEventListener {
   }
 
   private void processRepositoryItemAdd(RepositoryItemEventStore itemEvent) {
-    if (repositoryRegistry.isRegistered(itemEvent.getRepository()) && itemEvent.getItem().getPath().endsWith(".rpm")) {
+    if (isRpmItemEvent(itemEvent)) {
       LOG.info("ItemStoreEvent : {}", itemEvent.getItem().getPath());
       yumService.markDirty(itemEvent.getRepository(), getItemVersion(itemEvent.getItem()));
       yumService.addToYumRepository(itemEvent.getRepository(), itemEvent.getItem().getPath());
       repositoryRpmManager.updateRepository(itemEvent.getRepository().getId(), getItemVersion(itemEvent.getItem()));
     }
+  }
+
+  private boolean isRpmItemEvent(RepositoryItemEvent itemEvent) {
+    return repositoryRegistry.isRegistered(itemEvent.getRepository()) && itemEvent.getItem().getPath().endsWith(".rpm");
   }
 
   private String getItemVersion(StorageItem item) {
