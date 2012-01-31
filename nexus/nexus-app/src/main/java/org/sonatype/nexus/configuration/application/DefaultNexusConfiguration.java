@@ -794,10 +794,10 @@ public class DefaultNexusConfiguration
             {
                 i.remove();
 
-                releaseRepository( repository, getConfigurationModel(), repo );
-
                 saveConfiguration();
                 
+                releaseRepository( repository, getConfigurationModel(), repo );
+
                 return;
             }
         }
