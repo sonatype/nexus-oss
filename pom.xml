@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>de.is24.nexus</groupId>
   <artifactId>nexus-yum-plugin</artifactId>
-  <version>1.16-SNAPSHOT</version>
+  <version>1.16</version>
   <packaging>nexus-plugin</packaging>
   <name>Nexus Yum Plugin</name>
   <description>Nexus Plugin to let Nexus generate a RPM repository out of the repositories</description>
@@ -26,8 +25,8 @@
   </developers>
 
   <scm>
-    <connection>scm:svn:http://nexus-yum-plugin.googlecode.com/svn/trunk</connection>
-    <developerConnection>scm:svn:https://nexus-yum-plugin.googlecode.com/svn/trunk</developerConnection>
+    <connection>scm:svn:http://nexus-yum-plugin.googlecode.com/svn/tags/nexus-yum-plugin-1.16</connection>
+    <developerConnection>scm:svn:https://nexus-yum-plugin.googlecode.com/svn/tags/nexus-yum-plugin-1.16</developerConnection>
   </scm>
 
   <distributionManagement>
@@ -355,9 +354,7 @@
             <phase>pre-integration-test</phase>
             <configuration>
               <target>
-                <unzip
-                  src="${project.build.directory}/${project.build.finalName}-bundle.zip"
-                  dest="${project.build.directory}/test-classes/nexus/sonatype-work/nexus/plugin-repository" />
+                <unzip src="${project.build.directory}/${project.build.finalName}-bundle.zip" dest="${project.build.directory}/test-classes/nexus/sonatype-work/nexus/plugin-repository" />
               </target>
             </configuration>
             <goals>
