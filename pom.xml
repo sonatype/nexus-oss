@@ -48,8 +48,8 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <nexus.version>2.0-SNAPSHOT</nexus.version>
-    <capabilities-plugin.version>2.0-SNAPSHOT</capabilities-plugin.version>
+    <nexus.version>2.0-M4</nexus.version>
+    <capabilities-plugin.version>2.0-M4</capabilities-plugin.version>
     <nexus.plugin.type>nexus-plugin</nexus.plugin.type>
     <arguments />
   </properties>
