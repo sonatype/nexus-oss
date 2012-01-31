@@ -38,8 +38,6 @@ public class Nexus4341RunningTaskNotEditableIT
                                   TaskScheduleUtil.newProperty( "repositoryId", getTestRepositoryId() ),
                                   TaskScheduleUtil.newProperty( "time", String.valueOf( 10 ) ) );
 
-        Time.seconds( 1 ).sleep();
-
         return TaskScheduleUtil.getTask( taskName );
     }
 
@@ -68,10 +66,12 @@ public class Nexus4341RunningTaskNotEditableIT
         throws Exception
     {
         ScheduledServiceListResource running = createTask();
+
+        waitForState( running, "RUNNING" );
+
         ScheduledServiceListResource sleeping = createTask();
 
-        assertThat( running.getStatus(), is( "RUNNING" ) );
-        assertThat( sleeping.getStatus(), is( "SLEEPING" ) );
+        waitForState( sleeping, "SLEEPING" );
 
         verifyNoUpdate( sleeping );
         TaskScheduleUtil.cancel( sleeping.getId() );
@@ -82,5 +82,24 @@ public class Nexus4341RunningTaskNotEditableIT
         ScheduledServiceListResource cancelled = TaskScheduleUtil.getTask( running.getName() );
         assertThat( cancelled.getStatus(), is( "CANCELLING" ) );
         verifyNoUpdate( cancelled );
+    }
+
+    private void waitForState( ScheduledServiceListResource task, String state )
+        throws Exception
+    {
+        final long start = System.currentTimeMillis();
+        String actualState;
+        while ( !( actualState = TaskScheduleUtil.getTask( task.getName() ).getStatus() ).equals( state ) )
+        {
+            log.info( String.format("Seeing state '%s' for task '%s', waiting for '%s'", actualState, task.getName(), state ) );
+            if ( System.currentTimeMillis() - start > 15000 )
+            {
+                throw new IllegalStateException(
+                    String.format( "Task '%s' was not in expected state '%s' after waiting for 15s (actual state: '%s')",
+                                   task.getName(), state, actualState) );
+            }
+
+            Time.millis( 500 ).sleep();
+        }
     }
 }
