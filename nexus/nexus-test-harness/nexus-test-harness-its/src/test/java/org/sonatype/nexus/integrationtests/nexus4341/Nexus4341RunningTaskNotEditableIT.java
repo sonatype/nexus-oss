@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.integrationtests.nexus4341;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isClientError;
@@ -38,9 +39,10 @@ public class Nexus4341RunningTaskNotEditableIT
                                   TaskScheduleUtil.newProperty( "repositoryId", getTestRepositoryId() ),
                                   TaskScheduleUtil.newProperty( "time", String.valueOf( 10 ) ) );
 
-        Time.seconds( 1 ).sleep();
+        final ScheduledServiceListResource task = TaskScheduleUtil.getTask( taskName );
+        checkNotNull( task, "Task not created!" );
 
-        return TaskScheduleUtil.getTask( taskName );
+        return task;
     }
 
     private void verifyNoUpdate( ScheduledServiceListResource resource )
@@ -68,10 +70,12 @@ public class Nexus4341RunningTaskNotEditableIT
         throws Exception
     {
         ScheduledServiceListResource running = createTask();
+
+        waitForState( running, "RUNNING" );
+
         ScheduledServiceListResource sleeping = createTask();
 
-        assertThat( running.getStatus(), is( "RUNNING" ) );
-        assertThat( sleeping.getStatus(), is( "SLEEPING" ) );
+        waitForState( sleeping, "SLEEPING" );
 
         verifyNoUpdate( sleeping );
         TaskScheduleUtil.cancel( sleeping.getId() );
@@ -82,5 +86,30 @@ public class Nexus4341RunningTaskNotEditableIT
         ScheduledServiceListResource cancelled = TaskScheduleUtil.getTask( running.getName() );
         assertThat( cancelled.getStatus(), is( "CANCELLING" ) );
         verifyNoUpdate( cancelled );
+    }
+
+    private void waitForState( ScheduledServiceListResource task, String state )
+        throws Exception
+    {
+        final long start = System.currentTimeMillis();
+        final String name = task.getName();
+
+        String actualState;
+        while ( !( actualState = task.getStatus() ).equals( state ) )
+        {
+            log.info( "Seeing state '{}' for task '{}', waiting for '{}'", new String[] { actualState, name, state } );
+            if ( System.currentTimeMillis() - start > 15000 )
+            {
+                throw new IllegalStateException(
+                    String.format(
+                        "Task '%s' was not in expected state '%s' after waiting for 15s (actual state: '%s')",
+                        name, state, actualState ) );
+            }
+
+            Time.millis( 500 ).sleep();
+
+            task = TaskScheduleUtil.getTask( name );
+            checkNotNull( task, "Task not found!" );
+        }
     }
 }
