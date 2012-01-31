@@ -5,6 +5,8 @@ import static java.io.File.separator;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.listFiles;
 import static org.apache.commons.io.IOUtils.readLines;
+import static org.apache.commons.io.IOUtils.write;
+import static org.apache.commons.io.IOUtils.writeLines;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import java.io.File;
@@ -22,7 +24,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,17 +107,23 @@ public class RpmListWriter {
   }
 
   private void writeRpmFileList(Collection<String> files) throws IOException {
-    LOG.info("Wrote {} rpm packages to rpm list file {} .", files.size(), rpmListFile);
     writeRpmFileList(files, rpmListFile);
   }
 
   private void writeRpmFileList(Collection<String> files, File rpmListOutputFile) throws IOException {
     FileOutputStream outputStream = new FileOutputStream(rpmListOutputFile);
     try {
-      IOUtils.writeLines(files, "\n", outputStream);
+      writeLines(files, "\n", outputStream);
+      if (files.isEmpty()) {
+        LOG.info(
+            "Write non existing package to rpm list file {} to avoid an empty packge list that would cause createrepo to scan the whole directory",
+            rpmListOutputFile);
+        write(".foo/.bar.rpm/to-avoid-an-empty-rpm-list-file/that-would-cause-createrepo-to-scan-the-whole-repo.rpm", outputStream);
+      }
     } finally {
       outputStream.close();
     }
+    LOG.info("Wrote {} rpm packages to rpm list file {} .", files.size(), rpmListFile);
   }
 
   @SuppressWarnings("unchecked")
