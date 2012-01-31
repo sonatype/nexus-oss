@@ -20,9 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,15 +43,17 @@ public class RpmListWriter {
   public File writeList() throws IOException {
     if (rpmListFile.exists()) {
       LOG.info("Reuse existing rpm list file : {}", rpmListFile);
-      pruneToExistingRpms();
+      List<String> rpmFileList = pruneToExistingRpms();
 
       if (isNotBlank(config.getVersion())) {
-        return extractVersionOfListFile();
+        return extractVersionOfListFile(rpmFileList);
       }
 
       if (isNotBlank(config.getAddedFile())) {
-        addNewlyAddedRpmFileToList();
+        addNewlyAddedRpmFileToList(rpmFileList);
       }
+
+      writeRpmFileList(rpmFileList);
     } else {
       rewriteList();
     }
@@ -61,8 +61,7 @@ public class RpmListWriter {
     return rpmListFile;
   }
 
-  private File extractVersionOfListFile() throws IOException {
-    List<String> files = readRpmFileList();
+  private File extractVersionOfListFile(List<String> files) throws IOException {
     List<String> filesWithRequiredVersion = new ArrayList<String>();
     for (String file : files) {
       if (hasRequiredVersion(file)) {
@@ -80,20 +79,19 @@ public class RpmListWriter {
     return (segments.length >= 2) && config.getVersion().equals(segments[segments.length - 2]);
   }
 
-  private void addNewlyAddedRpmFileToList() throws IOException {
-    final SortedSet<String> files = new TreeSet<String>(readRpmFileList());
+  private void addNewlyAddedRpmFileToList(List<String> files) throws IOException {
     final int startPosition = config.getAddedFile().startsWith("/") ? POSITION_AFTER_SLASH : 0;
     final String filename = config.getAddedFile().substring(startPosition);
 
-    if (files.add(filename)) {
+    if (!files.contains(filename)) {
+      files.add(filename);
       LOG.info("Added rpm {} to file list.", filename);
     } else {
       LOG.info("Rpm {} already exists in fie list.", filename);
     }
-    writeRpmFileList(files);
   }
 
-  private void pruneToExistingRpms() throws IOException {
+  private List<String> pruneToExistingRpms() throws IOException {
     List<String> files = readRpmFileList();
     for (int i = 0; i < files.size(); i++) {
       if (!new File(config.getBaseRpmDir(), files.get(i)).exists()) {
@@ -103,7 +101,7 @@ public class RpmListWriter {
 
       }
     }
-    writeRpmFileList(files);
+    return files;
   }
 
   private void writeRpmFileList(Collection<String> files) throws IOException {
