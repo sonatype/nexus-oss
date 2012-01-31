@@ -12,8 +12,6 @@ import static org.junit.Assert.assertThat;
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.zip.GZIPInputStream;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.entity.StringEntity;
@@ -71,10 +69,6 @@ public class StagingYumRepositoryIT extends AbstractNexusTestBase {
     assertThat(content, not(containsString(STAGING_REPO_ID)));
     assertThat(content, containsString("test-rpm-1.45.rpm"));
     assertThat(content, containsString("dummy-artifakt-1.4.5.rpm"));
-  }
-
-  private String gzipResponseContent(HttpResponse response) throws IOException {
-    return IOUtils.toString(new GZIPInputStream(response.getEntity().getContent()));
   }
 
   private void whenUserPromotesStagingRepo() throws Exception {

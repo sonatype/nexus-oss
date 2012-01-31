@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.io.IOUtils;
@@ -134,6 +135,10 @@ public class AbstractNexusTestBase {
     StringEntity entity = new StringEntity(format(REPO_XML, SERVICE_BASE_URL, repositoryId, repositoryId, repositoryId));
     entity.setContentType("application/xml");
     return entity;
+  }
+
+  protected String gzipResponseContent(HttpResponse response) throws IOException {
+    return IOUtils.toString(new GZIPInputStream(response.getEntity().getContent()));
   }
 
 }
