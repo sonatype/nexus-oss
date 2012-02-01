@@ -10,24 +10,12 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.configuration.application.runtime;
+package org.sonatype.nexus.repositories.nexus4807;
 
-import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-/**
- * A component to be slimmed! Actually, it is a "factory" (backed by Plexus) that creates repo and other instances. It
- * should realy onto plexus as much can.
- * 
- * @author cstamas
- */
-public interface ApplicationRuntimeConfigurationBuilder
+public interface Nexus4807Repository
+    extends Repository
 {
-    Repository createRepositoryFromModel( Configuration configuration, CRepository repoConf )
-        throws ConfigurationException;
-
-    void releaseRepository( Repository repository, Configuration configuration, CRepository repoConf )
-        throws ConfigurationException;
+    boolean isDisposeInvoked();
 }

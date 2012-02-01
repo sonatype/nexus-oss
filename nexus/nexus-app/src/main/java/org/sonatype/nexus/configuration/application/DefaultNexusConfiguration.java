@@ -537,7 +537,7 @@ public class DefaultNexusConfiguration
         }
     }
 
-    protected Repository instantiateRepository( Configuration configuration, CRepository repositoryModel )
+    protected Repository instantiateRepository( final Configuration configuration, final CRepository repositoryModel )
         throws ConfigurationException
     {
         checkRepositoryMaxInstanceCountForCreation( repositoryModel );
@@ -550,6 +550,14 @@ public class DefaultNexusConfiguration
 
         // give it back
         return repository;
+    }
+
+    protected void releaseRepository( final Repository repository, final Configuration configuration,
+                                            final CRepository repositoryModel )
+        throws ConfigurationException
+    {
+        // release it
+        runtimeConfigurationBuilder.releaseRepository( repository, configuration, repositoryModel );
     }
 
     // ------------------------------------------------------------------
@@ -786,7 +794,9 @@ public class DefaultNexusConfiguration
             {
                 i.remove();
 
-                applyAndSaveConfiguration();
+                saveConfiguration();
+                
+                releaseRepository( repository, getConfigurationModel(), repo );
 
                 return;
             }

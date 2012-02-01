@@ -12,12 +12,8 @@
  */
 package org.sonatype.nexus.email;
 
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.micromailer.Address;
 import org.sonatype.micromailer.EMailer;
 import org.sonatype.micromailer.EmailerConfiguration;
@@ -33,10 +29,10 @@ import org.sonatype.nexus.logging.AbstractLoggingComponent;
 @Component( role = SmtpSettingsValidator.class )
 public class DefaultSmtpSettingsValidator
     extends AbstractLoggingComponent
-    implements SmtpSettingsValidator, Contextualizable
+    implements SmtpSettingsValidator
 {
-
-    private PlexusContainer plexusContainer;
+    @Requirement
+    private EMailer emailer;
 
     private static final String NEXUS_MAIL_ID = "Nexus";
 
@@ -52,15 +48,6 @@ public class DefaultSmtpSettingsValidator
         config.setTls( smtp.isTlsEnabled() );
         config.setUsername( smtp.getUsername() );
 
-        EMailer emailer;
-        try
-        {
-            emailer = plexusContainer.lookup( EMailer.class );
-        }
-        catch ( ComponentLookupException e )
-        {
-            throw new EmailerException( "Unable to create EMailer", e );
-        }
         emailer.configure( config );
 
         MailRequest request = new MailRequest( NEXUS_MAIL_ID, DefaultMailType.DEFAULT_TYPE_ID );
@@ -82,11 +69,5 @@ public class DefaultSmtpSettingsValidator
         }
 
         return status.isSent();
-    }
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        plexusContainer = (PlexusContainer) context.get( "plexus" );
     }
 }
