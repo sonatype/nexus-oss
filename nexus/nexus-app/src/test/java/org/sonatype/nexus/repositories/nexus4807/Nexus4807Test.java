@@ -15,9 +15,13 @@ package org.sonatype.nexus.repositories.nexus4807;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import junit.framework.Assert;
 
 import org.junit.Test;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -26,8 +30,7 @@ import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.nexus.test.NexusTestSupport;
 
 /**
- * Testing is repository released (from container) when it is removed from Nexus.
- * See NEXUS-4807.
+ * Testing is repository released (from container) when it is removed from Nexus. See NEXUS-4807.
  * 
  * @author cstamas
  */
@@ -39,6 +42,7 @@ public class Nexus4807Test
         throws Exception
     {
         final RepositoryTypeRegistry repositoryTypeRegistry = lookup( RepositoryTypeRegistry.class );
+        final RepositoryRegistry repositoryRegistry = lookup( RepositoryRegistry.class );
         final NexusConfiguration nexusConfiguration = lookup( NexusConfiguration.class );
         final TemplateManager templateManager = lookup( TemplateManager.class );
 
@@ -48,6 +52,17 @@ public class Nexus4807Test
 
         // load config
         nexusConfiguration.loadConfiguration();
+
+        // assert we have peter not present
+        try
+        {
+            repositoryRegistry.getRepository( "peter" );
+            Assert.fail( "Peter should not be present!" );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // good, it should be not present
+        }
 
         // create this new repo type
         final RepositoryTemplate template =
@@ -59,9 +74,23 @@ public class Nexus4807Test
         // do some simple assertion
         assertThat( repository.getId(), equalTo( "peter" ) );
         assertThat( repository.getName(), equalTo( "We all love Peter!" ) );
+        // assert peter is here simply, by having this below not throw any exception and returning non-null
+        // note: by interface contract, this method never returns null: either returns value or throws exception
+        assertThat( repositoryRegistry.getRepository( "peter" ), notNullValue() );
 
         // now drop it
         nexusConfiguration.deleteRepository( repository.getId() );
+
+        // assert peter left the building
+        try
+        {
+            repositoryRegistry.getRepository( "peter" );
+            Assert.fail( "Peter should not be present, he just left!" );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // good, he left of main entrance
+        }
 
         // and assert that we really do love Peter
         Nexus4807Repository nexus4807Repository = repository.adaptToFacet( Nexus4807Repository.class );
