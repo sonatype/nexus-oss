@@ -123,7 +123,7 @@ public abstract class AbstractApplicationConfigurationSource
 
         if ( getConfiguration() != null )
         {
-            getLogger().info( "Configuration loaded succesfully." );
+            getLogger().info( "Configuration loaded successfully." );
         }
     }
 
