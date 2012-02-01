@@ -16,7 +16,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
-@Component( role = ContentClass.class, hint = Nexus4807ContentClass.ID )
+// see org/sonatype/nexus/repositories/nexus4807/Nexus4807Test.xml
+//@Component( role = ContentClass.class, hint = Nexus4807ContentClass.ID )
 public class Nexus4807ContentClass
     extends AbstractIdContentClass
 {

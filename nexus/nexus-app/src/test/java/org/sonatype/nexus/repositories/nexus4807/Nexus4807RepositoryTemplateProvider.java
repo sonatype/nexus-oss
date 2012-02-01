@@ -17,7 +17,8 @@ import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
 
-@Component( role = TemplateProvider.class, hint = Nexus4807RepositoryTemplateProvider.PROVIDER_ID )
+// see org/sonatype/nexus/repositories/nexus4807/Nexus4807Test.xml
+//@Component( role = TemplateProvider.class, hint = Nexus4807RepositoryTemplateProvider.PROVIDER_ID )
 public class Nexus4807RepositoryTemplateProvider
     extends AbstractRepositoryTemplateProvider
 {
