@@ -14,6 +14,19 @@ Sonatype.repoServer.HelpAboutPanel = function(config) {
   var config = config || {};
   var defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
+  
+  var helpItems = [{
+      //add this one by default, so existing usage will be preserved
+      text: this.getHelpText()
+  }];
+  
+  Sonatype.Events.fireEvent('aboutPanelContributions',helpItems);
+  
+  var helpText = '';
+  
+  for ( var i = 0 ; i < helpItems.length ; i++ ) {
+      helpText += helpItems[i].text;
+  }
 
   Sonatype.repoServer.HelpAboutPanel.superclass.constructor.call(this, {
         layout : 'border',
@@ -24,7 +37,7 @@ Sonatype.repoServer.HelpAboutPanel = function(config) {
               xtype : 'panel',
               region : 'center',
               layout : 'fit',
-              html : this.getHelpText()
+              html : helpText
             }]
       });
 };
