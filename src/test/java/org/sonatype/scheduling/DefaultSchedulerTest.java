@@ -299,6 +299,49 @@ public class DefaultSchedulerTest
         task.cancel( true );
     }
 
+    public void testCallableStepOnEachOtherToe()
+        throws Exception
+    {
+        TestCallable tr = null;
+
+        // work that will sleep 3 seconds
+        tr = new TestCallable( 3000L );
+
+        long nearFuture = System.currentTimeMillis() + 500;
+
+        Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
+
+        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule );
+
+        assertEquals( 1, defaultScheduler.getActiveTasks().size() );
+
+        Thread.sleep( 1200 );
+
+        while ( defaultScheduler.getScheduledExecutorService().getActiveCount() > 0 )
+        {
+            assertEquals( "We scheduled one task, but more than one is executing?", 1,
+                          defaultScheduler.getScheduledExecutorService().getActiveCount() );
+        }
+
+        assertEquals( 5, tr.getRunCount() );
+
+        assertEquals( 5, st.getResults().size() );
+
+        assertEquals( Integer.valueOf( 0 ), st.getResults().get( 0 ) );
+
+        assertEquals( Integer.valueOf( 1 ), st.getResults().get( 1 ) );
+
+        assertEquals( Integer.valueOf( 2 ), st.getResults().get( 2 ) );
+
+        assertEquals( Integer.valueOf( 3 ), st.getResults().get( 3 ) );
+
+        assertEquals( Integer.valueOf( 4 ), st.getResults().get( 4 ) );
+
+        assertEquals( TaskState.FINISHED, st.getTaskState() );
+
+        assertEquals( 0, defaultScheduler.getActiveTasks().size() );
+    }
+
     protected Schedule getEverySecondSchedule( Date start, Date stop )
     {
         return new FewSecondSchedule( start, stop, 1 );
@@ -325,11 +368,28 @@ public class DefaultSchedulerTest
     public class TestCallable
         implements Callable<Integer>
     {
+        private final Long sleepTime;
+
         private int runCount = 0;
+
+        public TestCallable()
+        {
+            this( null );
+        }
+
+        public TestCallable( Long sleepTime )
+        {
+            this.sleepTime = sleepTime;
+        }
 
         public Integer call()
             throws Exception
         {
+            if ( sleepTime != null )
+            {
+                Thread.sleep( sleepTime );
+            }
+
             return runCount++;
         }
 
