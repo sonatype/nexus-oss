@@ -26,7 +26,8 @@ import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
-@Component( role = Repository.class, hint = Nexus4807RepositoryImpl.ID, instantiationStrategy = "per-lookup", description = "NEXUS4807 Repository" )
+// see org/sonatype/nexus/repositories/nexus4807/Nexus4807Test.xml
+//@Component( role = Repository.class, hint = Nexus4807RepositoryImpl.ID, instantiationStrategy = "per-lookup", description = "NEXUS4807 Repository" )
 public class Nexus4807RepositoryImpl
     extends AbstractRepository
     implements Nexus4807Repository, Disposable
