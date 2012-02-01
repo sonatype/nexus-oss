@@ -22,11 +22,11 @@ import javax.inject.Named;
 import org.sonatype.nexus.plugins.capabilities.Condition;
 import org.sonatype.nexus.plugins.capabilities.support.CapabilitySupport;
 import org.sonatype.nexus.plugins.capabilities.support.condition.Conditions;
+import org.sonatype.nexus.plugins.capabilities.support.condition.RepositoryConditions;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGenerator;
 import org.sonatype.nexus.plugins.p2.repository.P2MetadataGeneratorConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 @Named( TYPE_ID )
 public class P2MetadataGeneratorCapability
@@ -54,25 +54,51 @@ public class P2MetadataGeneratorCapability
     @Override
     public String description()
     {
-        P2MetadataGeneratorConfiguration cfg = configuration;
-        if ( cfg == null )
+        if ( configuration != null )
         {
-            cfg = createConfiguration( context().properties() );
+            try
+            {
+                return repositoryRegistry.getRepository( configuration.repositoryId() ).getName();
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                return configuration.repositoryId();
+            }
         }
-        try
-        {
-            return repositoryRegistry.getRepository( cfg.repositoryId() ).getName();
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            return cfg.repositoryId();
-        }
+        return null;
+    }
+
+    @Override
+    public void onCreate()
+        throws Exception
+    {
+        configuration = createConfiguration( context().properties() );
+    }
+
+    @Override
+    public void onLoad()
+        throws Exception
+    {
+        configuration = createConfiguration( context().properties() );
+    }
+
+    @Override
+    public void onUpdate()
+        throws Exception
+    {
+        configuration = createConfiguration( context().properties() );
+    }
+
+    @Override
+    public void onRemove()
+        throws Exception
+    {
+        configuration = null;
     }
 
     @Override
     public void onActivate()
     {
-        configuration = createConfiguration( context().properties() );
         service.addConfiguration( configuration );
     }
 
@@ -85,7 +111,30 @@ public class P2MetadataGeneratorCapability
     @Override
     public Condition activationCondition()
     {
-        return conditions.capabilities().passivateCapabilityDuringUpdate( context().id() );
+        return conditions.logical().and(
+            conditions.repository().repositoryIsInService( new RepositoryConditions.RepositoryId()
+            {
+                @Override
+                public String get()
+                {
+                    return configuration != null ? configuration.repositoryId() : null;
+                }
+            } ),
+            conditions.capabilities().passivateCapabilityDuringUpdate( context().id() )
+        );
+    }
+
+    @Override
+    public Condition validityCondition()
+    {
+        return conditions.repository().repositoryExists( new RepositoryConditions.RepositoryId()
+        {
+            @Override
+            public String get()
+            {
+                return configuration != null ? configuration.repositoryId() : null;
+            }
+        } );
     }
 
     private P2MetadataGeneratorConfiguration createConfiguration( final Map<String, String> properties )
