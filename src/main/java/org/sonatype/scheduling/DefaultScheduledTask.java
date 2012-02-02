@@ -63,8 +63,6 @@ public class DefaultScheduledTask<T>
     private volatile ProgressListener progressListener;
 
     boolean manualRun;
-    
-    private Future<T> manualPreviousFuture;
 
     private long duration;
 
@@ -382,7 +380,10 @@ public class DefaultScheduledTask<T>
         {
             manualRun = true;
             
-            manualPreviousFuture = getFuture();
+            if ( getFuture() != null )
+            {
+                getFuture().cancel( false );
+            }
             
             setFuture( doSchedule( 0 ) );
         }
@@ -442,6 +443,11 @@ public class DefaultScheduledTask<T>
                     {
                         nextMillis = reschedule( false );
                     }
+                    //if manual run, we take the previously set nextRun time and use that as next time
+                    else if ( nextRun != null )
+                    {
+                        nextMillis = nextRun.getTime();
+                    }
 
                     setLastRun( startDate );
 
@@ -477,13 +483,6 @@ public class DefaultScheduledTask<T>
                         setTaskState( TaskState.BROKEN );
                     }
                     
-                    //this will only be set in case of manual run
-                    if (!manualRun && manualPreviousFuture != null)
-                    {
-                        manualPreviousFuture.cancel( true );
-                        manualPreviousFuture = null;
-                    }
-                    
                     //if this is not a manual task, and no next scheduled time, dump it
                     if ( ( !isManualRunScheduled() && nextMillis == -1 && isEnabled() ) || isToBeRemoved() )
                     {
@@ -494,12 +493,6 @@ public class DefaultScheduledTask<T>
                                     || ( peekBefore != null && !peekBefore.equals( peekAfter ) ) )
                     {    
                         reschedule( true );
-                    }
-                    //if manual run, reuse the existing future
-                    else if ( manualRun )
-                    {
-                        setFuture( manualPreviousFuture );
-                        manualPreviousFuture = null;
                     }
                     //now that we dont schedule beforehand, need to schedule on error case if necessary
                     else if ( nextMillis != -1 )
@@ -523,13 +516,6 @@ public class DefaultScheduledTask<T>
                     setDuration( System.currentTimeMillis() - startDate.getTime() );
                 }
             }
-            
-            // this will only be set in case of manual run
-            if (!manualRun && manualPreviousFuture != null)
-            {
-                manualPreviousFuture.cancel( true );
-                manualPreviousFuture = null;
-            }
 
             if ( TaskState.BROKEN == getTaskState() )
             {
@@ -550,13 +536,6 @@ public class DefaultScheduledTask<T>
             {
                 setTaskState( TaskState.WAITING );
                 reschedule( true );
-            }
-            //if manual run, reuse the existing future
-            else if ( manualRun )
-            {
-                setTaskState( TaskState.WAITING );
-                setFuture( manualPreviousFuture );
-                manualPreviousFuture = null;
             }
             //schedule as appropriate in most common case
             else if ( nextMillis != -1 )
