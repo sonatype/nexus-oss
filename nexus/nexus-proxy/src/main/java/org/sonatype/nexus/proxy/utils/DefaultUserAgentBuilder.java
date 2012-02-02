@@ -66,6 +66,22 @@ public class DefaultUserAgentBuilder
         return buf.toString();
     }
 
+    @Override
+    public String formatUserAgentString( final RemoteStorageContext ctx )
+    {
+        final StringBuffer buf = new StringBuffer( getUserAgentPlatformInfo() );
+
+        // user customization
+        RemoteConnectionSettings remoteConnectionSettings = ctx.getRemoteConnectionSettings();
+
+        if ( !StringUtils.isEmpty( remoteConnectionSettings.getUserAgentCustomizationString() ) )
+        {
+            buf.append( " " ).append( remoteConnectionSettings.getUserAgentCustomizationString() );
+        }
+
+        return buf.toString();
+    }
+
     // ==
 
     protected synchronized String getUserAgentPlatformInfo()

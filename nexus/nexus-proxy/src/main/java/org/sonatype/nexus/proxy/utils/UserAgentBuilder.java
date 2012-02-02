@@ -39,4 +39,12 @@ public interface UserAgentBuilder
      */
     String formatRemoteRepositoryStorageUserAgentString( final ProxyRepository repository,
                                                          final RemoteStorageContext ctx );
+
+    /**
+     * Builds a user agent string to be used for the specified remote storage context.
+     * 
+     * @param ctx
+     * @return
+     */
+    String formatUserAgentString( final RemoteStorageContext ctx );
 }
