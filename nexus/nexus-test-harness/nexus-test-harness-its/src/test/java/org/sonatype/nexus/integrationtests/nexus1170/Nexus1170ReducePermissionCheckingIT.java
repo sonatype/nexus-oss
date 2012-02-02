@@ -56,15 +56,7 @@ public class Nexus1170ReducePermissionCheckingIT
 
         for ( ClientPermission clientPermission : permissions )
         {
-            if ( "apikey:access".equals( clientPermission.getId() ) )
-            {
-                // admin user should NOT have API-key access by default
-                Assert.assertEquals( 0, clientPermission.getValue() );
-            }
-            else
-            {
-                Assert.assertEquals( 15, clientPermission.getValue() );
-            }
+            Assert.assertEquals( 15, clientPermission.getValue() );
         }
     }
 
@@ -119,6 +111,8 @@ public class Nexus1170ReducePermissionCheckingIT
         this.checkPermission( permissions, "nexus:componentrealmtypes", 0 );
         this.checkPermission( permissions, "nexus:componentsrepotypes", 1 );
         this.checkPermission( permissions, "security:componentsuserlocatortypes", 0 );
+
+        this.checkPermission( permissions, "apikey:access", 15 );
 
         for ( ClientPermission outPermission : permissions )
         {
