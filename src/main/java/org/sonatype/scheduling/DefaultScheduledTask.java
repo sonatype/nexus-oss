@@ -382,7 +382,9 @@ public class DefaultScheduledTask<T>
             
             if ( getFuture() != null )
             {
-                getFuture().cancel( false );
+                //as bentmann mentioned, there is potential for the future to have started running between the check on our if above and now
+                //so we force interrupt it
+                getFuture().cancel( true );
             }
             
             setFuture( doSchedule( 0 ) );
