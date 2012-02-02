@@ -149,7 +149,7 @@
     <it.nexus.log.level>INFO</it.nexus.log.level>
 
     <!-- version properties -->
-    <applifecycle.version>1.5</applifecycle.version>
+    <applifecycle.version>1.6</applifecycle.version>
     <sonatype.plugin.version>1.1.0</sonatype.plugin.version>
     
     <!-- Logging -->
