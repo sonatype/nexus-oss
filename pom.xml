@@ -161,6 +161,24 @@
                 <value>${project.build.directory}/user_home</value>
               </property>
             </systemProperties>
+            <excludes>
+              <exclude>**/*$*</exclude>
+              <exclude>**/Abstract*</exclude>
+            </excludes>
+            <properties>
+              <property>
+                <name>usedefaultlisteners</name>
+                <value>true</value>
+              </property>
+              <property>
+                <name>reporter</name>
+                <value>org.testng.reporters.JUnitXMLReporter</value>
+              </property>
+              <property>
+                <name>listener</name>
+                <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
+              </property>
+            </properties>
           </configuration>
         </plugin>
         <plugin>
@@ -262,6 +280,7 @@
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
+        <version>1.5.5</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -335,6 +354,14 @@
 
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
