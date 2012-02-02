@@ -216,7 +216,7 @@ public class DefaultNexusConfiguration
 
             applyConfiguration();
 
-            // we succesfully loaded config
+            // we successfully loaded config
             applicationEventMulticaster.notifyEventListeners( new ConfigurationLoadEvent( this ) );
         }
     }
@@ -279,7 +279,7 @@ public class DefaultNexusConfiguration
 
             configurationSource.storeConfiguration();
 
-            // we succesfully saved config
+            // we successfully saved config
             applicationEventMulticaster.notifyEventListeners( new ConfigurationSaveEvent( this ) );
         }
     }
@@ -724,7 +724,7 @@ public class DefaultNexusConfiguration
         // create it, will do runtime validation
         Repository repository = instantiateRepository( getConfigurationModel(), settings );
 
-        // now add it to config, since it is validated and succesfully created
+        // now add it to config, since it is validated and successfully created
         getConfigurationModel().addRepository( settings );
 
         // save

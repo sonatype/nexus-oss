@@ -66,7 +66,7 @@ public class Nxcm970SimultaneousUploadDownloadIT
         // download the subjectArtifact -- should result in 404
         downloadSubjectArtifact( false, baseUrl );
 
-        // finish deploying the subjectArtifaft -- should finish succesfully
+        // finish deploying the subjectArtifaft -- should finish successfully
         continuousDeployer.finishDeploying();
 
         // wait to finish the HTTP tx, check result

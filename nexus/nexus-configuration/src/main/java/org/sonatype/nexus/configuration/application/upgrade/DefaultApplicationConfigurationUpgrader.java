@@ -111,7 +111,7 @@ public class DefaultApplicationConfigurationUpgrader
             }
 
             getLogger().info(
-                "Nexus configuration file upgraded to current version " + msg.getModelVersion() + " succesfully." );
+                "Nexus configuration file upgraded to current version " + msg.getModelVersion() + " successfully." );
 
             return (Configuration) msg.getConfiguration();
         }

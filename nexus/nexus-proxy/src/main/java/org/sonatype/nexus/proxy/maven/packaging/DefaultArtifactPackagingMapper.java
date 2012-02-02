@@ -106,7 +106,7 @@ public class DefaultArtifactPackagingMapper
                                 getLogger().info(
                                     propertiesFile.getAbsolutePath()
                                         + " user artifact packaging mapping file contained "
-                                        + userMappings.keySet().size() + " mappings, applied them all succesfully." );
+                                        + userMappings.keySet().size() + " mappings, applied them all successfully." );
                             }
                         }
                         catch ( IOException e )

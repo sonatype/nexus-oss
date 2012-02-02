@@ -247,7 +247,7 @@ public class FileConfigurationSource
         }
         else
         {
-            getLogger().info( "Nexus configuration validated succesfully." );
+            getLogger().info( "Nexus configuration validated successfully." );
         }
     }
 
