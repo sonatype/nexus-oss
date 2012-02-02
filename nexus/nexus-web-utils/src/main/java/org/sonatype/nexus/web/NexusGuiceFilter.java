@@ -42,8 +42,12 @@ public final class NexusGuiceFilter
         implements FilterPipeline
     {
         public void initPipeline( ServletContext context )
+            throws ServletException
         {
-            // pipelines support lazy initialization
+            for ( final FilterPipeline p : pipelines )
+            {
+                p.initPipeline( context );
+            }
         }
 
         public void dispatch( ServletRequest request, ServletResponse response, FilterChain chain )
