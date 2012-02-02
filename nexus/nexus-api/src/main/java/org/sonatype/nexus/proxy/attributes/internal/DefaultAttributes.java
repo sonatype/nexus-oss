@@ -153,7 +153,7 @@ public class DefaultAttributes
 
     protected String getKeyForAttribute( final String attributeName )
     {
-        return String.format( "%s-%s", "storageItem", Preconditions.checkNotNull( attributeName ) );
+        return new StringBuilder( 32 ).append( "storageItem-" ).append( Preconditions.checkNotNull( attributeName ) ).toString();
     }
 
     // ==
