@@ -271,7 +271,7 @@ public class DefaultSchedulerTest
     public void testChangeScheduleDuringRunCallable()
         throws Exception
     {
-        TestChangeScheduleDuringRunCallable callable = new TestChangeScheduleDuringRunCallable();
+        TestChangeScheduleDuringRunCallable callable = new TestChangeScheduleDuringRunCallable( 200000 );
 
         long nearFuture = System.currentTimeMillis() + 500;
 
@@ -286,7 +286,7 @@ public class DefaultSchedulerTest
         {
             if ( i == 11 )
             {
-                Assert.fail( "Waited too long for callable to have run count greater than 2 it is "
+                Assert.fail( "Waited too long for callable to have run count greater than 0 it is "
                     + callable.getRunCount() );
             }
             Thread.sleep( 500 );
@@ -297,6 +297,49 @@ public class DefaultSchedulerTest
         Assert.assertEquals( callable.getNextRun(), task.getNextRun() );
 
         task.cancel( true );
+    }
+
+    public void testCallableStepOnEachOtherToe()
+        throws Exception
+    {
+        TestCallable tr = null;
+
+        // work that will sleep 3 seconds
+        tr = new TestCallable( 3000L );
+
+        long nearFuture = System.currentTimeMillis() + 500;
+
+        Schedule schedule = getEverySecondSchedule( new Date( nearFuture ), new Date( nearFuture + 4900 ) );
+
+        ScheduledTask<Integer> st = defaultScheduler.schedule( "default", tr, schedule );
+
+        assertEquals( 1, defaultScheduler.getActiveTasks().size() );
+
+        Thread.sleep( 1200 );
+        
+        int count = 0;
+
+        while ( ( count = defaultScheduler.getScheduledExecutorService().getActiveCount() ) > 0 )
+        {
+            assertEquals( "We scheduled one task, but more than one is executing?", 1,
+                          count );
+            
+            Thread.sleep(10);
+        }
+
+        assertEquals( 3, tr.getRunCount() );
+
+        assertEquals( 3, st.getResults().size() );
+
+        assertEquals( Integer.valueOf( 0 ), st.getResults().get( 0 ) );
+
+        assertEquals( Integer.valueOf( 1 ), st.getResults().get( 1 ) );
+
+        assertEquals( Integer.valueOf( 2 ), st.getResults().get( 2 ) );
+
+        assertEquals( TaskState.FINISHED, st.getTaskState() );
+
+        assertEquals( 0, defaultScheduler.getActiveTasks().size() );
     }
 
     protected Schedule getEverySecondSchedule( Date start, Date stop )
@@ -325,11 +368,28 @@ public class DefaultSchedulerTest
     public class TestCallable
         implements Callable<Integer>
     {
+        private final Long sleepTime;
+
         private int runCount = 0;
+
+        public TestCallable()
+        {
+            this( null );
+        }
+
+        public TestCallable( Long sleepTime )
+        {
+            this.sleepTime = sleepTime;
+        }
 
         public Integer call()
             throws Exception
         {
+            if ( sleepTime != null )
+            {
+                Thread.sleep( sleepTime );
+            }
+
             return runCount++;
         }
 
@@ -357,11 +417,18 @@ public class DefaultSchedulerTest
         private ScheduledTask<?> task;
 
         private Date futureRun;
+        
+        private final long futureMillis;
+        
+        public TestChangeScheduleDuringRunCallable( long futureMillis )
+        {
+            this.futureMillis = futureMillis;
+        }
 
         public Integer call()
             throws Exception
         {
-            futureRun = new Date( System.currentTimeMillis() + 200000 );
+            futureRun = new Date( System.currentTimeMillis() + futureMillis );
 
             // by doing this, we should see the next scheduled time 200 seconds in future
             task.setSchedule( new HourlySchedule( futureRun, null ) );
