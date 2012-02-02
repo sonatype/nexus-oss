@@ -117,12 +117,16 @@ public final class Sources
     public static EntrySource getSelectTargetedEntrySource( final EntrySource source, final KeyTransformer transformer,
                                                             final String... keys )
     {
-        final KeyTransformingEntrySource transformingEntrySource = new KeyTransformingEntrySource( source, transformer );
+        if ( transformer != null )
+        {
+            final KeyTransformingEntrySource transformingEntrySource =
+                new KeyTransformingEntrySource( source, transformer );
 
-        final FilteredEntrySource filteredEntrySource =
-            new FilteredEntrySource( transformingEntrySource, new KeyEqualityEntryFilter( keys ) );
-
-        return filteredEntrySource;
+            return new FilteredEntrySource( transformingEntrySource, new KeyEqualityEntryFilter( keys ) );
+        }
+        else
+        {
+            return new FilteredEntrySource( source, new KeyEqualityEntryFilter( keys ) );
+        }
     }
-
 }
