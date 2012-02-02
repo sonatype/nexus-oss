@@ -17,9 +17,9 @@ import java.util.Map;
 
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.attributes.TransitioningAttributeStorage;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 
@@ -70,19 +70,17 @@ public class RecreateAttributesWalker
     public final void processItem( WalkerContext context, StorageItem item )
         throws Exception
     {
-        if ( item instanceof StorageFileItem )
+        if ( item instanceof StorageCollectionItem )
         {
-            processFileItem( context, (StorageFileItem) item );
+            return; // collections have no attributes persisted
         }
-        else if ( item instanceof StorageLinkItem )
-        {
-            processLinkItem( context, (StorageLinkItem) item );
-        }
+
+        doProcessFileItem( context, item );
     }
 
     // == Internal
 
-    protected void processFileItem( final WalkerContext ctx, final StorageFileItem item )
+    protected void doProcessFileItem( final WalkerContext ctx, final StorageItem item )
         throws IOException
     {
         if ( legacyAtributesOnly )
@@ -99,34 +97,15 @@ public class RecreateAttributesWalker
             item.getRepositoryItemAttributes().putAll( initialData );
         }
 
-        if ( forceAttributeRecreation )
+        if ( forceAttributeRecreation && item instanceof StorageFileItem )
         {
-            getRepository().getAttributesHandler().storeAttributes( item, item.getContentLocator() );
+            getRepository().getAttributesHandler().storeAttributes( item,
+                ( (StorageFileItem) item ).getContentLocator() );
         }
         else
         {
             getRepository().getAttributesHandler().storeAttributes( item, null );
         }
-    }
-
-    protected void processLinkItem( final WalkerContext ctx, final StorageLinkItem item )
-        throws IOException
-    {
-        if ( legacyAtributesOnly )
-        {
-            if ( !item.getRepositoryItemAttributes().containsKey( TransitioningAttributeStorage.FALLBACK_MARKER_KEY ) )
-            {
-                // if legacyAtributesOnly and current item attributes does not carry the marker, throw it away
-                return;
-            }
-        }
-
-        if ( getInitialData() != null )
-        {
-            item.getRepositoryItemAttributes().putAll( initialData );
-        }
-
-        getRepository().getAttributesHandler().storeAttributes( item, null );
     }
 
     protected boolean isForceAttributeRecreation( final WalkerContext ctx )
