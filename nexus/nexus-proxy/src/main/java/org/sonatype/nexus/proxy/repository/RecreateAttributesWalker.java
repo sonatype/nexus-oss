@@ -18,11 +18,13 @@ import java.util.Map;
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.attributes.TransitioningAttributeStorage;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
+import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StorageLinkItem;
+import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 
 public class RecreateAttributesWalker
-    extends AbstractFileWalkerProcessor
+    extends AbstractWalkerProcessor
 {
     public static final String FORCE_ATTRIBUTE_RECREATION = RecreateAttributesWalker.class.getName()
         + ".forceAttributeRecreation";
@@ -44,6 +46,18 @@ public class RecreateAttributesWalker
         this.initialData = initialData;
     }
 
+    public Repository getRepository()
+    {
+        return repository;
+    }
+
+    public Map<String, String> getInitialData()
+    {
+        return initialData;
+    }
+
+    // == WalkerProcessor
+
     @Override
     public void beforeWalk( WalkerContext context )
         throws Exception
@@ -53,6 +67,21 @@ public class RecreateAttributesWalker
     }
 
     @Override
+    public final void processItem( WalkerContext context, StorageItem item )
+        throws Exception
+    {
+        if ( item instanceof StorageFileItem )
+        {
+            processFileItem( context, (StorageFileItem) item );
+        }
+        else if ( item instanceof StorageLinkItem )
+        {
+            processLinkItem( context, (StorageLinkItem) item );
+        }
+    }
+
+    // == Internal
+
     protected void processFileItem( final WalkerContext ctx, final StorageFileItem item )
         throws IOException
     {
@@ -80,14 +109,24 @@ public class RecreateAttributesWalker
         }
     }
 
-    public Repository getRepository()
+    protected void processLinkItem( final WalkerContext ctx, final StorageLinkItem item )
+        throws IOException
     {
-        return repository;
-    }
+        if ( legacyAtributesOnly )
+        {
+            if ( !item.getRepositoryItemAttributes().containsKey( TransitioningAttributeStorage.FALLBACK_MARKER_KEY ) )
+            {
+                // if legacyAtributesOnly and current item attributes does not carry the marker, throw it away
+                return;
+            }
+        }
 
-    public Map<String, String> getInitialData()
-    {
-        return initialData;
+        if ( getInitialData() != null )
+        {
+            item.getRepositoryItemAttributes().putAll( initialData );
+        }
+
+        getRepository().getAttributesHandler().storeAttributes( item, null );
     }
 
     protected boolean isForceAttributeRecreation( final WalkerContext ctx )
