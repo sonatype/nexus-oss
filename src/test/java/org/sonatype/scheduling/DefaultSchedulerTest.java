@@ -316,26 +316,25 @@ public class DefaultSchedulerTest
         assertEquals( 1, defaultScheduler.getActiveTasks().size() );
 
         Thread.sleep( 1200 );
+        
+        int count = 0;
 
-        while ( defaultScheduler.getScheduledExecutorService().getActiveCount() > 0 )
+        while ( ( count = defaultScheduler.getScheduledExecutorService().getActiveCount() ) > 0 )
         {
             assertEquals( "We scheduled one task, but more than one is executing?", 1,
-                          defaultScheduler.getScheduledExecutorService().getActiveCount() );
+                          count );
+            Thread.sleep( 100 );
         }
 
-        assertEquals( 5, tr.getRunCount() );
+        assertEquals( 3, tr.getRunCount() );
 
-        assertEquals( 5, st.getResults().size() );
+        assertEquals( 3, st.getResults().size() );
 
         assertEquals( Integer.valueOf( 0 ), st.getResults().get( 0 ) );
 
         assertEquals( Integer.valueOf( 1 ), st.getResults().get( 1 ) );
 
         assertEquals( Integer.valueOf( 2 ), st.getResults().get( 2 ) );
-
-        assertEquals( Integer.valueOf( 3 ), st.getResults().get( 3 ) );
-
-        assertEquals( Integer.valueOf( 4 ), st.getResults().get( 4 ) );
 
         assertEquals( TaskState.FINISHED, st.getTaskState() );
 

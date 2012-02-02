@@ -63,6 +63,8 @@ public class DefaultScheduledTask<T>
     private volatile ProgressListener progressListener;
 
     boolean manualRun;
+    
+    private Future<T> manualPreviousFuture;
 
     private long duration;
 
@@ -128,7 +130,7 @@ public class DefaultScheduledTask<T>
     {
         this.scheduledAt = new Date();
 
-        setFuture( reschedule() );
+        reschedule( true );
     }
 
     protected Future<T> getFuture()
@@ -241,7 +243,7 @@ public class DefaultScheduledTask<T>
                 {
                     // only reschedule/set new state if task is not to be removed
                     // (maintain correct state transitions, e.g. SUBMITTED -> CANCELLED not allowed)
-                    reschedule();
+                    reschedule( true );
                     TaskState newState = isManualRunScheduled() ? TaskState.SUBMITTED : TaskState.WAITING;
                     setTaskState( newState );
                 }
@@ -273,8 +275,8 @@ public class DefaultScheduledTask<T>
         }
 
         setTaskState( TaskState.SUBMITTED );
-
-        setFuture( reschedule() );
+        
+        reschedule( true );
     }
 
     public Throwable getBrokenCause()
@@ -325,8 +327,14 @@ public class DefaultScheduledTask<T>
     {
         this.duration = duration;
     }
+    
+    private Future<T> doSchedule( long nextTime )
+    {
+        return getScheduler().getScheduledExecutorService().schedule( this, Math.max( 0, nextTime - System.currentTimeMillis() ),
+                                                               TimeUnit.MILLISECONDS );
+    }
 
-    protected Future<T> reschedule()
+    protected long reschedule( boolean setFuture )
     {
         if ( !isManualRunScheduled() )
         {
@@ -348,24 +356,25 @@ public class DefaultScheduledTask<T>
                 }
 
                 getScheduler().taskRescheduled( this );
-
-                return getScheduler().getScheduledExecutorService().schedule( this,
-                                                                              nextTime - System.currentTimeMillis(),
-                                                                              TimeUnit.MILLISECONDS );
+                
+                if ( setFuture )
+                {
+                    setFuture( doSchedule( nextTime ) );
+                }
+                
+                return nextTime;
             }
             else
             {
                 nextRun = null;
-
-                return null;
             }
         }
         else
         {
             nextRun = null;
-
-            return null;
         }
+        
+        return -1;
     }
 
     public void runNow()
@@ -374,8 +383,10 @@ public class DefaultScheduledTask<T>
         if ( !TaskState.RUNNING.equals( getTaskState() ) && !manualRun )
         {
             manualRun = true;
-
-            getScheduler().getScheduledExecutorService().schedule( this, 0, TimeUnit.MILLISECONDS );
+            
+            manualPreviousFuture = getFuture();
+            
+            setFuture( doSchedule( 0 ) );
         }
     }
 
@@ -410,7 +421,9 @@ public class DefaultScheduledTask<T>
                 }
             }
 
-            Future<T> nextFuture = null;
+            //nextFuture is gone, was too problematic having all these futures to setup and cancel, now we calculate next run time before 
+            //we run (to preserve that) and then run the task, then schedule the futures afterwards
+            long nextMillis = -1; 
             Date peekBefore = null;
             Date peekAfter = null;
 
@@ -422,21 +435,15 @@ public class DefaultScheduledTask<T>
 
                 try
                 {
-                    // Note that we need to do this prior to starting, so that the next run time will be updated
-                    // properly
-                    // Rather than having to wait for the task to finish
-
-                    // If manually running, just grab the previous future and use that or create a new one
+                    // this flag simply controls if another manual run can be invoked
                     if ( manualRun )
                     {
-                        nextFuture = getFuture();
-
                         manualRun = false;
                     }
-                    // Otherwise, grab the next one
+                    // otherwise normal scheduling, but dont update the future yet, just get the time
                     else
                     {
-                        nextFuture = reschedule();
+                        nextMillis = reschedule( false );
                     }
 
                     setLastRun( startDate );
@@ -454,12 +461,11 @@ public class DefaultScheduledTask<T>
                 }
                 catch ( Throwable e )
                 {
+                    //in case schedule changed, lets grab it, even in error state
                     if ( peekAfter == null )
                     {
                         peekAfter = getScheduleIterator().peekNext();
                     }
-                    
-                    manualRun = false;
 
                     setBrokenCause( e );
 
@@ -473,9 +479,14 @@ public class DefaultScheduledTask<T>
                         setTaskState( TaskState.BROKEN );
                     }
 
-                    if ( ( !isManualRunScheduled() && nextFuture == null && isEnabled() ) || isToBeRemoved() )
+                    if ( ( !isManualRunScheduled() && nextMillis == -1 && isEnabled() ) || isToBeRemoved() )
                     {
                         getScheduler().removeFromTasksMap( this );
+                    }
+                    //now that we dont schedule beforehand, need to schedule on error case if necessary
+                    else if ( nextMillis != -1 )
+                    {
+                        setFuture( doSchedule( nextMillis ) );
                     }
 
                     if ( Exception.class.isAssignableFrom( e.getClass() ) )
@@ -495,12 +506,13 @@ public class DefaultScheduledTask<T>
                     if ( ( peekBefore == null && peekAfter != null )
                         || ( peekBefore != null && !peekBefore.equals( peekAfter ) ) )
                     {
-                        if ( nextFuture != null )
+                        //this will only be set in case of manual run
+                        if ( manualPreviousFuture != null )
                         {
-                            nextFuture.cancel( true );
+                            manualPreviousFuture.cancel( true );
                         }
 
-                        nextFuture = reschedule();
+                        nextMillis = reschedule( false );
                     }
                     
                     setDuration( System.currentTimeMillis() - startDate.getTime() );
@@ -520,11 +532,17 @@ public class DefaultScheduledTask<T>
             {
                 setTaskState( TaskState.SUBMITTED );
             }
-            else if ( nextFuture != null )
+            else if ( manualPreviousFuture != null )
             {
                 setTaskState( TaskState.WAITING );
-
-                setFuture( nextFuture );
+                setFuture( manualPreviousFuture );
+                manualPreviousFuture = null;
+            }
+            else if ( nextMillis != -1 )
+            {
+                setTaskState( TaskState.WAITING );
+                
+                setFuture( doSchedule( nextMillis - System.currentTimeMillis() ) );
             }
             // If disabled (and not manually run),
             // put to waiting and reschedule for next time
@@ -533,10 +551,8 @@ public class DefaultScheduledTask<T>
             else if ( !isEnabled() )
             {
                 setTaskState( TaskState.WAITING );
-
-                nextFuture = reschedule();
-
-                setFuture( nextFuture );
+                
+                reschedule( true );
             }
             // this execution was the last execution (no other if-clause triggered)
             else if ( TaskState.CANCELLING.equals( getTaskState() ) )
