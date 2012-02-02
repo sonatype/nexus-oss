@@ -435,13 +435,7 @@ public class DefaultScheduledTask<T>
 
                 try
                 {
-                    // this flag simply controls if another manual run can be invoked
-                    if ( manualRun )
-                    {
-                        manualRun = false;
-                    }
-                    // otherwise normal scheduling, but dont update the future yet, just get the time
-                    else
+                    if ( !manualRun )
                     {
                         nextMillis = reschedule( false );
                     }
@@ -479,9 +473,26 @@ public class DefaultScheduledTask<T>
                         setTaskState( TaskState.BROKEN );
                     }
 
+                    
                     if ( ( !isManualRunScheduled() && nextMillis == -1 && isEnabled() ) || isToBeRemoved() )
                     {
                         getScheduler().removeFromTasksMap( this );
+                    }
+                    else if ( ( peekBefore == null && peekAfter != null )
+                                    || ( peekBefore != null && !peekBefore.equals( peekAfter ) ) )
+                    {
+                        //this will only be set in case of manual run
+                        if ( manualPreviousFuture != null )
+                        {
+                            manualPreviousFuture.cancel( true );
+                        }
+    
+                        nextMillis = reschedule( false );
+                    }
+                    else if ( manualRun )
+                    {
+                        setFuture( manualPreviousFuture );
+                        manualPreviousFuture = null;
                     }
                     //now that we dont schedule beforehand, need to schedule on error case if necessary
                     else if ( nextMillis != -1 )
@@ -501,20 +512,7 @@ public class DefaultScheduledTask<T>
                     }
                 }
                 finally
-                {
-                    // next run is set, but has changed from before run
-                    if ( ( peekBefore == null && peekAfter != null )
-                        || ( peekBefore != null && !peekBefore.equals( peekAfter ) ) )
-                    {
-                        //this will only be set in case of manual run
-                        if ( manualPreviousFuture != null )
-                        {
-                            manualPreviousFuture.cancel( true );
-                        }
-
-                        nextMillis = reschedule( false );
-                    }
-                    
+                {                    
                     setDuration( System.currentTimeMillis() - startDate.getTime() );
                 }
             }
@@ -532,14 +530,25 @@ public class DefaultScheduledTask<T>
             {
                 setTaskState( TaskState.SUBMITTED );
             }
-            else if ( manualPreviousFuture != null )
+            else if ( ( peekBefore == null && peekAfter != null )
+                                || ( peekBefore != null && !peekBefore.equals( peekAfter ) ) )
+            {
+                //this will only be set in case of manual run
+                if ( manualPreviousFuture != null )
+                {
+                    manualPreviousFuture.cancel( true );
+                }
+
+                nextMillis = reschedule( false );
+            }
+            else if ( manualRun )
             {
                 setTaskState( TaskState.WAITING );
                 setFuture( manualPreviousFuture );
                 manualPreviousFuture = null;
             }
             else if ( nextMillis != -1 )
-            {
+            {                
                 setTaskState( TaskState.WAITING );
                 
                 setFuture( doSchedule( nextMillis - System.currentTimeMillis() ) );
@@ -573,6 +582,8 @@ public class DefaultScheduledTask<T>
         }
         finally
         {
+            manualRun = false;
+            
             this.progressListener = null;
 
             TaskUtil.setCurrent( null );
