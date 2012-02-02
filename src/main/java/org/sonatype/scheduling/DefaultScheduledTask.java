@@ -548,6 +548,7 @@ public class DefaultScheduledTask<T>
             else if ( ( peekBefore == null && peekAfter != null )
                                 || ( peekBefore != null && !peekBefore.equals( peekAfter ) ) )
             {
+                setTaskState( TaskState.WAITING );
                 reschedule( true );
             }
             //if manual run, reuse the existing future

@@ -271,7 +271,7 @@ public class DefaultSchedulerTest
     public void testChangeScheduleDuringRunCallable()
         throws Exception
     {
-        TestChangeScheduleDuringRunCallable callable = new TestChangeScheduleDuringRunCallable();
+        TestChangeScheduleDuringRunCallable callable = new TestChangeScheduleDuringRunCallable( 200000 );
 
         long nearFuture = System.currentTimeMillis() + 500;
 
@@ -286,7 +286,7 @@ public class DefaultSchedulerTest
         {
             if ( i == 11 )
             {
-                Assert.fail( "Waited too long for callable to have run count greater than 2 it is "
+                Assert.fail( "Waited too long for callable to have run count greater than 0 it is "
                     + callable.getRunCount() );
             }
             Thread.sleep( 500 );
@@ -323,7 +323,8 @@ public class DefaultSchedulerTest
         {
             assertEquals( "We scheduled one task, but more than one is executing?", 1,
                           count );
-            Thread.sleep( 100 );
+            
+            Thread.sleep(10);
         }
 
         assertEquals( 3, tr.getRunCount() );
@@ -416,11 +417,18 @@ public class DefaultSchedulerTest
         private ScheduledTask<?> task;
 
         private Date futureRun;
+        
+        private final long futureMillis;
+        
+        public TestChangeScheduleDuringRunCallable( long futureMillis )
+        {
+            this.futureMillis = futureMillis;
+        }
 
         public Integer call()
             throws Exception
         {
-            futureRun = new Date( System.currentTimeMillis() + 200000 );
+            futureRun = new Date( System.currentTimeMillis() + futureMillis );
 
             // by doing this, we should see the next scheduled time 200 seconds in future
             task.setSchedule( new HourlySchedule( futureRun, null ) );
