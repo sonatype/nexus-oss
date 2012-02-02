@@ -26,6 +26,7 @@
             <privileges>
                 <privilege>1000</privilege>
                 <privilege>1001</privilege> <!-- Security Admin -->
+                <privilege>83</privilege> <!-- API-Key Access -->
             </privileges>
             <roles />
         </role>
@@ -34,6 +35,9 @@
             <name>Nexus Deployment Role</name>
             <description>Deployment role for Nexus</description>
             <sessionTimeout>60</sessionTimeout>
+            <privileges>
+                <privilege>83</privilege> <!-- API-Key Access -->
+            </privileges>
             <roles>
                 <role>anonymous</role>
                 <role>ui-basic</role>
