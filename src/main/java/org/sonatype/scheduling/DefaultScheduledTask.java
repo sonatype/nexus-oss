@@ -229,8 +229,6 @@ public class DefaultScheduledTask<T>
 
             if ( originalState.equals( TaskState.SLEEPING ) )
             {
-                // manualRun would be reset on transition to RUNNING, so we need to do that here as well
-                manualRun = false;
                 // NEXUS-4681 set last run to identify we tried to run this
                 setLastRun( new Date() );
 
@@ -401,6 +399,8 @@ public class DefaultScheduledTask<T>
 
             T result = null;
 
+            // Check to see if the task is already running, and if so, if concurrent executions are allowed.
+            // Should there concurrency not be allowed, the task will just sleep 10 secs and try again
             if ( getCallable() instanceof SchedulerTask )
             {
                 // check for execution
@@ -422,7 +422,8 @@ public class DefaultScheduledTask<T>
             }
 
             //nextFuture is gone, was too problematic having all these futures to setup and cancel, now we calculate next run time before 
-            //we run (to preserve that) and then run the task, then schedule the futures afterwards
+            //we run (to preserve that) and then run the task, then schedule the futures afterwards, the only gotcha is manual runs
+            //as there will be a future for the already scheduled next run that we need to handle
             long nextMillis = -1; 
             Date peekBefore = null;
             Date peekAfter = null;
@@ -435,6 +436,8 @@ public class DefaultScheduledTask<T>
 
                 try
                 {
+                    //on a manual run we dont need to calculate the next scheduled time unless the task changes the schedule
+                    //we will just reuse the previous future at the end
                     if ( !manualRun )
                     {
                         nextMillis = reschedule( false );
@@ -442,7 +445,8 @@ public class DefaultScheduledTask<T>
 
                     setLastRun( startDate );
 
-                    // keep track of the next run times so that if they change during schedule run, will get proper one
+                    // keep track of the next run times so that if they change during run, we can reschedule the next future
+                    // appropriately
                     peekBefore = getScheduleIterator().peekNext();
                     result = getCallable().call();
                     peekAfter = getScheduleIterator().peekNext();
@@ -472,23 +476,26 @@ public class DefaultScheduledTask<T>
                     {
                         setTaskState( TaskState.BROKEN );
                     }
-
                     
+                    //this will only be set in case of manual run
+                    if (!manualRun && manualPreviousFuture != null)
+                    {
+                        manualPreviousFuture.cancel( true );
+                        manualPreviousFuture = null;
+                    }
+                    
+                    //if this is not a manual task, and no next scheduled time, dump it
                     if ( ( !isManualRunScheduled() && nextMillis == -1 && isEnabled() ) || isToBeRemoved() )
                     {
                         getScheduler().removeFromTasksMap( this );
                     }
+                    //if the next scheduled time changed during task run, reschedule
                     else if ( ( peekBefore == null && peekAfter != null )
                                     || ( peekBefore != null && !peekBefore.equals( peekAfter ) ) )
-                    {
-                        //this will only be set in case of manual run
-                        if ( manualPreviousFuture != null )
-                        {
-                            manualPreviousFuture.cancel( true );
-                        }
-    
-                        nextMillis = reschedule( false );
+                    {    
+                        reschedule( true );
                     }
+                    //if manual run, reuse the existing future
                     else if ( manualRun )
                     {
                         setFuture( manualPreviousFuture );
@@ -516,6 +523,13 @@ public class DefaultScheduledTask<T>
                     setDuration( System.currentTimeMillis() - startDate.getTime() );
                 }
             }
+            
+            // this will only be set in case of manual run
+            if (!manualRun && manualPreviousFuture != null)
+            {
+                manualPreviousFuture.cancel( true );
+                manualPreviousFuture = null;
+            }
 
             if ( TaskState.BROKEN == getTaskState() )
             {
@@ -525,33 +539,30 @@ public class DefaultScheduledTask<T>
             {
                 setTaskState( TaskState.CANCELLED );
             }
-            // If manually running or having future, park this task to submitted
+            //manual schedule just sticks on submitted til user triggers again
             else if ( isManualRunScheduled() )
             {
                 setTaskState( TaskState.SUBMITTED );
             }
+            //if the next scheduled time changed during task run, reschedule
             else if ( ( peekBefore == null && peekAfter != null )
                                 || ( peekBefore != null && !peekBefore.equals( peekAfter ) ) )
             {
-                //this will only be set in case of manual run
-                if ( manualPreviousFuture != null )
-                {
-                    manualPreviousFuture.cancel( true );
-                }
-
-                nextMillis = reschedule( false );
+                reschedule( true );
             }
+            //if manual run, reuse the existing future
             else if ( manualRun )
             {
                 setTaskState( TaskState.WAITING );
                 setFuture( manualPreviousFuture );
                 manualPreviousFuture = null;
             }
+            //schedule as appropriate in most common case
             else if ( nextMillis != -1 )
             {                
                 setTaskState( TaskState.WAITING );
                 
-                setFuture( doSchedule( nextMillis - System.currentTimeMillis() ) );
+                setFuture( doSchedule( nextMillis ) );
             }
             // If disabled (and not manually run),
             // put to waiting and reschedule for next time
