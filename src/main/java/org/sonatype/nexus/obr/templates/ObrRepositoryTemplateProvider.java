@@ -52,10 +52,10 @@ public class ObrRepositoryTemplateProvider
 
         try
         {
-            templates.add( new ObrProxyRepositoryTemplate( this, OBR_PROXY, "OBR Proxy Repository" ) );
-            templates.add( new ObrShadowrepositoryTemplate( this, OBR_SHADOW, "OBR Shadow Repository" ) );
-            templates.add( new ObrGroupRepositoryTemplate( this, OBR_GROUP, "OBR Group Repository" ) );
-            templates.add( new ObrHostedRepositoryTemplate( this, OBR_HOSTED, "OBR Hosted Repository" ) );
+            templates.add( new ObrProxyRepositoryTemplate( this, OBR_PROXY, "OBR (proxy)" ) );
+            templates.add( new ObrShadowrepositoryTemplate( this, OBR_SHADOW, "OBR (virtual)" ) );
+            templates.add( new ObrGroupRepositoryTemplate( this, OBR_GROUP, "OBR (group)" ) );
+            templates.add( new ObrHostedRepositoryTemplate( this, OBR_HOSTED, "OBR (hosted)" ) );
         }
         catch ( final Exception e )
         {
