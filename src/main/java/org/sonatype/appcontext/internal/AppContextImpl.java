@@ -1,5 +1,6 @@
 package org.sonatype.appcontext.internal;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,7 +16,7 @@ public class AppContextImpl
     implements AppContext
 {
     private final String id;
-    
+
     private final AppContext parent;
 
     private final HierarchicalMap<String, AppContextEntry> entries;
@@ -24,7 +25,7 @@ public class AppContextImpl
                            final Map<String, AppContextEntry> sourcedEntries )
     {
         this.id = Preconditions.checkNotNull( id );
-        
+
         this.parent = parent;
 
         if ( parent != null )
@@ -84,18 +85,23 @@ public class AppContextImpl
 
     public void dump()
     {
+        dump( System.out );
+    }
+
+    public void dump( final PrintStream ps )
+    {
         if ( parent != null )
         {
-            parent.dump();
+            parent.dump( ps );
         }
 
         // now dump me
-        System.out.println( "AppContext: " + getId() );
+        ps.println( "AppContext: " + getId() );
         for ( AppContextEntry entry : entries.values() )
         {
-            System.out.println( entry.toString() );
+            ps.println( entry.toString() );
         }
-        System.out.println();
+        ps.println();
     }
 
     // ==

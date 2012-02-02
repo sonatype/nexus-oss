@@ -1,5 +1,6 @@
 package org.sonatype.appcontext;
 
+import java.io.PrintStream;
 import java.util.Map;
 
 import org.codehaus.plexus.interpolation.Interpolator;
@@ -27,20 +28,27 @@ public interface AppContext
     AppContext getParent();
 
     /**
-     * Returns the entry value, used in creation of this context. Gives access to source marker and raw (uninterpolated)
-     * values.
-     * 
-     * @return
-     */
-    AppContextEntry getAppContextEntry( String key );
-
-    /**
      * Flattens this AppContext (calculates "visible" entries from this and it's parent and returns a plain Map. This
      * map is not connected to AppContext anymore, and not modifiable! It is just a "snapshot".
      * 
      * @return
      */
     Map<String, Object> flatten();
+
+    /**
+     * Returns an interpolator using this app context as source.
+     * 
+     * @return
+     */
+    Interpolator getInterpolator();
+
+    /**
+     * Returns the entry value, used in creation of this context. Gives access to source marker and raw (uninterpolated)
+     * values.
+     * 
+     * @return
+     */
+    AppContextEntry getAppContextEntry( String key );
 
     /**
      * Flattens this AppContext (calculates "visible" entries from this and it's parent and returns a plain Map but with
@@ -52,14 +60,12 @@ public interface AppContext
     Map<String, AppContextEntry> flattenAppContextEntries();
 
     /**
-     * Returns an interpolator using this app context as source.
-     * 
-     * @return
-     */
-    Interpolator getInterpolator();
-
-    /**
-     * Dumps the complete AppContext (with hierarchy, sources).
+     * Dumps the complete AppContext (with hierarchy, sources) to default System.out.
      */
     void dump();
+
+    /**
+     * Dumps the complete AppContext (with hierarchy, sources) to given PrintStream.
+     */
+    void dump( PrintStream ps );
 }
