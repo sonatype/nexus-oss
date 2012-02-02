@@ -283,6 +283,13 @@ public class AbstractEnvironmentMojo
      */
     private boolean unpackPluginWebapps;
 
+    /**
+     * Prevents a given artifact to be copy into nexus plugin repository
+     * 
+     * @parameter
+     */
+    private String[] exclusions;
+
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
@@ -929,6 +936,8 @@ public class AbstractEnvironmentMojo
             nexusPluginsArtifacts.add( ma );
         }
 
+        nexusPluginsArtifacts = filterOutExcludedPlugins( nexusPluginsArtifacts );
+
         for ( MavenArtifact plugin : nexusPluginsArtifacts )
         {
             Artifact pluginArtifact = getMavenArtifact( plugin );
@@ -1237,6 +1246,50 @@ public class AbstractEnvironmentMojo
             public boolean apply( Artifact a )
             {
                 return !"system".equals( a.getScope() );
+            }
+        } );
+    }
+
+    private Set<MavenArtifact> filterOutExcludedPlugins( Collection<MavenArtifact> artifacts )
+    {
+        if ( exclusions == null )
+        {
+            return Sets.newLinkedHashSet( artifacts );
+        }
+
+        return Sets.filter( Sets.newLinkedHashSet( artifacts ), new Predicate<MavenArtifact>()
+        {
+
+            @Override
+            public boolean apply( MavenArtifact a )
+            {
+                for ( String exclusion : exclusions )
+                {
+                    String[] pieces = exclusion.split( ":" );
+                    if ( pieces.length != 2 )
+                    {
+                        throw new IllegalArgumentException( "Invalid exclusion " + exclusion );
+                    }
+                    String groupId = pieces[0];
+                    String artifactId = pieces[1];
+
+                    if ( "*".equals( groupId ) )
+                    {
+                        if ( artifactId.equals( a.getArtifactId() ) )
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        if ( groupId.equals( a.getGroupId() ) && artifactId.equals( a.getArtifactId() ) )
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
             }
         } );
     }
