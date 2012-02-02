@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sonatype.appcontext.source.filter.FilteredEntrySource;
+import org.sonatype.appcontext.source.filter.KeyEqualityEntryFilter;
 import org.sonatype.appcontext.source.filter.KeyPrefixEntryFilter;
 import org.sonatype.appcontext.source.keys.ConfigurableSystemEnvironmentKeyTransformer;
 import org.sonatype.appcontext.source.keys.KeyTransformer;
@@ -36,19 +37,19 @@ public final class Sources
 
         for ( String alias : aliases )
         {
-            result.add( getTargetedEntrySource( new SystemEnvironmentEntrySource(),
+            result.add( getPrefixTargetedEntrySource( new SystemEnvironmentEntrySource(),
                 new ConfigurableSystemEnvironmentKeyTransformer( '-' ), alias + "-" ) );
         }
 
-        result.add( getTargetedEntrySource( new SystemEnvironmentEntrySource(),
+        result.add( getPrefixTargetedEntrySource( new SystemEnvironmentEntrySource(),
             new ConfigurableSystemEnvironmentKeyTransformer( '-' ), id + "-" ) );
 
         for ( String alias : aliases )
         {
-            result.add( getTargetedEntrySource( new SystemPropertiesEntrySource(), alias + "." ) );
+            result.add( getPrefixTargetedEntrySource( new SystemPropertiesEntrySource(), alias + "." ) );
         }
 
-        result.add( getTargetedEntrySource( new SystemPropertiesEntrySource(), id + "." ) );
+        result.add( getPrefixTargetedEntrySource( new SystemPropertiesEntrySource(), id + "." ) );
 
         return result;
     }
@@ -61,9 +62,9 @@ public final class Sources
      * @param prefix
      * @return
      */
-    public static EntrySource getTargetedEntrySource( final EntrySource source, final String prefix )
+    public static EntrySource getPrefixTargetedEntrySource( final EntrySource source, final String prefix )
     {
-        return getTargetedEntrySource( source, new NoopKeyTransformer(), prefix );
+        return getPrefixTargetedEntrySource( source, new NoopKeyTransformer(), prefix );
     }
 
     /**
@@ -85,8 +86,8 @@ public final class Sources
      * @param prefix
      * @return
      */
-    public static EntrySource getTargetedEntrySource( final EntrySource source, final KeyTransformer transformer,
-                                                      final String prefix )
+    public static EntrySource getPrefixTargetedEntrySource( final EntrySource source, final KeyTransformer transformer,
+                                                            final String prefix )
     {
         final KeyTransformingEntrySource transformingEntrySource = new KeyTransformingEntrySource( source, transformer );
 
@@ -95,4 +96,33 @@ public final class Sources
 
         return new KeyTransformingEntrySource( filteredEntrySource, new PrefixRemovingKeyTransformer( prefix ) );
     }
+
+    /**
+     * Returns a "targeted entry source" that does:
+     * <ul>
+     * <li>performs key transformation with supplied key transformer</li>
+     * <li>filters (cherry-picks) keys with supplied keys (equality)</li>
+     * <li>does not performs a key transformation</li>
+     * </ul>
+     * Hence, if you have an entry source having keys "foo" and "bar", and you pass in keys [foo], the resulting entry
+     * sources will deliver only one key, the "foo" (filtering discareded "bar"). This is a special case of
+     * FilteredEntrySource that "cherry-picks" based on keys (so far does same as FilteredEntrySource with
+     * KeyEqualityEntryFilter).
+     * 
+     * @param source
+     * @param transformer
+     * @param prefix
+     * @return
+     */
+    public static EntrySource getSelectTargetedEntrySource( final EntrySource source, final KeyTransformer transformer,
+                                                            final String... keys )
+    {
+        final KeyTransformingEntrySource transformingEntrySource = new KeyTransformingEntrySource( source, transformer );
+
+        final FilteredEntrySource filteredEntrySource =
+            new FilteredEntrySource( transformingEntrySource, new KeyEqualityEntryFilter( keys ) );
+
+        return filteredEntrySource;
+    }
+
 }
