@@ -1,4 +1,4 @@
-/**
+/*
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -12,10 +12,6 @@
  */
 package org.sonatype.nexus.configuration.application.upgrade;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -23,19 +19,23 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.model.v1_10_0.CErrorReporting;
-import org.sonatype.nexus.configuration.model.v1_10_0.CNotification;
-import org.sonatype.nexus.configuration.model.v1_10_0.CRepository;
-import org.sonatype.nexus.configuration.model.v1_10_0.upgrade.BasicVersionUpgrade;
+import org.sonatype.nexus.configuration.model.CErrorReporting;
+import org.sonatype.nexus.configuration.model.CNotification;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.v2_0_0.upgrade.BasicVersionUpgrade;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfiguration;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
 /**
- * Upgrades configuration model from version 1.4.6 to 1.10.0.<BR>
+ * Upgrades configuration model from version 1.10.0 to 2.0.<BR>
  * 
  * @author velo
  */
-@Component( role = SingleVersionUpgrader.class, hint = "1.4.6" )
-public class Upgrade146to1100
+@Component( role = SingleVersionUpgrader.class, hint = "1.10.0" )
+public class Upgrade1100to200
     extends AbstractLogEnabled
     implements SingleVersionUpgrader
 {
@@ -45,15 +45,15 @@ public class Upgrade146to1100
     {
         FileReader fr = null;
 
-        org.sonatype.nexus.configuration.model.v1_4_6.Configuration conf = null;
+        org.sonatype.nexus.configuration.model.v1_10_0.Configuration conf = null;
 
         try
         {
             // reading without interpolation to preserve user settings as variables
             fr = new FileReader( file );
 
-            org.sonatype.nexus.configuration.model.v1_4_6.io.xpp3.NexusConfigurationXpp3Reader reader =
-                new org.sonatype.nexus.configuration.model.v1_4_6.io.xpp3.NexusConfigurationXpp3Reader();
+            org.sonatype.nexus.configuration.model.v1_10_0.io.xpp3.NexusConfigurationXpp3Reader reader =
+                new org.sonatype.nexus.configuration.model.v1_10_0.io.xpp3.NexusConfigurationXpp3Reader();
 
             conf = reader.read( fr );
         }
@@ -75,49 +75,31 @@ public class Upgrade146to1100
     public void upgrade( UpgradeMessage message )
         throws ConfigurationIsCorruptedException
     {
-        org.sonatype.nexus.configuration.model.v1_4_6.Configuration oldc =
-            (org.sonatype.nexus.configuration.model.v1_4_6.Configuration) message.getConfiguration();
+        org.sonatype.nexus.configuration.model.v1_10_0.Configuration oldc =
+            (org.sonatype.nexus.configuration.model.v1_10_0.Configuration) message.getConfiguration();
 
         BasicVersionUpgrade versionConverter = new BasicVersionUpgrade()
         {
             @Override
-            public CRepository upgradeCRepository( org.sonatype.nexus.configuration.model.v1_4_6.CRepository cRepository )
+            public CRepository upgradeCRepository( org.sonatype.nexus.configuration.model.v1_10_0.CRepository cRepository )
             {
                 CRepository newRepo = super.upgradeCRepository( cRepository );
 
-                Xpp3Dom dom = (Xpp3Dom) cRepository.getExternalConfiguration();
-                if ( cRepository.getRemoteStorage() != null && dom != null )
-                {
-                    Xpp3Dom validate = dom.getChild( AbstractProxyRepositoryConfiguration.FILE_TYPE_VALIDATION );
-                    if ( validate != null )
-                    {
-                        validate.setValue( Boolean.TRUE.toString() );
-                    }
-                }
+                // shut down NFC on any non-proxy repository
+                final boolean isProxyRepository =
+                    cRepository.isNotFoundCacheActive() &&
+                    newRepo.getRemoteStorage() != null &&
+                    newRepo.getRemoteStorage().getUrl() != null;
+                newRepo.setNotFoundCacheActive( isProxyRepository );
+
                 return newRepo;
             }
         };
 
-        org.sonatype.nexus.configuration.model.v1_10_0.Configuration newc = versionConverter.upgradeConfiguration( oldc );
+        org.sonatype.nexus.configuration.model.Configuration newc = versionConverter.upgradeConfiguration( oldc );
 
-        // this should go into much "older" upgrader, this was a mistake!
-        if ( newc.getErrorReporting() == null )
-        {
-            CErrorReporting errorReporting = new CErrorReporting();
-            errorReporting.setEnabled( false );
-            newc.setErrorReporting( errorReporting );
-        }
-        if ( newc.getNotification() == null )
-        {
-            CNotification notification = new CNotification();
-            notification.setEnabled( false );
-            newc.setNotification( notification );
-        }
-
-
-
-        newc.setVersion( org.sonatype.nexus.configuration.model.v1_10_0.Configuration.MODEL_VERSION );
-        message.setModelVersion( org.sonatype.nexus.configuration.model.v1_10_0.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
 }
