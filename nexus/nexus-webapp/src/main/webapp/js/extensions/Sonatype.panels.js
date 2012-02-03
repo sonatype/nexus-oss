@@ -81,6 +81,7 @@ Ext.extend(Sonatype.panels.AutoTabPanel, Ext.Panel, {
         this.tabPanel = new Ext.TabPanel({
               activeItem : this.activeTab == -1 ? null : this.activeTab,
               deferredRender : false,
+              enableTabScroll : true,
               autoScroll : false,
               frame : false,
               border : false,
