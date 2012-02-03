@@ -16,6 +16,7 @@ package org.sonatype.nexus.util;
  * A simple linear number sequence (linear equation).
  * 
  * @author cstamas
+ * @since 2.0
  */
 public class LinearNumberSequence
     implements NumberSequence

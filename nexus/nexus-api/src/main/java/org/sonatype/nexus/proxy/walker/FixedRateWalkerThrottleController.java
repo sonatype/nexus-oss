@@ -195,7 +195,7 @@ public class FixedRateWalkerThrottleController
     @Override
     public void walkEnded( final WalkerContext context, final ThrottleInfo info )
     {
-        calculateStats( info );
+        mayCalculateStats( info, true );
     }
 
     @Override
@@ -207,10 +207,8 @@ public class FixedRateWalkerThrottleController
     @Override
     public long throttleTime( final ThrottleInfo info )
     {
-        if ( adjustmentNeeded() )
+        if ( mayCalculateStats( info, false ) )
         {
-            calculateStats( info );
-
             if ( lastSliceTps > limiterTps )
             {
                 // hold down the horses, increase sleepTime
@@ -243,25 +241,34 @@ public class FixedRateWalkerThrottleController
 
     // ==
 
-    protected void calculateStats( final ThrottleInfo info )
+    protected boolean mayCalculateStats( final ThrottleInfo info, final boolean forced )
     {
-        // global average TPS since walk started
-        globalAverageTps = calculateCPS( info.getTotalProcessItemInvocationCount(), info.getTotalTimeWalking() );
-        // local TPS achieved in current "adjustment" slice
-        lastSliceTps =
-            calculateCPS( info.getTotalProcessItemInvocationCount() - lastAdjustmentProcessItemInvocationCount,
-                lastSliceSize );
-        lastAdjustmentProcessItemInvocationCount = info.getTotalProcessItemInvocationCount();
-        // the maximum TPS since the walk started
-        globalMaximumTps = Math.max( lastSliceTps, globalMaximumTps );
+        if ( adjustmentNeeded( forced ) )
+        {
+            // global average TPS since walk started
+            globalAverageTps = calculateCPS( info.getTotalProcessItemInvocationCount(), info.getTotalTimeWalking() );
+            // local TPS achieved in current "adjustment" slice
+            lastSliceTps =
+                calculateCPS( info.getTotalProcessItemInvocationCount() - lastAdjustmentProcessItemInvocationCount,
+                    lastSliceSize );
+            lastAdjustmentProcessItemInvocationCount = info.getTotalProcessItemInvocationCount();
+            // the maximum TPS since the walk started
+            globalMaximumTps = Math.max( lastSliceTps, globalMaximumTps );
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
-    protected boolean adjustmentNeeded()
+    protected boolean adjustmentNeeded( final boolean forced )
     {
         final long now = System.currentTimeMillis();
-        lastSliceSize = now - lastAdjustmentTimestamp;
-        if ( ( lastSliceSize ) > sliceSize )
+        final long latestSlice = now - lastAdjustmentTimestamp;
+        if ( forced || latestSlice > sliceSize )
         {
+            lastSliceSize = latestSlice;
             this.lastAdjustmentTimestamp = now;
             return true;
         }

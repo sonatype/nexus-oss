@@ -57,27 +57,49 @@ public class DefaultAttributeUpgraderMBean
     }
 
     @Override
-    public int getCurrentUps()
+    public int getGlobalAverageTps()
     {
-        return attributeUpgrader.getCurrentUps();
+        return attributeUpgrader.getGlobalAverageTps();
     }
 
     @Override
-    public int getMaximumUps()
+    public int getGlobalMaximumTps()
     {
-        return attributeUpgrader.getMaximumUps();
+        return attributeUpgrader.getGlobalMaximumTps();
     }
 
     @Override
-    public int getLimiterUps()
+    public int getLastSliceTps()
     {
-        return attributeUpgrader.getLimiterUps();
+        return attributeUpgrader.getLastSliceTps();
     }
 
     @Override
-    public void setLimiterUps( int limit )
+    public long getCurrentSleepTime()
     {
-        attributeUpgrader.setLimiterUps( limit );
+        return attributeUpgrader.getCurrentSleepTime();
+    }
+
+    public long getMinimumSleepTime()
+    {
+        return attributeUpgrader.getMinimumSleepTime();
+    }
+
+    public void setMinimumSleepTime( long sleepTime )
+    {
+        attributeUpgrader.setMinimumSleepTime( sleepTime );
+    }
+
+    @Override
+    public int getLimiterTps()
+    {
+        return attributeUpgrader.getLimiterTps();
+    }
+
+    @Override
+    public void setLimiterTps( int limiterTps )
+    {
+        attributeUpgrader.setLimiterTps( limiterTps );
     }
 
     @Override
