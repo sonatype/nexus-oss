@@ -17,7 +17,7 @@ import org.sonatype.appcontext.source.WrappingEntrySourceMarker;
  * 
  * @author cstamas
  */
-public class ConfigurableSystemEnvironmentKeyTransformer
+public class LegacySystemEnvironmentKeyTransformer
     implements KeyTransformer
 {
     private final char underscoreReplacement;
@@ -25,7 +25,7 @@ public class ConfigurableSystemEnvironmentKeyTransformer
     /**
      * Constructs default instance that uses '-' (dash).
      */
-    public ConfigurableSystemEnvironmentKeyTransformer()
+    public LegacySystemEnvironmentKeyTransformer()
     {
         this( '-' );
     }
@@ -36,7 +36,7 @@ public class ConfigurableSystemEnvironmentKeyTransformer
      * 
      * @param underscoreReplacement
      */
-    public ConfigurableSystemEnvironmentKeyTransformer( char underscoreReplacement )
+    public LegacySystemEnvironmentKeyTransformer( char underscoreReplacement )
     {
         this.underscoreReplacement = Preconditions.checkNotNull( underscoreReplacement );
     }
@@ -53,7 +53,7 @@ public class ConfigurableSystemEnvironmentKeyTransformer
             @Override
             protected String getDescription( final EntrySourceMarker wrapped )
             {
-                return String.format( "sysEnvTransformation(%s)", wrapped.getDescription() );
+                return String.format( "legacySysEnvTransformation(%s)", wrapped.getDescription() );
             }
         };
     }

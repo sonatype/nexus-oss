@@ -6,6 +6,8 @@ import org.sonatype.appcontext.source.EntrySourceMarker;
 public class AppContextEntryImpl
     implements AppContextEntry
 {
+    private final long created;
+    
     private final String key;
 
     private final Object rawValue;
@@ -14,13 +16,19 @@ public class AppContextEntryImpl
 
     private final EntrySourceMarker entrySourceMarker;
 
-    public AppContextEntryImpl( final String key, final Object rawValue, final Object value,
+    public AppContextEntryImpl( final long created, final String key, final Object rawValue, final Object value,
                                 final EntrySourceMarker entrySourceMarker )
     {
+        this.created = created;
         this.key = Preconditions.checkNotNull( key );
         this.rawValue = rawValue;
         this.value = value;
         this.entrySourceMarker = Preconditions.checkNotNull( entrySourceMarker );
+    }
+
+    public long getCreated()
+    {
+        return created;
     }
 
     public String getKey()

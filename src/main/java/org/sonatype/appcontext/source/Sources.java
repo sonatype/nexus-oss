@@ -6,9 +6,9 @@ import java.util.List;
 import org.sonatype.appcontext.source.filter.FilteredEntrySource;
 import org.sonatype.appcontext.source.filter.KeyEqualityEntryFilter;
 import org.sonatype.appcontext.source.filter.KeyPrefixEntryFilter;
-import org.sonatype.appcontext.source.keys.ConfigurableSystemEnvironmentKeyTransformer;
 import org.sonatype.appcontext.source.keys.KeyTransformer;
 import org.sonatype.appcontext.source.keys.KeyTransformingEntrySource;
+import org.sonatype.appcontext.source.keys.LegacySystemEnvironmentKeyTransformer;
 import org.sonatype.appcontext.source.keys.NoopKeyTransformer;
 import org.sonatype.appcontext.source.keys.PrefixRemovingKeyTransformer;
 
@@ -33,16 +33,16 @@ public final class Sources
      */
     public static List<EntrySource> getDefaultSources( final String id, final List<String> aliases )
     {
-        ArrayList<EntrySource> result = new ArrayList<EntrySource>( 2 );
+        final ArrayList<EntrySource> result = new ArrayList<EntrySource>( 2 );
 
         for ( String alias : aliases )
         {
             result.add( getPrefixTargetedEntrySource( new SystemEnvironmentEntrySource(),
-                new ConfigurableSystemEnvironmentKeyTransformer( '-' ), alias + "-" ) );
+                new LegacySystemEnvironmentKeyTransformer( '-' ), alias + "-" ) );
         }
 
         result.add( getPrefixTargetedEntrySource( new SystemEnvironmentEntrySource(),
-            new ConfigurableSystemEnvironmentKeyTransformer( '-' ), id + "-" ) );
+            new LegacySystemEnvironmentKeyTransformer( '-' ), id + "-" ) );
 
         for ( String alias : aliases )
         {
@@ -55,7 +55,39 @@ public final class Sources
     }
 
     /**
-     * Gets a targeted entry source (see {@link #getTargetedEntrySource(EntrySource, KeyTransformer, String)} for
+     * Creates a properly ordered list of EntrySources with variations to be used for prefixed entry sources. Order is
+     * system env then system properties.
+     * 
+     * @param prefix
+     * @return
+     */
+    public static List<EntrySource> getDefaultPrefixTargetedSources( final String prefix )
+    {
+        final ArrayList<EntrySource> result = new ArrayList<EntrySource>( 2 );
+        result.add( getPrefixTargetedEntrySource( new SystemEnvironmentEntrySource(),
+            new LegacySystemEnvironmentKeyTransformer( '-' ), prefix + "-" ) );
+        result.add( getPrefixTargetedEntrySource( new SystemPropertiesEntrySource(), prefix + "." ) );
+        return result;
+    }
+
+    /**
+     * Creates a properly ordered list of EntrySources with variations to be used for selected (listed keys, tested on
+     * equality) entry sources. Order is system env then system properties.
+     * 
+     * @param prefix
+     * @return
+     */
+    public static List<EntrySource> getDefaultSelectTargetedSources( final String... keys )
+    {
+        final ArrayList<EntrySource> result = new ArrayList<EntrySource>( 2 );
+        result.add( getSelectTargetedEntrySource( new SystemEnvironmentEntrySource(),
+            new LegacySystemEnvironmentKeyTransformer( '-' ), keys ) );
+        result.add( getSelectTargetedEntrySource( new SystemPropertiesEntrySource(), keys ) );
+        return result;
+    }
+
+    /**
+     * Gets a targeted entry source (see {@link #getPrefixTargetedEntrySource(EntrySource, KeyTransformer, String)} for
      * complete description) that uses {@link NoopKeyTransformer}.
      * 
      * @param source
@@ -65,6 +97,19 @@ public final class Sources
     public static EntrySource getPrefixTargetedEntrySource( final EntrySource source, final String prefix )
     {
         return getPrefixTargetedEntrySource( source, new NoopKeyTransformer(), prefix );
+    }
+
+    /**
+     * Gets a targeted entry source (see {@link #getSelectTargetedEntrySource(EntrySource, KeyTransformer, String)} for
+     * complete description) that uses {@link NoopKeyTransformer}.
+     * 
+     * @param source
+     * @param keys
+     * @return
+     */
+    public static EntrySource getSelectTargetedEntrySource( final EntrySource source, final String... keys )
+    {
+        return getSelectTargetedEntrySource( source, new NoopKeyTransformer(), keys );
     }
 
     /**

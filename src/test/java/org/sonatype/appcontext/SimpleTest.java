@@ -3,6 +3,7 @@ package org.sonatype.appcontext;
 import java.io.File;
 import java.util.Arrays;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.sonatype.appcontext.source.LegacyBasedirEntrySource;
@@ -10,8 +11,8 @@ import org.sonatype.appcontext.source.PropertiesFileEntrySource;
 import org.sonatype.appcontext.source.SystemEnvironmentEntrySource;
 import org.sonatype.appcontext.source.filter.FilteredEntrySource;
 import org.sonatype.appcontext.source.filter.KeyEqualityEntryFilter;
-import org.sonatype.appcontext.source.keys.ConfigurableSystemEnvironmentKeyTransformer;
 import org.sonatype.appcontext.source.keys.KeyTransformingEntrySource;
+import org.sonatype.appcontext.source.keys.LegacySystemEnvironmentKeyTransformer;
 
 public class SimpleTest
     extends TestCase
@@ -27,29 +28,31 @@ public class SimpleTest
         System.setProperty( "plexus.bimbimbim", "yeah!" );
         System.setProperty( "plexus.bimbimbim-dash", "dash" );
         System.setProperty( "plexus.bimbimbim.dot", "dot" );
+        System.setProperty( "included", "I am included!" );
 
         // ctx ID is "c01", but has alias "plexus" too. Will gather those set above from system props
-        AppContextRequest request = Factory.getDefaultRequest( "c01", null, Arrays.asList( "plexus" ) );
-        
+        AppContextRequest request = Factory.getDefaultRequest( "c01", null, Arrays.asList( "plexus" ), "included" );
+
         // +1 the basedir
         request.getSources().add( new LegacyBasedirEntrySource( "c01.basedir", true ) );
-        
+
         // +3 from properties file
         request.getSources().add(
             new PropertiesFileEntrySource( new File( "src/test/resources/c01/plexus.properties" ) ) );
-        
+
         // +1 from env: this one applies "default" system env key transformation, hence $HOME key will become "home"
         request.getSources().add(
             new FilteredEntrySource( new KeyTransformingEntrySource( new SystemEnvironmentEntrySource(),
-                new ConfigurableSystemEnvironmentKeyTransformer() ), new KeyEqualityEntryFilter( "home" ) ) );
-        
-        // +1 from env: this one those not applies "default" system env key transformation, hence $HOME ends up as "HOME"
+                new LegacySystemEnvironmentKeyTransformer() ), new KeyEqualityEntryFilter( "home" ) ) );
+
+        // +1 from env: this one those not applies "default" system env key transformation, hence $HOME ends up as
+        // "HOME"
         request.getSources().add(
             new FilteredEntrySource( new SystemEnvironmentEntrySource(), new KeyEqualityEntryFilter( "HOME" ) ) );
 
         AppContext appContext = Factory.create( request );
 
-        assertEquals( 13, appContext.size() );
+        assertEquals( 14, appContext.size() );
 
         // For reference, below is what should spit this out (naturally, paths would be different on different machine)
         // ===================================
@@ -69,6 +72,7 @@ public class SimpleTest
         // "blah"="tooMuchTalk!" (raw: "tooMuchTalk!", src: prefixRemove(prefix:c01., filter(keyStartsWith:[c01.],
         // system(properties))))
         // "HOME"="/Users/cstamas" (raw: "/Users/cstamas", src: filter(keyIsIn:[HOME], system(env)))
+        // "included"="I am included!" (raw: "I am included!", src: filter(keyIsIn:[included], system(properties)))
         // "foointerpolated"="1" (raw: "${foo}", src:
         // propsFile(/Users/cstamas/worx/sonatype/appcontext/src/test/resources/c01/plexus.properties, size:3))
         // "bimbimbim-dash"="dash" (raw: "dash", src: prefixRemove(prefix:plexus., filter(keyStartsWith:[plexus.],
@@ -82,5 +86,72 @@ public class SimpleTest
         // filter(keyStartsWith:[c01.], system(properties))))
         // Total of 13 entries.
         // ===================================
+    }
+
+    public void testTimestamps()
+        throws Exception
+    {
+        // Set this to have it "catched"
+        System.setProperty( "c01.blah", "tooMuchTalk!" );
+        System.setProperty( "c01.blah-blah", "dash" );
+        System.setProperty( "c01.blah.blah", "dot" );
+        System.setProperty( "c01.basedir", new File( "src/test/resources/c01" ).getAbsolutePath() );
+        System.setProperty( "plexus.bimbimbim", "yeah!" );
+        System.setProperty( "plexus.bimbimbim-dash", "dash" );
+        System.setProperty( "plexus.bimbimbim.dot", "dot" );
+        System.setProperty( "included", "I am included!" );
+
+        // ctx ID is "c01", but has alias "plexus" too. Will gather those set above from system props
+        AppContextRequest request = Factory.getDefaultRequest( "c01", null, Arrays.asList( "plexus" ), "included" );
+
+        // +1 the basedir
+        request.getSources().add( new LegacyBasedirEntrySource( "c01.basedir", true ) );
+
+        // +3 from properties file
+        request.getSources().add(
+            new PropertiesFileEntrySource( new File( "src/test/resources/c01/plexus.properties" ) ) );
+
+        // +1 from env: this one applies "default" system env key transformation, hence $HOME key will become "home"
+        request.getSources().add(
+            new FilteredEntrySource( new KeyTransformingEntrySource( new SystemEnvironmentEntrySource(),
+                new LegacySystemEnvironmentKeyTransformer() ), new KeyEqualityEntryFilter( "home" ) ) );
+
+        // +1 from env: this one those not applies "default" system env key transformation, hence $HOME ends up as
+        // "HOME"
+        request.getSources().add(
+            new FilteredEntrySource( new SystemEnvironmentEntrySource(), new KeyEqualityEntryFilter( "HOME" ) ) );
+
+        AppContext appContext = Factory.create( request );
+        
+        assertEquals( 14, appContext.size() );
+
+        final long created = appContext.getCreated();
+        long modified = appContext.getModified();
+        Thread.sleep( 5 ); // resolution is millis, so to be sure we have diff on fast HW
+        
+        Assert.assertEquals( created, modified );
+        
+        appContext.remove( "included" );
+        Assert.assertEquals( 13, appContext.size() );
+        
+        Assert.assertTrue( modified < appContext.getModified() );
+        modified = appContext.getModified();
+        Thread.sleep( 5 ); // resolution is millis, so to be sure we have diff on fast HW
+        
+        appContext.put( "foo1", "bar1" );
+        Assert.assertEquals( 14, appContext.size() );
+        
+        Assert.assertTrue( modified < appContext.getModified() );
+        modified = appContext.getModified();
+        Thread.sleep( 5 ); // resolution is millis, so to be sure we have diff on fast HW
+
+        appContext.clear();
+        Assert.assertEquals( 0, appContext.size() );
+        
+        Assert.assertTrue( modified < appContext.getModified() );
+        modified = appContext.getModified();
+        Thread.sleep( 5 ); // resolution is millis, so to be sure we have diff on fast HW
+
+       
     }
 }

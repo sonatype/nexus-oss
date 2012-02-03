@@ -25,9 +25,9 @@ public class Factory
     }
 
     public static AppContextRequest getDefaultRequest( final String id, final AppContext parent,
-                                                       final List<String> aliases )
+                                                       final List<String> aliases, final String... keyInclusions )
     {
-        return InternalFactory.getDefaultAppContextRequest( id, parent, aliases );
+        return InternalFactory.getDefaultAppContextRequest( id, parent, aliases, keyInclusions );
     }
 
     public static AppContext create( final AppContextRequest request )

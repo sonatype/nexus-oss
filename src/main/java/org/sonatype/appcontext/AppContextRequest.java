@@ -19,19 +19,27 @@ public class AppContextRequest
 
     private final boolean useSystemPropertiesFallback;
 
+    private final List<String> keyInclusions;
+
     public AppContextRequest( final String id, final List<EntrySource> sources, final List<EntryPublisher> publishers )
     {
-        this( id, null, sources, publishers, true );
+        this( id, null, sources, publishers, true, null );
     }
 
     public AppContextRequest( final String id, final AppContext parent, final List<EntrySource> sources,
-                              final List<EntryPublisher> publishers, final boolean useSystemPropertiesFallback )
+                              final List<EntryPublisher> publishers, final boolean useSystemPropertiesFallback,
+                              final List<String> keyInclusions )
     {
         this.id = Preconditions.checkNotNull( id );
         this.parent = parent;
         this.sources = new ArrayList<EntrySource>( Preconditions.checkNotNull( sources ) );
         this.publishers = new ArrayList<EntryPublisher>( Preconditions.checkNotNull( publishers ) );
         this.useSystemPropertiesFallback = useSystemPropertiesFallback;
+        this.keyInclusions = new ArrayList<String>();
+        if ( keyInclusions != null )
+        {
+            this.keyInclusions.addAll( keyInclusions );
+        }
     }
 
     public String getId()
@@ -57,5 +65,10 @@ public class AppContextRequest
     public boolean isUseSystemPropertiesFallback()
     {
         return useSystemPropertiesFallback;
+    }
+
+    public List<String> getKeyInclusions()
+    {
+        return keyInclusions;
     }
 }

@@ -15,15 +15,21 @@ import org.sonatype.appcontext.AppContextEntry;
 public class AppContextImpl
     implements AppContext
 {
+    private final long created;
+
+    private long modified;
+
     private final String id;
 
     private final AppContext parent;
 
     private final HierarchicalMap<String, AppContextEntry> entries;
 
-    public AppContextImpl( final String id, final AppContextImpl parent,
+    public AppContextImpl( final long created, final String id, final AppContextImpl parent,
                            final Map<String, AppContextEntry> sourcedEntries )
     {
+        this.created = created;
+        this.modified = this.created;
         this.id = Preconditions.checkNotNull( id );
 
         this.parent = parent;
@@ -38,6 +44,16 @@ public class AppContextImpl
         }
 
         this.entries.putAll( sourcedEntries );
+    }
+
+    public long getCreated()
+    {
+        return created;
+    }
+
+    public long getModified()
+    {
+        return modified;
     }
 
     public String getId()
@@ -125,6 +141,11 @@ public class AppContextImpl
         }
     }
 
+    protected void markContextModified( final long timestamp )
+    {
+        this.modified = timestamp;
+    }
+
     // ==
 
     public int size()
@@ -163,8 +184,12 @@ public class AppContextImpl
 
     public Object put( String key, Object value )
     {
+        final long created = System.currentTimeMillis();
+
         final AppContextEntry oldEntry =
-            put( new AppContextEntryImpl( key, value, value, new ProgrammaticallySetSourceMarker() ) );
+            put( new AppContextEntryImpl( created, key, value, value, new ProgrammaticallySetSourceMarker() ) );
+
+        markContextModified( created );
 
         if ( oldEntry != null )
         {
@@ -179,6 +204,8 @@ public class AppContextImpl
     public Object remove( Object key )
     {
         final AppContextEntry oldEntry = entries.remove( key );
+
+        markContextModified( System.currentTimeMillis() );
 
         if ( oldEntry != null )
         {
@@ -201,11 +228,12 @@ public class AppContextImpl
     public void clear()
     {
         entries.clear();
+        markContextModified( System.currentTimeMillis() );
     }
 
     public Set<String> keySet()
     {
-        return entries.keySet();
+        return Collections.unmodifiableSet( entries.keySet() );
     }
 
     public Collection<Object> values()

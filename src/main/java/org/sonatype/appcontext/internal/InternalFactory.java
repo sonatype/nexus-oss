@@ -1,5 +1,6 @@
 package org.sonatype.appcontext.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,20 +36,28 @@ public class InternalFactory
     }
 
     public static AppContextRequest getDefaultAppContextRequest( final String id, final AppContext parent,
-                                                                 final List<String> aliases )
+                                                                 final List<String> aliases,
+                                                                 final String... keyInclusions )
     {
         Preconditions.checkNotNull( id );
         Preconditions.checkNotNull( aliases );
 
-        List<EntrySource> sources = Sources.getDefaultSources( id, aliases );
+        final List<EntrySource> sources = new ArrayList<EntrySource>();
+
+        if ( keyInclusions.length > 0 )
+        {
+            sources.addAll( Sources.getDefaultSelectTargetedSources( keyInclusions ) );
+        }
+        sources.addAll( Sources.getDefaultSources( id, aliases ) );
         List<EntryPublisher> publishers = Arrays.asList( new EntryPublisher[] { new PrintStreamEntryPublisher() } );
 
-        return new AppContextRequest( id, parent, sources, publishers, true );
+        return new AppContextRequest( id, parent, sources, publishers, true, Arrays.asList( keyInclusions ) );
     }
 
     public static AppContext create( final AppContextRequest request )
         throws AppContextException
     {
+        final long created = System.currentTimeMillis();
         final Map<String, Object> rawContext = new HashMap<String, Object>();
         final Map<String, EntrySourceMarker> rawContextSourceMarkers = new HashMap<String, EntrySourceMarker>();
 
@@ -103,7 +112,7 @@ public class InternalFactory
                 }
 
                 final AppContextEntry entry =
-                    new AppContextEntryImpl( key, rawValue, value, rawContextSourceMarkers.get( key ) );
+                    new AppContextEntryImpl( created, key, rawValue, value, rawContextSourceMarkers.get( key ) );
 
                 context.put( key, entry );
             }
@@ -113,7 +122,8 @@ public class InternalFactory
             throw new AppContextException( "Cannot interpolate the raw context!", e );
         }
 
-        AppContext result = new AppContextImpl( request.getId(), (AppContextImpl) request.getParent(), context );
+        AppContext result =
+            new AppContextImpl( created, request.getId(), (AppContextImpl) request.getParent(), context );
 
         for ( EntryPublisher publisher : request.getPublishers() )
         {

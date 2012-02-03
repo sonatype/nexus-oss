@@ -35,7 +35,18 @@ public class PrefixRemovingKeyTransformer
     {
         if ( key.startsWith( prefix ) )
         {
-            return key.substring( prefix.length() );
+            // remove prefix, but watch for capitalization
+            final String result = key.substring( prefix.length() );
+            if ( Character.isUpperCase( result.charAt( 0 ) ) )
+            {
+                final char[] resultArray = result.toCharArray();
+                resultArray[0] = Character.toLowerCase( resultArray[0] );
+                return new String( resultArray );
+            }
+            else
+            {
+                return result;
+            }
         }
         else
         {
