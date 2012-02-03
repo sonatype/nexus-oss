@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -30,7 +29,10 @@ import com.google.inject.servlet.GuiceFilter;
 public final class NexusGuiceFilter
     extends GuiceFilter
 {
-    @Inject
+    /*
+     * Guice @Inject instead of JSR330 so Resin/CDI won't try to inject this and fail!
+     */
+    @com.google.inject.Inject
     static List<FilterPipeline> pipelines = Collections.emptyList();
 
     public NexusGuiceFilter()
