@@ -50,9 +50,9 @@ public class P2RepositoryTemplateProvider
 
         try
         {
-            templates.add( new P2ProxyRepositoryTemplate( this, P2_PROXY, "P2 Proxy Repository" ) );
-            templates.add( new UpdateSiteRepositoryTemplate( this, P2_UPDATE_SITE, "P2 Update Site Proxy Repository" ) );
-            templates.add( new P2GroupRepositoryTemplate( this, P2_GROUP, "P2 Repository Group" ) );
+            templates.add( new P2ProxyRepositoryTemplate( this, P2_PROXY, "P2 (proxy)" ) );
+            templates.add( new UpdateSiteRepositoryTemplate( this, P2_UPDATE_SITE, "P2 Update Site (proxy)" ) );
+            templates.add( new P2GroupRepositoryTemplate( this, P2_GROUP, "P2 (group)" ) );
         }
         catch ( final Exception e )
         {
