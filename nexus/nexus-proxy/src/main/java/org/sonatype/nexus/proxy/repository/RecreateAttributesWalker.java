@@ -17,12 +17,14 @@ import java.util.Map;
 
 import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.attributes.TransitioningAttributeStorage;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
+import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 
 public class RecreateAttributesWalker
-    extends AbstractFileWalkerProcessor
+    extends AbstractWalkerProcessor
 {
     public static final String FORCE_ATTRIBUTE_RECREATION = RecreateAttributesWalker.class.getName()
         + ".forceAttributeRecreation";
@@ -44,6 +46,18 @@ public class RecreateAttributesWalker
         this.initialData = initialData;
     }
 
+    public Repository getRepository()
+    {
+        return repository;
+    }
+
+    public Map<String, String> getInitialData()
+    {
+        return initialData;
+    }
+
+    // == WalkerProcessor
+
     @Override
     public void beforeWalk( WalkerContext context )
         throws Exception
@@ -53,7 +67,20 @@ public class RecreateAttributesWalker
     }
 
     @Override
-    protected void processFileItem( final WalkerContext ctx, final StorageFileItem item )
+    public final void processItem( WalkerContext context, StorageItem item )
+        throws Exception
+    {
+        if ( item instanceof StorageCollectionItem )
+        {
+            return; // collections have no attributes persisted
+        }
+
+        doProcessFileItem( context, item );
+    }
+
+    // == Internal
+
+    protected void doProcessFileItem( final WalkerContext ctx, final StorageItem item )
         throws IOException
     {
         if ( legacyAtributesOnly )
@@ -70,24 +97,15 @@ public class RecreateAttributesWalker
             item.getRepositoryItemAttributes().putAll( initialData );
         }
 
-        if ( forceAttributeRecreation )
+        if ( forceAttributeRecreation && item instanceof StorageFileItem )
         {
-            getRepository().getAttributesHandler().storeAttributes( item, item.getContentLocator() );
+            getRepository().getAttributesHandler().storeAttributes( item,
+                ( (StorageFileItem) item ).getContentLocator() );
         }
         else
         {
             getRepository().getAttributesHandler().storeAttributes( item, null );
         }
-    }
-
-    public Repository getRepository()
-    {
-        return repository;
-    }
-
-    public Map<String, String> getInitialData()
-    {
-        return initialData;
     }
 
     protected boolean isForceAttributeRecreation( final WalkerContext ctx )

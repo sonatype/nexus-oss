@@ -22,7 +22,7 @@ public abstract class AbstractFileWalkerProcessor
     public final void processItem( WalkerContext context, StorageItem item )
         throws Exception
     {
-        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
+        if ( item instanceof StorageFileItem )
         {
             processFileItem( context, (StorageFileItem) item );
         }
