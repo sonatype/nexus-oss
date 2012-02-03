@@ -81,11 +81,6 @@
       <artifactId>jackson-mapper-asl</artifactId>
       <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>com.fasterxml</groupId>
-      <artifactId>jackson-xml-databind</artifactId>
-      <scope>compile</scope>
-    </dependency>
     
     <!-- Local and remote storage techs -->
     <dependency>
@@ -143,11 +138,11 @@
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-charger</artifactId>
     </dependency>
-  <dependency>
-    <groupId>org.sonatype.sisu</groupId>
-    <artifactId>sisu-resource-scanner</artifactId>
-    <version>1.0</version>
-  </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-resource-scanner</artifactId>
+      <version>1.0</version>
+    </dependency>
 
     <!-- Testing -->
     <dependency>
@@ -187,6 +182,12 @@
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-web</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- For the Jackson XML Marshaller that is slower than JSON and will remain in test to not pollute core -->
+    <dependency>
+      <groupId>com.fasterxml</groupId>
+      <artifactId>jackson-xml-databind</artifactId>
       <scope>test</scope>
     </dependency>
     
