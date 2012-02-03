@@ -36,7 +36,7 @@ public class MavenSiteTemplateProvider
 
         try
         {
-            templates.add( new MavenSiteTemplate( this, MAVEN_SITE_ID, "Maven Hosted Site Repository" ) );
+            templates.add( new MavenSiteTemplate( this, MAVEN_SITE_ID, "Maven Site (hosted)" ) );
         }
         catch ( Exception e )
         {
