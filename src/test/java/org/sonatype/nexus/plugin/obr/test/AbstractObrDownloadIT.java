@@ -20,8 +20,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public abstract class AbstractObrDownloadIT
     extends AbstractOBRIntegrationTest
@@ -41,18 +39,13 @@ public abstract class AbstractObrDownloadIT
         throws IOException, Exception, MalformedURLException
     {
         FileUtils.deleteDirectory( new File( FELIX_HOME, "felix-cache" ) );
-
-        final ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryId" );
-        prop.setValue( repoId );
-
-        TaskScheduleUtil.runTask( "PublishObrDescriptorTask", prop );
+        FileUtils.deleteDirectory( new File( FELIX_REPO, ".meta" ) );
 
         downloadFile( new URL( getRepositoryUrl( repoId ) + ".meta/obr.xml" ), "target/" + getTestId()
             + "/download/obr.xml" );
 
-        final ProcessBuilder pb = new ProcessBuilder( "java", "-Dfelix.config.properties="
-            + FELIX_CONF.toURI(), "-jar", "bin/felix.jar" );
+        final ProcessBuilder pb =
+            new ProcessBuilder( "java", "-Dfelix.config.properties=" + FELIX_CONF.toURI(), "-jar", "bin/felix.jar" );
 
         pb.directory( FELIX_HOME );
         pb.redirectErrorStream( true );
