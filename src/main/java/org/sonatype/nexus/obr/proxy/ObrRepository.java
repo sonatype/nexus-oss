@@ -201,10 +201,7 @@ public class ObrRepository
 
             if ( null == backingItem )
             {
-                // completely blank OBR so we need to rebuild it from scratch
-                final RepositoryItemUid uid = createUid( "/" );
-
-                ObrUtils.buildObr( obrMetadataSource, uid, this, getWalker() );
+                ObrUtils.buildObr( obrMetadataSource, ObrUtils.createObrUid( this ), this, getWalker() );
             }
             else
             {
