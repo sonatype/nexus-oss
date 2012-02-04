@@ -191,6 +191,7 @@ public class MarshalUnmarchalTest
         dto.setUserObjectClass( "userObjectClass&" );
         dto.setUserPasswordAttribute( "userPasswordAttribute&" );
         dto.setUserRealNameAttribute( "userRealNameAttribute&" );
+        dto.setLdapFilter( "ldapFilter&" );
         dto.setUserSubtree( true );
 
         validateXmlHasNoPackageNames( resource );
@@ -205,6 +206,7 @@ public class MarshalUnmarchalTest
         Assert.assertEquals( result.getGroupMemberFormat(), "groupMemberFormat&" );
         Assert.assertEquals( result.getGroupBaseDn(), "groupBaseDn&" );
         Assert.assertEquals( result.getUserBaseDn(), "userBaseDn&" );
+        Assert.assertEquals( result.getLdapFilter(), "ldapFilter&" );
 
         Assert.assertEquals( result.getAuthScheme(), "authScheme&amp;" );
         Assert.assertEquals( result.getHost(), "host&amp;" );
