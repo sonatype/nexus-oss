@@ -45,6 +45,7 @@ public interface UserAgentBuilder
      * 
      * @param ctx
      * @return
+     * @since 2.0
      */
     String formatUserAgentString( final RemoteStorageContext ctx );
 }
