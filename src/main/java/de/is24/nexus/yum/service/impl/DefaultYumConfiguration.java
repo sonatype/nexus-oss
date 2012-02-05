@@ -2,15 +2,18 @@ package de.is24.nexus.yum.service.impl;
 
 import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+
 import de.is24.nexus.yum.service.AliasNotFoundException;
 import de.is24.nexus.yum.service.YumConfiguration;
 
@@ -147,5 +150,31 @@ public class DefaultYumConfiguration implements YumConfiguration {
     for (AliasMapping aliasMapping : xmlYumConfiguration.getAliasMappings()) {
       aliasMap.put(aliasMapping.getAliasKey(), aliasMapping.getVersion());
     }
+  }
+
+  @Override
+  public boolean isDeleteProcessing() {
+    checkForUpdates();
+    return xmlYumConfiguration.isDeleteProcessing();
+  }
+
+  @Override
+  public void setDeleteProcessing(boolean active) {
+    final XmlYumConfiguration newConfig = new XmlYumConfiguration(xmlYumConfiguration);
+    newConfig.setDeleteProcessing(active);
+    saveConfig(newConfig);
+  }
+
+  @Override
+  public long getDelayAfterDeletion() {
+    checkForUpdates();
+    return xmlYumConfiguration.getDelayAfterDeletion();
+  }
+
+  @Override
+  public void setDelayAfterDeletion(long timeout) {
+    final XmlYumConfiguration newConfig = new XmlYumConfiguration(xmlYumConfiguration);
+    newConfig.setDelayAfterDeletion(timeout);
+    saveConfig(newConfig);
   }
 }

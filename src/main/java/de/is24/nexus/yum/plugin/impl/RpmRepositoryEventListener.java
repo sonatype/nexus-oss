@@ -10,6 +10,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -17,6 +18,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.plexus.appevents.Event;
 
 import de.is24.nexus.yum.plugin.AbstractEventListener;
+import de.is24.nexus.yum.plugin.DeletionService;
 import de.is24.nexus.yum.plugin.ItemEventListener;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.service.RepositoryRpmManager;
@@ -24,7 +26,7 @@ import de.is24.nexus.yum.service.YumService;
 
 
 @Component(role = ItemEventListener.class, instantiationStrategy = Strategies.LOAD_ON_START)
-public class RpmDeployedOrRemovedListener extends AbstractEventListener {
+public class RpmRepositoryEventListener extends AbstractEventListener {
   private static final Logger LOG = LoggerFactory.getLogger(ItemEventListener.class);
 
   @Inject
@@ -35,6 +37,9 @@ public class RpmDeployedOrRemovedListener extends AbstractEventListener {
 
   @Inject
   private RepositoryRpmManager repositoryRpmManager;
+
+  @Inject
+  private DeletionService deletionService;
 
   @Override
   public void onEvent(Event<?> evt) {
@@ -49,9 +54,14 @@ public class RpmDeployedOrRemovedListener extends AbstractEventListener {
 
   private void processRepositoryItemDelete(RepositoryItemEventDelete itemEvent) {
     if (isRpmItemEvent(itemEvent)) {
-      LOG.info("ItemDeleteEvent : {}", itemEvent.getItem().getPath());
-      yumService.removeFromRepository(itemEvent.getRepository(), itemEvent.getItem().getPath());
+      deletionService.deleteRpm(itemEvent.getRepository(), itemEvent.getItem().getPath());
+    } else if (isCollectionItem(itemEvent)) {
+      deletionService.deleteDirectory(itemEvent.getRepository(), itemEvent.getItem().getPath());
     }
+  }
+
+  private boolean isCollectionItem(RepositoryItemEvent itemEvent) {
+    return StorageCollectionItem.class.isAssignableFrom(itemEvent.getItem().getClass());
   }
 
   private void processRepository(Repository repository) {

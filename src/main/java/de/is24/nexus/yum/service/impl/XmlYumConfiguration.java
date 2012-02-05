@@ -2,6 +2,7 @@ package de.is24.nexus.yum.service.impl;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -27,6 +28,9 @@ public class XmlYumConfiguration {
   @XmlElementWrapper
   private Set<AliasMapping> aliasMappings = new LinkedHashSet<AliasMapping>();
 
+  private boolean deleteProcessing;
+
+  private long delayAfterDeletion;
 
   public XmlYumConfiguration() {
     super();
@@ -105,6 +109,22 @@ public class XmlYumConfiguration {
 
   public void setRepositoryOfRepositoryVersionsActive(boolean repositoryOfRepositoryVersionsActive) {
     this.repositoryOfRepositoryVersionsActive = repositoryOfRepositoryVersionsActive;
+  }
+
+  public boolean isDeleteProcessing() {
+    return deleteProcessing;
+  }
+
+  public void setDeleteProcessing(boolean deleteProcessing) {
+    this.deleteProcessing = deleteProcessing;
+  }
+
+  public long getDelayAfterDeletion() {
+    return delayAfterDeletion;
+  }
+
+  public void setDelayAfterDeletion(long delayAfterDeletion) {
+    this.delayAfterDeletion = delayAfterDeletion;
   }
 
 }

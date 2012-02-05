@@ -15,7 +15,7 @@ import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.service.YumService;
 
 
-public class RpmDeployedListenerTest extends AbstractRepositoryTester {
+public class RpmRepositoryEventListenerTest extends AbstractRepositoryTester {
   @Inject
   private ItemEventListener listener;
 

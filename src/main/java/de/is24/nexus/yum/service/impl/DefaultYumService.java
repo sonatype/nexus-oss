@@ -113,7 +113,7 @@ public class DefaultYumService implements YumService {
   }
 
   @Override
-  public void removeFromRepository(Repository repository, String path) {
+  public void recreateRepository(Repository repository) {
     createYumRepository(repository);
   }
 

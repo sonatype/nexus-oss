@@ -34,5 +34,5 @@ public interface YumService {
 
   boolean isActive();
 
-  void removeFromRepository(Repository repository, String path);
+  void recreateRepository(Repository repository);
 }
