@@ -15,8 +15,6 @@ package org.sonatype.nexus.plugin.obr.test.nxcm858proxy;
 import java.io.File;
 
 import org.sonatype.nexus.plugin.obr.test.AbstractObrDownloadIT;
-import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -24,21 +22,8 @@ public class NXCM858ProxyObrRepoIT
     extends AbstractObrDownloadIT
 {
 
-    @Override
-    protected void runOnce()
-        throws Exception
-    {
-        super.runOnce();
-
-        final ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setKey( "repositoryId" );
-        prop.setValue( "obr-hosted" );
-
-        TaskScheduleUtil.runTask( "PublishObrDescriptorTask", prop );
-    }
-
     @Test
-    public void downloadFromShadow()
+    public void downloadFromProxy()
         throws Exception
     {
         downloadApacheFelixWebManagement( "obr-proxy" );

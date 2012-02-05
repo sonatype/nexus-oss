@@ -12,24 +12,12 @@
  */
 package org.sonatype.nexus.plugin.obr.test.nxcm858virtual;
 
-import java.io.File;
-
-import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.plugin.obr.test.AbstractObrDownloadIT;
 import org.testng.annotations.Test;
 
 public class NXCM858ShadowObrRepoIT
     extends AbstractObrDownloadIT
 {
-
-    @Override
-    protected void runOnce()
-        throws Exception
-    {
-        super.runOnce();
-
-        FileUtils.deleteDirectory( new File( FELIX_REPO, ".meta" ) );
-    }
 
     @Test
     public void downloadFromShadow()
