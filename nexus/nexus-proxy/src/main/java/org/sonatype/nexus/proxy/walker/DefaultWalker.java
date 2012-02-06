@@ -211,12 +211,6 @@ public class DefaultWalker
             return collCount;
         }
 
-        // user may call stop()
-        if ( shouldProcess )
-        {
-            processItem( context, coll );
-        }
-
         if ( context.isStopped() )
         {
             return collCount;
@@ -230,7 +224,7 @@ public class DefaultWalker
 
             for ( StorageItem i : ls )
             {
-                if ( !context.isCollectionsOnly() && !StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
+                if (  !(i instanceof StorageCollectionItem) )
                 {
                     if ( filter.shouldProcess( context, i ) )
                     {
@@ -244,7 +238,7 @@ public class DefaultWalker
                     }
                 }
 
-                if ( StorageCollectionItem.class.isAssignableFrom( i.getClass() ) )
+                if ( i instanceof StorageCollectionItem )
                 {
                     // user may call stop()
                     collCount = walkRecursive( collCount, context, filter, (StorageCollectionItem) i );
