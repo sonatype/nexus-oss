@@ -31,7 +31,7 @@ import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 
 /**
- * Tests for deployment entries in feeds.
+ * Tests for fail to login entries in feeds.
  */
 public class Nexus3882IPAtAthenticationFailureFeedIT
     extends AbstractPrivilegeTest
