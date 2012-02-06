@@ -42,6 +42,13 @@ public class XStreamInitalizer
         // conversion
         final StringConverter converter = new StringConverter()
         {
+            // UI sends null for some fields, super class does NOT like that.
+            @Override
+            public boolean canConvert( Class type )
+            {
+                return type == null || super.canConvert( type );
+            }
+
             @Override
             public Object fromString( String str )
             {
@@ -55,6 +62,7 @@ public class XStreamInitalizer
         xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "groupBaseDn", converter );
         xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "userBaseDn", converter );
         xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "groupMemberFormat", converter );
+        xstream.registerLocalConverter( LdapUserAndGroupConfigurationDTO.class, "ldapFilter", converter );
 
         xstream.registerLocalConverter( LdapUserAndGroupConfigTestRequestDTO.class, "systemUsername", converter );
         xstream.registerLocalConverter( LdapUserAndGroupConfigTestRequestDTO.class, "systemPassword", converter );

@@ -29,6 +29,7 @@ import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserResponseDTO;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapAuthenticationTestRequest;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequest;
 import org.sonatype.nexus.security.ldap.realms.test.api.dto.LdapUserAndGroupConfigTestRequestDTO;
+import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
 import com.thoughtworks.xstream.XStream;
@@ -50,8 +51,9 @@ public class MarshalUnmarchalTest
         XStreamConfigurator.configureXStream( xstreamXML );
         XStreamInitalizer.initXStream( xstreamXML );
 
-//        xstreamJSON = napp.doConfigureXstream( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
-//        XStreamInitalizer.initXStream( xstreamJSON );
+        xstreamJSON = new XStream( new JsonOrgHierarchicalStreamDriver() );
+        XStreamConfigurator.configureXStream( xstreamJSON );
+        XStreamInitalizer.initXStream( xstreamJSON );
     }
 
     @Test
@@ -191,6 +193,7 @@ public class MarshalUnmarchalTest
         dto.setUserObjectClass( "userObjectClass&" );
         dto.setUserPasswordAttribute( "userPasswordAttribute&" );
         dto.setUserRealNameAttribute( "userRealNameAttribute&" );
+        dto.setLdapFilter( "ldapFilter&" );
         dto.setUserSubtree( true );
 
         validateXmlHasNoPackageNames( resource );
@@ -205,6 +208,7 @@ public class MarshalUnmarchalTest
         Assert.assertEquals( result.getGroupMemberFormat(), "groupMemberFormat&" );
         Assert.assertEquals( result.getGroupBaseDn(), "groupBaseDn&" );
         Assert.assertEquals( result.getUserBaseDn(), "userBaseDn&" );
+        Assert.assertEquals( result.getLdapFilter(), "ldapFilter&" );
 
         Assert.assertEquals( result.getAuthScheme(), "authScheme&amp;" );
         Assert.assertEquals( result.getHost(), "host&amp;" );
@@ -221,6 +225,31 @@ public class MarshalUnmarchalTest
         Assert.assertEquals( result.getUserPasswordAttribute(), "userPasswordAttribute&amp;" );
         Assert.assertEquals( result.getUserRealNameAttribute(), "userRealNameAttribute&amp;" );
         Assert.assertEquals( result.isUserSubtree(), true );
+
+    }
+
+    @Test
+    public void testNullHTMLEscapedField()
+    {
+        LdapUserAndGroupConfigTestRequest resource = new LdapUserAndGroupConfigTestRequest();
+        LdapUserAndGroupConfigTestRequestDTO dto = new LdapUserAndGroupConfigTestRequestDTO();
+
+        resource.setData( dto );
+        dto.setLdapFilter( null ); // already null, but more clear for the test
+
+        String xml = this.xstreamXML.toXML( resource );
+        LdapUserAndGroupConfigTestRequestDTO result = ((LdapUserAndGroupConfigTestRequest) this.xstreamXML.fromXML( xml )).getData();
+
+        Assert.assertNull( result.getLdapFilter() );
+
+        // simple json string with an explicit null value (generated from the Nexus UI)
+        String payload = "{\"data\":{\"ldapFilter\":null}}";
+
+        StringBuffer sb =
+                new StringBuffer( "{ \"" ).append( LdapUserAndGroupConfigTestRequest.class.getName() ).append( "\" : " ).append( payload ).append(
+                                                                                                                             " }" );
+        // validate this parses without error
+        xstreamJSON.fromXML( sb.toString() );
 
     }
 
