@@ -343,7 +343,15 @@ public class DefaultWalker
 
                 if ( throttleTime > 0 )
                 {
-                    Thread.sleep( throttleTime );
+                    try
+                    {
+                        Thread.sleep( throttleTime );
+                    }
+                    catch ( InterruptedException e )
+                    {
+                        throw new TaskInterruptedException( "Thread \"" + Thread.currentThread().getName()
+                            + "\" is interrupted!", false );
+                    }
                 }
             }
         }
