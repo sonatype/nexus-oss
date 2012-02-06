@@ -12,14 +12,14 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3882;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.sonatype.nexus.test.utils.StatusMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.hasStatusCode;
+import static org.sonatype.nexus.test.utils.StatusMatchers.isError;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FeedUtil;
@@ -45,7 +45,10 @@ public class Nexus3882IPAtAthenticationFailureFeedIT
         TestContainer.getInstance().getTestContext().setUsername( "juka" );
         TestContainer.getInstance().getTestContext().setPassword( "juka" );
 
-        assertThat( UserCreationUtil.login(), isError() );
+        assertThat( UserCreationUtil.login(), hasStatusCode( 401 ) );
+
+        // NexusAuthenticationEventInspector is asynchronous
+        getEventInspectorsUtil().waitForCalmPeriod();
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
