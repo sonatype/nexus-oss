@@ -53,34 +53,66 @@ public interface AttributeUpgraderMBean
     boolean isUpgradeFinished();
 
     /**
-     * Returns the UPS of currently executing upgrade (if {@link #isUpgradeRunning()} returns true). Otherwise, it
-     * returns -1.
-     * 
-     * @return if upgrade is underway, the current amount of performed upgrade operations per second, -1 otherwise.
-     */
-    int getCurrentUps();
-
-    /**
-     * Returns the maximum UPS of last executing (or executed) upgrade. Without upgrade running, it returns -1.
+     * Returns the global average TPS of currently executing upgrade (if {@link #isUpgradeRunning()} returns true).
+     * Otherwise, it returns -1.
      * 
      * @return
      */
-    int getMaximumUps();
+    int getGlobalAverageTps();
 
     /**
-     * Returns the max UPS of currently executing upgrade (if {@link #isUpgradeRunning()} returns true). Otherwise, it
+     * Returns the global maximum TPS achieved by currently executing upgrade (if {@link #isUpgradeRunning()} returns
+     * true). Otherwise, it returns -1.
+     * 
+     * @return
+     */
+    int getGlobalMaximumTps();
+
+    /**
+     * Returns the last slice's TPS of currently executing upgrade (if {@link #isUpgradeRunning()} returns true).
+     * Otherwise, it returns -1.
+     * 
+     * @return
+     */
+    int getLastSliceTps();
+
+    /**
+     * Returns the last slice's sleep time of currently executing upgrade (if {@link #isUpgradeRunning()} returns true).
+     * Otherwise, it returns -1.
+     * 
+     * @return
+     */
+    long getCurrentSleepTime();
+
+    /**
+     * Returns the minimum sleep time that will be used if throttling is in effect.
+     * 
+     * @return
+     */
+    long getMinimumSleepTime();
+
+    /**
+     * Sets the minimum sleep time.
+     * 
+     * @param sleepTime
+     */
+    void setMinimumSleepTime( long sleepTime );
+
+    /**
+     * Returns the max TPS of currently executing upgrade (if {@link #isUpgradeRunning()} returns true). Otherwise, it
      * returns the value of parameter (ie. "this would be it if it would running").
      * 
-     * @return the max UPS of currently executing upgrade (if {@link #isUpgradeRunning()} returns true). Otherwise, it
-     *         returns the value of parameter (ie. "this would be it if it would running").
+     * @return
      */
-    int getLimiterUps();
+    int getLimiterTps();
 
     /**
      * Sets the max UPS of currently executing upgrade (if {@link #isUpgradeRunning()} returns true). Otherwise, it is
      * setting the parameter (ie. "this would be it if it would running").
+     * 
+     * @param limiterTps
      */
-    void setLimiterUps( int limit );
+    void setLimiterTps( final int limiterTps );
 
     /**
      * Starts the attributes upgrade if needed (will perform the needed checks and might not start it if decided as not

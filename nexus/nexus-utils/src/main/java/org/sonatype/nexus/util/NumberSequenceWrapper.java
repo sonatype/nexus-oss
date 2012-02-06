@@ -12,56 +12,50 @@
  */
 package org.sonatype.nexus.util;
 
+import com.google.common.base.Preconditions;
+
 /**
- * A simple linear number sequence (linear equation).
+ * Simple handy class to subclass when you want to wrap another {@link NumberSequence}.
  * 
  * @author cstamas
  * @since 2.0
  */
-public class LinearNumberSequence
+public abstract class NumberSequenceWrapper
     implements NumberSequence
 {
-    private final long start;
+    private final NumberSequence numberSequence;
 
-    private final long step;
-
-    private final long multiplier;
-
-    private final long shift;
-
-    private long current;
-
-    public LinearNumberSequence( final long start, final long step, final long multiplier, final long shift )
+    public NumberSequenceWrapper( final NumberSequence numberSequence )
     {
-        this.start = start;
-        this.step = step;
-        this.multiplier = multiplier;
-        this.shift = shift;
+        this.numberSequence = Preconditions.checkNotNull( numberSequence );
+    }
+    
+    protected NumberSequence getWrappedNumberSequence()
+    {
+        return numberSequence;
     }
 
     @Override
     public long next()
     {
-        current = current + step;
-        return peek();
+        return numberSequence.next();
     }
 
     @Override
     public long prev()
     {
-        current = current - step;
-        return peek();
+        return numberSequence.prev();
     }
 
     @Override
     public long peek()
     {
-        return ( current * multiplier ) + shift;
+        return numberSequence.peek();
     }
 
     @Override
     public void reset()
     {
-        this.current = start;
+        numberSequence.reset();
     }
 }

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.time.DurationFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -28,10 +29,10 @@ import org.sonatype.nexus.proxy.repository.RecreateAttributesWalker;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.FixedRateWalkerThrottleController;
+import org.sonatype.nexus.proxy.walker.FixedRateWalkerThrottleController.FixedRateWalkerThrottleControllerCallback;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.walker.WalkerThrottleController;
-import org.sonatype.nexus.proxy.walker.FixedRateWalkerThrottleController.FixedRateWalkerThrottleControllerCallback;
-import org.sonatype.nexus.util.FibonacciNumberSequence;
+import org.sonatype.nexus.util.NumberSequence;
 
 /**
  * The background thread doing the actual attribute upgrades (moving them from legacy to LS attribute storage).
@@ -52,13 +53,13 @@ public class AttributeUpgraderThread
     private final FixedRateWalkerThrottleController throttleController;
 
     public AttributeUpgraderThread( final File legacyAttributesDirectory, final RepositoryRegistry repositoryRegistry,
-                                    final int limiterTps )
+                                    final int limiterTps, final NumberSequence numberSequence )
     {
         this.legacyAttributesDirectory = legacyAttributesDirectory;
         this.repositoryRegistry = repositoryRegistry;
         // set throttle controller
         this.throttleController =
-            new FixedRateWalkerThrottleController( limiterTps, new FibonacciNumberSequence( 0, 5 ), this );
+            new FixedRateWalkerThrottleController( limiterTps, numberSequence, this );
         // to have it clearly in thread dumps
         setName( "LegacyAttributesUpgrader" );
         // to not prevent sudden reboots (by user, if upgrading, and rebooting)
@@ -67,24 +68,9 @@ public class AttributeUpgraderThread
         setPriority( Thread.MIN_PRIORITY );
     }
 
-    public int getActualUps()
+    public FixedRateWalkerThrottleController getThrottleController()
     {
-        return throttleController.getLastSliceTps();
-    }
-
-    public int getMaximumUps()
-    {
-        return throttleController.getGlobalMaximumTps();
-    }
-
-    public int getLimiterUps()
-    {
-        return throttleController.getLimiterTps();
-    }
-
-    public void setLimiterUps( final int limiterTps )
-    {
-        throttleController.setLimiterTps( limiterTps );
+        return throttleController;
     }
 
     @Override
@@ -106,6 +92,7 @@ public class AttributeUpgraderThread
             if ( !DefaultAttributeUpgrader.isUpgradeDone( legacyAttributesDirectory, null ) )
             {
                 boolean weHadSkippedRepositories = false;
+                final long started = System.currentTimeMillis();
                 List<Repository> reposes = repositoryRegistry.getRepositories();
                 for ( Repository repo : reposes )
                 {
@@ -164,6 +151,9 @@ public class AttributeUpgraderThread
                     }
                 }
 
+                final String totalRuntimeString =
+                    DurationFormatUtils.formatDurationHMS( System.currentTimeMillis() - started );
+
                 if ( !weHadSkippedRepositories )
                 {
                     try
@@ -180,12 +170,14 @@ public class AttributeUpgraderThread
                     }
 
                     logger.info(
-                        "Legacy attribute directory upgrade finished without any errors. Please delete, move or rename the \"{}\" folder.",
-                        legacyAttributesDirectory.getAbsolutePath() );
+                        "Legacy attribute directory upgrade finished without any errors. Please delete, move or rename the \"{}\" folder. Total runtime {}",
+                        legacyAttributesDirectory.getAbsolutePath(), totalRuntimeString );
                 }
                 else
                 {
-                    logger.info( "Legacy attribute directory upgrade was partially completed. Please see prior log messages for details." );
+                    logger.info(
+                        "Legacy attribute directory upgrade was partially completed. Please see prior log messages for details. Total runtime {}",
+                        totalRuntimeString );
                 }
             }
         }
