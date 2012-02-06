@@ -14,7 +14,6 @@ package org.sonatype.nexus.integrationtests.nexus3882;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.sonatype.nexus.test.utils.NexusRequestMatchers.hasStatusCode;
-import static org.sonatype.nexus.test.utils.StatusMatchers.isError;
 
 import java.util.List;
 import java.util.regex.Matcher;
