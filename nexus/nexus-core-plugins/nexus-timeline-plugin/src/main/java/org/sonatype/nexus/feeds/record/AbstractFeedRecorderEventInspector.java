@@ -13,6 +13,7 @@
 package org.sonatype.nexus.feeds.record;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 
@@ -25,8 +26,21 @@ public abstract class AbstractFeedRecorderEventInspector
     @Requirement
     private FeedRecorder feedRecorder;
 
+    @Requirement
+    private ApplicationStatusSource applicationStatusSource;
+
     protected FeedRecorder getFeedRecorder()
     {
         return feedRecorder;
+    }
+
+    protected ApplicationStatusSource getApplicationStatusSource()
+    {
+        return applicationStatusSource;
+    }
+
+    protected boolean isNexusStarted()
+    {
+        return getApplicationStatusSource().getSystemStatus().isNexusStarted();
     }
 }

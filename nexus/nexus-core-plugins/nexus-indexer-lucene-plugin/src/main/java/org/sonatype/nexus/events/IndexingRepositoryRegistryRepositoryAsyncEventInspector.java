@@ -99,7 +99,7 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
             if ( evt instanceof RepositoryRegistryEventAdd )
             {
                 // create the initial index
-                if ( applicationStatusSource.getSystemStatus().isNexusStarted() && repository.isIndexable() )
+                if ( repository.isIndexable() )
                 {
                     // Create the initial index for the repository
                     reindexRepo( repository, false, "Creating initial index, repositoryId=" + repository.getId() );
