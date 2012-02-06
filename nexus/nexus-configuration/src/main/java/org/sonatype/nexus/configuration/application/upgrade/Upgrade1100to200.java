@@ -1,4 +1,4 @@
-/*
+/**
  * Sonatype Nexus (TM) Open Source Version
  * Copyright (c) 2007-2012 Sonatype, Inc.
  * All rights reserved. Includes the third-party code listed at http://links.sonatype.com/products/nexus/oss/attributions.
@@ -12,22 +12,18 @@
  */
 package org.sonatype.nexus.configuration.application.upgrade;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.model.CErrorReporting;
-import org.sonatype.nexus.configuration.model.CNotification;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.v2_0_0.upgrade.BasicVersionUpgrade;
-import org.sonatype.nexus.proxy.repository.AbstractProxyRepositoryConfiguration;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 
 /**
  * Upgrades configuration model from version 1.10.0 to 2.0.<BR>
