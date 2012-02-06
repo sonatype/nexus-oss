@@ -158,7 +158,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
 
     private Marshaller getMarshaller()
     {
-        return new XStreamMarshaller();
+        return new JacksonJSONMarshaller();
     }
 
     private void changeProxyAttributeDate( File attributeFile, int daysFromToday )

@@ -76,6 +76,12 @@
       <groupId>com.thoughtworks.xstream</groupId>
       <artifactId>xstream</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    
     <!-- Local and remote storage techs -->
     <dependency>
       <groupId>com.ning</groupId>
@@ -132,11 +138,11 @@
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-charger</artifactId>
     </dependency>
-  <dependency>
-    <groupId>org.sonatype.sisu</groupId>
-    <artifactId>sisu-resource-scanner</artifactId>
-    <version>1.0</version>
-  </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-resource-scanner</artifactId>
+      <version>1.0</version>
+    </dependency>
 
     <!-- Testing -->
     <dependency>
@@ -178,13 +184,7 @@
       <artifactId>shiro-web</artifactId>
       <scope>test</scope>
     </dependency>
-    
-    <!-- NEXUS-4628: Attributes perf tests, for now the "alternate" imples are in tests not getting into core -->
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-mapper-asl</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!-- For the Jackson XML Marshaller that is slower than JSON and will remain in test to not pollute core -->
     <dependency>
       <groupId>com.fasterxml</groupId>
       <artifactId>jackson-xml-databind</artifactId>

@@ -55,7 +55,7 @@ public class DefaultLSAttributeStorage
      * Instantiates a new FSX stream attribute storage.
      */
     @Inject
-    public DefaultLSAttributeStorage( @Named( "xstream-xml" ) final Marshaller marshaller )
+    public DefaultLSAttributeStorage( @Named( "jackson-json" ) final Marshaller marshaller )
     {
         this.marshaller = marshaller;
         getLogger().info( "Default LS AttributeStorage in place." );
