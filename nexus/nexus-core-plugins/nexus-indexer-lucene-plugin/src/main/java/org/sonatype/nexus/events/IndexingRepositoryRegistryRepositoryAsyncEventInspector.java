@@ -56,7 +56,8 @@ public class IndexingRepositoryRegistryRepositoryAsyncEventInspector
 
     public boolean accepts( Event<?> evt )
     {
-        return ( evt instanceof RepositoryRegistryRepositoryEvent )
+        return applicationStatusSource.getSystemStatus().isNexusStarted()
+            && ( evt instanceof RepositoryRegistryRepositoryEvent )
             || ( evt instanceof RepositoryConfigurationUpdatedEvent );
     }
 
