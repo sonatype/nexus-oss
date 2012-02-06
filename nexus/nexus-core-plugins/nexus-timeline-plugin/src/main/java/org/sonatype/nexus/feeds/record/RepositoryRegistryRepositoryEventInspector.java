@@ -14,9 +14,7 @@ package org.sonatype.nexus.feeds.record;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.feeds.record.AbstractFeedRecorderEventInspector;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
@@ -45,13 +43,10 @@ public class RepositoryRegistryRepositoryEventInspector
     @Requirement
     private RepositoryRegistry repoRegistry;
 
-    @Requirement
-    private ApplicationStatusSource applicationStatusSource;
-
     public boolean accepts( Event<?> evt )
     {
-        return ( evt instanceof RepositoryRegistryRepositoryEvent )
-            || ( evt instanceof RepositoryConfigurationUpdatedEvent );
+        return ( ( evt instanceof RepositoryRegistryRepositoryEvent ) || ( evt instanceof RepositoryConfigurationUpdatedEvent ) )
+            && isNexusStarted();
     }
 
     public void inspect( Event<?> evt )
@@ -84,70 +79,67 @@ public class RepositoryRegistryRepositoryEventInspector
     private void inspectForTimeline( Event<?> evt, Repository repository )
     {
         // we do not want RSS entries about boot and repo additions during boot
-        if ( applicationStatusSource.getSystemStatus().isNexusStarted() )
+        StringBuffer sb = new StringBuffer();
+
+        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
         {
-            StringBuffer sb = new StringBuffer();
+            sb.append( " repository group " );
+        }
+        else
+        {
+            sb.append( " repository " );
+        }
 
-            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
-            {
-                sb.append( " repository group " );
-            }
-            else
-            {
-                sb.append( " repository " );
-            }
+        sb.append( repository.getName() );
 
-            sb.append( repository.getName() );
+        sb.append( " (ID=" );
+
+        sb.append( repository.getId() );
+
+        sb.append( ") " );
+
+        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        {
+            sb.append( " as proxy repository for URL " );
+
+            sb.append( repository.adaptToFacet( ProxyRepository.class ).getRemoteUrl() );
+        }
+        else if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
+        {
+            sb.append( " as hosted repository" );
+        }
+        else if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+        {
+            sb.append( " as " );
+
+            sb.append( repository.getClass().getName() );
+
+            sb.append( " virtual repository for " );
+
+            sb.append( repository.adaptToFacet( ShadowRepository.class ).getMasterRepository().getName() );
 
             sb.append( " (ID=" );
 
-            sb.append( repository.getId() );
+            sb.append( repository.adaptToFacet( ShadowRepository.class ).getMasterRepository().getId() );
 
             sb.append( ") " );
-
-            if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-            {
-                sb.append( " as proxy repository for URL " );
-
-                sb.append( repository.adaptToFacet( ProxyRepository.class ).getRemoteUrl() );
-            }
-            else if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
-            {
-                sb.append( " as hosted repository" );
-            }
-            else if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
-            {
-                sb.append( " as " );
-
-                sb.append( repository.getClass().getName() );
-
-                sb.append( " virtual repository for " );
-
-                sb.append( repository.adaptToFacet( ShadowRepository.class ).getMasterRepository().getName() );
-
-                sb.append( " (ID=" );
-
-                sb.append( repository.adaptToFacet( ShadowRepository.class ).getMasterRepository().getId() );
-
-                sb.append( ") " );
-            }
-
-            sb.append( "." );
-
-            if ( evt instanceof RepositoryRegistryEventAdd )
-            {
-                sb.insert( 0, "Registered" );
-            }
-            else if ( evt instanceof RepositoryRegistryEventRemove )
-            {
-                sb.insert( 0, "Unregistered" );
-            }
-            else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
-            {
-                sb.insert( 0, "Updated" );
-            }
-
-            getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, sb.toString() );
         }
+
+        sb.append( "." );
+
+        if ( evt instanceof RepositoryRegistryEventAdd )
+        {
+            sb.insert( 0, "Registered" );
+        }
+        else if ( evt instanceof RepositoryRegistryEventRemove )
+        {
+            sb.insert( 0, "Unregistered" );
+        }
+        else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
+        {
+            sb.insert( 0, "Updated" );
+        }
+
+        getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, sb.toString() );
     }
 }

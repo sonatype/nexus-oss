@@ -13,8 +13,6 @@
 package org.sonatype.nexus.feeds.record;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
@@ -31,9 +29,6 @@ import org.sonatype.plexus.appevents.Event;
 public class NexusBootEventInspector
     extends AbstractFeedRecorderEventInspector
 {
-    @Requirement
-    private ApplicationStatusSource applicationStatusSource;
-
     @Override
     public boolean accepts( Event<?> evt )
     {
@@ -45,15 +40,17 @@ public class NexusBootEventInspector
     {
         if ( evt instanceof NexusStartedEvent )
         {
-            getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Started Nexus (version "
-                + applicationStatusSource.getSystemStatus().getVersion() + " "
-                + applicationStatusSource.getSystemStatus().getEditionShort() + ")" );
+            getFeedRecorder().addSystemEvent(
+                FeedRecorder.SYSTEM_BOOT_ACTION,
+                "Started Nexus (version " + getApplicationStatusSource().getSystemStatus().getVersion() + " "
+                    + getApplicationStatusSource().getSystemStatus().getEditionShort() + ")" );
         }
         else if ( evt instanceof NexusStoppedEvent )
         {
-            getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Stopping Nexus (version "
-                + applicationStatusSource.getSystemStatus().getVersion() + " "
-                + applicationStatusSource.getSystemStatus().getEditionShort() + ")" );
+            getFeedRecorder().addSystemEvent(
+                FeedRecorder.SYSTEM_BOOT_ACTION,
+                "Stopping Nexus (version " + getApplicationStatusSource().getSystemStatus().getVersion() + " "
+                    + getApplicationStatusSource().getSystemStatus().getEditionShort() + ")" );
         }
     }
 

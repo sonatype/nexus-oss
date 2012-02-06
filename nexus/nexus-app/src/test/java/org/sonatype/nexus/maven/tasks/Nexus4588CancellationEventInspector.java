@@ -14,7 +14,6 @@ package org.sonatype.nexus.maven.tasks;
 
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireCaches;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.scheduling.TaskUtil;
 
