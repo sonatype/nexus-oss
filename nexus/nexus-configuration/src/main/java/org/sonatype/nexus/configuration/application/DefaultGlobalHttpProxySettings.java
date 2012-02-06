@@ -13,10 +13,8 @@
 package org.sonatype.nexus.configuration.application;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -25,6 +23,7 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.configuration.application.events.GlobalHttpProxySettingsChangedEvent;
 import org.sonatype.nexus.configuration.model.CGlobalHttpProxySettingsCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
@@ -268,4 +267,19 @@ public class DefaultGlobalHttpProxySettings
 
         getCurrentConfiguration( true ).setNonProxyHosts( new ArrayList<String>( nonProxyHosts ) );
     }
+
+    @Override
+    public boolean commitChanges()
+        throws ConfigurationException
+    {
+        boolean wasDirty = super.commitChanges();
+
+        if ( wasDirty )
+        {
+            getApplicationEventMulticaster().notifyEventListeners( new GlobalHttpProxySettingsChangedEvent( this ) );
+        }
+
+        return wasDirty;
+    }
+
 }
