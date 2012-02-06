@@ -185,7 +185,14 @@ public abstract class AbstractNexusTask<T>
             }
             else
             {
-                getLogger().info( getLoggedMessage( "failed", started ), e );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().warn( getLoggedMessage( "failed", started ), e );
+                }
+                else
+                {
+                    getLogger().warn( getLoggedMessage( "failed", started ) + ": " + e.getMessage() );
+                }
 
                 // notify that there was a failure
                 applicationEventMulticaster.notifyEventListeners( new NexusTaskEventStoppedFailed<T>( this,

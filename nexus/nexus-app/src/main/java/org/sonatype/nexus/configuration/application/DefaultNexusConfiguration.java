@@ -27,13 +27,13 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.NexusStreamResponse;
+import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationCommitEvent;
 import org.sonatype.nexus.configuration.ConfigurationLoadEvent;
@@ -49,7 +49,7 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
+import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.VetoFormatter;
@@ -69,6 +69,9 @@ import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.SecuritySystem;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Collections2;
+
 /**
  * The class DefaultNexusConfiguration is responsible for config management. It actually keeps in sync Nexus internal
  * state with p ersisted user configuration. All changes incoming thru its iface is reflect/maintained in Nexus current
@@ -78,10 +81,9 @@ import org.sonatype.security.SecuritySystem;
  */
 @Component( role = NexusConfiguration.class )
 public class DefaultNexusConfiguration
+    extends AbstractLoggingComponent
     implements NexusConfiguration
 {
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
-
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
 
@@ -150,13 +152,6 @@ public class DefaultNexusConfiguration
 
     // ==
 
-    protected Logger getLogger()
-    {
-        return logger;
-    }
-
-    // ==
-
     public void loadConfiguration()
         throws ConfigurationException, IOException
     {
@@ -221,9 +216,75 @@ public class DefaultNexusConfiguration
         }
     }
 
+    protected String changesToString( final Collection<Configurable> changes )
+    {
+        final StringBuilder sb = new StringBuilder();
+
+        if ( changes != null )
+        {
+            sb.append( Collections2.transform( changes, new Function<Configurable, String>()
+            {
+                @Override
+                public String apply( final Configurable input )
+                {
+                    return input.getName();
+                }
+            } ) );
+        }
+
+        return sb.toString();
+    }
+
+    protected void logApplyConfiguration( final Collection<Configurable> changes )
+    {
+        final String userId = getCurrentUserId();
+
+        if ( changes != null && changes.size() > 0 )
+        {
+            if ( StringUtils.isBlank( userId ) )
+            {
+                // should not really happen, we should always have subject (at least anon), but...
+                getLogger().info( "Applying Nexus Configuration due to changes in {}...", changesToString( changes ) );
+            }
+            else
+            {
+                // usually what happens on config change
+                getLogger().info( "Applying Nexus Configuration due to changes in {} made by {}...",
+                    changesToString( changes ), userId );
+            }
+        }
+        else
+        {
+            if ( StringUtils.isBlank( userId ) )
+            {
+                // usually on boot: no changes since "all" changed, and no subject either
+                getLogger().info( "Applying Nexus Configuration..." );
+            }
+            else
+            {
+                // inperfection of config framework, ie. on adding new component to config system (new repo)
+                getLogger().info( "Applying Nexus Configuration made by {}...", userId );
+            }
+        }
+    }
+
+    protected String getCurrentUserId()
+    {
+        Subject subject = ThreadContext.getSubject(); // Use ThreadContext directly, SecurityUtils will associate a
+                                                      // new Subject with the thread.
+        if ( subject != null && subject.getPrincipal() != null )
+        {
+            return subject.getPrincipal().toString();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     public synchronized boolean applyConfiguration()
     {
-        getLogger().info( "Applying Nexus Configuration..." );
+        getLogger().debug( "Applying Nexus Configuration..." );
 
         ConfigurationPrepareForSaveEvent prepare = new ConfigurationPrepareForSaveEvent( this );
 
@@ -231,22 +292,16 @@ public class DefaultNexusConfiguration
 
         if ( !prepare.isVetoed() )
         {
+            logApplyConfiguration( prepare.getChanges() );
+
             configurationDirectory = null;
 
             temporaryDirectory = null;
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
-            String userId = null;
-            Subject subject = ThreadContext.getSubject(); // Use ThreadContext directly, SecurityUtils will associate a
-                                                          // new Subject with the thread.
-            if ( subject != null && subject.getPrincipal() != null )
-            {
-                userId = subject.getPrincipal().toString();
-            }
-
             applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges(),
-                userId ) );
+                getCurrentUserId() ) );
 
             return true;
         }
@@ -340,7 +395,7 @@ public class DefaultNexusConfiguration
                     + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
                     + "******************************************************************************";
 
-            getLogger().fatalError( message );
+            getLogger().error( message );
         }
 
         return workingDirectory;
@@ -367,7 +422,7 @@ public class DefaultNexusConfiguration
                         + "* Nexus cannot start properly until the process has read+write permissions to this folder *\r\n"
                         + "******************************************************************************";
 
-                getLogger().fatalError( message );
+                getLogger().error( message );
             }
         }
 
@@ -553,7 +608,7 @@ public class DefaultNexusConfiguration
     }
 
     protected void releaseRepository( final Repository repository, final Configuration configuration,
-                                            final CRepository repositoryModel )
+                                      final CRepository repositoryModel )
         throws ConfigurationException
     {
         // release it
@@ -795,7 +850,7 @@ public class DefaultNexusConfiguration
                 i.remove();
 
                 saveConfiguration();
-                
+
                 releaseRepository( repository, getConfigurationModel(), repo );
 
                 return;

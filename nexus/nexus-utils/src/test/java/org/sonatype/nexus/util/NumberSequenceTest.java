@@ -163,4 +163,32 @@ public class NumberSequenceTest
             Assert.assertEquals( f, fs.prev() );
         }
     }
+
+    @Test
+    public void testLinearSequenceWithLimiter()
+    {
+        long startValue = 0;
+
+        // step=1, multiplier=1, shift=0
+        // f(x) = 1*x+0 = x; x starts at 1
+        LinearNumberSequence ls = new LinearNumberSequence( startValue, 1, 1, 0 );
+        LowerLimitNumberSequence seq = new LowerLimitNumberSequence( ls, 1 );
+
+        // go prev 5 times, it should actually result in ONE state change
+        for ( int i = 1; i < 5; i++ )
+        {
+            Assert.assertEquals( 1, seq.prev() );
+        }
+
+        Assert.assertEquals( 1, seq.peek() );
+
+        Assert.assertEquals( 1, seq.next() );
+        Assert.assertEquals( 2, seq.next() );
+
+        seq.reset();
+
+        Assert.assertEquals( 1, seq.next() );
+        Assert.assertEquals( 2, seq.next() );
+    }
+
 }

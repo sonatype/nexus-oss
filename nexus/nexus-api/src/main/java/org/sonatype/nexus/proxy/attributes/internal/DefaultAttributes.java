@@ -73,7 +73,18 @@ public class DefaultAttributes
     @Override
     public String remove( String key )
     {
-        return values.remove( key );
+        // key needs to be removed from both maps
+        final String valuesPrev = values.remove( key );
+        final String defaultsPrev = defaults.remove( key );
+        // but what we "saw" before depends where was the removed value
+        if ( valuesPrev == null )
+        {
+            return defaultsPrev;
+        }
+        else
+        {
+            return valuesPrev;
+        }
     }
 
     @Override
@@ -153,7 +164,7 @@ public class DefaultAttributes
 
     protected String getKeyForAttribute( final String attributeName )
     {
-        return String.format( "%s-%s", "storageItem", Preconditions.checkNotNull( attributeName ) );
+        return new StringBuilder( 32 ).append( "storageItem-" ).append( Preconditions.checkNotNull( attributeName ) ).toString();
     }
 
     // ==

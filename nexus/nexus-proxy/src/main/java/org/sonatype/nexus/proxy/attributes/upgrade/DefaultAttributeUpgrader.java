@@ -26,6 +26,8 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.util.FibonacciNumberSequence;
+import org.sonatype.nexus.util.LowerLimitNumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 /**
@@ -69,13 +71,16 @@ public class DefaultAttributeUpgrader
 
     private ObjectName jmxName;
 
-    private int upgradeThrottleUps;
+    private int upgradeThrottleTps;
+
+    private LowerLimitNumberSequence lowerLimitNumberSequence;
 
     private volatile AttributeUpgraderThread upgraderThread;
 
     public DefaultAttributeUpgrader()
     {
-        this.upgradeThrottleUps = UPGRADE_THROTTLE_UPS;
+        this.upgradeThrottleTps = UPGRADE_THROTTLE_UPS;
+        this.lowerLimitNumberSequence = new LowerLimitNumberSequence( new FibonacciNumberSequence( 0, 5 ), 0 );
 
         try
         {
@@ -145,11 +150,11 @@ public class DefaultAttributeUpgrader
     }
 
     @Override
-    public int getCurrentUps()
+    public int getGlobalAverageTps()
     {
         if ( isUpgradeRunning() )
         {
-            return upgraderThread.getActualUps();
+            return upgraderThread.getThrottleController().getGlobalAverageTps();
         }
         else
         {
@@ -158,11 +163,11 @@ public class DefaultAttributeUpgrader
     }
 
     @Override
-    public int getMaximumUps()
+    public int getGlobalMaximumTps()
     {
-        if ( upgraderThread != null )
+        if ( isUpgradeRunning() )
         {
-            return upgraderThread.getMaximumUps();
+            return upgraderThread.getThrottleController().getGlobalMaximumTps();
         }
         else
         {
@@ -171,28 +176,64 @@ public class DefaultAttributeUpgrader
     }
 
     @Override
-    public int getLimiterUps()
+    public int getLastSliceTps()
     {
         if ( isUpgradeRunning() )
         {
-            return upgraderThread.getLimiterUps();
+            return upgraderThread.getThrottleController().getLastSliceTps();
         }
         else
         {
-            return upgradeThrottleUps;
+            return -1;
         }
     }
 
     @Override
-    public void setLimiterUps( int limit )
+    public long getCurrentSleepTime()
     {
         if ( isUpgradeRunning() )
         {
-            upgraderThread.setLimiterUps( limit );
+            return upgraderThread.getThrottleController().getCurrentSleepTime();
         }
         else
         {
-            upgradeThrottleUps = limit;
+            return -1;
+        }
+    }
+
+    public long getMinimumSleepTime()
+    {
+        return lowerLimitNumberSequence.getLowerLimit();
+    }
+
+    public void setMinimumSleepTime( long sleepTime )
+    {
+        lowerLimitNumberSequence.setLowerLimit( sleepTime );
+    }
+
+    @Override
+    public int getLimiterTps()
+    {
+        if ( isUpgradeRunning() )
+        {
+            return upgraderThread.getThrottleController().getLimiterTps();
+        }
+        else
+        {
+            return upgradeThrottleTps;
+        }
+    }
+
+    @Override
+    public void setLimiterTps( int limiterTps )
+    {
+        if ( isUpgradeRunning() )
+        {
+            upgraderThread.getThrottleController().setLimiterTps( limiterTps );
+        }
+        else
+        {
+            upgradeThrottleTps = limiterTps;
         }
     }
 
@@ -241,7 +282,7 @@ public class DefaultAttributeUpgrader
                     }
                     this.upgraderThread =
                         new AttributeUpgraderThread( getLegacyAttributesDirectory(), repositoryRegistry,
-                            upgradeThrottleUps );
+                            upgradeThrottleTps, lowerLimitNumberSequence );
                     this.upgraderThread.start();
                 }
                 else
