@@ -216,12 +216,6 @@
                   <artifactId>org.sonatype.p2.bridge.model</artifactId>
                   <outputDirectory>${project.build.directory}/dependency/org.sonatype.p2.bridge.model</outputDirectory>
                 </artifactItem>
-                <artifactItem>
-                  <groupId>org.sonatype.p2.bridge</groupId>
-                  <artifactId>p2-runtime</artifactId>
-                  <type>zip</type>
-                  <outputDirectory>${project.build.directory}/dependency/p2-runtime</outputDirectory>
-                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>
@@ -238,6 +232,23 @@
                   <outputDirectory>${project.build.directory}/dependency/bundles</outputDirectory>
                 </artifactItem>
               </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-strip-version</id>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.sonatype.p2.bridge</groupId>
+                  <artifactId>p2-runtime</artifactId>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.directory}/dependency</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+              <stripVersion>true</stripVersion>
             </configuration>
           </execution>
         </executions>

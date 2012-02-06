@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.codehaus.plexus.archiver.UnArchiver;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.eclipse.core.runtime.internal.adaptor.EclipseEnvironmentInfo;
@@ -61,15 +62,19 @@ class P2Runtime
 
     private final ApplicationConfiguration applicationConfiguration;
 
+    private final UnArchiver unArchiver;
+
     @Inject
     public P2Runtime( final EclipseBridge eclipseBridge, final EclipseLocationFactory eclipseLocationFactory,
                       final PluginRepositoryManager pluginRepositoryManager,
-                      final ApplicationConfiguration applicationConfiguration )
+                      final ApplicationConfiguration applicationConfiguration,
+                      final @Named("zip") UnArchiver unArchiver)
     {
         this.eclipseBridge = eclipseBridge;
         this.eclipseLocationFactory = eclipseLocationFactory;
         this.pluginRepositoryManager = pluginRepositoryManager;
         this.applicationConfiguration = applicationConfiguration;
+        this.unArchiver = unArchiver;
     }
 
     EclipseInstance get()
@@ -90,8 +95,24 @@ class P2Runtime
             return;
         }
         final File pluginDir = getP2RepositoryPluginDir();
-        final EclipseLocation eclipseLocation =
-            eclipseLocationFactory.createStaticEclipseLocation( new File( pluginDir, "p2-runtime/eclipse" ) );
+
+        final File eclipseDir = new File( pluginDir, "p2-runtime/eclipse" );
+        if ( !eclipseDir.exists() )
+        {
+            try
+            {
+                unArchiver.setSourceFile( new File( pluginDir, "p2-runtime/eclipse.zip" ) );
+                unArchiver.setDestDirectory( eclipseDir.getParentFile() );
+                unArchiver.extract();
+            }
+            catch ( final Exception e )
+            {
+                throw new RuntimeException( "Cannot unpack Eclipse", e );
+            }
+        }
+
+        final EclipseLocation eclipseLocation = eclipseLocationFactory.createStaticEclipseLocation( eclipseDir );
+
         eclipse = eclipseBridge.createInstance( eclipseLocation );
         try
         {
