@@ -211,11 +211,6 @@ public class DefaultWalker
             return collCount;
         }
 
-        if ( context.isStopped() )
-        {
-            return collCount;
-        }
-
         Collection<StorageItem> ls = null;
 
         if ( shouldProcessRecursively )
