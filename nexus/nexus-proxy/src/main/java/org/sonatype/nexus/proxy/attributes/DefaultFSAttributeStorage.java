@@ -28,6 +28,7 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 
+import com.google.common.base.Preconditions;
 import com.google.common.io.Closeables;
 
 /**
@@ -59,13 +60,18 @@ public class DefaultFSAttributeStorage
      * @param applicationConfiguration
      */
     @Inject
-    public DefaultFSAttributeStorage( final ApplicationConfiguration applicationConfiguration,
-                                      @Named( "xstream-xml" ) final Marshaller marshaller )
+    public DefaultFSAttributeStorage( final ApplicationConfiguration applicationConfiguration )
     {
-        this.applicationConfiguration = applicationConfiguration;
-        this.marshaller = marshaller;
+        this( applicationConfiguration, new JacksonJSONMarshaller() );
+    }
+
+    public DefaultFSAttributeStorage( final ApplicationConfiguration applicationConfiguration,
+                                      final Marshaller marshaller )
+    {
+        this.applicationConfiguration = Preconditions.checkNotNull( applicationConfiguration );
+        this.marshaller = Preconditions.checkNotNull( marshaller );
         this.workingDirectory = initializeWorkingDirectory();
-        getLogger().info( "Default FS AttributeStorage in place." );
+        getLogger().info( "Default FS AttributeStorage in place, using {} marshaller.", marshaller );
     }
 
     public synchronized File initializeWorkingDirectory()

@@ -34,6 +34,8 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
+import com.google.common.base.Preconditions;
+
 /**
  * AttributeStorage implementation that uses LocalRepositoryStorage of repositories to store attributes "along" the
  * artifacts (well, not along but in same storage but hidden).
@@ -55,10 +57,18 @@ public class DefaultLSAttributeStorage
      * Instantiates a new FSX stream attribute storage.
      */
     @Inject
-    public DefaultLSAttributeStorage( @Named( "jackson-json" ) final Marshaller marshaller )
+    public DefaultLSAttributeStorage()
     {
-        this.marshaller = marshaller;
-        getLogger().info( "Default LS AttributeStorage in place." );
+        this( new JacksonJSONMarshaller() );
+    }
+
+    /**
+     * Instantiates a new FSX stream attribute storage.
+     */
+    public DefaultLSAttributeStorage( final Marshaller marshaller )
+    {
+        this.marshaller = Preconditions.checkNotNull( marshaller );
+        getLogger().info( "Default FS AttributeStorage in place, using {} marshaller.", marshaller );
     }
 
     public boolean deleteAttributes( final RepositoryItemUid uid )
