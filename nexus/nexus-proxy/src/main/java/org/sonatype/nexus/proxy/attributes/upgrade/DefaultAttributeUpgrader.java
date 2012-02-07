@@ -95,15 +95,20 @@ public class DefaultAttributeUpgrader
             getLogger().warn( "Problem registering MBean for: " + getClass().getName(), e );
         }
     }
-    
+
     // ==
-    
+
     @Override
     public void dispose()
     {
         shutdown();
+        // kill the daemon thread
+        if ( isUpgradeRunning() )
+        {
+            upgraderThread.interrupt();
+        }
     }
-    
+
     // ==
 
     public void shutdown()
