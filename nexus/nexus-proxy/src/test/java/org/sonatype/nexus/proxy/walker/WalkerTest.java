@@ -93,7 +93,7 @@ public class WalkerTest
 
         Assert.assertEquals( 10, wp.collEnters );
         Assert.assertEquals( 10, wp.collExits );
-        Assert.assertEquals( 10, wp.colls );
+        Assert.assertEquals( 0, wp.colls );
         Assert.assertEquals( 4, wp.files );
         Assert.assertEquals( 0, wp.links );
     }

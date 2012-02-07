@@ -40,13 +40,6 @@ public interface WalkerContext
     boolean isLocalOnly();
 
     /**
-     * The WalkerProcessors will get notified only on collections.
-     * 
-     * @return
-     */
-    boolean isCollectionsOnly();
-
-    /**
      * Returns the context.
      * 
      * @return

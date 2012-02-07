@@ -29,8 +29,6 @@ public class DefaultWalkerContext
 
     private final WalkerFilter walkerFilter;
 
-    private final boolean collectionsOnly;
-
     private final ResourceStoreRequest request;
 
     private final WalkerThrottleController throttleController;
@@ -50,11 +48,11 @@ public class DefaultWalkerContext
 
     public DefaultWalkerContext( Repository store, ResourceStoreRequest request, WalkerFilter filter )
     {
-        this( store, request, filter, true, false );
+        this( store, request, filter, true );
     }
 
     public DefaultWalkerContext( Repository store, ResourceStoreRequest request, WalkerFilter filter,
-                                 boolean localOnly, boolean collectionsOnly )
+                                 boolean localOnly )
     {
         super();
 
@@ -63,8 +61,6 @@ public class DefaultWalkerContext
         this.request = request;
 
         this.walkerFilter = filter;
-
-        this.collectionsOnly = collectionsOnly;
 
         this.running = true;
 
@@ -83,12 +79,6 @@ public class DefaultWalkerContext
     public boolean isLocalOnly()
     {
         return request.isRequestLocalOnly();
-    }
-
-    @Override
-    public boolean isCollectionsOnly()
-    {
-        return collectionsOnly;
     }
 
     @Override
