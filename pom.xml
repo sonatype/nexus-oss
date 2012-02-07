@@ -46,8 +46,8 @@
 
   <properties>
     <felix.home>${project.build.directory}/felix</felix.home>
-    <nexus.version>2.0-M4</nexus.version>
-    <applifecycle.version>1.5</applifecycle.version>
+    <nexus.version>2.0-RC1</nexus.version>
+    <applifecycle.version>1.6</applifecycle.version>
   </properties>
 
   <dependencies>
