@@ -21,12 +21,13 @@ import javax.management.ObjectName;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.util.FibonacciNumberSequence;
+import org.sonatype.nexus.util.LinearNumberSequence;
 import org.sonatype.nexus.util.LowerLimitNumberSequence;
 import org.sonatype.nexus.util.SystemPropertiesHelper;
 
@@ -40,7 +41,7 @@ import org.sonatype.nexus.util.SystemPropertiesHelper;
 @Component( role = AttributeUpgrader.class )
 public class DefaultAttributeUpgrader
     extends AbstractLoggingComponent
-    implements AttributeUpgrader
+    implements AttributeUpgrader, Disposable
 {
     private static final String JMX_DOMAIN = "org.sonatype.nexus.proxy.attributes.upgrade";
 
@@ -80,7 +81,7 @@ public class DefaultAttributeUpgrader
     public DefaultAttributeUpgrader()
     {
         this.upgradeThrottleTps = UPGRADE_THROTTLE_UPS;
-        this.lowerLimitNumberSequence = new LowerLimitNumberSequence( new FibonacciNumberSequence( 0, 5 ), 0 );
+        this.lowerLimitNumberSequence = new LowerLimitNumberSequence( new LinearNumberSequence( 0, 2, 1, 0 ), 0 );
 
         try
         {
@@ -94,6 +95,16 @@ public class DefaultAttributeUpgrader
             getLogger().warn( "Problem registering MBean for: " + getClass().getName(), e );
         }
     }
+    
+    // ==
+    
+    @Override
+    public void dispose()
+    {
+        shutdown();
+    }
+    
+    // ==
 
     public void shutdown()
     {
