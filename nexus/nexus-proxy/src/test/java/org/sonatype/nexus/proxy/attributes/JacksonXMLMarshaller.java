@@ -18,6 +18,8 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.stream.XMLStreamException;
+
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
@@ -63,6 +65,17 @@ public class JacksonXMLMarshaller
         catch ( JsonParseException e )
         {
             throw new InvalidInputException( "Persisted attribute malformed!", e );
+        }
+        catch ( IOException e )
+        {
+            if ( e.getCause() instanceof XMLStreamException )
+            {
+                throw new InvalidInputException( "Persisted attribute malformed!", e );
+            }
+            else
+            {
+                throw e;
+            }
         }
     }
 
