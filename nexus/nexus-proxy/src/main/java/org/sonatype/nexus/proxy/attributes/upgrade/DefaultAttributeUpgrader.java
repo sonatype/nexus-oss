@@ -81,7 +81,7 @@ public class DefaultAttributeUpgrader
     public DefaultAttributeUpgrader()
     {
         this.upgradeThrottleTps = UPGRADE_THROTTLE_UPS;
-        this.lowerLimitNumberSequence = new LowerLimitNumberSequence( new LinearNumberSequence( 0, 2, 1, 0 ), 0 );
+        this.lowerLimitNumberSequence = new LowerLimitNumberSequence( new LinearNumberSequence( 0, 1, 1, 0 ), 0 );
 
         try
         {
