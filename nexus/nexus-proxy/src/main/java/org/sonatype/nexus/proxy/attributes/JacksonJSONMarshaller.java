@@ -18,9 +18,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
+import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
@@ -28,8 +26,6 @@ import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
 /**
  * Jackson JSON Attribute marshaller. Part of NEXUS-4628 "alternate" AttributeStorage implementations.
  */
-@Singleton
-@Named( "jackson-json" )
 public class JacksonJSONMarshaller
     implements Marshaller
 {
@@ -52,10 +48,26 @@ public class JacksonJSONMarshaller
 
     @Override
     public Attributes unmarshal( final InputStream inputStream )
-        throws IOException
+        throws IOException, InvalidInputException
     {
-        final Map<String, String> attributesMap = objectMapper.readValue( inputStream, new TypeReference<Map<String, String>>() {} );
-        return new DefaultAttributes( attributesMap );
+        try
+        {
+            final Map<String, String> attributesMap =
+                objectMapper.readValue( inputStream, new TypeReference<Map<String, String>>()
+                {
+                } );
+            return new DefaultAttributes( attributesMap );
+        }
+        catch ( JsonParseException e )
+        {
+            throw new InvalidInputException( "Persisted attribute malformed!", e );
+        }
     }
 
+    // ==
+
+    public String toString()
+    {
+        return "JacksonJSON";
+    }
 }

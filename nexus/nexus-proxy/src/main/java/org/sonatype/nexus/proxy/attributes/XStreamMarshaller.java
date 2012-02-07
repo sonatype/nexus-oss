@@ -17,10 +17,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.attributes.internal.DefaultAttributes;
+
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.converters.collections.MapConverter;
@@ -30,9 +29,8 @@ import com.thoughtworks.xstream.converters.collections.MapConverter;
  * 
  * @author cstamas
  * @since 2.0
+ * @deprecated Deprecated in favor of Jackson powered Marshaller, see {@link JacksonJSONMarshaller}.
  */
-@Singleton
-@Named( "xstream-xml" )
 public class XStreamMarshaller
     implements Marshaller
 {
@@ -74,5 +72,11 @@ public class XStreamMarshaller
             throw new InvalidInputException( "XStream claimed file as corrupt.", e );
         }
     }
-
+    
+    // ==
+    
+    public String toString()
+    {
+        return "XStream";
+    }
 }
