@@ -18,6 +18,7 @@ import static org.testng.Assert.*;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -43,15 +44,15 @@ public class Nexus3929TimelineCorruptionIT
 
                 stopNexus();
 
-                File tl = new File( nexusWorkDir, "timeline/index" );
-                while ( FileUtils.listFiles( tl, new String[] { "cfs" }, false ).size() < 7 )
+                final File tl = new File( nexusWorkDir, "timeline/index" );
+                while ( getTimelineLuceneSegments( tl ).size() < 7 )
                 {
                     startNexus();
                     stopNexus();
                 }
 
-                @SuppressWarnings( "unchecked" )
-                List<File> cfs = new ArrayList<File>( FileUtils.listFiles( tl, new String[] { "cfs" }, false ) );
+                List<File> cfs = getTimelineLuceneSegments( tl );
+                // just delete some files to wreck the index
                 FileUtils.forceDelete( cfs.get( 0 ) );
                 FileUtils.forceDelete( cfs.get( 2 ) );
                 FileUtils.forceDelete( cfs.get( 5 ) );
@@ -59,6 +60,27 @@ public class Nexus3929TimelineCorruptionIT
                 startNexus();
             }
         }
+    }
+
+    protected List<File> getTimelineLuceneSegments( final File timelineLuceneIndexDirectory )
+    {
+        @SuppressWarnings( "unchecked" )
+        final List<File> luceneFiles =
+            new ArrayList<File>( FileUtils.listFiles( timelineLuceneIndexDirectory, new String[] { "cfs", "fnm", "fdt",
+                "fdx", "frm", "frq", "nrm", "prx", "tii", "tis" }, false ) );
+
+        // filter it
+        final Iterator<File> lfi = luceneFiles.iterator();
+        while ( lfi.hasNext() )
+        {
+            final File luceneFile = lfi.next();
+            if ( luceneFile.isFile() && luceneFile.getName().startsWith( "segments." ) )
+            {
+                lfi.remove();
+            }
+        }
+
+        return luceneFiles;
     }
 
     @Test
