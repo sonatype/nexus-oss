@@ -21,6 +21,7 @@ public class HttpClientProxyUtilTest
 
     @Test
     public void testHttpClientProxyUtilUseDoesNotModifyContext()
+        throws Exception
     {
         final RemoteConnectionSettings remoteConnectionSettings = new RemoteConnectionSettings()
         {
@@ -139,13 +140,19 @@ public class HttpClientProxyUtilTest
 
         // get last changed
         long lastChanged = ctx.getLastChanged();
+        // making sure we will have subtraction result grater than 0
+        Thread.sleep( 5 );
 
         // 1st invocation, should modify it
         HttpClientProxyUtil.applyProxyToHttpClient( httpClient, ctx, logger );
         assertThat( ctx.getLastChanged(), greaterThan( lastChanged ) );
 
-        // now 2nd invocation, should not change
+        // get last changed
         lastChanged = ctx.getLastChanged();
+        // making sure we will have subtraction result grater than 0
+        Thread.sleep( 5 );
+
+        // now 2nd invocation, should not change
         HttpClientProxyUtil.applyProxyToHttpClient( httpClient, ctx, logger );
         assertThat( ctx.getLastChanged(), equalTo( lastChanged ) );
     }
