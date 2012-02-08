@@ -28,11 +28,12 @@ import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 /**
  * This class is a base abstract class for remote storage.
- *
+ * 
  * @author cstamas
  */
 public abstract class AbstractRemoteRepositoryStorage
@@ -121,15 +122,28 @@ public abstract class AbstractRemoteRepositoryStorage
                     }
                     else
                     {
-                        getLogger().debug( "Remote context {} has been changed at {}. Previous change {}",
-                                           new Object[]{
-                                               ctx,
-                                               new Date( ctx.getLastChanged() ),
-                                               new Date( repositoryContexts.get( repository.getId() ) )
-                                           }
-                        );
+                        getLogger().debug(
+                            "Remote context {} has been changed at {}. Previous change {}",
+                            new Object[] { ctx, new Date( ctx.getLastChanged() ),
+                                new Date( repositoryContexts.get( repository.getId() ) ) } );
                     }
                 }
+
+                if ( !repositoryContexts.containsKey( repository.getId() ) )
+                {
+                    // very first request for the proxy repository (it goes remote for the 1st time)
+                    getLogger().info(
+                        String.format( "Initializing transport for proxy repository %s...",
+                            RepositoryStringUtils.getHumanizedNameString( repository ) ) );
+                }
+                else
+                {
+                    // subsequent invocation due to configuration change
+                    getLogger().info(
+                        String.format( "Updating transport for proxy repository %s...",
+                            RepositoryStringUtils.getHumanizedNameString( repository ) ) );
+                }
+
                 updateContext( repository, ctx );
                 repositoryContexts.put( repository.getId(), ctx.getLastChanged() );
             }
@@ -161,9 +175,9 @@ public abstract class AbstractRemoteRepositoryStorage
 
     /**
      * Remote storage specific, when the remote connection settings are actually applied.
-     *
+     * 
      * @param repository to update context for
-     * @param context    remote repository context
+     * @param context remote repository context
      * @throws RemoteStorageException If context could not be updated
      */
     protected abstract void updateContext( ProxyRepository repository, RemoteStorageContext context )

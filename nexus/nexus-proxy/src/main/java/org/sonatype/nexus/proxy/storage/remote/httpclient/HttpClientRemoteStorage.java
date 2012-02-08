@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -382,10 +383,6 @@ class HttpClientRemoteStorage
     protected void updateContext( final ProxyRepository repository,
                                   final RemoteStorageContext ctx )
     {
-        getLogger().info(
-            "Remote storage settings change detected for ProxyRepository ID=\"" + repository.getId() + "\" (\""
-                + repository.getName() + "\"), updating HttpClient..." );
-
         // reset current http client, if exists
         HttpClientUtil.release( CTX_KEY, ctx );
 

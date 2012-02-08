@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
@@ -65,8 +64,8 @@ public abstract class AbstractGroupRepository
     implements GroupRepository, CallableExecutor
 {
     /** Secret switch that allows disabling use of Charger if needed */
-    private static final boolean USE_CHARGER_FOR_GROUP_REQUESTS = SystemPropertiesHelper.getBoolean(
-        "nexus.useParallelGroupRequests", false );
+    private final boolean USE_CHARGER_FOR_GROUP_REQUESTS = SystemPropertiesHelper.getBoolean( getClass().getName()
+        + ".useParallelGroupRequests", false );
 
     @Requirement
     private RepositoryRegistry repoRegistry;
@@ -173,7 +172,7 @@ public abstract class AbstractGroupRepository
 
         return result;
     }
-    
+
     // ==
 
     @Override
@@ -226,16 +225,11 @@ public abstract class AbstractGroupRepository
                 }
                 else
                 {
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().debug(
-                            "Repository ID='"
-                                + repo.getId()
-                                + "' in group ID='"
-                                + this.getId()
-                                + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                + request.toString() );
-                    }
+                    getLogger().info(
+                        String.format(
+                            "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
+                            RepositoryStringUtils.getHumanizedNameString( repo ),
+                            RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
                 }
             }
         }
@@ -302,16 +296,11 @@ public abstract class AbstractGroupRepository
                         }
                         else
                         {
-                            if ( getLogger().isDebugEnabled() )
-                            {
-                                getLogger().debug(
-                                    "Repository ID='"
-                                        + repository.getId()
-                                        + "' in group ID='"
-                                        + this.getId()
-                                        + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                        + request.toString() );
-                            }
+                            getLogger().info(
+                                String.format(
+                                    "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
+                                    RepositoryStringUtils.getHumanizedNameString( repository ),
+                                    RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
                         }
                     }
 
@@ -527,16 +516,11 @@ public abstract class AbstractGroupRepository
                     }
                     else
                     {
-                        if ( getLogger().isDebugEnabled() )
-                        {
-                            getLogger().debug(
-                                "Repository ID='"
-                                    + repository.getId()
-                                    + "' in group ID='"
-                                    + this.getId()
-                                    + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                    + request.toString() );
-                        }
+                        getLogger().info(
+                            String.format(
+                                "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
+                                RepositoryStringUtils.getHumanizedNameString( repository ),
+                                RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
                     }
                 }
 
@@ -578,9 +562,12 @@ public abstract class AbstractGroupRepository
                         }
                         catch ( RepositoryNotAvailableException e )
                         {
-                            getLogger().debug(
-                                RepositoryStringUtils.getFormattedMessage(
-                                    "Member repository %s is not available, request failed.", e.getRepository() ) );
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug(
+                                    RepositoryStringUtils.getFormattedMessage(
+                                        "Member repository %s is not available, request failed.", e.getRepository() ) );
+                            }
                         }
                         catch ( StorageException e )
                         {
@@ -593,17 +580,11 @@ public abstract class AbstractGroupRepository
                     }
                     else
                     {
-                        if ( getLogger().isDebugEnabled() )
-                        {
-                            getLogger().debug(
-                                "Repository ID='"
-                                    + repository.getId()
-                                    + "' in group ID='"
-                                    + this.getId()
-                                    + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                    + request.toString() );
-
-                        }
+                        getLogger().info(
+                            String.format(
+                                "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
+                                RepositoryStringUtils.getHumanizedNameString( repository ),
+                                RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
                     }
                 }
             }
