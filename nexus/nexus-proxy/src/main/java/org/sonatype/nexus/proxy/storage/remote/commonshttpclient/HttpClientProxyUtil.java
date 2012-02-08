@@ -233,7 +233,7 @@ public class HttpClientProxyUtil
         // consequences, like resetting all the HTTP clients of all remote storages (coz they think there is a change
         // in proxy or remote connection settings, etc).
         final Boolean isNtlmUsedOldValue = (Boolean) ctx.getContextObject( NTLM_IS_IN_USE_KEY );
-        if ( isNtlmUsedOldValue == null || !isNtlmUsedOldValue.booleanValue() != isNtlmUsed )
+        if ( isNtlmUsedOldValue == null || isNtlmUsedOldValue.booleanValue() != isNtlmUsed )
         {
             if ( isNtlmUsed )
             {
