@@ -34,11 +34,11 @@ public class FixedRateWalkerThrottleControllerTest
     @Test
     public void testDoesItHelpAtAll()
     {
-        // set unrealistic TPS and we do "almost nothing" (1 nano) in processItem method
+        // set unrealistic TPS and we do "little" (1ms) in processItem method (to get the ceiling to compare with)
         final int measuredTpsUnreal = performAndMeasureActualTps( 100000000, new ConstantNumberSequence( 1 ) );
-        // set 500 TPS and we do "little" (1 nano) in processItem method
+        // set 500 TPS and we do "little" (1ms) in processItem method
         final int measuredTps500 = performAndMeasureActualTps( 500, new ConstantNumberSequence( 1 ) );
-        // set 200 TPS and we do "little" (1 nano) in processItem method
+        // set 200 TPS and we do "little" (1ms) in processItem method
         final int measuredTps200 = performAndMeasureActualTps( 200, new ConstantNumberSequence( 1 ) );
 
         assertThat( "TPS500 should less than Unreal one", measuredTps500, lessThan( measuredTpsUnreal ) );
@@ -54,11 +54,8 @@ public class FixedRateWalkerThrottleControllerTest
         fixedRateWalkerThrottleController.setSliceSize( 1 );
 
         final TestThrottleInfo info = new TestThrottleInfo();
-
         final WalkerContext context = Mockito.mock( WalkerContext.class );
-
-        final int iterationCount = 10000;
-
+        final int iterationCount = 1000;
         final long startTime = System.currentTimeMillis();
         fixedRateWalkerThrottleController.walkStarted( context );
         for ( int i = 0; i < iterationCount; i++ )
@@ -72,9 +69,10 @@ public class FixedRateWalkerThrottleControllerTest
         final int measuredTps =
             fixedRateWalkerThrottleController.calculateCPS( iterationCount, System.currentTimeMillis() - startTime );
 
-        System.out.println( "Measured=" + measuredTps );
-        System.out.println( "GlobalAvg=" + fixedRateWalkerThrottleController.getGlobalAverageTps() );
-        System.out.println( "GlobalMax=" + fixedRateWalkerThrottleController.getGlobalMaximumTps() );
+        // System.out.println( "MeasuredTps=" + measuredTps );
+        // System.out.println( "lastSliceTps=" + fixedRateWalkerThrottleController.getLastSliceTps() );
+        // System.out.println( "GlobalAvgTps=" + fixedRateWalkerThrottleController.getGlobalAverageTps() );
+        // System.out.println( "GlobalMaxTps=" + fixedRateWalkerThrottleController.getGlobalMaximumTps() );
 
         return measuredTps;
     }
@@ -86,19 +84,6 @@ public class FixedRateWalkerThrottleControllerTest
         try
         {
             Thread.sleep( millis );
-        }
-        catch ( InterruptedException e )
-        {
-            // need to kill test too
-            throw new RuntimeException( e );
-        }
-    }
-
-    protected static void sleepNanos( long nanos )
-    {
-        try
-        {
-            Thread.sleep( 0, (int) nanos );
         }
         catch ( InterruptedException e )
         {
@@ -126,8 +111,8 @@ public class FixedRateWalkerThrottleControllerTest
         public void simulateInvocation( final long spentTimeInProcessItem )
         {
             // we need to sleep to keep getTotalTimeWalking() and totalProcessItemSpentMillis aligned
-            sleepNanos( spentTimeInProcessItem );
-            totalProcessItemSpentMillis = totalProcessItemSpentMillis + ( spentTimeInProcessItem * 1000 );
+            sleep( spentTimeInProcessItem );
+            totalProcessItemSpentMillis = totalProcessItemSpentMillis + spentTimeInProcessItem;
             totalProcessItemInvocationCount++;
         }
 
