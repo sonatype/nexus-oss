@@ -39,6 +39,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * Am ArtifactStore helper class, that simply drives a MavenRepository and gets various infos from it. It uses the
@@ -75,7 +76,8 @@ public class ArtifactStoreHelper
             }
             catch ( IOException e )
             {
-                throw new LocalStorageException( "Could not get the content from the ContentLocator!", e );
+                throw new LocalStorageException( String.format( "Could not store item to repository %s, path %s",
+                    RepositoryStringUtils.getHumanizedNameString( getMavenRepository() ), request ), e );
             }
 
             StorageFileItem storedFile = (StorageFileItem) getMavenRepository().retrieveItem( false, request );
@@ -557,8 +559,7 @@ public class ArtifactStoreHelper
     // =======================================================================================
 
     protected void deleteAllSubordinates( ArtifactStoreRequest gavRequest )
-        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException,
-        AccessDeniedException
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
     {
         // delete all "below", meaning: classifiers of the GAV
         // watch for subdirs
