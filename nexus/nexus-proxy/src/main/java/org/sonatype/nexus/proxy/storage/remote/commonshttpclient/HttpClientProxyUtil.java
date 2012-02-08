@@ -58,11 +58,11 @@ public class HttpClientProxyUtil
         // properties, but defaulting it to the same we had before (httpClient defaults)
         int connectionPoolSize =
             SystemPropertiesHelper.getInteger( CONNECTION_POOL_SIZE_KEY,
-                                               MultiThreadedHttpConnectionManager.DEFAULT_MAX_TOTAL_CONNECTIONS );
+                MultiThreadedHttpConnectionManager.DEFAULT_MAX_TOTAL_CONNECTIONS );
 
         httpClient.getHttpConnectionManager().getParams().setConnectionTimeout( timeout );
         httpClient.getHttpConnectionManager().getParams().setSoTimeout( timeout );
-        //httpClient.getHttpConnectionManager().getParams().setTcpNoDelay( true );
+        // httpClient.getHttpConnectionManager().getParams().setTcpNoDelay( true );
         httpClient.getHttpConnectionManager().getParams().setMaxTotalConnections( connectionPoolSize );
         // NOTE: connPool is _per_ repo, hence all of those will connect to same host (unless mirrors are used)
         // so, we are violating intentionally the RFC and we let the whole pool size to chase same host
@@ -97,16 +97,13 @@ public class HttpClientProxyUtil
                 // Using NTLM auth, adding it as first in policies
                 authPrefs.add( 0, AuthPolicy.NTLM );
 
-                logger( logger ).info(
-                    "... authentication setup for NTLM domain '{}'", nras.getNtlmDomain()
-                );
+                logger( logger ).info( "... authentication setup for NTLM domain '{}'", nras.getNtlmDomain() );
 
                 httpConfiguration.setHost( nras.getNtlmHost() );
 
                 httpClient.getState().setCredentials(
                     AuthScope.ANY,
-                    new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(),
-                                       nras.getNtlmDomain() ) );
+                    new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras.getNtlmDomain() ) );
 
                 isNtlmUsed = true;
             }
@@ -115,13 +112,11 @@ public class HttpClientProxyUtil
                 UsernamePasswordRemoteAuthenticationSettings uras = (UsernamePasswordRemoteAuthenticationSettings) ras;
 
                 // Using Username/Pwd auth, will not add NTLM
-                logger( logger ).info(
-                    "... authentication setup for remote storage with username '{}'", uras.getUsername()
-                );
+                logger( logger ).info( "... authentication setup for remote storage with username '{}'",
+                    uras.getUsername() );
 
                 httpClient.getState().setCredentials( AuthScope.ANY,
-                                                      new UsernamePasswordCredentials( uras.getUsername(),
-                                                                                       uras.getPassword() ) );
+                    new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() ) );
 
                 isSimpleAuthUsed = true;
             }
@@ -189,20 +184,17 @@ public class HttpClientProxyUtil
                                 + " for BOTH server side and proxy side authentication!\n"
                                 + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
                                 + " if you have to use NTLM proxy, otherwise it will not work!\n"
-                                + " *** SERVER SIDE AUTH OVERRIDDEN"
-                        );
+                                + " *** SERVER SIDE AUTH OVERRIDDEN" );
                     }
 
-                    logger( logger ).info(
-                        "... proxy authentication setup for NTLM domain '{}'", nras.getNtlmDomain()
-                    );
+                    logger( logger ).info( "... proxy authentication setup for NTLM domain '{}'", nras.getNtlmDomain() );
 
                     httpConfiguration.setHost( nras.getNtlmHost() );
 
                     httpClient.getState().setProxyCredentials(
                         AuthScope.ANY,
                         new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(),
-                                           nras.getNtlmDomain() ) );
+                            nras.getNtlmDomain() ) );
 
                     isNtlmUsed = true;
                 }
@@ -212,13 +204,11 @@ public class HttpClientProxyUtil
                         (UsernamePasswordRemoteAuthenticationSettings) ras;
 
                     // Using Username/Pwd auth, will not add NTLM
-                    logger( logger ).info(
-                        "... proxy authentication setup for remote storage with username '{}'", uras.getUsername()
-                    );
+                    logger( logger ).info( "... proxy authentication setup for remote storage with username '{}'",
+                        uras.getUsername() );
 
                     httpClient.getState().setProxyCredentials( AuthScope.ANY,
-                                                               new UsernamePasswordCredentials( uras.getUsername(),
-                                                                                                uras.getPassword() ) );
+                        new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() ) );
                 }
 
                 httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
@@ -231,21 +221,28 @@ public class HttpClientProxyUtil
         {
             logger( logger ).info(
                 "... simple scenario: simple authentication used with no proxy in between target and us,"
-                    + " will use preemptive authentication"
-            );
+                    + " will use preemptive authentication" );
 
             // we have authentication, let's do it preemptive
             httpClient.getParams().setAuthenticationPreemptive( true );
         }
 
         // mark the fact that NTLM is in use
-        if ( isNtlmUsed )
+        // but ONLY IF IT CHANGED!
+        // Otherwise, doing it always, actually marks the ctx itself as "changed", causing an avalanche of other
+        // consequences, like resetting all the HTTP clients of all remote storages (coz they think there is a change
+        // in proxy or remote connection settings, etc).
+        final Boolean isNtlmUsedOldValue = (Boolean) ctx.getContextObject( NTLM_IS_IN_USE_KEY );
+        if ( isNtlmUsedOldValue == null || isNtlmUsedOldValue.booleanValue() != isNtlmUsed )
         {
-            ctx.putContextObject( NTLM_IS_IN_USE_KEY, Boolean.TRUE );
-        }
-        else
-        {
-            ctx.putContextObject( NTLM_IS_IN_USE_KEY, Boolean.FALSE );
+            if ( isNtlmUsed )
+            {
+                ctx.putContextObject( NTLM_IS_IN_USE_KEY, Boolean.TRUE );
+            }
+            else
+            {
+                ctx.putContextObject( NTLM_IS_IN_USE_KEY, Boolean.FALSE );
+            }
         }
     }
 
