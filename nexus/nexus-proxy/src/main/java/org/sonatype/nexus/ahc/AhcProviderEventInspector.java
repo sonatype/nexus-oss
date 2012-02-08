@@ -14,7 +14,8 @@ package org.sonatype.nexus.ahc;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
+import org.sonatype.nexus.configuration.application.events.GlobalHttpProxySettingsChangedEvent;
+import org.sonatype.nexus.configuration.application.events.GlobalRemoteConnectionSettingsChangedEvent;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
@@ -40,13 +41,15 @@ public class AhcProviderEventInspector
     @Override
     public boolean accepts( Event<?> evt )
     {
-        return ( evt instanceof ConfigurationChangeEvent ) || ( evt instanceof NexusStoppedEvent );
+        return ( evt instanceof GlobalRemoteConnectionSettingsChangedEvent )
+            || ( evt instanceof GlobalHttpProxySettingsChangedEvent ) || ( evt instanceof NexusStoppedEvent );
     }
 
     @Override
     public void inspect( Event<?> evt )
     {
-        if ( evt instanceof ConfigurationChangeEvent )
+        if ( ( evt instanceof GlobalRemoteConnectionSettingsChangedEvent )
+            || ( evt instanceof GlobalHttpProxySettingsChangedEvent ) )
         {
             ahcProvider.reset();
         }
