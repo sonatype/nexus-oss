@@ -275,7 +275,7 @@ public class DefaultLSAttributeStorage
         }
         catch ( IOException e )
         {
-            getLogger().info( "While reading attributes of " + uid + " we got IOException:", e );
+            getLogger().warn( "While reading attributes of " + uid + " we got IOException:", e );
 
             throw e;
         }
