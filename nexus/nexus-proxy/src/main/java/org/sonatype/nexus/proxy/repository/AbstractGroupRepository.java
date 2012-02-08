@@ -225,11 +225,14 @@ public abstract class AbstractGroupRepository
                 }
                 else
                 {
-                    getLogger().info(
-                        String.format(
-                            "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
-                            RepositoryStringUtils.getHumanizedNameString( repo ),
-                            RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                            String.format(
+                                "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
+                                RepositoryStringUtils.getHumanizedNameString( repo ),
+                                RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
+                    }
                 }
             }
         }
@@ -296,11 +299,14 @@ public abstract class AbstractGroupRepository
                         }
                         else
                         {
-                            getLogger().info(
-                                String.format(
-                                    "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
-                                    RepositoryStringUtils.getHumanizedNameString( repository ),
-                                    RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug(
+                                    String.format(
+                                        "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
+                                        RepositoryStringUtils.getHumanizedNameString( repository ),
+                                        RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
+                            }
                         }
                     }
 
@@ -362,11 +368,14 @@ public abstract class AbstractGroupRepository
                         }
                         else
                         {
-                            getLogger().info(
-                                String.format(
-                                    "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
-                                    RepositoryStringUtils.getHumanizedNameString( repo ),
-                                    RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug(
+                                    String.format(
+                                        "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
+                                        RepositoryStringUtils.getHumanizedNameString( repo ),
+                                        RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
+                            }
                         }
                     }
                 }
@@ -516,11 +525,14 @@ public abstract class AbstractGroupRepository
                     }
                     else
                     {
-                        getLogger().info(
-                            String.format(
-                                "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
-                                RepositoryStringUtils.getHumanizedNameString( repository ),
-                                RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            getLogger().debug(
+                                String.format(
+                                    "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
+                                    RepositoryStringUtils.getHumanizedNameString( repository ),
+                                    RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
+                        }
                     }
                 }
 
@@ -580,11 +592,14 @@ public abstract class AbstractGroupRepository
                     }
                     else
                     {
-                        getLogger().info(
-                            String.format(
-                                "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
-                                RepositoryStringUtils.getHumanizedNameString( repository ),
-                                RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
+                        if ( getLogger().isDebugEnabled() )
+                        {
+                            getLogger().debug(
+                                String.format(
+                                    "Repository %s member of group %s was already processed during this request! Skipping it from processing. Request: %s",
+                                    RepositoryStringUtils.getHumanizedNameString( repository ),
+                                    RepositoryStringUtils.getHumanizedNameString( this ), request.toString() ) );
+                        }
                     }
                 }
             }
