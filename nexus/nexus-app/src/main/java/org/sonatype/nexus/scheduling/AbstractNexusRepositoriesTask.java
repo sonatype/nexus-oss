@@ -129,6 +129,11 @@ public abstract class AbstractNexusRepositoriesTask<T>
                 plexusContainer.getComponentDescriptor( SchedulerTask.class, SchedulerTask.class.getName(),
                     taskType );
 
+            if ( cd == null )
+            {
+                cd = plexusContainer.getComponentDescriptor( NexusTask.class, NexusTask.class.getName(), taskType );
+            }
+
             if ( cd != null )
             {
                 Class<?> taskClazz = cd.getImplementationClass();
