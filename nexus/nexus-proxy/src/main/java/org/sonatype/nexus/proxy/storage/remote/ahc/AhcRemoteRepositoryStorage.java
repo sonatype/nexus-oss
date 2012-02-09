@@ -273,10 +273,6 @@ public class AhcRemoteRepositoryStorage
     protected void updateContext( ProxyRepository repository, RemoteStorageContext context )
         throws RemoteStorageException
     {
-        getLogger().info(
-            "Remote storage settings change detected for ProxyRepository ID=\"" + repository.getId() + "\" (\""
-                + repository.getName() + "\"), updating HTTP transport..." );
-
         if ( context.hasContextObject( CTX_KEY_CLIENT ) )
         {
             // proper shutdown of AHC, but cannot call getClient() here that would result in endless loop!

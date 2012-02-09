@@ -22,6 +22,7 @@ import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 /**
@@ -152,14 +153,11 @@ public abstract class AbstractHTTPRemoteRepositoryStorage
 
         if ( isAmazonS3 )
         {
-            getLogger().warn(
-                "The proxy repository \""
-                    + repository.getName()
-                    + "\" (ID="
-                    + repository.getId()
-                    + ") is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of "
-                    + "your setup (baseUrl of proxy repository)!"
-            );
+            // very first request for the proxy repository (it goes remote for the 1st time)
+            getLogger().info(
+                String.format( "The proxy repository %s is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of "
+                    + "your setup (baseUrl of proxy repository)!",
+                    RepositoryStringUtils.getHumanizedNameString( repository ) ) );
         }
     }
 
