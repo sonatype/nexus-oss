@@ -22,7 +22,7 @@
 <!--                                                              -->
 <!-- For help using this configuration, see:                      -->
 <!--                                                              -->
-<!--   https://docs.sonatype.com/display/NX/Jetty+Configuration   -->
+<!--   http://links.sonatype.com/products/nexus/oss/docs-jetty    -->
 <!--                                                              -->
 <!-- ============================================================ -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">

@@ -342,7 +342,7 @@
                     tabCode : Sonatype.repoServer.HelpAboutPanel
                   }, {
                     title : 'Browse Issue Tracker',
-                    href : 'https://issues.sonatype.org/browse/NEXUS/'
+                    href : 'http://links.sonatype.com/products/nexus/oss/issues'
                   }, {
                     title : 'Documentation',
                     tabId : 'Documentation',

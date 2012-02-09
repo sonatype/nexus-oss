@@ -20,12 +20,12 @@
     <lvoKey>
       <key>nexus-oss</key>
       <strategy>http-get-properties</strategy>
-      <remoteUrl>http://www.sonatype.com/products/nexus/product-versions.properties</remoteUrl>
+      <remoteUrl>http://links.sonatype.com/products/nexus/oss/versions</remoteUrl>
     </lvoKey>
     <lvoKey>
       <key>nexus-pro</key>
       <strategy>http-get-properties</strategy>
-      <remoteUrl>http://www.sonatype.com/products/nexus/product-versions.properties</remoteUrl>
+      <remoteUrl>http://links.sonatype.com/products/nexus/pro/versions</remoteUrl>
     </lvoKey>
   </lvoKeys>
 </lvoConfiguration>
