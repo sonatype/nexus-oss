@@ -34,14 +34,14 @@ public class ExpireCacheTaskDescriptor
         new RepoOrGroupComboFormField(
                                        REPO_OR_GROUP_FIELD_ID,
                                        RepoOrGroupComboFormField.DEFAULT_LABEL,
-                                       "Type in the repository path from which to expire caches recursively (ie. \"/\" for root or \"/org/apache\")",
+                                       "Type in the repository path from which to expire caches recursively (ie. \"/\" for root or \"/org/apache\").",
                                        FormField.MANDATORY );
 
     private final StringTextFormField resourceStorePathField =
         new StringTextFormField(
                                  RESOURCE_STORE_PATH_FIELD_ID,
                                  "Repository path",
-                                 "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")",
+                                 "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
                                  FormField.OPTIONAL );
 
     public String getId()
