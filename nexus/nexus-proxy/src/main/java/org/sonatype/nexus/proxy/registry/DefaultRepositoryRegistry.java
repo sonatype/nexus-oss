@@ -213,6 +213,9 @@ public class DefaultRepositoryRegistry
     /** The repository registry map */
     private final Map<String, Repository> _repositories = new HashMap<String, Repository>();
 
+    /** The repository registry RO "view" */
+    private volatile Map<String, Repository> _repositoriesView;
+
     /**
      * Returns a copy of map with repositories. Is synchronized method, to allow consistent-read access. Methods
      * modifying this map are all also synchronized (see API Interface and above), while all the "reading" methods from
@@ -220,17 +223,24 @@ public class DefaultRepositoryRegistry
      */
     protected synchronized Map<String, Repository> getRepositoriesMap()
     {
-        return Collections.unmodifiableMap( new HashMap<String, Repository>( _repositories ) );
+        if ( _repositoriesView == null )
+        {
+            _repositoriesView = Collections.unmodifiableMap( new HashMap<String, Repository>( _repositories ) );
+        }
+
+        return _repositoriesView;
     }
 
     protected synchronized void repositoriesMapPut( final Repository repository )
     {
         _repositories.put( repository.getId(), repository );
+        _repositoriesView = Collections.unmodifiableMap( new HashMap<String, Repository>( _repositories ) );
     }
 
     protected synchronized void repositoriesMapRemove( final String repositoryId )
     {
         _repositories.remove( repositoryId );
+        _repositoriesView = Collections.unmodifiableMap( new HashMap<String, Repository>( _repositories ) );
     }
 
     protected void doRemoveRepository( final String repoId, final boolean silently )
