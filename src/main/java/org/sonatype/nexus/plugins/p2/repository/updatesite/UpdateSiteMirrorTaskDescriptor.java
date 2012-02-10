@@ -35,7 +35,7 @@ public class UpdateSiteMirrorTaskDescriptor
         FormField.MANDATORY );
 
     private final CheckboxFormField forceField = new CheckboxFormField( FORCE_MIRROR_FIELD_ID, "Force mirror",
-        "Mirror Eclipse Update Site content even if site.xml did not change.", FormField.OPTIONAL );
+        "Mirror eclipse update site content even if site.xml did not change.", FormField.OPTIONAL );
 
     @Override
     public String getId()

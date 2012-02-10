@@ -40,7 +40,7 @@ public class P2MetadataGeneratorTaskDescriptor
 
     private final StringTextFormField resourceStorePathField = new StringTextFormField( RESOURCE_STORE_PATH_FIELD_ID,
         "Repository path",
-        "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")",
+        "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\").",
         FormField.OPTIONAL );
 
     @Override
