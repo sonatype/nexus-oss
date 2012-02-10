@@ -105,8 +105,11 @@ public class FixedRateWalkerThrottleController
      * Creates a new instance of fixed rate throttle controller without callback and some defaults (adjustment slice
      * size is 2 seconds).
      * 
-     * @param limiterTps
-     * @param numberSequence
+     * @param limiterTps the TPS limit you want to enforce, values -1 means do not limit (you can tune the value on
+     *            runtime too), 0 means "freeze" (walk will effectively sleep only, will not advance), and any positive
+     *            number means the maximum wanted TPS.
+     * @param numberSequence The numberSequence must be non-null, and will be reset, and it's initial state have to be a
+     *            non-negative number, otherwise IllegalArgumentException is thrown.
      * @throws IllegalArgumentException If passed in numberSequence is not having needed characteristics.
      */
     public FixedRateWalkerThrottleController( final int limiterTps, final NumberSequence numberSequence )
@@ -170,11 +173,17 @@ public class FixedRateWalkerThrottleController
         this.limiterTps = limiterTps;
     }
 
+    /**
+     * @return the current adjustment period in ms (time that has to pass before an adjustment is made)
+     */
     public long getSliceSize()
     {
         return sliceSize;
     }
 
+    /**
+     * Set the current adjustment period in ms (time that has to pass before an adjustment is made)
+     */
     public void setSliceSize( final long sliceSize )
     {
         Preconditions.checkArgument( sliceSize > 0 );
