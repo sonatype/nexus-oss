@@ -251,8 +251,6 @@ public class DefaultErrorReportingManager
                                             boolean useGlobalHttpProxy )
         throws IssueSubmissionException, IOException, GeneralSecurityException
     {
-        getLogger().error( "Detected Error in Nexus", request.getThrowable() );
-
         ErrorReportResponse response = new ErrorReportResponse();
 
         // if title is not null, this is a manual report, so we will generate regardless
@@ -260,6 +258,11 @@ public class DefaultErrorReportingManager
         if ( request.getTitle() != null
             || ( isEnabled() && shouldHandleReport( request ) && !shouldIgnore( request.getThrowable() ) ) )
         {
+            getLogger().info(
+                "Detected Error in Nexus: {}. Generating a problem report...",
+                getThrowableMessage( request.getThrowable() )
+            );
+
             IssueSubmissionRequest subRequest = buildRequest( request, jiraUsername, useGlobalHttpProxy );
 
             File unencryptedFile = subRequest.getProblemReportBundle();
@@ -315,9 +318,35 @@ public class DefaultErrorReportingManager
         else
         {
             response.setSuccess( true );
+
+            if ( getLogger().isInfoEnabled() )
+            {
+                String reason = "Nexus ignores this type of error";
+                if ( !isEnabled() )
+                {
+                    reason = "reporting is not enabled";
+                }
+                else if ( !shouldHandleReport( request ) )
+                {
+                    reason = "it has already being reported or it does not have an error message";
+                }
+                getLogger().info(
+                    "Detected Error in Nexus: {}. Skipping problem report generation because {}",
+                    getThrowableMessage( request.getThrowable() ), reason
+                );
+            }
         }
 
         return response;
+    }
+
+    private String getThrowableMessage( final Throwable throwable )
+    {
+        if ( throwable != null && StringUtils.isNotEmpty( throwable.getMessage() ) )
+        {
+            return throwable.getMessage();
+        }
+        return "(no exception message available)";
     }
 
     public ErrorReportResponse handleError( ErrorReportRequest request )
