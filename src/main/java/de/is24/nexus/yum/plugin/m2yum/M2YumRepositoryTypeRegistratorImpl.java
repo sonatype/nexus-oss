@@ -7,7 +7,9 @@ import org.sonatype.guice.plexus.config.Strategies;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -22,11 +24,16 @@ public class M2YumRepositoryTypeRegistratorImpl implements M2YumRepositoryTypeRe
 
   @Inject
   public void registerRepositoryType() {
-    LOG.info("Try register my M2YumRepository to the RepositoryTypeRegistry");
+    LOG.info("Try register my M2YumRepository and M2YumGroupRepository to the RepositoryTypeRegistry");
+    repositoryTypeRegistry.registerRepositoryTypeDescriptors(m2yumDescriptor());
+    repositoryTypeRegistry.registerRepositoryTypeDescriptors(m2yumGroupDescriptor());
+  }
 
-    RepositoryTypeDescriptor description = new RepositoryTypeDescriptor(Repository.class, M2YumRepository.ID,
-      "repositories",
-      RepositoryType.UNLIMITED_INSTANCES);
-    repositoryTypeRegistry.registerRepositoryTypeDescriptors(description);
+  private RepositoryTypeDescriptor m2yumDescriptor() {
+    return new RepositoryTypeDescriptor(Repository.class, M2YumRepository.ID, "repositories", RepositoryType.UNLIMITED_INSTANCES);
+  }
+
+  private RepositoryTypeDescriptor m2yumGroupDescriptor() {
+    return new RepositoryTypeDescriptor(GroupRepository.class, M2YumGroupRepository.ID, "groups", RepositoryType.UNLIMITED_INSTANCES);
   }
 }

@@ -23,6 +23,7 @@ public class M2YumRepositoryTemplateProvider extends DefaultRepositoryTemplatePr
         RepositoryPolicy.RELEASE));
     templates.add(new M2YumRepositoryTemplate(this, "maven2yum_hosted_snapshot", "Maven2 Yum (hosted, snapshot)",
         RepositoryPolicy.SNAPSHOT));
+    templates.add(new M2YumGroupRepositoryTemplate(this, "maven2yum_group", "Maven2 Yum (group)"));
 
     return templates;
   }
