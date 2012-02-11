@@ -30,13 +30,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.maven.index.context.IndexingContext;
 import org.codehaus.plexus.util.FileUtils;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.Test;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Response;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerList;
-import org.mortbay.jetty.handler.ResourceHandler;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 
 // This is an IT just because it runs longer then 15 seconds
@@ -66,11 +67,11 @@ public class DownloadRemoteIndexerManagerLRTest
         ResourceHandler resource_handler = new ResourceHandler()
         {
             @Override
-            public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+            public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
                 throws IOException, ServletException
             {
                 System.out.print( "JETTY: " + target );
-                super.handle( target, request, response, dispatch );
+                super.handle( target, baseRequest, request, response );
                 System.out.println( "  ::  " + ((Response)response).getStatus() );
             }
         };

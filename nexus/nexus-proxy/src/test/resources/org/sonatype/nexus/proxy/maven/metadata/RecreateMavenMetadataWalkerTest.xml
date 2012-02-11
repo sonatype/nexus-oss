@@ -13,7 +13,7 @@
 						<servletInfos>
 							<servletInfo>
 								<mapping>/*</mapping>
-								<servletClass> org.mortbay.jetty.servlet.DefaultServlet
+								<servletClass> org.eclipse.jetty.servlet.DefaultServlet
 								</servletClass>
 								<parameters>
 									<property>

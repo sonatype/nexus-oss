@@ -28,10 +28,6 @@
 
   <name>Nexus : Distros : Nexus OSS Bundle</name>
 
-  <properties>
-    <jetty.version>7.5.4.v20111024</jetty.version>
-  </properties>
-
   <dependencies>
 
     <dependency>

@@ -16,7 +16,7 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.mortbay.jetty.Server;
+import org.eclipse.jetty.server.Server;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;

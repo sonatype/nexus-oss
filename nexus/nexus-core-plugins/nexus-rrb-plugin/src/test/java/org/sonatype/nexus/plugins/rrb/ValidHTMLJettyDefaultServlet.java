@@ -17,9 +17,9 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.jetty.servlet.DefaultServlet;
-import org.mortbay.resource.Resource;
-import org.mortbay.util.URIUtil;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.URIUtil;
 
 public class ValidHTMLJettyDefaultServlet extends DefaultServlet
 {

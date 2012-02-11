@@ -12,98 +12,86 @@
  */
 package org.sonatype.nexus.restlight.testharness;
 
-import org.mortbay.jetty.HttpHeaders;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Response;
-import org.mortbay.jetty.security.Authenticator;
-import org.mortbay.jetty.security.B64Code;
-import org.mortbay.jetty.security.Constraint;
-import org.mortbay.jetty.security.UserRealm;
-import org.mortbay.log.Log;
-import org.mortbay.util.StringUtil;
-
 import java.io.IOException;
-import java.security.Principal;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.http.HttpHeaders;
+import org.eclipse.jetty.security.ServerAuthException;
+import org.eclipse.jetty.security.UserAuthentication;
+import org.eclipse.jetty.security.authentication.LoginAuthenticator;
+import org.eclipse.jetty.server.Authentication;
+import org.eclipse.jetty.server.Authentication.User;
+import org.eclipse.jetty.server.UserIdentity;
+import org.eclipse.jetty.util.B64Code;
+import org.eclipse.jetty.util.StringUtil;
+import org.eclipse.jetty.util.security.Constraint;
 
 // Grabbed from BasicAuthenticator in Jetty, and modded to use NxBASIC authType instead.
 public class NxBasicAuthenticator
-    implements Authenticator
+    extends LoginAuthenticator
 {
-
     public static final String AUTH_TYPE = "NxBASIC";
-
-    private static final long serialVersionUID = 1L;
 
     /* ------------------------------------------------------------ */
     /**
-     * @return UserPrinciple if authenticated or null if not. If Authentication fails, then the authenticator may have
-     *         committed the response as an auth challenge or redirect.
-     * @exception IOException
+     * @see org.eclipse.jetty.security.Authenticator#getAuthMethod()
      */
-    public Principal authenticate( final UserRealm realm, final String pathInContext, final Request request,
-                                   final Response response )
-        throws IOException
-    {
-        // Get the user if we can
-        Principal user = null;
-        String credentials = request.getHeader( HttpHeaders.AUTHORIZATION );
-
-        if ( credentials != null )
-        {
-            try
-            {
-                if ( Log.isDebugEnabled() )
-                {
-                    Log.debug( "Credentials: " + credentials );
-                }
-                credentials = credentials.substring( credentials.indexOf( ' ' ) + 1 );
-                credentials = B64Code.decode( credentials, StringUtil.__ISO_8859_1 );
-                int i = credentials.indexOf( ':' );
-                String username = credentials.substring( 0, i );
-                String password = credentials.substring( i + 1 );
-                user = realm.authenticate( username, password, request );
-
-                if ( user == null )
-                {
-                    Log.warn( "AUTH FAILURE: user {}", StringUtil.printable( username ) );
-                }
-                else
-                {
-                    request.setAuthType( AUTH_TYPE );
-                    request.setUserPrincipal( user );
-                }
-            }
-            catch ( Exception e )
-            {
-                Log.warn( "AUTH FAILURE: " + e.toString() );
-                Log.ignore( e );
-            }
-        }
-
-        // Challenge if we have no user
-        if ( user == null && response != null )
-        {
-            sendChallenge( realm, response );
-        }
-
-        return user;
-    }
-
-    /* ------------------------------------------------------------ */
     public String getAuthMethod()
     {
         return Constraint.__BASIC_AUTH;
     }
 
     /* ------------------------------------------------------------ */
-    public void sendChallenge( final UserRealm realm, final Response response )
-        throws IOException
+    /**
+     * @see org.eclipse.jetty.security.Authenticator#validateRequest(javax.servlet.ServletRequest, javax.servlet.ServletResponse, boolean)
+     */
+    public Authentication validateRequest(ServletRequest req, ServletResponse res, boolean mandatory) throws ServerAuthException
     {
-        response.setHeader( HttpHeaders.WWW_AUTHENTICATE, AUTH_TYPE + " realm=\"" + realm.getName()
-            + '"' );
-        response.sendError( HttpServletResponse.SC_UNAUTHORIZED );
+        HttpServletRequest request = (HttpServletRequest)req;
+        HttpServletResponse response = (HttpServletResponse)res;
+        String credentials = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        try
+        {
+            if (credentials != null)
+            {                 
+                int space=credentials.indexOf(' ');
+                if (space>0)
+                {
+                    credentials = credentials.substring(space+1);
+                    credentials = B64Code.decode(credentials,StringUtil.__ISO_8859_1);
+                    int i = credentials.indexOf(':');
+                    if (i>0)
+                    {
+                        String username = credentials.substring(0,i);
+                        String password = credentials.substring(i+1);
+
+                        UserIdentity user = _loginService.login(username,password);
+                        if (user!=null)
+                        {
+                            renewSessionOnAuthentication(request,response);
+                            return new UserAuthentication(AUTH_TYPE,user);
+                        }
+                    }
+                }
+            }
+
+            response.setHeader(HttpHeaders.WWW_AUTHENTICATE, AUTH_TYPE+" realm=\"" + _loginService.getName() + '"');
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return Authentication.SEND_CONTINUE;
+        }
+        catch (IOException e)
+        {
+            throw new ServerAuthException(e);
+        }
     }
 
+    public boolean secureResponse(ServletRequest req, ServletResponse res, boolean mandatory, User validatedUser) throws ServerAuthException
+    {
+        return true;
+    }
 }

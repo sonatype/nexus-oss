@@ -17,8 +17,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.handler.AbstractHandler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.restlet.data.Method;
 
 /**
@@ -44,7 +44,7 @@ public class ReturnErrorHandler
             this.headOk = headOk;
         }
 
-        public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+        public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
             throws IOException,
             ServletException
         {

@@ -162,7 +162,7 @@
     <commons-beanutils.baseVersion>1.7.0</commons-beanutils.baseVersion>
     <commons-beanutils.version>${commons-beanutils.baseVersion}-SONATYPE</commons-beanutils.version>
     <enunciate.version>1.20</enunciate.version>
-    <jetty.version>6.1.19</jetty.version>
+    <jetty.version>7.6.0.v20120127</jetty.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
     <maven.version>3.0.1</maven.version>
     <micromailer.version>1.1.1</micromailer.version>
@@ -175,7 +175,7 @@
     <plexus-interpolation.version>1.14</plexus-interpolation.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
     <plexus-jetty7.version>1.2</plexus-jetty7.version>
-    <plexus-jetty-testsuite.version>1.8</plexus-jetty-testsuite.version>
+    <plexus-jetty-testsuite.version>2.0-SNAPSHOT</plexus-jetty-testsuite.version>
     <plexus.restlet.bridge.version>1.18</plexus.restlet.bridge.version>
     <plexus-security.version>2.4</plexus-security.version>
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
@@ -301,22 +301,32 @@
 
       <!-- Jetty -->
       <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty</artifactId>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-webapp</artifactId>
         <version>${jetty.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.mortbay.jetty</groupId>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-servlet</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-security</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-deploy</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-client</artifactId>
         <version>${jetty.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-sslengine</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mortbay.jetty</groupId>
+        <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-util</artifactId>
         <version>${jetty.version}</version>
       </dependency>
@@ -1019,7 +1029,7 @@
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>server-provider</artifactId>
-        <version>0.4.3</version>
+        <version>0.5.0-SNAPSHOT</version>
         <scope>test</scope>
       </dependency>
 
@@ -1394,6 +1404,16 @@
                   </includes>
 
                   <message>Do not use log4j api directly in tests. Use slf4j api instead.</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.mortbay.jetty:*</exclude>
+                  </excludes>
+                  <includes>
+                    <include>org.eclipse.jetty:*:${jetty.version}</include>
+                  </includes>
+                  <message>Use the Eclipse/Jetty version defined in nexus parent. See jetty.version property</message>
                 </bannedDependencies>
 
                 <!-- <requirePluginVersions> <banSnapshots>false</banSnapshots> </requirePluginVersions> -->

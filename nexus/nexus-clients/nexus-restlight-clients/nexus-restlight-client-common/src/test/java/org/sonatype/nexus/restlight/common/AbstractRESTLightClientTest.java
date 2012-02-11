@@ -30,10 +30,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.jdom.Document;
 import org.junit.Test;
 import org.junit.internal.matchers.IsCollectionContaining;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.handler.HandlerWrapper;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.slf4j.LoggerFactory;
 
 public class AbstractRESTLightClientTest
@@ -228,11 +228,11 @@ public class AbstractRESTLightClientTest
         server = new Server( port );
 
         HandlerWrapper wrapper = new HandlerWrapper();
-        wrapper.addHandler( new AbstractHandler()
+        wrapper.setHandler( new AbstractHandler()
         {
 
             @Override
-            public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+            public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
                 throws IOException, ServletException
             {
                 response.setStatus( 400 );

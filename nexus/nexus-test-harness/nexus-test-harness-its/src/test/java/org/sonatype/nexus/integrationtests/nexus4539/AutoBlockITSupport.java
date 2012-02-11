@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.hamcrest.Matchers;
-import org.mortbay.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.jettytestsuite.ControlledServer;
