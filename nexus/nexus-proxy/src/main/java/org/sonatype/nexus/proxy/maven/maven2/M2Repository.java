@@ -344,12 +344,20 @@ public class M2Repository
                     mdItem = (StorageFileItem) super.doRetrieveItem( request );
                 }
 
-                InputStream inputStream = null;
                 try
                 {
-                    inputStream = mdItem.getInputStream();
+                    Metadata metadata;
+                    InputStream inputStream = null;
+                    try
+                    {
+                        inputStream = mdItem.getInputStream();
+                        metadata = MetadataBuilder.read( inputStream );
+                    }
+                    finally
+                    {
+                        IOUtil.close( inputStream ); // Make sure we unlock mdItem ASAP
+                    }
 
-                    Metadata metadata = MetadataBuilder.read( inputStream );
                     Version requiredVersion = getClientSupportedVersion( userAgent );
                     Version metadataVersion = ModelVersionUtility.getModelVersion( metadata );
 
@@ -406,10 +414,6 @@ public class M2Repository
                     }
 
                     return super.doRetrieveItem( request );
-                }
-                finally
-                {
-                    IOUtil.close( inputStream );
                 }
             }
         }
