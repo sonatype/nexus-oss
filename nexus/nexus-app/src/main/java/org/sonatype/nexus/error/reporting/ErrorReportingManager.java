@@ -56,5 +56,5 @@ public interface ErrorReportingManager
         throws IssueSubmissionException, IOException, GeneralSecurityException;
 
     File assembleBundle( ErrorReportRequest request )
-        throws IOException;
+        throws IOException, IssueSubmissionException;
 }

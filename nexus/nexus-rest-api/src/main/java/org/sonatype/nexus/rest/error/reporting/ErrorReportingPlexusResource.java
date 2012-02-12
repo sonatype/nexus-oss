@@ -127,6 +127,7 @@ public class ErrorReportingPlexusResource
         genReq.setTitle( dto.getTitle() );
         genReq.setDescription( dto.getDescription() );
         genReq.getContext().putAll( context.getAttributes() );
+        genReq.setManual( true );
 
         try
         {

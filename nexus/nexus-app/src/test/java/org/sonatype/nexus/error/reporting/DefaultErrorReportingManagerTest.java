@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.error.reporting;
 
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -22,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -29,9 +34,13 @@ import java.util.zip.ZipInputStream;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
+import org.codehaus.plexus.swizzle.jira.authentication.AuthenticationSource;
+import org.codehaus.plexus.swizzle.jira.authentication.DefaultAuthenticationSource;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.swizzle.jira.Issue;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.jira.AttachmentHandler;
@@ -173,27 +182,24 @@ public class DefaultErrorReportingManagerTest
         {
             request.setThrowable( e );
         }
-
+        
         // First make sure item doesn't already exist
         List<Issue> issues =
-            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), manager.getValidJIRAUsername(),
-                manager.getValidJIRAPassword() );
+            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), getAuth() );
 
         Assert.assertNull( issues );
 
         manager.handleError( request );
 
         issues =
-            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), manager.getValidJIRAUsername(),
-                manager.getValidJIRAPassword() );
+            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), getAuth() );
 
         Assert.assertEquals( 1, issues.size() );
 
         manager.handleError( request );
 
         issues =
-            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), manager.getValidJIRAUsername(),
-                manager.getValidJIRAPassword() );
+            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), getAuth() );
 
         Assert.assertEquals( 1, issues.size() );
     }
@@ -419,27 +425,25 @@ public class DefaultErrorReportingManagerTest
         task.setMessage( msg );
 
         // First make sure item doesn't already exist
-        List<Issue> issues =
-            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), manager.getValidJIRAUsername(),
-                manager.getValidJIRAPassword() );
+        Collection<?> issues =
+            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), getAuth() );
 
-        Assert.assertNull( issues );
-
-        doCall( task, eventInspectorHost );
-
-        issues =
-            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), manager.getValidJIRAUsername(),
-                manager.getValidJIRAPassword() );
-
-        Assert.assertEquals( 1, issues.size() );
+        // empty() has weirdo generics
+        assertThat( issues, hasSize( 0 ) );
 
         doCall( task, eventInspectorHost );
 
         issues =
-            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), manager.getValidJIRAUsername(),
-                manager.getValidJIRAPassword() );
+            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), getAuth() );
 
-        Assert.assertEquals( 1, issues.size() );
+        assertThat( issues, hasSize( 1 ) );
+
+        doCall( task, eventInspectorHost );
+
+        issues =
+            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), getAuth() );
+
+        assertThat( issues, hasSize( 1 ) );
     }
 
     private void doCall( final NexusTask<?> task, final EventInspectorHost inspectorHost )
@@ -462,4 +466,8 @@ public class DefaultErrorReportingManagerTest
         }
     }
 
+    public AuthenticationSource getAuth()
+    {
+        return new DefaultAuthenticationSource( manager.getValidJIRAUsername(), manager.getValidJIRAPassword() );
+    }
 }

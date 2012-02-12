@@ -87,7 +87,13 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.spice</groupId>
-      <artifactId>plexus-swizzle</artifactId>
+      <artifactId>spice-utils</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.sisu.pr</groupId>
+      <artifactId>sisu-problem-reporter</artifactId>
+      <version>1.5-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.spice</groupId>

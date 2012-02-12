@@ -10,47 +10,41 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.error.reporting;
+package org.sonatype.nexus.error.reporting.bundle;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.security.model.CUser;
-import org.sonatype.security.model.Configuration;
-import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
-import org.sonatype.security.model.source.SecurityModelConfigurationSource;
+import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 
-public class SecurityXmlHandler
+public class SecurityConfigurationXmlHandler
     extends AbstractXmlHandler
 {
-    public File getFile( SecurityModelConfigurationSource source, NexusConfiguration nexusConfig )
+    public File getFile( SecurityConfigurationSource source, NexusConfiguration nexusConfig )
         throws IOException
     {
-        Configuration configuration = 
-            ( Configuration ) cloneViaXml( source.getConfiguration() );
+        SecurityConfiguration configuration = ( SecurityConfiguration )cloneViaXml( source.getConfiguration() );
         
-        // No config ?
+        // No config ??
         if ( configuration == null )
         {
             return null;
         }
         
-        for ( CUser user : ( List<CUser> ) configuration.getUsers() )
-        {
-            user.setPassword( PASSWORD_MASK );
-            user.setEmail( PASSWORD_MASK );
-        }
+        configuration.setAnonymousPassword( PASSWORD_MASK );
         
         SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
+        
         FileWriter fWriter = null;
         File tempFile = null;
         
         try
         {
-            tempFile = new File( nexusConfig.getTemporaryDirectory(), "security.xml." + System.currentTimeMillis() );
+            tempFile = new File( nexusConfig.getTemporaryDirectory(), "security-configuration.xml." + System.currentTimeMillis() );
             fWriter = new FileWriter( tempFile );
             writer.write( fWriter, configuration );
         }

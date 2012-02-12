@@ -16,12 +16,15 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +33,9 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.inject.Provider;
+
+import com.google.common.base.Preconditions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
@@ -38,6 +44,7 @@ import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.swizzle.IssueSubmissionResult;
 import org.codehaus.plexus.swizzle.IssueSubmitter;
 import org.codehaus.plexus.swizzle.JiraIssueSubmitter;
+import org.codehaus.plexus.swizzle.jira.authentication.AuthenticationSource;
 import org.codehaus.plexus.swizzle.jira.authentication.DefaultAuthenticationSource;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.FileUtils;
@@ -45,9 +52,11 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.swizzle.jira.Issue;
 import org.codehaus.swizzle.jira.Jira;
+import org.codehaus.swizzle.jira.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.jira.AttachmentHandlerConfiguration;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
@@ -60,16 +69,28 @@ import org.sonatype.nexus.configuration.model.ConfigurationHelper;
 import org.sonatype.nexus.error.report.ErrorReportBundleContentContributor;
 import org.sonatype.nexus.error.report.ErrorReportBundleEntry;
 import org.sonatype.nexus.error.report.ErrorReportComponent;
+import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
+import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
+import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.HttpClientProxyUtil;
+import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.plexus.encryptor.PlexusEncryptor;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
+import org.sonatype.sisu.issue.IssueRetriever;
+import org.sonatype.sisu.pr.ProjectManager;
+import org.sonatype.sisu.pr.bundle.Archiver;
+import org.sonatype.sisu.pr.bundle.Bundle;
+import org.sonatype.sisu.pr.bundle.BundleManager;
 
 @Component( role = ErrorReportingManager.class )
 public class DefaultErrorReportingManager
     extends AbstractConfigurable
     implements ErrorReportingManager
 {
+
     private Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
@@ -93,8 +114,26 @@ public class DefaultErrorReportingManager
     @Requirement
     private ErrorReportComponent errorReportComponent;
 
-    @Requirement( role = ErrorReportBundleContentContributor.class )
-    private Map<String, ErrorReportBundleContentContributor> bundleExtraContent;
+    @Requirement
+    private IssueSubmitter issueSubmitter;
+
+    @Requirement
+    private Provider<IssueRetriever> issueRetriever;
+
+    @Requirement
+    private BundleManager assembler;
+
+    @Requirement
+    private Archiver archiver;
+
+    @Requirement
+    private AttachmentHandlerConfiguration remoteCfg;
+
+    @Requirement
+    private ProjectManager projectManager;
+
+    @Requirement
+    private UserAgentBuilder uaBuilder;
 
     private static final String DEFAULT_USERNAME = "sonatype_problem_reporting";
 
@@ -150,8 +189,8 @@ public class DefaultErrorReportingManager
         else
         {
             throw new ConfigurationException( "The passed configuration object is of class \""
-                + configuration.getClass().getName() + "\" and not the required \""
-                + ApplicationConfiguration.class.getName() + "\"!" );
+                                                  + configuration.getClass().getName() + "\" and not the required \""
+                                                  + ApplicationConfiguration.class.getName() + "\"!" );
         }
     }
 
@@ -175,6 +214,7 @@ public class DefaultErrorReportingManager
     public void setJIRAUrl( String url )
     {
         getCurrentConfiguration( true ).setJiraUrl( url );
+        issueSubmitter.setServerUrl( url );
     }
 
     public String getJIRAUsername()
@@ -247,9 +287,24 @@ public class DefaultErrorReportingManager
 
     // ==
 
-    public ErrorReportResponse handleError( ErrorReportRequest request, String jiraUsername, String jiraPassword,
+    @Override
+    public ErrorReportResponse handleError( ErrorReportRequest request )
+        throws IssueSubmissionException, IOException, GeneralSecurityException
+    {
+        return handleError( request, getJIRAUsername(), getJIRAPassword(), true );
+    }
+
+    public ErrorReportResponse handleError( ErrorReportRequest request, String username, String password,
                                             boolean useGlobalHttpProxy )
         throws IssueSubmissionException, IOException, GeneralSecurityException
+    {
+        Preconditions.checkState( username != null, "No username for error reporting given" );
+        Preconditions.checkState( password != null, "No password for error reporting given" );
+
+        return handleError( request, new DefaultAuthenticationSource( username, password ) );
+    }
+
+    public ErrorReportResponse handleError( final ErrorReportRequest request, final AuthenticationSource auth )
     {
         getLogger().error( "Detected Error in Nexus", request.getThrowable() );
 
@@ -257,73 +312,51 @@ public class DefaultErrorReportingManager
 
         // if title is not null, this is a manual report, so we will generate regardless
         // of other checks
-        if ( request.getTitle() != null
-            || ( isEnabled() && shouldHandleReport( request ) && !shouldIgnore( request.getThrowable() ) ) )
+        try
         {
-            IssueSubmissionRequest subRequest = buildRequest( request, jiraUsername, useGlobalHttpProxy );
-
-            File unencryptedFile = subRequest.getProblemReportBundle();
-
-            encryptRequest( subRequest );
-
-            File encryptedFile = subRequest.getProblemReportBundle();
-
-            try
+            if ( request.isManual() )
             {
-                // manual, no check for existing
-                if ( request.getTitle() != null )
-                {
-                    IssueSubmissionResult result =
-                        getIssueSubmitter( jiraUsername, jiraPassword ).submitIssue( subRequest );
-                    response.setCreated( true );
-                    response.setJiraUrl( result.getIssueUrl() );
-                    renameBundle( unencryptedFile, result.getKey() );
-                    getLogger().info( "Generated problem report, ticket " + result.getIssueUrl() + " was created." );
-                }
-                else
-                {
-                    List<Issue> existingIssues = retrieveIssues( subRequest.getSummary(), jiraUsername, jiraPassword );
+                IssueSubmissionRequest subRequest = buildRequest( request, auth.getLogin(), true );
+                IssueSubmissionResult result = issueSubmitter.submit( subRequest, auth );
+                response.setCreated( true );
+                response.setJiraUrl( result.getIssueUrl() );
+//                    renameBundle( unencryptedFile, result.getKey() );
+                getLogger().info( "Manual problem report, ticket {} was created.", result.getIssueUrl() );
+            }
+            if ( ( isEnabled() && shouldHandleReport( request ) && !shouldIgnore( request.getThrowable() ) ) )
+            {
+                IssueSubmissionRequest subRequest = buildRequest( request, auth.getLogin(), true );
 
-                    if ( existingIssues == null )
+                {
+                    List<Issue> existingIssues = retrieveIssues( subRequest.getSummary(), auth );
+
+                    if ( existingIssues.isEmpty() )
                     {
-                        IssueSubmissionResult result =
-                            getIssueSubmitter( jiraUsername, jiraPassword ).submitIssue( subRequest );
+                        IssueSubmissionResult result = issueSubmitter.submit( subRequest, auth );
                         response.setCreated( true );
                         response.setJiraUrl( result.getIssueUrl() );
-                        renameBundle( unencryptedFile, result.getKey() );
-                        getLogger().info( "Generated problem report, ticket " + result.getIssueUrl() + " was created." );
+//                        renameBundle( unencryptedFile, result.getKey() );
+                        getLogger().info(
+                            "Generated problem report, ticket " + result.getIssueUrl() + " was created." );
                     }
                     else
                     {
                         response.setJiraUrl( existingIssues.get( 0 ).getLink() );
-                        renameBundle( unencryptedFile, existingIssues.iterator().next().getKey() );
+//                        renameBundle( unencryptedFile, existingIssues.iterator().next().getKey() );
                         getLogger().info(
                             "Not reporting problem as it already exists in database: "
                                 + existingIssues.iterator().next().getLink() );
                     }
                 }
-                response.setSuccess( true );
             }
-            finally
-            {
-                if ( encryptedFile != null )
-                {
-                    encryptedFile.delete();
-                }
-            }
-        }
-        else
-        {
             response.setSuccess( true );
+        }
+        catch( IssueSubmissionException e)
+        {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
 
         return response;
-    }
-
-    public ErrorReportResponse handleError( ErrorReportRequest request )
-        throws IssueSubmissionException, IOException, GeneralSecurityException
-    {
-        return handleError( request, getValidJIRAUsername(), getValidJIRAPassword(), isUseGlobalProxy() );
     }
 
     private void encryptRequest( IssueSubmissionRequest subRequest )
@@ -378,43 +411,22 @@ public class DefaultErrorReportingManager
     }
 
     @SuppressWarnings( "unchecked" )
-    protected List<Issue> retrieveIssues( String description, String jiraUsername, String jiraPassword )
+    protected List<Issue> retrieveIssues( String description, AuthenticationSource auth )
     {
-        Jira jira = null;
-
         try
         {
-            jira = new Jira( getJIRAUrl() + "/rpc/xmlrpc" );
-            jira.login( jiraUsername, jiraPassword );
-
-            List<Issue> issues =
-                jira.getIssuesFromTextSearchWithProject( Arrays.asList( getJIRAProject() ), "\"" + description + "\"",
-                    20 );
-
-            if ( !issues.isEmpty() )
-            {
-                return issues;
-            }
+            final IssueRetriever retriever = issueRetriever.get();
+            retriever.setCredentials( auth );
+            Project project = retriever.getProject( projectManager.getProject( null ) );
+            List<Issue> issues = retriever.getIssues( "\"" + description + "\"", project );
+            return issues;
         }
         catch ( Exception e )
         {
             getLogger().error( "Unable to query JIRA server to find if error report already exists", e );
-        }
-        finally
-        {
-            if ( jira != null )
-            {
-                try
-                {
-                    jira.logout();
-                }
-                catch ( Exception e )
-                {
-                }
-            }
+            return null;
         }
 
-        return null;
     }
 
     protected void renameBundle( File bundle, String jiraTicket )
@@ -431,30 +443,14 @@ public class DefaultErrorReportingManager
     }
 
     protected IssueSubmissionRequest buildRequest( ErrorReportRequest request, String username, boolean useGlobalProxy )
-        throws IOException
     {
-        String summary = null;
-
-        if ( request.getTitle() != null )
-        {
-            summary = "MPR: " + request.getTitle();
-        }
-        else
-        {
-            summary = "APR: " + request.getThrowable().getMessage();
-        }
-
-        if ( summary.length() > 255 )
-        {
-            summary = summary.substring( 0, 254 );
-        }
-
         IssueSubmissionRequest subRequest = new IssueSubmissionRequest();
 
+        subRequest.setContext( request );
+        subRequest.setError( request.getThrowable() );
+
         subRequest.setProjectId( getJIRAProject() );
-        subRequest.setSummary( summary );
-        subRequest.setProblemReportBundle( assembleBundle( request ) );
-        subRequest.setReporter( username );
+//        subRequest.setProblemReportBundle( assembleBundle( request ) );
         subRequest.setComponent( errorReportComponent.getComponent() );
         subRequest.setEnvironment( assembleEnvironment( request ) );
 
@@ -467,13 +463,36 @@ public class DefaultErrorReportingManager
         else if ( request.getThrowable() != null )
         {
             subRequest.setDescription( "The following exception occurred: " + StringDigester.LINE_SEPERATOR
-                + ExceptionUtils.getFullStackTrace( request.getThrowable() ) );
+                                           + ExceptionUtils.getFullStackTrace( request.getThrowable() ) );
         }
 
         if ( useGlobalProxy )
         {
-            subRequest.setProxyConfigurator( new NexusProxyServerConfigurator(
-                nexusConfig.getGlobalRemoteStorageContext(), getLogger() ) );
+            final RemoteStorageContext ctx = nexusConfig.getGlobalRemoteStorageContext();
+            final String ua = uaBuilder.formatUserAgentString( ctx );
+            remoteCfg.setUserAgent( ua );
+
+            final RemoteProxySettings proxySettings = ctx.getRemoteProxySettings();
+            final RemoteAuthenticationSettings proxyAuthentication = proxySettings.getProxyAuthentication();
+
+            if ( proxySettings.isEnabled() )
+            {
+                if ( proxyAuthentication instanceof UsernamePasswordRemoteAuthenticationSettings )
+                {
+                    final UsernamePasswordRemoteAuthenticationSettings auth =
+                        (UsernamePasswordRemoteAuthenticationSettings) proxyAuthentication;
+
+                    remoteCfg.setProxyHost( proxySettings.getHostname() );
+                    remoteCfg.setProxyPort( proxySettings.getPort() );
+//                    remoteCfg.setNonProxyHosts( proxySettings.getNonProxyHosts() );
+                    remoteCfg.setProxyPrincipal( auth.getUsername() );
+                    remoteCfg.setProxyPassword( auth.getPassword() );
+                }
+                else
+                {
+                    logger.warn( "Proxy type unsupported for problem reporting. Trying without proxy..." );
+                }
+            }
         }
 
         return subRequest;
@@ -512,92 +531,31 @@ public class DefaultErrorReportingManager
         return sb.toString();
     }
 
-    private IssueSubmitter getIssueSubmitter( String jiraUsername, String jiraPassword )
-        throws IssueSubmissionException
+    public File assembleBundle( ErrorReportRequest request )
+        throws IOException, IssueSubmissionException
     {
-        try
-        {
-            return new JiraIssueSubmitter( getJIRAUrl(), new DefaultAuthenticationSource( jiraUsername, jiraPassword ) );
-        }
-        catch ( InitializationException e )
-        {
-            throw new IssueSubmissionException( e.getMessage(), e );
-        }
+        return writeArchive( assembler.assemble( buildRequest( request, getValidJIRAUsername(), true ) ) );
     }
 
-    public File assembleBundle( ErrorReportRequest request )
-        throws IOException
+    /* UT */File writeArchive( Collection<Bundle> bundles )
+        throws IOException, FileNotFoundException
     {
-        File nexusXml = new NexusXmlHandler().getFile( configHelper, nexusConfig );
-        File securityXml = new SecurityXmlHandler().getFile( securityXmlSource, nexusConfig );
-        File securityConfigurationXml =
-            new SecurityConfigurationXmlHandler().getFile( securityConfigurationXmlSource, nexusConfig );
-        // File fileListing = getFileListing(); //TODO: replace with FileUtil call
-        File contextListing = getContextListing( request.getContext() );
-        File exceptionListing = getExceptionListing( request.getThrowable() );
+        Bundle bundle = archiver.createArchive( bundles );
 
         File zipFile = getZipFile( "nexus-error-bundle", "zip" );
-
-        ZipOutputStream zStream = null;
+        OutputStream output = null;
+        InputStream input = null;
 
         try
         {
-            FileOutputStream fStream = new FileOutputStream( zipFile );
-            zStream = new ZipOutputStream( fStream );
-
-            addFileToZip( nexusXml, zStream, "nexus.xml" );
-            addFileToZip( securityXml, zStream, "security.xml" );
-            addFileToZip( securityConfigurationXml, zStream, "security-configuration.xml" );
-            // addFileToZip( fileListing, zStream, "fileListing.txt" );
-            addFileToZip( contextListing, zStream, "contextListing.txt" );
-            addFileToZip( exceptionListing, zStream, "exception.txt" );
-
-            for ( File confFile : getConfigurationFiles() )
-            {
-                if ( confFile.isDirectory() )
-                {
-                    addDirToZip( confFile, zStream, null );
-                }
-                else
-                {
-                    addFileToZip( confFile, zStream, null );
-                }
-            }
-
-            for ( File logFile : getLogFiles() )
-            {
-                addFileToZip( logFile, zStream, null );
-            }
-
-            Set<Entry<String, ErrorReportBundleContentContributor>> bundleExtraContent =
-                this.bundleExtraContent.entrySet();
-            for ( Entry<String, ErrorReportBundleContentContributor> extraContent : bundleExtraContent )
-            {
-                String basePath = extraContent.getKey() + "/";
-                ErrorReportBundleEntry[] entries = extraContent.getValue().getEntries();
-                for ( ErrorReportBundleEntry errorReportBundleEntry : entries )
-                {
-                    String entryName = errorReportBundleEntry.getEntryName();
-                    InputStream content = errorReportBundleEntry.getContent();
-
-                    zStream.putNextEntry( new ZipEntry( basePath + entryName ) );
-                    IOUtil.copy( content, zStream );
-                    zStream.closeEntry();
-
-                    errorReportBundleEntry.releaseEntry();
-                }
-            }
+            output = new FileOutputStream( zipFile );
+            input = bundle.getInputStream();
+            IOUtil.copy( input, output );
         }
         finally
         {
-            deleteFile( nexusXml );
-            deleteFile( securityXml );
-            deleteFile( securityConfigurationXml );
-            // deleteFile( fileListing );
-            deleteFile( contextListing );
-            deleteFile( exceptionListing );
-
-            IOUtil.close( zStream );
+            IOUtil.close( input );
+            IOUtil.close( output );
         }
 
         return zipFile;
@@ -779,13 +737,15 @@ public class DefaultErrorReportingManager
     {
         if ( throwable != null )
         {
-            if ( "org.mortbay.jetty.EofException".equals( throwable.getClass().getName() ) || "org.eclipse.jetty.io.EofException".equals( throwable.getClass().getName() ) )
+            if ( "org.mortbay.jetty.EofException".equals( throwable.getClass().getName() )
+                || "org.eclipse.jetty.io.EofException".equals( throwable.getClass().getName() ) )
             {
                 return true;
             }
             else if ( throwable.getMessage() != null
-                && ( throwable.getMessage().contains( "An exception occured writing the response entity" ) || throwable.getMessage().contains(
-                    "Error while handling an HTTP server call" ) ) )
+                && ( throwable.getMessage().contains( "An exception occured writing the response entity" )
+                || throwable.getMessage().contains(
+                "Error while handling an HTTP server call" ) ) )
             {
                 return true;
             }

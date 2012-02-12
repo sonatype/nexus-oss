@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+  <layout class="ch.qos.logback.classic.PatternLayout">
+    <pattern>%date{ISO8601} %logger %method%n%level: %message%n</pattern>
+  </layout>
+  <target>System.err</target>
+</appender>
+
+<root>
+  <level value="TRACE" />
+  <appender-ref ref="STDOUT" />
+</root>
+</configuration>
+
