@@ -12,7 +12,11 @@
  */
 package org.sonatype.scheduling;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -20,9 +24,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import javax.inject.Named;
+
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
@@ -136,6 +145,28 @@ public class DefaultTaskConfigManagerTest
         HashMap<String, Object> scheduleProperties = new HashMap<String, Object>();
         scheduleProperties.put( PROPERTY_KEY_CRON_EXPRESSION, CRON_EXPRESSION );
         genericTestStore( SCHEDULE_TYPE_ADVANCED, scheduleProperties );
+    }
+
+    @Test
+    public void testInitializeCronSchedule()
+        throws Exception
+    {
+        final CScheduledTask cst = new CScheduledTask();
+        cst.setId( "foo-" + System.currentTimeMillis() );
+        cst.setEnabled( true );
+        cst.setName( "foo" );
+        cst.setType( TestNexusTask.class.getName() );
+        cst.setNextRun( 1329242400000L ); // Tue Feb 14 20:00:00 EET 2012
+
+        final CScheduleConfig csc = new CScheduleConfig();
+        csc.setType( SCHEDULE_TYPE_ADVANCED );
+        csc.setCronCommand( "0 0 20 ? * TUE,THU,SAT" );
+        cst.setSchedule( csc );
+        
+        defaultManager.initializeTasks( defaultScheduler, Arrays.asList( cst ));
+
+        final ScheduledTask<?> task = defaultScheduler.getTaskById( cst.getId() );
+        assertThat( cst.getNextRun(), is( task.getNextRun().getTime() ) );
     }
 
     public void genericTestStore( String scheduleType, HashMap<String, Object> scheduleProperties )
