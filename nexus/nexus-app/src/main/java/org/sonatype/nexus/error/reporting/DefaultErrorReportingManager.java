@@ -144,16 +144,15 @@ public class DefaultErrorReportingManager
             issueSubmitter.setServerUrl( config.getJiraUrl() );
             issueRetriever.setServerUrl( config.getJiraUrl() );
         }
-//        else
-//        {
-//            issueSubmitter.setServerUrl( DEFAULT_URL );
-//            issueRetriever.setServerUrl( DEFAULT_URL );
-//        }
 
         AuthenticationSource credentials =
             new DefaultAuthenticationSource( getValidJIRAUsername(), getValidJIRAPassword() );
         issueSubmitter.setCredentials( credentials );
         issueRetriever.setCredentials( credentials );
+
+        final RemoteStorageContext ctx = nexusConfig.getGlobalRemoteStorageContext();
+        final String ua = uaBuilder.formatUserAgentString( ctx );
+        remoteCfg.setUserAgent( ua );
     }
 
     @Override
@@ -412,44 +411,12 @@ public class DefaultErrorReportingManager
         subRequest.setContext( request );
         subRequest.setError( request.getThrowable() );
 
-        subRequest.setProjectId( getJIRAProject() );
-//        subRequest.setProblemReportBundle( assembleBundle( request ) );
-//        subRequest.setEnvironment( assembleEnvironment( request ) );
+        subRequest.setProjectKey( getJIRAProject() );
 
-        // use description if set
         if ( request.isManual() )
         {
             subRequest.setSummary( request.getTitle() );
             subRequest.setDescription( request.getDescription() );
-        }
-
-        if ( useGlobalProxy )
-        {
-            final RemoteStorageContext ctx = nexusConfig.getGlobalRemoteStorageContext();
-            final String ua = uaBuilder.formatUserAgentString( ctx );
-            remoteCfg.setUserAgent( ua );
-
-            final RemoteProxySettings proxySettings = ctx.getRemoteProxySettings();
-            final RemoteAuthenticationSettings proxyAuthentication = proxySettings.getProxyAuthentication();
-
-            if ( proxySettings.isEnabled() )
-            {
-                if ( proxyAuthentication instanceof UsernamePasswordRemoteAuthenticationSettings )
-                {
-                    final UsernamePasswordRemoteAuthenticationSettings auth =
-                        (UsernamePasswordRemoteAuthenticationSettings) proxyAuthentication;
-
-                    remoteCfg.setProxyHost( proxySettings.getHostname() );
-                    remoteCfg.setProxyPort( proxySettings.getPort() );
-//                    remoteCfg.setNonProxyHosts( proxySettings.getNonProxyHosts() );
-                    remoteCfg.setProxyPrincipal( auth.getUsername() );
-                    remoteCfg.setProxyPassword( auth.getPassword() );
-                }
-                else
-                {
-                    logger.warn( "Proxy type unsupported for problem reporting. Trying without proxy..." );
-                }
-            }
         }
 
         return subRequest;
