@@ -96,12 +96,12 @@
     // Scheduled Services Config help text
     schedules : {
       enabled : 'This flag determines if the service is currently active.  To disable this service for a period of time, de-select this checkbox.',
-      name : 'A name for the Scheduled Task.',
-      serviceType : 'The Type of service that will be scheduled to run.',
-      alertEmail : 'The Email address where an email will be sent in case that task execution will fail.',
+      name : 'A name for the scheduled task.',
+      serviceType : 'The type of service that will be scheduled to run.',
+      alertEmail : 'The email address where an email will be sent in case that task execution will fail.',
       serviceSchedule : 'The frequency this service will run.  None - this service can only be run manually. Once - run the service once at the specified date/time. Daily - run the service every day at the specified time. Weekly - run the service every week on the specified day at the specified time. Monthly - run the service every month on the specified day(s) and time. Advanced - run the service using the supplied cron string.',
-      startDate : 'The Date this service should start running.',
-      startTime : 'The Time this service should start running.',
+      startDate : 'The date this service should start running.',
+      startTime : 'The time this service should start running.',
       recurringTime : 'The time this service should start on days it will run.',
       cronCommand : 'A cron expression that will control the running of the service.'
     },
