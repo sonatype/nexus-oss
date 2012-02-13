@@ -78,27 +78,21 @@ public class DefaultErrorReportingManager
     implements ErrorReportingManager
 {
 
-    private Logger logger = LoggerFactory.getLogger( getClass() );
+    private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    ApplicationStatusSource applicationStatus;
+    private final NexusConfiguration nexusConfig;
 
-    private NexusConfiguration nexusConfig;
+    private final IssueSubmitter issueSubmitter;
 
-    private IssueSubmitter issueSubmitter;
+    private final IssueRetriever issueRetriever;
 
-    private IssueRetriever issueRetriever;
+    private final Archiver archiver;
 
-    private BundleManager assembler;
+    private final AttachmentHandlerConfiguration remoteCfg;
 
-    private Archiver archiver;
+    private final ProjectManager projectManager;
 
-    private AttachmentHandlerConfiguration remoteCfg;
-
-    private ProjectManager projectManager;
-
-    private UserAgentBuilder uaBuilder;
-
-    private final ApplicationEventMulticaster applicationEventMulticaster;
+    private final UserAgentBuilder uaBuilder;
 
     private static final String DEFAULT_USERNAME = "sonatype_problem_reporting";
 
@@ -111,23 +105,20 @@ public class DefaultErrorReportingManager
 
     @Inject
     public DefaultErrorReportingManager( final ApplicationStatusSource applicationStatus, final Archiver archiver,
-                                         final BundleManager assembler,
                                          final IssueRetriever issueRetriever, final IssueSubmitter issueSubmitter,
                                          final NexusConfiguration nexusConfig,
                                          final ProjectManager projectManager,
                                          final AttachmentHandlerConfiguration remoteCfg,
                                          final UserAgentBuilder uaBuilder, final ApplicationEventMulticaster applicationEventMulticaster )
     {
-        this.applicationStatus = applicationStatus;
+        super( applicationEventMulticaster );
         this.archiver = archiver;
-        this.assembler = assembler;
         this.issueRetriever = issueRetriever;
         this.issueSubmitter = issueSubmitter;
         this.nexusConfig = nexusConfig;
         this.projectManager = projectManager;
         this.remoteCfg = remoteCfg;
         this.uaBuilder = uaBuilder;
-        this.applicationEventMulticaster = applicationEventMulticaster;
     }
 
     private Logger getLogger()
@@ -494,62 +485,6 @@ public class DefaultErrorReportingManager
         return zipFile;
     }
 
-    private void addDirToZip( File directory, ZipOutputStream zStream, String path )
-        throws IOException
-    {
-        if ( directory != null && directory.isDirectory() )
-        {
-            File[] files = directory.listFiles();
-
-            for ( File file : files )
-            {
-                String pathname =
-                    path != null ? ( path + "/" + file.getName() ) : directory.getName() + "/" + file.getName();
-                if ( file.isDirectory() )
-                {
-                    addDirToZip( file, zStream, pathname );
-                }
-                else
-                {
-                    addFileToZip( file, zStream, pathname );
-                }
-            }
-        }
-    }
-
-    private void addFileToZip( File file, ZipOutputStream zStream, String filename )
-        throws IOException
-    {
-        if ( file != null && file.exists() )
-        {
-            byte[] buffer = new byte[1024];
-
-            FileInputStream inStream = null;
-
-            try
-            {
-                inStream = new FileInputStream( file );
-
-                zStream.putNextEntry( new ZipEntry( filename != null ? filename : file.getName() ) );
-
-                int len;
-                while ( ( len = inStream.read( buffer ) ) > 0 )
-                {
-                    zStream.write( buffer, 0, len );
-                }
-
-                zStream.closeEntry();
-            }
-            finally
-            {
-                if ( inStream != null )
-                {
-                    inStream.close();
-                }
-            }
-        }
-    }
-
     @VisibleForTesting
     File getZipFile( String prefix, String suffix )
     {
@@ -561,14 +496,6 @@ public class DefaultErrorReportingManager
         }
 
         return new File( zipDir, prefix + "." + System.currentTimeMillis() + "." + suffix );
-    }
-
-    private void deleteFile( File file )
-    {
-        if ( file != null )
-        {
-            file.delete();
-        }
     }
 
     public String getName()
@@ -586,9 +513,8 @@ public class DefaultErrorReportingManager
                 return true;
             }
             else if ( throwable.getMessage() != null
-                && ( throwable.getMessage().contains( "An exception occured writing the response entity" )
-                || throwable.getMessage().contains(
-                "Error while handling an HTTP server call" ) ) )
+                && ( throwable.getMessage().contains( "An exception occurred writing the response entity" )
+                || throwable.getMessage().contains( "Error while handling an HTTP server call" ) ) )
             {
                 return true;
             }
@@ -598,22 +524,4 @@ public class DefaultErrorReportingManager
 
     }
 
-    /**
-     * FIXME when switching from plexus to sisu: AbstractConfigurable is still plexus, so we need to circumvent the @Requirement on the multicaster.
-     */
-    @Override
-    public void initialize()
-        throws InitializationException
-    {
-        applicationEventMulticaster.addEventListener( this );
-
-        try
-        {
-            initializeConfiguration();
-        }
-        catch ( ConfigurationException e )
-        {
-            throw new InitializationException( "Cannot configure the component!", e );
-        }
-    }
 }
