@@ -14,12 +14,14 @@ package org.sonatype.nexus.error.reporting.modifier;
 
 import static org.sonatype.sisu.pr.Modifier.Priority.MODIFIER;
 
+import javax.inject.Named;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.sonatype.nexus.error.reporting.ErrorReportRequest;
 import org.sonatype.sisu.pr.Modifier;
 
-@Component(role=Modifier.class)
+@Named
 public class TriggerTypeModifier
 implements Modifier
 {
@@ -37,6 +39,5 @@ implements Modifier
     {
         return MODIFIER.priority();
     }
-    
 
 }

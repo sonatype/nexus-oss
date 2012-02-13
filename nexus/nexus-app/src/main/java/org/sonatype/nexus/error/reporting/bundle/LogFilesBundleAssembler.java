@@ -14,6 +14,9 @@ package org.sonatype.nexus.error.reporting.bundle;
 
 import java.io.File;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
@@ -23,13 +26,18 @@ import org.sonatype.sisu.pr.bundle.Bundle;
 import org.sonatype.sisu.pr.bundle.BundleAssembler;
 import org.sonatype.sisu.pr.bundle.FileBundle;
 
-@Component( role = BundleAssembler.class, hint = "logfile" )
+@Named("logfile")
 public class LogFilesBundleAssembler
     implements BundleAssembler
 {
 
-    @Requirement
     private NexusConfiguration nexusConfig;
+
+    @Inject
+    public LogFilesBundleAssembler( final NexusConfiguration nexusConfig )
+    {
+        this.nexusConfig = nexusConfig;
+    }
 
     @Override
     public boolean isParticipating( IssueSubmissionRequest request )

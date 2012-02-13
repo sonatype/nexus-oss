@@ -27,10 +27,14 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.swizzle.IssueSubmissionResult;
@@ -60,13 +64,15 @@ import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationS
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.nexus.util.StringDigester;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.sisu.issue.IssueRetriever;
 import org.sonatype.sisu.pr.ProjectManager;
 import org.sonatype.sisu.pr.bundle.Archiver;
 import org.sonatype.sisu.pr.bundle.Bundle;
 import org.sonatype.sisu.pr.bundle.BundleManager;
+import sun.applet.AppletEventMulticaster;
 
-@Component( role = ErrorReportingManager.class )
+@Named
 public class DefaultErrorReportingManager
     extends AbstractConfigurable
     implements ErrorReportingManager
@@ -74,40 +80,55 @@ public class DefaultErrorReportingManager
 
     private Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Requirement( role = ApplicationStatusSource.class )
     ApplicationStatusSource applicationStatus;
 
-    @Requirement
     private NexusConfiguration nexusConfig;
 
-    @Requirement
     private IssueSubmitter issueSubmitter;
 
-    @Requirement
     private IssueRetriever issueRetriever;
 
-    @Requirement
     private BundleManager assembler;
 
-    @Requirement
     private Archiver archiver;
 
-    @Requirement
     private AttachmentHandlerConfiguration remoteCfg;
 
-    @Requirement
     private ProjectManager projectManager;
 
-    @Requirement
     private UserAgentBuilder uaBuilder;
+
+    private final ApplicationEventMulticaster applicationEventMulticaster;
 
     private static final String DEFAULT_USERNAME = "sonatype_problem_reporting";
 
-    private static final String ERROR_REPORT_DIR = "error-report-bundles";
+    @VisibleForTesting
+    static final String ERROR_REPORT_DIR = "error-report-bundles";
 
     private Set<String> errorHashSet = new HashSet<String>();
 
     // ==
+
+    @Inject
+    public DefaultErrorReportingManager( final ApplicationStatusSource applicationStatus, final Archiver archiver,
+                                         final BundleManager assembler,
+                                         final IssueRetriever issueRetriever, final IssueSubmitter issueSubmitter,
+                                         final NexusConfiguration nexusConfig,
+                                         final ProjectManager projectManager,
+                                         final AttachmentHandlerConfiguration remoteCfg,
+                                         final UserAgentBuilder uaBuilder, final ApplicationEventMulticaster applicationEventMulticaster )
+    {
+        this.applicationStatus = applicationStatus;
+        this.archiver = archiver;
+        this.assembler = assembler;
+        this.issueRetriever = issueRetriever;
+        this.issueSubmitter = issueSubmitter;
+        this.nexusConfig = nexusConfig;
+        this.projectManager = projectManager;
+        this.remoteCfg = remoteCfg;
+        this.uaBuilder = uaBuilder;
+        this.applicationEventMulticaster = applicationEventMulticaster;
+    }
 
     private Logger getLogger()
     {
@@ -295,8 +316,6 @@ public class DefaultErrorReportingManager
 
         ErrorReportResponse response = new ErrorReportResponse();
 
-        // if title is not null, this is a manual report, so we will generate regardless
-        // of other checks
         try
         {
             if ( request.isManual() )
@@ -318,7 +337,7 @@ public class DefaultErrorReportingManager
                 else
                 {
                     response.setJiraUrl( existingIssues.get( 0 ).getLink() );
-//                        renameBundle( unencryptedFile, existingIssues.iterator().next().getKey() );
+                    writeArchive( subRequest.getBundles(), existingIssues.get( 0 ).getKey() );
                     getLogger().info(
                         "Not reporting problem as it already exists in database: "
                             + existingIssues.iterator().next().getLink() );
@@ -328,8 +347,8 @@ public class DefaultErrorReportingManager
         }
         catch ( Exception e )
         {
-            logger.debug( e.getMessage(), e );
-            logger.warn( "Error while submitting problem report: " + e.getMessage() );
+            getLogger().warn( "Error while submitting problem report: " + e.getMessage() );
+            getLogger().debug( e.getMessage(), e );
         }
 
         return response;
@@ -445,7 +464,8 @@ public class DefaultErrorReportingManager
         return subRequest;
     }
 
-    private void writeArchive( Collection<Bundle> bundles, String suffix )
+    @VisibleForTesting
+    File writeArchive( Collection<Bundle> bundles, String suffix )
         throws IOException
     {
         Bundle bundle;
@@ -470,6 +490,8 @@ public class DefaultErrorReportingManager
             IOUtil.close( input );
             IOUtil.close( output );
         }
+        
+        return zipFile;
     }
 
     private void addDirToZip( File directory, ZipOutputStream zStream, String path )
@@ -528,7 +550,8 @@ public class DefaultErrorReportingManager
         }
     }
 
-    private File getZipFile( String prefix, String suffix )
+    @VisibleForTesting
+    File getZipFile( String prefix, String suffix )
     {
         File zipDir = nexusConfig.getWorkingDirectory( ERROR_REPORT_DIR );
 
@@ -575,4 +598,22 @@ public class DefaultErrorReportingManager
 
     }
 
+    /**
+     * FIXME when switching from plexus to sisu: AbstractConfigurable is still plexus, so we need to circumvent the @Requirement on the multicaster.
+     */
+    @Override
+    public void initialize()
+        throws InitializationException
+    {
+        applicationEventMulticaster.addEventListener( this );
+
+        try
+        {
+            initializeConfiguration();
+        }
+        catch ( ConfigurationException e )
+        {
+            throw new InitializationException( "Cannot configure the component!", e );
+        }
+    }
 }

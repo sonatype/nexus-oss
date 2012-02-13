@@ -19,6 +19,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
@@ -32,15 +35,22 @@ import org.sonatype.sisu.pr.bundle.DirBundle;
 import org.sonatype.sisu.pr.bundle.ManagedBundle;
 import org.sonatype.sisu.pr.bundle.StorageManager;
 
-@Component( role = BundleAssembler.class, hint = "legacy-contributors" )
+@Named
 public class LegacyBundleContributorsAssembler
     implements BundleAssembler
 {
-    @Requirement( role = ErrorReportBundleContentContributor.class )
+
     private Map<String, ErrorReportBundleContentContributor> bundleExtraContent;
-    
-    @Requirement
+
     private StorageManager storageManager;
+
+    @Inject
+    public LegacyBundleContributorsAssembler(
+        final Map<String, ErrorReportBundleContentContributor> bundleExtraContent, final StorageManager storageManager )
+    {
+        this.bundleExtraContent = bundleExtraContent;
+        this.storageManager = storageManager;
+    }
 
     @Override
     public boolean isParticipating( IssueSubmissionRequest request )

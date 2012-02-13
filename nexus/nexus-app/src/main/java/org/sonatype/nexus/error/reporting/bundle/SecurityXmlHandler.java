@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
@@ -31,17 +34,22 @@ import org.sonatype.sisu.pr.bundle.BundleAssembler;
 import org.sonatype.sisu.pr.bundle.ManagedBundle;
 import org.sonatype.sisu.pr.bundle.StorageManager;
 
-@Component(role = BundleAssembler.class, hint = "security.xml")
+@Named( "security.xml" )
 public class SecurityXmlHandler
     extends AbstractXmlHandler
     implements BundleAssembler
 {
-    @Requirement
     SecurityModelConfigurationSource source;
     
-    @Requirement
     StorageManager storageManager;
-    
+
+    @Inject
+    public SecurityXmlHandler( final SecurityModelConfigurationSource source, final StorageManager storageManager )
+    {
+        this.source = source;
+        this.storageManager = storageManager;
+    }
+
     @Override
     public boolean isParticipating( IssueSubmissionRequest request )
     {

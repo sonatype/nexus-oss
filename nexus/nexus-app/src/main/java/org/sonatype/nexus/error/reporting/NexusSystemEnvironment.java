@@ -12,20 +12,27 @@
  */
 package org.sonatype.nexus.error.reporting;
 
+import javax.inject.Named;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.sisu.pr.SystemEnvironmentContributor;
 
-@Component( role = SystemEnvironmentContributor.class, hint = "nexus")
+@Named( "nexus" )
 public class NexusSystemEnvironment
     implements SystemEnvironmentContributor
 {
     private static String LINE_SEPERATOR = System.getProperty( "line.separator" );
 
-    @Requirement( role = ApplicationStatusSource.class )
     ApplicationStatusSource applicationStatus;
-    
+
+    @Named
+    public NexusSystemEnvironment( final ApplicationStatusSource applicationStatus )
+    {
+        this.applicationStatus = applicationStatus;
+    }
+
     @Override
     public String asDiagnosticsFormat()
     {

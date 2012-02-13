@@ -15,6 +15,9 @@ package org.sonatype.nexus.error.reporting.bundle;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
@@ -29,20 +32,26 @@ import org.sonatype.sisu.pr.bundle.BundleAssembler;
 import org.sonatype.sisu.pr.bundle.ManagedBundle;
 import org.sonatype.sisu.pr.bundle.StorageManager;
 
-@Component( role = BundleAssembler.class, hint = "nexus.xml" )
+@Named( "nexus.xml" )
 public class NexusXmlHandler
     extends AbstractXmlHandler
     implements BundleAssembler
 {
 
-    @Requirement
     private ConfigurationHelper configHelper;
 
-    @Requirement
     private NexusConfiguration nexusConfig;
 
-    @Requirement
     private StorageManager storageManager;
+
+    @Inject
+    public NexusXmlHandler( final ConfigurationHelper configHelper, final NexusConfiguration nexusConfig,
+                            final StorageManager storageManager )
+    {
+        this.configHelper = configHelper;
+        this.nexusConfig = nexusConfig;
+        this.storageManager = storageManager;
+    }
 
     @SuppressWarnings( "deprecation" )
     @Override

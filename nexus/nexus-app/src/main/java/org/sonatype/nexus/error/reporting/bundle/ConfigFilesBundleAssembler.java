@@ -15,6 +15,9 @@ package org.sonatype.nexus.error.reporting.bundle;
 import java.io.File;
 import java.io.FileFilter;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
@@ -24,13 +27,18 @@ import org.sonatype.sisu.pr.bundle.Bundle;
 import org.sonatype.sisu.pr.bundle.BundleAssembler;
 import org.sonatype.sisu.pr.bundle.FileBundle;
 
-@Component( role = BundleAssembler.class, hint = "conf-dir" )
+@Named( "conf-dir")
 public class ConfigFilesBundleAssembler
     implements BundleAssembler
 {
 
-    @Requirement
     private NexusConfiguration nexusConfig;
+
+    @Inject
+    public ConfigFilesBundleAssembler( final NexusConfiguration nexusConfig )
+    {
+        this.nexusConfig = nexusConfig;
+    }
 
     @Override
     public boolean isParticipating( IssueSubmissionRequest request )
