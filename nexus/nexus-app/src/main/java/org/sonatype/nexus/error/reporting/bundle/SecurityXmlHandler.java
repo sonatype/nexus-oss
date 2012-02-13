@@ -40,9 +40,6 @@ public class SecurityXmlHandler
     SecurityModelConfigurationSource source;
     
     @Requirement
-    NexusConfiguration nexusConfig;
-    
-    @Requirement
     StorageManager storageManager;
     
     @Override
@@ -63,7 +60,7 @@ public class SecurityXmlHandler
                             ( Configuration ) cloneViaXml( source.getConfiguration() );
                                 
 
-			for ( CUser user : ( List<CUser> ) configuration.getUsers() )
+			for ( CUser user : configuration.getUsers() )
 			{
 			    user.setPassword( PASSWORD_MASK );
 			    user.setEmail( PASSWORD_MASK );

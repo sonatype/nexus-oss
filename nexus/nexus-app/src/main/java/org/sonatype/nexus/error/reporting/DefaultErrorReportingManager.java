@@ -12,46 +12,35 @@
  */
 package org.sonatype.nexus.error.reporting;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import javax.inject.Provider;
-
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.swizzle.IssueSubmissionResult;
 import org.codehaus.plexus.swizzle.IssueSubmitter;
-import org.codehaus.plexus.swizzle.JiraIssueSubmitter;
 import org.codehaus.plexus.swizzle.jira.authentication.AuthenticationSource;
 import org.codehaus.plexus.swizzle.jira.authentication.DefaultAuthenticationSource;
-import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.swizzle.jira.Issue;
-import org.codehaus.swizzle.jira.Jira;
 import org.codehaus.swizzle.jira.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,20 +54,12 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CErrorReportingCoreConfiguration;
-import org.sonatype.nexus.configuration.model.ConfigurationHelper;
-import org.sonatype.nexus.error.report.ErrorReportBundleContentContributor;
-import org.sonatype.nexus.error.report.ErrorReportBundleEntry;
-import org.sonatype.nexus.error.report.ErrorReportComponent;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
-import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.HttpClientProxyUtil;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.nexus.util.StringDigester;
-import org.sonatype.plexus.encryptor.PlexusEncryptor;
-import org.sonatype.security.configuration.source.SecurityConfigurationSource;
-import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.sisu.issue.IssueRetriever;
 import org.sonatype.sisu.pr.ProjectManager;
 import org.sonatype.sisu.pr.bundle.Archiver;
@@ -93,32 +74,17 @@ public class DefaultErrorReportingManager
 
     private Logger logger = LoggerFactory.getLogger( getClass() );
 
-    @Requirement
-    private NexusConfiguration nexusConfig;
-
-    @Requirement( role = SecurityModelConfigurationSource.class, hint = "file" )
-    private SecurityModelConfigurationSource securityXmlSource;
-
     @Requirement( role = ApplicationStatusSource.class )
     ApplicationStatusSource applicationStatus;
 
-    @Requirement( role = SecurityConfigurationSource.class, hint = "file" )
-    private SecurityConfigurationSource securityConfigurationXmlSource;
-
     @Requirement
-    private ConfigurationHelper configHelper;
-
-    @Requirement( hint = "rsa-aes" )
-    private PlexusEncryptor plexusEncryptor;
-
-    @Requirement
-    private ErrorReportComponent errorReportComponent;
+    private NexusConfiguration nexusConfig;
 
     @Requirement
     private IssueSubmitter issueSubmitter;
 
     @Requirement
-    private Provider<IssueRetriever> issueRetriever;
+    private IssueRetriever issueRetriever;
 
     @Requirement
     private BundleManager assembler;
@@ -158,6 +124,24 @@ public class DefaultErrorReportingManager
         {
             configure( getApplicationConfiguration() );
         }
+
+
+        CErrorReporting config = getCurrentConfiguration( false );
+        if ( config != null )
+        {
+            issueSubmitter.setServerUrl( config.getJiraUrl() );
+            issueRetriever.setServerUrl( config.getJiraUrl() );
+        }
+//        else
+//        {
+//            issueSubmitter.setServerUrl( DEFAULT_URL );
+//            issueRetriever.setServerUrl( DEFAULT_URL );
+//        }
+
+        AuthenticationSource credentials =
+            new DefaultAuthenticationSource( getValidJIRAUsername(), getValidJIRAPassword() );
+        issueSubmitter.setCredentials( credentials );
+        issueRetriever.setCredentials( credentials );
     }
 
     @Override
@@ -215,6 +199,7 @@ public class DefaultErrorReportingManager
     {
         getCurrentConfiguration( true ).setJiraUrl( url );
         issueSubmitter.setServerUrl( url );
+        issueRetriever.setServerUrl( url );
     }
 
     public String getJIRAUsername()
@@ -317,66 +302,48 @@ public class DefaultErrorReportingManager
             if ( request.isManual() )
             {
                 IssueSubmissionRequest subRequest = buildRequest( request, auth.getLogin(), true );
-                IssueSubmissionResult result = issueSubmitter.submit( subRequest, auth );
-                response.setCreated( true );
-                response.setJiraUrl( result.getIssueUrl() );
-//                    renameBundle( unencryptedFile, result.getKey() );
-                getLogger().info( "Manual problem report, ticket {} was created.", result.getIssueUrl() );
+                submitIssue( auth, response, subRequest );
             }
-            if ( ( isEnabled() && shouldHandleReport( request ) && !shouldIgnore( request.getThrowable() ) ) )
+            else if ( ( isEnabled() && shouldHandleReport( request ) 
+                && !shouldIgnore( request.getThrowable() ) ) )
             {
                 IssueSubmissionRequest subRequest = buildRequest( request, auth.getLogin(), true );
 
-                {
-                    List<Issue> existingIssues = retrieveIssues( subRequest.getSummary(), auth );
+                List<Issue> existingIssues = retrieveIssues( subRequest.getSummary(), auth );
 
-                    if ( existingIssues.isEmpty() )
-                    {
-                        IssueSubmissionResult result = issueSubmitter.submit( subRequest, auth );
-                        response.setCreated( true );
-                        response.setJiraUrl( result.getIssueUrl() );
-//                        renameBundle( unencryptedFile, result.getKey() );
-                        getLogger().info(
-                            "Generated problem report, ticket " + result.getIssueUrl() + " was created." );
-                    }
-                    else
-                    {
-                        response.setJiraUrl( existingIssues.get( 0 ).getLink() );
+                if ( existingIssues.isEmpty() )
+                {
+                    submitIssue( auth, response, subRequest );
+                }
+                else
+                {
+                    response.setJiraUrl( existingIssues.get( 0 ).getLink() );
 //                        renameBundle( unencryptedFile, existingIssues.iterator().next().getKey() );
-                        getLogger().info(
-                            "Not reporting problem as it already exists in database: "
-                                + existingIssues.iterator().next().getLink() );
-                    }
+                    getLogger().info(
+                        "Not reporting problem as it already exists in database: "
+                            + existingIssues.iterator().next().getLink() );
                 }
             }
             response.setSuccess( true );
         }
-        catch( IssueSubmissionException e)
+        catch ( Exception e )
         {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.debug( e.getMessage(), e );
+            logger.warn( "Error while submitting problem report: " + e.getMessage() );
         }
 
         return response;
     }
 
-    private void encryptRequest( IssueSubmissionRequest subRequest )
-        throws IOException, GeneralSecurityException
+    private void submitIssue( final AuthenticationSource auth, final ErrorReportResponse response,
+                              final IssueSubmissionRequest subRequest )
+        throws IssueSubmissionException, IOException
     {
-        File encryptedZip = getZipFile( "nexus-error-bundle", "ezip" );
-
-        InputStream publicKey = null;
-        try
-        {
-            publicKey = getClass().getResourceAsStream( "/apr/public-key.txt" );
-
-            plexusEncryptor.encrypt( subRequest.getProblemReportBundle(), encryptedZip, publicKey );
-        }
-        finally
-        {
-            IOUtil.close( publicKey );
-        }
-
-        subRequest.setProblemReportBundle( encryptedZip );
+        IssueSubmissionResult result = issueSubmitter.submit( subRequest, auth );
+        response.setCreated( true );
+        response.setJiraUrl( result.getIssueUrl() );
+        writeArchive( result.getBundles(), result.getKey() );
+        getLogger().info( "Problem report ticket " + result.getIssueUrl() + " was created." );
     }
 
     protected boolean shouldHandleReport( ErrorReportRequest request )
@@ -415,10 +382,9 @@ public class DefaultErrorReportingManager
     {
         try
         {
-            final IssueRetriever retriever = issueRetriever.get();
-            retriever.setCredentials( auth );
-            Project project = retriever.getProject( projectManager.getProject( null ) );
-            List<Issue> issues = retriever.getIssues( "\"" + description + "\"", project );
+            issueRetriever.setCredentials( auth );
+            Project project = issueRetriever.getProject( projectManager.getProject( null ) );
+            List<Issue> issues = issueRetriever.getIssues( "\"" + description + "\"", project );
             return issues;
         }
         catch ( Exception e )
@@ -427,19 +393,6 @@ public class DefaultErrorReportingManager
             return null;
         }
 
-    }
-
-    protected void renameBundle( File bundle, String jiraTicket )
-        throws IOException
-    {
-        if ( StringUtils.isNotEmpty( jiraTicket ) )
-        {
-            String filename = bundle.getAbsolutePath();
-
-            String newfilename = filename.replace( "nexus-error-bundle", "nexus-error-bundle-" + jiraTicket );
-
-            FileUtils.rename( bundle, new File( newfilename ) );
-        }
     }
 
     protected IssueSubmissionRequest buildRequest( ErrorReportRequest request, String username, boolean useGlobalProxy )
@@ -451,19 +404,13 @@ public class DefaultErrorReportingManager
 
         subRequest.setProjectId( getJIRAProject() );
 //        subRequest.setProblemReportBundle( assembleBundle( request ) );
-        subRequest.setComponent( errorReportComponent.getComponent() );
-        subRequest.setEnvironment( assembleEnvironment( request ) );
+//        subRequest.setEnvironment( assembleEnvironment( request ) );
 
         // use description if set
-        if ( request.getDescription() != null )
+        if ( request.isManual() )
         {
+            subRequest.setSummary( request.getTitle() );
             subRequest.setDescription( request.getDescription() );
-        }
-        // otherwise pull from throwable
-        else if ( request.getThrowable() != null )
-        {
-            subRequest.setDescription( "The following exception occurred: " + StringDigester.LINE_SEPERATOR
-                                           + ExceptionUtils.getFullStackTrace( request.getThrowable() ) );
         }
 
         if ( useGlobalProxy )
@@ -498,51 +445,17 @@ public class DefaultErrorReportingManager
         return subRequest;
     }
 
-    private String assembleEnvironment( ErrorReportRequest request )
+    private void writeArchive( Collection<Bundle> bundles, String suffix )
+        throws IOException
     {
-        StringBuffer sb = new StringBuffer();
-        sb.append( "Nexus Version: " );
-        sb.append( applicationStatus.getSystemStatus().getVersion() );
-        sb.append( StringDigester.LINE_SEPERATOR );
-
-        sb.append( "Nexus Edition: " );
-        sb.append( applicationStatus.getSystemStatus().getEditionLong() );
-        sb.append( StringDigester.LINE_SEPERATOR );
-
-        sb.append( "java.vendor: " );
-        sb.append( System.getProperty( "java.vendor" ) );
-        sb.append( StringDigester.LINE_SEPERATOR );
-
-        sb.append( "java.version: " );
-        sb.append( System.getProperty( "java.version" ) );
-        sb.append( StringDigester.LINE_SEPERATOR );
-
-        sb.append( "os.name: " );
-        sb.append( System.getProperty( "os.name" ) );
-        sb.append( StringDigester.LINE_SEPERATOR );
-
-        sb.append( "os.version: " );
-        sb.append( System.getProperty( "os.version" ) );
-        sb.append( StringDigester.LINE_SEPERATOR );
-
-        sb.append( "os.arch: " );
-        sb.append( System.getProperty( "os.arch" ) );
-
-        return sb.toString();
-    }
-
-    public File assembleBundle( ErrorReportRequest request )
-        throws IOException, IssueSubmissionException
-    {
-        return writeArchive( assembler.assemble( buildRequest( request, getValidJIRAUsername(), true ) ) );
-    }
-
-    /* UT */File writeArchive( Collection<Bundle> bundles )
-        throws IOException, FileNotFoundException
-    {
-        Bundle bundle = archiver.createArchive( bundles );
-
-        File zipFile = getZipFile( "nexus-error-bundle", "zip" );
+        Bundle bundle;
+        if ( !( bundles.size() == 1 && "application/zip".equals(
+            ( bundle = bundles.iterator().next() ).getContentType() ) ) )
+        {
+            bundle = archiver.createArchive( bundles );
+        }
+        
+        File zipFile = getZipFile( "nexus-error-bundle-" + suffix, "zip" );
         OutputStream output = null;
         InputStream input = null;
 
@@ -557,8 +470,6 @@ public class DefaultErrorReportingManager
             IOUtil.close( input );
             IOUtil.close( output );
         }
-
-        return zipFile;
     }
 
     private void addDirToZip( File directory, ZipOutputStream zStream, String path )
@@ -615,97 +526,6 @@ public class DefaultErrorReportingManager
                 }
             }
         }
-    }
-
-    private Set<File> getLogFiles()
-    {
-        Set<File> files = new HashSet<File>();
-
-        files.add( new File( nexusConfig.getWorkingDirectory( "logs" ), "nexus.log" ) );
-
-        return files;
-    }
-
-    private Set<File> getConfigurationFiles()
-    {
-        Set<File> files = new HashSet<File>();
-
-        File confDir = nexusConfig.getWorkingDirectory( "conf" );
-
-        File[] confFiles = confDir.listFiles( new FileFilter()
-        {
-            public boolean accept( File pathname )
-            {
-                return !pathname.getName().endsWith( ".bak" )
-                    && !pathname.getName().equals( "nexus.xml" )
-                    && !pathname.getName().endsWith( "security.xml" )
-                    && !pathname.getName().endsWith( "security-configuration.xml" );
-            }
-        } );
-
-        files.addAll( Arrays.asList( confFiles ) );
-
-        return files;
-    }
-
-    // TODO: this should be replaced with a call to FileUtil, but first we need to make sure that will not eat memory
-    // too
-    // private File getFileListing()
-    // throws IOException
-    // {
-    // return writeStringToTempFile( FileListingHelper.buildFileListing( nexusConfig.getWorkingDirectory() ),
-    // "fileListing.txt" );
-    // }
-
-    private File getExceptionListing( Throwable t )
-        throws IOException
-    {
-        return writeStringToTempFile( ExceptionUtils.getFullStackTrace( t ), "exceptionListing.txt" );
-    }
-
-    private File getContextListing( Map<String, Object> context )
-        throws IOException
-    {
-        StringBuffer sb = new StringBuffer();
-
-        for ( String key : context.keySet() )
-        {
-            sb.append( "key: " + key );
-            sb.append( FileListingHelper.LINE_SEPERATOR );
-
-            Object o = context.get( key );
-            sb.append( "value: " + o == null ? "null" : o.toString() );
-            sb.append( FileListingHelper.LINE_SEPERATOR );
-            sb.append( FileListingHelper.LINE_SEPERATOR );
-        }
-
-        return writeStringToTempFile( sb.toString(), "contextListing.txt" );
-    }
-
-    private File writeStringToTempFile( String text, String name )
-        throws IOException
-    {
-        File tempFile = null;
-
-        BufferedWriter bWriter = null;
-
-        try
-        {
-            tempFile = new File( nexusConfig.getTemporaryDirectory(), name + "." + System.currentTimeMillis() );
-
-            bWriter = new BufferedWriter( new FileWriter( tempFile ) );
-
-            bWriter.write( text );
-        }
-        finally
-        {
-            if ( bWriter != null )
-            {
-                bWriter.close();
-            }
-        }
-
-        return tempFile;
     }
 
     private File getZipFile( String prefix, String suffix )

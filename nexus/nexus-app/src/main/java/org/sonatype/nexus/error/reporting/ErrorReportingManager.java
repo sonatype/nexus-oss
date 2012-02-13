@@ -55,6 +55,4 @@ public interface ErrorReportingManager
                                      boolean useGlobalHttpProxy )
         throws IssueSubmissionException, IOException, GeneralSecurityException;
 
-    File assembleBundle( ErrorReportRequest request )
-        throws IOException, IssueSubmissionException;
 }

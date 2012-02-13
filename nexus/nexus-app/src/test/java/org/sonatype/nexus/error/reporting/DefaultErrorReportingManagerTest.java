@@ -67,6 +67,8 @@ public class DefaultErrorReportingManagerTest
 
     private JettyServerProvider provider;
 
+    private MockAttachmentHandler handler;
+
     @Override
     protected void setUp()
         throws Exception
@@ -93,7 +95,7 @@ public class DefaultErrorReportingManagerTest
             in = new FileInputStream( dbPath );
             mock.setDatabase( IOUtil.toString( in ) );
 
-            MockAttachmentHandler handler = new MockAttachmentHandler();
+            handler = new MockAttachmentHandler();
             handler.setMock( mock );
             List<AttachmentHandler> handlers = Arrays.<AttachmentHandler> asList( handler );
             provider = new JettyServerProvider();
@@ -187,7 +189,7 @@ public class DefaultErrorReportingManagerTest
         List<Issue> issues =
             manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), getAuth() );
 
-        Assert.assertNull( issues );
+        assertThat( issues, hasSize( 0 ) );
 
         manager.handleError( request );
 
