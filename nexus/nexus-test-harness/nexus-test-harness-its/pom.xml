@@ -441,7 +441,6 @@
                       <groupId>org.eclipse.jetty</groupId>
                       <artifactId>jetty-distribution</artifactId>
                       <version>${jetty.version}</version>
-                      <classifier>bundle</classifier>
                       <type>tar.gz</type>
                     </artifactItem>
                   </artifactItems>
