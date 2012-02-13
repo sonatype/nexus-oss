@@ -175,7 +175,7 @@
     <plexus-interpolation.version>1.14</plexus-interpolation.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
     <plexus-jetty7.version>1.2</plexus-jetty7.version>
-    <plexus-jetty-testsuite.version>2.0-SNAPSHOT</plexus-jetty-testsuite.version>
+    <plexus-jetty-testsuite.version>2.0</plexus-jetty-testsuite.version>
     <plexus.restlet.bridge.version>1.18</plexus.restlet.bridge.version>
     <plexus-security.version>2.4</plexus-security.version>
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
@@ -1029,7 +1029,7 @@
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>server-provider</artifactId>
-        <version>0.5.0-SNAPSHOT</version>
+        <version>0.5.0</version>
         <scope>test</scope>
       </dependency>
 
