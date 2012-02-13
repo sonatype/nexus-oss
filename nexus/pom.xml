@@ -1032,6 +1032,18 @@
         <version>0.5.0</version>
         <scope>test</scope>
       </dependency>
+      <dependency>
+        <groupId>org.sonatype.http-testing-harness</groupId>
+        <artifactId>junit-runner</artifactId>
+        <version>0.5.0</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.http-testing-harness</groupId>
+        <artifactId>testng-runner</artifactId>
+        <version>0.5.0</version>
+        <scope>test</scope>
+      </dependency>
 
       <!-- The modules -->
       <dependency>
