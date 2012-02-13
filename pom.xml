@@ -54,11 +54,10 @@
       <artifactId>nexus-test-harness-launcher</artifactId>
     </dependency>
 
-    <!-- Is perverted, but it uses maven 3.0-alpha-4!!! -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>apache-maven</artifactId>
-      <version>3.0-alpha-4</version>
+      <version>3.0.4</version>
       <type>tar.gz</type>
       <classifier>bin</classifier>
       <scope>test</scope>
