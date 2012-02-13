@@ -338,21 +338,27 @@ public class M2RepositoryTest
         // repository.setEnforceReleaseRedownloadPolicy( enforceReleaseRedownloadPolicy );
         repository.getCurrentCoreConfiguration().commitChanges();
 
-        mdFile.setLastModified( System.currentTimeMillis() - ( 3L * 24L * 60L * 60L * 1000L ) );
-
-        Thread.sleep( 500 ); // wait for FS
-
-        repository.retrieveItem( new ResourceStoreRequest( path, false ) );
-
-        mdFile.setLastModified( System.currentTimeMillis() - ( 2L * 24L * 60L * 60L * 1000L ) );
-
-        Thread.sleep( 500 ); // wait for FS
+        for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 3L * A_DAY ) ); i++ )
+        {
+            System.gc(); // helps with FS sync'ing on Windows
+            Thread.sleep( 500 ); // wait for FS
+        }
 
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
-        mdFile.setLastModified( System.currentTimeMillis() - ( 1L * 24L * 60L * 60L * 1000L ) );
+        for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 2L * A_DAY ) ); i++ )
+        {
+            System.gc(); // helps with FS sync'ing on Windows
+            Thread.sleep( 500 ); // wait for FS
+        }
 
-        Thread.sleep( 500 ); // wait for FS
+        repository.retrieveItem( new ResourceStoreRequest( path, false ) );
+
+        for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 1L * A_DAY ) ); i++ )
+        {
+            System.gc(); // helps with FS sync'ing on Windows
+            Thread.sleep( 500 ); // wait for FS
+        }
 
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
