@@ -1034,6 +1034,14 @@ public class DefaultIndexerManager
                         RepositoryStringUtils.getFormattedMessage(
                             "Cannot fetch remote index for repository %s, task cancelled.", repository ) );
                 }
+                catch ( IOException e )
+                {
+                    // kept logs since tasks will only log error if debug is enabled
+                    getLogger().warn(
+                        RepositoryStringUtils.getFormattedMessage( "Cannot fetch remote index for repository %s",
+                            repository ), e );
+                    throw e;
+                }
                 catch ( Exception e )
                 {
                     getLogger().warn(
