@@ -94,6 +94,12 @@
       <groupId>org.sonatype.sisu.pr</groupId>
       <artifactId>sisu-problem-reporter</artifactId>
       <version>1.5-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sonatype.spice</groupId>
@@ -134,7 +140,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.pr</groupId>
       <artifactId>sisu-pr-testutil</artifactId>
-      <version>1.4</version>
+      <version>1.5-SNAPSHOT</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
