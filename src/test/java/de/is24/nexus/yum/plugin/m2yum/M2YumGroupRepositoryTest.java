@@ -1,11 +1,11 @@
 package de.is24.nexus.yum.plugin.m2yum;
 
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import javax.inject.Inject;
 
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
@@ -27,7 +27,7 @@ public class M2YumGroupRepositoryTest extends AbstractRepositoryTester {
   @Test
   public void shouldHasFacet() throws Exception {
     GroupRepository repo = getContainer().lookup(GroupRepository.class, "maven2yum");
-    assertThat(repo.getRepositoryKind().isFacetAvailable(M2YumGroupRepository.class), Matchers.is(true));
+    assertThat(repo.getRepositoryKind().isFacetAvailable(M2YumGroupRepository.class), is(true));
   }
 
 }

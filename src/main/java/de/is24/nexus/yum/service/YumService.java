@@ -3,6 +3,7 @@ package de.is24.nexus.yum.service;
 import java.io.File;
 import java.net.URL;
 
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.ScheduledTask;
 
@@ -35,4 +36,6 @@ public interface YumService {
   boolean isActive();
 
   void recreateRepository(Repository repository);
+
+  ScheduledTask<YumRepository> createGroupRepository(GroupRepository groupRepository);
 }

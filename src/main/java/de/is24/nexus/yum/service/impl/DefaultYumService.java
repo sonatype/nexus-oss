@@ -13,11 +13,13 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
 import de.is24.nexus.yum.repository.YumGeneratorConfigurationBuilder;
+import de.is24.nexus.yum.repository.YumGroupRepositoryGenerationTask;
 import de.is24.nexus.yum.repository.YumMetadataGenerationTask;
 import de.is24.nexus.yum.repository.YumRepository;
 import de.is24.nexus.yum.service.YumService;
@@ -159,6 +161,13 @@ public class DefaultYumService implements YumService {
   @Override
   public boolean isActive() {
 		return YumMetadataGenerationTask.isActive();
+  }
+
+  @Override
+  public ScheduledTask<YumRepository> createGroupRepository(GroupRepository groupRepository) {
+    YumGroupRepositoryGenerationTask task = nexusScheduler.createTaskInstance(YumGroupRepositoryGenerationTask.class);
+    task.setGroupRepository(groupRepository);
+    return nexusScheduler.submit(YumGroupRepositoryGenerationTask.ID, task);
   }
 
   private YumMetadataGenerationTask createTask(YumGeneratorConfigurationBuilder config) {
