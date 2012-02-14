@@ -26,6 +26,8 @@ import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * Abstract class to implement configurable components to "click" them in into generic configuration environment.
+ *
+ * NOTE: Don't convert AbstractConfigurable plexus components to sisu, they will be initialized BEFORE configuration is loaded.
  * 
  * @author cstamas
  */

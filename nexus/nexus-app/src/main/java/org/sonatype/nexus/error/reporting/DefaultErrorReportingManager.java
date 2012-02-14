@@ -72,7 +72,7 @@ import org.sonatype.sisu.pr.bundle.Bundle;
 import org.sonatype.sisu.pr.bundle.BundleManager;
 import sun.applet.AppletEventMulticaster;
 
-@Named
+@Component( role = ErrorReportingManager.class )
 public class DefaultErrorReportingManager
     extends AbstractConfigurable
     implements ErrorReportingManager
@@ -80,19 +80,26 @@ public class DefaultErrorReportingManager
 
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
-    private final NexusConfiguration nexusConfig;
+    @Requirement
+    private NexusConfiguration nexusConfig;
 
-    private final IssueSubmitter issueSubmitter;
+    @Requirement
+    private IssueSubmitter issueSubmitter;
 
-    private final IssueRetriever issueRetriever;
+    @Requirement
+    private IssueRetriever issueRetriever;
 
-    private final Archiver archiver;
+    @Requirement
+    private Archiver archiver;
 
-    private final AttachmentHandlerConfiguration remoteCfg;
+    @Requirement
+    private AttachmentHandlerConfiguration remoteCfg;
 
-    private final ProjectManager projectManager;
+    @Requirement
+    private ProjectManager projectManager;
 
-    private final UserAgentBuilder uaBuilder;
+    @Requirement
+    private UserAgentBuilder uaBuilder;
 
     private static final String DEFAULT_USERNAME = "sonatype_problem_reporting";
 
@@ -103,13 +110,22 @@ public class DefaultErrorReportingManager
 
     // ==
 
-    @Inject
-    public DefaultErrorReportingManager( final ApplicationStatusSource applicationStatus, final Archiver archiver,
-                                         final IssueRetriever issueRetriever, final IssueSubmitter issueSubmitter,
-                                         final NexusConfiguration nexusConfig,
-                                         final ProjectManager projectManager,
-                                         final AttachmentHandlerConfiguration remoteCfg,
-                                         final UserAgentBuilder uaBuilder, final ApplicationEventMulticaster applicationEventMulticaster )
+    /**
+     * For plexus injection.
+     */
+    public DefaultErrorReportingManager()
+    {
+    }
+
+    @VisibleForTesting
+    DefaultErrorReportingManager( final Archiver archiver,
+                                  final IssueRetriever issueRetriever,
+                                  final IssueSubmitter issueSubmitter,
+                                  final ProjectManager projectManager,
+                                  final AttachmentHandlerConfiguration remoteCfg,
+                                  final UserAgentBuilder uaBuilder,
+                                  final NexusConfiguration nexusConfig,
+                                  final ApplicationEventMulticaster applicationEventMulticaster )
     {
         super( applicationEventMulticaster );
         this.archiver = archiver;
