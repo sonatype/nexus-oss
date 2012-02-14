@@ -287,7 +287,7 @@ public class DefaultErrorReportingManager
     public ErrorReportResponse handleError( ErrorReportRequest request )
         throws IssueSubmissionException, IOException, GeneralSecurityException
     {
-        return handleError( request, getJIRAUsername(), getJIRAPassword(), true );
+        return handleError( request, getValidJIRAUsername(), getValidJIRAPassword(), true );
     }
 
     public ErrorReportResponse handleError( ErrorReportRequest request, String username, String password,
@@ -310,12 +310,14 @@ public class DefaultErrorReportingManager
         {
             if ( request.isManual() )
             {
+                getLogger().trace( "Manual error report: '{}'", request.getTitle() );
                 IssueSubmissionRequest subRequest = buildRequest( request, auth.getLogin(), true );
                 submitIssue( auth, response, subRequest );
             }
             else if ( ( isEnabled() && shouldHandleReport( request ) 
                 && !shouldIgnore( request.getThrowable() ) ) )
             {
+                getLogger().trace( "Automatic error report: '{}'", request.getThrowable().getMessage() );
                 IssueSubmissionRequest subRequest = buildRequest( request, auth.getLogin(), true );
 
                 List<Issue> existingIssues = retrieveIssues( subRequest.getSummary(), auth );
@@ -460,6 +462,8 @@ public class DefaultErrorReportingManager
         }
         
         File zipFile = getZipFile( "nexus-error-bundle-" + suffix, "zip" );
+        getLogger().debug( "Writing problem report bundle: '{}'", zipFile );
+
         OutputStream output = null;
         InputStream input = null;
 
