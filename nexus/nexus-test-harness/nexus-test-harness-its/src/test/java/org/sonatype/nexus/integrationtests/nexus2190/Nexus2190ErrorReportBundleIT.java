@@ -25,7 +25,7 @@ public class Nexus2190ErrorReportBundleIT
     public void validateBundle()
         throws Exception
     {
-        RequestFacade.sendMessage( "service/local/exception", Method.POST, null );
+        RequestFacade.sendMessage( "service/local/exception?status=500", Method.GET, null );
         
         ErrorReportUtil.validateZipContents( nexusWorkDir );
     }
