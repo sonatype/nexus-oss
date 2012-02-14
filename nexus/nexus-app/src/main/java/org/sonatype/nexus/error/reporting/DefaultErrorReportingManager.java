@@ -334,6 +334,23 @@ public class DefaultErrorReportingManager
                 }
             }
             response.setSuccess( true );
+
+            if ( getLogger().isInfoEnabled() )
+            {
+                String reason = "Nexus ignores this type of error";
+                if ( !isEnabled() )
+                {
+                    reason = "reporting is not enabled";
+                }
+                else if ( !shouldHandleReport( request ) )
+                {
+                    reason = "it has already being reported or it does not have an error message";
+                }
+                getLogger().info(
+                    "Detected Error in Nexus: {}. Skipping problem report generation because {}",
+                    getThrowableMessage( request.getThrowable() ), reason
+                );
+            }
         }
         catch ( Exception e )
         {
@@ -342,6 +359,15 @@ public class DefaultErrorReportingManager
         }
 
         return response;
+    }
+
+    private String getThrowableMessage( final Throwable throwable )
+    {
+        if ( throwable != null && StringUtils.isNotEmpty( throwable.getMessage() ) )
+        {
+            return throwable.getMessage();
+        }
+        return "(no exception message available)";
     }
 
     private void submitIssue( final AuthenticationSource auth, final ErrorReportResponse response,
