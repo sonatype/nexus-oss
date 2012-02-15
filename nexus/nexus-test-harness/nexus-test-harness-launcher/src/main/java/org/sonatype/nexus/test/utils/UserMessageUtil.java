@@ -106,8 +106,8 @@ public class UserMessageUtil
         UserResource responseResource;
         try {
             response = this.sendMessage( Method.PUT, user );
+            assertThat( response, isSuccessful() );
             responseResource = this.getResourceFromResponse( response );
-            assertThat(response, isSuccessful());
         } finally {
             RequestFacade.releaseResponse(response);
         }
