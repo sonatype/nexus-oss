@@ -16,6 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -152,7 +153,9 @@ public class DefaultTaskConfigManagerTest
         cst.setEnabled( true );
         cst.setName( "foo" );
         cst.setType( TestNexusTask.class.getName() );
-        cst.setNextRun( 4070973600000L ); // Thu Jan 01 20:00:00 EET 2099
+        cst.setNextRun( new SimpleDateFormat( "yyyy-MM-DD hh:mm:ss" ).parse( "2099-01-01 20:00:00" ).getTime() );
+
+        System.out.println(new Date(cst.getNextRun()));
 
         final CScheduleConfig csc = new CScheduleConfig();
         csc.setType( SCHEDULE_TYPE_ADVANCED );
