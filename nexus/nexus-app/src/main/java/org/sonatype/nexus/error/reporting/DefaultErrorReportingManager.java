@@ -47,6 +47,7 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CErrorReportingCoreConfiguration;
+import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
@@ -129,20 +130,19 @@ public class DefaultErrorReportingManager
         if ( getApplicationConfiguration().getConfigurationModel() != null )
         {
             configure( getApplicationConfiguration() );
+
+            CErrorReporting config = getCurrentConfiguration( false );
+            if ( config != null )
+            {
+                issueSubmitter.setServerUrl( config.getJiraUrl() );
+                issueRetriever.setServerUrl( config.getJiraUrl() );
+            }
+
+            AuthenticationSource credentials =
+                new DefaultAuthenticationSource( getValidJIRAUsername(), getValidJIRAPassword() );
+            issueSubmitter.setCredentials( credentials );
+            issueRetriever.setCredentials( credentials );
         }
-
-
-        CErrorReporting config = getCurrentConfiguration( false );
-        if ( config != null )
-        {
-            issueSubmitter.setServerUrl( config.getJiraUrl() );
-            issueRetriever.setServerUrl( config.getJiraUrl() );
-        }
-
-        AuthenticationSource credentials =
-            new DefaultAuthenticationSource( getValidJIRAUsername(), getValidJIRAPassword() );
-        issueSubmitter.setCredentials( credentials );
-        issueRetriever.setCredentials( credentials );
     }
 
     @Override
