@@ -383,6 +383,11 @@ public class Jetty7NexusBooter
                 jettyXmlString.replace( "<Set name=\"stopAtShutdown\">true</Set>",
                     "<!-- NexusBooter: Set name=\"stopAtShutdown\">true</Set-->" );
 
+            // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=357318#c62
+            jettyXmlString =
+                jettyXmlString.replace( "org.eclipse.jetty.server.nio.SelectChannelConnector",
+                                        "org.eclipse.jetty.server.nio.BlockingChannelConnector" );
+
             FileUtils.writeStringToFile( jettyXml, jettyXmlString, "UTF-8" );
         }
     }
