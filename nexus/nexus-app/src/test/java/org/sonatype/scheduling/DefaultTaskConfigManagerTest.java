@@ -24,10 +24,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import javax.inject.Named;
-
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -156,7 +152,7 @@ public class DefaultTaskConfigManagerTest
         cst.setEnabled( true );
         cst.setName( "foo" );
         cst.setType( TestNexusTask.class.getName() );
-        cst.setNextRun( 1329242400000L ); // Tue Feb 14 20:00:00 EET 2012
+        cst.setNextRun( 4070973600000L ); // Thu Jan 01 20:00:00 EET 2099
 
         final CScheduleConfig csc = new CScheduleConfig();
         csc.setType( SCHEDULE_TYPE_ADVANCED );
@@ -166,7 +162,7 @@ public class DefaultTaskConfigManagerTest
         defaultManager.initializeTasks( defaultScheduler, Arrays.asList( cst ));
 
         final ScheduledTask<?> task = defaultScheduler.getTaskById( cst.getId() );
-        assertThat( cst.getNextRun(), is( task.getNextRun().getTime() ) );
+        assertThat( new Date( task.getNextRun().getTime() ), is( new Date( cst.getNextRun() ) ) );
     }
 
     public void genericTestStore( String scheduleType, HashMap<String, Object> scheduleProperties )
