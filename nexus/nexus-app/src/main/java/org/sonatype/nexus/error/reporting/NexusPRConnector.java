@@ -22,8 +22,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.google.common.base.Preconditions;
-import org.apache.commons.httpclient.HttpHost;
 import org.apache.http.HttpException;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpRequest;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
