@@ -13,8 +13,6 @@
 package org.sonatype.nexus.error.reporting;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,24 +22,17 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import javax.inject.Inject;
-import javax.inject.Named;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.swizzle.IssueSubmissionResult;
 import org.codehaus.plexus.swizzle.IssueSubmitter;
 import org.codehaus.plexus.swizzle.jira.authentication.AuthenticationSource;
 import org.codehaus.plexus.swizzle.jira.authentication.DefaultAuthenticationSource;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.swizzle.jira.Issue;
@@ -49,8 +40,6 @@ import org.codehaus.swizzle.jira.Project;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.jira.AttachmentHandlerConfiguration;
-import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
@@ -58,10 +47,6 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CErrorReportingCoreConfiguration;
-import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
-import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
-import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
@@ -69,8 +54,6 @@ import org.sonatype.sisu.issue.IssueRetriever;
 import org.sonatype.sisu.pr.ProjectManager;
 import org.sonatype.sisu.pr.bundle.Archiver;
 import org.sonatype.sisu.pr.bundle.Bundle;
-import org.sonatype.sisu.pr.bundle.BundleManager;
-import sun.applet.AppletEventMulticaster;
 
 @Component( role = ErrorReportingManager.class )
 public class DefaultErrorReportingManager
@@ -91,9 +74,6 @@ public class DefaultErrorReportingManager
 
     @Requirement
     private Archiver archiver;
-
-    @Requirement
-    private AttachmentHandlerConfiguration remoteCfg;
 
     @Requirement
     private ProjectManager projectManager;
@@ -122,7 +102,6 @@ public class DefaultErrorReportingManager
                                   final IssueRetriever issueRetriever,
                                   final IssueSubmitter issueSubmitter,
                                   final ProjectManager projectManager,
-                                  final AttachmentHandlerConfiguration remoteCfg,
                                   final UserAgentBuilder uaBuilder,
                                   final NexusConfiguration nexusConfig,
                                   final ApplicationEventMulticaster applicationEventMulticaster )
@@ -133,7 +112,6 @@ public class DefaultErrorReportingManager
         this.issueSubmitter = issueSubmitter;
         this.nexusConfig = nexusConfig;
         this.projectManager = projectManager;
-        this.remoteCfg = remoteCfg;
         this.uaBuilder = uaBuilder;
     }
 
@@ -165,10 +143,6 @@ public class DefaultErrorReportingManager
             new DefaultAuthenticationSource( getValidJIRAUsername(), getValidJIRAPassword() );
         issueSubmitter.setCredentials( credentials );
         issueRetriever.setCredentials( credentials );
-
-        final RemoteStorageContext ctx = nexusConfig.getGlobalRemoteStorageContext();
-        final String ua = uaBuilder.formatUserAgentString( ctx );
-        remoteCfg.setUserAgent( ua );
     }
 
     @Override

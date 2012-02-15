@@ -15,30 +15,17 @@ package org.sonatype.nexus.error.reporting;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.contains;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.containsEntry;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.Resources;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.swizzle.jira.authentication.AuthenticationSource;
@@ -58,7 +45,6 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.scheduling.SchedulerTask;
-import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
 
 public class DefaultErrorReportingManagerTest
