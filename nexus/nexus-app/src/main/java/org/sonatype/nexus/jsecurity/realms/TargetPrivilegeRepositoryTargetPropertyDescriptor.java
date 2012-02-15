@@ -23,7 +23,7 @@ public class TargetPrivilegeRepositoryTargetPropertyDescriptor
     
     public String getHelpText()
     {
-        return "The Repository Target associated with this Privilege.";
+        return "The repository target associated with this privilege.";
     }
 
     public String getId()

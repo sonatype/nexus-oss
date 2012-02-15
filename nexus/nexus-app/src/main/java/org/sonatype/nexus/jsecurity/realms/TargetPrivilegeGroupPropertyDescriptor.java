@@ -23,7 +23,7 @@ public class TargetPrivilegeGroupPropertyDescriptor
     
     public String getHelpText()
     {
-        return "The Repository Group associated with this Privilege.";
+        return "The repository group associated with this privilege.";
     }
 
     public String getId()

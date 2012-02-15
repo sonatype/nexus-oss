@@ -23,7 +23,7 @@ public class RepositoryPropertyDescriptor
     
     public String getHelpText()
     {
-        return "The Repository associated with this Privilege.";
+        return "The repository associated with this privilege.";
     }
 
     public String getId()

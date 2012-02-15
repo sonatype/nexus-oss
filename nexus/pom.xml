@@ -157,14 +157,14 @@
     <logback.version>1.0.0</logback.version>
     <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
 
-    <aether.version>1.9</aether.version>
+    <aether.version>1.13</aether.version>
     <aspectj.version>1.6.11</aspectj.version>
     <commons-beanutils.baseVersion>1.7.0</commons-beanutils.baseVersion>
     <commons-beanutils.version>${commons-beanutils.baseVersion}-SONATYPE</commons-beanutils.version>
     <enunciate.version>1.20</enunciate.version>
     <jetty.version>7.6.0.v20120127</jetty.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
-    <maven.version>3.0.1</maven.version>
+    <maven.version>3.0.4</maven.version>
     <micromailer.version>1.1.1</micromailer.version>
     <nexus.repository.metadata.version>1.2</nexus.repository.metadata.version>
     <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
@@ -697,6 +697,11 @@
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
+        <artifactId>maven-settings-builder</artifactId>
+        <version>${maven.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
         <artifactId>maven-api</artifactId>
         <version>${maven.version}</version>
       </dependency>
@@ -869,7 +874,7 @@
       <dependency>
         <groupId>com.ning</groupId>
         <artifactId>async-http-client</artifactId>
-        <version>1.6.4</version>
+        <version>1.6.5</version>
       </dependency>
 
       <dependency>

@@ -22,7 +22,7 @@ public class ResourceStorePathPropertyDescriptor
     
     public ResourceStorePathPropertyDescriptor()
     {
-        setHelpText( "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")" );
+        setHelpText( "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")." );
         setRequired( false );
     }
  
