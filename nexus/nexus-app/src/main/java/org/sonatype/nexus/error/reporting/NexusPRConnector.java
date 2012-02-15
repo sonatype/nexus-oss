@@ -36,6 +36,7 @@ import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.params.ConnRouteParams;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.impl.client.ClientParamsStack;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.DefaultHttpRoutePlanner;
 import org.apache.http.params.BasicHttpParams;
@@ -207,43 +208,45 @@ public class NexusPRConnector
     static class NonProxyHostsAwareHttpRoutePlanner
         extends DefaultHttpRoutePlanner
     {
-    
+
         // ----------------------------------------------------------------------
         // Implementation fields
         // ----------------------------------------------------------------------
-    
+
         /**
          * Set of patterns for matching hosts names against. Never null.
          */
         private final Set<Pattern> nonProxyHostPatterns;
-    
+
         // ----------------------------------------------------------------------
         // Constructors
         // ----------------------------------------------------------------------
-    
+
         NonProxyHostsAwareHttpRoutePlanner( final SchemeRegistry schemeRegistry,
                                             final Set<Pattern> nonProxyHostPatterns )
         {
             super( schemeRegistry );
             this.nonProxyHostPatterns = Preconditions.checkNotNull( nonProxyHostPatterns );
         }
-    
+
         // ----------------------------------------------------------------------
         // Public methods
         // ----------------------------------------------------------------------
-    
+
         public HttpRoute determineRoute( final org.apache.http.HttpHost target,
                                          final HttpRequest request,
                                          final HttpContext context )
             throws HttpException
         {
             Object proxy = null;
+            ClientParamsStack stack = (ClientParamsStack) request.getParams();
+            HttpParams params = stack.getClientParams();
             if ( noProxyFor( target.getHostName() ) )
             {
-                proxy = request.getParams().getParameter( ConnRouteParams.DEFAULT_PROXY );
+                proxy = params.getParameter( ConnRouteParams.DEFAULT_PROXY );
                 if ( proxy != null )
                 {
-                    request.getParams().removeParameter( ConnRouteParams.DEFAULT_PROXY );
+                    params.removeParameter( ConnRouteParams.DEFAULT_PROXY );
                 }
             }
             try
@@ -254,15 +257,15 @@ public class NexusPRConnector
             {
                 if ( proxy != null )
                 {
-                    request.getParams().setParameter( ConnRouteParams.DEFAULT_PROXY, proxy );
+                    params.setParameter( ConnRouteParams.DEFAULT_PROXY, proxy );
                 }
             }
         }
-    
+
         // ----------------------------------------------------------------------
         // Implementation methods
         // ----------------------------------------------------------------------
-    
+
         private boolean noProxyFor( final String hostName )
         {
             for ( final Pattern nonProxyHostPattern : nonProxyHostPatterns )
@@ -274,6 +277,6 @@ public class NexusPRConnector
             }
             return false;
         }
-    
+
     }
 }
