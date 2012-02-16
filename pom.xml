@@ -173,10 +173,6 @@
 
     <plugins>
       <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-      <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>port-allocator-maven-plugin</artifactId>
         <version>1.0</version>
