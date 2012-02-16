@@ -219,6 +219,18 @@
       <groupId>org.sonatype.nexus.restlight</groupId>
       <artifactId>nexus-restlight-client-common</artifactId>
     </dependency>
+    <!-- We don't want to use a "nexus only" patched HttpClient 3.1 that is not in Central -->
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+      <version>3.1</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
@@ -332,10 +344,12 @@
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils-core</artifactId>
+      <version>1.7.0</version>
     </dependency>
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils-bean-collections</artifactId>
+      <version>1.7.0</version>
     </dependency>
     <dependency>
       <groupId>commons-collections</groupId>
