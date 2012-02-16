@@ -293,8 +293,6 @@ public class DefaultErrorReportingManager
 
     public ErrorReportResponse handleError( final ErrorReportRequest request, final AuthenticationSource auth )
     {
-        getLogger().error( "Detected Error in Nexus", request.getThrowable() );
-
         ErrorReportResponse response = new ErrorReportResponse();
 
         try
@@ -303,12 +301,14 @@ public class DefaultErrorReportingManager
             {
                 getLogger().trace( "Manual error report: '{}'", request.getTitle() );
                 IssueSubmissionRequest subRequest = buildRequest( request, auth.getLogin(), true );
+
                 submitIssue( auth, response, subRequest );
             }
             else if ( ( isEnabled() && shouldHandleReport( request ) 
                 && !shouldIgnore( request.getThrowable() ) ) )
             {
-                getLogger().trace( "Automatic error report: '{}'", request.getThrowable().getMessage() );
+                getLogger().info( "Detected Error in Nexus: {}. Generating a problem report...",
+                                  getThrowableMessage( request.getThrowable() )  );
                 IssueSubmissionRequest subRequest = buildRequest( request, auth.getLogin(), true );
 
                 List<Issue> existingIssues = retrieveIssues( subRequest.getSummary(), auth );
@@ -325,25 +325,26 @@ public class DefaultErrorReportingManager
                         "Not reporting problem as it already exists in database: "
                             + existingIssues.iterator().next().getLink() );
                 }
+            } else {
+                if ( getLogger().isInfoEnabled() )
+                {
+                    String reason = "Nexus ignores this type of error";
+                    if ( !isEnabled() )
+                    {
+                        reason = "reporting is not enabled";
+                    }
+                    else if ( !shouldHandleReport( request ) )
+                    {
+                        reason = "it has already being reported or it does not have an error message";
+                    }
+                    getLogger().info(
+                        "Detected Error in Nexus: {}. Skipping problem report generation because {}",
+                        getThrowableMessage( request.getThrowable() ), reason
+                    );
+                }
             }
-            response.setSuccess( true );
 
-            if ( getLogger().isInfoEnabled() )
-            {
-                String reason = "Nexus ignores this type of error";
-                if ( !isEnabled() )
-                {
-                    reason = "reporting is not enabled";
-                }
-                else if ( !shouldHandleReport( request ) )
-                {
-                    reason = "it has already being reported or it does not have an error message";
-                }
-                getLogger().info(
-                    "Detected Error in Nexus: {}. Skipping problem report generation because {}",
-                    getThrowableMessage( request.getThrowable() ), reason
-                );
-            }
+            response.setSuccess( true );
         }
         catch ( Exception e )
         {
