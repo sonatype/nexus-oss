@@ -229,7 +229,10 @@ public class DefaultFSAttributeStorage
                     catch ( IOException ex )
                     {
                         // NEXUS-4862 prevent zero length/corrupt files
-                        target.delete();
+                        if ( target.length() == 0 )
+                        {
+                            target.delete();
+                        }
                         throw ex;
                     }
                     finally
