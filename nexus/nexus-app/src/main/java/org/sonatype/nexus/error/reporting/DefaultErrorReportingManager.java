@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -366,11 +367,19 @@ public class DefaultErrorReportingManager
                               final IssueSubmissionRequest subRequest )
         throws IssueSubmissionException, IOException
     {
-        IssueSubmissionResult result = issueSubmitter.submit( subRequest, auth );
-        response.setCreated( true );
-        response.setJiraUrl( result.getIssueUrl() );
-        writeArchive( result.getBundles(), result.getKey() );
-        getLogger().info( "Problem report ticket " + result.getIssueUrl() + " was created." );
+        try
+        {
+            IssueSubmissionResult result = issueSubmitter.submit( subRequest, auth );
+            response.setCreated( true );
+            response.setJiraUrl( result.getIssueUrl() );
+            writeArchive( result.getBundles(), result.getKey() );
+            getLogger().info( "Problem report ticket " + result.getIssueUrl() + " was created." );
+        }
+        catch ( IssueSubmissionException e )
+        {
+            writeArchive( subRequest.getBundles(), "NOTSUBMITTED" );
+            throw e;
+        }
     }
 
     protected boolean shouldHandleReport( ErrorReportRequest request )
@@ -417,7 +426,7 @@ public class DefaultErrorReportingManager
         catch ( Exception e )
         {
             getLogger().error( "Unable to query JIRA server to find if error report already exists", e );
-            return null;
+            return Collections.emptyList();
         }
 
     }
@@ -441,9 +450,15 @@ public class DefaultErrorReportingManager
     }
 
     @VisibleForTesting
-    File writeArchive( Collection<Bundle> bundles, String suffix )
+    void writeArchive( Collection<Bundle> bundles, String suffix )
         throws IOException
     {
+        if ( bundles == null || bundles.isEmpty() )
+        {
+            getLogger().debug( "No problem report bundle assembled" );
+            return;
+        }
+
         Bundle bundle;
         if ( !( bundles.size() == 1 && "application/zip".equals(
             ( bundle = bundles.iterator().next() ).getContentType() ) ) )
@@ -469,7 +484,7 @@ public class DefaultErrorReportingManager
             IOUtil.close( output );
         }
         
-        return zipFile;
+        return;
     }
 
     @VisibleForTesting

@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.configuration;
 
-import javax.inject.Inject;
-
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;

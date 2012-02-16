@@ -64,20 +64,20 @@ public class ExceptionPlexusResource
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
-        try
-        {
-            ErrorReportRequest req = new ErrorReportRequest();
-            req.getContext().putAll( context.getAttributes() );
-            req.getContext().putAll( request.getAttributes() );
-            
-            manager.assembleBundle( req );
-        }
-        catch ( IOException e )
-        {
-            getLogger().error( "Unable to assemble bundle.", e );
-            
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
-        }
+//        try
+//        {
+//            ErrorReportRequest req = new ErrorReportRequest();
+//            req.getContext().putAll( context.getAttributes() );
+//            req.getContext().putAll( request.getAttributes() );
+//
+////            manager.assembleBundle( req );
+//        }
+//        catch ( IOException e )
+//        {
+//            getLogger().error( "Unable to assemble bundle.", e );
+//
+//            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
+//        }
         
         return null;
     }

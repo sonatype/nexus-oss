@@ -25,6 +25,8 @@ import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
@@ -33,6 +35,7 @@ import org.sonatype.nexus.rest.model.ErrorReportRequestDTO;
 import org.sonatype.nexus.rest.model.ErrorReportResponse;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
@@ -137,84 +140,21 @@ public class ErrorReportUtil
     public static void validateZipContents( File file )
         throws IOException
     {
-        boolean foundException = false;
-        // boolean foundFileList = false;
-        boolean foundContextList = false;
-        boolean foundLogbackProperties = false;
-        boolean foundLogbackXml = false;
-        boolean foundLogbackNexusXml = false;
-        boolean foundNexusXml = false;
-        boolean foundSecurityXml = false;
-        boolean foundSecurityConfigXml = false;
-        boolean foundOthers = false;
-
         ZipFile zipFile = new ZipFile( file );
 
-        Enumeration<? extends ZipEntry> enumeration = zipFile.entries();
-
-        while ( enumeration.hasMoreElements() )
-        {
-            ZipEntry entry = enumeration.nextElement();
-
-            if ( entry.getName().equals( "exception.txt" ) )
-            {
-                foundException = true;
-            }
-            // TODO: removed because the listing of the files OOM'd
-            // else if ( entry.getName().equals( "fileListing.txt" ) )
-            // {
-            // foundFileList = true;
-            // }
-            else if ( entry.getName().equals( "contextListing.txt" ) )
-            {
-                foundContextList = true;
-            }
-            else if ( entry.getName().equals( "logback.properties" ) )
-            {
-                foundLogbackProperties = true;
-            }
-            else if ( entry.getName().equals( "logback.xml" ) )
-            {
-                foundLogbackXml = true;
-            }
-            else if ( entry.getName().equals( "logback-nexus.xml" ) )
-            {
-                foundLogbackNexusXml = true;
-            }
-            else if ( entry.getName().equals( "nexus.xml" ) )
-            {
-                foundNexusXml = true;
-            }
-            else if ( entry.getName().equals( "security.xml" ) )
-            {
-                foundSecurityXml = true;
-            }
-            else if ( entry.getName().equals( "security-configuration.xml" ) )
-            {
-                foundSecurityConfigXml = true;
-            }
-            else
-            {
-                String confDir = AbstractNexusIntegrationTest.WORK_CONF_DIR;
-
-                // any extra plugin config goes in the zip, so if we find something from the conf dir that is ok.
-                if ( !new File( confDir, entry.getName() ).exists() )
-                {
-                    foundOthers = true;
-                }
-            }
+        try {
+            MatcherAssert.assertThat( zipFile, Matchers.allOf(
+                FileMatchers.containsEntry( "exception.txt" ),
+                FileMatchers.containsEntry( "nexus.xml" ),
+                FileMatchers.containsEntry( "security.xml" ),
+                FileMatchers.containsEntry( "security-configuration.xml" ),
+                FileMatchers.containsEntry( "contextListing.txt" ),
+                FileMatchers.containsEntry( "conf/logback.properties" ),
+                FileMatchers.containsEntry( "conf/logback-nexus.xml" ),
+                FileMatchers.containsEntry( "conf/logback.xml" )
+            ));
+        } finally {
+            zipFile.close();
         }
-
-        Assert.assertTrue( foundException );
-        // Assert.assertTrue( foundFileList );
-        Assert.assertTrue( foundContextList );
-        Assert.assertTrue( foundLogbackProperties );
-        Assert.assertTrue( foundLogbackXml );
-        Assert.assertTrue( foundLogbackNexusXml );
-        Assert.assertTrue( foundNexusXml );
-        Assert.assertTrue( foundSecurityXml );
-        Assert.assertTrue( foundSecurityConfigXml );
-        // plugins can input others!
-        // Assert.assertFalse( foundOthers );
     }
 }

@@ -57,9 +57,11 @@ public class ConfigFilesBundleAssembler
             @Override
             public boolean accept( File pathname )
             {
-                return !pathname.getName().endsWith( ".bak" ) && !pathname.getName().endsWith( "nexus.xml" )
-                    && !pathname.getName().endsWith( "security.xml" )
-                    && !pathname.getName().endsWith( "security-configuration.xml" );
+                return !pathname.getName().endsWith( ".bak" )
+                    // following files are written with the current in-memory model
+                    && !pathname.getName().equals( "nexus.xml" )
+                    && !pathname.getName().equals( "security.xml" )
+                    && !pathname.getName().equals( "security-configuration.xml" );
             }
         };
 
