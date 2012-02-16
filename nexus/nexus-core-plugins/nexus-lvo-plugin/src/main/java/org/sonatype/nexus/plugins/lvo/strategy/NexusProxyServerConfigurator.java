@@ -10,26 +10,28 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.error.reporting.bundle;
+package org.sonatype.nexus.plugins.lvo.strategy;
 
-import com.thoughtworks.xstream.XStream;
+import org.apache.commons.httpclient.HttpClient;
+import org.slf4j.Logger;
+import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.HttpClientProxyUtil;
+import org.sonatype.spice.utils.proxyserver.ProxyServerConfigurator;
 
-public class AbstractXmlHandler
+public class NexusProxyServerConfigurator
+    implements ProxyServerConfigurator
 {
-    /**
-     * XStream is used for a deep clone (TODO: not sure if this is a great idea)
-     */
-    private static XStream xstream = new XStream();
+    private Logger logger;
+    private RemoteStorageContext ctx;
     
-    protected static final String PASSWORD_MASK = "*****";
-    
-    protected Object cloneViaXml( Object configuration )
+    public NexusProxyServerConfigurator( RemoteStorageContext ctx, Logger logger )
     {
-        if ( configuration == null )
-        {
-            return null;
-        }
-        
-        return xstream.fromXML( xstream.toXML( configuration ) );
+        this.ctx = ctx;
+        this.logger = logger;
+    }
+    
+    public void applyToClient( HttpClient client )
+    {   
+        HttpClientProxyUtil.applyProxyToHttpClient( client, ctx, logger );
     }
 }

@@ -22,8 +22,6 @@ import java.io.Writer;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.util.IOUtil;
@@ -36,8 +34,8 @@ import org.sonatype.sisu.pr.bundle.ManagedBundle;
 import org.sonatype.sisu.pr.bundle.StorageManager;
 
 @Named( "security-configuration.xml" )
-public class SecurityConfigurationXmlHandler
-    extends AbstractXmlHandler
+public class SecurityConfigurationXmlAssembler
+    extends AbstractXmlAssembler
     implements BundleAssembler
 {
 
@@ -46,8 +44,8 @@ public class SecurityConfigurationXmlHandler
     StorageManager storageManager;
 
     @Inject
-    public SecurityConfigurationXmlHandler( final SecurityConfigurationSource source,
-                                            final StorageManager storageManager )
+    public SecurityConfigurationXmlAssembler( final SecurityConfigurationSource source,
+                                              final StorageManager storageManager )
     {
         this.source = source;
         this.storageManager = storageManager;

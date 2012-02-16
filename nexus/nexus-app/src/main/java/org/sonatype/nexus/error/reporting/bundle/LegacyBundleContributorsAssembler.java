@@ -35,7 +35,7 @@ import org.sonatype.sisu.pr.bundle.DirBundle;
 import org.sonatype.sisu.pr.bundle.ManagedBundle;
 import org.sonatype.sisu.pr.bundle.StorageManager;
 
-@Named
+@Named( "extra-content" )
 public class LegacyBundleContributorsAssembler
     implements BundleAssembler
 {

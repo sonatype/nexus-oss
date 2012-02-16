@@ -14,17 +14,13 @@ package org.sonatype.nexus.error.reporting.bundle;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
@@ -35,8 +31,8 @@ import org.sonatype.sisu.pr.bundle.ManagedBundle;
 import org.sonatype.sisu.pr.bundle.StorageManager;
 
 @Named( "security.xml" )
-public class SecurityXmlHandler
-    extends AbstractXmlHandler
+public class SecurityXmlAssembler
+    extends AbstractXmlAssembler
     implements BundleAssembler
 {
     SecurityModelConfigurationSource source;
@@ -44,7 +40,7 @@ public class SecurityXmlHandler
     StorageManager storageManager;
 
     @Inject
-    public SecurityXmlHandler( final SecurityModelConfigurationSource source, final StorageManager storageManager )
+    public SecurityXmlAssembler( final SecurityModelConfigurationSource source, final StorageManager storageManager )
     {
         this.source = source;
         this.storageManager = storageManager;

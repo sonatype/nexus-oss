@@ -48,7 +48,6 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CErrorReportingCoreConfiguration;
-import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
@@ -278,11 +277,10 @@ public class DefaultErrorReportingManager
     public ErrorReportResponse handleError( ErrorReportRequest request )
         throws IssueSubmissionException, IOException, GeneralSecurityException
     {
-        return handleError( request, getValidJIRAUsername(), getValidJIRAPassword(), true );
+        return handleError( request, getValidJIRAUsername(), getValidJIRAPassword() );
     }
 
-    public ErrorReportResponse handleError( ErrorReportRequest request, String username, String password,
-                                            boolean useGlobalHttpProxy )
+    public ErrorReportResponse handleError( ErrorReportRequest request, String username, String password )
         throws IssueSubmissionException, IOException, GeneralSecurityException
     {
         Preconditions.checkState( username != null, "No username for error reporting given" );

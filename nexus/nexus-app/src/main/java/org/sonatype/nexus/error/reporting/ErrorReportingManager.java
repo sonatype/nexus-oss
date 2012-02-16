@@ -42,17 +42,12 @@ public interface ErrorReportingManager
 
     void setJIRAPassword( String password );
 
-    boolean isUseGlobalProxy();
-
-    void setUseGlobalProxy( boolean val );
-
     // ==
 
     ErrorReportResponse handleError( ErrorReportRequest request )
         throws IssueSubmissionException, IOException, GeneralSecurityException;
 
-    ErrorReportResponse handleError( ErrorReportRequest request, String jiraUsername, String jiraPassword,
-                                     boolean useGlobalHttpProxy )
+    ErrorReportResponse handleError( ErrorReportRequest request, String jiraUsername, String jiraPassword )
         throws IssueSubmissionException, IOException, GeneralSecurityException;
 
 }

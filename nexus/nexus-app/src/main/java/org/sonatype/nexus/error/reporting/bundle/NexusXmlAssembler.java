@@ -18,8 +18,6 @@ import java.io.OutputStream;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.util.IOUtil;
@@ -33,8 +31,8 @@ import org.sonatype.sisu.pr.bundle.ManagedBundle;
 import org.sonatype.sisu.pr.bundle.StorageManager;
 
 @Named( "nexus.xml" )
-public class NexusXmlHandler
-    extends AbstractXmlHandler
+public class NexusXmlAssembler
+    extends AbstractXmlAssembler
     implements BundleAssembler
 {
 
@@ -45,8 +43,8 @@ public class NexusXmlHandler
     private StorageManager storageManager;
 
     @Inject
-    public NexusXmlHandler( final ConfigurationHelper configHelper, final NexusConfiguration nexusConfig,
-                            final StorageManager storageManager )
+    public NexusXmlAssembler( final ConfigurationHelper configHelper, final NexusConfiguration nexusConfig,
+                              final StorageManager storageManager )
     {
         this.configHelper = configHelper;
         this.nexusConfig = nexusConfig;

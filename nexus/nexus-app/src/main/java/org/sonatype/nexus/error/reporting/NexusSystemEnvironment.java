@@ -19,6 +19,9 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.sisu.pr.SystemEnvironmentContributor;
 
+/**
+ * Additional system environment info (Nexus version + edition)
+ */
 @Named( "nexus" )
 public class NexusSystemEnvironment
     implements SystemEnvironmentContributor

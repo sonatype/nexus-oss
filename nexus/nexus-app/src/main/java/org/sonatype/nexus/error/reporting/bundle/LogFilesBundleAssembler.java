@@ -26,7 +26,7 @@ import org.sonatype.sisu.pr.bundle.Bundle;
 import org.sonatype.sisu.pr.bundle.BundleAssembler;
 import org.sonatype.sisu.pr.bundle.FileBundle;
 
-@Named("logfile")
+@Named("nexus.log")
 public class LogFilesBundleAssembler
     implements BundleAssembler
 {

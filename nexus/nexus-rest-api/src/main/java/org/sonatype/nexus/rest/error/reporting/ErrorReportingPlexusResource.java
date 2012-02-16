@@ -108,7 +108,6 @@ public class ErrorReportingPlexusResource
 
             manager.setJIRAUsername( settings.getJiraUsername() );
             manager.setJIRAPassword( getActualPassword( settings.getJiraPassword(), manager.getJIRAPassword() ) );
-            manager.setUseGlobalProxy( true );
 
             try
             {
@@ -139,8 +138,8 @@ public class ErrorReportingPlexusResource
                 && !StringUtils.isEmpty( settings.getJiraUsername() ) )
             {
                 genRes =
-                    manager.handleError( genReq, settings.getJiraUsername(), settings.getJiraPassword(),
-                                         manager.isUseGlobalProxy() );
+                    manager.handleError( genReq, settings.getJiraUsername(), settings.getJiraPassword()
+                    );
             }
             else
             {

@@ -57,7 +57,9 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 
 /**
+ * NexusConfiguration-aware connector for the attachment parts of sisu-problem-reporting.
  *
+ * TODO: this is mostly c&p from remote storage, change this if NEXUS-4689 ever happens.
  */
 @Named
 public class NexusPRConnector
