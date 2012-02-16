@@ -43,7 +43,7 @@
         
         <Set name="host">${application-host}</Set>
         
-        <!-- This is also an option, if you want to use plexus.properties to control this port:
+        <!-- This is also an option, if you want to use nexus.properties to control this port:
         <Set name="port">${application-port}</Set>
         -->
       </New>
@@ -56,7 +56,7 @@
              slows down Jetty's startup significantly. -->
         <Call name="addLifeCycleListener">
             <Arg>
-              <New class="org.sonatype.plexus.jetty.custom.DisableTagLibsListener" />
+              <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener" />
             </Arg>
         </Call>
     </New>

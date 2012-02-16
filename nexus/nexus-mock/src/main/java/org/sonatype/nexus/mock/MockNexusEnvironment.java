@@ -31,11 +31,11 @@ import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.sonatype.guice.bean.binders.MergedModule;
 import org.sonatype.guice.bean.reflect.ClassSpace;
-import org.sonatype.plexus.jetty.Jetty7;
-import org.sonatype.plexus.jetty.mangler.ContextAttributeGetterMangler;
-import org.sonatype.plexus.jetty.mangler.ContextGetterMangler;
-import org.sonatype.plexus.jetty.mangler.DisableShutdownHookMangler;
-import org.sonatype.plexus.jetty.util.JettyUtils;
+import org.sonatype.sisu.jetty.Jetty8;
+import org.sonatype.sisu.jetty.mangler.ContextAttributeGetterMangler;
+import org.sonatype.sisu.jetty.mangler.ContextGetterMangler;
+import org.sonatype.sisu.jetty.mangler.DisableShutdownHookMangler;
+import org.sonatype.sisu.jetty.util.JettyUtils;
 
 import com.google.inject.Module;
 
@@ -54,7 +54,7 @@ public class MockNexusEnvironment
     /** Copied from org.sonatype.nexus.web.PlexusContainerContextListener to not have direct dep */
     public static final String CUSTOM_MODULES = "customModules";
 
-    private Jetty7 jetty7;
+    private Jetty8 jetty8;
 
     private File bundleBasedir;
 
@@ -97,13 +97,13 @@ public class MockNexusEnvironment
         // tamper the port
         tamperJettyConfiguration( bundleBasedir, port );
 
-        this.jetty7 = new Jetty7( new File( bundleBasedir, "conf/jetty.xml" ), contexts );
+        this.jetty8 = new Jetty8( new File( bundleBasedir, "conf/jetty.xml" ), contexts );
 
         // override stop at shutdown
-        this.jetty7.mangleServer( new DisableShutdownHookMangler() );
+        this.jetty8.mangleServer( new DisableShutdownHookMangler() );
 
         // set system classpath priority (opposite of the "default" webapp classloading!)
-        WebAppContext nexusContext = (WebAppContext) this.jetty7.mangleServer( new ContextGetterMangler( "/nexus" ) );
+        WebAppContext nexusContext = (WebAppContext) this.jetty8.mangleServer( new ContextGetterMangler( "/nexus" ) );
         nexusContext.setParentLoaderPriority( true );
         nexusContext.setAttribute( CUSTOM_MODULES,
             new Module[] { new PlexusResourceInterceptorModule() } );
@@ -168,13 +168,13 @@ public class MockNexusEnvironment
     public void start()
         throws Exception
     {
-        jetty7.startJetty();
+        jetty8.startJetty();
     }
 
     public void stop()
         throws Exception
     {
-        jetty7.stopJetty();
+        jetty8.stopJetty();
     }
 
     public PlexusContainer getPlexusContainer()
@@ -184,7 +184,7 @@ public class MockNexusEnvironment
             final ContextAttributeGetterMangler plexusGetter =
                 new ContextAttributeGetterMangler( "/nexus", PlexusConstants.PLEXUS_KEY );
 
-            plexusContainer = (PlexusContainer) jetty7.mangleServer( plexusGetter );
+            plexusContainer = (PlexusContainer) jetty8.mangleServer( plexusGetter );
         }
 
         return plexusContainer;

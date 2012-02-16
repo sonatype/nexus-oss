@@ -53,7 +53,7 @@
              slows down Jetty's startup significantly. -->
         <Call name="addLifeCycleListener">
             <Arg>
-              <New class="org.sonatype.plexus.jetty.custom.DisableTagLibsListener" />
+              <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener" />
             </Arg>
         </Call>
     </New>
@@ -75,7 +75,7 @@
                 <Array type="org.eclipse.jetty.rewrite.handler.Rule">
                     <Item>
                       <New id="redirecedHttps"
-                          class="org.sonatype.plexus.jetty.custom.RedirectToHttpsRule">
+                          class="org.sonatype.sisu.jetty.custom.RedirectToHttpsRule">
                           <Set name="httpsPort">${application-port-ssl}</Set>
                       </New>
                     </Item>

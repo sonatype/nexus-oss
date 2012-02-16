@@ -161,7 +161,7 @@
     <aspectj.version>1.6.11</aspectj.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <enunciate.version>1.20</enunciate.version>
-    <jetty.version>7.6.0.v20120127</jetty.version>
+    <jetty.version>8.1.0.v20120127</jetty.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
     <maven.version>3.0.4</maven.version>
     <micromailer.version>1.1.1</micromailer.version>
@@ -174,7 +174,8 @@
     <plexus-interpolation.version>1.14</plexus-interpolation.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
     <plexus-jetty7.version>1.2</plexus-jetty7.version>
-    <plexus-jetty-testsuite.version>2.0</plexus-jetty-testsuite.version>
+    <sisu-jetty8.version>1.0-SNAPSHOT</sisu-jetty8.version>
+    <plexus-jetty-testsuite.version>2.1-SNAPSHOT</plexus-jetty-testsuite.version>
     <plexus.restlet.bridge.version>1.18</plexus.restlet.bridge.version>
     <plexus-security.version>2.4</plexus-security.version>
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
@@ -300,6 +301,11 @@
 
       <!-- Jetty -->
       <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>3.0.1</version>
+      </dependency>
+      <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-webapp</artifactId>
         <version>${jetty.version}</version>
@@ -312,6 +318,11 @@
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-security</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-server</artifactId>
         <version>${jetty.version}</version>
       </dependency>
       <dependency>
@@ -379,6 +390,11 @@
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-jetty7</artifactId>
         <version>${plexus-jetty7.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-jetty8</artifactId>
+        <version>${sisu-jetty8.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.plexus</groupId>
@@ -1026,19 +1042,19 @@
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>server-provider</artifactId>
-        <version>0.5.0</version>
+        <version>0.5.1-SNAPSHOT</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>junit-runner</artifactId>
-        <version>0.5.0</version>
+        <version>0.5.1-SNAPSHOT</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>testng-runner</artifactId>
-        <version>0.5.0</version>
+        <version>0.5.1-SNAPSHOT</version>
         <scope>test</scope>
       </dependency>
 
@@ -1421,6 +1437,7 @@
                   </excludes>
                   <includes>
                     <include>org.eclipse.jetty:*:${jetty.version}</include>
+                    <include>org.mortbay.jetty:servlet-api</include>
                   </includes>
                   <message>Use the Eclipse/Jetty version defined in nexus parent. See jetty.version property</message>
                 </bannedDependencies>

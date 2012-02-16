@@ -102,7 +102,7 @@
         <include>javax.servlet:*</include>
         <include>org.eclipse.jetty:*</include>
         <include>org.codehaus.plexus:*</include>
-        <include>org.sonatype.plexus:*</include>
+        <include>org.sonatype.sisu:*</include>
         <include>org.sonatype.appcontext:*</include>
       </includes>
       <useProjectArtifact>false</useProjectArtifact>
