@@ -344,12 +344,10 @@
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils-core</artifactId>
-      <version>1.7.0</version>
     </dependency>
     <dependency>
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils-bean-collections</artifactId>
-      <version>1.7.0</version>
     </dependency>
     <dependency>
       <groupId>commons-collections</groupId>
