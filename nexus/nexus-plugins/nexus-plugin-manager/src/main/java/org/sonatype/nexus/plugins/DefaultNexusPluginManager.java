@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -181,14 +182,14 @@ public final class DefaultNexusPluginManager
 
         nextInstalledEntry: for ( Map.Entry<GAVCoordinate, PluginMetadata> installedEntry : installedPlugins.entrySet() )
         {
-            for ( Map.Entry<GAVCoordinate, PluginMetadata> resultEntry : result.entrySet() )
+            for ( Iterator<Map.Entry<GAVCoordinate, PluginMetadata>> resultItr = result.entrySet().iterator(); resultItr.hasNext(); )
             {
+                final Map.Entry<GAVCoordinate, PluginMetadata> resultEntry = resultItr.next();
                 if ( resultEntry.getKey().matchesByGA( installedEntry.getKey() ) )
                 {
                     if ( compareVersionStrings( resultEntry.getKey().getVersion(), installedEntry.getKey().getVersion() ) < 0 )
                     {
-                        // result contains smaller version than installedOne, remove it
-                        result.remove( resultEntry.getKey() );
+                        resultItr.remove(); // result contains smaller version than installedOne, remove it
                     }
                     else
                     {
