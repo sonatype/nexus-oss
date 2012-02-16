@@ -109,7 +109,7 @@ public class Jetty8
 
         public JettyWrapperThread( final Server server )
         {
-            super( "jetty7-main-thread-" + INSTANCE_COUNTER.getAndIncrement() );
+            super( "jetty-main-thread-" + INSTANCE_COUNTER.getAndIncrement() );
             this.server = server;
             this.started = new CountDownLatch( 1 );
             this.stopped = new CountDownLatch( 1 );

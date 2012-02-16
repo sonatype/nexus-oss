@@ -85,7 +85,7 @@ public class Jetty8WrapperListener
             // Ignore this event, it's just user logged out and we are a service, so continue running
             if ( WrapperManager.isDebugEnabled() )
             {
-                WrapperManager.log( WrapperManager.WRAPPER_LOG_LEVEL_DEBUG, "Jetty7WrapperListener: controlEvent("
+                WrapperManager.log( WrapperManager.WRAPPER_LOG_LEVEL_DEBUG, "Jetty8WrapperListener: controlEvent("
                     + event + ") Ignored" );
             }
         }
@@ -93,7 +93,7 @@ public class Jetty8WrapperListener
         {
             if ( WrapperManager.isDebugEnabled() )
             {
-                WrapperManager.log( WrapperManager.WRAPPER_LOG_LEVEL_DEBUG, "Jetty7WrapperListener: controlEvent("
+                WrapperManager.log( WrapperManager.WRAPPER_LOG_LEVEL_DEBUG, "Jetty8WrapperListener: controlEvent("
                     + event + ") Stopping" );
             }
 
@@ -123,7 +123,7 @@ public class Jetty8WrapperListener
         else
         {
             WrapperManager.log( WrapperManager.WRAPPER_LOG_LEVEL_FATAL,
-                "First supplied app parameter should be path to existing jetty7 XML configuration file!" );
+                "First supplied app parameter should be path to existing Jetty8 XML configuration file!" );
 
             WrapperManager.stop( 1 );
         }
