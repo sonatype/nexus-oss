@@ -438,17 +438,9 @@
                       <type>tar.gz</type>
                     </artifactItem>
                     <artifactItem>
-                      <groupId>org.mortbay.jetty</groupId>
-                      <artifactId>jetty</artifactId>
-                      <version>6.1.26</version>
-                      <classifier>bundle</classifier>
-                      <type>zip</type>
-                    </artifactItem>
-                    <artifactItem>
                       <groupId>org.eclipse.jetty</groupId>
                       <artifactId>jetty-distribution</artifactId>
-                      <version>7.2.0.v20101020</version>
-                      <classifier>bundle</classifier>
+                      <version>${jetty.version}</version>
                       <type>tar.gz</type>
                     </artifactItem>
                   </artifactItems>

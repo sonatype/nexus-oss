@@ -21,8 +21,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.handler.AbstractHandler;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 
 public class TouchTrackingHandler
     extends AbstractHandler
@@ -35,7 +36,7 @@ public class TouchTrackingHandler
         this.touchedTargets = new ArrayList<String>();
     }
 
-    public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+    public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
         throws IOException, ServletException
     {
         touchedTargets.add( target );

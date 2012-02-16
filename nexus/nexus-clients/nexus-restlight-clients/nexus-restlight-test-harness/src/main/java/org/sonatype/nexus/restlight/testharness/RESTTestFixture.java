@@ -12,8 +12,8 @@
  */
 package org.sonatype.nexus.restlight.testharness;
 
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Server;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
 
 /**
  * <p>

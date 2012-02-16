@@ -14,7 +14,7 @@
 							<servletInfo>
 								<mapping>/*</mapping>
 								<servletClass>
-									org.mortbay.jetty.servlet.DefaultServlet
+									org.eclipse.jetty.servlet.DefaultServlet
 								</servletClass>
 								<parameters>
 									<property>
@@ -43,7 +43,7 @@
 							<servletInfo>
 								<mapping>/*</mapping>
 								<servletClass>
-									org.mortbay.jetty.servlet.DefaultServlet
+									org.eclipse.jetty.servlet.DefaultServlet
 								</servletClass>
 								<parameters>
 									<property>
@@ -72,7 +72,7 @@
 							<servletInfo>
 								<mapping>/*</mapping>
 								<servletClass>
-									org.mortbay.jetty.servlet.DefaultServlet
+									org.eclipse.jetty.servlet.DefaultServlet
 								</servletClass>
 								<parameters>
 									<property>

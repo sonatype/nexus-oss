@@ -12,10 +12,10 @@
  */
 package org.sonatype.nexus.restlight.testharness;
 
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,8 +102,9 @@ public class ConversationalFixture
 
             private int conversationIndex = 0;
 
-            public void handle( final String target, final HttpServletRequest request, final HttpServletResponse response, final int dispatch )
-            throws IOException, ServletException
+            public void handle( final String target, final Request baseRequest,
+                                final HttpServletRequest request, final HttpServletResponse response )
+                throws IOException, ServletException
             {
                 Logger logger = LoggerFactory.getLogger( ConversationalFixture.class );
 
@@ -127,7 +128,7 @@ public class ConversationalFixture
                 {
                     RESTTestFixture fixture = conversation.get( conversationIndex++ );
 
-                    fixture.getTestHandler().handle( target, request, response, dispatch );
+                    fixture.getTestHandler().handle( target, baseRequest, request, response );
 
                     traversedConversation.add( fixture );
                 }
