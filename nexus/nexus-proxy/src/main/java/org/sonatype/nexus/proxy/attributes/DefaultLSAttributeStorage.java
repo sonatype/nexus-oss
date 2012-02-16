@@ -239,7 +239,7 @@ public class DefaultLSAttributeStorage
 
                 if ( attributeItem.getLength() == 0 )
                 {
-                    // NEXUS-4862
+                    // NEXUS-4871
                     throw new InvalidInputException( "Attribute of " + uid + " is empty!" );
                 }
 

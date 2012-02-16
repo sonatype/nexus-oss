@@ -196,6 +196,7 @@ public class DefaultAttributeStorageTest
     public void testZeroLenghtFSAttributeStorage()
         throws Exception
     {
+        // NEXUS-4871
         ApplicationConfiguration appCfg = lookup( ApplicationConfiguration.class );
         File workDir = appCfg.getWorkingDirectory( "proxy/attributes-ng" );
         workDir.mkdirs();
@@ -241,6 +242,7 @@ public class DefaultAttributeStorageTest
     public void testZeroLenghtLSAttributeStorage()
         throws Exception
     {
+        // NEXUS-4871
         RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "a/b/c.txt" );
 
         File attFile = new File( localStorageDirectory, ".nexus/attributes/" + uid.getPath() );

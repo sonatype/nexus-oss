@@ -140,14 +140,14 @@ public class DefaultFSPeer
                     !item.getRepositoryItemUid().getBooleanAttributeValue( IsItemAttributeMetacontentAttribute.class );
 
                 if ( target != null && ( isCleanupNeeded ||
-                // NEXUS-4862 prevent zero length/corrupt files
+                // NEXUS-4871 prevent zero length/corrupt files
                     target.length() == 0 ) )
                 {
                     target.delete();
                 }
 
                 if ( hiddenTarget != null && ( isCleanupNeeded ||
-                // NEXUS-4862 prevent zero length/corrupt files
+                // NEXUS-4871 prevent zero length/corrupt files
                     hiddenTarget.length() == 0 ) )
                 {
                     hiddenTarget.delete();

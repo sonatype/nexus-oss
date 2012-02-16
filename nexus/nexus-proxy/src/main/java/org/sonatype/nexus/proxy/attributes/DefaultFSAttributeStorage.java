@@ -228,7 +228,7 @@ public class DefaultFSAttributeStorage
                     }
                     catch ( IOException ex )
                     {
-                        // NEXUS-4862 prevent zero length/corrupt files
+                        // NEXUS-4871 prevent zero length/corrupt files
                         if ( target.length() == 0 )
                         {
                             target.delete();
@@ -317,7 +317,7 @@ public class DefaultFSAttributeStorage
             {
                 if ( target.length() == 0 )
                 {
-                    // NEXUS-4862
+                    // NEXUS-4871
                     throw new InvalidInputException( "Attribute of " + uid + " is empty!" );
                 }
 
