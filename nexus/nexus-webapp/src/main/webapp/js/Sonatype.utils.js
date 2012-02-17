@@ -914,8 +914,13 @@
       {
         token = window.location.hash.substring(1);
       }
-
-      if (token && Sonatype.user.curr.repoServer && Sonatype.user.curr.repoServer.length)
+      
+      Sonatype.view.historyDisabled = true;
+      var eventResult = Sonatype.Events.fireEvent('historyChanged',token);
+      Sonatype.view.historyDisabled = false;
+      
+      //if event returns true, that means no event listener handled the data and stopped the process, so handle by default means
+      if (token && Sonatype.user.curr.repoServer && Sonatype.user.curr.repoServer.length && eventResult)
       {
         Sonatype.view.historyDisabled = true;
 
