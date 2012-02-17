@@ -129,10 +129,8 @@ public final class JettyUtils
 
         try
         {
-            // Interpolate jetty.xml
-            final String interpolatedConfig = appContext.getInterpolator().interpolate( rawConfig );
-
-            new XmlConfiguration( new ByteArrayInputStream( interpolatedConfig.getBytes( "UTF-8" ) ) ).configure( server );
+            // Interpolate jetty.xml and apply it to server
+            new XmlConfiguration( new ByteArrayInputStream( appContext.interpolate( rawConfig ).getBytes( "UTF-8" ) ) ).configure( server );
         }
         catch ( Exception e )
         {
