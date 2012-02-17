@@ -226,6 +226,15 @@ public class DefaultFSAttributeStorage
 
                         marshaller.marshal( attributes, fos );
                     }
+                    catch ( IOException ex )
+                    {
+                        // NEXUS-4871 prevent zero length/corrupt files
+                        if ( target.length() == 0 )
+                        {
+                            target.delete();
+                        }
+                        throw ex;
+                    }
                     finally
                     {
                         Closeables.closeQuietly( fos );
@@ -306,6 +315,12 @@ public class DefaultFSAttributeStorage
 
             try
             {
+                if ( target.length() == 0 )
+                {
+                    // NEXUS-4871
+                    throw new InvalidInputException( "Attribute of " + uid + " is empty!" );
+                }
+
                 fis = new FileInputStream( target );
 
                 result = marshaller.unmarshal( fis );
