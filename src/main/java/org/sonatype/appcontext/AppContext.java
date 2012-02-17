@@ -53,6 +53,7 @@ public interface AppContext
      * Interpolates passed in string using this app context as source.
      * 
      * @return
+     * @since 3.0
      */
     String interpolate( String input )
         throws AppContextInterpolationException;

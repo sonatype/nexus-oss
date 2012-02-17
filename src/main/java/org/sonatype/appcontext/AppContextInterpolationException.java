@@ -4,6 +4,7 @@ package org.sonatype.appcontext;
  * Thrown when some fatal exception happens during interpolation, like cycle detected in expressions.
  * 
  * @author cstamas
+ * @since 3.0
  */
 public class AppContextInterpolationException
     extends AppContextException
