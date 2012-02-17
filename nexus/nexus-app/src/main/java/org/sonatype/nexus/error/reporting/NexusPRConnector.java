@@ -199,7 +199,10 @@ public class NexusPRConnector
     @Override
     public void dispose()
     {
-        client.getConnectionManager().shutdown();
+        if ( client != null )
+        {
+            client.getConnectionManager().shutdown();
+        }
     }
 
     /**
