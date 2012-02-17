@@ -37,7 +37,6 @@
 
     <plugin-repository.directory>${project.build.finalName}/WEB-INF/plugin-repository</plugin-repository.directory>
     <optional-plugins.directory>${project.build.finalName}/WEB-INF/optional-plugins</optional-plugins.directory>
-    <jetty.version>7.4.4.v20110707</jetty.version>
   </properties>
 
   <dependencies>
@@ -446,8 +445,8 @@
 
       <plugin>
         <groupId>org.mortbay.jetty</groupId>
-        <artifactId>maven-jetty-plugin</artifactId>
-        <version>6.1.19</version>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>${jetty.version}</version>
         <configuration>
           <webXml>${basedir}/src/main/webapp-war-extras/WEB-INF/web.xml</webXml>
         </configuration>

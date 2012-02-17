@@ -20,18 +20,19 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerCollection;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.security.Constraint;
-import org.mortbay.jetty.security.ConstraintMapping;
-import org.mortbay.jetty.security.HashUserRealm;
-import org.mortbay.jetty.security.SecurityHandler;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.security.Credential;
 
 public class AuthenticationServer
 {
@@ -40,7 +41,7 @@ public class AuthenticationServer
 
     private final List<String> accessedUri;
 
-    private final HashUserRealm userRealm;
+    private final HashLoginService loginService;
 
     public List<String> getAccessedUri()
     {
@@ -64,16 +65,17 @@ public class AuthenticationServer
         cm.setConstraint( constraint );
         cm.setPathSpec( "/*" );
 
-        SecurityHandler sh = new SecurityHandler();
-        userRealm = new HashUserRealm( "MyRealm" );
-        sh.setUserRealm( userRealm );
+        ConstraintSecurityHandler sh = new ConstraintSecurityHandler();
+        loginService = new HashLoginService( "MyRealm" );
+        sh.setLoginService( loginService );
         sh.setConstraintMappings( new ConstraintMapping[] { cm } );
+        sh.setStrict( false );
 
         accessedUri = new ArrayList<String>();
 
         Handler handler = new AbstractHandler()
         {
-            public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+            public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
                 throws IOException, ServletException
             {
                 response.setContentType( "text/html" );
@@ -85,9 +87,10 @@ public class AuthenticationServer
         };
 
         HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers( new Handler[] { sh, handler, new DefaultHandler() } );
+        handlers.setHandlers( new Handler[] { handler, new DefaultHandler() } );
 
-        server.setHandler( handlers );
+        sh.setHandler( handlers );
+        server.setHandler( sh );
 
     }
 
@@ -99,11 +102,7 @@ public class AuthenticationServer
 
     public void addUser( String name, String password, String... roles )
     {
-        userRealm.put( name, password );
-        for ( String role : roles )
-        {
-            userRealm.addUserToRole( name, role );
-        }
+        loginService.putUser( name, Credential.getCredential( password ), roles );
     }
 
     public void stop()

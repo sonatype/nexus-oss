@@ -17,10 +17,10 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -214,8 +214,9 @@ extends AbstractRESTTestFixture
     {
         return new AbstractHandler()
         {
-            public void handle( final String target, final HttpServletRequest request, final HttpServletResponse response, final int dispatch )
-            throws IOException, ServletException
+            public void handle( final String target, final Request baseRequest,
+                                final HttpServletRequest request, final HttpServletResponse response )
+                throws IOException, ServletException
             {
                 Logger logger = LoggerFactory.getLogger( POSTFixture.class );
 

@@ -12,8 +12,6 @@
  */
 package org.sonatype.nexus.tasks;
 
-import java.io.IOException;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.index.IndexerManager;
@@ -48,20 +46,13 @@ public class DownloadIndexesTask
     protected Object doRun()
         throws Exception
     {
-        try
+        if ( getRepositoryId() != null )
         {
-            if ( getRepositoryId() != null )
-            {
-                indexerManager.downloadRepositoryIndex( getRepositoryId() );
-            }
-            else
-            {
-                indexerManager.downloadAllIndex();
-            }
+            indexerManager.downloadRepositoryIndex( getRepositoryId() );
         }
-        catch ( IOException e )
+        else
         {
-            getLogger().error( "Cannot download indexes!", e );
+            indexerManager.downloadAllIndex();
         }
 
         return null;

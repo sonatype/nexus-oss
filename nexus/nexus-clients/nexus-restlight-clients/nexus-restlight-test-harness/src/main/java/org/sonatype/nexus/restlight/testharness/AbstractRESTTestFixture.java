@@ -14,13 +14,13 @@ package org.sonatype.nexus.restlight.testharness;
 
 import java.net.ServerSocket;
 
-
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.HandlerWrapper;
-import org.mortbay.jetty.security.Constraint;
-import org.mortbay.jetty.security.ConstraintMapping;
-import org.mortbay.jetty.security.HashUserRealm;
-import org.mortbay.jetty.security.SecurityHandler;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.security.Credential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -152,23 +152,20 @@ public abstract class AbstractRESTTestFixture
         cm.setConstraint( constraint );
         cm.setPathSpec( "/*" );
 
-        SecurityHandler securityHandler = new SecurityHandler();
+        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
         securityHandler.setAuthMethod( NxBasicAuthenticator.AUTH_TYPE );
         securityHandler.setAuthenticator( new NxBasicAuthenticator() );
 
-        HashUserRealm securityRealm = new HashUserRealm( "Nexus REST Test Fixture" );
+        HashLoginService loginService = new HashLoginService( "Nexus REST Test Fixture" );
 
-        securityRealm.put( authUser, authPassword );
-        securityRealm.addUserToRole( authUser, "allowed" );
+        loginService.putUser( authUser, Credential.getCredential( authPassword ), new String[] { "allowed" } );
 
-        securityHandler.setUserRealm( securityRealm );
+        securityHandler.setLoginService( loginService );
         securityHandler.setConstraintMappings( new ConstraintMapping[] { cm } );
+        securityHandler.setStrict( false );
 
-        HandlerWrapper wrapper = new HandlerWrapper();
-        wrapper.addHandler( getTestHandler() );
-        wrapper.addHandler( securityHandler );
-
-        server.setHandler( wrapper );
+        securityHandler.setHandler( getTestHandler() );
+        server.setHandler( securityHandler );
 
         server.start();
     }

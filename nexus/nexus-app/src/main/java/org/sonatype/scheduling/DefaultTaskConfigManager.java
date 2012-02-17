@@ -136,8 +136,11 @@ public class DefaultTaskConfigManager
 
     public void initializeTasks( Scheduler scheduler )
     {
-        List<CScheduledTask> tasks = new ArrayList<CScheduledTask>( getCurrentConfiguration( false ) );
+        initializeTasks( scheduler, new ArrayList<CScheduledTask>( getCurrentConfiguration( false ) ) );
+    }
 
+    void initializeTasks( Scheduler scheduler, List<CScheduledTask> tasks )
+    {
         if ( tasks != null )
         {
             List<CScheduledTask> tempList = new ArrayList<CScheduledTask>( tasks );
@@ -410,7 +413,14 @@ public class DefaultTaskConfigManager
 
         if ( nextRun != null )
         {
-            schedule.getIterator().resetFrom( nextRun );
+            Date resetFrom = nextRun;
+            // NEXUS-4465: Cron schedule will add 1 second to given time to calculate next scheduled time
+            // so we subtract it in case that next schedule is actually a valid time to run
+            if ( schedule instanceof CronSchedule )
+            {
+                resetFrom = new Date( resetFrom.getTime() - 1000 );
+            }
+            schedule.getIterator().resetFrom( resetFrom );
         }
 
         return schedule;

@@ -18,7 +18,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.jetty.handler.AbstractHandler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 
 public class RequestHandler
     extends AbstractHandler
@@ -26,7 +27,7 @@ public class RequestHandler
 
     private String userAgent;
 
-    public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+    public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
         throws IOException, ServletException
     {
         this.userAgent = request.getHeader( "User-Agent" );

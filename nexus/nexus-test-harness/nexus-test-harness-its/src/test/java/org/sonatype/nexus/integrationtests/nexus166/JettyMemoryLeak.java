@@ -19,10 +19,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.swing.JOptionPane;
 
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -41,7 +41,7 @@ public class JettyMemoryLeak
         {
             private int[] ints = new int[1024 * 1024];
 
-            public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
+            public void handle( String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response )
                 throws IOException, ServletException
             {
                 int[] cache = ints;

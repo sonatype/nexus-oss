@@ -12,7 +12,12 @@
  */
 package org.sonatype.scheduling;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +28,7 @@ import java.util.concurrent.Callable;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
@@ -136,6 +142,30 @@ public class DefaultTaskConfigManagerTest
         HashMap<String, Object> scheduleProperties = new HashMap<String, Object>();
         scheduleProperties.put( PROPERTY_KEY_CRON_EXPRESSION, CRON_EXPRESSION );
         genericTestStore( SCHEDULE_TYPE_ADVANCED, scheduleProperties );
+    }
+
+    @Test
+    public void testInitializeCronSchedule()
+        throws Exception
+    {
+        final CScheduledTask cst = new CScheduledTask();
+        cst.setId( "foo-" + System.currentTimeMillis() );
+        cst.setEnabled( true );
+        cst.setName( "foo" );
+        cst.setType( TestNexusTask.class.getName() );
+        cst.setNextRun( new SimpleDateFormat( "yyyy-MM-DD hh:mm:ss" ).parse( "2099-01-01 20:00:00" ).getTime() );
+
+        System.out.println(new Date(cst.getNextRun()));
+
+        final CScheduleConfig csc = new CScheduleConfig();
+        csc.setType( SCHEDULE_TYPE_ADVANCED );
+        csc.setCronCommand( "0 0 20 ? * TUE,THU,SAT" );
+        cst.setSchedule( csc );
+        
+        defaultManager.initializeTasks( defaultScheduler, Arrays.asList( cst ));
+
+        final ScheduledTask<?> task = defaultScheduler.getTaskById( cst.getId() );
+        assertThat( new Date( task.getNextRun().getTime() ), is( new Date( cst.getNextRun() ) ) );
     }
 
     public void genericTestStore( String scheduleType, HashMap<String, Object> scheduleProperties )

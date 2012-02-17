@@ -17,7 +17,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.FileNotFoundException;
 
 import static org.hamcrest.Matchers.*;
-import org.mortbay.jetty.Server;
+import org.eclipse.jetty.server.Server;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.Assert;
