@@ -3,14 +3,14 @@ package org.sonatype.sisu.jetty;
 import java.io.File;
 import java.io.IOException;
 
-import org.codehaus.plexus.interpolation.InterpolationException;
 import org.tanukisoftware.wrapper.WrapperListener;
 import org.tanukisoftware.wrapper.WrapperManager;
 
 /**
- * Class extending Jetty8 and adding Java Service Wrapper support on it, making Jetty7 "jsw-ized". This class is used as
+ * Class extending Jetty8 and adding Java Service Wrapper support on it, making Jetty "jsw-ized". This class is used as
  * "main" launched class in Nexus bundle for example. Requirement for App is to have path to jetty.xml passed as first
- * argument.
+ * argument. Just make this one a "main class" in JSW config and pass in the path of jetty.xml as 1st parameter and you
+ * are done.
  * 
  * @author cstamas
  */
@@ -21,7 +21,7 @@ public class Jetty8WrapperListener
     protected static final Object waitObj = new Object();
 
     protected Jetty8WrapperListener( final File jettyXml )
-        throws InterpolationException, IOException
+        throws IOException
     {
         // nope, do not instantiate this directly, just from main()!
         super( jettyXml );
@@ -109,10 +109,9 @@ public class Jetty8WrapperListener
      * 
      * @param args
      * @throws IOException
-     * @throws InterpolationException
      */
     public static void main( final String[] args )
-        throws InterpolationException, IOException
+        throws IOException
     {
         if ( args != null && args.length > 0 )
         {

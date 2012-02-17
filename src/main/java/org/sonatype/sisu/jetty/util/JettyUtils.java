@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.codehaus.plexus.interpolation.InterpolationException;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.IO;
 import org.eclipse.jetty.xml.XmlConfiguration;
@@ -68,7 +67,7 @@ public final class JettyUtils
     }
 
     public static AppContext configureServer( final Server server, final File jettyXml, final Map<?, ?>... contexts )
-        throws InterpolationException, IOException
+        throws IOException
     {
         final FileInputStream fis = new FileInputStream( jettyXml );
         String rawConfig;
@@ -128,11 +127,11 @@ public final class JettyUtils
 
         final AppContext appContext = Factory.create( appContextReq );
 
-        // Interpolate jetty.xml
-        final String interpolatedConfig = appContext.getInterpolator().interpolate( rawConfig );
-
         try
         {
+            // Interpolate jetty.xml
+            final String interpolatedConfig = appContext.getInterpolator().interpolate( rawConfig );
+
             new XmlConfiguration( new ByteArrayInputStream( interpolatedConfig.getBytes( "UTF-8" ) ) ).configure( server );
         }
         catch ( Exception e )

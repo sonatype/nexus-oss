@@ -27,33 +27,31 @@
 
   <dependencies>
 
-    <!-- SISU -->
+    <!-- "Hard" dependencies -->
+
+    <!-- AppContext as one of the few "real" dependencies -->
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-bean</artifactId>
+      <groupId>org.sonatype.appcontext</groupId>
+      <artifactId>appcontext</artifactId>
+      <version>2.1</version>
+      <scope>compile</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-guice</artifactId>
-      <classifier>no_aop</classifier>
-    </dependency>
+    <!-- We actually compile against javax.inject only -->
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
+      <scope>compile</scope>
     </dependency>
 
-    <!-- Jetty WebApp container -->
+    <!-- Jetty Server -->
+    <!-- Basically we really depend on "minimal" Server only, but we provide some optional extras -->
+    <!-- For example, if you want j2ee servlet, you have to put them in env anyway -->
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-webapp</artifactId>
+      <artifactId>jetty-server</artifactId>
       <version>${jetty.version}</version>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-deploy</artifactId>
-      <version>${jetty.version}</version>
-      <scope>compile</scope>
+      <optional>false</optional>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
@@ -64,13 +62,27 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-ajp</artifactId>
+      <artifactId>jetty-webapp</artifactId>
       <version>${jetty.version}</version>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-deploy</artifactId>
+      <version>${jetty.version}</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-ajp</artifactId>
+      <version>${jetty.version}</version>
+      <scope>runtime</scope>
+      <optional>true</optional>
+    </dependency>
 
-    <!-- JSW as optional dependency -->
+    <!-- JSW as optional dependency too, used for JSW support -->
     <dependency>
       <groupId>tanukisoft</groupId>
       <artifactId>wrapper</artifactId>
@@ -79,23 +91,17 @@
       <optional>true</optional>
     </dependency>
 
+    <!-- SISU, needed runtime -->
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-interpolation</artifactId>
-      <version>1.14</version>
-      <scope>compile</scope>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-bean</artifactId>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.appcontext</groupId>
-      <artifactId>appcontext</artifactId>
-      <version>2.1</version>
-      <scope>compile</scope>
-    </dependency>
-
-    <!-- logging -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-guice</artifactId>
+      <classifier>no_aop</classifier>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- Test -->

@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.interpolation.InterpolationException;
 import org.eclipse.jetty.server.Server;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.sisu.jetty.mangler.ContextAttributeSetterMangler;
@@ -28,20 +27,25 @@ import org.sonatype.sisu.jetty.util.JettyUtils;
 public class Jetty8
 {
     private final Server server;
+
     private final File jettyXml;
+
     private final ClassLoader classloader;
+
     private final Map<?, ?>[] contexts;
+
     private final AppContext appContext;
+
     private volatile JettyWrapperThread serverThread;
 
     public Jetty8( final File jettyXml, final Map<?, ?>... contexts )
-        throws InterpolationException, IOException
+        throws IOException
     {
         this( jettyXml, Thread.currentThread().getContextClassLoader(), contexts );
     }
 
     public Jetty8( final File jettyXml, final ClassLoader classloader, final Map<?, ?>... contexts )
-        throws InterpolationException, IOException
+        throws IOException
     {
         this.jettyXml = jettyXml;
         this.classloader = classloader;
@@ -102,9 +106,13 @@ public class Jetty8
         extends Thread
     {
         private static final AtomicInteger INSTANCE_COUNTER = new AtomicInteger( 1 );
+
         private final Server server;
+
         private final CountDownLatch started;
+
         private final CountDownLatch stopped;
+
         private volatile Exception exception;
 
         public JettyWrapperThread( final Server server )
