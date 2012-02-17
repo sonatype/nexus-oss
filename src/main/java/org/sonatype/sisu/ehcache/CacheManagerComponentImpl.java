@@ -21,8 +21,8 @@ import org.sonatype.inject.Nullable;
 
 @Named
 @Singleton
-public class CacheManagerProviderImpl
-    implements CacheManagerProvider
+public class CacheManagerComponentImpl
+    implements CacheManagerComponent
 {
     private final Logger logger;
 
@@ -38,7 +38,7 @@ public class CacheManagerProviderImpl
      * @throws IOException
      */
     @Inject
-    public CacheManagerProviderImpl( @Nullable final AppContext appContext )
+    public CacheManagerComponentImpl( @Nullable final AppContext appContext )
         throws IOException
     {
         this( appContext, null );
@@ -52,10 +52,10 @@ public class CacheManagerProviderImpl
      * @param file
      * @throws IOException
      */
-    public CacheManagerProviderImpl( final AppContext appContext, final File file )
+    public CacheManagerComponentImpl( final AppContext appContext, final File file )
         throws IOException
     {
-        this( LoggerFactory.getLogger( CacheManagerProviderImpl.class ), appContext, file );
+        this( LoggerFactory.getLogger( CacheManagerComponentImpl.class ), appContext, file );
     }
 
     /**
@@ -68,7 +68,7 @@ public class CacheManagerProviderImpl
      * @throws IOException in case of some fatal problem.
      * @throws NullPointerException if logger is null.
      */
-    public CacheManagerProviderImpl( final Logger logger, final AppContext appContext, final File file )
+    public CacheManagerComponentImpl( final Logger logger, final AppContext appContext, final File file )
         throws IOException, NullPointerException
     {
         if ( logger == null )
@@ -92,6 +92,12 @@ public class CacheManagerProviderImpl
         return cacheManager;
     }
 
+    public CacheManager buildCacheManager( final File file )
+        throws IOException
+    {
+        return buildCacheManager( getAppContext(), file );
+    }
+
     // ==
 
     protected Logger getLogger()
@@ -102,12 +108,6 @@ public class CacheManagerProviderImpl
     protected AppContext getAppContext()
     {
         return appContext;
-    }
-
-    protected CacheManager buildCacheManager( final File file )
-        throws IOException
-    {
-        return buildCacheManager( getAppContext(), file );
     }
 
     protected CacheManager buildCacheManager( final AppContext appContext, final File file )

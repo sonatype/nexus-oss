@@ -13,7 +13,7 @@ import org.sonatype.guice.bean.containers.InjectedTestCase;
 import com.google.inject.Binder;
 import com.google.inject.Key;
 
-public class CacheManagerProviderImplTest
+public class CacheManagerComponentImplTest
     extends InjectedTestCase
 {
     @Override
@@ -35,7 +35,7 @@ public class CacheManagerProviderImplTest
         throws Exception
     {
         // look it up
-        CacheManagerProvider cacheWrapper = lookup( CacheManagerProvider.class );
+        CacheManagerComponent cacheWrapper = lookup( CacheManagerComponent.class );
 
         // check the store path, since the config from src/test/resources should be picked up
         String storePath = cacheWrapper.getCacheManager().getDiskStorePath();
