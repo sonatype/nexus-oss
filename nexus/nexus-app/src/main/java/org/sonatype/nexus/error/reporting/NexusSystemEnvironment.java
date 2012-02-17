@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.error.reporting;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -30,7 +31,7 @@ public class NexusSystemEnvironment
 
     ApplicationStatusSource applicationStatus;
 
-    @Named
+    @Inject
     public NexusSystemEnvironment( final ApplicationStatusSource applicationStatus )
     {
         this.applicationStatus = applicationStatus;
