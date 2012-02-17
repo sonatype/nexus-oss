@@ -19,6 +19,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 
 import org.codehaus.plexus.util.FileUtils;
@@ -221,9 +222,7 @@ public class DefaultAttributeStorageTest
             new DefaultStorageFileItem( repository, new ResourceStoreRequest( uid.getPath() ), true, true,
                 new StringContentLocator( "CONTENT" ) );
 
-        // make a zero length file
-        attFile.createNewFile();
-        long creationTime = new Date().getTime();
+        long creationTime = createFile( attFile );
         assertThat( attFile, FileMatchers.sized( 0L ) );
 
         att = file.getRepositoryItemAttributes();
@@ -268,8 +267,7 @@ public class DefaultAttributeStorageTest
                 new StringContentLocator( "CONTENT" ) );
 
         // make a zero length file
-        attFile.createNewFile();
-        long creationTime = new Date().getTime();
+        long creationTime = createFile( attFile );
         assertThat( attFile, FileMatchers.sized( 0L ) );
 
         att = file.getRepositoryItemAttributes();
@@ -282,6 +280,19 @@ public class DefaultAttributeStorageTest
 
         Attributes retAtt = lsStorage.getAttributes( uid );
         assertThat( retAtt, notNullValue() );
+    }
+
+    protected long createFile( File attFile )
+        throws IOException, InterruptedException
+    {
+        attFile.createNewFile();
+        long creationTime = new Date().getTime();
+
+        // https://github.com/sonatype/nexus/pull/308#r460989
+        // This may fail depending on the filesystem timestamp resolution (ext3 uses 1s IIRC)
+        Thread.sleep( 1500 );
+
+        return creationTime;
     }
 
 }
