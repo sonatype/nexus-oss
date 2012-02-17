@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.sonatype.spice</groupId>
     <artifactId>spice-parent</artifactId>
-    <version>18</version>
+    <version>19</version>
   </parent>
 
   <groupId>org.sonatype.appcontext</groupId>
@@ -31,13 +31,16 @@
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-interpolation</artifactId>
       <version>1.14</version>
+      <optional>false</optional>
+      <scope>compile</scope>
     </dependency>
 
-    <!-- logging -->
+    <!-- logging (optional) -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <optional>true</optional>
+      <scope>compile</scope>
     </dependency>
 
     <!-- Test -->

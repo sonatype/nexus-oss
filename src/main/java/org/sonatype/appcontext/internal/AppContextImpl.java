@@ -8,9 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.interpolation.Interpolator;
+import org.codehaus.plexus.interpolation.InterpolationException;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextEntry;
+import org.sonatype.appcontext.AppContextInterpolationException;
 
 public class AppContextImpl
     implements AppContext
@@ -94,9 +95,17 @@ public class AppContextImpl
         return Collections.unmodifiableMap( result );
     }
 
-    public Interpolator getInterpolator()
+    public String interpolate( final String string )
+        throws AppContextInterpolationException
     {
-        return InternalFactory.getInterpolator( this );
+        try
+        {
+            return InternalFactory.getInterpolator( this ).interpolate( string );
+        }
+        catch ( InterpolationException e )
+        {
+            throw new AppContextInterpolationException( e.getMessage(), e );
+        }
     }
 
     public void dump()

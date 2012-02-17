@@ -16,6 +16,7 @@ import org.sonatype.appcontext.AppContextException;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.publisher.EntryPublisher;
 import org.sonatype.appcontext.publisher.PrintStreamEntryPublisher;
+import org.sonatype.appcontext.publisher.Slf4jLoggerEntryPublisher;
 import org.sonatype.appcontext.source.EntrySource;
 import org.sonatype.appcontext.source.EntrySourceMarker;
 import org.sonatype.appcontext.source.Sources;
@@ -49,7 +50,17 @@ public class InternalFactory
             sources.addAll( Sources.getDefaultSelectTargetedSources( keyInclusions ) );
         }
         sources.addAll( Sources.getDefaultSources( id, aliases ) );
-        List<EntryPublisher> publishers = Arrays.asList( new EntryPublisher[] { new PrintStreamEntryPublisher() } );
+
+        // be smart with publishers. go for System.out only as last resort
+        List<EntryPublisher> publishers;
+        if ( isSlf4jPresentOnClasspath() )
+        {
+            publishers = Arrays.asList( new EntryPublisher[] { new Slf4jLoggerEntryPublisher() } );
+        }
+        else
+        {
+            publishers = Arrays.asList( new EntryPublisher[] { new PrintStreamEntryPublisher() } );
+        }
 
         return new AppContextRequest( id, parent, sources, publishers, true, Arrays.asList( keyInclusions ) );
     }
@@ -131,5 +142,17 @@ public class InternalFactory
         }
 
         return result;
+    }
+
+    public static boolean isSlf4jPresentOnClasspath()
+    {
+        try
+        {
+            return Class.forName( "org.slf4j.LoggerFactory", false, InternalFactory.class.getClassLoader() ) != null;
+        }
+        catch ( ClassNotFoundException e )
+        {
+            return false;
+        }
     }
 }

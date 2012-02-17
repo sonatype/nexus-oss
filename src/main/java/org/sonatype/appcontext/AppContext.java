@@ -3,8 +3,6 @@ package org.sonatype.appcontext;
 import java.io.PrintStream;
 import java.util.Map;
 
-import org.codehaus.plexus.interpolation.Interpolator;
-
 /**
  * The generic app context, which is actually a Map. For modification, you can use only the {@link #put(String, Object)}
  * , {@link #putAll(Map)} and {@link #clear()} methods, since all the {@link #keySet()} {@link #values()} and
@@ -52,11 +50,12 @@ public interface AppContext
     Map<String, Object> flatten();
 
     /**
-     * Returns an interpolator using this app context as source.
+     * Interpolates passed in string using this app context as source.
      * 
      * @return
      */
-    Interpolator getInterpolator();
+    String interpolate( String input )
+        throws AppContextInterpolationException;
 
     /**
      * Returns the entry value, used in creation of this context. Gives access to source marker and raw (uninterpolated)
