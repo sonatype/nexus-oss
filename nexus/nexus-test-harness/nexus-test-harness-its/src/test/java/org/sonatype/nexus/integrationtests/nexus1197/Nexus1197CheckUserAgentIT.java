@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 
 import static org.hamcrest.Matchers.*;
 import org.eclipse.jetty.server.Server;
+import org.sonatype.jettytestsuite.BlockingServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.Assert;
@@ -44,7 +45,7 @@ public class Nexus1197CheckUserAgentIT
     {
         handler = new RequestHandler();
 
-        server = new Server( TestProperties.getInteger( "proxy.server.port" ) );
+        server = new BlockingServer( TestProperties.getInteger( "proxy.server.port" ) );
         server.setHandler( handler );
         server.start();
     }

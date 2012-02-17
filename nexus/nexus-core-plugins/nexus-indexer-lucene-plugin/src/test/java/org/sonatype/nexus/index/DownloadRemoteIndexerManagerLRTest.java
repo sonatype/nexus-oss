@@ -38,6 +38,7 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.Test;
+import org.sonatype.jettytestsuite.BlockingServer;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 
 // This is an IT just because it runs longer then 15 seconds
@@ -62,7 +63,7 @@ public class DownloadRemoteIndexerManagerLRTest
         int port = s.getLocalPort();
         s.close();
 
-        server = new Server( port );
+        server = new BlockingServer( port );
 
         ResourceHandler resource_handler = new ResourceHandler()
         {

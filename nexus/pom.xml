@@ -161,7 +161,7 @@
     <aspectj.version>1.6.11</aspectj.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <enunciate.version>1.20</enunciate.version>
-    <jetty.version>8.1.0.v20120127</jetty.version>
+    <jetty.version>8.1.1.v20120215</jetty.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
     <maven.version>3.0.4</maven.version>
     <micromailer.version>1.1.1</micromailer.version>
@@ -304,6 +304,7 @@
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
         <version>3.0.1</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty</groupId>
@@ -1437,7 +1438,6 @@
                   </excludes>
                   <includes>
                     <include>org.eclipse.jetty:*:${jetty.version}</include>
-                    <include>org.mortbay.jetty:servlet-api</include>
                   </includes>
                   <message>Use the Eclipse/Jetty version defined in nexus parent. See jetty.version property</message>
                 </bannedDependencies>

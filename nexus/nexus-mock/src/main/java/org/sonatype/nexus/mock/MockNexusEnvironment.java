@@ -161,6 +161,14 @@ public class MockNexusEnvironment
                 jettyXmlString.replace( "<Set name=\"stopAtShutdown\">true</Set>",
                     "<!-- NexusBooter: Set name=\"stopAtShutdown\">true</Set-->" );
 
+            // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=357318#c62
+            if ( System.getProperty( "os.name" ).toLowerCase().contains( "windows" ) )
+            {
+                jettyXmlString =
+                    jettyXmlString.replace( "org.eclipse.jetty.server.nio.SelectChannelConnector",
+                                            "org.eclipse.jetty.server.nio.BlockingChannelConnector" );
+            }
+
             FileUtils.fileWrite( jettyXml, "UTF-8", jettyXmlString );
         }
     }
