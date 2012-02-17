@@ -34,15 +34,13 @@ public class FixedRateWalkerThrottleControllerTest
     @Test
     public void testDoesItHelpAtAll()
     {
-        // set unrealistic TPS and we do "little" (1ms) in processItem method (to get the ceiling to compare with)
-        final int measuredTpsUnreal = performAndMeasureActualTps( 100000000, new ConstantNumberSequence( 1 ) );
-        // set 500 TPS and we do "little" (1ms) in processItem method
-        final int measuredTps500 = performAndMeasureActualTps( 500, new ConstantNumberSequence( 1 ) );
-        // set 200 TPS and we do "little" (1ms) in processItem method
-        final int measuredTps200 = performAndMeasureActualTps( 200, new ConstantNumberSequence( 1 ) );
+        final int measuredTpsHigh = performAndMeasureActualTps( 20, new ConstantNumberSequence( 1 ) );
+        final int measuredTpsMid = performAndMeasureActualTps( 10, new ConstantNumberSequence( 1 ) );
+        final int measuredTpsLow = performAndMeasureActualTps( 5, new ConstantNumberSequence( 1 ) );
 
-        assertThat( "TPS500 should less than Unreal one", measuredTps500, lessThan( measuredTpsUnreal ) );
-        assertThat( "TPS200 should less than TPS500 one", measuredTps200, lessThan( measuredTps500 ) );
+        System.err.println( measuredTpsHigh + "\n" + measuredTpsMid + "\n" + measuredTpsLow );
+        assertThat( "Mid TPS should be less than high TPS run", measuredTpsMid, lessThan( measuredTpsHigh ) );
+        assertThat( "Low TPS should be less than medium TPS run", measuredTpsLow, lessThan( measuredTpsMid ) );
     }
 
     // ==
@@ -55,7 +53,8 @@ public class FixedRateWalkerThrottleControllerTest
 
         final TestThrottleInfo info = new TestThrottleInfo();
         final WalkerContext context = Mockito.mock( WalkerContext.class );
-        final int iterationCount = 1000;
+        // sleeptime starts oscillating after the 10th iteration, give some extra iterations to bring down the average
+        final int iterationCount = 25;
         final long startTime = System.currentTimeMillis();
         fixedRateWalkerThrottleController.walkStarted( context );
         for ( int i = 0; i < iterationCount; i++ )

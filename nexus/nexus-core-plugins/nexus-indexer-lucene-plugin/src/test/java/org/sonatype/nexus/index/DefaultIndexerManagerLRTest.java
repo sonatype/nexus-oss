@@ -12,6 +12,7 @@
  */
 package org.sonatype.nexus.index;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import org.apache.maven.index.ArtifactInfo;
@@ -19,6 +20,7 @@ import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
 import org.junit.Test;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
 
@@ -107,7 +109,7 @@ public class DefaultIndexerManagerLRTest
         response.close();
     }
 
-    @Test
+    @Test( expected = RemoteStorageException.class )
     public void testInvalidRemoteUrl()
         throws Exception
     {
