@@ -36,12 +36,6 @@
       <version>2.1</version>
       <scope>compile</scope>
     </dependency>
-    <!-- We actually compile against javax.inject only -->
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-      <scope>compile</scope>
-    </dependency>
 
     <!-- Jetty Server -->
     <!-- Basically we really depend on "minimal" Server only, but we provide some optional extras -->
@@ -82,36 +76,39 @@
       <optional>true</optional>
     </dependency>
 
-    <!-- JSW as optional dependency too, used for JSW support -->
+    <!-- SISU, needed if you use this library as a SISU component -->
+    <!-- Then you will have to add this to SISUized enviornment anyway -->
     <dependency>
-      <groupId>tanukisoft</groupId>
-      <artifactId>wrapper</artifactId>
-      <version>3.2.3</version>
-      <scope>compile</scope>
-      <optional>true</optional>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+      <scope>provided</scope>
     </dependency>
-
-    <!-- SISU, needed runtime -->
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-inject-bean</artifactId>
-      <scope>runtime</scope>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-guice</artifactId>
       <classifier>no_aop</classifier>
-      <scope>runtime</scope>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- JSW, needed if you use this library as Jetty JSW enabled booter -->
+    <!-- JSW as optional dependency too, used for JSW support -->
+    <dependency>
+      <groupId>tanukisoft</groupId>
+      <artifactId>wrapper</artifactId>
+      <version>3.2.3</version>
+      <scope>provided</scope>
+      <optional>true</optional>
     </dependency>
 
     <!-- Test -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
     </dependency>
 
   </dependencies>

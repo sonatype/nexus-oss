@@ -79,8 +79,7 @@ public class DisableTagLibsListener
 
                     if ( logger != null )
                     {
-                        logger.info( "Disabling TLD support for: {} (context path: {})", webapp.getDisplayName(),
-                            webapp.getContextPath() );
+                        logger.info( "Disabling TLD support for WebAppContext on context path: {}", webapp.getContextPath() );
                     }
 
                     Configuration[] configs = webapp.getConfigurations();
