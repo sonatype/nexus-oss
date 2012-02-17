@@ -13,21 +13,11 @@
 package org.sonatype.nexus.integrationtests.nexus3082;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import com.google.common.collect.Lists;
-import com.google.common.io.CharStreams;
-import com.google.common.io.Closeables;
 import com.google.common.io.Files;
-import com.google.common.io.InputSupplier;
-import com.google.common.io.Resources;
 import org.sonatype.jira.AttachmentHandler;
 import org.sonatype.jira.mock.MockAttachmentHandler;
 import org.sonatype.jira.mock.StubJira;
@@ -36,8 +26,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ErrorReportResponse;
 import org.sonatype.nexus.test.utils.ErrorReportUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.sonatype.tests.http.server.api.Behaviour;
-import org.sonatype.tests.http.server.fluent.Server;
 import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -84,13 +72,7 @@ public class Nexus3082GenerateProblemReportIT
 
         final int port = Integer.parseInt( TestProperties.getString( "webproxy-server-port" ) );
 
-        setupJiraMock( "jira-mock.db", port );
-    }
-
-    private void setupJiraMock( String dbName, int port )
-        throws Exception
-    {
-        final File mockDb = getTestFile( dbName );
+        final File mockDb = getTestFile( "jira-mock.db" );
 
         StubJira mock = new StubJira();
         mock.setDatabase(
