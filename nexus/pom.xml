@@ -159,8 +159,7 @@
 
     <aether.version>1.13</aether.version>
     <aspectj.version>1.6.11</aspectj.version>
-    <commons-beanutils.baseVersion>1.7.0</commons-beanutils.baseVersion>
-    <commons-beanutils.version>${commons-beanutils.baseVersion}-SONATYPE</commons-beanutils.version>
+    <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <enunciate.version>1.20</enunciate.version>
     <jetty.version>7.6.0.v20120127</jetty.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
@@ -611,7 +610,7 @@
       <dependency>
         <groupId>commons-beanutils</groupId>
         <artifactId>commons-beanutils-bean-collections</artifactId>
-        <version>${commons-beanutils.baseVersion}</version>
+        <version>${commons-beanutils.version}</version>
       </dependency>
 
       <!-- SLF4J Logging -->
