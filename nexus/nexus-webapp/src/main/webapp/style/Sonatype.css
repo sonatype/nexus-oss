@@ -44,8 +44,12 @@ body {
   text-align: right;
 }
 
-#logo a, a:link, a:visited, a:hover, a:active {
-     color: #ff9900;
+#logo a {
+    color: #ff9900;
+}
+
+a:link, a:visited, a:hover, a:active {
+     color: #336699;
 }
 
 #header div.right-side {
