@@ -14,6 +14,11 @@ public interface AppContext
     extends Map<String, Object>
 {
     /**
+     * A key to be used for mapping whenever needed, to find AppContext.
+     */
+    String APPCONTEXT_KEY = AppContext.class.getName();
+
+    /**
      * Returns the time stamp in milliseconds when this context was created.
      * 
      * @return the creation time in milliseconds.
