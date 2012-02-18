@@ -14,8 +14,11 @@ package org.sonatype.nexus.proxy.cache;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
+import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 /**
  * The Class EhCacheCacheManager is a thin wrapper around EhCache, just to make things going.
@@ -25,16 +28,16 @@ import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 @Component( role = CacheManager.class )
 public class EhCacheCacheManager
     extends AbstractLoggingComponent
-    implements CacheManager
+    implements CacheManager, Startable
 {
     @Requirement
-    private PlexusEhCacheWrapper cacheManager;
-    
+    private CacheManagerComponent cacheManagerComponent;
+
     public static final String SINGLE_PATH_CACHE_NAME = "path-cache";
 
     public PathCache getPathCache( String cache )
     {
-        net.sf.ehcache.CacheManager ehCacheManager = this.cacheManager.getEhCacheManager();
+        final net.sf.ehcache.CacheManager ehCacheManager = cacheManagerComponent.getCacheManager();
 
         if ( !ehCacheManager.cacheExists( SINGLE_PATH_CACHE_NAME ) )
         {
@@ -42,5 +45,19 @@ public class EhCacheCacheManager
         }
 
         return new EhCachePathCache( cache, ehCacheManager.getEhcache( SINGLE_PATH_CACHE_NAME ) );
+    }
+
+    @Override
+    public void start()
+        throws StartingException
+    {
+        // nop
+    }
+
+    @Override
+    public void stop()
+        throws StoppingException
+    {
+        cacheManagerComponent.shutdown();
     }
 }
