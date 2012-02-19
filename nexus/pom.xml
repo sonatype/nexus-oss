@@ -175,7 +175,7 @@
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
     <plexus-jetty7.version>1.2</plexus-jetty7.version>
     <sisu-jetty8.version>1.0-SNAPSHOT</sisu-jetty8.version>
-    <plexus-jetty-testsuite.version>2.1-SNAPSHOT</plexus-jetty-testsuite.version>
+    <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
     <plexus.restlet.bridge.version>1.18</plexus.restlet.bridge.version>
     <plexus-security.version>2.4</plexus-security.version>
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
@@ -1043,19 +1043,19 @@
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>server-provider</artifactId>
-        <version>0.5.1-SNAPSHOT</version>
+        <version>0.5.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>junit-runner</artifactId>
-        <version>0.5.1-SNAPSHOT</version>
+        <version>0.5.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.http-testing-harness</groupId>
         <artifactId>testng-runner</artifactId>
-        <version>0.5.1-SNAPSHOT</version>
+        <version>0.5.1</version>
         <scope>test</scope>
       </dependency>
 
