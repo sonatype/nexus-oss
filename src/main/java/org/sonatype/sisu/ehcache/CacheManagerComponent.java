@@ -31,10 +31,4 @@ public interface CacheManagerComponent
      */
     CacheManager buildCacheManager( final File file )
         throws IOException;
-
-    /**
-     * Stops the CacheManager cleanly. (cstamas: we need SISU-93, exposing lifecycle over Component contract is just
-     * bad!)
-     */
-    void shutdown();
 }

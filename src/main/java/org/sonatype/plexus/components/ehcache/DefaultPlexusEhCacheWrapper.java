@@ -1,13 +1,12 @@
 package org.sonatype.plexus.components.ehcache;
 
-import javax.enterprise.inject.Typed;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.sisu.ehcache.CacheManagerComponent;
-
 import net.sf.ehcache.CacheManager;
+
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
+import org.sonatype.sisu.ehcache.CacheManagerComponent;
+import org.sonatype.sisu.ehcache.CacheManagerComponentImpl;
 
 /**
  * Support to swap-out old Plexus-styled EHCacheManager wrapper.
@@ -16,20 +15,13 @@ import net.sf.ehcache.CacheManager;
  * @deprecated Use directly {@link CacheManagerComponent} instead. This is only to make possible "swap out" of old and
  *             putting in this new component.
  */
-@Named( "default" )
-@Singleton
-@Typed( PlexusEhCacheWrapper.class )
 @Deprecated
+@Component( role = PlexusEhCacheWrapper.class )
 public class DefaultPlexusEhCacheWrapper
-    implements PlexusEhCacheWrapper
+    implements PlexusEhCacheWrapper, Disposable
 {
-    private final CacheManagerComponent cacheManagerComponent;
-
-    @Inject
-    public DefaultPlexusEhCacheWrapper( final CacheManagerComponent cacheManagerComponent )
-    {
-        this.cacheManagerComponent = cacheManagerComponent;
-    }
+    @Requirement
+    private CacheManagerComponent cacheManagerComponent;
 
     public CacheManager getEhCacheManager()
     {
@@ -39,5 +31,13 @@ public class DefaultPlexusEhCacheWrapper
     public void stop()
     {
         // nop
+    }
+
+    public void dispose()
+    {
+        if ( cacheManagerComponent instanceof CacheManagerComponentImpl )
+        {
+            ( (CacheManagerComponentImpl) cacheManagerComponent ).shutdown();
+        }
     }
 }

@@ -28,7 +28,7 @@ public class CacheManagerComponentImpl
 
     private final AppContext appContext;
 
-    private final CacheManager cacheManager;
+    private CacheManager cacheManager;
 
     /**
      * Creates CacheManagerProviderImpl using the provided AppContext. See
@@ -77,14 +77,27 @@ public class CacheManagerComponentImpl
         }
         this.logger = logger;
         this.appContext = appContext;
-        this.cacheManager = buildCacheManager( file );
+        startup( file );
+    }
+
+    public synchronized void startup( final File file )
+        throws IOException
+    {
+        if ( cacheManager == null )
+        {
+            cacheManager = buildCacheManager( file );
+        }
     }
 
     public synchronized void shutdown()
     {
-        getLogger().info( "Shutting down EHCache CacheManager." );
-        cacheManager.removalAll();
-        cacheManager.shutdown();
+        if ( cacheManager != null )
+        {
+            getLogger().info( "Shutting down EHCache CacheManager." );
+            cacheManager.removalAll();
+            cacheManager.shutdown();
+            cacheManager = null;
+        }
     }
 
     public CacheManager getCacheManager()
@@ -96,6 +109,22 @@ public class CacheManagerComponentImpl
         throws IOException
     {
         return buildCacheManager( getAppContext(), file );
+    }
+
+    // ==
+
+    @Override
+    public void finalize()
+        throws Throwable
+    {
+        try
+        {
+            shutdown();
+        }
+        finally
+        {
+            super.finalize();
+        }
     }
 
     // ==
@@ -125,22 +154,29 @@ public class CacheManagerComponentImpl
             ehCacheXml = locateCacheManagerConfigurationFromClasspath();
         }
 
-        Configuration configuration;
-        if ( appContext != null )
+        if ( ehCacheXml != null )
         {
-            configuration =
-                ConfigurationFactory.parseConfiguration( new ByteArrayInputStream(
-                    appContext.interpolate( ehCacheXml ).getBytes( "UTF-8" ) ) );
+            Configuration configuration;
+            if ( appContext != null )
+            {
+                configuration =
+                    ConfigurationFactory.parseConfiguration( new ByteArrayInputStream( appContext.interpolate(
+                        ehCacheXml ).getBytes( "UTF-8" ) ) );
+            }
+            else
+            {
+                configuration =
+                    ConfigurationFactory.parseConfiguration( new ByteArrayInputStream( ehCacheXml.getBytes( "UTF-8" ) ) );
+            }
+
+            configureDiskStore( appContext, configuration );
+            return new CacheManager( configuration );
         }
         else
         {
-            configuration =
-                ConfigurationFactory.parseConfiguration( new ByteArrayInputStream( ehCacheXml.getBytes( "UTF-8" ) ) );
+            logger.info( "No EHCache configuration found, using defaults (is this really what you want?)." );
+            return new CacheManager();
         }
-
-        configureDiskStore( appContext, configuration );
-
-        return new CacheManager( configuration );
     }
 
     protected String locateCacheManagerConfigurationFromFile( final File file )
@@ -178,8 +214,8 @@ public class CacheManagerComponentImpl
             }
             else
             {
-                logger.info( "No EHCache configuration found an classpath, using defaults (is this really what you want?)." );
-                return "";
+                logger.debug( "No EHCache configuration found an classpath!" );
+                return null;
             }
         }
     }

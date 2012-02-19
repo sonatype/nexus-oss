@@ -35,7 +35,7 @@ public class CacheManagerComponentImplTest
         throws Exception
     {
         // look it up
-        CacheManagerComponent cacheWrapper = lookup( CacheManagerComponent.class );
+        CacheManagerComponentImpl cacheWrapper = (CacheManagerComponentImpl) lookup( CacheManagerComponent.class );
 
         // check the store path, since the config from src/test/resources should be picked up
         String storePath = cacheWrapper.getCacheManager().getDiskStorePath();
