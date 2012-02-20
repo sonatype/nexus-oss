@@ -1424,6 +1424,13 @@
                   </includes>
                   <message>Use the Eclipse/Jetty version defined in nexus parent. See jetty.version property</message>
                 </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.sonatype.spice:plexus-ehcache</exclude>
+                  </excludes>
+                  <message>Use the org.sonatype.sisu:sisu-ehcache instead of plexus-ehcache!</message>
+                </bannedDependencies>
 
                 <!-- <requirePluginVersions> <banSnapshots>false</banSnapshots> </requirePluginVersions> -->
               </rules>
