@@ -453,7 +453,7 @@ Sonatype.repoServer.LdapConfigPanel = function( config ) {
               {
                 xtype: 'textfield',
                 fieldLabel: 'Group Member Format',
-                helpText: 'The format the userId is stored in the group member attribute uid=${username},ou=people,o=sonatype (the username is filtered with the username...).',
+                helpText: 'The format the userId is stored in the group member attribute. Set the value to ${dn} to use the FQDN of the user, or use uid=${username},ou=people,o=sonatype (the username is filtered with the username...).',
                 name: 'groupMemberFormat',
                 anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
                 itemCls: 'required-field',
