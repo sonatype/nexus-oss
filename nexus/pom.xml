@@ -170,7 +170,7 @@
     <plexus-app-events.version>1.0.1</plexus-app-events.version>
     <plexus-cli.version>1.2</plexus-cli.version>
     <plexus-digest.version>1.1</plexus-digest.version>
-    <sisu-ehcache.version>1.0-SNAPSHOT</sisu-ehcache.version>
+    <sisu-ehcache.version>1.0</sisu-ehcache.version>
     <plexus-interpolation.version>1.14</plexus-interpolation.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
     <plexus-jetty7.version>1.2</plexus-jetty7.version>
@@ -238,7 +238,7 @@
       <dependency>
         <groupId>org.sonatype.appcontext</groupId>
         <artifactId>appcontext</artifactId>
-        <version>3.0-SNAPSHOT</version>
+        <version>3.0</version>
       </dependency>
 
       <dependency>
