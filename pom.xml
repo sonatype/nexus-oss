@@ -33,7 +33,7 @@
     <dependency>
       <groupId>org.sonatype.appcontext</groupId>
       <artifactId>appcontext</artifactId>
-      <version>3.0</version>
+      <version>3.1-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
 
@@ -69,17 +69,6 @@
       <classifier>no_aop</classifier>
       <scope>provided</scope>
     </dependency>
-    <!-- For backward dependency, see DefaultPlexusEhCacheWrapper -->
-    <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-      <scope>provided</scope>
-    </dependency>
 
     <!-- Test stuff -->
     <dependency>
@@ -93,12 +82,4 @@
 
   </dependencies>
   
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-      </plugin>
-    </plugins>
-  </build>
 </project>

@@ -19,6 +19,13 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.inject.Nullable;
 
+/**
+ * Default implementation of CacheManagerComponent. Note: as SISU-93 is not yet here, and this component does need
+ * explicit shutdown (in case when multiple instances are re-created of it, like in UT environment), you have to use
+ * {@link #shutdown()} method.
+ * 
+ * @author cstamas
+ */
 @Named
 @Singleton
 public class CacheManagerComponentImpl
