@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.interpolation.InterpolationException;
-import org.codehaus.plexus.interpolation.Interpolator;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextEntry;
 import org.sonatype.appcontext.AppContextInterpolationException;
@@ -94,12 +93,6 @@ public class AppContextImpl
         result.putAll( entries.flatten() );
 
         return Collections.unmodifiableMap( result );
-    }
-
-    @Deprecated
-    public Interpolator getInterpolator()
-    {
-        return InternalFactory.getInterpolator( this );
     }
 
     public String interpolate( final String string )

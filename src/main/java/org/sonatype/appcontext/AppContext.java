@@ -3,8 +3,6 @@ package org.sonatype.appcontext;
 import java.io.PrintStream;
 import java.util.Map;
 
-import org.codehaus.plexus.interpolation.Interpolator;
-
 /**
  * The generic app context, which is actually a Map. For modification, you can use only the {@link #put(String, Object)}
  * , {@link #putAll(Map)} and {@link #clear()} methods, since all the {@link #keySet()} {@link #values()} and
@@ -16,7 +14,8 @@ public interface AppContext
     extends Map<String, Object>
 {
     /**
-     * A key to be used for mapping whenever needed, to find AppContext.
+     * A key to be used for mapping whenever needed, to find AppContext. For SISU/Guice support see
+     * {@link AppContextModule} class. This key is merely to be used in Map-like mappings.
      */
     String APPCONTEXT_KEY = AppContext.class.getName();
 
@@ -55,16 +54,6 @@ public interface AppContext
      * @return
      */
     Map<String, Object> flatten();
-
-    /**
-     * Returns an interpolator using this app context as source.
-     * 
-     * @return
-     * @deprecated Use the {@link #interpolate(String)} method instead! The use of this method makes a lock-in to
-     *             interpolation mech by directly exposing it. Will be removed in next release!
-     */
-    @Deprecated
-    Interpolator getInterpolator();
 
     /**
      * Interpolates passed in string using this app context as source.

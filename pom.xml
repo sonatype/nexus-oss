@@ -42,6 +42,15 @@
       <optional>true</optional>
       <scope>compile</scope>
     </dependency>
+    
+    <!-- Guice module (optional) -->
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-guice</artifactId>
+      <classifier>no_aop</classifier>
+      <optional>true</optional>
+      <scope>compile</scope>
+    </dependency>
 
     <!-- Test -->
     <dependency>
