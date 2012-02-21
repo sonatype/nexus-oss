@@ -10,7 +10,7 @@
 
   <groupId>org.sonatype.sisu</groupId>
   <artifactId>sisu-ehcache</artifactId>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
 
   <name>SISU EHCache Component</name>
   <description>SISU EHCache Component</description>
