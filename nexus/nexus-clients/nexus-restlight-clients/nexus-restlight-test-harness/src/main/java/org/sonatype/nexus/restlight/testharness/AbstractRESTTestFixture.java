@@ -23,6 +23,7 @@ import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.jettytestsuite.BlockingServer;
 
 
 /**
@@ -141,7 +142,7 @@ public abstract class AbstractRESTTestFixture
 
         logger.info( "Starting test server on port: " + port );
 
-        server = new Server( port );
+        server = new BlockingServer( port );
 
         Constraint constraint = new Constraint();
 

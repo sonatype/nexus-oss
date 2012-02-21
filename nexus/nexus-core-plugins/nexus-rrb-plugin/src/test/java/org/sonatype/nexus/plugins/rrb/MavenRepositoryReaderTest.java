@@ -37,6 +37,7 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.sonatype.jettytestsuite.BlockingServer;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -117,7 +118,7 @@ public class MavenRepositoryReaderTest
             }
         };
 
-        server = new Server( 0 ); // We choose an arbitrary server port
+        server = new BlockingServer( 0 ); // We choose an arbitrary server port
         server.setHandler( handler ); // Assign the handler of incoming requests
         server.start();
 

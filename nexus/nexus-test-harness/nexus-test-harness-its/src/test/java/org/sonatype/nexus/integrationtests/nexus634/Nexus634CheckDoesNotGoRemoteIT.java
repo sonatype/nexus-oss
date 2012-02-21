@@ -18,6 +18,7 @@ import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.jetty.server.Server;
 import org.restlet.data.MediaType;
+import org.sonatype.jettytestsuite.BlockingServer;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
@@ -84,7 +85,7 @@ public class Nexus634CheckDoesNotGoRemoteIT
         throws Exception
     {
         touchTrackingHandler = new TouchTrackingHandler();
-        server = new Server( proxyPort );
+        server = new BlockingServer( proxyPort );
         server.setHandler( touchTrackingHandler );
         server.start();
     }

@@ -56,6 +56,12 @@
         <artifactId>security-system</artifactId>
         <version>${plexus-security.version}</version>
         <scope>provided</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.spice</groupId>
+            <artifactId>plexus-ehcache</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>

@@ -144,8 +144,16 @@ public class ForgotPasswordTest
 
     @Override
     public void tearDown()
+        throws Exception
     {
-        server.stop();
+        try
+        {
+            server.stop();
+        }
+        finally
+        {
+            super.tearDown();
+        }
     }
 
 }

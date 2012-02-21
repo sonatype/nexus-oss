@@ -12,30 +12,42 @@
  */
 package org.sonatype.nexus.security;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import org.apache.shiro.cache.ehcache.EhCache;
-import org.apache.shiro.cache.ehcache.EhCacheManager;
-import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
-import org.hamcrest.MatcherAssert;
-
-import java.io.Serializable;
-
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
+import java.io.Serializable;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+
+import org.apache.shiro.cache.ehcache.EhCache;
+import org.apache.shiro.cache.ehcache.EhCacheManager;
+import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
+import org.hamcrest.MatcherAssert;
+import org.junit.After;
+
 /**
- * Repeats the tests of StatelessAndStatefulWebSessionManager, using ehCache as the session store.
- * This test will check the cache instance directly (using the ehcache API to verify the cached contents)
+ * Repeats the tests of StatelessAndStatefulWebSessionManager, using ehCache as the session store. This test will check
+ * the cache instance directly (using the ehcache API to verify the cached contents)
  */
-public class StatelessAndStatefulWebSessionManagerEhCacheTest extends StatelessAndStatefulWebSessionManagerTest
+public class StatelessAndStatefulWebSessionManagerEhCacheTest
+    extends StatelessAndStatefulWebSessionManagerTest
 {
+    private EhCacheManager ehCacheManager = null;
+
     private CacheManager cacheManager = null;
+
+    @After
+    public void tearDownSecurityObjects()
+    {
+        // clean up after ourselves
+        ehCacheManager.destroy();
+    }
 
     protected void setupCacheManager( NexusWebRealmSecurityManager securityManager )
     {
-        EhCacheManager ehCacheManager = new EhCacheManager();
+        ehCacheManager = new EhCacheManager();
         ehCacheManager.init();
 
         cacheManager = ehCacheManager.getCacheManager();
@@ -52,13 +64,13 @@ public class StatelessAndStatefulWebSessionManagerEhCacheTest extends StatelessA
         MatcherAssert.assertThat( sessionDAO.getActiveSessionsCache(), is( instanceOf( EhCache.class ) ) );
     }
 
-
     protected void verifyNoSessionStored()
     {
         super.verifyNoSessionStored();
 
         // use the EhCache API to verify no sessions are stored
-        MatcherAssert.assertThat( cacheManager.getCache( CachingSessionDAO.ACTIVE_SESSION_CACHE_NAME ).getSize(), is( 0 ) );
+        MatcherAssert.assertThat( cacheManager.getCache( CachingSessionDAO.ACTIVE_SESSION_CACHE_NAME ).getSize(),
+            is( 0 ) );
 
     }
 
@@ -71,7 +83,7 @@ public class StatelessAndStatefulWebSessionManagerEhCacheTest extends StatelessA
         Cache cache = cacheManager.getCache( CachingSessionDAO.ACTIVE_SESSION_CACHE_NAME );
 
         MatcherAssert.assertThat( cache.getSize(), is( 1 ) );
-       // again using the sessionId
+        // again using the sessionId
         MatcherAssert.assertThat( cache.get( sessionId ), notNullValue() );
 
     }

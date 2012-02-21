@@ -126,11 +126,6 @@ public class DefaultFSPeer
             final RepositoryItemUidLock uidLock = item.getRepositoryItemUid().getLock();
             uidLock.lock( Action.create );
 
-            // if we ARE NOT handling attributes, do proper cleanup in case of IOEx
-            // if we ARE handling attributes, leave backups in case of IOEx
-            final boolean isCleanupNeeded =
-                !item.getRepositoryItemUid().getBooleanAttributeValue( IsItemAttributeMetacontentAttribute.class );
-
             try
             {
                 handleRenameOperation( hiddenTarget, target );
@@ -139,19 +134,26 @@ public class DefaultFSPeer
             }
             catch ( IOException e )
             {
-                if ( isCleanupNeeded )
-                {
-                    if ( target != null )
-                    {
-                        target.delete();
-                    }
+                // if we ARE NOT handling attributes, do proper cleanup in case of IOEx
+                // if we ARE handling attributes, leave backups in case of IOEx
+                final boolean isCleanupNeeded =
+                    !item.getRepositoryItemUid().getBooleanAttributeValue( IsItemAttributeMetacontentAttribute.class );
 
-                    if ( hiddenTarget != null )
-                    {
-                        hiddenTarget.delete();
-                    }
+                if ( target != null && ( isCleanupNeeded ||
+                // NEXUS-4871 prevent zero length/corrupt files
+                    target.length() == 0 ) )
+                {
+                    target.delete();
                 }
-                else
+
+                if ( hiddenTarget != null && ( isCleanupNeeded ||
+                // NEXUS-4871 prevent zero length/corrupt files
+                    hiddenTarget.length() == 0 ) )
+                {
+                    hiddenTarget.delete();
+                }
+
+                if ( !isCleanupNeeded )
                 {
                     getLogger().warn(
                         "No cleanup done for error that happened while trying to save attibutes of item {}, the backup is left as {}!",

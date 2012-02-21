@@ -15,7 +15,7 @@ package org.sonatype.nexus.proxy.cache;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
-import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
+import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 /**
  * The Class EhCacheCacheManager is a thin wrapper around EhCache, just to make things going.
@@ -28,13 +28,13 @@ public class EhCacheCacheManager
     implements CacheManager
 {
     @Requirement
-    private PlexusEhCacheWrapper cacheManager;
-    
+    private CacheManagerComponent cacheManagerComponent;
+
     public static final String SINGLE_PATH_CACHE_NAME = "path-cache";
 
     public PathCache getPathCache( String cache )
     {
-        net.sf.ehcache.CacheManager ehCacheManager = this.cacheManager.getEhCacheManager();
+        final net.sf.ehcache.CacheManager ehCacheManager = cacheManagerComponent.getCacheManager();
 
         if ( !ehCacheManager.cacheExists( SINGLE_PATH_CACHE_NAME ) )
         {

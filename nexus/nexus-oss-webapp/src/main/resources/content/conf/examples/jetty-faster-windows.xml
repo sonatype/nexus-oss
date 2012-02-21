@@ -46,7 +46,7 @@
                slows down Jetty's startup significantly. -->
           <Call name="addLifeCycleListener">
               <Arg>
-                <New class="org.sonatype.plexus.jetty.custom.DisableTagLibsListener" />
+                <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener" />
               </Arg>
           </Call>
       </New>

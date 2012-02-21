@@ -362,7 +362,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         Sonatype.MessageBox.show({
               animEl : node.getOwnerTree().getEl(),
               title : 'Delete Repository Item?',
-              msg : 'Delete the selected ' + (node.isLeaf() ? 'file' : 'folder') + '?',
+              msg : 'Delete the selected "' + node.data.relativePath + '" ' + (node.isLeaf() ? 'file' : 'folder') + '?',
               buttons : Sonatype.MessageBox.YESNO,
               scope : this,
               icon : Sonatype.MessageBox.QUESTION,

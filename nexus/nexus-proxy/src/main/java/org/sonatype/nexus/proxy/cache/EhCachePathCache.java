@@ -22,6 +22,8 @@ import net.sf.ehcache.Statistics;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
+import com.google.common.base.Preconditions;
+
 /**
  * The Class EhCacheCache is a thin wrapper around EHCache just to make things going.
  * 
@@ -42,8 +44,8 @@ public class EhCachePathCache
      */
     public EhCachePathCache( final String repositoryId, final Ehcache cache )
     {
-        this._repositoryId = repositoryId;
-        this._ec = cache;
+        this._repositoryId = Preconditions.checkNotNull( repositoryId );
+        this._ec = Preconditions.checkNotNull( cache );
     }
 
     protected String getRepositoryId()
@@ -56,12 +58,12 @@ public class EhCachePathCache
         return _ec;
     }
 
-    public boolean doContains( String key )
+    public boolean doContains( final String key )
     {
         return getEHCache().get( key ) != null;
     }
 
-    public boolean doIsExpired( String key )
+    public boolean doIsExpired( final String key )
     {
         if ( getEHCache().isKeyInCache( key ) )
         {
@@ -81,7 +83,7 @@ public class EhCachePathCache
         }
     }
 
-    public void doPut( String key, Object element, int expiration )
+    public void doPut( final String key, final Object element, final int expiration )
     {
         Element el = new Element( key, element );
         if ( expiration != -1 )
@@ -120,7 +122,7 @@ public class EhCachePathCache
         // getEHCache().flush();
 
         // this above is not true anymore, since the "shared-cache" implementor forgot about the fact that using purge()
-        // will purge _all_ caches (it purges the one shared!), not just this repo's cache 
+        // will purge _all_ caches (it purges the one shared!), not just this repo's cache
         return removeWithChildren( RepositoryItemUid.PATH_ROOT );
     }
 

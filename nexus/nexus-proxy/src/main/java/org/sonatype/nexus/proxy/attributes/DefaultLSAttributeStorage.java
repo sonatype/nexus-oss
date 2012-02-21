@@ -237,6 +237,12 @@ public class DefaultLSAttributeStorage
             {
                 StorageFileItem attributeItem = (StorageFileItem) attributeItemCandidate;
 
+                if ( attributeItem.getLength() == 0 )
+                {
+                    // NEXUS-4871
+                    throw new InvalidInputException( "Attribute of " + uid + " is empty!" );
+                }
+
                 attributeStream = attributeItem.getContentLocator().getContent();
 
                 result = marshaller.unmarshal( attributeStream );

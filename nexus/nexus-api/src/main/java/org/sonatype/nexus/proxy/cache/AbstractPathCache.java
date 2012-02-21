@@ -18,27 +18,27 @@ package org.sonatype.nexus.proxy.cache;
 public abstract class AbstractPathCache
     implements PathCache
 {
-    public final boolean contains( String path )
+    public final boolean contains( final String path )
     {
         return doContains( makeKeyFromPath( path ) );
     }
 
-    public final boolean isExpired( String path )
+    public final boolean isExpired( final String path )
     {
         return doIsExpired( makeKeyFromPath( path ) );
     }
 
-    public final void put( String path, Object element )
+    public final void put( final String path, final Object element )
     {
         doPut( makeKeyFromPath( path ), element, -1 );
     }
 
-    public final void put( String path, Object element, int expiration )
+    public final void put( final String path, final Object element, final int expiration )
     {
         doPut( makeKeyFromPath( path ), element, expiration );
     }
 
-    public final boolean remove( String path )
+    public final boolean remove( final String path )
     {
         if ( contains( path ) )
         {
@@ -64,7 +64,7 @@ public abstract class AbstractPathCache
         return result;
     }
 
-    public abstract boolean removeWithChildren( String path );
+    public abstract boolean removeWithChildren( final String path );
 
     public final boolean purge()
     {
