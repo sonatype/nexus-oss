@@ -35,6 +35,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.HandlerWrapper;
 import org.slf4j.LoggerFactory;
+import org.sonatype.jettytestsuite.BlockingServer;
 
 public class AbstractRESTLightClientTest
 {
@@ -225,7 +226,7 @@ public class AbstractRESTLightClientTest
 
         logger.info( "Starting test server on port: " + port );
 
-        server = new Server( port );
+        server = new BlockingServer( port );
 
         HandlerWrapper wrapper = new HandlerWrapper();
         wrapper.setHandler( new AbstractHandler()

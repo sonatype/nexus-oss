@@ -63,6 +63,11 @@
       <artifactId>aether-util</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-jetty-testsuite</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
       <scope>test</scope>

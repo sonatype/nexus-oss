@@ -23,6 +23,7 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.sonatype.jettytestsuite.BlockingServer;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -56,7 +57,7 @@ public class JettyMemoryLeak
             }
         };
 
-        server = new Server( 8080 );
+        server = new BlockingServer( 8080 );
         server.setHandler( handler );
         server.setStopAtShutdown( true );
         server.start();

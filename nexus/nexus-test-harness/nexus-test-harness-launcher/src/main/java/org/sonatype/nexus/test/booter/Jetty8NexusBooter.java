@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 /**
  * The simplified Nexus booter class, that boots Nexus (the IT test subject) in completely same way as it boots in
  * bundle, but in this same JVM in an isolated classloader, hence, even it will exist in same JVM, REST API is the only
- * possible "contact" with it. Naturally, Java Service Wrapper is not present, but it uses the same Jetty7 class used by
+ * possible "contact" with it. Naturally, Java Service Wrapper is not present, but it uses the same Jetty8 class used by
  * bundle boot procedure too. Currently, nexus is started/stopped per test class.
  * <p>
  * There are few trickeries happening here (think ClassLoaders) that will mostly go away once we start producing clean
@@ -51,19 +51,19 @@ import org.slf4j.LoggerFactory;
  * that is never recreated. For reasons, see comments in {@link #tamperJarsForSharedClasspath(File)} method. b) we are
  * emulating what is happening during bundle boot, and since Nexus -- while it is fully fledged Java Web Application --
  * there is one outstanding exception: the JARs are not in /WEB-INF/lib, but in a folder above /WEB-INF, which is
- * illegal. Hence, we, in same way as booter, add the Nexus constituent JARs to a classpath, and let Jetty7 create
+ * illegal. Hence, we, in same way as booter, add the Nexus constituent JARs to a classpath, and let Jetty8 create
  * WebAppClassloader, that will "delegate" to classes, but filtering out Jetty implementation classes on the way.
  * <p>
  * Again, once we start following conventions, this class would be simplified too! For example, the IT-realm and
- * trickery around it would become not needed at all, since Jetty7 would create WebAppClassloader anyway, lifting
+ * trickery around it would become not needed at all, since Jetty8 would create WebAppClassloader anyway, lifting
  * everything from /WEB-INF/lib directory.
  * 
  * @author cstamas
  */
-public class Jetty7NexusBooter
+public class Jetty8NexusBooter
     implements NexusBooter
 {
-    protected static Logger log = LoggerFactory.getLogger( Jetty7NexusBooter.class );
+    protected static Logger log = LoggerFactory.getLogger( Jetty8NexusBooter.class );
 
     // ==
 
@@ -101,9 +101,9 @@ public class Jetty7NexusBooter
     private ClassRealm nexusClassloader;
 
     /**
-     * Reference to Jetty7 class instance, got and manipulated using Reflection.
+     * Reference to Jetty8 class instance, got and manipulated using Reflection.
      */
-    private Object jetty7;
+    private Object jetty8;
 
     /**
      * Creates a NexusBooter instance, that pre-configures and adapts the Nexus bundle unzipped in passed in
@@ -116,7 +116,7 @@ public class Jetty7NexusBooter
      * @param port
      * @throws Exception
      */
-    public Jetty7NexusBooter( final File bundleBasedir, final int port )
+    public Jetty8NexusBooter( final File bundleBasedir, final int port )
         throws Exception
     {
         this.bundleBasedir = bundleBasedir;
@@ -170,7 +170,7 @@ public class Jetty7NexusBooter
     public void startNexus( final String testId )
         throws Exception
     {
-        if ( jetty7 != null )
+        if ( jetty8 != null )
         {
             // 2nd invocation? Stop first or puke?
             throw new IllegalStateException( "Nexus already started!" );
@@ -186,11 +186,11 @@ public class Jetty7NexusBooter
             Thread.currentThread().setContextClassLoader( sharedClassloader );
             // Thread.currentThread().setContextClassLoader( jetty7ClassLoader );
 
-            final Class<?> jetty7Class = sharedClassloader.loadClass( "org.sonatype.plexus.jetty.Jetty7" );
+            final Class<?> jetty8Class = sharedClassloader.loadClass( "org.sonatype.sisu.jetty.Jetty8" );
             // final Class<?> jetty7Class = jetty7ClassLoader.loadClass( "org.sonatype.plexus.jetty.Jetty7" );
 
-            jetty7 =
-                jetty7Class.getConstructor( File.class, ClassLoader.class, Map[].class ).newInstance(
+            jetty8 =
+                jetty8Class.getConstructor( File.class, ClassLoader.class, Map[].class ).newInstance(
                     new File( bundleBasedir, "conf/jetty.xml" ), nexusClassloader,
                     new Map[] { defaultContext( bundleBasedir ) } );
         }
@@ -199,7 +199,7 @@ public class Jetty7NexusBooter
             Thread.currentThread().setContextClassLoader( original );
         }
 
-        jetty7.getClass().getMethod( "startJetty" ).invoke( jetty7 );
+        jetty8.getClass().getMethod( "startJetty" ).invoke( jetty8 );
     }
 
     /**
@@ -214,16 +214,16 @@ public class Jetty7NexusBooter
     {
         try
         {
-            if ( jetty7 != null )
+            if ( jetty8 != null )
             {
-                jetty7.getClass().getMethod( "stopJetty" ).invoke( jetty7 );
+                jetty8.getClass().getMethod( "stopJetty" ).invoke( jetty8 );
             }
         }
         catch ( InvocationTargetException e )
         {
             if ( e.getCause() instanceof IllegalStateException )
             {
-                // swallow it, it is Jetty7 that throws this when we stop but did not start...
+                // swallow it, it is Jetty8 that throws this when we stop but did not start...
             }
             else
             {
@@ -239,7 +239,7 @@ public class Jetty7NexusBooter
     // == Protected methods below
 
     /**
-     * Builds minimal "default" context to boot Jetty7 properly. In case of bundle, the {@code bundleBasedir} context
+     * Builds minimal "default" context to boot Jetty8 properly. In case of bundle, the {@code bundleBasedir} context
      * element is got from Java System Properties, and is set by Java Service Wrapper (in wrapper.conf).
      * 
      * @param bundleBasedir
@@ -324,8 +324,8 @@ public class Jetty7NexusBooter
     }
 
     /**
-     * Modifies the Jetty's configuration files (those used by Jetty7 class, that is used in bundle but also here to
-     * boot Jetty7). It sets Jetty port to the one wanted by IT, but also eliminates the appearance of Jetty's
+     * Modifies the Jetty's configuration files (those used by Jetty8 class, that is used in bundle but also here to
+     * boot Jetty8). It sets Jetty port to the one wanted by IT, but also eliminates the appearance of Jetty's
      * "shutdown thread" that usually "pins" the it-realm classloader to memory, making it not garbage collected, and
      * making ITs OOM PermGen.
      * 
@@ -360,7 +360,7 @@ public class Jetty7NexusBooter
 
         // ==
         // Disable the shutdown hook, since it disturbs the embedded work
-        // In Jetty7, any invocation of server.stopAtShutdown(boolean) will create a thread in a class static member.
+        // In Jetty8, any invocation of server.stopAtShutdown(boolean) will create a thread in a class static member.
         // Hence, we simply want to make sure, that there is NO invocation happening of that method.
         {
             final File jettyXml = new File( basedir, "conf/jetty.xml" );
@@ -430,8 +430,8 @@ public class Jetty7NexusBooter
 
         // move jetty (actualy, all that is level up in real bundle too) level up, it is isolated anyway in real bundle
         tamperJarsForSharedClasspath( basedir, sharedLibs, "jetty-*.jar" );
-        tamperJarsForSharedClasspath( basedir, sharedLibs, "servlet-api-*.jar" );
-        tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-jetty7-*.jar" );
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "javax.servlet-api-*.jar" );
+        tamperJarsForSharedClasspath( basedir, sharedLibs, "sisu-jetty8-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-utils-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-interpolation-*.jar" );
         tamperJarsForSharedClasspath( basedir, sharedLibs, "plexus-classworlds-*.jar" );
@@ -492,7 +492,7 @@ public class Jetty7NexusBooter
         }
 
         // drop references
-        this.jetty7 = null;
+        this.jetty8 = null;
         this.nexusClassloader = null;
 
         // give some relief for other (like JVM internal) threads

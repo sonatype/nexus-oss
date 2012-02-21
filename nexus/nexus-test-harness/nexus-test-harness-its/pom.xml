@@ -440,7 +440,13 @@
                     <artifactItem>
                       <groupId>org.eclipse.jetty</groupId>
                       <artifactId>jetty-distribution</artifactId>
-                      <version>${jetty.version}</version>
+                      <version>8.1.1.v20120215</version>
+                      <type>tar.gz</type>
+                    </artifactItem>
+                    <artifactItem>
+                      <groupId>org.eclipse.jetty</groupId>
+                      <artifactId>jetty-distribution</artifactId>
+                      <version>7.6.0.v20120127</version>
                       <type>tar.gz</type>
                     </artifactItem>
                   </artifactItems>

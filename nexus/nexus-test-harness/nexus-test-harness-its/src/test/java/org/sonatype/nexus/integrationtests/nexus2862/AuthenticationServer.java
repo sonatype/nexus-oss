@@ -23,16 +23,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.security.ConstraintMapping;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.security.HashLoginService;
-import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.nio.SelectChannelConnector;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.util.security.Credential;
+import org.sonatype.jettytestsuite.BlockingServer;
 
 public class AuthenticationServer
 {
@@ -50,11 +49,7 @@ public class AuthenticationServer
 
     public AuthenticationServer( Integer port )
     {
-        server = new Server();
-
-        Connector connector = new SelectChannelConnector();
-        connector.setPort( port );
-        server.setConnectors( new Connector[] { connector } );
+        server = new BlockingServer( port );
 
         Constraint constraint = new Constraint();
         constraint.setName( Constraint.__BASIC_AUTH );

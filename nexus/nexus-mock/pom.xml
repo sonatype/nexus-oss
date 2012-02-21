@@ -94,8 +94,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty7</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-jetty8</artifactId>
     </dependency>
 
     <dependency>

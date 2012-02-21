@@ -42,12 +42,8 @@
       <artifactId>appcontext</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty7</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-jetty8</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -57,7 +53,7 @@
     <!--  The Jetty itself -->
     <dependency>
       <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>compile</scope>
     </dependency>
 
