@@ -67,7 +67,6 @@ import org.sonatype.nexus.templates.TemplateManager;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 import org.sonatype.security.SecuritySystem;
 
 /**
@@ -140,9 +139,6 @@ public class DefaultNexus
      */
     @Requirement
     private SecuritySystem securitySystem;
-
-    @Requirement
-    private PlexusEhCacheWrapper cacheWrapper;
 
     @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
@@ -439,8 +435,6 @@ public class DefaultNexus
 
         try
         {
-            cacheWrapper.start();
-
             // force config load and validation
             // applies configuration and notifies listeners
             nexusConfiguration.loadConfiguration( true );
@@ -532,8 +526,6 @@ public class DefaultNexus
         nexusConfiguration.dropInternals();
 
         securitySystem.stop();
-
-        cacheWrapper.stop();
 
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPED );
         

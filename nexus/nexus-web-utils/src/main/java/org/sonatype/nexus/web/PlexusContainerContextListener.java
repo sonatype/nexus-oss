@@ -14,6 +14,7 @@ package org.sonatype.nexus.web;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -75,25 +76,27 @@ public class PlexusContainerContextListener
         {
             try
             {
-                AppContext plexusContext =
+                final AppContext plexusContext =
                     createContainerContext( context,
                         (Map<String, Object>) context.getAttribute( AppContext.class.getName() ) );
 
-                ContainerConfiguration plexusConfiguration =
+                final ContainerConfiguration plexusConfiguration =
                     new DefaultContainerConfiguration().setName( context.getServletContextName() ).setContainerConfigurationURL(
                         plexusXmlFile.toURI().toURL() ).setContext( (Map) plexusContext ).setAutoWiring( true ).setClassPathScanning(
                         PlexusConstants.SCANNING_INDEX ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
+
+                final ArrayList<Module> modules = new ArrayList<Module>( 1 );
+                modules.add( new AppContextModule( plexusContext ) );
 
                 final Module[] customModules = (Module[]) context.getAttribute( CUSTOM_MODULES );
 
                 if ( customModules != null )
                 {
-                    plexusContainer = new DefaultPlexusContainer( plexusConfiguration, customModules );
+                    modules.addAll( Arrays.asList( customModules ) );
                 }
-                else
-                {
-                    plexusContainer = new DefaultPlexusContainer( plexusConfiguration );
-                }
+
+                plexusContainer =
+                    new DefaultPlexusContainer( plexusConfiguration, modules.toArray( new Module[modules.size()] ) );
 
                 context.setAttribute( PlexusConstants.PLEXUS_KEY, plexusContainer );
 

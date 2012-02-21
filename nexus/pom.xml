@@ -170,7 +170,7 @@
     <plexus-app-events.version>1.0.1</plexus-app-events.version>
     <plexus-cli.version>1.2</plexus-cli.version>
     <plexus-digest.version>1.1</plexus-digest.version>
-    <plexus-ehcache.version>1.3</plexus-ehcache.version>
+    <sisu-ehcache.version>1.0</sisu-ehcache.version>
     <plexus-interpolation.version>1.14</plexus-interpolation.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
     <plexus-jetty7.version>1.2</plexus-jetty7.version>
@@ -238,7 +238,7 @@
       <dependency>
         <groupId>org.sonatype.appcontext</groupId>
         <artifactId>appcontext</artifactId>
-        <version>2.1</version>
+        <version>3.0</version>
       </dependency>
 
       <dependency>
@@ -533,6 +533,12 @@
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-system</artifactId>
         <version>${plexus-security.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.spice</groupId>
+            <artifactId>plexus-ehcache</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
@@ -811,15 +817,14 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.spice</groupId>
-        <artifactId>plexus-ehcache</artifactId>
-        <version>${plexus-ehcache.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-ehcache</artifactId>
+        <version>${sisu-ehcache.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.sf.ehcache</groupId>
+        <artifactId>ehcache-core</artifactId>
+        <version>2.5.1</version>
       </dependency>
 
       <!-- Restlet.org et al -->
@@ -937,18 +942,6 @@
         <artifactId>commons-lang</artifactId>
         <version>2.3</version>
         <type>jar</type>
-      </dependency>
-      <dependency>
-        <groupId>net.sf.ehcache</groupId>
-        <artifactId>ehcache</artifactId>
-        <version>1.6.2</version>
-        <type>jar</type>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.sonatype.spice</groupId>
@@ -1430,6 +1423,13 @@
                     <include>org.eclipse.jetty:*:${jetty.version}</include>
                   </includes>
                   <message>Use the Eclipse/Jetty version defined in nexus parent. See jetty.version property</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <searchTransitive>true</searchTransitive>
+                  <excludes>
+                    <exclude>org.sonatype.spice:plexus-ehcache</exclude>
+                  </excludes>
+                  <message>Use the org.sonatype.sisu:sisu-ehcache instead of plexus-ehcache!</message>
                 </bannedDependencies>
 
                 <!-- <requirePluginVersions> <banSnapshots>false</banSnapshots> </requirePluginVersions> -->
