@@ -257,20 +257,6 @@ public class DefaultErrorReportingManager
         getCurrentConfiguration( true ).setJiraProject( pkey );
     }
 
-    /**
-     * the useGlobalProxy config is always ignored <br/>
-     * TODO: remove this config? <br/>
-     */
-    public boolean isUseGlobalProxy()
-    {
-        return true;
-    }
-
-    public void setUseGlobalProxy( boolean val )
-    {
-        getCurrentConfiguration( true ).setUseGlobalProxy( val );
-    }
-
     // ==
 
     @Override
@@ -298,7 +284,7 @@ public class DefaultErrorReportingManager
             if ( request.isManual() )
             {
                 getLogger().trace( "Manual error report: '{}'", request.getTitle() );
-                IssueSubmissionRequest subRequest = buildRequest( request, auth.getLogin(), true );
+                IssueSubmissionRequest subRequest = buildRequest( request );
 
                 submitIssue( auth, response, subRequest );
             }
@@ -307,7 +293,7 @@ public class DefaultErrorReportingManager
             {
                 getLogger().info( "Detected Error in Nexus: {}. Generating a problem report...",
                                   getThrowableMessage( request.getThrowable() )  );
-                IssueSubmissionRequest subRequest = buildRequest( request, auth.getLogin(), true );
+                IssueSubmissionRequest subRequest = buildRequest( request );
 
                 List<Issue> existingIssues = retrieveIssues( subRequest.getSummary(), auth );
 
@@ -430,7 +416,7 @@ public class DefaultErrorReportingManager
 
     }
 
-    protected IssueSubmissionRequest buildRequest( ErrorReportRequest request, String username, boolean useGlobalProxy )
+    protected IssueSubmissionRequest buildRequest( ErrorReportRequest request )
     {
         IssueSubmissionRequest subRequest = new IssueSubmissionRequest();
 

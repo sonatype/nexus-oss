@@ -155,7 +155,6 @@ public class DefaultErrorReportingManagerTest
         manager.setJIRAProject( "SBOX" );
         manager.setJIRAUsername( "jira" );
         manager.setJIRAPassword( "jira" );
-        manager.setUseGlobalProxy( useProxy );
 
         nexusConfig.saveConfiguration();
     }
