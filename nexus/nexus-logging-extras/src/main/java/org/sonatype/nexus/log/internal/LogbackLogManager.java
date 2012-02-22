@@ -52,6 +52,7 @@ import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.rolling.RollingFileAppender;
+import ch.qos.logback.core.status.StatusManager;
 import ch.qos.logback.core.util.StatusPrinter;
 
 //TODO configuration operations should be locking
@@ -390,6 +391,7 @@ public class LogbackLogManager
             JoranConfigurator configurator = new JoranConfigurator();
             configurator.setContext( lc );
             lc.reset();
+            lc.getStatusManager().clear();
             configurator.doConfigure( new File( logConfigDir, LOG_CONF ) );
         }
         catch ( JoranException je )
