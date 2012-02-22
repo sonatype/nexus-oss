@@ -208,7 +208,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             store.deleteItem( req );
 
             getLogger().info(
-                "Artifact(s) of path '" + req.getRequestPath() + "' was delete from repository ["
+                "Storage item(s) on path \"" + req.getRequestPath() + "\" (and below) were deleted from repository ["
                     + request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) + "]" );
         }
         catch ( Exception e )
