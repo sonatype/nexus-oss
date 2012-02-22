@@ -13,35 +13,47 @@
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventDeleteRecursively;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
+import com.google.common.base.Preconditions;
+
+/**
+ * WalkerProcessor performing a "notification" (by firing corresponding events) of items about to be deleted as part of
+ * a delete operation invoked against collection item. It handles all item types except collections.
+ * 
+ * @author cstamas
+ */
 public class DeletionNotifierWalker
-    extends AbstractFileWalkerProcessor
+    extends AbstractWalkerProcessor
 {
     private final ApplicationEventMulticaster applicationEventMulticaster;
 
     private final ResourceStoreRequest request;
 
-    public DeletionNotifierWalker( ApplicationEventMulticaster applicationEventMulticaster, ResourceStoreRequest request )
+    public DeletionNotifierWalker( final ApplicationEventMulticaster applicationEventMulticaster,
+                                   final ResourceStoreRequest request )
     {
-        this.applicationEventMulticaster = applicationEventMulticaster;
-
-        this.request = request;
+        this.applicationEventMulticaster = Preconditions.checkNotNull( applicationEventMulticaster );
+        this.request = Preconditions.checkNotNull( request );
     }
 
     @Override
-    protected void processFileItem( WalkerContext ctx, StorageFileItem item )
+    public final void processItem( final WalkerContext context, final StorageItem item )
+        throws Exception
     {
-        item.getItemContext().setParentContext( request.getRequestContext() );
-        
-        // just fire it, and someone will eventually catch it
-        applicationEventMulticaster.notifyEventListeners( new RepositoryItemEventDelete(
-            ctx.getRepository(),
-            item ) );
-    }
+        if ( !( item instanceof StorageCollectionItem ) )
+        {
+            // cstamas: this should be not needed, as Walker should handle this!
+            item.getItemContext().setParentContext( request.getRequestContext() );
 
+            // just fire it, and someone will eventually catch it
+            applicationEventMulticaster.notifyEventListeners( new RepositoryItemEventDeleteRecursively(
+                context.getRepository(), item ) );
+        }
+    }
 }

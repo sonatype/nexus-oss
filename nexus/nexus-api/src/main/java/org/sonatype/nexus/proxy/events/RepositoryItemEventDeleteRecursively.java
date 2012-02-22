@@ -16,15 +16,18 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The base event fired on item deletions. See {@link RepositoryItemEventDeleteRoot} and
- * {@link RepositoryItemEventDeleteRecursively} for actual events being fired.
+ * The event fired on item deletion when a collection is about to be deleted. When a collection is deleted, a
+ * "recursive dive" is done to notify listeners for recursive deletions about to happen as part of a deletion of a
+ * collection item. All delete events are fired before actual deletion is made, hence, the items carried by these events
+ * are still present and even it's content is reachable (if any).
  * 
  * @author cstamas
+ * @since 2.1
  */
-public abstract class RepositoryItemEventDelete
-    extends RepositoryItemEvent
+public class RepositoryItemEventDeleteRecursively
+    extends RepositoryItemEventDelete
 {
-    public RepositoryItemEventDelete( final Repository repository, final StorageItem item )
+    public RepositoryItemEventDeleteRecursively( final Repository repository, final StorageItem item )
     {
         super( repository, item );
     }

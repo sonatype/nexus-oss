@@ -23,10 +23,8 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class RepositoryItemEventRetrieve
     extends RepositoryItemEvent
 {
-
     public RepositoryItemEventRetrieve( final Repository repository, final StorageItem item )
     {
         super( repository, item );
     }
-
 }

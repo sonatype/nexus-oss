@@ -16,15 +16,19 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The base event fired on item deletions. See {@link RepositoryItemEventDeleteRoot} and
- * {@link RepositoryItemEventDeleteRecursively} for actual events being fired.
+ * The event fired on item delete carrying item from where deletion is executed. For one deletion (ie. invocation of
+ * {@link Repository#deleteItem(org.sonatype.nexus.proxy.ResourceStoreRequest)}) there will be only one event of this
+ * type fired. If item is a collection, other delete related events will be fired, see
+ * {@link RepositoryItemEventDeleteRecursively} event. All delete events are fired before actual deletion is made,
+ * hence, the items carried by these events are still present and even it's content is reachable (if any).
  * 
  * @author cstamas
+ * @since 2.1
  */
-public abstract class RepositoryItemEventDelete
-    extends RepositoryItemEvent
+public class RepositoryItemEventDeleteRoot
+    extends RepositoryItemEventDelete
 {
-    public RepositoryItemEventDelete( final Repository repository, final StorageItem item )
+    public RepositoryItemEventDeleteRoot( final Repository repository, final StorageItem item )
     {
         super( repository, item );
     }
