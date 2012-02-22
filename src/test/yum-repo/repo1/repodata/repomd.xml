@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<repomd xmlns="http://linux.duke.edu/metadata/repo" xmlns:rpm="http://linux.duke.edu/metadata/rpm">
+  <revision>1329475091</revision>
+  <data type="other_db">
+    <location xml:base="http://devnex.rz.is24.loc/content/repositories/production" href="repodata/other.sqlite.bz2"/>
+    <checksum type="sha256">6679348ef0c84c3f068d423fea7b692cfb9465e9a108f022a800a98b4e0616a1</checksum>
+    <timestamp>1329475092.0</timestamp>
+    <size>7311</size>
+    <open-size>22528</open-size>
+    <open-checksum type="sha256">87357b63cbb0ea0dd13c251d4744a28400acda0426bc15f3d9d6dd499520b6a8</open-checksum>
+    <database_version>10</database_version>
+  </data>
+  <data type="other">
+    <checksum type="sha256">15b465212b3f0d806123e0d77301f637408b8e34c90f967b001b76fd16a2baa8</checksum>
+    <timestamp>1329475092</timestamp>
+    <size>4923</size>
+    <open-size>19685</open-size>
+    <open-checksum type="sha256">682234f9bb367f81ed8ef495b491b5d7730a942aeb574060474de87b4fee6af0</open-checksum>
+    <location xml:base="http://devnex.rz.is24.loc/content/repositories/production" href="repodata/other.xml.gz"/>
+  </data>
+  <data type="filelists_db">
+    <location xml:base="http://devnex.rz.is24.loc/content/repositories/production" href="repodata/filelists.sqlite.bz2"/>
+    <checksum type="sha256">65799c92a5a38967abf4ead2b0ba16e586db99ff55252b3be66c16ce48ac50ad</checksum>
+    <timestamp>1329475093.0</timestamp>
+    <size>78801</size>
+    <open-size>1306624</open-size>
+    <open-checksum type="sha256">0831ac8a5f9880e6387e7c6f241f0439f76d73c787ec3d3f23442b102fd32153</open-checksum>
+    <database_version>10</database_version>
+  </data>
+  <data type="filelists">
+    <checksum type="sha256">cba1d412f7923c711e7289403664e7517750b5b1d7a971c9fdfe12a56cf372a9</checksum>
+    <timestamp>1329475092</timestamp>
+    <size>158107</size>
+    <open-size>2585819</open-size>
+    <open-checksum type="sha256">5d5a05ec7c653b6d9b97fc45444749fdb80eb5f2f1159fd0022a3d09c583f4c0</open-checksum>
+    <location xml:base="http://devnex.rz.is24.loc/content/repositories/production" href="repodata/filelists.xml.gz"/>
+  </data>
+  <data type="primary_db">
+    <location xml:base="http://devnex.rz.is24.loc/content/repositories/production" href="repodata/primary.sqlite.bz2"/>
+    <checksum type="sha256">79d8173a52f4b984ffd6b0399deeff65efb27528cf1b6016513ee00b0dff2887</checksum>
+    <timestamp>1329475093.0</timestamp>
+    <size>25961</size>
+    <open-size>139264</open-size>
+    <open-checksum type="sha256">b6353937f285f64b55b05773884227e44b74e62a3c42633b136284df261389fc</open-checksum>
+    <database_version>10</database_version>
+  </data>
+  <data type="primary">
+    <checksum type="sha256">1e45a3089b89361e0ec5477d864074da61d172d47e6b58104d4f61217a357e8b</checksum>
+    <timestamp>1329475092</timestamp>
+    <size>11879</size>
+    <open-size>170244</open-size>
+    <open-checksum type="sha256">c1c8c260221e2f0660e404adc388eb9dbd1349ffb9a22b1462ece3a08b207656</open-checksum>
+    <location xml:base="http://devnex.rz.is24.loc/content/repositories/production" href="repodata/primary.xml.gz"/>
+  </data>
+</repomd>
