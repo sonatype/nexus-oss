@@ -85,7 +85,8 @@ public class NexusPRConnector
     @Override
     protected HttpClient client()
     {
-        final DefaultHttpClient client = (DefaultHttpClient) client();
+        final DefaultHttpClient client = (DefaultHttpClient) super.client();
+
         // always configure with current proxy and params... settings may have changed
         client.setParams( createHttpParams( config.getGlobalRemoteStorageContext() ) );
         configureProxy( client, config.getGlobalRemoteStorageContext() );

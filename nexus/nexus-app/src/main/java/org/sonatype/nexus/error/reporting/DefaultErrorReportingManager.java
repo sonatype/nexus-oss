@@ -26,6 +26,7 @@ import java.util.Set;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
@@ -55,6 +56,7 @@ import org.sonatype.sisu.issue.IssueRetriever;
 import org.sonatype.sisu.pr.ProjectManager;
 import org.sonatype.sisu.pr.bundle.Archiver;
 import org.sonatype.sisu.pr.bundle.Bundle;
+import org.sonatype.sisu.pr.bundle.StorageManager;
 
 @Component( role = ErrorReportingManager.class )
 public class DefaultErrorReportingManager
@@ -82,6 +84,9 @@ public class DefaultErrorReportingManager
     @Requirement
     private UserAgentBuilder uaBuilder;
 
+    @Requirement
+    private StorageManager storageManager;
+
     private static final String DEFAULT_USERNAME = "sonatype_problem_reporting";
 
     @VisibleForTesting
@@ -105,7 +110,8 @@ public class DefaultErrorReportingManager
                                   final ProjectManager projectManager,
                                   final UserAgentBuilder uaBuilder,
                                   final NexusConfiguration nexusConfig,
-                                  final ApplicationEventMulticaster applicationEventMulticaster )
+                                  final ApplicationEventMulticaster applicationEventMulticaster,
+                                  final StorageManager storageManager )
     {
         super( applicationEventMulticaster );
         this.archiver = archiver;
@@ -114,6 +120,7 @@ public class DefaultErrorReportingManager
         this.nexusConfig = nexusConfig;
         this.projectManager = projectManager;
         this.uaBuilder = uaBuilder;
+        this.storageManager = storageManager;
     }
 
     private Logger getLogger()
@@ -276,6 +283,7 @@ public class DefaultErrorReportingManager
     }
 
     public ErrorReportResponse handleError( final ErrorReportRequest request, final AuthenticationSource auth )
+        throws IssueSubmissionException
     {
         ErrorReportResponse response = new ErrorReportResponse();
 
@@ -332,8 +340,22 @@ public class DefaultErrorReportingManager
         }
         catch ( Exception e )
         {
-            getLogger().warn( "Error while submitting problem report: " + e.getMessage() );
-            getLogger().debug( e.getMessage(), e );
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().warn( "Error while submitting problem report: {}", e.getMessage(), e );
+            }
+            else
+            {
+                getLogger().warn( "Error while submitting problem report: {}", e.getMessage() );
+            }
+
+            Throwables.propagateIfInstanceOf( e, IssueSubmissionException.class );
+
+            throw new IssueSubmissionException( "Unable to submit problem report: " + e.getMessage(), e );
+        }
+        finally
+        {
+            storageManager.release();
         }
 
         return response;
