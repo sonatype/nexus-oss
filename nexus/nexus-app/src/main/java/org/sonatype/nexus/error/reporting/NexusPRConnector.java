@@ -85,18 +85,14 @@ public class NexusPRConnector
     @Override
     protected HttpClient client()
     {
-        if ( client == null )
-        {
-            client = (DefaultHttpClient) super.client();
-        }
-
+        final DefaultHttpClient client = (DefaultHttpClient) client();
         // always configure with current proxy and params... settings may have changed
         client.setParams( createHttpParams( config.getGlobalRemoteStorageContext() ) );
         configureProxy( client, config.getGlobalRemoteStorageContext() );
 
         return client;
     }
-    
+
     @Override
     protected HttpParams requestParams()
     {
@@ -135,7 +131,6 @@ public class NexusPRConnector
                         httpClient.getConnectionManager().getSchemeRegistry(), nonProxyHostPatterns
                     )
                 );
-
             }
 
             configureAuthentication( httpClient, rps.getHostname(), rps.getPort(), rps.getProxyAuthentication() );
@@ -199,10 +194,7 @@ public class NexusPRConnector
     @Override
     public void dispose()
     {
-        if ( client != null )
-        {
-            client.getConnectionManager().shutdown();
-        }
+        super.dispose();
     }
 
     /**
