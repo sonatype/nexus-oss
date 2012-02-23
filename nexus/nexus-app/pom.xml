@@ -93,7 +93,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.pr</groupId>
       <artifactId>sisu-problem-reporter</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.5.1</version>
       <exclusions>
         <exclusion>
           <groupId>javax.inject</groupId>
@@ -140,7 +140,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.pr</groupId>
       <artifactId>sisu-pr-testutil</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.5.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
