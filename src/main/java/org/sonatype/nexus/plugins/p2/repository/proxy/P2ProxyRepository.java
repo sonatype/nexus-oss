@@ -249,9 +249,18 @@ public class P2ProxyRepository
         }
         catch ( final Exception e )
         {
+            String message = e.getMessage();
+            if ( e.getCause() != null )
+            {
+                if ( !message.contains( e.getCause().getMessage() ) )
+                {
+                    message += " Reason: " + e.getCause().getMessage();
+                }
+            }
             getLogger().warn(
-                "Could not retrieve list of repository mirrors. All downloads will come from repository canonical URL",
-                e );
+                "Could not retrieve list of repository mirrors ("
+                    + message
+                    + "). All downloads will come from repository canonical URL." );
         }
         finally
         {
