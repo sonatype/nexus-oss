@@ -117,7 +117,7 @@
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
   </smtpConfiguration>
   <errorReporting>
-    <jiraUrl>https://issues.sonatype.org</jiraUrl>
+    <jiraUrl>http://localhost:${webproxy-server-port}</jiraUrl>
     <jiraProject>SBOX</jiraProject>
   </errorReporting>
 </nexusConfiguration>
