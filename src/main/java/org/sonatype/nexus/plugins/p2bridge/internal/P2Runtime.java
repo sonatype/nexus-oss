@@ -68,7 +68,7 @@ class P2Runtime
     public P2Runtime( final EclipseBridge eclipseBridge, final EclipseLocationFactory eclipseLocationFactory,
                       final PluginRepositoryManager pluginRepositoryManager,
                       final ApplicationConfiguration applicationConfiguration,
-                      final @Named("zip") UnArchiver unArchiver)
+                      final @Named( "zip" ) UnArchiver unArchiver )
     {
         this.eclipseBridge = eclipseBridge;
         this.eclipseLocationFactory = eclipseLocationFactory;
@@ -118,10 +118,18 @@ class P2Runtime
         {
             {
                 // TODO is this really necessary?
-                final File secureStorage =
-                    new File( applicationConfiguration.getConfigurationDirectory(), "eclipse.secure_storage" );
+                final File secureStorage = new File(
+                    applicationConfiguration.getConfigurationDirectory(), "eclipse.secure_storage"
+                );
+                if ( secureStorage.exists() && !secureStorage.delete() )
+                {
+                    throw new RuntimeException(
+                        "Could not delete Eclipse secure storage " + secureStorage.getAbsolutePath()
+                    );
+                }
                 EclipseEnvironmentInfo.setAppArgs(
-                    new String[]{ "-eclipse.keyring", secureStorage.getAbsolutePath() } );
+                    new String[]{ "-eclipse.keyring", secureStorage.getAbsolutePath() }
+                );
             }
             eclipse.start( initParams( pluginDir ) );
             final File[] bundles = new File( pluginDir, "p2-runtime/bundles" ).listFiles( new FilenameFilter()
