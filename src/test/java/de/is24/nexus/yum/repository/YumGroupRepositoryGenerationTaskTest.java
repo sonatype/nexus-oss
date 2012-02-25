@@ -1,5 +1,7 @@
 package de.is24.nexus.yum.repository;
 
+import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.REPODATA_DIR;
+import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.assertRepository;
 import static java.util.Arrays.asList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -25,7 +27,7 @@ public class YumGroupRepositoryGenerationTaskTest {
   public void shouldGenerateGroupRepo() throws Exception {
     givenGroupRepoWith2YumRepos();
     thenGenerateYumRepo();
-    // assertGroupRepo();
+    assertRepository(REPODATA_DIR, "group-repo");
   }
 
   private void thenGenerateYumRepo() throws Exception {
