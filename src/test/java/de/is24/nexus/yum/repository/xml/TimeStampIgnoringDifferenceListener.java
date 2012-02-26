@@ -27,7 +27,7 @@ public class TimeStampIgnoringDifferenceListener implements DifferenceListener {
         || difference.getTestNodeDetail().getXpathLocation().contains("/format[1]")
         || difference.getTestNodeDetail().getXpathLocation().matches("^/repomd.{4,5}data.{4,5}(open-)?size.{3,4}$")
         || difference.getTestNodeDetail().getXpathLocation().matches("^/repomd.{4,5}(data.{4,5})?text.{5,6}$")
-        || difference.getTestNodeDetail().getXpathLocation().matches("^/repomd.{4,5}revision.{3,4}$")) {
+        || difference.getTestNodeDetail().getXpathLocation().matches("^/repomd.{4,5}revision.*$")) {
       return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
     }
 

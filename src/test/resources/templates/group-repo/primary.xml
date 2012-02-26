@@ -1,165 +1,4192 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata xmlns="http://linux.duke.edu/metadata/common"
-  xmlns:rpm="http://linux.duke.edu/metadata/rpm" packages="5">
-  <package type="rpm">
-    <name>another-artifact</name>
-    <arch>noarch</arch>
-    <version epoch="0" ver="0.0.1" rel="1" />
-    <checksum type="sha" pkgid="YES">badd9ef37442c1a4ff07b66fb37261b6e214f57a
-    </checksum>
-    <summary>(none)</summary>
-    <description>(none)</description>
-    <packager>maven - sherold</packager>
-    <url />
-    <time file="1320389088" build="1320389077" />
-    <size package="1372" installed="0" archive="124" />
-    <location xml:base="http://localhost:8080/nexus/content/snapshots"
-      href="another-artifact/0.0.1/another-artifact-0.0.1-1.noarch.rpm" />
-    <format>
-      <rpm:license />
-      <rpm:vendor>IS24</rpm:vendor>
-      <rpm:group>is24</rpm:group>
-      <rpm:buildhost>isdeblnmac39</rpm:buildhost>
-      <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this
-      </rpm:sourcerpm>
-      <rpm:header-range start="280" end="1316" />
-      <rpm:requires>
-        <rpm:entry name="rpmlib(PayloadFilesHavePrefix)"
-          flags="LE" epoch="0" ver="4.0" rel="1" />
-        <rpm:entry name="rpmlib(CompressedFileNames)" flags="LE"
-          epoch="0" ver="3.0.4" rel="1" />
-        <rpm:entry name="rpmlib(VersionedDependencies)" flags="LE"
-          epoch="0" ver="3.0.3" rel="1" />
-      </rpm:requires>
-    </format>
-  </package>
-  <package type="rpm">
-    <name>conflict-artifact</name>
-    <arch>noarch</arch>
-    <version epoch="0" ver="2.2" rel="1" />
-    <checksum type="sha" pkgid="YES">a08c947544e57edf650b250c474642cf22c78394
-    </checksum>
-    <summary>(none)</summary>
-    <description>(none)</description>
-    <packager>maven - sherold</packager>
-    <url />
-    <time file="1320389088" build="1320389077" />
-    <size package="1368" installed="0" archive="124" />
-    <location xml:base="http://localhost:8080/nexus/content/snapshots"
-      href="conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm" />
-    <format>
-      <rpm:license />
-      <rpm:vendor>IS24</rpm:vendor>
-      <rpm:group>is24</rpm:group>
-      <rpm:buildhost>isdeblnmac39</rpm:buildhost>
-      <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this
-      </rpm:sourcerpm>
-      <rpm:header-range start="280" end="1312" />
-      <rpm:requires>
-        <rpm:entry name="rpmlib(PayloadFilesHavePrefix)"
-          flags="LE" epoch="0" ver="4.0" rel="1" />
-        <rpm:entry name="rpmlib(CompressedFileNames)" flags="LE"
-          epoch="0" ver="3.0.4" rel="1" />
-        <rpm:entry name="rpmlib(VersionedDependencies)" flags="LE"
-          epoch="0" ver="3.0.3" rel="1" />
-      </rpm:requires>
-    </format>
-  </package>
-  <package type="rpm">
-    <name>conflict-artifact</name>
-    <arch>noarch</arch>
-    <version epoch="0" ver="2.2" rel="2" />
-    <checksum type="sha" pkgid="YES">7a52e1a653c82d6156ef744fb5882e70203f7dcc
-    </checksum>
-    <summary>(none)</summary>
-    <description>(none)</description>
-    <packager>maven - sherold</packager>
-    <url />
-    <time file="1320389088" build="1320389077" />
-    <size package="1368" installed="0" archive="124" />
-    <location xml:base="http://localhost:8080/nexus/content/snapshots"
-      href="conflict-artifact/2.2-2/conflict-artifact-2.2-2.noarch.rpm" />
-    <format>
-      <rpm:license />
-      <rpm:vendor>IS24</rpm:vendor>
-      <rpm:group>is24</rpm:group>
-      <rpm:buildhost>isdeblnmac39</rpm:buildhost>
-      <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this
-      </rpm:sourcerpm>
-      <rpm:header-range start="280" end="1312" />
-      <rpm:requires>
-        <rpm:entry name="rpmlib(PayloadFilesHavePrefix)"
-          flags="LE" epoch="0" ver="4.0" rel="1" />
-        <rpm:entry name="rpmlib(CompressedFileNames)" flags="LE"
-          epoch="0" ver="3.0.4" rel="1" />
-        <rpm:entry name="rpmlib(VersionedDependencies)" flags="LE"
-          epoch="0" ver="3.0.3" rel="1" />
-      </rpm:requires>
-    </format>
-  </package>
-  <package type="rpm">
-    <name>test-artifact</name>
-    <arch>noarch</arch>
-    <version epoch="0" ver="1.2" rel="1" />
-    <checksum type="sha" pkgid="YES">fa26218085aca9f31352746eec0e92d674326825
-    </checksum>
-    <summary>(none)</summary>
-    <description>(none)</description>
-    <packager>maven - sherold</packager>
-    <url />
-    <time file="1320389088" build="1320389077" />
-    <size package="1364" installed="0" archive="124" />
-    <location xml:base="http://localhost:8080/nexus/content/snapshots"
-      href="test-artifact/1.2/test-artifact-1.2-1.noarch.rpm" />
-    <format>
-      <rpm:license />
-      <rpm:vendor>IS24</rpm:vendor>
-      <rpm:group>is24</rpm:group>
-      <rpm:buildhost>isdeblnmac39</rpm:buildhost>
-      <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this
-      </rpm:sourcerpm>
-      <rpm:header-range start="280" end="1308" />
-      <rpm:requires>
-        <rpm:entry name="rpmlib(PayloadFilesHavePrefix)"
-          flags="LE" epoch="0" ver="4.0" rel="1" />
-        <rpm:entry name="rpmlib(CompressedFileNames)" flags="LE"
-          epoch="0" ver="3.0.4" rel="1" />
-        <rpm:entry name="rpmlib(VersionedDependencies)" flags="LE"
-          epoch="0" ver="3.0.3" rel="1" />
-      </rpm:requires>
-    </format>
-  </package>
-  <package type="rpm">
-    <name>test-artifact</name>
-    <arch>noarch</arch>
-    <version epoch="0" ver="1.3" rel="1" />
-    <checksum type="sha" pkgid="YES">e29bb8764b73e80b8bdde11639104748d2788c11
-    </checksum>
-    <summary>(none)</summary>
-    <description>(none)</description>
-    <packager>maven - sherold</packager>
-    <url />
-    <time file="1320389088" build="1320389077" />
-    <size package="1364" installed="0" archive="124" />
-    <location xml:base="http://localhost:8080/nexus/content/snapshots"
-      href="test-artifact/1.3/test-artifact-1.3-1.noarch.rpm" />
-    <format>
-      <rpm:license />
-      <rpm:vendor>IS24</rpm:vendor>
-      <rpm:group>is24</rpm:group>
-      <rpm:buildhost>isdeblnmac39</rpm:buildhost>
-      <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this
-      </rpm:sourcerpm>
-      <rpm:header-range start="280" end="1308" />
-      <rpm:requires>
-        <rpm:entry name="rpmlib(PayloadFilesHavePrefix)"
-          flags="LE" epoch="0" ver="4.0" rel="1" />
-        <rpm:entry name="rpmlib(CompressedFileNames)" flags="LE"
-          epoch="0" ver="3.0.4" rel="1" />
-        <rpm:entry name="rpmlib(VersionedDependencies)" flags="LE"
-          epoch="0" ver="3.0.3" rel="1" />
-      </rpm:requires>
-    </format>
-  </package>
-
+<metadata xmlns="http://linux.duke.edu/metadata/common" xmlns:rpm="http://linux.duke.edu/metadata/rpm" packages="118">
+<package type="rpm">
+  <name>is24-esb-crmadaptorv2-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.30.1" rel="1"/>
+  <checksum type="sha256" pkgid="YES">3650e92d02807a2b0bd8e8efda03917e1e14b4a465c68557178926d068dc75b3</checksum>
+  <summary>ESB :: apps :: crmadaptorv2</summary>
+  <description>ESB CRM Adaptor (SalesForce)</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1326272799" build="1326272796"/>
+  <size package="25000863" installed="25023828" archive="25024108"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-crmadaptorv2/1.30.1" href="esb-crmadaptorv2-1.30.1-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui03.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-crmadaptorv2-release-1.30.1-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2455"/>
+    <rpm:provides>
+      <rpm:entry name="esb-crmadaptorv2"/>
+      <rpm:entry name="is24-esb-crmadaptorv2-release" flags="EQ" epoch="0" ver="1.30.1" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat-with-httpd"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-crmadaptorv2-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-crmadaptorv2"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-crmadaptorv2-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.31.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">93324ca1f78edfb1dd839799710ce6f7bb067339cba10279d9df6b916434871e</checksum>
+  <summary>ESB :: apps :: crmadaptorv2</summary>
+  <description>ESB CRM Adaptor (SalesForce)</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1326726813" build="1326726809"/>
+  <size package="26502284" installed="26525739" archive="26526020"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-crmadaptorv2/1.31.0" href="esb-crmadaptorv2-1.31.0-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-crmadaptorv2-release-1.31.0-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2455"/>
+    <rpm:provides>
+      <rpm:entry name="esb-crmadaptorv2"/>
+      <rpm:entry name="is24-esb-crmadaptorv2-release" flags="EQ" epoch="0" ver="1.31.0" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat-with-httpd"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-crmadaptorv2-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-crmadaptorv2"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-crmadaptorv2-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.32.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">6bd7b59e2922d283f9f5dafbd9f1e5a639549f2972a0704947a99f9a2f4a3938</checksum>
+  <summary>ESB :: apps :: crmadaptorv2</summary>
+  <description>ESB CRM Adaptor (SalesForce)</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1327339451" build="1327339448"/>
+  <size package="26504398" installed="26527843" archive="26528124"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-crmadaptorv2/1.32.0" href="esb-crmadaptorv2-1.32.0-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-crmadaptorv2-release-1.32.0-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2455"/>
+    <rpm:provides>
+      <rpm:entry name="esb-crmadaptorv2"/>
+      <rpm:entry name="is24-esb-crmadaptorv2-release" flags="EQ" epoch="0" ver="1.32.0" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat-with-httpd"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-crmadaptorv2-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-crmadaptorv2"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-crmadaptorv2-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.32.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">dabd9fe15a6f2e7f3325ab64ff5c7f767e7f012c9e4667841c269070cde1b10c</checksum>
+  <summary>ESB :: apps :: crmadaptorv2</summary>
+  <description>ESB CRM Adaptor (SalesForce)</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328628175" build="1328628170"/>
+  <size package="26502733" installed="26526077" archive="26526360"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-crmadaptorv2/1.32.2" href="esb-crmadaptorv2-1.32.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui04.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-crmadaptorv2-release-1.32.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2455"/>
+    <rpm:provides>
+      <rpm:entry name="esb-crmadaptorv2"/>
+      <rpm:entry name="is24-esb-crmadaptorv2-release" flags="EQ" epoch="0" ver="1.32.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat-with-httpd"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-crmadaptorv2-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-crmadaptorv2"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-crmadaptorv2-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.33.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">3ce1deb0c94be153f1de9a16aa072a61408b6338fbd77ae811df23bce47310d8</checksum>
+  <summary>ESB :: apps :: crmadaptorv2</summary>
+  <description>ESB CRM Adaptor (SalesForce)</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328629844" build="1328629841"/>
+  <size package="26505698" installed="26529235" archive="26529516"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-crmadaptorv2/1.33.2" href="esb-crmadaptorv2-1.33.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui05.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-crmadaptorv2-release-1.33.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2455"/>
+    <rpm:provides>
+      <rpm:entry name="esb-crmadaptorv2"/>
+      <rpm:entry name="is24-esb-crmadaptorv2-release" flags="EQ" epoch="0" ver="1.33.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat-with-httpd"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-crmadaptorv2-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-crmadaptorv2"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-crmadaptorv2-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.33.3" rel="1"/>
+  <checksum type="sha256" pkgid="YES">c74ebe5554aea4ad71358fe3df5a9bd03ab7c2114e37eb6f43b3ccbdcc2d0e10</checksum>
+  <summary>ESB :: apps :: crmadaptorv2</summary>
+  <description>ESB CRM Adaptor (SalesForce)</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328702022" build="1328702018"/>
+  <size package="26505924" installed="26529499" archive="26529780"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-crmadaptorv2/1.33.3" href="esb-crmadaptorv2-1.33.3-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui06.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-crmadaptorv2-release-1.33.3-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2455"/>
+    <rpm:provides>
+      <rpm:entry name="esb-crmadaptorv2"/>
+      <rpm:entry name="is24-esb-crmadaptorv2-release" flags="EQ" epoch="0" ver="1.33.3" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat-with-httpd"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-crmadaptorv2-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-crmadaptorv2"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-crmadaptorv2-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.34.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">f5beb3e61d2dd3c2c060d50d653939c840942be9090253667ec34d2a1c1ac0e2</checksum>
+  <summary>ESB :: apps :: crmadaptorv2</summary>
+  <description>ESB CRM Adaptor (SalesForce)</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328702025" build="1328702021"/>
+  <size package="26505257" installed="26528594" archive="26528876"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-crmadaptorv2/1.34.2" href="esb-crmadaptorv2-1.34.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-crmadaptorv2-release-1.34.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2455"/>
+    <rpm:provides>
+      <rpm:entry name="esb-crmadaptorv2"/>
+      <rpm:entry name="is24-esb-crmadaptorv2-release" flags="EQ" epoch="0" ver="1.34.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat-with-httpd"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-crmadaptorv2-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-crmadaptorv2"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-crmadaptorv2-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.34.3" rel="1"/>
+  <checksum type="sha256" pkgid="YES">fce7fd4a643a2b66fa4a5524499b40be8bb1ab31c53a57dc1ac554d0974bece7</checksum>
+  <summary>ESB :: apps :: crmadaptorv2</summary>
+  <description>ESB CRM Adaptor (SalesForce)</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1329387811" build="1329387806"/>
+  <size package="26507311" installed="26530476" archive="26530756"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-crmadaptorv2/1.34.3" href="esb-crmadaptorv2-1.34.3-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-crmadaptorv2-release-1.34.3-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2455"/>
+    <rpm:provides>
+      <rpm:entry name="esb-crmadaptorv2"/>
+      <rpm:entry name="is24-esb-crmadaptorv2-release" flags="EQ" epoch="0" ver="1.34.3" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat-with-httpd"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-crmadaptorv2-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-crmadaptorv2"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-erpadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.30.1" rel="1"/>
+  <checksum type="sha256" pkgid="YES">6970c1d6fe2fbb5cec852a98407bf23721ac27da72656b7564c3bc93cbb7b160</checksum>
+  <summary>ESB :: apps :: erpadaptor</summary>
+  <description>ESB ERP Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1326272669" build="1326272666"/>
+  <size package="24184551" installed="24226312" archive="24226588"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-erpadaptor/1.30.1" href="esb-erpadaptor-1.30.1-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui03.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-erpadaptor-release-1.30.1-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-erpadaptor"/>
+      <rpm:entry name="is24-esb-erpadaptor-release" flags="EQ" epoch="0" ver="1.30.1" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-erpadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-erpadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-erpadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.31.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">9821d44a3620edf37f62f95e06c2a5a3160fc6a4d193d53563cba7666af54e7b</checksum>
+  <summary>ESB :: apps :: erpadaptor</summary>
+  <description>ESB ERP Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1326726715" build="1326726711"/>
+  <size package="25686052" installed="25728074" archive="25728352"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-erpadaptor/1.31.0" href="esb-erpadaptor-1.31.0-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-erpadaptor-release-1.31.0-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-erpadaptor"/>
+      <rpm:entry name="is24-esb-erpadaptor-release" flags="EQ" epoch="0" ver="1.31.0" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-erpadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-erpadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-erpadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.32.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">48f4e5c521a81d67a5a2e56cb082d1d8a84061690b7b819fc1f30a9a546f632d</checksum>
+  <summary>ESB :: apps :: erpadaptor</summary>
+  <description>ESB ERP Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1327339344" build="1327339340"/>
+  <size package="25686578" installed="25728560" archive="25728836"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-erpadaptor/1.32.0" href="esb-erpadaptor-1.32.0-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-erpadaptor-release-1.32.0-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-erpadaptor"/>
+      <rpm:entry name="is24-esb-erpadaptor-release" flags="EQ" epoch="0" ver="1.32.0" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-erpadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-erpadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-erpadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.32.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">ed548cd8873093e3475fb66c0e25e503e20d3c80c360814e950fdc7f8dc0b83d</checksum>
+  <summary>ESB :: apps :: erpadaptor</summary>
+  <description>ESB ERP Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328628031" build="1328628026"/>
+  <size package="25686827" installed="25728808" archive="25729084"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-erpadaptor/1.32.2" href="esb-erpadaptor-1.32.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui04.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-erpadaptor-release-1.32.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-erpadaptor"/>
+      <rpm:entry name="is24-esb-erpadaptor-release" flags="EQ" epoch="0" ver="1.32.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-erpadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-erpadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-erpadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.33.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">80d27a1bb79dc892563a7dab131010fa372e0d978cba997d832a13b2420776e2</checksum>
+  <summary>ESB :: apps :: erpadaptor</summary>
+  <description>ESB ERP Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328629686" build="1328629682"/>
+  <size package="25697087" installed="25739381" archive="25739660"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-erpadaptor/1.33.2" href="esb-erpadaptor-1.33.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui05.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-erpadaptor-release-1.33.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-erpadaptor"/>
+      <rpm:entry name="is24-esb-erpadaptor-release" flags="EQ" epoch="0" ver="1.33.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-erpadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-erpadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-erpadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.33.3" rel="1"/>
+  <checksum type="sha256" pkgid="YES">75084ce8abbf2c3d6cda089c441800f250d907e6bd1553bb8c5e382c4f495918</checksum>
+  <summary>ESB :: apps :: erpadaptor</summary>
+  <description>ESB ERP Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328701894" build="1328701891"/>
+  <size package="25696720" installed="25738855" archive="25739132"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-erpadaptor/1.33.3" href="esb-erpadaptor-1.33.3-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui06.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-erpadaptor-release-1.33.3-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-erpadaptor"/>
+      <rpm:entry name="is24-esb-erpadaptor-release" flags="EQ" epoch="0" ver="1.33.3" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-erpadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-erpadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-erpadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.34.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">05e202743d77bd6f2222af738d01b4cf3b3a46c0f8ae062838ae122d1d0a2fe0</checksum>
+  <summary>ESB :: apps :: erpadaptor</summary>
+  <description>ESB ERP Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328701897" build="1328701892"/>
+  <size package="25697969" installed="25740041" archive="25740320"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-erpadaptor/1.34.2" href="esb-erpadaptor-1.34.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-erpadaptor-release-1.34.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-erpadaptor"/>
+      <rpm:entry name="is24-esb-erpadaptor-release" flags="EQ" epoch="0" ver="1.34.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-erpadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-erpadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-erpadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.34.3" rel="1"/>
+  <checksum type="sha256" pkgid="YES">d20e2fbf9723e0f9fcd5bd54052184260df65cc8ef660db345325713bc915f97</checksum>
+  <summary>ESB :: apps :: erpadaptor</summary>
+  <description>ESB ERP Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1329387681" build="1329387677"/>
+  <size package="25698064" installed="25740035" archive="25740312"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-erpadaptor/1.34.3" href="esb-erpadaptor-1.34.3-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-erpadaptor-release-1.34.3-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-erpadaptor"/>
+      <rpm:entry name="is24-esb-erpadaptor-release" flags="EQ" epoch="0" ver="1.34.3" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-erpadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-erpadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-odsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.30.1" rel="1"/>
+  <checksum type="sha256" pkgid="YES">14fa36dc5a5dd1845d8575c26062251dc591d20473cea36d07736f5c6fcb56c3</checksum>
+  <summary>ESB :: apps :: odsadaptor</summary>
+  <description>ESB ODS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1326272733" build="1326272729"/>
+  <size package="23175392" installed="23182358" archive="23182636"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-odsadaptor/1.30.1" href="esb-odsadaptor-1.30.1-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui03.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-odsadaptor-release-1.30.1-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-odsadaptor"/>
+      <rpm:entry name="is24-esb-odsadaptor-release" flags="EQ" epoch="0" ver="1.30.1" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-odsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-odsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-odsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.31.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">c5581401a18dda83aaaae92669d796b97a9a25d83fb44014d3babf50168569cb</checksum>
+  <summary>ESB :: apps :: odsadaptor</summary>
+  <description>ESB ODS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1326726763" build="1326726759"/>
+  <size package="23180267" installed="23187106" archive="23187384"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-odsadaptor/1.31.0" href="esb-odsadaptor-1.31.0-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-odsadaptor-release-1.31.0-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-odsadaptor"/>
+      <rpm:entry name="is24-esb-odsadaptor-release" flags="EQ" epoch="0" ver="1.31.0" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-odsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-odsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-odsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.32.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">273e6dbcc2332499b757817279c8c2be2d5a96ce5473350a10cb15731f530d12</checksum>
+  <summary>ESB :: apps :: odsadaptor</summary>
+  <description>ESB ODS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1327339400" build="1327339396"/>
+  <size package="23180356" installed="23187194" archive="23187472"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-odsadaptor/1.32.0" href="esb-odsadaptor-1.32.0-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-odsadaptor-release-1.32.0-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-odsadaptor"/>
+      <rpm:entry name="is24-esb-odsadaptor-release" flags="EQ" epoch="0" ver="1.32.0" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-odsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-odsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-odsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.32.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">9a201fcbc2b9c6d198f00bcbb39462f59131be4098556bfa43c9b5cb572d583c</checksum>
+  <summary>ESB :: apps :: odsadaptor</summary>
+  <description>ESB ODS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328628100" build="1328628096"/>
+  <size package="23180476" installed="23187265" archive="23187544"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-odsadaptor/1.32.2" href="esb-odsadaptor-1.32.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui04.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-odsadaptor-release-1.32.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-odsadaptor"/>
+      <rpm:entry name="is24-esb-odsadaptor-release" flags="EQ" epoch="0" ver="1.32.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-odsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-odsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-odsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.33.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">1477a0b5d837aaa1d56692ef17aa145150ad40413c8b798b6bfd1cbef8ce7f3a</checksum>
+  <summary>ESB :: apps :: odsadaptor</summary>
+  <description>ESB ODS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328629767" build="1328629763"/>
+  <size package="23180987" installed="23187915" archive="23188192"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-odsadaptor/1.33.2" href="esb-odsadaptor-1.33.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui05.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-odsadaptor-release-1.33.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-odsadaptor"/>
+      <rpm:entry name="is24-esb-odsadaptor-release" flags="EQ" epoch="0" ver="1.33.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-odsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-odsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-odsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.33.3" rel="1"/>
+  <checksum type="sha256" pkgid="YES">4ad3a8c6a0e6cc1dbb8f989422b4c3f63a0ba5af9f11534525b83faaf73e44d1</checksum>
+  <summary>ESB :: apps :: odsadaptor</summary>
+  <description>ESB ODS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328701957" build="1328701954"/>
+  <size package="23180623" installed="23187333" archive="23187612"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-odsadaptor/1.33.3" href="esb-odsadaptor-1.33.3-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui06.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-odsadaptor-release-1.33.3-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-odsadaptor"/>
+      <rpm:entry name="is24-esb-odsadaptor-release" flags="EQ" epoch="0" ver="1.33.3" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-odsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-odsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-odsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.34.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">6cd028792e7c090e903c9411a84746ca9be1e10a3f722c062a166b8591f04e71</checksum>
+  <summary>ESB :: apps :: odsadaptor</summary>
+  <description>ESB ODS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328701960" build="1328701955"/>
+  <size package="23181496" installed="23188386" archive="23188664"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-odsadaptor/1.34.2" href="esb-odsadaptor-1.34.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-odsadaptor-release-1.34.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-odsadaptor"/>
+      <rpm:entry name="is24-esb-odsadaptor-release" flags="EQ" epoch="0" ver="1.34.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-odsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-odsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-odsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.34.3" rel="1"/>
+  <checksum type="sha256" pkgid="YES">5940a2bbc097f683f038d326a9f1e91dd62d6fcaf1527d41b9d42aca891cc645</checksum>
+  <summary>ESB :: apps :: odsadaptor</summary>
+  <description>ESB ODS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1329387744" build="1329387740"/>
+  <size package="23181533" installed="23188430" archive="23188708"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-odsadaptor/1.34.3" href="esb-odsadaptor-1.34.3-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-odsadaptor-release-1.34.3-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2411"/>
+    <rpm:provides>
+      <rpm:entry name="esb-odsadaptor"/>
+      <rpm:entry name="is24-esb-odsadaptor-release" flags="EQ" epoch="0" ver="1.34.3" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-odsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-odsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-termsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.30.1" rel="1"/>
+  <checksum type="sha256" pkgid="YES">655c4aec4b51554110c53d9a2bf9d943933af5db4d6f7c96625a622e097d23b4</checksum>
+  <summary>ESB :: apps :: termsadaptor</summary>
+  <description>ESB TERMS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1326272933" build="1326272915"/>
+  <size package="120751636" installed="120777831" archive="120778112"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-termsadaptor/1.30.1" href="esb-termsadaptor-1.30.1-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui03.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-termsadaptor-release-1.30.1-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2431"/>
+    <rpm:provides>
+      <rpm:entry name="esb-termsadaptor"/>
+      <rpm:entry name="is24-esb-termsadaptor-release" flags="EQ" epoch="0" ver="1.30.1" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-termsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-termsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-termsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.31.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">5ca39a2d9178869b5b05b89f50bda457a5d3ecf9e91260a4b4d4d04987369122</checksum>
+  <summary>ESB :: apps :: termsadaptor</summary>
+  <description>ESB TERMS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1326726871" build="1326726853"/>
+  <size package="120911066" installed="120937470" archive="120937752"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-termsadaptor/1.31.0" href="esb-termsadaptor-1.31.0-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-termsadaptor-release-1.31.0-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2431"/>
+    <rpm:provides>
+      <rpm:entry name="esb-termsadaptor"/>
+      <rpm:entry name="is24-esb-termsadaptor-release" flags="EQ" epoch="0" ver="1.31.0" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-termsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-termsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-termsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.32.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">3bf85dfecc7ef494a342f2a3d5397d9ad9ee62a7fa82341f9d7b4cd3850fe82a</checksum>
+  <summary>ESB :: apps :: termsadaptor</summary>
+  <description>ESB TERMS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1327339512" build="1327339495"/>
+  <size package="120918713" installed="120945140" archive="120945420"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-termsadaptor/1.32.0" href="esb-termsadaptor-1.32.0-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-termsadaptor-release-1.32.0-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2431"/>
+    <rpm:provides>
+      <rpm:entry name="esb-termsadaptor"/>
+      <rpm:entry name="is24-esb-termsadaptor-release" flags="EQ" epoch="0" ver="1.32.0" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-termsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-termsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-termsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.32.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">10b2908fe7371902cd54cafd3de20f745ecc02e113cdf7d194cc41e6b44cf0a7</checksum>
+  <summary>ESB :: apps :: termsadaptor</summary>
+  <description>ESB TERMS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328628291" build="1328628272"/>
+  <size package="120919307" installed="120945649" archive="120945932"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-termsadaptor/1.32.2" href="esb-termsadaptor-1.32.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui04.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-termsadaptor-release-1.32.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2431"/>
+    <rpm:provides>
+      <rpm:entry name="esb-termsadaptor"/>
+      <rpm:entry name="is24-esb-termsadaptor-release" flags="EQ" epoch="0" ver="1.32.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-termsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-termsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-termsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.33.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">fb01e39952eb78bd130a65e5ef67aa3477de7b3790e7a79d10297283fd714eaf</checksum>
+  <summary>ESB :: apps :: termsadaptor</summary>
+  <description>ESB TERMS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328629957" build="1328629940"/>
+  <size package="120617636" installed="120644110" archive="120644392"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-termsadaptor/1.33.2" href="esb-termsadaptor-1.33.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui05.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-termsadaptor-release-1.33.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2431"/>
+    <rpm:provides>
+      <rpm:entry name="esb-termsadaptor"/>
+      <rpm:entry name="is24-esb-termsadaptor-release" flags="EQ" epoch="0" ver="1.33.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-termsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-termsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-termsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.33.3" rel="1"/>
+  <checksum type="sha256" pkgid="YES">cfd810c93617a54d363b3073a1e3078527d26c34dda9ef99ffbef9b537696f19</checksum>
+  <summary>ESB :: apps :: termsadaptor</summary>
+  <description>ESB TERMS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328702132" build="1328702114"/>
+  <size package="120616721" installed="120643569" archive="120643852"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-termsadaptor/1.33.3" href="esb-termsadaptor-1.33.3-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui06.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-termsadaptor-release-1.33.3-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2431"/>
+    <rpm:provides>
+      <rpm:entry name="esb-termsadaptor"/>
+      <rpm:entry name="is24-esb-termsadaptor-release" flags="EQ" epoch="0" ver="1.33.3" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-termsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-termsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-termsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.34.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">6272ec60bd053feaaf65c6ef4c3366a19f7e90e08bef9da2c288de6e69fbb956</checksum>
+  <summary>ESB :: apps :: termsadaptor</summary>
+  <description>ESB TERMS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328702131" build="1328702112"/>
+  <size package="120710428" installed="120736634" archive="120736916"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-termsadaptor/1.34.2" href="esb-termsadaptor-1.34.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-termsadaptor-release-1.34.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2431"/>
+    <rpm:provides>
+      <rpm:entry name="esb-termsadaptor"/>
+      <rpm:entry name="is24-esb-termsadaptor-release" flags="EQ" epoch="0" ver="1.34.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-termsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-termsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-termsadaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.34.3" rel="1"/>
+  <checksum type="sha256" pkgid="YES">105f5f552b641f77e849fcf4b253b6d7e83642b1825cbc8ca5ce379100331bdb</checksum>
+  <summary>ESB :: apps :: termsadaptor</summary>
+  <description>ESB TERMS Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1329387934" build="1329387914"/>
+  <size package="120710134" installed="120736111" archive="120736392"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-termsadaptor/1.34.3" href="esb-termsadaptor-1.34.3-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-termsadaptor-release-1.34.3-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2431"/>
+    <rpm:provides>
+      <rpm:entry name="esb-termsadaptor"/>
+      <rpm:entry name="is24-esb-termsadaptor-release" flags="EQ" epoch="0" ver="1.34.3" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-termsadaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-termsadaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-wladaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.30.1" rel="1"/>
+  <checksum type="sha256" pkgid="YES">a90ad35ffc5e5d1e71c73e200577c6f55bc5adccd41d36b84dc868117a650808</checksum>
+  <summary>ESB :: apps :: wladaptor</summary>
+  <description>ESB WinLine Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1326272704" build="1326272699"/>
+  <size package="21372519" installed="21381911" archive="21382188"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-wladaptor/1.30.1" href="esb-wladaptor-1.30.1-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui03.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-wladaptor-release-1.30.1-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="esb-wladaptor"/>
+      <rpm:entry name="is24-esb-wladaptor-release" flags="EQ" epoch="0" ver="1.30.1" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-wladaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-wladaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-wladaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.31.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">2e1b6eb55e245c9edf6f50bdca58aa57453c201c41e404b2b8126bda974c638e</checksum>
+  <summary>ESB :: apps :: wladaptor</summary>
+  <description>ESB WinLine Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1326726741" build="1326726739"/>
+  <size package="21377438" installed="21386682" archive="21386960"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-wladaptor/1.31.0" href="esb-wladaptor-1.31.0-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-wladaptor-release-1.31.0-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="esb-wladaptor"/>
+      <rpm:entry name="is24-esb-wladaptor-release" flags="EQ" epoch="0" ver="1.31.0" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-wladaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-wladaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-wladaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.32.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">cee9f4b54ed7aa37d51f62d5485c860b8e4caef6dc41c508f2cdec7c6d4427a1</checksum>
+  <summary>ESB :: apps :: wladaptor</summary>
+  <description>ESB WinLine Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1327339376" build="1327339373"/>
+  <size package="21377565" installed="21386768" archive="21387044"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-wladaptor/1.32.0" href="esb-wladaptor-1.32.0-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-wladaptor-release-1.32.0-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="esb-wladaptor"/>
+      <rpm:entry name="is24-esb-wladaptor-release" flags="EQ" epoch="0" ver="1.32.0" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-wladaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-wladaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-wladaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.32.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">ceb8ab6009df4a90aaa86a376df0f820e9962871124e9591cb99bcaa896ea0c3</checksum>
+  <summary>ESB :: apps :: wladaptor</summary>
+  <description>ESB WinLine Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328628069" build="1328628065"/>
+  <size package="21377579" installed="21386841" archive="21387120"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-wladaptor/1.32.2" href="esb-wladaptor-1.32.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui04.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-wladaptor-release-1.32.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="esb-wladaptor"/>
+      <rpm:entry name="is24-esb-wladaptor-release" flags="EQ" epoch="0" ver="1.32.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-wladaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-wladaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-wladaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.33.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">8b7ce3aaee597260d6bda295e34a38f0aa114fd30c714cc92d1af01187f7065b</checksum>
+  <summary>ESB :: apps :: wladaptor</summary>
+  <description>ESB WinLine Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328629731" build="1328629727"/>
+  <size package="21378204" installed="21387502" archive="21387780"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-wladaptor/1.33.2" href="esb-wladaptor-1.33.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui05.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-wladaptor-release-1.33.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="esb-wladaptor"/>
+      <rpm:entry name="is24-esb-wladaptor-release" flags="EQ" epoch="0" ver="1.33.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-wladaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-wladaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-wladaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.33.3" rel="1"/>
+  <checksum type="sha256" pkgid="YES">8a7fae9f0a31cdf2d1ffdc8f72a28e58a46cf68f63c170483000f841ca688145</checksum>
+  <summary>ESB :: apps :: wladaptor</summary>
+  <description>ESB WinLine Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328701930" build="1328701927"/>
+  <size package="21377712" installed="21386919" archive="21387196"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-wladaptor/1.33.3" href="esb-wladaptor-1.33.3-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui06.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-wladaptor-release-1.33.3-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="esb-wladaptor"/>
+      <rpm:entry name="is24-esb-wladaptor-release" flags="EQ" epoch="0" ver="1.33.3" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-wladaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-wladaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-wladaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.34.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">d6f1f902ede93fc78b293bedf34add5bad7a2521a668222d77752a4399662a08</checksum>
+  <summary>ESB :: apps :: wladaptor</summary>
+  <description>ESB WinLine Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328701932" build="1328701928"/>
+  <size package="21378656" installed="21387973" archive="21388252"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-wladaptor/1.34.2" href="esb-wladaptor-1.34.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-wladaptor-release-1.34.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="esb-wladaptor"/>
+      <rpm:entry name="is24-esb-wladaptor-release" flags="EQ" epoch="0" ver="1.34.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-wladaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-wladaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-esb-wladaptor-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.34.3" rel="1"/>
+  <checksum type="sha256" pkgid="YES">6c6e7b61028139e6ac9bdf318201cea089c2313c5239bebdeb46e5a65f60f265</checksum>
+  <summary>ESB :: apps :: wladaptor</summary>
+  <description>ESB WinLine Adaptor</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1329387716" build="1329387712"/>
+  <size package="21378672" installed="21388015" archive="21388292"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/esb-wladaptor/1.34.3" href="esb-wladaptor-1.34.3-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-esb-wladaptor-release-1.34.3-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="esb-wladaptor"/>
+      <rpm:entry name="is24-esb-wladaptor-release" flags="EQ" epoch="0" ver="1.34.3" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="esb-wladaptor-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="esb-wladaptor"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-salescockpit-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.30.1" rel="1"/>
+  <checksum type="sha256" pkgid="YES">d95626125e583d34439838ccc5810c4f79fe1799cd49880ff4095f413a1d39b5</checksum>
+  <summary>ESB :: apps :: salescockpit</summary>
+  <description>ESB Sales Cockpit</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1326272759" build="1326272757"/>
+  <size package="16075986" installed="16077284" archive="16077564"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/salescockpit/1.30.1" href="salescockpit-1.30.1-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui03.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-salescockpit-release-1.30.1-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="is24-salescockpit-release" flags="EQ" epoch="0" ver="1.30.1" rel="1"/>
+      <rpm:entry name="salescockpit"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="salescockpit-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="salescockpit"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-salescockpit-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.31.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">93ef9db3049dc60befb7f8bdacce8e61df3de8ffa2fa4a2f11154a5c7a17f6ff</checksum>
+  <summary>ESB :: apps :: salescockpit</summary>
+  <description>ESB Sales Cockpit</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1326726785" build="1326726781"/>
+  <size package="17583273" installed="17584833" archive="17585116"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/salescockpit/1.31.0" href="salescockpit-1.31.0-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-salescockpit-release-1.31.0-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="is24-salescockpit-release" flags="EQ" epoch="0" ver="1.31.0" rel="1"/>
+      <rpm:entry name="salescockpit"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="salescockpit-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="salescockpit"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-salescockpit-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.32.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">d7cc2d5392d83cde514cda2f072e481e2fee419086b52cd8aaf5e248aeeca257</checksum>
+  <summary>ESB :: apps :: salescockpit</summary>
+  <description>ESB Sales Cockpit</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1327339424" build="1327339421"/>
+  <size package="17583706" installed="17585265" archive="17585548"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/salescockpit/1.32.0" href="salescockpit-1.32.0-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-salescockpit-release-1.32.0-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="is24-salescockpit-release" flags="EQ" epoch="0" ver="1.32.0" rel="1"/>
+      <rpm:entry name="salescockpit"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="salescockpit-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="salescockpit"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-salescockpit-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.32.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">837c38860cbf6bf0b6755713e31653523bd69e8a544ea07b2378440f35f2189a</checksum>
+  <summary>ESB :: apps :: salescockpit</summary>
+  <description>ESB Sales Cockpit</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328628129" build="1328628126"/>
+  <size package="17584026" installed="17585409" archive="17585692"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/salescockpit/1.32.2" href="salescockpit-1.32.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2011, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui04.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-salescockpit-release-1.32.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="is24-salescockpit-release" flags="EQ" epoch="0" ver="1.32.2" rel="1"/>
+      <rpm:entry name="salescockpit"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="salescockpit-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="salescockpit"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-salescockpit-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.33.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">34fa6b22918333b85c327b243ef3ed61f3035ddf3b344ad0bc461e27fef8e992</checksum>
+  <summary>ESB :: apps :: salescockpit</summary>
+  <description>ESB Sales Cockpit</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328629799" build="1328629796"/>
+  <size package="17584176" installed="17585790" archive="17586072"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/salescockpit/1.33.2" href="salescockpit-1.33.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui05.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-salescockpit-release-1.33.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="is24-salescockpit-release" flags="EQ" epoch="0" ver="1.33.2" rel="1"/>
+      <rpm:entry name="salescockpit"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="salescockpit-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="salescockpit"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-salescockpit-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.33.3" rel="1"/>
+  <checksum type="sha256" pkgid="YES">cf185c942ad72be9bb724399cd2c72062068f75a1e9470607b23176a632ec8ca</checksum>
+  <summary>ESB :: apps :: salescockpit</summary>
+  <description>ESB Sales Cockpit</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328701983" build="1328701980"/>
+  <size package="17583829" installed="17585250" archive="17585532"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/salescockpit/1.33.3" href="salescockpit-1.33.3-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui06.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-salescockpit-release-1.33.3-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="is24-salescockpit-release" flags="EQ" epoch="0" ver="1.33.3" rel="1"/>
+      <rpm:entry name="salescockpit"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="salescockpit-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="salescockpit"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-salescockpit-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.34.2" rel="1"/>
+  <checksum type="sha256" pkgid="YES">07ec2c828db14bbadb8efc557529580982a86207cfdbf862b291f746ed1933e3</checksum>
+  <summary>ESB :: apps :: salescockpit</summary>
+  <description>ESB Sales Cockpit</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1328701987" build="1328701983"/>
+  <size package="17584972" installed="17586461" archive="17586744"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/salescockpit/1.34.2" href="salescockpit-1.34.2-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-salescockpit-release-1.34.2-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="is24-salescockpit-release" flags="EQ" epoch="0" ver="1.34.2" rel="1"/>
+      <rpm:entry name="salescockpit"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="salescockpit-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="salescockpit"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-salescockpit-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.34.3" rel="1"/>
+  <checksum type="sha256" pkgid="YES">0f83cfa56052cb2f49c64ae1ada4e2fed17f5375685c6683af6a0990a26c76cf</checksum>
+  <summary>ESB :: apps :: salescockpit</summary>
+  <description>ESB Sales Cockpit</description>
+  <packager>Maven</packager>
+  <url>http://www.immobilienscout24.de</url>
+  <time file="1329387772" build="1329387769"/>
+  <size package="17585055" installed="17586464" archive="17586744"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/esb/salescockpit/1.34.3" href="salescockpit-1.34.3-rpm.rpm"/>
+  <format>
+    <rpm:license>2009, Immobilien Scout GmbH</rpm:license>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>is24-salescockpit-release-1.34.3-1.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2407"/>
+    <rpm:provides>
+      <rpm:entry name="is24-salescockpit-release" flags="EQ" epoch="0" ver="1.34.3" rel="1"/>
+      <rpm:entry name="salescockpit"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="is24-tomcat"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="salescockpit-snapshot"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="salescockpit"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.34" rel="1"/>
+  <checksum type="sha" pkgid="YES">c9c07a3986c8b6b4ef422afa01655f973afb4133</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1318348526" build="1315398977"/>
+  <size package="29499334" installed="39698418" archive="39972636"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.34" href="mailer-server-1.34.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui04.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="170782"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.34" rel="1"/>
+      <rpm:entry name="mailer-server" flags="EQ" epoch="0" ver="1.34" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.37" rel="1"/>
+  <checksum type="sha" pkgid="YES">39533c8fbddacb3f6cbbe4b5fcccfb293bb978c0</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1317116503" build="1317116363"/>
+  <size package="29491611" installed="39673695" archive="39945676"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.37" href="mailer-server-1.37.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="169551"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.37" rel="1"/>
+      <rpm:entry name="mailer-server" flags="EQ" epoch="0" ver="1.37" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.38" rel="1"/>
+  <checksum type="sha" pkgid="YES">c0fd8fb0f169d7d1e04acef301e689cac94e9364</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1318233048" build="1318232911"/>
+  <size package="29610673" installed="39909844" archive="40183124"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.38" href="mailer-server-1.38.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="170380"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.38" rel="1"/>
+      <rpm:entry name="mailer-server" flags="EQ" epoch="0" ver="1.38" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.40" rel="1"/>
+  <checksum type="sha" pkgid="YES">54a6b71ca92efa7a95c912db06fdcc1daa23ca1b</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1318347016" build="1318346872"/>
+  <size package="29421343" installed="39676692" archive="39949772"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.40" href="mailer-server-1.40.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="170261"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.40" rel="1"/>
+      <rpm:entry name="mailer-server" flags="EQ" epoch="0" ver="1.40" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.41" rel="1"/>
+  <checksum type="sha" pkgid="YES">c62f7bf47535768cda57ec636d1afe9fcaa7d80b</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1319028980" build="1319028842"/>
+  <size package="29421825" installed="39678858" archive="39951944"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.41" href="mailer-server-1.41.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="170261"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.41" rel="1"/>
+      <rpm:entry name="mailer-server" flags="EQ" epoch="0" ver="1.41" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.43" rel="1"/>
+  <checksum type="sha256" pkgid="YES">6869a6d4246a23ddc2b94b20172de4ddca98208c13d5181d03b9a9323ac4e0db</checksum>
+  <summary></summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1320064648" build="1320064500"/>
+  <size package="29397304" installed="39621951" archive="39895040"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.43" href="mailer-server-1.43.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="170837"/>
+    <rpm:provides>
+      <rpm:entry name="mailer-server" flags="EQ" epoch="0" ver="1.43" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.44" rel="1"/>
+  <checksum type="sha" pkgid="YES">bd6630a63c4879e31cfe7af2ab65808d0feed7d4</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1320231634" build="1320231477"/>
+  <size package="29397494" installed="39624885" archive="39897964"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.44" href="mailer-server-1.44.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="170837"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.44" rel="1"/>
+      <rpm:entry name="mailer-server" flags="EQ" epoch="0" ver="1.44" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.45" rel="1"/>
+  <checksum type="sha256" pkgid="YES">9b23fec8915c28853ca9c824e98c93df493af8e8180cc36aab85b85fdc9e869e</checksum>
+  <summary></summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1321444625" build="1321444451"/>
+  <size package="30085982" installed="40366230" archive="40641508"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.45" href="mailer-server-1.45.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui05.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="172340"/>
+    <rpm:provides>
+      <rpm:entry name="mailer-server" flags="EQ" epoch="0" ver="1.45" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.47" rel="1"/>
+  <checksum type="sha256" pkgid="YES">4f84b9fa46813132c646de485720712f5629d68817d105043db8e8a9075d11bf</checksum>
+  <summary></summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1322130965" build="1322130821"/>
+  <size package="30484898" installed="40902303" archive="41183996"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.47" href="mailer-server-1.47.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="176372"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.47" rel="1"/>
+      <rpm:entry name="mailer-server"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.49" rel="1"/>
+  <checksum type="sha256" pkgid="YES">5e1ad822dda71fb5072669ca8b2f58b949b69189e65874108ed8a50343f46ecf</checksum>
+  <summary>IS24 Mailer Server</summary>
+  <description>The new IS24 Mailer intend to run on Apache Tomcat 6.0.x.
+		To import the mailer modules "server" and "client" into Eclipse, ensure you have a parent workspace directory which is not this one!</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1322489704" build="1322489557"/>
+  <size package="30486259" installed="40907181" archive="41188876"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.49" href="mailer-server-1.49.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="176616"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.49" rel="1"/>
+      <rpm:entry name="mailer-server"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.50" rel="1"/>
+  <checksum type="sha256" pkgid="YES">51079bcb7ba051b1605f39005fa251490848904951a70e6786c36e9a4f2111a3</checksum>
+  <summary>IS24 Mailer Server</summary>
+  <description>The new IS24 Mailer intend to run on Apache Tomcat 6.0.x.
+		To import the mailer modules "server" and "client" into Eclipse, ensure you have a parent workspace directory which is not this one!</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1323103905" build="1323103738"/>
+  <size package="30478973" installed="40872822" archive="41154748"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.50" href="mailer-server-1.50.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui03.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="176735"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.50" rel="1"/>
+      <rpm:entry name="mailer-server"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.52" rel="1"/>
+  <checksum type="sha256" pkgid="YES">dd850d1cbd7ceba9b42259c3bba44d30014bfec2c814db4cbca2554814fb88e1</checksum>
+  <summary>IS24 Mailer Server</summary>
+  <description>The new IS24 Mailer intend to run on Apache Tomcat 6.0.x.
+		To import the mailer modules "server" and "client" into Eclipse, ensure you have a parent workspace directory which is not this one!</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1323690233" build="1323690089"/>
+  <size package="30484559" installed="40892078" archive="41174196"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.52" href="mailer-server-1.52.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui07.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="176898"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.52" rel="1"/>
+      <rpm:entry name="mailer-server"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.54" rel="1"/>
+  <checksum type="sha256" pkgid="YES">c74ac75e2d905e08ea44758e16d2b5ed77229ba92089b35f87dde62302ac2db9</checksum>
+  <summary>IS24 Mailer Server</summary>
+  <description>The new IS24 Mailer intend to run on Apache Tomcat 6.0.x.
+		To import the mailer modules "server" and "client" into Eclipse, ensure you have a parent workspace directory which is not this one!</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1326452113" build="1326451867"/>
+  <size package="30497897" installed="40926181" archive="41210100"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.54" href="mailer-server-1.54.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="177894"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.54" rel="1"/>
+      <rpm:entry name="mailer-server"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.55" rel="1"/>
+  <checksum type="sha256" pkgid="YES">204b7553a1774c23975dfa80cbeee34962e7a5c1bd3fdd21f4e88a6a0aa1e3e6</checksum>
+  <summary>IS24 Mailer Server</summary>
+  <description>The new IS24 Mailer intend to run on Apache Tomcat 6.0.x.
+		To import the mailer modules "server" and "client" into Eclipse, ensure you have a parent workspace directory which is not this one!</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1326977667" build="1326977507"/>
+  <size package="30447338" installed="40783568" archive="41064688"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.55" href="mailer-server-1.55.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="176352"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.55" rel="1"/>
+      <rpm:entry name="mailer-server"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.56" rel="1"/>
+  <checksum type="sha256" pkgid="YES">f4893978aa1eb10fd4ab762fb284e1c4992a7b2508c29fa705c06a9de0f8210d</checksum>
+  <summary>IS24 Mailer Server</summary>
+  <description>The new IS24 Mailer intend to run on Apache Tomcat 6.0.x.
+		To import the mailer modules "server" and "client" into Eclipse, ensure you have a parent workspace directory which is not this one!</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1327677168" build="1327677016"/>
+  <size package="30447083" installed="40783704" archive="41064828"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.56" href="mailer-server-1.56.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui07.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="176352"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.56" rel="1"/>
+      <rpm:entry name="mailer-server"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-mailer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.57" rel="1"/>
+  <checksum type="sha256" pkgid="YES">3f06cfdcadc44df9d323c6e76e0d2d098ac805d1aa68e7f10ffc4ee9f5cc84b1</checksum>
+  <summary>IS24 Mailer Server</summary>
+  <description>The new IS24 Mailer intend to run on Apache Tomcat 6.0.x.
+		To import the mailer modules "server" and "client" into Eclipse, ensure you have a parent workspace directory which is not this one!</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1329328460" build="1329328317"/>
+  <size package="30441392" installed="40737824" archive="41018764"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/mailer/mailer-server/1.57" href="mailer-server-1.57.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui09.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="176223"/>
+    <rpm:provides>
+      <rpm:entry name="is24-mailer-release" flags="EQ" epoch="0" ver="1.57" rel="1"/>
+      <rpm:entry name="mailer-server"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-jcr" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-mailer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-mailer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="mailer-server" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-build-stat-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="0.0.1" rel="1"/>
+  <checksum type="sha" pkgid="YES">590725262be802d3d15f6d1a0c694f94593c1db4</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - sherold</packager>
+  <url></url>
+  <time file="1320166692" build="1320166692"/>
+  <size package="69234" installed="191059" archive="194264"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/teamcity/build-statistics/0.0.1" href="build-statistics-0.0.1.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>is24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>isdeblnmac39</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="3734"/>
+    <rpm:provides>
+      <rpm:entry name="build-statistics" flags="EQ" epoch="0" ver="0.0.1" rel="1"/>
+      <rpm:entry name="is24-build-stat-release" flags="EQ" epoch="0" ver="0.0.1" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-httpd-with-php" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-build-stat-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="build-statistics" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-build-stat-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="0.0.10" rel="1"/>
+  <checksum type="sha" pkgid="YES">8f6f81e9d59d9dceeba4ec0e2ed1a5cf9faa030c</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1320735288" build="1320735286"/>
+  <size package="7300495" installed="8343783" archive="8358824"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/teamcity/build-statistics/0.0.10" href="build-statistics-0.0.10.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>is24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="10896"/>
+    <rpm:provides>
+      <rpm:entry name="build-statistics" flags="EQ" epoch="0" ver="0.0.10" rel="1"/>
+      <rpm:entry name="is24-build-stat-release" flags="EQ" epoch="0" ver="0.0.10" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-build-stat-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-build-stat-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="build-statistics" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-build-stat-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="0.0.11" rel="1"/>
+  <checksum type="sha" pkgid="YES">39c13d6480b41e096dcc7b9aba5091c0d4c15264</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1320736189" build="1320736188"/>
+  <size package="7300559" installed="8343965" archive="8359004"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/teamcity/build-statistics/0.0.11" href="build-statistics-0.0.11.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>is24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="10896"/>
+    <rpm:provides>
+      <rpm:entry name="build-statistics" flags="EQ" epoch="0" ver="0.0.11" rel="1"/>
+      <rpm:entry name="is24-build-stat-release" flags="EQ" epoch="0" ver="0.0.11" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-build-stat-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-build-stat-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="build-statistics" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-build-stat-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="0.0.2" rel="1"/>
+  <checksum type="sha" pkgid="YES">ea7294a556c6830c9df10d31d205188784de609c</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1320269484" build="1320269481"/>
+  <size package="7299888" installed="8341170" archive="8356204"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/teamcity/build-statistics/0.0.2" href="build-statistics-0.0.2.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>is24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="10896"/>
+    <rpm:provides>
+      <rpm:entry name="build-statistics" flags="EQ" epoch="0" ver="0.0.2" rel="1"/>
+      <rpm:entry name="is24-build-stat-release" flags="EQ" epoch="0" ver="0.0.2" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-build-stat-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-build-stat-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="build-statistics" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-build-stat-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="0.0.3" rel="1"/>
+  <checksum type="sha" pkgid="YES">9ac4dcd30e0778094e5e43b1e371a50f54304a3d</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1320673269" build="1320673267"/>
+  <size package="7300110" installed="8342486" archive="8357520"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/teamcity/build-statistics/0.0.3" href="build-statistics-0.0.3.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>is24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="10896"/>
+    <rpm:provides>
+      <rpm:entry name="build-statistics" flags="EQ" epoch="0" ver="0.0.3" rel="1"/>
+      <rpm:entry name="is24-build-stat-release" flags="EQ" epoch="0" ver="0.0.3" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-build-stat-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-build-stat-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="build-statistics" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-build-stat-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="0.0.4" rel="1"/>
+  <checksum type="sha" pkgid="YES">f8256d3122d3a6a6a63de31093e530cd680016f1</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - sherold</packager>
+  <url></url>
+  <time file="1320674485" build="1320674479"/>
+  <size package="7300101" installed="8342485" archive="8357520"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/teamcity/build-statistics/0.0.4" href="build-statistics-0.0.4.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>is24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>isdeblnmac39</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="10884"/>
+    <rpm:provides>
+      <rpm:entry name="build-statistics" flags="EQ" epoch="0" ver="0.0.4" rel="1"/>
+      <rpm:entry name="is24-build-stat-release" flags="EQ" epoch="0" ver="0.0.4" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-build-stat-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-build-stat-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="build-statistics" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-build-stat-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="0.0.5" rel="1"/>
+  <checksum type="sha" pkgid="YES">beec47ca178d1cc87dc23fccce0259c9c757738b</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1320675059" build="1320675057"/>
+  <size package="7300121" installed="8342485" archive="8357520"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/teamcity/build-statistics/0.0.5" href="build-statistics-0.0.5.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>is24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="10896"/>
+    <rpm:provides>
+      <rpm:entry name="build-statistics" flags="EQ" epoch="0" ver="0.0.5" rel="1"/>
+      <rpm:entry name="is24-build-stat-release" flags="EQ" epoch="0" ver="0.0.5" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-build-stat-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-build-stat-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="build-statistics" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-build-stat-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="0.0.6" rel="1"/>
+  <checksum type="sha" pkgid="YES">2edb495a655e8a8287b7278795cc5282e1e92cae</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - sherold</packager>
+  <url></url>
+  <time file="1320676832" build="1320676828"/>
+  <size package="7300185" installed="8342746" archive="8357780"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/teamcity/build-statistics/0.0.6" href="build-statistics-0.0.6.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>is24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>isdeblnmac39</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="10884"/>
+    <rpm:provides>
+      <rpm:entry name="build-statistics" flags="EQ" epoch="0" ver="0.0.6" rel="1"/>
+      <rpm:entry name="is24-build-stat-release" flags="EQ" epoch="0" ver="0.0.6" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-build-stat-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-build-stat-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="build-statistics" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-build-stat-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="0.0.7" rel="1"/>
+  <checksum type="sha" pkgid="YES">f0c5fc4e7e6cd6d5cefe59f6c35d68abfcf1b840</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1320678611" build="1320678609"/>
+  <size package="7300194" installed="8342746" archive="8357780"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/teamcity/build-statistics/0.0.7" href="build-statistics-0.0.7.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>is24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="10896"/>
+    <rpm:provides>
+      <rpm:entry name="build-statistics" flags="EQ" epoch="0" ver="0.0.7" rel="1"/>
+      <rpm:entry name="is24-build-stat-release" flags="EQ" epoch="0" ver="0.0.7" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-build-stat-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-build-stat-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="build-statistics" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-build-stat-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="0.0.8" rel="1"/>
+  <checksum type="sha" pkgid="YES">7057840acf57a408ba9095c4c6e9e535b5742552</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1320690506" build="1320690505"/>
+  <size package="7300501" installed="8343759" archive="8358796"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/teamcity/build-statistics/0.0.8" href="build-statistics-0.0.8.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>is24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="10896"/>
+    <rpm:provides>
+      <rpm:entry name="build-statistics" flags="EQ" epoch="0" ver="0.0.8" rel="1"/>
+      <rpm:entry name="is24-build-stat-release" flags="EQ" epoch="0" ver="0.0.8" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-build-stat-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-build-stat-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="build-statistics" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-build-stat-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="0.0.9" rel="1"/>
+  <checksum type="sha" pkgid="YES">0ae289d3cbf13da2f2855c2129f0fd7efa503cc8</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1320706117" build="1320706116"/>
+  <size package="7300518" installed="8343772" archive="8358812"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/teamcity/build-statistics/0.0.9" href="build-statistics-0.0.9.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>is24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="10896"/>
+    <rpm:provides>
+      <rpm:entry name="build-statistics" flags="EQ" epoch="0" ver="0.0.9" rel="1"/>
+      <rpm:entry name="is24-build-stat-release" flags="EQ" epoch="0" ver="0.0.9" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-build-stat-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-build-stat-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="build-statistics" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-tkm-vn-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">cded020672cf1b8ca7b1b2d1727dfcc59becf78bcf23ba614b70c83abb9c3861</checksum>
+  <summary></summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1328191849" build="1328191844"/>
+  <size package="22373933" installed="25968618" archive="26116484"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/tkm/is24-tkm-vn/1.0" href="is24-tkm-vn-1.0.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout 24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui12.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="73800"/>
+    <rpm:provides>
+      <rpm:entry name="is24-tkm-vn" flags="EQ" epoch="0" ver="1.0" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-tkm-vn-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-mysql-jdbc" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-tkm-vn-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="is24-tkm-vn" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-bdi-importer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="29" rel="1"/>
+  <checksum type="sha256" pkgid="YES">9dee5b7af2df33edfd5dd6b6a3f8147288fe012936521cededc21ff00d17498f</checksum>
+  <summary>is24-bdi-importer</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1326510248" build="1326510235"/>
+  <size package="21871754" installed="21893603" archive="21894536"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/bdi-importer/29" href="bdi-importer-29.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2740"/>
+    <rpm:provides>
+      <rpm:entry name="bdi-importer"/>
+      <rpm:entry name="is24-bdi-importer-release" flags="EQ" epoch="0" ver="29" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-bdi-importer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-bdi-importer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="bdi-importer" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-bdi-importer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="30" rel="1"/>
+  <checksum type="sha256" pkgid="YES">3922769c1ea0e17518519550de2d3788f5fc714a604e11afd4c1be8f5a3ed5ae</checksum>
+  <summary>is24-bdi-importer</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1326729054" build="1326729041"/>
+  <size package="21872591" installed="21894335" archive="21895268"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/bdi-importer/30" href="bdi-importer-30.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2740"/>
+    <rpm:provides>
+      <rpm:entry name="bdi-importer"/>
+      <rpm:entry name="is24-bdi-importer-release" flags="EQ" epoch="0" ver="30" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-bdi-importer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-bdi-importer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="bdi-importer" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-bdi-importer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="31" rel="1"/>
+  <checksum type="sha256" pkgid="YES">e29903467189eb9d98467f5f82dc1de096d21083adf050a243b76aa712fc8914</checksum>
+  <summary>is24-bdi-importer</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1326800616" build="1326800603"/>
+  <size package="21935511" installed="21957321" archive="21958256"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/bdi-importer/31" href="bdi-importer-31.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui07.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2740"/>
+    <rpm:provides>
+      <rpm:entry name="bdi-importer"/>
+      <rpm:entry name="is24-bdi-importer-release" flags="EQ" epoch="0" ver="31" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-bdi-importer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-bdi-importer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="bdi-importer" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-bdi-importer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="32" rel="1"/>
+  <checksum type="sha256" pkgid="YES">4b1b10c3e97136bac1eea5f94962cfc4e7dc2afa9c4c3d7a76433951f4dcec69</checksum>
+  <summary>is24-bdi-importer</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1326811181" build="1326811169"/>
+  <size package="21935531" installed="21957351" archive="21958284"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/bdi-importer/32" href="bdi-importer-32.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui04.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2740"/>
+    <rpm:provides>
+      <rpm:entry name="bdi-importer"/>
+      <rpm:entry name="is24-bdi-importer-release" flags="EQ" epoch="0" ver="32" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-bdi-importer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-bdi-importer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="bdi-importer" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-bdi-importer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="36" rel="1"/>
+  <checksum type="sha256" pkgid="YES">251ae4bf24201c94e9418042e34155bc9c4db1e42f83723cf0e4cf3b15323b64</checksum>
+  <summary>is24-bdi-importer</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1327078626" build="1327078611"/>
+  <size package="21933530" installed="21954103" archive="21955036"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/bdi-importer/36" href="bdi-importer-36.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2740"/>
+    <rpm:provides>
+      <rpm:entry name="bdi-importer"/>
+      <rpm:entry name="is24-bdi-importer-release" flags="EQ" epoch="0" ver="36" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-bdi-importer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-bdi-importer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="bdi-importer" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-bdi-importer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="39" rel="1"/>
+  <checksum type="sha256" pkgid="YES">753b076c34f43707208354dfbfaf64defc950eac04036f742ab8ea260339ec35</checksum>
+  <summary>is24-bdi-importer</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1327509347" build="1327509290"/>
+  <size package="21945144" installed="21966935" archive="21967868"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/bdi-importer/39" href="bdi-importer-39.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui12.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2736"/>
+    <rpm:provides>
+      <rpm:entry name="bdi-importer"/>
+      <rpm:entry name="is24-bdi-importer-release" flags="EQ" epoch="0" ver="39" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-bdi-importer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-bdi-importer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="bdi-importer" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-bdi-importer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="40" rel="1"/>
+  <checksum type="sha256" pkgid="YES">ed02fdabaf1570421d3edfd6f5b00d1730dd78efdd1bc6be91701d02fe396d65</checksum>
+  <summary>is24-bdi-importer</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1327596922" build="1327597000"/>
+  <size package="21949082" installed="21970971" archive="21971904"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/bdi-importer/40" href="bdi-importer-40.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui11.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2736"/>
+    <rpm:provides>
+      <rpm:entry name="bdi-importer"/>
+      <rpm:entry name="is24-bdi-importer-release" flags="EQ" epoch="0" ver="40" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-bdi-importer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-bdi-importer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="bdi-importer" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-bdi-importer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="41" rel="1"/>
+  <checksum type="sha256" pkgid="YES">09b3c583ffec98359798fdd14584fb35e83ec018f2ab06df111280bc96bb3f33</checksum>
+  <summary>is24-bdi-importer</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1327633328" build="1327633404"/>
+  <size package="21977845" installed="22001893" archive="22002828"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/bdi-importer/41" href="bdi-importer-41.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui11.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2736"/>
+    <rpm:provides>
+      <rpm:entry name="bdi-importer"/>
+      <rpm:entry name="is24-bdi-importer-release" flags="EQ" epoch="0" ver="41" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-bdi-importer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-bdi-importer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="bdi-importer" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-bdi-importer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="43" rel="1"/>
+  <checksum type="sha256" pkgid="YES">117a022cbb7cfeb13a811594745bb66306a864325000a843994cf41b6babb390</checksum>
+  <summary>is24-bdi-importer</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1327936808" build="1327936896"/>
+  <size package="22000215" installed="22028817" archive="22029752"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/bdi-importer/43" href="bdi-importer-43.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui11.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2736"/>
+    <rpm:provides>
+      <rpm:entry name="bdi-importer"/>
+      <rpm:entry name="is24-bdi-importer-release" flags="EQ" epoch="0" ver="43" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-bdi-importer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-bdi-importer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="bdi-importer" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-bdi-importer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="45" rel="1"/>
+  <checksum type="sha256" pkgid="YES">a9c76a980964c405a6c7153a681302386f028be6ae3109a2657f1c8c9657de78</checksum>
+  <summary>is24-bdi-importer</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1327937694" build="1327937781"/>
+  <size package="22006217" installed="22036172" archive="22037104"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/bdi-importer/45" href="bdi-importer-45.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui11.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2736"/>
+    <rpm:provides>
+      <rpm:entry name="bdi-importer"/>
+      <rpm:entry name="is24-bdi-importer-release" flags="EQ" epoch="0" ver="45" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-bdi-importer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-bdi-importer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="bdi-importer" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-bdi-importer-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="46" rel="1"/>
+  <checksum type="sha256" pkgid="YES">d4489b9cfdc650c5196d1fbeab6433f8f2eb88e8b49483065c20b75fea3aad35</checksum>
+  <summary>is24-bdi-importer</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1328274542" build="1328274526"/>
+  <size package="22007338" installed="22037324" archive="22038256"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/bdi-importer/46" href="bdi-importer-46.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui11.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2736"/>
+    <rpm:provides>
+      <rpm:entry name="bdi-importer"/>
+      <rpm:entry name="is24-bdi-importer-release" flags="EQ" epoch="0" ver="46" rel="1"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-bdi-importer-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-bdi-importer-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="bdi-importer" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="18" rel="1"/>
+  <checksum type="sha256" pkgid="YES">19af511c2f92404dd72e1284a5e9b338bd0065a121b73e7703439f06d8e1387b</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1325750531" build="1325750527"/>
+  <size package="26922721" installed="26970629" archive="26971552"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/18" href="modis-web-18.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2718"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="18" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="29" rel="1"/>
+  <checksum type="sha256" pkgid="YES">2431a26df6473d16d202fb6784f9ec2ea72087777df16db24c96a62f474d8890</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1326372597" build="1326372591"/>
+  <size package="26995045" installed="27036779" archive="27037708"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/29" href="modis-web-29.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui01.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2727"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="29" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="31" rel="1"/>
+  <checksum type="sha256" pkgid="YES">fceb46a65d603a54ece9f9eee023477cabdea7d1b20d609a553069353e9b5d16</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1326702919" build="1326702914"/>
+  <size package="26998461" installed="27039015" archive="27039944"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/31" href="modis-web-31.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui02.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2727"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="31" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="32" rel="1"/>
+  <checksum type="sha256" pkgid="YES">af32785973e15c70cef6d98ed270f7b7fb7000840d1a3e8ad350102429bf6cd9</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1326707229" build="1326707225"/>
+  <size package="26993162" installed="27039021" archive="27039952"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/32" href="modis-web-32.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2727"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="32" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="33" rel="1"/>
+  <checksum type="sha256" pkgid="YES">424dab4298cee75a30c7dd5da8c3ced4ebb89144707431567c7e52398d483bff</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1326800513" build="1326800507"/>
+  <size package="27048635" installed="27101623" archive="27102552"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/33" href="modis-web-33.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2727"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="33" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="36" rel="1"/>
+  <checksum type="sha256" pkgid="YES">c994360b7f9e70bae0378f0bce292fabdaea225db27d9452b883a83e12e0e746</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1326901588" build="1326901584"/>
+  <size package="27056420" installed="27103546" archive="27104476"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/36" href="modis-web-36.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2727"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="36" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="37" rel="1"/>
+  <checksum type="sha256" pkgid="YES">279d87fbd2304b7ef4d712112005c8d56dfdd13906daa6ee73eb364ec0e8b878</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1327587535" build="1327587639"/>
+  <size package="27057856" installed="27105001" archive="27105932"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/37" href="modis-web-37.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui10.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2723"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="37" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="38" rel="1"/>
+  <checksum type="sha256" pkgid="YES">2f81cb10cbf941495200bcaff782e4d149cc590219166bc37c7cc91784302aec</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1327669181" build="1327669273"/>
+  <size package="27065890" installed="27110844" archive="27111772"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/38" href="modis-web-38.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui11.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2723"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="38" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="39" rel="1"/>
+  <checksum type="sha256" pkgid="YES">c0aeb1e837f69de939df84114e82ea1034d69ecf5f8b51b23deebfd6b562bf1d</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1327926282" build="1327926278"/>
+  <size package="28022199" installed="28074740" archive="28075668"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/39" href="modis-web-39.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>magbui03.be.mag.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2727"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="39" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="40" rel="1"/>
+  <checksum type="sha256" pkgid="YES">b76e54f0646198553014d8a43089b4952dd2950c49a18649c27f5e7369212e22</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1328022032" build="1328022129"/>
+  <size package="28024822" installed="28074751" archive="28075680"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/40" href="modis-web-40.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui11.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2723"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="40" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="42" rel="1"/>
+  <checksum type="sha256" pkgid="YES">8e01fe16e49ca2b4378ffabc5e0aa87ef5c2e45e7cc9f4d49fba311e031a11d9</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1328100339" build="1328100439"/>
+  <size package="28026750" installed="28075104" archive="28076032"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/42" href="modis-web-42.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui11.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2723"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="42" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="43" rel="1"/>
+  <checksum type="sha256" pkgid="YES">86f1d1c256b47985578aabef202082f72a938bfa3f95aff107b53955688e767e</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1328104329" build="1328104325"/>
+  <size package="28027999" installed="28075103" archive="28076032"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/43" href="modis-web-43.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui09.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2723"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="43" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="46" rel="1"/>
+  <checksum type="sha256" pkgid="YES">e99f031daf456f0b0ad91aa7cef68eb69a136ded593dae07815beb8e4754732b</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1328182080" build="1328182077"/>
+  <size package="28026070" installed="28075355" archive="28076284"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/46" href="modis-web-46.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui12.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2723"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="46" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="47" rel="1"/>
+  <checksum type="sha256" pkgid="YES">ba80bffb51f2fb9d18e30a010be17d784db49f1eaa7519eec03b1fa07a91fc35</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1328265059" build="1328265052"/>
+  <size package="28032894" installed="28076125" archive="28077056"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/47" href="modis-web-47.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui10.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2723"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="47" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="53" rel="1"/>
+  <checksum type="sha256" pkgid="YES">03b89ae6b5e794af88fc5ef492963629a4aed57d11a04e77652363cd35448523</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1328541292" build="1328541288"/>
+  <size package="28027640" installed="28076590" archive="28077520"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/53" href="modis-web-53.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui09.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2723"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="53" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="59" rel="1"/>
+  <checksum type="sha256" pkgid="YES">9afe666198d520a173b0d7f99a92fd89637f8cef30f64121b0b646d6bdec9919</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1329406985" build="1329406980"/>
+  <size package="28073092" installed="28123231" archive="28124160"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/59" href="modis-web-59.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui09.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2723"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="59" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-modis-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="60" rel="1"/>
+  <checksum type="sha256" pkgid="YES">31028405f71118374c31ecfbdfc6a9cfec4440487fa9f9fed35cf05687d8e650</checksum>
+  <summary>modis-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1329474856" build="1329474850"/>
+  <size package="28761672" installed="28856639" archive="28857568"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/modis-web/60" href="modis-web-60.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui09.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2723"/>
+    <rpm:provides>
+      <rpm:entry name="is24-modis-web-release" flags="EQ" epoch="0" ver="60" rel="1"/>
+      <rpm:entry name="modis-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-modis-web-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-modis-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="modis-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-valuation-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="7" rel="1"/>
+  <checksum type="sha256" pkgid="YES">a62a764782c3458d8b75df8328ee7a4e52cb66b853e2db5a769e689ffb176960</checksum>
+  <summary>valuation-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1325867013" build="1325867008"/>
+  <size package="20330167" installed="20328283" archive="20329216"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/valuation/valuation-root/7" href="valuation-root-7.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui04.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2755"/>
+    <rpm:provides>
+      <rpm:entry name="is24-valuation-web-release" flags="EQ" epoch="0" ver="7" rel="1"/>
+      <rpm:entry name="valuation-root"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-valuation-web-config" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-valuation-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="valuation-root" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-valuation-web-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="13" rel="1"/>
+  <checksum type="sha256" pkgid="YES">fba5908e20e5569b618c42beb40748956ef1390060201433c21258f565063347</checksum>
+  <summary>valuation-web Maven Webapp</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1327048142" build="1327048139"/>
+  <size package="24517799" installed="24517017" archive="24517960"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/de/is24/valuation/valuation/valuation-web/13" href="valuation-web-13.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout GmbH</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui07.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2748"/>
+    <rpm:provides>
+      <rpm:entry name="is24-valuation-web-release" flags="EQ" epoch="0" ver="13" rel="1"/>
+      <rpm:entry name="valuation-web"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-tomcat-7-with-httpd" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-valuation-web-config" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-valuation-web-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="valuation-web" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-teamcity-rest-api-plugin-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.0" rel="1"/>
+  <checksum type="sha256" pkgid="YES">51d04c32381e387c5e0cfc0c9ccdd38b5aab00fd164ad4d1e344eb5195e9417e</checksum>
+  <summary>teamcity-rest-api-plugin</summary>
+  <description></description>
+  <packager>maven - sherold</packager>
+  <url></url>
+  <time file="1323948951" build="1323948947"/>
+  <size package="3046964" installed="3044197" archive="3045016"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/jetbrains/buildserver/server/teamcity-rest-api-plugin/1.0" href="teamcity-rest-api-plugin-1.0.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>IS24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>isdeblnmac39</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2208"/>
+    <rpm:provides>
+      <rpm:entry name="is24-teamcity-rest-api-plugin-release" flags="EQ" epoch="0" ver="1.0" rel="1"/>
+      <rpm:entry name="teamcity-rest-api-plugin"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-teamcity" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-teamcity-rest-api-plugin-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="teamcity-rest-api-plugin" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-teamcity-rest-api-plugin-release</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.1" rel="1"/>
+  <checksum type="sha256" pkgid="YES">9a8ed0f5abf0b0e4f6ae0d778510c8f48e2abf00a5cfd0620da576c7ccd3bbcc</checksum>
+  <summary>teamcity-rest-api-plugin</summary>
+  <description></description>
+  <packager>maven - sherold</packager>
+  <url></url>
+  <time file="1323972656" build="1323972651"/>
+  <size package="3793875" installed="3790972" archive="3791932"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/production/jetbrains/buildserver/server/teamcity-rest-api-plugin/1.1" href="teamcity-rest-api-plugin-1.1.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>IS24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>isdeblnmac39</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="2302"/>
+    <rpm:provides>
+      <rpm:entry name="is24-teamcity-rest-api-plugin-release" flags="EQ" epoch="0" ver="1.1" rel="1"/>
+      <rpm:entry name="teamcity-rest-api-plugin"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-teamcity" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-teamcity-rest-api-plugin-snapshot" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="teamcity-rest-api-plugin" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-autopilot-snapshot</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.0" rel="SNAPSHOT20120207094129"/>
+  <checksum type="sha256" pkgid="YES">8876e4cbf7eb32a2fdfd89fba35bfd55f8bd6b8315a074cda7dbcc2a4902dff0</checksum>
+  <summary>autopilot</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1328607708" build="1328607689"/>
+  <size package="40848185" installed="57832794" archive="57884528"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/rpm-snapshots/de/is24/autopilot/1.0-SNAPSHOT" href="autopilot-1.0-20120207.094145-1.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>IS24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui04.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="32006"/>
+    <rpm:provides>
+      <rpm:entry name="autopilot"/>
+      <rpm:entry name="is24-autopilot-snapshot" flags="EQ" epoch="0" ver="1.0" rel="SNAPSHOT20120207094129"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-autopilot-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-autopilot-release" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="autopilot" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-autopilot-snapshot</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.0" rel="SNAPSHOT20120207094348"/>
+  <checksum type="sha256" pkgid="YES">24d0eb43a34a3cba4fdc68cc7b7b953545aa605e807b6c79b03f56c9ba2671b4</checksum>
+  <summary>autopilot</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1328607848" build="1328607828"/>
+  <size package="40848156" installed="57832306" archive="57884040"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/rpm-snapshots/de/is24/autopilot/1.0-SNAPSHOT" href="autopilot-1.0-20120207.094403-2.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>IS24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui04.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="32006"/>
+    <rpm:provides>
+      <rpm:entry name="autopilot"/>
+      <rpm:entry name="is24-autopilot-snapshot" flags="EQ" epoch="0" ver="1.0" rel="SNAPSHOT20120207094348"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-autopilot-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-autopilot-release" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="autopilot" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-autopilot-snapshot</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.0" rel="SNAPSHOT20120207094839"/>
+  <checksum type="sha256" pkgid="YES">1d31de26f4ac26b738dea69911f333b0e2a98d2245f34c3ed1f0a094de525a14</checksum>
+  <summary>autopilot</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1328608136" build="1328608119"/>
+  <size package="40848157" installed="57832306" archive="57884040"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/rpm-snapshots/de/is24/autopilot/1.0-SNAPSHOT" href="autopilot-1.0-20120207.094853-3.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>IS24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui04.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="32006"/>
+    <rpm:provides>
+      <rpm:entry name="autopilot"/>
+      <rpm:entry name="is24-autopilot-snapshot" flags="EQ" epoch="0" ver="1.0" rel="SNAPSHOT20120207094839"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-autopilot-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-autopilot-release" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="autopilot" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-autopilot-snapshot</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.0" rel="SNAPSHOT20120207095045"/>
+  <checksum type="sha256" pkgid="YES">aac0cae8a9516c8598e79ffbcd3dff7ee1a8c8225e362c22284fd56f33c09ea4</checksum>
+  <summary>autopilot</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1328608264" build="1328608245"/>
+  <size package="40848136" installed="57832306" archive="57884040"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/rpm-snapshots/de/is24/autopilot/1.0-SNAPSHOT" href="autopilot-1.0-20120207.095100-4.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>IS24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui04.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="32006"/>
+    <rpm:provides>
+      <rpm:entry name="autopilot"/>
+      <rpm:entry name="is24-autopilot-snapshot" flags="EQ" epoch="0" ver="1.0" rel="SNAPSHOT20120207095045"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-autopilot-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-autopilot-release" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="autopilot" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-autopilot-snapshot</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.0" rel="SNAPSHOT20120207101243"/>
+  <checksum type="sha256" pkgid="YES">b835ff62c6840c987bd6dbfcbace53d3cf2d8473682124a68a0623bdddb7ada5</checksum>
+  <summary>autopilot</summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1328609581" build="1328609563"/>
+  <size package="40848608" installed="57834194" archive="57885932"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/rpm-snapshots/de/is24/autopilot/1.0-SNAPSHOT" href="autopilot-1.0-20120207.101258-5.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>IS24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui04.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="32006"/>
+    <rpm:provides>
+      <rpm:entry name="autopilot"/>
+      <rpm:entry name="is24-autopilot-snapshot" flags="EQ" epoch="0" ver="1.0" rel="SNAPSHOT20120207101243"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-autopilot-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-autopilot-release" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="autopilot" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-tat-snapshot</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="88.0.0" rel="SNAPSHOT20110610120811"/>
+  <checksum type="sha" pkgid="YES">b264599ad22f5bef22e4ce536421fb3a6d4e737d</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1307707823" build="1307707691"/>
+  <size package="162813969" installed="192246281" archive="192692124"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/rpm-snapshots/de/is24/tat/88.0.0-SNAPSHOT" href="tat-88.0.0-20110610.121010-6.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout 24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui99.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="275120"/>
+    <rpm:provides>
+      <rpm:entry name="is24-tat-snapshot" flags="EQ" epoch="0" ver="88.0.0" rel="SNAPSHOT20110610120811"/>
+      <rpm:entry name="tat" flags="EQ" epoch="0" ver="88.0.0" rel="SNAPSHOT20110610120811"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-tat-release" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="tat" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-tat-snapshot</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="89.0.0" rel="SNAPSHOT20110624151630"/>
+  <checksum type="sha" pkgid="YES">7bf73c1b651935fb6805b176e0fb7e8937900b41</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1308928763" build="1308928590"/>
+  <size package="162906684" installed="192391370" archive="192842208"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/rpm-snapshots/de/is24/tat/89.0.0-SNAPSHOT" href="tat-89.0.0-20110624.151912-211.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout 24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui99.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="278403"/>
+    <rpm:provides>
+      <rpm:entry name="is24-tat-snapshot" flags="EQ" epoch="0" ver="89.0.0" rel="SNAPSHOT20110624151630"/>
+      <rpm:entry name="tat" flags="EQ" epoch="0" ver="89.0.0" rel="SNAPSHOT20110624151630"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-tomcat-with-httpd-for-tat" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-tat-release" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="tat" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-tat-snapshot</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="90.0.0" rel="SNAPSHOT20110708123109"/>
+  <checksum type="sha" pkgid="YES">12e20d5a3b2ce6cce1250b3874f34076208ebac7</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1310128485" build="1310128269"/>
+  <size package="163004559" installed="192678316" archive="193141144"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/rpm-snapshots/de/is24/tat/90.0.0-SNAPSHOT" href="tat-90.0.0-20110708.123435-200.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout 24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui99.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="285897"/>
+    <rpm:provides>
+      <rpm:entry name="is24-tat-snapshot" flags="EQ" epoch="0" ver="90.0.0" rel="SNAPSHOT20110708123109"/>
+      <rpm:entry name="tat" flags="EQ" epoch="0" ver="90.0.0" rel="SNAPSHOT20110708123109"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-tat-release" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="tat" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-tat-snapshot</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="team-arte" rel="SNAPSHOT20110711110808"/>
+  <checksum type="sha" pkgid="YES">5a6e1f9201ca52b4af571e2c18342bc3e118095f</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1310382698" build="1310382488"/>
+  <size package="159117633" installed="188536979" archive="188998172"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/rpm-snapshots/de/is24/tat/team-arte-SNAPSHOT" href="tat-team-arte-20110711.111128-11.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>Immobilien Scout 24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui99.be.test.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="284843"/>
+    <rpm:provides>
+      <rpm:entry name="is24-tat-snapshot" flags="EQ" epoch="0" ver="team-arte" rel="SNAPSHOT20110711110808"/>
+      <rpm:entry name="tat" flags="EQ" epoch="0" ver="team-arte" rel="SNAPSHOT20110711110808"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-tat-release" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="tat" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
+<package type="rpm">
+  <name>is24-dummy-snapshot</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="0.0.1" rel="SNAPSHOT20110615134843"/>
+  <checksum type="sha" pkgid="YES">3eb0087ef1597ea99f5992545971c71bbe2d8ef2</checksum>
+  <summary>(none)</summary>
+  <description>(none)</description>
+  <packager>maven - sherold</packager>
+  <url></url>
+  <time file="1308145724" build="1308145723"/>
+  <size package="5281" installed="2907" archive="5720"/>
+<location xml:base="http://devnex.rz.is24.loc/content/repositories/rpm-snapshots/test/is24-dummy/0.0.1-SNAPSHOT" href="is24-dummy-0.0.1-20110615.134844-14.rpm"/>
+  <format>
+    <rpm:license/>
+    <rpm:vendor>IS24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>isdeblnmac39</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
+    <rpm:header-range start="280" end="3465"/>
+    <rpm:provides>
+      <rpm:entry name="is24-dummy" flags="EQ" epoch="0" ver="0.0.1" rel="SNAPSHOT20110615134843"/>
+      <rpm:entry name="is24-dummy-snapshot" flags="EQ" epoch="0" ver="0.0.1" rel="SNAPSHOT20110615134843"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="is24-dummy-config" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-ojdbc" flags="GE" epoch="0" ver="0"/>
+      <rpm:entry name="is24-tomcat-with-httpd" flags="GE" epoch="0" ver="0"/>
+    </rpm:requires>
+    <rpm:conflicts>
+      <rpm:entry name="is24-dummy-release" flags="GE" epoch="0" ver="0"/>
+    </rpm:conflicts>
+    <rpm:obsoletes>
+      <rpm:entry name="is24-dummy" flags="GE" epoch="0" ver="0"/>
+    </rpm:obsoletes>
+  </format>
+</package>
 </metadata>
