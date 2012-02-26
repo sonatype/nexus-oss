@@ -22,12 +22,9 @@ public class TimeStampIgnoringDifferenceListener implements DifferenceListener {
       return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
     }
 
-    if (difference.getTestNodeDetail().getXpathLocation().contains("/requires[")
-        || difference.getTestNodeDetail().getXpathLocation().contains("/provides[")
-        || difference.getTestNodeDetail().getXpathLocation().contains("/format[1]")
-        || difference.getTestNodeDetail().getXpathLocation().matches("^/repomd.{4,5}data.{4,5}(open-)?size.{3,4}$")
-        || difference.getTestNodeDetail().getXpathLocation().matches("^/repomd.{4,5}(data.{4,5})?text.{5,6}$")
-        || difference.getTestNodeDetail().getXpathLocation().matches("^/repomd.{4,5}revision.*$")) {
+    if (testNodeXpathContains(difference, "/requires[", "/provides[", "/format[1]")
+        || testNodeXpathMatches(difference, "^/repomd.{4,5}data.{4,5}(open-)?size.{3,4}$", "^/repomd.{4,5}(data.{4,5})?text.{5,6}$",
+            "^/repomd.{4,5}revision.*$")) {
       return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
     }
 
@@ -78,6 +75,28 @@ public class TimeStampIgnoringDifferenceListener implements DifferenceListener {
     }
 
     return isNodeName(localName(controlNode(difference)), nodeNames) && isNodeName(localName(testNode(difference)), nodeNames);
+  }
+
+  private boolean testNodeXpathContains(Difference difference, String... contains) {
+    if (difference.getTestNodeDetail().getXpathLocation() != null && contains != null && contains.length > 0) {
+      for (String containedString : contains) {
+        if (difference.getTestNodeDetail().getXpathLocation().contains(containedString)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private boolean testNodeXpathMatches(Difference difference, String... patterns) {
+    if (difference.getTestNodeDetail().getXpathLocation() != null && patterns != null && patterns.length > 0) {
+      for (String pattern : patterns) {
+        if (difference.getTestNodeDetail().getXpathLocation().matches(pattern)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private String localName(Node node) {
