@@ -30,7 +30,7 @@ public class RemoveRpmIT extends AbstractNexusTestBase {
     assertEquals(deployRpm(DUMMY_ARTIFACT, GROUP_ID, ARTIFACT_VERSION, NEW_REPO_ID), SC_CREATED);
     Thread.sleep(5000);
     executeDelete("/repositories/" + NEW_REPO_ID + "/content/" + GROUP_ID);
-    Thread.sleep(5000);
+    Thread.sleep(15000);
     String primaryXml = gzipResponseContent(executeGetWithResponse(NEXUS_BASE_URL + "/content/repositories/" + NEW_REPO_ID
         + "/repodata/primary.xml.gz"));
     assertThat(primaryXml, not(containsString(DUMMY_ARTIFACT)));
