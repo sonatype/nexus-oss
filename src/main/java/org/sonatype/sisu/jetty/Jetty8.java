@@ -137,14 +137,7 @@ public class Jetty8
                     started.countDown();
                 }
 
-                try
-                {
-                    server.join();
-                }
-                finally
-                {
-                    stopped.countDown();
-                }
+                server.join();
             }
             catch ( InterruptedException e )
             {
@@ -153,6 +146,10 @@ public class Jetty8
             catch ( Exception e )
             {
                 exception = e;
+            }
+            finally
+            {
+                stopped.countDown();
             }
         }
 
