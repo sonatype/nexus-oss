@@ -51,6 +51,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -196,9 +197,19 @@ public class P2ProxyRepository
                 {
                     // The remote repository is a SimpleArtifactRepository with mirrors configured
                     getLogger().debug(
-                        "Repository " + getId() + ": configureMirrors: found single mirrors URL=" + mirrorsURL );
-                    mirrorsItem = getMirrorsItemRemote( mirrorsURL );
-                    mirrorsItem.setRepositoryItemUid( createUid( PRIVATE_MIRRORS_PATH ) );
+                        "Repository " + getId() + ": configureMirrors: found single mirrors URL=" + mirrorsURL
+                    );
+                    final AbstractStorageItem remoteMirrorsItem = getMirrorsItemRemote( mirrorsURL );
+                    final ContentLocator content = new PreparedContentLocator(
+                        ( (StorageFileItem) remoteMirrorsItem ).getInputStream(), "text/xml"
+                    );
+                    mirrorsItem = new DefaultStorageFileItem(
+                        this,
+                        new ResourceStoreRequest( PRIVATE_MIRRORS_PATH ),
+                        true /* isReadable */,
+                        false /* isWritable */,
+                        content
+                    );
                     mirrorsItem = doCacheItem( mirrorsItem );
                 }
                 else
