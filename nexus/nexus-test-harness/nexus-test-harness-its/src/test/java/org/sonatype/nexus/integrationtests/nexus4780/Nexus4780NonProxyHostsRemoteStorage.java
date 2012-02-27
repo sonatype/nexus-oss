@@ -13,9 +13,12 @@
 package org.sonatype.nexus.integrationtests.nexus4780;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.sonatype.nexus.test.utils.FileTestingUtils.createSHA1FromFile;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.sonatype.nexus.integrationtests.ITGroups;
 import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
@@ -24,43 +27,47 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
- *
+ * This test ensures that the commons-httpclient (v3) and httpclient v4 remote storage implementations
+ * work in a proxied environment with non-proxy-hosts.
+ * 
+ * A web proxy is set up in the nexus configuration but localhost is set up as a NonProxyHost, so the web proxy should 
+ * not be accessed..
  */
 public class Nexus4780NonProxyHostsRemoteStorage
     extends AbstractNexusWebProxyIntegrationTest
 {
 
+    /**
+     * Retrieve two artifacts from a proxy repo set up with the httpclient v3 remote storage.
+     */
     @Test( groups = ITGroups.PROXY )
     public void apache3xDownloadArtifactNonProxyHost()
         throws Exception
     {
-        File pomFile = this.getLocalFile( "release-proxy-repo-1", "nexus4780", "artifact", "1.0", "pom" );
-        File jarFile = this.getLocalFile( "release-proxy-repo-1", "nexus4780", "artifact", "1.0", "jar" );
-
-        final String repoUrl = getNexusTestRepoUrl( "apache3x" );
-        File pomArtifact = this.downloadArtifact( repoUrl, "nexus4780", "artifact", "1.0", "pom", null, "target/downloads" );
-        Assert.assertTrue( FileTestingUtils.compareFileSHA1s( pomArtifact, pomFile ) );
-
-        File jarArtifact = this.downloadArtifact( repoUrl, "nexus4780", "artifact", "1.0", "jar", null, "target/downloads" );
-        Assert.assertTrue( FileTestingUtils.compareFileSHA1s( jarArtifact, jarFile ) );
-
-        assertThat( "proxy was used" ,server.getAccessedUris(), hasSize( 0 ) );
+        retrieveAndAssertArtifacts( getNexusTestRepoUrl( "apache3x" ) );
     }
 
+    /**
+     * Retrieve artifacts from a proxy repo set up with the httpclient v4 remote storage.
+     */
     @Test( groups = ITGroups.PROXY )
     public void apache4xDownloadArtifactNonProxyHost()
         throws Exception
     {
+        retrieveAndAssertArtifacts( getNexusTestRepoUrl( "apache4x" ) );
+    }
+
+    private void retrieveAndAssertArtifacts( final String repoUrl )
+        throws IOException
+    {
         File pomFile = this.getLocalFile( "release-proxy-repo-1", "nexus4780", "artifact", "1.0", "pom" );
         File jarFile = this.getLocalFile( "release-proxy-repo-1", "nexus4780", "artifact", "1.0", "jar" );
 
-        final String repoUrl = getNexusTestRepoUrl( "apache4x" );
         File pomArtifact = this.downloadArtifact( repoUrl, "nexus4780", "artifact", "1.0", "pom", null, "target/downloads" );
-        Assert.assertTrue( FileTestingUtils.compareFileSHA1s( pomArtifact, pomFile ) );
-
         File jarArtifact = this.downloadArtifact( repoUrl, "nexus4780", "artifact", "1.0", "jar", null, "target/downloads" );
-        Assert.assertTrue( FileTestingUtils.compareFileSHA1s( jarArtifact, jarFile ) );
 
+        assertThat( createSHA1FromFile( pomArtifact ), equalTo( createSHA1FromFile( pomFile ) ) );
+        assertThat( createSHA1FromFile( jarArtifact ), equalTo( createSHA1FromFile( jarFile ) ) );
         assertThat( "proxy was used" ,server.getAccessedUris(), hasSize( 0 ) );
     }
 }
