@@ -23,7 +23,7 @@ public class TimeStampIgnoringDifferenceListener implements DifferenceListener {
     }
 
     if (testNodeXpathContains(difference, "/requires[", "/provides[", "/format[1]")
-        || testNodeXpathMatches(difference, "^/repomd.{4,5}data.{4,5}(open-)?size.{3,4}$", "^/repomd.{4,5}(data.{4,5})?text.{5,6}$",
+        || testNodeXpathMatches(difference, "^/repomd.{4,5}data.{4,5}(open-)?size.*$", "^/repomd.{4,5}(data.{4,5})?text.{5,6}$",
             "^/repomd.{4,5}revision.*$")) {
       return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
     }
@@ -42,7 +42,27 @@ public class TimeStampIgnoringDifferenceListener implements DifferenceListener {
       return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
     }
 
+    if (isRpmRequiresWithOnlyRpmLibEntries(difference.getControlNodeDetail())) {
+      return RETURN_IGNORE_DIFFERENCE_NODES_IDENTICAL;
+    }
+
     return RETURN_ACCEPT_DIFFERENCE;
+  }
+
+  private boolean isRpmRequiresWithOnlyRpmLibEntries(NodeDetail controlNode) {
+    return controlNode != null && controlNode.getNode() != null && controlNode.getNode().getLocalName().equals("requires")
+        && hasOnlyRpmLibEntries(controlNode.getNode());
+  }
+
+  private boolean hasOnlyRpmLibEntries(Node node) {
+    for (int index = 0; index < node.getChildNodes().getLength(); index++) {
+      Node childNode = node.getChildNodes().item(index);
+      if (childNode.getNodeType() == Node.ELEMENT_NODE && childNode.getLocalName().equals("entry")
+          && !childNode.getAttributes().getNamedItem("name").getNodeValue().startsWith("rpmlib")) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private boolean isRpmLibEntry(Difference difference) {
