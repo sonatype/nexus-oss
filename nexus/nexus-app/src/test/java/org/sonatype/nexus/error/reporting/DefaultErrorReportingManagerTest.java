@@ -248,8 +248,12 @@ public class DefaultErrorReportingManagerTest
 
         final File zipDir = nexusConfig.getWorkingDirectory( DefaultErrorReportingManager.ERROR_REPORT_DIR );
         final ZipFile zipFile = new ZipFile( zipDir.listFiles()[0] );
-        assertThat( zipFile, containsDefaultEntries );
-        assertThat( zipFile, containsAdditionalEntries );
+        try {
+            assertThat( zipFile, containsDefaultEntries );
+            assertThat( zipFile, containsAdditionalEntries );
+        } finally {
+            zipFile.close();
+        }
     }
 
     private void addBackupFiles( File dir )
