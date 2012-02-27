@@ -13,6 +13,7 @@
 package org.sonatype.sisu.jetty;
 
 import java.io.File;
+import java.net.BindException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -215,6 +216,57 @@ public class JettyConfigurationTest
         catch ( IllegalStateException e )
         {
             // good
+        }
+    }
+
+    public void testStartStopConsecutivelyWrongOrder3()
+        throws Exception
+    {
+        Jetty8 subject = new Jetty8( new File( getJettyXmlPath( "jetty-two-war-context.xml" ) ) );
+
+        try
+        {
+            subject.startJetty();
+
+            subject.stopJetty();
+
+            subject.stopJetty();
+
+            Assert.fail( "We should not get here!" );
+        }
+        catch ( IllegalStateException e )
+        {
+            // good
+        }
+    }
+
+    public void testCanStopAfterStartupFailure()
+        throws Exception
+    {
+        Jetty8 subject = new Jetty8( new File( getJettyXmlPath( "jetty-misconfiguration.xml" ) ) );
+
+        try
+        {
+            subject.startJetty();
+
+            Assert.fail( "We should not get here!" );
+        }
+        catch ( BindException e )
+        {
+            // expected
+        }
+        finally
+        {
+            try
+            {
+                subject.stopJetty();
+
+                Assert.fail( "We should not get here!" );
+            }
+            catch ( BindException e )
+            {
+                // expected
+            }
         }
     }
 
