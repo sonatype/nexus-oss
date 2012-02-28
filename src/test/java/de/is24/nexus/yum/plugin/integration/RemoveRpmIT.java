@@ -3,6 +3,7 @@ package de.is24.nexus.yum.plugin.integration;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static org.apache.http.util.EntityUtils.consume;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -42,6 +43,7 @@ public class RemoveRpmIT extends AbstractNexusTestBase {
     HttpDelete request = new HttpDelete(SERVICE_BASE_URL + url);
     setCredentials(request);
     HttpResponse response = client.execute(request);
+    consume(response.getEntity());
     assertEquals(SC_NO_CONTENT, statusCode(response));
   }
 }

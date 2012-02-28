@@ -15,6 +15,7 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
@@ -90,8 +91,10 @@ public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepos
   private String buildCommand(File repoBaseDir) throws MalformedURLException, URISyntaxException {
     final StringBuilder repos = new StringBuilder();
     for (Repository memberRepository : groupRepository.getMemberRepositories()) {
-      repos.append(" --repo=");
-      repos.append(getFileUrl(memberRepository));
+      if (memberRepository.getRepositoryKind().isFacetAvailable(MavenHostedRepository.class)) {
+        repos.append(" --repo=");
+        repos.append(getFileUrl(memberRepository));
+      }
     }
     return format("mergerepo --nogroups -d %s -o %s", repos.toString(), repoBaseDir.getAbsolutePath());
   }

@@ -143,14 +143,16 @@ public class AbstractNexusTestBase {
     return IOUtils.toString(new GZIPInputStream(response.getEntity().getContent()));
   }
 
-  protected HttpResponse givenGroupRepository(String repoId, Repository... memberRepos) throws AuthenticationException,
+  protected HttpResponse givenGroupRepository(String repoId, String providerId, Repository... memberRepos) throws AuthenticationException,
       UnsupportedEncodingException, IOException, ClientProtocolException {
     HttpResponse response = executeDeleteWithResponse(format("/repo_groups/%s", repoId));
     consume(response.getEntity());
-    return executePost("/repo_groups",
-        new StringEntity(format("{data:{id: '%s', name: '%s', provider: 'maven2', repositories: [%s]}}", repoId, repoId,
-            render(memberRepos))), new BasicHeader(
-            "Content-Type", "application/json"));
+
+    final StringEntity content = new StringEntity(format("{data:{id: '%s', name: '%s', provider: '%s', repositories: [%s]}}", repoId, repoId, providerId,
+        render(memberRepos)));
+    return executePost(
+        "/repo_groups",
+        content, new BasicHeader("Content-Type", "application/json"));
   }
 
   protected void wait(int timeout, TimeUnit unit) throws InterruptedException {

@@ -19,8 +19,11 @@ import java.util.concurrent.Callable;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
+import org.mockito.Matchers;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.scheduling.ScheduledTask;
 
 public class YumGroupRepositoryGenerationTaskTest {
@@ -101,8 +104,11 @@ public class YumGroupRepositoryGenerationTaskTest {
   }
 
   private Repository createRepo(File repoDir) {
-    Repository repo = mock(Repository.class);
+    final Repository repo = mock(Repository.class);
+    final RepositoryKind kind = mock(RepositoryKind.class);
+    when(kind.isFacetAvailable(Matchers.eq(MavenHostedRepository.class))).thenReturn(true);
     when(repo.getLocalUrl()).thenReturn(repoDir.getAbsolutePath());
+    when(repo.getRepositoryKind()).thenReturn(kind);
     return repo;
   }
 }
