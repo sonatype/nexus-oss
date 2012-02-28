@@ -64,6 +64,7 @@ public class YumGroupRepositoryIT extends AbstractNexusTestBase {
   public void shouldRegenerateGroupRepoWhenMemberRepoIsRemoved() throws Exception {
     givenGroupRepoWith2Rpms();
     removeMemberRepo(MEMBER_REPO2);
+    wait(5, SECONDS);
     String primaryXml = getGroupRepoPrimaryXml();
     assertThat(primaryXml, containsString(DUMMY_ARTIFACT1));
     assertThat(primaryXml, not(containsString(DUMMY_ARTIFACT2)));
@@ -77,6 +78,7 @@ public class YumGroupRepositoryIT extends AbstractNexusTestBase {
     assertEquals(deployRpm(DUMMY_ARTIFACT3, GROUP_ID, ARTIFACT_VERSION3, MEMBER_REPO3), SC_CREATED);
     wait(5, SECONDS);
     addMemberRepo(MEMBER_REPO3);
+    wait(5, SECONDS);
     String primaryXml = getGroupRepoPrimaryXml();
     assertThat(primaryXml, containsString(DUMMY_ARTIFACT1));
     assertThat(primaryXml, containsString(DUMMY_ARTIFACT2));
