@@ -25,7 +25,7 @@ public class SystemStatus
     /**
      * The Application Name
      */
-    private String appName = "Sonatype Nexus Maven Repository Manager";
+    private String appName = "Sonatype Nexus";
 
     /**
      * The Formatted Application Name, used whenever possible
