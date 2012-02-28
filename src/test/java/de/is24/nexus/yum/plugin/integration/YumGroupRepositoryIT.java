@@ -1,10 +1,12 @@
 package de.is24.nexus.yum.plugin.integration;
 
 import static de.is24.nexus.yum.plugin.m2yum.M2YumGroupRepository.ID;
+import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static org.apache.http.util.EntityUtils.consume;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -40,12 +42,22 @@ public class YumGroupRepositoryIT extends AbstractNexusTestBase {
 
   @Test
   public void shouldRegenerateGroupRepoWhenMemberRepoIsRemoved() throws Exception {
-    // TODO
+    givenGroupRepoWith2Rpms();
+    removeMemberRepo(MEMBER_REPO2);
+    String primaryXml = getGroupRepoPrimaryXml();
+    assertThat(primaryXml, containsString(DUMMY_ARTIFACT1));
+    assertThat(primaryXml, not(containsString(DUMMY_ARTIFACT2)));
   }
+
 
   @Test
   public void shouldRegenerateGroupRepoWhenMemberRepoIsAdded() throws Exception {
     // TODO
+  }
+
+  private void removeMemberRepo(String memberRepo2) throws Exception {
+    executeGet(format("repo_groups/%s", memberRepo2));
+    wait(5, SECONDS);
   }
 
   private String getGroupRepoPrimaryXml() throws IOException, AuthenticationException {

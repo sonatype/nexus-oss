@@ -7,6 +7,7 @@ import static java.lang.String.format;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -27,7 +28,8 @@ public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepos
 
   private static final Logger LOG = LoggerFactory.getLogger(YumGroupRepositoryGenerationTask.class);
   public static final String ID = "YumGroupRepositoryGenerationTask";
-  private static final int MAXIMAL_PARALLEL_RUNS = 2;
+  private static final int MAXIMAL_PARALLEL_RUNS = 1; // we need to clean the
+                                                      // yum cache repo first
   private GroupRepository groupRepository;
 
   public void setGroupRepository(GroupRepository groupRepository) {
@@ -37,6 +39,7 @@ public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepos
   @Override
   protected YumRepository doRun() throws Exception {
     if (isActive() && isValidRepository(groupRepository)) {
+      clearYumCacheDir();
       LOG.info("Merging repository group {}='{}' ...", groupRepository.getId(), groupRepository.getName());
       final File repoBaseDir = getBaseDir(groupRepository);
       execCommand(buildCommand(repoBaseDir));
@@ -44,6 +47,17 @@ public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepos
       return new YumRepository(repoBaseDir, groupRepository.getId(), null);
     }
     return null;
+  }
+
+  private void clearYumCacheDir() throws IOException {
+    final String username = System.getProperty("user.name");
+    final String yumCacheDir = "/var/tmp/yum-" + username + "-*/";
+    LOG.info("Clearing yum cache dir : {} ...", yumCacheDir);
+    try {
+      execCommand(format("bash -c 'rm -rf %s'", yumCacheDir));
+    } catch (IOException e) {
+      // do nothing: failing of the yum cache dir removal is ok
+    }
   }
 
   @Override

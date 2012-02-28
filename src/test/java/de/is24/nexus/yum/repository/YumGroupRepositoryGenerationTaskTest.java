@@ -34,7 +34,6 @@ public class YumGroupRepositoryGenerationTaskTest {
   private static final File GROUP_REPO_DIR = new File("target/tmp/group-repo");
   private static final String REPO_ID = "group-repo-id";
   private static final String REPO_ID2 = "group-repo-id2";
-  private static final String REPO_ID3 = "group-repo-id3";
   private GroupRepository groupRepo;
 
   @Test
@@ -54,16 +53,14 @@ public class YumGroupRepositoryGenerationTaskTest {
   }
 
   @Test
-  public void shouldNotAllowConcurrentExecutionIfTwoTaskAreRunning() throws Exception {
+  public void shouldNotAllowConcurrentExecutionIfAnotherTaskIsRunning() throws Exception {
     final YumGroupRepositoryGenerationTask task = new YumGroupRepositoryGenerationTask();
     final GroupRepository groupRepo = mock(GroupRepository.class);
     when(groupRepo.getId()).thenReturn(REPO_ID);
     final GroupRepository groupRepo2 = mock(GroupRepository.class);
     when(groupRepo2.getId()).thenReturn(REPO_ID2);
-    final GroupRepository groupRepo3 = mock(GroupRepository.class);
-    when(groupRepo3.getId()).thenReturn(REPO_ID3);
     task.setGroupRepository(groupRepo);
-    assertThat(task.allowConcurrentExecution(createRunningTaskForRepos(groupRepo2, groupRepo3)), is(false));
+    assertThat(task.allowConcurrentExecution(createRunningTaskForRepos(groupRepo2)), is(false));
   }
 
   private Map<String, List<ScheduledTask<?>>> createRunningTaskForRepos(GroupRepository... groupRepos) {
