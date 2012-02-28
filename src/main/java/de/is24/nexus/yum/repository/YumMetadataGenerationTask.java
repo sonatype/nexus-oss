@@ -30,7 +30,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   public static final String ID = "YumMetadataGenerationTask";
 	private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
 	private static final Logger LOG = LoggerFactory.getLogger(YumMetadataGenerationTask.class);
-  private static final int MAXIMAL_PARALLEL_RUNS = 10;
+  public static final int MAXIMAL_PARALLEL_RUNS = 10;
 	private static boolean activated = true;
 
 	private YumGeneratorConfiguration config;
