@@ -152,6 +152,8 @@ Ext.extend(Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
                 style : this.textClass
               });
         }
+        
+        Sonatype.Events.fireEvent('pluginInfoTabInit',this);
 
         var failureReason = this.payload.data.failureReason;
         if (failureReason)
