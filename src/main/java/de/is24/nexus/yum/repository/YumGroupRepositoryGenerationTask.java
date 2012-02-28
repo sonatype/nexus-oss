@@ -46,6 +46,8 @@ public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepos
       final File repoBaseDir = getBaseDir(groupRepository);
       execCommand(buildCommand(repoBaseDir));
       LOG.info("Group repository {}='{}' merged.", groupRepository.getId(), groupRepository.getName());
+      cleanYumCacheDir();
+      LOG.info("Yum cache cleaned.");
       return new YumRepository(repoBaseDir, groupRepository.getId(), null);
     }
     return null;
