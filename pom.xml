@@ -225,36 +225,5 @@
       </build>
     </profile>
 
-    <!-- use to apply Apache License Version 2 to relevant files: mvn clean com.mycila.maven-license-plugin:maven-license-plugin:1.9.0:format -Plicense-alv2 -->
-    <profile>
-      <id>license-alv2</id>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>com.mycila.maven-license-plugin</groupId>
-              <artifactId>maven-license-plugin</artifactId>
-              <configuration>
-                <header>header-alv2.txt</header>
-                <includes>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.java</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.vm</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.xml</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.groovy</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.aj</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.css</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.html</include>
-                  <include>nexus/nexus-core-plugins/nexus-migration-plugin/**/*.js</include>
-                </includes>
-                <excludes>
-                  <exclude>**/target/**</exclude>
-                </excludes>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-
   </profiles>
 </project>
