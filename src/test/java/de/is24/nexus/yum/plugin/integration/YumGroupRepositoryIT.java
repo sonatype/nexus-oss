@@ -55,6 +55,7 @@ public class YumGroupRepositoryIT extends AbstractNexusTestBase {
   @Test
   public void shouldRegenerateGroupRepoWhenRpmGetsUploaded() throws Exception {
     givenGroupRepoWith2Rpms();
+    wait(5, SECONDS);
     String primaryXml = getGroupRepoPrimaryXml();
     assertThat(primaryXml, containsString(DUMMY_ARTIFACT1));
     assertThat(primaryXml, containsString(DUMMY_ARTIFACT2));
