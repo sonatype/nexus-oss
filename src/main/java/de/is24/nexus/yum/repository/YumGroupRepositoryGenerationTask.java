@@ -12,6 +12,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -42,15 +43,29 @@ public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepos
   protected YumRepository doRun() throws Exception {
     if (isActive() && isValidRepository(groupRepository)) {
       cleanYumCacheDir();
-      LOG.info("Merging repository group {}='{}' ...", groupRepository.getId(), groupRepository.getName());
       final File repoBaseDir = getBaseDir(groupRepository);
-      execCommand(buildCommand(repoBaseDir));
-      LOG.info("Group repository {}='{}' merged.", groupRepository.getId(), groupRepository.getName());
-      cleanYumCacheDir();
-      LOG.info("Yum cache cleaned.");
+      final List<File> memberRepoBaseDirs = validYumRepositoryBaseDirs();
+      if (memberRepoBaseDirs.size() > 1) {
+        LOG.info("Merging repository group {}='{}' ...", groupRepository.getId(), groupRepository.getName());
+        execCommand(buildCommand(repoBaseDir, memberRepoBaseDirs));
+        LOG.info("Group repository {}='{}' merged.", groupRepository.getId(), groupRepository.getName());
+      }
       return new YumRepository(repoBaseDir, groupRepository.getId(), null);
     }
     return null;
+  }
+
+  private List<File> validYumRepositoryBaseDirs() throws URISyntaxException, MalformedURLException {
+    final List<File> memberRepoBaseDirs = new ArrayList<File>();
+    for (Repository memberRepository : groupRepository.getMemberRepositories()) {
+      if (memberRepository.getRepositoryKind().isFacetAvailable(MavenHostedRepository.class)) {
+        final File memberRepoBaseDir = getBaseDir(memberRepository);
+        if (new File(memberRepoBaseDir, "repodata/repomd.xml").exists()) {
+          memberRepoBaseDirs.add(memberRepoBaseDir);
+        }
+      }
+    }
+    return memberRepoBaseDirs;
   }
 
   private void cleanYumCacheDir() throws IOException {
@@ -113,19 +128,12 @@ public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepos
     return groupRepository != null && !groupRepository.getMemberRepositories().isEmpty();
   }
 
-  private String buildCommand(File repoBaseDir) throws MalformedURLException, URISyntaxException {
+  private String buildCommand(File repoBaseDir, List<File> memberRepoBaseDirs) throws MalformedURLException, URISyntaxException {
     final StringBuilder repos = new StringBuilder();
-    for (Repository memberRepository : groupRepository.getMemberRepositories()) {
-      if (memberRepository.getRepositoryKind().isFacetAvailable(MavenHostedRepository.class)) {
+    for (File memberRepoBaseDir : memberRepoBaseDirs) {
         repos.append(" --repo=");
-        repos.append(getFileUrl(memberRepository));
-      }
+      repos.append(memberRepoBaseDir.toURI().toString());
     }
     return format("mergerepo --nogroups -d %s -o %s", repos.toString(), repoBaseDir.getAbsolutePath());
   }
-
-  private String getFileUrl(Repository repository) throws URISyntaxException, MalformedURLException {
-    return getBaseDir(repository).toURI().toString();
-  }
-
 }
