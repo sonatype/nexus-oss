@@ -4,9 +4,11 @@ import static de.is24.nexus.yum.execution.ExecutionUtil.execCommand;
 import static de.is24.nexus.yum.repository.RepositoryUtils.getBaseDir;
 import static de.is24.nexus.yum.repository.YumMetadataGenerationTask.isActive;
 import static java.lang.String.format;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -39,7 +41,7 @@ public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepos
   @Override
   protected YumRepository doRun() throws Exception {
     if (isActive() && isValidRepository(groupRepository)) {
-      clearYumCacheDir();
+      cleanYumCacheDir();
       LOG.info("Merging repository group {}='{}' ...", groupRepository.getId(), groupRepository.getName());
       final File repoBaseDir = getBaseDir(groupRepository);
       execCommand(buildCommand(repoBaseDir));
@@ -49,14 +51,21 @@ public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepos
     return null;
   }
 
-  private void clearYumCacheDir() throws IOException {
-    final String username = System.getProperty("user.name");
-    final String yumCacheDir = "/var/tmp/yum-" + username + "-*/";
-    LOG.info("Clearing yum cache dir : {} ...", yumCacheDir);
-    try {
-      execCommand(format("bash -c 'rm -rf %s'", yumCacheDir));
-    } catch (IOException e) {
-      // do nothing: failing of the yum cache dir removal is ok
+  private void cleanYumCacheDir() throws IOException {
+    final String yumTmpDirPrefix = "yum-" + System.getProperty("user.name");
+    final File tmpDir = new File("/var/tmp");
+    if (tmpDir.exists()) {
+      final File[] yumTmpDirs = tmpDir.listFiles(new FilenameFilter() {
+
+        @Override
+        public boolean accept(File dir, String name) {
+          return name.startsWith(yumTmpDirPrefix);
+        }
+      });
+      for (File yumTmpDir : yumTmpDirs) {
+        LOG.info("Deleting yum cache dir : {}", yumTmpDir);
+        deleteQuietly(yumTmpDir);
+      }
     }
   }
 
