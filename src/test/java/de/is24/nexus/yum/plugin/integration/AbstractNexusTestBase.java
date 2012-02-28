@@ -37,11 +37,14 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.apache.maven.index.artifact.Gav;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.test.utils.DeployUtils;
 
 public class AbstractNexusTestBase {
+  protected static final Logger LOG = LoggerFactory.getLogger(AbstractNexusTestBase.class);
   protected static final String NEXUS_BASE_URL = "http://localhost:8080/nexus";
   protected static final String SERVICE_BASE_URL = NEXUS_BASE_URL + "/service/local";
   private static final String REPO_XML = "<repository>" + "<data>" + "<contentResourceURI>%s/repositories/%s</contentResourceURI>"
@@ -92,6 +95,7 @@ public class AbstractNexusTestBase {
 
     HttpGet request = new HttpGet(url);
     setCredentials(request);
+    LOG.info("GET request : {}", url);
     return client.execute(request);
   }
 

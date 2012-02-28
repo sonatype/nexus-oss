@@ -12,14 +12,28 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
+
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.entity.StringEntity;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 public class YumGroupRepositoryIT extends AbstractNexusTestBase {
 
@@ -55,9 +69,31 @@ public class YumGroupRepositoryIT extends AbstractNexusTestBase {
     // TODO
   }
 
-  private void removeMemberRepo(String memberRepo2) throws Exception {
-    executeGet(format("repo_groups/%s", memberRepo2));
-    wait(5, SECONDS);
+  private void removeMemberRepo(String memberRepo) throws Exception {
+    final String url = format("%s/repo_groups/%s", SERVICE_BASE_URL, GROUP_REPO_ID);
+    final String repoJson = removeMemberRepoFromXml(url, memberRepo);
+    consume(executePut(url, new StringEntity(repoJson)).getEntity());
+  }
+
+  private String removeMemberRepoFromXml(String url, String memberRepo) throws Exception {
+    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    final Document document = dbf.newDocumentBuilder().parse(url);
+
+    final XPath xpath = XPathFactory.newInstance().newXPath();
+    final XPathExpression expression = xpath.compile("//repo-group-member[id/text()='" + memberRepo + "']");
+
+    final Node memberRepoNode = (Node) expression.evaluate(document, XPathConstants.NODE);
+    memberRepoNode.getParentNode().removeChild(memberRepoNode);
+
+    final TransformerFactory tf = TransformerFactory.newInstance();
+    final Transformer t = tf.newTransformer();
+    final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    try {
+      t.transform(new DOMSource(document), new StreamResult(outputStream));
+      return outputStream.toString();
+    } finally {
+      outputStream.close();
+    }
   }
 
   private String getGroupRepoPrimaryXml() throws IOException, AuthenticationException {
