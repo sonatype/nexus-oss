@@ -1,5 +1,6 @@
 package de.is24.nexus.yum.plugin.integration;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static org.junit.Assert.assertEquals;
 
@@ -22,12 +23,12 @@ public class CreateNewRpmRepositoryIT extends AbstractNexusTestBase {
   public void shouldCreateRepoRpmsForNewRpmsInNewRepository() throws Exception {
     givenTestRepository(NEW_REPO_ID);
 
-    Thread.sleep(5000);
+    wait(5, SECONDS);
 
     assertEquals(deployRpm(DUMMY_ARTIFACT, GROUP_ID, ARTIFACT_VERSION_1, NEW_REPO_ID), SC_CREATED);
     assertEquals(deployRpm(DUMMY_ARTIFACT, GROUP_ID, ARTIFACT_VERSION_2, NEW_REPO_ID), SC_CREATED);
 
-    Thread.sleep(5000);
+    wait(5, SECONDS);
 
     // is24-rel-next-try-1.0-repo-1-1.noarch.rpm
     executeGet("/yum/repo/is24-rel-" + NEW_REPO_ID + "-" + ARTIFACT_VERSION_1 + "-repo-1-1.noarch.rpm");

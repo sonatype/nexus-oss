@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.httpclient.HttpException;
@@ -32,11 +33,12 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.apache.maven.index.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.test.utils.DeployUtils;
-
 
 public class AbstractNexusTestBase {
   protected static final String NEXUS_BASE_URL = "http://localhost:8080/nexus";
@@ -51,7 +53,7 @@ public class AbstractNexusTestBase {
   protected HttpClient client = new DefaultHttpClient();
 
   protected HttpResponse executePost(String url, HttpEntity entity, Header... headers) throws AuthenticationException,
-    UnsupportedEncodingException, IOException, ClientProtocolException {
+      UnsupportedEncodingException, IOException, ClientProtocolException {
     HttpPost request = new HttpPost(SERVICE_BASE_URL + url);
     if (headers != null) {
       for (Header header : headers) {
@@ -63,8 +65,8 @@ public class AbstractNexusTestBase {
     return client.execute(request);
   }
 
-  protected HttpResponse executePut(String url, HttpEntity entity) throws AuthenticationException,
-    UnsupportedEncodingException, IOException, ClientProtocolException {
+  protected HttpResponse executePut(String url, HttpEntity entity) throws AuthenticationException, UnsupportedEncodingException,
+      IOException, ClientProtocolException {
     HttpPut request = new HttpPut(SERVICE_BASE_URL + url);
     setCredentials(request);
     request.setEntity(entity);
@@ -92,15 +94,15 @@ public class AbstractNexusTestBase {
     return client.execute(request);
   }
 
-	protected HttpResponse executeDeleteWithResponse(String url) throws AuthenticationException, IOException {
-		if (!url.startsWith("http")) {
-			url = SERVICE_BASE_URL + url;
-		}
+  protected HttpResponse executeDeleteWithResponse(String url) throws AuthenticationException, IOException {
+    if (!url.startsWith("http")) {
+      url = SERVICE_BASE_URL + url;
+    }
 
-		HttpDelete request = new HttpDelete(url);
-		setCredentials(request);
-		return client.execute(request);
-	}
+    HttpDelete request = new HttpDelete(url);
+    setCredentials(request);
+    return client.execute(request);
+  }
 
   protected int statusCode(HttpResponse response) {
     return response.getStatusLine().getStatusCode();
@@ -110,8 +112,8 @@ public class AbstractNexusTestBase {
     return IOUtils.toString(response.getEntity().getContent());
   }
 
-  protected int deployRpm(File rpmFile, String artifactId, String groupId, String version, String repositoryId)
-    throws HttpException, IOException {
+  protected int deployRpm(File rpmFile, String artifactId, String groupId, String version, String repositoryId) throws HttpException,
+      IOException {
     AbstractNexusIntegrationTest testMock = createMock(AbstractNexusIntegrationTest.class);
     replay(testMock);
 
@@ -119,8 +121,8 @@ public class AbstractNexusTestBase {
     return new DeployUtils(testMock).deployUsingGavWithRest(repositoryId, gav, rpmFile);
   }
 
-  protected int deployRpm(String artifactId, String groupId, String version, String repositoryId)
-    throws NoSuchAlgorithmException, IOException {
+  protected int deployRpm(String artifactId, String groupId, String version, String repositoryId) throws NoSuchAlgorithmException,
+      IOException {
     return deployRpm(createDummyRpm(artifactId, version), artifactId, groupId, version, repositoryId);
   }
 
@@ -139,6 +141,40 @@ public class AbstractNexusTestBase {
 
   protected String gzipResponseContent(HttpResponse response) throws IOException {
     return IOUtils.toString(new GZIPInputStream(response.getEntity().getContent()));
+  }
+
+  protected HttpResponse givenGroupRepository(String repoId, Repository... memberRepos) throws AuthenticationException,
+      UnsupportedEncodingException, IOException, ClientProtocolException {
+    HttpResponse response = executeDeleteWithResponse(format("/repo_groups/%s", repoId));
+    consume(response.getEntity());
+    return executePost("/repo_groups",
+        new StringEntity(format("{data:{id: '%s', name: '%s', provider: 'maven2', repositories: [%s]}}", repoId, repoId,
+            render(memberRepos))), new BasicHeader(
+            "Content-Type", "application/json"));
+  }
+
+  protected void wait(int timeout, TimeUnit unit) throws InterruptedException {
+    Thread.sleep(unit.toMillis(timeout));
+  }
+
+  private String render(Repository[] repos) {
+    if (repos == null || repos.length == 0) {
+      return "";
+    }
+
+    final StringBuffer buf = new StringBuffer();
+    for (Repository repo : repos) {
+      if (buf.length() > 0) {
+        buf.append(",");
+      }
+      buf.append(render(repo));
+    }
+
+    return buf.toString();
+  }
+
+  private String render(Repository repo) {
+    return format("{id : '%s', name: '%s'}", repo.getId(), repo.getName());
   }
 
 }

@@ -1,5 +1,6 @@
 package de.is24.nexus.yum.plugin.integration;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static org.hamcrest.Matchers.containsString;
@@ -26,11 +27,11 @@ public class RemoveRpmIT extends AbstractNexusTestBase {
   @Test
   public void shouldRemoveRpmFromYumRepoIfRemovedByWebGui() throws Exception {
     givenTestRepository(NEW_REPO_ID);
-    Thread.sleep(5000);
+    wait(5, SECONDS);
     assertEquals(deployRpm(DUMMY_ARTIFACT, GROUP_ID, ARTIFACT_VERSION, NEW_REPO_ID), SC_CREATED);
-    Thread.sleep(5000);
+    wait(5, SECONDS);
     executeDelete("/repositories/" + NEW_REPO_ID + "/content/" + GROUP_ID);
-    Thread.sleep(15000);
+    wait(15, SECONDS);
     String primaryXml = gzipResponseContent(executeGetWithResponse(NEXUS_BASE_URL + "/content/repositories/" + NEW_REPO_ID
         + "/repodata/primary.xml.gz"));
     assertThat(primaryXml, not(containsString(DUMMY_ARTIFACT)));

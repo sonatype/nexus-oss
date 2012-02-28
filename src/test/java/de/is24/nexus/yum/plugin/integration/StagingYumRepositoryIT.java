@@ -1,7 +1,7 @@
 package de.is24.nexus.yum.plugin.integration;
 
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.createDummyRpm;
-import static java.lang.Thread.sleep;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.http.util.EntityUtils.consume;
@@ -9,9 +9,11 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+
 import java.io.File;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.entity.StringEntity;
@@ -22,6 +24,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import de.is24.nexus.yum.repository.utils.RepositoryTestUtils;
 
 
@@ -49,13 +52,13 @@ public class StagingYumRepositoryIT extends AbstractNexusTestBase {
   @Test
   public void shouldStageRpmWithoutOverridingMetaData() throws Exception {
     givenUploadedArtifact();
-    sleep(2000);
+    wait(2, SECONDS);
     givenClosedStagingRepo();
-    sleep(2000);
+    wait(2, SECONDS);
     whenUserPromotesStagingRepo();
 
     // wait until yum-repository is really created
-    sleep(30000);
+    wait(2, SECONDS);
     thenEnsureThatRepositoryMetadataDoesNotContainOldUrl();
   }
 
