@@ -30,6 +30,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicHeader;
 import org.junit.Test;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.w3c.dom.Document;
@@ -37,14 +38,19 @@ import org.w3c.dom.Node;
 
 public class YumGroupRepositoryIT extends AbstractNexusTestBase {
 
+  private static final BasicHeader CONTENT_XML = new BasicHeader("Content-Type", "application/xml");
   private static final String MEMBER_REPO1 = "member-repo-1";
   private static final String MEMBER_REPO2 = "member-repo-2";
+  private static final String MEMBER_REPO3 = "member-repo-3";
   private static final String GROUP_REPO_ID = "group-repo-test";
+  private static final String GROUP_REPO_URL = format("%s/repo_groups/%s", SERVICE_BASE_URL, GROUP_REPO_ID);
   private static final String DUMMY_ARTIFACT1 = "groupRepoArtiFoo";
   private static final String DUMMY_ARTIFACT2 = "groupRepoArtiBla";
+  private static final String DUMMY_ARTIFACT3 = "groupRepoArtiBoo";
   private static final String GROUP_ID = "groupRepo";
   private static final String ARTIFACT_VERSION1 = "1";
   private static final String ARTIFACT_VERSION2 = "2";
+  private static final String ARTIFACT_VERSION3 = "3";
 
   @Test
   public void shouldRegenerateGroupRepoWhenRpmGetsUploaded() throws Exception {
@@ -63,21 +69,36 @@ public class YumGroupRepositoryIT extends AbstractNexusTestBase {
     assertThat(primaryXml, not(containsString(DUMMY_ARTIFACT2)));
   }
 
-
   @Test
   public void shouldRegenerateGroupRepoWhenMemberRepoIsAdded() throws Exception {
-    // TODO
+    givenGroupRepoWith2Rpms();
+    givenTestRepository(MEMBER_REPO3);
+    wait(5, SECONDS);
+    assertEquals(deployRpm(DUMMY_ARTIFACT3, GROUP_ID, ARTIFACT_VERSION3, MEMBER_REPO3), SC_CREATED);
+    wait(5, SECONDS);
+    addMemberRepo(MEMBER_REPO3);
+    String primaryXml = getGroupRepoPrimaryXml();
+    assertThat(primaryXml, containsString(DUMMY_ARTIFACT1));
+    assertThat(primaryXml, containsString(DUMMY_ARTIFACT2));
+    assertThat(primaryXml, containsString(DUMMY_ARTIFACT3));
+  }
+
+  private void addMemberRepo(String memberRepo) throws Exception {
+    String repoXml = executeGet(GROUP_REPO_URL);
+    repoXml = repoXml.replace("</repositories>",
+        format("<repo-group-member><id>%s</id><name>%s</name><resourceURI>%s</resourceURI></repo-group-member></repositories>", memberRepo,
+            memberRepo, GROUP_REPO_URL + "/" + memberRepo));
+    consume(executePut(GROUP_REPO_URL, new StringEntity(repoXml), CONTENT_XML).getEntity());
   }
 
   private void removeMemberRepo(String memberRepo) throws Exception {
-    final String url = format("%s/repo_groups/%s", SERVICE_BASE_URL, GROUP_REPO_ID);
-    final String repoJson = removeMemberRepoFromXml(url, memberRepo);
-    consume(executePut(url, new StringEntity(repoJson)).getEntity());
+    final String repoJson = removeMemberRepoFromXml(memberRepo);
+    consume(executePut(GROUP_REPO_URL, new StringEntity(repoJson), CONTENT_XML).getEntity());
   }
 
-  private String removeMemberRepoFromXml(String url, String memberRepo) throws Exception {
+  private String removeMemberRepoFromXml(String memberRepo) throws Exception {
     final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    final Document document = dbf.newDocumentBuilder().parse(url);
+    final Document document = dbf.newDocumentBuilder().parse(GROUP_REPO_URL);
 
     final XPath xpath = XPathFactory.newInstance().newXPath();
     final XPathExpression expression = xpath.compile("//repo-group-member[id/text()='" + memberRepo + "']");

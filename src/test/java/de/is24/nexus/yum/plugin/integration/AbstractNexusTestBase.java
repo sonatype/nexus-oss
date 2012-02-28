@@ -58,7 +58,8 @@ public class AbstractNexusTestBase {
 
   protected HttpResponse executePost(String url, HttpEntity entity, Header... headers) throws AuthenticationException,
       UnsupportedEncodingException, IOException, ClientProtocolException {
-    HttpPost request = new HttpPost(SERVICE_BASE_URL + url);
+    url = serviceUrl(url);
+    HttpPost request = new HttpPost(url);
     if (headers != null) {
       for (Header header : headers) {
         request.addHeader(header);
@@ -66,14 +67,21 @@ public class AbstractNexusTestBase {
     }
     setCredentials(request);
     request.setEntity(entity);
+    LOG.info("POST request : {}", url);
     return client.execute(request);
   }
 
-  protected HttpResponse executePut(String url, HttpEntity entity) throws AuthenticationException, UnsupportedEncodingException,
+  protected HttpResponse executePut(String url, HttpEntity entity, Header... headers) throws AuthenticationException,
+      UnsupportedEncodingException,
       IOException, ClientProtocolException {
-    HttpPut request = new HttpPut(SERVICE_BASE_URL + url);
+    url = serviceUrl(url);
+    HttpPut request = new HttpPut(url);
+    for (Header header : headers) {
+      request.addHeader(header);
+    }
     setCredentials(request);
     request.setEntity(entity);
+    LOG.info("PUT request : {}", url);
     return client.execute(request);
   }
 
@@ -89,14 +97,19 @@ public class AbstractNexusTestBase {
   }
 
   protected HttpResponse executeGetWithResponse(String url) throws AuthenticationException, IOException {
-    if (!url.startsWith("http")) {
-      url = SERVICE_BASE_URL + url;
-    }
+    url = serviceUrl(url);
 
     HttpGet request = new HttpGet(url);
     setCredentials(request);
     LOG.info("GET request : {}", url);
     return client.execute(request);
+  }
+
+  private String serviceUrl(String url) {
+    if (!url.startsWith("http")) {
+      return SERVICE_BASE_URL + url;
+    }
+    return url;
   }
 
   protected HttpResponse executeDeleteWithResponse(String url) throws AuthenticationException, IOException {
