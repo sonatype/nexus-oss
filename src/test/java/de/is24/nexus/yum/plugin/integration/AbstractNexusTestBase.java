@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
@@ -109,7 +110,12 @@ public class AbstractNexusTestBase {
   }
 
   protected String content(HttpResponse response) throws IOException {
-    return IOUtils.toString(response.getEntity().getContent());
+    final InputStream contentStream = response.getEntity().getContent();
+    try {
+      return IOUtils.toString(contentStream);
+    } finally {
+      contentStream.close();
+    }
   }
 
   protected int deployRpm(File rpmFile, String artifactId, String groupId, String version, String repositoryId) throws HttpException,
@@ -140,7 +146,12 @@ public class AbstractNexusTestBase {
   }
 
   protected String gzipResponseContent(HttpResponse response) throws IOException {
-    return IOUtils.toString(new GZIPInputStream(response.getEntity().getContent()));
+    final InputStream content = response.getEntity().getContent();
+    try {
+      return IOUtils.toString(new GZIPInputStream(content));
+    } finally {
+      content.close();
+    }
   }
 
   protected HttpResponse givenGroupRepository(String repoId, String providerId, Repository... memberRepos) throws AuthenticationException,
@@ -148,7 +159,7 @@ public class AbstractNexusTestBase {
     HttpResponse response = executeDeleteWithResponse(format("/repo_groups/%s", repoId));
     consume(response.getEntity());
 
-    final StringEntity content = new StringEntity(format("{data:{id: '%s', name: '%s', provider: '%s', repositories: [%s]}}", repoId, repoId, providerId,
+    final StringEntity content = new StringEntity(format("{data:{id: '%s', name: '%s', provider: '%s', exposed: true, repositories: [%s]}}", repoId, repoId, providerId,
         render(memberRepos)));
     return executePost(
         "/repo_groups",
