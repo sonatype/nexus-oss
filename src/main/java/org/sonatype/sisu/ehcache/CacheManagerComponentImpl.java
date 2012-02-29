@@ -17,6 +17,7 @@ import net.sf.ehcache.config.ConfigurationFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.appcontext.AppContext;
+import org.sonatype.appcontext.lifecycle.Stoppable;
 import org.sonatype.inject.Nullable;
 
 /**
@@ -84,6 +85,16 @@ public class CacheManagerComponentImpl
         }
         this.logger = logger;
         this.appContext = appContext;
+        if ( appContext != null )
+        {
+            appContext.getLifecycleManager().registerManaged( new Stoppable()
+            {
+                public void handle()
+                {
+                    shutdown();
+                }
+            } );
+        }
         this.cacheManager = buildCacheManager( file );
     }
 

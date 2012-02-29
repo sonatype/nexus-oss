@@ -7,6 +7,7 @@ import org.junit.Assert;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextRequest;
 import org.sonatype.appcontext.Factory;
+import org.sonatype.appcontext.lifecycle.Stoppable;
 import org.sonatype.appcontext.source.MapEntrySource;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
 
@@ -31,6 +32,19 @@ public class CacheManagerComponentImplTest
         binder.bind( Key.get( AppContext.class ) ).toInstance( appContext );
     }
 
+    protected void tearDown()
+        throws Exception
+    {
+        try
+        {
+            lookup( AppContext.class ).getLifecycleManager().invokeHandler( Stoppable.class );
+        }
+        finally
+        {
+            super.tearDown();
+        }
+    }
+
     public void testConfigFromClasspath()
         throws Exception
     {
@@ -51,7 +65,33 @@ public class CacheManagerComponentImplTest
         Assert.assertEquals( "The store path does not point where we set it!", new File( getBasedir(),
             "target/plexus-home/ehcache" ).getAbsoluteFile().getPath().toLowerCase(), storePath.toLowerCase() );
 
-        cacheWrapper.shutdown();
+        // no need for this, this UT employs AppContext lifecycle, see #tearDown
+        // cacheWrapper.shutdown();
+    }
+
+    public void testConfigFromFile()
+        throws Exception
+    {
+        // look it up
+        final File file = new File( new File( getBasedir() ), "src/test/resources/ehcache.xml" );
+        CacheManagerComponentImpl cacheWrapper = new CacheManagerComponentImpl( lookup( AppContext.class ), file );
+
+        // check the store path, since the config from src/test/resources should be picked up
+        String storePath = cacheWrapper.getCacheManager().getDiskStorePath();
+
+        // it has to be absolute
+        Assert.assertTrue( "Invalid path " + storePath, new File( storePath ).isAbsolute() );
+
+        // it has to be Interpolated
+        Assert.assertFalse( "The path is not interpolated? " + storePath,
+            storePath.contains( "${" ) || storePath.contains( "}" ) );
+
+        // it has to point where we did set it (${basedir}/target/plexus-home/ehcache)
+        Assert.assertEquals( "The store path does not point where we set it!", new File( getBasedir(),
+            "target/plexus-home/ehcache" ).getAbsoluteFile().getPath().toLowerCase(), storePath.toLowerCase() );
+
+        // no need for this, this UT employs AppContext lifecycle, see #tearDown
+        // cacheWrapper.shutdown();
     }
 
 }
