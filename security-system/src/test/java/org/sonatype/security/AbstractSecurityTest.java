@@ -5,6 +5,7 @@ import java.util.Properties;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.guice.bean.containers.InjectedTestCase;
+import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 public abstract class AbstractSecurityTest
     extends InjectedTestCase
@@ -26,11 +27,26 @@ public abstract class AbstractSecurityTest
         throws Exception
     {
         super.setUp();
-        
+
         // delete the plexus home dir
         FileUtils.deleteDirectory( PLEXUS_HOME );
 
-        this.getSecuritySystem().start();
+        getSecuritySystem().start();
+    }
+
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        try
+        {
+            getSecuritySystem().stop();
+            lookup( CacheManagerComponent.class ).shutdown();
+        }
+        finally
+        {
+            super.tearDown();
+        }
     }
 
     protected SecuritySystem getSecuritySystem()

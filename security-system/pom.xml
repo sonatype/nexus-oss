@@ -25,8 +25,8 @@
 			<artifactId>sisu-inject-bean</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.sonatype.spice</groupId>
-			<artifactId>plexus-ehcache</artifactId>
+			<groupId>org.sonatype.sisu</groupId>
+			<artifactId>sisu-ehcache</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

@@ -1,6 +1,8 @@
 package org.sonatype.security.sample.web;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.concurrent.Future;
 
 import junit.framework.Assert;
@@ -25,7 +27,7 @@ public class SampleAppIT
 
     private Server appServer = null;
 
-    private int appPort = 12345;
+    private int appPort;
 
     private AsyncHttpClient client = new AsyncHttpClient();
 
@@ -67,7 +69,7 @@ public class SampleAppIT
     public Response get( String urlString, String username, String password )
         throws Exception
     {
-        BoundRequestBuilder builder = client.prepareGet( "http://localhost:12345/" + urlString );
+        BoundRequestBuilder builder = client.prepareGet( "http://localhost:" + appPort + "/" + urlString );
 
         if ( username != null )
         {
@@ -85,9 +87,19 @@ public class SampleAppIT
         return Base64.encode( ( username + ":" + password ).getBytes() );
     }
 
+    protected int getFreePort()
+        throws IOException
+    {
+        final ServerSocket socket = new ServerSocket( 0 );
+        final int result = socket.getLocalPort();
+        socket.close();
+        return result;
+    }
+
     protected void setUp()
         throws Exception
     {
+        appPort = getFreePort();
         // copy security.xml in place
         // the test security.xml name will be <package-name>.<test-name>-security.xml
         String baseName = "target/test-classes/" + this.getClass().getName().replaceAll( "\\.", "/" );

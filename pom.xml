@@ -19,7 +19,7 @@
 
   <properties>
     <shiro.version>1.1.0</shiro.version>
-    <plexus-ehcache.version>1.4</plexus-ehcache.version>
+    <sisu-ehcache.version>1.1-SNAPSHOT</sisu-ehcache.version>
     <plexus-events.version>1.1</plexus-events.version>
     <base-configuration.version>1.0</base-configuration.version>
     <plexus-cipher.version>1.6</plexus-cipher.version>
@@ -91,9 +91,9 @@
         <version>1.5.8</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.spice</groupId>
-        <artifactId>plexus-ehcache</artifactId>
-        <version>${plexus-ehcache.version}</version>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-ehcache</artifactId>
+        <version>${sisu-ehcache.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.plexus.appevents</groupId>
