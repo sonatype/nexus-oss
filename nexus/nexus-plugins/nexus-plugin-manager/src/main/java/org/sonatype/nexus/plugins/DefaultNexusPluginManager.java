@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugins;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -22,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -59,6 +62,7 @@ import org.sonatype.plugins.model.ClasspathDependency;
 import org.sonatype.plugins.model.PluginDependency;
 import org.sonatype.plugins.model.PluginMetadata;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import com.google.inject.name.Names;
@@ -68,37 +72,46 @@ import com.google.inject.name.Names;
  */
 @Named
 @Singleton
-public final class DefaultNexusPluginManager
+public class DefaultNexusPluginManager
     implements NexusPluginManager
 {
     // ----------------------------------------------------------------------
     // Implementation fields
     // ----------------------------------------------------------------------
 
-    @Inject
-    private PluginRepositoryManager repositoryManager;
+    private final PluginRepositoryManager repositoryManager;
 
-    @Inject
-    private ApplicationEventMulticaster eventMulticaster;
+    private final ApplicationEventMulticaster eventMulticaster;
 
-    @Inject
-    private RepositoryTypeRegistry repositoryTypeRegistry;
+    private final RepositoryTypeRegistry repositoryTypeRegistry;
 
-    @Inject
-    private MimeSupport mimeSupport;
+    private final MimeSupport mimeSupport;
 
-    @Inject
-    private DefaultPlexusContainer container;
+    private final DefaultPlexusContainer container;
 
-    @Inject
-    @Parameters
-    private Map<String, String> variables;
+    private final Map<String, String> variables;
 
     private final Map<GAVCoordinate, PluginDescriptor> activePlugins = new HashMap<GAVCoordinate, PluginDescriptor>();
 
     private final Map<GAVCoordinate, PluginResponse> pluginResponses = new HashMap<GAVCoordinate, PluginResponse>();
 
     private final VersionParser versionParser = new GenericVersionParser();
+
+    @Inject
+    public DefaultNexusPluginManager( final RepositoryTypeRegistry repositoryTypeRegistry,
+                                      final ApplicationEventMulticaster eventMulticaster,
+                                      final PluginRepositoryManager repositoryManager,
+                                      final DefaultPlexusContainer container,
+                                      final MimeSupport mimeSupport,
+                                      final @Parameters Map<String, String> variables )
+    {
+        this.repositoryTypeRegistry = checkNotNull( repositoryTypeRegistry );
+        this.eventMulticaster = checkNotNull( eventMulticaster );
+        this.repositoryManager = checkNotNull( repositoryManager );
+        this.container = checkNotNull( container );
+        this.mimeSupport = checkNotNull( mimeSupport );
+        this.variables = checkNotNull( variables );
+    }
 
     // ----------------------------------------------------------------------
     // Public methods
@@ -131,7 +144,7 @@ public final class DefaultNexusPluginManager
         for ( final GAVCoordinate gav : filteredPlugins.keySet() )
         {
             // activate what we found in reposes
-            result.add( activatePlugin( gav, true ) );
+            result.add( activatePlugin( gav, true, filteredPlugins.keySet() ) );
         }
         return result;
     }
@@ -143,7 +156,12 @@ public final class DefaultNexusPluginManager
 
     public PluginManagerResponse activatePlugin( final GAVCoordinate gav )
     {
-        return activatePlugin( gav, true );
+        // if multiple V's for GAs are found, choose the one with biggest version (and pray that plugins has sane
+        // versioning)
+        Map<GAVCoordinate, PluginMetadata> filteredPlugins =
+            filterInstalledPlugins( repositoryManager.findAvailablePlugins() );
+
+        return activatePlugin( gav, true, filteredPlugins.keySet() );
     }
 
     public PluginManagerResponse deactivatePlugin( final GAVCoordinate gav )
@@ -248,7 +266,8 @@ public final class DefaultNexusPluginManager
         return getActivatedPluginGav( gav, strict ) != null;
     }
 
-    protected PluginManagerResponse activatePlugin( final GAVCoordinate gav, final boolean strict )
+    protected PluginManagerResponse activatePlugin( final GAVCoordinate gav, final boolean strict,
+                                                    final Set<GAVCoordinate> installedPluginsFilteredByGA )
     {
         final GAVCoordinate activatedGav = getActivatedPluginGav( gav, strict );
         if ( activatedGav == null )
@@ -256,7 +275,18 @@ public final class DefaultNexusPluginManager
             final PluginManagerResponse response = new PluginManagerResponse( gav, PluginActivationRequest.ACTIVATE );
             try
             {
-                activatePlugin( repositoryManager.resolveArtifact( gav ), response );
+                GAVCoordinate actualGAV = null;
+                if ( !strict )
+                {
+                    actualGAV = findInstalledPluginByGA( installedPluginsFilteredByGA, gav );
+                }
+                if ( actualGAV == null )
+                {
+                    actualGAV = gav;
+                }
+                activatePlugin(
+                    repositoryManager.resolveArtifact( actualGAV ), response, installedPluginsFilteredByGA
+                );
             }
             catch ( final NoSuchPluginRepositoryArtifactException e )
             {
@@ -270,7 +300,25 @@ public final class DefaultNexusPluginManager
         }
     }
 
-    private void activatePlugin( final PluginRepositoryArtifact plugin, final PluginManagerResponse response )
+    private GAVCoordinate findInstalledPluginByGA( final Set<GAVCoordinate> installedPluginsFilteredByGA,
+                                                   final GAVCoordinate gav )
+    {
+        if ( installedPluginsFilteredByGA != null )
+        {
+            for ( GAVCoordinate coord : installedPluginsFilteredByGA )
+            {
+                if ( coord.matchesByGA( gav ) )
+                {
+                    return coord;
+                }
+            }
+        }
+        return null;
+    }
+
+    private void activatePlugin( final PluginRepositoryArtifact plugin,
+                                 final PluginManagerResponse response,
+                                 final Set<GAVCoordinate> installedPluginsFilteredByGA )
         throws NoSuchPluginRepositoryArtifactException
     {
         final GAVCoordinate pluginGAV = plugin.getCoordinate();
@@ -292,7 +340,9 @@ public final class DefaultNexusPluginManager
             // since today we just "play" dependency resolution, we support GA resolution only
             // so, we say "relax version matching" and rely on luck for now it will work
             final GAVCoordinate gav = new GAVCoordinate( pd.getGroupId(), pd.getArtifactId(), pd.getVersion() );
-            final PluginManagerResponse dependencyActivationResponse = activatePlugin( gav, false );
+            final PluginManagerResponse dependencyActivationResponse = activatePlugin(
+                gav, false, installedPluginsFilteredByGA
+            );
             response.addPluginManagerResponse( dependencyActivationResponse );
             importList.add( gav );
             resolvedList.add( dependencyActivationResponse.getOriginator() );
@@ -320,7 +370,7 @@ public final class DefaultNexusPluginManager
         reportActivationResult( response, result );
     }
 
-    private void createPluginInjector( final PluginRepositoryArtifact plugin, final PluginDescriptor descriptor )
+    void createPluginInjector( final PluginRepositoryArtifact plugin, final PluginDescriptor descriptor )
         throws NoSuchPluginRepositoryArtifactException
     {
         final String realmId = descriptor.getPluginCoordinates().toString();
