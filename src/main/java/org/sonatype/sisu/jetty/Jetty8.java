@@ -52,7 +52,7 @@ public class Jetty8
         this.contexts = contexts;
         this.server = new Server();
         this.appContext = JettyUtils.configureServer( this.server, this.jettyXml, this.contexts );
-        mangleServer( new ContextAttributeSetterMangler( AppContext.APPCONTEXT_KEY, appContext.flatten() ) );
+        mangleServer( new ContextAttributeSetterMangler( AppContext.APPCONTEXT_KEY, appContext ) );
     }
 
     public AppContext getAppContext()
