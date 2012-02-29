@@ -4,6 +4,7 @@ import static de.is24.nexus.yum.repository.RepositoryUtils.getBaseDir;
 import static java.util.Arrays.asList;
 
 import java.io.File;
+import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -41,6 +42,8 @@ public class M2YumGroupRepository extends M2GroupRepository {
     return contentClass;
   }
 
+  private boolean skipTaskGeneration = false;
+
   @Override
   public RepositoryKind getRepositoryKind() {
     if (repositoryKind == null) {
@@ -52,9 +55,8 @@ public class M2YumGroupRepository extends M2GroupRepository {
 
   @Override
   public void addMemberRepositoryId(String repositoryId) throws NoSuchRepositoryException, InvalidGroupingException {
-    final boolean isNewRpmRepository = isNewRepo(repositoryId) && isRpmRepo(repositoryId);
     super.addMemberRepositoryId(repositoryId);
-    if (isNewRpmRepository) {
+    if (!skipTaskGeneration && isRpmRepo(repositoryId)) {
       yumService.createGroupRepository(this);
     }
   }
@@ -71,10 +73,6 @@ public class M2YumGroupRepository extends M2GroupRepository {
     return false;
   }
 
-  private boolean isNewRepo(String repositoryId) {
-    return !getMemberRepositoryIds().contains(repositoryId);
-  }
-
   @Override
   public void removeMemberRepositoryId(String repositoryId) {
     super.removeMemberRepositoryId(repositoryId);
@@ -85,6 +83,17 @@ public class M2YumGroupRepository extends M2GroupRepository {
     } catch (NoSuchRepositoryException e) {
       throw new RuntimeException("Could not detect rpm repository.", e);
     }
+  }
+
+  @Override
+  public void setMemberRepositoryIds(List<String> repositories) throws NoSuchRepositoryException, InvalidGroupingException {
+    try {
+      skipTaskGeneration = true;
+      super.setMemberRepositoryIds(repositories);
+    } finally {
+      skipTaskGeneration = false;
+    }
+    yumService.createGroupRepository(this);
   }
 
 }

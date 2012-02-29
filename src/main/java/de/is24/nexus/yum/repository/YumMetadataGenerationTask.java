@@ -12,12 +12,20 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
+
+import de.is24.nexus.yum.plugin.event.YumRepositoryGenerateEvent;
 
 /**
  * Create a yum-repository directory via 'createrepo' command line tool.
@@ -28,34 +36,42 @@ import org.sonatype.scheduling.SchedulerTask;
 @Component(role = SchedulerTask.class, hint = YumMetadataGenerationTask.ID, instantiationStrategy = "per-lookup")
 public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> implements ListFileFactory {
   public static final String ID = "YumMetadataGenerationTask";
-	private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
-	private static final Logger LOG = LoggerFactory.getLogger(YumMetadataGenerationTask.class);
+  private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
+  private static final Logger LOG = LoggerFactory.getLogger(YumMetadataGenerationTask.class);
   public static final int MAXIMAL_PARALLEL_RUNS = 10;
-	private static boolean activated = true;
+  private static boolean activated = true;
 
-	private YumGeneratorConfiguration config;
+  private YumGeneratorConfiguration config;
 
-	@Override
-	protected YumRepository doRun() throws Exception {
-		if (activated) {
-			LOG.info("Generating Yum-Repository for '{}' ...", config.getBaseRpmDir());
-			try {
-				config.getBaseRepoDir().mkdirs();
+  @Requirement
+  private ApplicationEventMulticaster applicationEventMulticaster;
 
-				File rpmListFile = createRpmListFile();
-				execCommand(buildCreateRepositoryCommand(rpmListFile));
+  @Requirement
+  private RepositoryRegistry repositoryRegistry;
 
-				replaceUrl();
-			} catch (IOException e) {
-				LOG.warn("Generating Yum-Repo failed", e);
-				throw new IOException("Generating Yum-Repo failed", e);
-			}
-			Thread.sleep(100);
-			LOG.info("Generation complete.");
-			return new YumRepository(config.getBaseRepoDir(), config.getId(), config.getVersion());
+  @Override
+  protected YumRepository doRun() throws Exception {
+    if (activated) {
+      LOG.info("Generating Yum-Repository for '{}' ...", config.getBaseRpmDir());
+      try {
+        config.getBaseRepoDir().mkdirs();
+
+        File rpmListFile = createRpmListFile();
+        execCommand(buildCreateRepositoryCommand(rpmListFile));
+
+        replaceUrl();
+      } catch (IOException e) {
+        LOG.warn("Generating Yum-Repo failed", e);
+        throw new IOException("Generating Yum-Repo failed", e);
+      }
+      Thread.sleep(100);
+      LOG.info("Generation complete.");
+
+      sendNotificationEvent();
+      return new YumRepository(config.getBaseRepoDir(), config.getId(), config.getVersion());
     }
 
-		return null;
+    return null;
   }
 
   @Override
@@ -69,18 +85,18 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   public void setConfiguration(YumGeneratorConfiguration config) {
-		this.config = config;
+    this.config = config;
   }
 
   @Override
   public boolean allowConcurrentExecution(Map<String, List<ScheduledTask<?>>> activeTasks) {
 
-		if (activeTasks.containsKey(ID)) {
+    if (activeTasks.containsKey(ID)) {
       int activeRunningTasks = 0;
       for (ScheduledTask<?> scheduledTask : activeTasks.get(ID)) {
-				if (RUNNING.equals(scheduledTask.getTaskState())) {
-					if (conflictsWith((YumMetadataGenerationTask) scheduledTask.getTask())) {
-						return false;
+        if (RUNNING.equals(scheduledTask.getTaskState())) {
+          if (conflictsWith((YumMetadataGenerationTask) scheduledTask.getTask())) {
+            return false;
           }
           activeRunningTasks++;
         }
@@ -91,77 +107,87 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     }
   }
 
-	private boolean conflictsWith(YumMetadataGenerationTask task) {
-		return getConfig().conflictsWith(task.getConfig());
+  private void sendNotificationEvent() {
+    if (StringUtils.isBlank(config.getVersion())) {
+      try {
+        final Repository repository = repositoryRegistry.getRepository(config.getId());
+        applicationEventMulticaster.notifyEventListeners(new YumRepositoryGenerateEvent(repository));
+      } catch (NoSuchRepositoryException e) {
+      }
+    }
   }
 
-	private File createRpmListFile() throws IOException {
-		return new RpmListWriter(config, this).writeList();
-	}
+  private boolean conflictsWith(YumMetadataGenerationTask task) {
+    return getConfig().conflictsWith(task.getConfig());
+  }
 
-	private File createCacheDir() {
-		File cacheDir = new File(config.getBaseCacheDir(), getRepositoryIdVersion());
-		cacheDir.mkdirs();
-		return cacheDir;
-	}
+  private File createRpmListFile() throws IOException {
+    return new RpmListWriter(config, this).writeList();
+  }
 
-	private String getRepositoryIdVersion() {
-		return config.getId() + (isNotBlank(config.getVersion()) ? ("-version-" + config.getVersion()) : "");
-	}
+  private File createCacheDir() {
+    File cacheDir = new File(config.getBaseCacheDir(), getRepositoryIdVersion());
+    cacheDir.mkdirs();
+    return cacheDir;
+  }
 
-	private void replaceUrl() throws IOException {
-		File repomd = new File(config.getBaseRepoDir(), YUM_REPOSITORY_DIR_NAME + File.separator + REPOMD_XML);
-		if (activated && repomd.exists()) {
-			String repomdStr = FileUtils.readFileToString(repomd);
-			repomdStr = repomdStr.replace(config.getBaseRpmUrl(), config.getBaseRepoUrl());
-			FileUtils.writeStringToFile(repomd, repomdStr);
-		}
-	}
+  private String getRepositoryIdVersion() {
+    return config.getId() + (isNotBlank(config.getVersion()) ? ("-version-" + config.getVersion()) : "");
+  }
 
-	private String buildCreateRepositoryCommand(File packageList) {
-		String baseRepoDir = config.getBaseRepoDir().getAbsolutePath();
-		String baseRpmUrl = config.getBaseRpmUrl();
-		String packageFile = packageList.getAbsolutePath();
-		String cacheDir = createCacheDir().getAbsolutePath();
-		String baseRpmDir = config.getBaseRpmDir().getAbsolutePath();
-		return String.format("createrepo --update -o %s -u %s  -v -d -i %s -c %s %s", baseRepoDir, baseRpmUrl, packageFile, cacheDir,
-				baseRpmDir);
-	}
+  private void replaceUrl() throws IOException {
+    File repomd = new File(config.getBaseRepoDir(), YUM_REPOSITORY_DIR_NAME + File.separator + REPOMD_XML);
+    if (activated && repomd.exists()) {
+      String repomdStr = FileUtils.readFileToString(repomd);
+      repomdStr = repomdStr.replace(config.getBaseRpmUrl(), config.getBaseRepoUrl());
+      FileUtils.writeStringToFile(repomd, repomdStr);
+    }
+  }
 
-	public static void deactivate() {
-		activated = false;
-	}
+  private String buildCreateRepositoryCommand(File packageList) {
+    String baseRepoDir = config.getBaseRepoDir().getAbsolutePath();
+    String baseRpmUrl = config.getBaseRpmUrl();
+    String packageFile = packageList.getAbsolutePath();
+    String cacheDir = createCacheDir().getAbsolutePath();
+    String baseRpmDir = config.getBaseRpmDir().getAbsolutePath();
+    return String.format("createrepo --update -o %s -u %s  -v -d -i %s -c %s %s", baseRepoDir, baseRpmUrl, packageFile, cacheDir,
+        baseRpmDir);
+  }
 
-	public static void activate() {
-		activated = true;
-	}
+  public static void deactivate() {
+    activated = false;
+  }
 
-	@Override
-	public File getRpmListFile(String repositoryId) {
-		return new File(createBasePackageDir(), config.getId() + ".txt");
-	}
+  public static void activate() {
+    activated = true;
+  }
 
-	private File createBasePackageDir() {
-		File basePackageDir = new File(config.getBaseCacheDir(), PACKAGE_FILE_DIR_NAME);
-		basePackageDir.mkdirs();
-		return basePackageDir;
-	}
+  @Override
+  public File getRpmListFile(String repositoryId) {
+    return new File(createBasePackageDir(), config.getId() + ".txt");
+  }
 
-	@Override
-	public File getRpmListFile(String repositoryId, String version) {
-		return new File(createBasePackageDir(), config.getId() + "-" + version + ".txt");
-	}
+  private File createBasePackageDir() {
+    File basePackageDir = new File(config.getBaseCacheDir(), PACKAGE_FILE_DIR_NAME);
+    basePackageDir.mkdirs();
+    return basePackageDir;
+  }
 
-	public static boolean isActive() {
-		return activated;
-	}
+  @Override
+  public File getRpmListFile(String repositoryId, String version) {
+    return new File(createBasePackageDir(), config.getId() + "-" + version + ".txt");
+  }
 
-	public String getRepositoryId() {
-		return config.getId();
-	}
+  public static boolean isActive() {
+    return activated;
+  }
+
+  public String getRepositoryId() {
+    return config.getId();
+  }
 
   private YumGeneratorConfiguration getConfig() {
-		return config;
+    return config;
   }
 
 }

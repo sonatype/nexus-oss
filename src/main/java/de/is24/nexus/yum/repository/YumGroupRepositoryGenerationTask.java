@@ -49,6 +49,10 @@ public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepos
         LOG.info("Merging repository group {}='{}' ...", groupRepository.getId(), groupRepository.getName());
         execCommand(buildCommand(repoBaseDir, memberRepoBaseDirs));
         LOG.info("Group repository {}='{}' merged.", groupRepository.getId(), groupRepository.getName());
+      } else {
+        final File groupRepoData = new File(repoBaseDir, "repodata");
+        LOG.info("Remove group repository repodata, because at maximum one yum member-repository left : {}", groupRepoData);
+        deleteQuietly(groupRepoData);
       }
       return new YumRepository(repoBaseDir, groupRepository.getId(), null);
     }
