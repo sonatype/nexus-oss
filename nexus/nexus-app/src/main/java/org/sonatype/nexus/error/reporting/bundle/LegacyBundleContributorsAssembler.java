@@ -55,7 +55,7 @@ public class LegacyBundleContributorsAssembler
     @Override
     public boolean isParticipating( IssueSubmissionRequest request )
     {
-        return true;
+        return !bundleExtraContent.isEmpty();
     }
 
     @Override
@@ -85,6 +85,7 @@ public class LegacyBundleContributorsAssembler
 
                     errorReportBundleEntry.releaseEntry();
                 }
+                main.addSubBundle( dir );
             }
         }
         catch ( IOException e )

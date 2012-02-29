@@ -18,6 +18,10 @@ import java.io.OutputStream;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Files;
+import com.google.common.io.OutputSupplier;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.util.IOUtil;
@@ -66,20 +70,30 @@ public class NexusXmlAssembler
         OutputStream out = null;
         try
         {
-            ManagedBundle bundle = storageManager.createBundle( "nexus.xml", "application/xml" );
+            final ManagedBundle bundle = storageManager.createBundle( "nexus.xml", "application/xml" );
             final Configuration configuration = configHelper.maskPasswords( nexusConfig.getConfigurationModel() );
 
+
             // No config ?
-            if ( configuration == null )
+            if ( configuration != null )
             {
-                return null;
+                NexusConfigurationXpp3Writer writer = new NexusConfigurationXpp3Writer();
+                out = bundle.getOutputStream();
+                writer.write( out, configuration );
+                out.close();
             }
-            NexusConfigurationXpp3Writer writer = new NexusConfigurationXpp3Writer();
-
-            out = bundle.getOutputStream();
-            writer.write( out, configuration );
-            out.close();
-
+            else
+            {
+                ByteStreams.write( "Got no configuration from config helper".getBytes( "utf-8" ), new OutputSupplier<OutputStream>()
+                {
+                    @Override
+                    public OutputStream getOutput()
+                        throws IOException
+                    {
+                        return bundle.getOutputStream();
+                    }
+                });
+            }
             return bundle;
         }
         catch ( IOException e )

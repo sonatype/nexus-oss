@@ -22,6 +22,8 @@ import org.sonatype.sisu.pr.SystemEnvironmentContributor;
 
 /**
  * Additional system environment info (Nexus version + edition)
+ *
+ * @since 2.1
  */
 @Named( "nexus" )
 public class NexusSystemEnvironment

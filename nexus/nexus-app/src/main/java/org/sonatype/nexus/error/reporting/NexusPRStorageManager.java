@@ -20,6 +20,8 @@ import org.sonatype.sisu.pr.bundle.internal.TmpFileStorageManager;
 
 /**
  * Empty implementation to make sisu-pr's TmpFileStorageManager the injected component.
+ *
+ * @since 2.1
  */
 @Named
 @Singleton
