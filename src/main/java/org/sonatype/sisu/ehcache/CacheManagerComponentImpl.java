@@ -84,16 +84,7 @@ public class CacheManagerComponentImpl
         }
         this.logger = logger;
         this.appContext = appContext;
-        startup( file );
-    }
-
-    public synchronized void startup( final File file )
-        throws IOException
-    {
-        if ( cacheManager == null )
-        {
-            cacheManager = buildCacheManager( file );
-        }
+        this.cacheManager = buildCacheManager( file );
     }
 
     public synchronized void shutdown()
