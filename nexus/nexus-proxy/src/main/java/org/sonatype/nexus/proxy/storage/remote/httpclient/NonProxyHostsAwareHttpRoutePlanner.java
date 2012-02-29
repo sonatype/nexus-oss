@@ -22,7 +22,9 @@ import org.apache.http.conn.params.ConnRouteParams;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.impl.client.ClientParamsStack;
 import org.apache.http.impl.conn.DefaultHttpRoutePlanner;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 import com.google.common.base.Preconditions;
 
@@ -64,26 +66,16 @@ class NonProxyHostsAwareHttpRoutePlanner
                                      final HttpContext context )
         throws HttpException
     {
-        Object proxy = null;
-        if ( noProxyFor( target.getHostName() ) )
+        if ( request.getParams() instanceof ClientParamsStack )
         {
-            proxy = request.getParams().getParameter( ConnRouteParams.DEFAULT_PROXY );
-            if ( proxy != null )
-            {
-                request.getParams().removeParameter( ConnRouteParams.DEFAULT_PROXY );
-            }
+            request.setParams( new NonProxyHostParamsStack( (ClientParamsStack) request.getParams(), noProxyFor( target.getHostName() ) ) );
         }
-        try
+        else
         {
-            return super.determineRoute( target, request, context );
+            request.setParams( new NonProxyHostParamsStack( request.getParams(), noProxyFor( target.getHostName() ) ) );
         }
-        finally
-        {
-            if ( proxy != null )
-            {
-                request.getParams().setParameter( ConnRouteParams.DEFAULT_PROXY, proxy );
-            }
-        }
+
+        return super.determineRoute( target, request, context );
     }
 
     // ----------------------------------------------------------------------
@@ -102,4 +94,37 @@ class NonProxyHostsAwareHttpRoutePlanner
         return false;
     }
 
+    private static class NonProxyHostParamsStack
+        extends ClientParamsStack
+    {
+
+        private final boolean filterProxy;
+
+        /**
+         * @param stack the parameter stack to delegate to
+         * @param filterProxy if {@code true}, always return null on {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
+         */
+        public NonProxyHostParamsStack( final ClientParamsStack stack, final boolean filterProxy )
+        {
+            super( stack.getApplicationParams(), stack.getClientParams(), stack.getRequestParams(),
+                   stack.getOverrideParams() );
+            this.filterProxy = filterProxy;
+        }
+
+        /**
+         * @param params the parameters instance to delegate to
+         * @param filterProxy if {@code true}, always return null on {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
+         */
+        public NonProxyHostParamsStack( final HttpParams params, final boolean filterProxy )
+        {
+            super( null, null, params, null );
+            this.filterProxy = filterProxy;
+        }
+
+        @Override
+        public Object getParameter( final String name )
+        {
+            return filterProxy && ConnRouteParams.DEFAULT_PROXY.equals( name ) ? null : super.getParameter( name );
+        }
+    }
 }
