@@ -60,6 +60,8 @@ import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
  * NexusConfiguration-aware connector for the attachment parts of sisu-problem-reporting.
  *
  * TODO: this is mostly c&p from remote storage, change this if NEXUS-4689 ever happens.
+ *
+ * @since 2.1
  */
 @Named
 public class NexusPRConnector
@@ -72,8 +74,6 @@ public class NexusPRConnector
     private NexusConfiguration config;
 
     private final UserAgentBuilder uaBuilder;
-
-    private DefaultHttpClient client;
 
     @Inject
     public NexusPRConnector( final NexusConfiguration config, final UserAgentBuilder uaBuilder )
@@ -231,33 +231,21 @@ public class NexusPRConnector
         // Public methods
         // ----------------------------------------------------------------------
 
-        public HttpRoute determineRoute( final org.apache.http.HttpHost target,
+        public HttpRoute determineRoute( final HttpHost target,
                                          final HttpRequest request,
                                          final HttpContext context )
             throws HttpException
         {
-            Object proxy = null;
-            ClientParamsStack stack = (ClientParamsStack) request.getParams();
-            HttpParams params = stack.getClientParams();
-            if ( noProxyFor( target.getHostName() ) )
+            if ( request.getParams() instanceof ClientParamsStack )
             {
-                proxy = params.getParameter( ConnRouteParams.DEFAULT_PROXY );
-                if ( proxy != null )
-                {
-                    params.removeParameter( ConnRouteParams.DEFAULT_PROXY );
-                }
+                request.setParams( new NonProxyHostParamsStack( (ClientParamsStack) request.getParams(), noProxyFor( target.getHostName() ) ) );
             }
-            try
+            else
             {
-                return super.determineRoute( target, request, context );
+                request.setParams( new NonProxyHostParamsStack( request.getParams(), noProxyFor( target.getHostName() ) ) );
             }
-            finally
-            {
-                if ( proxy != null )
-                {
-                    params.setParameter( ConnRouteParams.DEFAULT_PROXY, proxy );
-                }
-            }
+
+            return super.determineRoute( target, request, context );
         }
 
         // ----------------------------------------------------------------------
@@ -276,5 +264,39 @@ public class NexusPRConnector
             return false;
         }
 
+        private static class NonProxyHostParamsStack
+            extends ClientParamsStack
+        {
+
+            private final boolean filterProxy;
+
+            /**
+             * @param stack the parameter stack to delegate to
+             * @param filterProxy if {@code true}, always return null on {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
+             */
+            public NonProxyHostParamsStack( final ClientParamsStack stack, final boolean filterProxy )
+            {
+                super( stack.getApplicationParams(), stack.getClientParams(), stack.getRequestParams(),
+                       stack.getOverrideParams() );
+                this.filterProxy = filterProxy;
+            }
+
+            /**
+             * @param params the parameters instance to delegate to
+             * @param filterProxy if {@code true}, always return null on {@code #getParameter( ConnRouteParams.DEFAULT_PROXY )}
+             */
+            public NonProxyHostParamsStack( final HttpParams params, final boolean filterProxy )
+            {
+                super( null, null, params, null );
+                this.filterProxy = filterProxy;
+            }
+
+            @Override
+            public Object getParameter( final String name )
+            {
+                return filterProxy && ConnRouteParams.DEFAULT_PROXY.equals( name ) ? null : super.getParameter( name );
+            }
+        }
     }
 }
+
