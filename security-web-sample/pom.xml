@@ -29,28 +29,39 @@
 		<dependency>
 			<groupId>com.google.sitebricks</groupId>
 			<artifactId>sitebricks</artifactId>
-			<version>0.8.3-SONATYPE229</version>
+			<version>0.8.5</version>
 			<exclusions>
 				<exclusion>
 					<groupId>xalan</groupId>
 					<artifactId>xalan</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>com.google.inject</groupId>
-					<artifactId>guice</artifactId>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
 				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.google.inject.extensions</groupId>
-			<artifactId>guice-servlet</artifactId>
-			<version>3.0-rc3</version>
-			<exclusions>
 				<exclusion>
 					<groupId>com.google.inject</groupId>
 					<artifactId>guice</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>com.google.inject.extensions</groupId>
+					<artifactId>guice-multibindings</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.google.inject.extensions</groupId>
+					<artifactId>guice-servlet</artifactId>
+				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.sonatype.sisu.inject</groupId>
+			<artifactId>guice-multibindings</artifactId>
+			<version>3.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.sonatype.sisu.inject</groupId>
+			<artifactId>guice-servlet</artifactId>
+			<version>3.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.sonatype.sisu</groupId>

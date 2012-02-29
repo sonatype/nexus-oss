@@ -24,7 +24,7 @@
     <base-configuration.version>1.0</base-configuration.version>
     <plexus-cipher.version>1.6</plexus-cipher.version>
     <plugin-host-api.version>1.0.0</plugin-host-api.version>
-    <sisu-inject-bean.version>2.2.0</sisu-inject-bean.version>
+    <sisu-inject-bean.version>2.3.0</sisu-inject-bean.version>
     <slf4j.version>1.6.1</slf4j.version>
     <plexus.version>1.5.5</plexus.version>
   </properties>

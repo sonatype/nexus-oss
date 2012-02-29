@@ -8,6 +8,7 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 public abstract class AbstractSecurityRestTest
     extends PlexusTestCase
@@ -39,6 +40,13 @@ public abstract class AbstractSecurityRestTest
 
         // start security
         this.lookup( SecuritySystem.class ).start();
+    }
+
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        this.lookup( CacheManagerComponent.class ).shutdown();
     }
 
     @Override
