@@ -3,6 +3,8 @@ package org.sonatype.appcontext;
 import java.io.PrintStream;
 import java.util.Map;
 
+import org.sonatype.appcontext.lifecycle.AppContextLifecycleManager;
+
 /**
  * The generic app context, which is actually a Map. For modification, you can use only the {@link #put(String, Object)}
  * , {@link #putAll(Map)} and {@link #clear()} methods, since all the {@link #keySet()} {@link #values()} and
@@ -46,6 +48,13 @@ public interface AppContext
      * @return
      */
     AppContext getParent();
+
+    /**
+     * Returns the context's lifecycle manager.
+     * 
+     * @since 3.1
+     */
+    AppContextLifecycleManager getLifecycleManager();
 
     /**
      * Flattens this AppContext (calculates "visible" entries from this and it's parent and returns a plain Map. This

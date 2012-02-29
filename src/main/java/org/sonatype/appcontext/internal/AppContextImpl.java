@@ -12,6 +12,7 @@ import org.codehaus.plexus.interpolation.InterpolationException;
 import org.sonatype.appcontext.AppContext;
 import org.sonatype.appcontext.AppContextEntry;
 import org.sonatype.appcontext.AppContextInterpolationException;
+import org.sonatype.appcontext.lifecycle.AppContextLifecycleManager;
 
 public class AppContextImpl
     implements AppContext
@@ -25,6 +26,8 @@ public class AppContextImpl
     private final AppContext parent;
 
     private final HierarchicalMap<String, AppContextEntry> entries;
+
+    private final AppContextLifecycleManager lifecycleManager;
 
     public AppContextImpl( final long created, final String id, final AppContextImpl parent,
                            final Map<String, AppContextEntry> sourcedEntries )
@@ -45,6 +48,7 @@ public class AppContextImpl
         }
 
         this.entries.putAll( sourcedEntries );
+        this.lifecycleManager = new AppContextLifecycleManagerImpl();
     }
 
     public long getCreated()
@@ -65,6 +69,11 @@ public class AppContextImpl
     public AppContext getParent()
     {
         return parent;
+    }
+
+    public AppContextLifecycleManager getLifecycleManager()
+    {
+        return lifecycleManager;
     }
 
     public AppContextEntry getAppContextEntry( String key )
