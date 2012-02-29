@@ -102,7 +102,7 @@
     <dependency>
       <groupId>org.sonatype.p2.bridge</groupId>
       <artifactId>org.sonatype.p2.bridge.api</artifactId>
-      <version>1.1.0-SNAPSHOT</version>
+      <version>1.1.0</version>
       <scope>provided</scope>
     </dependency>
 
