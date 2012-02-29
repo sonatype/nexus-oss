@@ -31,4 +31,26 @@ public interface CacheManagerComponent
      */
     CacheManager buildCacheManager( final File file )
         throws IOException;
+
+    /**
+     * Prepares a new instance of CacheManager and configures it from the file passed in (if non null), or from default
+     * locations on class path (if null passed). In case file parameter is non null, but the actual file is not found,
+     * you will end up with an {@link IOException}, which is true for any other problem related to the file you pointed
+     * at (like unreadable, etc). If CacheManagerComponent is already started, this call does not have any effect.
+     * 
+     * @param file
+     * @throws IOException
+     */
+    void startup( final File file )
+        throws IOException;
+
+    /**
+     * Cleanly shuts down the EHCache, freeing all resources and allocated caches. Call of this method is a must in case
+     * you are about to start another instance of this component (or any EHCache Manager instance, even manually
+     * created) that would have same name as this manager had (depends on how you configure it, it is usually left as
+     * "default"), since EHCache (since version 2.5) is very strict and does not allow more than one instance having
+     * same named manager within one JVM. If CacheManagerComponent is already stopped, this call does not have any
+     * effect.
+     */
+    void shutdown();
 }

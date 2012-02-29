@@ -177,6 +177,7 @@ public class CacheManagerComponentImpl
             }
 
             configureDiskStore( appContext, configuration );
+            configuration.setUpdateCheck( false );
             return new CacheManager( configuration );
         }
         else
@@ -240,6 +241,9 @@ public class CacheManagerComponentImpl
             catch ( IOException e )
             {
                 getLogger().warn( "Could not canonize the path \"{}\"!", interpolatedPath, e );
+
+                // set the best we can
+                ehConfig.getDiskStoreConfiguration().setPath( new File( interpolatedPath ).getAbsolutePath() );
             }
         }
     }
