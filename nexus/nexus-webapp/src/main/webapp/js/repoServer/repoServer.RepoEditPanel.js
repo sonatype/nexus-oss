@@ -1378,7 +1378,8 @@ Ext.extend(Sonatype.repoServer.VirtualRepositoryEditor, Sonatype.repoServer.Abst
         var provider = rec.data.provider;
         var sourceRepoCombo = this.form.findField('shadowOf');
         sourceRepoCombo.clearValue();
-        sourceRepoCombo.focus();
+        sourceRepoCombo.clearInvalid();
+        //sourceRepoCombo.focus();
         if (provider == 'm1-m2-shadow')
         {
           sourceRepoCombo.store.filterBy(function fn(rec, id) {
