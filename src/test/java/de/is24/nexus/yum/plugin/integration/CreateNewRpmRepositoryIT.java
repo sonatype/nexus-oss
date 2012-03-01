@@ -4,7 +4,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.TestContainer;
 
@@ -20,7 +19,6 @@ public class CreateNewRpmRepositoryIT extends AbstractNexusTestBase {
     TestContainer.getInstance().getTestContext().setSecureTest(true);
   }
 
-  @Ignore("Test has no consistant results")
   @Test
   public void shouldCreateRepoRpmsForNewRpmsInNewRepository() throws Exception {
     givenTestRepository(NEW_REPO_ID);
