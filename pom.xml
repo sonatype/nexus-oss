@@ -5,7 +5,7 @@
 
   <groupId>de.is24.nexus</groupId>
   <artifactId>nexus-yum-plugin</artifactId>
-  <version>1.17-SNAPSHOT</version>
+  <version>1.17</version>
   <packaging>nexus-plugin</packaging>
   <name>Nexus Yum Plugin</name>
   <description>Nexus Plugin to let Nexus generate a RPM repository out of the repositories</description>
@@ -25,8 +25,8 @@
   </developers>
 
   <scm>
-    <connection>scm:svn:http://nexus-yum-plugin.googlecode.com/svn/trunk</connection>
-    <developerConnection>scm:svn:https://nexus-yum-plugin.googlecode.com/svn/trunk</developerConnection>
+    <connection>scm:svn:http://nexus-yum-plugin.googlecode.com/svn/tags/nexus-yum-plugin-1.17</connection>
+    <developerConnection>scm:svn:https://nexus-yum-plugin.googlecode.com/svn/tags/nexus-yum-plugin-1.17</developerConnection>
   </scm>
 
   <distributionManagement>
