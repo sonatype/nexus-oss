@@ -463,7 +463,11 @@ Ext.extend(Sonatype.repoServer.DefaultRoleEditor, Sonatype.ext.FormPanel, {
           this.find('name', 'id')[0].disable();
           this.find('name', 'name')[0].disable();
           this.find('name', 'description')[0].disable();
-          this.find('name', 'roleManager')[0].disable();
+
+          var roleManager = this.find('name', 'roleManager')[0];
+          roleManager.disable();
+          roleManager.clearValidation();
+
           for (var i = 0; i < this.buttons.length; i++)
           {
             this.buttons[i].disable();
