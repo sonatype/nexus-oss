@@ -47,7 +47,7 @@ import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventExpireNotFoundCaches;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventRecreateAttributes;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventDeleteRoot;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreUpdate;
@@ -468,9 +468,9 @@ public abstract class AbstractRepository
             }
         }
 
-        if( getLogger().isDebugEnabled() )
+        if ( getLogger().isDebugEnabled() )
         {
-            if( cacheAltered )
+            if ( cacheAltered )
             {
                 getLogger().info(
                     String.format( "NFC for repository %s from path=\"%s\" was cleared.",
@@ -943,9 +943,10 @@ public abstract class AbstractRepository
             StorageItem item = getLocalStorage().retrieveItem( this, request );
 
             // fire the event for file being deleted
-            getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventDelete( this, item ) );
+            getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventDeleteRoot( this, item ) );
 
-            if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
+            // if we are deleting a collection, perform recursive notification about this too
+            if ( item instanceof StorageCollectionItem )
             {
                 if ( getLogger().isDebugEnabled() )
                 {
