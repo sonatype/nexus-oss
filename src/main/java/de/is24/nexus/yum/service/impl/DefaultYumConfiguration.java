@@ -1,5 +1,7 @@
 package de.is24.nexus.yum.service.impl;
 
+import static javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
+
 import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -41,6 +43,7 @@ public class DefaultYumConfiguration implements YumConfiguration {
   public DefaultYumConfiguration() throws JAXBException {
     final JAXBContext jc = JAXBContext.newInstance(XmlYumConfiguration.class, AliasMapping.class);
     this.marshaller = jc.createMarshaller();
+    this.marshaller.setProperty(JAXB_FORMATTED_OUTPUT, true);
     this.unmarshaller = jc.createUnmarshaller();
   }
 
