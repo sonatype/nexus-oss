@@ -13,7 +13,7 @@
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventDeleteRecursively;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventDeleteItem;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.walker.AbstractWalkerProcessor;
@@ -52,7 +52,7 @@ public class DeletionNotifierWalker
             item.getItemContext().setParentContext( request.getRequestContext() );
 
             // just fire it, and someone will eventually catch it
-            applicationEventMulticaster.notifyEventListeners( new RepositoryItemEventDeleteRecursively(
+            applicationEventMulticaster.notifyEventListeners( new RepositoryItemEventDeleteItem(
                 context.getRepository(), item ) );
         }
     }

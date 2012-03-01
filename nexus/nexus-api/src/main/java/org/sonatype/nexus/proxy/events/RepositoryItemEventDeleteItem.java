@@ -24,10 +24,10 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @author cstamas
  * @since 2.1
  */
-public class RepositoryItemEventDeleteRecursively
+public class RepositoryItemEventDeleteItem
     extends RepositoryItemEventDelete
 {
-    public RepositoryItemEventDeleteRecursively( final Repository repository, final StorageItem item )
+    public RepositoryItemEventDeleteItem( final Repository repository, final StorageItem item )
     {
         super( repository, item );
     }

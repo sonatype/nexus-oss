@@ -21,7 +21,7 @@ import java.util.List;
 import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventDeleteRecursively;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventDeleteItem;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDeleteRoot;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.plexus.appevents.Event;
@@ -70,9 +70,9 @@ public class DeleteEventsTest
         assertThat( listener.getDeleteEvents().get( 0 ).getClass().getName(),
             equalTo( RepositoryItemEventDeleteRoot.class.getName() ) );
         assertThat( listener.getDeleteEvents().get( 1 ).getClass().getName(),
-            equalTo( RepositoryItemEventDeleteRecursively.class.getName() ) );
+            equalTo( RepositoryItemEventDeleteItem.class.getName() ) );
         assertThat( listener.getDeleteEvents().get( 2 ).getClass().getName(),
-            equalTo( RepositoryItemEventDeleteRecursively.class.getName() ) );
+            equalTo( RepositoryItemEventDeleteItem.class.getName() ) );
     }
 
     @Test
