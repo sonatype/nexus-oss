@@ -16,23 +16,33 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
+import com.google.common.collect.Sets;
+import org.apache.http.HttpException;
 import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.params.AuthPNames;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ConnectionPoolTimeoutException;
 import org.apache.http.conn.params.ConnRouteParams;
 import org.apache.http.conn.routing.HttpRoute;
+import org.apache.http.conn.routing.HttpRoutePlanner;
+import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpParams;
+import org.apache.http.protocol.HttpContext;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -45,9 +55,9 @@ import org.sonatype.nexus.proxy.utils.UserAgentBuilder;
 /**
  * Tests for assumptions in the PR connector:
  * <ul>
- *     <li>same underlying client instance</li>
- *     <li>properly shut down on #dispose()</li>
- *     <li>(re-)configuring proxy with auth</li>
+ * <li>same underlying client instance</li>
+ * <li>properly shut down on #dispose()</li>
+ * <li>(re-)configuring proxy with auth</li>
  * </ul>
  */
 public class NexusPRConnectorTest
@@ -128,7 +138,7 @@ public class NexusPRConnectorTest
 
         final HttpClient client = underTest.client();
         final HttpParams params = client.getParams();
-        
+
         assertThat( ConnRouteParams.getDefaultProxy( params ), notNullValue() );
         assertThat( params.getParameter( AuthPNames.PROXY_AUTH_PREF ), notNullValue() );
 
@@ -136,7 +146,7 @@ public class NexusPRConnectorTest
             new AuthScope( host, port ) ), notNullValue()
         );
     }
-    
+
     @Test
     public void testProxyReconfigure()
     {
@@ -146,14 +156,14 @@ public class NexusPRConnectorTest
         when( proxySettings.isEnabled() ).thenReturn( true );
         when( proxySettings.getHostname() ).thenReturn( host );
         when( proxySettings.getPort() ).thenReturn( port );
-        
+
         DefaultHttpClient client = (DefaultHttpClient) underTest.client();
         HttpParams params = client.getParams();
 
         assertThat( ConnRouteParams.getDefaultProxy( params ), notNullValue() );
         assertThat( params.getParameter( AuthPNames.PROXY_AUTH_PREF ), nullValue() );
 
-        assertThat( 
+        assertThat(
             client.getCredentialsProvider().getCredentials( new AuthScope( host, port ) ),
             nullValue()
         );
@@ -161,10 +171,10 @@ public class NexusPRConnectorTest
         when( proxySettings.getProxyAuthentication() ).thenReturn( proxyAuth );
         when( proxyAuth.getUsername() ).thenReturn( "user" );
         when( proxyAuth.getPassword() ).thenReturn( "pass" );
-        
+
         final DefaultHttpClient reconfigured = (DefaultHttpClient) underTest.client();
         params = reconfigured.getParams();
-        
+
         assertThat( reconfigured, equalTo( client ) );
 
         assertThat( ConnRouteParams.getDefaultProxy( params ), notNullValue() );
@@ -183,6 +193,34 @@ public class NexusPRConnectorTest
         underTest.dispose();
         client.getConnectionManager().requestConnection( new HttpRoute( new HttpHost( "host" ) ), null ).getConnection(
             1000, TimeUnit.SECONDS );
+    }
+
+    @Test
+    public void testNonProxyHosts()
+        throws HttpException
+    {
+        final String host = "host";
+        final int port = 1234;
+
+        when( proxySettings.isEnabled() ).thenReturn( true );
+        when( proxySettings.getHostname() ).thenReturn( host );
+        when( proxySettings.getPort() ).thenReturn( port );
+        when( proxySettings.getNonProxyHosts() ).thenReturn( Sets.newHashSet( ".*" ) );
+
+        final DefaultHttpClient client = (DefaultHttpClient) underTest.client();
+        assertThat( ConnRouteParams.getDefaultProxy( client.getParams() ), notNullValue() );
+
+        final HttpRoutePlanner planner = client.getRoutePlanner();
+        final HttpRequest request = mock( HttpRequest.class );
+        when( request.getParams() ).thenReturn( mock( HttpParams.class ) );
+
+        planner.determineRoute( new HttpHost( "host" ), request,
+                                mock( HttpContext.class ) );
+
+        ArgumentCaptor<HttpParams> captor = ArgumentCaptor.forClass( HttpParams.class );
+        
+        verify( request ).setParams(captor.capture());
+        assertThat( ConnRouteParams.getDefaultProxy( captor.getValue() ), nullValue() );
     }
 
 }

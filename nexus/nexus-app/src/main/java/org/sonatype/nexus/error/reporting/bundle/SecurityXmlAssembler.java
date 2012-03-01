@@ -13,11 +13,13 @@
 package org.sonatype.nexus.error.reporting.bundle;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.OutputSupplier;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.util.IOUtil;
@@ -35,8 +37,9 @@ public class SecurityXmlAssembler
     extends AbstractXmlAssembler
     implements BundleAssembler
 {
+
     SecurityModelConfigurationSource source;
-    
+
     StorageManager storageManager;
 
     @Inject
@@ -55,26 +58,49 @@ public class SecurityXmlAssembler
     @Override
     public Bundle assemble( IssueSubmissionRequest request )
         throws IssueSubmissionException
-    {        
+    {
         OutputStreamWriter out = null;
         try
         {
-            ManagedBundle bundle = storageManager.createBundle( "security.xml", "application/xml" );
-            Configuration configuration = 
-                            ( Configuration ) cloneViaXml( source.getConfiguration() );
-                                
+            final ManagedBundle bundle = storageManager.createBundle( "security.xml", "application/xml" );
+            Configuration configuration =
+                (Configuration) cloneViaXml( source.getConfiguration() );
 
-			for ( CUser user : configuration.getUsers() )
-			{
-			    user.setPassword( PASSWORD_MASK );
-			    user.setEmail( PASSWORD_MASK );
-			}
-            SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
-            
-            out = new OutputStreamWriter( bundle.getOutputStream() );
-            writer.write( out, configuration );
-            out.close();
-            
+            if ( configuration != null )
+            {
+                for ( CUser user : configuration.getUsers() )
+                {
+                    user.setPassword( PASSWORD_MASK );
+                    user.setEmail( PASSWORD_MASK );
+                }
+                SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
+
+                out = new OutputStreamWriter( bundle.getOutputStream() );
+                try
+                {
+                    writer.write( out, configuration );
+                }
+                finally
+                {
+                    out.close();
+                }
+            }
+            else
+            {
+                ByteStreams.write(
+                    "Got no security configuration".getBytes( "utf-8" ),
+                    new OutputSupplier<OutputStream>()
+                    {
+                        @Override
+                        public OutputStream getOutput()
+                            throws IOException
+                        {
+                            return bundle.getOutputStream();
+                        }
+                    }
+                );
+            }
+
             return bundle;
         }
         catch ( IOException e )

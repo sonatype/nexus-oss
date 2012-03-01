@@ -73,7 +73,6 @@ public class NexusXmlAssembler
             final ManagedBundle bundle = storageManager.createBundle( "nexus.xml", "application/xml" );
             final Configuration configuration = configHelper.maskPasswords( nexusConfig.getConfigurationModel() );
 
-
             // No config ?
             if ( configuration != null )
             {

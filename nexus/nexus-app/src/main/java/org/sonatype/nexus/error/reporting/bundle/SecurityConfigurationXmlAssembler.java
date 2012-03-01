@@ -22,6 +22,8 @@ import java.io.Writer;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.google.common.io.ByteStreams;
+import com.google.common.io.OutputSupplier;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.util.IOUtil;
@@ -63,28 +65,45 @@ public class SecurityConfigurationXmlAssembler
     {
         SecurityConfiguration configuration = (SecurityConfiguration) cloneViaXml( source.getConfiguration() );
 
-        configuration.setAnonymousPassword( PASSWORD_MASK );
-
-        SecurityConfigurationXpp3Writer xppWriter = new SecurityConfigurationXpp3Writer();
-
-        Writer writer = null;
-
         try
         {
-            ManagedBundle bundle = storageManager.createBundle( "security-configuration.xml", "application/xml" );
-            OutputStream out = bundle.getOutputStream();
-            writer = new OutputStreamWriter( out );
-            xppWriter.write( writer, configuration );
-            writer.close();
+            final ManagedBundle bundle = storageManager.createBundle( "security-configuration.xml", "application/xml" );
+
+            if ( configuration != null )
+            {
+                configuration.setAnonymousPassword( PASSWORD_MASK );
+
+                SecurityConfigurationXpp3Writer xppWriter = new SecurityConfigurationXpp3Writer();
+
+                Writer writer = new OutputStreamWriter( bundle.getOutputStream() );
+                try
+                {
+                    xppWriter.write( writer, configuration );
+                }
+                finally
+                {
+                    IOUtil.close( writer );
+                }
+            } else {
+                ByteStreams.write(
+                    "Got no security configuration".getBytes( "utf-8" ),
+                    new OutputSupplier<OutputStream>()
+                    {
+                        @Override
+                        public OutputStream getOutput()
+                            throws IOException
+                        {
+                            return bundle.getOutputStream();
+                        }
+                    }
+                );
+            }
             return bundle;
         }
         catch ( IOException e )
         {
             throw new IssueSubmissionException( "Could not assemble security-configuration.xml-bundle", e );
         }
-        finally
-        {
-            IOUtil.close( writer );
-        }
+
     }
 }

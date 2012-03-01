@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import com.google.common.collect.Lists;
 import com.google.common.io.CharStreams;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
@@ -31,29 +32,24 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
+import org.sonatype.security.model.CUser;
+import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.sisu.litmus.testsupport.TestSupport;
 import org.sonatype.sisu.pr.bundle.Bundle;
 import org.sonatype.sisu.pr.bundle.StorageManager;
 import org.sonatype.sisu.pr.bundle.internal.TmpFileStorageManager;
 
 /**
- *
- * Test for {@link NexusXmlAssembler}.
- * Asserting basic operation and masking of passwords.
- *
+ * Test for {@link SecurityXmlAssembler}.
+ * Asserting basic operation and masking of passwords and email.
+ * 
  * @since 2.1
  */
-public class NexusXmlAssemblerTest
+public class SecurityXmlAssemblerTest
     extends TestSupport
 {
-
-    @Mock
-    private ConfigurationHelper helper;
-
-    @Mock
-    private NexusConfiguration config;
 
     @Mock
     private IssueSubmissionRequest request;
@@ -61,18 +57,32 @@ public class NexusXmlAssemblerTest
     @Mock
     private Configuration model;
 
+    @Mock
+    private SecurityModelConfigurationSource source;
+    
+    @Mock
+    private CUser user;
+
     private StorageManager storage;
 
-    private NexusXmlAssembler underTest;
+    private SecurityXmlAssembler underTest;
 
     @Before
     public void init()
     {
-        when( config.getConfigurationModel() ).thenReturn( model );
+        when( source.getConfiguration() ).thenReturn( model );
+        
+        when( model.getUsers() ).thenReturn( Lists.newArrayList( user ) );
 
         storage = new TmpFileStorageManager( util.createTempDir( getClass().getSimpleName() ) );
 
-        underTest = new NexusXmlAssembler( helper, config, storage );
+        underTest = new SecurityXmlAssembler( source, storage ) {
+            @Override
+            protected Object cloneViaXml( final Object configuration )
+            {
+                return configuration;
+            }
+        };
     }
 
     @After
@@ -85,7 +95,7 @@ public class NexusXmlAssemblerTest
     public void testParticipation()
     {
         assertThat( underTest.isParticipating( request ), is( true ) );
-        when( config.getConfigurationModel() ).thenReturn( null );
+        when( source.getConfiguration() ).thenReturn( null );
         assertThat( underTest.isParticipating( request ), is( false ) );
     }
     
@@ -93,38 +103,34 @@ public class NexusXmlAssemblerTest
     public void testAssemblyNoModel()
         throws IssueSubmissionException, IOException
     {
+        when( source.getConfiguration() ).thenReturn( null );
         final Bundle bundle = underTest.assemble( request );
-        
-        assertThat( bundle.getName(), is( "nexus.xml" ) );
 
-        // hm, how to assert some kind of error message? message is short...
-        assertThat( bundle.getContentLength(), lessThan( 40L ) );
-
-        verify( helper ).maskPasswords( model );
+        assertThat( bundle.getName(), is( "security.xml" ) );
+        assertThat( bundle.getContentLength(), lessThan( 30L ) );
     }
 
     @Test
     public void testAssembly()
         throws IssueSubmissionException, IOException
     {
-        when( helper.maskPasswords( model ) ).thenReturn( model );
-
         final Bundle bundle = underTest.assemble( request );
-        assertThat( bundle.getName(), is( "nexus.xml" ) );
+        assertThat( bundle.getName(), is( "security.xml" ) );
 
-        assertThat( bundle.getContentLength(), greaterThan( 40L ) );
+        assertThat( bundle.getContentLength(), greaterThan( 30L ) );
 
         final InputStreamReader reader = new InputStreamReader( bundle.getInputStream() );
         try
         {
-            // basically empty configuration, only xml header and 'nexusConfiguration' tag
-            assertThat( CharStreams.toString( reader ), containsString( "<nexusConfiguration />" ) );
+            // basically empty configuration, xml header, 'security' tag and an empty user
+            assertThat( CharStreams.toString( reader ), containsString( "<security>" ) );
         }
         finally
         {
             reader.close();
         }
-
-        verify( helper ).maskPasswords( model );
+        
+        verify( user ).setPassword( underTest.PASSWORD_MASK );
+        verify( user ).setEmail( underTest.PASSWORD_MASK );
     }
 }
