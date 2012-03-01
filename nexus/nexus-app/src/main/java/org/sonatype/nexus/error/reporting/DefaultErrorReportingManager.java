@@ -268,13 +268,13 @@ public class DefaultErrorReportingManager
 
     @Override
     public ErrorReportResponse handleError( ErrorReportRequest request )
-        throws IssueSubmissionException, IOException, GeneralSecurityException
+        throws IssueSubmissionException
     {
         return handleError( request, getValidJIRAUsername(), getValidJIRAPassword() );
     }
 
     public ErrorReportResponse handleError( ErrorReportRequest request, String username, String password )
-        throws IssueSubmissionException, IOException, GeneralSecurityException
+        throws IssueSubmissionException
     {
         Preconditions.checkState( username != null, "No username for error reporting given" );
         Preconditions.checkState( password != null, "No password for error reporting given" );
