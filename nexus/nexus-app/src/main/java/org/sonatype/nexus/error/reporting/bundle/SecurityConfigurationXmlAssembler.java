@@ -35,6 +35,10 @@ import org.sonatype.sisu.pr.bundle.BundleAssembler;
 import org.sonatype.sisu.pr.bundle.ManagedBundle;
 import org.sonatype.sisu.pr.bundle.StorageManager;
 
+/**
+ * Adds the security-configuration.xml to the error report bundle.
+ * Anonymous password will be masked.
+ */
 @Named( "security-configuration.xml" )
 public class SecurityConfigurationXmlAssembler
     extends AbstractXmlAssembler

@@ -21,6 +21,9 @@ import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.sonatype.nexus.error.reporting.ErrorReportRequest;
 import org.sonatype.sisu.pr.Modifier;
 
+/**
+ * Prepends MPR or APR to the issue summary based on {@link ErrorReportRequest#isManual()}
+ */
 @Named
 public class TriggerTypeModifier
 implements Modifier

@@ -27,6 +27,14 @@ import org.sonatype.sisu.pr.bundle.Bundle;
 import org.sonatype.sisu.pr.bundle.BundleAssembler;
 import org.sonatype.sisu.pr.bundle.FileBundle;
 
+/**
+ * Provide files in the 'conf' directory for inclusion in the error report bundle.
+ * Some files will be ignored where specialized assemblers exist.
+ *
+ * @see NexusXmlAssembler
+ * @see SecurityConfigurationXmlAssembler
+ * @see SecurityXmlAssembler
+ */
 @Named( "conf-dir")
 public class ConfigFilesBundleAssembler
     implements BundleAssembler

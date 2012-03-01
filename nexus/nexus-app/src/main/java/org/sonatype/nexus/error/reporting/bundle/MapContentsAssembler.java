@@ -28,6 +28,10 @@ import org.sonatype.sisu.pr.bundle.AbstractBundle;
 import org.sonatype.sisu.pr.bundle.Bundle;
 import org.sonatype.sisu.pr.bundle.BundleAssembler;
 
+/**
+ * Adds the contextListing.txt to the error report bundle.
+ * This assembler renders {@link ErrorReportRequest#getContext}.
+ */
 @Named( "context" )
 public class MapContentsAssembler
     implements BundleAssembler

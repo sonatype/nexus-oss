@@ -91,7 +91,7 @@ public class LegacyBundleContributorsAssemblerTest
 
     @Test
     public void testAssembly()
-        throws IssueSubmissionException, UnsupportedEncodingException
+        throws IssueSubmissionException, IOException
     {
         contributors.put( "test1", contributor );
         contributors.put( "test2", contributor );
@@ -117,6 +117,7 @@ public class LegacyBundleContributorsAssemblerTest
         verify( contributor, times( 2 ) ).getEntries();
         verify( entry, times( 2 ) ).getEntryName();
         verify( entry, times( 2 ) ).getContent();
+        verify( entry, times( 2 ) ).releaseEntry();
     }
 
     private Function<Bundle, String> names()

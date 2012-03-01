@@ -21,6 +21,9 @@ import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.sonatype.nexus.error.report.ErrorReportComponent;
 import org.sonatype.sisu.pr.Modifier;
 
+/**
+ * Sets the JIRA component as specified in the {@link ErrorReportComponent}.
+ */
 @Named
 public class ComponentModifier
     implements Modifier

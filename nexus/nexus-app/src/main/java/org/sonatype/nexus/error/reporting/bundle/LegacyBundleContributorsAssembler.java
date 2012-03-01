@@ -35,6 +35,9 @@ import org.sonatype.sisu.pr.bundle.DirBundle;
 import org.sonatype.sisu.pr.bundle.ManagedBundle;
 import org.sonatype.sisu.pr.bundle.StorageManager;
 
+/**
+ * Adds the content of legacy {@link ErrorReportBundleContentContributor} instances to the error report bundle.
+ */
 @Named( "extra-content" )
 public class LegacyBundleContributorsAssembler
     implements BundleAssembler

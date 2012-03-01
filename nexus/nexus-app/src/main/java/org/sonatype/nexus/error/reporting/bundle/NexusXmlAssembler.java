@@ -34,6 +34,10 @@ import org.sonatype.sisu.pr.bundle.BundleAssembler;
 import org.sonatype.sisu.pr.bundle.ManagedBundle;
 import org.sonatype.sisu.pr.bundle.StorageManager;
 
+/**
+ * Adds nexus.xml configuration file to the error report bundle.
+ * Passwords will be masked.
+ */
 @Named( "nexus.xml" )
 public class NexusXmlAssembler
     extends AbstractXmlAssembler

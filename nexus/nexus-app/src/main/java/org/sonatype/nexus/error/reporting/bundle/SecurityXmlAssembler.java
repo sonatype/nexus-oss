@@ -32,6 +32,10 @@ import org.sonatype.sisu.pr.bundle.BundleAssembler;
 import org.sonatype.sisu.pr.bundle.ManagedBundle;
 import org.sonatype.sisu.pr.bundle.StorageManager;
 
+/**
+ * Adds the security.xml to the error report bundle.
+ * User email addresses and passwords will be masked.
+ */
 @Named( "security.xml" )
 public class SecurityXmlAssembler
     extends AbstractXmlAssembler

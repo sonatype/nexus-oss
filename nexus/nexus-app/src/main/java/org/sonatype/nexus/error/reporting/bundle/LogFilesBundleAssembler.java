@@ -26,6 +26,9 @@ import org.sonatype.sisu.pr.bundle.Bundle;
 import org.sonatype.sisu.pr.bundle.BundleAssembler;
 import org.sonatype.sisu.pr.bundle.FileBundle;
 
+/**
+ * Adds nexus.log to the error report bundle.
+ */
 @Named("nexus.log")
 public class LogFilesBundleAssembler
     implements BundleAssembler
