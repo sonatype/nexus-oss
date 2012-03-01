@@ -44,24 +44,14 @@
 					<artifactId>guice</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>com.google.inject.extensions</groupId>
-					<artifactId>guice-multibindings</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.google.inject.extensions</groupId>
-					<artifactId>guice-servlet</artifactId>
+				  <groupId>com.google.inject.extensions</groupId>
+                  <artifactId>guice-servlet</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>org.sonatype.sisu.inject</groupId>
-			<artifactId>guice-multibindings</artifactId>
-			<version>3.1.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.sonatype.sisu.inject</groupId>
-			<artifactId>guice-servlet</artifactId>
-			<version>3.1.1</version>
+            <groupId>org.sonatype.sisu.inject</groupId>
+            <artifactId>guice-servlet</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.sonatype.sisu</groupId>
@@ -74,7 +64,7 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>0.9.28</version>
+			<version>${logback.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -103,7 +93,7 @@
 				<artifactId>maven-failsafe-plugin</artifactId>
 				<version>2.7-SONATYPE-1033415</version>
 				<configuration>
-					<argLine>-Xmx512M</argLine>
+					<argLine>-Xmx512M -Dorg.sonatype.inject.debug</argLine>
 				</configuration>
 				<executions>
 					<execution>

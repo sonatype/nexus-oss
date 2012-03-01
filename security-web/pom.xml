@@ -19,7 +19,7 @@
 		<dependency>
             <groupId>org.sonatype.sisu.inject</groupId>
             <artifactId>guice-plexus-shim</artifactId>
-            <version>${sisu-inject-bean.version}</version>
+            <version>${sisu-inject.version}</version>
             <scope>provided</scope>
         </dependency>
 		<dependency>

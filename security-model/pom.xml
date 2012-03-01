@@ -11,15 +11,18 @@
 	<description>The modello model for the storage of users, roles, privileges, and the mapping of users to roles. (and a bit of legacy code, not yet refactored out.)</description>
 
 	<dependencies>
+        <dependency>
+          <groupId>org.sonatype.sisu</groupId>
+          <artifactId>sisu-inject-bean</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-utils</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.sonatype.sisu</groupId>
-			<artifactId>sisu-inject-bean</artifactId>
-		</dependency>
-
 		<dependency>
 			<groupId>org.sonatype.configuration</groupId>
 			<artifactId>base-configuration</artifactId>

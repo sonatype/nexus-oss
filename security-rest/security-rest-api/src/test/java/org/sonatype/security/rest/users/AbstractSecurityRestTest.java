@@ -46,7 +46,15 @@ public abstract class AbstractSecurityRestTest
     protected void tearDown()
         throws Exception
     {
-        this.lookup( CacheManagerComponent.class ).shutdown();
+        try
+        {
+            lookup( SecuritySystem.class ).stop();
+            lookup( CacheManagerComponent.class ).shutdown();
+        }
+        finally
+        {
+            super.tearDown();
+        }
     }
 
     @Override

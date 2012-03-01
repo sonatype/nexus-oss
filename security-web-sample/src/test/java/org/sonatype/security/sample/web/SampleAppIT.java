@@ -99,6 +99,7 @@ public class SampleAppIT
     protected void setUp()
         throws Exception
     {
+        // System.setProperty( "org.sonatype.inject.debug", "true" );
         appPort = getFreePort();
         // copy security.xml in place
         // the test security.xml name will be <package-name>.<test-name>-security.xml
