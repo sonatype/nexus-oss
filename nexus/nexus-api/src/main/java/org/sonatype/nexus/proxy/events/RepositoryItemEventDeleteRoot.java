@@ -19,7 +19,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * The event fired on item delete carrying item from where deletion is executed. For one deletion (ie. invocation of
  * {@link Repository#deleteItem(org.sonatype.nexus.proxy.ResourceStoreRequest)}) there will be only one event of this
  * type fired. If item is a collection, other delete related events will be fired, see
- * {@link RepositoryItemEventDeleteRecursively} event. All delete events are fired before actual deletion is made,
+ * {@link RepositoryItemEventDeleteItem} event. All delete events are fired before actual deletion is made,
  * hence, the items carried by these events are still present and even it's content is reachable (if any).
  * 
  * @author cstamas
