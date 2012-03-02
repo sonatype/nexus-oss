@@ -168,7 +168,7 @@ public class FileConfigurationSource
         }
         catch ( ConfigurationException e )
         {
-            getLogger().info( "Configuration file is invalid, attempting upgrade" );
+            getLogger().info( "Configuration file is outdated, begin upgrade" );
 
             upgradeConfiguration( getConfigurationFile() );
 
@@ -318,7 +318,7 @@ public class FileConfigurationSource
     private void loadConfiguration( File file )
         throws IOException, ConfigurationException
     {
-        getLogger().info( "Loading Nexus configuration from " + file.getAbsolutePath() );
+        getLogger().debug( "Loading Nexus configuration from " + file.getAbsolutePath() );
 
         FileInputStream fis = null;
         try

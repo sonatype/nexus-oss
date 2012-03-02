@@ -71,7 +71,7 @@ public abstract class AbstractApplicationConfigurationSource
 
         if ( message != null )
         {
-            getLogger().warn( message, e );
+            getLogger().debug( message, e );
         }
     }
 
@@ -83,8 +83,7 @@ public abstract class AbstractApplicationConfigurationSource
      * @throws IOException Signals that an I/O exception has occurred.
      */
     protected void loadConfiguration( InputStream is )
-        throws IOException,
-            ConfigurationException
+        throws IOException, ConfigurationException
     {
         Reader fr = null;
 
@@ -118,7 +117,8 @@ public abstract class AbstractApplicationConfigurationSource
         {
             rejectConfiguration( "Nexus configuration file was loaded but discarded, it has the wrong version number.", null );
             
-            throw new ConfigurationException( "Nexus configuration file was loaded but discarded, it has the wrong version number." );
+            throw new ConfigurationException(
+                "Nexus configuration file was loaded but discarded, it has the wrong version number." );
         }
 
         if ( getConfiguration() != null )
