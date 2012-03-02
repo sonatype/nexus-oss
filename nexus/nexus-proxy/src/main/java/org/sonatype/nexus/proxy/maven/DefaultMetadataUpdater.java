@@ -50,11 +50,9 @@ public class DefaultMetadataUpdater
     public void deployArtifact( ArtifactStoreRequest request )
         throws IOException
     {
-        if ( request.getGav().isHash() || request.getGav().isSignature()
-            || StringUtils.isNotBlank( request.getGav().getClassifier() ) )
+        if ( request.getGav().isHash() || request.getGav().isSignature() )
         {
             // hashes and signatures are "meta"
-            // artifacts with classifiers do not change metadata
             return;
         }
 
