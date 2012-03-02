@@ -52,7 +52,7 @@ import org.sonatype.plexus.appevents.EventListener;
 /**
  * @author Juven Xu
  */
-public class RecreateMavenMetadataWalkerTest
+public class RecreateMavenMetadataWalkerLRTest
     extends AbstractProxyTestEnvironment
 {
 
