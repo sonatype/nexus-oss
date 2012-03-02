@@ -94,7 +94,7 @@ public class DefaultMetadataUpdater
             Metadata gaMd = locator.retrieveGAMetadata( request );
 
             operations.add( new AddVersionOperation( new StringOperand( ModelVersionUtility.getModelVersion( gaMd ),
-                request.getVersion() ) ) );
+                request.getGav().getBaseVersion() ) ) );
 
             MetadataBuilder.changeMetadata( gaMd, operations );
 
