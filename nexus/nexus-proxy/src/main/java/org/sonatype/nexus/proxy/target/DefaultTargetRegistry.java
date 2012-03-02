@@ -15,15 +15,18 @@ package org.sonatype.nexus.proxy.target;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -34,7 +37,6 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRepositoryTargetCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
-import org.sonatype.nexus.logging.Slf4jPlexusLogger;
 import org.sonatype.nexus.proxy.events.TargetRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.TargetRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -51,7 +53,7 @@ public class DefaultTargetRegistry
     extends AbstractConfigurable
     implements TargetRegistry
 {
-    private Logger logger = Slf4jPlexusLogger.getPlexusLogger( getClass() );
+    private Logger logger = LoggerFactory.getLogger( getClass() );
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -62,7 +64,9 @@ public class DefaultTargetRegistry
     @Requirement
     private ApplicationConfigurationValidator validator;
 
-    private ArrayList<Target> targets;
+    // a cache view of "live" targets, keyed by target ID
+    // eagerly rebuilt on every configuration change
+    private Map<String, Target> targets;
 
     // ==
 
@@ -118,6 +122,14 @@ public class DefaultTargetRegistry
     }
 
     @Override
+    protected void doConfigure()
+        throws ConfigurationException
+    {
+        super.doConfigure();
+        rebuildView();
+    }
+
+    @Override
     public boolean commitChanges()
         throws ConfigurationException
     {
@@ -125,10 +137,35 @@ public class DefaultTargetRegistry
 
         if ( wasDirty )
         {
-            targets = null;
+            // instead of nullifying and lazily rebuilding the "view", we do it eagerly now
+            // this way, we "slow down" to configuration changer thread instead of the
+            // target reader (is security in 99%). Also, by rebuilding and replacing, instead
+            // of modifying the collection, we ensuse there is no concurrent modification happening
+            // and at worst, some thread processes a millis old collection, but we do not care about it.
+            rebuildView();
         }
 
         return wasDirty;
+    }
+
+    /**
+     * Gets the effective configuration and rebuilds the "view" of live target objects, that is a map, keyed by target
+     * IDs.
+     */
+    protected void rebuildView()
+    {
+        // rebuild the view
+        List<CRepositoryTarget> ctargets = getCurrentConfiguration( false );
+        final Map<String, Target> newView = new HashMap<String, Target>( ctargets.size() );
+        for ( CRepositoryTarget ctarget : ctargets )
+        {
+            Target target = convert( ctarget );
+            if ( target != null )
+            {
+                newView.put( target.getId(), target );
+            }
+        }
+        targets = newView;
     }
 
     // ==
@@ -156,14 +193,13 @@ public class DefaultTargetRegistry
         ArrayList<String> patterns = new ArrayList<String>( target.getPatternTexts().size() );
         patterns.addAll( target.getPatternTexts() );
         result.setPatterns( patterns );
-
         return result;
     }
 
     protected void validate( CRepositoryTarget target )
         throws InvalidConfigurationException
     {
-        ValidationResponse response = this.validator.validateRepositoryTarget( null, target );
+        ValidationResponse response = validator.validateRepositoryTarget( null, target );
         if ( !response.isValid() )
         {
             throw new InvalidConfigurationException( response );
@@ -179,60 +215,25 @@ public class DefaultTargetRegistry
 
     public Collection<Target> getRepositoryTargets()
     {
-        if ( targets == null )
-        {
-            List<CRepositoryTarget> ctargets = getCurrentConfiguration( false );
-
-            targets = new ArrayList<Target>( ctargets.size() );
-
-            for ( CRepositoryTarget ctarget : ctargets )
-            {
-                Target target = convert( ctarget );
-
-                if ( target != null )
-                {
-                    targets.add( target );
-                }
-            }
-        }
-
-        // copy the list, since processing it may take longer
-        ArrayList<Target> result = new ArrayList<Target>( targets );
-
-        return Collections.unmodifiableCollection( result );
+        return Collections.unmodifiableCollection( targets.values() );
     }
 
     public Target getRepositoryTarget( String id )
     {
-        List<CRepositoryTarget> targets = getCurrentConfiguration( false );
-
-        for ( CRepositoryTarget target : targets )
-        {
-            if ( StringUtils.equals( id, target.getId() ) )
-            {
-                return convert( target );
-            }
-        }
-
-        return null;
+        return targets.get( id );
     }
 
     public boolean addRepositoryTarget( Target target )
         throws ConfigurationException
     {
         CRepositoryTarget cnf = convert( target );
-
         this.validate( cnf );
-
         removeRepositoryTarget( cnf.getId(), true );
-
         getCurrentConfiguration( true ).add( cnf );
-        
         getApplicationEventMulticaster().notifyEventListeners( new TargetRegistryEventAdd( this, target ) );
-
         return true;
     }
-    
+
     public boolean removeRepositoryTarget( String id )
     {
         return removeRepositoryTarget( id, false );
@@ -240,23 +241,18 @@ public class DefaultTargetRegistry
 
     protected boolean removeRepositoryTarget( String id, boolean forUpdate )
     {
-        List<CRepositoryTarget> targets = getCurrentConfiguration( true );
-
+        final List<CRepositoryTarget> targets = getCurrentConfiguration( true );
         for ( Iterator<CRepositoryTarget> ti = targets.iterator(); ti.hasNext(); )
         {
             CRepositoryTarget cTarget = ti.next();
-
             if ( StringUtils.equals( id, cTarget.getId() ) )
             {
                 Target target = getRepositoryTarget( id );
-
                 ti.remove();
-
                 if ( !forUpdate )
                 {
                     getApplicationEventMulticaster().notifyEventListeners( new TargetRegistryEventRemove( this, target ) );
                 }
-
                 return true;
             }
         }
@@ -266,13 +262,12 @@ public class DefaultTargetRegistry
 
     public Set<Target> getTargetsForContentClass( ContentClass contentClass )
     {
-        Set<Target> result = new HashSet<Target>();
-
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "Resolving targets for contentClass='" + contentClass.getId() + "'" );
         }
 
+        final Set<Target> result = new HashSet<Target>();
         for ( Target t : getRepositoryTargets() )
         {
             if ( t.getContentClass().equals( contentClass ) )
@@ -280,21 +275,18 @@ public class DefaultTargetRegistry
                 result.add( t );
             }
         }
-
         return result;
     }
 
     public Set<Target> getTargetsForContentClassPath( ContentClass contentClass, String path )
     {
-        Set<Target> result = new HashSet<Target>();
-
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                               "Resolving targets for contentClass='" + contentClass.getId() + "' for path='" + path
-                                   + "'" );
+                "Resolving targets for contentClass='" + contentClass.getId() + "' for path='" + path + "'" );
         }
 
+        final Set<Target> result = new HashSet<Target>();
         for ( Target t : getRepositoryTargets() )
         {
             if ( t.isPathContained( contentClass, path ) )
@@ -302,19 +294,17 @@ public class DefaultTargetRegistry
                 result.add( t );
             }
         }
-
         return result;
     }
 
     public TargetSet getTargetsForRepositoryPath( Repository repository, String path )
     {
-        TargetSet result = new TargetSet();
-
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "Resolving targets for repository='" + repository.getId() + "' for path='" + path + "'" );
         }
 
+        final TargetSet result = new TargetSet();
         for ( Target t : getRepositoryTargets() )
         {
             if ( t.isPathContained( repository.getRepositoryContentClass(), path ) )
@@ -322,7 +312,6 @@ public class DefaultTargetRegistry
                 result.addTargetMatch( new TargetMatch( t, repository ) );
             }
         }
-
         return result;
     }
 
@@ -340,7 +329,6 @@ public class DefaultTargetRegistry
                 return true;
             }
         }
-
         return false;
     }
 
