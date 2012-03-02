@@ -89,7 +89,7 @@ public class DefaultApplicationConfigurationUpgrader
 
         if ( upgrader != null )
         {
-            getLogger().info(
+            getLogger().debug(
                 "Upgrading old Nexus configuration file (version " + msg.getModelVersion() + ") from "
                     + file.getAbsolutePath() );
 

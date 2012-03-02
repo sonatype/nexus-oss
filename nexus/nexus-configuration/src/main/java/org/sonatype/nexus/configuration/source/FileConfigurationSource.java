@@ -168,7 +168,7 @@ public class FileConfigurationSource
         }
         catch ( ConfigurationException e )
         {
-            getLogger().info( "Configuration file is out to dated, begin upgrade" );
+            getLogger().info( "Configuration file is outdated, begin upgrade" );
 
             upgradeConfiguration( getConfigurationFile() );
 
