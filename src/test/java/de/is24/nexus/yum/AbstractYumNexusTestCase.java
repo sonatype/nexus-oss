@@ -7,22 +7,26 @@ import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.BASE_CACHE_
 import static java.util.Arrays.asList;
 import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.apache.commons.lang.RandomStringUtils.randomAlphabetic;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
+
 import javax.inject.Inject;
+
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.test.NexusTestSupport;
+
 import com.google.code.tempusfugit.temporal.Condition;
 import com.google.code.tempusfugit.temporal.ThreadSleep;
 import com.google.code.tempusfugit.temporal.Timeout;
 
 
-public class AbstractYumNexusTestCase extends AbstractNexusTestCase {
+public class AbstractYumNexusTestCase extends NexusTestSupport {
   public static final String NEXUS_BASE_URL = "http://localhost:8081/nexus";
   public static final File NEXUS_CONF_DIR = new File(".", "target/test-classes/nexus/sonatype-work/nexus/conf/");
   public static final String TMP_DIR_KEY = "java.io.tmpdir";
@@ -118,10 +122,5 @@ public class AbstractYumNexusTestCase extends AbstractNexusTestCase {
     return tmpDir;
   }
 
-
-  @Override
-  protected boolean loadConfigurationAtSetUp() {
-    return false;
-  }
 
 }

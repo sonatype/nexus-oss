@@ -5,9 +5,8 @@ import static java.lang.String.format;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.http.util.EntityUtils.consume;
-import static org.easymock.EasyMock.createMock;
-import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +38,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.maven.index.artifact.Gav;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.NexusRestClient;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.test.utils.DeployUtils;
 
@@ -137,11 +136,9 @@ public class AbstractNexusTestBase {
 
   protected int deployRpm(File rpmFile, String artifactId, String groupId, String version, String repositoryId) throws HttpException,
       IOException {
-    AbstractNexusIntegrationTest testMock = createMock(AbstractNexusIntegrationTest.class);
-    replay(testMock);
-
-    Gav gav = new Gav(groupId, artifactId, version, null, "rpm", null, null, null, false, null, false, null);
-    return new DeployUtils(testMock).deployUsingGavWithRest(repositoryId, gav, rpmFile);
+    final NexusRestClient nexusRestClient = mock(NexusRestClient.class);
+    final Gav gav = new Gav(groupId, artifactId, version, null, "rpm", null, null, null, false, null, false, null);
+    return new DeployUtils(nexusRestClient).deployUsingGavWithRest(repositoryId, gav, rpmFile);
   }
 
   protected int deployRpm(String artifactId, String groupId, String version, String repositoryId) throws NoSuchAlgorithmException,

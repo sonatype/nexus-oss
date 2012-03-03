@@ -22,7 +22,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
+import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreCreate;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -101,7 +101,7 @@ public class ConcurrentRpmDeployedListenerTest extends AbstractRepositoryTester 
 
     StorageItem storageItem = createItem(versionStr, rpmFile.getName());
 
-    listener.onEvent(new RepositoryItemEventStore(repo, storageItem));
+    listener.onEvent(new RepositoryItemEventStoreCreate(repo, storageItem));
 
 		final int activeWorker = getRunningTasks();
 		log.info("active worker: " + activeWorker);

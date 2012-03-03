@@ -24,8 +24,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.scheduling.ScheduledTask;
 
 import com.google.code.tempusfugit.temporal.Condition;
@@ -74,7 +74,8 @@ public class ThreadPoolYumRespositoryCreatorServiceTest extends AbstractSchedule
 		enhancer.setSuperclass(YumMetadataGenerationTask.class);
 		enhancer.setCallback(interceptor);
 		YumMetadataGenerationTask task = (YumMetadataGenerationTask) enhancer.create();
-		setField(task, "feedRecorder", lookup(FeedRecorder.class));
+		setField(task, "applicationEventMulticaster", lookup(ApplicationEventMulticaster.class));
+        setField(task, "logger", LoggerFactory.getLogger( YumMetadataGenerationTask.class ));
   	task.setConfiguration(mockConfig("REPO_" + repositoryId));
   	return task;
   }
