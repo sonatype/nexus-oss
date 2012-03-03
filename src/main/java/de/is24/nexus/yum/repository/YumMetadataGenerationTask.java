@@ -44,7 +44,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   private YumGeneratorConfiguration config;
 
   @Requirement
-  private ApplicationEventMulticaster applicationEventMulticaster;
+  private ApplicationEventMulticaster eventMulticaster;
 
   @Requirement
   private RepositoryRegistry repositoryRegistry;
@@ -111,7 +111,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     if (StringUtils.isBlank(config.getVersion())) {
       try {
         final Repository repository = repositoryRegistry.getRepository(config.getId());
-        applicationEventMulticaster.notifyEventListeners(new YumRepositoryGenerateEvent(repository));
+        eventMulticaster.notifyEventListeners(new YumRepositoryGenerateEvent(repository));
       } catch (NoSuchRepositoryException e) {
       }
     }
