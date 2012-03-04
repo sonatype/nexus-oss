@@ -50,8 +50,11 @@
     <cobertura.branch.coverage>70</cobertura.branch.coverage>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <hamcrest.version>1.2.1</hamcrest.version>
-    <cargo.jvm.args />
-    <cargo.start.goal>start</cargo.start.goal>
+    <nexus.start.command>start</nexus.start.command>
+    <nexus.root.dir>${project.build.directory}/nexus</nexus.root.dir>
+    <nexus.exec>${nexus.root.dir}/nexus-professional-${nexus.version}/bin/nexus</nexus.exec>
+    <nexus.work.dir>${project.build.directory}/test-classes/nexus/sonatype-work/nexus</nexus.work.dir>
+    <nexus.port>8080</nexus.port>
   </properties>
 
   <dependencies>
@@ -305,26 +308,7 @@
         </executions>
       </plugin>
 
-      <!-- copy jar to sonatype config dir -->
-      <plugin>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.6</version>
-        <executions>
-          <execution>
-            <phase>pre-integration-test</phase>
-            <configuration>
-              <target>
-                <unzip src="${project.build.directory}/${project.build.finalName}-bundle.zip" dest="${project.build.directory}/test-classes/nexus/sonatype-work/nexus/plugin-repository" />
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <!-- download Nexus Professional WAR-file -->
+      <!-- download and unpack Nexus Professional bundle -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -334,86 +318,67 @@
             <id>copy-nexus-war-file</id>
             <phase>pre-integration-test</phase>
             <goals>
-              <goal>copy</goal>
+              <goal>unpack</goal>
             </goals>
             <configuration>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.sonatype.nexus</groupId>
                   <artifactId>nexus-professional</artifactId>
-                  <version>1.9.2.3</version>
-                  <type>war</type>
-                  <outputDirectory>${project.build.directory}</outputDirectory>
-                  <destFileName>nexus-professional-${nexus.version}.war</destFileName>
+                  <version>${nexus.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>tar.gz</type>
                 </artifactItem>
               </artifactItems>
               <!-- other configurations here -->
+              <outputDirectory>${nexus.root.dir}</outputDirectory>
             </configuration>
           </execution>
         </executions>
       </plugin>
 
-      <!-- run tomcat for nexus webapp -->
+      <!-- copy jar to sonatype config dir -->
+      <!-- run nexus application -->
       <plugin>
-        <groupId>org.codehaus.cargo</groupId>
-        <artifactId>cargo-maven2-plugin</artifactId>
-        <version>1.1.1</version>
-        <configuration>
-          <container>
-            <containerId>jetty6x</containerId>
-            <type>embedded</type>
-            <systemProperties>
-              <plexus.nexus-work>${project.build.directory}/test-classes/nexus/sonatype-work/nexus</plexus.nexus-work>
-            </systemProperties>
-          </container>
-          <configuration>
-
-            <deployables>
-              <deployable>
-                <groupId>org.sonatype.nexus</groupId>
-                <artifactId>nexus-webapp</artifactId>
-                <location>${project.build.directory}/nexus-professional-${nexus.version}.war</location>
-                <properties>
-                  <context>nexus</context>
-                </properties>
-                <type>war</type>
-              </deployable>
-            </deployables>
-          </configuration>
-        </configuration>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.6</version>
         <executions>
           <execution>
-            <id>start-tomcat</id>
+            <id>install-yum-plugin-and-start-nexus</id>
             <goals>
-              <goal>${cargo.start.goal}</goal>
+              <goal>run</goal>
             </goals>
             <phase>pre-integration-test</phase>
             <configuration>
-              <configuration>
-                <properties>
-                  <cargo.jvmargs>${cargo.jvm.args} -server</cargo.jvmargs>
-                  <cargo.tomcat.ajp.port>18093</cargo.tomcat.ajp.port>
-                </properties>
-              </configuration>
+              <target>
+                <unzip src="${project.build.directory}/${project.build.finalName}-bundle.zip" dest="${nexus.work.dir}/plugin-repository" />
+                <exec executable="${nexus.exec}">
+                  <arg value="${nexus.start.command}" />
+                  <env key="PLEXUS_NEXUS_WORK" value="${nexus.work.dir}" />
+                  <env key="PLEXUS_APPLICATION_PORT" value="${nexus.port}" />
+                </exec>
+              </target>
             </configuration>
           </execution>
           <execution>
-            <id>stop-tomcat</id>
+            <id>shutdown-nexus</id>
             <goals>
-              <goal>stop</goal>
+              <goal>run</goal>
             </goals>
             <phase>post-integration-test</phase>
             <configuration>
-              <configuration>
-                <properties>
-                  <cargo.tomcat.ajp.port>18093</cargo.tomcat.ajp.port>
-                </properties>
-              </configuration>
+              <target>
+                <exec executable="${nexus.exec}">
+                  <arg value="stop" />
+                  <env key="PLEXUS_NEXUS_WORK" value="${nexus.work.dir}" />
+                  <env key="PLEXUS_APPLICATION_PORT" value="${nexus.port}" />
+                </exec>
+              </target>
             </configuration>
           </execution>
         </executions>
       </plugin>
-
+      
       <!-- run integration tests -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
