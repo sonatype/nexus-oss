@@ -357,6 +357,9 @@
                   <env key="PLEXUS_NEXUS_WORK" value="${nexus.work.dir}" />
                   <env key="PLEXUS_APPLICATION_PORT" value="${nexus.port}" />
                 </exec>
+                <waitfor maxwait="2" maxwaitunit="minute" checkevery="10" checkeveryunit="second">
+                  <http url="http://localhost:${nexus.port}/nexus/index.html"/>
+                </waitfor>
               </target>
             </configuration>
           </execution>
