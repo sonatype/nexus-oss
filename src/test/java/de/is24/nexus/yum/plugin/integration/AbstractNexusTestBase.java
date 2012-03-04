@@ -6,7 +6,6 @@ import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.http.util.EntityUtils.consume;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,10 +38,13 @@ import org.apache.maven.index.artifact.Gav;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.integrationtests.NexusRestClient;
+import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.test.utils.DeployUtils;
 
 public class AbstractNexusTestBase {
+  private static final String NEXUS_PASSWORD = "admin123";
+  private static final String NEXUS_USERNAME = "admin";
   protected static final Logger LOG = LoggerFactory.getLogger(AbstractNexusTestBase.class);
   protected static final String NEXUS_BASE_URL = "http://localhost:8080/nexus";
   protected static final String SERVICE_BASE_URL = NEXUS_BASE_URL + "/service/local";
@@ -85,7 +87,7 @@ public class AbstractNexusTestBase {
   }
 
   protected void setCredentials(HttpRequest request) throws AuthenticationException {
-    UsernamePasswordCredentials creds = new UsernamePasswordCredentials("admin", "admin123");
+    UsernamePasswordCredentials creds = new UsernamePasswordCredentials(NEXUS_USERNAME, NEXUS_PASSWORD);
     request.addHeader(new BasicScheme().authenticate(creds, request));
   }
 
@@ -136,7 +138,7 @@ public class AbstractNexusTestBase {
 
   protected int deployRpm(File rpmFile, String artifactId, String groupId, String version, String repositoryId) throws HttpException,
       IOException {
-    final NexusRestClient nexusRestClient = mock(NexusRestClient.class);
+    final NexusRestClient nexusRestClient = new NexusRestClient(testContext());
     final Gav gav = new Gav(groupId, artifactId, version, null, "rpm", null, null, null, false, null, false, null);
     return new DeployUtils(nexusRestClient).deployUsingGavWithRest(repositoryId, gav, rpmFile);
   }
@@ -182,6 +184,15 @@ public class AbstractNexusTestBase {
 
   protected void wait(int timeout, TimeUnit unit) throws InterruptedException {
     Thread.sleep(unit.toMillis(timeout));
+  }
+
+  protected TestContext testContext() {
+    final TestContext testContext = new TestContext();
+    testContext.setNexusUrl(NEXUS_BASE_URL + "/");
+    testContext.setUsername(NEXUS_USERNAME);
+    testContext.setPassword(NEXUS_PASSWORD);
+    testContext.setSecureTest(true);
+    return testContext;
   }
 
   private String render(Repository[] repos) {
