@@ -15,6 +15,8 @@ package org.sonatype.nexus.proxy.maven;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -111,8 +113,7 @@ public class DefaultMetadataManagerTest
         ArtifactStoreRequest request =
             new ArtifactStoreRequest( repo,
                 "/nexus4918/artifact/1.2.1-SNAPSHOT/artifact-1.2.1-20110719.134341-19.pom.sha1", true );
-        updater.deployArtifact( request );
-        verifyNoMoreInteractions( locator );
+        assertFalse( updater.doesImpactMavenMetadata( request.getGav() ) );
     }
 
     @Test
@@ -121,8 +122,7 @@ public class DefaultMetadataManagerTest
     {
         ArtifactStoreRequest request =
             new ArtifactStoreRequest( repo, "/nexus4918/artifact/1.0/artifact-1.0.pom.asc", true );
-        updater.deployArtifact( request );
-        verifyNoMoreInteractions( locator );
+        assertFalse( updater.doesImpactMavenMetadata( request.getGav() ) );
     }
 
     @Test
@@ -131,42 +131,35 @@ public class DefaultMetadataManagerTest
     {
         ArtifactStoreRequest request =
             new ArtifactStoreRequest( repo, "/nexus4918/artifact/1.0/artifact-1.0-classifier.jar", true );
-        updater.deployArtifact( request );
-        verifyNoMoreInteractions( locator );
+        assertFalse( updater.doesImpactMavenMetadata( request.getGav() ) );
     }
 
-    @Test( expected = ConditionPassException.class )
+    @Test
     public void deployRelease()
         throws Exception
     {
-        doThrow( ConditionPassException.class ).when( locator ).getGavForRequest( Mockito.any( ArtifactStoreRequest.class ) );
-
         ArtifactStoreRequest request =
             new ArtifactStoreRequest( repo, "/nexus4918/artifact/1.0/artifact-1.0.jar", true );
-        updater.deployArtifact( request );
+        assertTrue( updater.doesImpactMavenMetadata( request.getGav() ) );
     }
 
-    @Test( expected = ConditionPassException.class )
+    @Test
     public void deploySnapshot()
         throws Exception
     {
-        doThrow( ConditionPassException.class ).when( locator ).getGavForRequest( Mockito.any( ArtifactStoreRequest.class ) );
-
         ArtifactStoreRequest request =
             new ArtifactStoreRequest( repo, "/nexus4918/artifact/1.1-SNAPSHOT/artifact-1.1-SNAPSHOT.jar", true );
-        updater.deployArtifact( request );
+        assertTrue( updater.doesImpactMavenMetadata( request.getGav() ) );
     }
 
-    @Test( expected = ConditionPassException.class )
+    @Test
     public void deploySnapshotWithClassifier()
         throws Exception
     {
-        doThrow( ConditionPassException.class ).when( locator ).getGavForRequest( Mockito.any( ArtifactStoreRequest.class ) );
-
         ArtifactStoreRequest request =
             new ArtifactStoreRequest( repo,
                 "/nexus4918/artifact/1.2.1-SNAPSHOT/artifact-1.2.1-20110719.134341-19-classifier.jar", true );
-        updater.deployArtifact( request );
+        assertTrue( updater.doesImpactMavenMetadata( request.getGav() ) );
     }
 
 }
