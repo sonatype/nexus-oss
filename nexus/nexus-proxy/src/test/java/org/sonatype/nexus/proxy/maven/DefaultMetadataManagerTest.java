@@ -12,12 +12,28 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import org.junit.Before;
 import org.junit.Test;
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.Matchers.*;
+import org.mockito.Mockito;
+import org.sonatype.nexus.proxy.maven.gav.GavCalculator;
+import org.sonatype.nexus.proxy.maven.gav.M2GavCalculator;
 
 public class DefaultMetadataManagerTest
 {
+
+    private MavenRepository repo;
+
+    private MetadataLocator locator;
+
+    private DefaultMetadataUpdater updater;
 
     @Test
     public void getTimeForMetadataTimestampMaven2Normal()
@@ -77,5 +93,80 @@ public class DefaultMetadataManagerTest
         assertThat(DefaultMetadataManager.getBuildNumberForMetadataMaven3Value( "1.2.1-20110719.092007-17" ), is(17));
     }
 
+    @Before
+    public void setup()
+    {
+        this.locator = mock( MetadataLocator.class );
+        this.updater = new DefaultMetadataUpdater( locator );
+
+        this.repo = mock( MavenRepository.class );
+        GavCalculator calculator = new M2GavCalculator();
+        when( repo.getGavCalculator() ).thenReturn( calculator );
+    }
+
+    @Test
+    public void deployHash()
+        throws Exception
+    {
+        ArtifactStoreRequest request =
+            new ArtifactStoreRequest( repo,
+                "/nexus4918/artifact/1.2.1-SNAPSHOT/artifact-1.2.1-20110719.134341-19.pom.sha1", true );
+        updater.deployArtifact( request );
+        verifyNoMoreInteractions( locator );
+    }
+
+    @Test
+    public void deploySignature()
+        throws Exception
+    {
+        ArtifactStoreRequest request =
+            new ArtifactStoreRequest( repo, "/nexus4918/artifact/1.0/artifact-1.0.pom.asc", true );
+        updater.deployArtifact( request );
+        verifyNoMoreInteractions( locator );
+    }
+
+    @Test
+    public void deployReleaseWithClassifier()
+        throws Exception
+    {
+        ArtifactStoreRequest request =
+            new ArtifactStoreRequest( repo, "/nexus4918/artifact/1.0/artifact-1.0-classifier.jar", true );
+        updater.deployArtifact( request );
+        verifyNoMoreInteractions( locator );
+    }
+
+    @Test( expected = ConditionPassException.class )
+    public void deployRelease()
+        throws Exception
+    {
+        doThrow( ConditionPassException.class ).when( locator ).getGavForRequest( Mockito.any( ArtifactStoreRequest.class ) );
+
+        ArtifactStoreRequest request =
+            new ArtifactStoreRequest( repo, "/nexus4918/artifact/1.0/artifact-1.0.jar", true );
+        updater.deployArtifact( request );
+    }
+
+    @Test( expected = ConditionPassException.class )
+    public void deploySnapshot()
+        throws Exception
+    {
+        doThrow( ConditionPassException.class ).when( locator ).getGavForRequest( Mockito.any( ArtifactStoreRequest.class ) );
+
+        ArtifactStoreRequest request =
+            new ArtifactStoreRequest( repo, "/nexus4918/artifact/1.1-SNAPSHOT/artifact-1.1-SNAPSHOT.jar", true );
+        updater.deployArtifact( request );
+    }
+
+    @Test( expected = ConditionPassException.class )
+    public void deploySnapshotWithClassifier()
+        throws Exception
+    {
+        doThrow( ConditionPassException.class ).when( locator ).getGavForRequest( Mockito.any( ArtifactStoreRequest.class ) );
+
+        ArtifactStoreRequest request =
+            new ArtifactStoreRequest( repo,
+                "/nexus4918/artifact/1.2.1-SNAPSHOT/artifact-1.2.1-20110719.134341-19-classifier.jar", true );
+        updater.deployArtifact( request );
+    }
 
 }
