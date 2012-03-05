@@ -12,6 +12,11 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +32,7 @@ import java.util.Map;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
+import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,10 +43,9 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.events.RepositoryItemEventStoreUpdate;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.RecreateMavenMetadataWalkerProcessor;
+import org.sonatype.nexus.proxy.maven.gav.M2ArtifactRecognizer;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -52,7 +57,7 @@ import org.sonatype.plexus.appevents.EventListener;
 /**
  * @author Juven Xu
  */
-public class RecreateMavenMetadataWalkerTest
+public class RecreateMavenMetadataWalkerLRTest
     extends AbstractProxyTestEnvironment
 {
 
@@ -65,74 +70,6 @@ public class RecreateMavenMetadataWalkerTest
     private File repoBase;
 
     private Walker walker;
-
-    private String[] releaseArtifactFiles = { "/junit/junit/3.8.1/junit-3.8.1.jar",
-        "/junit/junit/3.8.1/junit-3.8.1.pom", "/junit/junit/3.8.2/junit-3.8.2.jar",
-        "/junit/junit/3.8.2/junit-3.8.2.pom", "/junit/junit/4.0/junit-4.0.jar", "/junit/junit/4.0/junit-4.0.pom",
-        "/junit/junit/4.4/junit-4.4.jar", "/junit/junit/4.4/junit-4.4.pom",
-        "/junit/junit/4.4/junit-4.4.sources.jar.md5", "/junit/junit-mock/maven-metadata.xml",
-        "/junit/junit-mock/1.1/readme.txt", "/com/mycom/proj1/1.0/proj1-1.0.jar", "/com/mycom/proj1/1.0/proj1-1.0.pom",
-        "/com/mycom/proj1/2.0/proj1-2.0.jar", "/com/mycom/proj1/2.0/proj1-2.0.pom",
-        "/com/mycom/proj1/maven-metadata.xml", "/com/mycom/proj5/1.0/proj5-1.0.jar",
-        "/com/mycom/proj5/1.0/proj5-1.0.pom", "/com/mycom/proj6/1.0/proj6-1.0.jar",
-        "/com/mycom/proj6/1.0/proj6-1.0.pom", "/com/mycom1/1-proj/1.0/1-proj-1.0.pom",
-        "/com/mycom1/1.0/mycom1-1.0.pom", "/com/mycom1/2-proj/1.0/2-proj-1.0.pom", "/com/mycom1/2.0/mycom1-2.0.pom",
-        "/com/mycom2/proj-1/1.0/proj-1-1.0.pom", "/com/mycom2/proj-1/2.0/proj-1-2.0.pom",
-        "/com/mycom2/proj-1/maven-metadata.xml" };
-
-    private String[] snapshotArtifactFiles = {
-        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.180215-1.jar",
-        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.180215-1.pom",
-        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.182430-2.jar",
-        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.182430-2.pom",
-        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.184527-3.jar",
-        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.184527-3.pom",
-        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081025.143218-32.jar",
-        "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081025.143218-32.pom",
-        "/nexus1332/artifact-interp-main/14.0.0-SNAPSHOT/artifact-interp-main-14.0.0-20090108.150441-1.jar",
-        "/nexus1332/artifact-interp-main/14.0.0-SNAPSHOT/artifact-interp-main-14.0.0-20090108.150441-1.pom",
-        "/com/mycom/proj2/1.0-SNAPSHOT/proj2-1.0-SNAPSHOT.jar", "/com/mycom/proj2/1.0-SNAPSHOT/proj2-1.0-SNAPSHOT.pom",
-        "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.jar", "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.pom",
-        "/com/mycom/proj2/maven-metadata.xml", "/com/mycom/proj3/1.0-SNAPSHOT/proj3-1.0-20080923.191343-1.jar",
-        "/com/mycom/proj3/1.0-SNAPSHOT/proj3-1.0-20080923.191343-1.pom",
-        "/com/mycom/proj3/1.0-SNAPSHOT/proj3-1.0-20080924.191343-2.jar",
-        "/com/mycom/proj3/1.0-SNAPSHOT/proj3-1.0-20080924.191343-2.pom",
-        "/com/mycom/proj3/1.0-SNAPSHOT/maven-metadata.xml",
-        "/com/mycom/proj4/1.0-SNAPSHOT/proj4-1.0-20080923.191343-1.jar",
-        "/com/mycom/proj4/1.0-SNAPSHOT/proj4-1.0-20080923.191343-1.pom",
-        "/com/mycom/proj4/1.0-SNAPSHOT/proj4-1.0-20080924.191343-2.jar",
-        "/com/mycom/proj4/1.0-SNAPSHOT/proj4-1.0-20080924.191343-2.pom",
-        "/com/mycom/proj4/1.0-SNAPSHOT/maven-metadata.xml",
-        "/com/mycom/proj7/1.0-SNAPSHOT/proj7-1.0-20080924.191343-2.pom",
-        "/com/mycom/proj7/1.0-SNAPSHOT/proj7-1.0-20080924.191343-2.jar" };
-
-    private String[] pluginArtifactFiles = {
-        "/org/apache/maven/plugins/maven-antrun-plugin/1.1/maven-antrun-plugin-1.1.jar",
-        "/org/apache/maven/plugins/maven-antrun-plugin/1.1/maven-antrun-plugin-1.1.pom",
-        "/org/apache/maven/plugins/maven-clean-plugin/2.2/maven-clean-plugin-2.2.jar",
-        "/org/apache/maven/plugins/maven-clean-plugin/2.2/maven-clean-plugin-2.2.pom",
-        "/org/apache/maven/plugins/maven-plugin-plugin/2.4.1/maven-plugin-plugin-2.4.1.jar",
-        "/org/apache/maven/plugins/maven-plugin-plugin/2.4.1/maven-plugin-plugin-2.4.1.pom",
-        "/org/apache/maven/plugins/maven-plugin-plugin/2.4.3/maven-plugin-plugin-2.4.3.jar",
-        "/org/apache/maven/plugins/maven-plugin-plugin/2.4.3/maven-plugin-plugin-2.4.3.pom",
-        "/org/apache/maven/plugins/maven-source-plugin/2.0.4/maven-source-plugin-2.0.4.jar",
-        "/org/apache/maven/plugins/maven-source-plugin/2.0.4/maven-source-plugin-2.0.4.pom",
-        "/com/mycom/group1/maven-p1-plugin/1.0/maven-p1-plugin-1.0.jar",
-        "/com/mycom/group1/maven-p1-plugin/1.0/maven-p1-plugin-1.0.pom",
-        "/com/mycom/group1/maven-p2-plugin/1.0/maven-p2-plugin-1.0.jar",
-        "/com/mycom/group1/maven-p2-plugin/1.0/maven-p2-plugin-1.0.pom", "/com/mycom/group1/maven-metadata.xml",
-        "/com/mycom/group2/maven-p1-plugin/1.0/maven-p1-plugin-1.0.jar",
-        "/com/mycom/group2/maven-p1-plugin/1.0/maven-p1-plugin-1.0.pom",
-        "/com/mycom/group2/maven-p1-plugin/2.0/maven-p1-plugin-2.0.jar",
-        "/com/mycom/group2/maven-p1-plugin/2.0/maven-p1-plugin-2.0.pom",
-        "/com/mycom/group2/maven-p2-plugin/1.0/maven-p2-plugin-1.0.jar",
-        "/com/mycom/group2/maven-p2-plugin/1.0/maven-p2-plugin-1.0.pom", "/com/mycom/group2/maven-metadata.xml",
-        "/com/mycom/group3/maven-a1-plugin/1.0/maven-a1-plugin-1.0.pom",
-        "/com/mycom/group3/maven-a1-plugin/2.0/maven-a1-plugin-2.0.pom",
-        "/com/mycom/group3/maven-a1-plugin/3.0/maven-a1-plugin-3.0.pom",
-        "/com/mycom/group3/maven-b1-plugin/1.0/maven-b1-plugin-1.0.pom",
-        "/com/mycom/group3/maven-c1-plugin/1.0/maven-c1-plugin-1.0.pom",
-        "/com/mycom/group3/maven-d1-plugin/1.0/maven-d1-plugin-1.0.pom" };
 
     @Override
     protected EnvironmentBuilder getEnvironmentBuilder()
@@ -154,43 +91,31 @@ public class RecreateMavenMetadataWalkerTest
         repoBase = new File( getBasedir(), "target/test-classes/mavenMetadataTestRepo" );
 
         inhouseRelease = getRepositoryRegistry().getRepository( "inhouse" );
-
-        // copy all release artifact fils hosted inhouse repo
-        for ( String releaseArtifactFile : releaseArtifactFiles )
-        {
-            ResourceStoreRequest request = new ResourceStoreRequest( releaseArtifactFile, true );
-
-            FileInputStream fis = new FileInputStream( new File( repoBase, releaseArtifactFile ) );
-
-            inhouseRelease.storeItem( request, fis, null );
-
-            fis.close();
-        }
-
-        for ( String pluginArtifactFile : pluginArtifactFiles )
-        {
-            ResourceStoreRequest request = new ResourceStoreRequest( pluginArtifactFile, true );
-
-            FileInputStream fis = new FileInputStream( new File( repoBase, pluginArtifactFile ) );
-
-            inhouseRelease.storeItem( request, fis, null );
-
-            fis.close();
-        }
-
         inhouseSnapshot = getRepositoryRegistry().getRepository( "inhouse-snapshot" );
 
-        // copy all snapshot artifact fils hosted snapshot inhouse repo
-        for ( String snapshotArtifactFile : snapshotArtifactFiles )
+        DirectoryScanner scan = new DirectoryScanner();
+        scan.setBasedir( repoBase );
+        scan.addDefaultExcludes();
+        scan.scan();
+
+        for ( String path : scan.getIncludedFiles() )
         {
-            ResourceStoreRequest request = new ResourceStoreRequest( snapshotArtifactFile, true );
+            ResourceStoreRequest request = new ResourceStoreRequest( path, true );
 
-            FileInputStream fis = new FileInputStream( new File( repoBase, snapshotArtifactFile ) );
+            FileInputStream fis = new FileInputStream( new File( repoBase, path ) );
 
-            inhouseSnapshot.storeItem( request, fis, null );
+            if ( M2ArtifactRecognizer.isSnapshot( path ) )
+            {
+                inhouseSnapshot.storeItem( request, fis, null );
+            }
+            else
+            {
+                inhouseRelease.storeItem( request, fis, null );
+            }
 
             fis.close();
         }
+
 
         walker = lookup( Walker.class );
     }
@@ -403,7 +328,8 @@ public class RecreateMavenMetadataWalkerTest
             "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/maven-metadata.xml", false ) ) );
     }
 
-    public void BROKENtestRecreateMavenMetadataWalkerWalkerSnapshotWithInterpolation()
+    @Test
+    public void testRecreateMavenMetadataWalkerWalkerSnapshotWithInterpolation()
         throws Exception
     {
         rebuildMavenMetadata( inhouseSnapshot );

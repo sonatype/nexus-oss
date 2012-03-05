@@ -17,11 +17,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -39,22 +40,27 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.SnapshotOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.StringOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.TimeUtil;
 
-@Component( role = MetadataUpdater.class )
+import com.google.common.annotations.VisibleForTesting;
+
+@Named
 public class DefaultMetadataUpdater
     extends AbstractLoggingComponent
     implements MetadataUpdater
 {
-    @Requirement
-    private MetadataLocator locator;
+
+    private final MetadataLocator locator;
+
+    @Inject
+    public DefaultMetadataUpdater( MetadataLocator locator )
+    {
+        this.locator = locator;
+    }
 
     public void deployArtifact( ArtifactStoreRequest request )
         throws IOException
     {
-        if ( request.getGav().isHash() || request.getGav().isSignature()
-            || StringUtils.isNotBlank( request.getGav().getClassifier() ) )
+        if ( !doesImpactMavenMetadata( request.getGav() ) )
         {
-            // hashes and signatures are "meta"
-            // artifacts with classifiers do not change metadata
             return;
         }
 
@@ -96,7 +102,7 @@ public class DefaultMetadataUpdater
             Metadata gaMd = locator.retrieveGAMetadata( request );
 
             operations.add( new AddVersionOperation( new StringOperand( ModelVersionUtility.getModelVersion( gaMd ),
-                request.getVersion() ) ) );
+                gav.getBaseVersion() ) ) );
 
             MetadataBuilder.changeMetadata( gaMd, operations );
 
@@ -130,6 +136,14 @@ public class DefaultMetadataUpdater
         }
     }
 
+    @VisibleForTesting
+    boolean doesImpactMavenMetadata( final Gav requestGav )
+    {
+        // hashes and signatures are "meta"
+        // released artifacts with classifiers do not change metadata
+        return !( requestGav.isHash() || requestGav.isSignature() || ( StringUtils.isNotBlank( requestGav.getClassifier() ) && !requestGav.isSnapshot() ) );
+    }
+
     private SnapshotVersion buildVersioning( Gav gav )
     {
         SnapshotVersion version = new SnapshotVersion();
@@ -143,11 +157,8 @@ public class DefaultMetadataUpdater
     public void undeployArtifact( ArtifactStoreRequest request )
         throws IOException
     {
-        if ( request.getGav().isHash() || request.getGav().isSignature()
-            || StringUtils.isNotBlank( request.getGav().getClassifier() ) )
+        if ( !doesImpactMavenMetadata( request.getGav() ) )
         {
-            // hashes and signatures are "meta"
-            // artifacts with classifiers do not change metadata
             return;
         }
 
@@ -188,7 +199,7 @@ public class DefaultMetadataUpdater
             Metadata gaMd = locator.retrieveGAMetadata( request );
 
             operations.add( new AddVersionOperation( new StringOperand( ModelVersionUtility.getModelVersion( gaMd ),
-                request.getVersion() ) ) );
+                gav.getBaseVersion() ) ) );
 
             MetadataBuilder.changeMetadata( gaMd, operations );
 
