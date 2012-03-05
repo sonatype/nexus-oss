@@ -46,8 +46,8 @@ public class CRepositoryGroupingCoreConfiguration
     @Override
     public ValidationResponse doValidateChanges( Object changedConfiguration )
     {
-        CRepositoryGrouping settings = (CRepositoryGrouping)changedConfiguration;
-        
+        CRepositoryGrouping settings = (CRepositoryGrouping) changedConfiguration;
+
         ValidationResponse response = new ApplicationValidationResponse();
 
         ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
@@ -107,8 +107,8 @@ public class CRepositoryGroupingCoreConfiguration
 
         if ( StringUtils.isEmpty( item.getId() )
             || "0".equals( item.getId() )
-            || ( context.getExistingPathMappingIds() != null && context.getExistingPathMappingIds()
-                .contains( item.getId() ) ) )
+            || ( context.getExistingPathMappingIds() != null && context.getExistingPathMappingIds().contains(
+                item.getId() ) ) )
         {
             String newId = generateId();
 
@@ -123,9 +123,8 @@ public class CRepositoryGroupingCoreConfiguration
         {
             item.setGroupId( CPathMappingItem.ALL_GROUPS );
 
-            response
-                .addValidationWarning( "Fixed route without groupId set, set to ALL_GROUPS to keep backward comp, ID='"
-                    + item.getId() + "'." );
+            response.addValidationWarning( "Fixed route without groupId set, set to ALL_GROUPS to keep backward comp, ID='"
+                + item.getId() + "'." );
 
             response.setModified( true );
         }

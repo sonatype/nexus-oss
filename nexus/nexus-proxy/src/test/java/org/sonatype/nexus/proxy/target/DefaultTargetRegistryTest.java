@@ -16,59 +16,16 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
-import java.util.Arrays;
 
 import org.junit.Test;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.proxy.AbstractNexusTestCase;
-import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
-import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
 
+/**
+ * Simple DefaultTargetRegistry creation test
+ */
 public class DefaultTargetRegistryTest
-    extends AbstractNexusTestCase
+    extends AbstractDefaultTargetRegistryTest
 {
-    protected ApplicationConfiguration applicationConfiguration;
-
-    protected TargetRegistry targetRegistry;
-
-    protected ContentClass maven1;
-
-    protected ContentClass maven2;
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        applicationConfiguration = lookup( ApplicationConfiguration.class );
-
-        maven1 = new Maven1ContentClass();
-
-        maven2 = new Maven2ContentClass();
-
-        targetRegistry = lookup( TargetRegistry.class );
-
-        // adding two targets
-        Target t1 = new Target( "maven2-public", "Maven2 (public)", maven2, Arrays
-            .asList( new String[] { "/org/apache/maven/((?!sources\\.).)*" } ) );
-
-        targetRegistry.addRepositoryTarget( t1 );
-
-        Target t2 = new Target( "maven2-with-sources", "Maven2 sources", maven2, Arrays
-            .asList( new String[] { "/org/apache/maven/.*" } ) );
-
-        targetRegistry.addRepositoryTarget( t2 );
-
-        Target t3 = new Target( "maven1", "Maven1", maven1, Arrays.asList( new String[] { "/org\\.apache\\.maven.*" } ) );
-
-        targetRegistry.addRepositoryTarget( t3 );
-
-        applicationConfiguration.saveConfiguration();
-    }
-
     @Test
     public void testSimpleM2()
     {

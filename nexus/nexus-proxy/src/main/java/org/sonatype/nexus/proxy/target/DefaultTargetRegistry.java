@@ -126,26 +126,8 @@ public class DefaultTargetRegistry
         throws ConfigurationException
     {
         super.doConfigure();
+        // rebuild the view
         rebuildView();
-    }
-
-    @Override
-    public boolean commitChanges()
-        throws ConfigurationException
-    {
-        boolean wasDirty = super.commitChanges();
-
-        if ( wasDirty )
-        {
-            // instead of nullifying and lazily rebuilding the "view", we do it eagerly now
-            // this way, we "slow down" to configuration changer thread instead of the
-            // target reader (is security in 99%). Also, by rebuilding and replacing, instead
-            // of modifying the collection, we ensuse there is no concurrent modification happening
-            // and at worst, some thread processes a millis old collection, but we do not care about it.
-            rebuildView();
-        }
-
-        return wasDirty;
     }
 
     /**
@@ -154,18 +136,21 @@ public class DefaultTargetRegistry
      */
     protected void rebuildView()
     {
-        // rebuild the view
-        List<CRepositoryTarget> ctargets = getCurrentConfiguration( false );
-        final Map<String, Target> newView = new HashMap<String, Target>( ctargets.size() );
-        for ( CRepositoryTarget ctarget : ctargets )
+        synchronized ( getCurrentCoreConfiguration() )
         {
-            Target target = convert( ctarget );
-            if ( target != null )
+            // rebuild the view
+            List<CRepositoryTarget> ctargets = getCurrentConfiguration( false );
+            final Map<String, Target> newView = new HashMap<String, Target>( ctargets.size() );
+            for ( CRepositoryTarget ctarget : ctargets )
             {
-                newView.put( target.getId(), target );
+                Target target = convert( ctarget );
+                if ( target != null )
+                {
+                    newView.put( target.getId(), target );
+                }
             }
+            targets = newView;
         }
-        targets = newView;
     }
 
     // ==
@@ -223,18 +208,18 @@ public class DefaultTargetRegistry
         return targets.get( id );
     }
 
-    public boolean addRepositoryTarget( Target target )
+    public synchronized boolean addRepositoryTarget( Target target )
         throws ConfigurationException
     {
         CRepositoryTarget cnf = convert( target );
-        this.validate( cnf );
+        validate( cnf );
         removeRepositoryTarget( cnf.getId(), true );
         getCurrentConfiguration( true ).add( cnf );
         getApplicationEventMulticaster().notifyEventListeners( new TargetRegistryEventAdd( this, target ) );
         return true;
     }
 
-    public boolean removeRepositoryTarget( String id )
+    public synchronized boolean removeRepositoryTarget( String id )
     {
         return removeRepositoryTarget( id, false );
     }

@@ -155,14 +155,14 @@ public class DefaultTaskConfigManagerTest
         cst.setType( TestNexusTask.class.getName() );
         cst.setNextRun( new SimpleDateFormat( "yyyy-MM-DD hh:mm:ss" ).parse( "2099-01-01 20:00:00" ).getTime() );
 
-        System.out.println(new Date(cst.getNextRun()));
+        System.out.println( new Date( cst.getNextRun() ) );
 
         final CScheduleConfig csc = new CScheduleConfig();
         csc.setType( SCHEDULE_TYPE_ADVANCED );
         csc.setCronCommand( "0 0 20 ? * TUE,THU,SAT" );
         cst.setSchedule( csc );
-        
-        defaultManager.initializeTasks( defaultScheduler, Arrays.asList( cst ));
+
+        defaultManager.initializeTasks( defaultScheduler, Arrays.asList( cst ) );
 
         final ScheduledTask<?> task = defaultScheduler.getTaskById( cst.getId() );
         assertThat( new Date( task.getNextRun().getTime() ), is( new Date( cst.getNextRun() ) ) );
@@ -180,12 +180,12 @@ public class DefaultTaskConfigManagerTest
 
             // loadConfig();
 
-            assertTrue( getTaskConfiguration().size() == 1 );
+            assertEquals( 1, getTaskConfiguration().size() );
 
-            assertTrue( TaskState.SUBMITTED.equals( TaskState.valueOf( ( (CScheduledTask) getTaskConfiguration()
-                .get( 0 ) ).getStatus() ) ) );
+            assertEquals( TaskState.SUBMITTED,
+                TaskState.valueOf( ( (CScheduledTask) getTaskConfiguration().get( 0 ) ).getStatus() ) );
 
-            assertTrue( TASK_NAME.equals( ( (CScheduledTask) getTaskConfiguration().get( 0 ) ).getName() ) );
+            assertEquals( TASK_NAME, ( (CScheduledTask) getTaskConfiguration().get( 0 ) ).getName() );
 
             // assertTrue( typeClassMap.get( scheduleType ).isAssignableFrom(
             // ( (CScheduledTask) getTaskConfiguration().get( 0 ) ).getSchedule().getClass() ) );
@@ -214,22 +214,22 @@ public class DefaultTaskConfigManagerTest
         }
         else if ( SCHEDULE_TYPE_DAILY.equals( type ) )
         {
-            return new DailySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ), (Date) properties
-                .get( PROPERTY_KEY_END_DATE ) );
+            return new DailySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ),
+                (Date) properties.get( PROPERTY_KEY_END_DATE ) );
         }
         else if ( SCHEDULE_TYPE_WEEKLY.equals( type ) )
         {
             Set<Integer> daysToRun = new HashSet<Integer>();
             daysToRun.add( new Integer( 1 ) );
-            return new WeeklySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ), (Date) properties
-                .get( PROPERTY_KEY_END_DATE ), daysToRun );
+            return new WeeklySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ),
+                (Date) properties.get( PROPERTY_KEY_END_DATE ), daysToRun );
         }
         else if ( SCHEDULE_TYPE_MONTHLY.equals( type ) )
         {
             Set<Integer> daysToRun = new HashSet<Integer>();
             daysToRun.add( new Integer( 1 ) );
-            return new MonthlySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ), (Date) properties
-                .get( PROPERTY_KEY_END_DATE ), daysToRun );
+            return new MonthlySchedule( (Date) properties.get( PROPERTY_KEY_START_DATE ),
+                (Date) properties.get( PROPERTY_KEY_END_DATE ), daysToRun );
         }
         else if ( SCHEDULE_TYPE_ADVANCED.equals( type ) )
         {
@@ -242,14 +242,9 @@ public class DefaultTaskConfigManagerTest
     private ScheduledTask<Integer> createScheduledTask( Schedule schedule )
     {
         TestCallable callable = new TestCallable();
-        return new DefaultScheduledTask<Integer>(
-            "1",
-            TASK_NAME,
-            callable.getClass().getSimpleName(),
-            //TODO this is only use for testing, but we are expecting that the TaskHint matches the Classname.
-            defaultScheduler,
-            callable,
-            schedule );
+        return new DefaultScheduledTask<Integer>( "1", TASK_NAME, callable.getClass().getSimpleName(),
+        // TODO this is only use for testing, but we are expecting that the TaskHint matches the Classname.
+            defaultScheduler, callable, schedule );
     }
 
     private List<CScheduledTask> getTaskConfiguration()
