@@ -273,6 +273,8 @@ Ext.extend(Sonatype.repoServer.AbstractMirrorPanel, Sonatype.ext.FormPanel, {
       },
 
       activateHandler : function(panel) {
+        this.predefinedMirrorDataStore.load();
+
         if (panel.payload.data.repoType == 'proxy')
         {
           Ext.TaskMgr.start(this.mirrorStatusTask);
@@ -317,8 +319,7 @@ Sonatype.repoServer.ProxyMirrorEditor = function(config) {
         sortInfo : {
           field : 'url',
           direction : 'ASC'
-        },
-        autoLoad : true
+        }
       });
 
   Sonatype.repoServer.ProxyMirrorEditor.superclass.constructor.call(this, {
