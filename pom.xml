@@ -5,7 +5,7 @@
 
   <groupId>de.is24.nexus</groupId>
   <artifactId>nexus-yum-plugin</artifactId>
-  <version>2.0.1.0-SNAPSHOT</version>
+  <version>2.0.1.0</version>
   <packaging>nexus-plugin</packaging>
   <name>Nexus Yum Plugin</name>
   <description>Nexus Plugin to let Nexus generate a RPM repository out of the repositories</description>
@@ -25,8 +25,8 @@
   </developers>
 
   <scm>
-    <connection>scm:svn:http://nexus-yum-plugin.googlecode.com/svn/trunk</connection>
-    <developerConnection>scm:svn:https://nexus-yum-plugin.googlecode.com/svn/trunk</developerConnection>
+    <connection>scm:svn:http://nexus-yum-plugin.googlecode.com/svn/tags/nexus-yum-plugin-2.0.1.0</connection>
+    <developerConnection>scm:svn:https://nexus-yum-plugin.googlecode.com/svn/tags/nexus-yum-plugin-2.0.1.0</developerConnection>
   </scm>
 
   <distributionManagement>
@@ -358,7 +358,7 @@
                   <env key="PLEXUS_APPLICATION_PORT" value="${nexus.port}" />
                 </exec>
                 <waitfor maxwait="2" maxwaitunit="minute" checkevery="10" checkeveryunit="second">
-                  <http url="http://localhost:${nexus.port}/nexus/index.html"/>
+                  <http url="http://localhost:${nexus.port}/nexus/index.html" />
                 </waitfor>
               </target>
             </configuration>
