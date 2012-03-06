@@ -37,7 +37,12 @@ import com.google.common.collect.Lists;
 
 /**
  * Long run test that tries DefaultTargetRegistry with 100 threads and more then a thousand operations looking for
- * concurrency exceptions
+ * concurrency exceptions.
+ * <p>
+ * Note: this class contains one test method that is actually ignored on purpose. It's ignored, as it tests a thing
+ * known that will not work -- and cannot work -- with current configuration framework: simultaneous changes made by
+ * multiple threads of same component. The simple culprit is that "dirty" (the changed configuration) is kept as member
+ * variable, hence, is shared and modified by all changing threads causing all kinds of problems.
  * 
  * @author Marvin Froeder ( velo at sonatype.com )
  */

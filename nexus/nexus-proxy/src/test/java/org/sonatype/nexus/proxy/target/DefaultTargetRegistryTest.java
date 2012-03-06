@@ -15,7 +15,9 @@ package org.sonatype.nexus.proxy.target;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 import org.junit.Test;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -36,34 +38,29 @@ public class DefaultTargetRegistryTest
 
         replay( repository );
 
-        TargetSet ts = targetRegistry.getTargetsForRepositoryPath(
-            repository,
-            "/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9.pom" );
+        TargetSet ts =
+            targetRegistry.getTargetsForRepositoryPath( repository,
+                "/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9.pom" );
 
-        assertNotNull( ts );
+        assertThat( ts, notNullValue() );
+        assertThat( ts.getMatches().size(), equalTo( 2 ) );
+        assertThat( ts.getMatchedRepositoryIds().size(), equalTo( 1 ) );
+        assertThat( ts.getMatchedRepositoryIds().iterator().next(), equalTo( "dummy" ) );
 
-        assertEquals( 2, ts.getMatches().size() );
+        TargetSet ts1 =
+            targetRegistry.getTargetsForRepositoryPath( repository,
+                "/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9-sources.jar" );
 
-        assertEquals( 1, ts.getMatchedRepositoryIds().size() );
-
-        assertEquals( "dummy", ts.getMatchedRepositoryIds().iterator().next() );
-
-        TargetSet ts1 = targetRegistry.getTargetsForRepositoryPath(
-            repository,
-            "/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9-sources.jar" );
-
-        assertNotNull( ts1 );
-
-        assertEquals( 1, ts1.getMatches().size() );
-
-        assertEquals( "maven2-with-sources", ts1.getMatches().iterator().next().getTarget().getId() );
+        assertThat( ts1, notNullValue() );
+        assertThat( ts1.getMatches().size(), equalTo( 1 ) );
+        assertThat( ts1.getMatches().iterator().next().getTarget().getId(), equalTo( "maven2-with-sources" ) );
 
         // adding them
         ts.addTargetSet( ts1 );
 
-        assertEquals( 2, ts.getMatches().size() );
-
-        assertEquals( 1, ts.getMatchedRepositoryIds().size() );
+        assertThat( ts, notNullValue() );
+        assertThat( ts.getMatches().size(), equalTo( 2 ) );
+        assertThat( ts.getMatchedRepositoryIds().size(), equalTo( 1 ) );
     }
 
     @Test
@@ -76,21 +73,18 @@ public class DefaultTargetRegistryTest
 
         replay( repository );
 
-        TargetSet ts = targetRegistry.getTargetsForRepositoryPath(
-            repository,
-            "/org.apache.maven/jars/maven-model-v3-2.0.jar" );
+        TargetSet ts =
+            targetRegistry.getTargetsForRepositoryPath( repository, "/org.apache.maven/jars/maven-model-v3-2.0.jar" );
 
-        assertNotNull( ts );
+        assertThat( ts, notNullValue() );
+        assertThat( ts.getMatches().size(), equalTo( 1 ) );
 
-        assertEquals( 1, ts.getMatches().size() );
+        ts =
+            targetRegistry.getTargetsForRepositoryPath( repository,
+                "/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9-sources.jar" );
 
-        ts = targetRegistry.getTargetsForRepositoryPath(
-            repository,
-            "/org/apache/maven/maven-core/2.0.9/maven-core-2.0.9-sources.jar" );
-
-        assertNotNull( ts );
-
-        assertEquals( 0, ts.getMatches().size() );
+        assertThat( ts, notNullValue() );
+        assertThat( ts.getMatches().size(), equalTo( 0 ) );
     }
 
 }
