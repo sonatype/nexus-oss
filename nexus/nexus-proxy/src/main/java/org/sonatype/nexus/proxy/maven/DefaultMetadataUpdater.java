@@ -19,6 +19,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
@@ -43,11 +44,11 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.TimeUtil;
 import com.google.common.annotations.VisibleForTesting;
 
 @Named
+@Singleton
 public class DefaultMetadataUpdater
     extends AbstractLoggingComponent
     implements MetadataUpdater
 {
-
     private final MetadataLocator locator;
 
     @Inject
