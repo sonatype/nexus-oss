@@ -18,6 +18,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Set;
 
 import org.codehaus.plexus.context.Context;
@@ -91,6 +92,16 @@ public class LogbackLogManagerTest
         Set<File> logFiles = manager.getLogFiles();
         assertThat( "Logfiles set is not null", logFiles, is( notNullValue() ) );
         assertThat( "Logfiles set contains elements", logFiles.size(), is( equalTo( 1 ) ) );
+    }
+    
+    @Test
+    public void testConfigDefaultAppender()
+        throws IOException
+    {
+        final DefaultLogConfiguration configuration = (DefaultLogConfiguration) manager.getConfiguration();
+        configuration.setFileAppenderPattern( null );
+        manager.setConfiguration( configuration );
+        assertThat( manager.getConfiguration().getFileAppenderPattern(), notNullValue() );
     }
 
 }
