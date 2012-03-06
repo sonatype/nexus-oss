@@ -13,6 +13,7 @@
 package org.sonatype.scheduling;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 import java.text.ParseException;
@@ -179,16 +180,10 @@ public class DefaultTaskConfigManagerTest
             defaultManager.addTask( task );
 
             // loadConfig();
-
-            assertEquals( 1, getTaskConfiguration().size() );
-
-            assertEquals( TaskState.SUBMITTED,
-                TaskState.valueOf( ( (CScheduledTask) getTaskConfiguration().get( 0 ) ).getStatus() ) );
-
-            assertEquals( TASK_NAME, ( (CScheduledTask) getTaskConfiguration().get( 0 ) ).getName() );
-
-            // assertTrue( typeClassMap.get( scheduleType ).isAssignableFrom(
-            // ( (CScheduledTask) getTaskConfiguration().get( 0 ) ).getSchedule().getClass() ) );
+            
+            assertThat( getTaskConfiguration().size(), equalTo( 1 ) );
+            assertThat( TaskState.valueOf( ( (CScheduledTask) getTaskConfiguration().get( 0 ) ).getStatus() ), equalTo( TaskState.SUBMITTED ) );
+            assertThat( ( (CScheduledTask) getTaskConfiguration().get( 0 ) ).getName(), equalTo( TASK_NAME ) );
 
             defaultManager.removeTask( task );
 
