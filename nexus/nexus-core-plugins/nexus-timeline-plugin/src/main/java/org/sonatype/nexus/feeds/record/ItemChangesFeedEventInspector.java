@@ -38,12 +38,8 @@ public class ItemChangesFeedEventInspector
 {
     public boolean accepts( Event<?> evt )
     {
-        if ( evt instanceof RepositoryItemEvent )
-        {
-            return true;
-        }
-
-        return false;
+        // RETRIEVE event creates a lot of noise in events, so we are not processing those
+        return evt instanceof RepositoryItemEvent && !( evt instanceof RepositoryItemEventRetrieve );
     }
 
     public void inspect( Event<?> evt )
@@ -54,13 +50,6 @@ public class ItemChangesFeedEventInspector
     private void inspectForNexus( Event<?> evt )
     {
         RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
-
-        if ( ievt instanceof RepositoryItemEventRetrieve )
-        {
-            // RETRIEVE event creates a lot of noise in events,
-            // so we are not processing those
-            return;
-        }
 
         if ( ievt.getItemUid().getPath().endsWith( ".pom" ) || ievt.getItemUid().getPath().endsWith( ".jar" ) )
         {
