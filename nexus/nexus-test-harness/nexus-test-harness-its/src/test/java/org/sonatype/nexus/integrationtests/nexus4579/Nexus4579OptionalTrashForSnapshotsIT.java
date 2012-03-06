@@ -103,7 +103,11 @@ public class Nexus4579OptionalTrashForSnapshotsIT
         throws IOException
     {
         // clean trash before tests to remove possible leftovers from previous tests
-        FileUtils.deleteDirectory( trashPath );
+        // trashPath may be null if super.@Before failed
+        if ( trashPath != null )
+        {
+            FileUtils.deleteDirectory( trashPath );
+        }
     }
 
     @Test
