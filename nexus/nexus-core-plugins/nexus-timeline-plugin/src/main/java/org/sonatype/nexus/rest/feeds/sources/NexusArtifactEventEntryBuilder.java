@@ -126,7 +126,7 @@ public class NexusArtifactEventEntryBuilder
             return false;
         }
 
-        if ( !StringUtils.isEmpty( gav.getExtension() ) && gav.getExtension().toLowerCase().equals( "pom" ) )
+        if ( "pom".equalsIgnoreCase( gav.getExtension() ) && !gav.isHash() && !gav.isSignature() )
         {
             return true;
         }
