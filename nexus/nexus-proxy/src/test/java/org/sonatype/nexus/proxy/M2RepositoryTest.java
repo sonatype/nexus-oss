@@ -12,6 +12,10 @@
  */
 package org.sonatype.nexus.proxy;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -23,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.attributes.AttributeStorage;
 import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -286,29 +291,36 @@ public class M2RepositoryTest
     }
 
     @Test
-    public void testExpiration_NEXUS1675()
+    public void testExpirationAlwaysUpdate()
         throws Exception
     {
-        doTestExpiration( "/spoof/maven-metadata.xml", 0, 3, 5, 1 );
+        doTestExpiration( "/spoof/maven-metadata.xml", 0, 3 );
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 0, 3 );
     }
 
     @Test
-    public void testExpiration_NEXUS3065()
+    public void testExpirationNeverUpdate()
         throws Exception
     {
-        // "defaults"
-        // enforce = true, hence even if 1stround age = 0 (always), enforce will prevent redownload, so 1st round will
-        // have 1 remote hits
-        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 0, 3, -1, 1 );
-
-        // "overrides"
-        // enforce = false, hence since 1stround age = 0 (always), 1st round will
-        // have 3 remote hits
-        // doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", false, 0, 3, -1, 1 );
+        doTestExpiration( "/spoof/maven-metadata.xml", -1, 1 );
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", -1, 1 );
     }
 
-    public void doTestExpiration( String path, int age1stround, int remoteHitsExpected1stround, int age2ndround,
-                                  int remoteHitsExpected2ndround )
+    @Test
+    public void testExpiration()
+        throws Exception
+    {
+        doTestExpiration( "/spoof/maven-metadata.xml", 1, 2 );
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 1, 2 );
+    }
+
+    /**
+     * For expiration-related issues and stories see:
+     * NEXUS-1675
+     * NEXUS-3065
+     * NEXUS-4099
+     */
+    public void doTestExpiration( String path, final int age, final int expectedHits )
         throws Exception
     {
         CounterListener ch = new CounterListener();
@@ -319,9 +331,7 @@ public class M2RepositoryTest
 
         File mdFile = new File( new File( getBasedir() ), "target/test-classes/repo1" + path );
 
-        assertTrue( mdFile.exists() );
-
-        // ==
+        assertThat( mdFile, exists() );
 
         try
         {
@@ -332,10 +342,8 @@ public class M2RepositoryTest
             // ignore
         }
 
-        repository.setMetadataMaxAge( age1stround );
-        repository.setArtifactMaxAge( age1stround );
-        // not configurable
-        // repository.setEnforceReleaseRedownloadPolicy( enforceReleaseRedownloadPolicy );
+        repository.setMetadataMaxAge( age );
+        repository.setArtifactMaxAge( age );
         repository.getCurrentCoreConfiguration().commitChanges();
 
         for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 3L * A_DAY ) ); i++ )
@@ -344,7 +352,7 @@ public class M2RepositoryTest
             Thread.sleep( 500 ); // wait for FS
         }
 
-        repository.retrieveItem( new ResourceStoreRequest( path, false ) );
+        final StorageItem item = repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
         for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 2L * A_DAY ) ); i++ )
         {
@@ -352,6 +360,7 @@ public class M2RepositoryTest
             Thread.sleep( 500 ); // wait for FS
         }
 
+        // this goes remote depending on age setting
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
         for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 1L * A_DAY ) ); i++ )
@@ -360,48 +369,16 @@ public class M2RepositoryTest
             Thread.sleep( 500 ); // wait for FS
         }
 
-        repository.retrieveItem( new ResourceStoreRequest( path, false ) );
-
-        assertEquals( "Remote hits cound fail (1st round)!", remoteHitsExpected1stround, ch.getRequestCount() );
-
-        // ==
-
-        ch.reset();
-
-        try
-        {
-            repository.deleteItem( new ResourceStoreRequest( "/spoof", true ) );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore
-        }
-
-        repository.setMetadataMaxAge( age2ndround );
-        repository.setArtifactMaxAge( age2ndround );
-        // not configurable
-        // repository.setEnforceReleaseRedownloadPolicy( enforceReleaseRedownloadPolicy );
-        repository.getCurrentCoreConfiguration().commitChanges();
-
-        mdFile.setLastModified( System.currentTimeMillis() );
-
-        Thread.sleep( 200 ); // wait for FS
+        // set up last checked timestamp so that nexus should go remote
+        final RepositoryItemUid uid = item.getRepositoryItemUid();
+        final AttributeStorage storage = uid.getRepository().getAttributesHandler().getAttributeStorage();
+        final Attributes attributes = item.getRepositoryItemAttributes();
+        attributes.setCheckedRemotely( System.currentTimeMillis() - ( ( Math.abs(age) + 1 ) * 60 * 1000) );
+        storage.putAttributes( uid, attributes );
 
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
-        mdFile.setLastModified( System.currentTimeMillis() );
-
-        Thread.sleep( 200 ); // wait for FS
-
-        repository.retrieveItem( new ResourceStoreRequest( path, false ) );
-
-        mdFile.setLastModified( System.currentTimeMillis() );
-
-        Thread.sleep( 200 ); // wait for FS
-
-        repository.retrieveItem( new ResourceStoreRequest( path, false ) );
-
-        assertEquals( "Remote hits cound fail (2nd round)!", remoteHitsExpected2ndround, ch.getRequestCount() );
+        assertThat( "Remote hits count fail", ch.getRequestCount(), equalTo( expectedHits ) );
     }
 
     @Test
