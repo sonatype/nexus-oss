@@ -13,8 +13,9 @@
 package org.sonatype.nexus.feeds.record;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
-import org.sonatype.nexus.feeds.record.AbstractFeedRecorderEventInspector;
 import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
@@ -23,11 +24,12 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.plexus.appevents.Event;
 
 /**
  * Event inspector that creates feeds about item changes.
- * 
+ *
  * @author Juven Xu
  * @author cstamas
  */
@@ -36,6 +38,18 @@ public class ItemChangesFeedEventInspector
     extends AbstractFeedRecorderEventInspector
     implements AsynchronousEventInspector
 {
+
+    public ItemChangesFeedEventInspector()
+    {
+    }
+
+    // for now used just for UTs
+    ItemChangesFeedEventInspector( final FeedRecorder feedRecorder,
+                                   final ApplicationStatusSource applicationStatusSource )
+    {
+        super( feedRecorder, applicationStatusSource );
+    }
+
     public boolean accepts( Event<?> evt )
     {
         // RETRIEVE event creates a lot of noise in events, so we are not processing those
@@ -51,45 +65,44 @@ public class ItemChangesFeedEventInspector
     {
         RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
 
-        if ( ievt.getItemUid().getPath().endsWith( ".pom" ) || ievt.getItemUid().getPath().endsWith( ".jar" ) )
+        // filter out links and dirs/collections and hidden files
+        if ( StorageFileItem.class.isAssignableFrom( ievt.getItem().getClass() )
+            && !ievt.getItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
         {
-            // filter out links and dirs/collections
-            if ( StorageFileItem.class.isAssignableFrom( ievt.getItem().getClass() ) )
+            StorageFileItem pomItem = (StorageFileItem) ievt.getItem();
+
+            NexusItemInfo ai = new NexusItemInfo();
+            ai.setRepositoryId( pomItem.getRepositoryId() );
+            ai.setPath( pomItem.getPath() );
+            ai.setRemoteUrl( pomItem.getRemoteUrl() );
+
+            String action;
+
+            if ( ievt instanceof RepositoryItemEventCache )
             {
-                StorageFileItem pomItem = (StorageFileItem) ievt.getItem();
-
-                NexusItemInfo ai = new NexusItemInfo();
-                ai.setRepositoryId( pomItem.getRepositoryId() );
-                ai.setPath( pomItem.getPath() );
-                ai.setRemoteUrl( pomItem.getRemoteUrl() );
-
-                String action;
-
-                if ( ievt instanceof RepositoryItemEventCache )
-                {
-                    action = NexusArtifactEvent.ACTION_CACHED;
-                }
-                else if ( ievt instanceof RepositoryItemEventStore )
-                {
-                    action = NexusArtifactEvent.ACTION_DEPLOYED;
-                }
-                else if ( ievt instanceof RepositoryItemEventDelete )
-                {
-                    action = NexusArtifactEvent.ACTION_DELETED;
-                }
-                else
-                {
-                    return;
-                }
-
-                NexusArtifactEvent nae = new NexusArtifactEvent( ievt.getEventDate(), action, "", ai );
-                // set context
-                nae.addEventContext( ievt.getItemContext() );
-                // set attributes
-                nae.addItemAttributes( ievt.getItem().getRepositoryItemAttributes().asMap() );
-
-                getFeedRecorder().addNexusArtifactEvent( nae );
+                action = NexusArtifactEvent.ACTION_CACHED;
             }
+            else if ( ievt instanceof RepositoryItemEventStore )
+            {
+                action = NexusArtifactEvent.ACTION_DEPLOYED;
+            }
+            else if ( ievt instanceof RepositoryItemEventDelete )
+            {
+                action = NexusArtifactEvent.ACTION_DELETED;
+            }
+            else
+            {
+                return;
+            }
+
+            NexusArtifactEvent nae = new NexusArtifactEvent( ievt.getEventDate(), action, "", ai );
+            // set context
+            nae.addEventContext( ievt.getItemContext() );
+            // set attributes
+            nae.addItemAttributes( ievt.getItem().getRepositoryItemAttributes().asMap() );
+
+            getFeedRecorder().addNexusArtifactEvent( nae );
         }
     }
+
 }
