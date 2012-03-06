@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
-import java.text.ParseException;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
