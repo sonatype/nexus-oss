@@ -34,6 +34,8 @@ public interface P2Constants
 
     String COMPOSITE_ARTIFACTS_JAR = "/compositeArtifacts.jar";
 
+    String P2_INDEX = "/p2.index";
+
     String[] METADATA_FILE_PATHS = new String[] { CONTENT_XML, CONTENT_JAR, ARTIFACTS_XML, ARTIFACTS_JAR,
         COMPOSITE_ARTIFACTS_XML, COMPOSITE_ARTIFACTS_JAR };
 

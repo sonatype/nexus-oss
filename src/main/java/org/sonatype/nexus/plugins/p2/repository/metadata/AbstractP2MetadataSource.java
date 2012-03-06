@@ -59,7 +59,7 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
     protected static final List<String> METADATA_PATHS = Arrays.asList( P2Constants.SITE_XML, P2Constants.CONTENT_JAR,
         P2Constants.CONTENT_XML, P2Constants.ARTIFACTS_JAR, P2Constants.ARTIFACTS_XML,
         P2Constants.COMPOSITE_CONTENT_XML, P2Constants.COMPOSITE_CONTENT_JAR, P2Constants.COMPOSITE_ARTIFACTS_XML,
-        P2Constants.COMPOSITE_ARTIFACTS_JAR );
+        P2Constants.COMPOSITE_ARTIFACTS_JAR, P2Constants.P2_INDEX );
 
     protected LocalRepositoryStorage getLocalStorage( final E repository )
     {
