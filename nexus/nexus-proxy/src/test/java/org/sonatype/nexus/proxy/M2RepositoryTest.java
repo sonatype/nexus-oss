@@ -14,6 +14,7 @@ package org.sonatype.nexus.proxy;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 import java.io.File;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
@@ -91,7 +93,7 @@ public class M2RepositoryTest
         {
             item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_SNAPSHOT, false ) );
 
-            fail( "Should not be able to get snapshot from release repo" );
+            assertThat( "Should not be able to get snapshot from release repo", false );
         }
         catch ( ItemNotFoundException e )
         {
@@ -112,7 +114,7 @@ public class M2RepositoryTest
         {
             item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_RELEASE, false ) );
 
-            fail( "Should not be able to get release from snapshot repo" );
+            assertThat( "Should not be able to get release from snapshot repo", false );
         }
         catch ( ItemNotFoundException e )
         {
@@ -143,7 +145,7 @@ public class M2RepositoryTest
 
             repository.storeItem( false, item );
 
-            fail( "Should not be able to store snapshot to release repo" );
+            assertThat( "Should not be able to store snapshot to release repo", false );
         }
         catch ( UnsupportedStorageOperationException e )
         {
@@ -171,7 +173,7 @@ public class M2RepositoryTest
 
             repository.storeItem( false, item );
 
-            fail( "Should not be able to store release to snapshot repo" );
+            assertThat( "Should not be able to store release to snapshot repo", false );
         }
         catch ( UnsupportedStorageOperationException e )
         {
@@ -206,46 +208,46 @@ public class M2RepositoryTest
         repository.getCurrentCoreConfiguration().commitChanges();
 
         request.setRequestPath( releasePom );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( releaseArtifact );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( snapshotPom );
-        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( false ) );
         request.setRequestPath( snapshotArtifact );
-        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( false ) );
         request.setRequestPath( metadata1 );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( metadataR );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( metadataS );
-        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( false ) );
         request.setRequestPath( someDirectory );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( anyNonArtifactFile );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
 
         // it is equiv of repo type: SNAPSHOT
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
         repository.getCurrentCoreConfiguration().commitChanges();
 
         request.setRequestPath( releasePom );
-        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( false ) );
         request.setRequestPath( releaseArtifact );
-        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( false ) );
         request.setRequestPath( snapshotPom );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( snapshotArtifact );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( metadata1 );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( metadataR );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( metadataS );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( someDirectory );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( anyNonArtifactFile );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
     }
 
     @Test
@@ -259,7 +261,7 @@ public class M2RepositoryTest
         versions.add( "1.0.1" );
         versions.add( "1.0.2" );
         versions.add( "1.1.2" );
-        assertEquals( "1.1.2", repository.getLatestVersion( versions ) );
+        assertThat( repository.getLatestVersion( versions ), is( "1.1.2" ) );
     }
 
     @Test
@@ -275,7 +277,7 @@ public class M2RepositoryTest
         versions.add( "1.0-alpha-21" );
         versions.add( "1.0-alpha-22" );
         versions.add( "1.0-alpha-40" );
-        assertEquals( "1.0-alpha-40", repository.getLatestVersion( versions ) );
+        assertThat( repository.getLatestVersion( versions ), is( "1.0-alpha-40" ) );
     }
 
     @Test
@@ -284,10 +286,10 @@ public class M2RepositoryTest
     {
         // M2Repository repository = (M2Repository) getResourceStore();
 
-        assertEquals( false, Gav.isSnapshot( "1.0.0" ) );
-        assertEquals( true, Gav.isSnapshot( "1.0.0-SNAPSHOT" ) );
-        assertEquals( false, Gav.isSnapshot( "1.0-alpha-25" ) );
-        assertEquals( true, Gav.isSnapshot( "1.0-alpha-25-20070518.002146-2" ) );
+        assertThat( Gav.isSnapshot( "1.0.0" ), is( false ) );
+        assertThat( Gav.isSnapshot( "1.0.0-SNAPSHOT" ), is( true ) );
+        assertThat( Gav.isSnapshot( "1.0-alpha-25" ), is( false ) );
+        assertThat( Gav.isSnapshot( "1.0-alpha-25-20070518.002146-2" ), is( true ) );
     }
 
     @Test
@@ -437,7 +439,7 @@ public class M2RepositoryTest
         Attributes shadowStorageItem =
             repository.getAttributesHandler().getAttributeStorage().getAttributes(
                 repository.createUid( request.getRequestPath() ) );
-        Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
+        assertThat( shadowStorageItem.getLastRequested(), is( resultItem.getLastRequested() ) );
     }
 
     @Test
@@ -472,7 +474,7 @@ public class M2RepositoryTest
         Attributes shadowStorageItem =
             repository.getAttributesHandler().getAttributeStorage().getAttributes(
                 repository.createUid( request.getRequestPath() ) );
-        Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
+        assertThat( shadowStorageItem.getLastRequested(), is( resultItem.getLastRequested() ) );
     }
 
     // NEXUS-4218 BEGIN
