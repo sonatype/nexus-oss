@@ -12,6 +12,11 @@
  */
 package org.sonatype.nexus.proxy;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -19,10 +24,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.attributes.AttributeStorage;
 import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -86,7 +93,7 @@ public class M2RepositoryTest
         {
             item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_SNAPSHOT, false ) );
 
-            fail( "Should not be able to get snapshot from release repo" );
+            assertThat( "Should not be able to get snapshot from release repo", false );
         }
         catch ( ItemNotFoundException e )
         {
@@ -107,7 +114,7 @@ public class M2RepositoryTest
         {
             item = getResourceStore().retrieveItem( new ResourceStoreRequest( SPOOF_RELEASE, false ) );
 
-            fail( "Should not be able to get release from snapshot repo" );
+            assertThat( "Should not be able to get release from snapshot repo", false );
         }
         catch ( ItemNotFoundException e )
         {
@@ -138,7 +145,7 @@ public class M2RepositoryTest
 
             repository.storeItem( false, item );
 
-            fail( "Should not be able to store snapshot to release repo" );
+            assertThat( "Should not be able to store snapshot to release repo", false );
         }
         catch ( UnsupportedStorageOperationException e )
         {
@@ -166,7 +173,7 @@ public class M2RepositoryTest
 
             repository.storeItem( false, item );
 
-            fail( "Should not be able to store release to snapshot repo" );
+            assertThat( "Should not be able to store release to snapshot repo", false );
         }
         catch ( UnsupportedStorageOperationException e )
         {
@@ -201,46 +208,46 @@ public class M2RepositoryTest
         repository.getCurrentCoreConfiguration().commitChanges();
 
         request.setRequestPath( releasePom );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( releaseArtifact );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( snapshotPom );
-        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( false ) );
         request.setRequestPath( snapshotArtifact );
-        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( false ) );
         request.setRequestPath( metadata1 );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( metadataR );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( metadataS );
-        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( false ) );
         request.setRequestPath( someDirectory );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( anyNonArtifactFile );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
 
         // it is equiv of repo type: SNAPSHOT
         repository.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
         repository.getCurrentCoreConfiguration().commitChanges();
 
         request.setRequestPath( releasePom );
-        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( false ) );
         request.setRequestPath( releaseArtifact );
-        assertEquals( false, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( false ) );
         request.setRequestPath( snapshotPom );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( snapshotArtifact );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( metadata1 );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( metadataR );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( metadataS );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( someDirectory );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
         request.setRequestPath( anyNonArtifactFile );
-        assertEquals( true, repository.shouldServeByPolicies( request ) );
+        assertThat( repository.shouldServeByPolicies( request ), is( true ) );
     }
 
     @Test
@@ -254,7 +261,7 @@ public class M2RepositoryTest
         versions.add( "1.0.1" );
         versions.add( "1.0.2" );
         versions.add( "1.1.2" );
-        assertEquals( "1.1.2", repository.getLatestVersion( versions ) );
+        assertThat( repository.getLatestVersion( versions ), is( "1.1.2" ) );
     }
 
     @Test
@@ -270,7 +277,7 @@ public class M2RepositoryTest
         versions.add( "1.0-alpha-21" );
         versions.add( "1.0-alpha-22" );
         versions.add( "1.0-alpha-40" );
-        assertEquals( "1.0-alpha-40", repository.getLatestVersion( versions ) );
+        assertThat( repository.getLatestVersion( versions ), is( "1.0-alpha-40" ) );
     }
 
     @Test
@@ -279,36 +286,43 @@ public class M2RepositoryTest
     {
         // M2Repository repository = (M2Repository) getResourceStore();
 
-        assertEquals( false, Gav.isSnapshot( "1.0.0" ) );
-        assertEquals( true, Gav.isSnapshot( "1.0.0-SNAPSHOT" ) );
-        assertEquals( false, Gav.isSnapshot( "1.0-alpha-25" ) );
-        assertEquals( true, Gav.isSnapshot( "1.0-alpha-25-20070518.002146-2" ) );
+        assertThat( Gav.isSnapshot( "1.0.0" ), is( false ) );
+        assertThat( Gav.isSnapshot( "1.0.0-SNAPSHOT" ), is( true ) );
+        assertThat( Gav.isSnapshot( "1.0-alpha-25" ), is( false ) );
+        assertThat( Gav.isSnapshot( "1.0-alpha-25-20070518.002146-2" ), is( true ) );
     }
 
     @Test
-    public void testExpiration_NEXUS1675()
+    public void testExpirationAlwaysUpdate()
         throws Exception
     {
-        doTestExpiration( "/spoof/maven-metadata.xml", 0, 3, 5, 1 );
+        doTestExpiration( "/spoof/maven-metadata.xml", 0, 3 );
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 0, 3 );
     }
 
     @Test
-    public void testExpiration_NEXUS3065()
+    public void testExpirationNeverUpdate()
         throws Exception
     {
-        // "defaults"
-        // enforce = true, hence even if 1stround age = 0 (always), enforce will prevent redownload, so 1st round will
-        // have 1 remote hits
-        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 0, 3, -1, 1 );
-
-        // "overrides"
-        // enforce = false, hence since 1stround age = 0 (always), 1st round will
-        // have 3 remote hits
-        // doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", false, 0, 3, -1, 1 );
+        doTestExpiration( "/spoof/maven-metadata.xml", -1, 1 );
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", -1, 1 );
     }
 
-    public void doTestExpiration( String path, int age1stround, int remoteHitsExpected1stround, int age2ndround,
-                                  int remoteHitsExpected2ndround )
+    @Test
+    public void testExpiration()
+        throws Exception
+    {
+        doTestExpiration( "/spoof/maven-metadata.xml", 1, 2 );
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 1, 2 );
+    }
+
+    /**
+     * For expiration-related issues and stories see:
+     * NEXUS-1675
+     * NEXUS-3065
+     * NEXUS-4099
+     */
+    public void doTestExpiration( String path, final int age, final int expectedHits )
         throws Exception
     {
         CounterListener ch = new CounterListener();
@@ -319,9 +333,7 @@ public class M2RepositoryTest
 
         File mdFile = new File( new File( getBasedir() ), "target/test-classes/repo1" + path );
 
-        assertTrue( mdFile.exists() );
-
-        // ==
+        assertThat( mdFile, exists() );
 
         try
         {
@@ -332,10 +344,8 @@ public class M2RepositoryTest
             // ignore
         }
 
-        repository.setMetadataMaxAge( age1stround );
-        repository.setArtifactMaxAge( age1stround );
-        // not configurable
-        // repository.setEnforceReleaseRedownloadPolicy( enforceReleaseRedownloadPolicy );
+        repository.setMetadataMaxAge( age );
+        repository.setArtifactMaxAge( age );
         repository.getCurrentCoreConfiguration().commitChanges();
 
         for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 3L * A_DAY ) ); i++ )
@@ -344,7 +354,7 @@ public class M2RepositoryTest
             Thread.sleep( 500 ); // wait for FS
         }
 
-        repository.retrieveItem( new ResourceStoreRequest( path, false ) );
+        final StorageItem item = repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
         for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 2L * A_DAY ) ); i++ )
         {
@@ -352,6 +362,7 @@ public class M2RepositoryTest
             Thread.sleep( 500 ); // wait for FS
         }
 
+        // this goes remote depending on age setting
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
         for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 1L * A_DAY ) ); i++ )
@@ -360,48 +371,16 @@ public class M2RepositoryTest
             Thread.sleep( 500 ); // wait for FS
         }
 
-        repository.retrieveItem( new ResourceStoreRequest( path, false ) );
-
-        assertEquals( "Remote hits cound fail (1st round)!", remoteHitsExpected1stround, ch.getRequestCount() );
-
-        // ==
-
-        ch.reset();
-
-        try
-        {
-            repository.deleteItem( new ResourceStoreRequest( "/spoof", true ) );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore
-        }
-
-        repository.setMetadataMaxAge( age2ndround );
-        repository.setArtifactMaxAge( age2ndround );
-        // not configurable
-        // repository.setEnforceReleaseRedownloadPolicy( enforceReleaseRedownloadPolicy );
-        repository.getCurrentCoreConfiguration().commitChanges();
-
-        mdFile.setLastModified( System.currentTimeMillis() );
-
-        Thread.sleep( 200 ); // wait for FS
+        // set up last checked timestamp so that nexus should go remote
+        final RepositoryItemUid uid = item.getRepositoryItemUid();
+        final AttributeStorage storage = uid.getRepository().getAttributesHandler().getAttributeStorage();
+        final Attributes attributes = item.getRepositoryItemAttributes();
+        attributes.setCheckedRemotely( System.currentTimeMillis() - ( ( Math.abs(age) + 1 ) * 60 * 1000) );
+        storage.putAttributes( uid, attributes );
 
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
-        mdFile.setLastModified( System.currentTimeMillis() );
-
-        Thread.sleep( 200 ); // wait for FS
-
-        repository.retrieveItem( new ResourceStoreRequest( path, false ) );
-
-        mdFile.setLastModified( System.currentTimeMillis() );
-
-        Thread.sleep( 200 ); // wait for FS
-
-        repository.retrieveItem( new ResourceStoreRequest( path, false ) );
-
-        assertEquals( "Remote hits cound fail (2nd round)!", remoteHitsExpected2ndround, ch.getRequestCount() );
+        assertThat( "Remote hits count fail", ch.getRequestCount(), equalTo( expectedHits ) );
     }
 
     @Test
@@ -460,7 +439,7 @@ public class M2RepositoryTest
         Attributes shadowStorageItem =
             repository.getAttributesHandler().getAttributeStorage().getAttributes(
                 repository.createUid( request.getRequestPath() ) );
-        Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
+        assertThat( shadowStorageItem.getLastRequested(), is( resultItem.getLastRequested() ) );
     }
 
     @Test
@@ -495,7 +474,7 @@ public class M2RepositoryTest
         Attributes shadowStorageItem =
             repository.getAttributesHandler().getAttributeStorage().getAttributes(
                 repository.createUid( request.getRequestPath() ) );
-        Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
+        assertThat( shadowStorageItem.getLastRequested(), is( resultItem.getLastRequested() ) );
     }
 
     // NEXUS-4218 BEGIN
