@@ -156,7 +156,7 @@ public class DefaultTaskConfigManagerTest
         cst.setType( TestNexusTask.class.getName() );
         cst.setNextRun( new SimpleDateFormat( "yyyy-MM-DD hh:mm:ss" ).parse( "2099-01-01 20:00:00" ).getTime() );
 
-        System.out.println( new Date( cst.getNextRun() ) );
+        // System.out.println( new Date( cst.getNextRun() ) );
 
         final CScheduleConfig csc = new CScheduleConfig();
         csc.setType( SCHEDULE_TYPE_ADVANCED );
