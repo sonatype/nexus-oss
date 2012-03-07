@@ -116,20 +116,38 @@ public class CloseStageRepositoryMojo
             }
             catch ( RESTLightClientException e )
             {
-                if ( e.getErrorDocument() != null )
+                Document document = e.getErrorDocument();
+                if ( document != null )
                 {
-                    Document document = e.getErrorDocument();
-
                     final String name = document.getRootElement().getName();
                     if ( "stagingRuleFailures".equals( name ) )
                     {
                         getLog().error( ruleFailureMessage( document ) );
-                        throw new MojoExecutionException(
-                            "Failed to close open staging repository, see error message above." );
                     }
                 }
                 
-                throw new MojoExecutionException( "Failed to close open staging repository: " + e.getMessage(), e );
+                if ( removeOnFailure )
+                {
+                    try
+                    {
+                        getLog().warn( "Removing the repository as requested because there were failures... (" + repo.getRepositoryId() + ")" );
+                        client.dropRepository( repo, getDescription() );
+                        getLog().debug( "Removed " + repo.getRepositoryId() );
+                    }
+                    catch ( RESTLightClientException e1 )
+                    {
+                        getLog().error( "Could not remove " + repo.getRepositoryId() + "(" + repo.getUrl() + ")" );
+                    }
+                }
+
+                if ( document != null )
+                {
+                    throw new MojoExecutionException( "Failed to close open staging repository, see above error message." );
+                }
+                else
+                {
+                    throw new MojoExecutionException( "Failed to close open staging repository: " + e.getMessage(), e );
+                }
             }
         }
         else
@@ -144,7 +162,14 @@ public class CloseStageRepositoryMojo
     {
         final StringBuilder msg = new StringBuilder( "There were failed staging rules when closing the repository.\n" );
 
-        final List<Element> failures = document.getRootElement().getChild( "failures" ).getChildren( "entry" );
+        final Element failuresNode = document.getRootElement().getChild( "failures" );
+        if ( failuresNode == null )
+        {
+            return "Empty rule failures";
+        }
+
+        final List<Element> failures = failuresNode.getChildren( "entry" );
+
         for ( Element entry : failures )
         {
             msg.append(" * ").append( ( (Element) entry.getChildren().get( 0 ) ).getText() ).append( "\n" );
@@ -204,6 +229,17 @@ public class CloseStageRepositoryMojo
     {
         this.description = description;
     }
+
+    public boolean isRemoveOnFailure()
+    {
+        return removeOnFailure;
+    }
+
+    public void setRemoveOnFailure( final boolean removeOnFailure )
+    {
+        this.removeOnFailure = removeOnFailure;
+    }
+
 
     private String promptForMissingDescription()
         throws MojoExecutionException
