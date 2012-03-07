@@ -79,6 +79,8 @@ public class LogbackLogManager
 
     private static final String LOG_CONF_PROPS = "logback.properties";
 
+    private static final String LOG_CONF_PROPS_RESOURCE = "/META-INF/log/" + LOG_CONF_PROPS;
+
     @Requirement
     private Logger logger;
 
@@ -154,11 +156,34 @@ public class LogbackLogManager
         Properties logProperties = loadConfigurationProperties();
 
         logProperties.setProperty( KEY_ROOT_LEVEL, configuration.getRootLoggerLevel() );
-        logProperties.setProperty( KEY_APPENDER_PATTERN, configuration.getFileAppenderPattern() );
+        String pattern = configuration.getFileAppenderPattern();
+
+        if ( pattern == null )
+        {
+            pattern = getDefaultProperties().getProperty( KEY_APPENDER_PATTERN );
+        }
+
+        logProperties.setProperty( KEY_APPENDER_PATTERN, pattern );
 
         saveConfigurationProperties( logProperties );
         // TODO this will do a reconfiguration but would be just enough to "touch" logback.xml"
         reconfigure();
+    }
+
+    private Properties getDefaultProperties()
+        throws IOException
+    {
+        Properties properties = new Properties();
+        final InputStream stream = this.getClass().getResourceAsStream( LOG_CONF_PROPS_RESOURCE );
+        try
+        {
+            properties.load( stream );
+        }
+        finally
+        {
+            stream.close();
+        }
+        return properties;
     }
 
     public Collection<NexusStreamResponse> getApplicationLogFiles()
@@ -307,7 +332,7 @@ public class LogbackLogManager
         {
             try
             {
-                URL configUrl = this.getClass().getResource( "/META-INF/log/" + LOG_CONF_PROPS );
+                URL configUrl = this.getClass().getResource( LOG_CONF_PROPS_RESOURCE );
 
                 FileUtils.copyURLToFile( configUrl, logConfigPropsFile );
             }
