@@ -73,6 +73,13 @@ public class CloseStageRepositoryMojo
     @Deprecated
     private boolean auto;
 
+    /**
+     * If true, the mojo will try to remove the staging repository it was not able to close.
+     *
+     * @parameter expression="${nexus.removeOnFailure}" default-value="false"
+     */
+    private boolean removeOnFailure;
+
     protected void doExecute()
         throws MojoExecutionException
     {
