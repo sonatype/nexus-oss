@@ -15,10 +15,7 @@ package org.sonatype.nexus.rest.feeds.sources;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
-import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * Build feeds entry based on maven artifacts( poms and claasifiers)
@@ -52,33 +49,6 @@ public class NexusArtifactEventEntryBuilder
         msg.append( "'" );
 
         return msg.toString();
-    }
-
-    private Gav buildGAV( NexusArtifactEvent event )
-    {
-        if ( event.getNexusItemInfo() == null )
-        {
-            return null;
-        }
-        try
-        {
-            Repository repo = getRepositoryRegistry().getRepository( event.getNexusItemInfo().getRepositoryId() );
-
-            if ( MavenRepository.class.isAssignableFrom( repo.getClass() ) )
-            {
-                return ( (MavenRepository) repo ).getGavCalculator().pathToGav( event.getNexusItemInfo().getPath() );
-            }
-
-            return null;
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            getLogger().debug(
-                "Feed entry contained invalid repository id " + event.getNexusItemInfo().getRepositoryId(),
-                e );
-
-            return null;
-        }
     }
 
     private String getGAVString( NexusArtifactEvent event )
@@ -126,7 +96,12 @@ public class NexusArtifactEventEntryBuilder
             return false;
         }
 
-        if ( "pom".equalsIgnoreCase( gav.getExtension() ) && !gav.isHash() && !gav.isSignature() )
+        if ( gav.isHash() || gav.isSignature() )
+        {
+            return false;
+        }
+
+        if ( "pom".equalsIgnoreCase( gav.getExtension() ) )
         {
             return true;
         }
