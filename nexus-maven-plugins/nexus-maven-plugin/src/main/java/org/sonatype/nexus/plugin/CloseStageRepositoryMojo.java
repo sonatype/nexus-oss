@@ -165,38 +165,6 @@ public class CloseStageRepositoryMojo
         listRepos( groupId, artifactId, version, "The following CLOSED staging repositories were found" );
     }
 
-    private String ruleFailureMessage( final Document document )
-    {
-        final StringBuilder msg = new StringBuilder( "There were failed staging rules when closing the repository.\n" );
-
-        final Element failuresNode = document.getRootElement().getChild( "failures" );
-        if ( failuresNode == null )
-        {
-            return "Empty rule failures";
-        }
-
-        final List<Element> failures = failuresNode.getChildren( "entry" );
-
-        for ( Element entry : failures )
-        {
-            msg.append(" * ").append( ( (Element) entry.getChildren().get( 0 ) ).getText() ).append( "\n" );
-            final Element messageList = (Element) entry.getChildren().get( 1 );
-            List<Element> messages = (List<Element>) messageList.getChildren();
-            for ( Element message : messages )
-            {
-                msg.append( "      " ).append( message.getText() ).append( "\n" );
-            }
-        }
-
-        final String htmlString = msg.toString();
-
-        // staging rules return HTML markup in their results. Get rid of it.
-        // Usually this should not be done with a regular expression (b/c HTML is not a regular language)
-        // but this is (to date...) just stuff like '<b>$item</b>', so all will be well.
-        // FIXME we should change staging rules etc. server-side to return all the necessary information to build messages.
-        return StringEscapeUtils.unescapeHtml( htmlString.replaceAll( "<[^>]*>", "" ) );
-    }
-
     public String getGroupId()
     {
         return groupId;
