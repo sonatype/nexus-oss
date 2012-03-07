@@ -41,6 +41,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.codehaus.plexus.util.IOUtil;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Text;
 import org.jdom.input.SAXBuilder;
@@ -532,7 +533,8 @@ public abstract class AbstractRESTLightClient
 
     protected RESTLightClientException validationError( HttpMethod method )
     {
-        String errorBody = null;
+        String errorBody;
+        Document errorDocument = null;
         try
         {
             errorBody = method.getResponseBodyAsString();
@@ -542,8 +544,17 @@ public abstract class AbstractRESTLightClient
             errorBody = "Could not retrieve error body, message lost";
         }
 
-        return new RESTLightClientException( method.getName() + " request failed; HTTP status: " + method.getStatusCode() + ", " + method.getStatusText() + "\nHTTP body: " + errorBody );
+        try {
+            errorDocument = new SAXBuilder(false).build( new StringReader( errorBody ) );
+        }
+        catch ( Exception e )
+        {
+            // leave error document empty
+        }
+
+        return new RESTLightClientException( method.getName() + " request failed; HTTP status: " + method.getStatusCode() + ", " + method.getStatusText() + "\nHTTP body: " + errorBody, null, errorDocument );
     }
+
 
     private String formatUrl( final String baseUrl, final String path )
     {
@@ -644,7 +655,6 @@ public abstract class AbstractRESTLightClient
         }
 
         int status = method.getStatusCode();
-        String statusText = method.getStatusText();
 
         if ( status < 200 || status > 299 )
         {

@@ -14,8 +14,11 @@ package org.sonatype.nexus.plugin;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageRepository;
@@ -109,9 +112,23 @@ public class CloseStageRepositoryMojo
             try
             {
                 client.finishRepository( repo, getDescription() );
+
             }
             catch ( RESTLightClientException e )
             {
+                if ( e.getErrorDocument() != null )
+                {
+                    Document document = e.getErrorDocument();
+
+                    final String name = document.getRootElement().getName();
+                    if ( "stagingRuleFailures".equals( name ) )
+                    {
+                        getLog().error( ruleFailureMessage( document ) );
+                        throw new MojoExecutionException(
+                            "Failed to close open staging repository, see error message above." );
+                    }
+                }
+                
                 throw new MojoExecutionException( "Failed to close open staging repository: " + e.getMessage(), e );
             }
         }
@@ -121,6 +138,31 @@ public class CloseStageRepositoryMojo
         }
 
         listRepos( groupId, artifactId, version, "The following CLOSED staging repositories were found" );
+    }
+
+    private String ruleFailureMessage( final Document document )
+    {
+        final StringBuilder msg = new StringBuilder( "There were failed staging rules when closing the repository.\n" );
+
+        final List<Element> failures = document.getRootElement().getChild( "failures" ).getChildren( "entry" );
+        for ( Element entry : failures )
+        {
+            msg.append(" * ").append( ( (Element) entry.getChildren().get( 0 ) ).getText() ).append( "\n" );
+            final Element messageList = (Element) entry.getChildren().get( 1 );
+            List<Element> messages = (List<Element>) messageList.getChildren();
+            for ( Element message : messages )
+            {
+                msg.append( "      " ).append( message.getText() ).append( "\n" );
+            }
+        }
+
+        final String htmlString = msg.toString();
+
+        // staging rules return HTML markup in their results. Get rid of it.
+        // Usually this should not be done with a regular expression (b/c HTML is not a regular language)
+        // but this is (to date...) just stuff like '<b>$item</b>', so all will be well.
+        // FIXME we should change staging rules etc. server-side to return all the necessary information to build messages.
+        return StringEscapeUtils.unescapeHtml( htmlString.replaceAll( "<[^>]*>", "" ) );
     }
 
     public String getGroupId()
