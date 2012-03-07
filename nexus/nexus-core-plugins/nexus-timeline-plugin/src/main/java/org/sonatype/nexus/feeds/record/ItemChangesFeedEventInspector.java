@@ -67,7 +67,8 @@ public class ItemChangesFeedEventInspector
 
         // filter out links and dirs/collections and hidden files
         if ( StorageFileItem.class.isAssignableFrom( ievt.getItem().getClass() )
-            && !ievt.getItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
+            && !ievt.getItemUid().getBooleanAttributeValue( IsHiddenAttribute.class )
+            && !( (StorageFileItem) ievt.getItem() ).isContentGenerated() )
         {
             StorageFileItem pomItem = (StorageFileItem) ievt.getItem();
 
