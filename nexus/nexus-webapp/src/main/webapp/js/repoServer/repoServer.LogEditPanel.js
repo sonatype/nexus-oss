@@ -81,7 +81,6 @@ Sonatype.repoServer.LogEditPanel = function(config) {
                     allowBlank : true,
                     helpText : ht.fileAppenderPattern,
                     name : 'fileAppenderPattern',
-                    emptyText : "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n",
                     anchor : Sonatype.view.FIELD_OFFSET
                   }, {
                     xtype : 'textfield',
@@ -154,6 +153,7 @@ Ext.extend(Sonatype.repoServer.LogEditPanel, Ext.Panel, {
         if (allValid)
         {
           this.save();
+          this.formPanel.loadLogConfig();
         }
       },
 
