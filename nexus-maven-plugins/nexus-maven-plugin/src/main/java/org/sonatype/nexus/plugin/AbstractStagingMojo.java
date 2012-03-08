@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugin;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,6 +23,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.sonatype.nexus.restlight.common.ProxyConfig;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
@@ -251,6 +255,20 @@ public abstract class AbstractStagingMojo
 
     protected String ruleFailureMessage( final Document document )
     {
+        if ( getLog().isDebugEnabled() )
+        {
+            try
+            {
+                final StringWriter writer = new StringWriter();
+                new XMLOutputter( Format.getPrettyFormat() ).output( document, writer );
+                getLog().debug( writer.toString() );
+            }
+            catch ( IOException e )
+            {
+                // ignore
+            }
+        }
+
         final StringBuilder msg = new StringBuilder( "There were failed staging rules when closing the repository.\n" );
 
         final Element failuresNode = document.getRootElement().getChild( "failures" );
@@ -259,12 +277,12 @@ public abstract class AbstractStagingMojo
             return "Empty rule failures";
         }
 
-        final List<Element> failures = failuresNode.getChildren( "entry" );
+        final List<Element> failures = failuresNode.getChildren( "failure" );
 
         for ( Element entry : failures )
         {
-            msg.append(" * ").append( ( (Element) entry.getChildren().get( 0 ) ).getText() ).append( "\n" );
-            final Element messageList = (Element) entry.getChildren().get( 1 );
+            msg.append(" * ").append( entry.getChild( "ruleName" ).getText() ).append( "\n" );
+            final Element messageList = entry.getChild("messages");
             List<Element> messages = (List<Element>) messageList.getChildren();
             for ( Element message : messages )
             {
