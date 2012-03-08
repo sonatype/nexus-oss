@@ -12,7 +12,6 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
-import java.text.ParseException;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -105,18 +104,10 @@ public class SetSnapshotOperation
                 }
                 else
                 {
-                    try
+                    if ( new VersionComparator().compare( current.getVersion(), extra.getVersion() ) < 0 )
                     {
-                        if ( TimeUtil.compare( current.getUpdated(), extra.getUpdated() ) < 0 )
-                        {
-                            currents.remove( current );
-                            currents.add( extra );
-                        }
-                    }
-                    catch ( ParseException e )
-                    {
-                        throw new MetadataException( "Invalid timetamp: " + current.getUpdated() + "-"
-                            + extra.getUpdated(), e );
+                        currents.remove( current );
+                        currents.add( extra );
                     }
                 }
             }
