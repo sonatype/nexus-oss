@@ -1,13 +1,14 @@
 package de.is24.nexus.task.shell;
 
 import static de.is24.nexus.task.shell.ShellExecutionTaskDescriptor.COMMAND_FIELD_ID;
-import static de.is24.nexus.yum.execution.ExecutionUtil.execCommand;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.scheduling.SchedulerTask;
 
+import de.is24.nexus.yum.execution.CommandLineExecutor;
 
 @Component(role = SchedulerTask.class, hint = ShellExecutionTaskDescriptor.ID, instantiationStrategy = "per-lookup")
 public class ShellExecutionTask extends AbstractNexusTask<Object> {
@@ -16,7 +17,7 @@ public class ShellExecutionTask extends AbstractNexusTask<Object> {
   @Override
   protected Object doRun() throws Exception {
     if (isValidCommand()) {
-      final int exitCode = execCommand(getCommand());
+      final int exitCode = new CommandLineExecutor().exec(getCommand());
       if (exitCode != 0) {
         throw new RuntimeException(format("Execution of command '%s' faild with exit code %d.", getCommand(),
             exitCode));

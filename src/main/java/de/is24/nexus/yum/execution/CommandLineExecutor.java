@@ -1,6 +1,7 @@
 package de.is24.nexus.yum.execution;
 
 import java.io.IOException;
+
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
@@ -8,10 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public final class ExecutionUtil {
-  private static final Logger LOG = LoggerFactory.getLogger(ExecutionUtil.class);
+public final class CommandLineExecutor {
+  private static final Logger LOG = LoggerFactory.getLogger(CommandLineExecutor.class);
 
-  public static int execCommand(String command) throws IOException {
+  public int exec(String command) throws IOException {
     LOG.info("Execute command : {}", command);
 
     CommandLine cmdLine = CommandLine.parse(command);

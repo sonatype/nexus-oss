@@ -1,6 +1,5 @@
 package de.is24.nexus.yum.repository;
 
-import static de.is24.nexus.yum.execution.ExecutionUtil.execCommand;
 import static de.is24.nexus.yum.repository.YumRepository.REPOMD_XML;
 import static de.is24.nexus.yum.repository.YumRepository.YUM_REPOSITORY_DIR_NAME;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
@@ -25,6 +24,7 @@ import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 
+import de.is24.nexus.yum.execution.CommandLineExecutor;
 import de.is24.nexus.yum.plugin.event.YumRepositoryGenerateEvent;
 
 /**
@@ -57,7 +57,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
         config.getBaseRepoDir().mkdirs();
 
         File rpmListFile = createRpmListFile();
-        execCommand(buildCreateRepositoryCommand(rpmListFile));
+        new CommandLineExecutor().exec(buildCreateRepositoryCommand(rpmListFile));
 
         replaceUrl();
       } catch (IOException e) {

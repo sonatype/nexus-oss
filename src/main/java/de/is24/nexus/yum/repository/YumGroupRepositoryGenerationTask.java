@@ -1,6 +1,5 @@
 package de.is24.nexus.yum.repository;
 
-import static de.is24.nexus.yum.execution.ExecutionUtil.execCommand;
 import static de.is24.nexus.yum.repository.RepositoryUtils.getBaseDir;
 import static de.is24.nexus.yum.repository.YumMetadataGenerationTask.isActive;
 import static java.lang.String.format;
@@ -26,6 +25,8 @@ import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 
+import de.is24.nexus.yum.execution.CommandLineExecutor;
+
 @Component(role = SchedulerTask.class, hint = YumGroupRepositoryGenerationTask.ID, instantiationStrategy = "per-lookup")
 public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepository> {
 
@@ -47,7 +48,7 @@ public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepos
       final List<File> memberRepoBaseDirs = validYumRepositoryBaseDirs();
       if (memberRepoBaseDirs.size() > 1) {
         LOG.info("Merging repository group {}='{}' ...", groupRepository.getId(), groupRepository.getName());
-        execCommand(buildCommand(repoBaseDir, memberRepoBaseDirs));
+        new CommandLineExecutor().exec(buildCommand(repoBaseDir, memberRepoBaseDirs));
         LOG.info("Group repository {}='{}' merged.", groupRepository.getId(), groupRepository.getName());
       } else {
         final File groupRepoData = new File(repoBaseDir, "repodata");
