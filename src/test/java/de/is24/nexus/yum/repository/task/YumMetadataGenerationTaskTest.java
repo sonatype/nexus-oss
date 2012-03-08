@@ -1,6 +1,6 @@
-package de.is24.nexus.yum.repository;
+package de.is24.nexus.yum.repository.task;
 
-import static de.is24.nexus.yum.repository.YumMetadataGenerationTask.ID;
+import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.ID;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.sonatype.scheduling.TaskState.RUNNING;
@@ -19,6 +19,11 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
+
+import de.is24.nexus.yum.repository.YumRepository;
+import de.is24.nexus.yum.repository.config.DefaultYumGeneratorConfiguration;
+import de.is24.nexus.yum.repository.config.YumGeneratorConfiguration;
+import de.is24.nexus.yum.repository.task.YumMetadataGenerationTask;
 
 @SuppressWarnings("unchecked")
 public class YumMetadataGenerationTaskTest {

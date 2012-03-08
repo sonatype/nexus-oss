@@ -1,6 +1,8 @@
-package de.is24.nexus.yum.repository;
+package de.is24.nexus.yum.repository.task;
 
 import org.sonatype.scheduling.ScheduledTask;
+
+import de.is24.nexus.yum.repository.YumRepository;
 
 public class SameYumTaskAlreadSubmittedException extends RuntimeException {
 

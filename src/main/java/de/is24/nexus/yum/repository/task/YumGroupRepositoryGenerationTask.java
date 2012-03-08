@@ -1,7 +1,7 @@
-package de.is24.nexus.yum.repository;
+package de.is24.nexus.yum.repository.task;
 
 import static de.is24.nexus.yum.repository.RepositoryUtils.getBaseDir;
-import static de.is24.nexus.yum.repository.YumMetadataGenerationTask.isActive;
+import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.isActive;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.sonatype.scheduling.TaskState.RUNNING;
@@ -26,6 +26,7 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 
 import de.is24.nexus.yum.execution.CommandLineExecutor;
+import de.is24.nexus.yum.repository.YumRepository;
 
 @Component(role = SchedulerTask.class, hint = YumGroupRepositoryGenerationTask.ID, instantiationStrategy = "per-lookup")
 public class YumGroupRepositoryGenerationTask extends AbstractNexusTask<YumRepository> {

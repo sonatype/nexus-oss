@@ -11,6 +11,8 @@ import java.io.IOException;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
+import de.is24.nexus.yum.repository.config.YumGeneratorConfiguration;
+
 
 public class RpmListWriterTest {
   private static final String FILE_CONTENT = "another-artifact/0.0.1/another-artifact-0.0.1-1.noarch.rpm\n" +

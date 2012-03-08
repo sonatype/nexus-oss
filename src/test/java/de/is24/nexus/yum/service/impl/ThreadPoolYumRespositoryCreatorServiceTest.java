@@ -1,6 +1,6 @@
 package de.is24.nexus.yum.service.impl;
 
-import static de.is24.nexus.yum.repository.YumMetadataGenerationTask.ID;
+import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.ID;
 import static de.is24.test.reflection.ReflectionTestUtils.findMethod;
 import static de.is24.test.reflection.ReflectionTestUtils.setField;
 import static org.easymock.EasyMock.createNiceMock;
@@ -31,9 +31,9 @@ import org.sonatype.scheduling.ScheduledTask;
 import com.google.code.tempusfugit.temporal.Condition;
 
 import de.is24.nexus.yum.repository.AbstractSchedulerTest;
-import de.is24.nexus.yum.repository.YumGeneratorConfiguration;
-import de.is24.nexus.yum.repository.YumMetadataGenerationTask;
 import de.is24.nexus.yum.repository.YumRepository;
+import de.is24.nexus.yum.repository.config.YumGeneratorConfiguration;
+import de.is24.nexus.yum.repository.task.YumMetadataGenerationTask;
 
 
 public class ThreadPoolYumRespositoryCreatorServiceTest extends AbstractSchedulerTest {

@@ -1,4 +1,4 @@
-package de.is24.nexus.yum.repository;
+package de.is24.nexus.yum.repository.task;
 
 import static de.is24.nexus.yum.repository.YumRepository.REPOMD_XML;
 import static de.is24.nexus.yum.repository.YumRepository.YUM_REPOSITORY_DIR_NAME;
@@ -26,6 +26,10 @@ import org.sonatype.scheduling.SchedulerTask;
 
 import de.is24.nexus.yum.execution.CommandLineExecutor;
 import de.is24.nexus.yum.plugin.event.YumRepositoryGenerateEvent;
+import de.is24.nexus.yum.repository.ListFileFactory;
+import de.is24.nexus.yum.repository.RpmListWriter;
+import de.is24.nexus.yum.repository.YumRepository;
+import de.is24.nexus.yum.repository.config.YumGeneratorConfiguration;
 
 /**
  * Create a yum-repository directory via 'createrepo' command line tool.

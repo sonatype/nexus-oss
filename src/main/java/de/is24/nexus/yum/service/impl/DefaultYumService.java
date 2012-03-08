@@ -1,8 +1,8 @@
 package de.is24.nexus.yum.service.impl;
 
 import static de.is24.nexus.yum.repository.RepositoryUtils.getBaseDir;
-import static de.is24.nexus.yum.repository.YumGeneratorConfigurationBuilder.newConfigBuilder;
-import static de.is24.nexus.yum.repository.YumMetadataGenerationTask.ID;
+import static de.is24.nexus.yum.repository.config.YumGeneratorConfigurationBuilder.newConfigBuilder;
+import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.ID;
 
 import java.io.File;
 import java.net.URL;
@@ -18,10 +18,10 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
-import de.is24.nexus.yum.repository.YumGeneratorConfigurationBuilder;
-import de.is24.nexus.yum.repository.YumGroupRepositoryGenerationTask;
-import de.is24.nexus.yum.repository.YumMetadataGenerationTask;
 import de.is24.nexus.yum.repository.YumRepository;
+import de.is24.nexus.yum.repository.config.YumGeneratorConfigurationBuilder;
+import de.is24.nexus.yum.repository.task.YumGroupRepositoryGenerationTask;
+import de.is24.nexus.yum.repository.task.YumMetadataGenerationTask;
 import de.is24.nexus.yum.service.YumService;
 
 

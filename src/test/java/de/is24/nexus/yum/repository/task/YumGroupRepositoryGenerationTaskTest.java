@@ -1,6 +1,6 @@
-package de.is24.nexus.yum.repository;
+package de.is24.nexus.yum.repository.task;
 
-import static de.is24.nexus.yum.repository.YumGroupRepositoryGenerationTask.ID;
+import static de.is24.nexus.yum.repository.task.YumGroupRepositoryGenerationTask.ID;
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.assertRepository;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
@@ -25,6 +25,8 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.scheduling.ScheduledTask;
+
+import de.is24.nexus.yum.repository.task.YumGroupRepositoryGenerationTask;
 
 public class YumGroupRepositoryGenerationTaskTest {
 

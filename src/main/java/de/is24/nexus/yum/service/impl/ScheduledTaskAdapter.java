@@ -13,8 +13,8 @@ import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.TaskState;
 import org.sonatype.scheduling.iterators.SchedulerIterator;
 import org.sonatype.scheduling.schedules.Schedule;
-import de.is24.nexus.yum.repository.YumMetadataGenerationTask;
 import de.is24.nexus.yum.repository.YumRepository;
+import de.is24.nexus.yum.repository.task.YumMetadataGenerationTask;
 
 
 public class ScheduledTaskAdapter implements ScheduledTask<YumRepository> {

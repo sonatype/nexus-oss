@@ -1,6 +1,8 @@
-package de.is24.nexus.yum.repository;
+package de.is24.nexus.yum.repository.config;
 
 import java.io.File;
+
+import de.is24.nexus.yum.repository.task.YumMetadataGenerationTask;
 
 
 /**

@@ -1,6 +1,6 @@
 package de.is24.nexus.yum.repository;
 
-import static de.is24.nexus.yum.repository.YumMetadataGenerationTask.isActive;
+import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.isActive;
 import static java.io.File.separator;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.listFiles;
@@ -24,6 +24,8 @@ import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import de.is24.nexus.yum.repository.config.YumGeneratorConfiguration;
 
 
 public class RpmListWriter {

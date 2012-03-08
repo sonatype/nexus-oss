@@ -1,9 +1,11 @@
-package de.is24.nexus.yum.repository;
+package de.is24.nexus.yum.repository.config;
 
-import static de.is24.nexus.yum.repository.YumGeneratorConfigurationBuilder.newConfigBuilder;
+import static de.is24.nexus.yum.repository.config.YumGeneratorConfigurationBuilder.newConfigBuilder;
 import static junit.framework.Assert.assertEquals;
 import java.io.File;
 import org.junit.Test;
+
+import de.is24.nexus.yum.repository.config.YumGeneratorConfiguration;
 
 
 public class YumGeneratorConfigurationBuilderTest {

@@ -1,4 +1,4 @@
-package de.is24.nexus.yum.repository;
+package de.is24.nexus.yum.repository.task;
 
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.BASE_CACHE_DIR;
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.PACKAGE_CACHE_DIR;
@@ -13,6 +13,10 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import de.is24.nexus.yum.repository.AbstractSchedulerTest;
+import de.is24.nexus.yum.repository.config.DefaultYumGeneratorConfiguration;
+import de.is24.nexus.yum.repository.task.YumMetadataGenerationTask;
 
 
 public class YumRepositoryGeneratorJobTest extends AbstractSchedulerTest {

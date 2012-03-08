@@ -1,6 +1,6 @@
 package de.is24.nexus.yum.plugin.impl;
 
-import static de.is24.nexus.yum.repository.YumMetadataGenerationTask.ID;
+import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.ID;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;

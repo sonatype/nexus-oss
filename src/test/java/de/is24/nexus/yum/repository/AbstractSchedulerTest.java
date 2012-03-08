@@ -5,6 +5,8 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import de.is24.nexus.yum.AbstractYumNexusTestCase;
+import de.is24.nexus.yum.repository.config.DefaultYumGeneratorConfiguration;
+import de.is24.nexus.yum.repository.task.YumMetadataGenerationTask;
 
 
 public abstract class AbstractSchedulerTest extends AbstractYumNexusTestCase {
