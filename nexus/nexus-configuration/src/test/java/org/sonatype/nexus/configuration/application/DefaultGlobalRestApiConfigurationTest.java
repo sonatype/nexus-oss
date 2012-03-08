@@ -15,7 +15,6 @@ package org.sonatype.nexus.configuration.application;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 
 public class DefaultGlobalRestApiConfigurationTest
@@ -24,9 +23,9 @@ public class DefaultGlobalRestApiConfigurationTest
 
     @Test
     public void testNoConfiguration()
-        throws ConfigurationException
+        throws Exception
     {
-        DefaultGlobalRestApiSettings settings = new DefaultGlobalRestApiSettings();
+        final GlobalRestApiSettings settings = lookup( GlobalRestApiSettings.class );
         SimpleApplicationConfiguration cfg = new SimpleApplicationConfiguration();
         cfg.getConfigurationModel().setRestApi( null );
         settings.configure( cfg );

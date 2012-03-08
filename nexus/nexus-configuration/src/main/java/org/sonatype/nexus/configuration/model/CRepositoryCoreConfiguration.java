@@ -134,6 +134,8 @@ public class CRepositoryCoreConfiguration
         }
 
         // ID uniqueness
+        /* This is totally flawed, but this is NOT THE ONLY ONE of the places we did uniqueness check!
+         * But this one in certainly not the place to do this.
         List<CRepository> repositories = getApplicationConfiguration().getConfigurationModel().getRepositories();
 
         for ( CRepository other : repositories )
@@ -148,6 +150,7 @@ public class CRepositoryCoreConfiguration
                 }
             }
         }
+        */
 
         // Name
         if ( StringUtils.isBlank( cfg.getName() ) )

@@ -49,7 +49,6 @@ public class DefaultMetadataUpdater
     extends AbstractLoggingComponent
     implements MetadataUpdater
 {
-
     private final MetadataLocator locator;
 
     @Inject
