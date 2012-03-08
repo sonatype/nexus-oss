@@ -1,4 +1,4 @@
-package de.is24.nexus.yum.repository;
+package de.is24.nexus.yum.repository.task;
 
 import static org.apache.commons.io.FileUtils.listFiles;
 import java.io.File;
