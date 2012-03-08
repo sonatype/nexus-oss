@@ -21,6 +21,8 @@ import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import com.sun.syndication.feed.synd.SyndContent;
@@ -214,6 +216,33 @@ abstract public class AbstractNexusItemEventEntryBuilder
                 + (String) event.getEventContext().get( AccessManager.REQUEST_REMOTE_ADDRESS ) + ".\n";
         }
         return "";
+    }
+
+    protected Gav buildGAV( final NexusArtifactEvent event )
+    {
+        if ( event.getNexusItemInfo() == null )
+        {
+            return null;
+        }
+        try
+        {
+            final Repository repo = getRepositoryRegistry().getRepository( event.getNexusItemInfo().getRepositoryId() );
+
+            if ( MavenRepository.class.isAssignableFrom( repo.getClass() ) )
+            {
+                return ( (MavenRepository) repo ).getGavCalculator().pathToGav( event.getNexusItemInfo().getPath() );
+            }
+
+            return null;
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            getLogger().debug(
+                "Feed entry contained invalid repository id " + event.getNexusItemInfo().getRepositoryId(),
+                e );
+
+            return null;
+        }
     }
 
     public boolean shouldBuildEntry( NexusArtifactEvent event )

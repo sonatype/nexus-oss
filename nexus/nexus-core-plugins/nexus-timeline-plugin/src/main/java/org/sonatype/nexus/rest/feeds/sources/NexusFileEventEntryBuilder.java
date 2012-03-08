@@ -14,6 +14,7 @@ package org.sonatype.nexus.rest.feeds.sources;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
+import org.sonatype.nexus.proxy.maven.gav.Gav;
 
 /**
  * Build feeds entry based on files
@@ -61,6 +62,34 @@ public class NexusFileEventEntryBuilder
         msg.append( "'" );
 
         return msg.toString();
+    }
+
+    @Override
+    public boolean shouldBuildEntry( final NexusArtifactEvent event )
+    {
+        if ( !super.shouldBuildEntry( event ) )
+        {
+            return false;
+        }
+
+        final Gav gav = buildGAV( event );
+
+        if ( gav != null )
+        {
+            if ( gav.isHash() || gav.isSignature() )
+            {
+                return false;
+            }
+        }
+
+        final String path = event.getNexusItemInfo().getPath();
+
+        if ( path.contains( "maven-metadata.xml" ) )
+        {
+            return false;
+        }
+
+        return true;
     }
 
 }
