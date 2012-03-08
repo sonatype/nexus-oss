@@ -118,7 +118,7 @@ public class SimpleApplicationConfiguration
         return dir;
     }
 
-    public void saveConfiguration()
+    public synchronized void saveConfiguration()
         throws IOException
     {
         // send events out, but nothing else

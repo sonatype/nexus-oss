@@ -52,7 +52,7 @@ public class CGlobalHttpProxySettingsCoreConfiguration
         setChangedConfiguration( null );
 
         setOriginalConfiguration( null );
-        
+
         nullified = true;
     }
 
@@ -92,16 +92,17 @@ public class CGlobalHttpProxySettingsCoreConfiguration
 
         nullified = false;
     }
-    
+
     @Override
     protected void copyTransients( Object source, Object destination )
     {
         super.copyTransients( source, destination );
-        
-        // we need to manually set the authentication to null here, because of flawed overlay, where null objects do NOT overwrite non-null objects
-        if ( ( ( CRemoteHttpProxySettings ) source ).getAuthentication() == null )
+
+        // we need to manually set the authentication to null here, because of flawed overlay, where null objects do NOT
+        // overwrite non-null objects
+        if ( ( (CRemoteHttpProxySettings) source ).getAuthentication() == null )
         {
-            ( ( CRemoteHttpProxySettings ) destination ).setAuthentication( null );
+            ( (CRemoteHttpProxySettings) destination ).setAuthentication( null );
         }
     }
 }

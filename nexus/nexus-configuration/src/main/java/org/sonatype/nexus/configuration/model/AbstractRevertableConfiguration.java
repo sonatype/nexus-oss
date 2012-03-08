@@ -26,23 +26,29 @@ public abstract class AbstractRevertableConfiguration
 {
     private final XStream xstream = new XStream();
 
-    private Object originalConfiguration;
+    private volatile Object originalConfiguration;
 
-    private Object changedConfiguration;
+    private volatile Object changedConfiguration;
 
     public Object getConfiguration( boolean forWrite )
     {
         if ( forWrite )
         {
-            if ( getOriginalConfiguration() != null && getChangedConfiguration() == null )
+            synchronized ( this )
             {
-                // copy it
-                setChangedConfiguration( copyObject( getOriginalConfiguration(), null ) );
+                if ( getOriginalConfiguration() != null && getChangedConfiguration() == null )
+                {
+                    // copy it
+                    final Object copy = copyObject( getOriginalConfiguration(), null );
 
-                copyTransients( getOriginalConfiguration(), getChangedConfiguration() );
+                    copyTransients( getOriginalConfiguration(), copy );
+
+                    setChangedConfiguration( copy );
+                }
             }
 
             return getChangedConfiguration();
+
         }
         else
         {
@@ -115,7 +121,7 @@ public abstract class AbstractRevertableConfiguration
 
     public boolean isDirty()
     {
-        return isDirty();
+        return isThisDirty();
     }
 
     public void validateChanges()
@@ -127,7 +133,7 @@ public abstract class AbstractRevertableConfiguration
         }
     }
 
-    public void commitChanges()
+    public synchronized void commitChanges()
         throws ConfigurationException
     {
         if ( isThisDirty() )
@@ -144,7 +150,7 @@ public abstract class AbstractRevertableConfiguration
             }
 
             // nice, isn't it?
-            setOriginalConfiguration( copyObject( getChangedConfiguration(), getOriginalConfiguration() ) );
+            copyObject( getChangedConfiguration(),  getOriginalConfiguration() );
 
             copyTransients( getChangedConfiguration(), getOriginalConfiguration() );
 
