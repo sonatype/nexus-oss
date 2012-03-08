@@ -45,7 +45,7 @@ public abstract class AbstractShadowRepository
 {
     @Requirement
     private RepositoryRegistry repositoryRegistry;
-    
+
     protected RepositoryRegistry getRepositoryRegistry()
     {
         return repositoryRegistry;
@@ -73,7 +73,8 @@ public abstract class AbstractShadowRepository
     @Override
     public String getMasterRepositoryId()
     {
-        return getMasterRepository().getId();
+        // NEXUS-4901: this change is to lessen the logging noise, that is otherwise harmless but ugly
+        return getExternalConfiguration( false ).getMasterRepositoryId();
     }
 
     @Deprecated

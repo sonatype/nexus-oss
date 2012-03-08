@@ -55,7 +55,8 @@ public class ShadowRepositoryEventInspector
 
             for ( ShadowRepository shadow : shadows )
             {
-                if ( shadow.getMasterRepository().getId().equals( ievt.getRepository().getId() ) )
+                // NEXUS-4901: this change is to lessen the logging noise, that is otherwise harmless but ugly
+                if ( shadow.getMasterRepositoryId().equals( ievt.getRepository().getId() ) )
                 {
                     shadow.onRepositoryItemEvent( ievt );
                 }
