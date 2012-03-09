@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.scheduling.ScheduledTask;
 
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.plugin.impl.MavenRepositoryInfo;
 import de.is24.nexus.yum.repository.RepositoryRpmGenerator;
 import de.is24.nexus.yum.repository.YumRepository;
 import de.is24.nexus.yum.service.RepositoryRpmManager;
-import de.is24.nexus.yum.service.YumConfiguration;
 import de.is24.nexus.yum.service.YumService;
 
 

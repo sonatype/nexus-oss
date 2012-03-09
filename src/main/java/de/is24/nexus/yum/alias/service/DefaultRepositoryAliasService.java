@@ -1,12 +1,14 @@
-package de.is24.nexus.yum.service.impl;
+package de.is24.nexus.yum.alias.service;
 
 import java.io.File;
+
 import javax.inject.Inject;
+
 import org.codehaus.plexus.component.annotations.Component;
-import de.is24.nexus.yum.service.AliasNotFoundException;
-import de.is24.nexus.yum.service.RepositoryAliasService;
+
+import de.is24.nexus.yum.alias.AliasNotFoundException;
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.service.RepositoryRpmManager;
-import de.is24.nexus.yum.service.YumConfiguration;
 
 
 @Component(role = RepositoryAliasService.class)

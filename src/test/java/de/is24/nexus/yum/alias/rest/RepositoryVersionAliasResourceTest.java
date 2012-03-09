@@ -1,9 +1,9 @@
 /**
  *
  */
-package de.is24.nexus.yum.rest;
+package de.is24.nexus.yum.alias.rest;
 
-import static de.is24.nexus.yum.rest.RepositoryVersionAliasResource.RESOURCE_URI;
+import static de.is24.nexus.yum.alias.rest.RepositoryVersionAliasResource.RESOURCE_URI;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.instanceOf;
@@ -11,7 +11,9 @@ import static org.junit.Assert.assertThat;
 import static org.restlet.data.Method.GET;
 import static org.restlet.data.Method.POST;
 import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
+
 import javax.inject.Inject;
+
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,8 +24,10 @@ import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+
 import de.is24.nexus.yum.AbstractYumNexusTestCase;
-import de.is24.nexus.yum.service.YumConfiguration;
+import de.is24.nexus.yum.alias.rest.RepositoryVersionAliasResource;
+import de.is24.nexus.yum.config.YumConfiguration;
 
 
 /**

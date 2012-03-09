@@ -1,4 +1,4 @@
-package de.is24.nexus.yum.service;
+package de.is24.nexus.yum.alias;
 
 @SuppressWarnings("serial")
 public class AliasNotFoundException extends Exception {

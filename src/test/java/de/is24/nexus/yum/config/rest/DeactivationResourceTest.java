@@ -1,4 +1,4 @@
-package de.is24.nexus.yum.rest;
+package de.is24.nexus.yum.config.rest;
 
 import static org.restlet.data.Method.GET;
 import static org.restlet.data.Method.POST;

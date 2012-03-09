@@ -14,7 +14,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-import de.is24.nexus.yum.service.YumConfiguration;
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.service.YumService;
 
 public class DefaultDeletionServiceTest {

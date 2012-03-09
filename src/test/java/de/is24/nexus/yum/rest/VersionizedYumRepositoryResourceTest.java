@@ -3,9 +3,12 @@ package de.is24.nexus.yum.rest;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
+
 import java.util.HashMap;
 import java.util.Map;
+
 import javax.inject.Inject;
+
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,12 +23,14 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+
 import com.google.code.tempusfugit.temporal.Condition;
 import com.noelios.restlet.http.HttpResponse;
+
 import de.is24.nexus.yum.AbstractYumNexusTestCase;
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.repository.utils.RepositoryTestUtils;
-import de.is24.nexus.yum.service.YumConfiguration;
 
 
 public class VersionizedYumRepositoryResourceTest extends AbstractYumNexusTestCase {

@@ -1,11 +1,14 @@
-package de.is24.nexus.yum.rest;
+package de.is24.nexus.yum.alias.rest;
 
 import static org.restlet.data.MediaType.TEXT_PLAIN;
 import static org.restlet.data.Method.POST;
+
 import java.io.File;
+
 import javax.inject.Inject;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -20,9 +23,10 @@ import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import de.is24.nexus.yum.service.AliasNotFoundException;
-import de.is24.nexus.yum.service.RepositoryAliasService;
-import de.is24.nexus.yum.service.YumConfiguration;
+
+import de.is24.nexus.yum.alias.AliasNotFoundException;
+import de.is24.nexus.yum.alias.service.RepositoryAliasService;
+import de.is24.nexus.yum.config.YumConfiguration;
 
 
 /**

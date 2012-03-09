@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.plugin.DeletionService;
-import de.is24.nexus.yum.service.YumConfiguration;
 import de.is24.nexus.yum.service.YumService;
 
 @Component(role = DeletionService.class)

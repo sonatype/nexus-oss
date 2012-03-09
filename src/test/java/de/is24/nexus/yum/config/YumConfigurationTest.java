@@ -1,4 +1,4 @@
-package de.is24.nexus.yum.service.impl;
+package de.is24.nexus.yum.config;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
@@ -12,6 +12,7 @@ import static org.easymock.EasyMock.replay;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -21,16 +22,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedHashSet;
+
 import javax.inject.Inject;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.xml.sax.SAXException;
+
 import de.is24.nexus.yum.AbstractYumNexusTestCase;
-import de.is24.nexus.yum.service.AliasNotFoundException;
-import de.is24.nexus.yum.service.YumConfiguration;
+import de.is24.nexus.yum.alias.AliasNotFoundException;
+import de.is24.nexus.yum.alias.domain.AliasMapping;
+import de.is24.nexus.yum.config.DefaultYumConfiguration;
+import de.is24.nexus.yum.config.YumConfiguration;
+import de.is24.nexus.yum.config.domain.XmlYumConfiguration;
 
 
 /**

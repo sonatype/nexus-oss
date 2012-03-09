@@ -15,8 +15,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import de.is24.nexus.yum.AbstractRepositoryTester;
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.service.RepositoryRpmManager;
-import de.is24.nexus.yum.service.YumConfiguration;
 
 
 public class DefaultRepositoryRpmManagerTest extends AbstractRepositoryTester {

@@ -2,17 +2,20 @@ package de.is24.nexus.yum.rest;
 
 import static org.restlet.data.Status.CLIENT_ERROR_BAD_REQUEST;
 import static org.restlet.data.Status.CLIENT_ERROR_NOT_FOUND;
+
 import javax.inject.Inject;
 import javax.ws.rs.Path;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+
+import de.is24.nexus.yum.alias.AliasNotFoundException;
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.plugin.impl.MavenRepositoryInfo;
 import de.is24.nexus.yum.repository.YumRepository;
-import de.is24.nexus.yum.service.AliasNotFoundException;
-import de.is24.nexus.yum.service.YumConfiguration;
 import de.is24.nexus.yum.service.YumService;
 
 

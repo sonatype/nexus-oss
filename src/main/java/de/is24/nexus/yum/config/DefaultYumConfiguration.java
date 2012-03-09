@@ -1,4 +1,4 @@
-package de.is24.nexus.yum.service.impl;
+package de.is24.nexus.yum.config;
 
 import static javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 
@@ -16,8 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 
-import de.is24.nexus.yum.service.AliasNotFoundException;
-import de.is24.nexus.yum.service.YumConfiguration;
+import de.is24.nexus.yum.alias.AliasNotFoundException;
+import de.is24.nexus.yum.alias.domain.AliasKey;
+import de.is24.nexus.yum.alias.domain.AliasMapping;
+import de.is24.nexus.yum.config.YumConfiguration;
+import de.is24.nexus.yum.config.domain.XmlYumConfiguration;
 
 
 @Component(role = YumConfiguration.class)

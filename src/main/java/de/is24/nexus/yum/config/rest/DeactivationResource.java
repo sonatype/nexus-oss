@@ -1,4 +1,4 @@
-package de.is24.nexus.yum.rest;
+package de.is24.nexus.yum.config.rest;
 
 import javax.inject.Inject;
 import javax.ws.rs.Path;

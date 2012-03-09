@@ -1,7 +1,7 @@
 /**
  *
  */
-package de.is24.nexus.yum.service.impl;
+package de.is24.nexus.yum.alias.domain;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
