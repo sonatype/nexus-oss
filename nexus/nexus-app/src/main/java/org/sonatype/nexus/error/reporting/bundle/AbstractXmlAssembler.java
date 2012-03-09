@@ -10,24 +10,26 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-package org.sonatype.nexus.integrationtests.nexus2190;
+package org.sonatype.nexus.error.reporting.bundle;
 
-import org.restlet.data.Method;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.test.utils.ErrorReportUtil;
-import org.testng.annotations.Test;
+import com.thoughtworks.xstream.XStream;
 
-public class Nexus2190ErrorReportBundleIT
-    extends AbstractNexusIntegrationTest
-{    
-    @Test
-    public void validateBundle()
-        throws Exception
+public class AbstractXmlAssembler
+{
+    /**
+     * XStream is used for a deep clone (TODO: not sure if this is a great idea)
+     */
+    private static XStream xstream = new XStream();
+    
+    protected static final String PASSWORD_MASK = "*****";
+    
+    protected Object cloneViaXml( Object configuration )
     {
-        RequestFacade.sendMessage( "service/local/exception", Method.POST, null );
+        if ( configuration == null )
+        {
+            return null;
+        }
         
-        ErrorReportUtil.validateZipContents( nexusWorkDir );
+        return xstream.fromXML( xstream.toXML( configuration ) );
     }
 }
-

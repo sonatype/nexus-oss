@@ -12,24 +12,22 @@
  */
 package org.sonatype.nexus.error.reporting;
 
-import com.thoughtworks.xstream.XStream;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-public class AbstractXmlHandler
+import org.sonatype.sisu.pr.bundle.StorageManager;
+import org.sonatype.sisu.pr.bundle.internal.TmpFileStorageManager;
+
+/**
+ * Empty implementation to make sisu-pr's TmpFileStorageManager the injected component.
+ *
+ * @since 2.1
+ */
+@Named
+@Singleton
+public class NexusPRStorageManager
+    extends TmpFileStorageManager
+    implements StorageManager
 {
-    /**
-     * XStream is used for a deep clone (TODO: not sure if this is a great idea)
-     */
-    private static XStream xstream = new XStream();
-    
-    protected static final String PASSWORD_MASK = "*****";
-    
-    protected Object cloneViaXml( Object configuration )
-    {
-        if ( configuration == null )
-        {
-            return null;
-        }
-        
-        return xstream.fromXML( xstream.toXML( configuration ) );
-    }
+    // no need to override anything
 }

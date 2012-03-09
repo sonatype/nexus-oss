@@ -24,7 +24,9 @@ public class ErrorReportRequest
     private Throwable throwable;
     
     private Map<String,Object> context = new HashMap<String,Object>();
-    
+
+    private boolean manual;
+
     public Throwable getThrowable()
     {
         return throwable;
@@ -56,13 +58,28 @@ public class ErrorReportRequest
     }
     
     /**
-     * if a title is set, the throwable will not be used, as manual
-     * submission is assumed
-     * 
-     * @param title
+     * Set the title of the error report. If unset, the title will be generated.
      */
     public void setTitle( String title )
     {
         this.title = title;
     }
+
+    /**
+     * @return whether this is a manually submitted report.
+     */
+    public boolean isManual()
+    {
+        return manual;
+    }
+
+    /**
+     * Set whether this is a report submitted by a nexus user.
+     * Manual reports will always be filed, regardless of existing smilar reports.
+     */
+    public void setManual( final boolean manual )
+    {
+        this.manual = manual;
+    }
+
 }

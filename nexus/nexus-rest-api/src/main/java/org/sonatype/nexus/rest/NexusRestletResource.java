@@ -134,11 +134,7 @@ public class NexusRestletResource
                 manager.handleError( request );
             } catch ( IssueSubmissionException e ) {
                 getLogger().log( Level.SEVERE, "Unable to submit error report to jira", e );
-            } catch ( IOException e ) {
-                getLogger().log( Level.SEVERE, "Unable to submit error report to jira", e );
-            } catch ( GeneralSecurityException e ) {
-                getLogger().log( Level.SEVERE, "Unable to submit error report to jira", e );
-            }
+	    }
         }
     }
 }

@@ -108,7 +108,6 @@ public class ErrorReportingPlexusResource
 
             manager.setJIRAUsername( settings.getJiraUsername() );
             manager.setJIRAPassword( getActualPassword( settings.getJiraPassword(), manager.getJIRAPassword() ) );
-            manager.setUseGlobalProxy( true );
 
             try
             {
@@ -127,6 +126,7 @@ public class ErrorReportingPlexusResource
         genReq.setTitle( dto.getTitle() );
         genReq.setDescription( dto.getDescription() );
         genReq.getContext().putAll( context.getAttributes() );
+        genReq.setManual( true );
 
         try
         {
@@ -138,8 +138,8 @@ public class ErrorReportingPlexusResource
                 && !StringUtils.isEmpty( settings.getJiraUsername() ) )
             {
                 genRes =
-                    manager.handleError( genReq, settings.getJiraUsername(), settings.getJiraPassword(),
-                                         manager.isUseGlobalProxy() );
+                    manager.handleError( genReq, settings.getJiraUsername(), settings.getJiraPassword()
+                    );
             }
             else
             {
@@ -168,16 +168,6 @@ public class ErrorReportingPlexusResource
             }
 
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Unable to submit jira ticket:" + e.getMessage(), e );
-        }
-        catch ( IOException e )
-        {
-            getLogger().debug( "Unable to submit jira ticket.", e );
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to submit jira ticket.", e );
-        }
-        catch ( GeneralSecurityException e )
-        {
-            getLogger().debug( "Unable to submit jira ticket.", e );
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to submit jira ticket.", e );
         }
     }
 }

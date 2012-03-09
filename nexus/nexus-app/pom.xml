@@ -86,12 +86,15 @@
       <artifactId>sisu-mailer</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>plexus-swizzle</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>plexus-encryptor</artifactId>
+      <groupId>org.sonatype.sisu.pr</groupId>
+      <artifactId>sisu-problem-reporter</artifactId>
+      <version>1.5.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Testing -->
@@ -128,7 +131,7 @@
     <dependency>
       <groupId>org.sonatype.sisu.pr</groupId>
       <artifactId>sisu-pr-testutil</artifactId>
-      <version>1.5</version>
+      <version>1.5.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>

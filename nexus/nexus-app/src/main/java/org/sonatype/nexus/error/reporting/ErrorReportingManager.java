@@ -19,6 +19,9 @@ import java.security.GeneralSecurityException;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.sonatype.nexus.configuration.Configurable;
 
+/**
+ * An error reporting component.
+ */
 public interface ErrorReportingManager
     extends Configurable
 {
@@ -26,35 +29,55 @@ public interface ErrorReportingManager
 
     void setEnabled( boolean value );
 
+    /**
+     * @return the URL of the JIRA instance the manager connects to.
+     */
     String getJIRAUrl();
 
+    /**
+     * @param url the URL of the JIRA instance the manager connects to.
+     */
     void setJIRAUrl( String url );
 
+    /**
+     * @return the key of the JIRA project new issues will be filed in.
+     */
     String getJIRAProject();
 
+    /**
+     * @param pkey the key of the JIRA project new issues will be filed in.
+     */
     void setJIRAProject( String pkey );
 
+    /**
+     * @return the username to use for connections.
+     */
     String getJIRAUsername();
 
+    /**
+     * @param username the username to use for connections.
+     */
     void setJIRAUsername( String username );
 
+    /**
+     * @return the password to use for connections.
+     */
     String getJIRAPassword();
 
+    /**
+     * @param password the password to use for connections.
+     */
     void setJIRAPassword( String password );
-
-    boolean isUseGlobalProxy();
-
-    void setUseGlobalProxy( boolean val );
 
     // ==
 
+    /**
+     * File an issue based on the given error report request.
+     */
     ErrorReportResponse handleError( ErrorReportRequest request )
-        throws IssueSubmissionException, IOException, GeneralSecurityException;
+        throws IssueSubmissionException;
 
-    ErrorReportResponse handleError( ErrorReportRequest request, String jiraUsername, String jiraPassword,
-                                     boolean useGlobalHttpProxy )
-        throws IssueSubmissionException, IOException, GeneralSecurityException;
+    ErrorReportResponse handleError( ErrorReportRequest request, String jiraUsername, String jiraPassword )
+        throws IssueSubmissionException;
 
-    File assembleBundle( ErrorReportRequest request )
-        throws IOException;
 }

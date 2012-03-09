@@ -12,26 +12,27 @@
  */
 package org.sonatype.nexus.error.reporting;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.hasSize;
+import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.containsEntry;
+
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
+import com.google.common.io.Files;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
-import org.codehaus.plexus.util.ExceptionUtils;
+import org.codehaus.plexus.swizzle.jira.authentication.AuthenticationSource;
+import org.codehaus.plexus.swizzle.jira.authentication.DefaultAuthenticationSource;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.swizzle.jira.Issue;
+import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.jira.AttachmentHandler;
@@ -43,7 +44,6 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.scheduling.NexusTask;
-import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.tests.http.server.jetty.impl.JettyServerProvider;
 
@@ -57,6 +57,8 @@ public class DefaultErrorReportingManagerTest
     private File unzipHomeDir = null;
 
     private JettyServerProvider provider;
+
+    private MockAttachmentHandler handler;
 
     @Override
     protected void setUp()
@@ -72,10 +74,12 @@ public class DefaultErrorReportingManagerTest
         nexusConfig = lookup( NexusConfiguration.class );
 
         manager = (DefaultErrorReportingManager) lookup( ErrorReportingManager.class );
+
+        enableErrorReports( false );
     }
 
     private void setupJiraMock( String dbPath )
-        throws FileNotFoundException, IOException, Exception, MalformedURLException
+        throws Exception
     {
         StubJira mock = new StubJira();
         FileInputStream in = null;
@@ -84,7 +88,7 @@ public class DefaultErrorReportingManagerTest
             in = new FileInputStream( dbPath );
             mock.setDatabase( IOUtil.toString( in ) );
 
-            MockAttachmentHandler handler = new MockAttachmentHandler();
+            handler = new MockAttachmentHandler();
             handler.setMock( mock );
             List<AttachmentHandler> handlers = Arrays.<AttachmentHandler> asList( handler );
             provider = new JettyServerProvider();
@@ -151,7 +155,6 @@ public class DefaultErrorReportingManagerTest
         manager.setJIRAProject( "SBOX" );
         manager.setJIRAUsername( "jira" );
         manager.setJIRAPassword( "jira" );
-        manager.setUseGlobalProxy( useProxy );
 
         nexusConfig.saveConfiguration();
     }
@@ -160,9 +163,6 @@ public class DefaultErrorReportingManagerTest
     public void testJiraAccess()
         throws Exception
     {
-        // enableProxy();
-        enableErrorReports( false );
-
         ErrorReportRequest request = new ErrorReportRequest();
 
         try
@@ -176,24 +176,21 @@ public class DefaultErrorReportingManagerTest
 
         // First make sure item doesn't already exist
         List<Issue> issues =
-            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), manager.getValidJIRAUsername(),
-                manager.getValidJIRAPassword() );
+            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), getAuth() );
 
-        Assert.assertNull( issues );
+        assertThat( issues, hasSize( 0 ) );
 
         manager.handleError( request );
 
         issues =
-            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), manager.getValidJIRAUsername(),
-                manager.getValidJIRAPassword() );
+            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), getAuth() );
 
         Assert.assertEquals( 1, issues.size() );
 
         manager.handleError( request );
 
         issues =
-            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), manager.getValidJIRAUsername(),
-                manager.getValidJIRAPassword() );
+            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), getAuth() );
 
         Assert.assertEquals( 1, issues.size() );
     }
@@ -219,119 +216,44 @@ public class DefaultErrorReportingManagerTest
         }
 
         manager.setEnabled( true );
-        manager.setJIRAProject( "NEXUS" );
 
         nexusConfiguration.saveConfiguration();
 
         ErrorReportRequest request = new ErrorReportRequest();
         request.setThrowable( exception );
 
-        IssueSubmissionRequest subRequest =
-            manager.buildRequest( request, manager.getValidJIRAUsername(), manager.isUseGlobalProxy() );
+        // submit request to mock to trigger bundle creation
+        final ErrorReportResponse response = manager.handleError( request );
+        final String url = response.getJiraUrl();
 
-        assertEquals( "NEXUS", subRequest.getProjectId() );
-        assertEquals( "APR: Test exception", subRequest.getSummary() );
-        assertEquals(
-            "The following exception occurred: " + StringDigester.LINE_SEPERATOR
-                + ExceptionUtils.getFullStackTrace( exception ), subRequest.getDescription() );
-        assertNotNull( subRequest.getProblemReportBundle() );
+        // specific to mock jira
+        final String key = url.substring(url.indexOf( "SBOX"));
 
-        extractZipFile( subRequest.getProblemReportBundle(), unzipHomeDir );
+        final Matcher<ZipFile> containsDefaultEntries = allOf(
+            containsEntry( "nexus.xml" ), 
+            // containsEntry( "security.xml" ), // loaded too early for test setup, omitted b/c model is null
+            containsEntry( "security-configuration.xml" ),
+            containsEntry( "exception.txt" ),
+            containsEntry( "contextListing.txt" ) 
+        );
+        
+        final Matcher<ZipFile> containsAdditionalEntries = allOf(
+            containsEntry( "conf/test-directory/filename1.file" ),
+            containsEntry( "conf/test-directory/filename2.file" ),
+            containsEntry( "conf/test-directory/filename3.file" ),
+            containsEntry( "conf/nested-test-directory/more-nested-test-directory/filename1.file" ),
+            containsEntry( "conf/nested-test-directory/more-nested-test-directory/filename2.file" ) ,
+            containsEntry( "conf/nested-test-directory/more-nested-test-directory/filename3.file" )
+        );
 
-        assertTrue( unzipHomeDir.exists() );
-
-        File[] files = unzipHomeDir.listFiles();
-
-        assertNotNull( files );
-        assertEquals( 6, files.length ); // TODO: was seven with the directory listing, but that was removed, as it
-                                         // OOM'd
-
-        files = unzipHomeDir.listFiles( new FileFilter()
-        {
-            public boolean accept( File pathname )
-            {
-                if ( pathname.isDirectory() && pathname.getName().equals( "test-directory" ) )
-                {
-                    return true;
-                }
-
-                return false;
-            }
-        } );
-
-        assertEquals( 1, files.length );
-
-        files = files[0].listFiles();
-
-        boolean file1found = false;
-        boolean file2found = false;
-        boolean file3found = false;
-        for ( File file : files )
-        {
-            if ( file.getName().equals( "filename1.file" ) )
-            {
-                file1found = true;
-            }
-            else if ( file.getName().equals( "filename2.file" ) )
-            {
-                file2found = true;
-            }
-            else if ( file.getName().equals( "filename3.file" ) )
-            {
-                file3found = true;
-            }
+        final File zipDir = nexusConfig.getWorkingDirectory( DefaultErrorReportingManager.ERROR_REPORT_DIR );
+        final ZipFile zipFile = new ZipFile( zipDir.listFiles()[0] );
+        try {
+            assertThat( zipFile, containsDefaultEntries );
+            assertThat( zipFile, containsAdditionalEntries );
+        } finally {
+            zipFile.close();
         }
-
-        assertTrue( file1found && file2found && file3found );
-
-        files = unzipHomeDir.listFiles( new FileFilter()
-        {
-            public boolean accept( File pathname )
-            {
-                if ( pathname.isDirectory() && pathname.getName().equals( "nested-test-directory" ) )
-                {
-                    return true;
-                }
-
-                return false;
-            }
-        } );
-
-        files = files[0].listFiles( new FileFilter()
-        {
-            public boolean accept( File pathname )
-            {
-                if ( pathname.isDirectory() && pathname.getName().equals( "more-nested-test-directory" ) )
-                {
-                    return true;
-                }
-
-                return false;
-            }
-        } );
-
-        files = files[0].listFiles();
-
-        file1found = false;
-        file2found = false;
-        file3found = false;
-        for ( File file : files )
-        {
-            if ( file.getName().equals( "filename1.file" ) )
-            {
-                file1found = true;
-            }
-            else if ( file.getName().equals( "filename2.file" ) )
-            {
-                file2found = true;
-            }
-            else if ( file.getName().equals( "filename3.file" ) )
-            {
-                file3found = true;
-            }
-        }
-
-        assertTrue( file1found && file2found && file3found );
     }
 
     private void addBackupFiles( File dir )
@@ -345,59 +267,11 @@ public class DefaultErrorReportingManagerTest
         throws Exception
     {
         File confDir = new File( getConfHomeDir(), path );
-        File unzipDir = new File( unzipHomeDir, path );
         confDir.mkdirs();
-        unzipDir.mkdirs();
 
         for ( String filename : filenames )
         {
-            new File( confDir, filename ).createNewFile();
-        }
-    }
-
-    private void extractZipFile( File zipFile, File outputDirectory )
-        throws Exception
-    {
-        FileInputStream fis = new FileInputStream( zipFile );
-        ZipInputStream zin = null;
-
-        try
-        {
-            zin = new ZipInputStream( new BufferedInputStream( fis ) );
-
-            ZipEntry entry;
-            while ( ( entry = zin.getNextEntry() ) != null )
-            {
-                FileOutputStream fos = new FileOutputStream( new File( outputDirectory, entry.getName() ) );
-                BufferedOutputStream bos = null;
-
-                try
-                {
-                    byte[] buffer = new byte[2048];
-                    bos = new BufferedOutputStream( fos, 2048 );
-
-                    int count;
-                    while ( ( count = zin.read( buffer, 0, buffer.length ) ) != -1 )
-                    {
-                        bos.write( buffer, 0, count );
-                    }
-
-                }
-                finally
-                {
-                    if ( bos != null )
-                    {
-                        bos.close();
-                    }
-                }
-            }
-        }
-        finally
-        {
-            if ( zin != null )
-            {
-                zin.close();
-            }
+            Files.write( "test".getBytes(), new File( confDir, filename ) );
         }
     }
 
@@ -412,34 +286,30 @@ public class DefaultErrorReportingManagerTest
         // we will need this to properly wait the async event inspectors to finish
         final EventInspectorHost eventInspectorHost = lookup( EventInspectorHost.class );
 
-        enableErrorReports( false );
-
         String msg = "Runtime exception " + Long.toHexString( System.currentTimeMillis() );
         ExceptionTask task = (ExceptionTask) lookup( SchedulerTask.class, "ExceptionTask" );
         task.setMessage( msg );
 
         // First make sure item doesn't already exist
-        List<Issue> issues =
-            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), manager.getValidJIRAUsername(),
-                manager.getValidJIRAPassword() );
+        Collection<?> issues =
+            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), getAuth() );
 
-        Assert.assertNull( issues );
-
-        doCall( task, eventInspectorHost );
-
-        issues =
-            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), manager.getValidJIRAUsername(),
-                manager.getValidJIRAPassword() );
-
-        Assert.assertEquals( 1, issues.size() );
+        // empty() has weirdo generics
+        assertThat( issues, hasSize( 0 ) );
 
         doCall( task, eventInspectorHost );
 
         issues =
-            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), manager.getValidJIRAUsername(),
-                manager.getValidJIRAPassword() );
+            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), getAuth() );
 
-        Assert.assertEquals( 1, issues.size() );
+        assertThat( issues, hasSize( 1 ) );
+
+        doCall( task, eventInspectorHost );
+
+        issues =
+            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), getAuth() );
+
+        assertThat( issues, hasSize( 1 ) );
     }
 
     private void doCall( final NexusTask<?> task, final EventInspectorHost inspectorHost )
@@ -462,4 +332,8 @@ public class DefaultErrorReportingManagerTest
         }
     }
 
+    public AuthenticationSource getAuth()
+    {
+        return new DefaultAuthenticationSource( manager.getValidJIRAUsername(), manager.getValidJIRAPassword() );
+    }
 }
