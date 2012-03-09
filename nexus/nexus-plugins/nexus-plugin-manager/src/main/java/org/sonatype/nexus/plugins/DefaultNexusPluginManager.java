@@ -272,18 +272,18 @@ public class DefaultNexusPluginManager
         final GAVCoordinate activatedGav = getActivatedPluginGav( gav, strict );
         if ( activatedGav == null )
         {
-            final PluginManagerResponse response = new PluginManagerResponse( gav, PluginActivationRequest.ACTIVATE );
+            GAVCoordinate actualGAV = null;
+            if ( !strict )
+            {
+                actualGAV = findInstalledPluginByGA( installedPluginsFilteredByGA, gav );
+            }
+            if ( actualGAV == null )
+            {
+                actualGAV = gav;
+            }
+            final PluginManagerResponse response = new PluginManagerResponse( actualGAV, PluginActivationRequest.ACTIVATE );
             try
             {
-                GAVCoordinate actualGAV = null;
-                if ( !strict )
-                {
-                    actualGAV = findInstalledPluginByGA( installedPluginsFilteredByGA, gav );
-                }
-                if ( actualGAV == null )
-                {
-                    actualGAV = gav;
-                }
                 activatePlugin(
                     repositoryManager.resolveArtifact( actualGAV ), response, installedPluginsFilteredByGA
                 );
@@ -344,7 +344,7 @@ public class DefaultNexusPluginManager
                 gav, false, installedPluginsFilteredByGA
             );
             response.addPluginManagerResponse( dependencyActivationResponse );
-            importList.add( gav );
+            importList.add( dependencyActivationResponse.getOriginator() );
             resolvedList.add( dependencyActivationResponse.getOriginator() );
         }
         descriptor.setImportedPlugins( importList );
