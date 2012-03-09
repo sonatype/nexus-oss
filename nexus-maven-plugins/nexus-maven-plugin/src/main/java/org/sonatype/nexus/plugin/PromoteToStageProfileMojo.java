@@ -22,7 +22,6 @@ import org.apache.commons.beanutils.BeanComparator;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.StringUtils;
-import org.jdom.Document;
 import org.sonatype.nexus.plugin.util.PromptUtil;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
@@ -129,25 +128,7 @@ public class PromoteToStageProfileMojo
         }
         catch ( RESTLightClientException e )
         {
-            Document document = e.getErrorDocument();
-            if ( document != null )
-            {
-                final String name = document.getRootElement().getName();
-                if ( "stagingRuleFailures".equals( name ) )
-                {
-                    getLog().error( ruleFailureMessage( document ) );
-                }
-            }
-
-            if ( document != null )
-            {
-                throw new MojoExecutionException( "Failed to promote staging repositories, see above error message." );
-            }
-            else
-            {
-                throw new MojoExecutionException( "Failed to promote staging repositories: " + e.getMessage(), e );
-            }
-
+            throw logErrorDetailAndCreateException( e, "Failed to promote staging repositories" );
         }
 
         listRepos( null, null, null, "The following CLOSED staging repositories were found" );

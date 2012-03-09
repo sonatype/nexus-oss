@@ -298,4 +298,40 @@ public abstract class AbstractStagingMojo
         // FIXME we should change staging rules etc. server-side to return all the necessary information to build messages.
         return StringEscapeUtils.unescapeHtml( htmlString.replaceAll( "<[^>]*>", "" ) );
     }
+
+    /**
+     * Log the detailed error document if it's available, return MojoExecutionException with appropriate message and cause..
+     */
+    protected MojoExecutionException logErrorDetailAndCreateException( final RESTLightClientException e,
+                                                                       final String msg )
+    {
+        Document document = e.getErrorDocument();
+        if ( document != null )
+        {
+            final String name = document.getRootElement().getName();
+            if ( "stagingRuleFailures".equals( name ) )
+            {
+                getLog().error( ruleFailureMessage( document ) );
+            }
+            else
+            {
+                // unknown error format, can only print the xml
+                getLog().error( "Finishing the repository failed with an unknown detail message.\n" + e.getMessage() );
+                try
+                {
+                    final StringWriter out = new StringWriter();
+                    new XMLOutputter( Format.getPrettyFormat() ).output( document, out );
+                    getLog().error( "\n" + out.toString() );
+                }
+                catch ( IOException e1 )
+                {
+                    //  cannot write to StringWriter - unlikely, but we cannot do anything here anyway.
+                }
+            }
+
+            return new MojoExecutionException( msg + ", see above error message." );
+        }
+
+        return new MojoExecutionException( msg + ": " + e.getMessage(), e );
+    }
 }
