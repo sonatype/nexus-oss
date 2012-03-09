@@ -14,11 +14,9 @@ package org.sonatype.nexus.plugin;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.jdom.Document;
-import org.jdom.Element;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageRepository;
@@ -76,9 +74,9 @@ public class CloseStageRepositoryMojo
     /**
      * If true, the mojo will try to remove the staging repository it was not able to close.
      *
-     * @parameter expression="${nexus.removeOnFailure}" default-value="false"
+     * @parameter expression="${nexus.dropOnFailure}" default-value="false"
      */
-    private boolean removeOnFailure;
+    private boolean dropOnFailure;
 
     protected void doExecute()
         throws MojoExecutionException
@@ -133,17 +131,17 @@ public class CloseStageRepositoryMojo
                     }
                 }
                 
-                if ( removeOnFailure )
+                if ( dropOnFailure )
                 {
                     try
                     {
-                        getLog().warn( "Removing the repository as requested because there were failures... (" + repo.getRepositoryId() + ")" );
+                        getLog().warn( "Dropping the repository as requested because there were failures... (" + repo.getRepositoryId() + ")" );
                         client.dropRepository( repo, getDescription() );
-                        getLog().debug( "Removed " + repo.getRepositoryId() );
+                        getLog().debug( "Dropped " + repo.getRepositoryId() );
                     }
                     catch ( RESTLightClientException e1 )
                     {
-                        getLog().error( "Could not remove " + repo.getRepositoryId() + "(" + repo.getUrl() + ")" );
+                        getLog().error( "Could not drop " + repo.getRepositoryId() + "(" + repo.getUrl() + ")" );
                     }
                 }
 
@@ -205,14 +203,14 @@ public class CloseStageRepositoryMojo
         this.description = description;
     }
 
-    public boolean isRemoveOnFailure()
+    public boolean isDropOnFailure()
     {
-        return removeOnFailure;
+        return dropOnFailure;
     }
 
-    public void setRemoveOnFailure( final boolean removeOnFailure )
+    public void setDropOnFailure( final boolean dropOnFailure )
     {
-        this.removeOnFailure = removeOnFailure;
+        this.dropOnFailure = dropOnFailure;
     }
 
 

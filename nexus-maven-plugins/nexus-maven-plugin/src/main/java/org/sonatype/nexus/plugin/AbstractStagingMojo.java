@@ -269,12 +269,12 @@ public abstract class AbstractStagingMojo
             }
         }
 
-        final StringBuilder msg = new StringBuilder( "There were failed staging rules when closing the repository.\n" );
+        final StringBuilder msg = new StringBuilder( "There were failed staging rules when finishing the repository.\n" );
 
         final Element failuresNode = document.getRootElement().getChild( "failures" );
         if ( failuresNode == null )
         {
-            return "Empty rule failures";
+            return "No failures recorded.";
         }
 
         final List<Element> failures = failuresNode.getChildren( "failure" );

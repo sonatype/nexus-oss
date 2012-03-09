@@ -348,7 +348,7 @@ public class CloseStageRepositoryMojoTest
         mojo.setGroupId( "group.id" );
         mojo.setVersion( "1" );
         mojo.setDescription( "this is a description" );
-        mojo.setRemoveOnFailure( true );
+        mojo.setDropOnFailure( true );
 
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
