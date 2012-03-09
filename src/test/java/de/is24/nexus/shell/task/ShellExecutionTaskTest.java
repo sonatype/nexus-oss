@@ -1,7 +1,9 @@
-package de.is24.nexus.task.shell;
+package de.is24.nexus.shell.task;
 
 import java.io.IOException;
 import org.junit.Test;
+
+import de.is24.nexus.shell.task.ShellExecutionTask;
 
 
 public class ShellExecutionTaskTest {

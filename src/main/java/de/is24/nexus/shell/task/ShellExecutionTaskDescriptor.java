@@ -1,4 +1,4 @@
-package de.is24.nexus.task.shell;
+package de.is24.nexus.shell.task;
 
 import static java.util.Arrays.asList;
 import static org.sonatype.nexus.formfields.FormField.MANDATORY;

@@ -1,6 +1,6 @@
-package de.is24.nexus.task.shell;
+package de.is24.nexus.shell.task;
 
-import static de.is24.nexus.task.shell.ShellExecutionTaskDescriptor.COMMAND_FIELD_ID;
+import static de.is24.nexus.shell.task.ShellExecutionTaskDescriptor.COMMAND_FIELD_ID;
 import static java.lang.String.format;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 
