@@ -20,7 +20,7 @@ import org.sonatype.nexus.proxy.repository.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 
-import de.is24.nexus.yum.service.YumService;
+import de.is24.nexus.yum.repository.service.YumService;
 
 @Component(role = GroupRepository.class, hint = M2YumGroupRepository.ID, instantiationStrategy = "per-lookup", description = "Maven2-Yum Repository Group")
 public class M2YumGroupRepository extends M2GroupRepository {

@@ -33,11 +33,11 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.xml.sax.SAXException;
 
 import de.is24.nexus.yum.AbstractYumNexusTestCase;
-import de.is24.nexus.yum.alias.AliasNotFoundException;
-import de.is24.nexus.yum.alias.domain.AliasMapping;
 import de.is24.nexus.yum.config.DefaultYumConfiguration;
 import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.config.domain.XmlYumConfiguration;
+import de.is24.nexus.yum.version.alias.AliasNotFoundException;
+import de.is24.nexus.yum.version.alias.domain.AliasMapping;
 
 
 /**

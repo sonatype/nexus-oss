@@ -14,7 +14,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import de.is24.nexus.yum.AbstractRepositoryTester;
 import de.is24.nexus.yum.plugin.ItemEventListener;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
-import de.is24.nexus.yum.service.YumService;
+import de.is24.nexus.yum.repository.service.YumService;
 
 
 public class RpmRepositoryEventListenerTest extends AbstractRepositoryTester {

@@ -35,8 +35,8 @@ import com.google.code.tempusfugit.concurrency.annotations.Concurrent;
 import de.is24.nexus.yum.AbstractRepositoryTester;
 import de.is24.nexus.yum.plugin.ItemEventListener;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
+import de.is24.nexus.yum.repository.service.YumService;
 import de.is24.nexus.yum.repository.utils.RepositoryTestUtils;
-import de.is24.nexus.yum.service.YumService;
 
 
 /**

@@ -12,7 +12,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.repository.task.RepositoryScanningTask;
-import de.is24.nexus.yum.service.RepositoryRpmManager;
+import de.is24.nexus.yum.version.service.RepositoryRpmManager;
 
 
 @Component(role = RepositoryRegistry.class)

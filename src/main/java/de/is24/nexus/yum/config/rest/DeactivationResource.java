@@ -15,7 +15,8 @@ import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import de.is24.nexus.yum.service.YumService;
+
+import de.is24.nexus.yum.repository.service.YumService;
 
 
 /**

@@ -10,7 +10,7 @@ import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import de.is24.nexus.yum.AbstractYumNexusTestCase;
-import de.is24.nexus.yum.service.YumService;
+import de.is24.nexus.yum.repository.service.YumService;
 
 
 public class DeactivationResourceTest extends AbstractYumNexusTestCase {

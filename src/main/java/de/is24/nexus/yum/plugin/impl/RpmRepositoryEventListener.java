@@ -24,8 +24,8 @@ import de.is24.nexus.yum.plugin.ItemEventListener;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.plugin.event.YumRepositoryGenerateEvent;
 import de.is24.nexus.yum.plugin.m2yum.M2YumGroupRepository;
-import de.is24.nexus.yum.service.RepositoryRpmManager;
-import de.is24.nexus.yum.service.YumService;
+import de.is24.nexus.yum.repository.service.YumService;
+import de.is24.nexus.yum.version.service.RepositoryRpmManager;
 
 
 @Component(role = ItemEventListener.class, instantiationStrategy = Strategies.LOAD_ON_START)

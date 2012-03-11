@@ -12,7 +12,7 @@ import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 import org.sonatype.scheduling.TaskState;
 import de.is24.nexus.yum.plugin.impl.MavenRepositoryInfo;
-import de.is24.nexus.yum.service.RepositoryRpmManager;
+import de.is24.nexus.yum.version.service.RepositoryRpmManager;
 
 
 /**

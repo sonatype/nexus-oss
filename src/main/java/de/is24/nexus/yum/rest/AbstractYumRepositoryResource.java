@@ -12,6 +12,9 @@ import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import de.is24.nexus.yum.repository.FileDirectoryStructure;
+import de.is24.nexus.yum.rest.domain.IndexRepresentation;
+import de.is24.nexus.yum.rest.domain.UrlPathInterpretation;
+import de.is24.nexus.yum.rest.domain.YumFileRepresentation;
 
 
 public abstract class AbstractYumRepositoryResource extends AbstractPlexusResource {

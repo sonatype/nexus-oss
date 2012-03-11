@@ -17,7 +17,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 
 import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.plugin.DeletionService;
-import de.is24.nexus.yum.service.YumService;
+import de.is24.nexus.yum.repository.service.YumService;
 
 @Component(role = DeletionService.class)
 public class DefaultDeletionService implements DeletionService {

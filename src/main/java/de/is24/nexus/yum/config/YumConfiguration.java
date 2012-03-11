@@ -2,8 +2,8 @@ package de.is24.nexus.yum.config;
 
 import java.io.File;
 
-import de.is24.nexus.yum.alias.AliasNotFoundException;
 import de.is24.nexus.yum.config.domain.XmlYumConfiguration;
+import de.is24.nexus.yum.version.alias.AliasNotFoundException;
 
 
 public interface YumConfiguration {

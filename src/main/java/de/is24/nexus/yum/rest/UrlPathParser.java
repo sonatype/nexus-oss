@@ -10,6 +10,8 @@ import java.util.List;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 
+import de.is24.nexus.yum.rest.domain.UrlPathInterpretation;
+
 
 public class UrlPathParser {
   private static final int FIRST_PARAM = 0;

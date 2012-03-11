@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import de.is24.nexus.yum.alias.domain.AliasMapping;
+import de.is24.nexus.yum.version.alias.domain.AliasMapping;
 
 
 /**

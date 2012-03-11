@@ -8,6 +8,8 @@ import org.restlet.data.Method;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 
+import de.is24.nexus.yum.rest.domain.UrlPathInterpretation;
+
 
 public class UrlPathParserTest {
   private static final String DOMAIN = "http://localhost:8081";
