@@ -253,6 +253,10 @@ public abstract class AbstractStagingMojo
         this.repositoryId = repositoryId;
     }
 
+    /**
+     * Create an error message from a staging rule failure's XML document.
+     * @throws NullPointerException if the given document is {@code null}
+     */
     protected String ruleFailureMessage( final Document document )
     {
         if ( getLog().isDebugEnabled() )
@@ -300,7 +304,9 @@ public abstract class AbstractStagingMojo
     }
 
     /**
-     * Log the detailed error document if it's available, return MojoExecutionException with appropriate message and cause..
+     * Log the detailed error document if it's available, return MojoExecutionException with appropriate message and cause.
+     *
+     * @throws NullPointerException if the given exception is null
      */
     protected MojoExecutionException logErrorDetailAndCreateException( final RESTLightClientException e,
                                                                        final String msg )
