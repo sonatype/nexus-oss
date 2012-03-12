@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.restlight.common;
 
+import org.jdom.Document;
+
 /**
  * Exception indicating a failure to communicate with the Nexus server. This normally means either an 
  * I/O failure or a failure to parse the response message.
@@ -22,14 +24,27 @@ public class RESTLightClientException
 
     private static final long serialVersionUID = 1L;
 
-    public RESTLightClientException( final String message, final Throwable cause )
+    private final Document errorDocument;
+
+    public Document getErrorDocument()
+    {
+        return errorDocument;
+    }
+
+    public RESTLightClientException( final String message, final Throwable cause, final Document errorDocument )
     {
         super( message, cause );
+        this.errorDocument = errorDocument;
+    }
+
+    public RESTLightClientException( final String message, final Throwable cause )
+    {
+        this( message, cause, null );
     }
 
     public RESTLightClientException( final String message )
     {
-        super( message );
+        this( message, null, null );
     }
 
 }

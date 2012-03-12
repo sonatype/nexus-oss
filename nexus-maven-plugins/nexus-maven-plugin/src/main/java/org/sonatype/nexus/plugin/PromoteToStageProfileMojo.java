@@ -128,7 +128,7 @@ public class PromoteToStageProfileMojo
         }
         catch ( RESTLightClientException e )
         {
-            throw new MojoExecutionException( "Failed to promote staging repositories: " + e.getMessage(), e );
+            throw logErrorDetailAndCreateException( e, "Failed to promote staging repositories" );
         }
 
         listRepos( null, null, null, "The following CLOSED staging repositories were found" );

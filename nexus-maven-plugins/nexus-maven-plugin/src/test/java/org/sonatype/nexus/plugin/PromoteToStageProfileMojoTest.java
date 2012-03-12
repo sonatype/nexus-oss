@@ -12,29 +12,43 @@
  */
 package org.sonatype.nexus.plugin;
 
-import static org.junit.Assert.fail;
-
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.settings.Server;
-import org.apache.maven.settings.Settings;
-import org.jdom.JDOMException;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.any;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
-import org.junit.Test;
-import org.sonatype.nexus.plugin.discovery.fixture.DefaultDiscoveryFixture;
-import org.sonatype.nexus.restlight.common.RESTLightClientException;
-import org.sonatype.nexus.restlight.stage.StageClient;
-import org.sonatype.nexus.restlight.testharness.GETFixture;
-import org.sonatype.nexus.restlight.testharness.POSTFixture;
-import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.settings.Server;
+import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.sonatype.nexus.plugin.discovery.fixture.DefaultDiscoveryFixture;
+import org.sonatype.nexus.restlight.common.RESTLightClientException;
+import org.sonatype.nexus.restlight.stage.StageClient;
+import org.sonatype.nexus.restlight.stage.StageProfile;
+import org.sonatype.nexus.restlight.stage.StageRepository;
+import org.sonatype.nexus.restlight.testharness.GETFixture;
+import org.sonatype.nexus.restlight.testharness.POSTFixture;
+import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 
 public class PromoteToStageProfileMojoTest
     extends NexusMojoTestSupport
@@ -253,6 +267,69 @@ public class PromoteToStageProfileMojoTest
         mojo.setNexusUrl( getBaseUrl() );
 
         runMojo( mojo );
+    }
+
+    /**
+     * Verify that the error document is read from a restlight exception.
+     */
+    @Test
+    public void testStagingRuleFailure()
+        throws RESTLightClientException, JDOMException, IOException, MojoExecutionException
+    {
+        final StageClient client = mock( StageClient.class );
+
+        PromoteToStageProfileMojo mojo = new PromoteToStageProfileMojo()
+        {
+            @Override
+            protected StageClient getClient()
+                throws MojoExecutionException
+            {
+                return client;
+            }
+        };
+
+        mojo.setNexusUrl( getBaseUrl() );
+        mojo.setStagingBuildPromotionProfileId( "profile3" );
+        mojo.getRepositoryIds().add( "repoId1" );
+        mojo.setDescription( "this is a description" );
+
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
+
+        mojo.setPrompter( prompter );
+        mojo.setDiscoverer( new DefaultDiscoveryFixture( secDispatcher, prompter ) );
+        mojo.setDispatcher( secDispatcher );
+
+//        prompter.addExpectation( "1", "" );
+
+        final StageRepository repository = mock( StageRepository.class );
+        final StageProfile profile = mock( StageProfile.class );
+        final Document document = mock( Document.class );
+        final Element element = mock( Element.class );
+
+        when( document.getRootElement() ).thenReturn( element );
+        when( element.getName() ).thenReturn( "stagingRuleFailures" );
+
+        when( repository.getRepositoryId() ).thenReturn( "repoId1" );
+        when( client.getBuildPromotionProfiles() ).thenReturn( Lists.newArrayList( profile ) );
+        when( client.getClosedStageRepositories() )
+            .thenReturn( Lists.<StageRepository>newArrayList( repository ) );
+
+        doThrow( new RESTLightClientException( "msg", null, document ) )
+            .when( client ).promoteRepositories( anyString(), anyString(), Mockito.any(List.class) );
+
+        try
+        {
+            mojo.execute();
+            assertThat( "mojo should have thrown an exception", false );
+        }
+        catch ( MojoExecutionException e )
+        {
+            assertThat( e.getCause(), nullValue() );
+            Mockito.verify( document, atLeastOnce() ).getRootElement();
+            Mockito.verify( element ).getName();
+            Mockito.verify( element ).getChild( "failures" );
+        }
     }
 
     private PromoteToStageProfileMojo newMojo()

@@ -70,6 +70,13 @@ public class CloseStageRepositoryMojo
     @Deprecated
     private boolean auto;
 
+    /**
+     * If true, the mojo will try to remove the staging repository it was not able to close.
+     *
+     * @parameter expression="${nexus.dropOnFailure}" default-value="false"
+     */
+    private boolean dropOnFailure;
+
     protected void doExecute()
         throws MojoExecutionException
     {
@@ -109,10 +116,26 @@ public class CloseStageRepositoryMojo
             try
             {
                 client.finishRepository( repo, getDescription() );
+
             }
             catch ( RESTLightClientException e )
             {
-                throw new MojoExecutionException( "Failed to close open staging repository: " + e.getMessage(), e );
+
+                if ( dropOnFailure )
+                {
+                    try
+                    {
+                        getLog().warn( "Dropping the repository as requested because there were failures... (" + repo.getRepositoryId() + ")" );
+                        client.dropRepository( repo, getDescription() );
+                        getLog().debug( "Dropped " + repo.getRepositoryId() );
+                    }
+                    catch ( RESTLightClientException e1 )
+                    {
+                        getLog().error( "Could not drop " + repo.getRepositoryId() + "(" + repo.getUrl() + ")" );
+                    }
+                }
+
+                throw logErrorDetailAndCreateException( e, "Failed to close open staging repository" );
             }
         }
         else
@@ -162,6 +185,17 @@ public class CloseStageRepositoryMojo
     {
         this.description = description;
     }
+
+    public boolean isDropOnFailure()
+    {
+        return dropOnFailure;
+    }
+
+    public void setDropOnFailure( final boolean dropOnFailure )
+    {
+        this.dropOnFailure = dropOnFailure;
+    }
+
 
     private String promptForMissingDescription()
         throws MojoExecutionException

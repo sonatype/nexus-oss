@@ -12,6 +12,21 @@
  */
 package org.sonatype.nexus.plugin;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -19,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import com.google.common.collect.Lists;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
@@ -26,19 +42,17 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasSize;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.sonatype.nexus.plugin.discovery.fixture.DefaultDiscoveryFixture;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
+import org.sonatype.nexus.restlight.stage.StageRepository;
 import org.sonatype.nexus.restlight.testharness.GETFixture;
 import org.sonatype.nexus.restlight.testharness.POSTFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
@@ -308,6 +322,122 @@ public class CloseStageRepositoryMojoTest
         mojo.setNexusUrl( getBaseUrl() );
 
         runMojo( mojo );
+    }
+
+    /**
+     * Verify that the error document is read from a restlight exception.
+     */
+    @Test
+    public void testRemoveOnFailure()
+        throws RESTLightClientException, JDOMException, IOException, MojoExecutionException
+    {
+        final StageClient client = mock( StageClient.class );
+
+        CloseStageRepositoryMojo mojo = new CloseStageRepositoryMojo()
+        {
+            @Override
+            protected StageClient getClient()
+                throws MojoExecutionException
+            {
+                return client;
+            }
+        };
+
+        mojo.setNexusUrl( "url" );
+        mojo.setArtifactId( "artifactId" );
+        mojo.setGroupId( "group.id" );
+        mojo.setVersion( "1" );
+        mojo.setDescription( "this is a description" );
+        mojo.setDropOnFailure( true );
+
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
+
+        mojo.setPrompter( prompter );
+        mojo.setDiscoverer( new DefaultDiscoveryFixture( secDispatcher, prompter ) );
+        mojo.setDispatcher( secDispatcher );
+
+        prompter.addExpectation( "1", "" );
+
+        final StageRepository repository = mock( StageRepository.class );
+        final Element element = mock( Element.class );
+
+        when( client.getOpenStageRepositoriesForUser( anyString(), anyString(), anyString() ) )
+            .thenReturn( Lists.<StageRepository>newArrayList( repository ) );
+
+        doThrow( new RESTLightClientException( "msg", null, null ) )
+            .when( client ).finishRepository( eq( repository ), anyString() );
+
+        try
+        {
+            runMojo( mojo );
+            assertThat( "mojo should have thrown an exception", false );
+        }
+        catch ( MojoExecutionException e )
+        {
+            verify( client ).dropRepository( eq(repository), anyString() );
+        }
+    }
+
+    /**
+     * Verify that the error document is read from a restlight exception.
+     */
+    @Test
+    public void testStagingRuleFailure()
+        throws RESTLightClientException, JDOMException, IOException, MojoExecutionException
+    {
+        final StageClient client = mock( StageClient.class );
+
+        CloseStageRepositoryMojo mojo = new CloseStageRepositoryMojo()
+        {
+            @Override
+            protected StageClient getClient()
+                throws MojoExecutionException
+            {
+                return client;
+            }
+        };
+
+        mojo.setNexusUrl( "url" );
+        mojo.setArtifactId( "artifactId" );
+        mojo.setGroupId( "group.id" );
+        mojo.setVersion( "1" );
+        mojo.setDescription( "this is a description" );
+
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
+
+        mojo.setPrompter( prompter );
+        mojo.setDiscoverer( new DefaultDiscoveryFixture( secDispatcher, prompter ) );
+        mojo.setDispatcher( secDispatcher );
+
+        prompter.addExpectation( "1", "" );
+
+        final StageRepository repository = mock( StageRepository.class );
+        final Document document = mock( Document.class );
+        final Element element = mock( Element.class );
+
+        when( document.getRootElement() ).thenReturn( element );
+        when( element.getName() ).thenReturn( "stagingRuleFailures" );
+
+        when( client.getOpenStageRepositoriesForUser( anyString(), anyString(), anyString() ) )
+            .thenReturn( Lists.<StageRepository>newArrayList( repository ) );
+
+        doThrow( new RESTLightClientException( "msg", null, document ) )
+            .when( client ).finishRepository( eq( repository ), anyString()  );
+
+        try
+        {
+            runMojo( mojo );
+            assertThat( "mojo should have thrown an exception", false );
+        }
+        catch ( MojoExecutionException e )
+        {
+            assertThat( e.getCause(), nullValue() );
+            Mockito.verify( document, atLeastOnce() ).getRootElement();
+            Mockito.verify( element ).getName();
+            Mockito.verify( element ).getChild( "failures" );
+        }
     }
 
     private CloseStageRepositoryMojo newMojo()
