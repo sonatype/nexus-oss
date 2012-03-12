@@ -296,24 +296,24 @@ public class M2RepositoryTest
     public void testExpirationAlwaysUpdate()
         throws Exception
     {
-        doTestExpiration( "/spoof/maven-metadata.xml", 0, 3 );
-        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 0, 3 );
+        doTestExpiration( "/spoof/maven-metadata.xml", 0, 1,2,3 );
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 0, 1,2,3 );
     }
 
     @Test
     public void testExpirationNeverUpdate()
         throws Exception
     {
-        doTestExpiration( "/spoof/maven-metadata.xml", -1, 1 );
-        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", -1, 1 );
+        doTestExpiration( "/spoof/maven-metadata.xml", -1, 1,1,1 );
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", -1, 1,1,1 );
     }
 
     @Test
     public void testExpiration()
         throws Exception
     {
-        doTestExpiration( "/spoof/maven-metadata.xml", 1, 2 );
-        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 1, 2 );
+        doTestExpiration( "/spoof/maven-metadata.xml", 1, 1,1,2 );
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 1, 1,1,2 );
     }
 
     /**
@@ -322,7 +322,7 @@ public class M2RepositoryTest
      * NEXUS-3065
      * NEXUS-4099
      */
-    public void doTestExpiration( String path, final int age, final int expectedHits )
+    private void doTestExpiration( String path, final int age, final int... expectedHits )
         throws Exception
     {
         CounterListener ch = new CounterListener();
@@ -356,6 +356,8 @@ public class M2RepositoryTest
 
         final StorageItem item = repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
+        assertThat( "Remote hits count fail after first request", ch.getRequestCount(), equalTo( expectedHits[0] ) );
+
         for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 2L * A_DAY ) ); i++ )
         {
             System.gc(); // helps with FS sync'ing on Windows
@@ -364,6 +366,8 @@ public class M2RepositoryTest
 
         // this goes remote depending on age setting
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
+
+        assertThat( "Remote hits count fail after second request", ch.getRequestCount(), equalTo( expectedHits[1] ) );
 
         for ( int i = 0; i < 10 && !mdFile.setLastModified( System.currentTimeMillis() - ( 1L * A_DAY ) ); i++ )
         {
@@ -380,7 +384,7 @@ public class M2RepositoryTest
 
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
-        assertThat( "Remote hits count fail", ch.getRequestCount(), equalTo( expectedHits ) );
+        assertThat( "Remote hits count fail after third request", ch.getRequestCount(), equalTo( expectedHits[2] ) );
     }
 
     @Test
