@@ -7,8 +7,8 @@ import javax.inject.Inject;
 import org.codehaus.plexus.component.annotations.Component;
 
 import de.is24.nexus.yum.config.YumConfiguration;
+import de.is24.nexus.yum.metarepo.service.RepositoryRpmManager;
 import de.is24.nexus.yum.version.alias.AliasNotFoundException;
-import de.is24.nexus.yum.version.service.RepositoryRpmManager;
 
 
 @Component(role = RepositoryAliasService.class)

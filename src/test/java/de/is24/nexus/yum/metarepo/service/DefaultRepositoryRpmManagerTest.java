@@ -1,4 +1,4 @@
-package de.is24.nexus.yum.version.service;
+package de.is24.nexus.yum.metarepo.service;
 
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.REPOSITORY_RPM_CACHE_DIR;
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.assertRepository;
@@ -16,7 +16,7 @@ import org.junit.Test;
 
 import de.is24.nexus.yum.AbstractRepositoryTester;
 import de.is24.nexus.yum.config.YumConfiguration;
-import de.is24.nexus.yum.version.service.RepositoryRpmManager;
+import de.is24.nexus.yum.metarepo.service.RepositoryRpmManager;
 
 
 public class DefaultRepositoryRpmManagerTest extends AbstractRepositoryTester {

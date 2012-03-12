@@ -17,8 +17,8 @@ import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
 import com.google.code.tempusfugit.temporal.Condition;
 import de.is24.nexus.yum.AbstractRepositoryTester;
+import de.is24.nexus.yum.metarepo.service.RepositoryRpmManager;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
-import de.is24.nexus.yum.version.service.RepositoryRpmManager;
 
 
 public class DefaultRepositoryRegistryTest extends AbstractRepositoryTester {

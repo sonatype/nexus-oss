@@ -1,4 +1,4 @@
-package de.is24.nexus.yum.version.service;
+package de.is24.nexus.yum.metarepo.service;
 
 import static java.lang.String.format;
 

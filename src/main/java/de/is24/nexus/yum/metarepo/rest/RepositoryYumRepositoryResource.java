@@ -1,16 +1,17 @@
 package de.is24.nexus.yum.metarepo.rest;
 
-import static de.is24.nexus.yum.version.service.RepositoryRpmManager.URL_PREFIX;
+import static de.is24.nexus.yum.metarepo.service.RepositoryRpmManager.URL_PREFIX;
 
 import javax.inject.Inject;
 import javax.ws.rs.Path;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+
+import de.is24.nexus.yum.metarepo.service.RepositoryRpmManager;
 import de.is24.nexus.yum.repository.YumRepository;
 import de.is24.nexus.yum.rest.AbstractYumRepositoryResource;
 import de.is24.nexus.yum.rest.domain.UrlPathInterpretation;
-import de.is24.nexus.yum.version.service.RepositoryRpmManager;
 
 
 /**

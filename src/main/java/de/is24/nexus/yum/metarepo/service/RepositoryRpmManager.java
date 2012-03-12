@@ -1,4 +1,4 @@
-package de.is24.nexus.yum.version.service;
+package de.is24.nexus.yum.metarepo.service;
 
 import java.io.File;
 import java.util.concurrent.ExecutionException;
