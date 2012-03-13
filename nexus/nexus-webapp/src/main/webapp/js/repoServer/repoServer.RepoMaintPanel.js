@@ -276,6 +276,27 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
 
 Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
 
+	      deleteRecord : function(rec) {
+        Ext.Ajax.request({
+              callback : function(options, success, response) {
+                if (success)
+                {
+                  this.dataStore.remove(rec);
+                }
+                else
+                {
+                	var options = {
+                		hideErrorStatus : true
+                	};
+                  Sonatype.utils.connectionError(response, 'Delete Failed!', false, options);
+                }
+              },
+              scope : this,
+              method : 'DELETE',
+              url : rec.data.resourceURI
+            });
+      },
+
       applyBookmark : function(bookmark) {
         this.updatingBookmark = true;
         if (this.groupStore.lastOptions == null)

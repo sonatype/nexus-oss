@@ -379,10 +379,9 @@ public class RepositoryPlexusResource
         }
         catch ( ConfigurationException e )
         {
-            getLogger().warn( "Repository not deletable, it has dependants, id=" + repoId );
+            getLogger().warn( e.getMessage() );
 
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
-                                         "Repository is not deletable, it has dependants." );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(), e );
         }
         catch ( NoSuchRepositoryAccessException e )
         {
