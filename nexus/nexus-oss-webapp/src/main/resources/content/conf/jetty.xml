@@ -48,6 +48,12 @@
       <Arg><Ref id="Contexts"/></Arg>
       <Arg>${nexus-webapp}</Arg>
       <Arg>${nexus-webapp-context-path}</Arg>
+      <Set name="serverClasses">
+        <Array type="java.lang.String">
+          <Item>org.slf4j.</Item>
+          <Item>ch.qos.logback.</Item>
+        </Array>
+      </Set>
       <Set name="extractWAR">false</Set>
     </New>
     
