@@ -12,7 +12,10 @@
  */
 package org.sonatype.nexus.proxy.walker;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.TreeSet;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -216,6 +219,13 @@ public class DefaultWalker
         if ( shouldProcessRecursively )
         {
             ls = context.getRepository().list( false, coll );
+
+            if ( context.getItemComparator() != null )
+            {
+                final ArrayList list = new ArrayList( ls );
+                Collections.sort( list, context.getItemComparator() );
+                ls = list;
+            }
 
             for ( StorageItem i : ls )
             {

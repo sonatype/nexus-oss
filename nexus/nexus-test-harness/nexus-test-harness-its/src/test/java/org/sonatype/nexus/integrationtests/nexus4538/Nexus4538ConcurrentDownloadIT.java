@@ -63,7 +63,10 @@ public class Nexus4538ConcurrentDownloadIT
         String path = getRelitiveArtifactPath( gav );
         final URL url = new URL( baseUrl + path );
 
-        final long op = clockUrlDownload( url );
+        // same trick as with the throttling tests to counter load spikes on CI:
+        // get an already throttled baseline and test that it does not get worse.
+        // This download will take about 3 seconds now.
+        final long op = clockUrlDownload( url, 2000 );
 
         final Long[] time = new Long[1];
         final Throwable[] errors = new Throwable[1];
@@ -106,7 +109,7 @@ public class Nexus4538ConcurrentDownloadIT
         final long ping = clockUrlDownload( url );
 
         // check if ping was not blocked by download
-        assertThat( "Ping took " + ping + " original pind " + op, ping, lessThan( op * 2 ) );
+        assertThat( "Ping took " + ping + " original ping " + op, ping, lessThan( op * 2 ) );
 
         if ( time[0] != null )
         {
