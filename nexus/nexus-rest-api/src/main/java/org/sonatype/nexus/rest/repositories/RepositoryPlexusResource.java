@@ -380,7 +380,7 @@ public class RepositoryPlexusResource
         }
         catch ( RepositoryDependantException e )
         {
-            getLogger().warn( e.getMessage() );
+            getLogger().info( e.getMessage() );
 
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getUIMessage(), e );
         }
