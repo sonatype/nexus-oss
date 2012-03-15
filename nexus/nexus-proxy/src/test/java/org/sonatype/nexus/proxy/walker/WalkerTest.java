@@ -12,12 +12,22 @@
  */
 package org.sonatype.nexus.proxy.walker;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
+
+import java.util.Comparator;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import junit.framework.Assert;
+import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
 import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -82,7 +92,7 @@ public class WalkerTest
 
         walker.walk( wc );
 
-        assertFalse( "Should not be stopped!", wc.isStopped() );
+        assertThat( "Should not be stopped!", wc.isStopped(), is( false ) );
 
         if ( wc.getStopCause() != null )
         {
@@ -131,6 +141,81 @@ public class WalkerTest
         Assert.assertEquals( 0, wp.colls );
         Assert.assertEquals( 0, wp.files );
         Assert.assertEquals( 0, wp.links );
+    }
+
+    /**
+     * Tests whether the walker makes use of the item comparator set in the context.
+     */
+    @Test
+    public void testSortedWalk()
+        throws Exception
+    {
+        // fetch some content to have on walk on something
+        getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar", false ) );
+        getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.pom", false ) );
+
+        Comparator<StorageItem> itemComparator = new Comparator<StorageItem>()
+        {
+            @Override
+            public int compare( final StorageItem o1, final StorageItem o2 )
+            {
+                return o1.getName().compareTo( o2.getName() );
+            }
+        };
+
+        Matcher<Iterable<? extends String>> matcher = contains(
+            "slf4j-api-1.4.3.jar",
+            "slf4j-api-1.4.3.jar.sha1",
+            "slf4j-api-1.4.3.pom",
+            "slf4j-api-1.4.3.pom.sha1" );
+
+        assertSortedWalk( itemComparator, matcher );
+
+        itemComparator = new Comparator<StorageItem>()
+        {
+            @Override
+            public int compare( final StorageItem o1, final StorageItem o2 )
+            {
+                return o2.getName().compareTo( o1.getName() );
+            }
+        };
+
+        matcher = contains(
+            "slf4j-api-1.4.3.pom.sha1",
+            "slf4j-api-1.4.3.pom",
+            "slf4j-api-1.4.3.jar.sha1",
+            "slf4j-api-1.4.3.jar"
+        );
+
+        assertSortedWalk( itemComparator, matcher );
+    }
+
+    private void assertSortedWalk( final Comparator<StorageItem> itemComparator,
+                                   final Matcher<Iterable<? extends String>> matcher )
+        throws NoSuchRepositoryException
+    {
+
+        DefaultWalkerContext wc = new DefaultWalkerContext(
+            getRepositoryRegistry().getRepository( "test" ),
+            new ResourceStoreRequest( "/org/slf4j/slf4j-api/1.4.3", true )
+        );
+
+        final List<String> seen = Lists.newLinkedList();
+        wc.getProcessors().add( new AbstractWalkerProcessor()
+        {
+            @Override
+            public void processItem( final WalkerContext context, final StorageItem item )
+                throws Exception
+            {
+                seen.add( item.getName() );
+            }
+        } );
+
+        wc.setItemComparator( itemComparator );
+
+        walker.walk( wc );
+
+        assertThat( seen, matcher );
     }
 
     private class TestWalkerProcessor

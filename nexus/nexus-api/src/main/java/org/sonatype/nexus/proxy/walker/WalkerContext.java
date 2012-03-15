@@ -12,10 +12,12 @@
  */
 package org.sonatype.nexus.proxy.walker;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -101,4 +103,9 @@ public interface WalkerContext
      * @return
      */
     WalkerThrottleController getThrottleController();
+
+    /**
+     * Returns a comparator that defines the item order when walking a collection.
+     */
+    Comparator<StorageItem> getItemComparator();
 }

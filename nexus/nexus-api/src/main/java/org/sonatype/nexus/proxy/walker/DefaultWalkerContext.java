@@ -13,11 +13,13 @@
 package org.sonatype.nexus.proxy.walker;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.TaskInterruptedException;
 import org.sonatype.scheduling.TaskUtil;
@@ -38,6 +40,8 @@ public class DefaultWalkerContext
     private List<WalkerProcessor> processors;
 
     private Throwable stopCause;
+
+    private Comparator<StorageItem> itemComparator;
 
     private volatile boolean running;
 
@@ -165,4 +169,15 @@ public class DefaultWalkerContext
     {
         return this.throttleController;
     }
+
+    public Comparator<StorageItem> getItemComparator()
+    {
+        return itemComparator;
+    }
+
+    public void setItemComparator( final Comparator<StorageItem> itemComparator )
+    {
+        this.itemComparator = itemComparator;
+    }
+
 }
