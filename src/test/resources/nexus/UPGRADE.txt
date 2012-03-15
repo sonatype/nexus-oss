@@ -1,9 +1,0 @@
-
-
-To run tests with the professional version of nexus, we had the problem, that the professional version is not available as deployable WAR.
-
-That's why we build a WAR out of the professional version bundle:
-- copy libs to WEB-INF/libs
-- copy plugins to WEB-INF/runtime/...
-- copy plexus.xml,plexus.properties,jetty.xml to WEB-INF/
-- comment out all JettyServletContainer-Stuff in plexus.xml  
