@@ -64,7 +64,7 @@ public class DefaultYumService implements YumService {
         config.repoUrl(yumRepoUrl.toString());
         config.cacheDir(createCacheDir("nexus-yum-repo"));
         config.singleRpmPerDirectory(singleRpmPerDirectory);
-				return nexusScheduler.submit(ID, createTask(config));
+				return submitTask(config);
       }
     } catch (Exception e) {
       throw new RuntimeException("Unable to create repository", e);
@@ -87,13 +87,17 @@ public class DefaultYumService implements YumService {
         config.id(repository.getId());
         config.version(version);
         config.cacheDir(createCacheDir(repository.getId()));
-				return nexusScheduler.submit(ID, createTask(config));
+				return submitTask(config);
       }
     } catch (Exception e) {
       throw new RuntimeException("Unable to create repository", e);
     }
 
     return null;
+  }
+
+  private ScheduledTask<YumRepository> submitTask(YumGeneratorConfigurationBuilder config) {
+    return nexusScheduler.submit(ID, createTask(config));
   }
 
   @Override
@@ -148,7 +152,7 @@ public class DefaultYumService implements YumService {
         config.id(repository.getId());
         config.cacheDir(createCacheDir(repository.getId()));
         config.addedFile(filePath);
-				return nexusScheduler.submit(ID, createTask(config));
+				return submitTask(config);
       }
     } catch (Exception e) {
       throw new RuntimeException("Unable to create repository", e);

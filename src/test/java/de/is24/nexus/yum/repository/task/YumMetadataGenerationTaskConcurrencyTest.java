@@ -1,4 +1,4 @@
-package de.is24.nexus.yum.repository.service;
+package de.is24.nexus.yum.repository.task;
 
 import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.ID;
 import static de.is24.test.reflection.ReflectionTestUtils.findMethod;
@@ -33,12 +33,11 @@ import com.google.code.tempusfugit.temporal.Condition;
 import de.is24.nexus.yum.repository.AbstractSchedulerTest;
 import de.is24.nexus.yum.repository.YumRepository;
 import de.is24.nexus.yum.repository.config.YumGeneratorConfiguration;
-import de.is24.nexus.yum.repository.task.YumMetadataGenerationTask;
 
 
-public class ThreadPoolYumRespositoryCreatorServiceTest extends AbstractSchedulerTest {
+public class YumMetadataGenerationTaskConcurrencyTest extends AbstractSchedulerTest {
   public static final int PARALLEL_THREAD_COUNT = 5;
-  public static final Logger LOG = LoggerFactory.getLogger(ThreadPoolYumRespositoryCreatorServiceTest.class);
+  public static final Logger LOG = LoggerFactory.getLogger(YumMetadataGenerationTaskConcurrencyTest.class);
 
   @Requirement
   private NexusScheduler nexusScheduler;
