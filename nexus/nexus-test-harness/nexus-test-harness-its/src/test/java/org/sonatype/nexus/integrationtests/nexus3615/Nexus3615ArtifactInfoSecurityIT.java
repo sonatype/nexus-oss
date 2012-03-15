@@ -40,11 +40,6 @@ public class Nexus3615ArtifactInfoSecurityIT
 
     protected RoleMessageUtil roleUtil;
 
-    public Nexus3615ArtifactInfoSecurityIT()
-    {
-
-    }
-
     @BeforeClass
     public void setSecureTest()
     {
