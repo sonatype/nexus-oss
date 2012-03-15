@@ -776,6 +776,29 @@
                 Sonatype.repoServer.RepoServer.loginForm.getForm().reset();
               }
 
+              if (  Sonatype.repoServer.RepoServer.sessionRefreshTask )
+              {
+                Ext.TaskMgr.stop(Sonatype.repoServer.RepoServer.sessionRefreshTask);
+              }
+
+              Sonatype.repoServer.RepoServer.sessionRefreshTask = {
+                run: function()
+                {
+                  Ext.Ajax.request({
+                    method : 'GET',
+                    options : {
+                      ignore401 : true
+                    },
+                    url : Sonatype.config.repos.urls.status,
+                    callback : function(options, success, response) {
+                      // do nothing, we only request to refresh session
+                    }
+                  });
+                },
+                interval: 10000
+              };
+              Ext.TaskMgr.start(Sonatype.repoServer.RepoServer.sessionRefreshTask);
+
               var respObj = Ext.decode(response.responseText);
               Sonatype.utils.loadNexusStatus(respObj.data.clientPermissions.loggedInUserSource);
             },
