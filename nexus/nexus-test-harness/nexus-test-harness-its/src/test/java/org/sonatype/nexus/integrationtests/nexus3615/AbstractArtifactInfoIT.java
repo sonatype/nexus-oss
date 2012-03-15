@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryUrlResource;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public abstract class AbstractArtifactInfoIT
     extends AbstractNexusIntegrationTest
@@ -45,6 +46,7 @@ public abstract class AbstractArtifactInfoIT
         getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_REPO2, jar, pom, null, null );
         getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_RELEASE_REPO, jar, pom, null, null );
         
+        TaskScheduleUtil.waitForAllTasksToStop();
         getEventInspectorsUtil().waitForCalmPeriod();
     }
 
