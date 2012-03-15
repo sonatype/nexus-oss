@@ -811,8 +811,7 @@ public class DefaultNexusConfiguration
 
             if ( repository.getId().equals( shadow.getMasterRepository().getId() ) )
             {
-                throw new ConfigurationException( "The repository '" + repository.getName()
-                    + "' is not deletable cause '" + shadow.getName() + "' depends on it!" );
+                throw new RepositoryDependantException( repository, shadow );
             }
         }
 

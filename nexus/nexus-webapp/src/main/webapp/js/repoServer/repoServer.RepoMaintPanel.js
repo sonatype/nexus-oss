@@ -288,7 +288,7 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
                 	var options = {
                 		hideErrorStatus : true
                 	};
-                  Sonatype.utils.connectionError(response, 'Delete Failed!', false, options);
+                  Sonatype.utils.connectionError(response, 'Delete request could not be completed!', false, options);
                 }
               },
               scope : this,
