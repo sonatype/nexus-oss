@@ -43,6 +43,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
   private static final Logger LOG = LoggerFactory.getLogger(YumMetadataGenerationTask.class);
   public static final int MAXIMAL_PARALLEL_RUNS = 10;
+  public static final String PARAM_REPO_ID = "yumMetadataGenerationRepoId";
   private static boolean activated = true;
 
   private YumGeneratorConfiguration config;
@@ -90,6 +91,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
 
   public void setConfiguration(YumGeneratorConfiguration config) {
     this.config = config;
+    getParameters().put(PARAM_REPO_ID, config.getId());
   }
 
   @Override
