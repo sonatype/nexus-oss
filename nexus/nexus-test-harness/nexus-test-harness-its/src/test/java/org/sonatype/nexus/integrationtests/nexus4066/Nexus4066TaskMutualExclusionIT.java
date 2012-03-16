@@ -77,7 +77,7 @@ public class Nexus4066TaskMutualExclusionIT
 
     @AfterMethod
     public void killTasks()
-        throws IOException
+        throws Exception
     {
         // first I wanna cancel any blocked task, then I cancel the blocker
         Collections.reverse( tasks );
@@ -86,18 +86,30 @@ public class Nexus4066TaskMutualExclusionIT
         {
             TaskScheduleUtil.cancel( task.getId() );
         }
+
+        TaskScheduleUtil.deleteAllTasks();
     }
 
     @Test( dataProvider = "data" )
     public void run( String repo1, String repo2, boolean shouldWait )
         throws Exception
     {
+
+        StringBuilder msg = new StringBuilder("Running tasks:\n");
         try
         {
             ScheduledServiceListResource task1 = createTask( repo1 );
             assertThat( task1.getStatus(), equalTo( TaskState.RUNNING.name() ) );
 
             ScheduledServiceListResource task2 = createTask( repo2 );
+
+            final List<ScheduledServiceListResource> allTasks = TaskScheduleUtil.getAllTasks();
+            for ( ScheduledServiceListResource allTask : allTasks )
+            {
+                msg.append( allTask.getName() ).append( ": " );
+                msg.append( allTask.getStatus() ).append( "\n" );
+            }
+
             if ( shouldWait )
             {
                 assertThat( task2.getStatus(), equalTo( TaskState.SLEEPING.name() ) );
@@ -109,7 +121,7 @@ public class Nexus4066TaskMutualExclusionIT
         }
         catch ( java.lang.AssertionError e )
         {
-            throw new RuntimeException( "Repo1: " + repo1 + " repo2: " + repo2 + " shouldWait: " + shouldWait, e );
+            throw new RuntimeException( "Repo1: " + repo1 + " repo2: " + repo2 + " shouldWait: " + shouldWait + "\n" + msg.toString(), e );
         }
     }
 
