@@ -52,7 +52,8 @@
     <hamcrest.version>1.2.1</hamcrest.version>
     <nexus.start.command>start</nexus.start.command>
     <nexus.root.dir>${project.build.directory}/nexus</nexus.root.dir>
-    <nexus.exec>${nexus.root.dir}/nexus-professional-${nexus.version}/bin/nexus</nexus.exec>
+    <nexus.base.dir>${nexus.root.dir}/nexus-professional-${nexus.version}</nexus.base.dir>
+    <nexus.exec>${nexus.base.dir}/bin/nexus</nexus.exec>
     <nexus.work.dir>${project.build.directory}/test-classes/nexus/sonatype-work/nexus</nexus.work.dir>
     <nexus.port>8080</nexus.port>
   </properties>
@@ -338,6 +339,7 @@
       </plugin>
 
       <!-- copy jar to sonatype config dir -->
+      <!-- copy wrapper-override.conf -->
       <!-- run nexus application -->
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
@@ -352,6 +354,7 @@
             <configuration>
               <target>
                 <unzip src="${project.build.directory}/${project.build.finalName}-bundle.zip" dest="${nexus.work.dir}/plugin-repository" />
+                <copy file="${project.build.directory}/test-classes/nexus/wrapper-override.conf" todir="${nexus.base.dir}/conf/" />
                 <exec executable="${nexus.exec}">
                   <arg value="${nexus.start.command}" />
                   <env key="PLEXUS_NEXUS_WORK" value="${nexus.work.dir}" />
