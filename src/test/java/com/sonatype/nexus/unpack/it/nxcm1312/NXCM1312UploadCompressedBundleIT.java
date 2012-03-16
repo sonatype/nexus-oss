@@ -7,6 +7,10 @@
  */
 package com.sonatype.nexus.unpack.it.nxcm1312;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.not;
+import static org.sonatype.nexus.test.utils.NexusRequestMatchers.isSuccess;
+
 import java.io.File;
 
 import org.restlet.data.MediaType;
@@ -16,6 +20,8 @@ import org.restlet.data.Status;
 import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.Representation;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -54,7 +60,7 @@ public class NXCM1312UploadCompressedBundleIT
 
         // Check for the parent folder, it should been created
         File root = new File( nexusWorkDir, "storage/nexus-test-harness-repo/some/path" );
-        Assert.assertTrue( root.isDirectory() );
+        assertThat( root, FileMatchers.isDirectory() );
     }
 
     @Test( dependsOnMethods = "uploadWithPath" )
@@ -77,19 +83,19 @@ public class NXCM1312UploadCompressedBundleIT
             MediaType.APPLICATION_ZIP );
 
         // 1. upload the bundle
-        Assert.assertTrue( uploadBundle( false, bundleRepresentation ).isSuccess() );
+        assertThat( uploadBundle( false, bundleRepresentation ), isSuccess() );
 
         // 2. validate all is there
         validateBundleUpload( true, "org", "nxcm1312" );
 
         // 3. upload bundle1.zip (that lacks nxcm1312 root dir but do not use delete flag)
-        Assert.assertTrue( uploadBundle( false, bundle1Representation ).isSuccess() );
+        assertThat( uploadBundle( false, bundle1Representation ), isSuccess() );
 
         // 4. validate, all should be still there (did not delete)
         validateBundleUpload( true, "org", "nxcm1312" );
 
         // 5. upload bundle1.zip (that lacks nxcm1312 root dir but this time DO USE delete flag)
-        Assert.assertTrue( uploadBundle( true, bundle1Representation ).isSuccess() );
+        assertThat( uploadBundle( true, bundle1Representation ), isSuccess() );
 
         // 4. validate, nxcm1312 should not be there anymore
         validateBundleUpload( true, "org" );
@@ -128,15 +134,11 @@ public class NXCM1312UploadCompressedBundleIT
         {
             if ( checkForPresence )
             {
-                Assert.assertTrue(
-                    new File( repositoryRootDirectory, presentRootDirectory ).isDirectory(),
-                    "Directory should exists with name: " + presentRootDirectory );
+                assertThat( new File( repositoryRootDirectory, presentRootDirectory ), FileMatchers.isDirectory() );
             }
             else
             {
-                Assert.assertFalse(
-                    new File( repositoryRootDirectory, presentRootDirectory ).exists(),
-                    "File should not exists: " + presentRootDirectory );
+                assertThat( new File( repositoryRootDirectory, presentRootDirectory ), not( FileMatchers.exists() ) );
             }
         }
     }
