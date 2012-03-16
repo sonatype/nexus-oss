@@ -122,6 +122,9 @@ public class NXCM1312UploadCompressedBundleIT
         finally
         {
             RequestFacade.releaseResponse( response );
+
+            getEventInspectorsUtil().waitForCalmPeriod();
+            TaskScheduleUtil.waitForAllTasksToStop();
         }
     }
 
