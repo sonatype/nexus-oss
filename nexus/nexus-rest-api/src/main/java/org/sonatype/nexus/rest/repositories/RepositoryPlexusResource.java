@@ -32,7 +32,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.application.RepositoryDependantException;
+import org.sonatype.nexus.configuration.application.RepositoryDependentException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.StorageException;
@@ -378,7 +378,7 @@ public class RepositoryPlexusResource
 
             response.setStatus( Status.SUCCESS_NO_CONTENT );
         }
-        catch ( RepositoryDependantException e )
+        catch ( RepositoryDependentException e )
         {
             getLogger().info( e.getMessage() );
 

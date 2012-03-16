@@ -811,7 +811,7 @@ public class DefaultNexusConfiguration
 
             if ( repository.getId().equals( shadow.getMasterRepository().getId() ) )
             {
-                throw new RepositoryDependantException( repository, shadow );
+                throw new RepositoryDependentException( repository, shadow );
             }
         }
 
