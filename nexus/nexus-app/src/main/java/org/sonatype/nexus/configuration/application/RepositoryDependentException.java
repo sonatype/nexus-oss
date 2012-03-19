@@ -1,6 +1,7 @@
 package org.sonatype.nexus.configuration.application;
 
 import static java.lang.String.format;
+import static org.sonatype.nexus.proxy.utils.RepositoryStringUtils.getHumanizedNameString;
 
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -17,9 +18,8 @@ public class RepositoryDependentException
 
     public RepositoryDependentException( Repository repository, Repository dependant )
     {
-        super( format( "Repository [id=%s, name=%s] cannot be deleted due to dependency: repository[id=%s, name=%s].",
-            repository.getId(), repository.getName(),//
-            dependant.getId(), dependant.getName() ) );
+        super( format( "Repository %s cannot be deleted due to dependency: repository %s.",
+            getHumanizedNameString( repository ), getHumanizedNameString( dependant ) ) );
         this.repository = repository;
         this.dependant = dependant;
     }
@@ -36,9 +36,9 @@ public class RepositoryDependentException
 
     public String getUIMessage()
     {
-        return format( "Repository '%s' cannot be deleted due to dependencies on repository '%s'.\n"
-            + "Dependencies must be removed in order to complete this operation.", repository.getName(),
-            dependant.getName() );
+        return format(
+            "Repository '%s' cannot be deleted due to dependencies on repository '%s'.\nDependencies must be removed in order to complete this operation.",
+            getHumanizedNameString( repository ), getHumanizedNameString( dependant ) );
     }
 
 }
