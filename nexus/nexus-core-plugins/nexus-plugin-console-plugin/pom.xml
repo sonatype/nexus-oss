@@ -26,6 +26,7 @@
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Plugin Console</name>
   <description>Adds a UI to view installed plugins.</description>
+  <url/>
 
   <dependencies>
 
