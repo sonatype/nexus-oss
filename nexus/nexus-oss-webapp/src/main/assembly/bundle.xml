@@ -104,6 +104,8 @@
         <include>org.codehaus.plexus:*</include>
         <include>org.sonatype.sisu:*</include>
         <include>org.sonatype.appcontext:*</include>
+        <include>org.slf4j:*</include>
+        <include>ch.qos.logback:*</include>
       </includes>
       <useProjectArtifact>false</useProjectArtifact>
       <unpack>false</unpack>
