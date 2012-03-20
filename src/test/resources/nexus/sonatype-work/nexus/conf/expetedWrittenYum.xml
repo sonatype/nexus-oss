@@ -19,6 +19,6 @@
             <version>aliasVersion</version>
         </aliasMapping>
     </aliasMappings>
-    <deleteProcessing>false</deleteProcessing>
-    <delayAfterDeletion>0</delayAfterDeletion>
+    <deleteProcessing>true</deleteProcessing>
+    <delayAfterDeletion>10</delayAfterDeletion>
 </configuration>
