@@ -12,11 +12,11 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 
-import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.config.domain.XmlYumConfiguration;
 import de.is24.nexus.yum.version.alias.AliasNotFoundException;
 import de.is24.nexus.yum.version.alias.domain.AliasKey;
@@ -34,7 +34,10 @@ public class DefaultYumConfiguration implements YumConfiguration {
   private String filename = YUM_XML;
   private long fileLastModified = 0;
 
+  @Requirement
   private NexusConfiguration nexusConfiguration;
+
+  private File baseTempDir;
 
   private XmlYumConfiguration xmlYumConfiguration = new XmlYumConfiguration();
 
@@ -182,5 +185,14 @@ public class DefaultYumConfiguration implements YumConfiguration {
     final XmlYumConfiguration newConfig = new XmlYumConfiguration(xmlYumConfiguration);
     newConfig.setDelayAfterDeletion(timeout);
     saveConfig(newConfig);
+  }
+
+  @Override
+  public File getBaseTempDir() {
+    if (baseTempDir == null) {
+      baseTempDir = new File(nexusConfiguration.getTemporaryDirectory(), "yum");
+    }
+
+    return baseTempDir;
   }
 }

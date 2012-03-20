@@ -24,8 +24,6 @@ public interface YumService {
 
   void activate();
 
-  File getBaseTempDir();
-
   ScheduledTask<YumRepository> createYumRepository(File rpmBaseDir, String rpmBaseUrl, File yumRepoBaseDir,
     URL yumRepoUrl,
     String id,

@@ -31,7 +31,7 @@ public class DefaultRepositoryRpmManager implements RepositoryRpmManager {
   private GlobalRestApiSettings restApiSettings;
 
   @Requirement
-  private YumConfiguration configHandler;
+  private YumConfiguration yumConfig;
 
   private File rpmLocation;
 
@@ -56,7 +56,7 @@ public class DefaultRepositoryRpmManager implements RepositoryRpmManager {
   }
 
   public boolean isActive() {
-    return configHandler.isRepositoryOfRepositoryVersionsActive();
+    return yumConfig.isRepositoryOfRepositoryVersionsActive();
   }
 
   @Override
@@ -106,7 +106,7 @@ public class DefaultRepositoryRpmManager implements RepositoryRpmManager {
 
   private File getRpmCacheDir() {
     if (rpmLocation == null) {
-      rpmLocation = new File(yumService.getBaseTempDir(), ".repositoryRpms");
+      rpmLocation = new File(yumConfig.getBaseTempDir(), ".repositoryRpms");
       rpmLocation.mkdirs();
     }
 

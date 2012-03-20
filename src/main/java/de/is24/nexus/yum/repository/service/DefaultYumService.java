@@ -11,12 +11,12 @@ import javax.inject.Inject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.repository.YumRepository;
 import de.is24.nexus.yum.repository.task.YumGroupRepositoryGenerationTask;
 import de.is24.nexus.yum.repository.task.YumMetadataGenerationTask;
@@ -32,10 +32,8 @@ public class DefaultYumService implements YumService {
 	@Requirement
 	private NexusScheduler nexusScheduler;
 
-  @Inject
-  private NexusConfiguration nexusConfiguration;
-
-  private File baseTempDir;
+  @Requirement
+  private YumConfiguration yumConfig;
 
   private final YumRepositoryCache cache = new YumRepositoryCache();
 
@@ -60,7 +58,7 @@ public class DefaultYumService implements YumService {
         task.setRepositoryId(id);
         task.setRepoDir(yumRepoBaseDir);
         task.setRepoUrl(yumRepoUrl.toString());
-        task.setCacheDir(createCacheDir("nexus-yum-repo").getAbsolutePath());
+        task.setCacheDir(createCacheDir("nexus-yum-repo"));
         task.setSingleRpmPerDirectory(singleRpmPerDirectory);
 				return submitTask(task);
       }
@@ -84,7 +82,7 @@ public class DefaultYumService implements YumService {
         task.setRepoUrl(yumRepoUrl.toString());
         task.setRepositoryId(repository.getId());
         task.setVersion(version);
-        task.setCacheDir(createCacheDir(repository.getId()).getAbsolutePath());
+        task.setCacheDir(createCacheDir(repository.getId()));
 				return submitTask(task);
       }
     } catch (Exception e) {
@@ -126,15 +124,6 @@ public class DefaultYumService implements YumService {
   }
 
   @Override
-  public File getBaseTempDir() {
-    if (baseTempDir == null) {
-      baseTempDir = new File(nexusConfiguration.getTemporaryDirectory(), "yum");
-    }
-
-    return baseTempDir;
-  }
-
-  @Override
   public void activate() {
 		YumMetadataGenerationTask.activate();
   }
@@ -148,7 +137,7 @@ public class DefaultYumService implements YumService {
         task.setRpmDir(rpmBaseDir.getAbsolutePath());
         task.setRpmUrl(getBaseUrl(repository));
         task.setRepositoryId(repository.getId());
-        task.setCacheDir(createCacheDir(repository.getId()).getAbsolutePath());
+        task.setCacheDir(createCacheDir(repository.getId()));
         task.setAddedFiles(filePath);
 				return submitTask(task);
       }
@@ -176,10 +165,10 @@ public class DefaultYumService implements YumService {
   }
 
   private File createRepositoryTempDir(Repository repository, String version) {
-    return new File(getBaseTempDir(), repository.getId() + File.separator + version);
+    return new File(yumConfig.getBaseTempDir(), repository.getId() + File.separator + version);
   }
 
-  private File createCacheDir(String id) {
-    return new File(getBaseTempDir(), CACHE_DIR_PREFIX + id);
+  private String createCacheDir(String id) {
+    return new File(yumConfig.getBaseTempDir(), CACHE_DIR_PREFIX + id).getAbsolutePath();
   }
 }

@@ -7,29 +7,31 @@ import de.is24.nexus.yum.version.alias.AliasNotFoundException;
 
 
 public interface YumConfiguration {
-  String getVersion(String repositoryId, String alias) throws AliasNotFoundException;
+  public String getVersion(String repositoryId, String alias) throws AliasNotFoundException;
 
-  void setAlias(String repositoryId, String alias, String version);
+  public void setAlias(String repositoryId, String alias, String version);
 
-  XmlYumConfiguration getXmlYumConfiguration();
+  public XmlYumConfiguration getXmlYumConfiguration();
 
-  void setFilename(String testConfFilename);
+  public void setFilename(String testConfFilename);
 
-  void saveConfig(XmlYumConfiguration confToWrite);
+  public void saveConfig(XmlYumConfiguration confToWrite);
 
-  void load();
+  public void load();
 
-  File getConfigFile();
+  public File getConfigFile();
 
-  void setRepositoryOfRepositoryVersionsActive(boolean active);
+  public void setRepositoryOfRepositoryVersionsActive(boolean active);
 
-  boolean isRepositoryOfRepositoryVersionsActive();
+  public boolean isRepositoryOfRepositoryVersionsActive();
 
-  boolean isDeleteProcessing();
+  public boolean isDeleteProcessing();
 
-  void setDeleteProcessing(boolean active);
+  public void setDeleteProcessing(boolean active);
 
-  long getDelayAfterDeletion();
+  public long getDelayAfterDeletion();
 
-  void setDelayAfterDeletion(long timeout);
+  public void setDelayAfterDeletion(long timeout);
+
+  public File getBaseTempDir();
 }
