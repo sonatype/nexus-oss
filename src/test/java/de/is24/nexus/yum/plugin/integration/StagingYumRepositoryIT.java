@@ -20,15 +20,11 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.apache.maven.cli.MavenCli;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.is24.nexus.yum.repository.utils.RepositoryTestUtils;
 
-
-@Ignore("We need a valid licence for that")
 public class StagingYumRepositoryIT extends AbstractNexusTestBase {
   private static final String STAGING_REPO_ID = "staging-test-profile-001";
   private static final String DUMMY_ARTIFACT_ID = "dummy-artifakt";
@@ -43,11 +39,6 @@ public class StagingYumRepositoryIT extends AbstractNexusTestBase {
     "</stagedRepositoryId><targetRepositoryId>production</targetRepositoryId><description>Dummy Description</description></data></promoteRequest>";
 
   private final MavenCli maven = new MavenCli();
-
-  @Test
-  public void testtest() throws Exception {
-    RepositoryTestUtils.createDummyRpm("test-rpm", "1.45", new File("target"));
-  }
 
   @Test
   public void shouldStageRpmWithoutOverridingMetaData() throws Exception {
