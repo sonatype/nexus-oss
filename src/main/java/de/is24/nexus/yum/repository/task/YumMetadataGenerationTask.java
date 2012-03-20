@@ -206,6 +206,10 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     return PackageDir;
   }
 
+  private File getCacheDir() {
+    return new File(yumConfig.getBaseTempDir(), CACHE_DIR_PREFIX + getRepositoryId());
+  }
+
   @Override
   public File getRpmListFile(String repositoryId, String version) {
     return new File(createPackageDir(), getRepositoryId() + "-" + version + ".txt");
@@ -227,9 +231,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     setRepositoryId(repository.getId());
   }
 
-  public File getCacheDir() {
-    return new File(yumConfig.getBaseTempDir(), CACHE_DIR_PREFIX + getRepositoryId());
-  }
+
 
   public String getAddedFiles() {
     return getParameter(PARAM_ADDED_FILES);
