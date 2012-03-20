@@ -31,7 +31,6 @@ import de.is24.nexus.yum.plugin.event.YumRepositoryGenerateEvent;
 import de.is24.nexus.yum.repository.ListFileFactory;
 import de.is24.nexus.yum.repository.RpmListWriter;
 import de.is24.nexus.yum.repository.YumRepository;
-import de.is24.nexus.yum.repository.config.YumGeneratorConfiguration;
 
 /**
  * Create a yum-repository directory via 'createrepo' command line tool.
@@ -46,12 +45,12 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   private static final Logger LOG = LoggerFactory.getLogger(YumMetadataGenerationTask.class);
   public static final int MAXIMAL_PARALLEL_RUNS = 10;
   public static final String PARAM_REPO_ID = "yumMetadataGenerationRepoId";
-  public static final String PARAM_BASE_RPM_DIR = "yumMetadataGenerationBaseRpmDir";
-  public static final String PARAM_BASE_REPO_DIR = "yumMetadataGenerationBaseRepoDir";
+  public static final String PARAM_RPM_DIR = "yumMetadataGenerationRpmDir";
+  public static final String PARAM_REPO_DIR = "yumMetadataGenerationRepoDir";
   public static final String PARAM_VERSION = "yumMetadataGenerationVersion";
-  public static final String PARAM_BASE_CACHE_DIR = "yumMetadataGenerationBaseCacheDir";
-  public static final String PARAM_BASE_RPM_URL = "yumMetadataGenerationBaseRpmUrl";
-  public static final String PARAM_BASE_REPO_URL = "yumMetadataGenerationBaseRepoUrl";
+  public static final String PARAM_CACHE_DIR = "yumMetadataGenerationCacheDir";
+  public static final String PARAM_RPM_URL = "yumMetadataGenerationRpmUrl";
+  public static final String PARAM_REPO_URL = "yumMetadataGenerationRepoUrl";
   public static final String PARAM_ADDED_FILES = "yumMetadataGenerationAddedFiles";
   public static final String PARAM_SINGLE_RPM_PER_DIR = "yumMetadataGenerationSingleRpmPerDir";
   private static boolean activated = true;
@@ -65,9 +64,9 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   @Override
   protected YumRepository doRun() throws Exception {
     if (activated) {
-      LOG.info("Generating Yum-Repository for '{}' ...", getBaseRpmDir());
+      LOG.info("Generating Yum-Repository for '{}' ...", getRpmDir());
       try {
-        getBaseRepoDir().mkdirs();
+        getRepoDir().mkdirs();
 
         File rpmListFile = createRpmListFile();
         new CommandLineExecutor().exec(buildCreateRepositoryCommand(rpmListFile));
@@ -81,7 +80,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
       LOG.info("Generation complete.");
 
       sendNotificationEvent();
-      return new YumRepository(getBaseRepoDir(), getRepositoryId(), getVersion());
+      return new YumRepository(getRepoDir(), getRepositoryId(), getVersion());
     }
 
     return null;
@@ -95,18 +94,6 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   @Override
   protected String getMessage() {
     return "Generation YUM repository metadata";
-  }
-
-  public void setConfiguration(YumGeneratorConfiguration config) {
-    getParameters().put(PARAM_REPO_ID, config.getId());
-    getParameters().put(PARAM_ADDED_FILES, config.getAddedFile());
-    getParameters().put(PARAM_BASE_CACHE_DIR, pathOrNull(config.getBaseCacheDir()));
-    getParameters().put(PARAM_BASE_REPO_DIR, pathOrNull(config.getBaseRepoDir()));
-    getParameters().put(PARAM_BASE_REPO_URL, config.getBaseRepoUrl());
-    getParameters().put(PARAM_BASE_RPM_DIR, pathOrNull(config.getBaseRpmDir()));
-    getParameters().put(PARAM_BASE_RPM_URL, config.getBaseRpmUrl());
-    getParameters().put(PARAM_VERSION, config.getVersion());
-    getParameters().put(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(config.isSingleRpmPerDirectory()));
   }
 
   @Override
@@ -146,12 +133,12 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   private File createRpmListFile() throws IOException {
-    return new RpmListWriter(getRepositoryId(), getBaseRpmDir(), getAddedFiles(), getVersion(), isSingleRpmPerDirectory(), this)
+    return new RpmListWriter(getRepositoryId(), getRpmDir(), getAddedFiles(), getVersion(), isSingleRpmPerDirectory(), this)
         .writeList();
   }
 
   private File createCacheDir() {
-    File cacheDir = new File(getBaseCacheDir(), getRepositoryIdVersion());
+    File cacheDir = new File(getCacheDir(), getRepositoryIdVersion());
     cacheDir.mkdirs();
     return cacheDir;
   }
@@ -161,10 +148,10 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   private void replaceUrl() throws IOException {
-    File repomd = new File(getBaseRepoDir(), YUM_REPOSITORY_DIR_NAME + File.separator + REPOMD_XML);
-    if (activated && repomd.exists() && getBaseRepoUrl() != null) {
+    File repomd = new File(getRepoDir(), YUM_REPOSITORY_DIR_NAME + File.separator + REPOMD_XML);
+    if (activated && repomd.exists() && getRepoUrl() != null) {
       String repomdStr = FileUtils.readFileToString(repomd);
-      repomdStr = repomdStr.replace(getBaseRpmUrl(), getBaseRepoUrl());
+      repomdStr = repomdStr.replace(getRpmUrl(), getRepoUrl());
       writeStringToFile(repomd, repomdStr);
     }
   }
@@ -172,8 +159,8 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   private String buildCreateRepositoryCommand(File packageList) {
     String packageFile = packageList.getAbsolutePath();
     String cacheDir = createCacheDir().getAbsolutePath();
-    return format("createrepo --update -o %s -u %s  -v -d -i %s -c %s %s", getBaseRepoDir().getAbsolutePath(), getBaseRpmUrl(),
-        packageFile, cacheDir, getBaseRpmDir());
+    return format("createrepo --update -o %s -u %s  -v -d -i %s -c %s %s", getRepoDir().getAbsolutePath(), getRpmUrl(), packageFile,
+        cacheDir, getRpmDir());
   }
 
   public static void deactivate() {
@@ -186,18 +173,18 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
 
   @Override
   public File getRpmListFile(String repositoryId) {
-    return new File(createBasePackageDir(), getRepositoryId() + ".txt");
+    return new File(createPackageDir(), getRepositoryId() + ".txt");
   }
 
-  private File createBasePackageDir() {
-    File basePackageDir = new File(getBaseCacheDir(), PACKAGE_FILE_DIR_NAME);
-    basePackageDir.mkdirs();
-    return basePackageDir;
+  private File createPackageDir() {
+    File PackageDir = new File(getCacheDir(), PACKAGE_FILE_DIR_NAME);
+    PackageDir.mkdirs();
+    return PackageDir;
   }
 
   @Override
   public File getRpmListFile(String repositoryId, String version) {
-    return new File(createBasePackageDir(), getRepositoryId() + "-" + version + ".txt");
+    return new File(createPackageDir(), getRepositoryId() + "-" + version + ".txt");
   }
 
   public static boolean isActive() {
@@ -216,12 +203,12 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     getParameters().put(PARAM_REPO_ID, repository.getId());
   }
 
-  public String getBaseCacheDir() {
-    return getParameter(PARAM_BASE_CACHE_DIR);
+  public String getCacheDir() {
+    return getParameter(PARAM_CACHE_DIR);
   }
 
-  public void setBaseCacheDir(String baseCacheDir) {
-    getParameters().put(PARAM_BASE_CACHE_DIR, baseCacheDir);
+  public void setCacheDir(String CacheDir) {
+    getParameters().put(PARAM_CACHE_DIR, CacheDir);
   }
 
   public String getAddedFiles() {
@@ -232,36 +219,36 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     getParameters().put(PARAM_ADDED_FILES, addedFiles);
   }
 
-  public File getBaseRepoDir() {
-    return new File(getParameter(PARAM_BASE_REPO_DIR));
+  public File getRepoDir() {
+    return new File(getParameter(PARAM_REPO_DIR));
   }
 
-  public void setBaseRepoDir(File baseRepoDir) {
-    getParameters().put(PARAM_BASE_REPO_DIR, baseRepoDir.getAbsolutePath());
+  public void setRepoDir(File RepoDir) {
+    getParameters().put(PARAM_REPO_DIR, RepoDir.getAbsolutePath());
   }
 
-  public String getBaseRepoUrl() {
-    return getParameter(PARAM_BASE_REPO_URL);
+  public String getRepoUrl() {
+    return getParameter(PARAM_REPO_URL);
   }
 
-  public void setBaseRepoUrl(String baseRepoUrl) {
-    getParameters().put(PARAM_BASE_REPO_URL, baseRepoUrl);
+  public void setRepoUrl(String RepoUrl) {
+    getParameters().put(PARAM_REPO_URL, RepoUrl);
   }
 
-  public String getBaseRpmDir() {
-    return getParameter(PARAM_BASE_RPM_DIR);
+  public String getRpmDir() {
+    return getParameter(PARAM_RPM_DIR);
   }
 
-  public void setBaseRpmDir(String baseRpmDir) {
-    getParameters().put(PARAM_BASE_RPM_DIR, baseRpmDir);
+  public void setRpmDir(String RpmDir) {
+    getParameters().put(PARAM_RPM_DIR, RpmDir);
   }
 
-  public String getBaseRpmUrl() {
-    return getParameter(PARAM_BASE_RPM_URL);
+  public String getRpmUrl() {
+    return getParameter(PARAM_RPM_URL);
   }
 
-  public void setBaseRpmUrl(String baseRpmUrl) {
-    getParameters().put(PARAM_BASE_RPM_URL, baseRpmUrl);
+  public void setRpmUrl(String RpmUrl) {
+    getParameters().put(PARAM_RPM_URL, RpmUrl);
   }
 
   public String getVersion() {

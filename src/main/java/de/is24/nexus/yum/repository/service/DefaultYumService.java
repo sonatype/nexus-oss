@@ -1,7 +1,6 @@
 package de.is24.nexus.yum.repository.service;
 
 import static de.is24.nexus.yum.repository.RepositoryUtils.getBaseDir;
-import static de.is24.nexus.yum.repository.config.YumGeneratorConfigurationBuilder.newConfigBuilder;
 import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.ID;
 
 import java.io.File;
@@ -19,7 +18,6 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
 import de.is24.nexus.yum.repository.YumRepository;
-import de.is24.nexus.yum.repository.config.YumGeneratorConfigurationBuilder;
 import de.is24.nexus.yum.repository.task.YumGroupRepositoryGenerationTask;
 import de.is24.nexus.yum.repository.task.YumMetadataGenerationTask;
 
@@ -56,15 +54,15 @@ public class DefaultYumService implements YumService {
     boolean singleRpmPerDirectory) {
     try {
 			if (YumMetadataGenerationTask.isActive()) {
-        YumGeneratorConfigurationBuilder config = newConfigBuilder();
-        config.rpmDir(rpmBaseDir);
-        config.rpmUrl(rpmBaseUrl);
-        config.id(id);
-        config.repoDir(yumRepoBaseDir);
-        config.repoUrl(yumRepoUrl.toString());
-        config.cacheDir(createCacheDir("nexus-yum-repo"));
-        config.singleRpmPerDirectory(singleRpmPerDirectory);
-				return submitTask(config);
+        YumMetadataGenerationTask task = createTask();
+        task.setRpmDir(rpmBaseDir.getAbsolutePath());
+        task.setRpmUrl(rpmBaseUrl);
+        task.setRepositoryId(id);
+        task.setRepoDir(yumRepoBaseDir);
+        task.setRepoUrl(yumRepoUrl.toString());
+        task.setCacheDir(createCacheDir("nexus-yum-repo").getAbsolutePath());
+        task.setSingleRpmPerDirectory(singleRpmPerDirectory);
+				return submitTask(task);
       }
     } catch (Exception e) {
       throw new RuntimeException("Unable to create repository", e);
@@ -79,15 +77,15 @@ public class DefaultYumService implements YumService {
     try {
       File rpmBaseDir = getBaseDir(repository);
 			if (YumMetadataGenerationTask.isActive()) {
-        YumGeneratorConfigurationBuilder config = newConfigBuilder();
-        config.rpmDir(rpmBaseDir);
-        config.rpmUrl(getBaseUrl(repository));
-        config.repoDir(yumRepoBaseDir);
-        config.repoUrl(yumRepoUrl.toString());
-        config.id(repository.getId());
-        config.version(version);
-        config.cacheDir(createCacheDir(repository.getId()));
-				return submitTask(config);
+        YumMetadataGenerationTask task = createTask();
+        task.setRpmDir(rpmBaseDir.getAbsolutePath());
+        task.setRpmUrl(getBaseUrl(repository));
+        task.setRepoDir(yumRepoBaseDir);
+        task.setRepoUrl(yumRepoUrl.toString());
+        task.setRepositoryId(repository.getId());
+        task.setVersion(version);
+        task.setCacheDir(createCacheDir(repository.getId()).getAbsolutePath());
+				return submitTask(task);
       }
     } catch (Exception e) {
       throw new RuntimeException("Unable to create repository", e);
@@ -96,8 +94,8 @@ public class DefaultYumService implements YumService {
     return null;
   }
 
-  private ScheduledTask<YumRepository> submitTask(YumGeneratorConfigurationBuilder config) {
-    return nexusScheduler.submit(ID, createTask(config));
+  private ScheduledTask<YumRepository> submitTask(YumMetadataGenerationTask task) {
+    return nexusScheduler.submit(ID, task);
   }
 
   @Override
@@ -146,13 +144,13 @@ public class DefaultYumService implements YumService {
     try {
       File rpmBaseDir = getBaseDir(repository);
 			if (YumMetadataGenerationTask.isActive()) {
-        YumGeneratorConfigurationBuilder config = newConfigBuilder();
-        config.rpmDir(rpmBaseDir);
-        config.rpmUrl(getBaseUrl(repository));
-        config.id(repository.getId());
-        config.cacheDir(createCacheDir(repository.getId()));
-        config.addedFile(filePath);
-				return submitTask(config);
+        YumMetadataGenerationTask task = createTask();
+        task.setRpmDir(rpmBaseDir.getAbsolutePath());
+        task.setRpmUrl(getBaseUrl(repository));
+        task.setRepositoryId(repository.getId());
+        task.setCacheDir(createCacheDir(repository.getId()).getAbsolutePath());
+        task.setAddedFiles(filePath);
+				return submitTask(task);
       }
     } catch (Exception e) {
       throw new RuntimeException("Unable to create repository", e);
@@ -173,10 +171,8 @@ public class DefaultYumService implements YumService {
     return nexusScheduler.submit(YumGroupRepositoryGenerationTask.ID, task);
   }
 
-  private YumMetadataGenerationTask createTask(YumGeneratorConfigurationBuilder config) {
-    YumMetadataGenerationTask task = nexusScheduler.createTaskInstance(YumMetadataGenerationTask.class);
-    task.setConfiguration(config.toConfig());
-    return task;
+  private YumMetadataGenerationTask createTask() {
+    return nexusScheduler.createTaskInstance(YumMetadataGenerationTask.class);
   }
 
   private File createRepositoryTempDir(Repository repository, String version) {
