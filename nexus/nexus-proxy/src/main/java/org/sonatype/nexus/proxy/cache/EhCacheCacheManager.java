@@ -12,25 +12,42 @@
  */
 package org.sonatype.nexus.proxy.cache;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.sonatype.appcontext.AppContext;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
+import org.sonatype.sisu.ehcache.CacheManagerLifecycleHandler;
+
+import com.google.common.base.Preconditions;
 
 /**
  * The Class EhCacheCacheManager is a thin wrapper around EhCache, just to make things going.
  * 
  * @author cstamas
  */
-@Component( role = CacheManager.class )
+@Singleton
+@Named
 public class EhCacheCacheManager
     extends AbstractLoggingComponent
     implements CacheManager
 {
-    @Requirement
-    private CacheManagerComponent cacheManagerComponent;
+    private final CacheManagerComponent cacheManagerComponent;
 
     public static final String SINGLE_PATH_CACHE_NAME = "path-cache";
+
+    @Inject
+    public EhCacheCacheManager( final AppContext appContext, final CacheManagerComponent cacheManagerComponent )
+    {
+        this.cacheManagerComponent =
+            Preconditions.checkNotNull( cacheManagerComponent, "CacheManagerComponent have to be non-null!" );
+
+        // register it with Nexus' appContext
+        Preconditions.checkNotNull( appContext, "AppContext have to be non-null!" );
+        appContext.getLifecycleManager().registerManaged( new CacheManagerLifecycleHandler( cacheManagerComponent ) );
+    }
 
     public PathCache getPathCache( String cache )
     {
