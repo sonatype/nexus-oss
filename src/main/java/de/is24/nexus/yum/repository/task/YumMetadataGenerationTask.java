@@ -162,7 +162,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
 
   private void replaceUrl() throws IOException {
     File repomd = new File(getBaseRepoDir(), YUM_REPOSITORY_DIR_NAME + File.separator + REPOMD_XML);
-    if (activated && repomd.exists()) {
+    if (activated && repomd.exists() && getBaseRepoUrl() != null) {
       String repomdStr = FileUtils.readFileToString(repomd);
       repomdStr = repomdStr.replace(getBaseRpmUrl(), getBaseRepoUrl());
       writeStringToFile(repomd, repomdStr);
@@ -208,36 +208,76 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     return getParameter(PARAM_REPO_ID);
   }
 
+  public void setRepositoryId(String repositoryId) {
+    getParameters().put(PARAM_REPO_ID, repositoryId);
+  }
+
+  public void setRepository(Repository repository) {
+    getParameters().put(PARAM_REPO_ID, repository.getId());
+  }
+
   public String getBaseCacheDir() {
     return getParameter(PARAM_BASE_CACHE_DIR);
+  }
+
+  public void setBaseCacheDir(String baseCacheDir) {
+    getParameters().put(PARAM_BASE_CACHE_DIR, baseCacheDir);
   }
 
   public String getAddedFiles() {
     return getParameter(PARAM_ADDED_FILES);
   }
 
+  public void setAddedFiles(String addedFiles) {
+    getParameters().put(PARAM_ADDED_FILES, addedFiles);
+  }
+
   public File getBaseRepoDir() {
     return new File(getParameter(PARAM_BASE_REPO_DIR));
+  }
+
+  public void setBaseRepoDir(File baseRepoDir) {
+    getParameters().put(PARAM_BASE_REPO_DIR, baseRepoDir.getAbsolutePath());
   }
 
   public String getBaseRepoUrl() {
     return getParameter(PARAM_BASE_REPO_URL);
   }
 
+  public void setBaseRepoUrl(String baseRepoUrl) {
+    getParameters().put(PARAM_BASE_REPO_URL, baseRepoUrl);
+  }
+
   public String getBaseRpmDir() {
     return getParameter(PARAM_BASE_RPM_DIR);
+  }
+
+  public void setBaseRpmDir(String baseRpmDir) {
+    getParameters().put(PARAM_BASE_RPM_DIR, baseRpmDir);
   }
 
   public String getBaseRpmUrl() {
     return getParameter(PARAM_BASE_RPM_URL);
   }
 
+  public void setBaseRpmUrl(String baseRpmUrl) {
+    getParameters().put(PARAM_BASE_RPM_URL, baseRpmUrl);
+  }
+
   public String getVersion() {
     return getParameter(PARAM_VERSION);
   }
 
-  private boolean isSingleRpmPerDirectory() {
+  public void setVersion(String version) {
+    getParameters().put(PARAM_VERSION, version);
+  }
+
+  public boolean isSingleRpmPerDirectory() {
     return Boolean.valueOf(getParameter(PARAM_SINGLE_RPM_PER_DIR));
+  }
+
+  public void setSingleRpmPerDirectory(boolean singleRpmPerDirectory) {
+    getParameters().put(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(singleRpmPerDirectory));
   }
 
   private static String pathOrNull(File file) {

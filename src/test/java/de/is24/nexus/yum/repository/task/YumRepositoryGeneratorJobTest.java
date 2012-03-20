@@ -15,8 +15,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import de.is24.nexus.yum.repository.AbstractSchedulerTest;
-import de.is24.nexus.yum.repository.config.DefaultYumGeneratorConfiguration;
-import de.is24.nexus.yum.repository.task.YumMetadataGenerationTask;
 
 
 public class YumRepositoryGeneratorJobTest extends AbstractSchedulerTest {
@@ -36,7 +34,7 @@ public class YumRepositoryGeneratorJobTest extends AbstractSchedulerTest {
 
   @Test
   public void shouldCreateRepo() throws Exception {
-    executeJob(new DefaultYumGeneratorConfiguration(RPM_BASE_FILE, BASE_URL, TARGET_DIR, SNAPSHOTS, BASE_CACHE_DIR));
+    executeJob(createTask(RPM_BASE_FILE, BASE_URL, TARGET_DIR, SNAPSHOTS, BASE_CACHE_DIR));
     assertRepository(REPODATA_DIR, "default");
 
   }
@@ -44,13 +42,13 @@ public class YumRepositoryGeneratorJobTest extends AbstractSchedulerTest {
   @Test
   public void shouldNotExecuteCreateRepoIfDeactivated() throws Exception {
 		YumMetadataGenerationTask.deactivate();
-    executeJob(new DefaultYumGeneratorConfiguration(RPM_BASE_FILE, BASE_URL, TARGET_DIR, SNAPSHOTS, BASE_CACHE_DIR));
+    executeJob(createTask(RPM_BASE_FILE, BASE_URL, TARGET_DIR, SNAPSHOTS, BASE_CACHE_DIR));
     Assert.assertFalse(REPODATA_DIR.exists());
   }
 
   @Test
   public void shouldFilterForSpecificVersion() throws Exception {
-    executeJob(new DefaultYumGeneratorConfiguration(RPM_BASE_FILE, BASE_URL, TARGET_DIR,
+    executeJob(createTask(RPM_BASE_FILE, BASE_URL, TARGET_DIR,
         BASE_VERSIONED_URL, SNAPSHOTS,
         VERSION,
         BASE_CACHE_DIR, null, true));
@@ -59,7 +57,7 @@ public class YumRepositoryGeneratorJobTest extends AbstractSchedulerTest {
 
   @Test(expected = ExecutionException.class)
   public void shouldNotCreateRepoIfPathNotExists() throws Exception {
-    executeJob(new DefaultYumGeneratorConfiguration(PATH_NOT_EXISTS, BASE_URL, TARGET_DIR, SNAPSHOTS, BASE_CACHE_DIR));
+    executeJob(createTask(PATH_NOT_EXISTS, BASE_URL, TARGET_DIR, SNAPSHOTS, BASE_CACHE_DIR));
   }
 
 }
