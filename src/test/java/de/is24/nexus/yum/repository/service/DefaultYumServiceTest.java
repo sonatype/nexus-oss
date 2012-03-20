@@ -19,13 +19,14 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import de.is24.nexus.yum.AbstractYumNexusTestCase;
 import de.is24.nexus.yum.plugin.RepositoryRegistry;
 import de.is24.nexus.yum.repository.YumRepository;
-import de.is24.nexus.yum.repository.service.YumService;
 
 
 public class DefaultYumServiceTest extends AbstractYumNexusTestCase {
   private static final String REPO_BASE_URL = "http://localhost:8081/nexus/service/local/snapshots/1.0";
   private static final String VERSION_1_0 = "1.0";
   private static final String SNAPSHOTS = "snapshots";
+  // private static final String FILE_PATH1 = "path1.rpm";
+  // private static final String FILE_PATH2 = "path2.rpm";
 
   @Inject
   private YumService yumService;
@@ -71,6 +72,20 @@ public class DefaultYumServiceTest extends AbstractYumNexusTestCase {
   public void shouldFindRepository() throws Exception {
     repositoryRegistry.registerRepository(createRepository(SNAPSHOTS));
     Assert.assertNotNull(repositoryRegistry.findRepositoryForId(SNAPSHOTS));
+  }
+
+  @Test
+  public void shouldReuseQueuedScheduledTaskForTheSameRepository() throws Exception {
+    // given
+    // final DefaultYumService service = new DefaultYumService();
+    // final ScheduledTask<YumRepository> scheduledTask =
+    // service.addToYumRepository(createRepository(SNAPSHOTS), FILE_PATH1);
+    // when
+    // final ScheduledTask<YumRepository> nextScheduledTask =
+    // service.addToYumRepository(createRepository(SNAPSHOTS), FILE_PATH2);
+    // then
+    // Assert.assertEquals(scheduledTask, nextScheduledTask);
+    // scheduledTask.getTask()
   }
 
   public static MavenRepository createRepository(String id) {

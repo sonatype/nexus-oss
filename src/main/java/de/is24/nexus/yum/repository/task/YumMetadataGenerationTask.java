@@ -44,6 +44,13 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   private static final Logger LOG = LoggerFactory.getLogger(YumMetadataGenerationTask.class);
   public static final int MAXIMAL_PARALLEL_RUNS = 10;
   public static final String PARAM_REPO_ID = "yumMetadataGenerationRepoId";
+  public static final String PARAM_BASE_RPM_DIR = "yumMetadataGenerationBaseRpmDir";
+  public static final String PARAM_BASE_REPO_DIR = "yumMetadataGenerationBaseRepoDir";
+  public static final String PARAM_VERSION = "yumMetadataGenerationVersion";
+  public static final String PARAM_BASE_CACHE_DIR = "yumMetadataGenerationBaseCacheDir";
+  public static final String PARAM_BASE_RPM_URL = "yumMetadataGenerationBaseRpmUrl";
+  public static final String PARAM_BASE_REPO_URL = "yumMetadataGenerationBaseRepoUrl";
+  public static final String PARAM_ADDED_FILES = "yumMetadataGenerationAddedFiles";
   private static boolean activated = true;
 
   private YumGeneratorConfiguration config;
@@ -92,6 +99,13 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   public void setConfiguration(YumGeneratorConfiguration config) {
     this.config = config;
     getParameters().put(PARAM_REPO_ID, config.getId());
+    getParameters().put(PARAM_ADDED_FILES, config.getAddedFile());
+    getParameters().put(PARAM_BASE_CACHE_DIR, config.getBaseCacheDir().getPath());
+    getParameters().put(PARAM_BASE_REPO_DIR, config.getBaseRepoDir().getPath());
+    getParameters().put(PARAM_BASE_REPO_URL, config.getBaseRepoUrl());
+    getParameters().put(PARAM_BASE_RPM_DIR, config.getBaseRpmDir().getPath());
+    getParameters().put(PARAM_BASE_RPM_URL, config.getBaseRpmUrl());
+    getParameters().put(PARAM_VERSION, config.getVersion());
   }
 
   @Override
