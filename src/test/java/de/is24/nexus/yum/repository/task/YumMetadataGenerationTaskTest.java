@@ -70,6 +70,7 @@ public class YumMetadataGenerationTaskTest {
   public void shouldSetDefaultsForRepoParams() throws Exception {
     // given
     YumMetadataGenerationTask task = new YumMetadataGenerationTask();
+    setField(task, "repositoryRegistry", repoRegistry());
     task.setRpmDir(RPM_DIR.getAbsolutePath());
     task.setRpmUrl(RPM_URL);
     // when
