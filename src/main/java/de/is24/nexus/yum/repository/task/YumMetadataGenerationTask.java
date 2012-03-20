@@ -266,8 +266,4 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   public void setSingleRpmPerDirectory(boolean singleRpmPerDirectory) {
     getParameters().put(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(singleRpmPerDirectory));
   }
-
-  private static String pathOrNull(File file) {
-    return file != null ? file.getAbsolutePath() : null;
-  }
 }
