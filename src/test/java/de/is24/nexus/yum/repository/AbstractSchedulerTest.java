@@ -37,12 +37,6 @@ public abstract class AbstractSchedulerTest extends AbstractYumNexusTestCase {
   }
 
   protected YumMetadataGenerationTask createTask(File rpmDir, String rpmUrl, File repoDir, String id, File cacheDir) throws Exception {
-    YumMetadataGenerationTask yumTask = (YumMetadataGenerationTask) lookup(SchedulerTask.class, YumMetadataGenerationTask.ID);
-    yumTask.setRepositoryId(id);
-    yumTask.setRepoDir(repoDir);
-    yumTask.setRpmDir(rpmDir.getAbsolutePath());
-    yumTask.setRpmUrl(rpmUrl);
-    yumTask.setCacheDir(cacheDir.getAbsolutePath());
-    return yumTask;
+    return createTask(rpmDir, rpmUrl, repoDir, null, id, null, cacheDir, null, true);
   }
 }

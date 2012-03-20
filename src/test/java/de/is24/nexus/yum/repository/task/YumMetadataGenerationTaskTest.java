@@ -59,7 +59,7 @@ public class YumMetadataGenerationTaskTest {
 	}
 
   @Test
-  public void shouldSetDefaults() throws Exception {
+  public void shouldSetDefaultsForRepoParams() throws Exception {
     // given
     YumMetadataGenerationTask task = new YumMetadataGenerationTask();
     task.setRpmDir(RPM_DIR.getAbsolutePath());
