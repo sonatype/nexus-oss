@@ -161,7 +161,7 @@
     <aspectj.version>1.6.11</aspectj.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <enunciate.version>1.20</enunciate.version>
-    <jetty.version>8.1.1.v20120215</jetty.version>
+    <jetty.version>8.1.2.v20120308</jetty.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
     <maven.version>3.0.4</maven.version>
     <micromailer.version>1.1.1</micromailer.version>
@@ -170,14 +170,14 @@
     <plexus-app-events.version>1.0.1</plexus-app-events.version>
     <plexus-cli.version>1.2</plexus-cli.version>
     <plexus-digest.version>1.1</plexus-digest.version>
-    <sisu-ehcache.version>1.0</sisu-ehcache.version>
+    <sisu-ehcache.version>1.1</sisu-ehcache.version>
     <plexus-interpolation.version>1.14</plexus-interpolation.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
     <plexus-jetty7.version>1.2.1</plexus-jetty7.version>
-    <sisu-jetty8.version>1.0.1</sisu-jetty8.version>
+    <sisu-jetty8.version>1.1</sisu-jetty8.version>
     <plexus-jetty-testsuite.version>2.1</plexus-jetty-testsuite.version>
     <plexus.restlet.bridge.version>1.19</plexus.restlet.bridge.version>
-    <plexus-security.version>2.4</plexus-security.version>
+    <plexus-security.version>2.5-SNAPSHOT</plexus-security.version>
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
     <plexus-task-scheduler.version>1.6.0</plexus-task-scheduler.version>
     <plexus-velocity.version>1.1.7</plexus-velocity.version>
@@ -239,7 +239,7 @@
       <dependency>
         <groupId>org.sonatype.appcontext</groupId>
         <artifactId>appcontext</artifactId>
-        <version>3.0</version>
+        <version>3.1</version>
       </dependency>
 
       <dependency>
