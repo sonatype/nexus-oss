@@ -3,9 +3,6 @@ package de.is24.nexus.yum.repository.task;
 import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.ID;
 import static de.is24.test.reflection.ReflectionTestUtils.findMethod;
 import static de.is24.test.reflection.ReflectionTestUtils.setField;
-import static org.easymock.EasyMock.createNiceMock;
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -32,8 +29,6 @@ import com.google.code.tempusfugit.temporal.Condition;
 
 import de.is24.nexus.yum.repository.AbstractSchedulerTest;
 import de.is24.nexus.yum.repository.YumRepository;
-import de.is24.nexus.yum.repository.config.YumGeneratorConfiguration;
-
 
 public class YumMetadataGenerationTaskConcurrencyTest extends AbstractSchedulerTest {
   public static final int PARALLEL_THREAD_COUNT = 5;
@@ -47,11 +42,11 @@ public class YumMetadataGenerationTaskConcurrencyTest extends AbstractSchedulerT
   @After
   public void waitForAllTasks() throws TimeoutException, InterruptedException {
     waitFor(new Condition() {
-        @Override
-        public boolean isSatisfied() {
-          return nexusScheduler.getActiveTasks().isEmpty();
-        }
-      });
+      @Override
+      public boolean isSatisfied() {
+        return nexusScheduler.getActiveTasks().isEmpty();
+      }
+    });
   }
 
   @Test
@@ -59,7 +54,7 @@ public class YumMetadataGenerationTaskConcurrencyTest extends AbstractSchedulerT
     List<ScheduledTask<YumRepository>> futures = new ArrayList<ScheduledTask<YumRepository>>();
 
     for (int repositoryId = 0; repositoryId < PARALLEL_THREAD_COUNT; repositoryId++) {
-			futures.add(nexusScheduler.submit(ID, createYumRepositoryTask(repositoryId)));
+      futures.add(nexusScheduler.submit(ID, createYumRepositoryTask(repositoryId)));
     }
 
     for (ScheduledTask<YumRepository> future : futures) {
@@ -67,51 +62,43 @@ public class YumMetadataGenerationTaskConcurrencyTest extends AbstractSchedulerT
     }
   }
 
-	private YumMetadataGenerationTask createYumRepositoryTask(final int repositoryId) throws Exception {
-		YumTaskInterceptor interceptor = new YumTaskInterceptor(nexusScheduler.createTaskInstance(YumMetadataGenerationTask.class), threadNames);
-		Enhancer enhancer = new Enhancer();
-		enhancer.setSuperclass(YumMetadataGenerationTask.class);
-		enhancer.setCallback(interceptor);
-		YumMetadataGenerationTask task = (YumMetadataGenerationTask) enhancer.create();
-		setField(task, "applicationEventMulticaster", lookup(ApplicationEventMulticaster.class));
-        setField(task, "logger", LoggerFactory.getLogger( YumMetadataGenerationTask.class ));
-  	task.setConfiguration(mockConfig("REPO_" + repositoryId));
-  	return task;
+  private YumMetadataGenerationTask createYumRepositoryTask(final int repositoryId) throws Exception {
+    YumTaskInterceptor interceptor = new YumTaskInterceptor(nexusScheduler.createTaskInstance(YumMetadataGenerationTask.class), threadNames);
+    Enhancer enhancer = new Enhancer();
+    enhancer.setSuperclass(YumMetadataGenerationTask.class);
+    enhancer.setCallback(interceptor);
+    YumMetadataGenerationTask task = (YumMetadataGenerationTask) enhancer.create();
+    setField(task, "applicationEventMulticaster", lookup(ApplicationEventMulticaster.class));
+    setField(task, "logger", LoggerFactory.getLogger(YumMetadataGenerationTask.class));
+    task.setRepositoryId("REPO_" + repositoryId);
+    return task;
   }
 
-	private YumGeneratorConfiguration mockConfig(String repositoryId) {
-    final YumGeneratorConfiguration config = createNiceMock(YumGeneratorConfiguration.class);
-    expect(config.getId()).andReturn(repositoryId).anyTimes();
-    replay(config);
-    return config;
-  }
-  
-	private static class YumTaskInterceptor implements MethodInterceptor {
+  private static class YumTaskInterceptor implements MethodInterceptor {
 
-		private final YumMetadataGenerationTask task;
-		private final Set<String> threadNames;
+    private final YumMetadataGenerationTask task;
+    private final Set<String> threadNames;
 
-		public YumTaskInterceptor(YumMetadataGenerationTask task, Set<String> threadNames) {
-			this.task = task;
-			this.threadNames = threadNames;
-		}
+    public YumTaskInterceptor(YumMetadataGenerationTask task, Set<String> threadNames) {
+      this.task = task;
+      this.threadNames = threadNames;
+    }
 
-		@Override
-		public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
-			if ("doRun".equals(method.getName())) {
-				String threadName = Thread.currentThread().getName();
-				LOG.info("Thread name : {}", threadName);
-				if (!threadNames.add(threadName)) {
-					Assert.fail("Uses the same thread : " + threadName);
-				}
-				Thread.sleep(100);
-				return null;
-			}
+    @Override
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+      if ("doRun".equals(method.getName())) {
+        String threadName = Thread.currentThread().getName();
+        LOG.info("Thread name : {}", threadName);
+        if (!threadNames.add(threadName)) {
+          Assert.fail("Uses the same thread : " + threadName);
+        }
+        Thread.sleep(100);
+        return null;
+      }
 
-			Method origMethod = findMethod(YumMetadataGenerationTask.class, method.getName(), method.getParameterTypes());
-			return origMethod.invoke(task, args);
-		}
-  	
+      Method origMethod = findMethod(YumMetadataGenerationTask.class, method.getName(), method.getParameterTypes());
+      return origMethod.invoke(task, args);
+    }
 
   }
 }

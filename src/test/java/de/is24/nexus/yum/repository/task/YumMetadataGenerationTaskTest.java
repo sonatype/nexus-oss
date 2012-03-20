@@ -21,9 +21,6 @@ import org.sonatype.scheduling.schedules.OnceSchedule;
 import org.sonatype.scheduling.schedules.RunNowSchedule;
 
 import de.is24.nexus.yum.repository.YumRepository;
-import de.is24.nexus.yum.repository.config.DefaultYumGeneratorConfiguration;
-import de.is24.nexus.yum.repository.config.YumGeneratorConfiguration;
-import de.is24.nexus.yum.repository.task.YumMetadataGenerationTask;
 
 @SuppressWarnings("unchecked")
 public class YumMetadataGenerationTaskTest {
@@ -83,9 +80,15 @@ public class YumMetadataGenerationTaskTest {
 			}
 
 		};
-		YumGeneratorConfiguration config = new DefaultYumGeneratorConfiguration(RPM_DIR, RPM_URL, RPM_DIR, RPM_URL, repo, version, RPM_DIR,
-				null, true);
-		task.setConfiguration(config);
+    task.setBaseRpmDir(RPM_DIR.getAbsolutePath());
+    task.setBaseRpmUrl(RPM_URL);
+    task.setBaseRepoDir(RPM_DIR);
+    task.setBaseRepoUrl(RPM_URL);
+    task.setRepositoryId(repo);
+    task.setVersion(version);
+    task.setBaseCacheDir(RPM_DIR.getAbsolutePath());
+    task.setAddedFiles(null);
+    task.setSingleRpmPerDirectory(true);
 		return task;
 	}
 
