@@ -7,8 +7,8 @@ import org.sonatype.appcontext.lifecycle.AppContextLifecycleManager;
 
 /**
  * The generic app context, which is actually a Map. For modification, you can use only the {@link #put(String, Object)}
- * method, {@link #putAll(Map)} and {@link #clear()} methods, since all the {@link #keySet()} {@link #values()} and
- * {@link #entrySet()} returns unmodifiable "views" only!
+ * method, {@link #remove(Object)} method, {@link #putAll(Map)} and {@link #clear()} methods, since all the "collection"
+ * methods like {@link #keySet()} {@link #values()} and {@link #entrySet()} returns unmodifiable "views" only!
  * 
  * @author cstamas
  */

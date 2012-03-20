@@ -12,8 +12,6 @@
  */
 package org.sonatype.appcontext;
 
-import org.sonatype.appcontext.AppContext;
-
 import com.google.inject.AbstractModule;
 
 /**
@@ -43,5 +41,7 @@ public class AppContextModule
     protected void configure()
     {
         bind( AppContext.class ).toInstance( appContext );
+        // hm, I dislike parameters anyway, one should @Inject this one above instead
+        // bind(ParameterKeys.PROPERTIES).toInstance( appContext );
     }
 }
