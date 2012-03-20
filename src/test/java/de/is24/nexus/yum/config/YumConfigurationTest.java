@@ -1,5 +1,6 @@
 package de.is24.nexus.yum.config;
 
+import static de.is24.test.reflection.ReflectionTestUtils.setField;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Thread.sleep;
@@ -12,6 +13,8 @@ import static org.easymock.EasyMock.replay;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,8 +36,6 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.xml.sax.SAXException;
 
 import de.is24.nexus.yum.AbstractYumNexusTestCase;
-import de.is24.nexus.yum.config.DefaultYumConfiguration;
-import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.config.domain.XmlYumConfiguration;
 import de.is24.nexus.yum.version.alias.AliasNotFoundException;
 import de.is24.nexus.yum.version.alias.domain.AliasMapping;
@@ -155,6 +156,19 @@ public class YumConfigurationTest extends AbstractYumNexusTestCase {
     yumConfigurationHandler.setNexusConfiguration(createNexusConfig(tmpDir));
     yumConfigurationHandler.load();
     assertThat(new File(tmpDir, YUM_XML).exists(), is(TRUE));
+  }
+
+  @Test
+  public void shouldLoadOldOrEmptyYumXmlAndSetDefaults() throws Exception {
+    // given
+    final DefaultYumConfiguration config = new DefaultYumConfiguration();
+    final NexusConfiguration nexusConfig = mock(NexusConfiguration.class);
+    when(nexusConfig.getConfigurationDirectory()).thenReturn(new File("target/test-classes/config/empty"));
+    setField(config, "nexusConfiguration", nexusConfig);
+    // when
+    config.load();
+    // then
+    assertThat(config.getXmlYumConfiguration().getRepositoryCreationTimeout(), is(120));
   }
 
   private NexusConfiguration createNexusConfig(File tmpDir) {
