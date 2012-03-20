@@ -13,13 +13,11 @@
 package org.sonatype.nexus;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;

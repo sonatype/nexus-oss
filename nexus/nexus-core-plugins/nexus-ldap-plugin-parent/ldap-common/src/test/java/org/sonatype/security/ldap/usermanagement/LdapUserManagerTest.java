@@ -12,7 +12,6 @@
  */
 package org.sonatype.security.ldap.usermanagement;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,8 +20,6 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Test;
 import org.sonatype.security.SecuritySystem;
@@ -38,21 +35,13 @@ public class LdapUserManagerTest
     extends AbstractLdapTest
 {
     @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_CACHE );
-    }   
-
-    @Override
     public void setUp()
         throws Exception
     {
         super.setUp();
 
-        this.copyResourceToFile("/test-conf/conf/security-users-in-both-realms.xml", new File( CONF_HOME, "security.xml" ) );
-        
-        this.copyResourceToFile("/test-conf/conf/security-configuration.xml", new File( CONF_HOME, "security-configuration.xml" ) );
+        copyResourceToFile( "/test-conf/conf/security-users-in-both-realms.xml", getNexusSecurityConfiguration() );
+        copyResourceToFile( "/test-conf/conf/security-configuration.xml", getSecurityConfiguration() );
     }
 
     private SecuritySystem getSecuritySystem()
@@ -203,9 +192,8 @@ public class LdapUserManagerTest
     public void testOrderOfUserSearch()
         throws Exception
     {
-        IOUtil.copy(
-            getClass().getResourceAsStream( "/test-conf/conf/security-users-in-both-realms.xml" ),
-            new FileOutputStream( new File( CONF_HOME, "security.xml" ) ) );
+        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/conf/security-users-in-both-realms.xml" ),
+            new FileOutputStream( getNexusSecurityConfiguration() ) );
 
         SecuritySystem securitySystem = this.getSecuritySystem();
         securitySystem.start();

@@ -12,42 +12,26 @@
  */
 package org.sonatype.nexus.proxy.cache;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.sonatype.appcontext.AppContext;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
-import org.sonatype.sisu.ehcache.CacheManagerLifecycleHandler;
-
-import com.google.common.base.Preconditions;
 
 /**
  * The Class EhCacheCacheManager is a thin wrapper around EhCache, just to make things going.
  * 
  * @author cstamas
  */
-@Singleton
-@Named
+@Component( role = CacheManager.class )
 public class EhCacheCacheManager
     extends AbstractLoggingComponent
-    implements CacheManager
+    implements CacheManager, Disposable
 {
-    private final CacheManagerComponent cacheManagerComponent;
+    @Requirement
+    private CacheManagerComponent cacheManagerComponent;
 
     public static final String SINGLE_PATH_CACHE_NAME = "path-cache";
-
-    @Inject
-    public EhCacheCacheManager( final AppContext appContext, final CacheManagerComponent cacheManagerComponent )
-    {
-        this.cacheManagerComponent =
-            Preconditions.checkNotNull( cacheManagerComponent, "CacheManagerComponent have to be non-null!" );
-
-        // register it with Nexus' appContext
-        Preconditions.checkNotNull( appContext, "AppContext have to be non-null!" );
-        appContext.getLifecycleManager().registerManaged( new CacheManagerLifecycleHandler( cacheManagerComponent ) );
-    }
 
     public PathCache getPathCache( String cache )
     {
@@ -59,5 +43,11 @@ public class EhCacheCacheManager
         }
 
         return new EhCachePathCache( cache, ehCacheManager.getEhcache( SINGLE_PATH_CACHE_NAME ) );
+    }
+
+    @Override
+    public void dispose()
+    {
+        cacheManagerComponent.shutdown();
     }
 }
