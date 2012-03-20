@@ -26,6 +26,7 @@ import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
 
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.execution.CommandLineExecutor;
 import de.is24.nexus.yum.plugin.event.YumRepositoryGenerateEvent;
 import de.is24.nexus.yum.repository.ListFileFactory;
@@ -42,6 +43,7 @@ import de.is24.nexus.yum.repository.YumRepository;
 public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> implements ListFileFactory {
   public static final String ID = "YumMetadataGenerationTask";
   private static final String PACKAGE_FILE_DIR_NAME = ".packageFiles";
+  private static final String CACHE_DIR_PREFIX = ".cache-";
   private static final Logger LOG = LoggerFactory.getLogger(YumMetadataGenerationTask.class);
   public static final int MAXIMAL_PARALLEL_RUNS = 10;
   public static final String PARAM_REPO_ID = "yumMetadataGenerationRepoId";
@@ -69,6 +71,9 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
 
   @Requirement
   private RepositoryRegistry repositoryRegistry;
+
+  @Requirement
+  private YumConfiguration yumConfig;
 
   @Override
   protected YumRepository doRun() throws Exception {
@@ -219,15 +224,14 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   public void setRepository(Repository repository) {
-    getParameters().put(PARAM_REPO_ID, repository.getId());
+    setRepositoryId(repository.getId());
   }
 
-  public String getCacheDir() {
-    return getParameter(PARAM_CACHE_DIR);
+  public File getCacheDir() {
+    return new File(yumConfig.getBaseTempDir(), CACHE_DIR_PREFIX + getRepositoryId());
   }
 
   public void setCacheDir(String CacheDir) {
-    getParameters().put(PARAM_CACHE_DIR, CacheDir);
   }
 
   public String getAddedFiles() {
