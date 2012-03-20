@@ -50,7 +50,8 @@ public class TimeStampIgnoringDifferenceListener implements DifferenceListener {
   }
 
   private boolean isRpmRequiresWithOnlyRpmLibEntries(NodeDetail controlNode) {
-    return controlNode != null && controlNode.getNode() != null && controlNode.getNode().getLocalName().equals("requires")
+    return controlNode != null && controlNode.getNode() != null && controlNode.getNode().getLocalName() != null
+        && controlNode.getNode().getLocalName().equals("requires")
         && hasOnlyRpmLibEntries(controlNode.getNode());
   }
 
