@@ -72,6 +72,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
 
   @Override
   protected YumRepository doRun() throws Exception {
+    setDefaults();
     if (activated) {
       LOG.info("Generating Yum-Repository for '{}' ...", getRpmDir());
       try {
@@ -93,6 +94,15 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     }
 
     return null;
+  }
+
+  protected void setDefaults() {
+    if (getParameter(PARAM_REPO_DIR) == null) {
+      setRepoDir(new File(getRpmDir()));
+    }
+    if (getRepoUrl() == null) {
+      setRepoUrl(getRpmUrl());
+    }
   }
 
   @Override

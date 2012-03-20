@@ -1,7 +1,9 @@
 package de.is24.nexus.yum.repository.task;
 
 import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.ID;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
@@ -55,6 +57,19 @@ public class YumMetadataGenerationTaskTest {
 		YumMetadataGenerationTask task = task(REPO, NO_VERSION);
 		assertTrue(task.allowConcurrentExecution(createMap(scheduledTask(task), scheduledTask(ANOTHER_REPO, NO_VERSION, RUNNING))));
 	}
+
+  @Test
+  public void shouldSetDefaults() throws Exception {
+    // given
+    YumMetadataGenerationTask task = new YumMetadataGenerationTask();
+    task.setRpmDir(RPM_DIR.getAbsolutePath());
+    task.setRpmUrl(RPM_URL);
+    // when
+    task.setDefaults();
+    // then
+    assertThat(task.getRepoDir(), is(RPM_DIR.getAbsoluteFile()));
+    assertThat(task.getRepoUrl(), is(RPM_URL));
+  }
 
 	private ScheduledTask<YumRepository> scheduledTask(String repo, String version, TaskState state, Date scheduledAt) {
 		MockScheduledTask<YumRepository> scheduledTask = scheduledTask(task(repo, version));
