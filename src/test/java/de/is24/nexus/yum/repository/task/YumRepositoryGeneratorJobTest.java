@@ -10,9 +10,11 @@ import static org.apache.commons.io.FileUtils.deleteDirectory;
 import java.io.File;
 import java.util.concurrent.ExecutionException;
 
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.repository.AbstractSchedulerTest;
 
 
@@ -23,11 +25,15 @@ public class YumRepositoryGeneratorJobTest extends AbstractSchedulerTest {
   private static final String BASE_URL = "http://localhost:8080/nexus/content/snapshots";
   private static final String BASE_VERSIONED_URL = "http://localhost:8080/nexus/service/local/yum/snapshots/" + VERSION;
 
+  @Requirement
+  private YumConfiguration yumConfig;
+
   @Override
   public void setUp() throws Exception {
     super.setUp();
     deleteDirectory(PACKAGE_CACHE_DIR);
     deleteDirectory(REPODATA_DIR);
+    deleteDirectory(yumConfig.getBaseTempDir());
 		YumMetadataGenerationTask.activate();
   }
 
