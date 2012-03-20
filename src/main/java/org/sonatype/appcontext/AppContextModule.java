@@ -17,7 +17,10 @@ import org.sonatype.appcontext.AppContext;
 import com.google.inject.AbstractModule;
 
 /**
- * Module exposing AppContext as component, binding it to {@code AppContext.class} key.
+ * Guice Module exposing AppContext as component, binding it to {@code AppContext.class} key. Word of warning: this
+ * class is not suitable in all cases, like Nexus for example, as the appcontext is at "top level" Jetty classpath where
+ * no Guice exists. Hence, Nexus for example "reimplements" this same module to avoid class not found related problems.
+ * It really depends how you use AppContext.
  * 
  * @author cstamas
  * @since 3.1

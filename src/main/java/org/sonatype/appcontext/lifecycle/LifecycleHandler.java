@@ -5,6 +5,7 @@ package org.sonatype.appcontext.lifecycle;
  * implementations and use in a way they need.
  * 
  * @author cstamas
+ * @since 3.1
  */
 public interface LifecycleHandler
 {
