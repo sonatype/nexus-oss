@@ -25,24 +25,24 @@ public abstract class AbstractSchedulerTest extends AbstractYumNexusTestCase {
       File cacheDir, String addedFile, boolean singleRpmPerDirectory) throws Exception {
     YumMetadataGenerationTask yumTask = (YumMetadataGenerationTask) lookup(SchedulerTask.class, YumMetadataGenerationTask.ID);
     yumTask.setRepositoryId(id);
-    yumTask.setBaseRepoDir(repoDir);
-    yumTask.setBaseRepoUrl(repoUrl);
-    yumTask.setBaseRpmDir(rpmDir.getAbsolutePath());
-    yumTask.setBaseRpmUrl(rpmUrl);
+    yumTask.setRepoDir(repoDir);
+    yumTask.setRepoUrl(repoUrl);
+    yumTask.setRpmDir(rpmDir.getAbsolutePath());
+    yumTask.setRpmUrl(rpmUrl);
     yumTask.setVersion(version);
     yumTask.setAddedFiles(addedFile);
     yumTask.setSingleRpmPerDirectory(singleRpmPerDirectory);
-    yumTask.setBaseCacheDir(cacheDir.getAbsolutePath());
+    yumTask.setCacheDir(cacheDir.getAbsolutePath());
     return yumTask;
   }
 
   protected YumMetadataGenerationTask createTask(File rpmDir, String rpmUrl, File repoDir, String id, File cacheDir) throws Exception {
     YumMetadataGenerationTask yumTask = (YumMetadataGenerationTask) lookup(SchedulerTask.class, YumMetadataGenerationTask.ID);
     yumTask.setRepositoryId(id);
-    yumTask.setBaseRepoDir(repoDir);
-    yumTask.setBaseRpmDir(rpmDir.getAbsolutePath());
-    yumTask.setBaseRpmUrl(rpmUrl);
-    yumTask.setBaseCacheDir(cacheDir.getAbsolutePath());
+    yumTask.setRepoDir(repoDir);
+    yumTask.setRpmDir(rpmDir.getAbsolutePath());
+    yumTask.setRpmUrl(rpmUrl);
+    yumTask.setCacheDir(cacheDir.getAbsolutePath());
     return yumTask;
   }
 }

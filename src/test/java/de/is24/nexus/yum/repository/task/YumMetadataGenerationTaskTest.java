@@ -80,13 +80,13 @@ public class YumMetadataGenerationTaskTest {
 			}
 
 		};
-    task.setBaseRpmDir(RPM_DIR.getAbsolutePath());
-    task.setBaseRpmUrl(RPM_URL);
-    task.setBaseRepoDir(RPM_DIR);
-    task.setBaseRepoUrl(RPM_URL);
+    task.setRpmDir(RPM_DIR.getAbsolutePath());
+    task.setRpmUrl(RPM_URL);
+    task.setRepoDir(RPM_DIR);
+    task.setRepoUrl(RPM_URL);
     task.setRepositoryId(repo);
     task.setVersion(version);
-    task.setBaseCacheDir(RPM_DIR.getAbsolutePath());
+    task.setCacheDir(RPM_DIR.getAbsolutePath());
     task.setAddedFiles(null);
     task.setSingleRpmPerDirectory(true);
 		return task;
