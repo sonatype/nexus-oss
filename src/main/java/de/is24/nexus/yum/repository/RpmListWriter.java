@@ -32,12 +32,20 @@ public class RpmListWriter {
   private static final int POSITION_AFTER_SLASH = 1;
   private static final Logger LOG = LoggerFactory.getLogger(RpmListWriter.class);
 
-  private final YumGeneratorConfiguration config;
   private final File rpmListFile;
   private final ListFileFactory fileFactory;
+  private final String version;
+  private final String addedFiles;
+  private final String repositoryId;
+  private final String baseRpmDir;
+  private final boolean singleRpmPerDirectory;
 
   public RpmListWriter(YumGeneratorConfiguration config, ListFileFactory fileFactory) {
-    this.config = config;
+    this.version = config.getVersion();
+    this.addedFiles = config.getAddedFile();
+    this.repositoryId = config.getId();
+    this.baseRpmDir = config.getBaseRpmDir().getAbsolutePath();
+    this.singleRpmPerDirectory = config.isSingleRpmPerDirectory();
     this.fileFactory = fileFactory;
     this.rpmListFile = fileFactory.getRpmListFile(config.getId());
   }
@@ -47,11 +55,11 @@ public class RpmListWriter {
       LOG.info("Reuse existing rpm list file : {}", rpmListFile);
       List<String> rpmFileList = pruneToExistingRpms();
 
-      if (isNotBlank(config.getVersion())) {
+      if (isNotBlank(version)) {
         return extractVersionOfListFile(rpmFileList);
       }
 
-      if (isNotBlank(config.getAddedFile())) {
+      if (isNotBlank(addedFiles)) {
         addNewlyAddedRpmFileToList(rpmFileList);
       }
 
@@ -71,19 +79,19 @@ public class RpmListWriter {
       }
     }
 
-    File rpmVersionizedListFile = fileFactory.getRpmListFile(config.getId(), config.getVersion());
+    File rpmVersionizedListFile = fileFactory.getRpmListFile(repositoryId, version);
     writeRpmFileList(filesWithRequiredVersion, rpmVersionizedListFile);
     return rpmVersionizedListFile;
   }
 
   private boolean hasRequiredVersion(String file) {
     String[] segments = file.split("\\/");
-    return (segments.length >= 2) && config.getVersion().equals(segments[segments.length - 2]);
+    return (segments.length >= 2) && version.equals(segments[segments.length - 2]);
   }
 
   private void addNewlyAddedRpmFileToList(List<String> files) throws IOException {
-    final int startPosition = config.getAddedFile().startsWith("/") ? POSITION_AFTER_SLASH : 0;
-    final String filename = config.getAddedFile().substring(startPosition);
+    final int startPosition = addedFiles.startsWith("/") ? POSITION_AFTER_SLASH : 0;
+    final String filename = addedFiles.substring(startPosition);
 
     if (!files.contains(filename)) {
       files.add(filename);
@@ -96,7 +104,7 @@ public class RpmListWriter {
   private List<String> pruneToExistingRpms() throws IOException {
     List<String> files = readRpmFileList();
     for (int i = 0; i < files.size(); i++) {
-      if (!new File(config.getBaseRpmDir(), files.get(i)).exists()) {
+      if (!new File(baseRpmDir, files.get(i)).exists()) {
         LOG.info("Removed {} from rpm list.", files.get(i));
         files.remove(i);
         i--;
@@ -137,7 +145,7 @@ public class RpmListWriter {
   }
 
   private void rewriteList() throws IOException {
-    if (config.isSingleRpmPerDirectory()) {
+    if (singleRpmPerDirectory) {
       rewriteFileList(getSortedFilteredFileList());
     } else {
       writeRpmFileList(getRelativeFilenames(getRpmFileList()), rpmListFile);
@@ -145,7 +153,7 @@ public class RpmListWriter {
   }
 
   private List<String> getRelativeFilenames(Collection<File> rpmFileList) {
-    String absoluteBasePath = config.getBaseRpmDir().getAbsolutePath() + separator;
+    String absoluteBasePath = baseRpmDir + separator;
 
     List<String> result = new ArrayList<String>(rpmFileList.size());
     for (File rpmFile : rpmFileList) {
@@ -175,7 +183,7 @@ public class RpmListWriter {
   }
 
   private Map<String, String> getSortedFilteredFileList() {
-    String absoluteBasePath = config.getBaseRpmDir().getAbsolutePath() + separator;
+    String absoluteBasePath = baseRpmDir + separator;
 
     Map<String, String> fileMap = new TreeMap<String, String>();
 
@@ -197,7 +205,7 @@ public class RpmListWriter {
 
   @SuppressWarnings("unchecked")
   private Collection<File> getRpmFileList() {
-    Collection<File> result = listFiles(config.getBaseRpmDir(), new String[] { "rpm" }, true);
+    Collection<File> result = listFiles(new File(baseRpmDir), new String[] { "rpm" }, true);
     return result;
   }
 
@@ -210,7 +218,7 @@ public class RpmListWriter {
   }
 
   private boolean matchesRequestedVersion(File parentFile) {
-    return (config.getVersion() == null) || parentFile.getName().equals(config.getVersion());
+    return (version == null) || parentFile.getName().equals(version);
   }
 
 }

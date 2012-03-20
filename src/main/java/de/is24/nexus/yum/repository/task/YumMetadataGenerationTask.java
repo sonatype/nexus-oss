@@ -138,7 +138,10 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   private boolean conflictsWith(YumMetadataGenerationTask task) {
-    return config.conflictsWith(task.config);
+    if (StringUtils.equals(getRepositoryId(), task.getRepositoryId())) {
+      return StringUtils.equals(getVersion(), task.getVersion());
+    }
+    return false;
   }
 
   private File createRpmListFile() throws IOException {
@@ -152,7 +155,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   private String getRepositoryIdVersion() {
-    return config.getId() + (isNotBlank(getVersion()) ? ("-version-" + getVersion()) : "");
+    return getRepositoryId() + (isNotBlank(getVersion()) ? ("-version-" + getVersion()) : "");
   }
 
   private void replaceUrl() throws IOException {
@@ -181,18 +184,18 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
 
   @Override
   public File getRpmListFile(String repositoryId) {
-    return new File(createBasePackageDir(), config.getId() + ".txt");
+    return new File(createBasePackageDir(), getRepositoryId() + ".txt");
   }
 
   private File createBasePackageDir() {
-    File basePackageDir = new File(config.getBaseCacheDir(), PACKAGE_FILE_DIR_NAME);
+    File basePackageDir = new File(getBaseCacheDir(), PACKAGE_FILE_DIR_NAME);
     basePackageDir.mkdirs();
     return basePackageDir;
   }
 
   @Override
   public File getRpmListFile(String repositoryId, String version) {
-    return new File(createBasePackageDir(), config.getId() + "-" + version + ".txt");
+    return new File(createBasePackageDir(), getRepositoryId() + "-" + version + ".txt");
   }
 
   public static boolean isActive() {
