@@ -100,10 +100,10 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     this.config = config;
     getParameters().put(PARAM_REPO_ID, config.getId());
     getParameters().put(PARAM_ADDED_FILES, config.getAddedFile());
-    getParameters().put(PARAM_BASE_CACHE_DIR, config.getBaseCacheDir().getPath());
-    getParameters().put(PARAM_BASE_REPO_DIR, config.getBaseRepoDir().getPath());
+    getParameters().put(PARAM_BASE_CACHE_DIR, pathOrNull(config.getBaseCacheDir()));
+    getParameters().put(PARAM_BASE_REPO_DIR, pathOrNull(config.getBaseRepoDir()));
     getParameters().put(PARAM_BASE_REPO_URL, config.getBaseRepoUrl());
-    getParameters().put(PARAM_BASE_RPM_DIR, config.getBaseRpmDir().getPath());
+    getParameters().put(PARAM_BASE_RPM_DIR, pathOrNull(config.getBaseRpmDir()));
     getParameters().put(PARAM_BASE_RPM_URL, config.getBaseRpmUrl());
     getParameters().put(PARAM_VERSION, config.getVersion());
   }
@@ -138,7 +138,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   private boolean conflictsWith(YumMetadataGenerationTask task) {
-    return getConfig().conflictsWith(task.getConfig());
+    return config.conflictsWith(task.config);
   }
 
   private File createRpmListFile() throws IOException {
@@ -203,11 +203,38 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   public String getRepositoryId() {
-    return config.getId();
+    return getParameter(PARAM_REPO_ID);
   }
 
-  private YumGeneratorConfiguration getConfig() {
-    return config;
+  public String getBaseCacheDir() {
+    return getParameter(PARAM_BASE_CACHE_DIR);
   }
 
+  public String getAddedFiles() {
+    return getParameter(PARAM_ADDED_FILES);
+  }
+
+  public String getBaseRepoDir() {
+    return getParameter(PARAM_BASE_REPO_DIR);
+  }
+
+  public String getBaseRepoUrl() {
+    return getParameter(PARAM_BASE_REPO_URL);
+  }
+
+  public String getBaseRpmDir() {
+    return getParameter(PARAM_BASE_RPM_DIR);
+  }
+
+  public String getBaseRpmUrl() {
+    return getParameter(PARAM_BASE_RPM_URL);
+  }
+
+  public String getVersion() {
+    return getParameter(PARAM_VERSION);
+  }
+
+  private String pathOrNull(File file) {
+    return file != null ? file.getPath() : null;
+  }
 }
