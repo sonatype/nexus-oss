@@ -21,7 +21,7 @@
   </scm>
 
   <properties>
-    <jetty.version>8.1.1.v20120215</jetty.version>
+    <jetty.version>8.1.2.v20120308</jetty.version>
   </properties>
 
   <dependencies>
@@ -32,7 +32,7 @@
     <dependency>
       <groupId>org.sonatype.appcontext</groupId>
       <artifactId>appcontext</artifactId>
-      <version>3.1-SNAPSHOT</version>
+      <version>3.1</version>
       <scope>compile</scope>
     </dependency>
 
