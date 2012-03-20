@@ -22,7 +22,7 @@ public abstract class AbstractSchedulerTest extends AbstractYumNexusTestCase {
   }
 
   protected YumMetadataGenerationTask createTask(File rpmDir, String rpmUrl, File repoDir, String repoUrl, String id, String version,
-      File cacheDir, String addedFile, boolean singleRpmPerDirectory) throws Exception {
+      String addedFile, boolean singleRpmPerDirectory) throws Exception {
     YumMetadataGenerationTask yumTask = (YumMetadataGenerationTask) lookup(SchedulerTask.class, YumMetadataGenerationTask.ID);
     yumTask.setRepositoryId(id);
     yumTask.setRepoDir(repoDir);
@@ -32,11 +32,10 @@ public abstract class AbstractSchedulerTest extends AbstractYumNexusTestCase {
     yumTask.setVersion(version);
     yumTask.setAddedFiles(addedFile);
     yumTask.setSingleRpmPerDirectory(singleRpmPerDirectory);
-    yumTask.setCacheDir(cacheDir.getAbsolutePath());
     return yumTask;
   }
 
-  protected YumMetadataGenerationTask createTask(File rpmDir, String rpmUrl, File repoDir, String id, File cacheDir) throws Exception {
-    return createTask(rpmDir, rpmUrl, repoDir, null, id, null, cacheDir, null, true);
+  protected YumMetadataGenerationTask createTask(File rpmDir, String rpmUrl, File repoDir, String id) throws Exception {
+    return createTask(rpmDir, rpmUrl, repoDir, null, id, null, null, true);
   }
 }

@@ -101,7 +101,6 @@ public class YumMetadataGenerationTaskTest {
     task.setRepoUrl(RPM_URL);
     task.setRepositoryId(repo);
     task.setVersion(version);
-    task.setCacheDir(RPM_DIR.getAbsolutePath());
     task.setAddedFiles(null);
     task.setSingleRpmPerDirectory(true);
 		return task;

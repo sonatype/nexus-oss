@@ -231,9 +231,6 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     return new File(yumConfig.getBaseTempDir(), CACHE_DIR_PREFIX + getRepositoryId());
   }
 
-  public void setCacheDir(String CacheDir) {
-  }
-
   public String getAddedFiles() {
     return getParameter(PARAM_ADDED_FILES);
   }
