@@ -2,6 +2,8 @@ package de.is24.nexus.yum.repository.task;
 
 import static de.is24.nexus.yum.repository.YumRepository.REPOMD_XML;
 import static de.is24.nexus.yum.repository.YumRepository.YUM_REPOSITORY_DIR_NAME;
+import static java.lang.String.format;
+import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
@@ -51,9 +53,8 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   public static final String PARAM_BASE_RPM_URL = "yumMetadataGenerationBaseRpmUrl";
   public static final String PARAM_BASE_REPO_URL = "yumMetadataGenerationBaseRepoUrl";
   public static final String PARAM_ADDED_FILES = "yumMetadataGenerationAddedFiles";
+  public static final String PARAM_SINGLE_RPM_PER_DIR = "yumMetadataGenerationSingleRpmPerDir";
   private static boolean activated = true;
-
-  private YumGeneratorConfiguration config;
 
   @Requirement
   private ApplicationEventMulticaster eventMulticaster;
@@ -97,7 +98,6 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   public void setConfiguration(YumGeneratorConfiguration config) {
-    this.config = config;
     getParameters().put(PARAM_REPO_ID, config.getId());
     getParameters().put(PARAM_ADDED_FILES, config.getAddedFile());
     getParameters().put(PARAM_BASE_CACHE_DIR, pathOrNull(config.getBaseCacheDir()));
@@ -106,6 +106,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     getParameters().put(PARAM_BASE_RPM_DIR, pathOrNull(config.getBaseRpmDir()));
     getParameters().put(PARAM_BASE_RPM_URL, config.getBaseRpmUrl());
     getParameters().put(PARAM_VERSION, config.getVersion());
+    getParameters().put(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(config.isSingleRpmPerDirectory()));
   }
 
   @Override
@@ -145,7 +146,8 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   private File createRpmListFile() throws IOException {
-    return new RpmListWriter(config, this).writeList();
+    return new RpmListWriter(getRepositoryId(), getBaseRpmDir(), getAddedFiles(), getVersion(), isSingleRpmPerDirectory(), this)
+        .writeList();
   }
 
   private File createCacheDir() {
@@ -163,14 +165,14 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     if (activated && repomd.exists()) {
       String repomdStr = FileUtils.readFileToString(repomd);
       repomdStr = repomdStr.replace(getBaseRpmUrl(), getBaseRepoUrl());
-      FileUtils.writeStringToFile(repomd, repomdStr);
+      writeStringToFile(repomd, repomdStr);
     }
   }
 
   private String buildCreateRepositoryCommand(File packageList) {
     String packageFile = packageList.getAbsolutePath();
     String cacheDir = createCacheDir().getAbsolutePath();
-    return String.format("createrepo --update -o %s -u %s  -v -d -i %s -c %s %s", getBaseRepoDir().getAbsolutePath(), getBaseRpmUrl(),
+    return format("createrepo --update -o %s -u %s  -v -d -i %s -c %s %s", getBaseRepoDir().getAbsolutePath(), getBaseRpmUrl(),
         packageFile, cacheDir, getBaseRpmDir());
   }
 
@@ -234,7 +236,11 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     return getParameter(PARAM_VERSION);
   }
 
-  private String pathOrNull(File file) {
+  private boolean isSingleRpmPerDirectory() {
+    return Boolean.valueOf(getParameter(PARAM_SINGLE_RPM_PER_DIR));
+  }
+
+  private static String pathOrNull(File file) {
     return file != null ? file.getAbsolutePath() : null;
   }
 }

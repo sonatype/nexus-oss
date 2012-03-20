@@ -25,29 +25,28 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.is24.nexus.yum.repository.config.YumGeneratorConfiguration;
-
 
 public class RpmListWriter {
   private static final int POSITION_AFTER_SLASH = 1;
   private static final Logger LOG = LoggerFactory.getLogger(RpmListWriter.class);
 
   private final File rpmListFile;
-  private final ListFileFactory fileFactory;
   private final String version;
   private final String addedFiles;
   private final String repositoryId;
   private final String baseRpmDir;
   private final boolean singleRpmPerDirectory;
+  private final ListFileFactory fileFactory;
 
-  public RpmListWriter(YumGeneratorConfiguration config, ListFileFactory fileFactory) {
-    this.version = config.getVersion();
-    this.addedFiles = config.getAddedFile();
-    this.repositoryId = config.getId();
-    this.baseRpmDir = config.getBaseRpmDir().getAbsolutePath();
-    this.singleRpmPerDirectory = config.isSingleRpmPerDirectory();
+  public RpmListWriter(String repositoryId, String baseRpmDir, String addedFiles, String version, boolean singleRpmPerDirectory,
+      ListFileFactory fileFactory) {
+    this.repositoryId = repositoryId;
+    this.baseRpmDir = baseRpmDir;
+    this.addedFiles = addedFiles;
+    this.version = version;
+    this.singleRpmPerDirectory = singleRpmPerDirectory;
     this.fileFactory = fileFactory;
-    this.rpmListFile = fileFactory.getRpmListFile(config.getId());
+    this.rpmListFile = fileFactory.getRpmListFile(repositoryId);
   }
 
   public File writeList() throws IOException {
