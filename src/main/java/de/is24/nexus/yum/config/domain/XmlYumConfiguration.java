@@ -19,6 +19,8 @@ import de.is24.nexus.yum.version.alias.domain.AliasMapping;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "configuration")
 public class XmlYumConfiguration {
+  protected static final int DEFAULT_DELAY_AFTER_DELETION_IN_SEC = 10;
+  protected static final boolean DEFAULT_DELETE_PROCESSING = true;
   protected static final int DEFAULT_TIMEOUT_IN_SEC = 120;
   protected static final boolean DEFAULT_REPOSITORY_OF_REPOSITORY_VERSIONS = true;
 
@@ -30,9 +32,9 @@ public class XmlYumConfiguration {
   @XmlElementWrapper
   private Set<AliasMapping> aliasMappings = new LinkedHashSet<AliasMapping>();
 
-  private boolean deleteProcessing;
+  private boolean deleteProcessing = DEFAULT_DELETE_PROCESSING;
 
-  private long delayAfterDeletion;
+  private long delayAfterDeletion = DEFAULT_DELAY_AFTER_DELETION_IN_SEC;
 
   public XmlYumConfiguration() {
     super();
