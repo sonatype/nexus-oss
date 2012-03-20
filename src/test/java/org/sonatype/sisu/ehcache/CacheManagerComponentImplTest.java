@@ -17,6 +17,10 @@ import com.google.inject.Key;
 public class CacheManagerComponentImplTest
     extends InjectedTestCase
 {
+    private AppContext appContext;
+
+    private CacheManagerComponent cacheManagerComponent;
+
     @Override
     public void configure( Binder binder )
     {
@@ -27,17 +31,27 @@ public class CacheManagerComponentImplTest
         final AppContextRequest req = Factory.getDefaultRequest();
         req.getSources().add( new MapEntrySource( "aMAp", aMap ) );
 
-        final AppContext appContext = Factory.create( req );
+        appContext = Factory.create( req );
 
         binder.bind( Key.get( AppContext.class ) ).toInstance( appContext );
     }
 
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+        cacheManagerComponent = lookup( CacheManagerComponent.class );
+        appContext.getLifecycleManager().registerManaged( new CacheManagerLifecycleHandler( cacheManagerComponent ) );
+    }
+
+    @Override
     protected void tearDown()
         throws Exception
     {
         try
         {
-            lookup( AppContext.class ).getLifecycleManager().invokeHandler( Stoppable.class );
+            appContext.getLifecycleManager().invokeHandler( Stoppable.class );
         }
         finally
         {
@@ -49,7 +63,7 @@ public class CacheManagerComponentImplTest
         throws Exception
     {
         // look it up
-        CacheManagerComponentImpl cacheWrapper = (CacheManagerComponentImpl) lookup( CacheManagerComponent.class );
+        CacheManagerComponentImpl cacheWrapper = (CacheManagerComponentImpl) cacheManagerComponent;
 
         // check the store path, since the config from src/test/resources should be picked up
         String storePath = cacheWrapper.getCacheManager().getDiskStorePath();
@@ -72,9 +86,12 @@ public class CacheManagerComponentImplTest
     public void testConfigFromFile()
         throws Exception
     {
+        // stop the one created in setUp() method
+        cacheManagerComponent.shutdown();
+        
         // look it up
         final File file = new File( new File( getBasedir() ), "src/test/resources/ehcache.xml" );
-        CacheManagerComponentImpl cacheWrapper = new CacheManagerComponentImpl( lookup( AppContext.class ), file );
+        CacheManagerComponentImpl cacheWrapper = new CacheManagerComponentImpl( appContext, file );
 
         // check the store path, since the config from src/test/resources should be picked up
         String storePath = cacheWrapper.getCacheManager().getDiskStorePath();
