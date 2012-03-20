@@ -64,9 +64,9 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   @Override
   protected YumRepository doRun() throws Exception {
     if (activated) {
-      LOG.info("Generating Yum-Repository for '{}' ...", config.getBaseRpmDir());
+      LOG.info("Generating Yum-Repository for '{}' ...", getBaseRpmDir());
       try {
-        config.getBaseRepoDir().mkdirs();
+        getBaseRepoDir().mkdirs();
 
         File rpmListFile = createRpmListFile();
         new CommandLineExecutor().exec(buildCreateRepositoryCommand(rpmListFile));
@@ -80,7 +80,7 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
       LOG.info("Generation complete.");
 
       sendNotificationEvent();
-      return new YumRepository(config.getBaseRepoDir(), config.getId(), config.getVersion());
+      return new YumRepository(getBaseRepoDir(), getRepositoryId(), getVersion());
     }
 
     return null;
@@ -128,9 +128,9 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   private void sendNotificationEvent() {
-    if (StringUtils.isBlank(config.getVersion())) {
+    if (StringUtils.isBlank(getVersion())) {
       try {
-        final Repository repository = repositoryRegistry.getRepository(config.getId());
+        final Repository repository = repositoryRegistry.getRepository(getRepositoryId());
         eventMulticaster.notifyEventListeners(new YumRepositoryGenerateEvent(repository));
       } catch (NoSuchRepositoryException e) {
       }
@@ -146,32 +146,29 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   private File createCacheDir() {
-    File cacheDir = new File(config.getBaseCacheDir(), getRepositoryIdVersion());
+    File cacheDir = new File(getBaseCacheDir(), getRepositoryIdVersion());
     cacheDir.mkdirs();
     return cacheDir;
   }
 
   private String getRepositoryIdVersion() {
-    return config.getId() + (isNotBlank(config.getVersion()) ? ("-version-" + config.getVersion()) : "");
+    return config.getId() + (isNotBlank(getVersion()) ? ("-version-" + getVersion()) : "");
   }
 
   private void replaceUrl() throws IOException {
-    File repomd = new File(config.getBaseRepoDir(), YUM_REPOSITORY_DIR_NAME + File.separator + REPOMD_XML);
+    File repomd = new File(getBaseRepoDir(), YUM_REPOSITORY_DIR_NAME + File.separator + REPOMD_XML);
     if (activated && repomd.exists()) {
       String repomdStr = FileUtils.readFileToString(repomd);
-      repomdStr = repomdStr.replace(config.getBaseRpmUrl(), config.getBaseRepoUrl());
+      repomdStr = repomdStr.replace(getBaseRpmUrl(), getBaseRepoUrl());
       FileUtils.writeStringToFile(repomd, repomdStr);
     }
   }
 
   private String buildCreateRepositoryCommand(File packageList) {
-    String baseRepoDir = config.getBaseRepoDir().getAbsolutePath();
-    String baseRpmUrl = config.getBaseRpmUrl();
     String packageFile = packageList.getAbsolutePath();
     String cacheDir = createCacheDir().getAbsolutePath();
-    String baseRpmDir = config.getBaseRpmDir().getAbsolutePath();
-    return String.format("createrepo --update -o %s -u %s  -v -d -i %s -c %s %s", baseRepoDir, baseRpmUrl, packageFile, cacheDir,
-        baseRpmDir);
+    return String.format("createrepo --update -o %s -u %s  -v -d -i %s -c %s %s", getBaseRepoDir().getAbsolutePath(), getBaseRpmUrl(),
+        packageFile, cacheDir, getBaseRpmDir());
   }
 
   public static void deactivate() {
@@ -214,8 +211,8 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
     return getParameter(PARAM_ADDED_FILES);
   }
 
-  public String getBaseRepoDir() {
-    return getParameter(PARAM_BASE_REPO_DIR);
+  public File getBaseRepoDir() {
+    return new File(getParameter(PARAM_BASE_REPO_DIR));
   }
 
   public String getBaseRepoUrl() {
@@ -235,6 +232,6 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   private String pathOrNull(File file) {
-    return file != null ? file.getPath() : null;
+    return file != null ? file.getAbsolutePath() : null;
   }
 }
