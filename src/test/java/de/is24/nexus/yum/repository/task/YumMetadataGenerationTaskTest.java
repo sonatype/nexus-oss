@@ -1,10 +1,14 @@
 package de.is24.nexus.yum.repository.task;
 
 import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.ID;
+import static de.is24.test.reflection.ReflectionTestUtils.setField;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.io.File;
@@ -16,6 +20,9 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.junit.Test;
+import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
+import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.scheduling.DefaultScheduledTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskState;
@@ -31,7 +38,8 @@ public class YumMetadataGenerationTaskTest {
 	private static final String VERSION = "version";
 	private static final String NO_VERSION = null;
 	private static final String REPO = "REPO1";
-	private static final String RPM_URL = "http://url";
+  private static final String BASE_URL = "http://foo.bla";
+  private static final String RPM_URL = BASE_URL + "/content/repositories/" + REPO;
 	private static final File RPM_DIR = new File(".");
 
 	@Test
@@ -71,7 +79,38 @@ public class YumMetadataGenerationTaskTest {
     assertThat(task.getRepoUrl(), is(RPM_URL));
   }
 
-	private ScheduledTask<YumRepository> scheduledTask(String repo, String version, TaskState state, Date scheduledAt) {
+  @Test
+  public void shouldSetDefaultsIfOnlyRepoWasSet() throws Exception {
+    // given
+    YumMetadataGenerationTask task = new YumMetadataGenerationTask();
+    task.setRepositoryId(REPO);
+    setField(task, "repositoryRegistry", repoRegistry());
+    setField(task, "restApiSettings", restApiSettings());
+    // when
+    task.setDefaults();
+    // then
+    assertThat(task.getRpmDir(), is(RPM_DIR.getAbsolutePath()));
+    assertThat(task.getRpmUrl(), is(RPM_URL));
+    assertThat(task.getRepoDir(), is(RPM_DIR.getAbsoluteFile()));
+    assertThat(task.getRepoUrl(), is(RPM_URL));
+  }
+
+  private GlobalRestApiSettings restApiSettings() {
+    GlobalRestApiSettings settings = mock(GlobalRestApiSettings.class);
+    when(settings.getBaseUrl()).thenReturn(BASE_URL);
+    return settings;
+  }
+
+  private RepositoryRegistry repoRegistry() throws Exception {
+    final Repository repo = mock(Repository.class);
+    when(repo.getId()).thenReturn(REPO);
+    when(repo.getLocalUrl()).thenReturn(RPM_DIR.getAbsolutePath());
+    final RepositoryRegistry repoRegistry = mock(RepositoryRegistry.class);
+    when(repoRegistry.getRepository(anyString())).thenReturn(repo);
+    return repoRegistry;
+  }
+
+  private ScheduledTask<YumRepository> scheduledTask(String repo, String version, TaskState state, Date scheduledAt) {
 		MockScheduledTask<YumRepository> scheduledTask = scheduledTask(task(repo, version));
 		scheduledTask.setTaskState(state);
 		scheduledTask.setSchedule(new OnceSchedule(new Date(scheduledAt.getTime() + 400)));

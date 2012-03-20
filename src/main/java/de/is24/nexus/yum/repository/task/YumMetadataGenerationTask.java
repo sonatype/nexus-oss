@@ -1,16 +1,22 @@
 package de.is24.nexus.yum.repository.task;
 
+import static de.is24.nexus.yum.repository.RepositoryUtils.getBaseDir;
 import static de.is24.nexus.yum.repository.YumRepository.REPOMD_XML;
 import static de.is24.nexus.yum.repository.YumRepository.YUM_REPOSITORY_DIR_NAME;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.writeStringToFile;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.sonatype.scheduling.TaskState.RUNNING;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
@@ -18,6 +24,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -75,6 +82,9 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   @Requirement
   private YumConfiguration yumConfig;
 
+  @Inject
+  private GlobalRestApiSettings restApiSettings;
+
   @Override
   protected YumRepository doRun() throws Exception {
     setDefaults();
@@ -102,11 +112,34 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   }
 
   protected void setDefaults() {
-    if (getParameter(PARAM_REPO_DIR) == null) {
+    final Repository repository = findRepository();
+    if (isBlank(getRpmDir()) && repository != null) {
+      try {
+        setRpmDir(getBaseDir(repository).getAbsolutePath());
+      } catch (MalformedURLException e) {
+      } catch (URISyntaxException e) {
+      }
+    }
+    if (isBlank(getRpmUrl()) && repository != null) {
+      setRpmUrl(getBaseUrl(repository));
+    }
+    if (isBlank(getParameter(PARAM_REPO_DIR)) && isNotBlank(getRpmDir())) {
       setRepoDir(new File(getRpmDir()));
     }
-    if (getRepoUrl() == null) {
+    if (isBlank(getRepoUrl()) && isNotBlank(getRpmUrl())) {
       setRepoUrl(getRpmUrl());
+    }
+  }
+
+  private String getBaseUrl(Repository repository) {
+    return String.format("%s/content/repositories/%s", restApiSettings.getBaseUrl(), repository.getId());
+  }
+
+  private Repository findRepository() {
+    try {
+      return repositoryRegistry.getRepository(getRepositoryId());
+    } catch (NoSuchRepositoryException e) {
+      return null;
     }
   }
 
