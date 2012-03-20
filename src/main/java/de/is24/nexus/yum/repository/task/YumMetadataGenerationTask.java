@@ -55,6 +55,15 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
   public static final String PARAM_SINGLE_RPM_PER_DIR = "yumMetadataGenerationSingleRpmPerDir";
   private static boolean activated = true;
 
+  public YumMetadataGenerationTask() {
+    this(null);
+  }
+
+  public YumMetadataGenerationTask(String name) {
+    super(name);
+    getParameters().put(PARAM_SINGLE_RPM_PER_DIR, Boolean.toString(true));
+  }
+
   @Requirement
   private ApplicationEventMulticaster eventMulticaster;
 
