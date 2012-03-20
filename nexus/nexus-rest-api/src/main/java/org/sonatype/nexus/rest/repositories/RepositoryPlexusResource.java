@@ -32,6 +32,7 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.configuration.application.RepositoryDependentException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.StorageException;
@@ -377,12 +378,17 @@ public class RepositoryPlexusResource
 
             response.setStatus( Status.SUCCESS_NO_CONTENT );
         }
+        catch ( RepositoryDependentException e )
+        {
+            getLogger().info( e.getMessage() );
+
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getUIMessage(), e );
+        }
         catch ( ConfigurationException e )
         {
-            getLogger().warn( "Repository not deletable, it has dependants, id=" + repoId );
+            getLogger().warn( e.getMessage() );
 
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
-                                         "Repository is not deletable, it has dependants." );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(), e );
         }
         catch ( NoSuchRepositoryAccessException e )
         {
