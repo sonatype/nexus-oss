@@ -145,7 +145,7 @@ public class P2ProxyRepository
         return (P2ProxyRepositoryConfiguration) super.getExternalConfiguration( forModification );
     }
 
-    protected void configureMirrors( final ResourceStoreRequest incomingRequest, final RepositoryItemUid uid )
+    protected void configureMirrors( final ResourceStoreRequest incomingRequest )
     {
         getLogger().debug( "Repository " + getId() + ": configureMirrors: mirrorsConfigured=" + mirrorsConfigured );
         AbstractStorageItem mirrorsItem = null;
@@ -169,11 +169,6 @@ public class P2ProxyRepository
         {
             return;
         }
-
-        // exclusive locking begins here, since actual work needs to be done
-        final RepositoryItemUidLock lock = uid.getLock();
-
-        lock.lock( Action.create );
 
         try
         {
@@ -282,10 +277,6 @@ public class P2ProxyRepository
                         + message
                         + "). All downloads will come from repository canonical URL." );
             }
-        }
-        finally
-        {
-            lock.unlock();
         }
     }
 
@@ -416,12 +407,7 @@ public class P2ProxyRepository
         final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
         final RepositoryItemUidLock lock = uid.getLock();
 
-        // NOTE: THIS IS A DIRTY HACK
-        // We are doing this, to serialize the access to P2Proxy repository,
-        // and just exclude any possibility of deadlocks for now.
-        // Naturally, we need to come up with proper fix for P2Proxy repository implementation.
-        lock.lock( Action.create );
-
+        lock.lock( Action.read );
         try
         {
             return super.retrieveItem( fromTask, request );
@@ -472,7 +458,7 @@ public class P2ProxyRepository
         {
             // note this method can potentially go retrieve new mirrors, but it is using locking, so no
             // need to worry about multiples getting in
-            configureMirrors( request, uid );
+            configureMirrors( request );
             return super.doRetrieveItem( request );
         }
         finally

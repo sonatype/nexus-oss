@@ -20,6 +20,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
+import org.sonatype.nexus.plugins.p2.repository.P2Constants;
 import org.sonatype.nexus.plugins.p2.repository.P2ContentClass;
 import org.sonatype.nexus.plugins.p2.repository.P2Repository;
 import org.sonatype.nexus.plugins.p2.repository.metadata.P2MetadataSource;
@@ -27,6 +28,9 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidLock;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepository;
@@ -102,6 +106,25 @@ public class P2GroupRepository
         }
 
         return super.doRetrieveItem( request );
+    }
+
+    @Override
+    public StorageItem retrieveItem( final boolean fromTask, final ResourceStoreRequest request )
+        throws IllegalOperationException, ItemNotFoundException, StorageException
+    {
+        final RepositoryItemUid uid = createUid( P2Constants.METADATA_LOCK_PATH );
+        final RepositoryItemUidLock lock = uid.getLock();
+
+        lock.lock( Action.read );
+        try
+        {
+
+            return super.retrieveItem( fromTask, request );
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
 }

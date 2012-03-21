@@ -184,22 +184,49 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
                     // fall through
                 }
 
-                // we need to get new file, so update the lock
-                lock.lock( Action.delete );
+                // give away the lock on content.xml as we will regenerate it
+                final RepositoryItemUid contentXmlUid = repository.createUid( request.getRequestPath() );
+                contentXmlUid.getLock().unlock();
 
                 try
                 {
-                    final StorageItem result = doRetrieveContentItem( request.getRequestContext(), repository );
-                    doRetrieveArtifactsItem( request.getRequestContext(), repository );
-                    return result;
-                }
-                catch ( final RuntimeException e )
-                {
-                    return doRetrieveLocalOnTransferError( request, repository, e );
+                    // we need to get new file, so update the lock
+                    lock.lock( Action.delete );
+
+                    // recheck the condition now that we have an exclusive lock
+                    try
+                    {
+                        final AbstractStorageItem contentItem = doRetrieveLocalItem( request, repository );
+
+                        if ( !isContentOld( contentItem, repository ) )
+                        {
+                            return contentItem;
+                        }
+                    }
+                    catch ( final ItemNotFoundException e )
+                    {
+                        // fall through
+                    }
+
+                    try
+                    {
+                        final StorageItem result = doRetrieveContentItem( request.getRequestContext(), repository );
+                        doRetrieveArtifactsItem( request.getRequestContext(), repository );
+                        return result;
+                    }
+                    catch ( final RuntimeException e )
+                    {
+                        return doRetrieveLocalOnTransferError( request, repository, e );
+                    }
+                    finally
+                    {
+                        lock.unlock();
+                    }
                 }
                 finally
                 {
-                    lock.unlock();
+                    // get back the lock we gave in
+                    contentXmlUid.getLock().lock( Action.read );
                 }
             }
             else if ( P2Constants.ARTIFACTS_PATH.equals( request.getRequestPath() ) )
@@ -218,23 +245,49 @@ public abstract class AbstractP2MetadataSource<E extends Repository>
                     // fall through
                 }
 
-                // we need to get new file, so update the lock
-                lock.lock( Action.delete );
+                // give away the lock on artifacts.xml as we will regenerate it
+                final RepositoryItemUid artifactsXmlUid = repository.createUid( request.getRequestPath() );
+                artifactsXmlUid.getLock().unlock();
 
                 try
                 {
-                    deleteItemSilently( repository, new ResourceStoreRequest( P2Constants.PRIVATE_ROOT ) );
-                    doRetrieveContentItem( request.getRequestContext(), repository );
-                    return doRetrieveArtifactsItem( request.getRequestContext(), repository );
-                }
-                catch ( final RuntimeException e )
-                {
-                    return doRetrieveLocalOnTransferError( request, repository, e );
+                    // we need to get new file, so update the lock
+                    lock.lock( Action.delete );
 
+                    try
+                    {
+                        final AbstractStorageItem artifactsItem = doRetrieveLocalItem( request, repository );
+
+                        if ( !isArtifactsOld( artifactsItem, repository ) )
+                        {
+                            return artifactsItem;
+                        }
+                    }
+                    catch ( final ItemNotFoundException e )
+                    {
+                        // fall through
+                    }
+
+                    try
+                    {
+                        deleteItemSilently( repository, new ResourceStoreRequest( P2Constants.PRIVATE_ROOT ) );
+                        doRetrieveContentItem( request.getRequestContext(), repository );
+                        return doRetrieveArtifactsItem( request.getRequestContext(), repository );
+                    }
+                    catch ( final RuntimeException e )
+                    {
+                        return doRetrieveLocalOnTransferError( request, repository, e );
+
+                    }
+                    finally
+                    {
+                        lock.unlock();
+                    }
                 }
                 finally
                 {
-                    lock.unlock();
+                    // get back the lock we gave in
+                    artifactsXmlUid.getLock().lock( Action.read );
                 }
             }
 

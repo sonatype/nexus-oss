@@ -41,7 +41,7 @@ public interface P2Constants
 
     // Used to create a nexus lock for metadata items - it doesn't have to be ARTIFACTS_PATH...
     // cstamas: IMO, it should NOT be an existing path, to not trip on locking happening in core
-    String METADATA_LOCK_PATH = ARTIFACTS_PATH + "-lockPath";
+    String METADATA_LOCK_PATH = "/.p2/metadata-virtual-lock-path";
 
     /**
      * Location of "private" state in repository/group local store. This is not meant to be used by clients directly
