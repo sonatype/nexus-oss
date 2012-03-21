@@ -26,6 +26,7 @@
   <packaging>nexus-plugin</packaging>
   <name>Nexus : Core Plugins : Groovy Console</name>
   <description>Adds running groovy scripts in tasks and on events.</description>
+  <url/>
 
   <build>
     <plugins>

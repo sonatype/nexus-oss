@@ -25,6 +25,7 @@
   <name>Nexus : Core Plugins : OSS LDAP : LDAP Plugin</name>
   <description>Adds a LDAP security realm to Nexus.</description>
   <packaging>nexus-plugin</packaging>
+  <url/>
 
   <properties>
     <commons-collections.version>3.2.1</commons-collections.version>
