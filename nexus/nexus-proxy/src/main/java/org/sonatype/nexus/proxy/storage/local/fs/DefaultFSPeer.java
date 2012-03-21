@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.storage.local.fs;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
@@ -318,14 +320,29 @@ public class DefaultFSPeer
     protected File getHiddenTarget( final File target, final StorageItem item )
         throws LocalStorageException
     {
+        checkNotNull( target );
+
         try
         {
-            return File.createTempFile( target.getName(), HIDDEN_TARGET_SUFFIX, target.getParentFile() );
+            String prefix = expandPrefix( target.getName() );
+            return File.createTempFile( prefix, HIDDEN_TARGET_SUFFIX, target.getParentFile() );
         }
         catch ( IOException e )
         {
             throw new LocalStorageException( e.getMessage(), e );
         }
+    }
+
+    private String expandPrefix( String prefix )
+    {
+        checkNotNull( prefix );
+
+        if ( prefix.length() < 3 )
+        {
+            prefix = prefix + System.nanoTime();
+        }
+
+        return prefix;
     }
 
     protected void mkParentDirs( Repository repository, File target )
