@@ -1,7 +1,11 @@
 package de.is24.nexus.yum.repository;
 
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.RPM_BASE_FILE;
+import static java.io.File.pathSeparator;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +21,8 @@ public class RpmListWriterTest {
     "conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm\n" +
     "conflict-artifact/2.2-2/conflict-artifact-2.2-2.noarch.rpm\n" +
     "test-artifact/1.2/test-artifact-1.2-1.noarch.rpm\n" + "test-artifact/1.3/test-artifact-1.3-1.noarch.rpm\n";
+  private static final String NEW_RPM1 = "newAddFileRpm1.rpm";
+  private static final String NEW_RPM2 = "newAddFileRpm2.rpm";
 
   @Test
   public void shouldListFileInSubDirs() throws Exception {
@@ -60,6 +66,21 @@ public class RpmListWriterTest {
     rpmListFile = new RpmListWriter(REPO_ID, RPM_BASE_FILE.getAbsolutePath(), "conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm",
         null, true, wrap(rpmListFile)).writeList();
     assertEquals(FILE_CONTENT, IOUtils.toString(new FileInputStream(rpmListFile)));
+  }
+
+  @Test
+  public void shouldAddMultipleFiles() throws Exception {
+    // given written list file
+    File rpmListFile = writeRpmListFile(RPM_BASE_FILE, null, null);
+    // when create two files and recreate list
+    rpmListFile = new RpmListWriter(REPO_ID, RPM_BASE_FILE.getAbsolutePath(), NEW_RPM1 + pathSeparator + NEW_RPM2, null, false,
+        wrap(rpmListFile))
+        .writeList();
+    // then
+    final String content = IOUtils.toString(new FileInputStream(rpmListFile));
+    assertThat(content, containsString(NEW_RPM1));
+    assertThat(content, containsString(NEW_RPM2));
+    assertThat(content, not(containsString(pathSeparator)));
   }
 
   private File writeRpmListFile(File rpmBaseDir, String version, String addedFile) throws IOException {

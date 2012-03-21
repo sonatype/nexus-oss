@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<repomd xmlns="http://linux.duke.edu/metadata/repo" xmlns:rpm="http://linux.duke.edu/metadata/rpm">
+  <revision>1332330546</revision>
+  <data type="other_db">
+    <location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="repodata/other.sqlite.bz2"/>
+    <checksum type="sha1">7b4198e975c446e8843ff41d4467c163eda50402</checksum>
+    <timestamp>1332330546</timestamp>
+    <size>938</size>
+    <open-size>6144</open-size>
+    <open-checksum type="sha1">cb1f30566240b2cf9f993a72db34af4e0e0d8100</open-checksum>
+    <database_version>10</database_version>
+  </data>
+  <data type="other">
+    <checksum type="sha1">c9885895ae6d8a50073318733a8685b0dd8561cb</checksum>
+    <timestamp>1332330546</timestamp>
+    <size>539</size>
+    <open-size>1164</open-size>
+    <open-checksum type="sha1">47c227386132be625f775b506ff06bcef5d5e01b</open-checksum>
+    <location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="repodata/other.xml.gz"/>
+  </data>
+  <data type="filelists_db">
+    <location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="repodata/filelists.sqlite.bz2"/>
+    <checksum type="sha1">e6abb0a0bc7b0181aa6bdcf7322bbecf3a8ebfbc</checksum>
+    <timestamp>1332330546</timestamp>
+    <size>946</size>
+    <open-size>7168</open-size>
+    <open-checksum type="sha1">5efd1f3062b2fbc810872202a0bada1cc65772ba</open-checksum>
+    <database_version>10</database_version>
+  </data>
+  <data type="filelists">
+    <checksum type="sha1">9e039b5e3a3052b5fa60dcfcd29becd5888d6fbb</checksum>
+    <timestamp>1332330546</timestamp>
+    <size>546</size>
+    <open-size>1168</open-size>
+    <open-checksum type="sha1">603dec57a98dc7325891635d2e686c957fa68811</open-checksum>
+    <location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="repodata/filelists.xml.gz"/>
+  </data>
+  <data type="primary_db">
+    <location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="repodata/primary.sqlite.bz2"/>
+    <checksum type="sha1">41cf7ba3c54d5230c6a895f5b674bbb2949faa29</checksum>
+    <timestamp>1332330546</timestamp>
+    <size>2118</size>
+    <open-size>24576</open-size>
+    <open-checksum type="sha1">aa55143818f2c76e69d880691243077ac0f82f49</open-checksum>
+    <database_version>10</database_version>
+  </data>
+  <data type="primary">
+    <checksum type="sha1">473bde5f750a2363a4225a9908cf0504c51db114</checksum>
+    <timestamp>1332330546</timestamp>
+    <size>1041</size>
+    <open-size>6287</open-size>
+    <open-checksum type="sha1">cde834d54e0b3218b5cf04e9724457db1bbbe2bd</open-checksum>
+    <location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="repodata/primary.xml.gz"/>
+  </data>
+</repomd>

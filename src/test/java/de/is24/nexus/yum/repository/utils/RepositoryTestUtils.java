@@ -1,9 +1,11 @@
 package de.is24.nexus.yum.repository.utils;
 
+import static org.apache.commons.io.FileUtils.copyDirectory;
 import static org.freecompany.redline.header.Architecture.NOARCH;
 import static org.freecompany.redline.header.Os.LINUX;
 import static org.freecompany.redline.header.RpmType.BINARY;
 import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,11 +16,14 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.zip.GZIPInputStream;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.RandomStringUtils;
 import org.custommonkey.xmlunit.Diff;
 import org.freecompany.redline.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import de.is24.nexus.yum.repository.xml.TimeStampIgnoringDifferenceListener;
 
 
@@ -98,5 +103,11 @@ public final class RepositoryTestUtils {
 
     String filename = rpmBuilder.build(outputDirectory);
     return new File(outputDirectory, filename);
+  }
+
+  public static File copyToTempDir(File srcDir) throws IOException {
+    final File destDir = new File(BASE_TMP_FILE, RandomStringUtils.randomAlphabetic(20));
+    copyDirectory(srcDir, destDir);
+    return destDir;
   }
 }

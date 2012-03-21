@@ -2,6 +2,9 @@ package de.is24.nexus.yum.repository.service;
 
 import static de.is24.nexus.yum.repository.RepositoryUtils.getBaseDir;
 import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.ID;
+import static java.io.File.pathSeparator;
+import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.net.URL;
@@ -18,6 +21,7 @@ import org.sonatype.scheduling.ScheduledTask;
 
 import de.is24.nexus.yum.config.YumConfiguration;
 import de.is24.nexus.yum.repository.YumRepository;
+import de.is24.nexus.yum.repository.task.TaskDoubledException;
 import de.is24.nexus.yum.repository.task.YumGroupRepositoryGenerationTask;
 import de.is24.nexus.yum.repository.task.YumMetadataGenerationTask;
 
@@ -90,7 +94,24 @@ public class DefaultYumService implements YumService {
   }
 
   private ScheduledTask<YumRepository> submitTask(YumMetadataGenerationTask task) {
-    return nexusScheduler.submit(ID, task);
+    try {
+      return nexusScheduler.submit(ID, task);
+    } catch (TaskDoubledException e) {
+      return mergeAddedFiles(e.getOriginal(), task);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private ScheduledTask<YumRepository> mergeAddedFiles(ScheduledTask<?> existingScheduledTask, YumMetadataGenerationTask taskToMerge) {
+    if (isNotBlank(taskToMerge.getAddedFiles())) {
+      final YumMetadataGenerationTask existingTask = (YumMetadataGenerationTask) existingScheduledTask.getTask();
+      if (isBlank(existingTask.getAddedFiles())) {
+        existingTask.setAddedFiles(taskToMerge.getAddedFiles());
+      } else {
+        existingTask.setAddedFiles(existingTask.getAddedFiles() + pathSeparator + taskToMerge.getAddedFiles());
+      }
+    }
+    return (ScheduledTask<YumRepository>) existingScheduledTask;
   }
 
   @Override

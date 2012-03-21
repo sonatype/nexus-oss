@@ -1,6 +1,7 @@
 package de.is24.nexus.yum.repository;
 
 import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.isActive;
+import static java.io.File.pathSeparator;
 import static java.io.File.separator;
 import static java.lang.String.format;
 import static org.apache.commons.io.FileUtils.listFiles;
@@ -24,7 +25,6 @@ import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 public class RpmListWriter {
   private static final int POSITION_AFTER_SLASH = 1;
@@ -88,16 +88,24 @@ public class RpmListWriter {
     return (segments.length >= 2) && version.equals(segments[segments.length - 2]);
   }
 
-  private void addNewlyAddedRpmFileToList(List<String> files) throws IOException {
-    final int startPosition = addedFiles.startsWith("/") ? POSITION_AFTER_SLASH : 0;
-    final String filename = addedFiles.substring(startPosition);
+  private void addNewlyAddedRpmFileToList(List<String> fileList) throws IOException {
+    final String[] filenames = addedFiles.split(pathSeparator);
+    for (String filename : filenames) {
+      filename = addFileToList(fileList, filename);
+    }
+  }
 
-    if (!files.contains(filename)) {
-      files.add(filename);
+  private String addFileToList(List<String> fileList, String filename) {
+    final int startPosition = filename.startsWith("/") ? POSITION_AFTER_SLASH : 0;
+    filename = filename.substring(startPosition);
+
+    if (!fileList.contains(filename)) {
+      fileList.add(filename);
       LOG.info("Added rpm {} to file list.", filename);
     } else {
-      LOG.info("Rpm {} already exists in fie list.", filename);
+      LOG.info("Rpm {} already exists in file list.", filename);
     }
+    return filename;
   }
 
   private List<String> pruneToExistingRpms() throws IOException {
@@ -166,7 +174,7 @@ public class RpmListWriter {
       Writer writer = new FileWriter(rpmListFile);
       try {
         for (Entry<String, String> entry : fileMap.entrySet()) {
-					if (!isActive()) {
+          if (!isActive()) {
             return;
           }
           writer.append(format("%s%s\n", entry.getKey(), entry.getValue()));

@@ -8,6 +8,8 @@ import static org.apache.commons.io.FileUtils.writeStringToFile;
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
 import static org.sonatype.scheduling.TaskState.RUNNING;
+import static org.sonatype.scheduling.TaskState.SLEEPING;
+import static org.sonatype.scheduling.TaskState.SUBMITTED;
 
 import java.io.File;
 import java.io.IOException;
@@ -167,9 +169,26 @@ public class YumMetadataGenerationTask extends AbstractNexusTask<YumRepository> 
         }
       }
       return activeRunningTasks < MAXIMAL_PARALLEL_RUNS;
-    } else {
-      return true;
     }
+
+    return true;
+  }
+
+  @Override
+  public boolean allowConcurrentSubmission(Map<String, List<ScheduledTask<?>>> activeTasks) {
+    if (activeTasks.containsKey(ID)) {
+      for (ScheduledTask<?> scheduledTask : activeTasks.get(ID)) {
+        if (isSubmitted(scheduledTask) && conflictsWith((YumMetadataGenerationTask) scheduledTask.getTask())) {
+          throw new TaskDoubledException(scheduledTask, "Found same task in scheduler queue.");
+        }
+      }
+    }
+
+    return true;
+  }
+
+  private boolean isSubmitted(ScheduledTask<?> scheduledTask) {
+    return SUBMITTED.equals(scheduledTask.getTaskState()) || SLEEPING.equals(scheduledTask.getTaskState());
   }
 
   private void sendNotificationEvent() {
