@@ -119,14 +119,14 @@
   <name>hallo</name>
   <arch>noarch</arch>
   <version epoch="0" ver="1" rel="1"/>
-  <checksum type="sha1" pkgid="YES">5d3b9652b168819e0a1132afd249fdfe6d0c9090</checksum>
+  <checksum type="sha1" pkgid="YES">73e00fdc6255a52a45379825f2841d8377b70832</checksum>
   <summary>(none)</summary>
   <description>(none)</description>
   <packager>maven - sherold</packager>
   <url></url>
-  <time file="1332330544" build="1332330544"/>
+  <time file="1332333116" build="1332333116"/>
   <size package="1352" installed="0" archive="124"/>
-<location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="hallo-1-1.noarch.rpm"/>
+<location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="rpm1/hallo-1-1.noarch.rpm"/>
   <format>
     <rpm:license/>
     <rpm:vendor>IS24</rpm:vendor>
@@ -142,14 +142,14 @@
   <name>hallo</name>
   <arch>noarch</arch>
   <version epoch="0" ver="2" rel="1"/>
-  <checksum type="sha1" pkgid="YES">0b2f632c2b5bde1e41806f349d4e204253e33072</checksum>
+  <checksum type="sha1" pkgid="YES">4353e24156552bf9aeb0ebb0a23e9ddfe7ba2445</checksum>
   <summary>(none)</summary>
   <description>(none)</description>
   <packager>maven - sherold</packager>
   <url></url>
-  <time file="1332330544" build="1332330544"/>
+  <time file="1332333116" build="1332333116"/>
   <size package="1352" installed="0" archive="124"/>
-<location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="hallo-2-1.noarch.rpm"/>
+<location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="rpm2/hallo-2-1.noarch.rpm"/>
   <format>
     <rpm:license/>
     <rpm:vendor>IS24</rpm:vendor>

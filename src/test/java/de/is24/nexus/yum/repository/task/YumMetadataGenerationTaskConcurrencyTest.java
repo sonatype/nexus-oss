@@ -83,23 +83,25 @@ public class YumMetadataGenerationTaskConcurrencyTest extends AbstractSchedulerT
     final Repository repository = mock(Repository.class);
     when(repository.getId()).thenReturn("REPO");
     when(repository.getLocalUrl()).thenReturn(tmpDir.getAbsolutePath());
-    final File rpm1 = createDummyRpm("hallo", "1", tmpDir);
-    final File rpm2 = createDummyRpm("hallo", "2", tmpDir);
+    final File rpm1 = createDummyRpm("hallo", "1", new File(tmpDir, "rpm1"));
+    final File rpm2 = createDummyRpm("hallo", "2", new File(tmpDir, "rpm2"));
     // given executions blocking all thread of the scheduler
     final List<ScheduledTask<?>> futures = new ArrayList<ScheduledTask<?>>();
     for (int index = 0; index < MAX_PARALLEL_SCHEDULER_THREADS; index++) {
       futures.add(nexusScheduler.submit("WaitTask", nexusScheduler.createTaskInstance(WaitTask.class)));
     }
     // when
-    final ScheduledTask<YumRepository> first = yumService.addToYumRepository(repository, rpm1.getName());
-    final ScheduledTask<YumRepository> second = yumService.addToYumRepository(repository, rpm2.getName());
+    final String file1 = "rpm1/" + rpm1.getName();
+    final String file2 = "rpm2/" + rpm2.getName();
+    final ScheduledTask<YumRepository> first = yumService.addToYumRepository(repository, file1);
+    final ScheduledTask<YumRepository> second = yumService.addToYumRepository(repository, file2);
     futures.add(first);
     futures.add(second);
 
     waitFor(futures);
     // then
     assertThat(second, is(first));
-    assertThat(((YumMetadataGenerationTask) first.getTask()).getAddedFiles(), is(rpm1.getName() + pathSeparator + rpm2.getName()));
+    assertThat(((YumMetadataGenerationTask) first.getTask()).getAddedFiles(), is(file1 + pathSeparator + file2));
     assertRepository(new File(tmpDir, "repodata"), "multi-add");
   }
 
