@@ -55,6 +55,14 @@ Sonatype.repoServer.LogEditPanel = function(config) {
                     triggerAction : 'all',
                     forceSelection : true,
                     selectOnFocus : true
+                  },{
+                    xtype : 'panel',
+                    tabTitle : 'Artifact Upload',
+                    name : 'upload',
+                    items : [{
+                          border : false,
+                          html : 'More information on how to configure logging can be found <a href="http://www.sonatype.com/books/nexus-book/reference/confignx-sect-log.html" target="_blank">here</a>.'
+                        }]
                   }],
 
         buttons : [{
