@@ -61,7 +61,6 @@ public class Nexus2810PluginConsoleIT
             assertPropertyValid( "SCM Version", pluginConsolePlugin.getScmVersion() );
             assertPropertyValid( "SCM Timestamp", pluginConsolePlugin.getScmTimestamp() );
         }
-        assertPropertyValid( "Site", pluginConsolePlugin.getSite() );
         Assert.assertTrue( StringUtils.isEmpty( pluginConsolePlugin.getFailureReason() ) );
         Assert.assertTrue( !pluginConsolePlugin.getRestInfos().isEmpty() );
 
