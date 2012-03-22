@@ -22,7 +22,7 @@ public class DefaultReferenceFactory
      */
     public Reference getContextRoot( Request request )
     {
-        Reference result = null;
+        Reference result;
 
         // if ( getNexus().isForceBaseUrl() && getNexus().getBaseUrl() != null )
         // {
@@ -56,7 +56,7 @@ public class DefaultReferenceFactory
         return reference;
     }
 
-    public Reference createChildReference( Request request, String childPath )
+    public Reference createThisReference( Request request )
     {
         String uriPart =
             request.getResourceRef().getTargetRef().toString().substring(
@@ -68,8 +68,12 @@ public class DefaultReferenceFactory
             uriPart = uriPart.substring( 1 );
         }
 
-        Reference result =
-            updateBaseRefPath( new Reference( getContextRoot( request ), uriPart ) ).addSegment( childPath );
+        return updateBaseRefPath( new Reference( getContextRoot( request ), uriPart ) );
+    }
+
+    public Reference createChildReference( Request request, String childPath )
+    {
+        Reference result = createThisReference( request ).addSegment( childPath );
 
         if ( result.hasQuery() )
         {
