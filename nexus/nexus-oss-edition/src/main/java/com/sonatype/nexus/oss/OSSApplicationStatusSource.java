@@ -33,7 +33,7 @@ public class OSSApplicationStatusSource
         getSystemStatusInternal().setApiVersion( getSystemStatusInternal().getVersion() );
 
         getSystemStatusInternal().setFormattedAppName(
-            FORMATTED_APP_NAME_BASE + " " + getSystemStatusInternal().getEditionLong() + " Edition, Version: "
+            FORMATTED_APP_NAME_BASE + " " + getSystemStatusInternal().getEditionLong() + " Edition "
                 + getSystemStatusInternal().getVersion() );
     }
 
