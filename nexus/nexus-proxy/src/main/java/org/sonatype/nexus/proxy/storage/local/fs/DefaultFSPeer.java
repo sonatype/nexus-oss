@@ -56,6 +56,8 @@ public class DefaultFSPeer
 {
     private static final String HIDDEN_TARGET_SUFFIX = ".nx-upload";
 
+    private static final String APPENDIX = "nx-tmp";
+
     public boolean isReachable( Repository repository, ResourceStoreRequest request, File target )
         throws LocalStorageException
     {
@@ -339,7 +341,7 @@ public class DefaultFSPeer
 
         if ( prefix.length() < 3 )
         {
-            prefix = prefix + System.nanoTime();
+            prefix = prefix + APPENDIX;
         }
 
         return prefix;
