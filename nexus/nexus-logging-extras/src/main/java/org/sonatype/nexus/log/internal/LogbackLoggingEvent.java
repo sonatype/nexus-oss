@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.log.internal;
 
+import org.slf4j.Logger;
+import org.sonatype.appcontext.internal.Preconditions;
 import org.sonatype.nexus.logging.LoggingEvent;
 import org.sonatype.plexus.appevents.AbstractEvent;
 
@@ -93,6 +95,21 @@ public class LogbackLoggingEvent
     }
 
     /**
+     * Constructor (alt).
+     * 
+     * @param level
+     * @param message
+     * @param throwable
+     */
+    public LogbackLoggingEvent( final Logger logger, final Level level, final String message, final Throwable throwable )
+    {
+        super( logger.getName() );
+        this.level = Preconditions.checkNotNull( level, "Level is null!" );
+        this.message = message;
+        this.throwable = throwable;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public Level getLevel()
@@ -141,7 +158,5 @@ public class LogbackLoggingEvent
         builder.append( "]" );
         return builder.toString();
     }
-    
-    
 
 }

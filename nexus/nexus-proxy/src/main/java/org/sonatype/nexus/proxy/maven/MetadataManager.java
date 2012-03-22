@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.IOException;
 
 import org.sonatype.nexus.proxy.maven.gav.Gav;
+import org.sonatype.nexus.proxy.repository.RepositoryMetadataManager;
 
 public interface MetadataManager
 {

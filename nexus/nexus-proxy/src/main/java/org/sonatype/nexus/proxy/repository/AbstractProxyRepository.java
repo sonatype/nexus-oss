@@ -196,9 +196,15 @@ public abstract class AbstractProxyRepository
     @Override
     public void expireProxyCaches( final ResourceStoreRequest request )
     {
+        expireProxyCaches( request, null );
+    }
+
+    @Override
+    public boolean expireProxyCaches( final ResourceStoreRequest request, final WalkerFilter filter )
+    {
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            return;
+            return false;
         }
 
         // do this only if we ARE a proxy
@@ -217,7 +223,7 @@ public abstract class AbstractProxyRepository
                     RepositoryStringUtils.getHumanizedNameString( this ), request.getRequestPath() ) );
 
             // 1st, expire all the files below path
-            final DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
+            final DefaultWalkerContext ctx = new DefaultWalkerContext( this, request, filter );
             final ExpireCacheWalker expireCacheWalkerProcessor = new ExpireCacheWalker( this );
             ctx.getProcessors().add( expireCacheWalkerProcessor );
 
@@ -234,10 +240,10 @@ public abstract class AbstractProxyRepository
                     throw e;
                 }
             }
-            
-            if( getLogger().isDebugEnabled() )
+
+            if ( getLogger().isDebugEnabled() )
             {
-                if( expireCacheWalkerProcessor.isCacheAltered() )
+                if ( expireCacheWalkerProcessor.isCacheAltered() )
                 {
                     getLogger().info(
                         String.format( "Proxy cache was expired for repository %s from path=\"%s\"",
@@ -255,6 +261,12 @@ public abstract class AbstractProxyRepository
             getApplicationEventMulticaster().notifyEventListeners(
                 new RepositoryEventExpireProxyCaches( this, request.getRequestPath(),
                     request.getRequestContext().flatten(), expireCacheWalkerProcessor.isCacheAltered() ) );
+
+            return expireCacheWalkerProcessor.isCacheAltered();
+        }
+        else
+        {
+            return false;
         }
     }
 

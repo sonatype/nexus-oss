@@ -57,6 +57,7 @@ import org.sonatype.nexus.proxy.item.ContentGenerator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageNotFoundItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.ReadLockingContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -74,8 +75,10 @@ import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
+import org.sonatype.nexus.proxy.walker.ParentOMatic;
 import org.sonatype.nexus.proxy.walker.Walker;
 import org.sonatype.nexus.proxy.walker.WalkerException;
+import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskActivityDescriptor;
 import org.sonatype.nexus.scheduling.DefaultRepositoryTaskFilter;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
@@ -415,11 +418,18 @@ public abstract class AbstractRepository
         this.accessManager = accessManager;
     }
 
-    public void expireCaches( ResourceStoreRequest request )
+    @Override
+    public void expireCaches( final ResourceStoreRequest request )
+    {
+        expireCaches( request, null );
+    }
+
+    @Override
+    public boolean expireCaches( final ResourceStoreRequest request, final WalkerFilter filter )
     {
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            return;
+            return false;
         }
 
         // at this level (we are not proxy) expireCaches() actually boils down to "expire NFC" only
@@ -428,14 +438,21 @@ public abstract class AbstractRepository
         // meaning
 
         // 2nd, remove the items from NFC
-        expireNotFoundCaches( request );
+        return expireNotFoundCaches( request, filter );
     }
 
-    public void expireNotFoundCaches( ResourceStoreRequest request )
+    @Override
+    public void expireNotFoundCaches( final ResourceStoreRequest request )
+    {
+        expireNotFoundCaches( request, null );
+    }
+
+    @Override
+    public boolean expireNotFoundCaches( final ResourceStoreRequest request, final WalkerFilter filter )
     {
         if ( !getLocalStatus().shouldServiceRequest() )
         {
-            return;
+            return false;
         }
 
         if ( StringUtils.isBlank( request.getRequestPath() ) )
@@ -449,22 +466,48 @@ public abstract class AbstractRepository
 
         boolean cacheAltered = false;
         // remove the items from NFC
-        if ( RepositoryItemUid.PATH_ROOT.equals( request.getRequestPath() ) )
+        if ( filter == null )
         {
-            // purge all
-            if ( getNotFoundCache() != null )
+            if ( RepositoryItemUid.PATH_ROOT.equals( request.getRequestPath() ) )
             {
-                cacheAltered = getNotFoundCache().purge();
+                // purge all
+                if ( getNotFoundCache() != null )
+                {
+                    cacheAltered = getNotFoundCache().purge();
+                }
+            }
+            else
+            {
+                // purge below and above path only
+                if ( getNotFoundCache() != null )
+                {
+                    boolean altered1 = getNotFoundCache().removeWithParents( request.getRequestPath() );
+                    boolean altered2 = getNotFoundCache().removeWithChildren( request.getRequestPath() );
+                    cacheAltered = altered1 || altered2;
+                }
             }
         }
         else
         {
-            // purge below and above path only
-            if ( getNotFoundCache() != null )
+            final ParentOMatic parentOMatic = new ParentOMatic( false );
+            final DefaultWalkerContext context = new DefaultWalkerContext( this, request );
+            final Collection<String> nfcPaths = getNotFoundCache().listKeysInCache();
+
+            for ( String nfcPath : nfcPaths )
             {
-                boolean altered1 = getNotFoundCache().removeWithParents( request.getRequestPath() );
-                boolean altered2 = getNotFoundCache().removeWithChildren( request.getRequestPath() );
-                cacheAltered = altered1 || altered2;
+                final DefaultStorageNotFoundItem nfcItem =
+                    new DefaultStorageNotFoundItem( this, new ResourceStoreRequest( nfcPath ) );
+
+                if ( filter.shouldProcess( context, nfcItem ) )
+                {
+                    parentOMatic.addAndMarkPath( nfcPath );
+                }
+            }
+
+            for ( String path : parentOMatic.getMarkedPaths() )
+            {
+                boolean removed = getNotFoundCache().remove( path );
+                cacheAltered = cacheAltered || removed;
             }
         }
 
@@ -487,6 +530,14 @@ public abstract class AbstractRepository
         getApplicationEventMulticaster().notifyEventListeners(
             new RepositoryEventExpireNotFoundCaches( this, request.getRequestPath(),
                 request.getRequestContext().flatten(), cacheAltered ) );
+
+        return cacheAltered;
+    }
+
+    @Override
+    public RepositoryMetadataManager getRepositoryMetadataManager()
+    {
+        return new NoopRepositoryMetadataManager();
     }
 
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
