@@ -326,25 +326,13 @@ public class DefaultFSPeer
 
         try
         {
-            String prefix = expandPrefix( target.getName() );
-            return File.createTempFile( prefix, HIDDEN_TARGET_SUFFIX, target.getParentFile() );
+            // NEXUS-4955 add APPENDIX to make sure prefix is bigger the 3 chars
+            return File.createTempFile( target.getName() + APPENDIX, HIDDEN_TARGET_SUFFIX, target.getParentFile() );
         }
         catch ( IOException e )
         {
             throw new LocalStorageException( e.getMessage(), e );
         }
-    }
-
-    private String expandPrefix( String prefix )
-    {
-        checkNotNull( prefix );
-
-        if ( prefix.length() < 3 )
-        {
-            prefix = prefix + APPENDIX;
-        }
-
-        return prefix;
     }
 
     protected void mkParentDirs( Repository repository, File target )
