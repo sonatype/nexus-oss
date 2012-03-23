@@ -14,27 +14,52 @@ package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 import java.util.Comparator;
 
+import org.sonatype.nexus.proxy.maven.version.GenericVersionParser;
+import org.sonatype.nexus.proxy.maven.version.InvalidVersionSpecificationException;
+import org.sonatype.nexus.proxy.maven.version.Version;
+import org.sonatype.nexus.proxy.maven.version.VersionParser;
+
 /**
  * version comparator used elsewhere to keep version collections sorted
- *
+ * 
  * @author Oleg Gusakov
  * @version $Id: VersionComparator.java 744245 2009-02-13 21:23:44Z hboutemy $
  */
 public class VersionComparator
     implements Comparator<String>
 {
+    private final VersionParser versionParser;
 
-    public int compare( String v1, String v2 )
+    public VersionComparator()
+    {
+        this.versionParser = new GenericVersionParser();
+    }
+
+    public int compare( final String v1, final String v2 )
     {
         if ( v1 == null || v2 == null )
         {
             throw new IllegalArgumentException();
         }
 
-        ComparableVersion av1 = new ComparableVersion( v1 );
-        ComparableVersion av2 = new ComparableVersion( v2 );
+        final Version av1 = parseVersion( v1 );
+        final Version av2 = parseVersion( v2 );
 
         return av1.compareTo( av2 );
+    }
+
+    protected Version parseVersion( final String v )
+    {
+        try
+        {
+            return versionParser.parseVersion( v );
+        }
+        catch ( InvalidVersionSpecificationException e )
+        {
+            // from implementation (coming from Aether) we know today this will never happen
+            // but is here probably for future. Also, we do not deal with ranges, only single version strings
+            return null;
+        }
     }
 
 }
