@@ -91,13 +91,14 @@ public interface GroupRepository
 
     /**
      * Returns the list of available items in the group for same path. The resulting list keeps the order of reposes
-     * queried for path.
+     * queried for path. Never returns {@code null}, if nothing found, {@link GroupItemNotFoundException} is thrown.
      * 
      * @param uid
      * @param context
      * @return
      * @throws StorageException
+     * @throws GroupItemNotFoundException
      */
     List<StorageItem> doRetrieveItems( ResourceStoreRequest request )
-        throws StorageException;
+        throws GroupItemNotFoundException, StorageException;
 }

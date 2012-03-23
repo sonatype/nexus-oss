@@ -346,8 +346,14 @@ public class ResourceStoreRequest
         return appliedMappings;
     }
 
+    @Override
     public String toString()
     {
-        return getRequestPath();
+        StringBuffer sb = new StringBuffer( "ResourceStoreRequest(" );
+        sb.append( getRequestPath() );
+        sb.append( ") " );
+        sb.append( super.toString() );
+
+        return sb.toString();
     }
 }

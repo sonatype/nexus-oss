@@ -234,10 +234,10 @@ public abstract class AbstractProxyRepository
                     throw e;
                 }
             }
-            
-            if( getLogger().isDebugEnabled() )
+
+            if ( getLogger().isDebugEnabled() )
             {
-                if( expireCacheWalkerProcessor.isCacheAltered() )
+                if ( expireCacheWalkerProcessor.isCacheAltered() )
                 {
                     getLogger().info(
                         String.format( "Proxy cache was expired for repository %s from path=\"%s\"",
@@ -1726,7 +1726,8 @@ public abstract class AbstractProxyRepository
                 {
                     if ( !getProxyMode().shouldCheckRemoteStatus() )
                     {
-                        setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( request ) );
+                        setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( request,
+                            AbstractProxyRepository.this ) );
                     }
                     else
                     {
@@ -1736,7 +1737,7 @@ public abstract class AbstractProxyRepository
                         }
                         else
                         {
-                            autoBlockProxying( new ItemNotFoundException( request ) );
+                            autoBlockProxying( new ItemNotFoundException( request, AbstractProxyRepository.this ) );
                         }
                     }
                 }

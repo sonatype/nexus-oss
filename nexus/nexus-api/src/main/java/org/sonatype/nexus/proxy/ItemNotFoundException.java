@@ -13,6 +13,7 @@
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * Thrown if the requested item is not found.
@@ -34,6 +35,7 @@ public class ItemNotFoundException
      * @param path
      * @deprecated use a constructor that accepts a request!
      */
+    @Deprecated
     public ItemNotFoundException( String path )
     {
         this( path, null );
@@ -46,50 +48,92 @@ public class ItemNotFoundException
      * @param cause
      * @deprecated use a constructor that accepts a request!
      */
+    @Deprecated
     public ItemNotFoundException( String path, Throwable cause )
     {
         super( "Item not found on path " + path, cause );
-
         this.repository = null;
-
         this.request = null;
     }
 
-    public ItemNotFoundException( ResourceStoreRequest request )
+    /**
+     * Constructor. To be used in places where no Repository exists yet in context (like in a Router).
+     * 
+     * @param request
+     */
+    public ItemNotFoundException( final ResourceStoreRequest request )
     {
         this( request, null, null );
     }
 
-    public ItemNotFoundException( ResourceStoreRequest request, Repository repository )
-    {
-        this( request, repository, null );
-    }
-
-    public ItemNotFoundException( ResourceStoreRequest request, Throwable cause )
+    /**
+     * Constructor. To be used in places where no Repository exists yet in context (like in a Router).
+     * 
+     * @param request
+     * @param cause
+     */
+    public ItemNotFoundException( final ResourceStoreRequest request, final Throwable cause )
     {
         this( request, null, cause );
     }
 
-    public ItemNotFoundException( ResourceStoreRequest request, Repository repository, Throwable cause )
+    /**
+     * Constructor. To be used in places whenever there IS a Repository in context.
+     * 
+     * @param request
+     * @param repository
+     */
+    public ItemNotFoundException( final ResourceStoreRequest request, final Repository repository )
     {
-        this( repository != null ? "Item not found on path \"" + request.toString() + "\" in repository \""
-            + repository.getId() + "\"!" : "Item not found on path \"" + request.toString() + "\"!", request,
-            repository, cause );
+        this( request, repository, null );
     }
 
-    public ItemNotFoundException( String message, ResourceStoreRequest request, Repository repository )
+    /**
+     * Constructor. To be used in places whenever there IS a Repository in context.
+     * 
+     * @param request
+     * @param repository
+     * @param cause
+     */
+    public ItemNotFoundException( final ResourceStoreRequest request, final Repository repository, final Throwable cause )
+    {
+        this( repository != null ? "Item not found for request \"" + String.valueOf( request ) + "\" in repository \""
+            + RepositoryStringUtils.getHumanizedNameString( repository ) + "\"!" : "Item not found for request \""
+            + String.valueOf( request ) + "\"!", request, repository, cause );
+    }
+    
+    // ==
+
+    /**
+     * Protected constructor, to be used by this class and subclass constructors.
+     * 
+     * @param message
+     * @param request
+     * @param repository
+     */
+    protected ItemNotFoundException( final String message, final ResourceStoreRequest request,
+                                     final Repository repository )
     {
         this( message, request, repository, null );
     }
 
-    public ItemNotFoundException( String message, ResourceStoreRequest request, Repository repository, Throwable cause )
+    /**
+     * Protected constructor, to be used by this class and subclass constructors.
+     * 
+     * @param message
+     * @param request
+     * @param repository
+     * @param cause
+     */
+    protected ItemNotFoundException( final String message, final ResourceStoreRequest request,
+                                     final Repository repository, final Throwable cause )
     {
         super( message, cause );
-
         this.request = request;
-
         this.repository = repository;
     }
+
+    // ==
 
     public Repository getRepository()
     {
