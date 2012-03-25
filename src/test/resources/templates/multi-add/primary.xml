@@ -1,164 +1,168 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<metadata xmlns="http://linux.duke.edu/metadata/common" xmlns:rpm="http://linux.duke.edu/metadata/rpm" packages="7">
 <package type="rpm">
   <name>another-artifact</name>
   <arch>noarch</arch>
-  <version epoch="0" ver="0.0.1" rel="1"/>
-  <checksum type="sha1" pkgid="YES">badd9ef37442c1a4ff07b66fb37261b6e214f57a</checksum>
-  <summary>(none)</summary>
-  <description>(none)</description>
+  <version epoch="0" ver="0.0.1" rel="1" />
+  <checksum type="sha256" pkgid="YES">22681bfa25159476807adac7a84ca9f59cd4752a0e151ed628e2720dc0c105ce
+  </checksum>
+  <summary></summary>
+  <description></description>
   <packager>maven - sherold</packager>
   <url></url>
-  <time file="1332261742" build="1320389077"/>
-  <size package="1372" installed="0" archive="124"/>
-<location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="another-artifact/0.0.1/another-artifact-0.0.1-1.noarch.rpm"/>
+  <time file="1332632854" build="1320389077" />
+  <size package="1372" installed="0" archive="124" />
+  <location xml:base="http://localhost:8080/nexus/content/repositories/REPO"
+    href="another-artifact/0.0.1/another-artifact-0.0.1-1.noarch.rpm" />
   <format>
-    <rpm:license/>
+    <rpm:license />
     <rpm:vendor>IS24</rpm:vendor>
     <rpm:group>is24</rpm:group>
     <rpm:buildhost>isdeblnmac39</rpm:buildhost>
-    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
-    <rpm:header-range start="280" end="1316"/>
-    <rpm:requires>
-    </rpm:requires>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this
+    </rpm:sourcerpm>
+    <rpm:header-range start="280" end="1316" />
   </format>
 </package>
 <package type="rpm">
   <name>conflict-artifact</name>
   <arch>noarch</arch>
-  <version epoch="0" ver="2.2" rel="1"/>
-  <checksum type="sha1" pkgid="YES">a08c947544e57edf650b250c474642cf22c78394</checksum>
-  <summary>(none)</summary>
-  <description>(none)</description>
+  <version epoch="0" ver="2.2" rel="1" />
+  <checksum type="sha256" pkgid="YES">c7f56ee8449cf6ffa5e0153cd9ab4a70cf53f2536b295027cedbfac61cb5016f
+  </checksum>
+  <summary></summary>
+  <description></description>
   <packager>maven - sherold</packager>
   <url></url>
-  <time file="1332261742" build="1320389077"/>
-  <size package="1368" installed="0" archive="124"/>
-<location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm"/>
+  <time file="1332632854" build="1320389077" />
+  <size package="1368" installed="0" archive="124" />
+  <location xml:base="http://localhost:8080/nexus/content/repositories/REPO"
+    href="conflict-artifact/2.2-1/conflict-artifact-2.2-1.noarch.rpm" />
   <format>
-    <rpm:license/>
+    <rpm:license />
     <rpm:vendor>IS24</rpm:vendor>
     <rpm:group>is24</rpm:group>
     <rpm:buildhost>isdeblnmac39</rpm:buildhost>
-    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
-    <rpm:header-range start="280" end="1312"/>
-    <rpm:requires>
-    </rpm:requires>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this
+    </rpm:sourcerpm>
+    <rpm:header-range start="280" end="1312" />
   </format>
 </package>
 <package type="rpm">
   <name>conflict-artifact</name>
   <arch>noarch</arch>
-  <version epoch="0" ver="2.2" rel="2"/>
-  <checksum type="sha1" pkgid="YES">7a52e1a653c82d6156ef744fb5882e70203f7dcc</checksum>
-  <summary>(none)</summary>
-  <description>(none)</description>
+  <version epoch="0" ver="2.2" rel="2" />
+  <checksum type="sha256" pkgid="YES">aefd9433a55aecfe74baa0c72c51341bb06e696cfaf2d7cbd0edf4419e6455ac
+  </checksum>
+  <summary></summary>
+  <description></description>
   <packager>maven - sherold</packager>
   <url></url>
-  <time file="1332261742" build="1320389077"/>
-  <size package="1368" installed="0" archive="124"/>
-<location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="conflict-artifact/2.2-2/conflict-artifact-2.2-2.noarch.rpm"/>
+  <time file="1332632854" build="1320389077" />
+  <size package="1368" installed="0" archive="124" />
+  <location xml:base="http://localhost:8080/nexus/content/repositories/REPO"
+    href="conflict-artifact/2.2-2/conflict-artifact-2.2-2.noarch.rpm" />
   <format>
-    <rpm:license/>
+    <rpm:license />
     <rpm:vendor>IS24</rpm:vendor>
     <rpm:group>is24</rpm:group>
     <rpm:buildhost>isdeblnmac39</rpm:buildhost>
-    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
-    <rpm:header-range start="280" end="1312"/>
-    <rpm:requires>
-    </rpm:requires>
-  </format>
-</package>
-<package type="rpm">
-  <name>test-artifact</name>
-  <arch>noarch</arch>
-  <version epoch="0" ver="1.2" rel="1"/>
-  <checksum type="sha1" pkgid="YES">fa26218085aca9f31352746eec0e92d674326825</checksum>
-  <summary>(none)</summary>
-  <description>(none)</description>
-  <packager>maven - sherold</packager>
-  <url></url>
-  <time file="1332261742" build="1320389077"/>
-  <size package="1364" installed="0" archive="124"/>
-<location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="test-artifact/1.2/test-artifact-1.2-1.noarch.rpm"/>
-  <format>
-    <rpm:license/>
-    <rpm:vendor>IS24</rpm:vendor>
-    <rpm:group>is24</rpm:group>
-    <rpm:buildhost>isdeblnmac39</rpm:buildhost>
-    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
-    <rpm:header-range start="280" end="1308"/>
-    <rpm:requires>
-    </rpm:requires>
-  </format>
-</package>
-<package type="rpm">
-  <name>test-artifact</name>
-  <arch>noarch</arch>
-  <version epoch="0" ver="1.3" rel="1"/>
-  <checksum type="sha1" pkgid="YES">e29bb8764b73e80b8bdde11639104748d2788c11</checksum>
-  <summary>(none)</summary>
-  <description>(none)</description>
-  <packager>maven - sherold</packager>
-  <url></url>
-  <time file="1332261742" build="1320389077"/>
-  <size package="1364" installed="0" archive="124"/>
-<location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="test-artifact/1.3/test-artifact-1.3-1.noarch.rpm"/>
-  <format>
-    <rpm:license/>
-    <rpm:vendor>IS24</rpm:vendor>
-    <rpm:group>is24</rpm:group>
-    <rpm:buildhost>isdeblnmac39</rpm:buildhost>
-    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
-    <rpm:header-range start="280" end="1308"/>
-    <rpm:requires>
-    </rpm:requires>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this
+    </rpm:sourcerpm>
+    <rpm:header-range start="280" end="1312" />
   </format>
 </package>
 <package type="rpm">
   <name>hallo</name>
   <arch>noarch</arch>
-  <version epoch="0" ver="1" rel="1"/>
-  <checksum type="sha1" pkgid="YES">73e00fdc6255a52a45379825f2841d8377b70832</checksum>
-  <summary>(none)</summary>
-  <description>(none)</description>
-  <packager>maven - sherold</packager>
+  <version epoch="0" ver="1" rel="1" />
+  <checksum type="sha256" pkgid="YES">4c0656d71ac413bb5158db4d4b6f03bd9da77ad52a05156e4a47a8e2b9b5afd9
+  </checksum>
+  <summary></summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
   <url></url>
-  <time file="1332333116" build="1332333116"/>
-  <size package="1352" installed="0" archive="124"/>
-<location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="rpm1/hallo-1-1.noarch.rpm"/>
+  <time file="1332632932" build="1332632932" />
+  <size package="1360" installed="0" archive="124" />
+  <location xml:base="http://localhost:8080/nexus/content/repositories/REPO"
+    href="rpm1/hallo-1-1.noarch.rpm" />
   <format>
-    <rpm:license/>
+    <rpm:license />
     <rpm:vendor>IS24</rpm:vendor>
     <rpm:group>is24</rpm:group>
-    <rpm:buildhost>isdeblnmac39</rpm:buildhost>
-    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
-    <rpm:header-range start="280" end="1296"/>
-    <rpm:requires>
-    </rpm:requires>
+    <rpm:buildhost>devbui11.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this
+    </rpm:sourcerpm>
+    <rpm:header-range start="280" end="1304" />
   </format>
 </package>
 <package type="rpm">
   <name>hallo</name>
   <arch>noarch</arch>
-  <version epoch="0" ver="2" rel="1"/>
-  <checksum type="sha1" pkgid="YES">4353e24156552bf9aeb0ebb0a23e9ddfe7ba2445</checksum>
-  <summary>(none)</summary>
-  <description>(none)</description>
+  <version epoch="0" ver="2" rel="1" />
+  <checksum type="sha256" pkgid="YES">2fd8c6bb071117b5e129aa8d245338bacca9857be5bf367034e2dba85cc94867
+  </checksum>
+  <summary></summary>
+  <description></description>
+  <packager>maven - webadmin</packager>
+  <url></url>
+  <time file="1332632932" build="1332632932" />
+  <size package="1360" installed="0" archive="124" />
+  <location xml:base="http://localhost:8080/nexus/content/repositories/REPO"
+    href="rpm2/hallo-2-1.noarch.rpm" />
+  <format>
+    <rpm:license />
+    <rpm:vendor>IS24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>devbui11.dev.is24.loc</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this
+    </rpm:sourcerpm>
+    <rpm:header-range start="280" end="1304" />
+  </format>
+</package>
+<package type="rpm">
+  <name>test-artifact</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.2" rel="1" />
+  <checksum type="sha256" pkgid="YES">70506d08285fa0c0120ccd4a1a8fe5537c41838b08655ac4c8dc9de8afb16a2f
+  </checksum>
+  <summary></summary>
+  <description></description>
   <packager>maven - sherold</packager>
   <url></url>
-  <time file="1332333116" build="1332333116"/>
-  <size package="1352" installed="0" archive="124"/>
-<location xml:base="http://localhost:8080/nexus/content/repositories/REPO" href="rpm2/hallo-2-1.noarch.rpm"/>
+  <time file="1332632854" build="1320389077" />
+  <size package="1364" installed="0" archive="124" />
+  <location xml:base="http://localhost:8080/nexus/content/repositories/REPO"
+    href="test-artifact/1.2/test-artifact-1.2-1.noarch.rpm" />
   <format>
-    <rpm:license/>
+    <rpm:license />
     <rpm:vendor>IS24</rpm:vendor>
     <rpm:group>is24</rpm:group>
     <rpm:buildhost>isdeblnmac39</rpm:buildhost>
-    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this</rpm:sourcerpm>
-    <rpm:header-range start="280" end="1296"/>
-    <rpm:requires>
-    </rpm:requires>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this
+    </rpm:sourcerpm>
+    <rpm:header-range start="280" end="1308" />
   </format>
 </package>
-</metadata>
+<package type="rpm">
+  <name>test-artifact</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="1.3" rel="1" />
+  <checksum type="sha256" pkgid="YES">d26cea408e0750bb0d95c35782845681199086ab54bbf8ec3af8d6d1283bcdee
+  </checksum>
+  <summary></summary>
+  <description></description>
+  <packager>maven - sherold</packager>
+  <url></url>
+  <time file="1332632854" build="1320389077" />
+  <size package="1364" installed="0" archive="124" />
+  <location xml:base="http://localhost:8080/nexus/content/repositories/REPO"
+    href="test-artifact/1.3/test-artifact-1.3-1.noarch.rpm" />
+  <format>
+    <rpm:license />
+    <rpm:vendor>IS24</rpm:vendor>
+    <rpm:group>is24</rpm:group>
+    <rpm:buildhost>isdeblnmac39</rpm:buildhost>
+    <rpm:sourcerpm>dummy-source-rpm-because-yum-needs-this
+    </rpm:sourcerpm>
+    <rpm:header-range start="280" end="1308" />
+  </format>
+</package>
