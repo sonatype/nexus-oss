@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.proxy.storage.local.fs;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
@@ -53,6 +55,8 @@ public class DefaultFSPeer
     implements FSPeer
 {
     private static final String HIDDEN_TARGET_SUFFIX = ".nx-upload";
+
+    private static final String APPENDIX = "nx-tmp";
 
     public boolean isReachable( Repository repository, ResourceStoreRequest request, File target )
         throws LocalStorageException
@@ -318,9 +322,12 @@ public class DefaultFSPeer
     protected File getHiddenTarget( final File target, final StorageItem item )
         throws LocalStorageException
     {
+        checkNotNull( target );
+
         try
         {
-            return File.createTempFile( target.getName(), HIDDEN_TARGET_SUFFIX, target.getParentFile() );
+            // NEXUS-4955 add APPENDIX to make sure prefix is bigger the 3 chars
+            return File.createTempFile( target.getName() + APPENDIX, HIDDEN_TARGET_SUFFIX, target.getParentFile() );
         }
         catch ( IOException e )
         {
