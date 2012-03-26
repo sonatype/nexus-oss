@@ -2,18 +2,19 @@ package de.is24.nexus.yum.repository.task;
 
 import static de.is24.nexus.yum.repository.task.YumMetadataGenerationTask.ID;
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.RPM_BASE_FILE;
-import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.assertRepository;
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.copyToTempDir;
 import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.createDummyRpm;
 import static de.is24.test.reflection.ReflectionTestUtils.findMethod;
 import static de.is24.test.reflection.ReflectionTestUtils.setField;
 import static java.io.File.pathSeparator;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,11 +22,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import java.util.zip.GZIPInputStream;
 
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
+import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.junit.After;
 import org.junit.Assert;
@@ -44,6 +47,8 @@ import de.is24.nexus.yum.repository.YumRepository;
 import de.is24.nexus.yum.repository.service.YumService;
 
 public class YumMetadataGenerationTaskConcurrencyTest extends AbstractSchedulerTest {
+  private static final String RPM_NAME_2 = "hallomommy";
+  private static final String RPM_NAME_1 = "hallodaddy";
   public static final int PARALLEL_THREAD_COUNT = 5;
   public static final Logger LOG = LoggerFactory.getLogger(YumMetadataGenerationTaskConcurrencyTest.class);
   private static final int MAX_PARALLEL_SCHEDULER_THREADS = 20;
@@ -83,8 +88,8 @@ public class YumMetadataGenerationTaskConcurrencyTest extends AbstractSchedulerT
     final Repository repository = mock(Repository.class);
     when(repository.getId()).thenReturn("REPO");
     when(repository.getLocalUrl()).thenReturn(tmpDir.getAbsolutePath());
-    final File rpm1 = createDummyRpm("hallo", "1", new File(tmpDir, "rpm1"));
-    final File rpm2 = createDummyRpm("hallo", "2", new File(tmpDir, "rpm2"));
+    final File rpm1 = createDummyRpm(RPM_NAME_1, "1", new File(tmpDir, "rpm1"));
+    final File rpm2 = createDummyRpm(RPM_NAME_2, "2", new File(tmpDir, "rpm2"));
     // given executions blocking all thread of the scheduler
     final List<ScheduledTask<?>> futures = new ArrayList<ScheduledTask<?>>();
     for (int index = 0; index < MAX_PARALLEL_SCHEDULER_THREADS; index++) {
@@ -102,7 +107,9 @@ public class YumMetadataGenerationTaskConcurrencyTest extends AbstractSchedulerT
     // then
     assertThat(second, is(first));
     assertThat(((YumMetadataGenerationTask) first.getTask()).getAddedFiles(), is(file1 + pathSeparator + file2));
-    assertRepository(new File(tmpDir, "repodata"), "multi-add");
+    final String content = IOUtils.toString(new GZIPInputStream(new FileInputStream(new File(tmpDir, "repodata/primary.xml.gz"))));
+    assertThat(content, containsString(RPM_NAME_1));
+    assertThat(content, containsString(RPM_NAME_2));
   }
 
   private void waitFor(List<ScheduledTask<?>> futures) throws ExecutionException, InterruptedException {
