@@ -754,6 +754,7 @@
       }
 
       Sonatype.utils.updateAuthToken(username, password);
+
       Ext.Ajax.request({
             method : 'GET',
             cbPassThru : {
@@ -795,7 +796,7 @@
                     }
                   });
                 },
-                interval: 10000
+                interval: 15*60*1000
               };
               Ext.TaskMgr.start(Sonatype.repoServer.RepoServer.sessionRefreshTask);
 

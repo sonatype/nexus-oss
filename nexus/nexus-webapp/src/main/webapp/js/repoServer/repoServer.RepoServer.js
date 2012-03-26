@@ -359,6 +359,11 @@
       loginHandler : function() {
         if (Sonatype.user.curr.isLoggedIn)
         {
+          if ( Sonatype.repoServer.RepoServer.sessionRefreshTask )
+          {
+            Ext.TaskMgr.stop(Sonatype.repoServer.RepoServer.sessionRefreshTask);
+          }
+
           // do logout
           Ext.Ajax.request({
                 scope : this,
