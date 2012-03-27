@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.sonatype.sisu.litmus.testsupport.hamcrest.FileMatchers.exists;
 
 import java.io.File;
@@ -332,6 +333,7 @@ public class M2RepositoryTest
         getApplicationEventMulticaster().addEventListener( ch );
 
         File mdFile = new File( new File( getBasedir() ), "target/test-classes/repo1" + path );
+        long fileTimestamp = mdFile.lastModified();
 
         assertThat( mdFile, exists() );
 
@@ -353,6 +355,9 @@ public class M2RepositoryTest
             System.gc(); // helps with FS sync'ing on Windows
             Thread.sleep( 500 ); // wait for FS
         }
+        
+        assertThat( "File timestamp did not change, first pass", mdFile.lastModified(), not( equalTo( fileTimestamp ) ) );
+        fileTimestamp = mdFile.lastModified();
 
         final StorageItem item = repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
@@ -364,6 +369,9 @@ public class M2RepositoryTest
             Thread.sleep( 500 ); // wait for FS
         }
 
+        assertThat( "File timestamp did not change, second pass", mdFile.lastModified(), not( equalTo( fileTimestamp ) ) );
+        fileTimestamp = mdFile.lastModified();
+
         // this goes remote depending on age setting
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
@@ -374,6 +382,9 @@ public class M2RepositoryTest
             System.gc(); // helps with FS sync'ing on Windows
             Thread.sleep( 500 ); // wait for FS
         }
+
+        assertThat( "File timestamp did not change, third pass", mdFile.lastModified(), not( equalTo( fileTimestamp ) ) );
+        fileTimestamp = mdFile.lastModified();
 
         // set up last checked timestamp so that nexus should go remote
         final RepositoryItemUid uid = item.getRepositoryItemUid();
