@@ -366,6 +366,21 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-archiver</artifactId>
+        <version>2.1.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-component-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>org.sonatype.plexus</groupId>
         <artifactId>plexus-cipher</artifactId>
         <version>1.5</version>
@@ -995,6 +1010,18 @@
         <scope>test</scope>
       </dependency>
       <dependency>
+        <groupId>org.testng</groupId>
+        <artifactId>testng</artifactId>
+        <version>6.1.1</version>
+        <scope>test</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest-library</artifactId>
         <version>1.3.RC2</version>
@@ -1020,6 +1047,14 @@
         <version>1.9.0-rc1</version>
         <type>jar</type>
         <scope>test</scope>
+      </dependency>
+      <!-- Needed for proper convergence (mockito needs 1.0, and powermock pulled in litmus 1.2) -->
+      <dependency>
+        <groupId>org.objenesis</groupId>
+        <artifactId>objenesis</artifactId>
+        <version>1.2</version>
+        <type>jar</type>
+        <!-- scope>test</scope -->
       </dependency>
       <dependency>
         <groupId>org.uncommons</groupId>
@@ -1319,11 +1354,11 @@
             </configuration>
           </execution>
           <execution>
+            <id>enforce-dependencies</id>
             <goals>
               <goal>enforce</goal>
             </goals>
             <!-- we don't need these until JUST BEFORE integration testing, so moving to a later phase to get out of the way of m2eclipse. <phase>compile</phase> -->
-            <id>enforce-dependencies</id>
             <configuration>
               <rules>
                 <bannedDependencies>

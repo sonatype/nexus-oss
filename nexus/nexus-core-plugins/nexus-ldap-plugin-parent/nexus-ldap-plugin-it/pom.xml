@@ -33,31 +33,6 @@
     </dependency>
 
     <dependency>
-      <groupId>emma</groupId>
-      <artifactId>emma</artifactId>
-      <version>2.0.5312</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>apache-maven</artifactId>
-      <version>2.0.9</version>
-      <type>tar.gz</type>
-      <classifier>bin</classifier>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
       <version>${project.version}</version>
