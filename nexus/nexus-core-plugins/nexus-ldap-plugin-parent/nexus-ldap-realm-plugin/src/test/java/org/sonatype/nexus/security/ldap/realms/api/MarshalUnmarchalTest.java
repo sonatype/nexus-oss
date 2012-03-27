@@ -12,10 +12,7 @@
  */
 package org.sonatype.nexus.security.ldap.realms.api;
 
-import java.text.SimpleDateFormat;
-
 import org.codehaus.plexus.util.StringUtils;
-import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,9 +33,6 @@ import com.thoughtworks.xstream.XStream;
 
 public class MarshalUnmarchalTest
 {
-
-    private SimpleDateFormat dateFormat = new SimpleDateFormat( "MM/dd/yyyy" );
-
     private XStream xstreamXML;
 
     private XStream xstreamJSON;

@@ -22,22 +22,30 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.util.HashMap;
 
-import org.codehaus.plexus.context.Context;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.InterpolationFilterReader;
-import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
+import org.sonatype.ldaptestsuite.LdapServer;
+import org.sonatype.nexus.test.NexusTestSupport;
+import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 public abstract class AbstractLdapTest
-    extends AbstractLdapTestEnvironment
+    extends NexusTestSupport
 {
+    private LdapServer ldapServer;
+    
+    private File ldapRealmConfig;
 
-    public static final String SECURITY_CONFIG_KEY = "security-xml-file";
-
-    public static final String LDAP_CONFIGURATION_KEY = "application-conf";
-
-    protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
-
-    protected static final File CONF_HOME = new File( PLEXUS_HOME, "conf" );
+    protected LdapServer getLdapServer()
+    {
+        return ldapServer;
+    }
+    
+    protected File getLdapRealmConfig()
+    {
+        return ldapRealmConfig;
+    }
 
     @Override
     public void setUp()
@@ -45,30 +53,46 @@ public abstract class AbstractLdapTest
     {
         super.setUp();
 
-        CONF_HOME.mkdirs();
+        ldapServer = (LdapServer) lookup( LdapServer.ROLE );
 
-        File outputFile = new File( CONF_HOME, "ldap.xml" );
+        ldapRealmConfig = new File( getConfHomeDir(), "ldap.xml" );
 
         // check if we have a custom ldap.xml for this test
         String classname = this.getClass().getName();
-        File sourceLdapXml = new File( getBasedir() + "/target/test-classes/" + classname.replace( '.', '/' )
-            + "-ldap.xml" );
+        File sourceLdapXml =
+            new File( getBasedir() + "/target/test-classes/" + classname.replace( '.', '/' ) + "-ldap.xml" );
 
         if ( sourceLdapXml.exists() )
         {
-            this.interpolateLdapXml( sourceLdapXml, outputFile );
+            this.interpolateLdapXml( sourceLdapXml, ldapRealmConfig );
         }
         else
         {
-            this.interpolateLdapXml( "/test-conf/conf/ldap.xml", outputFile );
+            this.interpolateLdapXml( "/test-conf/conf/ldap.xml", ldapRealmConfig );
         }
     }
 
     @Override
-    protected void customizeContext( Context ctx )
+    public void tearDown()
+        throws Exception
     {
-        ctx.put( SECURITY_CONFIG_KEY, new File( CONF_HOME, "security.xml" ).getAbsolutePath() );
-        ctx.put( LDAP_CONFIGURATION_KEY, CONF_HOME.getAbsolutePath() );
+        lookup( CacheManagerComponent.class ).shutdown();
+
+        if ( ldapServer != null )
+        {
+            ldapServer.stop();
+            ldapServer = null;
+        }
+
+        super.tearDown();
+    }
+
+    @Override
+    protected void customizeContainerConfiguration( final ContainerConfiguration configuration )
+    {
+        super.customizeContainerConfiguration( configuration );
+        configuration.setAutoWiring( true );
+        configuration.setClassPathScanning( PlexusConstants.SCANNING_INDEX );
     }
 
     /**
@@ -86,6 +110,12 @@ public abstract class AbstractLdapTest
         IOUtil.copy( in, out );
         IOUtil.close( in );
         IOUtil.close( out );
+    }
+
+    protected void copyResourceToFile( String resource, String outputFilePath )
+        throws IOException
+    {
+        copyResourceToFile( resource, new File( outputFilePath ) );
     }
 
     /**
@@ -115,7 +145,7 @@ public abstract class AbstractLdapTest
         throws IOException
     {
         HashMap<String, String> interpolationMap = new HashMap<String, String>();
-        interpolationMap.put( "port", Integer.toString( this.getLdapServer().getPort() ) );
+        interpolationMap.put( "port", Integer.toString( getLdapServer().getPort() ) );
 
         Reader reader = new InterpolationFilterReader( new InputStreamReader( inputStream ), interpolationMap );
         OutputStream out = new FileOutputStream( outputFile );

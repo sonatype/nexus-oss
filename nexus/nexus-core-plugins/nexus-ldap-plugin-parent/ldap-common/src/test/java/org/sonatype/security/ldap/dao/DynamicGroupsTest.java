@@ -21,10 +21,10 @@ import javax.naming.Context;
 import javax.naming.ldap.InitialLdapContext;
 
 import org.junit.Test;
-import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
+import org.sonatype.security.ldap.AbstractLdapTest;
 
 public class DynamicGroupsTest
-    extends AbstractLdapTestEnvironment
+    extends AbstractLdapTest
 {
 
     @Test

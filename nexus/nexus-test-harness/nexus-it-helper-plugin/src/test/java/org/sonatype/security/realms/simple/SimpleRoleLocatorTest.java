@@ -18,19 +18,19 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.Role;
+import org.sonatype.security.realms.AbstractRealmTest;
 
 public class SimpleRoleLocatorTest
-    extends PlexusTestCaseSupport
+    extends AbstractRealmTest
 {
 
     @Test
     public void testListRoleIds()
         throws Exception
     {
-        AuthorizationManager roleLocator = this.lookup( AuthorizationManager.class, "Simple" );
+        AuthorizationManager roleLocator = lookup( AuthorizationManager.class, "Simple" );
 
         Set<String> roleIds = this.toIdSet( roleLocator.listRoles() );
         Assert.assertTrue( roleIds.contains( "role-xyz" ) );

@@ -12,16 +12,13 @@
  */
 package org.sonatype.nexus;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.junit.Assert;
+import org.junit.Test;
 import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
-
-import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
 
 public class LdapNexusTest
     extends AbstractNexusLdapTestCase

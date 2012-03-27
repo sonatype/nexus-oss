@@ -10,29 +10,17 @@
  * of Sonatype, Inc. Apache Maven is a trademark of the Apache Software Foundation. M2eclipse is a trademark of the
  * Eclipse Foundation. All other trademarks are the property of their respective owners.
  */
-import org.sonatype.security.ldap.AbstractLdapTest;
+package org.sonatype.security.realms;
 
-public class SimpleLdapServer
-    extends AbstractLdapTest
+import org.sonatype.nexus.test.PlexusTestCaseSupport;
+
+/**
+ * Abstract class for "realm" related tests.
+ * 
+ * @author cstamas
+ */
+public class AbstractRealmTest
+    extends PlexusTestCaseSupport
 {
-
-    /**
-     * @param args
-     * @throws Exception
-     */
-    public static void main( String[] args )
-        throws Exception
-    {
-        try
-        {
-            SimpleLdapServer server = new SimpleLdapServer();
-            server.setUp();
-        }
-        finally
-        {
-            // System.exit( 0 );
-        }
-
-    }
 
 }

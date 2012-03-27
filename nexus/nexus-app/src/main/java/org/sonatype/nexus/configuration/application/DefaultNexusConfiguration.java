@@ -52,6 +52,7 @@ import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.events.VetoFormatter;
 import org.sonatype.nexus.proxy.events.VetoFormatterRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -86,6 +87,16 @@ public class DefaultNexusConfiguration
 {
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
+
+    /**
+     * The path cache is referenced here only for UTs sake. At deploy/runtime, this does not matter, as CacheManager is
+     * already part of component dependency graph. This reference here is merely for UTs, as almost all of them (from
+     * nexus-app module onwards) does "awake" this component, and hence, by having this reference here, we actually pull
+     * and have Plexus manage the "lifecycle" of CacheManager component (and indirectly, EhCacheManager lifecycle).
+     */
+    @Requirement
+    @SuppressWarnings( "unused" )
+    private CacheManager pathCache;
 
     @Requirement( hint = "file" )
     private ApplicationConfigurationSource configurationSource;

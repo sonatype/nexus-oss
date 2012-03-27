@@ -14,6 +14,7 @@ package org.sonatype.nexus.proxy.cache;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
@@ -25,7 +26,7 @@ import org.sonatype.sisu.ehcache.CacheManagerComponent;
 @Component( role = CacheManager.class )
 public class EhCacheCacheManager
     extends AbstractLoggingComponent
-    implements CacheManager
+    implements CacheManager, Disposable
 {
     @Requirement
     private CacheManagerComponent cacheManagerComponent;
@@ -42,5 +43,11 @@ public class EhCacheCacheManager
         }
 
         return new EhCachePathCache( cache, ehCacheManager.getEhcache( SINGLE_PATH_CACHE_NAME ) );
+    }
+
+    @Override
+    public void dispose()
+    {
+        cacheManagerComponent.shutdown();
     }
 }

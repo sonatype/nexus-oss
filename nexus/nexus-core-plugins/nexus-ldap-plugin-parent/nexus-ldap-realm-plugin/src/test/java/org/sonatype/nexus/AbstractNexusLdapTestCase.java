@@ -31,6 +31,7 @@ import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
+import org.sonatype.sisu.ehcache.CacheManagerComponent;
 
 public abstract class AbstractNexusLdapTestCase
     extends NexusTestSupport
@@ -96,23 +97,27 @@ public abstract class AbstractNexusLdapTestCase
         this.copyDefaultLdapConfigToPlace();
     }
 
-    protected String getErrorString( ErrorResponse errorResponse, int index )
-    {
-        return ( (ErrorMessage) errorResponse.getErrors().get( index ) ).getMsg();
-    }
-
     @Override
     protected void tearDown()
         throws Exception
     {
-        ldapServer.stop();
-
-        ldapServer = null;
+        lookup( CacheManagerComponent.class ).shutdown();
+        
+        if ( ldapServer != null )
+        {
+            ldapServer.stop();
+            ldapServer = null;
+        }
 
         // configure the logging
         SLF4JBridgeHandler.uninstall();
 
         super.tearDown();
+    }
+
+    protected String getErrorString( ErrorResponse errorResponse, int index )
+    {
+        return ( (ErrorMessage) errorResponse.getErrors().get( index ) ).getMsg();
     }
 
     protected void validateConnectionDTO( LdapConnectionInfoDTO expected, LdapConnectionInfoDTO actual )

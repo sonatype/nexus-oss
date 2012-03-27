@@ -24,33 +24,85 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusConstants;
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.test.PlexusTestCaseSupport;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.realms.AbstractRealmWithSecuritySystemTest;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 
 public class SimpleRealmTest
-    extends PlexusTestCaseSupport
+    extends AbstractRealmWithSecuritySystemTest
 {
+    private final File confdir;
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    public SimpleRealmTest()
     {
-        configuration.setAutoWiring( true );
-        configuration.setClassPathScanning( PlexusConstants.SCANNING_ON );
+        this.confdir = new File( "target/app-conf" );
     }
 
-    private static java.io.File confdir = new File( "target/app-conf" );
+    @Override
+    protected File getConfDir()
+    {
+        return confdir;
+    }
+
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+        getConfDir().mkdirs();
+        // copy the tests nexus.xml and security.xml to the correct location
+        copyTestConfigToPlace();
+        // restart security
+        lookup( ConfigurationManager.class ).clearCache();
+        lookup( SecuritySystem.class ).start();
+    }
+
+    private void copyTestConfigToPlace()
+        throws FileNotFoundException, IOException
+    {
+        InputStream nexusConf = null;
+        InputStream security = null;
+        InputStream securityConf = null;
+
+        OutputStream nexusOut = null;
+        OutputStream securityOut = null;
+        OutputStream securityConfOut = null;
+
+        try
+        {
+            nexusConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "nexus.xml" );
+            nexusOut = new FileOutputStream( new File( confdir, "nexus.xml" ) );
+            IOUtil.copy( nexusConf, nexusOut );
+
+            security = Thread.currentThread().getContextClassLoader().getResourceAsStream( "security.xml" );
+            securityOut = new FileOutputStream( new File( confdir, "security.xml" ) );
+            IOUtil.copy( security, securityOut );
+
+            securityConf =
+                Thread.currentThread().getContextClassLoader().getResourceAsStream( "security-configuration.xml" );
+            securityConfOut = new FileOutputStream( new File( confdir, "security-configuration.xml" ) );
+            IOUtil.copy( securityConf, securityConfOut );
+        }
+        finally
+        {
+            IOUtil.close( nexusConf );
+            IOUtil.close( securityConf );
+            IOUtil.close( nexusOut );
+            IOUtil.close( securityOut );
+            IOUtil.close( security );
+            IOUtil.close( securityConfOut );
+
+        }
+    }
+
     // Realm Tests
     /**
      * Test authentication with a valid user and password.
-     *
+     * 
      * @throws Exception
      */
     @Test
@@ -67,7 +119,7 @@ public class SimpleRealmTest
 
     /**
      * Test authentication with a valid user and invalid password.
-     *
+     * 
      * @throws Exception
      */
     @Test
@@ -89,7 +141,7 @@ public class SimpleRealmTest
 
     /**
      * Test authentication with a invalid user and password.
-     *
+     * 
      * @throws Exception
      */
     @Test
@@ -111,9 +163,10 @@ public class SimpleRealmTest
 
     //
     /**
-     * Test authorization using the NexusMethodAuthorizingRealm. <BR/> Take a look a the security.xml in
-     * src/test/resources this maps the users in the UserStore to nexus roles/privileges
-     *
+     * Test authorization using the NexusMethodAuthorizingRealm. <BR/>
+     * Take a look a the security.xml in src/test/resources this maps the users in the UserStore to nexus
+     * roles/privileges
+     * 
      * @throws Exception
      */
     @Test
@@ -122,8 +175,7 @@ public class SimpleRealmTest
     {
         SecuritySystem plexusSecurity = this.lookup( SecuritySystem.class );
 
-        PrincipalCollection principal =
-            new SimplePrincipalCollection( "admin-simple", new SimpleRealm().getName() );
+        PrincipalCollection principal = new SimplePrincipalCollection( "admin-simple", new SimpleRealm().getName() );
 
         // test one of the privleges that the admin user has Repositories - (create,read)
         Assert.assertTrue( plexusSecurity.isPermitted( principal, "nexus:repositories:create" ) );
@@ -131,6 +183,7 @@ public class SimpleRealmTest
 
     /**
      * Tests a valid privilege for an invalid user
+     * 
      * @throws Exception
      */
     @Test
@@ -139,73 +192,11 @@ public class SimpleRealmTest
     {
         SecuritySystem plexusSecurity = this.lookup( SecuritySystem.class );
 
-        PrincipalCollection principal = new SimplePrincipalCollection( "INVALID", SecuritySystem.class
-            .getSimpleName() );
+        PrincipalCollection principal = new SimplePrincipalCollection( "INVALID", SecuritySystem.class.getSimpleName() );
 
         // test one of the privleges
         Assert.assertFalse( plexusSecurity.isPermitted( principal, "nexus:repositories:create" ) );// Repositories -
         // (create,read)
 
-    }
-
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        confdir.mkdirs();
-        // copy the tests nexus.xml and security.xml to the correct location
-        this.copyTestConfigToPlace();
-
-        // restart security
-        this.lookup( ConfigurationManager.class ).clearCache();
-        this.lookup( SecuritySystem.class ).start();
-    }
-
-
-    @Override
-    protected void customizeContext( Context ctx )
-    {
-        super.customizeContext( ctx );
-
-        ctx.put( "application-conf", confdir.getAbsolutePath() );
-        ctx.put( "security-xml-file", confdir.getAbsolutePath() + "/security.xml" );
-    }
-
-    private void copyTestConfigToPlace()
-        throws FileNotFoundException,
-            IOException
-    {
-        InputStream nexusConf = null;
-        InputStream security = null;
-        InputStream securityConf = null;
-
-        OutputStream nexusOut = null;
-        OutputStream securityOut = null;
-        OutputStream securityConfOut = null;
-
-        try
-        {
-            nexusConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "nexus.xml" );
-            nexusOut = new FileOutputStream( new File( confdir, "nexus.xml" ) );
-            IOUtil.copy( nexusConf, nexusOut );
-
-            security = Thread.currentThread().getContextClassLoader().getResourceAsStream( "security.xml" );
-            securityOut = new FileOutputStream( new File( confdir, "security.xml" ) );
-            IOUtil.copy( security, securityOut);
-
-            securityConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "security-configuration.xml" );
-            securityConfOut = new FileOutputStream( new File( confdir, "security-configuration.xml" ) );
-            IOUtil.copy( securityConf, securityConfOut);
-        }
-        finally
-        {
-            IOUtil.close( nexusConf );
-            IOUtil.close( securityConf );
-            IOUtil.close( nexusOut );
-            IOUtil.close( securityOut );
-            IOUtil.close( security );
-            IOUtil.close( securityConfOut );
-
-        }
     }
 }
