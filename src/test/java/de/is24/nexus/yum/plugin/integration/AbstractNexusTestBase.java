@@ -238,4 +238,9 @@ public class AbstractNexusTestBase {
       throw new RuntimeException("Maven ended with exit code " + exitCode);
     }
   }
+
+  protected String getStagingRepositoryId(String profileId) throws Exception {
+    final String content = executeGet("/staging/profile_repositories/" + profileId);
+    return content.replaceAll("(?s)(.*<repositoryId>)(.*)(</repositoryId>.*)", "$2");
+  }
 }

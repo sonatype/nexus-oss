@@ -56,13 +56,8 @@ public class CreateGroupRepositoryIT extends AbstractNexusTestBase {
     final String profileId = givenStagingProfile(profileName, TARGET_REPO_ID, GROUP_REPO_ID);
     reorderProfiles(profileId);
     givenUploadedRpmToStaging("de.is24.staging.test", artifactId, artifactVersion);
-    final String repositoryId = getRepositoryId(profileId);
+    final String repositoryId = getStagingRepositoryId(profileId);
     closeStagingRepo(profileId, repositoryId);
-  }
-
-  private String getRepositoryId(String profileId) throws Exception {
-    final String content = executeGet("/staging/profile_repositories/" + profileId);
-    return content.replaceAll("(?s)(.*<repositoryId>)(.*)(</repositoryId>.*)", "$2");
   }
 
   private void closeStagingRepo(String profileId, String repositoryId) throws Exception {
