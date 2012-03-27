@@ -215,6 +215,14 @@
         <pattern>.*</pattern>
       </patterns>
     </repositoryTarget>
+    <repositoryTarget>
+      <id>5</id>
+      <name>Yum Group Repo Test (Maven2)</name>
+      <contentClass>maven2</contentClass>
+      <patterns>
+        <pattern>.*/de/is24/staging/test/.*</pattern>
+      </patterns>
+    </repositoryTarget>
   </repositoryTargets>
   <smtpConfiguration>
     <hostname>smtp-host</hostname>

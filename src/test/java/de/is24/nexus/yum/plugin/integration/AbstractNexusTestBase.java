@@ -5,7 +5,9 @@ import static java.lang.String.format;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.http.util.EntityUtils.consume;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +36,7 @@ import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.apache.maven.cli.MavenCli;
 import org.apache.maven.index.artifact.Gav;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -170,16 +173,18 @@ public class AbstractNexusTestBase {
     }
   }
 
-  protected HttpResponse givenGroupRepository(String repoId, String providerId, Repository... memberRepos) throws AuthenticationException,
+  protected void givenGroupRepository(String repoId, String providerId, Repository... memberRepos) throws AuthenticationException,
       UnsupportedEncodingException, IOException, ClientProtocolException {
     HttpResponse response = executeDeleteWithResponse(format("/repo_groups/%s", repoId));
     consume(response.getEntity());
 
     final StringEntity content = new StringEntity(format("{data:{id: '%s', name: '%s', provider: '%s', exposed: true, repositories: [%s]}}", repoId, repoId, providerId,
         render(memberRepos)));
-    return executePost(
+    response = executePost(
         "/repo_groups",
         content, new BasicHeader("Content-Type", "application/json"));
+    consume(response.getEntity());
+    assertThat(response.getStatusLine().getStatusCode(), is(201));
   }
 
   protected void wait(int timeout, TimeUnit unit) throws InterruptedException {
@@ -215,4 +220,23 @@ public class AbstractNexusTestBase {
     return format("{id : '%s', name: '%s'}", repo.getId(), repo.getName());
   }
 
+  protected void givenUploadedRpmToStaging(String groupId, String artifactId, String version) throws NoSuchAlgorithmException, IOException {
+    File rpmFile = createDummyRpm(artifactId, version);
+    executeMaven("deploy:deploy-file", "-Dfile=" + rpmFile.getAbsolutePath(),
+      "-Durl=" + SERVICE_BASE_URL + "/staging/deploy/maven2", "-DgroupId=" + groupId,
+      "-DartifactId=" + artifactId,
+      "-Dversion=" + version, "-Dpackaging=rpm",
+      "-X",
+      "-DrepositoryId=local-nexus", "-s",
+      "../src/test/resources/maven/settings.xml");
+  }
+
+  protected void executeMaven(String... params) {
+    final MavenCli maven = new MavenCli();
+    int exitCode = maven.doMain(params, "target", null, null);
+
+    if (exitCode != 0) {
+      throw new RuntimeException("Maven ended with exit code " + exitCode);
+    }
+  }
 }

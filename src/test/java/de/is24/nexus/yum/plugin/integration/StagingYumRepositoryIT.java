@@ -1,6 +1,5 @@
 package de.is24.nexus.yum.plugin.integration;
 
-import static de.is24.nexus.yum.repository.utils.RepositoryTestUtils.createDummyRpm;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
@@ -10,16 +9,13 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import java.io.File;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthenticationException;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
-import org.apache.maven.cli.MavenCli;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,11 +34,9 @@ public class StagingYumRepositoryIT extends AbstractNexusTestBase {
     STAGING_REPO_ID +
     "</stagedRepositoryId><targetRepositoryId>production</targetRepositoryId><description>Dummy Description</description></data></promoteRequest>";
 
-  private final MavenCli maven = new MavenCli();
-
   @Test
   public void shouldStageRpmWithoutOverridingMetaData() throws Exception {
-    givenUploadedArtifact();
+    givenUploadedRpmToStaging(DUMMY_GROUP_ID, DUMMY_ARTIFACT_ID, DUMMY_VERSION);
     wait(2, SECONDS);
     givenClosedStagingRepo();
     wait(2, SECONDS);
@@ -80,24 +74,5 @@ public class StagingYumRepositoryIT extends AbstractNexusTestBase {
       new BasicHeader("Content-Type", "application/xml"));
     assertEquals(SC_CREATED, response.getStatusLine().getStatusCode());
     consume(response.getEntity());
-  }
-
-  private void givenUploadedArtifact() throws NoSuchAlgorithmException, IOException {
-    File rpmFile = createDummyRpm(DUMMY_ARTIFACT_ID, DUMMY_VERSION);
-    executeMaven("deploy:deploy-file", "-Dfile=" + rpmFile.getAbsolutePath(),
-      "-Durl=" + SERVICE_BASE_URL + "/staging/deploy/maven2", "-DgroupId=" + DUMMY_GROUP_ID,
-      "-DartifactId=" + DUMMY_ARTIFACT_ID,
-      "-Dversion=" + DUMMY_VERSION, "-Dpackaging=rpm",
-      "-X",
-      "-DrepositoryId=local-nexus", "-s",
-      "../src/test/resources/maven/settings.xml");
-  }
-
-  private void executeMaven(String... params) {
-    int exitCode = maven.doMain(params, "target", null, null);
-
-    if (exitCode != 0) {
-      throw new RuntimeException("Maven ended with exit code " + exitCode);
-    }
   }
 }

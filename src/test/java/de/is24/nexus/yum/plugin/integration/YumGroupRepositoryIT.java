@@ -127,7 +127,7 @@ public class YumGroupRepositoryIT extends AbstractNexusTestBase {
       ClientProtocolException, InterruptedException, NoSuchAlgorithmException {
     givenTestRepository(MEMBER_REPO1);
     givenTestRepository(MEMBER_REPO2);
-    consume(givenGroupRepository(GROUP_REPO_ID, ID, repo(MEMBER_REPO1), repo(MEMBER_REPO2)).getEntity());
+    givenGroupRepository(GROUP_REPO_ID, ID, repo(MEMBER_REPO1), repo(MEMBER_REPO2));
     wait(5, SECONDS);
     assertEquals(deployRpm(DUMMY_ARTIFACT1, GROUP_ID, ARTIFACT_VERSION1, MEMBER_REPO1), SC_CREATED);
     assertEquals(deployRpm(DUMMY_ARTIFACT2, GROUP_ID, ARTIFACT_VERSION2, MEMBER_REPO2), SC_CREATED);
