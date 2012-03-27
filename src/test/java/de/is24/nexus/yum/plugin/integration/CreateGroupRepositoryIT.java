@@ -28,6 +28,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
 public class CreateGroupRepositoryIT extends AbstractNexusTestBase {
+  private static final String ARTIFACT_ID_2 = "staging-bla";
+  private static final String ARTIFACT_ID_1 = "staging-foo";
   private static final String GROUP_REPO_ID = "staging-test-group";
   private static final String TARGET_REPO_ID = "production";
 
@@ -39,14 +41,14 @@ public class CreateGroupRepositoryIT extends AbstractNexusTestBase {
   @Test
   public void shouldProgateStagingRepoToYumGroupRepo() throws Exception {
     givenGroupRepository(GROUP_REPO_ID, "maven2yum");
-    givenClosedStagingRepoWithRpm("staging-foo", "4.3.2");
-    givenClosedStagingRepoWithRpm("staging-bla", "2.3.4");
+    givenClosedStagingRepoWithRpm(ARTIFACT_ID_1, "4.3.2");
+    givenClosedStagingRepoWithRpm(ARTIFACT_ID_2, "2.3.4");
     wait(10, SECONDS);
     final HttpResponse response = executeGetWithResponse(NEXUS_BASE_URL + "/content/groups/staging-test-group/repodata/primary.xml.gz");
     final String repoContent = IOUtils.toString(new GZIPInputStream(new ByteArrayInputStream(toByteArray(response.getEntity()))));
     assertThat(response.getStatusLine().getStatusCode(), is(200));
-    assertThat(repoContent, containsString("staging-foo"));
-    assertThat(repoContent, containsString("staging-bla"));
+    assertThat(repoContent, containsString(ARTIFACT_ID_1));
+    assertThat(repoContent, containsString(ARTIFACT_ID_2));
   }
 
   protected void givenClosedStagingRepoWithRpm(String artifactId, String artifactVersion) throws Exception, NoSuchAlgorithmException, IOException {

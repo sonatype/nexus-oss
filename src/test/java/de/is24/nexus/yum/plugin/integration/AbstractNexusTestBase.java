@@ -226,7 +226,6 @@ public class AbstractNexusTestBase {
       "-Durl=" + SERVICE_BASE_URL + "/staging/deploy/maven2", "-DgroupId=" + groupId,
       "-DartifactId=" + artifactId,
       "-Dversion=" + version, "-Dpackaging=rpm",
-      "-X",
       "-DrepositoryId=local-nexus", "-s",
       "../src/test/resources/maven/settings.xml");
   }
