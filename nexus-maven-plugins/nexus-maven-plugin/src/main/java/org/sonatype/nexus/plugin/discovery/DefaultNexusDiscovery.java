@@ -26,6 +26,7 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.model.Repository;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.settings.Mirror;
+import org.apache.maven.settings.Proxy;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.annotations.Component;
@@ -35,6 +36,7 @@ import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugin.util.PromptUtil;
+import org.sonatype.nexus.restlight.common.ProxyConfig;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
@@ -107,6 +109,7 @@ public class DefaultNexusDiscovery
         throws NexusDiscoveryException
     {
         Map<String, Server> serversById = new HashMap<String, Server>();
+        Map<String, Proxy> proxyById = new HashMap<String, Proxy>();
         List<ServerMapping> serverMap = new ArrayList<ServerMapping>();
 
         if ( settings != null )
@@ -114,6 +117,10 @@ public class DefaultNexusDiscovery
             for ( Server server : settings.getServers() )
             {
                 serversById.put( server.getId(), server );
+            }
+            for ( Proxy proxy : settings.getProxies() )
+            {
+                proxyById.put( proxy.getId(), proxy );
             }
         }
 
@@ -129,9 +136,9 @@ public class DefaultNexusDiscovery
                 if ( info.isConnectable() )
                 {
                     Server server = serversById.get( info.getConnectionId() );
+                    ProxyConfig proxy = selectProxyServer( proxyById, server.getId() );
                     if ( ( fullyAutomatic || promptForUserAcceptance( info.getNexusUrl(), info.getConnectionName(),
-                                                                      info.getUser() ) )
-                        && setAndValidateConnectionAuth( info, server ) )
+                        info.getUser() ) ) && setAndValidateConnectionAuth( info, server, proxy ) )
                     {
                         return info;
                     }
@@ -151,7 +158,8 @@ public class DefaultNexusDiscovery
                 info = new NexusConnectionInfo( urlPrompt() );
             }
 
-            fillAuth( info, serversById, defaultUser );
+            ProxyConfig proxy = selectProxyServer( proxyById, info.getConnectionId() );
+            fillAuth( info, serversById, defaultUser, proxy );
 
             return info;
         }
@@ -162,6 +170,7 @@ public class DefaultNexusDiscovery
         throws NexusDiscoveryException
     {
         Map<String, Server> serversById = new HashMap<String, Server>();
+        Map<String, Proxy> proxyById = new HashMap<String, Proxy>();
         List<ServerMapping> serverMap = new ArrayList<ServerMapping>();
 
         if ( settings != null )
@@ -170,13 +179,17 @@ public class DefaultNexusDiscovery
             {
                 serversById.put( server.getId(), server );
             }
+            for ( Proxy proxy : settings.getProxies() )
+            {
+                proxyById.put( proxy.getId(), proxy );
+            }
         }
 
         List<NexusConnectionInfo> candidates = new ArrayList<NexusConnectionInfo>();
 
         collectForDiscovery( settings, project, candidates, serverMap, serversById );
 
-        NexusConnectionInfo result = testCompleteCandidates( candidates, fullyAutomatic );
+        NexusConnectionInfo result = testCompleteCandidates( candidates, fullyAutomatic, proxyById );
         if ( result == null && !fullyAutomatic )
         {
             // if no clear candidate is found, guide the user through menus for URL and server/auth selection.
@@ -188,15 +201,18 @@ public class DefaultNexusDiscovery
                 {
                     if ( url.equals( serverMapping.getUrl() ) || url.startsWith( serverMapping.getUrl() ) )
                     {
-                        Server server = serversById.get( serverMapping.getServerId() );
+                        final String serverId = serverMapping.getServerId();
+
+                        Server server = serversById.get( serverId );
+                        ProxyConfig proxy = selectProxyServer( proxyById, serverId );
                         if ( server != null && server.getUsername() != null && server.getPassword() != null )
                         {
                             String password = decryptPassword( server.getPassword() );
-                            if ( testClientManager.testConnection( url, server.getUsername(), password ) )
+                            if ( testClientManager.testConnection( url, server.getUsername(), password, proxy ) )
                             {
                                 result =
                                     new NexusConnectionInfo( url, server.getUsername(), password,
-                                                             serverMapping.getName(), serverMapping.getServerId() );
+                                                             serverMapping.getName(), serverId );
                                 break all;
                             }
                         }
@@ -211,7 +227,8 @@ public class DefaultNexusDiscovery
                     password = decryptPassword( password );
                 }
 
-                if ( testClientManager.testConnection( url, server.getUsername(), password ) )
+                ProxyConfig proxy = selectProxyServer( proxyById, server.getId() );
+                if ( testClientManager.testConnection( url, server.getUsername(), password, proxy ) )
                 {
                     result = new NexusConnectionInfo( url, server.getUsername(), password );
                 }
@@ -226,7 +243,27 @@ public class DefaultNexusDiscovery
         return result;
     }
 
-    private boolean setAndValidateConnectionAuth( final NexusConnectionInfo info, final Server server )
+    private ProxyConfig selectProxyServer( Map<String, Proxy> proxyById, String serverId )
+        throws NexusDiscoveryException
+    {
+        if ( serverId == null )
+        {
+            return null;
+        }
+
+        Proxy proxy = proxyById.get( serverId );
+        if ( proxy == null )
+            return null;
+
+        ProxyConfig cfg =
+            new ProxyConfig( proxy.getHost(), proxy.getPort(), proxy.getUsername(),
+                decryptPassword( proxy.getPassword() ) );
+        return cfg;
+    }
+
+
+    private boolean setAndValidateConnectionAuth( final NexusConnectionInfo info, final Server server,
+                                                  ProxyConfig proxyConfig )
         throws NexusDiscoveryException
     {
         if ( server != null )
@@ -236,7 +273,7 @@ public class DefaultNexusDiscovery
             info.setPassword( password );
         }
 
-        if ( testClientManager.testConnection( info.getNexusUrl(), info.getUser(), info.getPassword() ) )
+        if ( testClientManager.testConnection( info.getNexusUrl(), info.getUser(), info.getPassword(), proxyConfig ) )
         {
             return true;
         }
@@ -249,7 +286,7 @@ public class DefaultNexusDiscovery
     }
 
     private void fillAuth( final NexusConnectionInfo info, final Map<String, Server> serversById,
-                           final String defaultUser )
+                           final String defaultUser, ProxyConfig proxyConfig )
     {
         do
         {
@@ -262,7 +299,7 @@ public class DefaultNexusDiscovery
                 info.setConnectionId( server.getId() );
             }
         }
-        while ( !testClientManager.testConnection( info.getNexusUrl(), info.getUser(), info.getPassword() ) );
+        while ( !testClientManager.testConnection( info.getNexusUrl(), info.getUser(), info.getPassword(), proxyConfig ) );
     }
 
     private String decryptPassword( final String password )
@@ -489,7 +526,7 @@ public class DefaultNexusDiscovery
     }
 
     private NexusConnectionInfo testCompleteCandidates( final List<NexusConnectionInfo> completeCandidates,
-                                                        final boolean fullyAutomatic )
+                                                        final boolean fullyAutomatic, Map<String, Proxy> proxyById )
         throws NexusDiscoveryException
     {
         for ( NexusConnectionInfo candidate : completeCandidates )
@@ -499,9 +536,11 @@ public class DefaultNexusDiscovery
                 continue;
             }
 
+            ProxyConfig proxy = selectProxyServer( proxyById, candidate.getConnectionId() );
+
             String password = decryptPassword( candidate.getPassword() );
             if ( ( fullyAutomatic || promptForAcceptance( candidate.getNexusUrl(), candidate.getConnectionName() ) )
-                && testClientManager.testConnection( candidate.getNexusUrl(), candidate.getUser(), password ) )
+                && testClientManager.testConnection( candidate.getNexusUrl(), candidate.getUser(), password, proxy ) )
             {
                 candidate.setPassword( password );
                 return candidate;
