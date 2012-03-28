@@ -329,7 +329,7 @@ Sonatype.repoServer.ArtifactUploadPanel = function(config) {
                           bodyBorder : true,
                           bodyStyle : 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
                           style : 'padding: 0px 10px 0px 105px',
-                          width : 500,
+                          width : 750,
                           height : 100,
                           animate : true,
                           lines : false,
