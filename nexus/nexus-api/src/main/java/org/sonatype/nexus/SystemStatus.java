@@ -45,7 +45,7 @@ public class SystemStatus
     /**
      * The Nexus Application edition for display in UI.
      */
-    private String editionLong = "Open Source";
+    private String editionLong = "";
 
     /**
      * The Nexus Application edition for user agent

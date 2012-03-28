@@ -28,6 +28,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
@@ -364,7 +365,12 @@ public class DefaultNexus
         sysInfoLog.append( "\n" );
         sysInfoLog.append( "-------------------------------------------------\n" );
         sysInfoLog.append( "\n" );
-        sysInfoLog.append( "Initializing Nexus (" ).append( applicationStatusSource.getSystemStatus().getEditionShort() ).append( "), Version " ).append( applicationStatusSource.getSystemStatus().getVersion() ).append( "\n" );
+        sysInfoLog.append( "Initializing Nexus (" );
+        if( !StringUtils.isEmpty( applicationStatusSource.getSystemStatus().getEditionLong() ) )
+        {
+            sysInfoLog.append( applicationStatusSource.getSystemStatus().getEditionLong() ).append( "), ");
+        }
+        sysInfoLog.append( "Version " ).append( applicationStatusSource.getSystemStatus().getVersion() ).append( "\n" );
         sysInfoLog.append( "\n" );
         sysInfoLog.append( "-------------------------------------------------" );
 
@@ -484,8 +490,11 @@ public class DefaultNexus
             getLogger().info( "Nexus Work Directory : "
                                   + nexusConfiguration.getWorkingDirectory().getAbsolutePath().toString() );
 
-            getLogger().info( "Started Nexus (version " + getSystemStatus().getVersion() + " "
-                                  + getSystemStatus().getEditionShort() + ")" );
+            getLogger().info( "Started Nexus (version " + getSystemStatus().getVersion()
+                                  + (StringUtils.isEmpty( getSystemStatus().getEditionLong() )
+                                        ? ""
+                                        : " " + getSystemStatus().getEditionLong() )
+                                    + ")" );
 
             applicationEventMulticaster.notifyEventListeners( new NexusStartedEvent( this ) );
         }
@@ -532,8 +541,11 @@ public class DefaultNexus
         // Now a cleanup, to kill dangling thread of HttpClients
         CustomMultiThreadedHttpConnectionManager.shutdownAll();
 
-        getLogger().info( "Stopped Nexus (version " + getSystemStatus().getVersion() + " "
-                              + getSystemStatus().getEditionShort() + ")" );
+        getLogger().info( "Stopped Nexus (version " + getSystemStatus().getVersion()
+                              + (StringUtils.isEmpty( getSystemStatus().getEditionLong() )
+                                    ? ""
+                                    : " " + getSystemStatus().getEditionLong() )
+                              + ")" );
     }
 
     private void synchronizeShadowsAtStartup()

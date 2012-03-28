@@ -13,6 +13,7 @@
 package com.sonatype.nexus.oss;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.AbstractApplicationStatusSource;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
@@ -33,7 +34,10 @@ public class OSSApplicationStatusSource
         getSystemStatusInternal().setApiVersion( getSystemStatusInternal().getVersion() );
 
         getSystemStatusInternal().setFormattedAppName(
-            FORMATTED_APP_NAME_BASE + " " + getSystemStatusInternal().getEditionLong() + " Edition "
+            FORMATTED_APP_NAME_BASE + " "
+                + ( StringUtils.isEmpty( getSystemStatusInternal().getEditionLong() )
+                        ? ""
+                        : getSystemStatusInternal().getEditionLong() + " Edition " )
                 + getSystemStatusInternal().getVersion() );
     }
 
