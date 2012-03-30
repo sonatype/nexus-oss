@@ -349,11 +349,11 @@ public class ResourceStoreRequest
     @Override
     public String toString()
     {
-        StringBuffer sb = new StringBuffer( "ResourceStoreRequest(" );
+        StringBuffer sb = new StringBuffer( getClass().getSimpleName() );
+        sb.append( "(requestPath=\"" );
         sb.append( getRequestPath() );
-        sb.append( ") " );
+        sb.append( "\") " );
         sb.append( super.toString() );
-
         return sb.toString();
     }
 }

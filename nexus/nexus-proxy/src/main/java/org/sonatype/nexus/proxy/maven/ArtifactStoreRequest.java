@@ -89,7 +89,8 @@ public class ArtifactStoreRequest
     @Override
     public String toString()
     {
-        StringBuffer sb = new StringBuffer( "ArtifactStoreRequest(" );
+        StringBuffer sb = new StringBuffer( super.toString() );
+        sb.append( "(GAVCE=" );
         sb.append( getGroupId() );
         sb.append( ":" );
         sb.append( getArtifactId() );
@@ -99,10 +100,9 @@ public class ArtifactStoreRequest
         sb.append( getClassifier() );
         sb.append( ":e=" );
         sb.append( getExtension() );
-        sb.append( ") " );
+        sb.append( ", for " );
         sb.append( RepositoryStringUtils.getHumanizedNameString( getMavenRepository() ) );
-        sb.append( " " );
-        sb.append( super.toString() );
+        sb.append( ") " );
 
         return sb.toString();
     }
