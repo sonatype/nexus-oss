@@ -13,6 +13,7 @@
 package org.sonatype.nexus.proxy;
 
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.utils.RepositoryStringUtils;
 
 /**
  * Thrown if the repository involved in processing is not available.
@@ -28,8 +29,7 @@ public class RepositoryNotAvailableException
 
     public RepositoryNotAvailableException( Repository repository )
     {
-        super( "Repository with ID='" + repository.getId() + "' is not available!" );
-
+        super( "Repository " + RepositoryStringUtils.getHumanizedNameString( repository ) + " is not available!" );
         this.repository = repository;
     }
 
@@ -37,5 +37,4 @@ public class RepositoryNotAvailableException
     {
         return repository;
     }
-
 }
