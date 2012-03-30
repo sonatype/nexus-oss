@@ -285,6 +285,22 @@ public abstract class AbstractProxyRepository
     }
 
     @Override
+    public boolean expireCaches( final ResourceStoreRequest request, final WalkerFilter filter )
+    {
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return false;
+        }
+
+        // expire proxy cache
+        boolean v1 = expireProxyCaches( request, filter );
+        // do the stuff we inherited
+        boolean v2 = super.expireCaches( request, filter );
+
+        return v1 || v2;
+    }
+
+    @Override
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
     {
         if ( !getLocalStatus().shouldServiceRequest() )
