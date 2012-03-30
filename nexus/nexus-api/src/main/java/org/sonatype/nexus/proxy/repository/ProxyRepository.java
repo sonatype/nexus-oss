@@ -17,10 +17,12 @@ import java.util.Map;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.walker.WalkerFilter;
 
 /**
  * A proxy repository is what it's name says :)
@@ -31,15 +33,26 @@ public interface ProxyRepository
     extends Repository
 {
     /**
+     * Marks the proxy cache items as expired. This methods delegates to
+     * {@link #expireProxyCaches(ResourceStoreRequest, WalkerFilter)} method using {@code null} for filter.
+     * 
+     * @param request a path from to start descending. If null, it is taken as "root".
+     * @since 2.0
+     */
+    void expireProxyCaches( ResourceStoreRequest request );
+
+    /**
      * Marks the proxy cache items as expired (items stored in Local Storage that is actually proxy cache in case of
      * Proxy repository). This expiration is explicit, and puts a flag in item attribute, that is overriding the aging
      * algorithm too! Meaning, even if your maxAge is "never", but item is flagged as expired, remote check will happen.
      * Also, consider that proxy cache might be huge, this method might be a long runner.
      * 
-     * @param path a path from to start descending. If null, it is taken as "root".
-     * @since 2.0
+     * @param request a path from to start descending. If null, it is taken as "root".
+     * @param filter to apply or {@code null} for "all".
+     * @return {@code true} if cache modified.
+     * @since 2.1
      */
-    void expireProxyCaches( ResourceStoreRequest request );
+    boolean expireProxyCaches( ResourceStoreRequest request, WalkerFilter filter );
 
     /**
      * Gets remote status.

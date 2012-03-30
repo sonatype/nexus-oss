@@ -47,6 +47,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepository;
+import org.sonatype.nexus.proxy.maven.MavenRepositoryMetadataManager;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.gav.GavCalculator;
@@ -56,6 +57,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility;
 import org.sonatype.nexus.proxy.maven.metadata.operations.ModelVersionUtility.Version;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryMetadataManager;
 import org.sonatype.nexus.util.AlphanumComparator;
 import org.sonatype.nexus.util.DigesterUtils;
 
@@ -82,6 +84,14 @@ public class M2Repository
 
     @Requirement
     private M2RepositoryConfigurator m2RepositoryConfigurator;
+    
+    private final MavenRepositoryMetadataManager mavenRepositoryMetadataManager = new MavenRepositoryMetadataManager( this );
+
+    @Override
+    public RepositoryMetadataManager getRepositoryMetadataManager()
+    {
+        return mavenRepositoryMetadataManager;
+    }
 
     @Override
     protected M2RepositoryConfiguration getExternalConfiguration( boolean forWrite )

@@ -13,6 +13,7 @@
 package org.sonatype.nexus.proxy;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -35,12 +36,17 @@ import org.sonatype.nexus.proxy.attributes.Attributes;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
+import org.sonatype.nexus.proxy.maven.ArtifactStoreRequest;
+import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.gav.Gav;
 import org.sonatype.nexus.proxy.maven.gav.M2ArtifactRecognizer;
+import org.sonatype.nexus.proxy.maven.gav.Gav.HashType;
+import org.sonatype.nexus.proxy.maven.gav.Gav.SignatureType;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -297,31 +303,28 @@ public class M2RepositoryTest
     public void testExpirationAlwaysUpdate()
         throws Exception
     {
-        doTestExpiration( "/spoof/maven-metadata.xml", 0, 1,2,3 );
-        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 0, 1,2,3 );
+        doTestExpiration( "/spoof/maven-metadata.xml", 0, 1, 2, 3 );
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 0, 1, 2, 3 );
     }
 
     @Test
     public void testExpirationNeverUpdate()
         throws Exception
     {
-        doTestExpiration( "/spoof/maven-metadata.xml", -1, 1,1,1 );
-        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", -1, 1,1,1 );
+        doTestExpiration( "/spoof/maven-metadata.xml", -1, 1, 1, 1 );
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", -1, 1, 1, 1 );
     }
 
     @Test
     public void testExpiration()
         throws Exception
     {
-        doTestExpiration( "/spoof/maven-metadata.xml", 1, 1,1,2 );
-        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 1, 1,1,2 );
+        doTestExpiration( "/spoof/maven-metadata.xml", 1, 1, 1, 2 );
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", 1, 1, 1, 2 );
     }
 
     /**
-     * For expiration-related issues and stories see:
-     * NEXUS-1675
-     * NEXUS-3065
-     * NEXUS-4099
+     * For expiration-related issues and stories see: NEXUS-1675 NEXUS-3065 NEXUS-4099
      */
     private void doTestExpiration( String path, final int age, final int... expectedHits )
         throws Exception
@@ -355,7 +358,7 @@ public class M2RepositoryTest
             System.gc(); // helps with FS sync'ing on Windows
             Thread.sleep( 500 ); // wait for FS
         }
-        
+
         assertThat( "File timestamp did not change, first pass", mdFile.lastModified(), not( equalTo( fileTimestamp ) ) );
         fileTimestamp = mdFile.lastModified();
 
@@ -390,7 +393,7 @@ public class M2RepositoryTest
         final RepositoryItemUid uid = item.getRepositoryItemUid();
         final AttributeStorage storage = uid.getRepository().getAttributesHandler().getAttributeStorage();
         final Attributes attributes = item.getRepositoryItemAttributes();
-        attributes.setCheckedRemotely( System.currentTimeMillis() - ( ( Math.abs(age) + 1 ) * 60 * 1000) );
+        attributes.setCheckedRemotely( System.currentTimeMillis() - ( ( Math.abs( age ) + 1 ) * 60 * 1000 ) );
         storage.putAttributes( uid, attributes );
 
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
@@ -490,6 +493,71 @@ public class M2RepositoryTest
             repository.getAttributesHandler().getAttributeStorage().getAttributes(
                 repository.createUid( request.getRequestPath() ) );
         assertThat( shadowStorageItem.getLastRequested(), is( resultItem.getLastRequested() ) );
+    }
+
+    @Test
+    public void testNEXUS4943RepositoryMetadataManager_expireNotFoundMetadataCaches()
+        throws Exception
+    {
+        // hosted reposes has NFC shut down (see NEXUS-4798)
+        MavenProxyRepository m2Repo =
+            getRepositoryRegistry().getRepositoryWithFacet( "repo1", MavenProxyRepository.class );
+        m2Repo.addToNotFoundCache( new ResourceStoreRequest( "/some/path/file.jar" ) );
+        m2Repo.addToNotFoundCache( new ResourceStoreRequest( "/some/path/maven-metadata.xml" ) );
+        
+        // note: above, that is the "standard" way to write item paths! (starting with slash)
+        // below, we tamper directly with NFC, so the lack of starting slash should not confuse you!
+
+        // we have two known entries in NFC
+        assertThat( m2Repo.getNotFoundCache().listKeysInCache().size(), equalTo( 2 ) );
+        assertThat( m2Repo.getNotFoundCache().listKeysInCache(),
+            contains( "some/path/file.jar", "some/path/maven-metadata.xml" ) );
+
+        m2Repo.getRepositoryMetadataManager().expireNotFoundMetadataCaches( new ResourceStoreRequest( "/" ) );
+
+        // M2 metadata should be removed, so we have one known entry in NFC
+        assertThat( m2Repo.getNotFoundCache().listKeysInCache().size(), equalTo( 1 ) );
+        assertThat( m2Repo.getNotFoundCache().listKeysInCache(), contains( "some/path/file.jar" ) );
+    }
+
+    @Test
+    public void testNEXUS4943RepositoryMetadataManager_expireMetadataCaches()
+        throws Exception
+    {
+        // hosted reposes has NFC shut down (see NEXUS-4798)
+        MavenProxyRepository m2Repo =
+            getRepositoryRegistry().getRepositoryWithFacet( "repo1", MavenProxyRepository.class );
+
+        // put some proxied content
+        // we need GavBuilder-like class, this below is hilarious!
+        final Gav gav =
+            new Gav( "org.slf4j", "slf4j-api", "1.4.3", null, "jar", null, null, null, false, null, false, null );
+        m2Repo.getArtifactStoreHelper().retrieveArtifact( new ArtifactStoreRequest( m2Repo, gav, false ) );
+        // get GAV metadata (is present)
+        m2Repo.retrieveItem( new ResourceStoreRequest( "/org/slf4j/slf4j-api/1.4.3/maven-metadata.xml" ) );
+        // get GA metadat (not present, will go into NFC
+        try
+        {
+            m2Repo.retrieveItem( new ResourceStoreRequest( "/org/slf4j/slf4j-api/maven-metadata.xml" ) );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // good, we expected this
+        }
+
+        m2Repo.getRepositoryMetadataManager().expireMetadataCaches( new ResourceStoreRequest( "/" ) );
+
+        // the GA metadata should be removed from NFC, so we have no known entry in NFC
+        assertThat( m2Repo.getNotFoundCache().listKeysInCache().size(), equalTo( 0 ) );
+
+        // the GAV metadata should be expired
+        assertThat(
+            m2Repo.retrieveItem( new ResourceStoreRequest( "/org/slf4j/slf4j-api/1.4.3/maven-metadata.xml" ) ).isExpired(),
+            is( true ) );
+        // but the JAR should not be expired
+        assertThat(
+            m2Repo.retrieveItem( new ResourceStoreRequest( "/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.jar" ) ).isExpired(),
+            is( false ) );
     }
 
     // NEXUS-4218 BEGIN
@@ -692,7 +760,7 @@ public class M2RepositoryTest
             if ( !M2ArtifactRecognizer.isChecksum( path ) )
             {
                 File artifactMainFile =
-                    new File( repositoryLocalStorageDir, path.substring( 1, path.length() ) +".sha1" );
+                    new File( repositoryLocalStorageDir, path.substring( 1, path.length() ) + ".sha1" );
                 Assert.assertTrue( artifactMainFile.exists() );
             }
         }

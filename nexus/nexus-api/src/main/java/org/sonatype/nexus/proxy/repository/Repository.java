@@ -38,6 +38,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.target.TargetSet;
+import org.sonatype.nexus.proxy.walker.WalkerFilter;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 
 /**
@@ -455,6 +456,14 @@ public interface Repository
     // Maintenance
 
     /**
+     * Expires all the caches used by this repository implementation from path and below. This methods delegates to
+     * {@link #expireCaches(ResourceStoreRequest, WalkerFilter)} method using {@code null} for filter.
+     * 
+     * @param request a path from to start descending. If null, it is taken as "root".
+     */
+    void expireCaches( ResourceStoreRequest request );
+
+    /**
      * Expires all the caches used by this repository implementation from path and below. What kind of caches are
      * tackled depends on the actual implementation behind this interface (NFC, proxy cache or something third). To gain
      * more control, you can call corresponding methods manually too. Currently, this method equals to a single call to
@@ -463,16 +472,38 @@ public interface Repository
      * {@link #expireNotFoundCaches(ResourceStoreRequest)} on proxy repositories. Moreover, on group repositories, this
      * call is propagated to it's member repositories!
      * 
-     * @param path a path from to start descending. If null, it is taken as "root".
+     * @param request a path from to start descending. If null, it is taken as "root".
+     * @param filter to apply or {@code null} for "all".
+     * @return {@code true} if cache modified.
+     * @since 2.1
      */
-    void expireCaches( ResourceStoreRequest request );
+    boolean expireCaches( ResourceStoreRequest request, WalkerFilter filter );
+
+    /**
+     * Purges the NFC caches from path and below. This methods delegates to
+     * {@link #expireNotFoundCaches(ResourceStoreRequest, WalkerFilter)} method using {@code null} for filter.
+     * 
+     * @param request
+     */
+    void expireNotFoundCaches( ResourceStoreRequest request );
 
     /**
      * Purges the NFC caches from path and below.
      * 
-     * @param path
+     * @param request
+     * @param filter to apply or {@code null} for "all".
+     * @return {@code true} if cache modified.
+     * @since 2.1
      */
-    void expireNotFoundCaches( ResourceStoreRequest request );
+    boolean expireNotFoundCaches( ResourceStoreRequest request, WalkerFilter filter );
+
+    /**
+     * Returns the meta data manager instance of this repository.
+     * 
+     * @return
+     * @since 2.1
+     */
+    RepositoryMetadataManager getRepositoryMetadataManager();
 
     /**
      * Evicts items that were last used before timestamp.
