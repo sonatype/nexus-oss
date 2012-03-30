@@ -53,6 +53,7 @@
     <nexus.start.command>start</nexus.start.command>
     <nexus.root.dir>${project.build.directory}/nexus</nexus.root.dir>
     <nexus.base.dir>${nexus.root.dir}/nexus-professional-${nexus.version}</nexus.base.dir>
+    <nexus.plugin.dir>${nexus.base.dir}/nexus/WEB-INF/plugin-repository</nexus.plugin.dir>
     <nexus.exec>${nexus.base.dir}/bin/nexus</nexus.exec>
     <nexus.work.dir>${project.build.directory}/test-classes/nexus/sonatype-work/nexus</nexus.work.dir>
     <nexus.port>8080</nexus.port>
@@ -353,7 +354,8 @@
             <phase>pre-integration-test</phase>
             <configuration>
               <target>
-                <unzip src="${project.build.directory}/${project.build.finalName}-bundle.zip" dest="${nexus.work.dir}/plugin-repository" />
+                <delete dir="${nexus.plugin.dir}/${project.artifactId}*" />
+                <unzip src="${project.build.directory}/${project.build.finalName}-bundle.zip" dest="${nexus.plugin.dir}" />
                 <copy file="${project.build.directory}/test-classes/nexus/wrapper-override.conf" todir="${nexus.base.dir}/conf/" />
                 <exec executable="${nexus.exec}">
                   <arg value="${nexus.start.command}" />
