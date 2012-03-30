@@ -352,8 +352,7 @@ public class ResourceStoreRequest
         StringBuffer sb = new StringBuffer( getClass().getSimpleName() );
         sb.append( "(requestPath=\"" );
         sb.append( getRequestPath() );
-        sb.append( "\") " );
-        sb.append( super.toString() );
+        sb.append( "\")" );
         return sb.toString();
     }
 }
