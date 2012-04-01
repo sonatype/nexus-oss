@@ -444,6 +444,7 @@
         var itemCount = welcomePanelConfig.items.length;
 
         Sonatype.Events.fireEvent('welcomePanelInit', this, welcomePanelConfig);
+        Sonatype.Events.fireEvent('welcomeTabInit', this, welcomeTabConfig);
 
         // If nothing was added, then add the default blurb, if perm'd of course
         if (welcomePanelConfig.items.length <= itemCount && sp.checkPermission('nexus:repostatus', sp.READ))
