@@ -1,4 +1,4 @@
-<ehcache updateCheck="true">
+<ehcache updateCheck="fale">
     
     <defaultCache
             maxElementsInMemory="1000"
