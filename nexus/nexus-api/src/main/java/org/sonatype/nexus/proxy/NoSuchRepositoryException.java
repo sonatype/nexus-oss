@@ -22,9 +22,26 @@ public class NoSuchRepositoryException
 {
     private static final long serialVersionUID = 299346983704055394L;
 
-    public NoSuchRepositoryException( String repoId )
+    /**
+     * Constructs a new exception with message based on passed in Repository ID.
+     * 
+     * @param repoId
+     */
+    public NoSuchRepositoryException( final String repoId )
     {
-        super( "Repository", repoId );
+        super( "Repository with ID=\"" + repoId + "\" not found!" );
     }
 
+    /**
+     * Constructs a new exception with the specified detail message and cause. Usable in cases where repository ID is
+     * unknown from the current context, only the fact is known it is not (yet) present.
+     * 
+     * @param msg message
+     * @param t the cause
+     * @since 2.1
+     */
+    public NoSuchRepositoryException( final String msg, final Throwable t )
+    {
+        super( msg, t );
+    }
 }
