@@ -12,12 +12,21 @@
  */
 package org.sonatype.nexus.proxy;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
+import org.sonatype.nexus.configuration.model.CLocalStorage;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCacheCreate;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCacheUpdate;
@@ -25,8 +34,15 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
+import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.AbstractRequestProcessor;
+import org.sonatype.nexus.proxy.repository.GroupItemNotFoundException;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
+
+import com.google.common.base.Strings;
 
 public class SimplePullTest
     extends AbstractProxyTestEnvironment
@@ -115,14 +131,14 @@ public class SimplePullTest
         // we should have listed in root only those things/dirs we pulled, se above!
         // ".nexus" is here too!
         assertEquals( 5, dir.size() );
-        
+
         // SO FAR, IT's OLD Unit test, except CacheCreate events were changed (it was Cache event).
         // Now below, we add some more, to cover NXCM-3525 too:
 
         // NXCM-3525
         // Now we expire local cache, and touch the "remote" files to make it newer and hence, to
         // make nexus refetch them and do all the pulls again:
-        
+
         // expire caches
         getRepositoryRegistry().getRepository( "repo1" ).expireCaches( new ResourceStoreRequest( "/" ) );
         getRepositoryRegistry().getRepository( "repo2" ).expireCaches( new ResourceStoreRequest( "/" ) );
@@ -354,7 +370,116 @@ public class SimplePullTest
             crp.getReferredCount() );
     }
 
+    @Test
+    public void testNexus4985GroupsShouldNotSwallowMemberExceptions()
+        throws Exception
+    {
+        // add another group to make things a bit hairier
+        {
+            M2GroupRepository group = (M2GroupRepository) lookup( GroupRepository.class, "maven2" );
+
+            CRepository repoGroupConf = new DefaultCRepository();
+
+            repoGroupConf.setProviderRole( GroupRepository.class.getName() );
+            repoGroupConf.setProviderHint( "maven2" );
+            repoGroupConf.setId( "another-test" );
+
+            repoGroupConf.setLocalStorage( new CLocalStorage() );
+            repoGroupConf.getLocalStorage().setProvider( "file" );
+            repoGroupConf.getLocalStorage().setUrl(
+                getApplicationConfiguration().getWorkingDirectory( "proxy/store/another-test" ).toURI().toURL().toString() );
+
+            Xpp3Dom exGroupRepo = new Xpp3Dom( "externalConfiguration" );
+            repoGroupConf.setExternalConfiguration( exGroupRepo );
+            M2GroupRepositoryConfiguration exGroupRepoConf = new M2GroupRepositoryConfiguration( exGroupRepo );
+            // members are "test" (an existing group, to have group of group) and repo1 that is already member via
+            // "test"
+            exGroupRepoConf.setMemberRepositoryIds( Arrays.asList( "test", "repo1" ) );
+            exGroupRepoConf.setMergeMetadata( true );
+            group.configure( repoGroupConf );
+            getApplicationConfiguration().getConfigurationModel().addRepository( repoGroupConf );
+            getRepositoryRegistry().addRepository( group );
+        }
+
+        // now put a hosted repository "inhouse-snapshot" out of service to make output nicer
+        final Repository inhouseSnapshot = getRepositoryRegistry().getRepository( "inhouse-snapshot" );
+        inhouseSnapshot.setLocalStatus( LocalStatus.OUT_OF_SERVICE );
+        inhouseSnapshot.commitChanges();
+
+        // so far, what we did: we had few reposes and a group called "test" (that had all the reposes as members).
+        // now, we added test and repo1 reposes ta a newly created group, to have groups of groups.
+        // we also put a member repo "inhouse-snapshot" out of service.
+
+        // now we ask for something that IS KNOWN TO NOT EXISTS, hence, request will arrive to all members
+        // and members of members (recursively), and the response will form a nice tree
+
+        final GroupRepository group =
+            getRepositoryRegistry().getRepositoryWithFacet( "another-test", GroupRepository.class );
+
+        try
+        {
+            group.retrieveItem( new ResourceStoreRequest( "/some/path/that/we/know/is/not/existing/123456/12.foo" ) );
+            // anything else should fail
+            Assert.fail( "We expected an exception here!" );
+        }
+        catch ( GroupItemNotFoundException e )
+        {
+            final String dumpStr = dumpNotFoundReasoning( e, 0 );
+
+            // just for eyes
+            System.out.println( dumpStr );
+
+            // Asserts
+            // one repo is out of service, this class simple name must exists, one of them
+            assertThat( dumpStr, containsString( RepositoryNotAvailableException.class.getSimpleName() ) );
+            assertThat( countOccurence( dumpStr, RepositoryNotAvailableException.class.getSimpleName() ), equalTo( 1 ));
+            // groups are throwing this one, 2 of them
+            assertThat( dumpStr, containsString( GroupItemNotFoundException.class.getSimpleName() ) );
+            assertThat( countOccurence( dumpStr, GroupItemNotFoundException.class.getSimpleName() ), equalTo( 2 ));
+            // non-groups are throwing this one, 4 of them (counting with space to not include partial matches against GroupItemNotFoundException)
+            assertThat( dumpStr, containsString( ItemNotFoundException.class.getSimpleName() ) );
+            assertThat( countOccurence( dumpStr, " " + ItemNotFoundException.class.getSimpleName() ), equalTo( 4 ));
+        }
+    }
+
     //
+
+    protected int countOccurence( final String string, final String snippet )
+    {
+        int occurrences = 0;
+        int index = 0;
+        while ( index < string.length() && ( index = string.indexOf( snippet, index ) ) >= 0 )
+        {
+            occurrences++;
+            index = index + snippet.length();
+        }
+        return occurrences;
+    }
+
+    protected String dumpNotFoundReasoning( final Throwable t, int depth )
+    {
+        final StringBuilder sb = new StringBuilder();
+
+        // newline
+        sb.append( "\n" );
+
+        // indent
+        sb.append( Strings.padEnd( "", depth * 2, ' ' ) );
+        sb.append( t.getClass().getSimpleName() ).append( "( " ).append( t.getMessage() ).append( " )" );
+
+        if ( t instanceof GroupItemNotFoundException )
+        {
+            final GroupItemNotFoundException ginf = (GroupItemNotFoundException) t;
+            sb.append( " repo=" ).append( ginf.getRepository().getId() );
+
+            for ( Throwable r : ginf.getMemberReasons().values() )
+            {
+                sb.append( dumpNotFoundReasoning( r, depth + 1 ) );
+            }
+        }
+
+        return sb.toString();
+    }
 
     public static class CounterRequestProcessor
         extends AbstractRequestProcessor
