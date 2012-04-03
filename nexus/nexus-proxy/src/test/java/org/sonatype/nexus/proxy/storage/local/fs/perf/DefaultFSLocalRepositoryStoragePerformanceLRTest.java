@@ -19,7 +19,6 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -53,7 +52,6 @@ import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
 import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
-import com.google.common.collect.Maps;
 
 /**
  *
@@ -92,7 +90,6 @@ public class DefaultFSLocalRepositoryStoragePerformanceLRTest
         Wastebasket wastebasket = mock( Wastebasket.class );
         LinkPersister linkPersister = mock( LinkPersister.class );
         MimeSupport mimeSupport = mock( MimeSupport.class );
-        Map<String, Long> repositoryContexts = Maps.newHashMap();
 
         // Application Config
         applicationConfiguration = mock( ApplicationConfiguration.class );
@@ -117,15 +114,15 @@ public class DefaultFSLocalRepositoryStoragePerformanceLRTest
 
         // setup the class under test
         localRepositoryStorageUnderTest =
-            new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeSupport, repositoryContexts,
-                new DefaultFSPeer() );
+            new DefaultFSLocalRepositoryStorage( wastebasket, linkPersister, mimeSupport, new DefaultFSPeer() );
 
         // this test expects "old" behaviour:
         ( (DefaultAttributesHandler) repository.getAttributesHandler() ).setLastRequestedResolution( 0 );
 
         // prime the retrieve
         ResourceStoreRequest resourceRequest = new ResourceStoreRequest( testFilePath );
-        originalLastAccessTime = localRepositoryStorageUnderTest.retrieveItem( repository, resourceRequest ).getLastRequested();
+        originalLastAccessTime =
+            localRepositoryStorageUnderTest.retrieveItem( repository, resourceRequest ).getLastRequested();
 
         // sleep so we are sure the clock is different when we validate the last update time.
         Thread.sleep( 2 );
@@ -135,8 +132,7 @@ public class DefaultFSLocalRepositoryStoragePerformanceLRTest
     {
         // Mock out the events
         DefaultFSAttributeStorage attributeStorage =
-            new DefaultFSAttributeStorage( applicationConfiguration,
-                new XStreamMarshaller() );
+            new DefaultFSAttributeStorage( applicationConfiguration, new XStreamMarshaller() );
         attributeStorage.initializeWorkingDirectory();
 
         return attributeStorage;

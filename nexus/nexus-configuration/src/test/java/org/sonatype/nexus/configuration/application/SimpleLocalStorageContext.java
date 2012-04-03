@@ -24,11 +24,20 @@ public class SimpleLocalStorageContext
 {
     private Map<String, Object> ctx = new HashMap<String, Object>();
 
+    @Override
     public long getLastChanged()
     {
         return 0;
     }
 
+    @Override
+    public int getGeneration()
+    {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
     public RemoteStorageContext getParentStorageContext()
     {
         return null;
@@ -39,27 +48,32 @@ public class SimpleLocalStorageContext
         return ctx;
     }
 
+    @Override
     public Object getContextObject( String key )
     {
         return ctx.get( key );
     }
 
+    @Override
     public void putContextObject( String key, Object value )
     {
         ctx.put( key, value );
     }
 
+    @Override
     public void removeContextObject( String key )
     {
         ctx.remove( key );
     }
 
+    @Override
     public void setParentStorageContext( StorageContext parent )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
+    @Override
     public boolean hasContextObject( String key )
     {
         return false;

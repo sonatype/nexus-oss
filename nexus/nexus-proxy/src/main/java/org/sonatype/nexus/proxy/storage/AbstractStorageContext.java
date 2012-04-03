@@ -13,6 +13,7 @@
 package org.sonatype.nexus.proxy.storage;
 
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 
@@ -25,32 +26,58 @@ public abstract class AbstractStorageContext
     extends AbstractLoggingComponent
     implements StorageContext
 {
-    private final HashMap<String, Object> context = new HashMap<String, Object>();
+    private final HashMap<String, Object> context;
 
-    private long lastChanged = System.currentTimeMillis();
+    private final StorageContext parent;
 
-    private StorageContext parent;
+    private AtomicInteger generation;
 
-    public AbstractStorageContext( StorageContext parent )
+    @Deprecated
+    private long changeTimestamp;
+
+    protected AbstractStorageContext( StorageContext parent )
     {
-        setParentStorageContext( parent );
+        this.context = new HashMap<String, Object>();
+        this.parent = parent;
+        this.generation = new AtomicInteger( 0 );
+        this.changeTimestamp = System.currentTimeMillis();
     }
 
-    public long getLastChanged()
+    public synchronized int getGeneration()
     {
         if ( parent != null )
         {
-            return parent.getLastChanged() > lastChanged ? parent.getLastChanged() : lastChanged;
+            int parentGeneration = parent.getGeneration();
+
+            if ( parentGeneration > generation.get() )
+            {
+                this.generation.set( parentGeneration );
+            }
         }
-        else
-        {
-            return lastChanged;
-        }
+
+        return generation.get();
     }
 
-    protected void setLastChanged( long ts )
+    @Deprecated
+    public synchronized long getLastChanged()
     {
-        lastChanged = ts;
+        if ( parent != null )
+        {
+            final long parentChangeTimestamp = parent.getLastChanged();
+
+            if ( parentChangeTimestamp > changeTimestamp )
+            {
+                return parentChangeTimestamp;
+            }
+        }
+
+        return changeTimestamp;
+    }
+
+    protected synchronized void incrementGeneration()
+    {
+        generation.incrementAndGet();
+        changeTimestamp = System.currentTimeMillis();
     }
 
     public StorageContext getParentStorageContext()
@@ -60,7 +87,9 @@ public abstract class AbstractStorageContext
 
     public void setParentStorageContext( StorageContext parent )
     {
-        this.parent = parent;
+        // noop
+        getLogger().warn(
+            "Class {} uses illegal method invocation, org.sonatype.nexus.proxy.storage.AbstractStorageContext.setParentStorageContext( StorageContext ), please update the code!" );
     }
 
     public Object getContextObject( String key )
@@ -68,7 +97,7 @@ public abstract class AbstractStorageContext
         return getContextObject( key, true );
     }
 
-    public Object getContextObject( final String key, final boolean fallbackToParent )
+    public synchronized Object getContextObject( final String key, final boolean fallbackToParent )
     {
         if ( context.containsKey( key ) )
         {
@@ -84,20 +113,20 @@ public abstract class AbstractStorageContext
         }
     }
 
-    public void putContextObject( String key, Object value )
+    public synchronized void putContextObject( String key, Object value )
     {
         final Object previous = context.put( key, value );
 
-        setLastChanged( System.currentTimeMillis() );
-        getLogger().debug( "Context entry '{}' updated: {} -> {}", new Object[]{ key, previous, value } );
+        incrementGeneration();
+        getLogger().debug( "Context entry \"{}\" updated: {} -> {}", new Object[] { key, previous, value } );
     }
 
-    public void removeContextObject( String key )
+    public synchronized void removeContextObject( String key )
     {
         final Object removed = context.remove( key );
 
-        setLastChanged( System.currentTimeMillis() );
-        getLogger().debug( "Context entry '{}' removed. Existent value: ", key, removed );
+        incrementGeneration();
+        getLogger().debug( "Context entry \"{}\" removed. Existent value: ", key, removed );
     }
 
     public boolean hasContextObject( String key )
@@ -108,7 +137,6 @@ public abstract class AbstractStorageContext
     @Override
     public String toString()
     {
-        return getClass().getName() + "{lastChanged=" + lastChanged + ", parent=" + parent + "}";
+        return getClass().getName() + "{generation=" + generation + ", parent=" + parent + "}";
     }
-
 }

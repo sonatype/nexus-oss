@@ -24,7 +24,7 @@ public class DefaultLocalStorageContext
     extends AbstractStorageContext
     implements LocalStorageContext
 {
-    public DefaultLocalStorageContext( StorageContext parent )
+    public DefaultLocalStorageContext( final StorageContext parent )
     {
         super( parent );
     }

@@ -31,119 +31,146 @@ public class HttpClientProxyUtilTest
 {
     private final Logger logger = LoggerFactory.getLogger( getClass() );
 
+    private final RemoteConnectionSettings remoteConnectionSettings = new RemoteConnectionSettings()
+    {
+        @Override
+        public void setUserAgentCustomizationString( String userAgentCustomizationString )
+        {
+        }
+
+        @Override
+        public void setRetrievalRetryCount( int retrievalRetryCount )
+        {
+        }
+
+        @Override
+        public void setQueryString( String queryString )
+        {
+        }
+
+        @Override
+        public void setConnectionTimeout( int connectionTimeout )
+        {
+        }
+
+        @Override
+        public String getUserAgentCustomizationString()
+        {
+            return null;
+        }
+
+        @Override
+        public int getRetrievalRetryCount()
+        {
+            return 3;
+        }
+
+        @Override
+        public String getQueryString()
+        {
+            return null;
+        }
+
+        @Override
+        public int getConnectionTimeout()
+        {
+            return 12000;
+        }
+    };
+
+    private final RemoteProxySettings remoteProxySettings = new RemoteProxySettings()
+    {
+        @Override
+        public void setProxyAuthentication( RemoteAuthenticationSettings proxyAuthentication )
+        {
+        }
+
+        @Override
+        public void setPort( int port )
+        {
+        }
+
+        @Override
+        public void setNonProxyHosts( Set<String> nonProxyHosts )
+        {
+        }
+
+        @Override
+        public void setHostname( String hostname )
+        {
+        }
+
+        @Override
+        public void setBlockInheritance( boolean val )
+        {
+        }
+
+        @Override
+        public boolean isEnabled()
+        {
+            return false;
+        }
+
+        @Override
+        public boolean isBlockInheritance()
+        {
+            return false;
+        }
+
+        @Override
+        public RemoteAuthenticationSettings getProxyAuthentication()
+        {
+            return null;
+        }
+
+        @Override
+        public int getPort()
+        {
+            return 0;
+        }
+
+        @Override
+        public Set<String> getNonProxyHosts()
+        {
+            return null;
+        }
+
+        @Override
+        public String getHostname()
+        {
+            return null;
+        }
+    };
+
     @Test
     public void testHttpClientProxyUtilUseDoesNotModifyContext()
         throws Exception
     {
-        final RemoteConnectionSettings remoteConnectionSettings = new RemoteConnectionSettings()
-        {
-            @Override
-            public void setUserAgentCustomizationString( String userAgentCustomizationString )
-            {
-            }
+        final DefaultRemoteStorageContext ctx = new DefaultRemoteStorageContext( null );
+        ctx.setRemoteConnectionSettings( remoteConnectionSettings );
+        ctx.setRemoteProxySettings( remoteProxySettings );
 
-            @Override
-            public void setRetrievalRetryCount( int retrievalRetryCount )
-            {
-            }
+        final HttpClient httpClient = new HttpClient();
 
-            @Override
-            public void setQueryString( String queryString )
-            {
-            }
+        // get last changed
+        int lastChanged = ctx.getGeneration();
 
-            @Override
-            public void setConnectionTimeout( int connectionTimeout )
-            {
-            }
+        // 1st invocation, should modify it
+        HttpClientProxyUtil.applyProxyToHttpClient( httpClient, ctx, logger );
+        assertThat( ctx.getGeneration(), greaterThan( lastChanged ) );
 
-            @Override
-            public String getUserAgentCustomizationString()
-            {
-                return null;
-            }
+        // get last changed
+        lastChanged = ctx.getGeneration();
 
-            @Override
-            public int getRetrievalRetryCount()
-            {
-                return 3;
-            }
+        // now 2nd invocation, should not change
+        HttpClientProxyUtil.applyProxyToHttpClient( httpClient, ctx, logger );
+        assertThat( ctx.getGeneration(), equalTo( lastChanged ) );
+    }
 
-            @Override
-            public String getQueryString()
-            {
-                return null;
-            }
-
-            @Override
-            public int getConnectionTimeout()
-            {
-                return 12000;
-            }
-        };
-        final RemoteProxySettings remoteProxySettings = new RemoteProxySettings()
-        {
-            @Override
-            public void setProxyAuthentication( RemoteAuthenticationSettings proxyAuthentication )
-            {
-            }
-
-            @Override
-            public void setPort( int port )
-            {
-            }
-
-            @Override
-            public void setNonProxyHosts( Set<String> nonProxyHosts )
-            {
-            }
-
-            @Override
-            public void setHostname( String hostname )
-            {
-            }
-
-            @Override
-            public void setBlockInheritance( boolean val )
-            {
-            }
-
-            @Override
-            public boolean isEnabled()
-            {
-                return false;
-            }
-
-            @Override
-            public boolean isBlockInheritance()
-            {
-                return false;
-            }
-
-            @Override
-            public RemoteAuthenticationSettings getProxyAuthentication()
-            {
-                return null;
-            }
-
-            @Override
-            public int getPort()
-            {
-                return 0;
-            }
-
-            @Override
-            public Set<String> getNonProxyHosts()
-            {
-                return null;
-            }
-
-            @Override
-            public String getHostname()
-            {
-                return null;
-            }
-        };
+    @Test
+    public void testHttpClientProxyUtilUseDoesNotModifyContextUsingDeprecatedMethod()
+        throws Exception
+    {
         final DefaultRemoteStorageContext ctx = new DefaultRemoteStorageContext( null );
         ctx.setRemoteConnectionSettings( remoteConnectionSettings );
         ctx.setRemoteProxySettings( remoteProxySettings );
@@ -153,7 +180,7 @@ public class HttpClientProxyUtilTest
         // get last changed
         long lastChanged = ctx.getLastChanged();
         // making sure we will have subtraction result grater than 0
-        Thread.sleep( 5 );
+        Thread.sleep( 15 );
 
         // 1st invocation, should modify it
         HttpClientProxyUtil.applyProxyToHttpClient( httpClient, ctx, logger );
@@ -162,11 +189,10 @@ public class HttpClientProxyUtilTest
         // get last changed
         lastChanged = ctx.getLastChanged();
         // making sure we will have subtraction result grater than 0
-        Thread.sleep( 5 );
+        Thread.sleep( 15 );
 
         // now 2nd invocation, should not change
         HttpClientProxyUtil.applyProxyToHttpClient( httpClient, ctx, logger );
         assertThat( ctx.getLastChanged(), equalTo( lastChanged ) );
     }
-
 }

@@ -28,56 +28,66 @@ public class DefaultRemoteStorageContext
     extends AbstractStorageContext
     implements RemoteStorageContext
 {
-    public DefaultRemoteStorageContext( StorageContext parent )
+    public DefaultRemoteStorageContext( final StorageContext parent )
     {
         super( parent );
     }
 
+    @Override
     public boolean hasRemoteAuthenticationSettings()
     {
         return hasContextObject( RemoteAuthenticationSettings.class.getName() );
     }
 
+    @Override
     public RemoteAuthenticationSettings getRemoteAuthenticationSettings()
     {
         return (RemoteAuthenticationSettings) getContextObject( RemoteAuthenticationSettings.class.getName() );
     }
 
+    @Override
     public void setRemoteAuthenticationSettings( RemoteAuthenticationSettings settings )
     {
         putContextObject( RemoteAuthenticationSettings.class.getName(), settings );
     }
 
+    @Override
     public void removeRemoteAuthenticationSettings()
     {
         removeContextObject( RemoteAuthenticationSettings.class.getName() );
     }
 
+    @Override
     public boolean hasRemoteConnectionSettings()
     {
         return hasContextObject( RemoteConnectionSettings.class.getName() );
     }
 
+    @Override
     public RemoteConnectionSettings getRemoteConnectionSettings()
     {
         return (RemoteConnectionSettings) getContextObject( RemoteConnectionSettings.class.getName() );
     }
 
+    @Override
     public void setRemoteConnectionSettings( RemoteConnectionSettings settings )
     {
         putContextObject( RemoteConnectionSettings.class.getName(), settings );
     }
 
+    @Override
     public void removeRemoteConnectionSettings()
     {
         removeContextObject( RemoteConnectionSettings.class.getName() );
     }
 
+    @Override
     public boolean hasRemoteProxySettings()
     {
         return hasContextObject( RemoteProxySettings.class.getName() );
     }
 
+    @Override
     public RemoteProxySettings getRemoteProxySettings()
     {
         // we have a special case here, need to track blockInheritance flag
@@ -119,11 +129,13 @@ public class DefaultRemoteStorageContext
         }
     }
 
+    @Override
     public void setRemoteProxySettings( RemoteProxySettings settings )
     {
         putContextObject( RemoteProxySettings.class.getName(), settings );
     }
 
+    @Override
     public void removeRemoteProxySettings()
     {
         removeContextObject( RemoteProxySettings.class.getName() );

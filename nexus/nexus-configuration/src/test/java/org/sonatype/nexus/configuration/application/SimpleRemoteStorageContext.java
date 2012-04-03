@@ -26,11 +26,20 @@ public class SimpleRemoteStorageContext
 {
     private Map<String, Object> ctx = new HashMap<String, Object>();
 
+    @Override
     public long getLastChanged()
     {
         return 0;
     }
 
+    @Override
+    public int getGeneration()
+    {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
     public RemoteStorageContext getParentStorageContext()
     {
         return null;
@@ -41,73 +50,81 @@ public class SimpleRemoteStorageContext
         return ctx;
     }
 
+    @Override
     public Object getContextObject( String key )
     {
         return ctx.get( key );
     }
 
+    @Override
     public void putContextObject( String key, Object value )
     {
         ctx.put( key, value );
     }
 
+    @Override
     public void removeContextObject( String key )
     {
         ctx.remove( key );
     }
 
-    public void setLastChanged( long ts )
-    {
-    }
-
+    @Override
     public RemoteAuthenticationSettings getRemoteAuthenticationSettings()
     {
         // TODO Auto-generated method stub
         return null;
     }
 
+    @Override
     public RemoteConnectionSettings getRemoteConnectionSettings()
     {
         // TODO Auto-generated method stub
         return null;
     }
 
+    @Override
     public RemoteProxySettings getRemoteProxySettings()
     {
         // TODO Auto-generated method stub
         return null;
     }
 
+    @Override
     public void setRemoteAuthenticationSettings( RemoteAuthenticationSettings settings )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
+    @Override
     public void setRemoteConnectionSettings( RemoteConnectionSettings settings )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
+    @Override
     public void setRemoteProxySettings( RemoteProxySettings settings )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
+    @Override
     public boolean hasRemoteAuthenticationSettings()
     {
         // TODO Auto-generated method stub
         return false;
     }
 
+    @Override
     public boolean hasContextObject( String key )
     {
         // TODO Auto-generated method stub
         return false;
     }
 
+    @Override
     public boolean hasRemoteConnectionSettings()
     {
         // TODO Auto-generated method stub
@@ -123,25 +140,25 @@ public class SimpleRemoteStorageContext
     public void removeRemoteAuthenticationSettings()
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void removeRemoteConnectionSettings()
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void removeRemoteProxySettings()
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void setParentStorageContext( StorageContext parent )
     {
         // TODO Auto-generated method stub
-        
+
     }
 
 }
