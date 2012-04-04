@@ -89,7 +89,8 @@ public abstract class AbstractStorageContext
     {
         // noop
         getLogger().warn(
-            "Class {} uses illegal method invocation, org.sonatype.nexus.proxy.storage.AbstractStorageContext.setParentStorageContext( StorageContext ), please update the code!" );
+            "Class {} uses illegal method invocation, org.sonatype.nexus.proxy.storage.AbstractStorageContext.setParentStorageContext( StorageContext ), please update the code!",
+            getClass().getName() );
     }
 
     public Object getContextObject( String key )
