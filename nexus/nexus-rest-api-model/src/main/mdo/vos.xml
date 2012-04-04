@@ -3115,6 +3115,27 @@
           <required>true</required>
           <description>The base url of the nexus instance.</description>
         </field>
+        <field>
+          <name>licenseInstalled</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Flag that states if currently there is a license installed.</description>
+        </field>
+        <field>
+          <name>licenseExpired</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Flag that states if current installed license is expired.</description>
+        </field>
+        <field>
+          <name>trialLicense</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Flag that states if current installed license is a trial license.</description>
+        </field>
       </fields>
     </class>
 

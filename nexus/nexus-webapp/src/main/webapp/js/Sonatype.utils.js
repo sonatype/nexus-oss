@@ -839,6 +839,9 @@
                 Sonatype.utils.attributionsURL = respObj.data.attributionsURL;
                 Sonatype.utils.purchaseURL = respObj.data.purchaseURL;
                 Sonatype.utils.userLicenseURL = respObj.data.userLicenseURL;
+                Sonatype.utils.licenseInstalled = respObj.data.licenseInstalled;
+                Sonatype.utils.licenseExpired = respObj.data.licenseExpired;
+                Sonatype.utils.trialLicense = respObj.data.trialLicense;
 
                 Sonatype.utils.formattedAppName = Sonatype.utils.parseFormattedAppName(respObj.data.formattedAppName);
 
@@ -857,6 +860,9 @@
               else
               {
                 Sonatype.utils.edition = '';
+                Sonatype.utils.licenseInstalled = null;
+                Sonatype.utils.licenseExpired = null;
+                Sonatype.utils.trialLicense = null;
 
                 Sonatype.user.curr.repoServer = null;
                 Sonatype.user.curr.isLoggedIn = null;
