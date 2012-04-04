@@ -26,7 +26,9 @@ import org.sonatype.nexus.configuration.ConfigurationSaveEvent;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.proxy.storage.local.DefaultLocalStorageContext;
 import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
+import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.test.NexusTestSupport;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
@@ -41,9 +43,9 @@ public class SimpleApplicationConfiguration
 
     private Configuration configuration;
 
-    private LocalStorageContext localStorageContext = new SimpleLocalStorageContext();
+    private LocalStorageContext localStorageContext = new DefaultLocalStorageContext( null );
 
-    private RemoteStorageContext remoteStorageContext = new SimpleRemoteStorageContext();
+    private RemoteStorageContext remoteStorageContext = new DefaultRemoteStorageContext( null );
 
     private File workingDirectory;
 
