@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -33,7 +34,7 @@
     <repository>
       <id>releases</id>
       <name>Local Repository</name>
-      <url>${nexus.url}/content/repositories/releases/</url>
+      <url>${nexus.url}/content/repositories/production/</url>
     </repository>
     <snapshotRepository>
       <id>snapshots</id>
@@ -99,7 +100,7 @@
       <version>4.8.2</version>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- #ITSet BEGINS -->
     <!-- Nexus IT setup (dependencies below are needed if you have extensive 
       ITs and you want to use Nexus Environment) -->
@@ -266,7 +267,7 @@
           <target>1.6</target>
         </configuration>
       </plugin>
-      
+
       <!-- Fork Tests because of problems with Sisu-Guice-Version -->
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
@@ -347,6 +348,21 @@
         <version>1.6</version>
         <executions>
           <execution>
+            <id>build-rpm</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <tasks>
+                <property name="project.build.finalName" value="${project.build.finalName}" />
+                <ant antfile="${project.basedir}\build-rpm.xml">
+                  <target name="rpm" />
+                </ant>
+              </tasks>
+            </configuration>
+          </execution>
+          <execution>
             <id>install-yum-plugin-and-start-nexus</id>
             <goals>
               <goal>run</goal>
@@ -355,15 +371,21 @@
             <configuration>
               <target>
                 <delete dir="${nexus.plugin.dir}/${project.artifactId}*" />
-                <unzip src="${project.build.directory}/${project.build.finalName}-bundle.zip" dest="${nexus.plugin.dir}" />
-                <copy file="${project.build.directory}/test-classes/nexus/wrapper-override.conf" todir="${nexus.base.dir}/conf/" />
+                <unzip
+                  src="${project.build.directory}/${project.build.finalName}-bundle.zip"
+                  dest="${nexus.plugin.dir}" />
+                <copy
+                  file="${project.build.directory}/test-classes/nexus/wrapper-override.conf"
+                  todir="${nexus.base.dir}/conf/" />
                 <exec executable="${nexus.exec}">
                   <arg value="${nexus.start.command}" />
                   <env key="PLEXUS_NEXUS_WORK" value="${nexus.work.dir}" />
                   <env key="PLEXUS_APPLICATION_PORT" value="${nexus.port}" />
                 </exec>
-                <waitfor maxwait="2" maxwaitunit="minute" checkevery="10" checkeveryunit="second">
-                  <http url="http://localhost:${nexus.port}/nexus/index.html" />
+                <waitfor maxwait="2" maxwaitunit="minute"
+                  checkevery="10" checkeveryunit="second">
+                  <http
+                    url="http://localhost:${nexus.port}/nexus/index.html" />
                 </waitfor>
               </target>
             </configuration>
@@ -385,8 +407,15 @@
             </configuration>
           </execution>
         </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.redline-rpm</groupId>
+            <artifactId>redline</artifactId>
+            <version>1.1.9</version>
+          </dependency>
+        </dependencies>
       </plugin>
-      
+
       <!-- run integration tests -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
