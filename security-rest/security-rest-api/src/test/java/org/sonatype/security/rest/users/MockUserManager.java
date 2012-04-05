@@ -1,15 +1,14 @@
 /**
- * Sonatype Nexus (TM) Open Source Version.
- * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
- * Includes the third-party code listed at http://nexus.sonatype.org/dev/attributions.html
- * This program is licensed to you under Version 3 only of the GNU General Public License as published by the Free Software Foundation.
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License Version 3 for more details.
- * You should have received a copy of the GNU General Public License Version 3 along with this program.
- * If not, see http://www.gnu.org/licenses/.
- * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
- * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
+ * Copyright (c) 2007-2012 Sonatype, Inc. All rights reserved.
+ *
+ * This program is licensed to you under the Apache License Version 2.0,
+ * and you may not use this file except in compliance with the Apache License Version 2.0.
+ * You may obtain a copy of the Apache License Version 2.0 at http://www.apache.org/licenses/LICENSE-2.0.
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the Apache License Version 2.0 is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
 package org.sonatype.security.rest.users;
 
