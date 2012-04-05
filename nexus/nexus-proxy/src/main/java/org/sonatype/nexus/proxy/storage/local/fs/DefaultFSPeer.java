@@ -453,7 +453,7 @@ public class DefaultFSPeer
                         + " ms intervals " + hiddenTarget.getAbsolutePath() + " --> " + target.getAbsolutePath() );
 
                 throw new IOException( "Cannot rename file \"" + hiddenTarget.getAbsolutePath() + "\" to \""
-                    + target.getAbsolutePath() + "\"! " + e.getMessage() );
+                    + target.getAbsolutePath() + "\"! " + e.getMessage(), e );
             }
         }
     }
